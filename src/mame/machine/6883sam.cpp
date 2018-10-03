@@ -156,6 +156,9 @@ void sam6883_device::configure_bank(int bank, uint8_t *memory, uint32_t memory_s
 	/* if we're configuring a bank that never changes, update it now */
 	switch(bank)
 	{
+		case 3:
+			m_space_C000.point(m_banks[3], m_banks[3].m_memory_offset);
+			break;
 		case 4:
 			m_space_FF00.point(m_banks[4], 0x0000);
 			break;

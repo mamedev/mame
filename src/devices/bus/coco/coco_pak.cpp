@@ -199,7 +199,7 @@ uint8_t *coco_pak_banked_device::get_cart_base()
 
 uint32_t coco_pak_banked_device::get_cart_size()
 {
-	return 0x4000;
+	return 0x20000;
 }
 
 //-------------------------------------------------
