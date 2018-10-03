@@ -21,7 +21,7 @@
 	"uniforms": [
 		{
 			"name": "s_tex",
-			"type": "int", 
+			"type": "int",
 			"values": [ 1.0 ]
 		}, {
 			"name": "s_3dlut",
