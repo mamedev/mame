@@ -2,6 +2,7 @@
 -- copyright-holders:Carl
 -- data files are json files named <romname>.json
 -- {
+--   "import":"<import filename>"
 --   "ports":{
 --     "<ioport name>":{
 --       "labels":{
@@ -39,19 +40,21 @@ function portname.startplugin()
 		return filename
 	end
 
-	emu.register_start(function()
-		local file = emu.file(ctrlrpath .. "/portname", "r")
-		local ret = file:open(get_filename())
-		if ret then
-			ret = file:open(get_filename(true))
-			if ret then
-				ret = file:open(manager:machine():system().parent .. ".json")
-				if ret then
-					return
-				end
+	local function parse_names(ctable, depth)
+		if depth >= 5 then
+			emu.print_error("portname: max import depth exceeded\n")
+			return
+		end
+		if ctable.import then
+			local file = emu.file(ctrlrpath .. "/portname", "r")
+			local ret = file:open(ctable.import)
+			if not ret then
+				parse_names(json.parse(file:read(file:size())), depth + 1)
 			end
 		end
-		local ctable = json.parse(file:read(file:size()))
+		if not ctable.ports then
+			return
+		end
 		for pname, port in pairs(ctable.ports) do
 			local ioport = manager:machine():ioport().ports[pname]
 			if ioport then
@@ -65,6 +68,35 @@ function portname.startplugin()
 				end
 			end
 		end
+	end
+
+	emu.register_start(function()
+		local file = emu.file(ctrlrpath .. "/portname", "r")
+		local ret = file:open(get_filename())
+		if ret then
+			if emu.softname() ~= "" then
+				local parent
+				for tag, image in pairs(manager:machine().images) do
+					parent = image.software_parent
+					if parent ~= "" then
+						break
+					end
+				end
+				if parent ~= "" then
+					ret = file:open(emu.romname() .. "_" .. parent:match("([^:]*)$")  .. ".json")
+				end
+			end
+			if ret then
+				ret = file:open(get_filename(true))
+				if ret then
+					ret = file:open(manager:machine():system().parent .. ".json")
+					if ret then
+						return
+					end
+				end
+			end
+		end
+		parse_names(json.parse(file:read(file:size())), 0)
 	end)
 
 	local function menu_populate()
