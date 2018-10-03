@@ -531,19 +531,25 @@ uint8_t mcs48_cpu_device::p2_mask()
 
 void mcs48_cpu_device::expander_operation(expander_op operation, uint8_t port)
 {
-	/* put opcode/data on low 4 bits of P2 */
+	// put opcode on low 4 bits of P2 (overwriting latch)
 	port_w(2, m_p2 = (m_p2 & 0xf0) | (uint8_t(operation) << 2) | (port & 3));
 
-	/* generate high-to-low transition on PROG line */
+	// generate high-to-low transition on PROG line
 	prog_w(0);
 
-	/* put data on low 4 bits of P2 */
+	// transfer data on low 4 bits of P2
 	if (operation != EXPANDER_OP_READ)
 		port_w(2, m_p2 = (m_p2 & 0xf0) | (m_a & 0x0f));
 	else
-		m_a = port_r(2) & 0x0f;
+	{
+		// place P20-P23 in input mode
+		port_w(2, m_p2 |= 0x0f);
 
-	/* generate low-to-high transition on PROG line */
+		// input data to lower 4 bits of A (upper 4 bits are cleared)
+		m_a = port_r(2) & 0x0f;
+	}
+
+	// generate low-to-high transition on PROG line
 	prog_w(1);
 }
 
