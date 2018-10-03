@@ -372,7 +372,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pbaction_state::pbactionx)
 	pbaction2(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_CPU_PBACTIO4, 4000000)   /* 4 MHz? */
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5128, 4000000)   /* 4 MHz? */
 	MCFG_DEVICE_PROGRAM_MAP(pbaction_map)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
@@ -548,8 +548,7 @@ void pbaction_state::init_pbactio3()
 }
 
 
-
-
+// some of these are probably bootlegs
 GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pbaction2, pbaction, pbaction2, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 2)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, init_pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
