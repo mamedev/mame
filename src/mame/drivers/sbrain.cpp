@@ -8,10 +8,12 @@ Intertec SuperBrain
 
 Intertec Compustar terminal appears to have identical hardware. Need roms for it.
 
-Chips: 2x Z80; FD1791; 2x 8251; 8255; BR1941; CRT8002; KR3600; DP8350
+Chips: 2x Z80; FD1791; 2x 8251; 8255; BR1941; CRT8002-003; KR3600-056; DP8350; MM5035
 Xtals: 16.0, 10.92, 5.0688
+RAM: 32K or 64K dynamic (TMS4116-20NL); 1K static disk buffer (MM2114)
 Disk parameters: 512 bytes x 10 sectors x 35 tracks. 1 and 2-sided disks supported.
 Sound: Beeper
+Expansion bus: 40 pins, nearly identical to TRS-80
 
 The boot prom is shared between both cpus. This feat is accomplished by holding the sub cpu
  in reset, until the main cpu has prepared a few memory locations. The first thing in the rom
@@ -26,30 +28,31 @@ When booted, the time (corrupted) is displayed at top right. You need to run TIM
 The schematic in parts is difficult to read. Some assumptions have been made.
 
 To Do:
-- Without a disk in, it should display a message to insert a disk. Doesn't happen. May
-  attempt to execute empty memory instead. (-bios 1, -bios 2)
+- Without a disk in, it should display a message to insert a disk. This happens, but only with
+  -bios 0. May attempt to execute empty memory instead. (-bios 1, -bios 2)
 - Improve keyboard.
-- Video chips need to be emulated (CRT8002 and DP8350), attributes etc.
+- Row buffering DMA (DP8350, MM5035) and line-by-line rendering.
+- Proper character generator emulation (CRT8002).
+- Add expansion bus slot.
 - Probably lots of other stuff.
-- PC0 when high will swap out lower 16k of RAM for the DP8350 device. The value of HL (the
-  "memory" address) is the data (cursor location, top of screen, etc). The byte "written"
-  to this address (d0,d1) is the command for the CRTC.
 
 *************************************************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "bus/rs232/rs232.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/wd_fdc.h"
+#include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/dp8350.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include <algorithm>
 
 
 class sbrain_state : public driver_device
@@ -59,42 +62,55 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
-		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
 		, m_crtc(*this, "crtc")
-		, m_u0(*this, "uart0")
-		, m_u1(*this, "uart1")
+		, m_usart(*this, "usart%u", 0U)
+		, m_mainport(*this, "mainport")
 		, m_ppi(*this, "ppi")
-		, m_fdc (*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
-		, m_vs(*this, "VS")
-		, m_bankr0(*this, "bankr0")
-		, m_bankw0(*this, "bankw0")
-		, m_bank2(*this, "bank2")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
+		, m_ram(*this, RAM_TAG)
+		, m_boot_prom(*this, "subcpu")
+		, m_disk_buffer(*this, "buffer")
 		, m_keyboard(*this, "X%u", 0)
+		, m_modifiers(*this, "MODIFIERS")
+		, m_serial_sw(*this, "BAUDCLOCK")
 	{
 	}
 
 	void sbrain(machine_config &config);
 
-	void init_sbrain();
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
-	DECLARE_MACHINE_RESET(sbrain);
-	DECLARE_READ8_MEMBER(ppi_pa_r);
-	DECLARE_WRITE8_MEMBER(ppi_pa_w);
-	DECLARE_READ8_MEMBER(ppi_pb_r);
-	DECLARE_WRITE8_MEMBER(ppi_pb_w);
-	DECLARE_READ8_MEMBER(ppi_pc_r);
-	DECLARE_WRITE8_MEMBER(ppi_pc_w);
-	DECLARE_READ8_MEMBER(port48_r);
-	DECLARE_READ8_MEMBER(port50_r);
-	DECLARE_READ8_MEMBER(port10_r);
-	DECLARE_WRITE8_MEMBER(port10_w);
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u8 mem_r(offs_t offset);
+	void mem_w(offs_t offset, u8 data);
+
+	u8 ppi_pa_r();
+	void ppi_pa_w(u8 data);
+	u8 ppi_pb_r();
+	void ppi_pb_w(u8 data);
+	u8 ppi_pc_r();
+	void ppi_pc_w(u8 data);
+	u8 char_int_ack_r();
+	void char_int_ack_w(u8 data);
+	u8 keyboard_r();
+
+	void disk_select_w(u8 data);
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
+
+	DECLARE_WRITE_LINE_MEMBER(crtc_lrc_w);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vblank_w);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_w);
+
+	DECLARE_WRITE_LINE_MEMBER(external_txc_w);
+	DECLARE_WRITE_LINE_MEMBER(external_rxc_w);
+	DECLARE_WRITE_LINE_MEMBER(internal_txc_rxc_w);
 
 	void sbrain_io(address_map &map);
 	void sbrain_mem(address_map &map);
@@ -107,79 +123,135 @@ private:
 	u8 m_portb;
 	u8 m_portc;
 	u8 m_port10;
-	u8 m_term_data;
+	u8 m_key_data;
 	u8 m_framecnt;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
 	required_device<dp8350_device> m_crtc;
-	required_device<i8251_device> m_u0;
-	required_device<i8251_device> m_u1;
+	required_device_array<i8251_device, 2> m_usart;
+	required_device<rs232_port_device> m_mainport;
 	required_device<i8255_device> m_ppi;
 	required_device<fd1791_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_ioport m_vs;
-	required_memory_bank m_bankr0;
-	required_memory_bank m_bankw0;
-	required_memory_bank m_bank2;
+	required_device_array<floppy_connector, 4> m_floppy;
+	required_device<ram_device> m_ram;
+	required_region_ptr<u8> m_boot_prom;
+	required_shared_ptr<u8> m_disk_buffer;
+
 	required_ioport_array<10> m_keyboard;
+	required_ioport m_modifiers;
+	required_ioport m_serial_sw;
 };
 
 void sbrain_state::sbrain_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
-	map(0x4000, 0x7fff).ram();
-	map(0x8000, 0xbfff).bankrw("bank2");
-	map(0xc000, 0xf7ff).ram();
-	map(0xf800, 0xffff).ram().share("videoram");
+	map(0x0000, 0xffff).rw(FUNC(sbrain_state::mem_r), FUNC(sbrain_state::mem_w));
 }
 
 void sbrain_state::sbrain_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x41).mirror(6).rw(m_u0, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x48, 0x4f).r(FUNC(sbrain_state::port48_r)); //chr_int_latch
-	map(0x50, 0x57).r(FUNC(sbrain_state::port50_r));
-	map(0x58, 0x59).mirror(6).rw(m_u1, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x40, 0x41).mirror(6).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x48, 0x48).mirror(7).rw(FUNC(sbrain_state::char_int_ack_r), FUNC(sbrain_state::char_int_ack_w)); //chr_int_latch
+	map(0x50, 0x50).mirror(7).r(FUNC(sbrain_state::keyboard_r));
+	map(0x58, 0x59).mirror(6).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x60, 0x60).mirror(7).w("brg", FUNC(com8116_device::stt_str_w));
 	map(0x68, 0x6b).mirror(4).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 void sbrain_state::sbrain_submem(address_map &map)
 {
-	map(0x0000, 0x07ff).rom();
-	map(0x8800, 0x8bff).ram().region("subcpu", 0x8800);
+	map(0x0000, 0x07ff).mirror(0xf000).rom().region("subcpu", 0);
+	map(0x8800, 0x8bff).mirror(0x7400).ram().share("buffer");
 }
 
 void sbrain_state::sbrain_subio(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x08, 0x0b).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
-	map(0x10, 0x10).rw(FUNC(sbrain_state::port10_r), FUNC(sbrain_state::port10_w));
+	map.global_mask(0x1f);
+	map(0x08, 0x0b).mirror(4).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
+	map(0x10, 0x10).mirror(7).w(FUNC(sbrain_state::disk_select_w));
 }
 
 
-READ8_MEMBER( sbrain_state::port48_r )
+u8 sbrain_state::mem_r(offs_t offset)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	switch (offset & 0xc000)
+	{
+	case 0x0000:
+		// PPIC-2 set selects boot PROM
+		if (BIT(m_portc, 2))
+			return m_boot_prom[offset & 0x7ff];
+
+		// lowest 16K of RAM is disabled when PPIC-0 is set
+		if (BIT(m_portc, 0))
+			return 0xff;
+		break;
+
+	case 0x8000:
+		// resetting PPIC-4 selects disk buffer RAM
+		if (!BIT(m_portc, 4))
+			return m_disk_buffer[offset & 0x3ff];
+
+		break;
+	}
+
+	return m_ram->read(offset);
+}
+
+void sbrain_state::mem_w(offs_t offset, u8 data)
+{
+	// any memory write affects CRTC when PPIC-0 is set
+	if (BIT(m_portc, 0))
+		m_crtc->register_load(bitswap<2>(data, 0, 1), offset & 0xfff);
+
+	switch (offset & 0xc000)
+	{
+	case 0x0000:
+		// can't write to boot PROM
+		if (BIT(m_portc, 2))
+			return;
+
+		// RAS is disabled for bank 0 when PPIC-0 is set
+		if (BIT(m_portc, 0))
+			return;
+
+		break;
+
+	case 0x8000:
+		// resetting PPIC-4 selects disk buffer RAM
+		if (!BIT(m_portc, 4))
+		{
+			m_disk_buffer[offset & 0x3ff] = data;
+			break;
+		}
+
+		break;
+	}
+
+	m_ram->write(offset, data);
+}
+
+u8 sbrain_state::char_int_ack_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return 0xff;
 }
 
-READ8_MEMBER( sbrain_state::port50_r )
+void sbrain_state::char_int_ack_w(u8 data)
 {
-	return m_term_data;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-READ8_MEMBER( sbrain_state::port10_r )
+u8 sbrain_state::keyboard_r()
 {
-	return m_port10;
+	return m_key_data;
 }
 
 /* Misc disk functions
-d0 : ?
+d0 : busy signal to master CPU
 d1 : SEL A (drive 0?)
 d2 : SEL B (drive 1?)
 d3 : SEL C
@@ -187,24 +259,27 @@ d4 : SEL D
 d5 : side select
 d6,7 : not used
 */
-WRITE8_MEMBER( sbrain_state::port10_w )
+void sbrain_state::disk_select_w(u8 data)
 {
 	m_port10 = data | 0xc0;
 
-	floppy_image_device *floppy = nullptr;
-	if (BIT(m_port10, 1)) floppy = m_floppy0->get_device();
-	if (BIT(m_port10, 2)) floppy = m_floppy1->get_device();
-
-	m_fdc->set_floppy(floppy);
-
-	if (floppy)
-		floppy->ss_w(BIT(m_port10, 5));
-
-	m_floppy0->get_device()->mon_w(0); // motors run all the time
-	m_floppy1->get_device()->mon_w(0);
+	m_fdc->set_floppy(nullptr);
+	for (int d = 0; d < 4; d++)
+	{
+		if (BIT(m_port10, d + 1))
+		{
+			floppy_image_device *floppy = m_floppy[d]->get_device();
+			if (floppy && floppy->exists())
+			{
+				m_fdc->set_floppy(floppy);
+				floppy->ss_w(BIT(m_port10, 5));
+				break;
+			}
+		}
+	}
 }
 
-READ8_MEMBER( sbrain_state::ppi_pa_r )
+u8 sbrain_state::ppi_pa_r()
 {
 	return m_porta;
 }
@@ -217,7 +292,7 @@ d5 : strike through
 d6 : 1=60hz 0=50hz
 d7 : reverse video
 */
-WRITE8_MEMBER( sbrain_state::ppi_pa_w )
+void sbrain_state::ppi_pa_w(u8 data)
 {
 	m_crtc->refresh_control(BIT(data, 6));
 
@@ -230,25 +305,26 @@ d1 : key held down
 d2 : Vert Blank
 d3 : not used
 d4 : /capslock
-d5 : ?
+d5 : disk status: 1 = busy, 0 = ready
 d6 : Ring Indicator line from main rs232 port, 1=normal, 0=set
 d7 : cpu2 /busak line
 */
-READ8_MEMBER( sbrain_state::ppi_pb_r )
+u8 sbrain_state::ppi_pb_r()
 {
-	u8 vertsync = m_vs->read(); // bit 2
-	u8 capslock = BIT(ioport("MODIFIERS")->read(), 0) << 4; // bit 4, capslock
+	u8 vertsync = m_crtc->vblank_r() << 2;
+	u8 capslock = BIT(m_modifiers->read(), 0) << 4; // bit 4, capslock
 	u8 p10d0 = BIT(m_port10, 0) << 5; // bit 5
+	u8 ri = m_mainport->ri_r() << 6;
 	u8 busak = m_busak ? 128 : 0; // bit 7
-	return busak | p10d0 | capslock | vertsync | m_keydown;
+	return busak | ri | p10d0 | capslock | vertsync | m_keydown;
 }
 
-WRITE8_MEMBER( sbrain_state::ppi_pb_w )
+void sbrain_state::ppi_pb_w(u8 data)
 {
 	m_portb = data & 8;
 }
 
-READ8_MEMBER( sbrain_state::ppi_pc_r )
+u8 sbrain_state::ppi_pc_r()
 {
 	return m_portc;
 }
@@ -263,18 +339,43 @@ d5 : cpu2 /busreq line
 d6 : beeper
 d7 : keyboard, 1=enable comms, 0=reset
 */
-WRITE8_MEMBER( sbrain_state::ppi_pc_w )
+void sbrain_state::ppi_pc_w(u8 data)
 {
 	m_portc = data;
 	m_beep->set_state(BIT(data, 6));
-	m_bankr0->set_entry(BIT(data, 2));
-	m_bank2->set_entry(BIT(data, 4));
 	if (!BIT(data, 7))
 		m_keydown &= 2; // ack DR
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
+	if (BIT(data, 3))
+	{
+		m_fdc->reset();
+		disk_select_w(0);
+	}
 	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSRQ, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE); // ignored in z80.cpp
 	m_busak = BIT(data, 5);
+}
+
+WRITE_LINE_MEMBER(sbrain_state::external_txc_w)
+{
+	if (!BIT(m_serial_sw->read(), 0))
+		m_usart[1]->write_txc(state);
+}
+
+WRITE_LINE_MEMBER(sbrain_state::external_rxc_w)
+{
+	if (!BIT(m_serial_sw->read(), 2))
+		m_usart[1]->write_rxc(state);
+}
+
+WRITE_LINE_MEMBER(sbrain_state::internal_txc_rxc_w)
+{
+	if (!BIT(m_serial_sw->read(), 1))
+		m_usart[1]->write_txc(state);
+	if (!BIT(m_serial_sw->read(), 3))
+		m_usart[1]->write_rxc(state);
+	if (!BIT(m_serial_sw->read(), 4))
+		m_mainport->write_etc(state);
 }
 
 u8 translate_table[3][10][8] = {
@@ -419,16 +520,23 @@ static INPUT_PORTS_START( sbrain )
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 
-	/* vblank */
-	PORT_START("VS")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_START("BAUDCLOCK")
+	PORT_DIPNAME(0x03, 0x01, "Main TX Clock") PORT_DIPLOCATION("SW:1,3")
+	PORT_DIPSETTING(0x01, "Internal")
+	PORT_DIPSETTING(0x02, "External")
+	PORT_DIPNAME(0x0c, 0x04, "Main RX Clock") PORT_DIPLOCATION("SW:2,4")
+	PORT_DIPSETTING(0x04, "Internal")
+	PORT_DIPSETTING(0x08, "External")
+	PORT_DIPNAME(0x10, 0x10, "Internal Baud Clock to Main Port") PORT_DIPLOCATION("SW:5")
+	PORT_DIPSETTING(0x10, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
 INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(sbrain_state::kbd_scan)
 {
 	// m_keydown: d0 = 1 after key pressed, and is reset by pc7; d1 = 1 while a key is down.
 	m_keydown &= 1;
-	u8 i, j, keyin, mods = ioport("MODIFIERS")->read() & 6;
+	u8 i, j, keyin, mods = m_modifiers->read() & 6;
 	u8 translate_set = 0;
 	if (BIT(mods, 1))
 		translate_set = 1;
@@ -446,26 +554,41 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbrain_state::kbd_scan)
 				if (BIT(keyin, j))
 				{
 					u8 pressed = translate_table[translate_set][i][j];
-					m_keydown = (m_term_data == pressed) ? (m_keydown | 2) : 3;
-					m_term_data = pressed;
+					m_keydown = (m_key_data == pressed) ? (m_keydown | 2) : 3;
+					m_key_data = pressed;
 					return;
 				}
 			}
 		}
 	}
-	m_term_data = 0xff;
+	m_key_data = 0xff;
 }
 
-void sbrain_state::init_sbrain()
+WRITE_LINE_MEMBER(sbrain_state::crtc_lrc_w)
 {
-	u8 *main = memregion("maincpu")->base();
-	u8 *sub = memregion("subcpu")->base();
+	// TODO: actually triggered by BUSACK and taken after DMA burst finishes
+	if (state && !m_crtc->lbre_r() && !m_crtc->vblank_r())
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+}
 
-	m_bankr0->configure_entry(0, &main[0x0000]);
-	m_bankr0->configure_entry(1, &sub[0x0000]);
-	m_bankw0->configure_entry(0, &main[0x0000]);
-	m_bank2->configure_entry(0, &sub[0x8000]);
-	m_bank2->configure_entry(1, &main[0x8000]);
+WRITE_LINE_MEMBER(sbrain_state::crtc_vblank_w)
+{
+	if (state)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(sbrain_state::crtc_vsync_w)
+{
+	// TODO: internal to the CRT8002
+	if (!state)
+		m_framecnt++;
+}
+
+void sbrain_state::machine_start()
+{
+	std::fill_n(m_ram->pointer(), m_ram->size(), 0x00);
+
+	m_usart[0]->write_cts(0);
 }
 
 static void sbrain_floppies(device_slot_interface &device)
@@ -473,20 +596,31 @@ static void sbrain_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_RESET_MEMBER( sbrain_state, sbrain )
+void sbrain_state::machine_reset()
 {
 	m_keydown = 0;
-	m_bankr0->set_entry(1); // point at rom
-	m_bankw0->set_entry(0); // always write to ram
-	m_bank2->set_entry(1); // point at maincpu bank
-	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // hold subcpu in reset
+
+	for (auto &floppy : m_floppy)
+	{
+		floppy_image_device *device = floppy->get_device();
+		if (device != nullptr)
+			device->mon_w(0); // motors run all the time
+	}
+
+	// PPI resets to input mode, which causes PPIC-3 to be pulled up to +5V, resetting disk CPU
 }
 
-u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 sbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// PPIC-3 blanks entire display
+	if (BIT(m_portc, 3))
+	{
+		bitmap.fill(rgb_t::black(), cliprect);
+		return 0;
+	}
+
 	u8 y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
-	m_framecnt++;
+	uint16_t sy=0,x;
 
 	// Where attributes come from:
 	// - Most systems use ram for character-based attributes, but this one uses strictly hardware which would seem cumbersome
@@ -497,39 +631,45 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	// - d5 blank from PC1 (scan-line based)
 	// - d6 flash from bit 7 of each character
 
+	uint16_t ma = m_crtc->top_of_page();
+	uint16_t cr = m_crtc->cursor_address();
+	uint8_t *videoram = &m_ram->pointer()[m_ram->size() - 0x800];
 	for (y = 0; y < 24; y++)
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 
 			for (x = 0; x < 80; x++)
 			{
 				gfx = 0;
-				if (ra < 9)
+				if (ra > 0)
 				{
-					chr = m_p_videoram[x+ma];
+					chr = videoram[(x + ma) & 0x7ff];
 
 					if (!BIT(chr, 7) || BIT(m_framecnt, 5))
 					{
 						chr &= 0x7f;
 
 						if (chr)
-							gfx = m_p_chargen[(chr<<4) | ra ];
+							gfx = m_p_chargen[(chr<<4) | (ra - 1)]; // ra hacked for incorrect character generator
 					}
 				}
 
+				if (((x + ma) & 0xfff) == cr)
+					gfx ^= 0x7f;
+
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
+				*p++ = BIT(gfx, 6) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 5) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 4) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 3) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 2) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 1) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 0) ? rgb_t::white() : rgb_t::black();
 			}
 		}
-		ma+=80;
+		ma = (ma + 80) & 0xfff;
 	}
 	return 0;
 }
@@ -539,27 +679,26 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sbrain_mem)
 	MCFG_DEVICE_IO_MAP(sbrain_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sbrain_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("subcpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sbrain_submem)
 	MCFG_DEVICE_IO_MAP(sbrain_subio)
 
-	MCFG_MACHINE_RESET_OVERRIDE(sbrain_state, sbrain)
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("32K");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DRIVER(sbrain_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
-	DP8350(config, m_crtc, 10.92_MHz_XTAL).set_screen("screen");
+	DP8350(config, m_crtc, 10.92_MHz_XTAL).set_screen("screen"); // XTAL not directly connected
+	m_crtc->character_generator_program(1);
+	m_crtc->lrc_callback().set(FUNC(sbrain_state::crtc_lrc_w));
+	m_crtc->vblank_callback().set(FUNC(sbrain_state::crtc_vblank_w));
+	m_crtc->vsync_callback().set(FUNC(sbrain_state::crtc_vsync_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 800)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -570,29 +709,45 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	m_ppi->in_pc_callback().set(FUNC(sbrain_state::ppi_pc_r));
 	m_ppi->out_pc_callback().set(FUNC(sbrain_state::ppi_pc_w));
 
-	I8251(config, m_u0, 0);
+	I8251(config, m_usart[0], 16_MHz_XTAL / 8);
+	m_usart[0]->txd_handler().set("auxport", FUNC(rs232_port_device::write_txd));
 
-	I8251(config, m_u1, 0);
+	I8251(config, m_usart[1], 16_MHz_XTAL / 8);
+	m_usart[1]->txd_handler().set(m_mainport, FUNC(rs232_port_device::write_txd));
+	m_usart[1]->rts_handler().set(m_mainport, FUNC(rs232_port_device::write_rts));
+	m_usart[1]->dtr_handler().set(m_mainport, FUNC(rs232_port_device::write_dtr));
+
+	RS232_PORT(config, m_mainport, default_rs232_devices, nullptr);
+	m_mainport->rxd_handler().set(m_usart[1], FUNC(i8251_device::write_rxd));
+	m_mainport->cts_handler().set(m_usart[1], FUNC(i8251_device::write_cts));
+	m_mainport->dsr_handler().set(m_usart[1], FUNC(i8251_device::write_dsr));
+	m_mainport->txc_handler().set(FUNC(sbrain_state::external_txc_w));
+	m_mainport->rxc_handler().set(FUNC(sbrain_state::external_rxc_w));
+
+	rs232_port_device &auxport(RS232_PORT(config, "auxport", default_rs232_devices, nullptr));
+	auxport.rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
+	auxport.dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
 
 	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL)); // BR1941L
-	brg.fr_handler().set(m_u0, FUNC(i8251_device::write_txc));
-	brg.fr_handler().append(m_u0, FUNC(i8251_device::write_rxc));
-	brg.ft_handler().set(m_u1, FUNC(i8251_device::write_txc));
-	brg.ft_handler().append(m_u1, FUNC(i8251_device::write_rxc));
+	brg.fr_handler().set(m_usart[0], FUNC(i8251_device::write_txc));
+	brg.fr_handler().append(m_usart[0], FUNC(i8251_device::write_rxc));
+	brg.ft_handler().set(FUNC(sbrain_state::internal_txc_rxc_w));
 
 	FD1791(config, m_fdc, 16_MHz_XTAL / 16);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", sbrain_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", sbrain_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", sbrain_state, kbd_scan, attotime::from_hz(15))
 MACHINE_CONFIG_END
 
 ROM_START( sbrain )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x10000, "subcpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "subcpu", ROMREGION_ERASEFF ) // only the second CPU has its own ROM
 	ROM_SYSTEM_BIOS( 0, "4_003", "4.003" )
 	ROMX_LOAD("4_003_vc8001.z69", 0x0000, 0x0800, CRC(3ce3cd53) SHA1(fb6ade6bd67de3d9f911a1a48481ca619bda65ae), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "3_1", "3.1" )
@@ -604,4 +759,4 @@ ROM_START( sbrain )
 	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
-COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, init_sbrain, "Intertec", "Superbrain", MACHINE_NOT_WORKING )
+COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, empty_init, "Intertec Data Systems", "SuperBrain Video Computer System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

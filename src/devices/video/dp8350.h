@@ -66,6 +66,11 @@ public:
 	DECLARE_READ_LINE_MEMBER(vsync_r);
 	DECLARE_READ_LINE_MEMBER(vblank_r);
 
+	// address getters (TODO: accurate character-by-character emulation)
+	u16 top_of_page() const { return m_topr; }
+	u16 row_start() const { return m_row_start; }
+	u16 cursor_address() const { return m_cr; }
+
 protected:
 	// base type constructor
 	dp835x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
