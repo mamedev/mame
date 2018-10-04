@@ -1025,3 +1025,29 @@ bool core_options::header_exists(const char *description) const
 
 	return iter != m_entries.end();
 }
+
+//-------------------------------------------------
+//  revert - revert options at or below a certain
+//  priority back to their defaults
+//-------------------------------------------------
+
+void core_options::revert(int priority_hi, int priority_lo)
+{
+	for (entry::shared_ptr &curentry : m_entries)
+		curentry->revert(priority_hi, priority_lo);
+}
+
+//-------------------------------------------------
+//  revert - revert back to our default if we are
+//  within the given priority range
+//-------------------------------------------------
+
+void core_options::simple_entry::revert(int priority_hi, int priority_lo)
+{
+	// if our priority is within the range, revert to the default
+	if (priority() <= priority_hi && priority() >= priority_lo)
+	{
+		set_value(std::string(default_value()), priority(), true);
+		set_priority(OPTION_PRIORITY_DEFAULT);
+	}
+}
