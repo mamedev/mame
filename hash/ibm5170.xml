@@ -4689,7 +4689,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- S/N: 142948-001 -->
 	<software name="prolin31">
 		<description>Compaq ProLinea 486-based PC's - Microsoft Windows 3.1 Support Diskette</description>
@@ -5002,7 +5002,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- S/N: 145149-001 -->
 	<software name="fastart">
 		<description>MS-DOS FASTART/SYSTEM - The Compaq Personal Computer FASTART/SYSTEM Diskette</description>
@@ -5016,7 +5016,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- S/N: 139399-006 -->
 	<software name="msdossup">
 		<description>MS-DOS Support - User Programs</description>
@@ -6105,7 +6105,7 @@ x
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="picbook">
 		<description>The Greatest Little PIC Book</description>
 		<year>1997?</year>
@@ -6238,7 +6238,7 @@ x
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="nicklaus">
 		<description>Jack Nicklaus Screen Savers</description>
 		<year>1994</year>
@@ -6863,6 +6863,19 @@ x
 		</part>
 	</software>
 
+	<software name="postnr">
+		<description>Postnummerkatalogen 1996 (Swe)</description>
+		<year>1996</year>
+		<publisher>Posten Sverige AB</publisher>
+		<info name="alt_title" value="Postnummerkatalogen A-Ö" />
+		<info name="usage" value="Sätt i disketten i din diskettdrive. Skriv A:start eller (B:start) tryck enter. I Windows välj Kör under arkiv, skriv A:start (B:start) klicka på OK." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="postnummerkatalogen 1996 (swe).img" size="1474560" crc="ef119023" sha1="47f33838d3e8aa0afe64173ece2d10223ed4b1e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="prodigy">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Prodigy Service</description>
@@ -7021,6 +7034,17 @@ x
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="sneakers.img" size="1474560" crc="a816defd" sha1="357db57c9430bc4432fbfecf07065dbd9d63c6ac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tms320c5x">
+		<description>TMS320C5x DSK - Applications Guide/Application Software</description>
+		<year>1997</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="tms320c5x dsk - applications guide application software.img" size="1474560" crc="3ca3e247" sha1="e8d4e2bb9093ffac1c4034fb7ef023d9f0b2efb2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7494,6 +7518,42 @@ x
 		</part>
 	</software>
 
+	<software name="wordfndr">
+		<description>WordFinder Lexikon på PC (Swe)</description>
+		<year>1994</year>
+		<publisher>WordFinder Software AB</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Registreringsdiskett" />
+			<dataarea name="flop" size="737280">
+				<rom name="registreringsdiskett.img" size="737280" crc="26700ec2" sha1="51d0deb495af37a09bc2a6facd73c372e776b670" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Programdiskett 1 för DOS och Windows Version 2.5" />
+			<dataarea name="flop" size="737280">
+				<rom name="programdiskett 1 för dos och windows version 2_5.img" size="737280" crc="1b5c95b6" sha1="c4f9eb0289c3a5079595919f001f81e35347c1a9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Sv-En Verkst.tekn. lexikon - Lexikondiskett 2" />
+			<dataarea name="flop" size="737280">
+				<rom name="sv-en verkst tekn lexikon - lexikondiskett 2.img" size="737280" crc="8ba40420" sha1="39c5c520f7337f6dc2ecfda8cf637cb95f3c84b3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Svenskt lexikon (SAOL) - Lexikondiskett 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="svenskt lexikon (saol) - lexikondiskett 3.img" size="1474560" crc="dee45b52" sha1="0a60c29e231514448751fd023fef1e2ae81f6483" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Svenskt lexikon (SAOL) - Lexikondiskett 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="svenskt lexikon (saol) - lexikondiskett 4.img" size="1474560" crc="56ef5cd6" sha1="a2084e8b00dde0a34a80690ccca709eafdaa4bd2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wp60">
 		<description>WordPerfect 6.0 for DOS</description>
 		<year>1993</year>
@@ -7538,6 +7598,18 @@ x
 			<feature name="part_id" value="Program 3"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="Word Perfect 6.0 DOS - Disk 7.img" size="1474560" crc="50b4d482" sha1="02894c316a1900bce1d07bc8c0458bdb88e35699" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="writeon">
+		<description>Write On! for Windows</description>
+		<year>1994?</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="usage" value="Insert the Diskette in Drive A or B. STEP 1. Type A: or B:, then hit ENTER. STEP 2. Type GO, then hit ENTER." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="write on for windows.img" size="1474560" crc="bb2e91e7" sha1="241863ebd4073889db37a3f508a42d7091532e17" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10773,6 +10845,80 @@ x
 		</part>
 	</software>
 
+	<software name="nova9">
+		<description>Nova 9 (International Version, 3.5")</description>
+		<year>1991</year>
+		<publisher>Dynamix</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<feature name="part_id" value="Disk 1" />
+				<rom name="nova 9 (international version, 3.5) disk 1.img" size="737280" crc="a14599bc" sha1="f94be59a1426c00b2b0421c8b47433b1fda48b19" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<feature name="part_id" value="Disk 2" />
+				<rom name="nova 9 (international version, 3.5) disk 2.img" size="737280" crc="7a3eaeac" sha1="5bc1879831c26dd7c1fb76df2af2ac938385d14c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<feature name="part_id" value="Disk 3" />
+				<rom name="nova 9 (international version, 3.5) disk 3.img" size="737280" crc="ebce8727" sha1="e308e3b461ef6e23c53308fefe670f51e83ea940" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<feature name="part_id" value="Disk 4" />
+				<rom name="nova 9 (international version, 3.5) disk 4.img" size="737280" crc="1d884a9f" sha1="927fe65a2c607a21ca2f24d41d019b65abc47dda" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<feature name="part_id" value="Disk 5" />
+				<rom name="nova 9 (international version, 3.5) disk 5.img" size="737280" crc="3e9db843" sha1="7ca2acf1e7c270636d182c1484503246d310529d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<feature name="part_id" value="Disk 6" />
+				<rom name="nova 9 (international version, 3.5) disk 6.img" size="737280" crc="cc16d0de" sha1="3ba05e1d37397ff92f833ddc0111baeb342c1704" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nova9_525" cloneof="nova9">
+		<description>Nova 9 (International Version, 5.25")</description>
+		<year>1991</year>
+		<publisher>Dynamix</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<feature name="part_id" value="Disk 1" />
+				<rom name="nova 9 (international version, 5.25) disk 1.img" size="1228800" crc="9f1ab6f9" sha1="39314fe0be08e277006b8de435859f906d07ef71" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<feature name="part_id" value="Disk 2" />
+				<rom name="nova 9 (international version, 5.25) disk 2.img" size="1228800" crc="bccd3a41" sha1="62455d5cac132b7e7035de687827a815c758d2fd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<feature name="part_id" value="Disk 3" />
+				<rom name="nova 9 (international version, 5.25) disk 3.img" size="1228800" crc="2f57be7b" sha1="a089ae8f80eaec1ee16523c8a92925775c966595" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<feature name="part_id" value="Disk 4" />
+				<rom name="nova 9 (international version, 5.25) disk 4.img" size="1228800" crc="a27d7959" sha1="9fde920925a72851c89c14b1475e2546c6eaa7e2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="omf2097">
 		<description>One Must Fall 2097</description>
 		<year>1994</year>
@@ -11531,6 +11677,25 @@ x
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="thndrhwk">
+		<description>Thunderhawk AH-73M</description>
+		<year>1991</year>
+		<publisher>Core Design</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<feature name="part_id" value="Disk 1" />
+				<rom name="thunderhawk ah-73m disk 1.img" size="1474560" crc="5b1ca8fd" sha1="b127ae100b4ffc73d470d3ff1d0d863a95fbd59b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<feature name="part_id" value="Disk 2" />
+				<rom name="thunderhawk ah-73m disk 2.img" size="1474560" crc="aabeac50" sha1="af127a034efbd1b4fa815c3ec5255ab9597f5f88" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="ufoeu">
 		<description>UFO - Enemy Unknown</description>
