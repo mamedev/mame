@@ -1166,9 +1166,7 @@
 #include "speaker.h"
 
 
-#define SS22_MASTER_CLOCK   (XTAL(49'152'000))    /* info from Guru */
-
-#define PIXEL_CLOCK         (SS22_MASTER_CLOCK/2)
+#define PIXEL_CLOCK         (49.152_MHz_XTAL/2)
 
 // VSync - 59.9042 Hz
 // HSync - 15.7248 kHz (may be inaccurate)
@@ -3712,6 +3710,7 @@ void namcos22_state::machine_reset()
 	master_enable(false);
 	slave_enable(false);
 	m_dsp_irq_enabled = false;
+	if (!m_is_ss22) m_iomcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_poly->reset();
@@ -3729,11 +3728,11 @@ void namcos22_state::machine_start()
 MACHINE_CONFIG_START(namcos22_state::namcos22)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
+	MCFG_DEVICE_ADD("maincpu", M68020, 49.152_MHz_XTAL/2) // MC68020RP25E
 	MCFG_DEVICE_PROGRAM_MAP(namcos22_am)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22_interrupt)
 
-	tms32025_device& master(TMS32025(config, m_master, SS22_MASTER_CLOCK)); /* ? */
+	tms32025_device& master(TMS32025(config, m_master, 40_MHz_XTAL));
 	master.set_addrmap(AS_PROGRAM, &namcos22_state::master_dsp_program);
 	master.set_addrmap(AS_DATA, &namcos22_state::master_dsp_data);
 	master.set_addrmap(AS_IO, &namcos22_state::master_dsp_io);
@@ -3745,7 +3744,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	master.set_vblank_int("screen", FUNC(namcos22_state::dsp_vblank_irq));
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dsp_serial", namcos22_state, dsp_serial_pulse, attotime::from_hz(SERIAL_IO_PERIOD))
 
-	tms32025_device& slave(TMS32025(config, m_slave, SS22_MASTER_CLOCK)); /* ? */
+	tms32025_device& slave(TMS32025(config, m_slave, 40_MHz_XTAL));
 	slave.set_addrmap(AS_PROGRAM, &namcos22_state::slave_dsp_program);
 	slave.set_addrmap(AS_DATA, &namcos22_state::slave_dsp_data);
 	slave.set_addrmap(AS_IO, &namcos22_state::slave_dsp_io);
@@ -3755,7 +3754,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
 
-	MCFG_DEVICE_ADD("mcu", NAMCO_C74, SS22_MASTER_CLOCK/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
+	MCFG_DEVICE_ADD("mcu", NAMCO_C74, 49.152_MHz_XTAL/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
 	MCFG_DEVICE_PROGRAM_MAP( mcu_s22_program)
 	MCFG_DEVICE_IO_MAP( mcu_s22_io)
 
@@ -3778,7 +3777,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("c352", C352, SS22_MASTER_CLOCK/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, 49.152_MHz_XTAL/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -3798,11 +3797,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::namcos22s)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 49.152_MHz_XTAL/2) // MC68EC020FG25
 	MCFG_DEVICE_PROGRAM_MAP(namcos22s_am)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22s_interrupt)
 
-	tms32025_device& master(TMS32025(config, m_master, SS22_MASTER_CLOCK));
+	tms32025_device& master(TMS32025(config, m_master, 40_MHz_XTAL));
 	master.set_addrmap(AS_PROGRAM, &namcos22_state::master_dsp_program);
 	master.set_addrmap(AS_DATA, &namcos22_state::master_dsp_data);
 	master.set_addrmap(AS_IO, &namcos22_state::master_dsp_io);
@@ -3814,7 +3813,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	master.set_vblank_int("screen", FUNC(namcos22_state::dsp_vblank_irq));
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dsp_serial", namcos22_state, dsp_serial_pulse, attotime::from_hz(SERIAL_IO_PERIOD))
 
-	tms32025_device& slave(TMS32025(config, m_slave, SS22_MASTER_CLOCK));
+	tms32025_device& slave(TMS32025(config, m_slave, 40_MHz_XTAL));
 	slave.set_addrmap(AS_PROGRAM, &namcos22_state::slave_dsp_program);
 	slave.set_addrmap(AS_DATA, &namcos22_state::slave_dsp_data);
 	slave.set_addrmap(AS_IO, &namcos22_state::slave_dsp_io);
@@ -3824,7 +3823,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
 
-	MCFG_DEVICE_ADD("mcu", M37710S4, SS22_MASTER_CLOCK/3)
+	MCFG_DEVICE_ADD("mcu", M37710S4, 49.152_MHz_XTAL/3)
 	MCFG_DEVICE_PROGRAM_MAP(mcu_program)
 	MCFG_DEVICE_IO_MAP(mcu_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_irq", namcos22_state, mcu_irq, "screen", 0, 240)
@@ -3844,7 +3843,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("c352", C352, SS22_MASTER_CLOCK/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, 49.152_MHz_XTAL/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END

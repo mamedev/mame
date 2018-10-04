@@ -1778,15 +1778,21 @@ TILE_GET_INFO_MEMBER(namcos22_state::get_text_tile_info)
 
 WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
 {
+	uint32_t prevdata = m_textram[offset];
 	COMBINE_DATA(&m_textram[offset]);
-	m_bgtilemap->mark_tile_dirty(offset * 2);
-	m_bgtilemap->mark_tile_dirty(offset * 2 + 1);
+	if (prevdata != m_textram[offset])
+	{
+		m_bgtilemap->mark_tile_dirty(offset * 2);
+		m_bgtilemap->mark_tile_dirty(offset * 2 + 1);
+	}
 }
 
 WRITE32_MEMBER(namcos22_state::namcos22_cgram_w)
 {
+	uint32_t prevdata = m_cgram[offset];
 	COMBINE_DATA(&m_cgram[offset]);
-	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
+	if (prevdata != m_cgram[offset])
+		m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 }
 
 READ32_MEMBER(namcos22_state::namcos22_tilemapattr_r)
