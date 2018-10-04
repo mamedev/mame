@@ -374,8 +374,9 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 */
 
 #include "emu.h"
-#include "includes/xbox.h"
+#include "machine/pci.h"
 #include "includes/xbox_pci.h"
+#include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
 #include "machine/idehd.h"
