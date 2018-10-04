@@ -986,7 +986,7 @@ void namcos22_state::draw_direct_poly(const uint16_t *src)
  *    0x07350 - guardrail
  *    0x061a8 - red car
  */
-void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint32_t addr, float m[4][4], int32_t polyshift, int flags, int packetformat)
+void namcos22_state::blit_single_quad(uint32_t color, uint32_t addr, float m[4][4], int32_t polyshift, int flags, int packetformat)
 {
 	int absolute_priority = m_absolute_priority;
 	int32_t zsort;
@@ -1130,7 +1130,7 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint
 }
 
 
-void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4], int32_t base)
+void namcos22_state::blit_quads(int32_t addr, float m[4][4], int32_t base)
 {
 //  int additionalnormals = 0;
 	int chunklength = point_read(addr++);
@@ -1169,7 +1169,7 @@ void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4
 				flags = point_read(addr + 1);
 				color = point_read(addr + 2);
 				bias = 0;
-				blit_single_quad(bitmap, color, addr + 3, m, bias, flags, packetformat);
+				blit_single_quad(color, addr + 3, m, bias, flags, packetformat);
 				break;
 
 			case 0x18:
@@ -1182,7 +1182,7 @@ void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4
 				flags = point_read(addr + 1);
 				color = point_read(addr + 2);
 				bias  = point_read(addr + 3);
-				blit_single_quad(bitmap, color, addr + 4, m, bias, flags, packetformat);
+				blit_single_quad(color, addr + 4, m, bias, flags, packetformat);
 				break;
 
 			case 0x10: /* vertex lighting */
@@ -1219,7 +1219,7 @@ void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4
 	}
 }
 
-void namcos22_state::blit_polyobject(bitmap_rgb32 &bitmap, int code, float m[4][4])
+void namcos22_state::blit_polyobject(int code, float m[4][4])
 {
 	uint32_t addr1 = point_read(code);
 	m_LitSurfaceCount = 0;
@@ -1230,7 +1230,7 @@ void namcos22_state::blit_polyobject(bitmap_rgb32 &bitmap, int code, float m[4][
 		int32_t addr2 = point_read(addr1++);
 		if (addr2 < 0)
 			break;
-		blit_quads(bitmap, addr2, m, code);
+		blit_quads(addr2, m, code);
 	}
 }
 
@@ -1318,7 +1318,7 @@ void namcos22_state::slavesim_handle_bb0003(const int32_t *src)
 	transform_normal(&m_camera_lx, &m_camera_ly, &m_camera_lz, m_viewmatrix);
 }
 
-void namcos22_state::slavesim_handle_200002(bitmap_rgb32 &bitmap, const int32_t *src)
+void namcos22_state::slavesim_handle_200002(const int32_t *src)
 {
 	/**
 	* 0xfffd
@@ -1351,7 +1351,7 @@ void namcos22_state::slavesim_handle_200002(bitmap_rgb32 &bitmap, const int32_t 
 		m[3][2] = src[0xc]; /* zpos */
 
 		matrix3d_multiply(m, m_viewmatrix);
-		blit_polyobject(bitmap, m_PrimitiveID, m);
+		blit_polyobject(m_PrimitiveID, m);
 	}
 	else if (m_PrimitiveID != 0 && m_PrimitiveID != 2)
 	{
@@ -1393,7 +1393,7 @@ void namcos22_state::slavesim_handle_233002(const int32_t *src)
 	m_objectshift = src[2];
 }
 
-void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
+void namcos22_state::simulate_slavedsp()
 {
 	const int32_t *src = 0x300 + (int32_t *)m_polygonram.target();
 
@@ -1433,7 +1433,7 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 				break;
 
 			case 0x0d:
-				slavesim_handle_200002(bitmap, src); /* render primitive */
+				slavesim_handle_200002(src); /* render primitive */
 				break;
 
 			default:
@@ -1455,7 +1455,7 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 
 		src += len;
 		src++; /* always 0xffff */
-		uint16_t next = 0x7fff & *src++; /* link to next command */
+		uint16_t next = *src++ & 0x7fff; /* link to next command */
 		if (next != (index + len + 1 + 1))
 		{
 			/* end of list */
@@ -1469,11 +1469,11 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 	}
 }
 
-void namcos22_state::draw_polygons(bitmap_rgb32 &bitmap)
+void namcos22_state::draw_polygons()
 {
 	if (m_slave_simulation_active)
 	{
-		simulate_slavedsp(bitmap);
+		simulate_slavedsp();
 		m_poly->wait("draw_polygons");
 	}
 }
@@ -1482,7 +1482,7 @@ void namcos22_state::draw_polygons(bitmap_rgb32 &bitmap)
 
 /*********************************************************************************************/
 
-void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *src, const uint32_t *attr, int num_sprites, int deltax, int deltay, int y_lowres)
+void namcos22_state::draw_sprite_group(const uint32_t *src, const uint32_t *attr, int num_sprites, int deltax, int deltay, int y_lowres)
 {
 	for (int i = 0; i < num_sprites; i++)
 	{
@@ -1607,7 +1607,7 @@ void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cl
 	}
 }
 
-void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void namcos22_state::draw_sprites()
 {
 	const uint32_t *src;
 	const uint32_t *attr;
@@ -1678,7 +1678,7 @@ void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	{
 		src = &m_spriteram[0x04000/4 + base*4];
 		attr = &m_spriteram[0x20000/4 + base*2];
-		draw_sprite_group(bitmap, cliprect, src, attr, num_sprites, deltax, deltay, y_lowres);
+		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
 	}
 
 	/* VICS RAM provides two additional banks (also many unknown regs here) */
@@ -1712,7 +1712,7 @@ void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	{
 		src = &m_vics_data[(m_vics_control[0x48/4] & 0xffff)/4];
 		attr = &m_vics_data[(m_vics_control[0x58/4] & 0xffff)/4];
-		draw_sprite_group(bitmap, cliprect, src, attr, num_sprites, deltax, deltay, y_lowres);
+		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
 	}
 
 	num_sprites = m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
@@ -1728,7 +1728,7 @@ void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	{
 		src = &m_vics_data[(m_vics_control[0x68/4] & 0xffff)/4];
 		attr = &m_vics_data[(m_vics_control[0x78/4] & 0xffff)/4];
-		draw_sprite_group(bitmap, cliprect, src, attr, num_sprites, deltax, deltay, y_lowres);
+		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
 	}
 }
 
@@ -2341,8 +2341,8 @@ uint32_t namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_r
 	// layers
 	uint8_t layer = nthbyte(m_mixer, 0x1f);
 	if (layer & 4) draw_text_layer(screen, bitmap, cliprect);
-	if (layer & 2) draw_sprites(bitmap, cliprect);
-	if (layer & 1) draw_polygons(bitmap);
+	if (layer & 2) draw_sprites();
+	if (layer & 1) draw_polygons();
 	m_poly->render_scene(screen, bitmap);
 	if (layer & 4) namcos22s_mix_text_layer(screen, bitmap, cliprect, 6);
 
@@ -2376,7 +2376,7 @@ uint32_t namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rg
 	bitmap.fill(m_palette->pen(0x7fff), cliprect);
 
 	// layers
-	draw_polygons(bitmap);
+	draw_polygons();
 	m_poly->render_scene(screen, bitmap);
 	draw_text_layer(screen, bitmap, cliprect); // text layer + final mix(gamma)
 

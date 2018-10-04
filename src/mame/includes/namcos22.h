@@ -323,7 +323,7 @@ private:
 	DECLARE_WRITE16_MEMBER(dsp_led_w);
 	DECLARE_WRITE16_MEMBER(dsp_unk8_w);
 	DECLARE_WRITE16_MEMBER(master_render_device_w);
-	DECLARE_READ16_MEMBER(dsp_bioz_r);
+	DECLARE_READ16_MEMBER(dsp_slave_bioz_r);
 	DECLARE_READ16_MEMBER(dsp_slave_port3_r);
 	DECLARE_READ16_MEMBER(dsp_slave_port4_r);
 	DECLARE_READ16_MEMBER(dsp_slave_port5_r);
@@ -379,8 +379,8 @@ private:
 	void handle_driving_io();
 	void handle_coinage(int slots, int address_is_odd);
 	void handle_cybrcomm_io();
-	uint32_t pdp_polygonram_read(offs_t offs);
-	void pdp_polygonram_write(offs_t offs, uint32_t data);
+	inline uint32_t pdp_polygonram_read(offs_t offs) { return m_polygonram[offs & 0x7fff]; }
+	inline void pdp_polygonram_write(offs_t offs, uint32_t data) { m_polygonram[offs & 0x7fff] = data; }
 	void point_write(offs_t offs, uint32_t data);
 	int32_t pointram_read(offs_t offs);
 	inline int32_t point_read(offs_t offs) { offs &= 0x00ffffff; return (offs < m_pointrom_size) ? m_pointrom[offs] : pointram_read(offs); }
@@ -394,24 +394,24 @@ private:
 	void transform_normal(float *nx, float *ny, float *nz, float m[4][4]);
 	void register_normals(int32_t addr, float m[4][4]);
 
-	void blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint32_t addr, float m[4][4], int32_t polyshift, int flags, int packetformat);
-	void blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4], int32_t base);
-	void blit_polyobject(bitmap_rgb32 &bitmap, int code, float m[4][4]);
+	void blit_single_quad(uint32_t color, uint32_t addr, float m[4][4], int32_t polyshift, int flags, int packetformat);
+	void blit_quads(int32_t addr, float m[4][4], int32_t base);
+	void blit_polyobject(int code, float m[4][4]);
 
 	void slavesim_handle_bb0003(const int32_t *src);
-	void slavesim_handle_200002(bitmap_rgb32 &bitmap, const int32_t *src);
+	void slavesim_handle_200002(const int32_t *src);
 	void slavesim_handle_300000(const int32_t *src);
 	void slavesim_handle_233002(const int32_t *src);
-	void simulate_slavedsp(bitmap_rgb32 &bitmap);
+	void simulate_slavedsp();
 
 	void init_tables();
 	void update_mixer();
 	void update_palette();
 	void recalc_czram();
 	void draw_direct_poly(const uint16_t *src);
-	void draw_polygons(bitmap_rgb32 &bitmap);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *src, const uint32_t *attr, int num_sprites, int deltax, int deltay, int y_lowres);
+	void draw_polygons();
+	void draw_sprites();
+	void draw_sprite_group(const uint32_t *src, const uint32_t *attr, int num_sprites, int deltax, int deltay, int y_lowres);
 	void draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival);
 	void namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -495,6 +495,7 @@ private:
 	uint32_t m_old_coin_state;
 	uint32_t m_credits1;
 	uint32_t m_credits2;
+	uint16_t m_pdp_base;
 	uint32_t m_point_address;
 	uint32_t m_point_data;
 	uint16_t m_SerialDataSlaveToMasterNext;
