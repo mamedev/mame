@@ -263,20 +263,19 @@ void sbrain_state::disk_select_w(u8 data)
 {
 	m_port10 = data | 0xc0;
 
-	m_fdc->set_floppy(nullptr);
+	floppy_image_device *floppy = nullptr;
 	for (int d = 0; d < 4; d++)
-	{
 		if (BIT(m_port10, d + 1))
 		{
-			floppy_image_device *floppy = m_floppy[d]->get_device();
-			if (floppy && floppy->exists())
-			{
-				m_fdc->set_floppy(floppy);
-				floppy->ss_w(BIT(m_port10, 5));
+			floppy = m_floppy[d]->get_device();
+			if (floppy)
 				break;
-			}
 		}
-	}
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+		floppy->ss_w(BIT(m_port10, 5));
 }
 
 u8 sbrain_state::ppi_pa_r()
@@ -349,7 +348,7 @@ void sbrain_state::ppi_pc_w(u8 data)
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 	if (BIT(data, 3))
 	{
-		m_fdc->reset();
+		//m_fdc->reset(); // wd_fdc doesn't like this for some reason
 		disk_select_w(0);
 	}
 	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSRQ, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE); // ignored in z80.cpp
@@ -734,6 +733,7 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	brg.ft_handler().set(FUNC(sbrain_state::internal_txc_rxc_w));
 
 	FD1791(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->set_force_ready(true);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
