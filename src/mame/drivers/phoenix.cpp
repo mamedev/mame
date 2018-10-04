@@ -915,6 +915,30 @@ ROM_START( phoenixi ) // verified single PCB, single PROM
 	ROM_LOAD( "sn74s471n.bin",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
+ROM_START( fenixn ) // Fenix, bootleg from the Spanish company Niemer
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2201.bin", 0x0000, 0x0800, CRC(2afa8e2c) SHA1(e9cd02b730912365aae4172da881bddb7c7b16aa) )
+	ROM_LOAD( "1202.bin", 0x0800, 0x0800, CRC(6527395e) SHA1(13799da4b5c4118b3fafe7b6145b0ebca89b9f00) )
+	ROM_LOAD( "1203.bin", 0x1000, 0x0800, CRC(868e69ba) SHA1(bef3173f1c978a9b9d1597439d272186b466e069) )
+	ROM_LOAD( "1204.bin", 0x1800, 0x0800, CRC(85d96d7c) SHA1(19bb1d0a6764b6982d3cb29e2681dee8648d5fda) )
+	ROM_LOAD( "1205.bin", 0x2000, 0x0800, CRC(a105e4e7) SHA1(b35142a91b6b7fdf7535202671793393c9f4685f) )
+	ROM_LOAD( "1206.bin", 0x2800, 0x0800, CRC(249a6f21) SHA1(1c83d9883120796cf3bf775ab6620c4850f52d3c) )
+	ROM_LOAD( "1207.bin", 0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "1208.bin", 0x3800, 0x0800, CRC(b90efc28) SHA1(61956880f64ae50c4796d4cf60a49c44a81aaa31) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "1211.bin", 0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "1212.bin", 0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "1209.bin", 0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "1210.bin", 0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom1.bin", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "prom2.bin", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+ROM_END
+
 ROM_START( condor )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cond01c.bin",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
@@ -1583,6 +1607,7 @@ GAME( 1981, phoenixc2,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init, 
 GAME( 1981, phoenixc3,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc4,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixi,   phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (IDI)",                     "Phoenix (IDI bootleg)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Needs correct color PROM decode
+GAME( 1980, fenixn,     phoenix, phoenix,  phoenix,  phoenix_state, empty_init,      ROT90, "bootleg (Niemer)",                  "Fenix (Niemer bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, condor,     phoenix, condor,   condor,   phoenix_state, init_coindsw,         ROT90, "bootleg (Sidam)",                   "Condor (Sidam bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, condorn,    phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (S C Novar)",               "Condor (S C Novar bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 // the following 2 were common bootlegs in England & France respectively
@@ -1595,8 +1620,8 @@ GAME( 1980, vautourza,  phoenix, condor ,  phoenixt, phoenix_state, init_oneprom
 // German bootlegs
 GAME( 1981, phoenixha,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg (Hellomat Automaten)",      "Phoenix (Hellomat Automaten bootleg)", MACHINE_SUPPORTS_SAVE )
 
-// fenix is an Italian bootleg based on vautourz
-GAME( 1980, fenix,      phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Orio)",                    "Fenix (bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+// fenix is an Italian bootleg based on vautourz (also an unrelated Spanish bootleg from Niemer)
+GAME( 1980, fenix,      phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Orio)",                    "Fenix (Orio bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, griffon,    phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Videotron)",               "Griffon (Videotron bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, griffono,   phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Olympia)",                 "Griffon (Olympia bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // nextfase is a Spanish bootleg
