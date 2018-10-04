@@ -28,8 +28,6 @@ When booted, the time (corrupted) is displayed at top right. You need to run TIM
 The schematic in parts is difficult to read. Some assumptions have been made.
 
 To Do:
-- Without a disk in, it should display a message to insert a disk. This happens, but only with
-  -bios 0. May attempt to execute empty memory instead. (-bios 1, -bios 2)
 - Improve keyboard.
 - Row buffering DMA (DP8350, MM5035) and line-by-line rendering.
 - Proper character generator emulation (CRT8002).
