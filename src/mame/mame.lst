@@ -15179,9 +15179,10 @@ sams64_2                        // 005 1998/10/16 Samurai Shodown: Warrior's Rag
 xrally                          // 003 1998/05/13 Xtreme Rally / Off Beat Racer!
 
 @source:holeland.cpp
-crzrally                        // (c) 1985
-crzrallya                       // (c) 1985
-crzrallyg                       // (c) 1985
+crzrally                        // (c) 1985 Tecfri
+crzrallya                       // (c) 1985 Tecfri
+crzrallyg                       // (c) 1985 Gecas
+crzrallyrf                      // (c) 1985 Recreativos Franco
 holeland                        // (c) 1984
 holeland2                       // (c) 1984
 
