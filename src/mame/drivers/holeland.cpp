@@ -589,9 +589,9 @@ ROM_START( crzrallyrf )
 	ROM_LOAD( "pal16r8a.1d", 0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-GAME( 1984, holeland,   0,        holeland, holeland,  holeland_state, empty_init, ROT0,   "Tecfri",                 "Hole Land (Japan)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, holeland2,  holeland, holeland, holeland2, holeland_state, empty_init, ROT0,   "Tecfri",                 "Hole Land (Spain)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
-GAME( 1985, crzrally,   0,        crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri",                 "Crazy Rally (set 1)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crzrallya,  crzrally, crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri",                 "Crazy Rally (set 2)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crzrallyg,  crzrally, crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crzrallyrf, crzrally, crzrally, crzrally,  holeland_state, empty_init, ROT270, "Recreativos Franco",     "Crazy Rally (Recreativos Franco)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, holeland,   0,        holeland, holeland,  holeland_state, empty_init, ROT0,   "Tecfri",                              "Hole Land (Japan)",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, holeland2,  holeland, holeland, holeland2, holeland_state, empty_init, ROT0,   "Tecfri",                              "Hole Land (Spain)",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
+GAME( 1985, crzrally,   0,        crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri",                              "Crazy Rally (set 1)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crzrallya,  crzrally, crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri",                              "Crazy Rally (set 2)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crzrallyg,  crzrally, crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri (Gecas license)",              "Crazy Rally (Gecas license)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crzrallyrf, crzrally, crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri (Recreativos Franco license)", "Crazy Rally (Recreativos Franco license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
