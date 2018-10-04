@@ -182,7 +182,7 @@ WRITE8_MEMBER(m52_state::m52_scroll_w)
 	m_bg_tilemap->set_scrollx(0, 255);
 	m_bg_tilemap->set_scrollx(1, 255);
 	m_bg_tilemap->set_scrollx(2, 255);
-	m_bg_tilemap->set_scrollx(3, -data);
+	m_bg_tilemap->set_scrollx(3, -(data + 1));
 }
 
 
@@ -298,17 +298,17 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 	if (flip_screen())
 	{
-		xpos = 127 - xpos;
-		ypos = 255 - ypos - BGHEIGHT;
+		xpos = 264 - xpos;
+		ypos = 264 - ypos - BGHEIGHT;
 	}
 
-	xpos += 128;
+	xpos += 124;
 
 	/* this may not be correct */
-	ypos = ypos + (22 - 8);
+	ypos += 16;
 
 
-		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -316,7 +316,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		ypos, 0);
 
 
-		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -338,6 +338,64 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	}
 
 	bitmap.fill(m_gfxdecode->gfx(image)->colorbase() + 3, rect);
+}
+
+
+
+/*************************************
+ *
+ *  Sprites rendering
+ *
+ *************************************/
+
+void m52_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int initoffs)
+{
+	int offs;
+
+	/* draw the sprites */
+	for (offs = initoffs; offs >= (initoffs & 0xc0); offs -= 4)
+	{
+		int sy = 257 - m_spriteram[offs];
+		int color = m_spriteram[offs + 1] & 0x3f;
+		int flipx = m_spriteram[offs + 1] & 0x40;
+		int flipy = m_spriteram[offs + 1] & 0x80;
+		int code = m_spriteram[offs + 2];
+		int sx = m_spriteram[offs + 3];
+		rectangle clip;
+
+		/* sprites from offsets $00-$7F are processed in the upper half of the frame */
+		/* sprites from offsets $80-$FF are processed in the lower half of the frame */
+		clip = cliprect;
+		if (!(offs & 0x80))
+			clip.min_y = 0, clip.max_y = 127;
+		else
+			clip.min_y = 128, clip.max_y = 255;
+
+		/* adjust for flipping */
+		if (flip_screen())
+		{
+			int temp = clip.min_y;
+			clip.min_y = 255 - clip.max_y;
+			clip.max_y = 255 - temp;
+			flipx = !flipx;
+			flipy = !flipy;
+			sx = 238 - sx;
+			sy = 282 - sy;
+		}
+
+		sx += 129;
+
+		/* in theory anyways; in practice, some of the molecule-looking guys get clipped */
+#ifdef SPLIT_SPRITES
+		sect_rect(&clip, cliprect);
+#else
+		clip = cliprect;
+#endif
+
+		m_gfxdecode->gfx(1)->transmask(bitmap,clip,
+			code, color, flipx, flipy, sx, sy,
+			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512 + 32));
+	}
 }
 
 
@@ -371,48 +429,8 @@ uint32_t m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitma
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
-	for (offs = 0xfc; offs >= 0; offs -= 4)
-	{
-		int sy = 257 - m_spriteram[offs];
-		int color = m_spriteram[offs + 1] & 0x3f;
-		int flipx = m_spriteram[offs + 1] & 0x40;
-		int flipy = m_spriteram[offs + 1] & 0x80;
-		int code = m_spriteram[offs + 2];
-		int sx = m_spriteram[offs + 3];
-		rectangle clip;
+	for (offs = 0x3c; offs <= 0xfc; offs += 0x40)
+		draw_sprites(bitmap, cliprect, offs);
 
-		/* sprites from offsets $00-$7F are processed in the upper half of the frame */
-		/* sprites from offsets $80-$FF are processed in the lower half of the frame */
-		clip = cliprect;
-		if (!(offs & 0x80))
-			clip.min_y = 0, clip.max_y = 127;
-		else
-			clip.min_y = 128, clip.max_y = 255;
-
-		/* adjust for flipping */
-		if (flip_screen())
-		{
-			int temp = clip.min_y;
-			clip.min_y = 255 - clip.max_y;
-			clip.max_y = 255 - temp;
-			flipx = !flipx;
-			flipy = !flipy;
-			sx = 112 - sx;
-			sy = 257 + 11 - sy;
-		}
-
-		sx += 128;
-
-		/* in theory anyways; in practice, some of the molecule-looking guys get clipped */
-#ifdef SPLIT_SPRITES
-		sect_rect(&clip, cliprect);
-#else
-		clip = cliprect;
-#endif
-
-		m_gfxdecode->gfx(1)->transmask(bitmap,clip,
-			code, color, flipx, flipy, sx, sy,
-			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512 + 32));
-	}
 	return 0;
 }
