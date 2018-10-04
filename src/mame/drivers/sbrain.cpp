@@ -348,7 +348,7 @@ void sbrain_state::ppi_pc_w(u8 data)
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 	if (BIT(data, 3))
 	{
-		//m_fdc->reset(); // wd_fdc doesn't like this for some reason
+		m_fdc->soft_reset();
 		disk_select_w(0);
 	}
 	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSRQ, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE); // ignored in z80.cpp
