@@ -1034,7 +1034,8 @@ bool core_options::header_exists(const char *description) const
 void core_options::revert(int priority_hi, int priority_lo)
 {
 	for (entry::shared_ptr &curentry : m_entries)
-		curentry->revert(priority_hi, priority_lo);
+		if (curentry->type() != option_type::HEADER)
+			curentry->revert(priority_hi, priority_lo);
 }
 
 //-------------------------------------------------
