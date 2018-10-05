@@ -64,8 +64,8 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char
 gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 27) // Unknown address bits
 	, m_stream(nullptr)
-	, m_snd_data(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -111,20 +111,20 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample
 				/* generates output data (range 0x00000..0xffff) */
 				if (type == 0x08){
 					/* PCM, 8 bits mono */
-					data = m_snd_data[bank + end_pos + m_sndregs[base_offset + 3]];
+					data = read_byte(bank + end_pos + m_sndregs[base_offset + 3]);
 					ch_data_l = m_volume_table[vol_l][data];
 					ch_data_r = m_volume_table[vol_r][data];
 
 					m_sndregs[base_offset + 3]--;
 				} else if (type == 0x0c){
 					/* PCM, 8 bits stereo */
-					data = m_snd_data[bank + end_pos + m_sndregs[base_offset + 3]];
+					data = read_byte(bank + end_pos + m_sndregs[base_offset + 3]);
 					ch_data_l = m_volume_table[vol_l][data];
 
 					m_sndregs[base_offset + 3]--;
 
 					if (m_sndregs[base_offset + 3] > 0){
-						data = m_snd_data[bank + end_pos + m_sndregs[base_offset + 3]];
+						data = read_byte(bank + end_pos + m_sndregs[base_offset + 3]);
 						ch_data_r = m_volume_table[vol_r][data];
 
 						m_sndregs[base_offset + 3]--;
@@ -257,6 +257,12 @@ void gaelco_gae1_device::device_stop()
 	if (wavraw)
 		wav_close(wavraw);
 	wavraw = nullptr;
+}
+
+
+void gaelco_gae1_device::rom_bank_updated()
+{
+	m_stream->update();
 }
 
 

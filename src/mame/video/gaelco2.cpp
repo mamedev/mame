@@ -104,19 +104,11 @@ Multi monitor notes:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0)
+template<int Layer>
+TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info)
 {
-	int data = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
-	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
-
-	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
-}
-
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1)
-{
-	int data = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
+	int data = m_videoram[(((m_vregs[Layer] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
+	int data2 = m_videoram[(((m_vregs[Layer] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
 	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
@@ -145,22 +137,14 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0_dual)
+template<int Layer>
+TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_dual)
 {
-	int data = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
+	int data = m_videoram[(((m_vregs[Layer] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
+	int data2 = m_videoram[(((m_vregs[Layer] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
-}
-
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1_dual)
-{
-	int data = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
-	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
-
-	SET_TILE_INFO_MEMBER(0, code, 0x40 + ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(0, code, (Layer * 0x40) + ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
 
@@ -170,7 +154,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1_dual)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_vram_w)
+WRITE16_MEMBER(gaelco2_state::vram_w)
 {
 	int pant0_start = ((m_vregs[0] >> 9) & 0x07)*0x1000;
 	int pant0_end = pant0_start + 0x1000;
@@ -180,13 +164,26 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_vram_w)
 	COMBINE_DATA(&m_videoram[offset]);
 
 	/* tilemap 0 writes */
-	if ((offset >= pant0_start) && (offset < pant0_end)){
+	if ((offset >= pant0_start) && (offset < pant0_end))
+	{
 		m_pant[0]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
 	}
 
 	/* tilemap 1 writes */
-	if ((offset >= pant1_start) && (offset < pant1_end)){
+	if ((offset >= pant1_start) && (offset < pant1_end))
+	{
 		m_pant[1]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
+	}
+}
+
+WRITE16_MEMBER(gaelco2_state::vregs_w)
+{
+	uint16_t old = m_vregs[offset];
+	COMBINE_DATA(&m_vregs[offset]);
+
+	if ((offset <= 1) && ((old ^ m_vregs[offset]) & 0xe00))
+	{
+		m_pant[offset]->mark_all_dirty();
 	}
 }
 
@@ -220,12 +217,12 @@ static const int pen_color_adjust[16] = {
 };
 
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
+WRITE16_MEMBER(gaelco2_state::palette_w)
 {
 	int i, color, r, g, b, auxr, auxg, auxb;
 
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	color = m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_paletteram[offset]);
+	color = m_paletteram[offset];
 
 	/* extract RGB components */
 	r = (color >> 10) & 0x1f;
@@ -264,8 +261,8 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2)
 	m_videoram = m_spriteram->live();
 
 	/* create tilemaps */
-	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	/* set tilemap properties */
 	m_pant[0]->set_transparent_pen(0);
@@ -284,8 +281,8 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
 	m_videoram = m_spriteram->live();
 
 	/* create tilemaps */
-	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen0_dual),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen1_dual),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_dual<0>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_dual<1>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	/* set tilemap properties */
 	m_pant[0]->set_transparent_pen(0);
@@ -431,7 +428,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 ***************************************************************************/
 
-uint32_t gaelco2_state::screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gaelco2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -503,8 +500,6 @@ uint32_t gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap,
 		m_pant[1]->set_scrollx(i & 0x1ff, (m_vregs[1] & 0x8000) ? (m_videoram[(0x2400/2) + i] + xoff1) & 0x3ff : scroll1x & 0x3ff);
 	}
 
-
-
 	/* draw screen */
 	bitmap.fill(0, cliprect);
 
@@ -514,5 +509,5 @@ uint32_t gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-uint32_t gaelco2_state::screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 0); }
-uint32_t gaelco2_state::screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 1); }
+uint32_t gaelco2_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 0); }
+uint32_t gaelco2_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 1); }

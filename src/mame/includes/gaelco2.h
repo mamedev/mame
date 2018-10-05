@@ -10,8 +10,8 @@
 class gaelco2_state : public driver_device
 {
 public:
-	gaelco2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gaelco2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_mainlatch(*this, "mainlatch"),
 		m_spriteram(*this,"spriteram"),
@@ -20,7 +20,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram"),
+		m_paletteram(*this, "paletteram"),
 		m_shareram(*this, "shareram")
 	{ }
 
@@ -45,16 +45,17 @@ public:
 	DECLARE_VIDEO_START(gaelco2);
 	DECLARE_VIDEO_START(gaelco2_dual);
 
-	uint32_t screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	required_device<m68000_device> m_maincpu;
 	optional_device<ls259_device> m_mainlatch;
 
-	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
-	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
+	DECLARE_WRITE16_MEMBER(vram_w);
+	DECLARE_WRITE16_MEMBER(vregs_w);
+	DECLARE_WRITE16_MEMBER(palette_w);
 
 	DECLARE_WRITE16_MEMBER(wrally2_latch_w);
 
@@ -70,10 +71,8 @@ private:
 	DECLARE_WRITE16_MEMBER(snowboar_protection_w);
 	DECLARE_READ16_MEMBER(play2000_shareram_68k_r);
 	DECLARE_WRITE16_MEMBER(play2000_shareram_68k_w);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1_dual);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info_dual);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask, int xoffs);
 	uint32_t dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 	void gaelco2_ROM16_split_gfx(const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2);
@@ -96,7 +95,7 @@ private:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint16_t> m_generic_paletteram_16;
+	required_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_shareram;
 };
 

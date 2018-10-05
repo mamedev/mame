@@ -42,31 +42,20 @@
 #include "speaker.h"
 
 
-#define TILELAYOUT16(NUM) static const gfx_layout tilelayout16_##NUM =              \
-{                                                                                   \
-	16,16,                                          /* 16x16 tiles */               \
-	NUM/32,                                         /* number of tiles */           \
-	5,                                              /* 5 bpp */                     \
-	{ 4*NUM*8, 3*NUM*8, 2*NUM*8, 1*NUM*8, 0*NUM*8 },                                \
-	{ 0,1,2,3,4,5,6,7, 16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7 },   \
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8, 8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },     \
-	32*8                                                                            \
+static const gfx_layout tilelayout16 =
+{
+	16,16,                                          /* 16x16 tiles */
+	RGN_FRAC(1,5),                                  /* number of tiles */
+	5,                                              /* 5 bpp */
+	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), 0 },
+	{ STEP8(0,1), STEP8(16*8,1) },
+	{ STEP16(0,8) },
+	32*8
 };
 
-#define GFXDECODEINFO(NUM,ENTRIES) \
-static GFXDECODE_START( gfx_##NUM )\
-	GFXDECODE_ENTRY( "gfx1", 0x0000000, tilelayout16_##NUM,0,   ENTRIES )                       \
+static GFXDECODE_START( gfx_gaelco2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000000, tilelayout16, 0, 128 )
 GFXDECODE_END
-
-
-TILELAYOUT16(0x0080000)
-GFXDECODEINFO(0x0080000, 128)
-TILELAYOUT16(0x0200000)
-GFXDECODEINFO(0x0200000, 128)
-TILELAYOUT16(0x0400000)
-GFXDECODEINFO(0x0400000, 128)
-
-
 
 /*============================================================================
                             COMMON
@@ -85,10 +74,10 @@ void gaelco2_state::mcu_hostmem_map(address_map &map)
 void gaelco2_state::maniacsq_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                                     /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");                         /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
-	map(0x218004, 0x218009).ram().share("vregs");                                                   /* Video Registers */
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");                     /* Palette */
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                            /* Video Registers */
 	map(0x300000, 0x300001).portr("IN0");                                                        /* DSW #1 + Input 1P */
 	map(0x300002, 0x300003).portr("IN1");                                                        /* DSW #2 + Input 2P */
 	map(0x30004a, 0x30004b).nopw();                                                                /* Sound muting? */
@@ -191,11 +180,11 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0080000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaelco2)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -204,11 +193,11 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
-	MCFG_GAELCO_SND_DATA("gfx1")
-	MCFG_GAELCO_BANKS(0 * 0x0080000, 1 * 0x0080000, 0, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelcosnd.set_device_rom_tag("gfx1");
+	gaelcosnd.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
+	gaelcosnd.add_route(0, "lspeaker", 1.0);
+	gaelcosnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaelco2_state::maniacsq_d5002fp)
@@ -496,12 +485,12 @@ void gaelco2_state::play2000_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();                                                                     /* ROM */
 	map(0x100000, 0x100001).portr("IN0");                                                        /* Coins + other buttons? */
 	// AM_RANGE(0x110000, 0x110001) ?
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");                         /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
-	map(0x214000, 0x214fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
+	map(0x214000, 0x214fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");                     /* Palette */
 	map(0x215000, 0x217fff).ram();                                                                     /* Written to, but unused? */
 	map(0x218000, 0x218003).ram();                                                                     /* Written to, but unused? */
-	map(0x218004, 0x218009).ram().share("vregs");                                                   /* Video Registers */
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                      /* Video Registers */
 	map(0x21800a, 0x218fff).ram();                                                                     /* Written to, but unused? */
 	// AM_RANGE(0x843100, 0x84315e)  ?
 	map(0xfe0000, 0xfe7fff).ram();                                                                     /* Work RAM */
@@ -622,11 +611,11 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaelco2)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -635,11 +624,11 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
-	MCFG_GAELCO_SND_DATA("gfx1")
-	MCFG_GAELCO_BANKS(1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000) // ?
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelcosnd.set_device_rom_tag("gfx1");
+	gaelcosnd.set_bank_offsets(1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000); // ?
+	gaelcosnd.add_route(0, "lspeaker", 1.0);
+	gaelcosnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -655,11 +644,11 @@ READ16_MEMBER(bang_state::p2_gun_y){return (m_light1_y->read() * 240 / 0x100) - 
 void bang_state::bang_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                     /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(bang_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(bang_state::vram_w)).share("spriteram");                         /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_cg1v_device::gaelcosnd_r), FUNC(gaelco_cg1v_device::gaelcosnd_w));    /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(bang_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
+	map(0x210000, 0x211fff).ram().w(FUNC(bang_state::palette_w)).share("paletteram");                     /* Palette */
 	map(0x218004, 0x218009).readonly();                                                                /* Video Registers */
-	map(0x218004, 0x218007).writeonly().share("vregs");                                             /* Video Registers */
+	map(0x218004, 0x218007).writeonly().w(FUNC(bang_state::vregs_w)).share("vregs");                   /* Video Registers */
 	map(0x218008, 0x218009).nopw();                                                                /* CLR INT Video */
 	map(0x300000, 0x300001).portr("P1");
 	map(0x300002, 0x300003).nopr();                                                                 /* Random number generator? */
@@ -727,11 +716,11 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaelco2)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -740,11 +729,11 @@ MACHINE_CONFIG_START(bang_state::bang)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("gaelco", GAELCO_CG1V, 0)
-	MCFG_GAELCO_SND_DATA("gfx1")
-	MCFG_GAELCO_BANKS(0 * 0x0200000, 1 * 0x0200000, 2 * 0x0200000, 3 * 0x0200000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	gaelco_cg1v_device &gaelcosnd(GAELCO_CG1V(config, "gaelco", 0));
+	gaelcosnd.set_device_rom_tag("gfx1");
+	gaelcosnd.set_bank_offsets(0 * 0x0200000, 1 * 0x0200000, 2 * 0x0200000, 3 * 0x0200000);
+	gaelcosnd.add_route(0, "lspeaker", 1.0);
+	gaelcosnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -860,10 +849,10 @@ ROM_END
 void gaelco2_state::alighunt_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                         /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                             /* Video RAM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");                             /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));        /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                         /* Palette */
-	map(0x218004, 0x218009).ram().share("vregs");                                                       /* Video Registers */
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");                         /* Palette */
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                                /* Video Registers */
 	map(0x300000, 0x300001).portr("IN0");                                                            /* DSW #1 + Input 1P */
 	map(0x300002, 0x300003).portr("IN1");                                                            /* DSW #2 + Input 2P */
 	map(0x320000, 0x320001).portr("COIN");                                                           /* COINSW + SERVICESW */
@@ -965,11 +954,11 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaelco2)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -978,11 +967,11 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
-	MCFG_GAELCO_SND_DATA("gfx1")
-	MCFG_GAELCO_BANKS(0 * 0x0400000, 1 * 0x0400000, 2 * 0x0400000, 3 * 0x0400000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelcosnd.set_device_rom_tag("gfx1");
+	gaelcosnd.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 2 * 0x0400000, 3 * 0x0400000);
+	gaelcosnd.add_route(0, "lspeaker", 1.0);
+	gaelcosnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaelco2_state::alighunt_d5002fp)
@@ -1129,10 +1118,10 @@ ROM_END
 void gaelco2_state::touchgo_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                         /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                             /* Video RAM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");                             /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));        /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                         /* Palette */
-	map(0x218004, 0x218009).ram().share("vregs");                                                       /* Video Registers */
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");                         /* Palette */
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                                /* Video Registers */
 	map(0x300000, 0x300001).portr("IN0");                                                            /* DSW #1 + Input 1P */
 	map(0x300002, 0x300003).portr("IN1");                                                            /* DSW #2 + Input 2P */
 	map(0x300004, 0x300005).portr("IN2");                                                            /* COINSW + Input 3P */
@@ -1264,7 +1253,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaelco2)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	config.set_default_layout(layout_dualhsxs);
 
@@ -1273,7 +1262,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2_left)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
@@ -1281,7 +1270,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2_right)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_right)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1293,11 +1282,11 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
-	MCFG_GAELCO_SND_DATA("gfx1")
-	MCFG_GAELCO_BANKS(0 * 0x0400000, 1 * 0x0400000, 0, 0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelcosnd.set_device_rom_tag("gfx1");
+	gaelcosnd.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 0, 0);
+	gaelcosnd.add_route(0, "rspeaker", 1.0);
+	gaelcosnd.add_route(1, "lspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaelco2_state::touchgo_d5002fp)
@@ -1508,11 +1497,11 @@ ROM_END
 void gaelco2_state::snowboar_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                         /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                             /* Video RAM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");                             /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_cg1v_device::gaelcosnd_r), FUNC(gaelco_cg1v_device::gaelcosnd_w));        /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                         /* Palette */
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::palette_w)).share("paletteram");                         /* Palette */
 	map(0x212000, 0x213fff).ram();                                                                         /* Extra RAM */
-	map(0x218004, 0x218009).ram().share("vregs");                                                       /* Video Registers */
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                          /* Video Registers */
 	map(0x300000, 0x300001).portr("P1");
 	map(0x300000, 0x30000f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);                      /* Coin Counters & serial EEPROM */
 	map(0x300010, 0x300011).portr("P2");
@@ -1577,11 +1566,11 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaelco2)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -1590,11 +1579,11 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("gaelco", GAELCO_CG1V, 0)
-	MCFG_GAELCO_SND_DATA("gfx1")
-	MCFG_GAELCO_BANKS(0 * 0x0400000, 1 * 0x0400000, 0, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	gaelco_cg1v_device &gaelcosnd(GAELCO_CG1V(config, "gaelco", 0));
+	gaelcosnd.set_device_rom_tag("gfx1");
+	gaelcosnd.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 0, 0);
+	gaelcosnd.add_route(0, "lspeaker", 1.0);
+	gaelcosnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
@@ -1620,11 +1609,11 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0080000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaelco2)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -1633,11 +1622,11 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
-	MCFG_GAELCO_SND_DATA("gfx1")
-	MCFG_GAELCO_BANKS(0 * 0x0080000, 1 * 0x0080000, 0, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelcosnd.set_device_rom_tag("gfx1");
+	gaelcosnd.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
+	gaelcosnd.add_route(0, "lspeaker", 1.0);
+	gaelcosnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -1739,11 +1728,11 @@ ROM_END
 void wrally2_state::wrally2_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                     /* ROM */
-	map(0x200000, 0x20ffff).ram().w(FUNC(wrally2_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x200000, 0x20ffff).ram().w(FUNC(wrally2_state::vram_w)).share("spriteram");                         /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
-	map(0x210000, 0x211fff).ram().w(FUNC(wrally2_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
+	map(0x210000, 0x211fff).ram().w(FUNC(wrally2_state::palette_w)).share("paletteram");                     /* Palette */
 	map(0x212000, 0x213fff).ram();                                                                     /* Extra RAM */
-	map(0x218004, 0x218009).ram().share("vregs");                                                   /* Video Registers */
+	map(0x218004, 0x218009).ram().w(FUNC(wrally2_state::vregs_w)).share("vregs");                      /* Video Registers */
 	map(0x300000, 0x300001).portr("IN0");                                                        /* DIPSW #2 + Inputs 1P */
 	map(0x300002, 0x300003).portr("IN1");                                                        /* DIPSW #1 */
 	map(0x300004, 0x300005).portr("IN2");                                                        /* Inputs 2P + COINSW */
@@ -1860,7 +1849,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaelco2)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	config.set_default_layout(layout_dualhsxs);
 
@@ -1869,7 +1858,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(384, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2_left)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
@@ -1877,7 +1866,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(384, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2_right)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_right)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1890,11 +1879,11 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
-	MCFG_GAELCO_SND_DATA("gfx1")
-	MCFG_GAELCO_BANKS(0 * 0x0200000, 1 * 0x0200000, 0, 0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelcosnd.set_device_rom_tag("gfx1");
+	gaelcosnd.set_bank_offsets(0 * 0x0200000, 1 * 0x0200000, 0, 0);
+	gaelcosnd.add_route(0, "rspeaker", 1.0);
+	gaelcosnd.add_route(1, "lspeaker", 1.0);
 MACHINE_CONFIG_END
 
 /*
