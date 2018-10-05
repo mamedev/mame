@@ -3758,7 +3758,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_DEVICE_PROGRAM_MAP( mcu_s22_program)
 	MCFG_DEVICE_IO_MAP( mcu_s22_io)
 
-	MCFG_DEVICE_ADD("iomcu", NAMCO_C74, XTAL(6'144'000)) // 6.144MHz XTAL on I/O board, not sure if it has a divider
+	MCFG_DEVICE_ADD("iomcu", NAMCO_C74, 49.152_MHz_XTAL/3)
 	MCFG_DEVICE_PROGRAM_MAP( iomcu_s22_program)
 	MCFG_DEVICE_IO_MAP( iomcu_s22_io)
 
