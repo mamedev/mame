@@ -6720,14 +6720,14 @@ ROM_START( mvstemp )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) ) // BIOS
 	ROM_Y_ZOOM
 
-	NEO_BIOS_AUDIO_64K( "s-800h", CRC(307fffb2) SHA1(0a7a21c2f1a1f245de59d588f20b5ffea522a949) ) 
+	NEO_BIOS_AUDIO_64K( "s-800h", CRC(307fffb2) SHA1(0a7a21c2f1a1f245de59d588f20b5ffea522a949) )
 
 	ROM_REGION( 0x200000, "cslot1:hd64180", 0 ) // HD64180SCP10 program, not hooked up
 	ROM_LOAD( "mvs64p", 0x000000, 0x10000, CRC(42a1d73a) SHA1(cb82a73f087ed6ca936dbe36a0a85451e63c9c8c) )
 
 	ROM_REGION( 0x117, "cslot1:pld", 0 )
 	ROM_LOAD( "ic6.bin",  0x000, 0x117, CRC(7e3da063) SHA1(2778932f8d4c48101c728e2f1906e54f8d73ff90) )
-	ROM_LOAD( "ic12.bin", 0x000, 0x117, CRC(b4f3c5ae) SHA1(61a1cda077c6998f0427922b1d229ef05e65e6ee) )	
+	ROM_LOAD( "ic12.bin", 0x000, 0x117, CRC(b4f3c5ae) SHA1(61a1cda077c6998f0427922b1d229ef05e65e6ee) )
 
 	ROM_REGION( 0x800000, "cslot1:ymsnd", ROMREGION_ERASE00 )
 	// No V data (no positions for it)
@@ -11847,7 +11847,7 @@ GAME( 1991, bakatono,   neogeo,   neogeo_mj, neogeo_mj, mvs_led_state, empty_ini
 // Nazca (later acquired by SNK)
 GAME( 1996, turfmast,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Nazca", "Neo Turf Masters / Big Tournament Golf", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, mslug,      neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Nazca", "Metal Slug - Super Vehicle-001", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, mvstemp,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Nazca", "MVS-TEMP 'SubSystem Ver1.4' (Nazca development board)", MACHINE_NOT_WORKING )
+GAME( 1995?,mvstemp,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Nazca", "MVS-TEMP 'SubSystem Ver1.4' (Nazca development board)", MACHINE_NOT_WORKING )
 
 // NMK
 GAME( 1994, zedblade,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "NMK", "Zed Blade / Operation Ragnarok", MACHINE_SUPPORTS_SAVE )
@@ -11877,7 +11877,7 @@ GAME( 1996, wakuwak7,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 // Taito
 GAME( 1994, pbobblen,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo, NGM-083)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, pbobblenb,  pbobblen, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Puzzle Bobble / Bust-A-Move (Neo-Geo, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, pbobbl2n,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Taito (SNK license)", "Puzzle Bobble 2 / Bust-A-Move Again (Neo-Geo)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, pbobbl2n,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Taito (SNK license)", "Puzzle Bobble 2 / Bust-A-Move Again (Neo-Geo)", MACHINE_SUPPORTS_SAVE ) // ported to Neo-Geo by SNK, original version is on Taito F3
 GAME( 2003, pnyaa,      neogeo,   pnyaa,     neogeo,    mvs_led_state, empty_init, ROT0, "Aiky / Taito", "Pochi and Nyaa (Ver 2.02)", MACHINE_SUPPORTS_SAVE ) // this version does not show the web address on the title screen
 GAME( 2003, pnyaaa,     pnyaa,    pnyaa,     neogeo,    mvs_led_state, empty_init, ROT0, "Aiky / Taito", "Pochi and Nyaa (Ver 2.00)", MACHINE_SUPPORTS_SAVE )
 
@@ -11905,12 +11905,12 @@ GAME( 1995, froman2b,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 
 // Visco
 GAME( 1992, androdun,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Andro Dunos (NGM-049 ~ NGH-049)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, puzzledp,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Taito (Visco license)", "Puzzle De Pon!", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, neomrdo,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Neo Mr. Do!", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzledp,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Puzzle De Pon!", MACHINE_SUPPORTS_SAVE ) // game concept licensed from Taito
+GAME( 1996, neomrdo,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Neo Mr. Do!", MACHINE_SUPPORTS_SAVE ) // game concept licensed from Universal
 GAME( 1995, goalx3,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Goal! Goal! Goal!", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, neodrift,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Neo Drift Out - New Technology", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, breakers,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Breakers", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, puzzldpr,   puzzledp, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Taito (Visco license)", "Puzzle De Pon! R!", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, puzzldpr,   puzzledp, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Puzzle De Pon! R!", MACHINE_SUPPORTS_SAVE ) // game concept licensed from Taito
 GAME( 1998, breakrev,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Breakers Revenge", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, flipshot,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Battle Flip Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, ctomaday,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Captain Tomaday", MACHINE_SUPPORTS_SAVE )
