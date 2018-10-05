@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", XTAL(26'000'000) / 26));
 	gaelcosnd.set_device_rom_tag("gfx1");
 	gaelcosnd.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
 	gaelcosnd.add_route(0, "lspeaker", 1.0);
@@ -624,7 +624,7 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", XTAL(34'000'000) / 34));
 	gaelcosnd.set_device_rom_tag("gfx1");
 	gaelcosnd.set_bank_offsets(1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000, 1 * 0x0080000); // ?
 	gaelcosnd.add_route(0, "lspeaker", 1.0);
@@ -729,7 +729,7 @@ MACHINE_CONFIG_START(bang_state::bang)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_cg1v_device &gaelcosnd(GAELCO_CG1V(config, "gaelco", 0));
+	gaelco_cg1v_device &gaelcosnd(GAELCO_CG1V(config, "gaelco", XTAL(30'000'000) / 30));
 	gaelcosnd.set_device_rom_tag("gfx1");
 	gaelcosnd.set_bank_offsets(0 * 0x0200000, 1 * 0x0200000, 2 * 0x0200000, 3 * 0x0200000);
 	gaelcosnd.add_route(0, "lspeaker", 1.0);
@@ -967,7 +967,7 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", XTAL(24'000'000) / 24));
 	gaelcosnd.set_device_rom_tag("gfx1");
 	gaelcosnd.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 2 * 0x0400000, 3 * 0x0400000);
 	gaelcosnd.add_route(0, "lspeaker", 1.0);
@@ -1282,7 +1282,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", XTAL(32'000'000) / 32));
 	gaelcosnd.set_device_rom_tag("gfx1");
 	gaelcosnd.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 0, 0);
 	gaelcosnd.add_route(0, "rspeaker", 1.0);
@@ -1579,7 +1579,7 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_cg1v_device &gaelcosnd(GAELCO_CG1V(config, "gaelco", 0));
+	gaelco_cg1v_device &gaelcosnd(GAELCO_CG1V(config, "gaelco", XTAL(30'000'000) / 30));
 	gaelcosnd.set_device_rom_tag("gfx1");
 	gaelcosnd.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 0, 0);
 	gaelcosnd.add_route(0, "lspeaker", 1.0);
@@ -1622,7 +1622,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", XTAL(24'000'000) / 24));
 	gaelcosnd.set_device_rom_tag("gfx1");
 	gaelcosnd.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
 	gaelcosnd.add_route(0, "lspeaker", 1.0);
@@ -1879,7 +1879,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco", 0));
+	gaelco_gae1_device &gaelcosnd(GAELCO_GAE1(config, "gaelco",  XTAL(26'000'000) / 26));
 	gaelcosnd.set_device_rom_tag("gfx1");
 	gaelcosnd.set_bank_offsets(0 * 0x0200000, 1 * 0x0200000, 0, 0);
 	gaelcosnd.add_route(0, "rspeaker", 1.0);

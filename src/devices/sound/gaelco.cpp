@@ -238,7 +238,8 @@ WRITE16_MEMBER( gaelco_gae1_device::gaelcosnd_w )
 
 void gaelco_gae1_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, 8000);
+	uint32_t rate = clock() / 128;
+	m_stream = stream_alloc(0, 2, rate);
 
 	/* init volume table */
 	for (int vol = 0; vol < VOLUME_LEVELS; vol++){
@@ -248,7 +249,7 @@ void gaelco_gae1_device::device_start()
 	}
 
 	if (LOG_WAVE)
-		wavraw = wav_open("gae1_snd.wav", 8000, 2);
+		wavraw = wav_open("gae1_snd.wav", rate, 2);
 }
 
 
@@ -257,6 +258,18 @@ void gaelco_gae1_device::device_stop()
 	if (wavraw)
 		wav_close(wavraw);
 	wavraw = nullptr;
+}
+
+
+void gaelco_gae1_device::device_post_load()
+{
+	device_clock_changed();
+}
+
+
+void gaelco_gae1_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 128);
 }
 
 
