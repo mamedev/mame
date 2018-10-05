@@ -3905,7 +3905,7 @@ MACHINE_CONFIG_START(namcos22_state::tokyowar)
 	namcos22s(config);
 
 	SPEAKER(config, "vibration").subwoofer();
-	SPEAKER(config, "seat", 0.0, 0.0, -0.5);
+	SPEAKER(config, "seat").rear_center();
 
 	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(2, "vibration", 0.50) // to "bass shaker"
