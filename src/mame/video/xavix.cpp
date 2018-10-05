@@ -556,7 +556,7 @@ WRITE8_MEMBER(xavix_state::vid_dma_params_2_w)
 	m_vid_dma_param2[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::vid_dma_trigger_w)
+WRITE8_MEMBER(xavix_state::vid_rom_dmatrg_w)
 {
 	uint16_t len = data & 0x07;
 	uint16_t src = (m_vid_dma_param1[1]<<8) | m_vid_dma_param1[0];
@@ -565,7 +565,7 @@ WRITE8_MEMBER(xavix_state::vid_dma_trigger_w)
 
 	uint8_t unk = m_vid_dma_param2[1];
 
-	logerror("%s: vid_dma_trigger_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len,src,dst,unk);
+	logerror("%s: vid_rom_dmatrg_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len,src,dst,unk);
 
 	if (unk)
 	{
@@ -592,7 +592,7 @@ WRITE8_MEMBER(xavix_state::vid_dma_trigger_w)
 	}
 }
 
-READ8_MEMBER(xavix_state::vid_dma_trigger_r)
+READ8_MEMBER(xavix_state::vid_rom_dmatrg_r)
 {
 	// expects bit 0x40 to clear in most cases
 	return 0x00;
@@ -606,10 +606,12 @@ READ8_MEMBER(xavix_state::pal_ntsc_r)
 	return m_region->read();
 }
 
+/*
 WRITE8_MEMBER(xavix_state::xavix_6fc0_w) // also related to tilemap 1?
 {
 	logerror("%s: xavix_6fc0_w data %02x\n", machine().describe_context(), data);
 }
+*/
 
 WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 {
@@ -688,13 +690,13 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 	COMBINE_DATA(&m_tmap1_regs[offset]);
 }
 
-WRITE8_MEMBER(xavix_state::xavix_6fd8_w) // also related to tilemap 2?
+WRITE8_MEMBER(xavix_state::spriteregs_w) // also related to tilemap 2?
 {
 	// possibly just a mirror of tmap2_regs_w, at least it writes 0x04 here which would be the correct
 	// base address to otherwise write at tmap2_regs_w offset 0
 //  tmap2_regs_w(space,offset,data);
 
-	logerror("%s: xavix_6fd8_w data %02x\n", machine().describe_context(), data);
+	logerror("%s: spriteregs_w data %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(xavix_state::tmap2_regs_w)

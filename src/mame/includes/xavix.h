@@ -67,19 +67,19 @@ private:
 	DECLARE_READ8_MEMBER(main2_r);
 	DECLARE_WRITE8_MEMBER(main2_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_7900_w);
-	DECLARE_WRITE8_MEMBER(xavix_7901_w);
-	DECLARE_WRITE8_MEMBER(xavix_7902_w);
+	DECLARE_WRITE8_MEMBER(extintrf_7900_w);
+	DECLARE_WRITE8_MEMBER(extintrf_7901_w);
+	DECLARE_WRITE8_MEMBER(extintrf_7902_w);
 
 	DECLARE_WRITE8_MEMBER(xavix_7a80_w);
-	DECLARE_WRITE8_MEMBER(xavix_7b00_w);
-	DECLARE_READ8_MEMBER(xavix_7b80_r);
-	DECLARE_WRITE8_MEMBER(xavix_7b80_w);
-	DECLARE_WRITE8_MEMBER(xavix_7b81_w);
+	DECLARE_WRITE8_MEMBER(adc_7b00_w);
+	DECLARE_READ8_MEMBER(adc_7b80_r);
+	DECLARE_WRITE8_MEMBER(adc_7b80_w);
+	DECLARE_WRITE8_MEMBER(adc_7b81_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_7810_w);
+	DECLARE_WRITE8_MEMBER(slotreg_7810_w);
 
-	DECLARE_WRITE8_MEMBER(dma_trigger_w);
+	DECLARE_WRITE8_MEMBER(rom_dmatrg_w);
 	DECLARE_WRITE8_MEMBER(rom_dmasrc_lo_w);
 	DECLARE_WRITE8_MEMBER(rom_dmasrc_md_w);
 	DECLARE_WRITE8_MEMBER(rom_dmasrc_hi_w);
@@ -87,24 +87,24 @@ private:
 	DECLARE_WRITE8_MEMBER(rom_dmadst_hi_w);
 	DECLARE_WRITE8_MEMBER(rom_dmalen_lo_w);
 	DECLARE_WRITE8_MEMBER(rom_dmalen_hi_w);
-	DECLARE_READ8_MEMBER(dma_trigger_r);
+	DECLARE_READ8_MEMBER(rom_dmatrg_r);
 
 	DECLARE_WRITE8_MEMBER(vid_dma_params_1_w);
 	DECLARE_WRITE8_MEMBER(vid_dma_params_2_w);
-	DECLARE_WRITE8_MEMBER(vid_dma_trigger_w);
-	DECLARE_READ8_MEMBER(vid_dma_trigger_r);
+	DECLARE_WRITE8_MEMBER(vid_rom_dmatrg_w);
+	DECLARE_READ8_MEMBER(vid_rom_dmatrg_r);
 
-	DECLARE_READ8_MEMBER(xavix_io_0_r);
-	DECLARE_READ8_MEMBER(xavix_io_1_r);
-	DECLARE_READ8_MEMBER(xavix_7a02_r);
-	DECLARE_READ8_MEMBER(xavix_7a03_r);
+	DECLARE_READ8_MEMBER(io_0_r);
+	DECLARE_READ8_MEMBER(io_1_r);
+	DECLARE_READ8_MEMBER(io_2_r);
+	DECLARE_READ8_MEMBER(io_3_r);
 
-	DECLARE_WRITE8_MEMBER(xavix_7a00_w);
-	DECLARE_WRITE8_MEMBER(xavix_7a01_w);
-	DECLARE_WRITE8_MEMBER(xavix_7a02_w);
-	DECLARE_WRITE8_MEMBER(xavix_7a03_w);
+	DECLARE_WRITE8_MEMBER(io_0_w);
+	DECLARE_WRITE8_MEMBER(io_1_w);
+	DECLARE_WRITE8_MEMBER(io_2_w);
+	DECLARE_WRITE8_MEMBER(io_3_w);
 
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE8_MEMBER(vector_enable_w);
 	DECLARE_WRITE8_MEMBER(irq_vector0_lo_w);
 	DECLARE_WRITE8_MEMBER(irq_vector0_hi_w);
 	DECLARE_WRITE8_MEMBER(irq_vector1_lo_w);
@@ -113,63 +113,63 @@ private:
 	DECLARE_READ8_MEMBER(irq_source_r);
 	DECLARE_WRITE8_MEMBER(irq_source_w);
 
-	DECLARE_READ8_MEMBER(xavix_6fe8_r);
-	DECLARE_WRITE8_MEMBER(xavix_6fe8_w);
-	DECLARE_READ8_MEMBER(xavix_6fe9_r);
-	DECLARE_WRITE8_MEMBER(xavix_6fe9_w);
-	DECLARE_WRITE8_MEMBER(xavix_6fea_w);
+	DECLARE_READ8_MEMBER(arena_6fe8_r);
+	DECLARE_WRITE8_MEMBER(arena_6fe8_w);
+	DECLARE_READ8_MEMBER(arena_6fe9_r);
+	DECLARE_WRITE8_MEMBER(arena_6fe9_w);
+	DECLARE_WRITE8_MEMBER(arena_6fea_w);
 
-	DECLARE_READ8_MEMBER(xavix_6ff0_r);
-	DECLARE_WRITE8_MEMBER(xavix_6ff0_w);
+	DECLARE_READ8_MEMBER(colmix_6ff0_r);
+	DECLARE_WRITE8_MEMBER(colmix_6ff0_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_6ff1_w);
-	DECLARE_WRITE8_MEMBER(xavix_6ff2_w);
+	DECLARE_WRITE8_MEMBER(colmix_6ff1_w);
+	DECLARE_WRITE8_MEMBER(colmix_6ff2_w);
 
-	DECLARE_READ8_MEMBER(xavix_6ff8_r);
-	DECLARE_WRITE8_MEMBER(xavix_6ff8_w);
+	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
+	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_6ffa_w);
-	DECLARE_WRITE8_MEMBER(xavix_6ffb_w);
+	DECLARE_WRITE8_MEMBER(dispctrl_6ffa_w);
+	DECLARE_WRITE8_MEMBER(dispctrl_6ffb_w);
 
-	DECLARE_READ8_MEMBER(xavix_75f0_r);
-	DECLARE_WRITE8_MEMBER(xavix_75f0_w);
+	DECLARE_READ8_MEMBER(sound_75f0_r);
+	DECLARE_WRITE8_MEMBER(sound_75f0_w);
 
-	DECLARE_READ8_MEMBER(xavix_75f1_r);
-	DECLARE_WRITE8_MEMBER(xavix_75f1_w);
+	DECLARE_READ8_MEMBER(sound_75f1_r);
+	DECLARE_WRITE8_MEMBER(sound_75f1_w);
 
-	DECLARE_READ8_MEMBER(xavix_75f4_r);
-	DECLARE_READ8_MEMBER(xavix_75f5_r);
-	DECLARE_READ8_MEMBER(xavix_75f6_r);
-	DECLARE_WRITE8_MEMBER(xavix_75f6_w);
+	DECLARE_READ8_MEMBER(sound_75f4_r);
+	DECLARE_READ8_MEMBER(sound_75f5_r);
+	DECLARE_READ8_MEMBER(sound_75f6_r);
+	DECLARE_WRITE8_MEMBER(sound_75f6_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_75f7_w);
+	DECLARE_WRITE8_MEMBER(sound_75f7_w);
 
-	DECLARE_READ8_MEMBER(xavix_75f8_r);
-	DECLARE_WRITE8_MEMBER(xavix_75f8_w);
+	DECLARE_READ8_MEMBER(sound_75f8_r);
+	DECLARE_WRITE8_MEMBER(sound_75f8_w);
 
-	DECLARE_READ8_MEMBER(xavix_75f9_r);
-	DECLARE_WRITE8_MEMBER(xavix_75f9_w);
+	DECLARE_READ8_MEMBER(sound_75f9_r);
+	DECLARE_WRITE8_MEMBER(sound_75f9_w);
 
-	DECLARE_READ8_MEMBER(xavix_75fa_r);
-	DECLARE_WRITE8_MEMBER(xavix_75fa_w);
-	DECLARE_READ8_MEMBER(xavix_75fb_r);
-	DECLARE_WRITE8_MEMBER(xavix_75fb_w);
-	DECLARE_READ8_MEMBER(xavix_75fc_r);
-	DECLARE_WRITE8_MEMBER(xavix_75fc_w);
-	DECLARE_READ8_MEMBER(xavix_75fd_r);
-	DECLARE_WRITE8_MEMBER(xavix_75fd_w);
+	DECLARE_READ8_MEMBER(sound_75fa_r);
+	DECLARE_WRITE8_MEMBER(sound_75fa_w);
+	DECLARE_READ8_MEMBER(sound_75fb_r);
+	DECLARE_WRITE8_MEMBER(sound_75fb_w);
+	DECLARE_READ8_MEMBER(sound_75fc_r);
+	DECLARE_WRITE8_MEMBER(sound_75fc_w);
+	DECLARE_READ8_MEMBER(sound_75fd_r);
+	DECLARE_WRITE8_MEMBER(sound_75fd_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_75fe_w);
-	DECLARE_WRITE8_MEMBER(xavix_75ff_w);
+	DECLARE_WRITE8_MEMBER(sound_75fe_w);
+	DECLARE_WRITE8_MEMBER(sound_75ff_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_7c00_w);
-	DECLARE_READ8_MEMBER(xavix_7c01_r);
-	DECLARE_WRITE8_MEMBER(xavix_7c01_w);
-	DECLARE_WRITE8_MEMBER(xavix_7c02_w);
+	DECLARE_WRITE8_MEMBER(timer_7c00_w);
+	DECLARE_READ8_MEMBER(timer_7c01_r);
+	DECLARE_WRITE8_MEMBER(timer_7c01_w);
+	DECLARE_WRITE8_MEMBER(timer_7c02_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_6fc0_w);
+	//DECLARE_WRITE8_MEMBER(xavix_6fc0_w);
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
-	DECLARE_WRITE8_MEMBER(xavix_6fd8_w);
+	DECLARE_WRITE8_MEMBER(spriteregs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
 	DECLARE_READ8_MEMBER(tmap2_regs_r);
 
@@ -193,7 +193,7 @@ private:
 	uint8_t m_rom_dmalen_lo_data;
 	uint8_t m_rom_dmalen_hi_data;
 
-	uint8_t m_irq_enable_data;
+	uint8_t m_vectorenable;
 	uint8_t m_irq_vector0_lo_data;
 	uint8_t m_irq_vector0_hi_data;
 	uint8_t m_irq_vector1_lo_data;
@@ -218,7 +218,7 @@ private:
 
 	uint8_t m_7c01;
 
-	uint8_t get_vectors(int which, int half);
+	int16_t get_vectors(int which, int half);
 
 	required_shared_ptr<uint8_t> m_mainram;
 

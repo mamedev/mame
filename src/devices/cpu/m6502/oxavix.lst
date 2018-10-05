@@ -61,8 +61,16 @@ brk_xav_imp
 		}
 		else
 		{
-			PC = m_vector_callback(0,1);
-			PC = set_h(PC, m_vector_callback(0,0));
+			if (m_vector_callback(0,1) != -1)
+			{
+				PC = m_vector_callback(0,1);
+				PC = set_h(PC, m_vector_callback(0,0));
+			}
+			else
+			{
+				PC = read_arg(0xfffa);
+				PC = set_h(PC, read_arg(0xfffb));		
+			}
 		}
 
 		nmi_state = false;
@@ -75,8 +83,16 @@ brk_xav_imp
 		}
 		else
 		{
-			PC = m_vector_callback(1,1);
-			PC = set_h(PC, m_vector_callback(1,0));
+			if (m_vector_callback(1,1) != -1)
+			{
+				PC = m_vector_callback(1,1);
+				PC = set_h(PC, m_vector_callback(1,0));
+			}
+			else
+			{
+				PC = read_arg(0xfffe);
+				PC = set_h(PC, read_arg(0xffff));		
+			}
 		}
 
 		if(irq_taken)

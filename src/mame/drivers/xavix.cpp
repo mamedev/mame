@@ -244,6 +244,9 @@ WRITE8_MEMBER(xavix_state::main_w)
    note, many DMA operations and tile bank redirects etc. have the high bit set too, so that could be significant if it defines how it accesses
    memory in those cases too
 
+   this can't be correct, it breaks monster truck which expects ROM at 8000 even in the >0x800000 region, maybe code + data mappings need
+   to be kept separate, with >0x800000 showing both ROM banks for code, but still having the zero page area etc. for data?
+
 */
 READ8_MEMBER(xavix_state::main2_r)
 {
@@ -288,12 +291,10 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x3fff).ram().share("mainram");
 
-	// this might not be a real area, the tilemap base register gets set to 0x40 in monster truck service mode, and expects a fixed layout.
-	// As that would point at this address maybe said layout is being read from here, or maybe it's just a magic tilemap register value that doesn't read address space at all.
+	// Memory Emulator / Text Array
 	map(0x4000, 0x41ff).r(FUNC(xavix_state::xavix_4000_r));
 
-	// 6xxx ranges are the video hardware
-	// appears to be 256 sprites
+	// Sprite RAM 
 	map(0x6000, 0x60ff).ram().share("spr_attr0");
 	map(0x6100, 0x61ff).ram().share("spr_attr1");
 	map(0x6200, 0x62ff).ram().share("spr_ypos"); // cleared to 0x80 by both games, maybe enable registers?
@@ -302,108 +303,130 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6500, 0x65ff).ram().share("spr_addr_lo");
 	map(0x6600, 0x66ff).ram().share("spr_addr_md");
 	map(0x6700, 0x67ff).ram().share("spr_addr_hi");
+
+	// Palette RAM
 	map(0x6800, 0x68ff).ram().share("palram1"); // written with 6900
 	map(0x6900, 0x69ff).ram().share("palram2"); // startup (taitons1)
+
+	// Segment RAM
 	map(0x6a00, 0x6a1f).ram().share("spr_attra"); // test mode, pass flag 0x20
 
-	map(0x6fc0, 0x6fc0).w(FUNC(xavix_state::xavix_6fc0_w)); // startup (maybe this is a mirror of tmap1_regs_w)
-
+	// Tilemap 1 Registers
 	map(0x6fc8, 0x6fcf).w(FUNC(xavix_state::tmap1_regs_w)); // video registers
 
+	// Tilemap 2 Registers
 	map(0x6fd0, 0x6fd7).rw(FUNC(xavix_state::tmap2_regs_r), FUNC(xavix_state::tmap2_regs_w));
-	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::xavix_6fd8_w)); // startup (mirror of tmap2_regs_w?)
+	
+	// Sprite Registers
+	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::spriteregs_w));
 
-	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::vid_dma_trigger_r), FUNC(xavix_state::vid_dma_trigger_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
+	// Sprite DMA
+	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::vid_rom_dmatrg_r), FUNC(xavix_state::vid_rom_dmatrg_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
 	map(0x6fe1, 0x6fe2).w(FUNC(xavix_state::vid_dma_params_1_w));
 	map(0x6fe5, 0x6fe6).w(FUNC(xavix_state::vid_dma_params_2_w));
 
-	// function in rad_mtrk at 0184b7 uses this
-	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::xavix_6fe8_r), FUNC(xavix_state::xavix_6fe8_w)); // r/w tested
-	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::xavix_6fe9_r), FUNC(xavix_state::xavix_6fe9_w)); // r/w tested
-	map(0x6fea, 0x6fea).w(FUNC(xavix_state::xavix_6fea_w));
+	// Arena Registers
+	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::arena_6fe8_r), FUNC(xavix_state::arena_6fe8_w)); // r/w tested
+	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::arena_6fe9_r), FUNC(xavix_state::arena_6fe9_w)); // r/w tested
+	map(0x6fea, 0x6fea).w(FUNC(xavix_state::arena_6fea_w));
 
-	map(0x6ff0, 0x6ff0).rw(FUNC(xavix_state::xavix_6ff0_r), FUNC(xavix_state::xavix_6ff0_w)); // r/w tested
-	map(0x6ff1, 0x6ff1).w(FUNC(xavix_state::xavix_6ff1_w)); // startup - cleared in interrupt 0
-	map(0x6ff2, 0x6ff2).w(FUNC(xavix_state::xavix_6ff2_w)); // set to 07 after clearing above things in interrupt 0
+	// Colour Mixing / Enabling Registers
+	map(0x6ff0, 0x6ff0).rw(FUNC(xavix_state::colmix_6ff0_r), FUNC(xavix_state::colmix_6ff0_w)); // r/w tested
+	map(0x6ff1, 0x6ff1).w(FUNC(xavix_state::colmix_6ff1_w)); // startup - cleared in interrupt 0
+	map(0x6ff2, 0x6ff2).w(FUNC(xavix_state::colmix_6ff2_w)); // set to 07 after clearing above things in interrupt 0
 
-	map(0x6ff8, 0x6ff8).rw(FUNC(xavix_state::xavix_6ff8_r), FUNC(xavix_state::xavix_6ff8_w)); // always seems to be a read/store or read/modify/store
+	// Display Control Register / Status Flags
+	map(0x6ff8, 0x6ff8).rw(FUNC(xavix_state::dispctrl_6ff8_r), FUNC(xavix_state::dispctrl_6ff8_w)); // always seems to be a read/store or read/modify/store
 	map(0x6ff9, 0x6ff9).r(FUNC(xavix_state::pal_ntsc_r));
-	map(0x6ffa, 0x6ffa).w(FUNC(xavix_state::xavix_6ffa_w));
-	map(0x6ffb, 0x6ffb).w(FUNC(xavix_state::xavix_6ffb_w)); // increases / decreases when you jump in snowboard, maybe raster irq pos or part of a clipping window?
+	map(0x6ffa, 0x6ffa).w(FUNC(xavix_state::dispctrl_6ffa_w));
+	map(0x6ffb, 0x6ffb).w(FUNC(xavix_state::dispctrl_6ffb_w)); // increases / decreases when you jump in snowboard, maybe raster irq pos or part of a clipping window?
 
-	// 7xxx ranges system controller?
-	map(0x75f0, 0x75f0).rw(FUNC(xavix_state::xavix_75f0_r), FUNC(xavix_state::xavix_75f0_w)); // r/w tested read/written 8 times in a row
-	map(0x75f1, 0x75f1).rw(FUNC(xavix_state::xavix_75f1_r), FUNC(xavix_state::xavix_75f1_w)); // r/w tested read/written 8 times in a row
+	// Lightgun / pen 1 control
+	// map(0x6ffc, 0x6fff)
+
+	// Sound RAM
+	// map(0x7400, 0x75ff)
+
+	// Sound Control
+	map(0x75f0, 0x75f0).rw(FUNC(xavix_state::sound_75f0_r), FUNC(xavix_state::sound_75f0_w)); // r/w tested read/written 8 times in a row
+	map(0x75f1, 0x75f1).rw(FUNC(xavix_state::sound_75f1_r), FUNC(xavix_state::sound_75f1_w)); // r/w tested read/written 8 times in a row
 	map(0x75f3, 0x75f3).ram();
-	map(0x75f4, 0x75f4).r(FUNC(xavix_state::xavix_75f4_r)); // related to 75f0 (read after writing there - rad_mtrk)
-	map(0x75f5, 0x75f5).r(FUNC(xavix_state::xavix_75f5_r)); // related to 75f1 (read after writing there - rad_mtrk)
-
+	map(0x75f4, 0x75f4).r(FUNC(xavix_state::sound_75f4_r)); // related to 75f0 (read after writing there - rad_mtrk)
+	map(0x75f5, 0x75f5).r(FUNC(xavix_state::sound_75f5_r)); // related to 75f1 (read after writing there - rad_mtrk)
 	// taitons1 after 75f7/75f8
-	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::xavix_75f6_r), FUNC(xavix_state::xavix_75f6_w)); // r/w tested
+	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_75f6_r), FUNC(xavix_state::sound_75f6_w)); // r/w tested
 	// taitons1 written as a pair
-	map(0x75f7, 0x75f7).w(FUNC(xavix_state::xavix_75f7_w));
-	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::xavix_75f8_r), FUNC(xavix_state::xavix_75f8_w)); // r/w tested
+	map(0x75f7, 0x75f7).w(FUNC(xavix_state::sound_75f7_w));
+	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::sound_75f8_r), FUNC(xavix_state::sound_75f8_w)); // r/w tested
 	// taitons1 written after 75f6, then read
-	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::xavix_75f9_r), FUNC(xavix_state::xavix_75f9_w));
+	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::sound_75f9_r), FUNC(xavix_state::sound_75f9_w));
 	// at another time
-	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::xavix_75fa_r), FUNC(xavix_state::xavix_75fa_w)); // r/w tested
-	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::xavix_75fb_r), FUNC(xavix_state::xavix_75fb_w)); // r/w tested
-	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::xavix_75fc_r), FUNC(xavix_state::xavix_75fc_w)); // r/w tested
-	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::xavix_75fd_r), FUNC(xavix_state::xavix_75fd_w)); // r/w tested
-	map(0x75fe, 0x75fe).w(FUNC(xavix_state::xavix_75fe_w));
+	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::sound_75fa_r), FUNC(xavix_state::sound_75fa_w)); // r/w tested
+	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_75fb_r), FUNC(xavix_state::sound_75fb_w)); // r/w tested
+	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_75fc_r), FUNC(xavix_state::sound_75fc_w)); // r/w tested
+	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_75fd_r), FUNC(xavix_state::sound_75fd_w)); // r/w tested
+	map(0x75fe, 0x75fe).w(FUNC(xavix_state::sound_75fe_w));
 	// taitons1 written other 75xx operations
-	map(0x75ff, 0x75ff).w(FUNC(xavix_state::xavix_75ff_w));
+	map(0x75ff, 0x75ff).w(FUNC(xavix_state::sound_75ff_w));
 
-	map(0x7810, 0x7810).w(FUNC(xavix_state::xavix_7810_w)); // startup
+	// Slot Registers
+	map(0x7810, 0x7810).w(FUNC(xavix_state::slotreg_7810_w)); // startup
 
-	map(0x7900, 0x7900).w(FUNC(xavix_state::xavix_7900_w));
-	map(0x7901, 0x7901).w(FUNC(xavix_state::xavix_7901_w));
-	map(0x7902, 0x7902).w(FUNC(xavix_state::xavix_7902_w));
+	// External Interface
+	map(0x7900, 0x7900).w(FUNC(xavix_state::extintrf_7900_w));
+	map(0x7901, 0x7901).w(FUNC(xavix_state::extintrf_7901_w));
+	map(0x7902, 0x7902).w(FUNC(xavix_state::extintrf_7902_w));
 
-	// DMA trigger for below (written after the others) waits on status of bit 1 in a loop
-	map(0x7980, 0x7980).rw(FUNC(xavix_state::dma_trigger_r), FUNC(xavix_state::dma_trigger_w));
-	// DMA source
-	map(0x7981, 0x7981).w(FUNC(xavix_state::rom_dmasrc_lo_w));
+	// DMA Controller
+	map(0x7980, 0x7980).rw(FUNC(xavix_state::rom_dmatrg_r), FUNC(xavix_state::rom_dmatrg_w));
+	map(0x7981, 0x7981).w(FUNC(xavix_state::rom_dmasrc_lo_w)); 	// DMA source
 	map(0x7982, 0x7982).w(FUNC(xavix_state::rom_dmasrc_md_w));
 	map(0x7983, 0x7983).w(FUNC(xavix_state::rom_dmasrc_hi_w));
-	// DMA dest
-	map(0x7984, 0x7984).w(FUNC(xavix_state::rom_dmadst_lo_w));
+	map(0x7984, 0x7984).w(FUNC(xavix_state::rom_dmadst_lo_w)); 	// DMA dest
 	map(0x7985, 0x7985).w(FUNC(xavix_state::rom_dmadst_hi_w));
-	// DMA length
-	map(0x7986, 0x7986).w(FUNC(xavix_state::rom_dmalen_lo_w));
+	map(0x7986, 0x7986).w(FUNC(xavix_state::rom_dmalen_lo_w)); 	// DMA length
 	map(0x7987, 0x7987).w(FUNC(xavix_state::rom_dmalen_hi_w));
 
-	// GPIO stuff
-	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::xavix_io_0_r),FUNC(xavix_state::xavix_7a00_w));
-	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::xavix_io_1_r),FUNC(xavix_state::xavix_7a01_w)); // startup (taitons1)
-	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::xavix_7a02_r),FUNC(xavix_state::xavix_7a02_w)); // startup, gets set to 20, 7a00 is then also written with 20
-	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::xavix_7a03_r),FUNC(xavix_state::xavix_7a03_w)); // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
+	// IO Ports
+	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::io_0_r),FUNC(xavix_state::io_0_w));
+	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io_1_r),FUNC(xavix_state::io_1_w)); // startup (taitons1)
+	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io_2_r),FUNC(xavix_state::io_2_w)); // startup, gets set to 20, 7a00 is then also written with 20
+	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io_3_r),FUNC(xavix_state::io_3_w)); // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
 
+	// Interrupt control registers
 	map(0x7a80, 0x7a80).w(FUNC(xavix_state::xavix_7a80_w)); // still IO? ADC related?
 
-	map(0x7b00, 0x7b00).w(FUNC(xavix_state::xavix_7b00_w)); // rad_snow (not often)
+	// Mouse?
+	map(0x7b00, 0x7b00).w(FUNC(xavix_state::adc_7b00_w)); // rad_snow (not often, why?)
 
-	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::xavix_7b80_r), FUNC(xavix_state::xavix_7b80_w)); // rad_snow (not often)
-	map(0x7b81, 0x7b81).w(FUNC(xavix_state::xavix_7b81_w)); // written (often, m_trck, analog related?)
+	// Lightgun / pen 2 control
+	//map(0x7b18, 0x7b1b)
+		
+	// ADC registers
+	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::adc_7b80_r), FUNC(xavix_state::adc_7b80_w)); // rad_snow (not often)
+	map(0x7b81, 0x7b81).w(FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
 
-	map(0x7c00, 0x7c00).w(FUNC(xavix_state::xavix_7c00_w));
-	map(0x7c01, 0x7c01).rw(FUNC(xavix_state::xavix_7c01_r), FUNC(xavix_state::xavix_7c01_w)); // r/w tested
-	map(0x7c02, 0x7c02).w(FUNC(xavix_state::xavix_7c02_w));
+	// Sleep control
+	//map(7b82, 7b83)
 
-	// this is a multiplication chip
+	// Timer control
+	map(0x7c00, 0x7c00).w(FUNC(xavix_state::timer_7c00_w));
+	map(0x7c01, 0x7c01).rw(FUNC(xavix_state::timer_7c01_r), FUNC(xavix_state::timer_7c01_w)); // r/w tested
+	map(0x7c02, 0x7c02).w(FUNC(xavix_state::timer_7c02_w));
+
+	// Barrel Shifter registers
+	// map(0x7ff0, 0x7ff1)
+
+	// Multiply / Divide registers
 	map(0x7ff2, 0x7ff4).w(FUNC(xavix_state::mult_param_w));
 	map(0x7ff5, 0x7ff6).rw(FUNC(xavix_state::mult_r), FUNC(xavix_state::mult_w));
 
-	// maybe irq enable, written after below
-	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::irq_enable_w)); // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
-	// an IRQ vector (nmi?)
-	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::irq_vector0_lo_w));
+	// CPU Vector registers
+	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::vector_enable_w)); // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
+	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::irq_vector0_lo_w)); // an IRQ vector (nmi?)
 	map(0x7ffb, 0x7ffb).w(FUNC(xavix_state::irq_vector0_hi_w));
-
 	map(0x7ffc, 0x7ffc).rw(FUNC(xavix_state::irq_source_r), FUNC(xavix_state::irq_source_w));
-
-	// an IRQ vector (irq?)
-	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector1_lo_w));
+	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector1_lo_w)); // an IRQ vector (irq?)
 	map(0x7fff, 0x7fff).w(FUNC(xavix_state::irq_vector1_hi_w));
 }
 

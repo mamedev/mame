@@ -32,7 +32,7 @@ public:
 	O(brk_xav_imp);
 	O(rti_xav_imp);
 
-	typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
+	typedef device_delegate<int16_t (int which, int half)> xavix_interrupt_vector_delegate;
 
 	template <typename Object> void set_vector_callback(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
 
