@@ -61,7 +61,7 @@
 Notes:
     (1) See sprite format in the sprite section
     (2) x scroll register is not taken into account when doing line scroll
-    (3) See sound/gaelco.c for the sound register layout
+    (3) See sound/gaelco.cpp for the sound register layout
     (4) tilemaps use the memory [0x2000*bank .. 0x2000*bank + 0x1fff]
     (5) See tile format in the tilemap section
 
