@@ -10,6 +10,15 @@
  * - trackmaster@gmx.net (Bjorn Sunder)
  * - team vivanonno
  *
+ * TODO: (for video related issues, see video source file)
+ * - finish slave DSP emulation
+ * - emulate System 22 I/O board C74
+ * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit.
+ * - alpinesa doesn't work, protection related?
+ * - C139 for linked cabinets, as well as in RR fullscale
+ * - confirm DSP and MCU clocks and their IRQ timing
+ *
+ **********************************************************************************************************
  * Input
  *      - input ports require manual calibration through built-in diagnostics (or canned EEPROM)
  *
@@ -17,12 +26,6 @@
  *      - Prop Cycle fan (outputs noted at the right MCU port)
  *      - lamps/LEDs on some cabinets
  *      - time crisis has force feedback for the guns
- *
- * Link
- *      - SCI (link) feature is not yet hooked up
- *
- * CPU Emulation issues
- *      - slave DSP is not yet used in-game
  *
  * Notes:
  *      The "dipswitch" settings are ignored in many games - this isn't a bug.  For example, Prop Cycle software
@@ -3758,7 +3761,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_DEVICE_PROGRAM_MAP( mcu_s22_program)
 	MCFG_DEVICE_IO_MAP( mcu_s22_io)
 
-	MCFG_DEVICE_ADD("iomcu", NAMCO_C74, 49.152_MHz_XTAL/3)
+	MCFG_DEVICE_ADD("iomcu", NAMCO_C74, 6.144_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP( iomcu_s22_program)
 	MCFG_DEVICE_IO_MAP( iomcu_s22_io)
 

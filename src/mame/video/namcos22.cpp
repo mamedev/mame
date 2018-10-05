@@ -4,12 +4,8 @@
  * video hardware for Namco System22
  *
  * TODO:
- *
- * - emulate slave dsp!
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
  *       it used to be much worse with the legacy_poly_manager
- * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit.
- *       is this related to dsp? or cpu?
  * - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
  * - improve ss22 fogging:
  *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
