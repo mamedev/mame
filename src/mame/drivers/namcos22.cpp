@@ -1165,23 +1165,23 @@
 #include "sound/c352.h"
 #include "speaker.h"
 
+// 51.2MHz XTAL on video board, pixel clock of 12.8MHz (doubled in MAME because of unemulated interlacing)
+// HSync - 15.7248 kHz -> htotal = 814.001
+// VSync - 59.9042 Hz  -> vtotal = 524.998 (262+263)
+#define PIXEL_CLOCK         (51.2_MHz_XTAL/4*2)
 
-#define PIXEL_CLOCK         (49.152_MHz_XTAL/2)
-
-// VSync - 59.9042 Hz
-// HSync - 15.7248 kHz (may be inaccurate)
-#define HTOTAL              (800)
+#define HTOTAL              (814)
 #define HBEND               (0)
 #define HBSTART             (640)
 
-#define VTOTAL              (512)
+#define VTOTAL              (525)
 #define VBEND               (0)
 #define VBSTART             (480)
 
 
-#define MCU_SPEEDUP         1    /* mcu idle skipping */
-#define SERIAL_IO_PERIOD    (60) /* lower DSP serial I/O period */
-// actual dsp serial freq is unknown, should be much higher than 60hz of course
+#define MCU_SPEEDUP         1     /* mcu idle skipping */
+#define SERIAL_IO_PERIOD    (100) /* lower DSP serial I/O period */
+// actual dsp serial freq is unknown, should be much higher than 100Hz of course
 // serial comms doesn't work yet anyway
 
 /*********************************************************************************************/
