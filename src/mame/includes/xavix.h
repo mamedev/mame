@@ -214,7 +214,7 @@ private:
 	uint8_t m_6ff0;
 	uint8_t m_6ff8;
 
-	uint8_t m_75fx[0x10];
+	uint8_t m_soundregs[0x10];
 
 	uint8_t m_7c01;
 
