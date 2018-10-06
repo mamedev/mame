@@ -63,6 +63,7 @@ Detailed list of bugs:
 #include "emu.h"
 
 #include "cpu/unsp/unsp.h"
+#include "machine/spg2xx.h"
 #include "machine/i2cmem.h"
 
 #include "bus/generic/slot.h"
@@ -72,33 +73,16 @@ Detailed list of bugs:
 #include "screen.h"
 #include "softlist.h"
 
-#define VII_DEBUG_VIDEO			(0)
-
-#define PAGE_ENABLE_MASK        0x0008
-#define PAGE_BLANK_MASK			0x0004
-
-#define PAGE_DEPTH_FLAG_MASK    0x3000
-#define PAGE_DEPTH_FLAG_SHIFT   12
-#define PAGE_TILE_HEIGHT_MASK   0x00c0
-#define PAGE_TILE_HEIGHT_SHIFT  6
-#define PAGE_TILE_WIDTH_MASK    0x0030
-#define PAGE_TILE_WIDTH_SHIFT   4
-#define TILE_X_FLIP             0x0004
-#define TILE_Y_FLIP             0x0008
-
 class spg2xx_game_state : public driver_device, public device_nvram_interface
 {
 public:
 	spg2xx_game_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, device_nvram_interface(mconfig, *this)
+		, m_spg(*this, "spg")
 		, m_bank(*this, "cart")
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_p_ram(*this, "p_ram")
-		, m_p_rowscroll(*this, "p_rowscroll")
-		, m_p_palette(*this, "p_palette")
-		, m_p_spriteram(*this, "p_spriteram")
 		, m_io_p1(*this, "P1")
 		, m_io_p2(*this, "P2")
 		, m_io_p3(*this, "P3")
@@ -109,24 +93,30 @@ public:
 
 	void spg2xx_base(machine_config &config);
 	void spg2xx_basep(machine_config &config);
-	void batman(machine_config &config);
+	void jakks(machine_config &config);
+	void wireless60(machine_config &config);
+	void rad_skat(machine_config &config);
 
-	void init_walle();
-	void init_batman();
-	void init_wirels60();
-	void init_rad_skat();
 	void init_rad_crik();
 
 protected:
 	void switch_bank(uint32_t bank);
-	uint32_t m_centered_coordinates; // this must be a vreg?
-	void test_centered(uint8_t *ROM);
 
 	virtual void machine_start() override;
 
-	typedef delegate<uint16_t(uint16_t, int)> unsp_io_rw_delegate;
-	unsp_io_rw_delegate   m_unsp_io_rw;
+	DECLARE_READ8_MEMBER(uart_rx);
 
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_READ8_MEMBER(eeprom_r);
+
+	DECLARE_READ16_MEMBER(jakks_porta_r);
+	DECLARE_WRITE16_MEMBER(wireless60_porta_w);
+	DECLARE_WRITE16_MEMBER(wireless60_portb_w);
+	DECLARE_READ16_MEMBER(wireless60_porta_r);
+
+	DECLARE_WRITE_LINE_MEMBER(poll_controls);
+
+	required_device<spg2xx_device> m_spg;
 	required_memory_bank m_bank;
 
 	// device_nvram_interface overrides
@@ -135,84 +125,22 @@ protected:
 	virtual void nvram_write(emu_file &file) override;
 
 private:
-	DECLARE_READ16_MEMBER(video_r);
-	DECLARE_WRITE16_MEMBER(video_w);
-	DECLARE_READ16_MEMBER(audio_r);
-	DECLARE_WRITE16_MEMBER(audio_w);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_READ16_MEMBER(rom_r);
-
-	DECLARE_WRITE_LINE_MEMBER(vii_vblank);
-	void check_irqs(const uint16_t changed);
-	inline void check_video_irq();
-
-	uint32_t screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void vii_mem(address_map &map);
-
-	static const device_timer_id TIMER_TMB1 = 0;
-	static const device_timer_id TIMER_TMB2 = 1;
-	static const device_timer_id TIMER_SCREENPOS = 2;
-
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	uint16_t do_spg240_rad_skat_io(uint16_t what, int index);
-	uint16_t do_spg243_batman_io(uint16_t what, int index);
-	uint16_t do_spg243_wireless60_io(uint16_t what, int index);
+	void mem_map(address_map &map);
 
 	uint32_t m_current_bank;
 
-	uint16_t m_video_regs[0x100];
-
-	struct
-	{
-		uint8_t r, g, b;
-	}
-	m_screenram[320 * 240];
-
-	bool m_hide_page0;
-	bool m_hide_page1;
-	bool m_hide_sprites;
-	bool m_debug_sprites;
-	bool m_debug_blit;
-	uint8_t m_sprite_index_to_debug;
-
-	uint16_t m_io_regs[0x200];
 	std::unique_ptr<uint8_t[]> m_serial_eeprom;
 	uint16_t m_uart_rx_count;
 	uint8_t m_controller_input[8];
 	uint8_t m_w60_controller_input;
+	uint16_t m_w60_porta_data;
 
-	emu_timer *m_tmb1;
-	emu_timer *m_tmb2;
-	emu_timer *m_screenpos_timer;
-
-	void do_dma(uint32_t len);
-	void do_gpio(uint32_t offset);
-	void do_i2c();
-	void spg_do_dma(uint32_t len);
-
-	void blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
-	void blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs);
-	void blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t base_addr);
-	void blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3, 4);
-	inline uint8_t expand_rgb5_to_rgb8(uint8_t val);
-	inline uint8_t mix_channel(uint8_t a, uint8_t b);
-	void mix_pixel(uint32_t offset, uint16_t rgb);
-	void set_pixel(uint32_t offset, uint16_t rgb);
-
-	// devices
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_shared_ptr<uint16_t> m_p_ram;
-	required_shared_ptr<uint16_t> m_p_rowscroll;
-	required_shared_ptr<uint16_t> m_p_palette;
-	required_shared_ptr<uint16_t> m_p_spriteram;
 	required_ioport m_io_p1;
 	optional_ioport m_io_p2;
 	optional_ioport m_io_p3;
@@ -237,11 +165,9 @@ public:
 	void vsmile(machine_config &config);
 
 	void init_vii();
-	void init_vsmile();
 
 private:
-	uint16_t do_spg243_vsmile_io(uint16_t what, int index);
-	uint16_t do_spg243_vii_io(uint16_t what, int index);
+	DECLARE_WRITE16_MEMBER(vii_portb_w);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
@@ -251,11 +177,6 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_rom;
 };
-
-#define VII_IRQ_ENABLE			m_io_regs[0x21]
-#define VII_IRQ_STATUS			m_io_regs[0x22]
-#define VII_VIDEO_IRQ_ENABLE    m_video_regs[0x62]
-#define VII_VIDEO_IRQ_STATUS    m_video_regs[0x63]
 
 #define VERBOSE_LEVEL   (4)
 
@@ -277,437 +198,8 @@ inline void spg2xx_game_state::verboselog(int n_level, const char *s_fmt, ...)
 }
 
 /*************************
-*     Video Hardware     *
-*************************/
-
-void spg2xx_game_state::video_start()
-{
-}
-
-inline uint8_t spg2xx_game_state::expand_rgb5_to_rgb8(uint8_t val)
-{
-	uint8_t temp = val & 0x1f;
-	return (temp << 3) | (temp >> 2);
-}
-
-// Perform a lerp between a and b
-inline uint8_t spg2xx_game_state::mix_channel(uint8_t a, uint8_t b)
-{
-	uint8_t alpha = (m_video_regs[0x2a] & 3) << 6;
-	return ((255 - alpha) * a + alpha * b) / 255;
-}
-
-void spg2xx_game_state::mix_pixel(uint32_t offset, uint16_t rgb)
-{
-	m_screenram[offset].r = mix_channel(m_screenram[offset].r, expand_rgb5_to_rgb8(rgb >> 10));
-	m_screenram[offset].g = mix_channel(m_screenram[offset].g, expand_rgb5_to_rgb8(rgb >> 5));
-	m_screenram[offset].b = mix_channel(m_screenram[offset].b, expand_rgb5_to_rgb8(rgb));
-}
-
-void spg2xx_game_state::set_pixel(uint32_t offset, uint16_t rgb)
-{
-	m_screenram[offset].r = expand_rgb5_to_rgb8(rgb >> 10);
-	m_screenram[offset].g = expand_rgb5_to_rgb8(rgb >> 5);
-	m_screenram[offset].b = expand_rgb5_to_rgb8(rgb);
-}
-
-void spg2xx_game_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
-
-	uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
-	uint32_t xflipmask = attr & TILE_X_FLIP ? w - 1 : 0;
-
-	uint32_t nc = ((attr & 0x0003) + 1) << 1;
-
-	uint32_t palette_offset = (attr & 0x0f00) >> 4;
-	if (m_debug_blit && VII_DEBUG_VIDEO)
-	{
-		printf("xy:%08x,%08x attr:%08x ctrl:%08x bitmap_addr:%08x tile:%04x\n", xoff, yoff, attr, ctrl, bitmap_addr, tile);
-		printf("hw:%d,%d f:%d,%d fm:%d,%d ncols:%d pobs:%02x ", w, h, (attr & TILE_X_FLIP) ? 1 : 0, (attr & TILE_Y_FLIP) ? 1 : 0, xflipmask, yflipmask, nc, palette_offset);
-	}
-	palette_offset >>= nc;
-	palette_offset <<= nc;
-	if (m_debug_blit && VII_DEBUG_VIDEO)
-	{
-		printf("poas:%02x\n", palette_offset);
-	}
-
-	uint32_t m = bitmap_addr + nc * w*h / 16 * tile;
-	uint32_t bits = 0;
-	uint32_t nbits = 0;
-
-	for (uint32_t y = 0; y < h; y++)
-	{
-		int yy = (yoff + (y ^ yflipmask)) & 0x1ff;
-		if (yy >= 0x01c0)
-			yy -= 0x0200;
-
-		if (m_debug_blit && VII_DEBUG_VIDEO)
-			printf("%3d:\n", yy);
-
-		for (uint32_t x = 0; x < w; x++)
-		{
-			int xx = xoff + (x ^ xflipmask);
-
-			bits <<= nc;
-			if (m_debug_blit && VII_DEBUG_VIDEO)
-				printf("    %08x:%d ", bits, nbits);
-			if (nbits < nc)
-			{
-				uint16_t b = space.read_word(m++ & 0x3fffff);
-				b = (b << 8) | (b >> 8);
-				bits |= b << (nc - nbits);
-				nbits += 16;
-				if (m_debug_blit && VII_DEBUG_VIDEO)
-					printf("(%04x:%08x:%d) ", b, bits, nbits);
-			}
-			nbits -= nc;
-
-			uint32_t pal = palette_offset + (bits >> 16);
-			if (m_debug_blit && VII_DEBUG_VIDEO)
-				printf("%02x:%02x:%04x ", bits >> 16, pal, bits & 0xffff);
-			bits &= 0xffff;
-
-			if ((ctrl & 0x0010) && yy < 240)
-				xx -= (int16_t)m_p_rowscroll[yy + 15];
-
-			xx &= 0x01ff;
-			if (xx >= 0x01c0)
-				xx -= 0x0200;
-
-			if (xx >= 0 && xx < 320 && yy >= 0 && yy < 240)
-			{
-				uint16_t rgb = m_p_palette[pal];
-				if (m_debug_blit && VII_DEBUG_VIDEO)
-					printf("rgb:%04x ", rgb);
-				if (!(rgb & 0x8000))
-				{
-					if (attr & 0x4000 || ctrl & 0x0100)
-					{
-						if (m_debug_blit && VII_DEBUG_VIDEO)
-							printf("M\n");
-						mix_pixel(xx + 320 * yy, rgb);
-					}
-					else
-					{
-						if (m_debug_blit && VII_DEBUG_VIDEO)
-							printf("S\n");
-						set_pixel(xx + 320 * yy, rgb);
-					}
-				}
-				else if (m_debug_blit && VII_DEBUG_VIDEO)
-				{
-					printf("X\n");
-				}
-			}
-		}
-	}
-}
-
-void spg2xx_game_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs)
-{
-	uint32_t xscroll = regs[0];
-	uint32_t yscroll = regs[1];
-	uint32_t attr = regs[2];
-	uint32_t ctrl = regs[3];
-	uint32_t tilemap = regs[4];
-	uint32_t palette_map = regs[5];
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	if (!(ctrl & PAGE_ENABLE_MASK))
-	{
-		return;
-	}
-
-	if (((attr & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
-	{
-		return;
-	}
-
-	uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
-
-	uint32_t hn = 256 / h;
-	uint32_t wn = 512 / w;
-
-	for (uint32_t y0 = 0; y0 < hn; y0++)
-	{
-		for (uint32_t x0 = 0; x0 < wn; x0++)
-		{
-			uint16_t tile = (ctrl & PAGE_BLANK_MASK) ? 0 : space.read_word(tilemap + x0 + wn * y0);
-			uint16_t palette = 0;
-			uint32_t xx, yy;
-
-			if (!tile)
-			{
-				continue;
-			}
-
-			palette = space.read_word(palette_map + (x0 + wn * y0) / 2);
-			if (x0 & 1)
-			{
-				palette >>= 8;
-			}
-
-			uint32_t tileattr = attr;
-			uint32_t tilectrl = ctrl;
-			if ((ctrl & 2) == 0)
-			{   // -(1) bld(1) flip(2) pal(4)
-				tileattr &= ~0x000c;
-				tileattr |= (palette >> 2) & 0x000c;    // flip
-
-				tileattr &= ~0x0f00;
-				tileattr |= (palette << 8) & 0x0f00;    // palette
-
-				tilectrl &= ~0x0100;
-				tilectrl |= (palette << 2) & 0x0100;    // blend
-			}
-
-			yy = ((h*y0 - yscroll + 0x10) & 0xff) - 0x10;
-			xx = (w*x0 - xscroll) & 0x1ff;
-
-			blit(bitmap, cliprect, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
-		}
-	}
-}
-
-void spg2xx_game_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t base_addr)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint32_t bitmap_addr = 0x40 * m_video_regs[0x22];
-
-	uint16_t tile = space.read_word(base_addr + 0);
-	int16_t x = space.read_word(base_addr + 1);
-	int16_t y = space.read_word(base_addr + 2);
-	uint16_t attr = space.read_word(base_addr + 3);
-
-	if (!tile)
-	{
-		return;
-	}
-
-	if (((attr & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
-	{
-		return;
-	}
-
-	if (m_centered_coordinates)
-	{
-		x = 160 + x;
-		y = 120 - y;
-
-		uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-		uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
-
-		x -= (w / 2);
-		y -= (h / 2) - 8;
-	}
-
-	x &= 0x01ff;
-	y &= 0x01ff;
-
-#if VII_DEBUG_VIDEO
-	if (m_debug_sprites && machine().input().code_pressed(KEYCODE_MINUS))
-		m_debug_blit = true;
-	blit(bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
-	m_debug_blit = false;
-#else
-	blit(bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
-#endif
-}
-
-void spg2xx_game_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth)
-{
-	if (!(m_video_regs[0x42] & 1))
-	{
-		return;
-	}
-
-#if VII_DEBUG_VIDEO
-	if (!m_debug_sprites)
-	{
-#endif
-		for (uint32_t n = 0; n < 256; n++)
-		{
-			blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4 * n);
-		}
-#if VII_DEBUG_VIDEO
-	}
-	else
-	{
-		blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4 * m_sprite_index_to_debug);
-	}
-#endif
-}
-
-uint32_t spg2xx_game_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	memset(&m_screenram[320 * cliprect.min_y], 0, 3 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
-
-	for (int i = 0; i < 4; i++)
-	{
-		if (!m_hide_page0)
-			blit_page(bitmap, cliprect, i, 0x40 * m_video_regs[0x20], m_video_regs + 0x10);
-		if (!m_hide_page1)
-			blit_page(bitmap, cliprect, i, 0x40 * m_video_regs[0x21], m_video_regs + 0x16);
-		if (!m_hide_sprites)
-			blit_sprites(bitmap, cliprect, i);
-	}
-
-	bitmap.fill(0, cliprect);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			bitmap.pix32(y, x) = (m_screenram[x + 320 * y].r << 16) | (m_screenram[x + 320 * y].g << 8) | m_screenram[x + 320 * y].b;
-		}
-	}
-
-	return 0;
-}
-
-/*************************
 *    Machine Hardware    *
 *************************/
-
-void spg2xx_game_state::do_dma(uint32_t len)
-{
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	uint32_t src = m_video_regs[0x70];
-	uint32_t dst = m_video_regs[0x71] + 0x2c00;
-
-	//printf("Video DMAing from %08x to %08x\n", src, dst);
-	for (uint32_t j = 0; j < len; j++)
-	{
-		const uint16_t word = mem.read_word(src + j);
-		//printf("%04x ", word);
-		mem.write_word(dst + j, word);
-	}
-	//printf("\n");
-
-	m_video_regs[0x72] = 0;
-	//const uint16_t old = VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS;
-	VII_VIDEO_IRQ_STATUS |= 4;
-	//const uint16_t changed = old ^ (VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS);
-	//if (changed)
-		//check_video_irq();
-}
-
-READ16_MEMBER(spg2xx_game_state::video_r)
-{
-	switch (offset)
-	{
-	case 0x38: // Current Line
-		verboselog(3, "video_r: Current Line: %04x\n", m_screen->vpos());
-		return m_screen->vpos();
-
-	case 0x62: // Video IRQ Enable
-		verboselog(0, "video_r: Video IRQ Enable: %04x\n", VII_VIDEO_IRQ_ENABLE);
-		return VII_VIDEO_IRQ_ENABLE;
-
-	case 0x63: // Video IRQ Status
-		verboselog(0, "video_r: Video IRQ Status: %04x\n", VII_VIDEO_IRQ_STATUS);
-		return VII_VIDEO_IRQ_STATUS;
-
-	default:
-		verboselog(0, "video_r: Unknown register %04x = %04x\n", 0x2800 + offset, m_video_regs[offset]);
-		break;
-	}
-	return m_video_regs[offset];
-}
-
-WRITE16_MEMBER(spg2xx_game_state::video_w)
-{
-	switch (offset)
-	{
-	case 0x10: case 0x16:   // page 1,2 X scroll
-		data &= 0x01ff;
-		COMBINE_DATA(&m_video_regs[offset]);
-		break;
-
-	case 0x11: case 0x17:   // page 1,2 Y scroll
-		data &= 0x00ff;
-		COMBINE_DATA(&m_video_regs[offset]);
-		break;
-	case 0x36:      // IRQ pos V
-	case 0x37:      // IRQ pos H
-		data &= 0x01ff;
-		COMBINE_DATA(&m_video_regs[offset]);
-		verboselog(0, "video_w: Video IRQ Position: %04x,%04x (%04x)\n", m_video_regs[0x37], m_video_regs[0x36], 0x2800 | offset);
-		if (m_video_regs[0x37] < 160 && m_video_regs[0x36] < 240)
-			m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
-		else
-			m_screenpos_timer->adjust(attotime::never);
-		break;
-
-	case 0x62: // Video IRQ Enable
-	{
-		verboselog(0, "video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
-		const uint16_t old = VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS;
-		COMBINE_DATA(&VII_VIDEO_IRQ_ENABLE);
-		const uint16_t changed = old ^ (VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS);
-		if (changed)
-			check_video_irq();
-		break;
-	}
-
-	case 0x63: // Video IRQ Acknowledge
-	{
-		verboselog(0, "video_w: Video IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
-		const uint16_t old = VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS;
-		VII_VIDEO_IRQ_STATUS &= ~data;
-		const uint16_t changed = old ^ (VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS);
-		if (changed)
-			check_video_irq();
-		break;
-	}
-
-	case 0x70: // Video DMA Source
-		verboselog(0, "video_w: Video DMA Source = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_video_regs[offset]);
-		break;
-
-	case 0x71: // Video DMA Dest
-		verboselog(0, "video_w: Video DMA Dest = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_video_regs[offset]);
-		break;
-
-	case 0x72: // Video DMA Length
-		verboselog(0, "video_w: Video DMA Length = %04x (%04x)\n", data, mem_mask);
-		do_dma(data);
-		break;
-
-	default:
-		verboselog(0, "video_w: Unknown register %04x = %04x (%04x)\n", 0x2800 + offset, data, mem_mask);
-		COMBINE_DATA(&m_video_regs[offset]);
-		break;
-	}
-}
-
-READ16_MEMBER(spg2xx_game_state::audio_r)
-{
-	switch (offset)
-	{
-	default:
-		verboselog(4, "audio_r: Unknown register %04x\n", 0x3000 + offset);
-		break;
-	}
-	return 0;
-}
-
-WRITE16_MEMBER(spg2xx_game_state::audio_w)
-{
-	switch (offset)
-	{
-	default:
-		verboselog(4, "audio_w: Unknown register %04x = %04x (%04x)\n", 0x3000 + offset, data, mem_mask);
-		break;
-	}
-}
 
 void spg2xx_game_state::switch_bank(uint32_t bank)
 {
@@ -718,116 +210,75 @@ void spg2xx_game_state::switch_bank(uint32_t bank)
 	}
 }
 
-uint16_t spg2xx_cart_state::do_spg243_vii_io(uint16_t what, int index)
+WRITE8_MEMBER(spg2xx_game_state::eeprom_w)
 {
-	if (index == 1)
-	{
-		uint32_t bank = ((what & 0x80) >> 7) | ((what & 0x20) >> 4);
-		switch_bank(bank);
-	}
-	return what;
+	m_serial_eeprom[offset & 0x3ff] = data;
 }
 
-uint16_t spg2xx_cart_state::do_spg243_vsmile_io(uint16_t what, int index)
+READ8_MEMBER(spg2xx_game_state::eeprom_r)
 {
-	// TODO: find out how vsmile accesses these GPIO regs!
-	return what;
+	return m_serial_eeprom[offset & 0x3ff];
 }
 
-uint16_t spg2xx_game_state::do_spg243_batman_io(uint16_t what, int index)
+READ8_MEMBER(spg2xx_game_state::uart_rx)
 {
-	if (index == 0)
-	{
-		uint16_t temp = m_io_p1->read();
-		what |= (temp & 0x0001) ? 0x8000 : 0;
-		what |= (temp & 0x0002) ? 0x4000 : 0;
-		what |= (temp & 0x0004) ? 0x2000 : 0;
-		what |= (temp & 0x0008) ? 0x1000 : 0;
-		what |= (temp & 0x0010) ? 0x0800 : 0;
-		what |= (temp & 0x0020) ? 0x0400 : 0;
-		what |= (temp & 0x0040) ? 0x0200 : 0;
-		what |= (temp & 0x0080) ? 0x0100 : 0;
-	}
-
-	if (index == 2)
-	{
-		// TODO: what is here?
-	}
-
-	return what;
+	uint8_t val = m_controller_input[m_uart_rx_count];
+	m_uart_rx_count = (m_uart_rx_count + 1) % 8;
+	return val;
 }
 
-uint16_t spg2xx_game_state::do_spg240_rad_skat_io(uint16_t what, int index)
+WRITE16_MEMBER(spg2xx_game_state::wireless60_porta_w)
 {
-	// have not checked for outputs yet.
+	m_w60_porta_data = data & 0xf00;
+	switch (m_w60_porta_data & 0x300)
+	{
+	case 0x300:
+		m_w60_controller_input = -1;
+		break;
 
-	if (index == 0)
-	{
-		what = m_io_p1->read();
+	case 0x200:
+		m_w60_controller_input++;
+		break;
+
+	default:
+		uint16_t temp1 = m_io_p1->read();
+		uint16_t temp2 = m_io_p2->read();
+		uint16_t temp3 = 1 << m_w60_controller_input;
+		if (temp1 & temp3) m_w60_porta_data ^= 0x400;
+		if (temp2 & temp3) m_w60_porta_data ^= 0x800;
+		break;
 	}
-	else if (index == 1)
-	{
-		what = m_io_p2->read();
-	}
-	else if (index == 2)
-	{
-		what = m_io_p3->read();
-	}
-	return what;
 }
 
-uint16_t spg2xx_game_state::do_spg243_wireless60_io(uint16_t what, int index)
+READ16_MEMBER(spg2xx_game_state::wireless60_porta_r)
 {
-	if (index == 0)
-	{
-		switch (what & 0x300)
-		{
-		case 0x300:
-			m_w60_controller_input = -1;
-			break;
-
-		case 0x200:
-			m_w60_controller_input++;
-			break;
-
-		default:
-			uint16_t temp1 = m_io_p1->read();
-			uint16_t temp2 = m_io_p2->read();
-			uint16_t temp3 = 1 << m_w60_controller_input;
-			if (temp1 & temp3) what ^= 0x400;
-			if (temp2 & temp3) what ^= 0x800;
-			break;
-		}
-	}
-
-	if (index == 1)
-	{
-		uint32_t bank = (what & 7);
-		switch_bank(bank);
-	}
-
-	return what;
+	return m_w60_porta_data;
 }
 
-
-void spg2xx_game_state::do_gpio(uint32_t offset)
+WRITE16_MEMBER(spg2xx_game_state::wireless60_portb_w)
 {
-	uint32_t index = (offset - 1) / 5;
-	uint16_t buffer = m_io_regs[5 * index + 2];
-	uint16_t dir = m_io_regs[5 * index + 3];
-	uint16_t attr = m_io_regs[5 * index + 4];
-	uint16_t special = m_io_regs[5 * index + 5];
+	switch_bank(data & 7);
+}
 
-	uint16_t push = dir;
-	uint16_t pull = (~dir) & (~attr);
-	uint16_t what = (buffer & (push | pull));
-	what ^= (dir & ~attr);
-	what &= ~special;
+WRITE16_MEMBER(spg2xx_cart_state::vii_portb_w)
+{
+	if (data == 0x7c) machine().debug_break();
+	switch_bank(((data & 0x80) >> 7) | ((data & 0x20) >> 4));
+}
 
-	if (!m_unsp_io_rw.isnull())
-		what = m_unsp_io_rw(what, index);
-
-	m_io_regs[5 * index + 1] = what;
+READ16_MEMBER(spg2xx_game_state::jakks_porta_r)
+{
+	const uint16_t temp = m_io_p1->read();
+	uint16_t value = 0;
+	value |= (temp & 0x0001) ? 0x8000 : 0;
+	value |= (temp & 0x0002) ? 0x4000 : 0;
+	value |= (temp & 0x0004) ? 0x2000 : 0;
+	value |= (temp & 0x0008) ? 0x1000 : 0;
+	value |= (temp & 0x0010) ? 0x0800 : 0;
+	value |= (temp & 0x0020) ? 0x0400 : 0;
+	value |= (temp & 0x0040) ? 0x0200 : 0;
+	value |= (temp & 0x0080) ? 0x0100 : 0;
+	return value;
 }
 
 void spg2xx_game_state::nvram_default()
@@ -845,291 +296,10 @@ void spg2xx_game_state::nvram_write(emu_file &file)
 	file.write(&m_serial_eeprom[0], 0x400);
 }
 
-void spg2xx_game_state::do_i2c()
-{
-	const uint16_t addr = ((m_io_regs[0x5b] & 0x06) << 7) | (uint8_t)m_io_regs[0x5c];
-
-	if (m_io_regs[0x58] & 0x40) // Serial EEPROM read
-		m_io_regs[0x5e] = m_serial_eeprom[addr];
-	else
-		m_serial_eeprom[addr] = m_io_regs[0x5d];
-
-	m_io_regs[0x59] |= 1;
-}
-
-void spg2xx_game_state::spg_do_dma(uint32_t len)
-{
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
-
-	uint32_t src = ((m_io_regs[0x101] & 0x3f) << 16) | m_io_regs[0x100];
-	uint32_t dst = m_io_regs[0x103] & 0x3fff;
-
-	//printf("CPU DMAing from %08x to %08x\n", src, dst);
-	for (uint32_t j = 0; j < len; j++)
-	{
-		const uint16_t word = mem.read_word(src + j);
-		//printf("%04x ", word);
-		mem.write_word(dst + j, word);
-	}
-	//printf("\n");
-
-	m_io_regs[0x102] = 0;
-}
-
-READ16_MEMBER(spg2xx_game_state::io_r)
-{
-	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
-	static const char gpioports[] = { 'A', 'B', 'C' };
-
-	uint16_t val = m_io_regs[offset];
-
-	switch (offset)
-	{
-	case 0x01: case 0x06: case 0x0b: // GPIO Data Port A/B/C
-		do_gpio(offset);
-		verboselog(3, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
-		val = m_io_regs[offset];
-		break;
-
-	case 0x02: case 0x03: case 0x04: case 0x05:
-	case 0x07: case 0x08: case 0x09: case 0x0a:
-	case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Other GPIO regs
-		verboselog(3, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
-		break;
-
-	case 0x1c: // Video line counter
-		val = m_screen->vpos();
-		verboselog(3, "io_r: Video Line = %04x (%04x)\n", val, mem_mask);
-		break;
-
-	case 0x21: // IRQ Control
-		verboselog(3, "io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
-		break;
-
-	case 0x22: // IRQ Status
-		verboselog(3, "io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
-		break;
-
-	case 0x2b:
-		return 0x0000;
-
-	case 0x2c: case 0x2d: // Timers?
-		val = machine().rand() & 0x0000ffff;
-		verboselog(3, "io_r: Unknown Timer %d Register = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
-		break;
-
-	case 0x2f: // Data Segment
-		val = m_maincpu->state_int(UNSP_SR) >> 10;
-		verboselog(3, "io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
-		break;
-
-	case 0x31: // Unknown, UART Status?
-		verboselog(3, "io_r: Unknown (UART Status?) = %04x (%04x)\n", 3, mem_mask);
-		val = 3;
-		break;
-
-	case 0x36: // UART RX Data
-		val = m_controller_input[m_uart_rx_count];
-		m_uart_rx_count = (m_uart_rx_count + 1) % 8;
-		verboselog(3, "io_r: UART RX Data = %04x (%04x)\n", val, mem_mask);
-		break;
-
-	case 0x59: // I2C Status
-		verboselog(3, "io_r: I2C Status = %04x (%04x)\n", val, mem_mask);
-		break;
-
-	case 0x5e: // I2C Data In
-		verboselog(3, "io_r: I2C Data In = %04x (%04x)\n", val, mem_mask);
-		break;
-
-	default:
-		verboselog(3, "io_r: Unknown register %04x\n", 0x3d00 + offset);
-		break;
-	}
-
-	return val;
-}
-
-WRITE16_MEMBER(spg2xx_game_state::io_w)
-{
-	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
-	static const char gpioports[3] = { 'A', 'B', 'C' };
-
-	uint16_t temp = 0;
-
-	switch (offset)
-	{
-	case 0x00: // GPIO special function select
-		verboselog(3, "io_w: GPIO Function Select = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x01: case 0x06: case 0x0b: // GPIO data, port A/B/C
-		offset++;
-		// Intentional fallthrough
-
-	case 0x02: case 0x03: case 0x04: case 0x05: // Port A
-	case 0x07: case 0x08: case 0x09: case 0x0a: // Port B
-	case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Port C
-		verboselog(3, "io_w: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		do_gpio(offset);
-		break;
-
-	case 0x10:      // timebase control
-		if ((m_io_regs[offset] & 0x0003) != (data & 0x0003))
-		{
-			uint16_t hz = 8 << (data & 0x0003);
-			verboselog(3, "*** TMB1 FREQ set to %dHz\n", hz);
-			m_tmb1->adjust(attotime::zero, 0, attotime::from_hz(hz));
-		}
-		if ((m_io_regs[offset] & 0x000c) != (data & 0x000c))
-		{
-			uint16_t hz = 128 << ((data & 0x000c) >> 2);
-			verboselog(3, "*** TMB2 FREQ set to %dHz\n", hz);
-			m_tmb2->adjust(attotime::zero, 0, attotime::from_hz(hz));
-		}
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x21: // IRQ Enable
-	{
-		verboselog(3, "io_w: IRQ Control = %04x (%04x)\n", data, mem_mask);
-		const uint16_t old = VII_IRQ_ENABLE & VII_IRQ_STATUS;
-		COMBINE_DATA(&VII_IRQ_ENABLE);
-		const uint16_t changed = old ^ (VII_IRQ_ENABLE & VII_IRQ_STATUS);
-		if (changed)
-			check_irqs(changed);
-		break;
-	}
-
-	case 0x22: // IRQ Acknowledge
-	{
-		verboselog(3, "io_w: IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
-		const uint16_t old = VII_IRQ_STATUS;
-		VII_IRQ_STATUS &= ~data;
-		const uint16_t changed = old ^ (VII_IRQ_ENABLE & VII_IRQ_STATUS);
-		if (changed)
-			check_irqs(changed);
-		break;
-	}
-
-	case 0x2f: // Data Segment
-		temp = m_maincpu->state_int(UNSP_SR);
-		m_maincpu->set_state_int(UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
-		verboselog(3, "io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
-		break;
-
-	case 0x31: // Unknown UART
-		verboselog(3, "io_w: Unknown UART = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x32: // UART Reset
-		verboselog(3, "io_w: UART Reset\n");
-		break;
-
-	case 0x33: // UART Baud Rate
-		verboselog(3, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (m_io_regs[0x34] << 8) - data));
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x35: // UART TX Data
-		verboselog(3, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - m_io_regs[0x33]));
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x58: // I2C Command
-		verboselog(3, "io_w: I2C Command = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		do_i2c();
-		break;
-
-	case 0x59: // I2C Status / Acknowledge
-		verboselog(3, "io_w: I2C Acknowledge = %04x (%04x)\n", data, mem_mask);
-		m_io_regs[offset] &= ~data;
-		break;
-
-	case 0x5a: // I2C Access Mode
-		verboselog(3, "io_w: I2C Access Mode = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x5b: // I2C Device Address
-		verboselog(3, "io_w: I2C Device Address = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x5c: // I2C Sub-Address
-		verboselog(3, "io_w: I2C Sub-Address = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x5d: // I2C Data Out
-		verboselog(3, "io_w: I2C Data Out = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x5e: // I2C Data In
-		verboselog(3, "io_w: I2C Data In = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x5f: // I2C Controller Mode
-		verboselog(3, "io_w: I2C Controller Mode = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x100: // DMA Source (L)
-	case 0x101: // DMA Source (H)
-	case 0x103: // DMA Destination
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-
-	case 0x102: // DMA Length
-		spg_do_dma(data);
-		break;
-
-	default:
-		verboselog(3, "io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
-		break;
-	}
-}
-
-/*
-WRITE16_MEMBER( spg2xx_game_state::rowscroll_w )
-{
-    switch(offset)
-    {
-        default:
-            verboselog(0, "rowscroll_w: %04x = %04x (%04x)\n", 0x2900 + offset, data, mem_mask);
-            break;
-    }
-}
-
-WRITE16_MEMBER( spg2xx_game_state::spriteram_w )
-{
-    switch(offset)
-    {
-        default:
-            verboselog(0, "spriteram_w: %04x = %04x (%04x)\n", 0x2c00 + offset, data, mem_mask);
-            break;
-    }
-}
-*/
-
-void spg2xx_game_state::vii_mem(address_map &map)
+void spg2xx_game_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).bankr("cart");
-
-	map(0x000000, 0x0027ff).ram().share("p_ram");
-	map(0x002800, 0x0028ff).rw(FUNC(spg2xx_game_state::video_r), FUNC(spg2xx_game_state::video_w));
-	map(0x002900, 0x002aff).ram().share("p_rowscroll");
-	map(0x002b00, 0x002bff).ram().share("p_palette");
-	map(0x002c00, 0x002fff).ram().share("p_spriteram");
-	map(0x003000, 0x0037ff).rw(FUNC(spg2xx_game_state::audio_r), FUNC(spg2xx_game_state::audio_w));
-	map(0x003d00, 0x003eff).rw(FUNC(spg2xx_game_state::io_r), FUNC(spg2xx_game_state::io_w));
+	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
 }
 
 static INPUT_PORTS_START( vii )
@@ -1359,58 +529,6 @@ static INPUT_PORTS_START( rad_crik )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-void spg2xx_game_state::test_centered(uint8_t *ROM)
-{
-	if (ROM[0x3cd808] == 0x99 &&
-		ROM[0x3cd809] == 0x99 &&
-		ROM[0x3cd80a] == 0x83 &&
-		ROM[0x3cd80b] == 0x5e &&
-		ROM[0x3cd80c] == 0x52 &&
-		ROM[0x3cd80d] == 0x6b &&
-		ROM[0x3cd80e] == 0x78 &&
-		ROM[0x3cd80f] == 0x7f)
-	{
-		m_centered_coordinates = 0;
-	}
-}
-
-void spg2xx_game_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-		case TIMER_TMB1:
-		{
-			const uint16_t old = (VII_IRQ_ENABLE & VII_IRQ_STATUS);
-			VII_IRQ_STATUS |= 1;
-			const uint16_t changed = old ^ (VII_IRQ_ENABLE & VII_IRQ_STATUS);
-			if (changed)
-				check_irqs(changed);
-			break;
-		}
-		case TIMER_TMB2:
-		{
-			const uint16_t old = m_io_regs[0x22] & m_io_regs[0x21];
-			VII_IRQ_STATUS |= 2;
-			const uint16_t changed = old ^ (VII_IRQ_ENABLE & VII_IRQ_STATUS);
-			if (changed)
-				check_irqs(changed);
-			break;
-		}
-		case TIMER_SCREENPOS:
-		{
-			const uint16_t old = VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS;
-			VII_VIDEO_IRQ_STATUS |= 2;
-			const uint16_t changed = old ^ (VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS);
-			if (changed)
-			{
-				check_video_irq();
-			}
-			m_screen->update_partial(m_screen->vpos());
-			break;
-		}
-	}
-}
-
 void spg2xx_cart_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
@@ -1427,14 +545,6 @@ void spg2xx_cart_state::machine_start()
 
 void spg2xx_game_state::machine_start()
 {
-	m_tmb1 = timer_alloc(TIMER_TMB1);
-	m_tmb2 = timer_alloc(TIMER_TMB2);
-	m_tmb1->adjust(attotime::never);
-	m_tmb2->adjust(attotime::never);
-
-	m_screenpos_timer = timer_alloc(TIMER_SCREENPOS);
-	m_screenpos_timer->adjust(attotime::never);
-
 	m_bank->configure_entries(0, ceilf((float)memregion("maincpu")->bytes() / 0x800000), memregion("maincpu")->base(), 0x800000);
 	m_bank->set_entry(0);
 
@@ -1443,8 +553,6 @@ void spg2xx_game_state::machine_start()
 
 void spg2xx_game_state::machine_reset()
 {
-	memset(m_video_regs, 0, 0x100 * sizeof(m_video_regs[0]));
-	memset(m_io_regs, 0, 0x200 * sizeof(m_io_regs[0]));
 	m_current_bank = 0;
 
 	m_controller_input[0] = 0;
@@ -1452,37 +560,13 @@ void spg2xx_game_state::machine_reset()
 	m_controller_input[6] = 0xff;
 	m_controller_input[7] = 0;
 	m_w60_controller_input = -1;
-
-	m_video_regs[0x36] = 0xffff;
-	m_video_regs[0x37] = 0xffff;
-
-	m_hide_page0 = false;
-	m_hide_page1 = false;
-	m_hide_sprites = false;
-	m_debug_sprites = false;
-	m_debug_blit = false;
-	m_sprite_index_to_debug = 0;
+	m_w60_porta_data = 0;
 }
 
-WRITE_LINE_MEMBER(spg2xx_game_state::vii_vblank)
+WRITE_LINE_MEMBER(spg2xx_game_state::poll_controls)
 {
 	if (!state)
 		return;
-
-#if VII_DEBUG_VIDEO
-	if (machine().input().code_pressed_once(KEYCODE_5))
-		m_hide_page0 = !m_hide_page0;
-	if (machine().input().code_pressed_once(KEYCODE_6))
-		m_hide_page1 = !m_hide_page1;
-	if (machine().input().code_pressed_once(KEYCODE_7))
-		m_hide_sprites = !m_hide_sprites;
-	if (machine().input().code_pressed_once(KEYCODE_8))
-		m_debug_sprites = !m_debug_sprites;
-	if (machine().input().code_pressed_once(KEYCODE_9))
-		m_sprite_index_to_debug--;
-	if (machine().input().code_pressed_once(KEYCODE_0))
-		m_sprite_index_to_debug++;
-#endif
 
 	int32_t x = m_io_motionx ? ((int32_t)m_io_motionx->read() - 0x200) : 0;
 	int32_t y = m_io_motiony ? ((int32_t)m_io_motiony->read() - 0x200) : 0;
@@ -1501,59 +585,6 @@ WRITE_LINE_MEMBER(spg2xx_game_state::vii_vblank)
 	m_controller_input[7] = 0;
 
 	m_uart_rx_count = 0;
-
-	const uint16_t old = VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS;
-	VII_VIDEO_IRQ_STATUS |= 1;
-	const uint16_t changed = old ^ (VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS);
-	if (changed)
-		check_video_irq();
-
-	// For now, manually trigger controller IRQs
-	if (VII_IRQ_ENABLE & 0x2100)
-	{
-		VII_IRQ_STATUS |= 0x0100;
-		m_maincpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
-	}
-}
-
-void spg2xx_game_state::check_video_irq()
-{
-	m_maincpu->set_input_line(UNSP_IRQ0_LINE, (VII_VIDEO_IRQ_STATUS & VII_VIDEO_IRQ_ENABLE) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void spg2xx_game_state::check_irqs(const uint16_t changed)
-{
-	//  {
-	//      verboselog(0, "audio 1 IRQ\n");
-	//      m_maincpu->set_input_line(UNSP_IRQ1_LINE, ASSERT_LINE);
-	//  }
-	if (changed & 0x0c00) // Timer A, Timer B IRQ
-	{
-		m_maincpu->set_input_line(UNSP_IRQ2_LINE, (VII_IRQ_ENABLE & VII_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
-	}
-
-	if (changed & 0x2100) // UART, ADC IRQ
-		m_maincpu->set_input_line(UNSP_IRQ3_LINE, (VII_IRQ_ENABLE & VII_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
-
-	//  {
-	//      verboselog(0, "audio 4 IRQ\n");
-	//      m_maincpu->set_input_line(UNSP_IRQ4_LINE, ASSERT_LINE);
-	//  }
-
-	if (changed & 0x1200) // External IRQ
-	{
-		m_maincpu->set_input_line(UNSP_IRQ5_LINE, (VII_IRQ_ENABLE & VII_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
-	}
-
-	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
-	{
-		m_maincpu->set_input_line(UNSP_IRQ6_LINE, (VII_IRQ_ENABLE & VII_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
-	}
-
-	if (changed & 0x008b) // TMB1, TMB2, 4Hz, key change IRQ
-	{
-		m_maincpu->set_input_line(UNSP_IRQ7_LINE, (VII_IRQ_ENABLE & VII_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
-	}
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(spg2xx_cart_state, vii_cart)
@@ -1568,8 +599,6 @@ DEVICE_IMAGE_LOAD_MEMBER(spg2xx_cart_state, vii_cart)
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	test_centered(m_cart->get_rom_base());
 
 	return image_init_result::PASS;
 }
@@ -1587,17 +616,18 @@ DEVICE_IMAGE_LOAD_MEMBER(spg2xx_cart_state, vsmile_cart)
 void spg2xx_game_state::spg2xx_base(machine_config &config)
 {
 	UNSP(config, m_maincpu, XTAL(27'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::vii_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(320, 240);
+	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
-	m_screen->set_screen_update(FUNC(spg2xx_game_state::screen_update_vii));
-	//m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	m_screen->screen_vblank().set(FUNC(spg2xx_game_state::vii_vblank));
+	m_screen->set_screen_update("spg", FUNC(spg2xx_device::screen_update));
+	m_screen->screen_vblank().set(m_spg, FUNC(spg2xx_device::vblank));
+	m_screen->screen_vblank().append(FUNC(spg2xx_game_state::poll_controls));
 
-	PALETTE(config, "palette", 32768);
+	SPG2XX(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
 }
 
 void spg2xx_game_state::spg2xx_basep(machine_config &config)
@@ -1608,10 +638,11 @@ void spg2xx_game_state::spg2xx_basep(machine_config &config)
 	m_screen->set_size(320, 312);
 }
 
-
 void spg2xx_cart_state::vii(machine_config &config)
 {
 	spg2xx_base(config);
+
+	m_spg->portb_out().set(FUNC(spg2xx_cart_state::vii_portb_w));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vii_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -1631,35 +662,30 @@ void spg2xx_cart_state::vsmile(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmile_cart");
 }
 
-void spg2xx_game_state::batman(machine_config &config)
+void spg2xx_game_state::wireless60(machine_config &config)
 {
 	spg2xx_base(config);
+
+	m_spg->porta_out().set(FUNC(spg2xx_game_state::wireless60_porta_w));
+	m_spg->portb_out().set(FUNC(spg2xx_game_state::wireless60_portb_w));
+	m_spg->porta_in().set(FUNC(spg2xx_game_state::wireless60_porta_r));
+}
+
+void spg2xx_game_state::jakks(machine_config &config)
+{
+	spg2xx_base(config);
+	m_spg->porta_in().set(FUNC(spg2xx_cart_state::jakks_porta_r));
 	I2CMEM(config, "i2cmem", 0).set_data_size(0x200);
 }
 
-
-void spg2xx_cart_state::init_vii()
+void spg2xx_game_state::rad_skat(machine_config &config)
 {
-	m_unsp_io_rw = unsp_io_rw_delegate(&spg2xx_cart_state::do_spg243_vii_io, this);
-	m_centered_coordinates = 1;
-}
-
-void spg2xx_cart_state::init_vsmile()
-{
-	m_unsp_io_rw = unsp_io_rw_delegate(&spg2xx_cart_state::do_spg243_vsmile_io, this);
-	m_centered_coordinates = 1;
-}
-
-void spg2xx_game_state::init_batman()
-{
-	m_unsp_io_rw = unsp_io_rw_delegate(&spg2xx_game_state::do_spg243_batman_io, this);
-	m_centered_coordinates = 1;
-}
-
-void spg2xx_game_state::init_rad_skat()
-{
-	m_unsp_io_rw = unsp_io_rw_delegate(&spg2xx_game_state::do_spg240_rad_skat_io, this);
-	m_centered_coordinates = 1;
+	spg2xx_base(config);
+	m_spg->porta_in().set_ioport("P1");
+	m_spg->portb_in().set_ioport("P2");
+	m_spg->portc_in().set_ioport("P3");
+	m_spg->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
+	m_spg->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
 }
 
 READ16_MEMBER(spg2xx_game_state::rad_crik_hack_r)
@@ -1673,25 +699,8 @@ READ16_MEMBER(spg2xx_game_state::rad_crik_hack_r)
 
 void spg2xx_game_state::init_rad_crik()
 {
-	m_maincpu->space(AS_PROGRAM).install_writeonly(0x5800, 0x5bff, m_p_spriteram); // is this due to a CPU or DMA bug? 5800 == 2c00 << 1
-
 	// not 100% sure what this is waiting on, could be eeprom as it seems to end up here frequently during the eeprom test, patch running code, not ROM, so that checksum can still pass
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf851, 0xf851, read16_delegate(FUNC(spg2xx_game_state::rad_crik_hack_r),this));
-
-	m_unsp_io_rw = unsp_io_rw_delegate(&spg2xx_game_state::do_spg240_rad_skat_io, this);
-	m_centered_coordinates = 1;
-}
-
-void spg2xx_game_state::init_walle()
-{
-	m_unsp_io_rw = unsp_io_rw_delegate(&spg2xx_game_state::do_spg243_batman_io, this);
-	m_centered_coordinates = 0;
-}
-
-void spg2xx_game_state::init_wirels60()
-{
-	m_unsp_io_rw = unsp_io_rw_delegate(&spg2xx_game_state::do_spg243_wireless60_io, this);
-	m_centered_coordinates = 1;
 }
 
 ROM_START( vii )
@@ -1881,35 +890,32 @@ ROM_START( wrlshunt )
 	ROM_LOAD16_WORD_SWAP( "wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     CLASS              INIT           COMPANY                                              FULLNAME             FLAGS
+// year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
 // VTech systems
-CONS( 2005, vsmile,   0,        0,        vsmile,      vsmile,   spg2xx_cart_state, init_vsmile,   "VTech",                                             "V.Smile (US)",      MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileg,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, init_vsmile,   "VTech",                                             "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmilef,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, init_vsmile,   "VTech",                                             "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileb,  0,        0,        vsmile,      vsmile,   spg2xx_cart_state, init_vsmile,   "VTech",                                             "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,  0,      0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (US)",      MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileg, vsmile, 0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmilef, vsmile, 0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileb, 0,      0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 // Jungle's Soft TV games
-CONS( 2007, vii,      0,        0,        vii,         vii,      spg2xx_cart_state, init_vii,      "Jungle's Soft / KenSingTon / Siatronics", "Vii",               MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // some games run, others crash
-
-CONS( 2010, zone60,   0,        0,        spg2xx_base, wirels60, spg2xx_game_state, init_wirels60, "Jungle's Soft / Ultimate Products (HK) Ltd",          "Zone 60",           MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2010, wirels60, 0,        0,        spg2xx_base, wirels60, spg2xx_game_state, init_wirels60, "Jungle's Soft / Kids Station Toys Inc",               "Wireless 60",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, vii,      0, 0, vii,        vii,      spg2xx_cart_state, empty_init, "Jungle's Soft / KenSingTon / Siatronics",    "Vii",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
+CONS( 2010, zone60,   0, 0, wireless60, wirels60, spg2xx_game_state, empty_init, "Jungle's Soft / Ultimate Products (HK) Ltd", "Zone 60",     MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init, "Jungle's Soft / Kids Station Toys Inc",      "Wireless 60", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // JAKKS Pacific Inc TV games
-CONS( 2004, batmantv, 0,        0,        batman,      batman,   spg2xx_game_state, init_batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2008, walle,    0,        0,        batman,      walle,    spg2xx_game_state, init_walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, batmantv, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, walle,    0, 0, jakks, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc",              "Wall-E",     MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Radica TV games
-CONS( 2006, rad_skat,  0,       0,        spg2xx_base, rad_skat, spg2xx_game_state, init_rad_skat, "Radica",                                            "Play TV Skateboarder (NTSC)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_state, init_rad_skat, "Radica",                                            "Connectv Skateboarder (PAL)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-CONS( 2006, rad_crik,  0,       0,        spg2xx_basep,rad_crik, spg2xx_game_state, init_rad_crik, "Radica",                                            "Connectv Cricket (PAL)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
-
-CONS( 2007, rad_sktv,  0,       0,        spg2xx_base, rad_sktv, spg2xx_game_state, init_rad_skat, "Radica",                                            "Skannerz TV",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-
+CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,  spg2xx_game_state, empty_init, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp, rad_skat, 0, rad_skat, rad_skatp, spg2xx_game_state, empty_init, "Radica", "Connectv Skateboarder (PAL)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_crik,  0,        0, rad_skat, rad_crik,  spg2xx_game_state, empty_init, "Radica", "Connectv Cricket (PAL)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+CONS( 2007, rad_sktv,  0,        0, rad_skat, rad_sktv,  spg2xx_game_state, empty_init, "Radica", "Skannerz TV",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
-CONS( 2009, zone40,    0,       0,        spg2xx_base, wirels60, spg2xx_game_state, init_wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-// might not fit here, NAND dump, has internal bootstrap at least, see above.
-CONS( 2010, wlsair60,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, init_wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2011, wrlshunt,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, init_wirels60, "Hamy / Kids Station Toys Inc",                      "Wireless: Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, zone40,    0,       0,        spg2xx_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// NAND dumps w/ internal bootstrap. Almost certainly do not fit in this driver, as the SPG2xx can only address up to 4Mwords.
+CONS( 2010, wlsair60,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, wrlshunt,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, empty_init, "Hamy / Kids Station Toys Inc",                      "Wireless: Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

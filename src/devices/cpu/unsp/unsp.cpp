@@ -102,24 +102,47 @@ void unsp_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 
-	state_add( UNSP_SP,     "SP", UNSP_REG(SP)).formatstr("%04X");
-	state_add( UNSP_R1,     "R1", UNSP_REG(R1)).formatstr("%04X");
-	state_add( UNSP_R2,     "R2", UNSP_REG(R2)).formatstr("%04X");
-	state_add( UNSP_R3,     "R3", UNSP_REG(R3)).formatstr("%04X");
-	state_add( UNSP_R4,     "R4", UNSP_REG(R4)).formatstr("%04X");
-	state_add( UNSP_BP,     "BP", UNSP_REG(BP)).formatstr("%04X");
-	state_add( UNSP_SR,     "SR", UNSP_REG(SR)).formatstr("%04X");
-	state_add( UNSP_PC,     "PC", m_debugger_temp).callimport().callexport().formatstr("%06X");
-	state_add( UNSP_IRQ_EN, "IRQE", m_enable_irq).formatstr("%1u");
-	state_add( UNSP_FIQ_EN, "FIQE", m_enable_fiq).formatstr("%1u");
-	state_add( UNSP_IRQ,    "IRQ", m_irq).formatstr("%1u");
-	state_add( UNSP_FIQ,    "FIQ", m_fiq).formatstr("%1u");
-	state_add( UNSP_SB,     "SB", m_sb).formatstr("%1u");
+	state_add(STATE_GENFLAGS, "GENFLAGS", UNSP_REG(SR)).callimport().callexport().formatstr("%4s").noshow();
+	state_add(UNSP_SP,     "SP", UNSP_REG(SP)).formatstr("%04X");
+	state_add(UNSP_R1,     "R1", UNSP_REG(R1)).formatstr("%04X");
+	state_add(UNSP_R2,     "R2", UNSP_REG(R2)).formatstr("%04X");
+	state_add(UNSP_R3,     "R3", UNSP_REG(R3)).formatstr("%04X");
+	state_add(UNSP_R4,     "R4", UNSP_REG(R4)).formatstr("%04X");
+	state_add(UNSP_BP,     "BP", UNSP_REG(BP)).formatstr("%04X");
+	state_add(UNSP_SR,     "SR", UNSP_REG(SR)).formatstr("%04X");
+	state_add(UNSP_PC,     "PC", m_debugger_temp).callimport().callexport().formatstr("%06X");
+	state_add(UNSP_IRQ_EN, "IRQE", m_enable_irq).formatstr("%1u");
+	state_add(UNSP_FIQ_EN, "FIQE", m_enable_fiq).formatstr("%1u");
+	state_add(UNSP_IRQ,    "IRQ", m_irq).formatstr("%1u");
+	state_add(UNSP_FIQ,    "FIQ", m_fiq).formatstr("%1u");
+	state_add(UNSP_SB,     "SB", m_sb).formatstr("%1u");
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 
 	set_icountptr(m_icount);
+
+	save_item(NAME(m_r));
+	save_item(NAME(m_enable_irq));
+	save_item(NAME(m_enable_fiq));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_fiq));
+	save_item(NAME(m_curirq));
+	save_item(NAME(m_sirq));
+	save_item(NAME(m_sb));
+	save_item(NAME(m_saved_sb));
+}
+
+void unsp_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+		{
+			const uint16_t sr = UNSP_REG(SR);
+			str = string_format("%c%c%c%c", (sr & UNSP_N) ? 'N' : ' ', (sr & UNSP_Z) ? 'Z' : ' ', (sr & UNSP_S) ? 'S' : ' ', (sr & UNSP_C) ? 'C' : ' ');
+		}
+	}
 }
 
 void unsp_device::state_export(const device_state_entry &entry)
@@ -197,8 +220,11 @@ uint16_t unsp_device::pop(uint16_t *reg)
 
 void unsp_device::trigger_fiq()
 {
-	if (!m_enable_fiq || m_fiq)
+	if (!m_enable_fiq || m_fiq || m_irq)
+	{
+		logerror("FIQs are disabled or we're already in an FIQ/IRQ, bailing\n");
 		return;
+	}
 
 	m_fiq = true;
 
@@ -213,8 +239,11 @@ void unsp_device::trigger_fiq()
 
 void unsp_device::trigger_irq(int line)
 {
-	if (!m_enable_irq || m_irq)
+	if (!m_enable_irq || m_irq || m_fiq)
+	{
+		logerror("IRQs are disabled or we're already in an FIQ/IRQ, bailing\n");
 		return;
+	}
 
 	m_irq = true;
 
@@ -229,6 +258,9 @@ void unsp_device::trigger_irq(int line)
 
 void unsp_device::check_irqs()
 {
+	if (!m_sirq)
+		return;
+
 	int highest_irq = -1;
 	for (int i = 0; i <= 8; i++)
 	{
@@ -423,6 +455,7 @@ void unsp_device::execute_run()
 					m_saved_sb[1] = m_sb;
 					m_sb = m_saved_sb[0];
 				}
+				m_curirq = 0;
 
 				check_irqs();
 				continue;
@@ -485,7 +518,6 @@ void unsp_device::execute_run()
 					{
 						m_icount -= 5;
 						UNSP_REG(PC) = read16(UNSP_LPC);
-						UNSP_REG(PC)++;
 						UNSP_REG(SR) &= 0xffc0;
 						UNSP_REG(SR) |= OPIMM;
 					}

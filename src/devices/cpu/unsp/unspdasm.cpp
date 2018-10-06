@@ -1,17 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/**************************\
-*
-*   SunPlus u'nSP disassembler
-*
-*    by Ryan Holtz
-*
-\**************************/
+/*****************************************************************************
+
+	SunPlus micro'nSP disassembler
+
+*****************************************************************************/
 
 #include "emu.h"
 #include "unspdasm.h"
-
-/*****************************************************************************/
 
 char const *const unsp_disassembler::reg[] =
 {

@@ -2603,6 +2603,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/spg2xx.h,MACHINES["SPG2XX"] = true
+---------------------------------------------------
+
+if (MACHINES["SPG2XX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/spg2xx.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/stvcd.h,MACHINES["STVCD"] = true
 ---------------------------------------------------
 

@@ -1,13 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/**************************\
-*
-*   SunPlus u'nSP disassembler
-*
-*    by Ryan Holtz
-*
-\**************************/
+/*****************************************************************************
 
+	SunPlus micro'nSP disassembler
+
+*****************************************************************************/
 
 #ifndef MAME_CPU_UNSP_UNSPDASM_H
 #define MAME_CPU_UNSP_UNSPDASM_H

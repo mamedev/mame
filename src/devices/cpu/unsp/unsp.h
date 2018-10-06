@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/**************************\
-*
-*   SunPlus u'nSP emulator
-*
-*    by Ryan Holtz
-*
-\**************************/
+/*****************************************************************************
+
+	SunPlus micro'nSP core
+
+	based primarily on Unununium, by segher
+
+*****************************************************************************/
 
 #ifndef MAME_CPU_UNSP_UNSP_H
 #define MAME_CPU_UNSP_UNSP_H
@@ -75,6 +75,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
