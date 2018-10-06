@@ -198,7 +198,7 @@
 
 	<software name="drafix">
 		<description>Drafix Windows CAD (Demo)</description>
-		<year>1990?</year>
+		<year>1990</year>
 		<publisher>Fox Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
@@ -3109,31 +3109,31 @@
 
 	<software name="tangopcb">
 		<description>Tango Printed Circuit Design Evaluation</description>
-		<year>1990?</year>
+		<year>1990</year>
 		<publisher>ACCEL Technologies</publisher>
 		<info name="version" value="1.16" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1/2" />
 			<dataarea name="flop" size="1228800">
-				<rom name="tango printed circuit design evaluation 1_16 (disk 1).img" size="1228800" crc="68da86ea" sha1="3116216c5beeddc05a3ef8793b21647526f087ca" offset="0" />
+				<rom name="tango printed circuit design evaluation 1.16 (disk 1).img" size="1228800" crc="68da86ea" sha1="3116216c5beeddc05a3ef8793b21647526f087ca" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2/2" />
 			<dataarea name="flop" size="1228800">
-				<rom name="tango printed circuit design evaluation 1_16 (disk 2).img" size="1228800" crc="05c138d7" sha1="f061e47d533a251d7a7ff6fd02de585167a870d9" offset="0" />
+				<rom name="tango printed circuit design evaluation 1.16 (disk 2).img" size="1228800" crc="05c138d7" sha1="f061e47d533a251d7a7ff6fd02de585167a870d9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tangosce">
 		<description>Tango Schematic Capture Evaluation</description>
-		<year>1990?</year>
+		<year>1990</year>
 		<publisher>ACCEL Technologies</publisher>
 		<info name="version" value="1.12" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
-				<rom name="tango schematic capture evaluation 1_12.img" size="1228800" crc="2428ff17" sha1="a9fa07bd163043cf92e0f3fe9e1bb4f1da8c29c8" offset="0" />
+				<rom name="tango schematic capture evaluation 1.12.img" size="1228800" crc="2428ff17" sha1="a9fa07bd163043cf92e0f3fe9e1bb4f1da8c29c8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4699,7 +4699,7 @@
 		<info name="release" value="19920527"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="142949-001.img" size="737280" crc="f7840aab" sha1="67ab7a61a2a3baa5246028d3d1540bd756ac40a9" offset="0" />
+				<rom name="142948-001.img" size="737280" crc="f7840aab" sha1="67ab7a61a2a3baa5246028d3d1540bd756ac40a9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5044,12 +5044,12 @@
 
 	<software name="nd010pci">
 		<description>NexNIC ND010 PCI Adapter (Ethernet/Fast Ethernet)</description>
-		<year>1999?</year>
+		<year>1998</year>
 		<publisher>Unex Technology Corporation</publisher>
 		<info name="version" value="3.02" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1492992">
-				<rom name="nexnic nd010 pci adapter (ethernet/fast ethernet) 3.02.img" size="1492992" crc="2324ce96" sha1="aae7140dfd7603ffcf48f8fd80c026744c584e8a" offset="0" />
+				<rom name="nexnic nd010 pci adapter (ethernet-fast ethernet) 3.02.img" size="1492992" crc="2324ce96" sha1="aae7140dfd7603ffcf48f8fd80c026744c584e8a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5057,7 +5057,7 @@
 	<!-- S/N: 26-00195-01, 26-00195-02 and 26-00195-03 -->
 	<software name="nusound">
 		<description>NuSound PnP Install Disk</description>
-		<year>1995?</year>
+		<year>1995</year>
 		<publisher>Orchid</publisher>
 		<info name="version" value="1.0" />
 		<info name="usage" value="Windows 95: 1. When NuSound is detected, select &quot;driver from disk&quot; and click &quot;OK&quot; / 2. To install applications, select &quot;start&quot; and &quot;run&quot; / 3. Type A:setup.exe (or B) and click &quot;OK&quot; / Windows: 1. From Program Manager select &quot;file&quot; and &quot;run&quot; / 2. Type A:setup.exe (or B) and click &quot;OK&quot;" />
@@ -5325,25 +5325,25 @@
 
 	<software name="sndwav32">
 		<description>SoundWave 32 Series</description>
-		<year>1994?</year>
+		<year>1994</year>
 		<publisher>Orchid</publisher>
 		<info name="version" value="3.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #1" />
 			<dataarea name="flop" size="1474560">
-				<rom name="soundwave 32 series 3_0 (disk 1).img" size="1474560" crc="8420c21c" sha1="337f31df6ec72fb1c62a0d7409421b618282f16d" offset="0" />
+				<rom name="soundwave 32 series 3.0 (disk 1).img" size="1474560" crc="8420c21c" sha1="337f31df6ec72fb1c62a0d7409421b618282f16d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #2" />
 			<dataarea name="flop" size="1474560">
-				<rom name="soundwave 32 series 3_0 (disk 2).img" size="1474560" crc="a4f80a83" sha1="50ac37c8fc7b3fcba3e6d1fb81e8288e643f622a" offset="0" />
+				<rom name="soundwave 32 series 3.0 (disk 2).img" size="1474560" crc="a4f80a83" sha1="50ac37c8fc7b3fcba3e6d1fb81e8288e643f622a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #3" />
 			<dataarea name="flop" size="1474560">
-				<rom name="soundwave 32 series 3_0 (disk 3).img" size="1474560" crc="a26402fd" sha1="9386134e27286db48e076aaa98f7c86b86277c53" offset="0" />
+				<rom name="soundwave 32 series 3.0 (disk 3).img" size="1474560" crc="a26402fd" sha1="9386134e27286db48e076aaa98f7c86b86277c53" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6126,7 +6126,7 @@ x
 
 	<software name="hijaak">
 		<description>HiJaak</description>
-		<year>1991?</year>
+		<year>1991</year>
 		<publisher>Inset Systems</publisher>
 		<info name="version" value="2.1" />
 		<part name="flop1" interface="floppy_3_5">
@@ -6145,7 +6145,7 @@ x
 
 	<software name="hijaakp">
 		<description>HiJaak Pro</description>
-		<year>1993?</year>
+		<year>1993</year>
 		<publisher>Inset Systems</publisher>
 		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
@@ -6193,7 +6193,7 @@ x
 	<!-- Bundled with Integration i Microsoft Office 97: Step by Step by Susanne Freet et al. ISBN10: 91-644-0153-7 -->
 	<software name="iimso97">
 		<description>Integration i Microsoft Office 97: Step by Step (Swe)</description>
-		<year>1997?</year>
+		<year>1997</year>
 		<publisher>Bonnier DataMedia</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -7531,7 +7531,7 @@ x
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Programdiskett 1 för DOS och Windows Version 2.5" />
 			<dataarea name="flop" size="737280">
-				<rom name="programdiskett 1 för dos och windows version 2_5.img" size="737280" crc="1b5c95b6" sha1="c4f9eb0289c3a5079595919f001f81e35347c1a9" offset="0" />
+				<rom name="programdiskett 1 för dos och windows version 2.5.img" size="737280" crc="1b5c95b6" sha1="c4f9eb0289c3a5079595919f001f81e35347c1a9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
@@ -7604,7 +7604,7 @@ x
 
 	<software name="writeon">
 		<description>Write On! for Windows</description>
-		<year>1994?</year>
+		<year>1994</year>
 		<publisher>The B&amp;N Companies</publisher>
 		<info name="usage" value="Insert the Diskette in Drive A or B. STEP 1. Type A: or B:, then hit ENTER. STEP 2. Type GO, then hit ENTER." />
 		<part name="flop1" interface="floppy_3_5">
