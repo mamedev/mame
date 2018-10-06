@@ -33865,6 +33865,9 @@ spacewin                        //
 @source:sderby2.cpp
 sderby2                         // (c) 1985
 
+@source:sdk51.cpp
+sdk51                           //
+
 @source:sdk80.cpp
 sdk80                           //
 
