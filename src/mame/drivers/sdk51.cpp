@@ -179,7 +179,7 @@ ROM_START(sdk51)
 	ROM_LOAD("u41-8041a.bin", 0x000, 0x400, CRC(02f38b69) SHA1(ab2ac73b69b3297572583242ed5bd717eb116c37))
 
 	ROM_REGION(0x0200, "cycles", 0)
-	ROM_LOAD("u63-3622a.bin", 0x000, 0x200, CRC(85cbd498) SHA1(f0214b6d02d6d153b5fafd9adf5a23013373c9c4) BAD_DUMP) // pin 11 output stuck high (pin 9 also stuck but not used)
+	ROM_LOAD("u63-3622a.bin", 0x000, 0x200, CRC(85cbd498) SHA1(f0214b6d02d6d153b5fafd9adf5a23013373c9c4)) // pin 9 output stuck high but not used
 ROM_END
 
 COMP(1981, sdk51, 0, 0, sdk51, sdk51, sdk51_state, empty_init, "Intel", "MCS-51 System Design Kit", MACHINE_IS_SKELETON)
