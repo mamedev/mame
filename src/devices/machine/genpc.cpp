@@ -194,6 +194,11 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out2_changed )
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
+WRITE_LINE_MEMBER( ibm5150_mb_device::pc_pit8253_out2_changed )
+{
+	ibm5160_mb_device::pc_pit8253_out2_changed(state);
+	m_cassette->output(m_pit_out2 ? 1.0 : -1.0);
+}
 
 /**********************************************************
  *
