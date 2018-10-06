@@ -13,7 +13,8 @@
 
 #include "spg2xx.h"
 
-DEFINE_DEVICE_TYPE(SPG2XX, spg2xx_device, "spg2xx", "SPG200-series System-on-a-Chip")
+DEFINE_DEVICE_TYPE(SPG24X, spg24x_device, "spg24x", "SPG240-series System-on-a-Chip")
+DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-Chip")
 
 #define VERBOSE_LEVEL   (4)
 
@@ -41,8 +42,8 @@ inline void spg2xx_device::verboselog(int n_level, const char *s_fmt, ...)
 #define VIDEO_IRQ_ENABLE    m_video_regs[0x62]
 #define VIDEO_IRQ_STATUS    m_video_regs[0x63]
 
-spg2xx_device::spg2xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SPG2XX, tag, owner, clock)
+spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_porta_out(*this)
 	, m_portb_out(*this)
 	, m_portc_out(*this)
@@ -58,6 +59,16 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, const char *tag, dev
 	, m_scrollram(*this, "scrollram")
 	, m_paletteram(*this, "paletteram")
 	, m_spriteram(*this, "spriteram")
+{
+}
+
+spg24x_device::spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: spg2xx_device(mconfig, SPG24X, tag, owner, clock, 256)
+{
+}
+
+spg28x_device::spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: spg2xx_device(mconfig, SPG28X, tag, owner, clock, 64)
 {
 }
 
@@ -362,7 +373,7 @@ void spg2xx_device::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	if (!m_debug_sprites)
 	{
 #endif
-		for (uint32_t n = 0; n < 256; n++)
+		for (uint32_t n = 0; n < m_sprite_limit; n++)
 		{
 			blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4 * n);
 		}

@@ -79,10 +79,10 @@ public:
 	spg2xx_game_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, device_nvram_interface(mconfig, *this)
-		, m_spg(*this, "spg")
-		, m_bank(*this, "cart")
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
+		, m_spg(*this, "spg")
+		, m_bank(*this, "cart")
 		, m_io_p1(*this, "P1")
 		, m_io_p2(*this, "P2")
 		, m_io_p3(*this, "P3")
@@ -96,6 +96,8 @@ public:
 	void jakks(machine_config &config);
 	void wireless60(machine_config &config);
 	void rad_skat(machine_config &config);
+	void rad_crik(machine_config &config);
+	void non_spg_base(machine_config &config);
 
 	void init_rad_crik();
 
@@ -116,6 +118,8 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(poll_controls);
 
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<spg2xx_device> m_spg;
 	required_memory_bank m_bank;
 
@@ -139,8 +143,6 @@ private:
 
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3, 4);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
 	required_ioport m_io_p1;
 	optional_ioport m_io_p2;
 	optional_ioport m_io_p3;
@@ -625,9 +627,13 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 	m_screen->set_screen_update("spg", FUNC(spg2xx_device::screen_update));
 	m_screen->screen_vblank().set(m_spg, FUNC(spg2xx_device::vblank));
 	m_screen->screen_vblank().append(FUNC(spg2xx_game_state::poll_controls));
+}
 
-	SPG2XX(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
-	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
+void spg2xx_game_state::non_spg_base(machine_config &config)
+{
+	spg2xx_base(config);
+
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 }
 
 void spg2xx_game_state::spg2xx_basep(machine_config &config)
@@ -642,6 +648,8 @@ void spg2xx_cart_state::vii(machine_config &config)
 {
 	spg2xx_base(config);
 
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	m_spg->uart_rx().set(FUNC(spg2xx_cart_state::uart_rx));
 	m_spg->portb_out().set(FUNC(spg2xx_cart_state::vii_portb_w));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vii_cart");
@@ -655,6 +663,9 @@ void spg2xx_cart_state::vsmile(machine_config &config)
 {
 	spg2xx_base(config);
 
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	m_spg->uart_rx().set(FUNC(spg2xx_cart_state::uart_rx));
+
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vsmile_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(device_image_load_delegate(&spg2xx_cart_state::device_image_load_vsmile_cart, this));
@@ -666,6 +677,9 @@ void spg2xx_game_state::wireless60(machine_config &config)
 {
 	spg2xx_base(config);
 
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
+
 	m_spg->porta_out().set(FUNC(spg2xx_game_state::wireless60_porta_w));
 	m_spg->portb_out().set(FUNC(spg2xx_game_state::wireless60_portb_w));
 	m_spg->porta_in().set(FUNC(spg2xx_game_state::wireless60_porta_r));
@@ -674,13 +688,33 @@ void spg2xx_game_state::wireless60(machine_config &config)
 void spg2xx_game_state::jakks(machine_config &config)
 {
 	spg2xx_base(config);
+
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
 	m_spg->porta_in().set(FUNC(spg2xx_cart_state::jakks_porta_r));
+
 	I2CMEM(config, "i2cmem", 0).set_data_size(0x200);
 }
 
 void spg2xx_game_state::rad_skat(machine_config &config)
 {
 	spg2xx_base(config);
+
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
+	m_spg->porta_in().set_ioport("P1");
+	m_spg->portb_in().set_ioport("P2");
+	m_spg->portc_in().set_ioport("P3");
+	m_spg->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
+	m_spg->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
+}
+
+void spg2xx_game_state::rad_crik(machine_config &config)
+{
+	spg2xx_base(config);
+
+	SPG28X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
 	m_spg->porta_in().set_ioport("P1");
 	m_spg->portb_in().set_ioport("P2");
 	m_spg->portc_in().set_ioport("P3");
@@ -910,12 +944,12 @@ CONS( 2008, walle,    0, 0, jakks, walle,  spg2xx_game_state, empty_init, "JAKKS
 // Radica TV games
 CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,  spg2xx_game_state, empty_init, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2006, rad_skatp, rad_skat, 0, rad_skat, rad_skatp, spg2xx_game_state, empty_init, "Radica", "Connectv Skateboarder (PAL)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_crik,  0,        0, rad_skat, rad_crik,  spg2xx_game_state, empty_init, "Radica", "Connectv Cricket (PAL)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+CONS( 2006, rad_crik,  0,        0, rad_crik, rad_crik,  spg2xx_game_state, empty_init, "Radica", "Connectv Cricket (PAL)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
 CONS( 2007, rad_sktv,  0,        0, rad_skat, rad_sktv,  spg2xx_game_state, empty_init, "Radica", "Skannerz TV",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
-CONS( 2009, zone40,    0,       0,        spg2xx_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, zone40,    0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // NAND dumps w/ internal bootstrap. Almost certainly do not fit in this driver, as the SPG2xx can only address up to 4Mwords.
-CONS( 2010, wlsair60,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2011, wrlshunt,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, empty_init, "Hamy / Kids Station Toys Inc",                      "Wireless: Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2010, wlsair60,  0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, wrlshunt,  0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Hamy / Kids Station Toys Inc",                      "Wireless: Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -23,15 +23,7 @@
 class spg2xx_device : public device_t
 {
 public:
-	template <typename T, typename U>
-	spg2xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
-		: spg2xx_device(mconfig, tag, owner, clock)
-	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-		m_screen.set_tag(std::forward<U>(screen_tag));
-	}
-
-	spg2xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	void map(address_map &map);
 
@@ -52,6 +44,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
 protected:
+	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const size_t sprite_limit)
+		: spg2xx_device(mconfig, type, tag, owner, clock)
+	{
+		m_sprite_limit = sprite_limit;
+	}
+
 	enum
 	{
 		PAGE_ENABLE_MASK        = 0x0008,
@@ -121,6 +119,7 @@ protected:
 
 	uint16_t m_video_regs[0x100];
 	uint16_t m_io_regs[0x200];
+	size_t m_sprite_limit;
 
 	devcb_write16 m_porta_out;
 	devcb_write16 m_portb_out;
@@ -146,6 +145,35 @@ protected:
 	required_shared_ptr<uint16_t> m_spriteram;
 };
 
-DECLARE_DEVICE_TYPE(SPG2XX, spg2xx_device)
+class spg24x_device : public spg2xx_device
+{
+public:
+	template <typename T, typename U>
+	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+		: spg24x_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+		m_screen.set_tag(std::forward<U>(screen_tag));
+	}
+
+	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class spg28x_device : public spg2xx_device
+{
+public:
+	template <typename T, typename U>
+	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+		: spg28x_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+		m_screen.set_tag(std::forward<U>(screen_tag));
+	}
+
+	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(SPG24X, spg24x_device)
+DECLARE_DEVICE_TYPE(SPG28X, spg28x_device)
 
 #endif // DEVICES_MACHINE_SPG2XX_H
