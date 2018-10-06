@@ -34943,6 +34943,7 @@ sg1000m2                        // Sega SG-1000 Mark II (Japan)
 chboxing                        // (c) 1984
 chwrestl                        // (c) 1985
 dokidoki                        // (c) 1985
+sderbys                         // (c) 1984
 sderby2s                        // (c) 1985
 
 @source:sh4robot.cpp
