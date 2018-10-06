@@ -193,8 +193,8 @@ public:
 		, m_iomcu(*this, "iomcu")
 		, m_shareram(*this, "shareram")
 		, m_eeprom(*this, "eeprom")
-		, m_pSlaveExternalRAM(*this, "slaveextram")
-		, m_pMasterExternalRAM(*this, "masterextram")
+		, m_slave_extram(*this, "slaveextram")
+		, m_master_extram(*this, "masterextram")
 		, m_paletteram(*this, "paletteram")
 		, m_cgram(*this, "cgram")
 		, m_textram(*this, "textram")
@@ -299,8 +299,6 @@ private:
 	DECLARE_WRITE16_MEMBER(namcos22_dspram16_w);
 	DECLARE_READ16_MEMBER(pdp_status_r);
 	DECLARE_READ16_MEMBER(pdp_begin_r);
-	DECLARE_READ16_MEMBER(slave_external_ram_r);
-	DECLARE_WRITE16_MEMBER(slave_external_ram_w);
 	DECLARE_READ16_MEMBER(dsp_hold_signal_r);
 	DECLARE_WRITE16_MEMBER(dsp_hold_ack_w);
 	DECLARE_WRITE16_MEMBER(dsp_xf_output_w);
@@ -315,8 +313,6 @@ private:
 	DECLARE_READ16_MEMBER(dsp_unk8_r);
 	DECLARE_READ16_MEMBER(custom_ic_status_r);
 	DECLARE_READ16_MEMBER(dsp_upload_status_r);
-	DECLARE_READ16_MEMBER(master_external_ram_r);
-	DECLARE_WRITE16_MEMBER(master_external_ram_w);
 	DECLARE_WRITE16_MEMBER(slave_serial_io_w);
 	DECLARE_READ16_MEMBER(master_serial_io_r);
 	DECLARE_WRITE16_MEMBER(dsp_unk_porta_w);
@@ -337,6 +333,8 @@ private:
 	DECLARE_READ8_MEMBER(namcos22_system_controller_r);
 	DECLARE_WRITE8_MEMBER(namcos22s_system_controller_w);
 	DECLARE_WRITE8_MEMBER(namcos22_system_controller_w);
+	DECLARE_READ16_MEMBER(namcos22_shared_r);
+	DECLARE_WRITE16_MEMBER(namcos22_shared_w);
 	DECLARE_READ16_MEMBER(namcos22_keycus_r);
 	DECLARE_WRITE16_MEMBER(namcos22_keycus_w);
 	DECLARE_READ16_MEMBER(namcos22_portbit_r);
@@ -347,8 +345,6 @@ private:
 	DECLARE_READ32_MEMBER(alpinesa_prot_r);
 	DECLARE_WRITE32_MEMBER(alpinesa_prot_w);
 	DECLARE_WRITE32_MEMBER(namcos22s_chipselect_w);
-	DECLARE_READ16_MEMBER(s22mcu_shared_r);
-	DECLARE_WRITE16_MEMBER(s22mcu_shared_w);
 	DECLARE_WRITE8_MEMBER(mcu_port4_w);
 	DECLARE_READ8_MEMBER(mcu_port4_r);
 	DECLARE_WRITE8_MEMBER(mcu_port5_w);
@@ -377,7 +373,7 @@ private:
 	float dspfloat_to_nativefloat(uint32_t val);
 
 	void handle_driving_io();
-	void handle_coinage(int slots, int address_is_odd);
+	void handle_coinage(uint16_t flags);
 	void handle_cybrcomm_io();
 	inline uint32_t pdp_polygonram_read(offs_t offs) { return m_polygonram[offs & 0x7fff]; }
 	inline void pdp_polygonram_write(offs_t offs, uint32_t data) { m_polygonram[offs & 0x7fff] = data; }
@@ -463,10 +459,10 @@ private:
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_mcu;
 	optional_device<cpu_device> m_iomcu;
-	required_shared_ptr<uint32_t> m_shareram;
+	required_shared_ptr<uint16_t> m_shareram;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
-	required_shared_ptr<uint16_t> m_pSlaveExternalRAM;
-	required_shared_ptr<uint16_t> m_pMasterExternalRAM;
+	required_shared_ptr<uint16_t> m_slave_extram;
+	required_shared_ptr<uint16_t> m_master_extram;
 	required_shared_ptr<uint32_t> m_paletteram;
 	required_shared_ptr<uint32_t> m_cgram;
 	required_shared_ptr<uint32_t> m_textram;
@@ -492,7 +488,7 @@ private:
 	emu_timer *m_ar_tb_interrupt[2];
 	uint16_t m_dsp_master_bioz;
 	std::unique_ptr<uint32_t[]> m_pointram;
-	uint32_t m_old_coin_state;
+	int m_old_coin_state;
 	uint32_t m_credits1;
 	uint32_t m_credits2;
 	uint16_t m_pdp_base;

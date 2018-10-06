@@ -759,7 +759,7 @@ void namcos22_state::matrix3d_multiply(float a[4][4], float b[4][4])
 {
 	float result[4][4];
 
-	for (int row = 0; row < 4;  row++)
+	for (int row = 0; row < 4; row++)
 	{
 		for (int col = 0; col < 4; col++)
 		{

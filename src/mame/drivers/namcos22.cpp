@@ -1580,6 +1580,17 @@ READ8_MEMBER(namcos22_state::namcos22_system_controller_r)
 }
 
 
+READ16_MEMBER(namcos22_state::namcos22_shared_r)
+{
+	return m_shareram[offset];
+}
+
+WRITE16_MEMBER(namcos22_state::namcos22_shared_w)
+{
+	COMBINE_DATA(&m_shareram[offset]);
+}
+
+
 READ32_MEMBER(namcos22_state::namcos22_dspram_r)
 {
 	return m_polygonram[offset] | 0xff000000; // only d0-23 are connected
@@ -1865,7 +1876,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 * +0x0300 - 0x03ff?    Song Title (put messages here from Sound CPU)
 	 */
 	map(0x60000000, 0x60003fff).nopw();
-	map(0x60004000, 0x6000bfff).ram().share("shareram");
+	map(0x60004000, 0x6000bfff).rw(FUNC(namcos22_state::namcos22_shared_r), FUNC(namcos22_state::namcos22_shared_w));
 
 	/**
 	 * C71 (TI TMS320C25 DSP) Shared RAM (0x70000000 - 0x70020000)
@@ -1954,7 +1965,7 @@ void namcos22_state::namcos22s_am(address_map &map)
 	map(0x900000, 0x90ffff).ram().share("vics_data");
 	map(0x940000, 0x94007f).rw(FUNC(namcos22_state::namcos22s_vics_control_r), FUNC(namcos22_state::namcos22s_vics_control_w)).share("vics_control");
 	map(0x980000, 0x9affff).ram().share("spriteram"); // C374
-	map(0xa04000, 0xa0bfff).ram().share("shareram"); // COM RAM
+	map(0xa04000, 0xa0bfff).rw(FUNC(namcos22_state::namcos22_shared_r), FUNC(namcos22_state::namcos22_shared_w)); // COM RAM
 	map(0xc00000, 0xc1ffff).rw(FUNC(namcos22_state::namcos22_dspram_r), FUNC(namcos22_state::namcos22_dspram_w)).share("polygonram");
 	map(0xe00000, 0xe3ffff).ram(); // workram
 }
@@ -2298,16 +2309,6 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 	return 0;
 }
 
-READ16_MEMBER(namcos22_state::slave_external_ram_r)
-{
-	return m_pSlaveExternalRAM[offset];
-}
-
-WRITE16_MEMBER(namcos22_state::slave_external_ram_w)
-{
-	COMBINE_DATA(&m_pSlaveExternalRAM[offset]);
-}
-
 READ16_MEMBER(namcos22_state::dsp_hold_signal_r)
 {
 	/* STUB */
@@ -2388,7 +2389,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 			break;
 
 		case NAMCOS22_DSP_UPLOAD_DATA:
-			m_pSlaveExternalRAM[m_UploadDestIdx & 0x1fff] = data;
+			m_slave_extram[m_UploadDestIdx & 0x1fff] = data;
 			m_UploadDestIdx++;
 			break;
 
@@ -2413,16 +2414,6 @@ READ16_MEMBER(namcos22_state::dsp_upload_status_r)
 {
 	/* bit 0x0001 is polled to confirm that code/data has been successfully uploaded to the slave dsp via port 0x7. */
 	return 0x0000;
-}
-
-READ16_MEMBER(namcos22_state::master_external_ram_r)
-{
-	return m_pMasterExternalRAM[offset];
-}
-
-WRITE16_MEMBER(namcos22_state::master_external_ram_w)
-{
-	COMBINE_DATA(&m_pMasterExternalRAM[offset]);
 }
 
 WRITE16_MEMBER(namcos22_state::slave_serial_io_w)
@@ -2527,7 +2518,7 @@ void namcos22_state::master_dsp_program(address_map &map)
 void namcos22_state::master_dsp_data(address_map &map)
 {
 	map(0x1000, 0x3fff).ram();
-	map(0x4000, 0x7fff).r(FUNC(namcos22_state::master_external_ram_r)).w(FUNC(namcos22_state::master_external_ram_w));
+	map(0x4000, 0x7fff).ram().share("masterextram");
 	map(0x8000, 0xffff).r(FUNC(namcos22_state::namcos22_dspram16_r)).w(FUNC(namcos22_state::namcos22_dspram16_w));
 }
 
@@ -2615,7 +2606,7 @@ void namcos22_state::slave_dsp_program(address_map &map)
 
 void namcos22_state::slave_dsp_data(address_map &map)
 {
-	map(0x8000, 0x9fff).rw(FUNC(namcos22_state::slave_external_ram_r), FUNC(namcos22_state::slave_external_ram_w));
+	map(0x8000, 0x9fff).ram().share("slaveextram");
 }
 
 void namcos22_state::slave_dsp_io(address_map &map)
@@ -2666,18 +2657,6 @@ void namcos22_state::slave_dsp_io(address_map &map)
 
 // System 22 37702
 
-READ16_MEMBER(namcos22_state::s22mcu_shared_r)
-{
-	uint16_t *share16 = (uint16_t *)m_shareram.target();
-	return share16[BYTE_XOR_BE(offset)];
-}
-
-WRITE16_MEMBER(namcos22_state::s22mcu_shared_w)
-{
-	uint16_t *share16 = (uint16_t *)m_shareram.target();
-	COMBINE_DATA(&share16[BYTE_XOR_BE(offset)]);
-}
-
 READ8_MEMBER(namcos22_state::mcu_port4_s22_r)
 {
 	// for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
@@ -2693,7 +2672,7 @@ READ8_MEMBER(namcos22_state::iomcu_port4_s22_r)
 void namcos22_state::mcu_s22_program(address_map &map)
 {
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
-	map(0x004000, 0x00bfff).rw(FUNC(namcos22_state::s22mcu_shared_r), FUNC(namcos22_state::s22mcu_shared_w));
+	map(0x004000, 0x00bfff).ram().share("shareram");
 	map(0x080000, 0x0fffff).rom().region("mcu", 0);
 	map(0x200000, 0x27ffff).rom().region("mcu", 0);
 	map(0x280000, 0x2fffff).rom().region("mcu", 0);
@@ -2786,7 +2765,7 @@ READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
 void namcos22_state::mcu_program(address_map &map)
 {
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
-	map(0x004000, 0x00bfff).rw(FUNC(namcos22_state::s22mcu_shared_r), FUNC(namcos22_state::s22mcu_shared_w));
+	map(0x004000, 0x00bfff).ram().share("shareram");
 	map(0x00c000, 0x00ffff).rom().region("mcu", 0xc000);
 	map(0x080000, 0x0fffff).rom().region("mcu", 0);
 	map(0x200000, 0x27ffff).rom().region("mcu", 0);
@@ -2809,30 +2788,22 @@ void namcos22_state::mcu_io(address_map &map)
 // custom input handling
 
 /* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
-void namcos22_state::handle_coinage(int slots, int address_is_odd)
+void namcos22_state::handle_coinage(uint16_t flags)
 {
-	uint16_t *share16 = (uint16_t *)m_shareram.target();
+	int coin_state = (flags & 0x1000) >> 12 | (flags & 0x0200) >> 8;
 
-	uint32_t coin_state = ioport("INPUTS")->read() & 0x1200;
-
-	if (!(coin_state & 0x1000) && (m_old_coin_state & 0x1000))
+	if (!(coin_state & 1) && (m_old_coin_state & 1))
 	{
 		m_credits1++;
 	}
 
-	if (!(coin_state & 0x0200) && (m_old_coin_state & 0x0200))
+	if (!(coin_state & 2) && (m_old_coin_state & 2))
 	{
 		m_credits2++;
 	}
 
 	m_old_coin_state = coin_state;
-
-	share16[BYTE_XOR_LE(0x38/2)] = m_credits1 << (address_is_odd*8);
-
-	if (slots == 2)
-	{
-		share16[BYTE_XOR_LE(0x3e/2)] = m_credits2 << (address_is_odd*8);
-	}
+	m_shareram[0x3a/2] = m_credits1 << 8 | m_credits2;
 }
 
 /* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
@@ -2841,8 +2812,6 @@ void namcos22_state::handle_driving_io()
 	if (m_syscontrol[0x18] != 0)
 	{
 		uint16_t flags = ioport("INPUTS")->read();
-		uint16_t coinram_address_is_odd = 0;
-
 		uint16_t gas   = ioport("GAS")->read();
 		uint16_t brake = ioport("BRAKE")->read();
 		uint16_t steer = ioport("STEER")->read();
@@ -2869,8 +2838,6 @@ void namcos22_state::handle_driving_io()
 				break;
 
 			case NAMCOS22_VICTORY_LAP:
-				coinram_address_is_odd = 1;
-				// (fall through)
 			case NAMCOS22_ACE_DRIVER:
 				gas <<= 3;
 				gas += 992;
@@ -2887,10 +2854,11 @@ void namcos22_state::handle_driving_io()
 				break;
 		}
 
-		handle_coinage(2, coinram_address_is_odd);
-		m_shareram[0x000/4] = 0x10 << 16; /* SUB CPU ready */
-		m_shareram[0x030/4] = (flags << 16) | steer;
-		m_shareram[0x034/4] = (gas << 16) | brake;
+		m_shareram[0x030/2] = flags;
+		m_shareram[0x032/2] = steer;
+		m_shareram[0x034/2] = gas;
+		m_shareram[0x036/2] = brake;
+		handle_coinage(flags);
 	}
 }
 
@@ -2900,17 +2868,17 @@ void namcos22_state::handle_cybrcomm_io()
 	if (m_syscontrol[0x18] != 0)
 	{
 		uint16_t flags = ioport("INPUTS")->read();
-
 		uint16_t volume0 = ioport("STICKY1")->read() * 0x10;
 		uint16_t volume1 = ioport("STICKY2")->read() * 0x10;
 		uint16_t volume2 = ioport("STICKX1")->read() * 0x10;
 		uint16_t volume3 = ioport("STICKX2")->read() * 0x10;
 
-		m_shareram[0x030/4] = (flags << 16) | volume0;
-		m_shareram[0x034/4] = (volume1 << 16) | volume2;
-		m_shareram[0x038/4] = volume3 << 16;
-
-		handle_coinage(1, 0);
+		m_shareram[0x030/2] = flags;
+		m_shareram[0x032/2] = volume0;
+		m_shareram[0x034/2] = volume1;
+		m_shareram[0x036/2] = volume2;
+		m_shareram[0x038/2] = volume3;
+		handle_coinage(flags);
 	}
 }
 
@@ -3172,7 +3140,6 @@ static INPUT_PORTS_START( raveracw )
 
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("View Change")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no coin2
 
 	PORT_CONFNAME( 0x2100, 0x2000, DEF_STR( Cabinet ) ) // @ JAMMA pins
 	PORT_CONFSETTING(      0x0000, "50 Inch" )
