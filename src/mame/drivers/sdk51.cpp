@@ -50,12 +50,18 @@ private:
 	u8 brkmem_r(offs_t offset);
 	void brkmem_w(offs_t offset, u8 data);
 
+	u8 upibus_r();
+	void upibus_w(u8 data);
+	void serial_control_w(u8 data);
+
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_progmem;
 	required_device<address_map_bank_device> m_datamem;
 	required_device<address_map_bank_device> m_mem0;
 	required_device<i8251_device> m_usart;
 	required_region_ptr<u8> m_cycles;
+
+	u8 m_serial_control;
 };
 
 READ8_MEMBER(sdk51_state::psen_r)
@@ -81,6 +87,27 @@ u8 sdk51_state::brkmem_r(offs_t offset)
 void sdk51_state::brkmem_w(offs_t offset, u8 data)
 {
 	m_mem0->set_bank(0);
+}
+
+u8 sdk51_state::upibus_r()
+{
+	u8 result = 0xff;
+
+	if (!BIT(m_serial_control, 0))
+		result &= m_usart->read(BIT(m_serial_control, 2));
+
+	return result;
+}
+
+void sdk51_state::upibus_w(u8 data)
+{
+	if (!BIT(m_serial_control, 1))
+		m_usart->write(BIT(m_serial_control, 2), data);
+}
+
+void sdk51_state::serial_control_w(u8 data)
+{
+	m_serial_control = data;
 }
 
 void sdk51_state::psen_map(address_map &map)
@@ -120,6 +147,9 @@ INPUT_PORTS_END
 
 void sdk51_state::machine_start()
 {
+	m_serial_control = 0x0f;
+
+	save_item(NAME(m_serial_control));
 }
 
 void sdk51_state::machine_reset()
@@ -150,12 +180,15 @@ void sdk51_state::sdk51(machine_config &config)
 	m_mem0->set_stride(0x2000);
 
 	upi41_cpu_device &upi(I8041(config, "upi", 6_MHz_XTAL));
+	upi.p1_in_cb().set(FUNC(sdk51_state::upibus_r));
+	upi.p1_out_cb().set(FUNC(sdk51_state::upibus_w));
 	upi.p2_in_cb().set("upiexp", FUNC(i8243_device::p2_r));
 	upi.p2_out_cb().set("upiexp", FUNC(i8243_device::p2_w));
 	upi.prog_out_cb().set("upiexp", FUNC(i8243_device::prog_w));
 	upi.t1_in_cb().set(m_usart, FUNC(i8251_device::txrdy_r));
 
-	I8243(config, "upiexp");
+	i8243_device &upiexp(I8243(config, "upiexp"));
+	upiexp.p4_out_cb().set(FUNC(sdk51_state::serial_control_w));
 
 	i8155_device &io(I8155(config, "io", 6_MHz_XTAL / 3));
 	io.out_to_callback().set(m_usart, FUNC(i8251_device::write_txc));
