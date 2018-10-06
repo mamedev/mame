@@ -25,8 +25,10 @@ public:
 		, m_progmem(*this, "progmem")
 		, m_datamem(*this, "datamem")
 		, m_mem0(*this, "mem0")
+		, m_upi(*this, "upi")
 		, m_usart(*this, "usart")
 		, m_cycles(*this, "cycles")
+		, m_kb(*this, "KB%u", 0U)
 	{
 	}
 
@@ -52,16 +54,23 @@ private:
 
 	u8 upibus_r();
 	void upibus_w(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(display_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(upiobf_w);
 	void serial_control_w(u8 data);
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_progmem;
 	required_device<address_map_bank_device> m_datamem;
 	required_device<address_map_bank_device> m_mem0;
+	required_device<upi41_cpu_device> m_upi;
 	required_device<i8251_device> m_usart;
 	required_region_ptr<u8> m_cycles;
+	required_ioport_array<7> m_kb;
 
+	bool m_upiobf;
 	u8 m_serial_control;
+	u32 m_kdtime;
+	bool m_display_clock;
 };
 
 READ8_MEMBER(sdk51_state::psen_r)
@@ -81,7 +90,7 @@ WRITE8_MEMBER(sdk51_state::datamem_w)
 
 u8 sdk51_state::brkmem_r(offs_t offset)
 {
-	return 0;
+	return 1 | (m_upiobf ? 2 : 0);
 }
 
 void sdk51_state::brkmem_w(offs_t offset, u8 data)
@@ -96,6 +105,11 @@ u8 sdk51_state::upibus_r()
 	if (!BIT(m_serial_control, 0))
 		result &= m_usart->read(BIT(m_serial_control, 2));
 
+	if (!BIT(m_upi->p2_r(), 6))
+		for (int n = 0; n < 7; n++)
+			if (BIT(m_kdtime, n))
+				result &= m_kb[n]->read();
+
 	return result;
 }
 
@@ -108,6 +122,23 @@ void sdk51_state::upibus_w(u8 data)
 void sdk51_state::serial_control_w(u8 data)
 {
 	m_serial_control = data;
+}
+
+WRITE_LINE_MEMBER(sdk51_state::display_clock_w)
+{
+	if (!m_display_clock && state)
+		m_kdtime = ((m_kdtime << 1) & 0xfffffe) | BIT(m_upi->p1_r(), 6);
+
+	m_display_clock = state;
+}
+
+WRITE_LINE_MEMBER(sdk51_state::upiobf_w)
+{
+	if (m_upiobf != bool(state))
+	{
+		m_upiobf = state;
+		m_maincpu->set_input_line(MCS51_INT0_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void sdk51_state::psen_map(address_map &map)
@@ -130,7 +161,7 @@ void sdk51_state::progmem_map(address_map &map)
 void sdk51_state::datamem_map(address_map &map)
 {
 	progmem_map(map);
-	map(0xa000, 0xa001).mirror(0xffe).rw("upi", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
+	map(0xa000, 0xa001).mirror(0xffe).rw(m_upi, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 	map(0xb000, 0xb0ff).mirror(0x700).rw("io", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0xb800, 0xb807).mirror(0x7f8).rw("io", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xc000, 0xdfff).rw(FUNC(sdk51_state::brkmem_r), FUNC(sdk51_state::brkmem_w));
@@ -143,18 +174,88 @@ void sdk51_state::mem0_map(address_map &map)
 }
 
 static INPUT_PORTS_START(sdk51)
+	PORT_START("KB0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CHAR(UCHAR_SHIFT_1) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(0x09) PORT_CODE(KEYCODE_TAB)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(0x1b) PORT_CODE(KEYCODE_ESC)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rubout") PORT_CHAR(0x7f) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(' ') PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('@') PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CHAR(0x0d) PORT_CODE(KEYCODE_ENTER)
+
+	PORT_START("KB1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('0') PORT_CHAR('\\') PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('1') PORT_CHAR('!') PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('2') PORT_CHAR('"') PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('3') PORT_CHAR('#') PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('4') PORT_CHAR('$') PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('5') PORT_CHAR('%') PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('6') PORT_CHAR('&') PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('7') PORT_CHAR('\'') PORT_CODE(KEYCODE_7)
+
+	PORT_START("KB2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('8') PORT_CHAR('(') PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('9') PORT_CHAR(')') PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('-') PORT_CHAR('=') PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(';') PORT_CHAR('+') PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(':') PORT_CHAR('*') PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('/') PORT_CHAR('?') PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('.') PORT_CHAR(']') PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(',') PORT_CHAR('[') PORT_CODE(KEYCODE_COMMA)
+
+	PORT_START("KB3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('A') PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('B') PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('C') PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('D') PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('E') PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('F') PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('G') PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('H') PORT_CODE(KEYCODE_H)
+
+	PORT_START("KB4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('I') PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('J') PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('K') PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('L') PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('M') PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('N') PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('O') PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('P') PORT_CODE(KEYCODE_P)
+
+	PORT_START("KB5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('Q') PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('R') PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('S') PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('T') PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('U') PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('V') PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('W') PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('X') PORT_CODE(KEYCODE_X)
+
+	PORT_START("KB6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('Y') PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('Z') PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 void sdk51_state::machine_start()
 {
+	m_upiobf = false;
 	m_serial_control = 0x0f;
+	m_display_clock = true;
 
+	save_item(NAME(m_upiobf));
 	save_item(NAME(m_serial_control));
+	save_item(NAME(m_kdtime));
+	save_item(NAME(m_display_clock));
 }
 
 void sdk51_state::machine_reset()
 {
 	m_mem0->set_bank(1);
+	m_kdtime = 0;
 }
 
 void sdk51_state::sdk51(machine_config &config)
@@ -179,13 +280,15 @@ void sdk51_state::sdk51(machine_config &config)
 	m_mem0->set_addr_width(14);
 	m_mem0->set_stride(0x2000);
 
-	upi41_cpu_device &upi(I8041(config, "upi", 6_MHz_XTAL));
-	upi.p1_in_cb().set(FUNC(sdk51_state::upibus_r));
-	upi.p1_out_cb().set(FUNC(sdk51_state::upibus_w));
-	upi.p2_in_cb().set("upiexp", FUNC(i8243_device::p2_r));
-	upi.p2_out_cb().set("upiexp", FUNC(i8243_device::p2_w));
-	upi.prog_out_cb().set("upiexp", FUNC(i8243_device::prog_w));
-	upi.t1_in_cb().set(m_usart, FUNC(i8251_device::txrdy_r));
+	I8041(config, m_upi, 6_MHz_XTAL);
+	m_upi->p1_in_cb().set(FUNC(sdk51_state::upibus_r));
+	m_upi->p1_out_cb().set(FUNC(sdk51_state::upibus_w));
+	m_upi->p2_in_cb().set("upiexp", FUNC(i8243_device::p2_r));
+	m_upi->p2_out_cb().set(FUNC(sdk51_state::display_clock_w)).bit(7);
+	m_upi->p2_out_cb().append(FUNC(sdk51_state::upiobf_w)).bit(4);
+	m_upi->p2_out_cb().append("upiexp", FUNC(i8243_device::p2_w)).mask(0x0f);
+	m_upi->prog_out_cb().set("upiexp", FUNC(i8243_device::prog_w));
+	m_upi->t1_in_cb().set(m_usart, FUNC(i8251_device::txrdy_r));
 
 	i8243_device &upiexp(I8243(config, "upiexp"));
 	upiexp.p4_out_cb().set(FUNC(sdk51_state::serial_control_w));
