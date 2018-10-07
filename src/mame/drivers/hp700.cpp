@@ -102,10 +102,40 @@ ROM_START(hp700_92)
 	ROM_LOAD("5181-8672.u803", 0x00000, 0x20000, CRC(21440d2f) SHA1(69a3de064ae2b18adc46c2fdd0bf69620375efe7))
 ROM_END
 
+/**************************************************************************************************************
+
+HP 700/70 Terminal with AlphaWindows capability
+
+Board D-3416 C1093-60001
+-------------
+2 EPROMs
+EPROM Type: M27C1001 (128KB - 1 MBit)
+-------------
+
+-------------
+1LV5-0001
+93491
+SINGAPORE
+-------------
+
+-------------
+NEC
+9401Y5 V20
+D70108C-10(C)'84 NEC
+-------------
+
+-------------
+HP ASIC 1MH1-0202
+94281 Singapore
+HJP02
+-------------
+
+***************************************************************************************************************/
+
 ROM_START(hp700_70)
 	ROM_REGION(0x40000, "maincpu", 0) // "© HP 1994 REV: 3440"
-	ROM_LOAD("c1093-80008.bin", 0x00000, 0x20000, CRC(25c527a6) SHA1(97e82774d25eab6fd4cc6ff7a5a473341281abb1)) // "CKSM 96A5"
-	ROM_LOAD("c1093-80009.bin", 0x20000, 0x20000, CRC(369e6855) SHA1(938ac9cd120d0aa7c76011d1a5e91244a142b397)) // "CKSM 7B6B"
+	ROM_LOAD("c1093-80008.u802", 0x00000, 0x20000, CRC(25c527a6) SHA1(97e82774d25eab6fd4cc6ff7a5a473341281abb1)) // "CKSM 96A5"
+	ROM_LOAD("c1093-80009.u817", 0x20000, 0x20000, CRC(369e6855) SHA1(938ac9cd120d0aa7c76011d1a5e91244a142b397)) // "CKSM 7B6B"
 ROM_END
 
 COMP(1987, hp700_92, 0, 0, hp700_92, hp700_92, hp700_state, empty_init, "Hewlett-Packard", "HP 700/92 Display Terminal", MACHINE_IS_SKELETON)
