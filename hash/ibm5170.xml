@@ -4965,7 +4965,7 @@
 
 	<software name="mitsmous">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
-		<description>Mitsumi Mouse Driver</description>
+		<description>Mitsumi Mouse Driver (v7.22)</description>
 		<year>1994</year>
 		<publisher>Mitsumi</publisher>
 		<info name="version" value="7.22" />
@@ -4977,7 +4977,7 @@
 	</software>
 
 	<software name="mitsmous6" cloneof="mitsmous">
-		<description>Mitsumi Mouse Driver</description>
+		<description>Mitsumi Mouse Driver (v6.0)</description>
 		<year>1993</year>
 		<publisher>Mitsumi</publisher>
 		<info name="version" value="6.0" />
@@ -5619,7 +5619,7 @@
 			</dataarea>
 		</part>
 	</software>
-x
+
 	<!-- S/N: IAC-57008-I -->
 	<software name="autoconv">
 		<description>Auto Convert</description>
@@ -7614,7 +7614,7 @@ x
 		</part>
 	</software>
 
-<!-- SDK's-->
+<!-- SDK's -->
 
 	<software name="photdev">
 		<description>Photon microGUI Development version 1.10 for QNX 4.2x</description>
@@ -10900,38 +10900,38 @@ x
 		<publisher>Dynamix</publisher>
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "737280">
-				<feature name="part_id" value="Disk 1" />
 				<rom name="nova 9 (international version, 3.5) disk 1.img" size="737280" crc="a14599bc" sha1="f94be59a1426c00b2b0421c8b47433b1fda48b19" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+	 		<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "737280">
-				<feature name="part_id" value="Disk 2" />
 				<rom name="nova 9 (international version, 3.5) disk 2.img" size="737280" crc="7a3eaeac" sha1="5bc1879831c26dd7c1fb76df2af2ac938385d14c" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size = "737280">
-				<feature name="part_id" value="Disk 3" />
 				<rom name="nova 9 (international version, 3.5) disk 3.img" size="737280" crc="ebce8727" sha1="e308e3b461ef6e23c53308fefe670f51e83ea940" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size = "737280">
-				<feature name="part_id" value="Disk 4" />
 				<rom name="nova 9 (international version, 3.5) disk 4.img" size="737280" crc="1d884a9f" sha1="927fe65a2c607a21ca2f24d41d019b65abc47dda" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size = "737280">
-				<feature name="part_id" value="Disk 5" />
 				<rom name="nova 9 (international version, 3.5) disk 5.img" size="737280" crc="3e9db843" sha1="7ca2acf1e7c270636d182c1484503246d310529d" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size = "737280">
-				<feature name="part_id" value="Disk 6" />
 				<rom name="nova 9 (international version, 3.5) disk 6.img" size="737280" crc="cc16d0de" sha1="3ba05e1d37397ff92f833ddc0111baeb342c1704" offset="0"/>
 			</dataarea>
 		</part>
@@ -10943,26 +10943,26 @@ x
 		<publisher>Dynamix</publisher>
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1228800">
-				<feature name="part_id" value="Disk 1" />
 				<rom name="nova 9 (international version, 5.25) disk 1.img" size="1228800" crc="9f1ab6f9" sha1="39314fe0be08e277006b8de435859f906d07ef71" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "1228800">
-				<feature name="part_id" value="Disk 2" />
 				<rom name="nova 9 (international version, 5.25) disk 2.img" size="1228800" crc="bccd3a41" sha1="62455d5cac132b7e7035de687827a815c758d2fd" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size = "1228800">
-				<feature name="part_id" value="Disk 3" />
 				<rom name="nova 9 (international version, 5.25) disk 3.img" size="1228800" crc="2f57be7b" sha1="a089ae8f80eaec1ee16523c8a92925775c966595" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size = "1228800">
-				<feature name="part_id" value="Disk 4" />
 				<rom name="nova 9 (international version, 5.25) disk 4.img" size="1228800" crc="a27d7959" sha1="9fde920925a72851c89c14b1475e2546c6eaa7e2" offset="0"/>
 			</dataarea>
 		</part>
@@ -11732,14 +11732,14 @@ x
 		<year>1991</year>
 		<publisher>Core Design</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1474560">
-				<feature name="part_id" value="Disk 1" />
 				<rom name="thunderhawk ah-73m disk 1.img" size="1474560" crc="5b1ca8fd" sha1="b127ae100b4ffc73d470d3ff1d0d863a95fbd59b" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "1474560">
-				<feature name="part_id" value="Disk 2" />
 				<rom name="thunderhawk ah-73m disk 2.img" size="1474560" crc="aabeac50" sha1="af127a034efbd1b4fa815c3ec5255ab9597f5f88" offset="0"/>
 			</dataarea>
 		</part>
@@ -12640,7 +12640,7 @@ x
 		</part>
 	</software>
 
-	<!-- Needs a drastic redump from Original Disks-->
+	<!-- Needs a drastic redump from Original Disks -->
 
 	<software name="airduel">
 		<description>Air Duel - 80 Years of Dogfighting</description>
