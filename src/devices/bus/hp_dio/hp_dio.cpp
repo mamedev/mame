@@ -13,7 +13,13 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DIO16_SLOT, dio16_slot_device, "dio16_slot", "16-bit DIO slot")
+DEFINE_DEVICE_TYPE_NS(DIO16_SLOT, bus::hp_dio, dio16_slot_device, "dio16_slot", "16-bit DIO slot")
+DEFINE_DEVICE_TYPE_NS(DIO32_SLOT, bus::hp_dio, dio32_slot_device, "dio32_slot", "32-bit DIO-II slot")
+DEFINE_DEVICE_TYPE_NS(DIO16, bus::hp_dio, dio16_device, "dio16", "16-bit DIO bus")
+DEFINE_DEVICE_TYPE_NS(DIO32, bus::hp_dio, dio32_device, "dio32", "32-bit DIO-II bus")
+
+namespace bus {
+	namespace hp_dio {
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -52,14 +58,6 @@ void dio16_slot_device::device_start()
 		throw emu_fatalerror("dio16_slot_device: card device %s (%s) does not implement device_dio16_card_interface\n", card->tag(), card->name());
 }
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(DIO32_SLOT, dio32_slot_device, "dio32_slot", "32-bit DIO-II slot")
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -80,13 +78,6 @@ void dio32_slot_device::device_start()
 {
 	dio16_slot_device::device_start();
 }
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(DIO16, dio16_device, "dio16", "16-bit DIO bus")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -200,7 +191,7 @@ void device_dio16_card_interface::interface_pre_start()
 //  DIO32 DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DIO32, dio32_device, "dio32", "32-bit DIO-II bus")
+
 
 dio32_device::dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dio16_device(mconfig, DIO32, tag, owner, clock)
@@ -232,4 +223,6 @@ void device_dio32_card_interface::interface_pre_start()
 
 	if (m_dio_dev && !dynamic_cast<dio32_device *>(m_dio_dev))
 		throw emu_fatalerror("device_dio32_card_interface: DIO32 device %s (%s) in DIO16 slot %s\n", device().tag(), device().name(), m_dio_dev->name());
+}
+}
 }

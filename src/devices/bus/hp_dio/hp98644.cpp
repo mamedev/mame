@@ -15,8 +15,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HPDIO_98644, dio16_98644_device, "dio98644", "HP98644A Asynchronous Serial Interface")
+DEFINE_DEVICE_TYPE_NS(HPDIO_98644, bus::hp_dio, dio16_98644_device, "dio98644", "HP98644A Asynchronous Serial Interface")
 
+namespace bus {
+	namespace hp_dio {
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -226,3 +228,6 @@ WRITE16_MEMBER(dio16_98644_device::io_w)
 		break;
 	}
 }
+
+} // namespace bus::hp_dio
+} // namespace bus

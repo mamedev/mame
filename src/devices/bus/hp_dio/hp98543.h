@@ -11,6 +11,9 @@
 #include "video/nereid.h"
 #include "machine/ram.h"
 
+namespace bus {
+	namespace hp_dio {
+
 class dio16_98543_device :
 	public device_t,
 	public device_dio16_card_interface,
@@ -57,7 +60,10 @@ private:
 
 };
 
+} // namespace bus::hp_dio
+} // namespace bus
+
 // device type definition
-DECLARE_DEVICE_TYPE(HPDIO_98543, dio16_98543_device)
+DECLARE_DEVICE_TYPE_NS(HPDIO_98543, bus::hp_dio, dio16_98543_device)
 
 #endif // MAME_BUS_HPDIO_98543_H

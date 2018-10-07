@@ -17,26 +17,28 @@
 
 #pragma once
 
+namespace bus {
+	namespace hp_dio {
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
 #define MCFG_DIO16_CPU(_cputag) \
-	downcast<dio16_device &>(*device).set_cputag(_cputag);
+	downcast<bus::hp_dio::dio16_device &>(*device).set_cputag(_cputag);
 #define MCFG_DIO32_CPU(_cputag) \
-	downcast<dio32_device &>(*device).set_cputag(_cputag);
+	downcast<bus::hp_dio::dio32_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_ISA_OUT_IRQ3_CB(_devcb) \
-	downcast<dio16_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
+	downcast<bus::hp_dio::dio16_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ4_CB(_devcb) \
-	downcast<dio16_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
+	downcast<bus::hp_dio::dio16_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ5_CB(_devcb) \
-	downcast<dio16_device &>(*device).set_out_irq5_callback(DEVCB_##_devcb);
+	downcast<bus::hp_dio::dio16_device &>(*device).set_out_irq5_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ6_CB(_devcb) \
-	downcast<dio16_device &>(*device).set_out_irq6_callback(DEVCB_##_devcb);
+	downcast<bus::hp_dio::dio16_device &>(*device).set_out_irq6_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -75,8 +77,6 @@ protected:
 	required_device<dio16_device> m_dio;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(DIO16_SLOT, dio16_slot_device)
 
 class device_dio16_card_interface;
 // ======================> dio16_device
@@ -133,10 +133,6 @@ protected:
 	devcb_write_line    m_out_irq6_cb;
 };
 
-
-// device type definition
-DECLARE_DEVICE_TYPE(DIO16, dio16_device)
-
 // ======================> device_dio16_card_interface
 
 // class representing interface-specific live dio16 card
@@ -189,8 +185,6 @@ protected:
 };
 
 
-// device type definition
-DECLARE_DEVICE_TYPE(DIO32_SLOT, dio32_slot_device)
 
 // ======================> dio32_device
 class dio32_device : public dio16_device
@@ -207,8 +201,6 @@ protected:
 };
 
 
-// device type definition
-DECLARE_DEVICE_TYPE(DIO32, dio32_device)
 
 // ======================> device_dio32_card_interface
 
@@ -227,5 +219,13 @@ protected:
 
 	dio32_device &dio() { assert(m_dio_dev); return downcast<dio32_device &>(*m_dio_dev); }
 };
+} // namespace bus::hp_dio
+} // namespace bus
+
+// device type definition
+DECLARE_DEVICE_TYPE_NS(DIO16_SLOT, bus::hp_dio, dio16_slot_device)
+DECLARE_DEVICE_TYPE_NS(DIO32, bus::hp_dio, dio32_device)
+DECLARE_DEVICE_TYPE_NS(DIO32_SLOT, bus::hp_dio, dio32_slot_device)
+DECLARE_DEVICE_TYPE_NS(DIO16, bus::hp_dio, dio16_device)
 
 #endif // MAME_BUS_HPDIO_HPDIO_H

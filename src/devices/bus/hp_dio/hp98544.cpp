@@ -24,8 +24,10 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HPDIO_98544, dio16_98544_device, "dio98544", "HP98544 high-res monochrome DIO video card")
+DEFINE_DEVICE_TYPE_NS(HPDIO_98544, bus::hp_dio, dio16_98544_device, "dio98544", "HP98544 high-res monochrome DIO video card")
 
+namespace bus {
+	namespace hp_dio {
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -156,4 +158,5 @@ uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 	return 0;
 }
-
+} // namespace bus::hp_dio
+} // namespace bus

@@ -14,6 +14,9 @@
 
 // ======================> dio16_98544_device
 
+namespace bus {
+	namespace hp_dio {
+
 class dio16_98544_device :
 	public device_t,
 	public device_dio16_card_interface,
@@ -52,7 +55,10 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 };
 
+} // namespace bus::hp_dio
+} // namespace bus
+
 // device type definition
-DECLARE_DEVICE_TYPE(HPDIO_98544, dio16_98544_device)
+DECLARE_DEVICE_TYPE_NS(HPDIO_98544, bus::hp_dio, dio16_98544_device)
 
 #endif // MAME_BUS_HPDIO_98544_H
