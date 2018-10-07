@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 
 #define VERBOSE_LEVEL   (4)
 
-#define ENABLE_VERBOSE_LOG (0)
+#define ENABLE_VERBOSE_LOG (1)
 
 inline void spg2xx_device::verboselog(int n_level, const char *s_fmt, ...)
 {
@@ -138,6 +138,9 @@ void spg2xx_device::device_reset()
 	m_debug_samples = false;
 	m_debug_rates = false;
 	m_audio_curr_beat_base_count = 0;
+
+	m_audio_regs[AUDIO_CHANNEL_REPEAT] = 0x3f;
+	m_audio_regs[AUDIO_CHANNEL_ENV_MODE] = 0x3f;
 }
 
 
@@ -975,119 +978,119 @@ READ16_MEMBER(spg2xx_device::audio_r)
 		switch (offset)
 		{
 		case AUDIO_CHANNEL_ENABLE:
-			verboselog(0, "audio_r: NYI: Channel Enable: %04x\n", data);
+			verboselog(0, "audio_r: Channel Enable: %04x\n", data);
 			break;
 
 		case AUDIO_MAIN_VOLUME:
-			verboselog(0, "audio_r: NYI: Main Volume: %04x\n", data);
+			verboselog(0, "audio_r: Main Volume: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_FIQ_ENABLE:
-			verboselog(0, "audio_r: NYI: Channel FIQ Enable: %04x\n", data);
+			verboselog(0, "audio_r: Channel FIQ Enable: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_FIQ_STATUS:
-			verboselog(0, "audio_r: NYI: Channel FIQ Acknowledge: %04x\n", data);
+			verboselog(0, "audio_r: Channel FIQ Acknowledge: %04x\n", data);
 			break;
 
 		case AUDIO_BEAT_BASE_COUNT:
-			verboselog(0, "audio_r: NYI: Beat Base Count: %04x\n", data);
+			verboselog(0, "audio_r: Beat Base Count: %04x\n", data);
 			break;
 
 		case AUDIO_BEAT_COUNT:
-			verboselog(0, "audio_r: NYI: Beat Count: %04x\n", data);
+			verboselog(0, "audio_r: Beat Count: %04x\n", data);
 			break;
 
 		case AUDIO_ENVCLK:
-			verboselog(0, "audio_r: NYI: Envelope Interval (lo): %04x\n", data);
+			verboselog(0, "audio_r: Envelope Interval (lo): %04x\n", data);
 			break;
 
 		case AUDIO_ENVCLK_HIGH:
-			verboselog(0, "audio_r: NYI: Envelope Interval (hi): %04x\n", data);
+			verboselog(0, "audio_r: Envelope Interval (hi): %04x\n", data);
 			break;
 
 		case AUDIO_ENV_RAMP_DOWN:
-			verboselog(0, "audio_r: NYI: Envelope Fast Ramp Down: %04x\n", data);
+			verboselog(0, "audio_r: Envelope Fast Ramp Down: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_STOP:
-			verboselog(0, "audio_r: NYI: Channel Stop Status: %04x\n", data);
+			verboselog(0, "audio_r: Channel Stop Status: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_ZERO_CROSS:
-			verboselog(0, "audio_r: NYI: Channel Zero-Cross Enable: %04x\n", data);
+			verboselog(0, "audio_r: Channel Zero-Cross Enable: %04x\n", data);
 			break;
 
 		case AUDIO_CONTROL:
-			verboselog(0, "audio_r: NYI: Control: %04x\n", data);
+			verboselog(0, "audio_r: Control: %04x\n", data);
 			break;
 
 		case AUDIO_COMPRESS_CTRL:
-			verboselog(0, "audio_r: NYI: Compressor Control: %04x\n", data);
+			verboselog(0, "audio_r: Compressor Control: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_STATUS:
-			verboselog(0, "audio_r: NYI: Channel Status: %04x\n", data);
+			verboselog(0, "audio_r: Channel Status: %04x\n", data);
 			break;
 
 		case AUDIO_WAVE_IN_L:
-			verboselog(0, "audio_r: NYI: Wave In (L) / FIFO Write Data: %04x\n", data);
+			verboselog(0, "audio_r: Wave In (L) / FIFO Write Data: %04x\n", data);
 			break;
 
 		case AUDIO_WAVE_IN_R:
-			verboselog(0, "audio_r: NYI: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
+			verboselog(0, "audio_r: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
 			break;
 
 		case AUDIO_WAVE_OUT_L:
-			verboselog(0, "audio_r: NYI: Wave Out (L): %04x\n", data);
+			verboselog(0, "audio_r: Wave Out (L): %04x\n", data);
 			break;
 
 		case AUDIO_WAVE_OUT_R:
-			verboselog(0, "audio_r: NYI: Wave Out (R): %04x\n", data);
+			verboselog(0, "audio_r: Wave Out (R): %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_REPEAT:
-			verboselog(0, "audio_r: NYI: Channel Repeat Enable: %04x\n", data);
+			verboselog(0, "audio_r: Channel Repeat Enable: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_ENV_MODE:
-			verboselog(0, "audio_r: NYI: Channel Envelope Enable: %04x\n", data);
+			verboselog(0, "audio_r: Channel Envelope Enable: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_TONE_RELEASE:
-			verboselog(0, "audio_r: NYI: Channel Tone Release Enable: %04x\n", data);
+			verboselog(0, "audio_r: Channel Tone Release Enable: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_ENV_IRQ:
-			verboselog(0, "audio_r: NYI: Channel Envelope IRQ Status: %04x\n", data);
+			verboselog(0, "audio_r: Channel Envelope IRQ Status: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_PITCH_BEND:
-			verboselog(0, "audio_r: NYI: Channel Pitch Bend Enable: %04x\n", data);
+			verboselog(0, "audio_r: Channel Pitch Bend Enable: %04x\n", data);
 			break;
 
 		case AUDIO_SOFT_PHASE:
-			verboselog(0, "audio_r: NYI: Software Channel Phase: %04x\n", data);
+			verboselog(0, "audio_r: Software Channel Phase: %04x\n", data);
 			break;
 
 		case AUDIO_ATTACK_RELEASE:
-			verboselog(0, "audio_r: NYI: Attack/Release Time Control: %04x\n", data);
+			verboselog(0, "audio_r: Attack/Release Time Control: %04x\n", data);
 			break;
 
 		case AUDIO_EQ_CUTOFF10:
-			verboselog(0, "audio_r: NYI: EQ Cutoff Frequency 0/1: %04x\n", data);
+			verboselog(0, "audio_r: EQ Cutoff Frequency 0/1: %04x\n", data);
 			break;
 
 		case AUDIO_EQ_CUTOFF32:
-			verboselog(0, "audio_r: NYI: EQ Cutoff Frequency 2/3: %04x\n", data);
+			verboselog(0, "audio_r: EQ Cutoff Frequency 2/3: %04x\n", data);
 			break;
 
 		case AUDIO_EQ_GAIN10:
-			verboselog(0, "audio_r: NYI: EQ Cutoff Gain 0/1: %04x\n", data);
+			verboselog(0, "audio_r: EQ Cutoff Gain 0/1: %04x\n", data);
 			break;
 
 		case AUDIO_EQ_GAIN32:
-			verboselog(0, "audio_r: NYI: EQ Cutoff Gain 2/3: %04x\n", data);
+			verboselog(0, "audio_r: EQ Cutoff Gain 2/3: %04x\n", data);
 			break;
 
 		default:
@@ -1100,95 +1103,95 @@ READ16_MEMBER(spg2xx_device::audio_r)
 		switch (offset & AUDIO_CHAN_OFFSET_MASK)
 		{
 		case AUDIO_WAVE_ADDR:
-			verboselog(0, "audio_r: NYI: Channel %d: Wave Addr (lo): %04x\n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Wave Addr (lo): %04x\n", channel, data);
 			break;
 
 		case AUDIO_MODE:
-			verboselog(0, "audio_r: NYI: Channel %d: Mode: %04x (ADPCM:%d, 16M:%d, TONE:%d, LADDR_HI:%04x, WADDR_HI:%04x)\n", channel, data,
+			verboselog(0, "audio_r: Channel %d: Mode: %04x (ADPCM:%d, 16M:%d, TONE:%d, LADDR_HI:%04x, WADDR_HI:%04x)\n", channel, data,
 				get_adpcm_bit(channel), get_16bit_bit(channel), get_tone_mode(channel), get_loop_addr_high(channel), get_wave_addr_high(channel));
 			break;
 
 		case AUDIO_LOOP_ADDR:
-			verboselog(0, "audio_r: NYI: Channel %d: Loop Addr: %04x\n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Loop Addr: %04x\n", channel, data);
 			break;
 
 		case AUDIO_PAN_VOL:
-			verboselog(0, "audio_r: NYI: Channel %d: Pan/Vol: %04x (PAN:%02x, VOL:%02x)\n", channel, data,
+			verboselog(0, "audio_r: Channel %d: Pan/Vol: %04x (PAN:%02x, VOL:%02x)\n", channel, data,
 				get_pan(channel), get_volume(channel));
 			break;
 
 		case AUDIO_ENVELOPE0:
-			verboselog(0, "audio_r: NYI: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
+			verboselog(0, "audio_r: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
 				get_repeat_period_bit(channel), get_envelope_target(channel), get_envelope_sign_bit(channel), get_envelope_inc(channel));
 			break;
 
 		case AUDIO_ENVELOPE_DATA:
-			verboselog(0, "audio_r: NYI: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
+			verboselog(0, "audio_r: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
 				get_envelope_count(channel), get_edd(channel));
 			break;
 
 		case AUDIO_ENVELOPE1:
-			verboselog(0, "audio_r: NYI: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
+			verboselog(0, "audio_r: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
 				get_envelope_repeat_count(channel), get_envelope_repeat_bit(channel), get_envelope_load(channel));
 			break;
 
 		case AUDIO_ENVELOPE_ADDR_HIGH:
-			verboselog(0, "audio_r: NYI: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
+			verboselog(0, "audio_r: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
 				get_audio_irq_addr(channel), get_audio_irq_enable_bit(channel), get_envelope_addr_high(channel));
 			break;
 
 		case AUDIO_ENVELOPE_ADDR:
-			verboselog(0, "audio_r: NYI: Channel %d: Envelope Addr (lo): %04x \n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Envelope Addr (lo): %04x \n", channel, data);
 			break;
 
 		case AUDIO_WAVE_DATA_PREV:
-			verboselog(0, "audio_r: NYI: Channel %d: Wave Data Prev: %04x \n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Wave Data Prev: %04x \n", channel, data);
 			break;
 
 		case AUDIO_ENVELOPE_LOOP_CTRL:
-			verboselog(0, "audio_r: NYI: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
+			verboselog(0, "audio_r: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
 				get_rampdown_offset(channel), get_envelope_eaoffset(channel));
 			break;
 
 		case AUDIO_WAVE_DATA:
-			verboselog(0, "audio_r: NYI: Channel %d: Wave Data: %04x\n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Wave Data: %04x\n", channel, data);
 			break;
 
 		case AUDIO_ADPCM_SEL:
-			verboselog(0, "audio_r: NYI: Channel %d: ADPCM Sel: %04x (ADPCM36:%d, POINTNUM:%02x\n", channel, data,
+			verboselog(0, "audio_r: Channel %d: ADPCM Sel: %04x (ADPCM36:%d, POINTNUM:%02x\n", channel, data,
 				get_adpcm36_bit(channel), get_point_number(channel));
 			break;
 
 		case AUDIO_PHASE_HIGH:
-			verboselog(0, "audio_r: NYI: Channel %d: Phase High: %04x\n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Phase High: %04x\n", channel, data);
 			break;
 
 		case AUDIO_PHASE_ACCUM_HIGH:
-			verboselog(0, "audio_r: NYI: Channel %d: Phase Accum High: %04x\n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Phase Accum High: %04x\n", channel, data);
 			break;
 
 		case AUDIO_TARGET_PHASE_HIGH:
-			verboselog(0, "audio_r: NYI: Channel %d: Target Phase High: %04x\n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Target Phase High: %04x\n", channel, data);
 			break;
 
 		case AUDIO_RAMP_DOWN_CLOCK:
-			verboselog(0, "audio_r: NYI: Channel %d: Rampdown Clock: %04x\n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Rampdown Clock: %04x\n", channel, data);
 			break;
 
 		case AUDIO_PHASE:
-			verboselog(0, "audio_r: NYI: Channel %d: Phase: %04x\n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Phase: %04x\n", channel, data);
 			break;
 
 		case AUDIO_PHASE_ACCUM:
-			verboselog(0, "audio_r: NYI: Channel %d: Phase Accum: %04x\n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Phase Accum: %04x\n", channel, data);
 			break;
 
 		case AUDIO_TARGET_PHASE:
-			verboselog(0, "audio_r: NYI: Channel %d: Target Phase: %04x\n", channel, data);
+			verboselog(0, "audio_r: Channel %d: Target Phase: %04x\n", channel, data);
 			break;
 
 		case AUDIO_PHASE_CTRL:
-			verboselog(0, "audio_r: NYI: Channel %d: Phase Ctrl: %04x (TIMESTEP:%d, SIGN:%d, OFFSET:%03x\n", channel, data,
+			verboselog(0, "audio_r: Channel %d: Phase Ctrl: %04x (TIMESTEP:%d, SIGN:%d, OFFSET:%03x\n", channel, data,
 				get_phase_time_step(channel), get_phase_sign_bit(channel), get_phase_offset(channel));
 			break;
 
@@ -1210,7 +1213,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 		{
 		case AUDIO_CHANNEL_ENABLE:
 		{
-			verboselog(0, "audio_w: NYI: Channel Enable: %04x\n", data);
+			verboselog(0, "audio_w: Channel Enable: %04x\n", data);
 			const uint16_t changed = m_audio_regs[AUDIO_CHANNEL_STATUS] ^ data;
 			for (uint32_t channel_bit = 0; channel_bit < 6; channel_bit++)
 			{
@@ -1237,35 +1240,36 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 					m_audio_regs[offset] &= ~mask;
 					m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~mask;
 					m_audio_regs[AUDIO_CHANNEL_STOP] |= mask;
+					m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~mask;
 				}
 			}
 			break;
 		}
 
 		case AUDIO_MAIN_VOLUME:
-			verboselog(0, "audio_w: NYI: Main Volume: %04x\n", data);
+			verboselog(0, "audio_w: Main Volume: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_MAIN_VOLUME_MASK;
 			break;
 
 		case AUDIO_CHANNEL_FIQ_ENABLE:
-			verboselog(0, "audio_w: NYI: Channel FIQ Enable: %04x\n", data);
+			verboselog(0, "audio_w: Channel FIQ Enable: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_CHANNEL_FIQ_ENABLE_MASK;
 			break;
 
 		case AUDIO_CHANNEL_FIQ_STATUS:
-			verboselog(0, "audio_w: NYI: Channel FIQ Acknowledge: %04x\n", data);
+			verboselog(0, "audio_w: Channel FIQ Acknowledge: %04x\n", data);
 			m_audio_regs[offset] &= ~(data & AUDIO_CHANNEL_FIQ_STATUS_MASK);
 			break;
 
 		case AUDIO_BEAT_BASE_COUNT:
-			verboselog(0, "audio_w: NYI: Beat Base Count: %04x\n", data);
+			verboselog(0, "audio_w: Beat Base Count: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_BEAT_BASE_COUNT_MASK;
 			m_audio_curr_beat_base_count = m_audio_regs[offset];
 			break;
 
 		case AUDIO_BEAT_COUNT:
 		{
-			verboselog(0, "audio_w: NYI: Beat Count: %04x\n", data);
+			verboselog(0, "audio_w: Beat Count: %04x\n", data);
 			const uint16_t old = m_audio_regs[offset];
 			m_audio_regs[offset] &= ~(data & AUDIO_BIS_MASK);
 			m_audio_regs[offset] &= AUDIO_BIS_MASK;
@@ -1280,18 +1284,18 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 		}
 
 		case AUDIO_ENVCLK:
-			verboselog(0, "audio_w: NYI: Envelope Interval (lo): %04x\n", data);
+			verboselog(0, "audio_w: Envelope Interval (lo): %04x\n", data);
 			m_audio_regs[offset] = data;
 			break;
 
 		case AUDIO_ENVCLK_HIGH:
-			verboselog(0, "audio_w: NYI: Envelope Interval (hi): %04x\n", data);
+			verboselog(0, "audio_w: Envelope Interval (hi): %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_ENVCLK_HIGH_MASK;
 			break;
 
 		case AUDIO_ENV_RAMP_DOWN:
 		{
-			verboselog(0, "audio_w: NYI: Envelope Fast Ramp Down: %04x\n", data);
+			verboselog(0, "audio_w: Envelope Fast Ramp Down: %04x\n", data);
 			const uint16_t old = m_audio_regs[offset];
 			m_audio_regs[offset] = data & AUDIO_ENV_RAMP_DOWN_MASK;
 			const uint16_t changed = old ^ m_audio_regs[offset];
@@ -1315,17 +1319,17 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 		}
 
 		case AUDIO_CHANNEL_STOP:
-			verboselog(0, "audio_w: NYI: Channel Stop Status: %04x\n", data);
+			verboselog(0, "audio_w: Channel Stop Status: %04x\n", data);
 			m_audio_regs[offset] &= ~(data & AUDIO_CHANNEL_STOP_MASK);
 			break;
 
 		case AUDIO_CHANNEL_ZERO_CROSS:
-			verboselog(0, "audio_w: NYI: Channel Zero-Cross Enable: %04x\n", data);
+			verboselog(0, "audio_w: Channel Zero-Cross Enable: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_CHANNEL_ZERO_CROSS_MASK;
 			break;
 
 		case AUDIO_CONTROL:
-			verboselog(0, "audio_w: NYI: Control: %04x (SOFTCH:%d, COMPEN:%d, NOHIGH:%d, NOINT:%d, EQEN:%d\n", data
+			verboselog(0, "audio_w: Control: %04x (SOFTCH:%d, COMPEN:%d, NOHIGH:%d, NOINT:%d, EQEN:%d\n", data
 				, (data & AUDIO_CONTROL_SOFTCH_MASK) ? 1 : 0
 				, (data & AUDIO_CONTROL_COMPEN_MASK) ? 1 : 0
 				, (data & AUDIO_CONTROL_NOHIGH_MASK) ? 1 : 0
@@ -1335,7 +1339,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			break;
 
 		case AUDIO_COMPRESS_CTRL:
-			verboselog(0, "audio_w: NYI: Compressor Control: %04x\n", data);
+			verboselog(0, "audio_w: Compressor Control: %04x\n", data);
 			m_audio_regs[offset] = data;
 			break;
 
@@ -1344,77 +1348,77 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			break;
 
 		case AUDIO_WAVE_IN_L:
-			verboselog(0, "audio_w: NYI: Wave In (L) / FIFO Write Data: %04x\n", data);
+			verboselog(0, "audio_w: Wave In (L) / FIFO Write Data: %04x\n", data);
 			m_audio_regs[offset] = data;
 			break;
 
 		case AUDIO_WAVE_IN_R:
-			verboselog(0, "audio_w: NYI: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
+			verboselog(0, "audio_w: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
 			m_audio_regs[offset] = data;
 			break;
 
 		case AUDIO_WAVE_OUT_L:
-			verboselog(0, "audio_w: NYI: Wave Out (L): %04x\n", data);
+			verboselog(0, "audio_w: Wave Out (L): %04x\n", data);
 			m_audio_regs[offset] = data;
 			break;
 
 		case AUDIO_WAVE_OUT_R:
-			verboselog(0, "audio_w: NYI: Wave Out (R): %04x\n", data);
+			verboselog(0, "audio_w: Wave Out (R): %04x\n", data);
 			m_audio_regs[offset] = data;
 			break;
 
 		case AUDIO_CHANNEL_REPEAT:
-			verboselog(0, "audio_w: NYI: Channel Repeat Enable: %04x\n", data);
+			verboselog(0, "audio_w: Channel Repeat Enable: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_CHANNEL_REPEAT_MASK;
 			break;
 
 		case AUDIO_CHANNEL_ENV_MODE:
-			verboselog(0, "audio_w: NYI: Channel Envelope Enable: %04x\n", data);
+			verboselog(0, "audio_w: Channel Envelope Enable: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_CHANNEL_ENV_MODE_MASK;
 			break;
 
 		case AUDIO_CHANNEL_TONE_RELEASE:
-			verboselog(0, "audio_w: NYI: Channel Tone Release Enable: %04x\n", data);
+			verboselog(0, "audio_w: Channel Tone Release Enable: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_CHANNEL_TONE_RELEASE_MASK;
 			break;
 
 		case AUDIO_CHANNEL_ENV_IRQ:
-			verboselog(0, "audio_w: NYI: Channel Envelope IRQ Acknowledge: %04x\n", data);
+			verboselog(0, "audio_w: Channel Envelope IRQ Acknowledge: %04x\n", data);
 			m_audio_regs[offset] &= ~data & AUDIO_CHANNEL_ENV_IRQ_MASK;
 			break;
 
 		case AUDIO_CHANNEL_PITCH_BEND:
-			verboselog(0, "audio_w: NYI: Channel Pitch Bend Enable: %04x\n", data);
+			verboselog(0, "audio_w: Channel Pitch Bend Enable: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_CHANNEL_PITCH_BEND_MASK;
 			break;
 
 		case AUDIO_SOFT_PHASE:
-			verboselog(0, "audio_w: NYI: Software Channel Phase: %04x\n", data);
+			verboselog(0, "audio_w: Software Channel Phase: %04x\n", data);
 			m_audio_regs[offset] = data;
 			break;
 
 		case AUDIO_ATTACK_RELEASE:
-			verboselog(0, "audio_w: NYI: Attack/Release Time Control: %04x\n", data);
+			verboselog(0, "audio_w: Attack/Release Time Control: %04x\n", data);
 			m_audio_regs[offset] = data;
 			break;
 
 		case AUDIO_EQ_CUTOFF10:
-			verboselog(0, "audio_w: NYI: EQ Cutoff Frequency 0/1: %04x\n", data);
+			verboselog(0, "audio_w: EQ Cutoff Frequency 0/1: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_EQ_CUTOFF10_MASK;
 			break;
 
 		case AUDIO_EQ_CUTOFF32:
-			verboselog(0, "audio_w: NYI: EQ Cutoff Frequency 2/3: %04x\n", data);
+			verboselog(0, "audio_w: EQ Cutoff Frequency 2/3: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_EQ_CUTOFF32_MASK;
 			break;
 
 		case AUDIO_EQ_GAIN10:
-			verboselog(0, "audio_w: NYI: EQ Cutoff Gain 0/1: %04x\n", data);
+			verboselog(0, "audio_w: EQ Cutoff Gain 0/1: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_EQ_GAIN10_MASK;
 			break;
 
 		case AUDIO_EQ_GAIN32:
-			verboselog(0, "audio_w: NYI: EQ Cutoff Gain 2/3: %04x\n", data);
+			verboselog(0, "audio_w: EQ Cutoff Gain 2/3: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_EQ_GAIN32_MASK;
 			break;
 
@@ -1430,74 +1434,74 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 		{
 		case AUDIO_WAVE_ADDR:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Wave Addr (lo): %04x\n", channel, data);
+			verboselog(0, "audio_w: Channel %d: Wave Addr (lo): %04x\n", channel, data);
 			break;
 
 		case AUDIO_MODE:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Mode: %04x (ADPCM:%d, 16M:%d, TONE:%d, LADDR_HI:%04x, WADDR_HI:%04x)\n", channel, data,
+			verboselog(0, "audio_w: Channel %d: Mode: %04x (ADPCM:%d, 16M:%d, TONE:%d, LADDR_HI:%04x, WADDR_HI:%04x)\n", channel, data,
 				get_adpcm_bit(channel), get_16bit_bit(channel), get_tone_mode(channel), get_loop_addr_high(channel), get_wave_addr_high(channel));
 			break;
 
 		case AUDIO_LOOP_ADDR:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Loop Addr: %04x\n", channel, data);
+			verboselog(0, "audio_w: Channel %d: Loop Addr: %04x\n", channel, data);
 			break;
 
 		case AUDIO_PAN_VOL:
 			m_audio_regs[offset] = data & AUDIO_PAN_VOL_MASK;
-			verboselog(0, "audio_w: NYI: Channel %d: Pan/Vol: %04x (PAN:%02x, VOL:%02x)\n", channel, data,
+			verboselog(0, "audio_w: Channel %d: Pan/Vol: %04x (PAN:%02x, VOL:%02x)\n", channel, data,
 				get_pan(channel), get_volume(channel));
 			break;
 
 		case AUDIO_ENVELOPE0:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
+			verboselog(0, "audio_w: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
 				get_repeat_period_bit(channel), get_envelope_target(channel), get_envelope_sign_bit(channel), get_envelope_inc(channel));
 			break;
 
 		case AUDIO_ENVELOPE_DATA:
 			m_audio_regs[offset] = data & AUDIO_ENVELOPE_DATA_MASK;
-			verboselog(0, "audio_w: NYI: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
+			verboselog(0, "audio_w: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
 				get_envelope_count(channel), get_edd(channel));
 			break;
 
 		case AUDIO_ENVELOPE1:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
+			verboselog(0, "audio_w: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
 				get_envelope_repeat_count(channel), get_envelope_repeat_bit(channel), get_envelope_load(channel));
 			break;
 
 		case AUDIO_ENVELOPE_ADDR_HIGH:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
+			verboselog(0, "audio_w: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
 				get_audio_irq_addr(channel), get_audio_irq_enable_bit(channel), get_envelope_addr_high(channel));
 			break;
 
 		case AUDIO_ENVELOPE_ADDR:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Envelope Addr (lo): %04x\n", channel, data);
+			verboselog(0, "audio_w: Channel %d: Envelope Addr (lo): %04x\n", channel, data);
 			break;
 
 		case AUDIO_WAVE_DATA_PREV:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Wave Data Prev: %04x \n", channel, data);
+			verboselog(0, "audio_w: Channel %d: Wave Data Prev: %04x \n", channel, data);
 			break;
 
 		case AUDIO_ENVELOPE_LOOP_CTRL:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
+			verboselog(0, "audio_w: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
 				get_rampdown_offset(channel), get_envelope_eaoffset(channel));
 			break;
 
 		case AUDIO_WAVE_DATA:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Wave Data: %04x\n", channel, data);
+			verboselog(0, "audio_w: Channel %d: Wave Data: %04x\n", channel, data);
 			break;
 
 		case AUDIO_ADPCM_SEL:
 			m_audio_regs[offset] = data & AUDIO_ADPCM_SEL_MASK;
-			verboselog(0, "audio_w: NYI: Channel %d: ADPCM Sel: %04x (ADPCM36:%d, POINTNUM:%02x\n", channel, data,
+			verboselog(0, "audio_w: Channel %d: ADPCM Sel: %04x (ADPCM36:%d, POINTNUM:%02x\n", channel, data,
 				get_adpcm36_bit(channel), get_point_number(channel));
 			break;
 
@@ -1505,44 +1509,44 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			m_audio_regs[offset] = data & AUDIO_PHASE_HIGH_MASK;
 			m_channel_rate[channel] = ((double)get_phase(channel) * 140625.0 * 2.0) / (double)(1 << 19);
 			m_channel_rate_accum[channel] = 0.0;
-			verboselog(0, "audio_w: NYI: Channel %d: Phase High: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
+			verboselog(0, "audio_w: Channel %d: Phase High: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
 			break;
 
 		case AUDIO_PHASE_ACCUM_HIGH:
 			m_audio_regs[offset] = data & AUDIO_PHASE_ACCUM_HIGH_MASK;
-			verboselog(0, "audio_w: NYI: Channel %d: Phase Accum High: %04x\n", channel, data);
+			verboselog(0, "audio_w: Channel %d: Phase Accum High: %04x\n", channel, data);
 			break;
 
 		case AUDIO_TARGET_PHASE_HIGH:
 			m_audio_regs[offset] = data & AUDIO_TARGET_PHASE_HIGH_MASK;
-			verboselog(0, "audio_w: NYI: Channel %d: Target Phase High: %04x\n", channel, data);
+			verboselog(0, "audio_w: Channel %d: Target Phase High: %04x\n", channel, data);
 			break;
 
 		case AUDIO_RAMP_DOWN_CLOCK:
 			m_audio_regs[offset] = data & AUDIO_RAMP_DOWN_CLOCK_MASK;
-			verboselog(0, "audio_w: NYI: Channel %d: Rampdown Clock: %04x\n", channel, data);
+			verboselog(0, "audio_w: Channel %d: Rampdown Clock: %04x\n", channel, data);
 			break;
 
 		case AUDIO_PHASE:
 			m_audio_regs[offset] = data;
 			m_channel_rate[channel] = ((double)get_phase(channel) * 140625.0 * 2.0) / (double)(1 << 19);
 			m_channel_rate_accum[channel] = 0.0;
-			verboselog(0, "audio_w: NYI: Channel %d: Phase: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
+			verboselog(0, "audio_w: Channel %d: Phase: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
 			break;
 
 		case AUDIO_PHASE_ACCUM:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Phase Accum: %04x\n", channel, data);
+			verboselog(0, "audio_w: Channel %d: Phase Accum: %04x\n", channel, data);
 			break;
 
 		case AUDIO_TARGET_PHASE:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Target Phase: %04x\n", channel, data);
+			verboselog(0, "audio_w: Channel %d: Target Phase: %04x\n", channel, data);
 			break;
 
 		case AUDIO_PHASE_CTRL:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: NYI: Channel %d: Phase Ctrl: %04x (TIMESTEP:%d, SIGN:%d, OFFSET:%03x\n", channel, data,
+			verboselog(0, "audio_w: Channel %d: Phase Ctrl: %04x (TIMESTEP:%d, SIGN:%d, OFFSET:%03x\n", channel, data,
 				get_phase_time_step(channel), get_phase_sign_bit(channel), get_phase_offset(channel));
 			break;
 
@@ -1566,7 +1570,8 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 	for (int i = 0; i < samples; i++)
 	{
-		int32_t sample_total = 0;
+		int32_t left_total = 0;
+		int32_t right_total = 0;
 		int32_t active_count = 0;
 
 		for (uint32_t ch_index = 0; ch_index < 6; ch_index++)
@@ -1582,20 +1587,45 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			bool playing = advance_channel(space, ch_index);
 			if (playing)
 			{
-				if (SPG_DEBUG_AUDIO && m_debug_samples)
-					printf("%d:%06x:%04x ", ch_index, m_sample_addr[ch_index], m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA]);
+				int32_t sample = (int16_t)(m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] ^ 0x8000);
+				if (!(m_audio_regs[AUDIO_CONTROL] & AUDIO_CONTROL_NOINT_MASK))
+				{
+					int32_t prev_sample = (int16_t)(m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA_PREV] ^ 0x8000);
+					int16_t lerp_factor = (int16_t)((m_channel_rate_accum[ch_index] / 44100.0) * 256.0);
+					prev_sample = (prev_sample * (0x100 - lerp_factor)) >> 8;
+					sample = (sample * lerp_factor) >> 8;
+					sample += prev_sample;
+				}
 
-				const int16_t sample = (int16_t)(m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] ^ 0x8000);
+				if (get_envelope_enable(ch_index))
+					sample = (sample * (int16_t)get_edd(ch_index)) >> 7;
+
 				active_count++;
-				sample_total += sample;
+
+				int32_t vol = get_volume(ch_index);
+				int32_t pan = get_pan(ch_index);
+
+				int32_t pan_left, pan_right;
+				if (pan < 0x40)
+				{
+					pan_left = 0x7f * vol;
+					pan_right = pan * 2 * vol;
+				}
+				else
+				{
+					pan_left = (0x7f - pan) * 2 * vol;
+					pan_right = 0x7f * vol;
+				}
+
+				left_total += ((int16_t)sample * (int16_t)pan_left) >> 14;
+				right_total += ((int16_t)sample * (int16_t)pan_right) >> 14;
 			}
 		}
 
 		if (active_count)
 		{
-			sample_total /= active_count;
-			*out_l++ = sample_total;
-			*out_r++ = sample_total;
+			*out_l++ = left_total / active_count;
+			*out_r++ = right_total / active_count;
 		}
 		else
 		{
@@ -1611,6 +1641,7 @@ inline void spg2xx_device::stop_channel(const uint32_t channel)
 	m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~(1 << channel);
 	m_audio_regs[AUDIO_CHANNEL_STOP] |= (1 << channel);
 	m_audio_regs[(channel << 4) | AUDIO_MODE] &= ~AUDIO_ADPCM_MASK;
+	m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~(1 << channel);
 }
 
 bool spg2xx_device::advance_channel(address_space &space, const uint32_t channel)
@@ -1847,6 +1878,7 @@ void spg2xx_device::audio_rampdown_tick(const uint32_t channel)
 		m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~channel_mask;
 		m_audio_regs[AUDIO_CHANNEL_STOP] |= channel_mask;
 		m_audio_regs[AUDIO_ENV_RAMP_DOWN] &= ~channel_mask;
+		m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~channel_mask;
 	}
 }
 

@@ -80,6 +80,7 @@ protected:
 	// Audio getters
 	inline bool get_channel_enable(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_ENABLE] & (1 << channel); }
 	inline bool get_channel_status(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_STATUS] & (1 << channel); }
+	inline bool get_envelope_enable(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_ENV_MODE] & (1 << channel); }
 
 	// Audio Mode getters
 	inline uint16_t get_wave_addr_high(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_WADDR_HIGH_MASK; }
