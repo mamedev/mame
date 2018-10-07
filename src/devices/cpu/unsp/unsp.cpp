@@ -222,7 +222,6 @@ void unsp_device::trigger_fiq()
 {
 	if (!m_enable_fiq || m_fiq || m_irq)
 	{
-		logerror("FIQs are disabled or we're already in an FIQ/IRQ, bailing\n");
 		return;
 	}
 
@@ -241,7 +240,6 @@ void unsp_device::trigger_irq(int line)
 {
 	if (!m_enable_irq || m_irq || m_fiq)
 	{
-		logerror("IRQs are disabled or we're already in an FIQ/IRQ, bailing\n");
 		return;
 	}
 

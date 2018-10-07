@@ -72,6 +72,7 @@ Detailed list of bugs:
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class spg2xx_game_state : public driver_device, public device_nvram_interface
 {
@@ -627,13 +628,18 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 	m_screen->set_screen_update("spg", FUNC(spg2xx_device::screen_update));
 	m_screen->screen_vblank().set(m_spg, FUNC(spg2xx_device::vblank));
 	m_screen->screen_vblank().append(FUNC(spg2xx_game_state::poll_controls));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
 
 void spg2xx_game_state::non_spg_base(machine_config &config)
 {
-	spg2xx_base(config);
-
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+
+	spg2xx_base(config);
 }
 
 void spg2xx_game_state::spg2xx_basep(machine_config &config)
@@ -646,9 +652,9 @@ void spg2xx_game_state::spg2xx_basep(machine_config &config)
 
 void spg2xx_cart_state::vii(machine_config &config)
 {
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	spg2xx_base(config);
 
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	m_spg->uart_rx().set(FUNC(spg2xx_cart_state::uart_rx));
 	m_spg->portb_out().set(FUNC(spg2xx_cart_state::vii_portb_w));
 
@@ -661,9 +667,9 @@ void spg2xx_cart_state::vii(machine_config &config)
 
 void spg2xx_cart_state::vsmile(machine_config &config)
 {
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	spg2xx_base(config);
 
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	m_spg->uart_rx().set(FUNC(spg2xx_cart_state::uart_rx));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vsmile_cart");
@@ -675,9 +681,9 @@ void spg2xx_cart_state::vsmile(machine_config &config)
 
 void spg2xx_game_state::wireless60(machine_config &config)
 {
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	spg2xx_base(config);
 
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
 
 	m_spg->porta_out().set(FUNC(spg2xx_game_state::wireless60_porta_w));
@@ -687,9 +693,9 @@ void spg2xx_game_state::wireless60(machine_config &config)
 
 void spg2xx_game_state::jakks(machine_config &config)
 {
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	spg2xx_base(config);
 
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
 	m_spg->porta_in().set(FUNC(spg2xx_cart_state::jakks_porta_r));
 
@@ -698,9 +704,9 @@ void spg2xx_game_state::jakks(machine_config &config)
 
 void spg2xx_game_state::rad_skat(machine_config &config)
 {
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	spg2xx_base(config);
 
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
 	m_spg->porta_in().set_ioport("P1");
 	m_spg->portb_in().set_ioport("P2");
@@ -711,9 +717,9 @@ void spg2xx_game_state::rad_skat(machine_config &config)
 
 void spg2xx_game_state::rad_crik(machine_config &config)
 {
+	SPG28X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	spg2xx_base(config);
 
-	SPG28X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
 	m_spg->porta_in().set_ioport("P1");
 	m_spg->portb_in().set_ioport("P2");
@@ -927,25 +933,25 @@ ROM_END
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
 // VTech systems
-CONS( 2005, vsmile,  0,      0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (US)",      MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileg, vsmile, 0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmilef, vsmile, 0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileb, 0,      0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,  0,      0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (US)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileg, vsmile, 0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmilef, vsmile, 0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (France)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileb, 0,      0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 // Jungle's Soft TV games
-CONS( 2007, vii,      0, 0, vii,        vii,      spg2xx_cart_state, empty_init, "Jungle's Soft / KenSingTon / Siatronics",    "Vii",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
-CONS( 2010, zone60,   0, 0, wireless60, wirels60, spg2xx_game_state, empty_init, "Jungle's Soft / Ultimate Products (HK) Ltd", "Zone 60",     MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init, "Jungle's Soft / Kids Station Toys Inc",      "Wireless 60", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, vii,      0, 0, vii,        vii,      spg2xx_cart_state, empty_init, "Jungle's Soft / KenSingTon / Siatronics",    "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
+CONS( 2010, zone60,   0, 0, wireless60, wirels60, spg2xx_game_state, empty_init, "Jungle's Soft / Ultimate Products (HK) Ltd", "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init, "Jungle's Soft / Kids Station Toys Inc",      "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // JAKKS Pacific Inc TV games
-CONS( 2004, batmantv, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2008, walle,    0, 0, jakks, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc",              "Wall-E",     MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, batmantv, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, walle,    0, 0, jakks, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc",              "Wall-E",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Radica TV games
-CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,  spg2xx_game_state, empty_init, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_skatp, rad_skat, 0, rad_skat, rad_skatp, spg2xx_game_state, empty_init, "Radica", "Connectv Skateboarder (PAL)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_crik,  0,        0, rad_crik, rad_crik,  spg2xx_game_state, empty_init, "Radica", "Connectv Cricket (PAL)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
-CONS( 2007, rad_sktv,  0,        0, rad_skat, rad_sktv,  spg2xx_game_state, empty_init, "Radica", "Skannerz TV",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,  spg2xx_game_state, empty_init, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp, rad_skat, 0, rad_skat, rad_skatp, spg2xx_game_state, empty_init, "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_crik,  0,        0, rad_crik, rad_crik,  spg2xx_game_state, empty_init, "Radica", "Connectv Cricket (PAL)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+CONS( 2007, rad_sktv,  0,        0, rad_skat, rad_sktv,  spg2xx_game_state, empty_init, "Radica", "Skannerz TV",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
 CONS( 2009, zone40,    0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
