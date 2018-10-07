@@ -15284,6 +15284,7 @@ hp49gp                          // HP 49G+
 hp64k                           //
 
 @source:hp700.cpp
+hp700_70                        //
 hp700_92                        //
 
 @source:hp9825.cpp
