@@ -1647,6 +1647,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mb87030.h,MACHINES["MB87030"] = true
+---------------------------------------------------
+
+if (MACHINES["MB87030"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mb87030.cpp",
+		MAME_DIR .. "src/devices/machine/mb87030.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mb87078.h,MACHINES["MB87078"] = true
 ---------------------------------------------------
 
