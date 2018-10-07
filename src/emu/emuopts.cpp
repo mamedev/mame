@@ -389,9 +389,9 @@ namespace
 		if (!same_name)
 			result.push_back(image.brief_instance_name());
 
-		if (strcmp(image.device_typename(image.image_type()), image.instance_name().c_str()) == 0)
+		if( image.instance_name() != image.cannonical_instance_name() )
 		{
-			result.push_back(image.instance_name() + "1");
+			result.push_back(image.cannonical_instance_name());
 			if (!same_name)
 				result.push_back(image.brief_instance_name() + "1");
 		}
