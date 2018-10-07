@@ -55,6 +55,7 @@ static constexpr int EXCEPTION_UNINITIALIZED_INTERRUPT = 15;
 static constexpr int EXCEPTION_SPURIOUS_INTERRUPT      = 24;
 static constexpr int EXCEPTION_INTERRUPT_AUTOVECTOR    = 24;
 static constexpr int EXCEPTION_TRAP_BASE               = 32;
+static constexpr int EXCEPTION_MMU_CONFIGURATION       = 56; // only on 020/030
 
 /* Function codes set by CPU during data/address bus activity */
 static constexpr int FUNCTION_CODE_USER_DATA          = 1;
