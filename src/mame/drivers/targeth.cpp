@@ -6,7 +6,7 @@ Target Hits (c) 1994 Gaelco (Designed & Developed by Zigurat. Produced by Gaelco
 
 Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
-** NOTES: Merge with wrally.ccp???  Address map nearly identical & PCB
+** NOTES: Merge with wrally.cpp???  Address map nearly identical & PCB
           is reworked to add connections for light guns and different RAM
 
           is the visible area correct? if it's larger than the startup
