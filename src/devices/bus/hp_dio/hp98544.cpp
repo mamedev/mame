@@ -158,5 +158,5 @@ uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 	return 0;
 }
-}
-}
+} // namespace bus::hp_dio
+} // namespace bus

@@ -229,5 +229,6 @@ WRITE16_MEMBER(dio16_98644_device::io_w)
 		break;
 	}
 }
-}
-}
+
+} // namespace bus::hp_dio
+} // namespace bus

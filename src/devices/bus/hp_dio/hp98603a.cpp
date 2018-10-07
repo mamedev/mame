@@ -79,5 +79,5 @@ WRITE16_MEMBER(dio16_98603a_device::rom_w)
 {
 }
 
-}
-}
+} // namespace bus::hp_dio
+} // namespace bus

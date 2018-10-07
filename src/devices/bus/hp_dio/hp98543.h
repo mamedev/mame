@@ -59,8 +59,10 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 
 };
-}
-}
+
+} // namespace bus::hp_dio
+} // namespace bus
+
 // device type definition
 DECLARE_DEVICE_TYPE_NS(HPDIO_98543, bus::hp_dio, dio16_98543_device)
 

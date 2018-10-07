@@ -35,8 +35,9 @@ protected:
 private:
 	uint8_t *m_rom;
 };
-}
-}
+
+} // namespace bus::hp_dio
+} // namespace bus
 
 DECLARE_DEVICE_TYPE_NS(HPDIO_98603B, bus::hp_dio, dio16_98603b_device)
 

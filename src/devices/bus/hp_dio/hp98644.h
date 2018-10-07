@@ -51,8 +51,10 @@ private:
 	bool     m_loopback;
 	uint8_t  m_data;
 };
-}
-}
+
+} // namespace bus::hp_dio
+} // namespace bus
+
 // device type definition
 DECLARE_DEVICE_TYPE_NS(HPDIO_98644, bus::hp_dio, dio16_98644_device)
 
