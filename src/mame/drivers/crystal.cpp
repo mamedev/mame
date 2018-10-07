@@ -253,6 +253,8 @@ public:
 		m_textureram(*this, "textureram"),
 		m_frameram(*this, "frameram"),
 		m_reset_patch(*this, "reset_patch"),
+		m_flash(*this, "flash"),
+		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0vid(*this, "vr0vid"),
 		m_vr0snd(*this, "vr0snd"),
@@ -281,6 +283,9 @@ private:
 	required_shared_ptr<uint32_t> m_textureram;
 	required_shared_ptr<uint32_t> m_frameram;
 	optional_shared_ptr<uint32_t> m_reset_patch; // not needed for trivrus
+	optional_region_ptr<uint32_t> m_flash;
+
+	optional_memory_bank m_mainbank;
 
 	/* devices */
 	required_device<se3208_device> m_maincpu;
@@ -294,6 +299,7 @@ private:
 #endif
 
 	uint32_t    m_Bank;
+	uint32_t    m_maxbank;
 	uint8_t     m_FlipCount;
 	uint8_t     m_IntHigh;
 	emu_timer  *m_Timer[4];
@@ -337,7 +343,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_CALLBACK_MEMBER(Timercb);
 	IRQ_CALLBACK_MEMBER(icallback);
-	void crystal_banksw_postload();
 	void IntReq( int num );
 	inline void DMA_w( address_space &space, int which, uint32_t data, uint32_t mem_mask );
 	void PatchReset(  );
@@ -711,10 +716,7 @@ READ32_MEMBER(crystal_state::Input_r)
 WRITE32_MEMBER(crystal_state::Banksw_w)
 {
 	m_Bank = (data >> 1) & 7;
-	if (m_Bank <= 2)
-		membank("bank1")->set_base(memregion("user1")->base() + m_Bank * 0x1000000);
-	else
-		membank("bank1")->set_base(memregion("user2")->base());
+	m_mainbank->set_entry(m_Bank);
 }
 
 READ32_MEMBER(crystal_state::PIO_r)
@@ -744,9 +746,9 @@ READ32_MEMBER(crystal_state::FlashCmd_r)
 {
 	if ((m_FlashCmd & 0xff) == 0xff)
 	{
-		if (m_Bank <= 2)
+		if (m_Bank < m_maxbank)
 		{
-			uint32_t *ptr = (uint32_t*)(memregion("user1")->base() + m_Bank * 0x1000000);
+			uint32_t *ptr = (uint32_t*)(m_mainbank->base());
 			return ptr[0];
 		}
 		else
@@ -754,7 +756,7 @@ READ32_MEMBER(crystal_state::FlashCmd_r)
 	}
 	if ((m_FlashCmd & 0xff) == 0x90)
 	{
-		if (m_Bank <= 2)
+		if (m_Bank < m_maxbank)
 			return 0x00180089;  //Intel 128MBit
 		else
 			return 0xffffffff;
@@ -783,7 +785,7 @@ void crystal_state::crystal_mem(address_map &map)
 	map(0x03800000, 0x03ffffff).ram().share("textureram");
 	map(0x04000000, 0x047fffff).ram().share("frameram");
 
-	map(0x05000000, 0x05ffffff).bankr("bank1");
+	map(0x05000000, 0x05ffffff).bankr("mainbank");
 	map(0x05000000, 0x05000003).rw(FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
 
 	map(0x44414F4C, 0x44414F7F).ram().share("reset_patch");
@@ -834,7 +836,7 @@ void crystal_state::trivrus_mem(address_map &map)
 	map(0x03800000, 0x03ffffff).ram().share("textureram");
 	map(0x04000000, 0x047fffff).ram().share("frameram");
 
-	map(0x05000000, 0x05ffffff).bankr("bank1");
+	map(0x05000000, 0x05ffffff).bankr("mainbank");
 	map(0x05000000, 0x05000003).rw(FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
@@ -910,7 +912,7 @@ void crystal_state::crzyddz2_mem(address_map &map)
 	map(0x03800000, 0x03ffffff).ram().share("textureram");
 	map(0x04000000, 0x047fffff).ram().share("frameram");
 
-	map(0x05000000, 0x05ffffff).bankr("bank1");
+	map(0x05000000, 0x05ffffff).bankr("mainbank");
 	map(0x05000000, 0x05000003).rw(FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
@@ -969,22 +971,27 @@ loop:
 #endif
 }
 
-void crystal_state::crystal_banksw_postload()
-{
-	if (m_Bank <= 2)
-		membank("bank1")->set_base(memregion("user1")->base() + m_Bank * 0x1000000);
-	else
-		membank("bank1")->set_base(memregion("user2")->base());
-}
-
 void crystal_state::machine_start()
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(uintptr_t)i);
 
 	PatchReset();
+
+	if (m_mainbank)
+	{
+		m_maxbank = (m_flash) ? m_flash.bytes() / 0x1000000 : 0;
+		uint8_t *dummy_region = auto_alloc_array(machine(), uint8_t, 0x1000000);
+		std::fill_n(&dummy_region[0], 0x1000000, 0xff); // 0xff Filled at Unmapped area
+		uint8_t *ROM = (m_flash) ? (uint8_t *)&m_flash[0] : dummy_region;
+		for (int i = 0; i < 8; i++)
+		{
+			if ((i < m_maxbank))
+				m_mainbank->configure_entry(i, ROM + i * 0x1000000);
+			else
+				m_mainbank->configure_entry(i, dummy_region);
+		}
+	}
 
 #ifdef IDLE_LOOP_SPEEDUP
 	save_item(NAME(m_FlipCntRead));
@@ -998,7 +1005,6 @@ void crystal_state::machine_start()
 	save_item(NAME(m_DMActrl));
 	save_item(NAME(m_OldPort4));
 	save_item(NAME(m_trivrus_input));
-	machine().save().register_postload(save_prepost_delegate(FUNC(crystal_state::crystal_banksw_postload), this));
 }
 
 void crystal_state::machine_reset()
@@ -1011,7 +1017,7 @@ void crystal_state::machine_reset()
 	m_FlipCount = 0;
 	m_IntHigh = 0;
 	m_Bank = 0;
-	membank("bank1")->set_base(memregion("user1")->base() + 0);
+	m_mainbank->set_entry(m_Bank);
 	m_FlashCmd = 0xff;
 	m_OldPort4 = 0;
 
@@ -1594,33 +1600,27 @@ ROM_START( crysbios )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb) )
 
-	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
-
-	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
+	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF ) // Flash
 ROM_END
 
 ROM_START( crysking )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
 
-	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x3000000, "flash", 0 ) // Flash
 	ROM_LOAD("bcsv0004f01.u1",  0x0000000, 0x1000000, CRC(8feff120) SHA1(2ea42fa893bff845b5b855e2556789f8354e9066) )
 	ROM_LOAD("bcsv0004f02.u2",  0x1000000, 0x1000000, CRC(0e799845) SHA1(419674ce043cb1efb18303f4cb7fdbbae642ee39) )
 	ROM_LOAD("bcsv0004f03.u3",  0x2000000, 0x1000000, CRC(659e2d17) SHA1(342c98f3f695ef4dea8b533612451c4d2fb58809) )
-
-	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 ROM_START( evosocc )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
 
-	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x3000000, "flash", 0 ) // Flash
 	ROM_LOAD("bcsv0001u01",  0x0000000, 0x1000000, CRC(2581a0ea) SHA1(ee483ac60a3ed00a21cb515974cec4af19916a7d) )
 	ROM_LOAD("bcsv0001u02",  0x1000000, 0x1000000, CRC(47ef1794) SHA1(f573706c17d1342b9b7aed9b40b8b648f0bf58db) )
 	ROM_LOAD("bcsv0001u03",  0x2000000, 0x1000000, CRC(f396a2ec) SHA1(f305eb10856fb5d4c229a6b09d6a2fb21b24ce66) )
-
-	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 ROM_START( topbladv )
@@ -1630,11 +1630,8 @@ ROM_START( topbladv )
 	ROM_REGION( 0x4300, "pic", 0 ) // pic16c727 - we don't have a core for this
 	ROM_LOAD("top_blade_v_pic16c727.bin",  0x000000, 0x4300, CRC(9cdea57b) SHA1(884156085f9e780cdf719aedc2e8a0fd5983613b) )
 
-
-	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
-
-	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 ROM_START( officeye )
@@ -1644,12 +1641,9 @@ ROM_START( officeye )
 	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this
 	ROM_LOAD("office_yeo_in_cheon_ha_pic16f84a.bin",  0x000000, 0x4280, CRC(7561cdf5) SHA1(eade592823a110019b4af81a7dc56d01f7d6589f) )
 
-
-	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x2000000, "flash", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )
 	ROM_LOAD("flash.u2",  0x1000000, 0x1000000, CRC(e4f85d0a) SHA1(2ddfa6b3a30e69754aa9d96434ff3d37784bfa57) )
-
-	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 ROM_START( donghaer )
@@ -1659,32 +1653,26 @@ ROM_START( donghaer )
 	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this (or the dump in this case)
 	ROM_LOAD("donghaer_pic16f84a.bin",  0x000000, 0x4280, NO_DUMP )
 
-	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x2000000, "flash", 0 ) // Flash
 	ROM_LOAD( "u1",           0x0000000, 0x1000000, CRC(61217ad7) SHA1(2593f1356aa850f4f9aa5d00bec822aa59c59224) )
 	ROM_LOAD( "u2",           0x1000000, 0x1000000, CRC(6d82f1a5) SHA1(036bd45f0daac1ffeaa5ad9774fc1b56e3c75ff9) )
-
-	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 ROM_START( trivrus )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "u4", 0x00000, 0x80000, CRC(2d2e9a11) SHA1(73e7b19a032eae21312ca80f8c42cc16725496a7) )
 
-	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
+	ROM_REGION32_LE( 0x2000000, "flash", ROMREGION_ERASEFF ) // Flash
 	ROM_LOAD( "u3", 0x000000, 0x1000010, CRC(ba901707) SHA1(e281ba07024cd19ef1ab72d2197014f7b1f4d30f) )
-
-	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 ROM_START( crospuzl ) /* This PCB uses ADC 'Amazon-LF' SoC, EISC CPU core - However PCBs have been see with a standard VRenderZERO+ MagicEyes EISC chip */
 	ROM_REGION( 0x80010, "maincpu", 0 )
 	ROM_LOAD("en29lv040a.u5",  0x000000, 0x80010, CRC(d50e8500) SHA1(d681cd18cd0e48854c24291d417d2d6d28fe35c1) )
 
-	ROM_REGION32_LE( 0x8400010, "user1", ROMREGION_ERASEFF ) // Flash
+	ROM_REGION32_LE( 0x8400010, "flash", ROMREGION_ERASEFF ) // NAND Flash
 	// mostly empty, but still looks good
 	ROM_LOAD("k9f1g08u0a.riser",  0x000000, 0x8400010, CRC(7f3c88c3) SHA1(db3169a7b4caab754e9d911998a2ece13c65ce5b) )
-
-	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 ROM_START( psattack )
@@ -1697,10 +1685,6 @@ ROM_START( psattack )
 
 	DISK_REGION( "cfcard" )
 	DISK_IMAGE_READONLY( "psattack", 0, SHA1(e99cd0dafc33ec13bf56061f81dc7c0a181594ee) )
-
-	// keep driver happy
-	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
-	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( ddz )
@@ -1708,10 +1692,6 @@ ROM_START( ddz )
 	ROM_LOAD("ddz.001.rom",  0x000000, 0x400000, CRC(b379f823) SHA1(531885b35d668d22c75a9759994f4aca6eacb046) )
 	ROM_LOAD("ddz.002.rom",  0x400000, 0x400000, CRC(285c744d) SHA1(2f8bc70825e55e3114015cb263e786df35cde275) )
 	ROM_LOAD("ddz.003.rom",  0x800000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
-
-	// keep driver happy
-	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
-	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
 ROM_END
 
 
@@ -1751,10 +1731,6 @@ ROM_START( crzclass ) // PCB marked MAH-JONG
 	ROM_LOAD("tjf-mahjong-rom2.bin",  0x400000, 0x400000, CRC(2a04e84a) SHA1(189b16fd4314fd2a5f8a1214618b5db83f8ac59a) ) // SHARP LH28F320BJD-TTL80
 	ROM_LOAD("tjf-mahjong-rom3.bin",  0x800000, 0x400000, CRC(1cacf3f9) SHA1(e6c88c98aeb7df4098f8e20f412018617005724d) ) // SHARP LH28F320BJD-TTL80
 	// rom4 not populated
-
-	// keep driver happy
-	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
-	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
 ROM_END
 
 /***************************************************************************
@@ -1803,18 +1779,16 @@ Notes:
 ***************************************************************************/
 
 ROM_START( crzyddz2 )
-	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
+	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
 	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(0f3a1987) SHA1(6cad943846c79db31226676c7391f32216cfff79) )
 
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
-	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 ) // copy flash here
+	ROM_COPY( "flash",      0x000000, 0x000000, 0x1000000 ) // copy flash here
 	ROM_LOAD( "27c322.u49", 0x000000, 0x0200000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x0200000 )
 
 	ROM_REGION( 0x4280, "pic", 0 ) // hy04
 	ROM_LOAD("hy04", 0x000000, 0x4280, NO_DUMP )
-
-	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 /***************************************************************************
@@ -1827,23 +1801,21 @@ Red PCB, very similar to crzyddz2
 ***************************************************************************/
 
 ROM_START( menghong )
-	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
+	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
 	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(e24257c4) SHA1(569d79a61ff6d35100ba5727069363146df9e0b7) )
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 ) // copy flash here
+	ROM_COPY( "flash",      0x000000, 0x000000, 0x1000000 ) // copy flash here
 	ROM_LOAD( "060511_08-01-18.u49",  0x000000, 0x0200000, CRC(b0c12107) SHA1(b1753757bbdb7d996df563ac6abdc6b46676704b) ) // 27C160
 
 	ROM_REGION( 0x4280, "pic", 0 ) // hy04
 	ROM_LOAD("menghong_hy04", 0x000000, 0x4280, NO_DUMP )
-
-	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 
 void crystal_state::init_crysking()
 {
-	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("flash")->base();
 
 	//patch the data feed by the protection
 
@@ -1862,7 +1834,7 @@ void crystal_state::init_crysking()
 
 void crystal_state::init_evosocc()
 {
-	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("flash")->base();
 	Rom += 0x1000000 * 2 / 2;
 
 	Rom[WORD_XOR_LE(0x97388E/2)] = 0x90FC;  //PUSH R2..R7
@@ -1890,7 +1862,7 @@ also it seems that bit 0x40000000 is the PIC reset.
 void crystal_state::init_topbladv()
 {
 	// patches based on analysis of PIC dump
-	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("flash")->base();
 	/*
 	    PIC Protection data:
 	    - RAM ADDR - --PATCH--
@@ -1917,7 +1889,7 @@ void crystal_state::init_topbladv()
 void crystal_state::init_officeye()
 {
 	// patches based on analysis of PIC dump
-	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("flash")->base();
 
 	/*
 	    PIC Protection data:
@@ -1943,7 +1915,7 @@ void crystal_state::init_officeye()
 
 void crystal_state::init_donghaer()
 {
-	uint16_t *Rom = (uint16_t*)memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*)memregion("flash")->base();
 
 	Rom[WORD_XOR_LE(0x037A2 / 2)] = 0x9004; // PUSH %R2
 	Rom[WORD_XOR_LE(0x037A4 / 2)] = 0x8202; // LD   (%SP,0x8),%R2
