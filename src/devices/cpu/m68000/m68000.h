@@ -32,6 +32,10 @@ constexpr int M68K_IRQ_5    = 5;
 constexpr int M68K_IRQ_6    = 6;
 constexpr int M68K_IRQ_7    = 7;
 
+constexpr int M68K_SZ_LONG = 0;
+constexpr int M68K_SZ_BYTE = 1;
+constexpr int M68K_SZ_WORD = 2;
+
 // special input lines
 constexpr int M68K_LINE_BUSERROR = 16;
 
@@ -278,10 +282,13 @@ protected:
 	uint16_t m_mmu_tmp_sr;      /* temporary hack: status code for ptest and to handle write protection */
 	uint16_t m_mmu_tmp_fc;      /* temporary hack: function code for the mmu (moves) */
 	uint16_t m_mmu_tmp_rw;      /* temporary hack: read/write (1/0) for the mmu */
+	uint8_t m_mmu_tmp_sz;       /* temporary hack: size for mmu */
+
 	uint32_t m_mmu_tmp_buserror_address;   /* temporary hack: (first) bus error address */
 	uint16_t m_mmu_tmp_buserror_occurred;  /* temporary hack: flag that bus error has occurred from mmu */
 	uint16_t m_mmu_tmp_buserror_fc;   /* temporary hack: (first) bus error fc */
 	uint16_t m_mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
+	uint16_t m_mmu_tmp_buserror_sz;   /* temporary hack: (first) bus error size` */
 
 	uint32_t m_ic_address[M68K_IC_SIZE];   /* instruction cache address data */
 	uint32_t m_ic_data[M68K_IC_SIZE];      /* instruction cache content data */

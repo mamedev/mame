@@ -489,6 +489,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 				m_mmu_tmp_buserror_address = addr_in;
 				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 			}
 		}
 		else if (m_mmu_tmp_sr & M68K_MMU_SR_SUPERVISOR_ONLY)
@@ -498,6 +499,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 				m_mmu_tmp_buserror_address = addr_in;
 				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 			}
 		}
 		else if ((m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT) && !m_mmu_tmp_rw)
@@ -507,6 +509,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 				m_mmu_tmp_buserror_address = addr_in;
 				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 			}
 		}
 
@@ -568,6 +571,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					m_mmu_tmp_buserror_address = addr_in;
 					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 				}
 			}
 
@@ -593,6 +597,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					m_mmu_tmp_buserror_address = addr_in;
 					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 				}
 			}
 
@@ -663,6 +668,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					m_mmu_tmp_buserror_address = addr_in;
 					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 				}
 
 				return addr_in;
@@ -677,6 +683,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					m_mmu_tmp_buserror_address = addr_in;
 					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 				}
 
 				return addr_in;
@@ -695,6 +702,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					m_mmu_tmp_buserror_address = addr_in;
 					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 				}
 			}
 
@@ -739,6 +747,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 				m_mmu_tmp_buserror_address = addr_in;
 				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 			}
 
 			return addr_in;
@@ -755,6 +764,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 						m_mmu_tmp_buserror_address = addr_in;
 						m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 						m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+						m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 					}
 				}
 
