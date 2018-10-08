@@ -15645,8 +15645,8 @@ farwest                         // bootleg
 ironhors                        // GX560 (c) 1986
 ironhorsh                       // GX560 (c) 1986
 
-@source:is488.cpp
-is488a                          //
+@source:is48x.cpp
+is482                           //
 
 @source:isbc.cpp
 isbc286                         //

@@ -3721,7 +3721,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/if800.cpp",
 	MAME_DIR .. "src/mame/drivers/imsai.cpp",
 	MAME_DIR .. "src/mame/drivers/indiana.cpp",
-	MAME_DIR .. "src/mame/drivers/is488.cpp",
+	MAME_DIR .. "src/mame/drivers/is48x.cpp",
 	MAME_DIR .. "src/mame/drivers/itt3030.cpp",
 	MAME_DIR .. "src/mame/drivers/jade.cpp",
 	MAME_DIR .. "src/mame/drivers/jonos.cpp",
