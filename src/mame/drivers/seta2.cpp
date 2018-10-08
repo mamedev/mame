@@ -3456,13 +3456,67 @@ ROM_END
 Kosodate Quiz My Angel (JPN Ver.)
 (c)1996 Namco
 
-Board:  KE (Namco) ; P0-125A (Seta)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP, @ U10)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz
+ Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
+        GAL 16V8 at U38
 
-CPU:    TMP68301 (68000 core)
-OSC:    50.0000MHz
-        32.5304MHz
+Memory:
+M1 are HM628128LFP-10L at U42 & U43
+M2 is  W2465K-70LL at U27
+M3 are LH5168D-10L at U8 & U9 (unpopulated)
+M4 are CXK58257AM-10L at U6, U7, U13 & U14
 
-Sound:  X1-010
+PCB Number:  namco KE / P0-125A
++-----------------------------------------------------------+
+|             +------+      U  U             CN4*           |
+| VOL         |Seta  |   M  5  5            +--------------+|
+|             |X1-010|   2  8  7    +-+  M  | KQ1 CG0  U16 ||
+|             +------+      *  *    | |  1  +--------------+|
++-+                                 |U|     +--------------+|
+  |  +-++-++-++-+            BT1*   |3|     | KQ1 CG2  U20 ||
++-+  | || || || |      M            |2|  M  +--------------+|
+|    |U||U||U||U| M M  4            | |  1  +--------------+|
+|J   |3||5||2||4| 3 3               +-+     | KQ1 CG1  U15 ||
+|A   | || || || | * *  M                    +--------------+|
+|M   +-++-++-++-+      4                    +--------------+|
+|M                                          | KQ1 CG3  U19 ||
+|A                                          +--------------+|
+|                                           +--------------+|
+|C                                          | KQ1 CG4  U18 ||
+|o                           +----------+   +--------------+|
+|n          +-------+        |          |   +--------------+|
+|n          |Toshiba|        |   NEC    |   | KQ1 CG6  U22 ||
+|e          |  TMP  |        |  DX-101  |   +--------------+|
+|c          | 68301 |        |          |   +--------------+|
+|t        U +-------+        |          |   | KQ1 CG5  U17 ||
+|e        5                  +----------+   +--------------+|
+|r        6                                 +--------------+|
+|         *                                 | KQ1 CG7  U21 ||
++-+   +---+    +---+       U                +--------------+|
+  |   |DX |  S |DX |       3  50MHz 32MHz*                  |
+  |   |102|  W |102|       8                                |
++-+   +---+  1 +---+                    M  M   +---+        |
+|              D D                      4  4   |DX |        |
+|              S S                             |102|        |
+|              W W                             +---+        |
+|              2 1                                          |
++-----------------------------------------------------------+
+
+U2 is KQ1 PRG E EPROM
+U3 is KQ1 PRG O EPROM
+U4 is KQ1 TBL E EPROM
+U5 is KQ1 TBL O EPROM
+U32 is KG SND mask ROM (silkscreened SOUND ROM)
+
+BT1 is unpopulated battery
+U56 is unpopulated 93C45 EEPROM
+CN4 - 96 pin connector (3 rows by 32 pins)
+* Denotes not populated.
 
 ***************************************************************************/
 
@@ -3764,11 +3818,11 @@ Reel'N Quake!
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: NEC DX-101 (240 Pin PQFP, @ U10)
-        NEC DX-102 (52 Pin PQFP x3, @ U28 U30 & U45)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
-        Push Button SW1
+        Reset Push Button at SW1
         3.6V Battery at BT1
         GAL 16V8 - labeled "KF-001" at U38
 
@@ -3805,9 +3859,9 @@ PCB Number: P-FG-02
 |r N      6                                                 |
 |  3      *                                        U21*     |
 +-+   +---+    +---+       U  50MHz 32MHz*                  |
-  |   |DX | S  |DX |       3                                |
-  |   |102| W  |102|       8                   +---+   28MHz|
-+-+   +---+ 1  +---+                    M  M   |DX |        |
+  |   |DX |  S |DX |       3                                |
+  |   |102|  W |102|       8                   +---+   28MHz|
++-+   +---+  1 +---+                    M  M   |DX |        |
 |              D D                      4  4   |102|        |
 |              S S                             +---+        |
 |              W W                                          |
@@ -3817,7 +3871,7 @@ PCB Number: P-FG-02
 CN1   - 7 Pin connector
 CN2-1 - 3 Pin connector
 CN2-2 - 3 Pin connector
-CN3   - 10 Pin connector (used for extra buttons)
+CN3   - 10 Pin connector (used for extra buttons)CN1 - 7 Pin connector
 
 * Denotes not populated. U56 is unpopulated 93C45 EEPROM
 
@@ -3872,11 +3926,11 @@ Endless Riches
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: NEC DX-101 (240 Pin PQFP, @ U10)
-        NEC DX-102 (52 Pin PQFP x3, @ U28 U30 & U45)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
-        Push Button SW1
+        Reset Push Button at SW1
         3.6V Battery at BT1
         GAL 16V8 - labeled "KF-001" at U38
 
@@ -3912,18 +3966,18 @@ PCB Number: P-FG-03
 |e C      5                  +----------+   +---------------+|
 |c N      6                                                  |
 |t 2      *                                        U21*      |
-|e  +---+    +---+       U  50MHz 28MHz                      |
-|r    |DX | S  |DX |       3                                 |
-|     |102| W  |102|       8                   +---+    OSC2*|
-|     +---+ 1  +---+                    M  M   |DX |         |
+|e    +---+    +---+       U  50MHz 28MHz                    |
+|r    |DX |  S |DX |       3                                 |
+|     |102|  W |102|       8                   +---+    OSC2*|
+|     +---+  1 +---+                    M  M   |DX |         |
 +-+            D D                      4  4   |102|         |
   |            S S                             +---+         |
 +-+            W W                                           |
 |              2 1                                           |
 +------------------------------------------------------------+
 
-CN1   - 7 Pin connector
-CN2   - 8 Pin connector
+CN1 - 7 Pin connector
+CN2 - 8 Pin connector
 
 * Denotes not populated.
   U56 is unpopulated 93C45 EEPROM
@@ -3933,6 +3987,8 @@ CN2   - 8 Pin connector
   U57-U58 silkscreened 23C8001E
   U15-U22 silkscreened 23C32000
       U32 silkscreened 23C32000
+
+KFP is Program, KFC is Character Graphics and KFS is Sound
 
 Note:
   8-Liner version of P-FG-02 (see Reel'N Quake! above)
@@ -3953,7 +4009,7 @@ ROM_START( endrichs )
 	ROM_LOAD( "kfc-u17-c00.u17", 0x600000, 0x200000, CRC(34660029) SHA1(cf09b97422497d739f71e6ff8b9974fca0329928) )
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) ) // Yes, it's actually "KFS" here
+	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
