@@ -19,12 +19,6 @@
 
 namespace bus {
 	namespace hp_dio {
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_DIO16_CPU(_cputag) downcast<bus::hp_dio::dio16_device &>(*device).set_cputag(_cputag);
-#define MCFG_DIO32_CPU(_cputag) downcast<bus::hp_dio::dio32_device &>(*device).set_cputag(_cputag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
