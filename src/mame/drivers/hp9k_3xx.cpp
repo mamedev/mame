@@ -513,12 +513,13 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_DEVICE_ADD(m_maincpu, M68010, 10000000)
 	MCFG_DEVICE_PROGRAM_MAP(hp9k310_map)
 
-	MCFG_DEVICE_ADD("diobus", DIO16, 0)
-	MCFG_DIO16_CPU(m_maincpu)
-	MCFG_DEVICE_ADD("sl1", DIO16_SLOT, 0, "diobus", dio16_cards, "98544", true)
-	MCFG_DEVICE_ADD("sl2", DIO16_SLOT, 0, "diobus", dio16_cards, "98603b", true)
-	MCFG_DEVICE_ADD("sl3", DIO16_SLOT, 0, "diobus", dio16_cards, "98644", true)
-	MCFG_DEVICE_ADD("sl4", DIO16_SLOT, 0, "diobus", dio16_cards, nullptr, false)
+	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus", 0));
+	dio16.set_cputag(m_maincpu);
+
+	DIO16_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
+	DIO16_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
+	DIO16_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
+	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
 
 MACHINE_CONFIG_END
 
@@ -528,12 +529,13 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 
 	hp9k300(config);
 
-	MCFG_DEVICE_ADD("diobus", DIO32, 0)
-	MCFG_DIO32_CPU(m_maincpu)
-	MCFG_DEVICE_ADD("sl1", DIO32_SLOT, 0, "diobus", dio16_cards, "98544", true)
-	MCFG_DEVICE_ADD("sl2", DIO16_SLOT, 0, "diobus", dio16_cards, "98603b", true)
-	MCFG_DEVICE_ADD("sl3", DIO16_SLOT, 0, "diobus", dio16_cards, "98644", true)
-	MCFG_DEVICE_ADD("sl4", DIO32_SLOT, 0, "diobus", dio16_cards, nullptr, false)
+	bus::hp_dio::dio16_device &dio32(DIO32(config, "diobus", 0));
+	dio32.set_cputag(m_maincpu);
+
+	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
+	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
+	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
+	DIO32_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
@@ -542,12 +544,13 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
 
 	hp9k300(config);
 
-	MCFG_DEVICE_ADD("diobus", DIO32, 0)
-	MCFG_DIO32_CPU(m_maincpu)
-	MCFG_DEVICE_ADD("sl1", DIO32_SLOT, 0, "diobus", dio16_cards, "98544", true)
-	MCFG_DEVICE_ADD("sl2", DIO16_SLOT, 0, "diobus", dio16_cards, "98603b", true)
-	MCFG_DEVICE_ADD("sl3", DIO16_SLOT, 0, "diobus", dio16_cards, "98644", true)
-	MCFG_DEVICE_ADD("sl4", DIO32_SLOT, 0, "diobus", dio16_cards, nullptr, false)
+	bus::hp_dio::dio16_device &dio32(DIO32(config, "diobus", 0));
+	dio32.set_cputag(m_maincpu);
+
+	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
+	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
+	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
+	DIO32_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
