@@ -1057,8 +1057,8 @@ void m68881_mmu_ops()
 												m_mmu_srp_limit = (temp64>>32) & 0xffffffff;
 												m_mmu_srp_aptr = temp64 & 0xffffffff;
 //                                              printf("PMMU: SRP limit = %08x aptr = %08x\n", m_mmu_srp_limit, m_mmu_srp_aptr);
-												// CRP type 0 is not allowed
-												if ((m_mmu_crp_limit & 3) == 0) {
+												// SRP type 0 is not allowed
+												if ((m_mmu_srp_limit & 3) == 0) {
 													m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
 													return;
 												}
