@@ -893,6 +893,8 @@ if (BUSES["HPDIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98603b.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98644.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98644.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/human_interface.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/human_interface.h",
 	}
 end
 
