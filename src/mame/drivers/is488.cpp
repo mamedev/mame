@@ -11,6 +11,7 @@
 //#include "cpu/bcp/bcp.h"
 //#include "machine/eeprompar.h"
 //#include "video/mc6845.h"
+//#include "screen.h"
 
 class is488_state : public driver_device
 {
@@ -33,11 +34,19 @@ void is488_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
 	map(0x40000, 0x47fff).ram();
+	map(0x50000, 0x51fff).ram();
+	map(0x54000, 0x55fff).ram();
+	map(0x60022, 0x60022).nopr();
+	map(0x61ffa, 0x61ffa).nopr();
 	map(0x80000, 0xfffff).rom().region("program", 0);
 }
 
 void is488_state::io_map(address_map &map)
 {
+	map(0x8005, 0x8005).nopw();
+	//map(0x8080, 0x8080).w("crtc", FUNC(mc6845_device::address_w));
+	//map(0x8081, 0x8081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x8101, 0x8101).nopr();
 	map(0x8180, 0x8180).ram();
 }
 
