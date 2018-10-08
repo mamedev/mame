@@ -95,6 +95,15 @@ const tiny_rom_entry *coco_pak_device::device_rom_region() const
 	return ROM_NAME( coco_pak );
 }
 
+//-------------------------------------------------
+//  get_cart_size
+//-------------------------------------------------
+
+uint32_t coco_pak_device::get_cart_size()
+{
+	return 0x8000;
+}
+
 /*-------------------------------------------------
     device_reset - device-specific startup
 -------------------------------------------------*/
@@ -120,6 +129,17 @@ uint8_t* coco_pak_device::get_cart_base()
 {
 	return memregion(CARTSLOT_TAG)->base();
 }
+
+/*-------------------------------------------------
+    get_cart_memregion
+-------------------------------------------------*/
+
+memory_region* coco_pak_device::get_cart_memregion()
+{
+	return memregion(CARTSLOT_TAG);
+}
+
+
 
 /***************************************************************************
     BANKED CARTRIDGES
@@ -199,7 +219,7 @@ uint8_t *coco_pak_banked_device::get_cart_base()
 
 uint32_t coco_pak_banked_device::get_cart_size()
 {
-	return 0x20000;
+	return 0x4000;
 }
 
 //-------------------------------------------------
