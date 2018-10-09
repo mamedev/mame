@@ -338,8 +338,7 @@ READ8_MEMBER(xavix_state::mult_r)
 
 WRITE8_MEMBER(xavix_state::mult_w)
 {
-	// rad_fb writes here, why would you write to the results registers?
-	logerror("%s: mult_w (write to multiply RESULT registers, why?) reg: %d %02x\n", machine().describe_context(), offset, data);
+	// rad_madf writes here to set the base value which the multiplication result gets added to
 	m_multresults[offset] = data;
 }
 
@@ -349,13 +348,43 @@ WRITE8_MEMBER(xavix_state::mult_param_w)
 	// there are NOPs after one of the writes, so presumably the operation is write triggerd and not intstant
 	// see test code at 0184a4 in monster truck
 
+	// offset0 is control
+
+	// mm-- --Ss
+	// mm = mode, S = sign for param1, s = sign for param2
+	// modes 00 = multiply (regular?) 11 = add to previous 01 / 10 unknown (maybe subtract?)
+
 	if (offset == 2)
 	{
 		// assume 0 is upper bits, might be 'mode' instead, check
-		uint16_t param1 = (m_multparams[0]<<8) | (m_multparams[1]);
-		uint8_t param2 = (m_multparams[2]);
+		int param1 = m_multparams[1];
+		int param2 = m_multparams[2];
 
-		uint16_t result =  param1*param2;
+#if 0
+		int signparam1 = (m_multparams[0] & 0x02)>>1;
+		int signparam2 = (m_multparams[0] & 0x01)>>0;
+
+		if (signparam1) param1 = -param1;
+		if (signparam2) param2 = -param2;
+#endif
+
+		uint16_t result = 0;
+
+		// rad_madf uses this mode (add to previous result)
+		if ((m_multparams[0] & 0xc0) == 0xc0)
+		{
+			result = param1 * param2;
+			uint16_t oldresult = (m_multresults[1] << 8) | m_multresults[0];
+			result = oldresult + result;
+		}
+		else if ((m_multparams[0] & 0xc0) == 0x00)
+		{
+			result = param1 * param2;
+		}
+		else
+		{
+			popmessage("unknown multiplier mode %02n", m_multparams[0] & 0xc0);
+		}
 
 		m_multresults[1] = (result>>8)&0xff;
 		m_multresults[0] = result&0xff;
