@@ -244,17 +244,22 @@ WRITE8_MEMBER(xavix_state::main_w)
    note, many DMA operations and tile bank redirects etc. have the high bit set too, so that could be significant if it defines how it accesses
    memory in those cases too
 
+   this can't be correct, it breaks monster truck which expects ROM at 8000 even in the >0x800000 region, maybe code + data mappings need
+   to be kept separate, with >0x800000 showing both ROM banks for code, but still having the zero page area etc. for data?
+
 */
 READ8_MEMBER(xavix_state::main2_r)
 {
 	if (offset & 0x8000)
 	{
-		return m_lowbus->read8(space, offset&0x7fff);
+		return m_rgn[(offset) & (m_rgnlen - 1)];
+		// return m_lowbus->read8(space, offset&0x7fff);
+
 	}
 	else
 	{
 		if (offset>0x200)
-			return  m_rgn[(offset) & (m_rgnlen - 1)];
+			return m_rgn[(offset) & (m_rgnlen - 1)];
 		else
 			return m_lowbus->read8(space, offset&0x7fff);
 	}
@@ -262,6 +267,7 @@ READ8_MEMBER(xavix_state::main2_r)
 
 WRITE8_MEMBER(xavix_state::main2_w)
 {
+	/*
 	if (offset & 0x8000)
 	{
 		m_lowbus->write8(space, offset & 0x7fff, data);
@@ -273,6 +279,7 @@ WRITE8_MEMBER(xavix_state::main2_w)
 		else
 			m_lowbus->write8(space, offset & 0x7fff, data);
 	}
+	*/
 }
 
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
@@ -288,122 +295,135 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x3fff).ram().share("mainram");
 
-	// this might not be a real area, the tilemap base register gets set to 0x40 in monster truck service mode, and expects a fixed layout.
-	// As that would point at this address maybe said layout is being read from here, or maybe it's just a magic tilemap register value that doesn't read address space at all.
-	map(0x4000, 0x41ff).r(FUNC(xavix_state::xavix_4000_r));
+	// Memory Emulator / Text Array
+	map(0x4000, 0x4fff).rw(FUNC(xavix_state::xavix_memoryemu_txarray_r), FUNC(xavix_state::xavix_memoryemu_txarray_w));
 
-	// 6xxx ranges are the video hardware
-	// appears to be 256 sprites
-	map(0x6000, 0x60ff).ram().share("spr_attr0");
-	map(0x6100, 0x61ff).ram().share("spr_attr1");
-	map(0x6200, 0x62ff).ram().share("spr_ypos"); // cleared to 0x80 by both games, maybe enable registers?
-	map(0x6300, 0x63ff).ram().share("spr_xpos");
-	map(0x6400, 0x64ff).ram(); // 6400 range gets populated in some cases, but it seems to be more like work ram, data doesn't matter and must be ignored?
-	map(0x6500, 0x65ff).ram().share("spr_addr_lo");
-	map(0x6600, 0x66ff).ram().share("spr_addr_md");
-	map(0x6700, 0x67ff).ram().share("spr_addr_hi");
-	map(0x6800, 0x68ff).ram().share("palram1"); // written with 6900
-	map(0x6900, 0x69ff).ram().share("palram2"); // startup (taitons1)
-	map(0x6a00, 0x6a1f).ram().share("spr_attra"); // test mode, pass flag 0x20
+	// Sprite RAM (aka Fragment RAM)
+	map(0x6000, 0x67ff).ram().share("fragment_sprite");
 
-	map(0x6fc0, 0x6fc0).w(FUNC(xavix_state::xavix_6fc0_w)); // startup (maybe this is a mirror of tmap1_regs_w)
+	// Palette RAM
+	map(0x6800, 0x68ff).ram().share("palram_sh");
+	map(0x6900, 0x69ff).ram().share("palram_l");
 
-	map(0x6fc8, 0x6fcf).w(FUNC(xavix_state::tmap1_regs_w)); // video registers
+	// Segment RAM
+	map(0x6a00, 0x6a1f).ram().share("segment_regs"); // test mode, pass flag 0x20
 
+	// Tilemap 1 Registers
+	map(0x6fc8, 0x6fcf).rw(FUNC(xavix_state::tmap1_regs_r), FUNC(xavix_state::tmap1_regs_w));
+
+	// Tilemap 2 Registers
 	map(0x6fd0, 0x6fd7).rw(FUNC(xavix_state::tmap2_regs_r), FUNC(xavix_state::tmap2_regs_w));
-	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::xavix_6fd8_w)); // startup (mirror of tmap2_regs_w?)
+	
+	// Sprite Registers
+	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::spriteregs_w));
 
-	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::vid_dma_trigger_r), FUNC(xavix_state::vid_dma_trigger_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
-	map(0x6fe1, 0x6fe2).w(FUNC(xavix_state::vid_dma_params_1_w));
-	map(0x6fe5, 0x6fe6).w(FUNC(xavix_state::vid_dma_params_2_w));
+	// Sprite DMA
+	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::spritefragment_dma_status_r), FUNC(xavix_state::spritefragment_dma_trg_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
+	map(0x6fe1, 0x6fe2).w(FUNC(xavix_state::spritefragment_dma_params_1_w));
+	map(0x6fe5, 0x6fe6).w(FUNC(xavix_state::spritefragment_dma_params_2_w));
 
-	// function in rad_mtrk at 0184b7 uses this
-	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::xavix_6fe8_r), FUNC(xavix_state::xavix_6fe8_w)); // r/w tested
-	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::xavix_6fe9_r), FUNC(xavix_state::xavix_6fe9_w)); // r/w tested
-	map(0x6fea, 0x6fea).w(FUNC(xavix_state::xavix_6fea_w));
+	// Arena Registers
+	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::arena_start_r), FUNC(xavix_state::arena_start_w)); // r/w tested
+	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::arena_end_r), FUNC(xavix_state::arena_end_w)); // r/w tested
+	map(0x6fea, 0x6fea).w(FUNC(xavix_state::arena_control_w));
 
-	map(0x6ff0, 0x6ff0).rw(FUNC(xavix_state::xavix_6ff0_r), FUNC(xavix_state::xavix_6ff0_w)); // r/w tested
-	map(0x6ff1, 0x6ff1).w(FUNC(xavix_state::xavix_6ff1_w)); // startup - cleared in interrupt 0
-	map(0x6ff2, 0x6ff2).w(FUNC(xavix_state::xavix_6ff2_w)); // set to 07 after clearing above things in interrupt 0
+	// Colour Mixing / Enabling Registers
+	map(0x6ff0, 0x6ff0).ram().share("colmix_sh"); // a single colour (for effects or bgpen?)
+	map(0x6ff1, 0x6ff1).ram().share("colmix_l");
+	map(0x6ff2, 0x6ff2).w(FUNC(xavix_state::colmix_6ff2_w)); // set to 07 after clearing above things in interrupt 0
 
-	map(0x6ff8, 0x6ff8).rw(FUNC(xavix_state::xavix_6ff8_r), FUNC(xavix_state::xavix_6ff8_w)); // always seems to be a read/store or read/modify/store
+	// Display Control Register / Status Flags
+	map(0x6ff8, 0x6ff8).rw(FUNC(xavix_state::dispctrl_6ff8_r), FUNC(xavix_state::dispctrl_6ff8_w)); // always seems to be a read/store or read/modify/store
 	map(0x6ff9, 0x6ff9).r(FUNC(xavix_state::pal_ntsc_r));
-	map(0x6ffa, 0x6ffa).w(FUNC(xavix_state::xavix_6ffa_w));
-	map(0x6ffb, 0x6ffb).w(FUNC(xavix_state::xavix_6ffb_w)); // increases / decreases when you jump in snowboard, maybe raster irq pos or part of a clipping window?
+	map(0x6ffa, 0x6ffa).w(FUNC(xavix_state::dispctrl_6ffa_w));
+	map(0x6ffb, 0x6ffb).w(FUNC(xavix_state::dispctrl_6ffb_w)); // increases / decreases when you jump in snowboard, maybe raster irq pos or part of a clipping window?
 
-	// 7xxx ranges system controller?
-	map(0x75f0, 0x75f0).rw(FUNC(xavix_state::xavix_75f0_r), FUNC(xavix_state::xavix_75f0_w)); // r/w tested read/written 8 times in a row
-	map(0x75f1, 0x75f1).rw(FUNC(xavix_state::xavix_75f1_r), FUNC(xavix_state::xavix_75f1_w)); // r/w tested read/written 8 times in a row
+	// Lightgun / pen 1 control
+	// map(0x6ffc, 0x6fff)
+
+	// Sound RAM
+	// map(0x7400, 0x75ff)
+
+	// Sound Control
+	map(0x75f0, 0x75f0).rw(FUNC(xavix_state::sound_75f0_r), FUNC(xavix_state::sound_75f0_w)); // r/w tested read/written 8 times in a row
+	map(0x75f1, 0x75f1).rw(FUNC(xavix_state::sound_75f1_r), FUNC(xavix_state::sound_75f1_w)); // r/w tested read/written 8 times in a row
 	map(0x75f3, 0x75f3).ram();
-	map(0x75f4, 0x75f4).r(FUNC(xavix_state::xavix_75f4_r)); // related to 75f0 (read after writing there - rad_mtrk)
-	map(0x75f5, 0x75f5).r(FUNC(xavix_state::xavix_75f5_r)); // related to 75f1 (read after writing there - rad_mtrk)
-
+	map(0x75f4, 0x75f4).r(FUNC(xavix_state::sound_75f4_r)); // related to 75f0 (read after writing there - rad_mtrk)
+	map(0x75f5, 0x75f5).r(FUNC(xavix_state::sound_75f5_r)); // related to 75f1 (read after writing there - rad_mtrk)
 	// taitons1 after 75f7/75f8
-	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::xavix_75f6_r), FUNC(xavix_state::xavix_75f6_w)); // r/w tested
+	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_75f6_r), FUNC(xavix_state::sound_75f6_w)); // r/w tested
 	// taitons1 written as a pair
-	map(0x75f7, 0x75f7).w(FUNC(xavix_state::xavix_75f7_w));
-	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::xavix_75f8_r), FUNC(xavix_state::xavix_75f8_w)); // r/w tested
+	map(0x75f7, 0x75f7).w(FUNC(xavix_state::sound_75f7_w));
+	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::sound_75f8_r), FUNC(xavix_state::sound_75f8_w)); // r/w tested
 	// taitons1 written after 75f6, then read
-	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::xavix_75f9_r), FUNC(xavix_state::xavix_75f9_w));
+	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::sound_75f9_r), FUNC(xavix_state::sound_75f9_w));
 	// at another time
-	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::xavix_75fa_r), FUNC(xavix_state::xavix_75fa_w)); // r/w tested
-	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::xavix_75fb_r), FUNC(xavix_state::xavix_75fb_w)); // r/w tested
-	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::xavix_75fc_r), FUNC(xavix_state::xavix_75fc_w)); // r/w tested
-	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::xavix_75fd_r), FUNC(xavix_state::xavix_75fd_w)); // r/w tested
-	map(0x75fe, 0x75fe).w(FUNC(xavix_state::xavix_75fe_w));
+	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::sound_75fa_r), FUNC(xavix_state::sound_75fa_w)); // r/w tested
+	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_75fb_r), FUNC(xavix_state::sound_75fb_w)); // r/w tested
+	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_75fc_r), FUNC(xavix_state::sound_75fc_w)); // r/w tested
+	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_75fd_r), FUNC(xavix_state::sound_75fd_w)); // r/w tested
+	map(0x75fe, 0x75fe).w(FUNC(xavix_state::sound_75fe_w));
 	// taitons1 written other 75xx operations
-	map(0x75ff, 0x75ff).w(FUNC(xavix_state::xavix_75ff_w));
+	map(0x75ff, 0x75ff).w(FUNC(xavix_state::sound_75ff_w));
 
-	map(0x7810, 0x7810).w(FUNC(xavix_state::xavix_7810_w)); // startup
+	// Slot Registers
+	map(0x7810, 0x7810).w(FUNC(xavix_state::slotreg_7810_w)); // startup
 
-	map(0x7900, 0x7900).w(FUNC(xavix_state::xavix_7900_w));
-	map(0x7901, 0x7901).w(FUNC(xavix_state::xavix_7901_w));
-	map(0x7902, 0x7902).w(FUNC(xavix_state::xavix_7902_w));
+	// External Interface
+	map(0x7900, 0x7900).w(FUNC(xavix_state::extintrf_7900_w));
+	map(0x7901, 0x7901).w(FUNC(xavix_state::extintrf_7901_w));
+	map(0x7902, 0x7902).w(FUNC(xavix_state::extintrf_7902_w));
 
-	// DMA trigger for below (written after the others) waits on status of bit 1 in a loop
-	map(0x7980, 0x7980).rw(FUNC(xavix_state::dma_trigger_r), FUNC(xavix_state::dma_trigger_w));
-	// DMA source
-	map(0x7981, 0x7981).w(FUNC(xavix_state::rom_dmasrc_lo_w));
+	// DMA Controller
+	map(0x7980, 0x7980).rw(FUNC(xavix_state::rom_dmatrg_r), FUNC(xavix_state::rom_dmatrg_w));
+	map(0x7981, 0x7981).w(FUNC(xavix_state::rom_dmasrc_lo_w)); 	// DMA source
 	map(0x7982, 0x7982).w(FUNC(xavix_state::rom_dmasrc_md_w));
 	map(0x7983, 0x7983).w(FUNC(xavix_state::rom_dmasrc_hi_w));
-	// DMA dest
-	map(0x7984, 0x7984).w(FUNC(xavix_state::rom_dmadst_lo_w));
+	map(0x7984, 0x7984).w(FUNC(xavix_state::rom_dmadst_lo_w)); 	// DMA dest
 	map(0x7985, 0x7985).w(FUNC(xavix_state::rom_dmadst_hi_w));
-	// DMA length
-	map(0x7986, 0x7986).w(FUNC(xavix_state::rom_dmalen_lo_w));
+	map(0x7986, 0x7986).w(FUNC(xavix_state::rom_dmalen_lo_w)); 	// DMA length
 	map(0x7987, 0x7987).w(FUNC(xavix_state::rom_dmalen_hi_w));
 
-	// GPIO stuff
-	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::xavix_io_0_r),FUNC(xavix_state::xavix_7a00_w));
-	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::xavix_io_1_r),FUNC(xavix_state::xavix_7a01_w)); // startup (taitons1)
-	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::xavix_7a02_r),FUNC(xavix_state::xavix_7a02_w)); // startup, gets set to 20, 7a00 is then also written with 20
-	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::xavix_7a03_r),FUNC(xavix_state::xavix_7a03_w)); // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
+	// IO Ports
+	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::io_0_r),FUNC(xavix_state::io_0_w));
+	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io_1_r),FUNC(xavix_state::io_1_w)); // startup (taitons1)
+	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io_2_r),FUNC(xavix_state::io_2_w)); // startup, gets set to 20, 7a00 is then also written with 20
+	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io_3_r),FUNC(xavix_state::io_3_w)); // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
 
+	// Interrupt control registers
 	map(0x7a80, 0x7a80).w(FUNC(xavix_state::xavix_7a80_w)); // still IO? ADC related?
 
-	map(0x7b00, 0x7b00).w(FUNC(xavix_state::xavix_7b00_w)); // rad_snow (not often)
+	// Mouse?
+	map(0x7b00, 0x7b00).w(FUNC(xavix_state::adc_7b00_w)); // rad_snow (not often, why?)
 
-	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::xavix_7b80_r), FUNC(xavix_state::xavix_7b80_w)); // rad_snow (not often)
-	map(0x7b81, 0x7b81).w(FUNC(xavix_state::xavix_7b81_w)); // written (often, m_trck, analog related?)
+	// Lightgun / pen 2 control
+	//map(0x7b18, 0x7b1b)
+		
+	// ADC registers
+	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::adc_7b80_r), FUNC(xavix_state::adc_7b80_w)); // rad_snow (not often)
+	map(0x7b81, 0x7b81).w(FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
 
-	map(0x7c00, 0x7c00).w(FUNC(xavix_state::xavix_7c00_w));
-	map(0x7c01, 0x7c01).rw(FUNC(xavix_state::xavix_7c01_r), FUNC(xavix_state::xavix_7c01_w)); // r/w tested
-	map(0x7c02, 0x7c02).w(FUNC(xavix_state::xavix_7c02_w));
+	// Sleep control
+	//map(7b82, 7b83)
 
-	// this is a multiplication chip
+	// Timer control
+	map(0x7c00, 0x7c00).w(FUNC(xavix_state::timer_control_w));
+	map(0x7c01, 0x7c01).rw(FUNC(xavix_state::timer_baseval_r), FUNC(xavix_state::timer_baseval_w)); // r/w tested
+	map(0x7c02, 0x7c02).w(FUNC(xavix_state::timer_freq_w));
+
+	// Barrel Shifter registers
+	// map(0x7ff0, 0x7ff1)
+
+	// Multiply / Divide registers
 	map(0x7ff2, 0x7ff4).w(FUNC(xavix_state::mult_param_w));
 	map(0x7ff5, 0x7ff6).rw(FUNC(xavix_state::mult_r), FUNC(xavix_state::mult_w));
 
-	// maybe irq enable, written after below
-	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::irq_enable_w)); // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
-	// an IRQ vector (nmi?)
-	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::irq_vector0_lo_w));
+	// CPU Vector registers
+	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::vector_enable_w)); // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
+	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::irq_vector0_lo_w)); // an IRQ vector (nmi?)
 	map(0x7ffb, 0x7ffb).w(FUNC(xavix_state::irq_vector0_hi_w));
-
 	map(0x7ffc, 0x7ffc).rw(FUNC(xavix_state::irq_source_r), FUNC(xavix_state::irq_source_w));
-
-	// an IRQ vector (irq?)
-	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector1_lo_w));
+	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector1_lo_w)); // an IRQ vector (irq?)
 	map(0x7fff, 0x7fff).w(FUNC(xavix_state::irq_vector1_hi_w));
 }
 
@@ -652,7 +672,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD("palette", 256 + 1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -685,18 +705,6 @@ void xavix_state::init_xavix()
 {
 	m_rgnlen = memregion("bios")->bytes();
 	m_rgn = memregion("bios")->base();
-}
-
-void xavix_state::init_taitons1()
-{
-	init_xavix();
-	m_alt_addressing = 1;
-}
-
-void xavix_state::init_rad_box()
-{
-	init_xavix();
-	m_alt_addressing = 2;
 }
 
 /***************************************************************************
@@ -842,51 +850,51 @@ ROM_END
 
 /* Standalone TV Games */
 
-CONS( 2006, taitons1,  0,          0,  xavix,  xavix,    xavix_state, init_taitons1, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, taitons1,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
 
 CONS( 2006, taitons2,  0,          0,  xavix,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_IS_SKELETON )
 
-CONS( 2006, namcons1,  0,          0,  xavix,  namcons2, xavix_state, init_taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, namcons1,  0,          0,  xavix,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_IS_SKELETON )
 
-CONS( 2006, namcons2,  0,          0,  xavix,  namcons2, xavix_state, init_taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_IS_SKELETON )
+CONS( 2006, namcons2,  0,          0,  xavix,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_IS_SKELETON )
 
 CONS( 2000, rad_ping,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 
 CONS( 2003, rad_mtrk,  0,          0,  xavix,  rad_mtrk, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_IS_SKELETON )
 CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavixp, rad_mtrkp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_IS_SKELETON )
 
-CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Boxing (NTSC)", MACHINE_IS_SKELETON)
-CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Boxing (PAL)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Boxing (NTSC)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Boxing (PAL)", MACHINE_IS_SKELETON)
 
-CONS( 200?, rad_crdn,  0,          0,  xavix,  rad_crdn, xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IS_SKELETON)
-CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdn,  0,          0,  xavix,  rad_crdn, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IS_SKELETON)
 
 CONS( 2002, rad_bb2,   0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
-CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IS_SKELETON)
 
-CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_IS_SKELETON) // no Play TV branding, USA only release?
+CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_IS_SKELETON) // no Play TV branding, USA only release?
 
-CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
+CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
 
-CONS( 200?, rad_rh,    0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_IS_SKELETON)
+CONS( 200?, rad_rh,    0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_IS_SKELETON)
 
-CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_IS_SKELETON)
+CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_IS_SKELETON)
 
-CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,  xavix_state, init_rad_box,   "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
+CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
 
-CONS( 200?, eka_base,  0,          0,  xavix,  xavix,  xavix_state, init_xavix,     "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON)
+CONS( 200?, eka_base,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON)
 
-CONS( 200?, eka_strt,  0,          0,   xavix,  xavix,  xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
+CONS( 200?, eka_strt,  0,          0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
 
-CONS( 200?, eka_vol1,  0,          0,   xavix,  xavix,  xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
+CONS( 200?, eka_vol1,  0,          0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
 
-CONS( 200?, eka_vol2,  0,          0,   xavix,  xavix,  xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
+CONS( 200?, eka_vol2,  0,          0,   xavix,  xavix  , xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
