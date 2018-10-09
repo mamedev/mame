@@ -30,18 +30,6 @@ dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_typ
 {
 }
 
-#if 0
-constexpr int REG_SW1_INT_LEVEL_SHIFT = 0;
-constexpr int REG_SW1_INT_LEVEL_MASK = 0x3;
-
-constexpr int REG_SW1_SELECT_CODE_SHIFT = 2;
-constexpr int REG_SW1_SELECT_CODE_MASK = 0x1f;
-
-constexpr int REG_SW2_SCSI_ADDR_SHIFT = 0;
-constexpr int REG_SW2_SCSI_ADDR_MASK = 0x07;
-
-constexpr int REG_SW2_SCSI_PARITY = 0x08;
-#endif
 static INPUT_PORTS_START(hp98620_port)
 INPUT_PORTS_END
 
