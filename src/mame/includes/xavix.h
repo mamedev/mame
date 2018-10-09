@@ -34,7 +34,6 @@ public:
 		m_in1(*this, "IN1"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_alt_addressing(0),
 		m_lowbus(*this, "lowbus")
 	{ }
 
@@ -43,8 +42,6 @@ public:
 	void xavix2000(machine_config &config);
 
 	void init_xavix();
-	void init_taitons1();
-	void init_rad_box();
 
 private:
 	// screen updates
@@ -264,7 +261,6 @@ private:
 
 	int get_current_address_byte();
 
-	int m_alt_addressing;
 	required_device<address_map_bank_device> m_lowbus;
 };
 

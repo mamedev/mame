@@ -364,6 +364,28 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int alt_addressing = 0;
+
+	if (m_spritereg == 0x00)
+	{
+		// 8-bit addressing  (Tile Number)
+		alt_addressing = 1;
+	}
+	else if (m_spritereg == 0x02)
+	{
+		// 16-bit addressing (Addressing Mode 1)
+		alt_addressing = 2;
+	}
+	else if (m_spritereg == 0x04)
+	{
+		// 24-bit addressing (Addressing Mode 2)
+		alt_addressing = 0;
+	}
+	else
+	{
+		popmessage("unknown sprite reg %02x", m_spritereg);
+	}
+
 	//logerror("frame\n");
 	// priority doesn't seem to be based on list order, there are bad sprite-sprite priorities with either forward or reverse
 
@@ -390,16 +412,15 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		tile &= (m_rgnlen - 1);
 
-		// taito nostalgia 1 also seems to use a different addressing, is it selectable or is the chip different?
 		// taito nost attr1 is 84 / 80 / 88 / 8c for the various elements of the xavix logo.  monster truck uses ec / fc / dc / 4c / 5c / 6c (final 6 sprites ingame are 00 00 f0 f0 f0 f0, radar?)
 
 		if ((attr1 & 0x0c) == 0x0c)
 		{
 			drawheight = 16;
 			drawwidth = 16;
-			if (m_alt_addressing == 1)
+			if (alt_addressing == 1)
 				tile = tile * 128;
-			else if (m_alt_addressing == 2)
+			else if (alt_addressing == 2)
 				tile = tile * 8;
 		}
 		else if ((attr1 & 0x0c) == 0x08)
@@ -407,9 +428,9 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			drawheight = 16;
 			drawwidth = 8;
 			xpos += 4;
-			if (m_alt_addressing == 1)
+			if (alt_addressing == 1)
 				tile = tile * 64;
-			else if (m_alt_addressing == 2)
+			else if (alt_addressing == 2)
 				tile = tile * 8;
 		}
 		else if ((attr1 & 0x0c) == 0x04)
@@ -417,9 +438,9 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			drawheight = 8;
 			drawwidth = 16;
 			ypos -= 4;
-			if (m_alt_addressing == 1)
+			if (alt_addressing == 1)
 				tile = tile * 64;
-			else if (m_alt_addressing == 2)
+			else if (alt_addressing == 2)
 				tile = tile * 8;
 		}
 		else if ((attr1 & 0x0c) == 0x00)
@@ -428,13 +449,13 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			drawwidth = 8;
 			xpos += 4;
 			ypos -= 4;
-			if (m_alt_addressing == 1)
+			if (alt_addressing == 1)
 				tile = tile * 32;
-			else if (m_alt_addressing == 2)
+			else if (alt_addressing == 2)
 				tile = tile * 8;
 		}
 
-		if (m_alt_addressing != 0)
+		if (alt_addressing != 0)
 		{
 			int basereg = (tile & 0xf0000) >> 16;
 			tile &= 0xffff;
@@ -671,14 +692,14 @@ WRITE8_MEMBER(xavix_state::spriteregs_w)
 	/*
 		This is similar to Tilemap reg 7 and is used to set the addressing mode for sprite data
 
-		---0 -000 8-bit addressing  (Tile Number)
-		---0 -001 16-bit addressing (Tile Number)
-		---0 -010 16-bit addressing (Addressing Mode 1)
-		---0 -011 16-bit addressing (Addressing Mode 2)
-		---0 -100 24-bit addressing (Addressing Mode 2)
+		---0 -000 (00) 8-bit addressing  (Tile Number)
+		---0 -001 (01) 16-bit addressing (Tile Number)
+		---0 -010 (02) 16-bit addressing (Addressing Mode 1)
+		---0 -011 (03) 16-bit addressing (Addressing Mode 2)
+		---0 -100 (04) 24-bit addressing (Addressing Mode 2)
 
-		---1 -011 16-bit addressing (Addressing Mode 2 + Inline Header)
-		---1 -100 24-bit addressing (Addressing Mode 2 + Inline Header)
+		---1 -011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)
+		---1 -100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
 	*/
 	m_spritereg = data;
 }
