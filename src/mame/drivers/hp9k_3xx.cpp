@@ -128,8 +128,6 @@ private:
         DECLARE_WRITE_LINE_MEMBER(dio_irq6_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR); };
         DECLARE_WRITE_LINE_MEMBER(dio_irq7_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_7, state, M68K_INT_ACK_AUTOVECTOR); };
 
-	DECLARE_WRITE_LINE_MEMBER(cpu_reset);
-
 	uint32_t m_lastpc;
 };
 
@@ -257,10 +255,6 @@ uint32_t hp9k3xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 static INPUT_PORTS_START( hp9k330 )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(hp9k3xx_state::cpu_reset)
-{
-}
-
 void hp9k3xx_state::driver_start()
 {
 	m_diag_led.resolve();
@@ -268,7 +262,9 @@ void hp9k3xx_state::driver_start()
 
 void hp9k3xx_state::machine_reset()
 {
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(hp9k3xx_state::cpu_reset), this));
+	auto *dio = subdevice<bus::hp_dio::dio16_device>("diobus");
+	if (dio)
+		m_maincpu->set_reset_callback(write_line_delegate(FUNC(bus::hp_dio::dio16_device::reset_in), dio));
 }
 
 WRITE16_MEMBER(hp9k3xx_state::led_w)
