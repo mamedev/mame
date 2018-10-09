@@ -241,7 +241,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 					if (!alt_tileaddressing2)
 					{
 						basereg = 0;
-						gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+						gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 
 						tile = tile * (offset_multiplier * bpp);
 						tile += gfxbase;
@@ -251,7 +251,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 						tile = tile * 8;
 						basereg = (tile & 0x70000) >> 16;
 						tile &= 0xffff;
-						gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+						gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 						tile += gfxbase;
 
 						if (tileregs[0x7] & 0x08)
@@ -269,7 +269,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 					basereg = (tile & 0xf000) >> 12;
 					tile &= 0x0fff;
-					gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 
 					tile += gfxbase;
 					set_data_address(tile, 0);
@@ -438,7 +438,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		{
 			int basereg = (tile & 0xf0000) >> 16;
 			tile &= 0xffff;
-			int gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+			int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 			tile+= gfxbase;
 		}
 
@@ -606,81 +606,44 @@ READ8_MEMBER(xavix_state::pal_ntsc_r)
 	return m_region->read();
 }
 
-/*
-WRITE8_MEMBER(xavix_state::xavix_6fc0_w) // also related to tilemap 1?
-{
-	logerror("%s: xavix_6fc0_w data %02x\n", machine().describe_context(), data);
-}
-*/
 
 WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 {
 	/*
-	   0x0 pointer to address where tile data is
-	       it gets set to 0x40 in monster truck test mode, which is outside of ram but test mode requires a fixed 'column scan' layout
-	       so that might be special
+	   0x0 pointer to low tile bits
+	   0x1 pointer to middle tile bits
+	   0x2 pointer to upper tile bits
 
-	   0x1 pointer to middle tile bits (if needed, depends on mode) (usually straight after the ram needed for above)
+	   0x3 Fftt bbb-  Ff = flip Y,X
+	                  tt = tile/tilemap size
+					  b = bpp
+					  - = unused
 
-	   0x2 pointer to tile highest tile bits (if needed, depends on mode) (usually straight after the ram needed for above)
+	   0x4 scroll
+	   0x5 scroll
 
-	   0x3 --tt bbb-     - = ?  tt = tile/tilemap size b = bpp    (0x36 xavix logo, 0x3c title screen, 0x36 course select)
+	   0x6 pppp zzzz  p = palette
+	                  z = priority
 
-	   0x4 and 0x5 are scroll
+	   0x7 e--m mmmm  e = enable
+	                  m = mode
 
-	   0x6 pppp ----     p = palette  - = ?   (0x02 xavix logo, 0x01 course select)
+	   modes are
+		---0 0000 (00) 8-bit addressing  (Tile Number)
+		---0 0001 (01) 16-bit addressing (Tile Number) (monster truck, ekara)
+		---0 0010 (02) 16-bit addressing (Addressing Mode 1) (boxing)
+		---0 0011 (03) 16-bit addressing (Addressing Mode 2) 
+		---0 0100 (04) 24-bit addressing (Addressing Mode 2)
 
-	   0x7 could be mode (16x16, 8x8 etc.)
-	        0x00 is disabled?
-	        0x80 means 16x16 tiles
-	        0x81 might be 8x8 tiles
-	        0x93 course / mode select bg / ingame (weird addressing?)
+		---0 1000 (08) 8-bit+8 addressing  (Tile Number + 8-bit Attribute)
+		---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute)
+		---0 1010 (0a) 16-bit+8 addressing (Addressing Mode 1 + 8-bit Attribute) (boxing, Snowboard)
+		---0 1011 (0b) 16-bit+8 addressing (Addressing Mode 2 + 8-bit Attribute)
 
+		---1 0011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)  (monster truck)
+		---1 0100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
 
-	 */
-
-	/*
-	    6aff base registers
-	    -- ingame
-
-	    ae 80
-	    02 80
-	    02 90
-	    02 a0
-	    02 b0
-	    02 c0
-	    02 d0
-	    02 e0
-
-	    02 00
-	    04 80
-	    04 90
-	    04 a0
-	    04 b0
-	    04 c0
-	    04 d0
-	    04 e0
-
-	    -- menu
-	    af 80
-	    27 80
-	    27 90
-	    27 a0
-	    27 b0
-	    27 c0
-	    27 d0
-	    27 e0
-
-	    27 00
-	    00 80
-	    00 90
-	    00 a0
-	    00 b0
-	    00 c0
-	    00 d0
-	    00 e0
 	*/
-
 
 	if ((offset != 0x4) && (offset != 0x5))
 	{
@@ -688,15 +651,6 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 	}
 
 	COMBINE_DATA(&m_tmap1_regs[offset]);
-}
-
-WRITE8_MEMBER(xavix_state::spriteregs_w) // also related to tilemap 2?
-{
-	// possibly just a mirror of tmap2_regs_w, at least it writes 0x04 here which would be the correct
-	// base address to otherwise write at tmap2_regs_w offset 0
-//  tmap2_regs_w(space,offset,data);
-
-	logerror("%s: spriteregs_w data %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(xavix_state::tmap2_regs_w)
@@ -709,6 +663,26 @@ WRITE8_MEMBER(xavix_state::tmap2_regs_w)
 
 	COMBINE_DATA(&m_tmap2_regs[offset]);
 }
+
+
+WRITE8_MEMBER(xavix_state::spriteregs_w)
+{
+	logerror("%s: spriteregs_w data %02x\n", machine().describe_context(), data);
+	/*
+		This is similar to Tilemap reg 7 and is used to set the addressing mode for sprite data
+
+		---0 -000 8-bit addressing  (Tile Number)
+		---0 -001 16-bit addressing (Tile Number)
+		---0 -010 16-bit addressing (Addressing Mode 1)
+		---0 -011 16-bit addressing (Addressing Mode 2)
+		---0 -100 24-bit addressing (Addressing Mode 2)
+
+		---1 -011 16-bit addressing (Addressing Mode 2 + Inline Header)
+		---1 -100 24-bit addressing (Addressing Mode 2 + Inline Header)
+	*/
+	m_spritereg = data;
+}
+
 
 READ8_MEMBER(xavix_state::tmap2_regs_r)
 {

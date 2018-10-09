@@ -28,7 +28,7 @@ public:
 		m_spr_addr_hi(*this, "spr_addr_hi"),
 		m_palram1(*this, "palram1"),
 		m_palram2(*this, "palram2"),
-		m_spr_attra(*this, "spr_attra"),
+		m_segment_regs(*this, "segment_regs"),
 		m_palette(*this, "palette"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
@@ -234,7 +234,7 @@ private:
 	required_shared_ptr<uint8_t> m_palram1;
 	required_shared_ptr<uint8_t> m_palram2;
 
-	required_shared_ptr<uint8_t> m_spr_attra;
+	required_shared_ptr<uint8_t> m_segment_regs;
 
 	required_device<palette_device> m_palette;
 
@@ -249,6 +249,8 @@ private:
 	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque);
 	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	uint8_t m_spritereg;
 
 	int m_rgnlen;
 	uint8_t* m_rgn;

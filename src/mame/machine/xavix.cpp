@@ -414,6 +414,8 @@ void xavix_state::machine_reset()
 	m_6ff0 = 0;
 	m_6ff8 = 0;
 
+	m_spritereg = 0;
+
 	m_soundregs[0] = 0;
 	m_soundregs[1] = 0;
 

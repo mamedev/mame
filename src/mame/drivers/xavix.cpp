@@ -252,12 +252,14 @@ READ8_MEMBER(xavix_state::main2_r)
 {
 	if (offset & 0x8000)
 	{
-		return m_lowbus->read8(space, offset&0x7fff);
+		return m_rgn[(offset) & (m_rgnlen - 1)];
+		// return m_lowbus->read8(space, offset&0x7fff);
+
 	}
 	else
 	{
 		if (offset>0x200)
-			return  m_rgn[(offset) & (m_rgnlen - 1)];
+			return m_rgn[(offset) & (m_rgnlen - 1)];
 		else
 			return m_lowbus->read8(space, offset&0x7fff);
 	}
@@ -265,6 +267,7 @@ READ8_MEMBER(xavix_state::main2_r)
 
 WRITE8_MEMBER(xavix_state::main2_w)
 {
+	/*
 	if (offset & 0x8000)
 	{
 		m_lowbus->write8(space, offset & 0x7fff, data);
@@ -276,6 +279,7 @@ WRITE8_MEMBER(xavix_state::main2_w)
 		else
 			m_lowbus->write8(space, offset & 0x7fff, data);
 	}
+	*/
 }
 
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
@@ -309,7 +313,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6900, 0x69ff).ram().share("palram2"); // startup (taitons1)
 
 	// Segment RAM
-	map(0x6a00, 0x6a1f).ram().share("spr_attra"); // test mode, pass flag 0x20
+	map(0x6a00, 0x6a1f).ram().share("segment_regs"); // test mode, pass flag 0x20
 
 	// Tilemap 1 Registers
 	map(0x6fc8, 0x6fcf).w(FUNC(xavix_state::tmap1_regs_w)); // video registers
