@@ -58,14 +58,7 @@
 #include "logmacro.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6840ptm.h"
-#include "sound/sn76496.h"
 #include "bus/hp_dio/hp_dio.h"
-#include "bus/hp_dio/hp98543.h"
-#include "bus/hp_dio/hp98544.h"
-#include "bus/hp_dio/hp98603a.h"
-#include "bus/hp_dio/hp98603b.h"
-#include "bus/hp_dio/hp98644.h"
-#include "bus/hp_dio/human_interface.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -324,16 +317,6 @@ WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
-static void dio16_cards(device_slot_interface &device)
-{
-	device.option_add("98543", HPDIO_98543); /* 98543 Medium Resolution Color Card */
-	device.option_add("98544", HPDIO_98544); /* 98544 High Resolution Monochrome Card */
-	device.option_add("98603a", HPDIO_98603A); /* 98603A ROM BASIC (4.0) */
-	device.option_add("98603b", HPDIO_98603B); /* 98603B ROM BASIC (5.1) */
-	device.option_add("98644", HPDIO_98644); /* 98644 Async serial interface */
-	device.option_add("human_interface", HPDIO_HUMAN_INTERFACE);
-}
-
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k300)
 	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 250000)); // from oscillator module next to the 6840
 	ptm.set_external_clocks(250000.0f, 0.0f, 250000.0f);
@@ -387,7 +370,8 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
 	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
 	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
-	DIO32_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
+	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98620", false);
+	DIO32_SLOT(config, "sl5", 0, "diobus", dio16_cards, nullptr, false);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
