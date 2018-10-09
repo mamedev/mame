@@ -386,7 +386,8 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
 	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
 	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98620", false);
-	DIO32_SLOT(config, "sl5", 0, "diobus", dio16_cards, nullptr, false);
+	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, "98265a", false);
+	DIO32_SLOT(config, "sl6", 0, "diobus", dio16_cards, nullptr, false);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
