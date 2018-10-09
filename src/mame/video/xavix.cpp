@@ -136,8 +136,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	int ytilesize = 0;
 	int xtilesize = 0;
 
-	address_space& mainspace = m_maincpu->space(AS_PROGRAM);
-
 	switch (tileregs[0x3] & 0x30)
 	{
 	case 0x00:
@@ -204,6 +202,8 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	{
 		for (int x = 0; x < xdimension; x++)
 		{
+			address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+
 			int bpp, pal, scrolly, scrollx;
 			int tile = 0;
 			int extraattr = 0;
@@ -398,6 +398,17 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	for (int i = 0xff; i >= 0; i--)
 	{
+
+		uint8_t* spr_attr0 = m_fragment_sprite + 0x000;
+		uint8_t* spr_attr1 = m_fragment_sprite + 0x100;
+		uint8_t* spr_ypos = m_fragment_sprite + 0x200;
+		uint8_t* spr_xpos = m_fragment_sprite + 0x300;
+		// + 0x400
+		uint8_t* spr_addr_lo = m_fragment_sprite + 0x500;
+		uint8_t* spr_addr_md = m_fragment_sprite + 0x600;
+		uint8_t* spr_addr_hi = m_fragment_sprite + 0x700;
+
+
 		/* attribute 0 bits
 		   pppp bbb-    p = palette, b = bpp
 
@@ -405,11 +416,11 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		   ---- ss-f    s = size, f = flipx
 		*/
 
-		int ypos = m_spr_ypos[i];
-		int xpos = m_spr_xpos[i];
-		int tile = (m_spr_addr_hi[i] << 16) | (m_spr_addr_md[i] << 8) | m_spr_addr_lo[i];
-		int attr0 = m_spr_attr0[i];
-		int attr1 = m_spr_attr1[i];
+		int ypos = spr_ypos[i];
+		int xpos = spr_xpos[i];
+		int tile = (spr_addr_hi[i] << 16) | (spr_addr_md[i] << 8) | spr_addr_lo[i];
+		int attr0 = spr_attr0[i];
+		int attr1 = spr_attr1[i];
 
 		int pal = (attr0 & 0xf0) >> 4;
 		int flipx = (attr1 & 0x01);
@@ -485,9 +496,9 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos - 256, ypos - 256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x,y
 
 		/*
-		if ((m_spr_ypos[i] != 0x81) && (m_spr_ypos[i] != 0x80) && (m_spr_ypos[i] != 0x00))
+		if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
 		{
-		    logerror("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_ypos[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_xpos[i], m_spr_addr_lo[i], m_spr_addr_md[i], m_spr_addr_hi[i] );
+		    logerror("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", spr_ypos[i], spr_attr0[i], spr_attr1[i], spr_xpos[i], spr_addr_lo[i], spr_addr_md[i], spr_addr_hi[i] );
 		}
 		*/
 	}
@@ -567,30 +578,29 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-WRITE8_MEMBER(xavix_state::vid_dma_params_1_w)
+WRITE8_MEMBER(xavix_state::spritefragment_dma_params_1_w)
 {
-	m_vid_dma_param1[offset] = data;
+	m_spritefragment_dmaparam1[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::vid_dma_params_2_w)
+WRITE8_MEMBER(xavix_state::spritefragment_dma_params_2_w)
 {
-	m_vid_dma_param2[offset] = data;
+	m_spritefragment_dmaparam2[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::vid_rom_dmatrg_w)
+WRITE8_MEMBER(xavix_state::spritefragment_dma_trg_w)
 {
 	uint16_t len = data & 0x07;
-	uint16_t src = (m_vid_dma_param1[1]<<8) | m_vid_dma_param1[0];
-	uint16_t dst = (m_vid_dma_param2[0]<<8);
-	dst += 0x6000;
+	uint16_t src = (m_spritefragment_dmaparam1[1]<<8) | m_spritefragment_dmaparam1[0];
+	uint16_t dst = (m_spritefragment_dmaparam2[0]<<8);
 
-	uint8_t unk = m_vid_dma_param2[1];
+	uint8_t unk = m_spritefragment_dmaparam2[1];
 
-	logerror("%s: vid_rom_dmatrg_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len,src,dst,unk);
+	logerror("%s: spritefragment_dma_trg_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len,src,dst,unk);
 
 	if (unk)
 	{
-		fatalerror("m_vid_dma_param2[1] != 0x00 (is %02x)\n", m_vid_dma_param2[1]);
+		fatalerror("m_spritefragment_dmaparam2[1] != 0x00 (is %02x)\n", m_spritefragment_dmaparam2[1]);
 	}
 
 	if (len == 0x00)
@@ -601,19 +611,17 @@ WRITE8_MEMBER(xavix_state::vid_rom_dmatrg_w)
 
 	len = len << 8;
 
-	address_space& dmaspace = m_maincpu->space(AS_PROGRAM);
-
 	if (data & 0x40)
 	{
 		for (int i = 0; i < len; i++)
 		{
-			uint8_t dat = dmaspace.read_byte(src + i);
-			dmaspace.write_byte(dst + i, dat);
+			uint8_t dat = m_maincpu->space(AS_PROGRAM).read_byte(src + i);
+			m_fragment_sprite[(dst + i) & 0x7ff] = dat;
 		}
 	}
 }
 
-READ8_MEMBER(xavix_state::vid_rom_dmatrg_r)
+READ8_MEMBER(xavix_state::spritefragment_dma_status_r)
 {
 	// expects bit 0x40 to clear in most cases
 	return 0x00;

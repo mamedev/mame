@@ -298,19 +298,12 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// Memory Emulator / Text Array
 	map(0x4000, 0x41ff).r(FUNC(xavix_state::xavix_4000_r));
 
-	// Sprite RAM 
-	map(0x6000, 0x60ff).ram().share("spr_attr0");
-	map(0x6100, 0x61ff).ram().share("spr_attr1");
-	map(0x6200, 0x62ff).ram().share("spr_ypos"); // cleared to 0x80 by both games, maybe enable registers?
-	map(0x6300, 0x63ff).ram().share("spr_xpos");
-	map(0x6400, 0x64ff).ram(); // 6400 range gets populated in some cases, but it seems to be more like work ram, data doesn't matter and must be ignored?
-	map(0x6500, 0x65ff).ram().share("spr_addr_lo");
-	map(0x6600, 0x66ff).ram().share("spr_addr_md");
-	map(0x6700, 0x67ff).ram().share("spr_addr_hi");
+	// Sprite RAM (aka Fragment RAM)
+	map(0x6000, 0x67ff).ram().share("fragment_sprite");
 
 	// Palette RAM
-	map(0x6800, 0x68ff).ram().share("palram1"); // written with 6900
-	map(0x6900, 0x69ff).ram().share("palram2"); // startup (taitons1)
+	map(0x6800, 0x68ff).ram().share("palram1");
+	map(0x6900, 0x69ff).ram().share("palram2");
 
 	// Segment RAM
 	map(0x6a00, 0x6a1f).ram().share("segment_regs"); // test mode, pass flag 0x20
@@ -325,9 +318,9 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::spriteregs_w));
 
 	// Sprite DMA
-	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::vid_rom_dmatrg_r), FUNC(xavix_state::vid_rom_dmatrg_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
-	map(0x6fe1, 0x6fe2).w(FUNC(xavix_state::vid_dma_params_1_w));
-	map(0x6fe5, 0x6fe6).w(FUNC(xavix_state::vid_dma_params_2_w));
+	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::spritefragment_dma_status_r), FUNC(xavix_state::spritefragment_dma_trg_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
+	map(0x6fe1, 0x6fe2).w(FUNC(xavix_state::spritefragment_dma_params_1_w));
+	map(0x6fe5, 0x6fe6).w(FUNC(xavix_state::spritefragment_dma_params_2_w));
 
 	// Arena Registers
 	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::arena_6fe8_r), FUNC(xavix_state::arena_6fe8_w)); // r/w tested

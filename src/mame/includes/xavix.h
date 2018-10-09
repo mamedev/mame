@@ -19,13 +19,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
-		m_spr_attr0(*this, "spr_attr0"),
-		m_spr_attr1(*this, "spr_attr1"),
-		m_spr_ypos(*this, "spr_ypos"),
-		m_spr_xpos(*this, "spr_xpos"),
-		m_spr_addr_lo(*this, "spr_addr_lo"),
-		m_spr_addr_md(*this, "spr_addr_md"),
-		m_spr_addr_hi(*this, "spr_addr_hi"),
+		m_fragment_sprite(*this, "fragment_sprite"),
 		m_palram1(*this, "palram1"),
 		m_palram2(*this, "palram2"),
 		m_segment_regs(*this, "segment_regs"),
@@ -86,10 +80,10 @@ private:
 	DECLARE_WRITE8_MEMBER(rom_dmalen_hi_w);
 	DECLARE_READ8_MEMBER(rom_dmatrg_r);
 
-	DECLARE_WRITE8_MEMBER(vid_dma_params_1_w);
-	DECLARE_WRITE8_MEMBER(vid_dma_params_2_w);
-	DECLARE_WRITE8_MEMBER(vid_rom_dmatrg_w);
-	DECLARE_READ8_MEMBER(vid_rom_dmatrg_r);
+	DECLARE_WRITE8_MEMBER(spritefragment_dma_params_1_w);
+	DECLARE_WRITE8_MEMBER(spritefragment_dma_params_2_w);
+	DECLARE_WRITE8_MEMBER(spritefragment_dma_trg_w);
+	DECLARE_READ8_MEMBER(spritefragment_dma_status_r);
 
 	DECLARE_READ8_MEMBER(io_0_r);
 	DECLARE_READ8_MEMBER(io_1_r);
@@ -199,8 +193,8 @@ private:
 	uint8_t m_multparams[3];
 	uint8_t m_multresults[2];
 
-	uint8_t m_vid_dma_param1[2];
-	uint8_t m_vid_dma_param2[2];
+	uint8_t m_spritefragment_dmaparam1[2];
+	uint8_t m_spritefragment_dmaparam2[2];
 
 	uint8_t m_tmap1_regs[8];
 	uint8_t m_tmap2_regs[8];
@@ -219,14 +213,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_mainram;
 
-	required_shared_ptr<uint8_t> m_spr_attr0;
-	required_shared_ptr<uint8_t> m_spr_attr1;
-	required_shared_ptr<uint8_t> m_spr_ypos;
-	required_shared_ptr<uint8_t> m_spr_xpos;
-
-	required_shared_ptr<uint8_t> m_spr_addr_lo;
-	required_shared_ptr<uint8_t> m_spr_addr_md;
-	required_shared_ptr<uint8_t> m_spr_addr_hi;
+	required_shared_ptr<uint8_t> m_fragment_sprite;
 
 	required_shared_ptr<uint8_t> m_palram1;
 	required_shared_ptr<uint8_t> m_palram2;

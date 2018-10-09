@@ -434,8 +434,8 @@ void xavix_state::machine_reset()
 
 	for (int i = 0; i < 2; i++)
 	{
-		m_vid_dma_param1[i] = 0;
-		m_vid_dma_param2[i] = 0;
+		m_spritefragment_dmaparam1[i] = 0;
+		m_spritefragment_dmaparam2[i] = 0;
 	}
 
 	for (int i = 0; i < 8; i++)
