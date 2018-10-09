@@ -12,8 +12,8 @@
 class targeth_state : public driver_device
 {
 public:
-	targeth_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	targeth_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -22,13 +22,14 @@ public:
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
-		m_shareram(*this, "shareram")
+		m_shareram(*this, "shareram"),
+		m_okibank(*this, "okibank")
 	{ }
 
 	void targeth(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(output_latch_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
@@ -37,8 +38,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(vram_w);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_screen0);
-	TILE_GET_INFO_MEMBER(get_tile_info_screen1);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	TIMER_CALLBACK_MEMBER(gun1_irq);
 	TIMER_CALLBACK_MEMBER(gun2_irq);
@@ -63,7 +63,9 @@ private:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_shareram;
+	required_shared_ptr<uint16_t> m_shareram;
+
+	required_memory_bank m_okibank;
 
 	emu_timer       *m_gun_irq_timer[2];
 
