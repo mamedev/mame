@@ -20,8 +20,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
-		m_palram1(*this, "palram1"),
-		m_palram2(*this, "palram2"),
+		m_palram_sh(*this, "palram_sh"),
+		m_palram_l(*this, "palram_l"),
+		m_colmix_sh(*this, "colmix_sh"),
+		m_colmix_l(*this, "colmix_l"),
 		m_segment_regs(*this, "segment_regs"),
 		m_palette(*this, "palette"),
 		m_in0(*this, "IN0"),
@@ -218,8 +220,11 @@ private:
 
 	required_shared_ptr<uint8_t> m_fragment_sprite;
 
-	required_shared_ptr<uint8_t> m_palram1;
-	required_shared_ptr<uint8_t> m_palram2;
+	required_shared_ptr<uint8_t> m_palram_sh;
+	required_shared_ptr<uint8_t> m_palram_l;
+	required_shared_ptr<uint8_t> m_colmix_sh;
+	required_shared_ptr<uint8_t> m_colmix_l;
+
 
 	required_shared_ptr<uint8_t> m_segment_regs;
 

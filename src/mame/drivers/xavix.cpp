@@ -302,8 +302,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6000, 0x67ff).ram().share("fragment_sprite");
 
 	// Palette RAM
-	map(0x6800, 0x68ff).ram().share("palram1");
-	map(0x6900, 0x69ff).ram().share("palram2");
+	map(0x6800, 0x68ff).ram().share("palram_sh");
+	map(0x6900, 0x69ff).ram().share("palram_l");
 
 	// Segment RAM
 	map(0x6a00, 0x6a1f).ram().share("segment_regs"); // test mode, pass flag 0x20
@@ -328,8 +328,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6fea, 0x6fea).w(FUNC(xavix_state::arena_control_w));
 
 	// Colour Mixing / Enabling Registers
-	map(0x6ff0, 0x6ff0).rw(FUNC(xavix_state::colmix_6ff0_r), FUNC(xavix_state::colmix_6ff0_w)); // r/w tested
-	map(0x6ff1, 0x6ff1).w(FUNC(xavix_state::colmix_6ff1_w)); // startup - cleared in interrupt 0
+	map(0x6ff0, 0x6ff0).ram().share("colmix_sh"); // a single colour (for effects or bgpen?)
+	map(0x6ff1, 0x6ff1).ram().share("colmix_l");
 	map(0x6ff2, 0x6ff2).w(FUNC(xavix_state::colmix_6ff2_w)); // set to 07 after clearing above things in interrupt 0
 
 	// Display Control Register / Status Flags
@@ -672,7 +672,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD("palette", 256 + 1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

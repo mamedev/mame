@@ -180,23 +180,6 @@ INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 
 
 
-READ8_MEMBER(xavix_state::colmix_6ff0_r)
-{
-	//logerror("%s: colmix_6ff0_r\n", machine().describe_context());
-	return m_6ff0;
-}
-
-WRITE8_MEMBER(xavix_state::colmix_6ff0_w)
-{
-	// expected to return data written
-	m_6ff0 = data;
-	//logerror("%s: colmix_6ff0_w %02x\n", machine().describe_context(), data);
-}
-
-WRITE8_MEMBER(xavix_state::colmix_6ff1_w)
-{
-	logerror("%s: colmix_6ff1_w %02x\n", machine().describe_context(), data);
-}
 
 WRITE8_MEMBER(xavix_state::colmix_6ff2_w)
 {
@@ -441,7 +424,6 @@ void xavix_state::machine_reset()
 	m_irq_vector1_lo_data = 0;
 	m_irq_vector1_hi_data = 0;
 
-	m_6ff0 = 0;
 	m_6ff8 = 0;
 
 	m_spritereg = 0;

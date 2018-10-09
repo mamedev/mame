@@ -63,10 +63,21 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	// not verified
 	int offs = 0;
-	for (int index = 0; index < 256; index++)
+	for (int index = 0; index < 257; index++)
 	{
-		uint16_t dat = m_palram1[offs];
-		dat |= m_palram2[offs]<<8;
+		uint16_t dat;
+			
+		if (index < 256)
+		{
+			dat = m_palram_sh[offs];
+			dat |= m_palram_l[offs] << 8;
+		}
+		else
+		{
+			dat = m_colmix_sh[0];
+			dat |= m_colmix_l[0] << 8;
+		}
+
 		offs++;
 
 		int l_raw = (dat & 0x1f00) >> 8;
