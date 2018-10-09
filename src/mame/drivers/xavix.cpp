@@ -309,7 +309,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6a00, 0x6a1f).ram().share("segment_regs"); // test mode, pass flag 0x20
 
 	// Tilemap 1 Registers
-	map(0x6fc8, 0x6fcf).w(FUNC(xavix_state::tmap1_regs_w)); // video registers
+	map(0x6fc8, 0x6fcf).rw(FUNC(xavix_state::tmap1_regs_r), FUNC(xavix_state::tmap1_regs_w));
 
 	// Tilemap 2 Registers
 	map(0x6fd0, 0x6fd7).rw(FUNC(xavix_state::tmap2_regs_r), FUNC(xavix_state::tmap2_regs_w));
@@ -323,9 +323,9 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6fe5, 0x6fe6).w(FUNC(xavix_state::spritefragment_dma_params_2_w));
 
 	// Arena Registers
-	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::arena_6fe8_r), FUNC(xavix_state::arena_6fe8_w)); // r/w tested
-	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::arena_6fe9_r), FUNC(xavix_state::arena_6fe9_w)); // r/w tested
-	map(0x6fea, 0x6fea).w(FUNC(xavix_state::arena_6fea_w));
+	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::arena_start_r), FUNC(xavix_state::arena_start_w)); // r/w tested
+	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::arena_end_r), FUNC(xavix_state::arena_end_w)); // r/w tested
+	map(0x6fea, 0x6fea).w(FUNC(xavix_state::arena_control_w));
 
 	// Colour Mixing / Enabling Registers
 	map(0x6ff0, 0x6ff0).rw(FUNC(xavix_state::colmix_6ff0_r), FUNC(xavix_state::colmix_6ff0_w)); // r/w tested

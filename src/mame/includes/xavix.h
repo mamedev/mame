@@ -104,11 +104,11 @@ private:
 	DECLARE_READ8_MEMBER(irq_source_r);
 	DECLARE_WRITE8_MEMBER(irq_source_w);
 
-	DECLARE_READ8_MEMBER(arena_6fe8_r);
-	DECLARE_WRITE8_MEMBER(arena_6fe8_w);
-	DECLARE_READ8_MEMBER(arena_6fe9_r);
-	DECLARE_WRITE8_MEMBER(arena_6fe9_w);
-	DECLARE_WRITE8_MEMBER(arena_6fea_w);
+	DECLARE_READ8_MEMBER(arena_start_r);
+	DECLARE_WRITE8_MEMBER(arena_start_w);
+	DECLARE_READ8_MEMBER(arena_end_r);
+	DECLARE_WRITE8_MEMBER(arena_end_w);
+	DECLARE_WRITE8_MEMBER(arena_control_w);
 
 	DECLARE_READ8_MEMBER(colmix_6ff0_r);
 	DECLARE_WRITE8_MEMBER(colmix_6ff0_w);
@@ -158,11 +158,12 @@ private:
 	DECLARE_WRITE8_MEMBER(timer_7c01_w);
 	DECLARE_WRITE8_MEMBER(timer_7c02_w);
 
-	//DECLARE_WRITE8_MEMBER(xavix_6fc0_w);
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
-	DECLARE_WRITE8_MEMBER(spriteregs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
+	DECLARE_READ8_MEMBER(tmap1_regs_r);
 	DECLARE_READ8_MEMBER(tmap2_regs_r);
+
+	DECLARE_WRITE8_MEMBER(spriteregs_w);
 
 	DECLARE_READ8_MEMBER(pal_ntsc_r);
 
@@ -199,8 +200,8 @@ private:
 	uint8_t m_tmap1_regs[8];
 	uint8_t m_tmap2_regs[8];
 
-	uint8_t m_6fe8;
-	uint8_t m_6fe9;
+	uint8_t m_arena_start;
+	uint8_t m_arena_end;
 
 	uint8_t m_6ff0;
 	uint8_t m_6ff8;

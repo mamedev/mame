@@ -712,11 +712,14 @@ WRITE8_MEMBER(xavix_state::spriteregs_w)
 	m_spritereg = data;
 }
 
+READ8_MEMBER(xavix_state::tmap1_regs_r)
+{
+	logerror("%s: tmap1_regs_r offset %02x\n", offset, machine().describe_context());
+	return m_tmap1_regs[offset];
+}
 
 READ8_MEMBER(xavix_state::tmap2_regs_r)
 {
-	// does this return the same data or a status?
-
 	logerror("%s: tmap2_regs_r offset %02x\n", offset, machine().describe_context());
 	return m_tmap2_regs[offset];
 }

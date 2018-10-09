@@ -277,35 +277,33 @@ WRITE8_MEMBER(xavix_state::io_3_w)
 	logerror("%s: io_3_w %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(xavix_state::arena_6fe8_r)
+READ8_MEMBER(xavix_state::arena_start_r)
 {
-	logerror("%s: arena_6fe8_r\n", machine().describe_context());
-	return m_6fe8;
+	//logerror("%s: arena_start_r\n", machine().describe_context());
+	return m_arena_start;
 }
 
-WRITE8_MEMBER(xavix_state::arena_6fe8_w)
+WRITE8_MEMBER(xavix_state::arena_start_w)
 {
-	// expected to return data written
-	m_6fe8 = data;
-	logerror("%s: arena_6fe8_w %02x\n", machine().describe_context(), data);
+	//logerror("%s: arena_start_w %02x\n", machine().describe_context(), data);
+	m_arena_start = data; // expected to return data written
+
+}
+READ8_MEMBER(xavix_state::arena_end_r)
+{
+	logerror("%s: arena_end_r\n", machine().describe_context());
+	return m_arena_end;
 }
 
-READ8_MEMBER(xavix_state::arena_6fe9_r)
+WRITE8_MEMBER(xavix_state::arena_end_w)
 {
-	logerror("%s: arena_6fe9_r\n", machine().describe_context());
-	return m_6fe9;
+	//logerror("%s: arena_end_w %02x\n", machine().describe_context(), data);
+	m_arena_end = data; // expected to return data written
 }
 
-WRITE8_MEMBER(xavix_state::arena_6fe9_w)
+WRITE8_MEMBER(xavix_state::arena_control_w)
 {
-	// expected to return data written
-	m_6fe9 = data;
-	logerror("%s: arena_6fe9_w %02x\n", machine().describe_context(), data);
-}
-
-WRITE8_MEMBER(xavix_state::arena_6fea_w)
-{
-	logerror("%s: arena_6fea_w %02x\n", machine().describe_context(), data);
+	//logerror("%s: arena_control_w %02x\n", machine().describe_context(), data);
 }
 
 
@@ -367,16 +365,18 @@ WRITE8_MEMBER(xavix_state::mult_param_w)
 
 READ8_MEMBER(xavix_state::irq_source_r)
 {
-	/* the 2nd IRQ routine (regular IRQ, not NMI?) reads here before deciding what to do
+	/* the 2nd IRQ routine (regular IRQ) reads here before deciding what to do
 
 	 the following bits have been seen to be checked (active low?)
 
-	  0x40 - Monster Truck - stuff with 6ffb 6fd6 and 6ff8
-	  0x20 - most games (but not Monster Truck) - DMA related?
-	  0x10 - card night + monster truck - 7c00 related? (increases 16-bit counter in ram stores 0xc1 at 7c00)
-	  0x08 - several games - Input related (ADC? - used for analog control on Monster Truck) (uses 7a80 top bit to determine direction, and 7a81 0x08 as an output, presumably to clock)
-	  0x04 - Monster Truck - loads/stores 7b81
+	  0x80 - Sound Irq
+	  0x40 - Picture / Arena Irq?
+	  0x20 - DMA Irq
+	  0x10 - Timer / Counter IRQ
+	  0x08 - IO Irq (ADC? - used for analog control on Monster Truck) (uses 7a80 top bit to determine direction, and 7a81 0x08 as an output, presumably to clock)
+	  0x04 - ADC IRQ - loads/stores 7b81
 	*/
+
 	logerror("%s: irq_source_r\n", machine().describe_context());
 	return 0xff;
 }
