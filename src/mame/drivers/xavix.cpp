@@ -407,9 +407,9 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	//map(7b82, 7b83)
 
 	// Timer control
-	map(0x7c00, 0x7c00).w(FUNC(xavix_state::timer_7c00_w));
-	map(0x7c01, 0x7c01).rw(FUNC(xavix_state::timer_7c01_r), FUNC(xavix_state::timer_7c01_w)); // r/w tested
-	map(0x7c02, 0x7c02).w(FUNC(xavix_state::timer_7c02_w));
+	map(0x7c00, 0x7c00).w(FUNC(xavix_state::timer_control_w));
+	map(0x7c01, 0x7c01).rw(FUNC(xavix_state::timer_baseval_r), FUNC(xavix_state::timer_baseval_w)); // r/w tested
+	map(0x7c02, 0x7c02).w(FUNC(xavix_state::timer_freq_w));
 
 	// Barrel Shifter registers
 	// map(0x7ff0, 0x7ff1)

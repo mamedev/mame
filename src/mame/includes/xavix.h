@@ -153,10 +153,10 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_75fe_w);
 	DECLARE_WRITE8_MEMBER(sound_75ff_w);
 
-	DECLARE_WRITE8_MEMBER(timer_7c00_w);
-	DECLARE_READ8_MEMBER(timer_7c01_r);
-	DECLARE_WRITE8_MEMBER(timer_7c01_w);
-	DECLARE_WRITE8_MEMBER(timer_7c02_w);
+	DECLARE_WRITE8_MEMBER(timer_control_w);
+	DECLARE_READ8_MEMBER(timer_baseval_r);
+	DECLARE_WRITE8_MEMBER(timer_baseval_w);
+	DECLARE_WRITE8_MEMBER(timer_freq_w);
 
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
@@ -210,7 +210,7 @@ private:
 
 	uint8_t m_soundregs[0x10];
 
-	uint8_t m_7c01;
+	uint8_t m_timer_baseval;
 
 	int16_t get_vectors(int which, int half);
 

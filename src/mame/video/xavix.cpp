@@ -243,7 +243,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 				if (!alt_tileaddressing2)
 				{
 					// Tile Based Addressing takes into account Tile Sizes and bpp
-
 					const int offset_multiplier = (ytilesize * xtilesize)/8;
 					
 					basereg = 0;
@@ -254,12 +253,14 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 				}
 				else
 				{
+					// Addressing Mode 1 uses a fixed offset? (like sprites)
 					tile = tile * 8;
 					basereg = (tile & 0x70000) >> 16;
 					tile &= 0xffff;
 					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 					tile += gfxbase;
 
+					// Tilemap specific mode extension with an 8-bit per tile attribute
 					if (tileregs[0x7] & 0x08)
 					{
 						// make use of the extraattr stuff?
@@ -270,7 +271,8 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 			}
 			else
 			{
-				// Inline Header mode
+				// Addressing Mode 2 (plus Inline Header)
+
 				if (debug_packets) logerror("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
 
 

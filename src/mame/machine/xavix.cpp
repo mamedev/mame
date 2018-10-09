@@ -307,27 +307,28 @@ WRITE8_MEMBER(xavix_state::arena_control_w)
 }
 
 
-READ8_MEMBER(xavix_state::timer_7c01_r)
+READ8_MEMBER(xavix_state::timer_baseval_r)
 {
-	logerror("%s: timer_7c01_r\n", machine().describe_context());
-	return m_7c01;
+	logerror("%s: timer_baseval_r\n", machine().describe_context());
+	return m_timer_baseval;
 }
 
-WRITE8_MEMBER(xavix_state::timer_7c00_w)
+WRITE8_MEMBER(xavix_state::timer_control_w)
 {
-	logerror("%s: timer_7c00_w %02x\n", machine().describe_context(), data);
+	logerror("%s: timer_control_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::timer_7c01_w)
+WRITE8_MEMBER(xavix_state::timer_baseval_w)
 {
 	// expected to return data written
-	m_7c01 = data;
-	logerror("%s: timer_7c01_w %02x\n", machine().describe_context(), data);
+	m_timer_baseval = data;
+	logerror("%s: timer_baseval_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::timer_7c02_w)
+WRITE8_MEMBER(xavix_state::timer_freq_w)
 {
-	logerror("%s: timer_7c02_w %02x\n", machine().describe_context(), data);
+	// 4-bit prescale
+	logerror("%s: timer_freq_w %02x\n", machine().describe_context(), data);
 }
 
 
