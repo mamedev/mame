@@ -167,7 +167,9 @@ private:
 
 	DECLARE_READ8_MEMBER(pal_ntsc_r);
 
-	DECLARE_READ8_MEMBER(xavix_4000_r);
+	DECLARE_READ8_MEMBER(xavix_memoryemu_txarray_r);
+	DECLARE_WRITE8_MEMBER(xavix_memoryemu_txarray_w);
+	uint8_t m_txarray[3];
 
 	DECLARE_READ8_MEMBER(mult_r);
 	DECLARE_WRITE8_MEMBER(mult_w);

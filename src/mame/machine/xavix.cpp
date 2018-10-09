@@ -473,6 +473,11 @@ void xavix_state::machine_reset()
 		m_tmap2_regs[i] = 0;
 	}
 
+	for (int i = 0; i < 3; i++)
+	{
+		m_txarray[i] = 0x00;
+	}
+
 	m_lowbus->set_bank(0);
 }
 

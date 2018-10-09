@@ -296,7 +296,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x0200, 0x3fff).ram().share("mainram");
 
 	// Memory Emulator / Text Array
-	map(0x4000, 0x41ff).r(FUNC(xavix_state::xavix_4000_r));
+	map(0x4000, 0x4fff).rw(FUNC(xavix_state::xavix_memoryemu_txarray_r), FUNC(xavix_state::xavix_memoryemu_txarray_w));
 
 	// Sprite RAM (aka Fragment RAM)
 	map(0x6000, 0x67ff).ram().share("fragment_sprite");

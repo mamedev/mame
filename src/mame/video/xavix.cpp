@@ -724,15 +724,62 @@ READ8_MEMBER(xavix_state::tmap2_regs_r)
 	return m_tmap2_regs[offset];
 }
 
-READ8_MEMBER(xavix_state::xavix_4000_r)
+// The Text Array / Memory Emulator acts as a memory area that you can point the tilemap sources at to get a fixed pattern of data
+WRITE8_MEMBER(xavix_state::xavix_memoryemu_txarray_w)
+{
+	if (offset < 0x400)
+	{
+		// nothing
+	}
+	else if (offset < 0x800)
+	{
+		m_txarray[0] = data;
+	}
+	else if (offset < 0xc00)
+	{
+		m_txarray[1] = data;
+	}
+	else if (offset < 0x1000)
+	{
+		m_txarray[2] = data;
+	}	
+}
+
+READ8_MEMBER(xavix_state::xavix_memoryemu_txarray_r)
 {
 	if (offset < 0x100)
 	{
+		offset &= 0xff;
 		return ((offset>>4) | (offset<<4));
 	}
-	else
+	else if (offset < 0x200)
 	{
-		return 0x00;
+		offset &= 0xff;
+		return ((offset>>4) | (~offset<<4));
 	}
+	else if (offset < 0x300)
+	{
+		offset &= 0xff;
+		return ((~offset>>4) | (offset<<4));
+	}
+	else if (offset < 0x400)
+	{
+		offset &= 0xff;
+		return ((~offset>>4) | (~offset<<4));
+	}
+	else if (offset < 0x800)
+	{
+		return m_txarray[0];
+	}
+	else if (offset < 0xc00)
+	{
+		return m_txarray[1];
+	}
+	else if (offset < 0x1000)
+	{
+		return m_txarray[2];
+	}
+
+	return 0xff;
 }
 
