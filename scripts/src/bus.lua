@@ -883,6 +883,8 @@ if (BUSES["HPDIO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98265a.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98265a.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98543.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98543.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98544.cpp",

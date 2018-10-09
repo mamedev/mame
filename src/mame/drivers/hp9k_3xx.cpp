@@ -62,6 +62,7 @@
 
 #include "screen.h"
 #include "softlist_dev.h"
+#include "hp9k_3xx.lh"
 
 #define MAINCPU_TAG "maincpu"
 #define PTM6840_TAG "ptm"
@@ -73,7 +74,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_vram16(*this, "vram16"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_diag_led(*this, "led_diag_%u", 0U)
 	{ }
 
 	void hp9k370(machine_config &config);
@@ -88,10 +90,13 @@ public:
 
 private:
 	required_device<m68000_base_device> m_maincpu;
+
 	virtual void machine_reset() override;
+	virtual void driver_start() override;
 
 	optional_shared_ptr<uint16_t> m_vram16;
 	optional_shared_ptr<uint32_t> m_vram;
+	output_finder<8> m_diag_led;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -101,28 +106,7 @@ private:
 	DECLARE_READ32_MEMBER(buserror_r);
 	DECLARE_WRITE32_MEMBER(buserror_w);
 
-	DECLARE_WRITE32_MEMBER(led_w)
-	{
-		if (mem_mask != 0x000000ff)
-		{
-			return;
-		}
-#if 0
-		printf("LED: %02x  (", data&0xff);
-		for (int i = 7; i >= 0; i--)
-		{
-			if (data & (1 << i))
-			{
-				printf("o");
-			}
-			else
-			{
-				printf("*");
-			}
-		}
-		printf(")\n");
-#endif
-	}
+	DECLARE_WRITE16_MEMBER(led_w);
 
 	void hp9k310_map(address_map &map);
 	void hp9k320_map(address_map &map);
@@ -187,7 +171,7 @@ void hp9k3xx_state::hp9k3xx_common(address_map &map)
 void hp9k3xx_state::hp9k310_map(address_map &map)
 {
 	map(0x000000, 0xffffff).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));
-	map(0x000000, 0x01ffff).rom().region("maincpu", 0).nopw();  // writes to 1fffc are the LED
+	map(0x000000, 0x01ffff).rom().region("maincpu", 0).w(FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
 	map(0x5f4000, 0x5f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
 	map(0x5f8000, 0x5f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0x800000, 0xffffff).ram();
@@ -272,10 +256,31 @@ WRITE_LINE_MEMBER(hp9k3xx_state::cpu_reset)
 {
 }
 
+void hp9k3xx_state::driver_start()
+{
+	m_diag_led.resolve();
+}
 
 void hp9k3xx_state::machine_reset()
 {
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(hp9k3xx_state::cpu_reset), this));
+}
+
+WRITE16_MEMBER(hp9k3xx_state::led_w)
+{
+	if (!(mem_mask & 0xff))
+	       return;
+
+	LOG("LED: %02x\n", data & 0xff);
+
+	m_diag_led[0] = BIT(data, 0);
+	m_diag_led[1] = BIT(data, 1);
+	m_diag_led[2] = BIT(data, 2);
+	m_diag_led[3] = BIT(data, 3);
+	m_diag_led[4] = BIT(data, 4);
+	m_diag_led[5] = BIT(data, 5);
+	m_diag_led[6] = BIT(data, 6);
+	m_diag_led[7] = BIT(data, 7);
 }
 
 void hp9k3xx_state::add_dio16_bus(machine_config &config)
@@ -351,6 +356,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k300)
 	ptm.irq_callback().set_inputline("maincpu", M68K_IRQ_6);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "hp9k3xx_flop")
+	config.set_default_layout(layout_hp9k_3xx);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
@@ -367,6 +373,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	DIO16_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
 	DIO16_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
 	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
@@ -381,7 +388,8 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
 	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
 	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98620", false);
-	DIO32_SLOT(config, "sl5", 0, "diobus", dio16_cards, nullptr, false);
+	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, "98265a", false);
+	DIO32_SLOT(config, "sl6", 0, "diobus", dio16_cards, nullptr, false);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
@@ -417,6 +425,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	MCFG_SCREEN_SIZE(512,390)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 390-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k340)
