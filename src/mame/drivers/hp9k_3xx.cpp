@@ -58,14 +58,7 @@
 #include "logmacro.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6840ptm.h"
-#include "sound/sn76496.h"
 #include "bus/hp_dio/hp_dio.h"
-#include "bus/hp_dio/hp98543.h"
-#include "bus/hp_dio/hp98544.h"
-#include "bus/hp_dio/hp98603a.h"
-#include "bus/hp_dio/hp98603b.h"
-#include "bus/hp_dio/hp98644.h"
-#include "bus/hp_dio/human_interface.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -322,16 +315,6 @@ WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 	}
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-}
-
-static void dio16_cards(device_slot_interface &device)
-{
-	device.option_add("98543", HPDIO_98543); /* 98543 Medium Resolution Color Card */
-	device.option_add("98544", HPDIO_98544); /* 98544 High Resolution Monochrome Card */
-	device.option_add("98603a", HPDIO_98603A); /* 98603A ROM BASIC (4.0) */
-	device.option_add("98603b", HPDIO_98603B); /* 98603B ROM BASIC (5.1) */
-	device.option_add("98644", HPDIO_98644); /* 98644 Async serial interface */
-	device.option_add("human_interface", HPDIO_HUMAN_INTERFACE);
 }
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k300)

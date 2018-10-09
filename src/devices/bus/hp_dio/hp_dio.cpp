@@ -13,6 +13,7 @@
 #include "hp98603a.h"
 #include "hp98603b.h"
 #include "hp98644.h"
+#include "human_interface.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -350,11 +351,18 @@ void device_dio32_card_interface::interface_pre_start()
 } // namespace bus::hp_dio
 } // namespace bus
 
-void hpdio_cards(device_slot_interface & device)
+void dio16_cards(device_slot_interface & device)
 {
-	device.option_add("hp98543", HPDIO_98543);
-	device.option_add("hp98544", HPDIO_98544);
-	device.option_add("hp98603a", HPDIO_98603A);
-	device.option_add("hp98603b", HPDIO_98603B);
-	device.option_add("hp98644", HPDIO_98644);
+	device.option_add("98543", HPDIO_98543);
+	device.option_add("98544", HPDIO_98544);
+	device.option_add("98603a", HPDIO_98603A);
+	device.option_add("98603b", HPDIO_98603B);
+	device.option_add("98644", HPDIO_98644);
+	device.option_add("human_interface", HPDIO_HUMAN_INTERFACE);
+}
+
+void dio32_cards(device_slot_interface & device)
+{
+	device.option_add("98265a", HPDIO_98265A);
+	device.option_add("98620", HPDIO_98620);
 }
