@@ -36,7 +36,9 @@ inline void spg2xx_device::verboselog(int n_level, const char *s_fmt, ...)
 }
 
 #define SPG_DEBUG_VIDEO		(0)
-#define SPG_DEBUG_AUDIO		(1)
+#define SPG_DEBUG_AUDIO		(0)
+#define SPG_DEBUG_ENVELOPES	(0)
+#define SPG_DEBUG_SAMPLES	(0)
 
 #define IO_IRQ_ENABLE		m_io_regs[0x21]
 #define IO_IRQ_STATUS		m_io_regs[0x22]
@@ -107,7 +109,7 @@ void spg2xx_device::device_start()
 	m_screenpos_timer->adjust(attotime::never);
 
 	m_audio_beat = timer_alloc(TIMER_BEAT);
-	m_audio_beat->adjust(attotime::from_ticks(4, 281250), 0, attotime::from_ticks(4, 281250));
+	m_audio_beat->adjust(attotime::never);
 
 	m_stream = stream_alloc(0, 2, 44100);
 }
@@ -121,6 +123,8 @@ void spg2xx_device::device_reset()
 	memset(m_channel_rate, 0, sizeof(double) * 6);
 	memset(m_channel_rate_accum, 0, sizeof(double) * 6);
 	memset(m_rampdown_frame, 0, sizeof(uint32_t) * 6);
+	memset(m_envclk_frame, 4, sizeof(uint32_t) * 6);
+	memset(m_envelope_addr, 0, sizeof(uint32_t) * 6);
 
 	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
 	memset(m_io_regs, 0, 0x200 * sizeof(uint16_t));
@@ -141,6 +145,8 @@ void spg2xx_device::device_reset()
 
 	m_audio_regs[AUDIO_CHANNEL_REPEAT] = 0x3f;
 	m_audio_regs[AUDIO_CHANNEL_ENV_MODE] = 0x3f;
+
+	m_audio_beat->adjust(attotime::from_ticks(4, 281250), 0, attotime::from_ticks(4, 281250));
 }
 
 
@@ -523,7 +529,7 @@ WRITE16_MEMBER(spg2xx_device::video_w)
 		verboselog(5, "video_w: Video IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
 		const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 		VIDEO_IRQ_STATUS &= ~data;
-		verboselog(4, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
+		//verboselog(4, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
 		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
 		if (changed)
 			check_video_irq();
@@ -581,7 +587,7 @@ WRITE_LINE_MEMBER(spg2xx_device::vblank)
 
 	const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 	VIDEO_IRQ_STATUS |= 1;
-	verboselog(4, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
+	verboselog(5, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
 	const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
 	if (changed)
 		check_video_irq();
@@ -1030,7 +1036,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		case AUDIO_CHANNEL_STATUS:
-			verboselog(0, "audio_r: Channel Status: %04x\n", data);
+			verboselog(5, "audio_r: Channel Status: %04x\n", data);
 			break;
 
 		case AUDIO_WAVE_IN_L:
@@ -1230,6 +1236,8 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 						//printf("Stop not set, starting playback on channel %d, mask %04x\n", channel_bit, mask);
 						m_audio_regs[AUDIO_CHANNEL_STATUS] |= mask;
 						m_sample_addr[channel_bit] = get_wave_addr(channel_bit);
+						m_envelope_addr[channel_bit] = get_envelope_addr(channel_bit);
+						set_envelope_count(channel, get_envelope_load(channel));
 					}
 					m_adpcm[channel_bit].reset();
 					m_sample_shift[channel_bit] = 0;
@@ -1284,14 +1292,55 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 		}
 
 		case AUDIO_ENVCLK:
+		{
 			verboselog(0, "audio_w: Envelope Interval (lo): %04x\n", data);
+			const uint16_t old = m_audio_regs[offset];
 			m_audio_regs[offset] = data;
+			const uint16_t changed = old ^ m_audio_regs[offset];
+
+			if (!changed)
+			{
+				if (SPG_DEBUG_ENVELOPES) logerror("No change, %04x %04x %04x\n", old, data, m_audio_regs[offset]);
+				break;
+			}
+
+			for (uint8_t channel_bit = 0; channel_bit < 4; channel_bit++)
+			{
+				const uint8_t shift = channel_bit << 2;
+				const uint16_t mask = 0x0f << shift;
+				if (changed & mask)
+				{
+					m_envclk_frame[channel_bit] = get_envclk_frame_count(channel_bit);
+					if (SPG_DEBUG_ENVELOPES) logerror("envclk_frame %d: %08x\n", channel_bit, m_envclk_frame[channel_bit]);
+				}
+			}
 			break;
+		}
 
 		case AUDIO_ENVCLK_HIGH:
+		{
 			verboselog(0, "audio_w: Envelope Interval (hi): %04x\n", data);
+			const uint16_t old = m_audio_regs[offset];
 			m_audio_regs[offset] = data & AUDIO_ENVCLK_HIGH_MASK;
+			const uint16_t changed = old ^ m_audio_regs[offset];
+			if (!changed)
+			{
+				if (SPG_DEBUG_ENVELOPES) logerror("No change, %04x %04x %04x\n", old, data, m_audio_regs[offset]);
+				break;
+			}
+
+			for (uint8_t channel_bit = 0; channel_bit < 2; channel_bit++)
+			{
+				const uint8_t shift = channel_bit << 2;
+				const uint16_t mask = 0x0f << shift;
+				if (changed & mask)
+				{
+					m_envclk_frame[channel_bit + 4] = get_envclk_frame_count(channel_bit);
+					if (SPG_DEBUG_ENVELOPES) logerror("envclk_frame %d: %08x\n", channel_bit + 4, m_envclk_frame[channel_bit + 4]);
+				}
+			}
 			break;
+		}
 
 		case AUDIO_ENV_RAMP_DOWN:
 		{
@@ -1576,7 +1625,6 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		for (uint32_t ch_index = 0; ch_index < 6; ch_index++)
 		{
-			// TODO: Envelopes, volume, panning
 			if (!get_channel_status(ch_index))
 			{
 				continue;
@@ -1597,8 +1645,7 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					sample += prev_sample;
 				}
 
-				if (get_envelope_enable(ch_index))
-					sample = (sample * (int16_t)get_edd(ch_index)) >> 7;
+				sample = (sample * (int16_t)get_edd(ch_index)) >> 7;
 
 				active_count++;
 
@@ -1727,14 +1774,14 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 		{
 			if (tone_mode == AUDIO_TONE_MODE_HW_ONESHOT)
 			{
-				//printf("ADPCM stopped after %d samples\n", m_sample_count[channel]);
+				if (SPG_DEBUG_SAMPLES) logerror("ADPCM stopped after %d samples\n", m_sample_count[channel]);
 				m_sample_count[channel] = 0;
 				stop_channel(channel);
 				return false;
 			}
 			else
 			{
-				//printf("ADPCM looping after %d samples\n", m_sample_count[channel]);
+				if (SPG_DEBUG_SAMPLES) logerror("ADPCM looping after %d samples\n", m_sample_count[channel]);
 				m_sample_count[channel] = 0;
 				loop_channel(channel);
 			}
@@ -1748,14 +1795,14 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 		{
 			if (tone_mode == AUDIO_TONE_MODE_HW_ONESHOT)
 			{
-				//printf("16-bit PCM stopped after %d samples\n", m_sample_count[channel]);
+				if (SPG_DEBUG_SAMPLES) logerror("16-bit PCM stopped after %d samples\n", m_sample_count[channel]);
 				m_sample_count[channel] = 0;
 				stop_channel(channel);
 				return false;
 			}
 			else
 			{
-				//printf("16-bit PCM looping after %d samples\n", m_sample_count[channel]);
+				if (SPG_DEBUG_SAMPLES) logerror("16-bit PCM looping after %d samples\n", m_sample_count[channel]);
 				m_sample_count[channel] = 0;
 				loop_channel(channel);
 			}
@@ -1776,14 +1823,14 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 			{
 				if (tone_mode == AUDIO_TONE_MODE_HW_ONESHOT)
 				{
-					//printf("8-bit PCM stopped after %d samples\n", m_sample_count[channel]);
+					if (SPG_DEBUG_SAMPLES) logerror("8-bit PCM stopped after %d samples\n", m_sample_count[channel]);
 					m_sample_count[channel] = 0;
 					stop_channel(channel);
 					return false;
 				}
 				else
 				{
-					//printf("8-bit PCM looping after %d samples\n", m_sample_count[channel]);
+					if (SPG_DEBUG_SAMPLES) logerror("8-bit PCM looping after %d samples\n", m_sample_count[channel]);
 					m_sample_count[channel] = 0;
 					loop_channel(channel);
 				}
@@ -1806,20 +1853,40 @@ void spg2xx_device::audio_frame_tick()
 {
 	audio_beat_tick();
 
-	if (!m_audio_regs[AUDIO_ENV_RAMP_DOWN])
-		return;
-
+	address_space &space = m_cpu->space(AS_PROGRAM);
 	for (uint32_t channel = 0; channel < 6; channel++)
 	{
 		const uint16_t mask = (1 << channel);
-		if (!(m_audio_regs[AUDIO_ENV_RAMP_DOWN] & mask))
-			continue;
-
-		m_rampdown_frame[channel]--;
-		if (m_rampdown_frame[channel] == 0)
+		if (!(m_audio_regs[AUDIO_CHANNEL_STATUS] & mask))
 		{
-			//printf("Ticking rampdown for channel %d\n", channel);
-			audio_rampdown_tick(channel);
+			if (SPG_DEBUG_ENVELOPES) printf("Skipping channel 4 due to status\n");
+			continue;
+		}
+
+		if (m_audio_regs[AUDIO_ENV_RAMP_DOWN] & mask)
+		{
+			m_rampdown_frame[channel]--;
+			if (m_rampdown_frame[channel] == 0)
+			{
+				//printf("Ticking rampdown for channel %d\n", channel);
+				audio_rampdown_tick(channel);
+				continue;
+			}
+		}
+
+		if (!(m_audio_regs[AUDIO_CHANNEL_ENV_MODE] & mask))
+		{
+			m_envclk_frame[channel]--;
+			if (m_envclk_frame[channel] == 0)
+			{
+				if (SPG_DEBUG_ENVELOPES) logerror("Ticking envelope for channel %d\n", channel);
+				audio_envelope_tick(space, channel);
+				m_envclk_frame[channel] = get_envclk_frame_count(channel);
+			}
+		}
+		else if (SPG_DEBUG_ENVELOPES)
+		{
+			logerror("Not ticking envelope for channel %d\n", channel);
 		}
 	}
 }
@@ -1864,7 +1931,7 @@ void spg2xx_device::audio_rampdown_tick(const uint32_t channel)
 
 	if (new_edd)
 	{
-		//printf("Channel %d preparing for next rampdown step (%02x)\n", channel, new_edd);
+		if (SPG_DEBUG_ENVELOPES) logerror("Channel %d preparing for next rampdown step (%02x)\n", channel, new_edd);
 		const uint16_t channel_mask = channel << 4;
 		m_audio_regs[channel_mask | AUDIO_ENVELOPE_DATA] &= ~AUDIO_EDD_MASK;
 		m_audio_regs[channel_mask | AUDIO_ENVELOPE_DATA] |= new_edd & AUDIO_EDD_MASK;
@@ -1872,7 +1939,7 @@ void spg2xx_device::audio_rampdown_tick(const uint32_t channel)
 	}
 	else
 	{
-		//printf("Stopping channel %d due to rampdown\n", channel);
+		if (SPG_DEBUG_ENVELOPES) logerror("Stopping channel %d due to rampdown\n", channel);
 		const uint16_t channel_mask = 1 << channel;
 		m_audio_regs[AUDIO_CHANNEL_ENABLE] &= ~channel_mask;
 		m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~channel_mask;
@@ -1882,15 +1949,125 @@ void spg2xx_device::audio_rampdown_tick(const uint32_t channel)
 	}
 }
 
+const uint32_t spg2xx_device::s_rampdown_frame_counts[8] =
+{
+	13*4, 13*16, 13*64, 13*256, 13*1024, 13*4096, 13*8192, 13*8192
+};
+
 uint32_t spg2xx_device::get_rampdown_frame_count(const uint32_t channel)
 {
-	const uint16_t rampdown_clock = get_rampdown_clock(channel);
-	if (rampdown_clock >= 6)
+	return s_rampdown_frame_counts[get_rampdown_clock(channel)];
+}
+
+const uint32_t spg2xx_device::s_envclk_frame_counts[16] =
+{
+	4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 8192, 8192, 8192, 8192
+};
+
+uint32_t spg2xx_device::get_envclk_frame_count(const uint32_t channel)
+{
+	return s_envclk_frame_counts[get_envelope_clock(channel)];
+}
+
+uint32_t spg2xx_device::get_envelope_clock(const offs_t channel) const
+{
+	if (channel < 4)
+		return (m_audio_regs[AUDIO_ENVCLK] >> (channel << 2)) & 0x000f;
+	else
+		return (m_audio_regs[AUDIO_ENVCLK_HIGH] >> ((channel - 4) << 2)) & 0x000f;
+}
+
+void spg2xx_device::audio_envelope_tick(address_space &space, const uint32_t channel)
+{
+	const uint16_t channel_mask = channel << 4;
+	uint16_t new_count = get_envelope_count(channel);
+	const uint16_t curr_edd = get_edd(channel);
+	if (SPG_DEBUG_ENVELOPES) logerror("envelope %d tick, count is %04x, curr edd is %04x\n", channel, new_count, curr_edd);
+	if (new_count == 0)
 	{
-		return 13 * 8192;
+		const uint16_t target = get_envelope_target(channel);
+		uint16_t new_edd = curr_edd;
+		const uint16_t inc = get_envelope_inc(channel);
+
+		if (new_edd != target)
+		{
+			if (get_envelope_sign_bit(channel))
+			{
+				new_edd -= inc;
+				if (SPG_DEBUG_ENVELOPES) logerror("Envelope %d new EDD-: %04x (%04x), dec %04x\n", channel, new_edd, target, inc);
+				if (new_edd > curr_edd)
+					new_edd = 0;
+				else if (new_edd < target)
+					new_edd = target;
+
+				if (new_edd == 0)
+				{
+					if (SPG_DEBUG_ENVELOPES) logerror("Envelope %d at 0, stopping channel\n", channel);
+					stop_channel(channel);
+					return;
+				}
+			}
+			else
+			{
+				new_edd += inc;
+				if (SPG_DEBUG_ENVELOPES) logerror("Envelope %d new EDD+: %04x\n", channel, new_edd);
+				if (new_edd >= target)
+					new_edd = target;
+			}
+		}
+
+		if (new_edd == target)
+		{
+			if (SPG_DEBUG_ENVELOPES) logerror("Envelope %d at target %04x\n", channel, target);
+			new_edd = target;
+
+			if (get_envelope_repeat_bit(channel))
+			{
+				const uint16_t repeat_count = get_envelope_repeat_count(channel) - 1;
+				if (SPG_DEBUG_ENVELOPES) logerror("Repeating envelope, new repeat count %d\n", repeat_count);
+				if (repeat_count == 0)
+				{
+					m_audio_regs[channel_mask | AUDIO_ENVELOPE0] = space.read_word(m_envelope_addr[channel]);
+					m_audio_regs[channel_mask | AUDIO_ENVELOPE1] = space.read_word(m_envelope_addr[channel] + 1);
+					m_audio_regs[channel_mask | AUDIO_ENVELOPE_LOOP_CTRL] = space.read_word(m_envelope_addr[channel] + 2);
+					m_envelope_addr[channel] = get_envelope_addr(channel) + get_envelope_eaoffset(channel);
+					if (SPG_DEBUG_ENVELOPES) logerror("Envelope data after repeat: %04x %04x %04x (%08x)\n", m_audio_regs[channel_mask | AUDIO_ENVELOPE0], m_audio_regs[channel_mask | AUDIO_ENVELOPE1], m_audio_regs[channel_mask | AUDIO_ENVELOPE_LOOP_CTRL], m_envelope_addr[channel]);
+				}
+				else
+				{
+					set_envelope_repeat_count(channel, repeat_count);
+				}
+			}
+			else
+			{
+				if (SPG_DEBUG_ENVELOPES) logerror("Fetching envelope for channel %d from %08x\n", channel, m_envelope_addr[channel]);
+				m_audio_regs[channel_mask | AUDIO_ENVELOPE0] = space.read_word(m_envelope_addr[channel]);
+				m_audio_regs[channel_mask | AUDIO_ENVELOPE1] = space.read_word(m_envelope_addr[channel] + 1);
+				if (SPG_DEBUG_ENVELOPES) logerror("Fetched envelopes %04x %04x\n", m_audio_regs[channel_mask | AUDIO_ENVELOPE0], m_audio_regs[channel_mask | AUDIO_ENVELOPE1]);
+				m_envelope_addr[channel] += 2;
+			}
+			// FIXME: This makes things sound markedly worse even though the docs indicate
+			// the envelope count should be reloaded by the envelope load register! Why?
+			//set_envelope_count(channel, get_envelope_load(channel));
+		}
+		else
+		{
+			if (SPG_DEBUG_ENVELOPES) logerror("Envelope %d not yet at target %04x (%04x)\n", channel, target, new_edd);
+			// FIXME: This makes things sound markedly worse even though the docs indicate
+			// the envelope count should be reloaded by the envelope load register! So instead,
+			// we just reload with zero, which at least keeps the channels going. Why?
+			//new_count = get_envelope_load(channel);
+			set_envelope_count(channel, new_count);
+		}
+		if (SPG_DEBUG_ENVELOPES) logerror("Envelope %d new count %04x\n", channel, new_count);
+
+		set_edd(channel, new_edd);
+		if (SPG_DEBUG_ENVELOPES) logerror("Setting channel %d edd to %04x, register is %04x\n", channel, new_edd, m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA]);
 	}
 	else
 	{
-		return 13 * (4 << (rampdown_clock * 2));
+		new_count--;
+		set_envelope_count(channel, new_count);
 	}
+	if (SPG_DEBUG_ENVELOPES) logerror("envelope %d post-tick, count is now %04x, register is %04x\n", channel, new_count, m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA]);
 }
