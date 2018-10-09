@@ -178,23 +178,18 @@ void hp9k3xx_state::hp9k3xx_common(address_map &map)
 {
 	map(0x00000000, 0xffffffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
-
+	map(0x005f4000, 0x005f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
 	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
 
-	map(0x005f4000, 0x005f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
 }
 
 // 9000/310 - has onboard video that the graphics card used in other 3xxes conflicts with
 void hp9k3xx_state::hp9k310_map(address_map &map)
 {
+	map(0x000000, 0xffffff).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0).nopw();  // writes to 1fffc are the LED
-
-	map(0x510000, 0x510003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
-	map(0x538000, 0x538003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Graphics"
-	map(0x5c0000, 0x5c0003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no add-on FP coprocessor
-
+	map(0x5f4000, 0x5f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
 	map(0x5f8000, 0x5f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	map(0x600000, 0x7fffff).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // prevent reading invalid DIO slots
 	map(0x800000, 0xffffff).ram();
 }
 
