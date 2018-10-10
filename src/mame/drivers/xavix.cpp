@@ -247,39 +247,43 @@ WRITE8_MEMBER(xavix_state::main_w)
    this can't be correct, it breaks monster truck which expects ROM at 8000 even in the >0x800000 region, maybe code + data mappings need
    to be kept separate, with >0x800000 showing both ROM banks for code, but still having the zero page area etc. for data?
 
+   The code at 00EA84 in Ping Pong stores 8e to the data bank, reads 16 bit pointer from from 0000 + y (expecting it to come from zero page ram - value 3081) 
+   then reads data from 3081, pushes it to stack (which is expected to work) then sets data bank back to 00 (writes to ff, expecting it to work) then pulls
+   the value written and puts it in RAM.  Is stack actually still memory mapped at this point, or do stack operations always go to stack regardless?
+   Do reads return databank/codebank/stack, or only zero page? is zero page visibility maybe even conditional on how it gets used?
+
 */
 READ8_MEMBER(xavix_state::main2_r)
 {
 	if (offset & 0x8000)
 	{
 		return m_rgn[(offset) & (m_rgnlen - 1)];
-		// return m_lowbus->read8(space, offset&0x7fff);
-
 	}
 	else
 	{
-		if (offset>0x200)
+		if ((offset & 0xffff) >= 0x200)
+		{
 			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
 		else
-			return m_lowbus->read8(space, offset&0x7fff);
+			return m_lowbus->read8(space, offset & 0x7fff);
 	}
 }
 
 WRITE8_MEMBER(xavix_state::main2_w)
 {
-	/*
+
 	if (offset & 0x8000)
 	{
-		m_lowbus->write8(space, offset & 0x7fff, data);
+
 	}
 	else
 	{
-		if (offset>0x200)
+		if ((offset & 0xffff) >= 0x200)
 			logerror("write to ROM area?\n");
 		else
 			m_lowbus->write8(space, offset & 0x7fff, data);
 	}
-	*/
 }
 
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
@@ -529,7 +533,14 @@ static INPUT_PORTS_START( rad_crdn )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // can press this to get to a game select screen
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) 
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_crdnp )
@@ -588,10 +599,14 @@ static INPUT_PORTS_START( namcons2 )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Fire1?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Fire2?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Pause / Add Coins
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
 /* correct, 4bpp gfxs */
@@ -850,7 +865,7 @@ ROM_END
 
 /* Standalone TV Games */
 
-CONS( 2006, taitons1,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, taitons1,  0,          0,  xavix,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
 
 CONS( 2006, taitons2,  0,          0,  xavix,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_IS_SKELETON )
 
