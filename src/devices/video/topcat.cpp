@@ -24,10 +24,9 @@ topcat_device::topcat_device(const machine_config &mconfig, const char *tag, dev
 
 void topcat_device::device_start()
 {
+	m_int_write_func.resolve_safe();
 	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(topcat_device::cursor_callback), this));
 	m_cursor_timer->adjust(attotime::from_hz(3));
-
-	m_int_write_func.resolve_safe();
 
 	save_item(NAME(m_vblank));
 	save_item(NAME(m_wmove_active));
@@ -355,7 +354,6 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 	m_changed = true;
 	switch (offset) {
 	case TOPCAT_REG_VBLANK:
-		m_vblank = data;
 		break;
 	case TOPCAT_REG_WMOVE_ACTIVE:
 		break;
@@ -436,7 +434,7 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 		m_cursor_width = data;
 		break;
 	default:
-		logerror("unknown register: %02X = %04x\n", offset, data, mem_mask);
+		logerror("unknown register write: %02X = %04x (mask %04X)\n", offset, data, mem_mask);
 		break;
 	}
 }

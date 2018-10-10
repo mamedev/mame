@@ -33,29 +33,35 @@ MACHINE_CONFIG_START(dio16_98543_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dio16_98543_device, vblank_w));
+	MCFG_SCREEN_RAW_PARAMS(39504000, 1408, 0, 1024, 425, 0, 400);
 
-	MCFG_DEVICE_ADD("topcat0", TOPCAT, XTAL(35904000))
-	MCFG_TOPCAT_FB_WIDTH(1024)
-	MCFG_TOPCAT_FB_HEIGHT(400)
-	MCFG_TOPCAT_PLANEMASK(1)
+	topcat_device &topcat0(TOPCAT(config, "topcat0", XTAL(35904000)));
+	topcat0.set_fb_width(1024);
+	topcat0.set_fb_height(400);
+	topcat0.set_planemask(8);
+	topcat0.irq_out_cb().set(FUNC(dio16_98543_device::int0_w));
 
-	MCFG_DEVICE_ADD("topcat1", TOPCAT, XTAL(35904000))
-	MCFG_TOPCAT_FB_WIDTH(1024)
-	MCFG_TOPCAT_FB_HEIGHT(400)
-	MCFG_TOPCAT_PLANEMASK(2)
+	topcat_device &topcat1(TOPCAT(config, "topcat1", XTAL(35904000)));
+	topcat1.set_fb_width(1024);
+	topcat1.set_fb_height(400);
+	topcat1.set_planemask(8);
+	topcat1.irq_out_cb().set(FUNC(dio16_98543_device::int1_w));
 
-	MCFG_DEVICE_ADD("topcat2", TOPCAT, XTAL(35904000))
-	MCFG_TOPCAT_FB_WIDTH(1024)
-	MCFG_TOPCAT_FB_HEIGHT(400)
-	MCFG_TOPCAT_PLANEMASK(4)
+	topcat_device &topcat2(TOPCAT(config, "topcat2", XTAL(35904000)));
+	topcat2.set_fb_width(1024);
+	topcat2.set_fb_height(400);
+	topcat2.set_planemask(4);
+	topcat2.irq_out_cb().set(FUNC(dio16_98543_device::int2_w));
 
-	MCFG_DEVICE_ADD("topcat3", TOPCAT, XTAL(35904000))
-	MCFG_TOPCAT_FB_WIDTH(1024)
-	MCFG_TOPCAT_FB_HEIGHT(400)
-	MCFG_TOPCAT_PLANEMASK(8)
+	topcat_device &topcat3(TOPCAT(config, "topcat3", XTAL(35904000)));
+	topcat3.set_fb_width(1024);
+	topcat3.set_fb_height(400);
+	topcat3.set_planemask(8);
+	topcat3.irq_out_cb().set(FUNC(dio16_98543_device::int3_w));
 
-	MCFG_DEVICE_ADD("nereid", NEREID, 0)
+	NEREID(config, "nereid", 0);
 MACHINE_CONFIG_END
+
 const tiny_rom_entry *dio16_98543_device::device_rom_region() const
 {
 	return ROM_NAME(hp98543);
@@ -118,11 +124,15 @@ void dio16_98543_device::device_reset()
 
 READ16_MEMBER(dio16_98543_device::rom_r)
 {
+	if (offset == 1)
+		return m_intreg;
 	return 0xff00 | m_rom[offset];
 }
 
 WRITE16_MEMBER(dio16_98543_device::rom_w)
 {
+	if (offset == 1)
+		m_intreg = data;
 }
 
 READ16_MEMBER(dio16_98543_device::ctrl_r)
@@ -161,11 +171,54 @@ WRITE_LINE_MEMBER(dio16_98543_device::vblank_w)
 		tc->vblank_w(state);
 }
 
+WRITE_LINE_MEMBER(dio16_98543_device::int0_w)
+{
+	m_ints[0] = state;
+	update_int();
+}
+
+WRITE_LINE_MEMBER(dio16_98543_device::int1_w)
+{
+	m_ints[1] = state;
+	update_int();
+}
+
+WRITE_LINE_MEMBER(dio16_98543_device::int2_w)
+{
+	m_ints[2] = state;
+	update_int();
+}
+
+WRITE_LINE_MEMBER(dio16_98543_device::int3_w)
+{
+
+	m_ints[3] = state;
+	update_int();
+}
+
+
+void dio16_98543_device::update_int()
+{
+	bool state = m_ints[0] || m_ints[1] || m_ints[2] || m_ints[3];
+	int line = (m_intreg >> 3) & 7;
+
+	if (!(m_intreg & 0x80))
+		state = false;
+
+	irq1_out(line == 1 && state);
+	irq2_out(line == 2 && state);
+	irq3_out(line == 3 && state);
+	irq4_out(line == 4 && state);
+	irq5_out(line == 5 && state);
+	irq6_out(line == 6 && state);
+	irq7_out(line == 7 && state);
+}
+
 uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int startx[TOPCAT_COUNT], starty[TOPCAT_COUNT];
 	int endx[TOPCAT_COUNT], endy[TOPCAT_COUNT];
-
+	bool plane_enabled[TOPCAT_COUNT];
 	bool changed = false;
 
 	for (auto& tc: m_topcat)
@@ -174,8 +227,10 @@ uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	if (!changed)
 		return UPDATE_HAS_NOT_CHANGED;
 
-	for (int i = 0; i < TOPCAT_COUNT; i++)
+	for (int i = 0; i < TOPCAT_COUNT; i++) {
 		m_topcat[i]->get_cursor_pos(startx[i], starty[i], endx[i], endy[i]);
+		plane_enabled[i] = m_topcat[i]->plane_enabled();
+	}
 
 	for (int y = 0; y < m_v_pix; y++) {
 		uint32_t *scanline = &bitmap.pix32(y);
@@ -186,6 +241,8 @@ uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				if (y >= starty[i] && y <= endy[i] && x >= startx[i] && x <= endx[i]) {
 					tmp |= 1 << i;
 				}
+				if (!plane_enabled[i])
+					tmp &= ~(1 << i);
 			}
 			*scanline++ = m_nereid->map_color(tmp);
 		}
