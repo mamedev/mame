@@ -24,8 +24,8 @@ DEFINE_DEVICE_TYPE_NS(HPDIO_HUMAN_INTERFACE, bus::hp_dio, human_interface_device
 namespace bus {
 	namespace hp_dio {
 
-MACHINE_CONFIG_START(human_interface_device::device_add_mconfig)
-
+void human_interface_device::device_add_mconfig(machine_config &config)
+{
 	i8042_device &iocpu(I8042(config, "iocpu", XTAL(5'000'000)));
 	iocpu.set_addrmap(AS_PROGRAM, &human_interface_device::iocpu_map);
 	iocpu.p1_out_cb().set(FUNC(human_interface_device::iocpu_port1_w));
@@ -35,45 +35,51 @@ MACHINE_CONFIG_START(human_interface_device::device_add_mconfig)
 	iocpu.p2_in_cb().set_constant(0xdf);
 	iocpu.t1_in_cb().set_constant(1);
 
-	MCFG_DEVICE_ADD(m_mlc, HP_HIL_MLC, XTAL(8'000'000))
-	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_46021a")
+	HP_HIL_MLC(config, m_mlc, XTAL(8'000'000));
+	hp_hil_slot_device &keyboard(HP_HIL_SLOT(config, "hil1", 0));
+	hp_hil_devices(keyboard);
+	keyboard.set_default_option("hp_46021a");
+	keyboard.set_hp_hil_slot(this, "mlc");
+
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn76494", SN76494, 333333)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	sn76494_device &sound(SN76494(config, "sn76494", 333333));
+	sound.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_DEVICE_ADD("rtc", MSM58321, 32.768_kHz_XTAL)
-	MCFG_MSM58321_DEFAULT_24H(false)
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, human_interface_device, rtc_d0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, human_interface_device, rtc_d1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, human_interface_device, rtc_d2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, human_interface_device, rtc_d3_w))
+	msm58321_device &rtc(MSM58321(config, "rtc", 32.768_kHz_XTAL));
+	rtc.set_default_24h(false);
+	rtc.d0_handler().set(FUNC(human_interface_device::rtc_d0_w));
+	rtc.d1_handler().set(FUNC(human_interface_device::rtc_d1_w));
+	rtc.d2_handler().set(FUNC(human_interface_device::rtc_d2_w));
+	rtc.d3_handler().set(FUNC(human_interface_device::rtc_d3_w));
 
-	MCFG_DEVICE_ADD(m_tms9914, TMS9914, XTAL(5000000))
-	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, human_interface_device, gpib_irq));
-	MCFG_TMS9914_ACCRQ_WRITE_CB(WRITELINE(*this, human_interface_device, gpib_dreq));
-	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
-	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_eoi_w))
-	MCFG_TMS9914_DAV_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
-	MCFG_TMS9914_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_nrfd_w))
-	MCFG_TMS9914_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
-	MCFG_TMS9914_IFC_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ifc_w))
-	MCFG_TMS9914_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_srq_w))
-	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_atn_w))
-	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ren_w))
+	tms9914_device &gpib(TMS9914(config, "tms9914", XTAL(5'000'000)));
+	gpib.eoi_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	gpib.dav_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
+	gpib.nrfd_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
+	gpib.ndac_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
+	gpib.ifc_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
+	gpib.srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
+	gpib.atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	gpib.ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
+	gpib.dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
+	gpib.dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	gpib.int_write_cb().set(FUNC(human_interface_device::gpib_irq));
+	gpib.accrq_write_cb().set(FUNC(human_interface_device::gpib_dreq));
 
-	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9122c")
-	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
-	MCFG_IEEE488_BUS_ADD()
+	ieee488_device &ieee488(IEEE488(config, IEEE488_TAG, 0));
+	ieee488.eoi_callback().set(m_tms9914, FUNC(tms9914_device::eoi_w));
+	ieee488.dav_callback().set(m_tms9914, FUNC(tms9914_device::dav_w));
+	ieee488.nrfd_callback().set(m_tms9914, FUNC(tms9914_device::nrfd_w));
+	ieee488.ndac_callback().set(m_tms9914, FUNC(tms9914_device::ndac_w));
+	ieee488.ifc_callback().set(m_tms9914, FUNC(tms9914_device::ifc_w));
+	ieee488.srq_callback().set(m_tms9914, FUNC(tms9914_device::srq_w));
+	ieee488.atn_callback().set(m_tms9914, FUNC(tms9914_device::atn_w));
+	ieee488.ren_callback().set(m_tms9914, FUNC(tms9914_device::ren_w));
 
-	MCFG_IEEE488_EOI_CALLBACK(WRITELINE(m_tms9914, tms9914_device, eoi_w))
-	MCFG_IEEE488_DAV_CALLBACK(WRITELINE(m_tms9914, tms9914_device, dav_w))
-	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE(m_tms9914, tms9914_device, nrfd_w))
-	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ndac_w))
-	MCFG_IEEE488_IFC_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ifc_w))
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_tms9914, tms9914_device, srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, atn_w))
-	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ren_w))
-MACHINE_CONFIG_END
+	ieee488_slot_device &slot0(IEEE488_SLOT(config, "ieee0", 0));
+	hp_ieee488_devices(slot0);
+	slot0.set_default_option("hp9122c");
+}
 
 ROM_START(human_interface)
 	ROM_REGION(0x800 , "iocpu" , 0)
