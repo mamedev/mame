@@ -284,7 +284,6 @@ void hp9k3xx_state::machine_reset()
 void hp9k3xx_state::machine_start()
 {
 	m_bus_error_timer = timer_alloc(0);
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(hp9k3xx_state::cpu_reset), this));
 }
 
 void hp9k3xx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
