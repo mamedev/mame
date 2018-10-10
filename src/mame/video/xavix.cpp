@@ -239,7 +239,10 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 			// this is consistent with the top layer too
 			// should we draw as solid in solid layer?
 			if (tile == 0)
+			{
+				count++;
 				continue;
+			}
 
 			const int debug_packets = 0;
 			int test = 0;
