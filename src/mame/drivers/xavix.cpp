@@ -247,39 +247,43 @@ WRITE8_MEMBER(xavix_state::main_w)
    this can't be correct, it breaks monster truck which expects ROM at 8000 even in the >0x800000 region, maybe code + data mappings need
    to be kept separate, with >0x800000 showing both ROM banks for code, but still having the zero page area etc. for data?
 
+   The code at 00EA84 in Ping Pong stores 8e to the data bank, reads 16 bit pointer from from 0000 + y (expecting it to come from zero page ram - value 3081) 
+   then reads data from 3081, pushes it to stack (which is expected to work) then sets data bank back to 00 (writes to ff, expecting it to work) then pulls
+   the value written and puts it in RAM.  Is stack actually still memory mapped at this point, or do stack operations always go to stack regardless?
+   Do reads return databank/codebank/stack, or only zero page? is zero page visibility maybe even conditional on how it gets used?
+
 */
 READ8_MEMBER(xavix_state::main2_r)
 {
 	if (offset & 0x8000)
 	{
 		return m_rgn[(offset) & (m_rgnlen - 1)];
-		// return m_lowbus->read8(space, offset&0x7fff);
-
 	}
 	else
 	{
-		if (offset>0x200)
+		if ((offset & 0xffff) >= 0x200)
+		{
 			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
 		else
-			return m_lowbus->read8(space, offset&0x7fff);
+			return m_lowbus->read8(space, offset & 0x7fff);
 	}
 }
 
 WRITE8_MEMBER(xavix_state::main2_w)
 {
-	/*
+
 	if (offset & 0x8000)
 	{
-		m_lowbus->write8(space, offset & 0x7fff, data);
+
 	}
 	else
 	{
-		if (offset>0x200)
+		if ((offset & 0xffff) >= 0x200)
 			logerror("write to ROM area?\n");
 		else
 			m_lowbus->write8(space, offset & 0x7fff, data);
 	}
-	*/
 }
 
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
