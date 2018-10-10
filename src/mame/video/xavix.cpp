@@ -513,7 +513,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			ypos &= 0x7f;
 		}
 
-		ypos += 128 - 15;
+		ypos += 128 - 15 - 8;
 
 
 		int bpp = 1;
