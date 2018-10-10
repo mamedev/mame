@@ -92,6 +92,7 @@ private:
 	required_device<m68000_base_device> m_maincpu;
 
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	virtual void driver_start() override;
 
 	optional_shared_ptr<uint16_t> m_vram16;
@@ -100,6 +101,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 
 	DECLARE_READ16_MEMBER(buserror16_r);
 	DECLARE_WRITE16_MEMBER(buserror16_w);
@@ -128,7 +132,8 @@ private:
         DECLARE_WRITE_LINE_MEMBER(dio_irq6_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR); };
         DECLARE_WRITE_LINE_MEMBER(dio_irq7_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_7, state, M68K_INT_ACK_AUTOVECTOR); };
 
-	uint32_t m_lastpc;
+	bool m_bus_error;
+	emu_timer *m_bus_error_timer;
 };
 
 uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -262,6 +267,17 @@ void hp9k3xx_state::machine_reset()
 		m_maincpu->set_reset_callback(write_line_delegate(FUNC(bus::hp_dio::dio16_device::reset_in), dio));
 }
 
+void hp9k3xx_state::machine_start()
+{
+	m_bus_error_timer = timer_alloc(0);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(hp9k3xx_state::cpu_reset), this));
+}
+
+void hp9k3xx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_bus_error = false;
+}
+
 WRITE16_MEMBER(hp9k3xx_state::led_w)
 {
 	if (!(mem_mask & 0xff))
@@ -307,42 +323,41 @@ void hp9k3xx_state::add_dio32_bus(machine_config &config)
 	dio32.irq7_out_cb().set(FUNC(hp9k3xx_state::dio_irq7_w));
 }
 
+void hp9k3xx_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
+{
+	if (m_bus_error)
+		return;
+
+	m_bus_error = true;
+	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
+        m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
+}
 
 READ16_MEMBER(hp9k3xx_state::buserror16_r)
 {
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	m_lastpc = m_maincpu->pc();
-	return 0;
+	if (!machine().side_effects_disabled())
+		set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
+	return 0xffff;
 }
 
 WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
 {
-	if (m_lastpc == m_maincpu->pc()) {
-		logerror("%s: ignoring r-m-w double bus error\n", __FUNCTION__);
-		return;
-	}
-
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
 }
 
 READ32_MEMBER(hp9k3xx_state::buserror_r)
 {
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	m_lastpc = m_maincpu->pc();
-	return 0;
+	if (!machine().side_effects_disabled())
+		set_bus_error(offset << 2, false, mem_mask);
+	return 0xffffffff;
 }
 
 WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 {
-	if (m_lastpc == m_maincpu->pc()) {
-		logerror("%s: ignoring r-m-w double bus error\n", __FUNCTION__);
-		return;
-	}
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		set_bus_error(offset << 2, false, mem_mask);
 }
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k300)
