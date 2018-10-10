@@ -198,6 +198,9 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	if (tileregs[0x7] & 0x02)
 		alt_tileaddressing2 = 1;
 
+	if ((tileregs[0x7] & 0x7f) == 0x04)
+		alt_tileaddressing2 = 2;
+
 	/*
 	static int hackx = 1;
 
@@ -236,8 +239,10 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 			// only read the next byte if we're not in an 8-bit mode
 			if (((tileregs[0x7] & 0x7f) != 0x00) && ((tileregs[0x7] & 0x7f) != 0x08))
 				tile |= mainspace.read_byte((tileregs[0x1] << 8) + count) << 8;
-			
+		
 			// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
+			if (alt_tileaddressing2 == 2)
+				tile |= mainspace.read_byte((tileregs[0x2] << 8) + count) << 16;
 
 
 			bpp = (tileregs[0x3] & 0x0e) >> 1;
@@ -265,7 +270,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 			if (!alt_tileaddressing)
 			{
-				if (!alt_tileaddressing2)
+				if (alt_tileaddressing2 == 0)
 				{
 					// Tile Based Addressing takes into account Tile Sizes and bpp
 					const int offset_multiplier = (ytilesize * xtilesize)/8;
@@ -276,7 +281,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 					tile = tile * (offset_multiplier * bpp);
 					tile += gfxbase;
 				}
-				else
+				else if (alt_tileaddressing2 == 1)
 				{
 					// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
 					tile = tile * 8;
@@ -284,6 +289,11 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 					tile &= 0xffff;
 					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 					tile += gfxbase;
+				}
+				else if (alt_tileaddressing2 == 2)
+				{
+					// 24-bit addressing
+					tile |= 0x800000;
 				}
 
 				// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
@@ -718,7 +728,7 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 		---0 0001 (01) 16-bit addressing (Tile Number) (monster truck, ekara)
 		---0 0010 (02) 16-bit addressing (8-byte alignment Addressing Mode) (boxing)
 		---0 0011 (03) 16-bit addressing (Addressing Mode 2) 
-		---0 0100 (04) 24-bit addressing (Addressing Mode 2)
+		---0 0100 (04) 24-bit addressing (Addressing Mode 2) (epo_efdx)
 
 		---0 1000 (08) 8-bit+8 addressing  (Tile Number + 8-bit Attribute)
 		---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute) (Taito Nostalgia 2)
