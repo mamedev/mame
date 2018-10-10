@@ -114,14 +114,16 @@ protected:
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
+	virtual bool rtc_feature_leap_year() const override { return true; }
 
 private:
-	static const device_timer_id TIMER_CLOCK = 0;
-	static const device_timer_id TIMER_BUSY = 1;
+	static constexpr device_timer_id TIMER_CLOCK = 0;
+	static constexpr device_timer_id TIMER_BUSY = 1;
+	static constexpr device_timer_id TIMER_STANDARD = 2;
 
 	void update_input();
 	void update_output();
-
+	void update_standard();
 	inline int read_counter(int counter);
 	inline void write_counter(int counter, int value);
 
@@ -151,11 +153,14 @@ private:
 	int m_cs1;                  // chip select 1
 
 	uint8_t m_address;            // address latch
-	uint8_t m_reg[13];            // registers
+	std::array<uint8_t, 16> m_reg;            // registers
 
 	// timers
 	emu_timer *m_clock_timer;
 	emu_timer *m_busy_timer;
+	emu_timer *m_standard_timer;
+
+	int m_khz_ctr;
 };
 
 
