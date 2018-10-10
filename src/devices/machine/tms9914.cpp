@@ -285,6 +285,19 @@ WRITE8_MEMBER(tms9914_device::reg8_w)
 
 	case REG_W_DO:
 		m_reg_do = data;
+
+		if (m_next_eoi) {
+			m_next_eoi = false;
+			if (!m_swrst) {
+				if (m_t_eoi_state == FSM_T_ENIS) {
+					m_t_eoi_state = FSM_T_ENRS;
+				} else if (m_t_eoi_state == FSM_T_ENAS) {
+					m_t_eoi_state = FSM_T_ERAS;
+				}
+			}
+
+		}
+
 		set_accrq(false);
 		if (!m_swrst) {
 			BIT_CLR(m_reg_int0_status , REG_INT0_BO_BIT);
@@ -1131,6 +1144,7 @@ void tms9914_device::if_cmd_received(uint8_t if_cmd)
 void tms9914_device::dab_received(uint8_t dab , bool eoi)
 {
 	LOG("%.6f RX DAB:%02x/%d\n" , machine().time().as_double() , dab , eoi);
+	m_reg_di = dab;
 	if (!m_shdw) {
 		m_ah_anhs = true;
 		set_int0_bit(REG_INT0_BI_BIT);
@@ -1141,7 +1155,6 @@ void tms9914_device::dab_received(uint8_t dab , bool eoi)
 	if (m_hdfe && eoi) {
 		m_ah_aehs = true;
 	}
-	m_reg_di = dab;
 }
 
 void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
@@ -1219,13 +1232,7 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		break;
 
 	case AUXCMD_FEOI:
-		if (!m_swrst) {
-			if (m_t_eoi_state == FSM_T_ENIS) {
-				m_t_eoi_state = FSM_T_ENRS;
-			} else if (m_t_eoi_state == FSM_T_ENAS) {
-				m_t_eoi_state = FSM_T_ERAS;
-			}
-		}
+		m_next_eoi = true;
 		break;
 
 	case AUXCMD_LON:

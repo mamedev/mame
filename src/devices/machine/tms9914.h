@@ -303,6 +303,7 @@ private:
 	void update_ifc();
 	void update_ren();
 	void set_accrq(bool state);
+	bool m_next_eoi;
 };
 
 // device type definition
