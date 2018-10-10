@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, hap, R. Belmont
 /**
- * This driver describes Namco's System22 and Super System 22 hardware.
+ * This driver describes Namco's System22 and System Super22 hardware.
  *
  * driver provided with thanks to:
  * - hap
@@ -10,13 +10,48 @@
  * - trackmaster@gmx.net (Bjorn Sunder)
  * - team vivanonno
  *
- * TODO: (for video related issues, see video source file)
+ * TODO:
  * - finish slave DSP emulation
- * - emulate System 22 I/O board C74
+ * - emulate System22 I/O board C74
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit.
  * - alpinesa doesn't work, protection related?
  * - C139 for linked cabinets, as well as in RR fullscale
  * - confirm DSP and MCU clocks and their IRQ timing
+ * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
+ *       it used to be much worse with the legacy_poly_manager
+ * - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
+ * - improve ss22 fogging:
+ *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
+ *       + timecris submarine explosion
+ *       + aquajet underwater should show blue haze
+ *       + 100% fog if you start dirtdash at the hill level
+ * - improve ss22 lighting, eg. mountains in alpinr2b selection screen
+ * - improve ss22 spot: the bugs hint toward an extra bg layer bank?
+ *       + dirtdash spotlight is opaque for a short time when exiting the jungle level
+ *       + dirtdash speedometer has wrong colors when in the jungle level
+ *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
+ * - polygon layer stays visible sometimes when it shouldn't:
+ *       + cybrcomm/victlapw namco logo screen after attract demo
+ *       + airco22b title logo after attract demo
+ *       + aquajet namco logo/game over after ending
+ * - cybrcomm arrows(black part) should be below textlayer when a messagebox pops up
+ * - cybrcomm enemies should flash white when you shoot them, it's not poly fog
+ * - cybrcycc speed dial needle is missing
+ * - s22 background color control? see victlapw attract mode
+ * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors), and alpinr2b character selection screen
+ * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
+ * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
+ * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?
+ * - propcycl scoreboard sprite part should fade out in attract mode and just before game over, fader or fog related?
+ * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
+ *       czram contents is rather odd here and partly cleared (probably the cause?):
+ *        $0000-$0d7f - gradual increase from $00-$7c
+ *        $0d80-$0fff - $73, huh, why lower?
+ *        $1000-$19ff - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
+ *        $1a00-$0dff - $77
+ *        $1e00-$1fff - $78
+ *
+ * - lots of smaller issues
  *
  **********************************************************************************************************
  * Input
@@ -89,7 +124,7 @@
  * - some (typically racing) games may be linked together
  * - serial controller is C139 SCI (same as System21).
  *
- * "Super" System22
+ * System Super22
  * - different memory map
  * - different CPU controller register layout
  * - sound CPU uses external ROM (i.e. pr1data.8k) instead of internal BIOS (C74)
@@ -1235,7 +1270,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_sci_w)
 }
 
 
-/* system controller (super system22)
+/* system controller (ss22)
 
 0x00: vblank irq level
 0x01: hblank irq level
@@ -1709,8 +1744,8 @@ READ16_MEMBER(namcos22_state::namcos22_dipswitch_r)
 WRITE16_MEMBER(namcos22_state::namcos22_cpuleds_w)
 {
 	// 8 leds on cpu board, 0=on 1=off
-	// on system 22: two rows of 4 red leds
-	// on super system 22: GYRGYRGY green/yellow/red
+	// on System22: two rows of 4 red leds
+	// on SS22: GYRGYRGY green/yellow/red
 	for (int i = 0; i < 8; i++)
 		m_cpuled[i] = (~data << i & 0x80) ? 0 : 1;
 }
@@ -1732,7 +1767,7 @@ WRITE32_MEMBER(namcos22_state::namcos22s_chipselect_w)
 }
 
 
-// System 22
+// System22
 void namcos22_state::namcos22_am(address_map &map)
 {
 	/**
@@ -1936,7 +1971,7 @@ void namcos22_state::namcos22_am(address_map &map)
 }
 
 
-// Super System 22
+// System Super22
 void namcos22_state::namcos22s_am(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
@@ -2184,7 +2219,7 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 	* This presumably kickstarts the PDP(polygon display parser/processor?)
 	* It parses through the displaylist and sends commands to the 3D render device.
 	* In MAME, this main task is done in simulate_slavedsp instead. Ideally, we'd make the PDP a device with execute_run
-	* Super System 22 supports more than just "goto" and render commands, they are handled here.
+	* SS22 supports more than just "goto" and render commands, they are handled here.
 	*/
 	m_dsp_master_bioz = 1;
 	uint16_t offs = (m_is_ss22) ? pdp_polygonram_read(0x7fff) : m_pdp_base;
@@ -2632,7 +2667,7 @@ void namcos22_state::slave_dsp_io(address_map &map)
   000000-00027f: internal MCU registers and RAM
   002000-002fff: C352 PCM chip
   004000-00bfff: shared RAM with host CPU
-  00c000-00ffff: BIOS ROM (internal on System 22, external on Super)
+  00c000-00ffff: BIOS ROM (internal on System22, external on Super)
   200000-27ffff: data ROM
   301000-301001: watchdog?
   308000-308003: unknown (I/O?)
@@ -2651,7 +2686,7 @@ void namcos22_state::slave_dsp_io(address_map &map)
 
 */
 
-// System 22 37702
+// System22 37702
 
 READ8_MEMBER(namcos22_state::mcu_port4_s22_r)
 {
@@ -2693,7 +2728,7 @@ void namcos22_state::iomcu_s22_io(address_map &map)
 }
 
 
-// Super System 22 M37710
+// System Super22 M37710
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
 {
@@ -3602,7 +3637,7 @@ INPUT_PORTS_END
 
 /*********************************************************************************************/
 
-/* Super System22 supports a sprite layer.
+/* System Super22 supports a sprite layer.
  * Sprites are rendered as part of the polygon draw list, based on a per-sprite Z attribute.
  * Each sprite has explicit placement/color/zoom controls.
  */
@@ -3690,7 +3725,7 @@ void namcos22_state::machine_start()
 	m_portbits[1] = 0xffff;
 }
 
-// System 22
+// System22
 MACHINE_CONFIG_START(namcos22_state::namcos22)
 
 	/* basic machine hardware */
@@ -3759,7 +3794,7 @@ MACHINE_CONFIG_START(namcos22_state::cybrcomm)
 	MCFG_SOUND_ROUTE(3, "rear_right", 1.00)
 MACHINE_CONFIG_END
 
-// Super System 22
+// System Super22
 MACHINE_CONFIG_START(namcos22_state::namcos22s)
 
 	/* basic machine hardware */
@@ -5616,7 +5651,7 @@ void namcos22_state::init_dirtdash()
 /*********************************************************************************************/
 
 /*     YEAR, NAME,    PARENT,    MACHINE,   INPUT,     CLASS,          INIT,          MNTR, COMPANY, FULLNAME, FLAGS */
-/* System22 games */
+// System22 games
 GAME( 1993, ridgerac,  0,        namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR3, World)", MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
 GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World, 3-screen?)", MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, no indication that this really is a 3-screen version.
 GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2, World)", MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
@@ -5632,7 +5667,7 @@ GAME( 1995, raveracja, raveracw, namcos22,  raveracw,  namcos22_state, init_rave
 GAME( 1994, acedrvrw,  0,        namcos22,  acedrvr,   namcos22_state, init_acedrvr,  ROT0, "Namco", "Ace Driver: Racing Evolution (Rev. AD2, World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
 GAME( 1996, victlapw,  0,        namcos22,  victlap,   namcos22_state, init_victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:50:06
 
-/* Super System22 games */
+// System Super22 games
 GAME( 1994, alpinerd, 0,         alpine,    alpiner,   namcos22_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, alpinerc, alpinerd,  alpine,    alpiner,   namcos22_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, airco22b, 0,         airco22b,  airco22,   namcos22_state, init_airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_IMPERFECT_GRAPHICS )

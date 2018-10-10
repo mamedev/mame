@@ -1,41 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, hap, R. Belmont
-/**
- * video hardware for Namco System22
- *
- * TODO:
- * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
- *       it used to be much worse with the legacy_poly_manager
- * - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
- * - improve ss22 fogging:
- *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
- *       + 100% fog if you start dirtdash at the hill level
- * - improve ss22 lighting, eg. mountains in alpinr2b selection screen
- * - improve ss22 spot: the bugs hint toward an extra bg layer bank?
- *       + dirtdash spotlight is opaque for a short time when exiting the jungle level
- *       + dirtdash speedometer has wrong colors when in the jungle level
- *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
- * - polygon layer stays visible sometimes when it shouldn't:
- *       + cybrcomm/victlapw namco logo screen after attract demo
- *       + airco22b title logo after attract demo
- *       + aquajet namco logo/game over after ending
- * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors), and alpinr2b character selection screen
- * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
- * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
- * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?
- * - propcycl scoreboard sprite part should fade out in attract mode and just before game over, fader or fog related?
- * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
- *       czram contents is rather odd here and partly cleared (probably the cause?):
- *        $0000-$0d7f   - gradual increase from $00-$7c
- *        $0d80-$0fff   - $73, huh, why lower?
- *        $1000-$19ff   - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
- *        $1a00-$0dff   - $77
- *        $1e00-$1fff   - $78
- *
- * - lots of smaller issues
- *
- *
- *******************************/
+/*
+
+     Namco System22 + System Super22 video hardware emulation
+
+*/
 
 #include "emu.h"
 #include "includes/namcos22.h"
@@ -57,9 +26,6 @@ void namcos22_renderer::reset()
 	m_cliprect.set(0, 639, 0, 479);
 }
 
-
-
-/*********************************************************************************************/
 
 // poly scanline callbacks
 void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
@@ -1822,7 +1788,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_tilemapattr_w)
 {
 	/*
 	0.hiword    R/W     x offset
-	0.loword    R/W     y offset, bit 9 for interlacing?(cybrcomm, tokyowar)
+	0.loword    R/W     y offset
 	1.hiword    R/W     ??? always 0x006e?
 	1.loword    ?       unused?
 	2.hiword    R/W     posirq scanline? - not hooked up yet
@@ -1831,7 +1797,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_tilemapattr_w)
 	3.loword    R       ???
 	*/
 	COMBINE_DATA(&m_tilemapattr[offset]);
-//  popmessage("%08x\n%08x\n%08x\n%08x\n",m_tilemapattr[0],m_tilemapattr[1],m_tilemapattr[2],m_tilemapattr[3]);
+	//popmessage("%08x\n%08x\n%08x\n%08x\n",m_tilemapattr[0],m_tilemapattr[1],m_tilemapattr[2],m_tilemapattr[3]);
 }
 
 
@@ -2473,7 +2439,7 @@ void namcos22_state::init_tables()
 		}
 	}
 
-	// following setup is Namco System 22 specific
+	// following setup is System22 specific
 	switch (m_gametype)
 	{
 		case NAMCOS22_RIDGE_RACER:
