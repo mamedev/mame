@@ -295,8 +295,7 @@ void human_interface_device::dmack_w_in(int channel, uint8_t data)
 {
 	if (channel)
 		return;
-//	FIXME
-//	m_tms9914->reg8_w(memory_space(), 7, data);
+	m_tms9914->reg8_w(*program_space(), 7, data);
 }
 
 uint8_t human_interface_device::dmack_r_in(int channel)
