@@ -1695,7 +1695,7 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 	}
 
 	// pick a random number, but don't pick the same twice in a row
-	uint16_t old_rng = m_keycus_rng;
+	u16 old_rng = m_keycus_rng;
 	do
 	{
 		m_keycus_rng = machine().rand() & 0xffff;
@@ -1726,7 +1726,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_keycus_w)
  */
 READ16_MEMBER(namcos22_state::namcos22_portbit_r)
 {
-	uint16_t ret = m_portbits[offset] & 1;
+	u16 ret = m_portbits[offset] & 1;
 	m_portbits[offset] = m_portbits[offset] >> 1 | 0x8000;
 	return ret;
 }
@@ -2005,8 +2005,8 @@ void namcos22_state::namcos22s_am(address_map &map)
 // Time Crisis gun
 READ32_MEMBER(namcos22_state::namcos22_gun_r)
 {
-	uint16_t xpos = ioport("LIGHTX")->read();
-	uint16_t ypos = ioport("LIGHTY")->read();
+	int xpos = ioport("LIGHTX")->read();
+	int ypos = ioport("LIGHTY")->read();
 	// ypos is not completely understood yet, there should be a difference between case 1 and 2
 	// game determines real y = 430004 + 430008
 
@@ -2085,7 +2085,7 @@ void namcos22_state::slave_enable(bool enable)
 
 READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 {
-	uint32_t value = m_polygonram[offset];
+	u32 value = m_polygonram[offset];
 
 	switch (m_dspram_bank)
 	{
@@ -2106,14 +2106,14 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 			break;
 	}
 
-	return (uint16_t)value;
+	return value;
 }
 
 WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 {
-	uint32_t value = m_polygonram[offset];
-	uint16_t lo = value & 0xffff;
-	uint16_t hi = value >> 16;
+	u32 value = m_polygonram[offset];
+	u16 lo = value & 0xffff;
+	u16 hi = value >> 16;
 
 	switch (m_dspram_bank)
 	{
@@ -2143,7 +2143,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_dspram16_bank_w)
 }
 
 
-void namcos22_state::point_write(offs_t offs, uint32_t data)
+void namcos22_state::point_write(offs_t offs, u32 data)
 {
 	offs &= 0x00ffffff; /* 24 bit addressing */
 	if (m_is_ss22)
@@ -2158,10 +2158,10 @@ void namcos22_state::point_write(offs_t offs, uint32_t data)
 	}
 }
 
-int32_t namcos22_state::pointram_read(offs_t offs) // called from point_read
+s32 namcos22_state::pointram_read(offs_t offs) // called from point_read
 {
 	// point ram, only used in ram test?
-	int32_t result = 0;
+	s32 result = 0;
 	if (m_is_ss22)
 	{
 		if (offs >= 0xf80000 && offs < 0xfa0000)
@@ -2222,7 +2222,7 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 	* SS22 supports more than just "goto" and render commands, they are handled here.
 	*/
 	m_dsp_master_bioz = 1;
-	uint16_t offs = (m_is_ss22) ? pdp_polygonram_read(0x7fff) : m_pdp_base;
+	u16 offs = (m_is_ss22) ? pdp_polygonram_read(0x7fff) : m_pdp_base;
 
 	if (!m_is_ss22)
 		return 0;
@@ -2230,12 +2230,12 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 	for (;;)
 	{
 		offs &= 0x7fff;
-		uint16_t start = offs;
-		uint16_t cmd = pdp_polygonram_read(offs++);
-		uint32_t srcAddr;
-		uint32_t dstAddr;
-		uint32_t numWords;
-		uint32_t data;
+		u16 start = offs;
+		u16 cmd = pdp_polygonram_read(offs++);
+		u32 srcAddr;
+		u32 dstAddr;
+		u32 numWords;
+		u32 data;
 		switch (cmd)
 		{
 			case 0xfff0:
@@ -2789,7 +2789,7 @@ READ8_MEMBER(namcos22_state::mcu_port7_r)
 
 READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
 {
-	uint16_t adc = m_adc_ports[offset >> 1 & 7].read_safe(0) << 2;
+	u16 adc = m_adc_ports[offset >> 1 & 7].read_safe(0) << 2;
 	return (offset & 1) ? adc >> 8 : adc;
 }
 
@@ -2819,7 +2819,7 @@ void namcos22_state::mcu_io(address_map &map)
 // custom input handling
 
 /* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
-void namcos22_state::handle_coinage(uint16_t flags)
+void namcos22_state::handle_coinage(u16 flags)
 {
 	int coin_state = (flags & 0x1000) >> 12 | (flags & 0x0200) >> 8;
 
@@ -2842,10 +2842,10 @@ void namcos22_state::handle_driving_io()
 {
 	if (m_syscontrol[0x18] != 0)
 	{
-		uint16_t flags = ioport("INPUTS")->read();
-		uint16_t gas   = ioport("GAS")->read();
-		uint16_t brake = ioport("BRAKE")->read();
-		uint16_t steer = ioport("STEER")->read();
+		u16 flags = ioport("INPUTS")->read();
+		u16 gas   = ioport("GAS")->read();
+		u16 brake = ioport("BRAKE")->read();
+		u16 steer = ioport("STEER")->read();
 
 		switch (m_gametype)
 		{
@@ -2898,11 +2898,11 @@ void namcos22_state::handle_cybrcomm_io()
 {
 	if (m_syscontrol[0x18] != 0)
 	{
-		uint16_t flags = ioport("INPUTS")->read();
-		uint16_t volume0 = ioport("STICKY1")->read() * 0x10;
-		uint16_t volume1 = ioport("STICKY2")->read() * 0x10;
-		uint16_t volume2 = ioport("STICKX1")->read() * 0x10;
-		uint16_t volume3 = ioport("STICKX2")->read() * 0x10;
+		u16 flags = ioport("INPUTS")->read();
+		u16 volume0 = ioport("STICKY1")->read() * 0x10;
+		u16 volume1 = ioport("STICKY2")->read() * 0x10;
+		u16 volume2 = ioport("STICKX1")->read() * 0x10;
+		u16 volume3 = ioport("STICKX2")->read() * 0x10;
 
 		m_shareram[0x030/2] = flags;
 		m_shareram[0x032/2] = volume0;
@@ -2976,7 +2976,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 {
 	// arbitrary timer for reading optical pedal
-	uint8_t i = ioport("PEDAL")->read();
+	u8 i = ioport("PEDAL")->read();
 
 	if (i != 0)
 	{
@@ -3011,8 +3011,8 @@ TIMER_CALLBACK_MEMBER(namcos22_state::adillor_trackball_interrupt)
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 {
 	// arbitrary timer for reading optical trackball
-	uint8_t ix = ioport("TRACKX")->read();
-	uint8_t iy = ioport("TRACKY")->read();
+	u8 ix = ioport("TRACKX")->read();
+	u8 iy = ioport("TRACKY")->read();
 
 	if (ix != 0x80 || iy < 0x80)
 	{
@@ -5588,7 +5588,7 @@ void namcos22_state::init_airco22()
 
 void namcos22_state::init_propcycl()
 {
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
 	// patch out strange routine (uninitialized-eeprom related?)
 	// maybe needs more accurate 28C64 eeprom device emulation
