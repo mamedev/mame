@@ -12,7 +12,19 @@ inline void xavix_state::set_data_address(int address, int bit)
 
 inline uint8_t xavix_state::get_next_bit()
 {
-	uint8_t bit = m_rgn[m_tmp_dataaddress & (m_rgnlen - 1)];
+	uint8_t bit;
+	
+	// if bank is > 0x80, or address is >0x8000 it's a plain ROM read
+	if ((m_tmp_dataaddress >= 0x80000) || (m_tmp_dataaddress & 0x8000))
+	{
+		bit= m_rgn[m_tmp_dataaddress & (m_rgnlen - 1)];
+	}
+	else // otherwise we read from RAM etc.? (baseball 2 secret test mode relies on this as it puts 1bpp characters in RAM)
+	{
+		address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+		bit = m_lowbus->read8(mainspace, m_tmp_dataaddress & 0x7fff);
+	}
+
 	bit = bit >> m_tmp_databit;
 	bit &= 1;
 
@@ -220,7 +232,11 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 			// the register being 0 probably isn't the condition here
 			if (tileregs[0x0] != 0x00) tile |= mainspace.read_byte((tileregs[0x0] << 8) + count);
-			if (tileregs[0x1] != 0x00) tile |= mainspace.read_byte((tileregs[0x1] << 8) + count) << 8;
+			
+			// only read the next byte if we're not in an 8-bit mode
+			if (((tileregs[0x7] & 0x7f) != 0x00) && ((tileregs[0x7] & 0x7f) != 0x08))
+				tile |= mainspace.read_byte((tileregs[0x1] << 8) + count) << 8;
+			
 			// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
 
 
@@ -490,8 +506,14 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 			tile += gfxbase;
 		}
+		else
+		{
+			// ?? in 24-bit mode the upper bit isn't being set, which causes some things to be drawn from RAM instead
+			// which is not what we want at all. are the segment registers still involved even in this mode?
+			tile |= 0x800000;
+		}
 
-		/* coodrinates are signed, based on screen position 0,0 being at the center of the screen
+		/* coordinates are signed, based on screen position 0,0 being at the center of the screen
 		   tile addressing likewise, point 0,0 is center of tile?
 		   this makes the calculation a bit more annoying in terms of knowing when to apply offsets, when to wrap etc.
 		   this is likely still incorrect
@@ -597,7 +619,9 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	handle_palette(screen, bitmap, cliprect);
 
-	bitmap.fill(0, cliprect);
+	// monster truck & taito nostalgia 1 look worse with black pen, baseball 2 hidden test looks worse with forced pen 0
+	// probably depends on transparency etc.
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	draw_tilemap(screen,bitmap,cliprect,0);
 	draw_sprites(screen,bitmap,cliprect);
