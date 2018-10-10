@@ -607,9 +607,9 @@ static INPUT_PORTS_START( toypop )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, 0x80, "SWA:1" )
 
 	PORT_START("DSW2")  /* 56XX #1 pins 30-33 and 38-41 */
@@ -829,5 +829,5 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
-GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, empty_init, ROT0, "Namco", "Libble Rabble", 0 )
-GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, empty_init, ROT0, "Namco", "Toypop",        0 )
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, empty_init, ROT0,   "Namco", "Libble Rabble", 0 )
+GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, empty_init, ROT180, "Namco", "Toypop",        0 )
