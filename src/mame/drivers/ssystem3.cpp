@@ -291,7 +291,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(LCD_FRAMES_PER_SECOND);
+	screen.set_refresh_hz(30);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(728, 437);
 	screen.set_visarea(0, 728-1, 0, 437-1);
