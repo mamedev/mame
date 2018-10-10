@@ -217,15 +217,11 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 			int bpp, pal, scrolly, scrollx;
 			int tile = 0;
-			int extraattr = 0;
 
 			// the register being 0 probably isn't the condition here
 			if (tileregs[0x0] != 0x00) tile |= mainspace.read_byte((tileregs[0x0] << 8) + count);
 			if (tileregs[0x1] != 0x00) tile |= mainspace.read_byte((tileregs[0x1] << 8) + count) << 8;
-
-			// at the very least boxing leaves unwanted bits set in ram after changing between mode 0x8a and 0x82, expecting them to not be used
-			if (tileregs[0x7] & 0x08)
-				extraattr = mainspace.read_byte((tileregs[0x2] << 8) + count);
+			// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
 
 			count++;
 
@@ -264,20 +260,21 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 				}
 				else
 				{
-					// Addressing Mode 1 uses a fixed offset? (like sprites)
+					// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
 					tile = tile * 8;
 					basereg = (tile & 0x70000) >> 16;
 					tile &= 0xffff;
 					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 					tile += gfxbase;
+				}
 
-					// Tilemap specific mode extension with an 8-bit per tile attribute
-					if (tileregs[0x7] & 0x08)
-					{
-						// make use of the extraattr stuff?
-						pal = (extraattr & 0xf0)>>4;
-						// low bits are priority?
-					}
+				// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
+				if (tileregs[0x7] & 0x08)
+				{
+					uint8_t extraattr = mainspace.read_byte((tileregs[0x2] << 8) + count);
+					// make use of the extraattr stuff?
+					pal = (extraattr & 0xf0)>>4;
+					// low bits are priority?
 				}
 			}
 			else
@@ -393,7 +390,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 	else if (m_spritereg == 0x02)
 	{
-		// 16-bit addressing (Addressing Mode 1)
+		// 16-bit addressing (8-byte alignment Addressing Mode)
 		alt_addressing = 2;
 	}
 	else if (m_spritereg == 0x04)
@@ -477,7 +474,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			if (alt_addressing == 1)
 				tile = (tile * drawheight * drawwidth) / 2;
 
-			// Addressing Mode 1 uses a fixed offset?
+			// 8-byte alignment Addressing Mode uses a fixed offset?
 			if (alt_addressing == 2)
 				tile = tile * 8;
 
@@ -673,13 +670,13 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 	   modes are
 		---0 0000 (00) 8-bit addressing  (Tile Number)
 		---0 0001 (01) 16-bit addressing (Tile Number) (monster truck, ekara)
-		---0 0010 (02) 16-bit addressing (Addressing Mode 1) (boxing)
+		---0 0010 (02) 16-bit addressing (8-byte alignment Addressing Mode) (boxing)
 		---0 0011 (03) 16-bit addressing (Addressing Mode 2) 
 		---0 0100 (04) 24-bit addressing (Addressing Mode 2)
 
 		---0 1000 (08) 8-bit+8 addressing  (Tile Number + 8-bit Attribute)
-		---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute)
-		---0 1010 (0a) 16-bit+8 addressing (Addressing Mode 1 + 8-bit Attribute) (boxing, Snowboard)
+		---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute) (Taito Nostalgia 2)
+		---0 1010 (0a) 16-bit+8 addressing (8-byte alignment Addressing Mode + 8-bit Attribute) (boxing, Snowboard)
 		---0 1011 (0b) 16-bit+8 addressing (Addressing Mode 2 + 8-bit Attribute)
 
 		---1 0011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)  (monster truck)
@@ -689,7 +686,7 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 
 	if ((offset != 0x4) && (offset != 0x5))
 	{
-		logerror("%s: tmap1_regs_w offset %02x data %02x\n", machine().describe_context(), offset, data);
+		printf("%s: tmap1_regs_w offset %02x data %02x\n", machine().describe_context().c_str(), offset, data);
 	}
 
 	COMBINE_DATA(&m_tmap1_regs[offset]);
@@ -700,7 +697,7 @@ WRITE8_MEMBER(xavix_state::tmap2_regs_w)
 	// same as above but for 2nd tilemap
 	if ((offset != 0x4) && (offset != 0x5))
 	{
-		//logerror("%s: tmap2_regs_w offset %02x data %02x\n", machine().describe_context(), offset, data);
+		printf("%s: tmap2_regs_w offset %02x data %02x\n", machine().describe_context().c_str(), offset, data);
 	}
 
 	COMBINE_DATA(&m_tmap2_regs[offset]);
@@ -715,7 +712,7 @@ WRITE8_MEMBER(xavix_state::spriteregs_w)
 
 		---0 -000 (00) 8-bit addressing  (Tile Number)
 		---0 -001 (01) 16-bit addressing (Tile Number)
-		---0 -010 (02) 16-bit addressing (Addressing Mode 1)
+		---0 -010 (02) 16-bit addressing (8-byte alignment Addressing Mode)
 		---0 -011 (03) 16-bit addressing (Addressing Mode 2)
 		---0 -100 (04) 24-bit addressing (Addressing Mode 2)
 
