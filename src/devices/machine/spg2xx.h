@@ -75,12 +75,16 @@ protected:
 	void audio_frame_tick();
 	void audio_beat_tick();
 	void audio_rampdown_tick(const uint32_t channel);
-	uint32_t get_rampdown_frame_count(const uint32_t channel);
+	void audio_envelope_tick(address_space &space, const uint32_t channel);
+	inline uint32_t get_rampdown_frame_count(const uint32_t channel);
+	inline uint32_t get_envclk_frame_count(const uint32_t channel);
 
 	// Audio getters
 	inline bool get_channel_enable(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_ENABLE] & (1 << channel); }
 	inline bool get_channel_status(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_STATUS] & (1 << channel); }
-	inline bool get_envelope_enable(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_ENV_MODE] & (1 << channel); }
+	inline bool get_manual_envelope_enable(const offs_t channel) const { return m_audio_regs[AUDIO_CHANNEL_ENV_MODE] & (1 << channel); }
+	inline bool get_auto_envelope_enable(const offs_t channel) const { return !get_manual_envelope_enable(channel); }
+	uint32_t get_envelope_clock(const offs_t channel) const;
 
 	// Audio Mode getters
 	inline uint16_t get_wave_addr_high(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_WADDR_HIGH_MASK; }
@@ -102,11 +106,14 @@ protected:
 	// Audio Envelope Data getters
 	inline uint16_t get_edd(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA] & AUDIO_EDD_MASK; }
 	inline uint16_t get_envelope_count(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA] & AUDIO_ENVELOPE_COUNT_MASK) >> AUDIO_ENVELOPE_COUNT_SHIFT; }
+	inline void set_edd(const offs_t channel, uint8_t edd) { m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA] = (m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA] & ~AUDIO_EDD_MASK) | edd; }
+	inline void set_envelope_count(const offs_t channel, uint16_t count) { m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA] = get_edd(channel) | (count << AUDIO_ENVELOPE_COUNT_SHIFT); }
 
 	// Audio Envelope1 Data getters
 	inline uint16_t get_envelope_load(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_ENVELOPE1] & AUDIO_ENVELOPE_LOAD_MASK; }
 	inline uint16_t get_envelope_repeat_bit(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_ENVELOPE1] & AUDIO_ENVELOPE_RPT_MASK) ? 1 : 0; }
 	inline uint16_t get_envelope_repeat_count(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_ENVELOPE1] & AUDIO_ENVELOPE_RPCNT_MASK) >> AUDIO_ENVELOPE_RPCNT_SHIFT; }
+	inline void set_envelope_repeat_count(const offs_t channel, const uint16_t count) { m_audio_regs[(channel << 4) | AUDIO_ENVELOPE1] = (m_audio_regs[(channel << 4) | AUDIO_ENVELOPE1] & ~AUDIO_ENVELOPE_RPCNT_MASK) | ((count << AUDIO_ENVELOPE_RPCNT_SHIFT) & AUDIO_ENVELOPE_RPCNT_MASK); }
 
 	// Audio Envelope Address getters
 	inline uint16_t get_envelope_addr_high(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_ADDR_HIGH] & AUDIO_EADDR_HIGH_MASK; }
@@ -116,6 +123,7 @@ protected:
 	// Audio Envelope Loop getters
 	inline uint16_t get_envelope_eaoffset(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_LOOP_CTRL] & AUDIO_EAOFFSET_MASK; }
 	inline uint16_t get_rampdown_offset(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_LOOP_CTRL] & AUDIO_RAMPDOWN_OFFSET_MASK) >> AUDIO_RAMPDOWN_OFFSET_SHIFT; }
+	inline void set_envelope_eaoffset(const offs_t channel, uint16_t eaoffset) { m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_LOOP_CTRL] = (m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_LOOP_CTRL] & ~AUDIO_RAMPDOWN_OFFSET_MASK) | (eaoffset & AUDIO_EAOFFSET_MASK); }
 
 	// Audio ADPCM getters
 	inline uint16_t get_point_number(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_ADPCM_SEL] & AUDIO_POINT_NUMBER_MASK) >> AUDIO_POINT_NUMBER_SHIFT; }
@@ -138,6 +146,7 @@ protected:
 	inline uint32_t get_target_phase(const offs_t channel) const { return ((uint32_t)get_target_phase_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_TARGET_PHASE]; }
 	inline uint32_t get_wave_addr(const offs_t channel) const { return ((uint32_t)get_wave_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_WAVE_ADDR]; }
 	inline uint32_t get_loop_addr(const offs_t channel) const { return ((uint32_t)get_loop_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_LOOP_ADDR]; }
+	inline uint32_t get_envelope_addr(const offs_t channel) const { return ((uint32_t)get_envelope_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_ADDR]; }
 
 	enum
 	{
@@ -402,6 +411,8 @@ protected:
 	double m_channel_rate[6];
 	double m_channel_rate_accum[6];
 	uint32_t m_rampdown_frame[6];
+	uint32_t m_envclk_frame[6];
+	uint32_t m_envelope_addr[6];
 	uint16_t m_audio_curr_beat_base_count;
 
 	uint16_t m_video_regs[0x100];
@@ -434,6 +445,9 @@ protected:
 	required_shared_ptr<uint16_t> m_scrollram;
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_spriteram;
+
+	static const uint32_t s_rampdown_frame_counts[8];
+	static const uint32_t s_envclk_frame_counts[16];
 };
 
 class spg24x_device : public spg2xx_device

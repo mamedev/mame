@@ -1317,10 +1317,6 @@ WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
 		// reset mcu
 		case 0x16:
 			m_mcu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
-
-			// timecris POST "SUBCPU START WAIT" needs high interleave
-			if (data && m_gametype == NAMCOS22_TIME_CRISIS)
-				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(150));
 			break;
 
 		// dsp control
@@ -3797,6 +3793,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_DEVICE_PROGRAM_MAP(mcu_program)
 	MCFG_DEVICE_IO_MAP(mcu_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_irq", namcos22_state, mcu_irq, "screen", 0, 240)
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // erratic inputs otherwise, probably mcu vs maincpu shareram
 
 	EEPROM_2864(config, "eeprom");
 

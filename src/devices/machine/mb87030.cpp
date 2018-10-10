@@ -6,7 +6,7 @@
 #include "logmacro.h"
 #include "mb87030.h"
 
-DEFINE_DEVICE_TYPE(MB87030, mb87030_device, "MB87030", "Fujitsu MB87030 SCSI controller")
+DEFINE_DEVICE_TYPE(MB87030, mb87030_device, "mb87030", "Fujitsu MB87030 SCSI controller")
 
 mb87030_device::mb87030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		mb87030_device(mconfig, MB87030, tag, owner, clock)
