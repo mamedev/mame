@@ -619,9 +619,10 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	handle_palette(screen, bitmap, cliprect);
 
-	// monster truck & taito nostalgia 1 look worse with black pen, baseball 2 hidden test looks worse with forced pen 0
+	// monster truck, taito nostalgia 1, madden and more look worse with black pen, baseball 2 hidden test mode looks worse with forced pen 0
 	// probably depends on transparency etc.
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	//bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(0, cliprect);
 
 	draw_tilemap(screen,bitmap,cliprect,0);
 	draw_sprites(screen,bitmap,cliprect);
