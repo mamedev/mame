@@ -134,6 +134,7 @@ private:
 	void update_and_log(u16& reg, u16 newValue, const char* register_name);
 
 	emu_timer *m_dma_timer;
+	emu_timer *m_451_timer;
 
 	devcb_read8 m_m68k_r_cb;
 	devcb_write8 m_m68k_w_cb;
