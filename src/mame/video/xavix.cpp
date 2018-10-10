@@ -223,7 +223,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 			if (tileregs[0x1] != 0x00) tile |= mainspace.read_byte((tileregs[0x1] << 8) + count) << 8;
 			// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
 
-			count++;
 
 			bpp = (tileregs[0x3] & 0x0e) >> 1;
 			bpp++;
@@ -374,6 +373,8 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-y
 			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-x
 			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-y and x
+		
+			count++;
 		}
 	}
 	
@@ -517,10 +518,10 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		bpp = (attr0 & 0x0e) >> 1;
 		bpp += 1;
 
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos + ypos_adjust, drawheight, drawwidth, flipx, 0, pal, 0);
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos + ypos_adjust, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - 256 + ypos_adjust, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-y
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - 256 + ypos_adjust, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x,y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - ypos_adjust, drawheight, drawwidth, flipx, 0, pal, 0);
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - ypos_adjust, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x,y
 
 		/*
 		if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
