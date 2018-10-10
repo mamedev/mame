@@ -45,14 +45,17 @@ public:
 private:
 
 	WRITE_LINE_MEMBER(vblank_w);
+	WRITE_LINE_MEMBER(int_w);
+
 	static constexpr int m_v_pix = 768;
 	static constexpr int m_h_pix = 1024;
 
 	const address_space_config m_space_config;
 	void map(address_map &map);
-
 	required_region_ptr<uint8_t> m_rom;
 	required_shared_ptr<uint8_t> m_vram;
+
+	uint8_t m_intreg;
 };
 
 } // namespace bus::hp_dio
