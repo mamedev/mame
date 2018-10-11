@@ -442,7 +442,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		uint8_t* spr_attr1 = m_fragment_sprite + 0x100;
 		uint8_t* spr_ypos = m_fragment_sprite + 0x200;
 		uint8_t* spr_xpos = m_fragment_sprite + 0x300;
-		// + 0x400
+		uint8_t* spr_xposh = m_fragment_sprite + 0x400;
 		uint8_t* spr_addr_lo = m_fragment_sprite + 0x500;
 		uint8_t* spr_addr_md = m_fragment_sprite + 0x600;
 		uint8_t* spr_addr_hi = m_fragment_sprite + 0x700;
@@ -457,7 +457,19 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		int ypos = spr_ypos[i];
 		int xpos = spr_xpos[i];
-		int tile = (spr_addr_hi[i] << 16) | (spr_addr_md[i] << 8) | spr_addr_lo[i];
+		int tile = 0;
+		
+		// high 8-bits only used in 24-bit mode
+		if (((m_spritereg & 0x7f) == 0x04) || ((m_spritereg & 0x7f) == 0x15))
+			tile |= (spr_addr_hi[i] << 16);
+		
+		// mid 8-bits used in everything except 8-bit mode
+		if ((m_spritereg & 0x7f) != 0x00)
+			tile |= (spr_addr_md[i] << 8);
+		
+		// low 8-bits always read
+		tile |= spr_addr_lo[i];
+		
 		int attr0 = spr_attr0[i];
 		int attr1 = spr_attr1[i];
 
@@ -530,11 +542,29 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		   this makes the calculation a bit more annoying in terms of knowing when to apply offsets, when to wrap etc.
 		   this is likely still incorrect
 		   
-		   I think there is also an additional x bit
-		   */
+		   Use of additional x-bit is very confusing rad_snow, taitons1 (ingame) etc. clearly need to use it
+		   but the taitons1 xavix logo doesn't even initialize the RAM for it and behavior conflicts with ingame?
+		   maybe only works with certain tile sizes?
 
-		xpos -= 136;
-		xpos &= 0xff;
+		   some code even suggests this should be bit 0 of attr0, but it never gets set there
+
+		   */
+		int xposh = spr_xposh[i]&1;
+
+		if (xpos & 0x80)
+		{
+			xpos &=0x7f;
+			xpos = -0x80+xpos;
+		}
+		else
+		{
+			xpos &= 0x7f;
+
+			if (xposh)
+				xpos += 0x80;
+		}
+
+		xpos += 128 - 8;
 
 		ypos ^= 0xff;
 
@@ -556,9 +586,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		bpp += 1;
 
 		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0, zval);
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0, zval); // wrap-x
 		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0, zval); // wrap-y
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0, zval); // wrap-x,y
 
 		/*
 		if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))

@@ -460,6 +460,12 @@ void xavix_state::machine_reset()
 		m_txarray[i] = 0x00;
 	}
 
+	for (int i = 0; i < 0x800; i++)
+	{
+		// taito nostalgia 1 never initializes the ram at 0x6400 but there's no condition on using it at present?
+		m_fragment_sprite[i] = 0x00;
+	}
+
 	m_lowbus->set_bank(0);
 }
 
