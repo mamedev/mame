@@ -193,8 +193,6 @@ protected:
 
 	int                     m_device_id;
 	uint16_t                m_device_id16;
-	bool                    m_powerup;
-	bool                    m_passthru;
 
 private:
 	device_hp_hil_interface *m_next;

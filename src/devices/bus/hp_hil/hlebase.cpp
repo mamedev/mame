@@ -42,6 +42,10 @@ hle_device_base::~hle_device_base()
 
 void hle_device_base::device_start()
 {
+
+	save_item(NAME(m_powerup));
+	save_item(NAME(m_passthru));
+
 	set_hp_hil_mlc_device();
 
 	m_powerup = true;

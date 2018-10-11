@@ -33,8 +33,10 @@ protected:
 	virtual int hil_poll() = 0;
 private:
 
-
 	util::fifo<uint8_t, 8> m_fifo;
+
+	bool m_powerup;
+	bool m_passthru;
 };
 
 } // namespace bus::hp_hil

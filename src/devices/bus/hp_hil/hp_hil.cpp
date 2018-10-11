@@ -76,6 +76,13 @@ void hp_hil_mlc_device::device_start()
 	// resolve callbacks
 	int_cb.resolve_safe();
 	nmi_cb.resolve_safe();
+
+	save_item(NAME(m_r2));
+	save_item(NAME(m_r3));
+	save_item(NAME(m_w1));
+	save_item(NAME(m_w2));
+	save_item(NAME(m_w3));
+	save_item(NAME(m_loop));
 }
 
 
@@ -105,6 +112,7 @@ WRITE8_MEMBER(hp_hil_mlc_device::write)
 
 		if (m_loop & 2) // no devices on 2nd link loop
 			return;
+
 		if (m_loop == 0)
 		{
 			if (!m_fifo.full()) {
@@ -239,7 +247,6 @@ device_hp_hil_interface::device_hp_hil_interface(const machine_config &mconfig, 
 	, m_next(nullptr)
 {
 }
-
 
 //-------------------------------------------------
 //  ~device_hp_hil_interface - destructor
