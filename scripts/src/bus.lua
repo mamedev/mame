@@ -1379,6 +1379,8 @@ if (BUSES["PC_KBD"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc_kbd/pcat84.h",
 		MAME_DIR .. "src/devices/bus/pc_kbd/pcxt83.cpp",
 		MAME_DIR .. "src/devices/bus/pc_kbd/pcxt83.h",
+		MAME_DIR .. "src/devices/bus/pc_kbd/pcat101.cpp",
+		MAME_DIR .. "src/devices/bus/pc_kbd/pcat101.h",
 	}
 end
 
