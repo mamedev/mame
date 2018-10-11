@@ -485,12 +485,14 @@ static INPUT_PORTS_START( xavix )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
+/*
 static INPUT_PORTS_START( xavixp )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("REGION") // PAL/NTSC flag
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
+*/
 
 /* Test mode lists the following
 
@@ -571,6 +573,22 @@ static INPUT_PORTS_START( rad_boxp )
 
 	PORT_MODIFY("REGION") // PAL/NTSC flag
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_bass )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_bassp )
+	PORT_INCLUDE(rad_bass)
+
+	PORT_MODIFY("REGION") // PAL/NTSC flag
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -910,8 +928,8 @@ CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_xavix
 
 CONS( 2002, rad_bb2,   0,          0,  xavix,  rad_bb2,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bass,  0,          0,  xavix,  rad_bass, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
 CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
