@@ -296,8 +296,7 @@ void xavix_state::xavix_map(address_map &map)
 
 void xavix_state::xavix_lowbus_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x3fff).ram().share("mainram");
+	map(0x0000, 0x3fff).ram().share("mainram");
 
 	// Memory Emulator / Text Array
 	map(0x4000, 0x4fff).rw(FUNC(xavix_state::xavix_memoryemu_txarray_r), FUNC(xavix_state::xavix_memoryemu_txarray_w));

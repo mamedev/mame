@@ -476,6 +476,12 @@ void xavix_state::machine_reset()
 		m_fragment_sprite[i] = 0x00;
 	}
 
+	for (int i = 0; i < 0x4000; i++)
+	{
+		// card night expects RAM to be initialized to 0xff or it will show the pause menu over the startup graphics?!
+		m_mainram[i] = 0xff;
+	}
+
 	m_lowbus->set_bank(0);
 }
 
