@@ -20,6 +20,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
+		m_rom_dma_src(*this,"rom_dma_src"),
+		m_rom_dma_dst(*this,"rom_dma_dst"),
+		m_rom_dma_len(*this,"rom_dma_len"),
 		m_palram_sh(*this, "palram_sh"),
 		m_palram_l(*this, "palram_l"),
 		m_colmix_sh(*this, "colmix_sh"),
@@ -75,17 +78,11 @@ private:
 
 	DECLARE_WRITE8_MEMBER(rom_dmatrg_w);
 
-	DECLARE_READ8_MEMBER(rom_dmasrc_lo_r);
-	DECLARE_READ8_MEMBER(rom_dmasrc_md_r);
-	DECLARE_READ8_MEMBER(rom_dmasrc_hi_r);
-	DECLARE_WRITE8_MEMBER(rom_dmasrc_lo_w);
-	DECLARE_WRITE8_MEMBER(rom_dmasrc_md_w);
-	DECLARE_WRITE8_MEMBER(rom_dmasrc_hi_w);
-	DECLARE_WRITE8_MEMBER(rom_dmadst_lo_w);
-	DECLARE_WRITE8_MEMBER(rom_dmadst_hi_w);
-	DECLARE_WRITE8_MEMBER(rom_dmalen_lo_w);
-	DECLARE_WRITE8_MEMBER(rom_dmalen_hi_w);
-	DECLARE_READ8_MEMBER(rom_dmatrg_r);
+	DECLARE_WRITE8_MEMBER(rom_dmasrc_w);
+
+	DECLARE_WRITE8_MEMBER(rom_dmadst_w);
+	DECLARE_WRITE8_MEMBER(rom_dmalen_w);
+	DECLARE_READ8_MEMBER(rom_dmastat_r);
 
 	DECLARE_WRITE8_MEMBER(spritefragment_dma_params_1_w);
 	DECLARE_WRITE8_MEMBER(spritefragment_dma_params_2_w);
@@ -184,17 +181,7 @@ private:
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
 	required_device<cpu_device> m_maincpu;
-
-	uint8_t m_rom_dmasrc_lo_data;
-	uint8_t m_rom_dmasrc_md_data;
-	uint8_t m_rom_dmasrc_hi_data;
-
-	uint8_t m_rom_dmadst_lo_data;
-	uint8_t m_rom_dmadst_hi_data;
-
-	uint8_t m_rom_dmalen_lo_data;
-	uint8_t m_rom_dmalen_hi_data;
-
+	
 	uint8_t m_vectorenable;
 	uint8_t m_irq_vector0_lo_data;
 	uint8_t m_irq_vector0_hi_data;
@@ -223,8 +210,10 @@ private:
 	int16_t get_vectors(int which, int half);
 
 	required_shared_ptr<uint8_t> m_mainram;
-
 	required_shared_ptr<uint8_t> m_fragment_sprite;
+	required_shared_ptr<uint8_t> m_rom_dma_src;
+	required_shared_ptr<uint8_t> m_rom_dma_dst;
+	required_shared_ptr<uint8_t> m_rom_dma_len;
 
 	required_shared_ptr<uint8_t> m_palram_sh;
 	required_shared_ptr<uint8_t> m_palram_l;

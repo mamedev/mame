@@ -351,7 +351,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// Sound Control
 	map(0x75f0, 0x75f0).rw(FUNC(xavix_state::sound_75f0_r), FUNC(xavix_state::sound_75f0_w)); // r/w tested read/written 8 times in a row
 	map(0x75f1, 0x75f1).rw(FUNC(xavix_state::sound_75f1_r), FUNC(xavix_state::sound_75f1_w)); // r/w tested read/written 8 times in a row
-	map(0x75f3, 0x75f3).ram();
+	map(0x75f2, 0x75f3).ram();
 	map(0x75f4, 0x75f4).r(FUNC(xavix_state::sound_75f4_r)); // related to 75f0 (read after writing there - rad_mtrk)
 	map(0x75f5, 0x75f5).r(FUNC(xavix_state::sound_75f5_r)); // related to 75f1 (read after writing there - rad_mtrk)
 	// taitons1 after 75f7/75f8
@@ -379,20 +379,16 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7902, 0x7902).w(FUNC(xavix_state::extintrf_7902_w));
 
 	// DMA Controller
-	map(0x7980, 0x7980).rw(FUNC(xavix_state::rom_dmatrg_r), FUNC(xavix_state::rom_dmatrg_w));
-	map(0x7981, 0x7981).rw(FUNC(xavix_state::rom_dmasrc_lo_r), FUNC(xavix_state::rom_dmasrc_lo_w)); 	// DMA source
-	map(0x7982, 0x7982).rw(FUNC(xavix_state::rom_dmasrc_md_r), FUNC(xavix_state::rom_dmasrc_md_w));
-	map(0x7983, 0x7983).rw(FUNC(xavix_state::rom_dmasrc_hi_r), FUNC(xavix_state::rom_dmasrc_hi_w));
-	map(0x7984, 0x7984).w(FUNC(xavix_state::rom_dmadst_lo_w)); 	// DMA dest
-	map(0x7985, 0x7985).w(FUNC(xavix_state::rom_dmadst_hi_w));
-	map(0x7986, 0x7986).w(FUNC(xavix_state::rom_dmalen_lo_w)); 	// DMA length
-	map(0x7987, 0x7987).w(FUNC(xavix_state::rom_dmalen_hi_w));
+	map(0x7980, 0x7980).rw(FUNC(xavix_state::rom_dmastat_r), FUNC(xavix_state::rom_dmatrg_w));
+	map(0x7981, 0x7983).ram().w(FUNC(xavix_state::rom_dmasrc_w)).share("rom_dma_src");
+	map(0x7984, 0x7985).ram().w(FUNC(xavix_state::rom_dmadst_w)).share("rom_dma_dst");
+	map(0x7986, 0x7987).ram().w(FUNC(xavix_state::rom_dmalen_w)).share("rom_dma_len");
 
 	// IO Ports
 	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::io_0_r),FUNC(xavix_state::io_0_w));
-	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io_1_r),FUNC(xavix_state::io_1_w)); // startup (taitons1)
-	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io_2_r),FUNC(xavix_state::io_2_w)); // startup, gets set to 20, 7a00 is then also written with 20
-	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io_3_r),FUNC(xavix_state::io_3_w)); // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
+	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io_1_r),FUNC(xavix_state::io_1_w));
+	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io_2_r),FUNC(xavix_state::io_2_w));
+	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io_3_r),FUNC(xavix_state::io_3_w));
 
 	// Interrupt control registers
 	map(0x7a80, 0x7a80).w(FUNC(xavix_state::xavix_7a80_w)); // still IO? ADC related?
@@ -427,6 +423,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::irq_vector0_lo_w)); // an IRQ vector (nmi?)
 	map(0x7ffb, 0x7ffb).w(FUNC(xavix_state::irq_vector0_hi_w));
 	map(0x7ffc, 0x7ffc).rw(FUNC(xavix_state::irq_source_r), FUNC(xavix_state::irq_source_w));
+	// map(0x7ffd, 0x7ffd) some of the Nostalgia games read here, why?
 	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector1_lo_w)); // an IRQ vector (irq?)
 	map(0x7fff, 0x7fff).w(FUNC(xavix_state::irq_vector1_hi_w));
 }

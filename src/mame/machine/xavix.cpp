@@ -11,9 +11,9 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 	{
 		logerror("%s: rom_dmatrg_w (do DMA?) %02x\n", machine().describe_context(), data);
 
-		uint32_t source = (m_rom_dmasrc_hi_data << 16) | (m_rom_dmasrc_md_data << 8) | m_rom_dmasrc_lo_data;
-		uint16_t dest = (m_rom_dmadst_hi_data << 8) | m_rom_dmadst_lo_data;
-		uint16_t len = (m_rom_dmalen_hi_data << 8) | m_rom_dmalen_lo_data;
+		uint32_t source = (m_rom_dma_src[2] << 16) | (m_rom_dma_src[1] << 8) | m_rom_dma_src[0];
+		uint16_t dest = (m_rom_dma_dst[1] << 8) | m_rom_dma_dst[0];
+		uint16_t len = (m_rom_dma_len[1] << 8) | m_rom_dma_len[0];
 
 		logerror("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
 
@@ -48,72 +48,29 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 }
 
 
-// has_wamg expects to read the registers to perform calcs on them
-READ8_MEMBER(xavix_state::rom_dmasrc_lo_r)
+WRITE8_MEMBER(xavix_state::rom_dmasrc_w)
 {
-	return m_rom_dmasrc_lo_data;
+	// has_wamg expects to be able to read back the source to modify it (need to check if it expects it to change after an operation)
+	logerror("%s: rom_dmasrc_w (%02x) %02x\n", machine().describe_context(), offset, data);
+	m_rom_dma_src[offset] = data;
 }
 
-READ8_MEMBER(xavix_state::rom_dmasrc_md_r)
+WRITE8_MEMBER(xavix_state::rom_dmadst_w)
 {
-	return m_rom_dmasrc_md_data;
+	logerror("%s: rom_dmadst_w (%02x) %02x\n", machine().describe_context(), offset, data);
+	m_rom_dma_dst[offset] = data;
 }
 
-READ8_MEMBER(xavix_state::rom_dmasrc_hi_r)
+WRITE8_MEMBER(xavix_state::rom_dmalen_w)
 {
-	return m_rom_dmasrc_hi_data;
+	logerror("%s: rom_dmalen_w (%02x) %02x\n", machine().describe_context(), offset, data);
+	m_rom_dma_len[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::rom_dmasrc_lo_w)
+
+READ8_MEMBER(xavix_state::rom_dmastat_r)
 {
-	logerror("%s: rom_dmasrc_lo_w %02x\n", machine().describe_context(), data);
-	m_rom_dmasrc_lo_data = data;
-}
-
-WRITE8_MEMBER(xavix_state::rom_dmasrc_md_w)
-{
-	logerror("%s: rom_dmasrc_md_w %02x\n", machine().describe_context(), data);
-	m_rom_dmasrc_md_data = data;
-}
-
-WRITE8_MEMBER(xavix_state::rom_dmasrc_hi_w)
-{
-	logerror("%s: rom_dmasrc_hi_w %02x\n", machine().describe_context(), data);
-	m_rom_dmasrc_hi_data = data;
-	logerror("  (DMA ROM source of %02x%02x%02x)\n", m_rom_dmasrc_hi_data, m_rom_dmasrc_md_data, m_rom_dmasrc_lo_data);
-}
-
-WRITE8_MEMBER(xavix_state::rom_dmadst_lo_w)
-{
-	logerror("%s: rom_dmadst_lo_w %02x\n", machine().describe_context(), data);
-	m_rom_dmadst_lo_data = data;
-}
-
-WRITE8_MEMBER(xavix_state::rom_dmadst_hi_w)
-{
-	logerror("%s: rom_dmadst_hi_w %02x\n", machine().describe_context(), data);
-	m_rom_dmadst_hi_data = data;
-
-	logerror("  (DMA dest of %02x%02x)\n", m_rom_dmadst_hi_data, m_rom_dmadst_lo_data);
-}
-
-WRITE8_MEMBER(xavix_state::rom_dmalen_lo_w)
-{
-	logerror("%s: rom_dmalen_lo_w %02x\n", machine().describe_context(), data);
-	m_rom_dmalen_lo_data = data;
-}
-
-WRITE8_MEMBER(xavix_state::rom_dmalen_hi_w)
-{
-	logerror("%s: rom_dmalen_hi_w %02x\n", machine().describe_context(), data);
-	m_rom_dmalen_hi_data = data;
-
-	logerror("  (DMA len of %02x%02x)\n", m_rom_dmalen_hi_data, m_rom_dmalen_lo_data);
-}
-
-READ8_MEMBER(xavix_state::rom_dmatrg_r)
-{
-	logerror("%s: rom_dmatrg_r (operation status?)\n", machine().describe_context());
+	logerror("%s: rom_dmastat_r (operation status?)\n", machine().describe_context());
 	return 0x00;
 }
 
@@ -450,15 +407,15 @@ void xavix_state::machine_start()
 
 void xavix_state::machine_reset()
 {
-	m_rom_dmasrc_lo_data = 0;
-	m_rom_dmasrc_md_data = 0;
-	m_rom_dmasrc_hi_data = 0;
+	m_rom_dma_src[0] = 0;
+	m_rom_dma_src[1] = 0;
+	m_rom_dma_src[2] = 0;
 
-	m_rom_dmadst_lo_data = 0;
-	m_rom_dmadst_hi_data = 0;
+	m_rom_dma_dst[0] = 0;
+	m_rom_dma_dst[1] = 0;
 
-	m_rom_dmalen_lo_data = 0;
-	m_rom_dmalen_hi_data = 0;
+	m_rom_dma_len[0] = 0;
+	m_rom_dma_len[1] = 0;
 
 	m_vectorenable = 0;
 	m_irq_vector0_lo_data = 0;
