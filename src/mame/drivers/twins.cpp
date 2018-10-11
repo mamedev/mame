@@ -624,13 +624,52 @@ ROM_START( twinsa )
 	ROM_LOAD16_BYTE( "hp.bin", 0x000001, 0x080000, CRC(aaf74b83) SHA1(09bd76b9fc5cb7ba6ffe1a2581ffd5633fe440b3) )
 ROM_END
 
+/*
+ECOGAMES Twins
+_________________________________________________________
+| LABEL: VIDEOR-191193                                   |
+| ____________________         _____________             |
+| | U24 40PIN DEVICE |         | IMSG176P-66|        ____|
+| |__________________|         |____________|        |
+|                                                    |___
+| ___________   74HC574  ___________       74HC574   ----|
+| | D43256AC |           | D43256AC |                ----|
+| |__________|  74LS245  |__________|      74LS245   ----|
+|                                                    ----|
+| 74LS245       74HC573  74LS245           74HC573   ----|
+|  ____________   ____________  __________________   ----|
+|  | 84256A-10L|  | 84256A-10L| | AY-3-8910A      |  ----|
+|  |___________|  |___________| |_________________|  ----|
+| _____________  _____________                       ----|
+| | 1 27C4001  | | 2 27C4001  |                      ----|
+| |____________| |____________| ___________________  ----|
+|                               |U30 40PIN DEVICE |  ----|
+| 74LS245      74LS245  74HC573 |_________________|  ----|
+|                                                    ----|
+| 74HC573      74HC573  74HC74                       ____|
+|  __________________                                |
+|  |NEC V30 9327N5   |  74HC04      24C2AB1          |___
+|  |_________________|         XTAL8MHz                  |
+|________________________________________________________|
+*/
+ROM_START( twinseg )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2.u8", 0x000000, 0x080000, CRC(1ec942b0) SHA1(627deb739c50f93c4cb61b8baf2a07213f1613b3) )
+	ROM_LOAD16_BYTE( "1.u9", 0x000001, 0x080000, CRC(4417ff34) SHA1(be992128fe48556a0a7c018953702b4ce9076526) )
+
+	/* Unused */
+	ROM_REGION( 0x000100, "extra", 0 )
+	ROM_LOAD("24c02.u15", 0x000000, 0x000100, CRC(5ba30b14) SHA1(461f701879b76f1784705e067a5b6b31bfda4606) )
+ROM_END
+
 ROM_START( spider )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "20.bin", 0x000001, 0x080000, CRC(25e15f11) SHA1(b728f35c817f60a294e38d66559da8977b94a1f5) )
 	ROM_LOAD16_BYTE( "21.bin", 0x000000, 0x080000, CRC(ff224206) SHA1(d8d45850983542e811facc917d016841fc56a97f) )
 ROM_END
 
-GAME( 1994, twins,  0,     twins,  twins, twins_state, empty_init, ROT0, "Electronic Devices", "Twins (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twinsa, twins, twinsa, twins, twins_state, empty_init, ROT0, "Electronic Devices", "Twins (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twins,   0,     twins,  twins, twins_state, empty_init, ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twinsa,  twins, twinsa, twins, twins_state, empty_init, ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, twinseg, twins, twinsa, twins, twins_state, empty_init, ROT0, "Ecogames",                              "Twins",                                     MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, spider, 0,     spider, twins, twins_state, empty_init, ROT0, "Buena Vision",       "Spider",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
