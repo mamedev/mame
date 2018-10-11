@@ -135,17 +135,13 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
 	uint8_t* tileregs;
-	int opaque = 0;
-
 	if (which == 0)
 	{
 		tileregs = m_tmap1_regs;
-		opaque = 1;
 	}
 	else
 	{
 		tileregs = m_tmap2_regs;
-		opaque = 0;
 	}
 
 	// bail if tilemap is disabled
@@ -397,10 +393,10 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 			if (test == 1) pal = machine().rand() & 0xf;
 
 
-			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque, zval);
-			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque, zval); // wrap-y
-			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque, zval); // wrap-x
-			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque, zval); // wrap-y and x
+			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, zval);
+			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-y
+			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-x
+			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-y and x
 		
 			count++;
 		}
@@ -548,15 +544,20 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		   some code even suggests this should be bit 0 of attr0, but it never gets set there
 
-		   */
+		   there must be a register somewhere (or a side-effect of another mode) that enables / disables this
+		   behavior, as we need to make use of xposh for the left side in cases that need it, but that
+		   completely breaks the games that never set it at all (monster truck, xavix logo on taitons1)
+
+		 */
+
 		int xposh = spr_xposh[i]&1;
 
-		if (xpos & 0x80)
+		if (xpos & 0x80) // left side of center
 		{
 			xpos &=0x7f;
 			xpos = -0x80+xpos;
 		}
-		else
+		else // right side of center
 		{
 			xpos &= 0x7f;
 
@@ -585,8 +586,8 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		bpp = (attr0 & 0x0e) >> 1;
 		bpp += 1;
 
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0, zval);
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0, zval); // wrap-y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, zval);
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, zval); // wrap-y
 
 		/*
 		if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
@@ -597,7 +598,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 }
 
-void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque, int zval)
+void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval)
 {
 	// set the address here so we can increment in bits in the draw function
 	set_data_address(tile, 0);
@@ -640,19 +641,17 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 				uint16_t* rowptr = &bitmap.pix16(row);
 				uint16_t* zrowptr = &m_zbuffer.pix16(row);
 
-				//if (opaque)
-				{
-					if (zval >= zrowptr[col])
-					{
-						int pen = (dat + (pal << 4)) & 0xff;
 
-						if ((m_palram_sh[pen] & 0x1f) < 24)
-						{
-							rowptr[col] = pen;
-							zrowptr[col] = zval;
-						}
+				if (zval >= zrowptr[col])
+				{
+					int pen = (dat + (pal << 4)) & 0xff;
+
+					if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
+					{
+						rowptr[col] = pen;
+						zrowptr[col] = zval;
 					}
-				}
+				}			
 			}
 		}
 	}
@@ -662,8 +661,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	handle_palette(screen, bitmap, cliprect);
 
-	// monster truck, taito nostalgia 1, madden and more look worse with black pen, baseball 2 hidden test mode looks worse with forced pen 0
-	// probably depends on transparency etc.
+	// not sure what you end up with if you fall through all layers as transparent, so far no issues noticed
 	//bitmap.fill(m_palette->black_pen(), cliprect);
 	bitmap.fill(0, cliprect);
 	m_zbuffer.fill(0,cliprect);
