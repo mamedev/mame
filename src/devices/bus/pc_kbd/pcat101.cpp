@@ -12,7 +12,7 @@
  *
  * Part No  Layout
  * 1391401  US English 101-key
- * 
+ *
  * TODO
  *   - matrix and mcu ports (skeleton only)
  */
@@ -25,10 +25,10 @@ DEFINE_DEVICE_TYPE(PC_KBD_IBM_PC_AT_101, ibm_pc_at_101_keyboard_device, "kb_pcat
 ROM_START(ibm_pc_at_101_keyboard)
 	ROM_REGION(0x1000, "mcu", 0)
 	/*
-	 * PCB 
+	 * PCB
 	 * 1394792 K27-1
 	 * EC 528739 4989
-	 * 
+	 *
 	 * MCU
 	 * ST (C)IBM 1984
 	 * C430 28940
@@ -223,8 +223,8 @@ ibm_pc_at_101_keyboard_device::ibm_pc_at_101_keyboard_device(const machine_confi
 	: device_t(mconfig, PC_KBD_IBM_PC_AT_101, tag, owner, clock)
 	, device_pc_kbd_interface(mconfig, *this)
 	, m_maincpu(*this, "mcu")
-	, m_column(*this, "column%02u", 0)
-	, m_leds(*this, "led%u", 0)
+	, m_column(*this, "column%02u", 0U)
+	, m_leds(*this, "led%u", 0U)
 {
 }
 
