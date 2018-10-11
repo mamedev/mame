@@ -14,11 +14,16 @@ Todo:
 
 Game Status:
 - Inbuilt ROM and PDA functions all work
-- On the screen where the cart goes into the slot, there are vertical bands of randomness
 - Due to an irritating message, the NVRAM is commented out in the machine config
 - All carts appear to work except:
-- - Henry: crash just after "HENRY" button clicked
-- - Lost World: freeze just after entering Stage 2 (the nest)
+- - Henry: misbehaviour just after "HENRY" button clicked.
+- --- You can still click where the invisible HENRY button is, and have one
+      turn. After that, it's game over, and you can't play any more until
+      you cold boot the emulation.
+- - Lost World: freeze just after entering Stage 2 (the nest).
+- --- If you do nothing it freezes at the point where the stegasaurus
+      should turn around. So, straight away start moving to the right
+      and you can keep playing.
 - Weblink and Internet are of no use as there is nothing to connect to.
 
 ***************************************************************************/
@@ -71,6 +76,7 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Button D" ) PORT_CODE( KEYCODE_D ) PORT_CODE( KEYCODE_LSHIFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME( "Stylus press" ) PORT_CODE( KEYCODE_Z ) PORT_CODE( MOUSECODE_BUTTON1 )
 
+	// These are used by the "Default Grid" artwork to detect mouse clicks
 	PORT_START("GRID.0")
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_OTHER)
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_OTHER)
