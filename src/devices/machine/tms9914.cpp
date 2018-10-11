@@ -431,6 +431,55 @@ READ_LINE_MEMBER(tms9914_device::cont_r)
 // device-level overrides
 void tms9914_device::device_start()
 {
+	save_item(NAME(m_int_line));
+	save_item(NAME(m_accrq_line));
+	save_item(NAME(m_dio));
+	save_item(NAME(m_signals));
+	save_item(NAME(m_ext_signals));
+	save_item(NAME(m_no_reflection));
+	save_item(NAME(m_ext_state_change));
+	save_item(NAME(m_reg_int0_status));
+	save_item(NAME(m_reg_int0_mask));
+	save_item(NAME(m_reg_int1_status));
+	save_item(NAME(m_reg_int1_mask));
+	save_item(NAME(m_reg_address));
+	save_item(NAME(m_reg_serial_p));
+	save_item(NAME(m_reg_parallel_p));
+	save_item(NAME(m_reg_2nd_parallel_p));
+	save_item(NAME(m_reg_di));
+	save_item(NAME(m_reg_do));
+	save_item(NAME(m_reg_ulpa));
+	save_item(NAME(m_swrst));
+	save_item(NAME(m_hdfa));
+	save_item(NAME(m_hdfe));
+	save_item(NAME(m_rtl));
+	save_item(NAME(m_gts));
+	save_item(NAME(m_rpp));
+	save_item(NAME(m_sic));
+	save_item(NAME(m_sre));
+	save_item(NAME(m_dai));
+	save_item(NAME(m_pts));
+	save_item(NAME(m_stdl));
+	save_item(NAME(m_shdw));
+	save_item(NAME(m_vstdl));
+	save_item(NAME(m_ah_state));
+	save_item(NAME(m_ah_adhs));
+	save_item(NAME(m_ah_anhs));
+	save_item(NAME(m_sh_state));
+	save_item(NAME(m_sh_shfs));
+	save_item(NAME(m_sh_vsts));
+	save_item(NAME(m_t_state));
+	save_item(NAME(m_t_tpas));
+	save_item(NAME(m_t_spms));
+	save_item(NAME(m_t_eoi_state));
+	save_item(NAME(m_l_state));
+	save_item(NAME(m_l_lpas));
+	save_item(NAME(m_sr_state));
+	save_item(NAME(m_rl_state));
+	save_item(NAME(m_pp_ppas));
+	save_item(NAME(m_c_state));
+	save_item(NAME(m_next_eoi));
+
 	m_dio_read_func.resolve_safe(0xff);
 	m_dio_write_func.resolve_safe();
 	for (auto& f : m_signal_wr_fns) {
