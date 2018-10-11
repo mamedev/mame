@@ -301,7 +301,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 					uint8_t extraattr = mainspace.read_byte((tileregs[0x2] << 8) + count);
 					// make use of the extraattr stuff?
 					pal = (extraattr & 0xf0)>>4;
-					// low bits are priority?
+					zval = (extraattr & 0x0f) >> 0;
 				}
 			}
 			else
@@ -646,9 +646,9 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	bitmap.fill(0, cliprect);
 	m_zbuffer.fill(0,cliprect);
 
+	draw_tilemap(screen,bitmap,cliprect,1);
 	draw_tilemap(screen,bitmap,cliprect,0);
 	draw_sprites(screen,bitmap,cliprect);
-	draw_tilemap(screen,bitmap,cliprect,1);
 
 	//popmessage("%02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x", m_soundregs[0],m_soundregs[1],m_soundregs[2],m_soundregs[3],m_soundregs[4],m_soundregs[5],m_soundregs[6],m_soundregs[7],m_soundregs[8],m_soundregs[9],m_soundregs[10],m_soundregs[11],m_soundregs[12],m_soundregs[13],m_soundregs[14],m_soundregs[15]);
 
