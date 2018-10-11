@@ -758,6 +758,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_2))
 	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_7))
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
+	MCFG_HP_HIL_SLOT_ADD("mlc", "hil2", hp_hil_devices, "hp_46060b")
 
 	MCFG_DEVICE_ADD("hpib", TMS9914, 4_MHz_XTAL)
 	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp_ipc_state, irq_3))
