@@ -139,6 +139,10 @@ ioport_constructor dio16_98644_device::device_input_ports() const
 
 void dio16_98644_device::device_start()
 {
+	save_item(NAME(m_installed_io));
+	save_item(NAME(m_control));
+	save_item(NAME(m_loopback));
+	save_item(NAME(m_data));
 	m_installed_io = false;
 }
 

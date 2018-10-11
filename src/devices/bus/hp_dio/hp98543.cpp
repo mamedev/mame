@@ -99,6 +99,9 @@ dio16_98543_device::dio16_98543_device(const machine_config &mconfig, device_typ
 
 void dio16_98543_device::device_start()
 {
+	save_item(NAME(m_intreg));
+	save_item(NAME(m_ints));
+
 	dio().install_memory(
 			0x200000, 0x27ffff,
 			read16_delegate(FUNC(dio16_98543_device::vram_r), this),
