@@ -57,6 +57,7 @@ inline int xavix_state::get_current_address_byte()
 
 void xavix_state::video_start()
 {
+	m_screen->register_screen_bitmap(m_zbuffer);
 }
 
 
@@ -221,16 +222,13 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	// there's a tilemap register to specify base in main ram, although in the monster truck test mode it points to an unmapped region
 	// and expected a fixed layout, we handle that in the memory map at the moment
-	int count;
-
-	count = 0;// ;
+	int count = 0;
 	for (int y = 0; y < ydimension; y++)
 	{
 		for (int x = 0; x < xdimension; x++)
 		{
 			address_space& mainspace = m_maincpu->space(AS_PROGRAM);
 
-			int bpp, pal, scrolly, scrollx;
 			int tile = 0;
 
 			// the register being 0 probably isn't the condition here
@@ -245,11 +243,12 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 				tile |= mainspace.read_byte((tileregs[0x2] << 8) + count) << 16;
 
 
-			bpp = (tileregs[0x3] & 0x0e) >> 1;
+			int bpp = (tileregs[0x3] & 0x0e) >> 1;
 			bpp++;
-			pal = (tileregs[0x6] & 0xf0) >> 4;
-			scrolly = tileregs[0x5];
-			scrollx = tileregs[0x4];
+			int pal = (tileregs[0x6] & 0xf0) >> 4;
+			int zval = (tileregs[0x6] & 0x0f) >> 0;
+			int scrolly = tileregs[0x5];
+			int scrollx = tileregs[0x4];
 
 			int basereg;
 			int flipx = 0;
@@ -398,10 +397,10 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 			if (test == 1) pal = machine().rand() & 0xf;
 
 
-			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque);
-			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-y
-			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-x
-			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-y and x
+			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque, zval);
+			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque, zval); // wrap-y
+			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque, zval); // wrap-x
+			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque, zval); // wrap-y and x
 		
 			count++;
 		}
@@ -453,7 +452,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		   pppp bbb-    p = palette, b = bpp
 
 		   attribute 1 bits
-		   ---- ss-f    s = size, f = flipx
+		   zzzz ssFf    s = size, F = flipy f = flipx
 		*/
 
 		int ypos = spr_ypos[i];
@@ -463,6 +462,8 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		int attr1 = spr_attr1[i];
 
 		int pal = (attr0 & 0xf0) >> 4;
+		
+		int zval = (attr1 & 0xf0) >> 4;
 		int flipx = (attr1 & 0x01);
 		int flipy = (attr1 & 0x02);
 
@@ -554,10 +555,10 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		bpp = (attr0 & 0x0e) >> 1;
 		bpp += 1;
 
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0);
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0); // wrap-x
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0); // wrap-y
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0); // wrap-x,y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0, zval);
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0, zval); // wrap-x
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0, zval); // wrap-y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0, zval); // wrap-x,y
 
 		/*
 		if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
@@ -568,7 +569,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 }
 
-void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque)
+void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque, int zval)
 {
 	// set the address here so we can increment in bits in the draw function
 	set_data_address(tile, 0);
@@ -608,18 +609,27 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 			if ((row >= cliprect.min_y && row <= cliprect.max_y) && (col >= cliprect.min_x && col <= cliprect.max_x))
 			{
-				uint16_t* rowptr;
-
-				rowptr = &bitmap.pix16(row);
+				uint16_t* rowptr = &bitmap.pix16(row);
+				uint16_t* zrowptr = &m_zbuffer.pix16(row);
 
 				if (opaque)
 				{
-					rowptr[col] = (dat + (pal << 4)) & 0xff;
+					if (zval >= zrowptr[col])
+					{
+						rowptr[col] = (dat + (pal << 4)) & 0xff;
+						zrowptr[col] = zval;
+					}
 				}
 				else
 				{
 					if (dat)
-						rowptr[col] = (dat + (pal << 4)) & 0xff;
+					{
+						if (zval >= zrowptr[col])
+						{
+							rowptr[col] = (dat + (pal << 4)) & 0xff;
+							zrowptr[col] = zval;
+						}
+					}
 				}
 			}
 		}
@@ -634,6 +644,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// probably depends on transparency etc.
 	//bitmap.fill(m_palette->black_pen(), cliprect);
 	bitmap.fill(0, cliprect);
+	m_zbuffer.fill(0,cliprect);
 
 	draw_tilemap(screen,bitmap,cliprect,0);
 	draw_sprites(screen,bitmap,cliprect);

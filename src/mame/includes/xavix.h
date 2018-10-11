@@ -18,6 +18,7 @@ public:
 	xavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
 		m_rom_dma_src(*this,"rom_dma_src"),
@@ -181,6 +182,7 @@ private:
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	
 	uint8_t m_vectorenable;
 	uint8_t m_irq_vector0_lo_data;
@@ -233,9 +235,10 @@ private:
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	double hue2rgb(double p, double q, double t);
-	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque);
+	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque, int zval);
 	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	bitmap_ind16 m_zbuffer;
 
 	uint8_t m_spritereg;
 
