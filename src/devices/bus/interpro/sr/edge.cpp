@@ -471,8 +471,9 @@ MACHINE_CONFIG_START(mpcb828_device::device_add_mconfig)
 	RAM(config, "sram").set_default_size("128KiB").set_default_value(0);
 	RAM(config, "vram").set_default_size("2560KiB").set_default_value(0);
 
-	MCFG_DEVICE_ADD("dsp", TMS32030, 1_MHz_XTAL) // 30_MHz_XTAL
+	MCFG_DEVICE_ADD("dsp", TMS32030, 30_MHz_XTAL)
 	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, mpcb828_device, holda))
+	MCFG_DEVICE_DISABLE()
 	//MCFG_DEVICE_ADDRESS_MAP(0, map_dynamic<2>)
 
 	MCFG_DEVICE_ADD("ramdac", BT458, 83'020'800)
@@ -501,8 +502,9 @@ MACHINE_CONFIG_START(mpcb849_device::device_add_mconfig)
 	RAM(config, "sram").set_default_size("128KiB").set_default_value(0);
 	RAM(config, "vram").set_default_size("5120KiB").set_default_value(0); // size is a guess
 
-	MCFG_DEVICE_ADD("dsp", TMS32030, 1_MHz_XTAL) // 30_MHz_XTAL
+	MCFG_DEVICE_ADD("dsp", TMS32030, 30_MHz_XTAL)
 	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, mpcb828_device, holda))
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("ramdac", BT458, 0) // unconfirmed clock
 
@@ -544,9 +546,10 @@ MACHINE_CONFIG_END
  * Inputs htotal=2112 (1664+448) and vtotal=1299 (1248+51) give hsync=77.940kHz.
  */
 MACHINE_CONFIG_START(msmt094_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dsp1", TMS32030, 1_MHz_XTAL) // 33.333_MHz_XTAL
+	MCFG_DEVICE_ADD("dsp1", TMS32030, 33.333_MHz_XTAL)
 	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, msmt094_device, holda))
 	MCFG_DEVICE_ADDRESS_MAP(0, dsp1_map)
+	MCFG_DEVICE_DISABLE()
 
 	RAM(config, "ram").set_default_size("6MiB").set_default_value(0);
 
