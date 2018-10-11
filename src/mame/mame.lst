@@ -8963,6 +8963,7 @@ br8641                          //
 @source:brkthru.cpp
 brkthru                         // (c) 1986 Data East USA (US)
 brkthruj                        // (c) 1986 Data East Corporation (Japan)
+brkthrut                        // (c) 1986 Data East Corporation (Tecfri license)
 darwin                          // (c) 1986 Data East Corporation (Japan)
 forcebrk                        // (c) 1986 Data East Corporation (Japan)
 
