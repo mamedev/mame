@@ -37931,8 +37931,9 @@ gq863                           //
 
 @source:twins.cpp
 spider                          //
-twins                           // (c) 1994
-twinsa                          // (c) 1994
+twins                           // (c) 1994 Electronic Devices
+twinsa                          // (c) 1994 Electronic Devices
+twinseg                         // (c) 1993 Ecogames
 
 @source:tx0.cpp
 tx0_64kw                        // April 1956 MIT TX-0 (64kw RAM)
