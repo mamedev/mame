@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "includes/xavix.h"
 
-// general DMA fro ROM, not Video DMA
+// general DMA to/from entire main map (not dedicated sprite DMA)
 WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 {
 	if (data & 0x01) // namcons2 writes 0x81, most of the time things write 0x01
@@ -15,14 +15,29 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 		uint16_t dest = (m_rom_dmadst_hi_data << 8) | m_rom_dmadst_lo_data;
 		uint16_t len = (m_rom_dmalen_hi_data << 8) | m_rom_dmalen_lo_data;
 
-		source &= m_rgnlen - 1;
 		logerror("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
 
 		address_space& destspace = m_maincpu->space(AS_PROGRAM);
 
 		for (int i = 0; i < len; i++)
 		{
-			uint8_t dat = m_rgn[(source + i) & (m_rgnlen - 1)];
+			uint32_t m_tmpaddress = source+i;
+
+			// many games explicitly want to access with the high bank bit set, so probably the same logic as when grabbing tile data
+			// we have to be careful here or we get the zero page memory read, hence not just using read8 on the whole space
+			// this again probably indicates there is 'data space' where those don't appear
+			uint8_t dat = 0;
+			// if bank is > 0x80, or address is >0x8000 it's a plain ROM read
+			if ((m_tmpaddress >= 0x80000) || (m_tmpaddress & 0x8000))
+			{
+				dat= m_rgn[m_tmpaddress & (m_rgnlen - 1)];
+			}
+			else
+			{
+				address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+				dat = m_lowbus->read8(mainspace, m_tmpaddress & 0x7fff);
+			}
+
 			destspace.write_byte(dest + i, dat);
 		}
 	}
@@ -30,6 +45,23 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 	{
 		logerror("%s: rom_dmatrg_w (unknown) %02x\n", machine().describe_context(), data);
 	}
+}
+
+
+// has_wamg expects to read the registers to perform calcs on them
+READ8_MEMBER(xavix_state::rom_dmasrc_lo_r)
+{
+	return m_rom_dmasrc_lo_data;
+}
+
+READ8_MEMBER(xavix_state::rom_dmasrc_md_r)
+{
+	return m_rom_dmasrc_md_data;
+}
+
+READ8_MEMBER(xavix_state::rom_dmasrc_hi_r)
+{
+	return m_rom_dmasrc_hi_data;
 }
 
 WRITE8_MEMBER(xavix_state::rom_dmasrc_lo_w)
@@ -48,7 +80,6 @@ WRITE8_MEMBER(xavix_state::rom_dmasrc_hi_w)
 {
 	logerror("%s: rom_dmasrc_hi_w %02x\n", machine().describe_context(), data);
 	m_rom_dmasrc_hi_data = data;
-	// this would mean Taito Nostalgia relies on mirroring tho, as it has the high bits set... so could just be wrong
 	logerror("  (DMA ROM source of %02x%02x%02x)\n", m_rom_dmasrc_hi_data, m_rom_dmasrc_md_data, m_rom_dmasrc_lo_data);
 }
 
@@ -159,6 +190,12 @@ WRITE8_MEMBER(xavix_state::adc_7b81_w)
 {
 	logerror("%s: adc_7b81_w %02x\n", machine().describe_context(), data);
 }
+
+READ8_MEMBER(xavix_state::adc_7b81_r)
+{
+	return machine().rand();
+}
+
 
 
 WRITE8_MEMBER(xavix_state::slotreg_7810_w)
@@ -324,6 +361,11 @@ WRITE8_MEMBER(xavix_state::mult_w)
 {
 	// rad_madf writes here to set the base value which the multiplication result gets added to
 	m_multresults[offset] = data;
+}
+
+READ8_MEMBER(xavix_state::mult_param_r)
+{
+	return m_multparams[offset];
 }
 
 WRITE8_MEMBER(xavix_state::mult_param_w)

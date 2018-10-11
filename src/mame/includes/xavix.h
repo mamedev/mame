@@ -68,11 +68,16 @@ private:
 	DECLARE_WRITE8_MEMBER(adc_7b00_w);
 	DECLARE_READ8_MEMBER(adc_7b80_r);
 	DECLARE_WRITE8_MEMBER(adc_7b80_w);
+	DECLARE_READ8_MEMBER(adc_7b81_r);
 	DECLARE_WRITE8_MEMBER(adc_7b81_w);
 
 	DECLARE_WRITE8_MEMBER(slotreg_7810_w);
 
 	DECLARE_WRITE8_MEMBER(rom_dmatrg_w);
+
+	DECLARE_READ8_MEMBER(rom_dmasrc_lo_r);
+	DECLARE_READ8_MEMBER(rom_dmasrc_md_r);
+	DECLARE_READ8_MEMBER(rom_dmasrc_hi_r);
 	DECLARE_WRITE8_MEMBER(rom_dmasrc_lo_w);
 	DECLARE_WRITE8_MEMBER(rom_dmasrc_md_w);
 	DECLARE_WRITE8_MEMBER(rom_dmasrc_hi_w);
@@ -175,6 +180,7 @@ private:
 
 	DECLARE_READ8_MEMBER(mult_r);
 	DECLARE_WRITE8_MEMBER(mult_w);
+	DECLARE_READ8_MEMBER(mult_param_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
 	required_device<cpu_device> m_maincpu;

@@ -380,9 +380,9 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 
 	// DMA Controller
 	map(0x7980, 0x7980).rw(FUNC(xavix_state::rom_dmatrg_r), FUNC(xavix_state::rom_dmatrg_w));
-	map(0x7981, 0x7981).w(FUNC(xavix_state::rom_dmasrc_lo_w)); 	// DMA source
-	map(0x7982, 0x7982).w(FUNC(xavix_state::rom_dmasrc_md_w));
-	map(0x7983, 0x7983).w(FUNC(xavix_state::rom_dmasrc_hi_w));
+	map(0x7981, 0x7981).rw(FUNC(xavix_state::rom_dmasrc_lo_r), FUNC(xavix_state::rom_dmasrc_lo_w)); 	// DMA source
+	map(0x7982, 0x7982).rw(FUNC(xavix_state::rom_dmasrc_md_r), FUNC(xavix_state::rom_dmasrc_md_w));
+	map(0x7983, 0x7983).rw(FUNC(xavix_state::rom_dmasrc_hi_r), FUNC(xavix_state::rom_dmasrc_hi_w));
 	map(0x7984, 0x7984).w(FUNC(xavix_state::rom_dmadst_lo_w)); 	// DMA dest
 	map(0x7985, 0x7985).w(FUNC(xavix_state::rom_dmadst_hi_w));
 	map(0x7986, 0x7986).w(FUNC(xavix_state::rom_dmalen_lo_w)); 	// DMA length
@@ -405,7 +405,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 		
 	// ADC registers
 	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::adc_7b80_r), FUNC(xavix_state::adc_7b80_w)); // rad_snow (not often)
-	map(0x7b81, 0x7b81).w(FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
+	map(0x7b81, 0x7b81).rw(FUNC(xavix_state::adc_7b81_r), FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
 
 	// Sleep control
 	//map(7b82, 7b83)
@@ -419,7 +419,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// map(0x7ff0, 0x7ff1)
 
 	// Multiply / Divide registers
-	map(0x7ff2, 0x7ff4).w(FUNC(xavix_state::mult_param_w));
+	map(0x7ff2, 0x7ff4).rw(FUNC(xavix_state::mult_param_r), FUNC(xavix_state::mult_param_w));
 	map(0x7ff5, 0x7ff6).rw(FUNC(xavix_state::mult_r), FUNC(xavix_state::mult_w));
 
 	// CPU Vector registers
@@ -848,30 +848,35 @@ ROM_START( rad_rh )
 ROM_END
 
 /*
-    There's more code in here than in the 'eka_strt' set, but all it seems to do is display an 'insert cartridge' message,
-    however eka_strt also seems a complete program in it's own right, it's unclear if it can see any of the data from this
-    ROM.
-
-    (TODO: turn the cartridges into a software list once the mapping is properly understood)
+    The e-kara cartridges require the BIOS rom to map into 2nd external bus space as they fetch palette data from
+	it etc.
 */
 
+#define EKARA_BASE_ROM \
+	ROM_LOAD( "ekara.bin", 0x600000, 0x100000, CRC(9b27c4a2) SHA1(d75dda7434933135d2f7e353840a9384e9a0d586) )
+
+
 ROM_START( eka_base )
-	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "ekara.bin", 0x000000, 0x100000, CRC(9b27c4a2) SHA1(d75dda7434933135d2f7e353840a9384e9a0d586) )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	EKARA_BASE_ROM
+	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
 ROM_START( eka_strt )
-	ROM_REGION( 0x080000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	EKARA_BASE_ROM
 	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
 ROM_END
 
 ROM_START( eka_vol1 )
-	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	EKARA_BASE_ROM
 	ROM_LOAD( "ekaravol1.bin", 0x000000, 0x100000, CRC(29df4aea) SHA1(b95835aaf8630b61b47e5da0968cd4a1dd3bc517) )
 ROM_END
 
 ROM_START( eka_vol2 )
-	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	EKARA_BASE_ROM
 	ROM_LOAD( "ekaravol2.bin", 0x000000, 0x100000, CRC(6c66772e) SHA1(e1e719df1e51caaafd9b3af187059334f7abbba3) )
 ROM_END
 
@@ -920,13 +925,13 @@ CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,    xavix_state, init_xavix
 
 CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
 
-CONS( 200?, eka_base,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON)
+CONS( 200?, eka_base,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
 
-CONS( 200?, eka_strt,  0,          0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
+CONS( 200?, eka_strt,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
 
-CONS( 200?, eka_vol1,  0,          0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
+CONS( 200?, eka_vol1,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
 
-CONS( 200?, eka_vol2,  0,          0,   xavix,  xavix  , xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
+CONS( 200?, eka_vol2,  eka_base,   0,   xavix,  xavix  , xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
