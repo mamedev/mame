@@ -278,9 +278,15 @@ WRITE8_MEMBER(xavix_state::arena_end_w)
 	m_arena_end = data; // expected to return data written
 }
 
+READ8_MEMBER(xavix_state::arena_control_r)
+{
+	return m_arena_control;
+}
+
 WRITE8_MEMBER(xavix_state::arena_control_w)
 {
 	//logerror("%s: arena_control_w %02x\n", machine().describe_context(), data);
+	m_arena_control = data;
 }
 
 
@@ -424,6 +430,10 @@ void xavix_state::machine_reset()
 	m_irq_vector1_hi_data = 0;
 
 	m_6ff8 = 0;
+
+	m_arena_control = 0;
+	m_arena_start = 0;
+	m_arena_end = 0;
 
 	m_spritereg = 0;
 

@@ -329,7 +329,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// Arena Registers
 	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::arena_start_r), FUNC(xavix_state::arena_start_w)); // r/w tested
 	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::arena_end_r), FUNC(xavix_state::arena_end_w)); // r/w tested
-	map(0x6fea, 0x6fea).w(FUNC(xavix_state::arena_control_w));
+	map(0x6fea, 0x6fea).rw(FUNC(xavix_state::arena_control_r), FUNC(xavix_state::arena_control_w));
 
 	// Colour Mixing / Enabling Registers
 	map(0x6ff0, 0x6ff0).ram().share("colmix_sh"); // a single colour (for effects or bgpen?)

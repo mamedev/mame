@@ -113,6 +113,7 @@ private:
 	DECLARE_WRITE8_MEMBER(arena_start_w);
 	DECLARE_READ8_MEMBER(arena_end_r);
 	DECLARE_WRITE8_MEMBER(arena_end_w);
+	DECLARE_READ8_MEMBER(arena_control_r);
 	DECLARE_WRITE8_MEMBER(arena_control_w);
 
 	DECLARE_READ8_MEMBER(colmix_6ff0_r);
@@ -201,6 +202,7 @@ private:
 
 	uint8_t m_arena_start;
 	uint8_t m_arena_end;
+	uint8_t m_arena_control;
 
 	uint8_t m_6ff0;
 	uint8_t m_6ff8;

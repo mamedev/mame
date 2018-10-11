@@ -640,21 +640,15 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 				uint16_t* rowptr = &bitmap.pix16(row);
 				uint16_t* zrowptr = &m_zbuffer.pix16(row);
 
-				if (opaque)
+				//if (opaque)
 				{
 					if (zval >= zrowptr[col])
 					{
-						rowptr[col] = (dat + (pal << 4)) & 0xff;
-						zrowptr[col] = zval;
-					}
-				}
-				else
-				{
-					if (dat)
-					{
-						if (zval >= zrowptr[col])
+						int pen = (dat + (pal << 4)) & 0xff;
+
+						if ((m_palram_sh[pen] & 0x1f) < 24)
 						{
-							rowptr[col] = (dat + (pal << 4)) & 0xff;
+							rowptr[col] = pen;
 							zrowptr[col] = zval;
 						}
 					}
