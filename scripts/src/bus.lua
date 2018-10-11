@@ -869,6 +869,10 @@ if (BUSES["HPHIL"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_hil/hp_hil.h",
 		MAME_DIR .. "src/devices/bus/hp_hil/hil_devices.cpp",
 		MAME_DIR .. "src/devices/bus/hp_hil/hil_devices.h",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlebase.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlebase.h",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlemouse.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlemouse.h",
 		MAME_DIR .. "src/devices/bus/hp_hil/hlekbd.cpp",
 		MAME_DIR .. "src/devices/bus/hp_hil/hlekbd.h",
 	}
