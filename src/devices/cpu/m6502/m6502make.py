@@ -229,7 +229,7 @@ def save_dasm(f, device, states):
         extra = "0"
         if opc in ["jsr", "bsr", "callf"]:
             extra = "STEP_OVER"
-        elif opc in ["rts", "rti", "rtn"]:
+        elif opc in ["rts", "rti", "rtn", "retf"]:
             extra = "STEP_OUT"
         emit(f, '\t{ "%s", DASM_%s, %s },' % (opc, mode, extra))
     emit(f, DISASM_EPILOG % d)
