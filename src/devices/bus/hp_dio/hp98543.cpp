@@ -26,14 +26,12 @@ DEFINE_DEVICE_TYPE_NS(HPDIO_98543, bus::hp_dio, dio16_98543_device, "dio98543", 
 namespace bus {
 	namespace hp_dio {
 
-MACHINE_CONFIG_START(dio16_98543_device::device_add_mconfig)
-	MCFG_SCREEN_ADD(HP98543_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, dio16_98543_device, screen_update)
-	MCFG_SCREEN_SIZE(1024,400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 400-1)
-	MCFG_SCREEN_REFRESH_RATE(70)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dio16_98543_device, vblank_w));
-	MCFG_SCREEN_RAW_PARAMS(39504000, 1408, 0, 1024, 425, 0, 400);
+void dio16_98543_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, HP98543_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(dio16_98543_device::screen_update));
+	screen.screen_vblank().set(FUNC(dio16_98543_device::vblank_w));
+	screen.set_raw(XTAL(39'504'000), 1408, 0, 1024, 425, 0, 400);
 
 	topcat_device &topcat0(TOPCAT(config, "topcat0", XTAL(35904000)));
 	topcat0.set_fb_width(1024);
@@ -60,7 +58,7 @@ MACHINE_CONFIG_START(dio16_98543_device::device_add_mconfig)
 	topcat3.irq_out_cb().set(FUNC(dio16_98543_device::int3_w));
 
 	NEREID(config, m_nereid, 0);
-MACHINE_CONFIG_END
+}
 
 const tiny_rom_entry *dio16_98543_device::device_rom_region() const
 {
