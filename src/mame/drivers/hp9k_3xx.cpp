@@ -107,7 +107,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 
 	DECLARE_READ16_MEMBER(buserror16_r);
@@ -140,6 +139,7 @@ private:
 
 	bool m_bus_error;
 	emu_timer *m_bus_error_timer;
+	TIMER_CALLBACK_MEMBER(bus_error_timeout);
 };
 
 uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -283,11 +283,11 @@ void hp9k3xx_state::machine_reset()
 
 void hp9k3xx_state::machine_start()
 {
-	m_bus_error_timer = timer_alloc(0);
+	m_bus_error_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9k3xx_state::bus_error_timeout), this));
 	save_item(NAME(m_bus_error));
 }
 
-void hp9k3xx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(hp9k3xx_state::bus_error_timeout)
 {
 	m_bus_error = false;
 }
