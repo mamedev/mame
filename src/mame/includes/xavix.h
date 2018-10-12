@@ -101,10 +101,10 @@ private:
 	DECLARE_WRITE8_MEMBER(io_3_w);
 
 	DECLARE_WRITE8_MEMBER(vector_enable_w);
-	DECLARE_WRITE8_MEMBER(irq_vector0_lo_w);
-	DECLARE_WRITE8_MEMBER(irq_vector0_hi_w);
-	DECLARE_WRITE8_MEMBER(irq_vector1_lo_w);
-	DECLARE_WRITE8_MEMBER(irq_vector1_hi_w);
+	DECLARE_WRITE8_MEMBER(nmi_vector_lo_w);
+	DECLARE_WRITE8_MEMBER(nmi_vector_hi_w);
+	DECLARE_WRITE8_MEMBER(irq_vector_lo_w);
+	DECLARE_WRITE8_MEMBER(irq_vector_hi_w);
 
 	DECLARE_READ8_MEMBER(irq_source_r);
 	DECLARE_WRITE8_MEMBER(irq_source_w);
@@ -186,10 +186,10 @@ private:
 	required_device<screen_device> m_screen;
 	
 	uint8_t m_vectorenable;
-	uint8_t m_irq_vector0_lo_data;
-	uint8_t m_irq_vector0_hi_data;
-	uint8_t m_irq_vector1_lo_data;
-	uint8_t m_irq_vector1_hi_data;
+	uint8_t m_nmi_vector_lo_data;
+	uint8_t m_nmi_vector_hi_data;
+	uint8_t m_irq_vector_lo_data;
+	uint8_t m_irq_vector_hi_data;
 
 	uint8_t m_multparams[3];
 	uint8_t m_multresults[2];

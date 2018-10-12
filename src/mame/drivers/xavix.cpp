@@ -418,13 +418,13 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7ff5, 0x7ff6).rw(FUNC(xavix_state::mult_r), FUNC(xavix_state::mult_w));
 
 	// CPU Vector registers
-	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::vector_enable_w)); // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
-	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::irq_vector0_lo_w)); // an IRQ vector (nmi?)
-	map(0x7ffb, 0x7ffb).w(FUNC(xavix_state::irq_vector0_hi_w));
+	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::vector_enable_w)); // enables / disables the custom vectors
+	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::nmi_vector_lo_w)); // an IRQ vector (nmi?)
+	map(0x7ffb, 0x7ffb).w(FUNC(xavix_state::nmi_vector_hi_w));
 	map(0x7ffc, 0x7ffc).rw(FUNC(xavix_state::irq_source_r), FUNC(xavix_state::irq_source_w));
 	// map(0x7ffd, 0x7ffd) some of the Nostalgia games read here, why?
-	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector1_lo_w)); // an IRQ vector (irq?)
-	map(0x7fff, 0x7fff).w(FUNC(xavix_state::irq_vector1_hi_w));
+	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector_lo_w)); // an IRQ vector (irq?)
+	map(0x7fff, 0x7fff).w(FUNC(xavix_state::irq_vector_hi_w));
 }
 
 static INPUT_PORTS_START( xavix )

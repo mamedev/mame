@@ -82,28 +82,28 @@ WRITE8_MEMBER(xavix_state::vector_enable_w)
 	m_vectorenable = data;
 }
 
-WRITE8_MEMBER(xavix_state::irq_vector0_lo_w)
+WRITE8_MEMBER(xavix_state::nmi_vector_lo_w)
 {
-	logerror("%s: irq_vector0_lo_w %02x\n", machine().describe_context(), data);
-	m_irq_vector0_lo_data = data;
+	logerror("%s: nmi_vector_lo_w %02x\n", machine().describe_context(), data);
+	m_nmi_vector_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::irq_vector0_hi_w)
+WRITE8_MEMBER(xavix_state::nmi_vector_hi_w)
 {
-	logerror("%s: irq_vector0_hi_w %02x\n", machine().describe_context(), data);
-	m_irq_vector0_hi_data = data;
+	logerror("%s: nmi_vector_hi_w %02x\n", machine().describe_context(), data);
+	m_nmi_vector_hi_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::irq_vector1_lo_w)
+WRITE8_MEMBER(xavix_state::irq_vector_lo_w)
 {
-	logerror("%s: irq_vector1_lo_w %02x\n", machine().describe_context(), data);
-	m_irq_vector1_lo_data = data;
+	logerror("%s: irq_vector_lo_w %02x\n", machine().describe_context(), data);
+	m_irq_vector_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::irq_vector1_hi_w)
+WRITE8_MEMBER(xavix_state::irq_vector_hi_w)
 {
-	logerror("%s: irq_vector1_hi_w %02x\n", machine().describe_context(), data);
-	m_irq_vector1_hi_data = data;
+	logerror("%s: irq_vector_hi_w %02x\n", machine().describe_context(), data);
+	m_irq_vector_hi_data = data;
 }
 
 
@@ -425,10 +425,10 @@ void xavix_state::machine_reset()
 	m_rom_dma_len[1] = 0;
 
 	m_vectorenable = 0;
-	m_irq_vector0_lo_data = 0;
-	m_irq_vector0_hi_data = 0;
-	m_irq_vector1_lo_data = 0;
-	m_irq_vector1_hi_data = 0;
+	m_nmi_vector_lo_data = 0;
+	m_nmi_vector_hi_data = 0;
+	m_irq_vector_lo_data = 0;
+	m_irq_vector_hi_data = 0;
 
 	m_6ff8 = 0;
 
@@ -497,16 +497,16 @@ int16_t xavix_state::get_vectors(int which, int half)
 	if (which == 0) // irq?
 	{
 		if (half == 0)
-			return m_irq_vector0_hi_data;
+			return m_nmi_vector_hi_data;
 		else
-			return m_irq_vector0_lo_data;
+			return m_nmi_vector_lo_data;
 	}
 	else
 	{
 		if (half == 0)
-			return m_irq_vector1_hi_data;
+			return m_irq_vector_hi_data;
 		else
-			return m_irq_vector1_lo_data;
+			return m_irq_vector_lo_data;
 	}
 }
 
