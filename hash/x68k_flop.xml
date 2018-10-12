@@ -14031,7 +14031,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="tricornf">
+	<software name="tritornf">
 		<description>Tritorn Final</description>
 		<year>1989</year>
 		<publisher>ザインソフト (Zain Soft)</publisher>
@@ -14039,25 +14039,25 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tricorn final (19xx)(xain)(disk 1 of 4)(disk a).dim" size="1261824" crc="3feb2cf7" sha1="d6f6dce8d71c3a34ee320d2fefe8f933dfa84e72" offset="0" />
+				<rom name="tritorn final (19xx)(xain)(disk 1 of 4)(disk a).dim" size="1261824" crc="3feb2cf7" sha1="d6f6dce8d71c3a34ee320d2fefe8f933dfa84e72" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tricorn final (19xx)(xain)(disk 2 of 4)(disk b).dim" size="1261824" crc="eb768611" sha1="02cbc595b59e47111594eff4fb56b165e21fabe9" offset="0" />
+				<rom name="tritorn final (19xx)(xain)(disk 2 of 4)(disk b).dim" size="1261824" crc="eb768611" sha1="02cbc595b59e47111594eff4fb56b165e21fabe9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tricorn final (19xx)(xain)(disk 3 of 4)(disk c).dim" size="1261824" crc="80b50eba" sha1="5f66395b39f4be9b3fbc95ae20c86b325a34645c" offset="0" />
+				<rom name="tritorn final (19xx)(xain)(disk 3 of 4)(disk c).dim" size="1261824" crc="80b50eba" sha1="5f66395b39f4be9b3fbc95ae20c86b325a34645c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tricorn final (19xx)(xain)(disk 4 of 4)(disk d).dim" size="1261824" crc="c2e49141" sha1="ad373e82d599df5c39249690075e466a0e4522bb" offset="0" />
+				<rom name="tritorn final (19xx)(xain)(disk 4 of 4)(disk d).dim" size="1261824" crc="c2e49141" sha1="ad373e82d599df5c39249690075e466a0e4522bb" offset="0" />
 			</dataarea>
 		</part>
 	</software>

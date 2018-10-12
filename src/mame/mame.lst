@@ -21419,6 +21419,10 @@ minitel2                        //
 @source:minivadr.cpp
 minivadr                        // D26 cabinet test board
 
+@source:mips.cpp
+rc2030                          // MIPS RC2030
+rs2030                          // MIPS RS2030
+
 @source:mirage.cpp
 mirage                          // (c) 1994 Mitchell
 
