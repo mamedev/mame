@@ -27,19 +27,20 @@ namespace bus {
 #define RS232_TAG       "rs232"
 #define INS8250_TAG     "ins8250"
 
-MACHINE_CONFIG_START( dio16_98644_device::device_add_mconfig )
+void dio16_98644_device::device_add_mconfig(machine_config &config)
+{
 	INS8250(config, m_uart, XTAL(2'457'600));
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, ins8250_uart_device, cts_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
+	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
+	rs232.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
+	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
+}
 
 //**************************************************************************
 //  LIVE DEVICE
