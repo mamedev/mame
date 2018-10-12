@@ -20,7 +20,7 @@
 #include "emu.h"
 #include "pcat101.h"
 
-DEFINE_DEVICE_TYPE(PC_KBD_IBM_PC_AT_101, ibm_pc_at_101_keyboard_device, "kb_pcat101", "IBM PC/AT Keyboard")
+DEFINE_DEVICE_TYPE(PC_KBD_IBM_PC_AT_101, ibm_pc_at_101_keyboard_device, "kb_pcat101", "IBM Model M Keyboard")
 
 ROM_START(ibm_pc_at_101_keyboard)
 	ROM_REGION(0x1000, "mcu", 0)
