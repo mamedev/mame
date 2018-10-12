@@ -8,6 +8,36 @@ Electronic Devices, 1994
 PCB Layout
 ----------
 
+ECOGAMES Twins
+_________________________________________________________
+| LABEL: VIDEOR-191193                                   |
+| ____________________         _____________             |
+| | U24 40PIN DEVICE |         | IMSG176P-66|        ____|
+| |__________________|         |____________|        |
+|                                                    |___
+| ___________   74HC574  ___________       74HC574   ----|
+| | D43256AC |           | D43256AC |                ----|
+| |__________|  74LS245  |__________|      74LS245   ----|
+|                                                    ----|
+| 74LS245       74HC573  74LS245           74HC573   ----|
+|  ____________   ____________  __________________   ----|
+|  | 84256A-10L|  | 84256A-10L| | AY-3-8910A      |  ----|
+|  |___________|  |___________| |_________________|  ----|
+| _____________  _____________                       ----|
+| | 1 27C4001  | | 2 27C4001  |                      ----|
+| |____________| |____________| ___________________  ----|
+|                               |U30 40PIN DEVICE |  ----|
+| 74LS245      74LS245  74HC573 |_________________|  ----|
+|                                                    ----|
+| 74HC573      74HC573  74HC74                       ____|
+|  __________________                                |
+|  |NEC V30 9327N5   |  74HC04      24C2AB1          |___
+|  |_________________|         XTAL8MHz                  |
+|________________________________________________________|
+
+
+ELECTRONIC DEVICES Twins
+
 This is a very tiny PCB,
 only about 6 inches square.
 
@@ -23,12 +53,11 @@ only about 6 inches square.
 | AY3-8910              |
 |                 D70116|
 |-----------------------|
+
 Notes:
     V30 clock      : 8.000MHz (16/2)
     AY3-8910 clock : 2.000MHz (16/8)
     VSync          : 50Hz
-
-
 
 seems a similar board to Hot Blocks
 
@@ -52,11 +81,11 @@ Spider PCB appears almost identical but uses additional 'blitter' features.
 It is possible the Twins PCB has them too and doesn't use them.
 
 
-Twins (set 2) is significantly changed hardware, uses a regular RAMDAC hookup for plaette etc.
+Twins (Electronic Devices license, set 2) is significantly changed hardware, uses a regular RAMDAC hookup for plaette etc.
+
 
 To access Service Mode in Spider you must boot with P1 Left and P1 Right held down,
 this requires the -joystick_contradictory switch on the commandline.
-
 
 */
 
@@ -68,7 +97,6 @@ this requires the -joystick_contradictory switch on the commandline.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
 
 class twins_state : public driver_device
 {
@@ -84,8 +112,8 @@ public:
 	{ }
 
 	void spider(machine_config &config);
+	void twinsed1(machine_config &config);
 	void twins(machine_config &config);
-	void twinsa(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -125,9 +153,9 @@ private:
 
 	void ramdac_map(address_map &map);
 	void spider_io(address_map &map);
-	void twins_io(address_map &map);
+	void twinsed1_io(address_map &map);
 	void twins_map(address_map &map);
-	void twinsa_io(address_map &map);
+	void twins_io(address_map &map);
 };
 
 
@@ -290,7 +318,7 @@ void twins_state::twins_map(address_map &map)
 	map(0x00000, 0xfffff).rw(FUNC(twins_state::spider_blitter_r), FUNC(twins_state::spider_blitter_w));
 }
 
-void twins_state::twins_io(address_map &map)
+void twins_state::twinsed1_io(address_map &map)
 {
 	map(0x0000, 0x0003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x0002, 0x0002).r("aysnd", FUNC(ay8910_device::data_r));
@@ -312,8 +340,6 @@ void twins_state::video_start()
 	save_item(NAME(m_videoram2));
 	save_item(NAME(m_videorambank));
 }
-
-
 
 
 uint32_t twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -392,11 +418,11 @@ static INPUT_PORTS_START(twins)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(twins_state::twins)
+MACHINE_CONFIG_START(twins_state::twinsed1)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
 	MCFG_DEVICE_PROGRAM_MAP(twins_map)
-	MCFG_DEVICE_IO_MAP(twins_io)
+	MCFG_DEVICE_IO_MAP(twinsed1_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -418,11 +444,11 @@ MACHINE_CONFIG_START(twins_state::twins)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-/* The second set has different palette hardware and a different port map */
 
+/* The Ecogames set and the Electronic Devices second set has different palette hardware 
+   and a different port map than Electronic Devices first set */
 
-
-void twins_state::twinsa_io(address_map &map)
+void twins_state::twins_io(address_map &map)
 {
 	map(0x0000, 0x0000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x0002, 0x0002).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -439,11 +465,11 @@ void twins_state::ramdac_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(twins_state::twinsa)
+MACHINE_CONFIG_START(twins_state::twins)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(twins_map)
-	MCFG_DEVICE_IO_MAP(twinsa_io)
+	MCFG_DEVICE_IO_MAP(twins_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -563,9 +589,6 @@ void twins_state::spider_io(address_map &map)
 }
 
 
-
-
-
 MACHINE_CONFIG_START(twins_state::spider)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
@@ -594,7 +617,19 @@ MACHINE_CONFIG_START(twins_state::spider)
 MACHINE_CONFIG_END
 
 
+/* ECOGAMES Twins */
 ROM_START( twins )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2.u8", 0x000000, 0x080000, CRC(1ec942b0) SHA1(627deb739c50f93c4cb61b8baf2a07213f1613b3) )
+	ROM_LOAD16_BYTE( "1.u9", 0x000001, 0x080000, CRC(4417ff34) SHA1(be992128fe48556a0a7c018953702b4ce9076526) )
+
+	/* Unused */
+	ROM_REGION( 0x000100, "extra", 0 )
+	ROM_LOAD("24c02.u15", 0x000000, 0x000100, CRC(5ba30b14) SHA1(461f701879b76f1784705e067a5b6b31bfda4606) )
+ROM_END
+
+/** Electronic Devices Twins */
+ROM_START( twinsed1 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1.bin", 0x000000, 0x080000, CRC(d5ef7b0d) SHA1(7261dca5bb0aef755b4f2b85a159b356e7ac8219) )
 	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x080000, CRC(8a5392f4) SHA1(e6a2ecdb775138a87d27aa4ad267bdec33c26baa) )
@@ -618,48 +653,10 @@ hmm, we're only emulating 1x ay-3-8910, is the other at port 0 on this?
 
 */
 
-ROM_START( twinsa )
+ROM_START( twinsed2 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lp.bin", 0x000000, 0x080000, CRC(4f07862e) SHA1(fbda1973f79c6938c7f026a4db706e78781c2df8) )
 	ROM_LOAD16_BYTE( "hp.bin", 0x000001, 0x080000, CRC(aaf74b83) SHA1(09bd76b9fc5cb7ba6ffe1a2581ffd5633fe440b3) )
-ROM_END
-
-/*
-ECOGAMES Twins
-_________________________________________________________
-| LABEL: VIDEOR-191193                                   |
-| ____________________         _____________             |
-| | U24 40PIN DEVICE |         | IMSG176P-66|        ____|
-| |__________________|         |____________|        |
-|                                                    |___
-| ___________   74HC574  ___________       74HC574   ----|
-| | D43256AC |           | D43256AC |                ----|
-| |__________|  74LS245  |__________|      74LS245   ----|
-|                                                    ----|
-| 74LS245       74HC573  74LS245           74HC573   ----|
-|  ____________   ____________  __________________   ----|
-|  | 84256A-10L|  | 84256A-10L| | AY-3-8910A      |  ----|
-|  |___________|  |___________| |_________________|  ----|
-| _____________  _____________                       ----|
-| | 1 27C4001  | | 2 27C4001  |                      ----|
-| |____________| |____________| ___________________  ----|
-|                               |U30 40PIN DEVICE |  ----|
-| 74LS245      74LS245  74HC573 |_________________|  ----|
-|                                                    ----|
-| 74HC573      74HC573  74HC74                       ____|
-|  __________________                                |
-|  |NEC V30 9327N5   |  74HC04      24C2AB1          |___
-|  |_________________|         XTAL8MHz                  |
-|________________________________________________________|
-*/
-ROM_START( twinseg )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "2.u8", 0x000000, 0x080000, CRC(1ec942b0) SHA1(627deb739c50f93c4cb61b8baf2a07213f1613b3) )
-	ROM_LOAD16_BYTE( "1.u9", 0x000001, 0x080000, CRC(4417ff34) SHA1(be992128fe48556a0a7c018953702b4ce9076526) )
-
-	/* Unused */
-	ROM_REGION( 0x000100, "extra", 0 )
-	ROM_LOAD("24c02.u15", 0x000000, 0x000100, CRC(5ba30b14) SHA1(461f701879b76f1784705e067a5b6b31bfda4606) )
 ROM_END
 
 ROM_START( spider )
@@ -668,8 +665,8 @@ ROM_START( spider )
 	ROM_LOAD16_BYTE( "21.bin", 0x000000, 0x080000, CRC(ff224206) SHA1(d8d45850983542e811facc917d016841fc56a97f) )
 ROM_END
 
-GAME( 1994, twins,   0,     twins,  twins, twins_state, empty_init, ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twinsa,  twins, twinsa, twins, twins_state, empty_init, ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, twinseg, twins, twinsa, twins, twins_state, empty_init, ROT0, "Ecogames",                              "Twins",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1993, twins,    0,     twins,    twins, twins_state, empty_init, ROT0, "Ecogames",                              "Twins",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twinsed1, twins, twinsed1, twins, twins_state, empty_init, ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twinsed2, twins, twins,    twins, twins_state, empty_init, ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, spider, 0,     spider, twins, twins_state, empty_init, ROT0, "Buena Vision",       "Spider",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, spider,   0,     spider,   twins, twins_state, empty_init, ROT0, "Buena Vision",                          "Spider",                                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
