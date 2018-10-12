@@ -159,12 +159,6 @@ void hp9k3xx_state::hp9k310_map(address_map &map)
 void hp9k3xx_state::hp9k320_map(address_map &map)
 {
 	hp9k3xx_common(map);
-
-	// unknown, but bootrom crashes without
-	map(0x00510000, 0x00510fff).ram();
-	map(0x00516000, 0x00516fff).ram();
-	map(0x00440000, 0x0044ffff).ram();
-
 	// main memory
 	map(0xfff00000, 0xffffffff).ram();
 }
@@ -173,8 +167,7 @@ void hp9k3xx_state::hp9k320_map(address_map &map)
 void hp9k3xx_state::hp9k330_map(address_map &map)
 {
 	hp9k3xx_common(map);
-
-	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	// main memory
 	map(0xffc00000, 0xffffffff).ram();
 }
 
@@ -182,8 +175,7 @@ void hp9k3xx_state::hp9k330_map(address_map &map)
 void hp9k3xx_state::hp9k332_map(address_map &map)
 {
 	hp9k3xx_common(map);
-
-	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	// main memory
 	map(0xffc00000, 0xffffffff).ram();
 }
 
@@ -191,7 +183,7 @@ void hp9k3xx_state::hp9k332_map(address_map &map)
 void hp9k3xx_state::hp9k360_map(address_map &map)
 {
 	hp9k3xx_common(map);
-
+	// main memory
 	map(0xff000000, 0xffffffff).ram();
 }
 
@@ -199,8 +191,7 @@ void hp9k3xx_state::hp9k360_map(address_map &map)
 void hp9k3xx_state::hp9k370_map(address_map &map)
 {
 	hp9k3xx_common(map);
-
-	map(0xff700000, 0xff7fffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	// main memory
 	map(0xff800000, 0xffffffff).ram();
 }
 
@@ -208,10 +199,7 @@ void hp9k3xx_state::hp9k370_map(address_map &map)
 void hp9k3xx_state::hp9k380_map(address_map &map)
 {
 	hp9k3xx_common(map);
-
-	map(0x0051a000, 0x0051afff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
-
-	map(0xc0000000, 0xff7fffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	// main memory
 	map(0xff800000, 0xffffffff).ram();
 }
 
@@ -219,11 +207,8 @@ void hp9k3xx_state::hp9k380_map(address_map &map)
 void hp9k3xx_state::hp9k382_map(address_map &map)
 {
 	hp9k3xx_common(map);
-
-	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	// main memory
 	map(0xffc00000, 0xffffffff).ram();
-
-	map(0x0051a000, 0x0051afff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
 }
 
 /* Input ports */
