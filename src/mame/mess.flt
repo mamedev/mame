@@ -425,6 +425,7 @@ minicom.cpp
 miniforce.cpp
 miniframe.cpp
 minitel_2_rpic.cpp
+mips.cpp
 mits680b.cpp
 mk1.cpp
 mk14.cpp
