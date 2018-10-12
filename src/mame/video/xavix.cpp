@@ -57,6 +57,7 @@ inline int xavix_state::get_current_address_byte()
 
 void xavix_state::video_start()
 {
+	m_screen->register_screen_bitmap(m_zbuffer);
 }
 
 
@@ -134,17 +135,13 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
 	uint8_t* tileregs;
-	int opaque = 0;
-
 	if (which == 0)
 	{
 		tileregs = m_tmap1_regs;
-		opaque = 1;
 	}
 	else
 	{
 		tileregs = m_tmap2_regs;
-		opaque = 0;
 	}
 
 	// bail if tilemap is disabled
@@ -221,16 +218,13 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	// there's a tilemap register to specify base in main ram, although in the monster truck test mode it points to an unmapped region
 	// and expected a fixed layout, we handle that in the memory map at the moment
-	int count;
-
-	count = 0;// ;
+	int count = 0;
 	for (int y = 0; y < ydimension; y++)
 	{
 		for (int x = 0; x < xdimension; x++)
 		{
 			address_space& mainspace = m_maincpu->space(AS_PROGRAM);
 
-			int bpp, pal, scrolly, scrollx;
 			int tile = 0;
 
 			// the register being 0 probably isn't the condition here
@@ -245,11 +239,12 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 				tile |= mainspace.read_byte((tileregs[0x2] << 8) + count) << 16;
 
 
-			bpp = (tileregs[0x3] & 0x0e) >> 1;
+			int bpp = (tileregs[0x3] & 0x0e) >> 1;
 			bpp++;
-			pal = (tileregs[0x6] & 0xf0) >> 4;
-			scrolly = tileregs[0x5];
-			scrollx = tileregs[0x4];
+			int pal = (tileregs[0x6] & 0xf0) >> 4;
+			int zval = (tileregs[0x6] & 0x0f) >> 0;
+			int scrolly = tileregs[0x5];
+			int scrollx = tileregs[0x4];
 
 			int basereg;
 			int flipx = 0;
@@ -302,7 +297,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 					uint8_t extraattr = mainspace.read_byte((tileregs[0x2] << 8) + count);
 					// make use of the extraattr stuff?
 					pal = (extraattr & 0xf0)>>4;
-					// low bits are priority?
+					zval = (extraattr & 0x0f) >> 0;
 				}
 			}
 			else
@@ -398,10 +393,10 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 			if (test == 1) pal = machine().rand() & 0xf;
 
 
-			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque);
-			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-y
-			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-x
-			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-y and x
+			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, zval);
+			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-y
+			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-x
+			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-y and x
 		
 			count++;
 		}
@@ -443,7 +438,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		uint8_t* spr_attr1 = m_fragment_sprite + 0x100;
 		uint8_t* spr_ypos = m_fragment_sprite + 0x200;
 		uint8_t* spr_xpos = m_fragment_sprite + 0x300;
-		// + 0x400
+		uint8_t* spr_xposh = m_fragment_sprite + 0x400;
 		uint8_t* spr_addr_lo = m_fragment_sprite + 0x500;
 		uint8_t* spr_addr_md = m_fragment_sprite + 0x600;
 		uint8_t* spr_addr_hi = m_fragment_sprite + 0x700;
@@ -453,16 +448,30 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		   pppp bbb-    p = palette, b = bpp
 
 		   attribute 1 bits
-		   ---- ss-f    s = size, f = flipx
+		   zzzz ssFf    s = size, F = flipy f = flipx
 		*/
 
 		int ypos = spr_ypos[i];
 		int xpos = spr_xpos[i];
-		int tile = (spr_addr_hi[i] << 16) | (spr_addr_md[i] << 8) | spr_addr_lo[i];
+		int tile = 0;
+		
+		// high 8-bits only used in 24-bit mode
+		if (((m_spritereg & 0x7f) == 0x04) || ((m_spritereg & 0x7f) == 0x15))
+			tile |= (spr_addr_hi[i] << 16);
+		
+		// mid 8-bits used in everything except 8-bit mode
+		if ((m_spritereg & 0x7f) != 0x00)
+			tile |= (spr_addr_md[i] << 8);
+		
+		// low 8-bits always read
+		tile |= spr_addr_lo[i];
+		
 		int attr0 = spr_attr0[i];
 		int attr1 = spr_attr1[i];
 
 		int pal = (attr0 & 0xf0) >> 4;
+		
+		int zval = (attr1 & 0xf0) >> 4;
 		int flipx = (attr1 & 0x01);
 		int flipy = (attr1 & 0x02);
 
@@ -529,11 +538,34 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		   this makes the calculation a bit more annoying in terms of knowing when to apply offsets, when to wrap etc.
 		   this is likely still incorrect
 		   
-		   I think there is also an additional x bit
-		   */
+		   Use of additional x-bit is very confusing rad_snow, taitons1 (ingame) etc. clearly need to use it
+		   but the taitons1 xavix logo doesn't even initialize the RAM for it and behavior conflicts with ingame?
+		   maybe only works with certain tile sizes?
 
-		xpos -= 136;
-		xpos &= 0xff;
+		   some code even suggests this should be bit 0 of attr0, but it never gets set there
+
+		   there must be a register somewhere (or a side-effect of another mode) that enables / disables this
+		   behavior, as we need to make use of xposh for the left side in cases that need it, but that
+		   completely breaks the games that never set it at all (monster truck, xavix logo on taitons1)
+
+		 */
+
+		int xposh = spr_xposh[i]&1;
+
+		if (xpos & 0x80) // left side of center
+		{
+			xpos &=0x7f;
+			xpos = -0x80+xpos;
+		}
+		else // right side of center
+		{
+			xpos &= 0x7f;
+
+			if (xposh)
+				xpos += 0x80;
+		}
+
+		xpos += 128 - 8;
 
 		ypos ^= 0xff;
 
@@ -554,10 +586,8 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		bpp = (attr0 & 0x0e) >> 1;
 		bpp += 1;
 
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0);
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0); // wrap-x
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0); // wrap-y
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust - 256, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, 0); // wrap-x,y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, zval);
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, ypos - 256 - ypos_adjust, drawheight, drawwidth, flipx, flipy, pal, zval); // wrap-y
 
 		/*
 		if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
@@ -568,7 +598,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 }
 
-void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque)
+void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval)
 {
 	// set the address here so we can increment in bits in the draw function
 	set_data_address(tile, 0);
@@ -608,19 +638,20 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 			if ((row >= cliprect.min_y && row <= cliprect.max_y) && (col >= cliprect.min_x && col <= cliprect.max_x))
 			{
-				uint16_t* rowptr;
+				uint16_t* rowptr = &bitmap.pix16(row);
+				uint16_t* zrowptr = &m_zbuffer.pix16(row);
 
-				rowptr = &bitmap.pix16(row);
 
-				if (opaque)
+				if (zval >= zrowptr[col])
 				{
-					rowptr[col] = (dat + (pal << 4)) & 0xff;
-				}
-				else
-				{
-					if (dat)
-						rowptr[col] = (dat + (pal << 4)) & 0xff;
-				}
+					int pen = (dat + (pal << 4)) & 0xff;
+
+					if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
+					{
+						rowptr[col] = pen;
+						zrowptr[col] = zval;
+					}
+				}			
 			}
 		}
 	}
@@ -630,14 +661,41 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	handle_palette(screen, bitmap, cliprect);
 
-	// monster truck, taito nostalgia 1, madden and more look worse with black pen, baseball 2 hidden test mode looks worse with forced pen 0
-	// probably depends on transparency etc.
-	//bitmap.fill(m_palette->black_pen(), cliprect);
-	bitmap.fill(0, cliprect);
+	// not sure what you end up with if you fall through all layers as transparent, so far no issues noticed
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	m_zbuffer.fill(0,cliprect);
 
-	draw_tilemap(screen,bitmap,cliprect,0);
-	draw_sprites(screen,bitmap,cliprect);
-	draw_tilemap(screen,bitmap,cliprect,1);
+	rectangle clip = cliprect;
+
+	clip.min_y = cliprect.min_y;
+	clip.max_y = cliprect.max_y;
+	clip.min_x = cliprect.min_x;
+	clip.max_x = cliprect.max_x;
+
+	if (m_arena_control & 0x01)
+	{
+		// some games enable it with both regs as 00, which causes a problem
+		if (m_arena_start > m_arena_end)
+		{
+			// controls the clipping area (for all layers?) used for effect at start of Slap Fight and to add black borders in other cases
+			// based on Slap Fight Tiger lives display (and reference videos) this is slightly offset as all gfx must display
+			// other games don't correct the offset so will display a tiny bit of extra space at times?
+			// (there is some tilemap draw-in on Monster Truck)
+			clip.max_x = m_arena_start + 1;
+			clip.min_x = m_arena_end - 2;
+
+			if (clip.min_x < cliprect.min_x)
+				clip.min_x = cliprect.min_x;
+
+			if (clip.max_x > cliprect.max_x)
+				clip.max_x = cliprect.max_x;
+		}
+	}
+	bitmap.fill(0, clip);
+
+	draw_tilemap(screen,bitmap,clip,1);
+	draw_tilemap(screen,bitmap,clip,0);
+	draw_sprites(screen,bitmap,clip);
 
 	//popmessage("%02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x", m_soundregs[0],m_soundregs[1],m_soundregs[2],m_soundregs[3],m_soundregs[4],m_soundregs[5],m_soundregs[6],m_soundregs[7],m_soundregs[8],m_soundregs[9],m_soundregs[10],m_soundregs[11],m_soundregs[12],m_soundregs[13],m_soundregs[14],m_soundregs[15]);
 

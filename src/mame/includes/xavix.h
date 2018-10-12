@@ -18,8 +18,12 @@ public:
 	xavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
+		m_rom_dma_src(*this,"rom_dma_src"),
+		m_rom_dma_dst(*this,"rom_dma_dst"),
+		m_rom_dma_len(*this,"rom_dma_len"),
 		m_palram_sh(*this, "palram_sh"),
 		m_palram_l(*this, "palram_l"),
 		m_colmix_sh(*this, "colmix_sh"),
@@ -68,19 +72,18 @@ private:
 	DECLARE_WRITE8_MEMBER(adc_7b00_w);
 	DECLARE_READ8_MEMBER(adc_7b80_r);
 	DECLARE_WRITE8_MEMBER(adc_7b80_w);
+	DECLARE_READ8_MEMBER(adc_7b81_r);
 	DECLARE_WRITE8_MEMBER(adc_7b81_w);
 
 	DECLARE_WRITE8_MEMBER(slotreg_7810_w);
 
 	DECLARE_WRITE8_MEMBER(rom_dmatrg_w);
-	DECLARE_WRITE8_MEMBER(rom_dmasrc_lo_w);
-	DECLARE_WRITE8_MEMBER(rom_dmasrc_md_w);
-	DECLARE_WRITE8_MEMBER(rom_dmasrc_hi_w);
-	DECLARE_WRITE8_MEMBER(rom_dmadst_lo_w);
-	DECLARE_WRITE8_MEMBER(rom_dmadst_hi_w);
-	DECLARE_WRITE8_MEMBER(rom_dmalen_lo_w);
-	DECLARE_WRITE8_MEMBER(rom_dmalen_hi_w);
-	DECLARE_READ8_MEMBER(rom_dmatrg_r);
+
+	DECLARE_WRITE8_MEMBER(rom_dmasrc_w);
+
+	DECLARE_WRITE8_MEMBER(rom_dmadst_w);
+	DECLARE_WRITE8_MEMBER(rom_dmalen_w);
+	DECLARE_READ8_MEMBER(rom_dmastat_r);
 
 	DECLARE_WRITE8_MEMBER(spritefragment_dma_params_1_w);
 	DECLARE_WRITE8_MEMBER(spritefragment_dma_params_2_w);
@@ -98,10 +101,10 @@ private:
 	DECLARE_WRITE8_MEMBER(io_3_w);
 
 	DECLARE_WRITE8_MEMBER(vector_enable_w);
-	DECLARE_WRITE8_MEMBER(irq_vector0_lo_w);
-	DECLARE_WRITE8_MEMBER(irq_vector0_hi_w);
-	DECLARE_WRITE8_MEMBER(irq_vector1_lo_w);
-	DECLARE_WRITE8_MEMBER(irq_vector1_hi_w);
+	DECLARE_WRITE8_MEMBER(nmi_vector_lo_w);
+	DECLARE_WRITE8_MEMBER(nmi_vector_hi_w);
+	DECLARE_WRITE8_MEMBER(irq_vector_lo_w);
+	DECLARE_WRITE8_MEMBER(irq_vector_hi_w);
 
 	DECLARE_READ8_MEMBER(irq_source_r);
 	DECLARE_WRITE8_MEMBER(irq_source_w);
@@ -110,6 +113,7 @@ private:
 	DECLARE_WRITE8_MEMBER(arena_start_w);
 	DECLARE_READ8_MEMBER(arena_end_r);
 	DECLARE_WRITE8_MEMBER(arena_end_w);
+	DECLARE_READ8_MEMBER(arena_control_r);
 	DECLARE_WRITE8_MEMBER(arena_control_w);
 
 	DECLARE_READ8_MEMBER(colmix_6ff0_r);
@@ -121,8 +125,8 @@ private:
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_WRITE8_MEMBER(dispctrl_6ffa_w);
-	DECLARE_WRITE8_MEMBER(dispctrl_6ffb_w);
+	DECLARE_WRITE8_MEMBER(dispctrl_posirq_x_w);
+	DECLARE_WRITE8_MEMBER(dispctrl_posirq_y_w);
 
 	DECLARE_READ8_MEMBER(sound_75f0_r);
 	DECLARE_WRITE8_MEMBER(sound_75f0_w);
@@ -175,25 +179,17 @@ private:
 
 	DECLARE_READ8_MEMBER(mult_r);
 	DECLARE_WRITE8_MEMBER(mult_w);
+	DECLARE_READ8_MEMBER(mult_param_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
 	required_device<cpu_device> m_maincpu;
-
-	uint8_t m_rom_dmasrc_lo_data;
-	uint8_t m_rom_dmasrc_md_data;
-	uint8_t m_rom_dmasrc_hi_data;
-
-	uint8_t m_rom_dmadst_lo_data;
-	uint8_t m_rom_dmadst_hi_data;
-
-	uint8_t m_rom_dmalen_lo_data;
-	uint8_t m_rom_dmalen_hi_data;
-
+	required_device<screen_device> m_screen;
+	
 	uint8_t m_vectorenable;
-	uint8_t m_irq_vector0_lo_data;
-	uint8_t m_irq_vector0_hi_data;
-	uint8_t m_irq_vector1_lo_data;
-	uint8_t m_irq_vector1_hi_data;
+	uint8_t m_nmi_vector_lo_data;
+	uint8_t m_nmi_vector_hi_data;
+	uint8_t m_irq_vector_lo_data;
+	uint8_t m_irq_vector_hi_data;
 
 	uint8_t m_multparams[3];
 	uint8_t m_multresults[2];
@@ -204,8 +200,9 @@ private:
 	uint8_t m_tmap1_regs[8];
 	uint8_t m_tmap2_regs[8];
 
-	uint8_t m_arena_start;
-	uint8_t m_arena_end;
+	int m_arena_start;
+	int m_arena_end;
+	uint8_t m_arena_control;
 
 	uint8_t m_6ff0;
 	uint8_t m_6ff8;
@@ -217,8 +214,10 @@ private:
 	int16_t get_vectors(int which, int half);
 
 	required_shared_ptr<uint8_t> m_mainram;
-
 	required_shared_ptr<uint8_t> m_fragment_sprite;
+	required_shared_ptr<uint8_t> m_rom_dma_src;
+	required_shared_ptr<uint8_t> m_rom_dma_dst;
+	required_shared_ptr<uint8_t> m_rom_dma_len;
 
 	required_shared_ptr<uint8_t> m_palram_sh;
 	required_shared_ptr<uint8_t> m_palram_l;
@@ -238,9 +237,10 @@ private:
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	double hue2rgb(double p, double q, double t);
-	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque);
+	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval);
 	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	bitmap_ind16 m_zbuffer;
 
 	uint8_t m_spritereg;
 

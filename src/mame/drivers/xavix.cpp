@@ -296,8 +296,7 @@ void xavix_state::xavix_map(address_map &map)
 
 void xavix_state::xavix_lowbus_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x3fff).ram().share("mainram");
+	map(0x0000, 0x3fff).ram().share("mainram");
 
 	// Memory Emulator / Text Array
 	map(0x4000, 0x4fff).rw(FUNC(xavix_state::xavix_memoryemu_txarray_r), FUNC(xavix_state::xavix_memoryemu_txarray_w));
@@ -326,21 +325,21 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6fe1, 0x6fe2).w(FUNC(xavix_state::spritefragment_dma_params_1_w));
 	map(0x6fe5, 0x6fe6).w(FUNC(xavix_state::spritefragment_dma_params_2_w));
 
-	// Arena Registers
+	// Arena Registers (controls visible window + more?)
 	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::arena_start_r), FUNC(xavix_state::arena_start_w)); // r/w tested
 	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::arena_end_r), FUNC(xavix_state::arena_end_w)); // r/w tested
-	map(0x6fea, 0x6fea).w(FUNC(xavix_state::arena_control_w));
+	map(0x6fea, 0x6fea).rw(FUNC(xavix_state::arena_control_r), FUNC(xavix_state::arena_control_w));
 
 	// Colour Mixing / Enabling Registers
-	map(0x6ff0, 0x6ff0).ram().share("colmix_sh"); // a single colour (for effects or bgpen?)
+	map(0x6ff0, 0x6ff0).ram().share("colmix_sh"); // a single colour (for effects?) not bgpen
 	map(0x6ff1, 0x6ff1).ram().share("colmix_l");
 	map(0x6ff2, 0x6ff2).w(FUNC(xavix_state::colmix_6ff2_w)); // set to 07 after clearing above things in interrupt 0
 
 	// Display Control Register / Status Flags
 	map(0x6ff8, 0x6ff8).rw(FUNC(xavix_state::dispctrl_6ff8_r), FUNC(xavix_state::dispctrl_6ff8_w)); // always seems to be a read/store or read/modify/store
 	map(0x6ff9, 0x6ff9).r(FUNC(xavix_state::pal_ntsc_r));
-	map(0x6ffa, 0x6ffa).w(FUNC(xavix_state::dispctrl_6ffa_w));
-	map(0x6ffb, 0x6ffb).w(FUNC(xavix_state::dispctrl_6ffb_w)); // increases / decreases when you jump in snowboard, maybe raster irq pos or part of a clipping window?
+	map(0x6ffa, 0x6ffa).w(FUNC(xavix_state::dispctrl_posirq_x_w));
+	map(0x6ffb, 0x6ffb).w(FUNC(xavix_state::dispctrl_posirq_y_w)); // increases / decreases when you jump in snowboard (snowboard, used to blank ground)
 
 	// Lightgun / pen 1 control
 	// map(0x6ffc, 0x6fff)
@@ -351,7 +350,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// Sound Control
 	map(0x75f0, 0x75f0).rw(FUNC(xavix_state::sound_75f0_r), FUNC(xavix_state::sound_75f0_w)); // r/w tested read/written 8 times in a row
 	map(0x75f1, 0x75f1).rw(FUNC(xavix_state::sound_75f1_r), FUNC(xavix_state::sound_75f1_w)); // r/w tested read/written 8 times in a row
-	map(0x75f3, 0x75f3).ram();
+	map(0x75f2, 0x75f3).ram();
 	map(0x75f4, 0x75f4).r(FUNC(xavix_state::sound_75f4_r)); // related to 75f0 (read after writing there - rad_mtrk)
 	map(0x75f5, 0x75f5).r(FUNC(xavix_state::sound_75f5_r)); // related to 75f1 (read after writing there - rad_mtrk)
 	// taitons1 after 75f7/75f8
@@ -379,20 +378,16 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7902, 0x7902).w(FUNC(xavix_state::extintrf_7902_w));
 
 	// DMA Controller
-	map(0x7980, 0x7980).rw(FUNC(xavix_state::rom_dmatrg_r), FUNC(xavix_state::rom_dmatrg_w));
-	map(0x7981, 0x7981).w(FUNC(xavix_state::rom_dmasrc_lo_w)); 	// DMA source
-	map(0x7982, 0x7982).w(FUNC(xavix_state::rom_dmasrc_md_w));
-	map(0x7983, 0x7983).w(FUNC(xavix_state::rom_dmasrc_hi_w));
-	map(0x7984, 0x7984).w(FUNC(xavix_state::rom_dmadst_lo_w)); 	// DMA dest
-	map(0x7985, 0x7985).w(FUNC(xavix_state::rom_dmadst_hi_w));
-	map(0x7986, 0x7986).w(FUNC(xavix_state::rom_dmalen_lo_w)); 	// DMA length
-	map(0x7987, 0x7987).w(FUNC(xavix_state::rom_dmalen_hi_w));
+	map(0x7980, 0x7980).rw(FUNC(xavix_state::rom_dmastat_r), FUNC(xavix_state::rom_dmatrg_w));
+	map(0x7981, 0x7983).ram().w(FUNC(xavix_state::rom_dmasrc_w)).share("rom_dma_src");
+	map(0x7984, 0x7985).ram().w(FUNC(xavix_state::rom_dmadst_w)).share("rom_dma_dst");
+	map(0x7986, 0x7987).ram().w(FUNC(xavix_state::rom_dmalen_w)).share("rom_dma_len");
 
 	// IO Ports
 	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::io_0_r),FUNC(xavix_state::io_0_w));
-	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io_1_r),FUNC(xavix_state::io_1_w)); // startup (taitons1)
-	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io_2_r),FUNC(xavix_state::io_2_w)); // startup, gets set to 20, 7a00 is then also written with 20
-	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io_3_r),FUNC(xavix_state::io_3_w)); // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
+	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io_1_r),FUNC(xavix_state::io_1_w));
+	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io_2_r),FUNC(xavix_state::io_2_w));
+	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io_3_r),FUNC(xavix_state::io_3_w));
 
 	// Interrupt control registers
 	map(0x7a80, 0x7a80).w(FUNC(xavix_state::xavix_7a80_w)); // still IO? ADC related?
@@ -405,7 +400,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 		
 	// ADC registers
 	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::adc_7b80_r), FUNC(xavix_state::adc_7b80_w)); // rad_snow (not often)
-	map(0x7b81, 0x7b81).w(FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
+	map(0x7b81, 0x7b81).rw(FUNC(xavix_state::adc_7b81_r), FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
 
 	// Sleep control
 	//map(7b82, 7b83)
@@ -419,16 +414,17 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// map(0x7ff0, 0x7ff1)
 
 	// Multiply / Divide registers
-	map(0x7ff2, 0x7ff4).w(FUNC(xavix_state::mult_param_w));
+	map(0x7ff2, 0x7ff4).rw(FUNC(xavix_state::mult_param_r), FUNC(xavix_state::mult_param_w));
 	map(0x7ff5, 0x7ff6).rw(FUNC(xavix_state::mult_r), FUNC(xavix_state::mult_w));
 
 	// CPU Vector registers
-	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::vector_enable_w)); // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
-	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::irq_vector0_lo_w)); // an IRQ vector (nmi?)
-	map(0x7ffb, 0x7ffb).w(FUNC(xavix_state::irq_vector0_hi_w));
+	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::vector_enable_w)); // enables / disables the custom vectors
+	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::nmi_vector_lo_w)); // an IRQ vector (nmi?)
+	map(0x7ffb, 0x7ffb).w(FUNC(xavix_state::nmi_vector_hi_w));
 	map(0x7ffc, 0x7ffc).rw(FUNC(xavix_state::irq_source_r), FUNC(xavix_state::irq_source_w));
-	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector1_lo_w)); // an IRQ vector (irq?)
-	map(0x7fff, 0x7fff).w(FUNC(xavix_state::irq_vector1_hi_w));
+	// map(0x7ffd, 0x7ffd) some of the Nostalgia games read here, why?
+	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector_lo_w)); // an IRQ vector (irq?)
+	map(0x7fff, 0x7fff).w(FUNC(xavix_state::irq_vector_hi_w));
 }
 
 static INPUT_PORTS_START( xavix )
@@ -488,12 +484,14 @@ static INPUT_PORTS_START( xavix )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
+/*
 static INPUT_PORTS_START( xavixp )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("REGION") // PAL/NTSC flag
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
+*/
 
 /* Test mode lists the following
 
@@ -576,6 +574,22 @@ static INPUT_PORTS_START( rad_boxp )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rad_bass )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_bassp )
+	PORT_INCLUDE(rad_bass)
+
+	PORT_MODIFY("REGION") // PAL/NTSC flag
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( rad_snow )
 	PORT_INCLUDE(xavix)
@@ -598,15 +612,20 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( namcons2 )
 	PORT_INCLUDE(xavix)
 
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Fire1?
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Fire2?
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Pause / Add Coins
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_MODIFY("IN0") // mappings based on Dragon Buster button list, inputs don't seem to work properly in some games, probably because bad EEPROM support means all buttons are mapped to the same thing?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // Fire4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Fire3
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // not a button? (but can be used to pass prompts?)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // Pause / Add Coins, marked 'Credit' (but not a coin slot)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Fire2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Fire1
+
 INPUT_PORTS_END
 
 // to access hidden test mode reset while holding Button1 and Button2 (works every other reset)
@@ -699,7 +718,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_UPDATE_DRIVER(xavix_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
@@ -848,30 +867,35 @@ ROM_START( rad_rh )
 ROM_END
 
 /*
-    There's more code in here than in the 'eka_strt' set, but all it seems to do is display an 'insert cartridge' message,
-    however eka_strt also seems a complete program in it's own right, it's unclear if it can see any of the data from this
-    ROM.
-
-    (TODO: turn the cartridges into a software list once the mapping is properly understood)
+    The e-kara cartridges require the BIOS rom to map into 2nd external bus space as they fetch palette data from
+	it etc.
 */
 
+#define EKARA_BASE_ROM \
+	ROM_LOAD( "ekara.bin", 0x600000, 0x100000, CRC(9b27c4a2) SHA1(d75dda7434933135d2f7e353840a9384e9a0d586) )
+
+
 ROM_START( eka_base )
-	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "ekara.bin", 0x000000, 0x100000, CRC(9b27c4a2) SHA1(d75dda7434933135d2f7e353840a9384e9a0d586) )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	EKARA_BASE_ROM
+	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
 ROM_START( eka_strt )
-	ROM_REGION( 0x080000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	EKARA_BASE_ROM
 	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
 ROM_END
 
 ROM_START( eka_vol1 )
-	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	EKARA_BASE_ROM
 	ROM_LOAD( "ekaravol1.bin", 0x000000, 0x100000, CRC(29df4aea) SHA1(b95835aaf8630b61b47e5da0968cd4a1dd3bc517) )
 ROM_END
 
 ROM_START( eka_vol2 )
-	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	EKARA_BASE_ROM
 	ROM_LOAD( "ekaravol2.bin", 0x000000, 0x100000, CRC(6c66772e) SHA1(e1e719df1e51caaafd9b3af187059334f7abbba3) )
 ROM_END
 
@@ -903,8 +927,8 @@ CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_xavix
 
 CONS( 2002, rad_bb2,   0,          0,  xavix,  rad_bb2,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bass,  0,          0,  xavix,  rad_bass, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
 CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
@@ -920,13 +944,13 @@ CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,    xavix_state, init_xavix
 
 CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
 
-CONS( 200?, eka_base,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON)
+CONS( 200?, eka_base,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
 
-CONS( 200?, eka_strt,  0,          0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
+CONS( 200?, eka_strt,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
 
-CONS( 200?, eka_vol1,  0,          0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
+CONS( 200?, eka_vol1,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
 
-CONS( 200?, eka_vol2,  0,          0,   xavix,  xavix  , xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
+CONS( 200?, eka_vol2,  eka_base,   0,   xavix,  xavix  , xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
