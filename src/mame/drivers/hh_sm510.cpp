@@ -1200,13 +1200,13 @@ MACHINE_CONFIG_START(gnw_dkong_state::gnw_dkong)
         /* video hardware */
         MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
         MCFG_SCREEN_REFRESH_RATE(50)
-        MCFG_SCREEN_SIZE(1920/2, 1241/2)
-        MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1241/2-1)
+        MCFG_SCREEN_SIZE(1920/2, 1266/2)
+        MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1266/2-1)
 
         MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
         MCFG_SCREEN_REFRESH_RATE(50)
-        MCFG_SCREEN_SIZE(1920/2, 1237/2)
-        MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1237/2-1)
+        MCFG_SCREEN_SIZE(1920/2, 1266/2)
+        MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1266/2-1)
 
         MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
         config.set_default_layout(layout_gnw_dualv);
@@ -6645,10 +6645,10 @@ ROM_START( gnw_dkong )
         ROM_REGION( 0x1000, "maincpu", 0 )
         ROM_LOAD( "dk-52", 0x0000, 0x1000, CRC(5180cbf8) SHA1(5174570a8d6a601226f51e972bac6735535fe11d) )
 
-        ROM_REGION( 267443, "svg_top", 0)
+        ROM_REGION( 176706, "svg_top", 0)
         ROM_LOAD( "gnw_dkong_top.svg", 0, 176706, CRC(db041556) SHA1(fb0f979dea3ecd25288d341fa80e35b5fd0a8349) )
 
-        ROM_REGION( 390558, "svg_bottom", 0)
+        ROM_REGION( 145397, "svg_bottom", 0)
         ROM_LOAD( "gnw_dkong_bottom.svg", 0, 145397, CRC(2c8c9d08) SHA1(658fd0bbccaabb0645b02e5cb81709c4b2a4250e) )
 ROM_END
 
