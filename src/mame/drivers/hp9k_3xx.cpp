@@ -77,8 +77,6 @@ public:
 	hp9k3xx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
-		m_vram16(*this, "vram16"),
-		m_vram(*this, "vram"),
 		m_diag_led(*this, "led_diag_%u", 0U)
 	{ }
 
@@ -100,12 +98,7 @@ private:
 	virtual void machine_start() override;
 	virtual void driver_start() override;
 
-	optional_shared_ptr<uint16_t> m_vram16;
-	optional_shared_ptr<uint32_t> m_vram;
 	output_finder<8> m_diag_led;
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
@@ -130,41 +123,17 @@ private:
 	void add_dio16_bus(machine_config &mconfig);
 	void add_dio32_bus(machine_config &mconfig);
 
-        DECLARE_WRITE_LINE_MEMBER(dio_irq1_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, M68K_INT_ACK_AUTOVECTOR); };
-        DECLARE_WRITE_LINE_MEMBER(dio_irq2_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR); };
-        DECLARE_WRITE_LINE_MEMBER(dio_irq3_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR); };
-        DECLARE_WRITE_LINE_MEMBER(dio_irq4_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_4, state, M68K_INT_ACK_AUTOVECTOR); };
-        DECLARE_WRITE_LINE_MEMBER(dio_irq5_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_5, state, M68K_INT_ACK_AUTOVECTOR); };
-        DECLARE_WRITE_LINE_MEMBER(dio_irq6_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR); };
-        DECLARE_WRITE_LINE_MEMBER(dio_irq7_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_7, state, M68K_INT_ACK_AUTOVECTOR); };
+	DECLARE_WRITE_LINE_MEMBER(dio_irq1_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, M68K_INT_ACK_AUTOVECTOR); };
+	DECLARE_WRITE_LINE_MEMBER(dio_irq2_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR); };
+	DECLARE_WRITE_LINE_MEMBER(dio_irq3_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR); };
+	DECLARE_WRITE_LINE_MEMBER(dio_irq4_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_4, state, M68K_INT_ACK_AUTOVECTOR); };
+	DECLARE_WRITE_LINE_MEMBER(dio_irq5_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_5, state, M68K_INT_ACK_AUTOVECTOR); };
+	DECLARE_WRITE_LINE_MEMBER(dio_irq6_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR); };
+	DECLARE_WRITE_LINE_MEMBER(dio_irq7_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_7, state, M68K_INT_ACK_AUTOVECTOR); };
 
 	bool m_bus_error;
 	emu_timer *m_bus_error_timer;
 };
-
-uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint32_t *scanline;
-	int x, y;
-	uint32_t pixels;
-	uint32_t m_palette[2] = { 0x00000000, 0xffffffff };
-
-	for (y = 0; y < 390; y++)
-	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 512/4; x++)
-		{
-			pixels = m_vram[(y * 256) + x];
-
-			*scanline++ = m_palette[(pixels>>24) & 1];
-			*scanline++ = m_palette[(pixels>>16) & 1];
-			*scanline++ = m_palette[(pixels>>8) & 1];
-			*scanline++ = m_palette[(pixels & 1)];
-		}
-	}
-
-	return 0;
-}
 
 // shared mappings for all 9000/3xx systems
 void hp9k3xx_state::hp9k3xx_common(address_map &map)
@@ -214,9 +183,6 @@ void hp9k3xx_state::hp9k332_map(address_map &map)
 {
 	hp9k3xx_common(map);
 
-	map(0x00200000, 0x002fffff).ram().share("vram");    // 98544 mono framebuffer
-	map(0x00560000, 0x00563fff).rom().region("graphics", 0x0000);   // 98544 mono ROM
-
 	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0xffc00000, 0xffffffff).ram();
 }
@@ -258,11 +224,6 @@ void hp9k3xx_state::hp9k382_map(address_map &map)
 	map(0xffc00000, 0xffffffff).ram();
 
 	map(0x0051a000, 0x0051afff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
-}
-
-uint32_t hp9k3xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
 }
 
 /* Input ports */
@@ -409,7 +370,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	add_dio32_bus(config);
 
 	DIO32_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
-	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
+	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98543", false);
 	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
 	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
 	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98620", false);
@@ -441,15 +402,8 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	DIO16_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
 	DIO16_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98603b", false);
 	DIO16_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98644", false);
-	DIO16_SLOT(config, "sl3", 0, "diobus", dio16_cards, nullptr, false);
+	DIO16_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98543", false);
 	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
-
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(hp9k3xx_state, hp_medres_update)
-	MCFG_SCREEN_SIZE(512,390)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 390-1)
-	MCFG_SCREEN_REFRESH_RATE(70)
 
 MACHINE_CONFIG_END
 
@@ -516,9 +470,6 @@ ROM_START( hp9k332 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
 	ROM_LOAD16_BYTE( "1818-4796.bin", 0x000000, 0x010000, CRC(8a7642da) SHA1(7ba12adcea85916d18b021255391bec806c32e94) )
 	ROM_LOAD16_BYTE( "1818-4797.bin", 0x000001, 0x010000, CRC(98129eb1) SHA1(f3451a854060f1be1bee9f17c5c198b4b1cd61ac) )
-
-	ROM_REGION( 0x4000, "graphics", ROMREGION_ERASEFF | ROMREGION_BE | ROMREGION_32BIT )
-	ROM_LOAD16_BYTE( "5180-0471.bin", 0x000001, 0x002000, CRC(7256af2e) SHA1(584e8d4dcae8c898c1438125dc9c4709631b32f7) )
 ROM_END
 
 ROM_START( hp9k340 )
