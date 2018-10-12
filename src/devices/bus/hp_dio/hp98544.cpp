@@ -100,6 +100,7 @@ device_memory_interface::space_config_vector dio16_98544_device::memory_space_co
 
 void dio16_98544_device::device_start()
 {
+	save_item(NAME(m_intreg));
 	dio().install_memory(
 			0x200000, 0x2fffff,
 			read16_delegate(FUNC(topcat_device::vram_r), static_cast<topcat_device*>(m_topcat)),

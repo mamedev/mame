@@ -939,8 +939,7 @@ PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 
 READ8_MEMBER( portfolio_state::hd61830_rd_r )
 {
-	// TODO with real ROM: offs_t address = ((offset & 0xff) << 4) | ((offset >> 12) & 0x0f);
-	uint16_t address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
+	offs_t address = ((offset & 0xff) << 4) | ((offset >> 12) & 0x0f);
 	uint8_t data = m_char_rom[address];
 
 	return data;
@@ -1085,7 +1084,7 @@ ROM_START( pofo )
 	ROMX_LOAD( "c101781-007.u3", 0x20000, 0x20000, CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(0) )
 
 	ROM_REGION( 0x8000, HD61830_TAG, 0 )
-	ROM_LOAD( "hd61830 external character generator", 0x000, 0x800, BAD_DUMP CRC(747a1db3) SHA1(a4b29678fdb43791a8ce4c1ec778f3231bb422c5) ) // typed in from manual
+	ROM_LOAD( "c101783-001a-01.u3", 0x0000, 0x8000, CRC(61fdaff1) SHA1(5eb99e7a19af7b8d77ea8a2f1f554e6e3d382fa2) )
 ROM_END
 
 

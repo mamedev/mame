@@ -14,10 +14,11 @@
 #include "emu.h"
 #include "am79c90.h"
 
-DEFINE_DEVICE_TYPE(AM79C90, am79c90_device, "am79c90", "Am79C90 LANCE Ethernet Controller")
+DEFINE_DEVICE_TYPE(AM7990, am7990_device, "am7990", "Am7990 LANCE Ethernet Controller")
+DEFINE_DEVICE_TYPE(AM79C90, am79c90_device, "am79c90", "Am79C90 C-LANCE Ethernet Controller")
 
-am79c90_device::am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AM79C90, tag, owner, clock)
+am7990_device_base::am7990_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_receive_timer(nullptr)
 	//, m_receive_poll_timer(nullptr)
 	, m_transmit_timer(nullptr)
@@ -28,7 +29,17 @@ am79c90_device::am79c90_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void am79c90_device::device_start()
+am7990_device::am7990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: am7990_device_base(mconfig, AM7990, tag, owner, clock)
+{
+}
+
+am79c90_device::am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: am7990_device_base(mconfig, AM79C90, tag, owner, clock)
+{
+}
+
+void am7990_device_base::device_start()
 {
 	m_irq_out_cb.resolve_safe();
 	m_dma_out_cb.resolve_safe(); // TODO: Should be read/write16!
@@ -77,7 +88,7 @@ void am79c90_device::device_start()
 	save_item(NAME(m_transmitting));
 }
 
-void am79c90_device::device_reset()
+void am7990_device_base::device_reset()
 {
 	memset(&m_curr_transmit_desc, 0, sizeof(ring_descriptor));
 	memset(&m_next_transmit_desc, 0, sizeof(ring_descriptor));
@@ -112,7 +123,7 @@ void am79c90_device::device_reset()
 	m_transmitting = false;
 }
 
-void am79c90_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void am7990_device_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -130,7 +141,7 @@ void am79c90_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-void am79c90_device::fetch_transmit_descriptor()
+void am7990_device_base::fetch_transmit_descriptor()
 {
 	const uint32_t next_addr = (m_transmit_ring_addr >> 2) + (m_transmit_ring_pos << 1);
 	ring_descriptor &next = m_next_transmit_desc;
@@ -138,7 +149,7 @@ void am79c90_device::fetch_transmit_descriptor()
 	next.m_tmd23 = m_dma_in_cb(next_addr + 1, ~0);
 }
 
-void am79c90_device::fetch_receive_descriptor()
+void am7990_device_base::fetch_receive_descriptor()
 {
 	const uint32_t next_addr = (m_recv_ring_addr >> 2) + (m_recv_ring_pos << 1);
 	ring_descriptor &next = m_next_recv_desc;
@@ -146,7 +157,7 @@ void am79c90_device::fetch_receive_descriptor()
 	next.m_rmd23 = m_dma_in_cb(next_addr + 1, ~0);
 }
 
-void am79c90_device::recv_fifo_push(uint32_t value)
+void am7990_device_base::recv_fifo_push(uint32_t value)
 {
 	// TODO: Poll for the FIFO at 1.6ms, don't instantly start receiving!
 	// "...If the C-LANCE does not own it, it will poll the ring once every 1.6ms until
@@ -172,7 +183,7 @@ void am79c90_device::recv_fifo_push(uint32_t value)
 	}
 }
 
-void am79c90_device::begin_receiving()
+void am7990_device_base::begin_receiving()
 {
 	fetch_receive_descriptor();
 	m_curr_recv_desc = m_next_recv_desc;
@@ -208,7 +219,7 @@ void am79c90_device::begin_receiving()
 	}
 }
 
-void am79c90_device::receive()
+void am7990_device_base::receive()
 {
 	const uint32_t received_value = (m_recv_fifo_write == 0) ? 0 : m_recv_fifo[m_recv_fifo_read];
 	m_recv_fifo_read++;
@@ -277,7 +288,7 @@ void am79c90_device::receive()
 	}
 }
 
-void am79c90_device::transmit()
+void am7990_device_base::transmit()
 {
 	logerror("%s: LANCE transmit, fetching from %08x\n", machine().describe_context(), m_transmit_buf_addr >> 2);
 	uint32_t transmit_value = 0;
@@ -359,7 +370,7 @@ void am79c90_device::transmit()
 	}
 }
 
-void am79c90_device::prepare_transmit_buf()
+void am7990_device_base::prepare_transmit_buf()
 {
 	ring_descriptor &curr = m_curr_transmit_desc;
 	m_transmit_buf_addr = ((curr.m_tmd01 << 16) | ((curr.m_tmd01 >> 16) & 0x00ffffff)) | 0xff000000;
@@ -374,7 +385,7 @@ void am79c90_device::prepare_transmit_buf()
 	logerror("%s: LANCE: Valid transmit descriptors found, preparing to transmit %d bytes\n", machine().describe_context(), m_transmit_buf_count);
 }
 
-void am79c90_device::poll_transmit()
+void am7990_device_base::poll_transmit()
 {
 	ring_descriptor &curr = m_curr_transmit_desc;
 	const uint32_t base_addr = (m_transmit_ring_addr >> 2) + (m_transmit_ring_pos << 1);
@@ -436,7 +447,7 @@ void am79c90_device::poll_transmit()
 	m_transmit_timer->adjust(attotime::from_hz(10'000'000), 0, attotime::from_hz(10'000'000));
 }
 
-void am79c90_device::update_interrupts()
+void am7990_device_base::update_interrupts()
 {
 	if (m_csr[0] & CSR0_ANY_INTR)
 	{
@@ -449,7 +460,7 @@ void am79c90_device::update_interrupts()
 	m_irq_out_cb((m_csr[0] & CSR0_INTR) ? 1 : 0);
 }
 
-READ16_MEMBER(am79c90_device::regs_r)
+READ16_MEMBER(am7990_device_base::regs_r)
 {
 	uint16_t ret = 0;
 	if (offset)
@@ -465,11 +476,11 @@ READ16_MEMBER(am79c90_device::regs_r)
 	return ret;
 }
 
-WRITE16_MEMBER(am79c90_device::regs_w)
+WRITE16_MEMBER(am7990_device_base::regs_w)
 {
 	if (offset)
 	{
-		logerror("%s: lance_r: RAP = %d\n", machine().describe_context(), data & 3);
+		logerror("%s: lance_w: RAP = %d\n", machine().describe_context(), data & 3);
 		m_rap = data & 3;
 	}
 	else
@@ -557,10 +568,17 @@ WRITE16_MEMBER(am79c90_device::regs_w)
 				}
 				break;
 			case 1: // Least significant 15 bits of the Initialization Block
-				m_csr[1] = data & 0xfffe;
+				// Datasheet says "must be zero", but doesn't indicate what
+				// happens if it's written non-zero. Must be writable to pass
+				// system diagnostic on MIPS RS2030.
+				m_csr[1] = data;
 				break;
 			case 2: // Most significant 8 bits of the Initialization Block
-				m_csr[2] = data & 0x00ff;
+				// The C-LANCE datasheet explicitly states these bits read and
+				// write as zero, while LANCE datasheet just says "reserved".
+				// MIPS RS2030 diagnostic requires these bits to be writable,
+				// so assuming this is older device behaviour.
+				m_csr[2] = (type() == AM7990) ? data : (data & 0x00ff);
 				break;
 			case 3: // Bus master interface
 				m_csr[3] = data & 0x0007;

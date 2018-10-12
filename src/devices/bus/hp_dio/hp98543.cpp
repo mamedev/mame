@@ -38,13 +38,13 @@ MACHINE_CONFIG_START(dio16_98543_device::device_add_mconfig)
 	topcat_device &topcat0(TOPCAT(config, "topcat0", XTAL(35904000)));
 	topcat0.set_fb_width(1024);
 	topcat0.set_fb_height(400);
-	topcat0.set_planemask(8);
+	topcat0.set_planemask(1);
 	topcat0.irq_out_cb().set(FUNC(dio16_98543_device::int0_w));
 
 	topcat_device &topcat1(TOPCAT(config, "topcat1", XTAL(35904000)));
 	topcat1.set_fb_width(1024);
 	topcat1.set_fb_height(400);
-	topcat1.set_planemask(8);
+	topcat1.set_planemask(2);
 	topcat1.irq_out_cb().set(FUNC(dio16_98543_device::int1_w));
 
 	topcat_device &topcat2(TOPCAT(config, "topcat2", XTAL(35904000)));
@@ -59,7 +59,7 @@ MACHINE_CONFIG_START(dio16_98543_device::device_add_mconfig)
 	topcat3.set_planemask(8);
 	topcat3.irq_out_cb().set(FUNC(dio16_98543_device::int3_w));
 
-	NEREID(config, "nereid", 0);
+	NEREID(config, m_nereid, 0);
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *dio16_98543_device::device_rom_region() const
@@ -99,6 +99,9 @@ dio16_98543_device::dio16_98543_device(const machine_config &mconfig, device_typ
 
 void dio16_98543_device::device_start()
 {
+	save_item(NAME(m_intreg));
+	save_item(NAME(m_ints));
+
 	dio().install_memory(
 			0x200000, 0x27ffff,
 			read16_delegate(FUNC(dio16_98543_device::vram_r), this),

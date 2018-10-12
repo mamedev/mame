@@ -869,6 +869,10 @@ if (BUSES["HPHIL"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_hil/hp_hil.h",
 		MAME_DIR .. "src/devices/bus/hp_hil/hil_devices.cpp",
 		MAME_DIR .. "src/devices/bus/hp_hil/hil_devices.h",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlebase.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlebase.h",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlemouse.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlemouse.h",
 		MAME_DIR .. "src/devices/bus/hp_hil/hlekbd.cpp",
 		MAME_DIR .. "src/devices/bus/hp_hil/hlekbd.h",
 	}
@@ -1379,6 +1383,8 @@ if (BUSES["PC_KBD"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc_kbd/pcat84.h",
 		MAME_DIR .. "src/devices/bus/pc_kbd/pcxt83.cpp",
 		MAME_DIR .. "src/devices/bus/pc_kbd/pcxt83.h",
+		MAME_DIR .. "src/devices/bus/pc_kbd/pcat101.cpp",
+		MAME_DIR .. "src/devices/bus/pc_kbd/pcat101.h",
 	}
 end
 

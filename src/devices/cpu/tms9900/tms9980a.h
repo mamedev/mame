@@ -30,6 +30,8 @@ public:
 	tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	tms9980a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	void        mem_read(void) override;
 	void        mem_write(void) override;
 	void        acquire_instruction(void) override;
@@ -50,7 +52,14 @@ protected:
 	address_space_config    m_io_config80;
 };
 
+class tms9981_device : public tms9980a_device
+{
+public:
+	tms9981_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(TMS9980A, tms9980a_device)
+DECLARE_DEVICE_TYPE(TMS9981, tms9981_device)
 
 #endif // MAME_CPU_TMS9900_TMS9980A_H

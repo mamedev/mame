@@ -21,6 +21,8 @@
 #include "sound/okiadpcm.h"
 #include "screen.h"
 
+#define SPG2XX_VISUAL_AUDIO_DEBUG (0)
+
 class spg2xx_device : public device_t, public device_sound_interface
 {
 public:
@@ -42,6 +44,10 @@ public:
 	auto uart_rx() { return m_uart_rx.bind(); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	void advance_debug_pos();
+	uint32_t debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+#endif
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
 protected:
@@ -446,6 +452,12 @@ protected:
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	std::unique_ptr<uint8_t[]> m_audio_debug_buffer;
+	uint16_t m_audio_debug_x;
+	required_device<screen_device> m_audio_screen;
+#endif
+
 	static const uint32_t s_rampdown_frame_counts[8];
 	static const uint32_t s_envclk_frame_counts[16];
 };
@@ -453,12 +465,20 @@ protected:
 class spg24x_device : public spg2xx_device
 {
 public:
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	template <typename T, typename U, typename V>
+	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag, V &&debug_screen_tag)
+#else
 	template <typename T, typename U>
 	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+#endif
 		: spg24x_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 		m_screen.set_tag(std::forward<U>(screen_tag));
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+		m_audio_screen.set_tag(std::forward<V>(debug_screen_tag));
+#endif
 	}
 
 	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -467,12 +487,20 @@ public:
 class spg28x_device : public spg2xx_device
 {
 public:
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	template <typename T, typename U, typename V>
+	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag, V &&debug_screen_tag)
+#else
 	template <typename T, typename U>
 	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+#endif
 		: spg28x_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 		m_screen.set_tag(std::forward<U>(screen_tag));
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+		m_audio_screen.set_tag(std::forward<V>(debug_screen_tag));
+#endif
 	}
 
 	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

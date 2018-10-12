@@ -786,19 +786,19 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(CRT9007_TAG, CRT9007, 16_MHz_XTAL * 28 / 20 / 8)
-	MCFG_DEVICE_ADDRESS_MAP(0, vpac_mem)
-	MCFG_CRT9007_CHARACTER_WIDTH(8)
-	MCFG_CRT9007_INT_CALLBACK(WRITELINE(I8259A_1_TAG, pic8259_device, ir1_w))
-	MCFG_CRT9007_VS_CALLBACK(WRITELINE(CRT9021B_TAG, crt9021_device, vsync_w))
-	MCFG_CRT9007_VLT_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_vlt_w))
-	MCFG_CRT9007_CURS_CALLBACK(WRITELINE(CRT9021B_TAG, crt9021_device, cursor_w))
-	MCFG_CRT9007_DRB_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_drb_w))
-	MCFG_CRT9007_WBEN_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_wben_w))
-	MCFG_CRT9007_CBLANK_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_cblank_w))
-	MCFG_CRT9007_SLG_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_slg_w))
-	MCFG_CRT9007_SLD_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_sld_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	crt9007_device &vpac(CRT9007(config, CRT9007_TAG, 16_MHz_XTAL * 28 / 20 / 8));
+	vpac.set_addrmap(0, &tandy2k_state::vpac_mem);
+	vpac.set_character_width(8);
+	vpac.int_callback().set(I8259A_1_TAG, FUNC(pic8259_device::ir1_w));
+	vpac.vs_callback().set(CRT9021B_TAG, FUNC(crt9021_device::vsync_w));
+	vpac.vlt_callback().set(FUNC(tandy2k_state::vpac_vlt_w));
+	vpac.curs_callback().set(CRT9021B_TAG, FUNC(crt9021_device::cursor_w));
+	vpac.drb_callback().set(FUNC(tandy2k_state::vpac_drb_w));
+	vpac.wben_callback().set(FUNC(tandy2k_state::vpac_wben_w));
+	vpac.cblank_callback().set(FUNC(tandy2k_state::vpac_cblank_w));
+	vpac.slg_callback().set(FUNC(tandy2k_state::vpac_slg_w));
+	vpac.sld_callback().set(FUNC(tandy2k_state::vpac_sld_w));
+	vpac.set_screen(SCREEN_TAG);
 
 	MCFG_DEVICE_ADD(CRT9212_0_TAG, CRT9212, 0)
 	MCFG_CRT9212_WEN2_VCC()

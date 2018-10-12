@@ -2583,6 +2583,7 @@ atetrisa                        // 136066           (c) 1988
 atetrisb                        // (bootleg)
 atetrisb2                       // (bootleg)
 atetrisb3                       // (bootleg)
+atetb3482                       // (bootleg, with UM3482)
 atetrisc                        // 136066           (c) 1989
 atetrisc2                       // 136066           (c) 1989
 
@@ -21418,6 +21419,10 @@ minitel2                        //
 @source:minivadr.cpp
 minivadr                        // D26 cabinet test board
 
+@source:mips.cpp
+rc2030                          // MIPS RC2030
+rs2030                          // MIPS RS2030
+
 @source:mirage.cpp
 mirage                          // (c) 1994 Mitchell
 
@@ -37931,8 +37936,9 @@ gq863                           //
 
 @source:twins.cpp
 spider                          //
-twins                           // (c) 1994
-twinsa                          // (c) 1994
+twins                           // (c) 1993 Ecogames
+twinsed1                        // (c) 1994 Electronic Devices
+twinsed2                        // (c) 1994 Electronic Devices
 
 @source:tx0.cpp
 tx0_64kw                        // April 1956 MIT TX-0 (64kw RAM)

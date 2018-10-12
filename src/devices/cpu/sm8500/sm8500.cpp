@@ -272,7 +272,6 @@ void sm8500_cpu_device::process_interrupts()
 				m_IR0 = m_program->read_byte(0x12);
 				m_IR1 = m_program->read_byte(0x13);
 				m_PS0 = m_program->read_byte(0x1e);
-				m_PS1 = m_program->read_byte(0x1f);
 				switch( irqline )
 				{
 				case WDT_INT:
@@ -284,56 +283,56 @@ void sm8500_cpu_device::process_interrupts()
 					break;
 				case DMA_INT:
 					m_IR0 |= 0x80;
-					if ( ( m_IE0 & 0x80 ) && ( ( m_PS0 & 0x07 ) < 8 ) && ( m_PS1 & 0x01 ) )
+					if ( BIT( m_IE0, 7) && BIT( m_PS1, 0) )
 					{
 						take_interrupt( 0x1000 );
 					}
 					break;
 				case TIM0_INT:
 					m_IR0 |= 0x40;
-					if ( ( m_IE0 & 0x40 ) && ( ( m_PS0 & 0x07 ) < 8 ) && ( m_PS1 & 0x01 ) )
+					if ( BIT( m_IE0, 6) && BIT( m_PS1, 0) )
 					{
 						take_interrupt( 0x1002 );
 					}
 					break;
 				case EXT_INT:
 					m_IR0 |= 0x10;
-					if ( ( m_IE0 & 0x10 ) && ( ( m_PS0 & 0x07 ) < 7 ) && ( m_PS1 & 0x01 ) )
+					if ( BIT( m_IE0, 4) && ( ( m_PS0 & 0x07 ) < 7 ) && BIT( m_PS1, 0) )
 					{
 						take_interrupt( 0x1006 );
 					}
 					break;
 				case UART_INT:
 					m_IR0 |= 0x08;
-					if ( ( m_IE0 & 0x08 ) && ( ( m_PS0 & 0x07 ) < 6 ) && ( m_PS1 & 0x01 ) )
+					if ( BIT( m_IE0, 3) && ( ( m_PS0 & 0x07 ) < 6 ) && BIT( m_PS1, 0) )
 					{
 						take_interrupt( 0x1008 );
 					}
 					break;
 				case LCDC_INT:
 					m_IR0 |= 0x01;
-					if ( ( m_IE0 & 0x01 ) && ( ( m_PS0 & 0x07 ) < 5 ) && ( m_PS1 & 0x01 ) )
+					if ( BIT( m_IE0, 0) && ( ( m_PS0 & 0x07 ) < 5 ) && BIT( m_PS1, 0) )
 					{
 						take_interrupt( 0x100E );
 					}
 					break;
 				case TIM1_INT:
 					m_IR1 |= 0x40;
-					if ( ( m_IE1 & 0x40 ) && ( ( m_PS0 & 0x07 ) < 4 ) && ( m_PS1 & 0x01 ) )
+					if ( BIT( m_IE1, 6) && ( ( m_PS0 & 0x07 ) < 4 ) && BIT( m_PS1, 0) )
 					{
 						take_interrupt( 0x1012 );
 					}
 					break;
 				case CK_INT:
 					m_IR1 |= 0x10;
-					if ( ( m_IE1 & 0x10 ) && ( ( m_PS0 & 0x07 ) < 3 ) && ( m_PS1 & 0x01 ) )
+					if ( BIT( m_IE1, 4) && ( ( m_PS0 & 0x07 ) < 3 ) && BIT( m_PS1, 0) )
 					{
 						take_interrupt( 0x1016 );
 					}
 					break;
 				case PIO_INT:
 					m_IR1 |= 0x04;
-					if ( ( m_IE1 & 0x04 ) && ( ( m_PS0 & 0x07 ) < 2 ) && ( m_PS1 & 0x01 ) )
+					if ( BIT( m_IE1, 2) && ( ( m_PS0 & 0x07 ) < 2 ) && BIT( m_PS1, 0) )
 					{
 						take_interrupt( 0x101A );
 					}

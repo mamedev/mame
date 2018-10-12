@@ -45,14 +45,18 @@ void topcat_device::device_start()
 	save_item(NAME(m_dst_y_pixel));
 	save_item(NAME(m_block_mover_pixel_width));
 	save_item(NAME(m_block_mover_pixel_height));
-	save_item(NAME(m_fb_width));
-	save_item(NAME(m_fb_height));
-	save_item(NAME(m_read_enable));
-	save_item(NAME(m_write_enable));
-	save_item(NAME(m_fb_enable));
 	save_item(NAME(m_unknown_reg4a));
 	save_item(NAME(m_unknown_reg4c));
 	save_item(NAME(m_cursor_state));
+	save_item(NAME(m_cursor_x_pos));
+	save_item(NAME(m_cursor_y_pos));
+	save_item(NAME(m_cursor_width));
+	save_item(NAME(m_fb_width));
+	save_item(NAME(m_fb_height));
+	save_item(NAME(m_plane_mask));
+	save_item(NAME(m_read_enable));
+	save_item(NAME(m_write_enable));
+	save_item(NAME(m_fb_enable));
 	save_item(NAME(m_changed));
 }
 

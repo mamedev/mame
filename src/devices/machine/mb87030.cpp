@@ -132,18 +132,16 @@ void mb87030_device::update_state(mb87030_device::State new_state, int delay, in
 		m_timer->reset();
 }
 
-void mb87030_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(mb87030_device::timeout)
 {
-	switch(id) {
-	case TimerId::Delay:
-		m_delay_timer->reset();
-		step(false);
-		break;
-	case TimerId::Timeout:
-		m_timer->reset();
-		step(true);
-		break;
-	}
+	m_timer->reset();
+	step(true);
+}
+
+TIMER_CALLBACK_MEMBER(mb87030_device::delay_timeout)
+{
+	m_delay_timer->reset();
+	step(false);
 }
 
 void mb87030_device::scsi_command_complete()
@@ -432,8 +430,8 @@ void mb87030_device::step(bool timeout)
 
 void mb87030_device::device_start()
 {
-	m_timer = timer_alloc(TimerId::Timeout);
-	m_delay_timer = timer_alloc(TimerId::Delay);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb87030_device::timeout), this));
+	m_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb87030_device::delay_timeout), this));
 	m_irq_handler.resolve_safe();
 	m_dreq_handler.resolve_safe();
 

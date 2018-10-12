@@ -41,6 +41,11 @@ void human_interface_device::device_add_mconfig(machine_config &config)
 	keyboard.set_default_option("hp_46021a");
 	keyboard.set_hp_hil_slot(this, "mlc");
 
+	hp_hil_slot_device &mouse(HP_HIL_SLOT(config, "hil2", 0));
+	hp_hil_devices(mouse);
+	mouse.set_default_option("hp_46060b");
+	mouse.set_hp_hil_slot(this, "mlc");
+
 	SPEAKER(config, "mono").front_center();
 	sn76494_device &sound(SN76494(config, "sn76494", 333333));
 	sound.add_route(ALL_OUTPUTS, "mono", 0.75);
@@ -295,8 +300,7 @@ void human_interface_device::dmack_w_in(int channel, uint8_t data)
 {
 	if (channel)
 		return;
-//	FIXME
-//	m_tms9914->reg8_w(memory_space(), 7, data);
+	m_tms9914->reg8_w(*program_space(), 7, data);
 }
 
 uint8_t human_interface_device::dmack_r_in(int channel)
