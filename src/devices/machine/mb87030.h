@@ -181,9 +181,11 @@ private:
 	uint32_t scsi_get_ctrl();
 	void step(bool timeout);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_dreq_handler;
+
+	TIMER_CALLBACK_MEMBER(delay_timeout);
+	TIMER_CALLBACK_MEMBER(timeout);
 
 	// registers
 	uint8_t m_bdid;
