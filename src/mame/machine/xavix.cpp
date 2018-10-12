@@ -194,14 +194,14 @@ WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 	logerror("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::dispctrl_6ffa_w)
+WRITE8_MEMBER(xavix_state::dispctrl_posirq_x_w)
 {
-	logerror("%s: dispctrl_6ffa_w %02x\n", machine().describe_context(), data);
+	logerror("%s: dispctrl_posirq_x_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::dispctrl_6ffb_w)
+WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 {
-	logerror("%s: dispctrl_6ffb_w %02x\n", machine().describe_context(), data);
+	logerror("%s: dispctrl_posirq_y_w %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(xavix_state::io_0_r)

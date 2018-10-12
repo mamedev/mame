@@ -325,21 +325,21 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6fe1, 0x6fe2).w(FUNC(xavix_state::spritefragment_dma_params_1_w));
 	map(0x6fe5, 0x6fe6).w(FUNC(xavix_state::spritefragment_dma_params_2_w));
 
-	// Arena Registers
+	// Arena Registers (controls visible window + more?)
 	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::arena_start_r), FUNC(xavix_state::arena_start_w)); // r/w tested
 	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::arena_end_r), FUNC(xavix_state::arena_end_w)); // r/w tested
 	map(0x6fea, 0x6fea).rw(FUNC(xavix_state::arena_control_r), FUNC(xavix_state::arena_control_w));
 
 	// Colour Mixing / Enabling Registers
-	map(0x6ff0, 0x6ff0).ram().share("colmix_sh"); // a single colour (for effects or bgpen?)
+	map(0x6ff0, 0x6ff0).ram().share("colmix_sh"); // a single colour (for effects?) not bgpen
 	map(0x6ff1, 0x6ff1).ram().share("colmix_l");
 	map(0x6ff2, 0x6ff2).w(FUNC(xavix_state::colmix_6ff2_w)); // set to 07 after clearing above things in interrupt 0
 
 	// Display Control Register / Status Flags
 	map(0x6ff8, 0x6ff8).rw(FUNC(xavix_state::dispctrl_6ff8_r), FUNC(xavix_state::dispctrl_6ff8_w)); // always seems to be a read/store or read/modify/store
 	map(0x6ff9, 0x6ff9).r(FUNC(xavix_state::pal_ntsc_r));
-	map(0x6ffa, 0x6ffa).w(FUNC(xavix_state::dispctrl_6ffa_w));
-	map(0x6ffb, 0x6ffb).w(FUNC(xavix_state::dispctrl_6ffb_w)); // increases / decreases when you jump in snowboard, maybe raster irq pos or part of a clipping window?
+	map(0x6ffa, 0x6ffa).w(FUNC(xavix_state::dispctrl_posirq_x_w));
+	map(0x6ffb, 0x6ffb).w(FUNC(xavix_state::dispctrl_posirq_y_w)); // increases / decreases when you jump in snowboard (snowboard, used to blank ground)
 
 	// Lightgun / pen 1 control
 	// map(0x6ffc, 0x6fff)

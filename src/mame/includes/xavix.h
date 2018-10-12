@@ -125,8 +125,8 @@ private:
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_WRITE8_MEMBER(dispctrl_6ffa_w);
-	DECLARE_WRITE8_MEMBER(dispctrl_6ffb_w);
+	DECLARE_WRITE8_MEMBER(dispctrl_posirq_x_w);
+	DECLARE_WRITE8_MEMBER(dispctrl_posirq_y_w);
 
 	DECLARE_READ8_MEMBER(sound_75f0_r);
 	DECLARE_WRITE8_MEMBER(sound_75f0_w);
