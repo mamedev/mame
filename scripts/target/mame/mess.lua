@@ -1088,7 +1088,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"mgu",
 		"microkey",
 		"microsoft",
-		"mips"
+		"mips",
 		"mit",
 		"mits",
 		"mitsubishi",
