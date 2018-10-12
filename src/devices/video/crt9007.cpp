@@ -964,5 +964,6 @@ void crt9007_device::set_character_width(unsigned value)
 {
 	m_hpixels_per_column = value;
 
-	recompute_parameters();
+	if (started())
+		recompute_parameters();
 }

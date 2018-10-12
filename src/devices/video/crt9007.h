@@ -38,48 +38,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CRT9007_CHARACTER_WIDTH(_value) \
-	downcast<crt9007_device &>(*device).config_set_character_width(_value);
-
-#define MCFG_CRT9007_INT_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_int_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9007_DMAR_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_dmar_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9007_VS_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_vs_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9007_HS_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_hs_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9007_VLT_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_vlt_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9007_CURS_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_curs_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9007_DRB_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_drb_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9007_WBEN_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_wben_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9007_CBLANK_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_cblank_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9007_SLG_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_slg_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9007_SLD_CALLBACK(_write) \
-	downcast<crt9007_device &>(*device).set_sld_wr_callback(DEVCB_##_write);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -93,19 +51,17 @@ public:
 	// construction/destruction
 	crt9007_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void config_set_character_width(unsigned value) { m_hpixels_per_column = value; }
-
-	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dmar_wr_callback(Object &&cb) { return m_write_dmar.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vs_wr_callback(Object &&cb) { return m_write_vs.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hs_wr_callback(Object &&cb) { return m_write_hs.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vlt_wr_callback(Object &&cb) { return m_write_vlt.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_curs_wr_callback(Object &&cb) { return m_write_curs.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drb_wr_callback(Object &&cb) { return m_write_drb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_wben_wr_callback(Object &&cb) { return m_write_wben.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cblank_wr_callback(Object &&cb) { return m_write_cblank.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_slg_wr_callback(Object &&cb) { return m_write_slg.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sld_wr_callback(Object &&cb) { return m_write_sld.set_callback(std::forward<Object>(cb)); }
+	auto int_callback() { return m_write_int.bind(); }
+	auto dmar_callback() { return m_write_dmar.bind(); }
+	auto vs_callback() { return m_write_vs.bind(); }
+	auto hs_callback() { return m_write_hs.bind(); }
+	auto vlt_callback() { return m_write_vlt.bind(); }
+	auto curs_callback() { return m_write_curs.bind(); }
+	auto drb_callback() { return m_write_drb.bind(); }
+	auto wben_callback() { return m_write_wben.bind(); }
+	auto cblank_callback() { return m_write_cblank.bind(); }
+	auto slg_callback() { return m_write_slg.bind(); }
+	auto sld_callback() { return m_write_sld.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
