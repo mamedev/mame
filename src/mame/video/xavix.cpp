@@ -677,14 +677,10 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		// some games enable it with both regs as 00, which causes a problem
 		if (m_arena_start > m_arena_end)
 		{
-
 			// controls the clipping area (for all layers?) used for effect at start of Slap Fight and to add black borders in other cases
 			// based on Slap Fight Tiger lives display (and reference videos) this is slightly offset as all gfx must display
 			// other games don't correct the offset so will display a tiny bit of extra space at times?
 			// (there is some tilemap draw-in on Monster Truck)
-
-			printf("%02x %02x\n", m_arena_start, m_arena_end);
-
 			clip.max_x = m_arena_start + 1;
 			clip.min_x = m_arena_end - 2;
 
@@ -693,7 +689,6 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			if (clip.max_x > cliprect.max_x)
 				clip.max_x = cliprect.max_x;
-
 		}
 	}
 	bitmap.fill(0, clip);
