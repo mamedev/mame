@@ -186,12 +186,12 @@ static const char *const turbo_sample_names[] =
 MACHINE_CONFIG_START(turbo_state::turbo_samples)
 
 	/* this is the cockpit speaker configuration */
-	MCFG_SPEAKER_ADD("fspeaker", 0.0, 0.0, 1.0)     /* front */
-	MCFG_SPEAKER_ADD("bspeaker",  0.0, 0.0, -0.5)   /* back */
-	MCFG_SPEAKER_ADD("lspeaker", -0.2, 0.0, 1.0)    /* left */
-	MCFG_SPEAKER_ADD("rspeaker", 0.2, 0.0, 1.0)     /* right */
+	SPEAKER(config, "fspeaker", 0.0, 0.0, 1.0);     // front
+	SPEAKER(config, "bspeaker",  0.0, 0.0, -0.5);   // back
+	SPEAKER(config, "lspeaker", -0.2, 0.0, 1.0);    // left
+	SPEAKER(config, "rspeaker", 0.2, 0.0, 1.0);     // right
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(10)
 	MCFG_SAMPLES_NAMES(turbo_sample_names)
 
@@ -430,9 +430,10 @@ static const char *const subroc3d_sample_names[] =
 };
 
 MACHINE_CONFIG_START(turbo_state::subroc3d_samples)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(12)
 	MCFG_SAMPLES_NAMES(subroc3d_sample_names)
 
@@ -575,8 +576,8 @@ static const char *const buckrog_sample_names[]=
 
 
 MACHINE_CONFIG_START(turbo_state::buckrog_samples)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(buckrog_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -616,7 +617,7 @@ static const discrete_555_desc turbo_alarm_555 =
 	DEFAULT_555_VALUES,
 };
 
-DISCRETE_SOUND_START(turbo)
+DISCRETE_SOUND_START(turbo_discrete)
 	/************************************************/
 	/* Input register mapping for turbo             */
 	/************************************************/

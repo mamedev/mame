@@ -195,7 +195,7 @@ void rm380z_state::check_scroll_register()
 
 WRITE8_MEMBER( rm380z_state::videoram_write )
 {
-	//printf("vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x] PC [%4.4x]\n",offset,data,m_port0,m_fbfd,m_fbfe,m_maincpu->safe_pc());
+	//printf("%s vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x]\n",machine().describe_context().c_str(),offset,data,m_port0,m_fbfd,m_fbfe);
 
 	int lineWidth=0x80;
 	if (m_videomode==RM380Z_VIDEOMODE_40COL)

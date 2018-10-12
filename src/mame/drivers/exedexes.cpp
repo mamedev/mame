@@ -34,36 +34,38 @@ TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::exedexes_scanline)
 }
 
 
-ADDRESS_MAP_START(exedexes_state::exedexes_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW0")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(exedexes_c804_w)                              /* coin counters + text layer enable */
-	AM_RANGE(0xc806, 0xc806) AM_WRITENOP                                            /* Watchdog ?? */
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(exedexes_videoram_w) AM_SHARE("videoram") /* Video RAM */
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(exedexes_colorram_w) AM_SHARE("colorram") /* Color RAM */
-	AM_RANGE(0xd800, 0xd801) AM_WRITEONLY AM_SHARE("nbg_yscroll")
-	AM_RANGE(0xd802, 0xd803) AM_WRITEONLY AM_SHARE("nbg_xscroll")
-	AM_RANGE(0xd804, 0xd805) AM_WRITEONLY AM_SHARE("bg_scroll")
-	AM_RANGE(0xd807, 0xd807) AM_WRITE(exedexes_gfxctrl_w)                           /* layer enables */
-	AM_RANGE(0xe000, 0xefff) AM_RAM                                                 /* Work RAM */
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")   /* Sprite RAM */
-ADDRESS_MAP_END
+void exedexes_state::exedexes_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc000).portr("SYSTEM");
+	map(0xc001, 0xc001).portr("P1");
+	map(0xc002, 0xc002).portr("P2");
+	map(0xc003, 0xc003).portr("DSW0");
+	map(0xc004, 0xc004).portr("DSW1");
+	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc804, 0xc804).w(FUNC(exedexes_state::exedexes_c804_w));                              /* coin counters + text layer enable */
+	map(0xc806, 0xc806).nopw();                                            /* Watchdog ?? */
+	map(0xd000, 0xd3ff).ram().w(FUNC(exedexes_state::exedexes_videoram_w)).share("videoram"); /* Video RAM */
+	map(0xd400, 0xd7ff).ram().w(FUNC(exedexes_state::exedexes_colorram_w)).share("colorram"); /* Color RAM */
+	map(0xd800, 0xd801).writeonly().share("nbg_yscroll");
+	map(0xd802, 0xd803).writeonly().share("nbg_xscroll");
+	map(0xd804, 0xd805).writeonly().share("bg_scroll");
+	map(0xd807, 0xd807).w(FUNC(exedexes_state::exedexes_gfxctrl_w));                           /* layer enables */
+	map(0xe000, 0xefff).ram();                                                 /* Work RAM */
+	map(0xf000, 0xffff).ram().share("spriteram");   /* Sprite RAM */
+}
 
 
 
-ADDRESS_MAP_START(exedexes_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("sn2", sn76489_device, write)
-ADDRESS_MAP_END
+void exedexes_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8002).w("sn1", FUNC(sn76489_device::command_w));
+	map(0x8003, 0x8003).w("sn2", FUNC(sn76489_device::command_w));
+}
 
 
 
@@ -193,7 +195,7 @@ static const gfx_layout tilelayout =
 
 
 
-static GFXDECODE_START( exedexes )
+static GFXDECODE_START( gfx_exedexes )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           64*4, 64 ) /* 32x32 Tiles */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,       2*64*4, 16 ) /* 16x16 Tiles */
@@ -220,17 +222,17 @@ void exedexes_state::machine_reset()
 MACHINE_CONFIG_START(exedexes_state::exedexes)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(exedexes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(exedexes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exedexes_state, exedexes_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)  /* 3 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(exedexes_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)  /* 3 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(exedexes_state, irq0_line_hold, 4*60)
 
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -238,27 +240,27 @@ MACHINE_CONFIG_START(exedexes_state::exedexes)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exedexes_state, screen_update_exedexes)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exedexes)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exedexes)
 
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(exedexes_state, exedexes)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("sn1", SN76489, 3000000)
+	MCFG_DEVICE_ADD("sn1", SN76489, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.36)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 3000000)
+	MCFG_DEVICE_ADD("sn2", SN76489, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.36)
 MACHINE_CONFIG_END
 
@@ -350,5 +352,5 @@ ROM_END
 
 
 
-GAME( 1985, exedexes, 0,        exedexes, exedexes, exedexes_state, 0, ROT270, "Capcom", "Exed Exes", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, savgbees, exedexes, exedexes, exedexes, exedexes_state, 0, ROT270, "Capcom (Memetron license)", "Savage Bees", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, exedexes, 0,        exedexes, exedexes, exedexes_state, empty_init, ROT270, "Capcom", "Exed Exes", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, savgbees, exedexes, exedexes, exedexes, exedexes_state, empty_init, ROT270, "Capcom (Memetron license)", "Savage Bees", MACHINE_SUPPORTS_SAVE )

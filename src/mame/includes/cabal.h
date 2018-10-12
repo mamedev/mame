@@ -2,6 +2,7 @@
 // copyright-holders:Carlos A. Lozano
 #include "audio/seibu.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class cabal_state : public driver_device
 {
@@ -46,7 +47,7 @@ public:
 	DECLARE_WRITE16_MEMBER(text_videoram_w);
 
 	// cabal specific
-	DECLARE_WRITE16_MEMBER(sound_irq_trigger_word_w);
+	void sound_irq_trigger_word_w(offs_t, u16 data, u16 mem_mask);
 
 	// cabalbl specific
 	DECLARE_WRITE16_MEMBER(cabalbl_sndcmd_w);
@@ -57,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cabalbl_1_adpcm_w);
 	DECLARE_WRITE8_MEMBER(cabalbl_2_adpcm_w);
 
-	DECLARE_DRIVER_INIT(cabal);
+	void init_cabal();
 	DECLARE_MACHINE_START(cabalbl);
 	DECLARE_MACHINE_RESET(cabalbl);
 	virtual void video_start() override;

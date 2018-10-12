@@ -500,4 +500,18 @@
 		</part>
 	</software>
 
+	<!-- Mega Games Cartridge -->
+
+	<software name="mgc">
+		<description>Mega Games Cartridge</description>
+		<year>2017</year>
+		<publisher>Retro Hardware</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="mgc" />
+			<dataarea name="nvram" size="4194304">
+				<rom name="mgc.rom" size="4194304" crc="cfeb80bc" sha1="064a44e8ac9a31cb300bda568b36162f9c1134d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

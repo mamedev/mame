@@ -94,7 +94,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 
@@ -131,7 +131,7 @@ protected:
 	int m_icount;
 
 	address_space *m_program;
-	direct_read_data<0> * m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
 
 	write32_delegate m_cmd_callback;
 
@@ -181,7 +181,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 
@@ -191,7 +191,7 @@ protected:
 	int m_icount;
 
 	address_space *m_program;
-	direct_read_data<0> * m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
 };
 
 

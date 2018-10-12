@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 class pc090oj_device : public device_t
 {
 public:
@@ -71,9 +73,9 @@ DECLARE_DEVICE_TYPE(PC090OJ, pc090oj_device)
 	downcast<pc090oj_device &>(*device).set_usebuffer(_use_buf);
 
 #define MCFG_PC090OJ_GFXDECODE(_gfxtag) \
-	downcast<pc090oj_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<pc090oj_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #define MCFG_PC090OJ_PALETTE(_palette_tag) \
-	downcast<pc090oj_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<pc090oj_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_PC090)J_H

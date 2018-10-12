@@ -98,6 +98,7 @@ dumped by sayu
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -113,6 +114,9 @@ public:
 		m_adpcm(*this, "adpcm") ,
 		m_palette(*this, "palette"){ }
 
+	void jantotsu(machine_config &config);
+
+private:
 	/* sound-related */
 	uint32_t   m_adpcm_pos;
 	uint8_t    m_adpcm_idle;
@@ -143,7 +147,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
 	required_device<palette_device> m_palette;
-	void jantotsu(machine_config &config);
 	void jantotsu_io(address_map &map);
 	void jantotsu_map(address_map &map);
 };
@@ -316,7 +319,7 @@ WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
 		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
-		m_adpcm->data_w(m_adpcm_data & 0xf);
+		m_adpcm->write_data(m_adpcm_data & 0xf);
 		m_adpcm_trigger ^= 1;
 		if (m_adpcm_trigger == 0)
 		{
@@ -334,20 +337,22 @@ WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
  *
  *************************************/
 
-ADDRESS_MAP_START(jantotsu_state::jantotsu_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(jantotsu_bitmap_r, jantotsu_bitmap_w)
-ADDRESS_MAP_END
+void jantotsu_state::jantotsu_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xffff).rw(FUNC(jantotsu_state::jantotsu_bitmap_r), FUNC(jantotsu_state::jantotsu_bitmap_w));
+}
 
-ADDRESS_MAP_START(jantotsu_state::jantotsu_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0x02, 0x03) AM_WRITE(jan_adpcm_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(jantotsu_mux_r, jantotsu_mux_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(bankaddr_w)
-ADDRESS_MAP_END
+void jantotsu_state::jantotsu_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW1").w("sn1", FUNC(sn76489a_device::command_w));
+	map(0x01, 0x01).r(FUNC(jantotsu_state::jantotsu_dsw2_r)).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0x02, 0x03).w(FUNC(jantotsu_state::jan_adpcm_w));
+	map(0x04, 0x04).rw(FUNC(jantotsu_state::jantotsu_mux_r), FUNC(jantotsu_state::jantotsu_mux_w));
+	map(0x07, 0x07).w(FUNC(jantotsu_state::bankaddr_w));
+}
 
 
 /*************************************
@@ -500,11 +505,9 @@ void jantotsu_state::machine_reset()
 MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(jantotsu_map)
-	MCFG_CPU_IO_MAP(jantotsu_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jantotsu_state,  nmi_line_pulse)
-
+	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(jantotsu_map)
+	MCFG_DEVICE_IO_MAP(jantotsu_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -513,21 +516,22 @@ MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jantotsu_state, screen_update_jantotsu)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(jantotsu_state, jantotsu)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489A, MAIN_CLOCK/4)
+	MCFG_DEVICE_ADD("sn1", SN76489A, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, MAIN_CLOCK/4)
+	MCFG_DEVICE_ADD("sn2", SN76489A, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(jantotsu_state, jan_adpcm_int))  /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, jantotsu_state, jan_adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -565,4 +569,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, jantotsu,  0,    jantotsu, jantotsu, jantotsu_state,  0, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jantotsu, 0, jantotsu, jantotsu, jantotsu_state, empty_init, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", MACHINE_SUPPORTS_SAVE )

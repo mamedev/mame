@@ -342,11 +342,11 @@ void arm_cpu_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, R15 & ADDRESS_MASK);
+		debugger_instruction_hook(R15 & ADDRESS_MASK);
 
 		/* load instruction */
 		pc = R15;
-		insn = m_direct->read_dword( pc & ADDRESS_MASK );
+		insn = m_pr32( pc & ADDRESS_MASK );
 
 		switch (insn >> INSN_COND_SHIFT)
 		{
@@ -510,7 +510,14 @@ void arm_cpu_device::execute_set_input(int irqline, int state)
 void arm_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+
+	if(m_program->endianness() == ENDIANNESS_LITTLE) {
+		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+	} else {
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+	}
 
 	save_item(NAME(m_sArmRegister));
 	save_item(NAME(m_coproRegister));
@@ -550,13 +557,13 @@ void arm_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_sArmRegister[15]).mask(ADDRESS_MASK).formatstr("%8s").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sArmRegister[15]).formatstr("%11s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
 void arm_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	static const char *s[4] = { "USER", "FIRQ", "IRQ ", "SVC " };
+	static char const *const s[4] = { "USER", "FIRQ", "IRQ ", "SVC " };
 
 	switch (entry.index())
 	{
@@ -1560,7 +1567,7 @@ void arm_cpu_device::HandleCoPro( uint32_t insn )
 }
 
 
-util::disasm_interface *arm_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> arm_cpu_device::create_disassembler()
 {
-	return new arm_disassembler;
+	return std::make_unique<arm_disassembler>();
 }

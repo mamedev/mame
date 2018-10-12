@@ -76,14 +76,14 @@ WRITE_LINE_MEMBER(ojankohs_state::ojankohs_adpcm_int)
 	/* clock the data through */
 	if (m_vclk_left)
 	{
-		m_msm->data_w((m_adpcm_data >> 4));
+		m_msm->write_data((m_adpcm_data >> 4));
 		m_adpcm_data <<= 4;
 		m_vclk_left--;
 	}
 
 	/* generate an NMI if we're out of data */
 	if (!m_vclk_left)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
@@ -96,80 +96,87 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
 }
 
 
-ADDRESS_MAP_START(ojankohs_state::ojankohs_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(ojankohs_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xa000, 0xb7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(ojankohs_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void ojankohs_state::ojankohs_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().w(FUNC(ojankohs_state::ojankohs_videoram_w)).share("videoram");
+	map(0x9000, 0x9fff).ram().w(FUNC(ojankohs_state::ojankohs_colorram_w)).share("colorram");
+	map(0xa000, 0xb7ff).ram().share("nvram");
+	map(0xb800, 0xbfff).ram().w(FUNC(ojankohs_state::ojankohs_palette_w)).share("paletteram");
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
 
-ADDRESS_MAP_START(ojankohs_state::ojankoy_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(ojankohs_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void ojankohs_state::ojankoy_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram().w(FUNC(ojankohs_state::ojankohs_videoram_w)).share("videoram");
+	map(0xa000, 0xafff).ram().w(FUNC(ojankohs_state::ojankohs_colorram_w)).share("colorram");
+	map(0xb000, 0xbfff).ram().share("nvram");
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
 
-ADDRESS_MAP_START(ojankohs_state::ojankoc_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(ojankoc_videoram_w)
-ADDRESS_MAP_END
+void ojankohs_state::ojankoc_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).bankr("bank1").w(FUNC(ojankohs_state::ojankoc_videoram_w));
+}
 
 
-ADDRESS_MAP_START(ojankohs_state::ojankohs_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("system") AM_WRITE(port_select_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(keymatrix_p1_r, ojankohs_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(keymatrix_p2_r, ojankohs_gfxreg_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ojankohs_adpcm_reset_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ym2149_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ym2149_device, data_address_w)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
-ADDRESS_MAP_END
+void ojankohs_state::ojankohs_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("system").w(FUNC(ojankohs_state::port_select_w));
+	map(0x01, 0x01).rw(FUNC(ojankohs_state::keymatrix_p1_r), FUNC(ojankohs_state::ojankohs_rombank_w));
+	map(0x02, 0x02).rw(FUNC(ojankohs_state::keymatrix_p2_r), FUNC(ojankohs_state::ojankohs_gfxreg_w));
+	map(0x03, 0x03).w(FUNC(ojankohs_state::ojankohs_adpcm_reset_w));
+	map(0x04, 0x04).w(FUNC(ojankohs_state::ojankohs_flipscreen_w));
+	map(0x05, 0x05).w(FUNC(ojankohs_state::ojankohs_msm5205_w));
+	map(0x06, 0x06).r("aysnd", FUNC(ym2149_device::data_r));
+	map(0x06, 0x07).w("aysnd", FUNC(ym2149_device::data_address_w));
+	map(0x10, 0x11).w("gga", FUNC(vsystem_gga_device::write));
+}
 
-ADDRESS_MAP_START(ojankohs_state::ojankoy_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("system") AM_WRITE(port_select_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(keymatrix_p1_r, ojankoy_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(keymatrix_p2_r, ojankoy_coinctr_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void ojankohs_state::ojankoy_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("system").w(FUNC(ojankohs_state::port_select_w));
+	map(0x01, 0x01).rw(FUNC(ojankohs_state::keymatrix_p1_r), FUNC(ojankohs_state::ojankoy_rombank_w));
+	map(0x02, 0x02).rw(FUNC(ojankohs_state::keymatrix_p2_r), FUNC(ojankohs_state::ojankoy_coinctr_w));
+	map(0x04, 0x04).w(FUNC(ojankohs_state::ojankohs_flipscreen_w));
+	map(0x05, 0x05).w(FUNC(ojankohs_state::ojankohs_msm5205_w));
+	map(0x06, 0x06).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x06, 0x07).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
-ADDRESS_MAP_START(ojankohs_state::ccasino_io_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ_PORT("system") AM_WRITE(port_select_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(keymatrix_p1_r, ojankohs_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff00) AM_READWRITE(keymatrix_p2_r, ccasino_coinctr_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff00) AM_READ(ccasino_dipsw3_r) AM_WRITE(ojankohs_adpcm_reset_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff00) AM_READ(ccasino_dipsw4_r) AM_WRITE(ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff00) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x08, 0x0f) AM_SELECT(0xff00) AM_WRITE(ccasino_palette_w)     // 16bit address access
-	AM_RANGE(0x10, 0x11) AM_MIRROR(0xff00) AM_DEVWRITE("gga", vsystem_gga_device, write)
-ADDRESS_MAP_END
+void ojankohs_state::ccasino_io_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff00).portr("system").w(FUNC(ojankohs_state::port_select_w));
+	map(0x01, 0x01).mirror(0xff00).rw(FUNC(ojankohs_state::keymatrix_p1_r), FUNC(ojankohs_state::ojankohs_rombank_w));
+	map(0x02, 0x02).mirror(0xff00).rw(FUNC(ojankohs_state::keymatrix_p2_r), FUNC(ojankohs_state::ccasino_coinctr_w));
+	map(0x03, 0x03).mirror(0xff00).r(FUNC(ojankohs_state::ccasino_dipsw3_r)).w(FUNC(ojankohs_state::ojankohs_adpcm_reset_w));
+	map(0x04, 0x04).mirror(0xff00).r(FUNC(ojankohs_state::ccasino_dipsw4_r)).w(FUNC(ojankohs_state::ojankohs_flipscreen_w));
+	map(0x05, 0x05).mirror(0xff00).w(FUNC(ojankohs_state::ojankohs_msm5205_w));
+	map(0x06, 0x06).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x06, 0x07).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x08, 0x0f).select(0xff00).w(FUNC(ojankohs_state::ccasino_palette_w));     // 16bit address access
+	map(0x10, 0x11).mirror(0xff00).w("gga", FUNC(vsystem_gga_device::write));
+}
 
-ADDRESS_MAP_START(ojankohs_state::ojankoc_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_WRITE(ojankoc_palette_w)
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0xfb, 0xfb) AM_WRITE(ojankoc_ctrl_w)
-	AM_RANGE(0xfc, 0xfc) AM_READ(ojankoc_keymatrix_p1_r)
-	AM_RANGE(0xfd, 0xfd) AM_READ(ojankoc_keymatrix_p2_r)
-	AM_RANGE(0xfd, 0xfd) AM_WRITE(port_select_w)
-	AM_RANGE(0xfe, 0xff) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0xff, 0xff) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void ojankohs_state::ojankoc_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x1f).w(FUNC(ojankohs_state::ojankoc_palette_w));
+	map(0xf9, 0xf9).w(FUNC(ojankohs_state::ojankohs_msm5205_w));
+	map(0xfb, 0xfb).w(FUNC(ojankohs_state::ojankoc_ctrl_w));
+	map(0xfc, 0xfc).r(FUNC(ojankohs_state::ojankoc_keymatrix_p1_r));
+	map(0xfd, 0xfd).r(FUNC(ojankohs_state::ojankoc_keymatrix_p2_r));
+	map(0xfd, 0xfd).w(FUNC(ojankohs_state::port_select_w));
+	map(0xfe, 0xff).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0xff, 0xff).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 //**************************************************************************
@@ -644,7 +651,7 @@ static const gfx_layout ojankohs_bglayout =
 	16*8
 };
 
-static GFXDECODE_START( ojankohs )
+static GFXDECODE_START( gfx_ojankohs )
 	GFXDECODE_ENTRY( "gfx1", 0, ojankohs_bglayout,   0, 64 )
 GFXDECODE_END
 
@@ -708,13 +715,13 @@ void ojankohs_state::machine_reset()
 MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ojankohs_map)
-	MCFG_CPU_IO_MAP(ojankohs_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ojankohs_map)
+	MCFG_DEVICE_IO_MAP(ojankohs_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -725,7 +732,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
@@ -733,15 +740,15 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 12000000/6)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(ojankohs_state, ojankohs_dipsw1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(ojankohs_state, ojankohs_dipsw2_r))
+	MCFG_DEVICE_ADD("aysnd", YM2149, 12000000/6)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ojankohs_state, ojankohs_dipsw1_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, ojankohs_state, ojankohs_dipsw2_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -749,13 +756,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ojankoy_map)
-	MCFG_CPU_IO_MAP(ojankoy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ojankoy_map)
+	MCFG_DEVICE_IO_MAP(ojankoy_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoy)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -766,22 +773,22 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(ojankohs_state,ojankoy)
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -789,13 +796,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ojankohs_state::ccasino)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ojankoy_map)
-	MCFG_CPU_IO_MAP(ccasino_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ojankoy_map)
+	MCFG_DEVICE_IO_MAP(ccasino_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -806,7 +813,7 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
@@ -814,15 +821,15 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ccasino)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -830,13 +837,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2)          /* 4.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(ojankoc_map)
-	MCFG_CPU_IO_MAP(ojankoc_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2)          /* 4.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ojankoc_map)
+	MCFG_DEVICE_IO_MAP(ojankoc_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoc)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -852,15 +859,15 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 8000000/22)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 8000000/22)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -975,9 +982,9 @@ ROM_START( ojankoca )
 ROM_END
 
 
-GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ojankohs_state, 0, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko High School (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko High School (Japan)",            MACHINE_SUPPORTS_SAVE )

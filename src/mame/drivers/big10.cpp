@@ -69,15 +69,16 @@ class big10_state : public driver_device
 public:
 	big10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_v9938(*this, "v9938")
 		, m_maincpu(*this, "maincpu")
 		, m_hopper(*this, "hopper")
 		, m_in(*this, "IN%u", 1)
+		, m_lamp(*this, "lamp")
 	{ }
 
 	void big10(machine_config &config);
 
 protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	void main_io(address_map &map);
 	void main_map(address_map &map);
 
@@ -85,11 +86,11 @@ protected:
 	DECLARE_WRITE8_MEMBER(mux_w);
 
 private:
-	required_device<v9938_device> m_v9938;
 	uint8_t m_mux_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
+	output_finder<> m_lamp;
 };
 
 
@@ -106,7 +107,7 @@ WRITE8_MEMBER(big10_state::mux_w)
 {
 	m_mux_data = ~data;
 	m_hopper->motor_w(BIT(data, 6));
-	machine().output().set_lamp_value(1, BIT(~data, 7)); // maybe a coin counter?
+	m_lamp = BIT(~data, 7); // maybe a coin counter?
 }
 
 READ8_MEMBER(big10_state::mux_r)
@@ -124,20 +125,22 @@ READ8_MEMBER(big10_state::mux_r)
 *             Memory Map              *
 **************************************/
 
-ADDRESS_MAP_START(big10_state::main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void big10_state::main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram().share("nvram");
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(big10_state::main_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(mux_r)         /* present in test mode */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") /* coins and service */
-	AM_RANGE(0x98, 0x9b) AM_DEVREADWRITE("v9938", v9938_device, read, write)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_device, data_r) /* Dip-Switches routes here. */
-ADDRESS_MAP_END
+void big10_state::main_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(big10_state::mux_r));         /* present in test mode */
+	map(0x02, 0x02).portr("SYSTEM"); /* coins and service */
+	map(0x98, 0x9b).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r)); /* Dip-Switches routes here. */
+}
 
 
 /**************************************
@@ -228,23 +231,25 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(big10_state::big10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
+	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(VDP_MEM);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* guess */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* guess */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(big10_state, mux_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, big10_state, mux_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
@@ -267,5 +272,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT    ROT      COMPANY     FULLNAME   FLAGS  */
-GAME( 1985, big10,    0,        big10,    big10,    big10_state,   0,      ROT0,   "Success",  "Big 10",   0 )
+/*    YEAR  NAME   PARENT    MACHINE   INPUT     STATE        INIT        ROT      COMPANY     FULLNAME   FLAGS  */
+GAME( 1985, big10, 0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",  "Big 10",   0 )

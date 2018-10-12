@@ -122,6 +122,8 @@ READ8_MEMBER(namco_c116_device::read)
 				return m_regs[reg] & 0xff;
 			else
 				return m_regs[reg] >> 8;
+		/* registers 6,7: unmapped? */
+		//if (reg > 0x6) return 0xff;
 		}
 	}
 
@@ -145,13 +147,29 @@ WRITE8_MEMBER(namco_c116_device::write)
 			RAM = &m_ram_b[0];
 			break;
 		default: // case 0x1800 (internal registers)
-		{
+		{   /* notes from namcos2.cpp */
+			/* registers 0-3: clipping */
+
+			/* register 4: ? */
+			/* sets using it:
+			assault:    $0020
+			burnforc:   $0130 after titlescreen
+			dirtfoxj:   $0108 at game start
+			finalap1/2/3:   $00C0
+			finehour:   $0168 after titlescreen
+			fourtrax:   $00E8 and $00F0
+			luckywld:   $00E8 at titlescreen, $00A0 in game and $0118 if in tunnel
+			suzuka8h1/2:    $00E8 and $00A0 */
+
+			/* register 5: POSIRQ scanline (only 8 bits used) */
+
+			/* registers 6,7: nothing? */
 			int reg = (offset & 0xf) >> 1;
 			if (offset & 1)
 				m_regs[reg] = (m_regs[reg] & 0xff00) | data;
 			else
 				m_regs[reg] = (m_regs[reg] & 0x00ff) | (data << 8);
-			//printf("reg%d = %d\n", reg, m_regs[reg]);
+			//logerror("reg%d = %d\n", reg, m_regs[reg]);
 			return;
 		}
 	}

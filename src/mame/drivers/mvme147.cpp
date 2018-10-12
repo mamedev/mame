@@ -8,7 +8,7 @@
  *
  * Thanks to Plamen Mihaylov and his site http://www.m88k.com/ I got the information
  * required to start the work with this driver. The goal is to boot a tape through
- * the MVME-350 devide connected over a VME bus device.
+ * the MVME-350 device connected over a VME bus device.
  *
  *
  *       ||
@@ -184,7 +184,7 @@
 #endif
 
 /* from documentataion: http://www.m88k.com/Docs/147/147aih.pdf but crystal and divider not known */
-#define BAUDGEN_CLOCK XTAL(5'000'000)
+#define BAUDGEN_CLOCK 5_MHz_XTAL
 #define SCC_CLOCK (BAUDGEN_CLOCK) /* This gives prompt at the RS232 terminal device (9600) */
 
 class mvme147_state : public driver_device
@@ -198,6 +198,9 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 	{
 	}
 
+	void mvme147(machine_config &config);
+
+private:
 	DECLARE_READ32_MEMBER (bootvect_r);
 	DECLARE_WRITE32_MEMBER (bootvect_w);
 	/* PCC - Peripheral Channel Controller */
@@ -215,11 +218,8 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 	//DECLARE_WRITE16_MEMBER (vme_a16_w);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	void mvme147(machine_config &config);
 	void mvme147_mem(address_map &map);
-protected:
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scc85c30_device> m_sccterm;
 	required_device<scc85c30_device> m_sccterm2;
@@ -235,28 +235,29 @@ private:
 	uint8_t   m_vc_cntl_conf;
 };
 
-ADDRESS_MAP_START(mvme147_state::mvme147_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)       /* After first write we act as RAM */
-	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just during reset */
-	AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* 4 Mb RAM */
-	AM_RANGE (0xff800000, 0xff9fffff) AM_ROM AM_REGION("roms", 0x800000) //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 1 - 147bug */
-	AM_RANGE (0xffa00000, 0xffbfffff) AM_ROM AM_REGION("roms", 0xa00000) //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 2 - unpopulated */
+void mvme147_state::mvme147_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x00000007).ram().w(FUNC(mvme147_state::bootvect_w));       /* After first write we act as RAM */
+	map(0x00000000, 0x00000007).rom().r(FUNC(mvme147_state::bootvect_r));       /* ROM mirror just during reset */
+	map(0x00000008, 0x003fffff).ram(); /* 4 Mb RAM */
+	map(0xff800000, 0xff9fffff).rom().region("roms", 0x800000); //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 1 - 147bug */
+	map(0xffa00000, 0xffbfffff).rom().region("roms", 0xa00000); //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 2 - unpopulated */
 
 		/*  SGS-Thompson M48T18 RAM and clock chip, only 4088 bytes used,  and 8 bytes for the RTC, out of 8Kb though */
-	AM_RANGE (0xfffe0000, 0xfffe0fff) AM_DEVREADWRITE8("m48t18", timekeeper_device, read, write, 0xffffffff)
+	map(0xfffe0000, 0xfffe0fff).rw("m48t18", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 
 		//AM_RANGE (0xfffe1000, 0xfffe100f) AM_READWRITE32(pcc32_r, pcc32_w, 0xffffffff) /* PCC 32 bits registers  - needs U64 cast defined to work */
-	AM_RANGE (0xfffe1010, 0xfffe1017) AM_READWRITE16(pcc16_r, pcc16_w, 0xffffffff) /* PCC 16 bits registers */
-	AM_RANGE (0xfffe1018, 0xfffe102f) AM_READWRITE8(pcc8_r,   pcc8_w,  0xffffffff) /* PCC 8 bits registers */
-	AM_RANGE (0xfffe2000, 0xfffe201b) AM_READWRITE8(vmechip_r, vmechip_w, 0x00ff00ff) /* VMEchip 8 bits registers on odd adresses */
+	map(0xfffe1010, 0xfffe1017).rw(FUNC(mvme147_state::pcc16_r), FUNC(mvme147_state::pcc16_w)); /* PCC 16 bits registers */
+	map(0xfffe1018, 0xfffe102f).rw(FUNC(mvme147_state::pcc8_r), FUNC(mvme147_state::pcc8_w)); /* PCC 8 bits registers */
+	map(0xfffe2000, 0xfffe201b).rw(FUNC(mvme147_state::vmechip_r), FUNC(mvme147_state::vmechip_w)).umask32(0x00ff00ff); /* VMEchip 8 bits registers on odd adresses */
 
-	AM_RANGE (0xfffe3000, 0xfffe3003) AM_DEVREADWRITE8("scc",  scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xffffffff) /* Port 1&2 - Dual serial port Z80-SCC */
-	AM_RANGE (0xfffe3800, 0xfffe3803) AM_DEVREADWRITE8("scc2", scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xffffffff) /* Port 3&4 - Dual serial port Z80-SCC */
+	map(0xfffe3000, 0xfffe3003).rw(m_sccterm, FUNC(scc85c30_device::ba_cd_inv_r), FUNC(scc85c30_device::ba_cd_inv_w)); /* Port 1&2 - Dual serial port Z80-SCC */
+	map(0xfffe3800, 0xfffe3803).rw(m_sccterm2, FUNC(scc85c30_device::ba_cd_inv_r), FUNC(scc85c30_device::ba_cd_inv_w)); /* Port 3&4 - Dual serial port Z80-SCC */
 
 	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START (mvme147)
@@ -639,33 +640,34 @@ WRITE16_MEMBER (mvme147_state::vme_a16_w){
 }
 #endif
 
-static SLOT_INTERFACE_START(mvme147_vme_cards)
-	SLOT_INTERFACE("mvme350", VME_MVME350)
-SLOT_INTERFACE_END
+static void mvme147_vme_cards(device_slot_interface &device)
+{
+	device.option_add("mvme350", VME_MVME350);
+}
 
 /*
  * Machine configuration
  */
 MACHINE_CONFIG_START(mvme147_state::mvme147)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68030, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP (mvme147_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mvme147_mem)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, mvme147_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD("vme", 1, mvme147_vme_cards, nullptr)
 
-	MCFG_M48T02_ADD("m48t18") /* t08 differs only in accepted voltage levels compared to t18 */
+	MCFG_DEVICE_ADD("m48t18", M48T02, 0) /* t08 differs only in accepted voltage levels compared to t18 */
 
 	/* Terminal Port config */
-	MCFG_SCC85C30_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
+	SCC85C30(config, m_sccterm, SCC_CLOCK);
+	m_sccterm->out_txda_callback().set("rs232trm", FUNC(rs232_port_device::write_txd));
+	m_sccterm->out_dtra_callback().set("rs232trm", FUNC(rs232_port_device::write_dtr));
+	m_sccterm->out_rtsa_callback().set("rs232trm", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc85c30_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc85c30_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE(m_sccterm, scc85c30_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE(m_sccterm, scc85c30_device, ctsa_w))
 
-	MCFG_SCC85C30_ADD("scc2", SCC_CLOCK, 0, 0, 0, 0 )
+	SCC85C30(config, m_sccterm2, SCC_CLOCK);
 MACHINE_CONFIG_END
 
 /* ROM definitions */
@@ -674,8 +676,8 @@ ROM_START (mvme147)
 	ROM_DEFAULT_BIOS("147bug-v2.44")
 
 	ROM_SYSTEM_BIOS(0, "147bug-v2.44", "MVME147 147bug v2.44")
-	ROMX_LOAD("147bug-2.44-U22.BIN", 0x800000, 0x20000, CRC (da09ce8a) SHA1 (3eaa8fa802187d9b08f453ff1ba64f5113a195a9), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("147bug-2.44-U30.BIN", 0x800001, 0x20000, CRC (f883e17d) SHA1 (01fe43e5ddfd3cf8aabb5a5959c80a8b5ec5d895), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("147bug-2.44-u22.bin", 0x800000, 0x20000, CRC (da09ce8a) SHA1 (3eaa8fa802187d9b08f453ff1ba64f5113a195a9), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("147bug-2.44-u30.bin", 0x800001, 0x20000, CRC (f883e17d) SHA1 (01fe43e5ddfd3cf8aabb5a5959c80a8b5ec5d895), ROM_SKIP(1) | ROM_BIOS(0))
 /*
  * System ROM information
  *
@@ -701,8 +703,8 @@ ROM_START (mvme147)
  */
 
 	ROM_SYSTEM_BIOS(1, "147bug-v2.43", "MVME147 147bug v2.43")
-	ROMX_LOAD("5741B42E.BIN", 0x800000, 0x20000, CRC (2ba98f97) SHA1 (5f18c6dd6a7b03067890f0164ef3d37ced907d7f), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("5741B41E.BIN", 0x800001, 0x20000, CRC (dfa014f2) SHA1 (ff9db90a05c295819ce7ca7c1a6ac67b04003728), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("5741b42e.bin", 0x800000, 0x20000, CRC (2ba98f97) SHA1 (5f18c6dd6a7b03067890f0164ef3d37ced907d7f), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("5741b41e.bin", 0x800001, 0x20000, CRC (dfa014f2) SHA1 (ff9db90a05c295819ce7ca7c1a6ac67b04003728), ROM_SKIP(1) | ROM_BIOS(1))
 /*
  * System ROM information
  *
@@ -713,5 +715,5 @@ ROM_START (mvme147)
 ROM_END
 
 /* Driver */
-//    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT    CLASS          INIT COMPANY       FULLNAME    FLAGS
-COMP (1989, mvme147,      0,      0,       mvme147,        mvme147, mvme147_state, 0,   "Motorola",   "MVME-147", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS
+COMP( 1989, mvme147, 0,      0,      mvme147, mvme147, mvme147_state, empty_init, "Motorola", "MVME-147", MACHINE_NO_SOUND_HW )

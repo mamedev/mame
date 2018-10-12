@@ -218,7 +218,7 @@ WRITE16_MEMBER( asic65_device::data_w )
 	else
 	{
 		int command = (data < MAX_COMMANDS) ? command_map[m_asic65_type][data] : OP_UNKNOWN;
-		if (m_log) fprintf(m_log, "\n(%06X)%c%04X:", safe_pcbase(), (command == OP_UNKNOWN) ? '*' : ' ', data);
+		if (m_log) fprintf(m_log, "\n%s %c%04X:", machine().describe_context().c_str(), (command == OP_UNKNOWN) ? '*' : ' ', data);
 
 		/* set the command number and reset the parameter/result indices */
 		m_command = data;
@@ -521,15 +521,17 @@ READ_LINE_MEMBER( asic65_device::get_bio )
  *
  *************************************/
 
-ADDRESS_MAP_START(asic65_device::asic65_program_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void asic65_device::asic65_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0xfff).rom();
+}
 
-ADDRESS_MAP_START(asic65_device::asic65_io_map)
-	AM_RANGE(0, 0) AM_MIRROR(6) AM_READWRITE(m68k_r, m68k_w)
-	AM_RANGE(1, 1) AM_MIRROR(6) AM_READWRITE(stat_r, stat_w)
-ADDRESS_MAP_END
+void asic65_device::asic65_io_map(address_map &map)
+{
+	map(0, 0).mirror(6).rw(FUNC(asic65_device::m68k_r), FUNC(asic65_device::m68k_w));
+	map(1, 1).mirror(6).rw(FUNC(asic65_device::stat_r), FUNC(asic65_device::stat_w));
+}
 
 
 //-------------------------------------------------
@@ -539,10 +541,10 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(asic65_device::device_add_mconfig)
 
 	/* ASIC65 */
-	MCFG_CPU_ADD("asic65cpu", TMS32010, 20000000)
-	MCFG_CPU_PROGRAM_MAP(asic65_program_map)
-	MCFG_CPU_IO_MAP(asic65_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(asic65_device, get_bio))
+	MCFG_DEVICE_ADD("asic65cpu", TMS32010, 20000000)
+	MCFG_DEVICE_PROGRAM_MAP(asic65_program_map)
+	MCFG_DEVICE_IO_MAP(asic65_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, asic65_device, get_bio))
 MACHINE_CONFIG_END
 
 

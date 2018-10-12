@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
 	void junior(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(junior_riot_a_r);
 	DECLARE_READ8_MEMBER(junior_riot_b_r);
 	DECLARE_WRITE8_MEMBER(junior_riot_a_w);
@@ -59,7 +59,6 @@ protected:
 
 	void junior_mem(address_map &map);
 
-private:
 	required_device<mos6532_new_device> m_riot;
 	uint8_t m_port_a;
 	uint8_t m_port_b;
@@ -72,14 +71,15 @@ private:
 
 
 
-ADDRESS_MAP_START(junior_state::junior_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x1FFF)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1K RAM
-	AM_RANGE(0x1a00, 0x1a7f) AM_DEVICE("riot", mos6532_new_device, ram_map)
-	AM_RANGE(0x1a80, 0x1a9f) AM_DEVICE("riot", mos6532_new_device, io_map)
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM // Monitor
-ADDRESS_MAP_END
+void junior_state::junior_mem(address_map &map)
+{
+	map.global_mask(0x1FFF);
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).ram(); // 1K RAM
+	map(0x1a00, 0x1a7f).m(m_riot, FUNC(mos6532_new_device::ram_map));
+	map(0x1a80, 0x1a9f).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x1c00, 0x1fff).rom(); // Monitor
+}
 
 
 INPUT_CHANGED_MEMBER(junior_state::junior_reset)
@@ -227,19 +227,19 @@ void junior_state::machine_reset()
 
 MACHINE_CONFIG_START(junior_state::junior)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502, 1_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(junior_mem)
+	MCFG_DEVICE_ADD("maincpu",M6502, 1_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(junior_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_junior )
+	config.set_default_layout(layout_junior);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, 1_MHz_XTAL)
-	MCFG_MOS6530n_IN_PA_CB(READ8(junior_state, junior_riot_a_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(junior_state, junior_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(junior_state, junior_riot_b_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(junior_state, junior_riot_b_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, junior_state, junior_riot_a_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, junior_state, junior_riot_a_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, junior_state, junior_riot_b_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, junior_state, junior_riot_b_w))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", junior_state, junior_update_leds, attotime::from_hz(50))
@@ -252,16 +252,16 @@ ROM_START( junior )
 	ROM_DEFAULT_BIOS("orig")
 
 	ROM_SYSTEM_BIOS( 0, "orig", "Original ESS503" )
-	ROMX_LOAD( "ess503.ic2", 0x1c00, 0x0400, CRC(9e804f8c) SHA1(181bdb69fb4711cb008e7966747d4775a5e3ef69), ROM_BIOS(1))
+	ROMX_LOAD( "ess503.ic2", 0x1c00, 0x0400, CRC(9e804f8c) SHA1(181bdb69fb4711cb008e7966747d4775a5e3ef69), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "mod-orig", "Mod-Original (2708)" )
-	ROMX_LOAD( "junior-mod.ic2", 0x1c00, 0x0400, CRC(ee8aa69d) SHA1(a132a51603f1a841c354815e6d868b335ac84364), ROM_BIOS(2))
+	ROMX_LOAD( "junior-mod.ic2", 0x1c00, 0x0400, CRC(ee8aa69d) SHA1(a132a51603f1a841c354815e6d868b335ac84364), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS( 2, "2732", "Just monitor (2732)" )
-	ROMX_LOAD( "junior27321a.ic2", 0x1c00, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(3))
+	ROMX_LOAD( "junior27321a.ic2", 0x1c00, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(2))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY                FULLNAME           FLAGS */
-COMP( 1980, junior, 0,      0,       junior,    junior, junior_state,  0,     "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME           FLAGS */
+COMP( 1980, junior, 0,      0,      junior,  junior, junior_state, empty_init, "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

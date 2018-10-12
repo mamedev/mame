@@ -51,20 +51,21 @@ PALETTE_INIT_MEMBER(subs_state, subs)
  *
  *************************************/
 
-ADDRESS_MAP_START(subs_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(noise_reset_w)
-	AM_RANGE(0x0000, 0x0007) AM_READ(control_r)
-	AM_RANGE(0x0020, 0x0020) AM_WRITE(steer_reset_w)
-	AM_RANGE(0x0020, 0x0027) AM_READ(coin_r)
+void subs_state::main_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x0000).w(FUNC(subs_state::noise_reset_w));
+	map(0x0000, 0x0007).r(FUNC(subs_state::control_r));
+	map(0x0020, 0x0020).w(FUNC(subs_state::steer_reset_w));
+	map(0x0020, 0x0027).r(FUNC(subs_state::coin_r));
 //  AM_RANGE(0x0040, 0x0040) AM_WRITE(timer_reset_w)
-	AM_RANGE(0x0060, 0x0063) AM_READ(options_r)
-	AM_RANGE(0x0060, 0x006f) AM_DEVWRITE("latch", ls259_device, write_a0)
-	AM_RANGE(0x0090, 0x009f) AM_SHARE("spriteram")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+	map(0x0060, 0x0063).r(FUNC(subs_state::options_r));
+	map(0x0060, 0x006f).w("latch", FUNC(ls259_device::write_a0));
+	map(0x0090, 0x009f).share("spriteram");
+	map(0x0800, 0x0bff).ram().share("videoram");
+	map(0x2000, 0x3fff).rom();
+}
 
 
 
@@ -160,7 +161,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( subs )
+static GFXDECODE_START( gfx_subs )
 	GFXDECODE_ENTRY( "gfx1", 0, playfield_layout, 0, 2 )    /* playfield graphics */
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout,    0, 2 )    /* motion graphics */
 GFXDECODE_END
@@ -175,18 +176,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(subs_state::subs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,12096000/16)      /* clock input is the "4H" signal */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(subs_state, interrupt, 4*57)
+	MCFG_DEVICE_ADD("maincpu", M6502,12096000/16)      /* clock input is the "4H" signal */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(subs_state, interrupt, 4*57)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_subs)
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(subs_state, subs)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
@@ -206,23 +207,21 @@ MACHINE_CONFIG_START(subs_state::subs)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(subs)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // C9
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(subs_state, lamp1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(subs_state, lamp2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_SONAR2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_SONAR1_EN>))
+	ls259_device &latch(LS259(config, "latch")); // C9
+	latch.q_out_cb<0>().set_output("led0").invert(); // START LAMP 1
+	latch.q_out_cb<1>().set_output("led1").invert(); // START LAMP 2
+	latch.q_out_cb<2>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_SONAR2_EN>));
+	latch.q_out_cb<3>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_SONAR1_EN>));
 	// Schematics show crash and explode reversed.  But this is proper.
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_EXPLODE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_CRASH_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(subs_state, invert1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(subs_state, invert2_w))
+	latch.q_out_cb<4>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_EXPLODE_EN>));
+	latch.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_CRASH_EN>));
+	latch.q_out_cb<6>().set(FUNC(subs_state::invert1_w));
+	latch.q_out_cb<7>().set(FUNC(subs_state::invert2_w));
 MACHINE_CONFIG_END
 
 
@@ -259,4 +258,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, subs, 0, subs, subs, subs_state, 0, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, subs, 0, subs, subs, subs_state, empty_init, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

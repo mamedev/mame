@@ -97,6 +97,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport m_z14;
 	required_ioport m_mouseb;
+	output_finder<11> m_leds;
 
 	int m_si;
 	int m_si_en;

@@ -40,24 +40,28 @@ DEFINE_DEVICE_TYPE(NEC_D552,  upd552_cpu_device,  "upd552",  "NEC uPD552") // 42
 
 
 // internal memory maps
-ADDRESS_MAP_START(ucom4_cpu_device::program_1k)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
+void ucom4_cpu_device::program_1k(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+}
 
-ADDRESS_MAP_START(ucom4_cpu_device::program_2k)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void ucom4_cpu_device::program_2k(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
 
-ADDRESS_MAP_START(ucom4_cpu_device::data_64x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void ucom4_cpu_device::data_64x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(ucom4_cpu_device::data_96x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(0x40, 0x4f) AM_RAM
-	AM_RANGE(0x70, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void ucom4_cpu_device::data_96x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+	map(0x40, 0x4f).ram();
+	map(0x70, 0x7f).ram();
+}
 
 
 // device definitions
@@ -137,9 +141,9 @@ void ucom4_cpu_device::state_string_export(const device_state_entry &entry, std:
 	}
 }
 
-util::disasm_interface *ucom4_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ucom4_cpu_device::create_disassembler()
 {
-	return new ucom4_disassembler;
+	return std::make_unique<ucom4_disassembler>();
 }
 
 
@@ -224,7 +228,7 @@ void ucom4_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_carry_f).formatstr("%5s").noshow(); // dummy
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -409,7 +413,7 @@ void ucom4_cpu_device::execute_run()
 		m_prev_pc = m_pc;
 
 		// fetch next opcode
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		m_icount--;
 		m_op = m_program->read_byte(m_pc);
 		m_bitmask = 1 << (m_op & 0x03);

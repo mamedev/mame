@@ -26,6 +26,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual uint8_t* get_cart_base() override;
+	virtual uint32_t get_cart_size() override;
+	virtual memory_region* get_cart_memregion() override;
 
 protected:
 	coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -66,8 +68,7 @@ private:
 
 
 // device type definitions
-extern const device_type COCO_PAK;
-extern const device_type COCO_PAK_BANKED;
-extern const device_type COCO_PAK_GMC;
+DECLARE_DEVICE_TYPE(COCO_PAK, coco_pak_device)
+DECLARE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device)
 
 #endif // MAME_BUS_COCO_COCO_PAK_H

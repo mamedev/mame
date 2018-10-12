@@ -19,6 +19,7 @@
 #include "machine/nvram.h"
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -37,6 +38,13 @@ public:
 		, m_mainbank(*this, "mainbank")
 	{ }
 
+	void lastbank(machine_config &config);
+
+	void init_lastbank();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 	required_device<okim6295_device> m_oki;
@@ -63,7 +71,6 @@ public:
 	DECLARE_READ8_MEMBER(mux_0_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(sound_flags_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
 
 	DECLARE_READ8_MEMBER(rom_bank_r);
 	DECLARE_WRITE8_MEMBER(rom_bank_w);
@@ -73,11 +80,8 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_vector_w);
 	DECLARE_READ8_MEMBER(irq_enable_r);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	
-	DECLARE_DRIVER_INIT(lastbank);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
-	void lastbank(machine_config &config);
 	void lastbank_audio_io(address_map &map);
 	void lastbank_audio_map(address_map &map);
 	void lastbank_map(address_map &map);
@@ -224,56 +228,60 @@ CUSTOM_INPUT_MEMBER(lastbank_state::sound_status_r)
 	return BIT(m_sound_flags, 0) << 1 | BIT(m_sound_flags, 1);
 }
 
-ADDRESS_MAP_START(lastbank_state::tc0091lvc_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("mainbank")
+void lastbank_state::tc0091lvc_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).bankr("mainbank");
 
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
+	map(0x8000, 0x9fff).ram().share("nvram");
 
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(ram_r<0>,ram_w<0>)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(ram_r<1>,ram_w<1>)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(ram_r<2>,ram_w<2>)
-	AM_RANGE(0xf000, 0xfdff) AM_READWRITE(ram_r<3>,ram_w<3>)
+	map(0xc000, 0xcfff).rw(FUNC(lastbank_state::ram_r<0>), FUNC(lastbank_state::ram_w<0>));
+	map(0xd000, 0xdfff).rw(FUNC(lastbank_state::ram_r<1>), FUNC(lastbank_state::ram_w<1>));
+	map(0xe000, 0xefff).rw(FUNC(lastbank_state::ram_r<2>), FUNC(lastbank_state::ram_w<2>));
+	map(0xf000, 0xfdff).rw(FUNC(lastbank_state::ram_r<3>), FUNC(lastbank_state::ram_w<3>));
 
-	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("tc0091lvc", tc0091lvc_device, vregs_r, vregs_w)
-	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_vector_r, irq_vector_w)
-	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(ram_bank_r, ram_bank_w)
-	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rom_bank_r, rom_bank_w)
-ADDRESS_MAP_END
+	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
+	map(0xff00, 0xff02).rw(FUNC(lastbank_state::irq_vector_r), FUNC(lastbank_state::irq_vector_w));
+	map(0xff03, 0xff03).rw(FUNC(lastbank_state::irq_enable_r), FUNC(lastbank_state::irq_enable_w));
+	map(0xff04, 0xff07).rw(FUNC(lastbank_state::ram_bank_r), FUNC(lastbank_state::ram_bank_w));
+	map(0xff08, 0xff08).rw(FUNC(lastbank_state::rom_bank_r), FUNC(lastbank_state::rom_bank_w));
+}
 
-ADDRESS_MAP_START(lastbank_state::lastbank_map)
-	AM_IMPORT_FROM( tc0091lvc_map )
-	AM_RANGE(0xa000, 0xa00d) AM_NOP // MSM62X42B or equivalent probably read from here
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("COINS")
-	AM_RANGE(0xa800, 0xa802) AM_WRITE(output_w)
-	AM_RANGE(0xa803, 0xa803) AM_WRITE(mux_w) // mux for $a808 / $a80c
-	AM_RANGE(0xa804, 0xa804) AM_READ_PORT("SPECIAL")
-	AM_RANGE(0xa805, 0xa805) AM_DEVWRITE("soundlatch1", generic_latch_8_device, write)
-	AM_RANGE(0xa806, 0xa806) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xa807, 0xa807) AM_WRITENOP // hopper?
-	AM_RANGE(0xa808, 0xa808) AM_READ(mux_0_r)
-	AM_RANGE(0xa80c, 0xa80c) AM_READ(mux_0_r)
-	AM_RANGE(0xa81c, 0xa81c) AM_READ_PORT("DSW0")
-	AM_RANGE(0xa81d, 0xa81d) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa81e, 0xa81e) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa81f, 0xa81f) AM_READ_PORT("DSW3")
-ADDRESS_MAP_END
+void lastbank_state::lastbank_map(address_map &map)
+{
+	tc0091lvc_map(map);
+	map(0xa000, 0xa00d).noprw(); // MSM62X42B or equivalent probably read from here
+	map(0xa800, 0xa800).portr("COINS");
+	map(0xa800, 0xa802).w(FUNC(lastbank_state::output_w));
+	map(0xa803, 0xa803).w(FUNC(lastbank_state::mux_w)); // mux for $a808 / $a80c
+	map(0xa804, 0xa804).portr("SPECIAL");
+	map(0xa805, 0xa805).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xa806, 0xa806).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0xa807, 0xa807).nopw(); // hopper?
+	map(0xa808, 0xa808).r(FUNC(lastbank_state::mux_0_r));
+	map(0xa80c, 0xa80c).r(FUNC(lastbank_state::mux_0_r));
+	map(0xa81c, 0xa81c).portr("DSW0");
+	map(0xa81d, 0xa81d).portr("DSW1");
+	map(0xa81e, 0xa81e).portr("DSW2");
+	map(0xa81f, 0xa81f).portr("DSW3");
+}
 
-ADDRESS_MAP_START(lastbank_state::lastbank_audio_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void lastbank_state::lastbank_audio_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe7ff).ram();
+}
 
-ADDRESS_MAP_START(lastbank_state::lastbank_audio_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x06) AM_DEVREADWRITE("essnd", es8712_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_WRITE(sound_flags_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void lastbank_state::lastbank_audio_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x06).rw(m_essnd, FUNC(es8712_device::read), FUNC(es8712_device::write));
+	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x80, 0x80).w(FUNC(lastbank_state::sound_flags_w));
+	map(0x80, 0x80).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).r("soundlatch2", FUNC(generic_latch_8_device::read));
+}
 
 static INPUT_PORTS_START( lastbank )
 	PORT_START("COINS")
@@ -296,7 +304,7 @@ static INPUT_PORTS_START( lastbank )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lastbank_state, sound_status_r, nullptr)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lastbank_state, sound_status_r, nullptr)
 
 	PORT_START("P1_KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("5-6") PORT_CODE(KEYCODE_B)
@@ -484,7 +492,7 @@ static const gfx_layout sp2_layout =
 #undef O2
 
 
-static GFXDECODE_START( lastbank )
+static GFXDECODE_START( gfx_lastbank )
 	GFXDECODE_ENTRY( "gfx1",        0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1",        0, sp2_layout, 0, 16 )
 GFXDECODE_END
@@ -507,15 +515,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 MACHINE_CONFIG_START(lastbank_state::lastbank)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!
-	MCFG_CPU_PROGRAM_MAP(lastbank_map)
+	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!
+	MCFG_DEVICE_PROGRAM_MAP(lastbank_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, irq_scanline, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(lastbank_audio_map)
-	MCFG_CPU_IO_MAP(lastbank_audio_io)
+	MCFG_DEVICE_ADD("audiocpu",Z80,MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(lastbank_audio_map)
+	MCFG_DEVICE_IO_MAP(lastbank_audio_io)
 	// yes, we have no interrupts
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -530,10 +538,10 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lastbank_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(lastbank_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lastbank_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastbank )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastbank )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
@@ -542,20 +550,20 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+	SPEAKER(config, "mono").front_center();
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_MSM_WRITE_CALLBACK(DEVWRITE8("msm", msm6585_device, data_w))
+	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm6585_device, data_w))
 	MCFG_ES8712_MSM_TAG("msm")
 
-	MCFG_SOUND_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified, It's actually MSM6585? */
-	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("essnd", es8712_device, msm_int))
+	MCFG_DEVICE_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified, It's actually MSM6585? */
+	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* Not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -588,10 +596,10 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-DRIVER_INIT_MEMBER(lastbank_state,lastbank)
+void lastbank_state::init_lastbank()
 {
 	uint32_t max = memregion("maincpu")->bytes() / 0x2000;
 	m_mainbank->configure_entries(0, max, memregion("maincpu")->base(), 0x2000);
 }
 
-GAME( 1994, lastbank,  0,   lastbank, lastbank, lastbank_state, lastbank, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )
+GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, init_lastbank, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )

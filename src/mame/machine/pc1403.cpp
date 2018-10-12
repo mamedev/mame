@@ -124,7 +124,7 @@ READ8_MEMBER(pc1403_state::pc1403_inb)
 WRITE8_MEMBER(pc1403_state::pc1403_outc)
 {
 	m_portc = data;
-//    logerror("%g pc %.4x outc %.2x\n", device->machine().time().as_double(), device->m_maincpu->safe_pc(), data);
+//    logerror("%s %g pc %.4x outc %.2x\n", machine().describe_context(), machine().time().as_double(), data);
 }
 
 
@@ -143,8 +143,8 @@ void pc1403_state::machine_start()
 	uint8_t *ram = memregion("maincpu")->base() + 0x8000;
 	uint8_t *cpu = m_maincpu->internal_ram();
 
-	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
-	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x8000);
+	subdevice<nvram_device>("cpu_nvram")->set_base(cpu, 96);
+	subdevice<nvram_device>("ram_nvram")->set_base(ram, 0x8000);
 }
 
 void pc1403_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -159,7 +159,7 @@ void pc1403_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-DRIVER_INIT_MEMBER(pc1403_state,pc1403)
+void pc1403_state::init_pc1403()
 {
 	int i;
 	uint8_t *gfx=memregion("gfx1")->base();

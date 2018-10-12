@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Uki
+
+#include "emupal.h"
+
 class xxmissio_state : public driver_device
 {
 public:
@@ -13,6 +16,11 @@ public:
 		m_fgram(*this, "fgram"),
 		m_spriteram(*this, "spriteram")  { }
 
+	void xxmissio(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(status_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -38,9 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scroll_x_w);
 	DECLARE_WRITE8_MEMBER(scroll_y_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(status_r);
 
-	INTERRUPT_GEN_MEMBER(interrupt_m);
+	DECLARE_WRITE_LINE_MEMBER(interrupt_m);
 	INTERRUPT_GEN_MEMBER(interrupt_s);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -53,7 +60,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
-	void xxmissio(machine_config &config);
+
 	void map1(address_map &map);
 	void map2(address_map &map);
 };

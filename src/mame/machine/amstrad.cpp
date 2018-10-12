@@ -1923,7 +1923,7 @@ b9 b8 | PPI Function Read/Write status
 	if ((offset & (1<<11)) == 0)
 	{
 		if (r1r0 < 0x03 )
-			data = m_ppi->read(space, r1r0);
+			data = m_ppi->read(r1r0);
 		if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // Plus systems return the data written to port C (I/O status is ignored)
 			if(r1r0 == 0x02)
 				data = m_last_write;
@@ -1947,28 +1947,22 @@ b8 b0 Function Read/Write state
 If b10 is reset but none of b7-b5 are reset, user expansion peripherals are selected.
 The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset.
  */
-	if ( m_system_type != SYSTEM_GX4000 )
+	if (m_fdc.found())  // if FDC is present (it isn't on a 464 or GX4000)
 	{
-		if(m_fdc)  // if FDC is present (it isn't on a 464)
+		if ( ( offset & (1<<10) ) == 0 )
 		{
-			if ( ( offset & (1<<10) ) == 0 )
-			{
-				if ( ( offset & (1<<10) ) == 0 )
-				{
-					int b8b0 = ( ( offset & (1<<8) ) >> (8 - 1) ) | ( offset & 0x01 );
+			int b8b0 = ( ( offset & (1<<8) ) >> (8 - 1) ) | ( offset & 0x01 );
 
-					switch (b8b0)
-					{
-					case 0x02:
-						data = m_fdc->msr_r(space, 0);
-						break;
-					case 0x03:
-						data = m_fdc->fifo_r(space, 0);
-						break;
-					default:
-						break;
-					}
-				}
+			switch (b8b0)
+			{
+			case 0x02:
+				data = m_fdc->msr_r(space, 0);
+				break;
+			case 0x03:
+				data = m_fdc->fifo_r(space, 0);
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -2134,7 +2128,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	{
 		unsigned int idx = ((offset & 0x0300) >> 8);
 
-		m_ppi->write(space, idx, data);
+		m_ppi->write(idx, data);
 		if(idx == 0x02)
 			m_last_write = data;
 	}
@@ -2159,39 +2153,33 @@ b8 b0 Function Read/Write state
 If b10 is reset but none of b7-b5 are reset, user expansion peripherals are selected.
 The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset.
 */
-		if(m_system_type != SYSTEM_GX4000)
+		if (m_fdc.found())  // if FDC is present (it isn't on a 464 or GX4000)
 		{
-			if(m_fdc)  // if FDC is present (it isn't on a 464)
+			if ((offset & (1<<7)) == 0)
 			{
-				if ((offset & (1<<7)) == 0)
+				unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);
+
+				switch (b8b0)
 				{
-					unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);
-
-					switch (b8b0)
+				case 0x00:
+				case 0x01:
+					/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
+					 * "1" the FDD motor will be active.
+					 * "0" the FDD motor will be in-active.*/
+					for (auto &fd : m_floppy)
 					{
-					case 0x00:
-					case 0x01:
-						{
-							/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
-							 * "1" the FDD motor will be active.
-							 * "0" the FDD motor will be in-active.*/
-							floppy_image_device *floppy;
-							floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
-							if(floppy)
-								floppy->mon_w(!BIT(data, 0));
-							floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
-							if(floppy)
-								floppy->mon_w(!BIT(data, 0));
-							break;
-						}
-
-					case 0x03: /* Write Data register of FDC */
-						m_fdc->fifo_w(space, 0,data);
-						break;
-
-					default:
-						break;
+						floppy_image_device *floppy = fd->get_device();
+						if(floppy)
+							floppy->mon_w(!BIT(data, 0));
 					}
+					break;
+
+				case 0x03: /* Write Data register of FDC */
+					m_fdc->fifo_w(space, 0,data);
+					break;
+
+				default:
+					break;
 				}
 			}
 		}
@@ -2323,11 +2311,11 @@ void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 	m_gate_array.upper_bank = pSnapshot[0x055];
 
 	/* PPI */
-	m_ppi->write(space, 3, pSnapshot[0x059] & 0x0ff);
+	m_ppi->write(3, pSnapshot[0x059] & 0x0ff);
 
-	m_ppi->write(space, 0, pSnapshot[0x056] & 0x0ff);
-	m_ppi->write(space, 1, pSnapshot[0x057] & 0x0ff);
-	m_ppi->write(space, 2, pSnapshot[0x058] & 0x0ff);
+	m_ppi->write(0, pSnapshot[0x056] & 0x0ff);
+	m_ppi->write(1, pSnapshot[0x057] & 0x0ff);
+	m_ppi->write(2, pSnapshot[0x058] & 0x0ff);
 
 	/* PSG */
 	for (i=0; i<16; i++)
@@ -2936,7 +2924,14 @@ void amstrad_state::enumerate_roms()
 	if (m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000)
 	{
 		uint8_t *crt = m_region_cart->base();
-		int bank_mask = (m_cart->get_rom_size() / 0x4000) - 1;
+		int bank_mask = 0x7ffff;
+
+		if (m_cart->get_rom_size() <= 0x20000)
+			bank_mask = 0x1ffff;
+		else if (m_cart->get_rom_size() <= 0x40000)
+			bank_mask = 0x3ffff;
+		else if (m_cart->get_rom_size() <= 0x80000)
+			bank_mask = 0x7ffff;
 
 		/* ROMs are stored on the inserted cartridge in the Plus/GX4000 */
 		for (int i = 0; i < 128; i++) // fill ROM table

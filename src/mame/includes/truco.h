@@ -3,6 +3,7 @@
 
 #include "machine/watchdog.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 class truco_state : public driver_device
 {
@@ -15,6 +16,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_battery_ram(*this, "battery_ram") { }
 
+	void truco(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<dac_bit_interface> m_dac;
@@ -37,6 +41,5 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
-	void truco(machine_config &config);
 	void main_map(address_map &map);
 };

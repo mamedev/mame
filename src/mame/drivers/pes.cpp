@@ -131,14 +131,14 @@ WRITE8_MEMBER( pes_state::port1_w )
 #ifdef DEBUG_PORTS
 	logerror("port1 write: tms5220 data written: %02X\n", data);
 #endif
-	m_speech->data_w(space, 0, data);
+	m_speech->data_w(data);
 
 }
 
 READ8_MEMBER( pes_state::port1_r )
 {
 	uint8_t data = 0xFF;
-	data = m_speech->status_r(space, 0);
+	data = m_speech->status_r();
 #ifdef DEBUG_PORTS
 	logerror("port1 read: tms5220 data read: 0x%02X\n", data);
 #endif
@@ -208,7 +208,7 @@ void pes_state::machine_reset()
 
 	m_port3_state = 0; // reset the openbus state of port 3
 	//m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // this causes debugger to fail badly if included
-	machine().device("tms5220")->reset(); // reset the 5220
+	m_speech->reset(); // reset the 5220
 }
 
 /******************************************************************************
@@ -223,18 +223,20 @@ void pes_state::machine_reset()
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(pes_state::i80c31_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM /* 27C64 ROM */
+void pes_state::i80c31_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom(); /* 27C64 ROM */
 	// AM_RANGE(0x2000, 0x3fff) AM_RAM /* 6164 8k SRAM, not populated */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(pes_state::i80c31_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0, 0x0) AM_WRITE(rsq_wsq_w) /* /WS(0) and /RS(1) */
-	AM_RANGE(0x1, 0x1) AM_READWRITE(port1_r, port1_w) /* tms5220 reads and writes */
-	AM_RANGE(0x3, 0x3) AM_READWRITE(port3_r, port3_w) /* writes and reads from port 3, see top of file */
-ADDRESS_MAP_END
+void pes_state::i80c31_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0, 0x0).w(FUNC(pes_state::rsq_wsq_w)); /* /WS(0) and /RS(1) */
+	map(0x1, 0x1).rw(FUNC(pes_state::port1_r), FUNC(pes_state::port1_w)); /* tms5220 reads and writes */
+	map(0x3, 0x3).rw(FUNC(pes_state::port3_r), FUNC(pes_state::port3_w)); /* writes and reads from port 3, see top of file */
+}
 
 /******************************************************************************
  Input Ports
@@ -247,18 +249,18 @@ INPUT_PORTS_END
 ******************************************************************************/
 MACHINE_CONFIG_START(pes_state::pes)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(i80c31_mem)
-	MCFG_CPU_IO_MAP(i80c31_io)
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(pes_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(pes_state, data_to_i8031))
+	MCFG_DEVICE_ADD("maincpu", I80C31, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_mem)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, pes_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, pes_state, data_to_i8031))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pes_state, pes_kbd_input))
 MACHINE_CONFIG_END
 
@@ -269,14 +271,14 @@ ROM_START( pes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("kevbios")
 	ROM_SYSTEM_BIOS( 0, "orig", "PES box with original firmware v2.5")
-	ROMX_LOAD( "vpu_2-5.bin",   0x0000, 0x2000, CRC(b27cfdf7) SHA1(c52acf9c080823de5ef26ac55abe168ad53a7d38), ROM_BIOS(1)) // original firmware, rather buggy, 4800bps serial, buggy RTS/CTS flow control, no buffer
+	ROMX_LOAD( "vpu_2-5.bin",   0x0000, 0x2000, CRC(b27cfdf7) SHA1(c52acf9c080823de5ef26ac55abe168ad53a7d38), ROM_BIOS(0)) // original firmware, rather buggy, 4800bps serial, buggy RTS/CTS flow control, no buffer
 	ROM_SYSTEM_BIOS( 1, "kevbios", "PES box with kevtris' rewritten firmware")
-	ROMX_LOAD( "pes.bin",   0x0000, 0x2000, CRC(22c1c4ec) SHA1(042e139cd0cf6ffafcd88904f1636c6fa1b38f25), ROM_BIOS(2)) // rewritten firmware by kevtris, 4800bps serial, RTS/CTS plus XON/XOFF flow control, 64 byte buffer
+	ROMX_LOAD( "pes.bin",   0x0000, 0x2000, CRC(22c1c4ec) SHA1(042e139cd0cf6ffafcd88904f1636c6fa1b38f25), ROM_BIOS(1)) // rewritten firmware by kevtris, 4800bps serial, RTS/CTS plus XON/XOFF flow control, 64 byte buffer
 ROM_END
 
 /******************************************************************************
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE       INIT  COMPANY                        FULLNAME             FLAGS
-COMP( 1987, pes,    0,      0,      pes,        pes,   pes_state,  0,    "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                        FULLNAME             FLAGS
+COMP( 1987, pes,  0,      0,      pes,     pes,   pes_state, empty_init, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )

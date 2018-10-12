@@ -56,7 +56,7 @@ protected:
 	virtual DECLARE_WRITE16_MEMBER(write_al);
 
 private:
-	required_device<device_t> m_svp;
+	required_device<cpu_device> m_svp;
 	required_ioport m_test_ipt;
 
 	uint32_t pm_io(int reg, int write, uint32_t d);

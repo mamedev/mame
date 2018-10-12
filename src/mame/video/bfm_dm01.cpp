@@ -264,14 +264,15 @@ WRITE8_MEMBER( bfm_dm01_device::unknown_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START(bfm_dm01_device::bfm_dm01_memmap)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM                             // 8k RAM
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE(control_r, control_w)  // control reg
-	AM_RANGE(0x2800, 0x2800) AM_READWRITE(mux_r, mux_w)           // mux
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(comm_r, comm_w)     //
-	AM_RANGE(0x3800, 0x3800) AM_READWRITE(unknown_r, unknown_w)   // ???
-	AM_RANGE(0x4000, 0xFfff) AM_ROM                             // 48k  ROM
-ADDRESS_MAP_END
+void bfm_dm01_device::bfm_dm01_memmap(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();                             // 8k RAM
+	map(0x2000, 0x2000).rw(FUNC(bfm_dm01_device::control_r), FUNC(bfm_dm01_device::control_w));  // control reg
+	map(0x2800, 0x2800).rw(FUNC(bfm_dm01_device::mux_r), FUNC(bfm_dm01_device::mux_w));           // mux
+	map(0x3000, 0x3000).rw(FUNC(bfm_dm01_device::comm_r), FUNC(bfm_dm01_device::comm_w));     //
+	map(0x3800, 0x3800).rw(FUNC(bfm_dm01_device::unknown_r), FUNC(bfm_dm01_device::unknown_w));   // ???
+	map(0x4000, 0xFfff).rom();                             // 48k  ROM
+}
 
 
 uint32_t bfm_dm01_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -288,9 +289,9 @@ INTERRUPT_GEN_MEMBER( bfm_dm01_device::nmi_line_assert )
 }
 
 MACHINE_CONFIG_START(bfm_dm01_device::device_add_mconfig)
-	MCFG_CPU_ADD("matrix", M6809, 2000000 )        /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
-	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_dm01_device, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */
+	MCFG_DEVICE_ADD("matrix", M6809, 2000000 )        /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
+	MCFG_DEVICE_PROGRAM_MAP(bfm_dm01_memmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_dm01_device, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */
 
 	MCFG_PALETTE_ADD("palette_lcd", 3)
 

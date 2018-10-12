@@ -229,6 +229,7 @@ if sys.argv[3]=='target':
     sys.stdout.write('    targetsubdir(_target .."_" .. _subtarget)\n')
     sys.stdout.write('    kind (LIBTYPE)\n')
     sys.stdout.write('    uuid (os.uuid("drv-mame-%s"))\n' % sys.argv[4])
+    sys.stdout.write('    addprojectflags()\n')
     sys.stdout.write('    \n')
     sys.stdout.write('    includedirs {\n')
     sys.stdout.write('        MAME_DIR .. "src/osd",\n')

@@ -29,7 +29,7 @@
 	downcast<s2636_device &>(*device).set_divider((divider));
 
 #define MCFG_S2623_SET_INTREQ_CALLBACK(cb) \
-	devcb = &downcast<s2636_device &>(*device).set_intreq_cb(DEVCB_##cb);
+	downcast<s2636_device &>(*device).set_intreq_cb(DEVCB_##cb);
 
 
 /*************************************

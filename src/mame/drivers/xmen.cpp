@@ -24,6 +24,7 @@ likewise a 2 screen game
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "speaker.h"
 
@@ -77,90 +78,93 @@ WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
 }
 
 
-ADDRESS_MAP_START(xmen_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
-	AM_RANGE(0x108040, 0x10805f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
-	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
-	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
-	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
-	AM_RANGE(0x18c000, 0x197fff) AM_DEVREADWRITE("k052109", k052109_device, lsb_r, lsb_w)
-	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
-ADDRESS_MAP_END
+void xmen_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x0fffff).rom();
+	map(0x100000, 0x100fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w));
+	map(0x101000, 0x101fff).ram();
+	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
+	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w));
+	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
+	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x10a000, 0x10a001).portr("P2_P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x10a002, 0x10a003).portr("P1_P3");
+	map(0x10a004, 0x10a005).portr("EEPROM");
+	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r));
+	map(0x110000, 0x113fff).ram();     /* main RAM */
+	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::lsb_r), FUNC(k052109_device::lsb_w));
+	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
+}
 
-ADDRESS_MAP_START(xmen_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("z80bank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xe800, 0xe801) AM_MIRROR(0x0400) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
-ADDRESS_MAP_END
+void xmen_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("z80bank");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe22f).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
+	map(0xe800, 0xe801).mirror(0x0400).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
+	map(0xf800, 0xf800).w(FUNC(xmen_state::sound_bankswitch_w));
+}
 
 
-ADDRESS_MAP_START(xmen_state::_6p_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteramleft")   /* sprites (screen 1) */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_SHARE("spriteramright")  /* sprites (screen 2) */
-	AM_RANGE(0x103000, 0x103fff) AM_RAM     /* 6p - a buffer? */
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w) /* sprites */
-	AM_RANGE(0x108040, 0x10805f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
-	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
-	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x10a006, 0x10a007) AM_READ_PORT("P5_P6")
-	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r) /* sprites */
-	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
-/*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_device, lsb_w) AM_SHARE("tilemapleft") */
-	AM_RANGE(0x18c000, 0x197fff) AM_RAM AM_SHARE("tilemapleft") /* left tilemap (p1,p2,p3 counters) */
-	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
+void xmen_state::_6p_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x0fffff).rom();
+	map(0x100000, 0x100fff).ram().share("spriteramleft");   /* sprites (screen 1) */
+	map(0x101000, 0x101fff).ram();
+	map(0x102000, 0x102fff).ram().share("spriteramright");  /* sprites (screen 2) */
+	map(0x103000, 0x103fff).ram();     /* 6p - a buffer? */
+	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
+	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w)); /* sprites */
+	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
+	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x10a000, 0x10a001).portr("P2_P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x10a002, 0x10a003).portr("P1_P3");
+	map(0x10a004, 0x10a005).portr("EEPROM");
+	map(0x10a006, 0x10a007).portr("P5_P6");
+	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r)); /* sprites */
+	map(0x110000, 0x113fff).ram();     /* main RAM */
+/*  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:lsb_w)).share("tilemapleft"); */
+	map(0x18c000, 0x197fff).ram().share("tilemapleft"); /* left tilemap (p1,p2,p3 counters) */
+	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
 /*
-    AM_RANGE(0x1ac000, 0x1af7ff) AM_READONLY
-    AM_RANGE(0x1ac000, 0x1af7ff) AM_WRITEONLY
+    map(0x1ac000, 0x1af7ff).readonly();
+    map(0x1ac000, 0x1af7ff).writeonly();
 
-    AM_RANGE(0x1b0000, 0x1b37ff) AM_READONLY
-    AM_RANGE(0x1b0000, 0x1b37ff) AM_WRITEONLY
+    map(0x1b0000, 0x1b37ff).readonly();
+    map(0x1b0000, 0x1b37ff).writeonly();
 
-    AM_RANGE(0x1b4000, 0x1b77ff) AM_READONLY
-    AM_RANGE(0x1b4000, 0x1b77ff) AM_WRITEONLY
+    map(0x1b4000, 0x1b77ff).readonly();
+    map(0x1b4000, 0x1b77ff).writeonly();
 */
-	AM_RANGE(0x1ac000, 0x1b7fff) AM_RAM AM_SHARE("tilemapright") /* right tilemap */
+	map(0x1ac000, 0x1b7fff).ram().share("tilemapright"); /* right tilemap */
 
 	/* what are the regions below buffers? (used by hw or software?) */
 /*
-    AM_RANGE(0x1cc000, 0x1cf7ff) AM_READONLY
-    AM_RANGE(0x1cc000, 0x1cf7ff) AM_WRITEONLY
+    map(0x1cc000, 0x1cf7ff).readonly();
+    map(0x1cc000, 0x1cf7ff).writeonly();
 
-    AM_RANGE(0x1d0000, 0x1d37ff) AM_READONLY
-    AM_RANGE(0x1d0000, 0x1d37ff) AM_WRITEONLY
+    map(0x1d0000, 0x1d37ff).readonly();
+    map(0x1d0000, 0x1d37ff).writeonly();
 */
-	AM_RANGE(0x1cc000, 0x1d7fff) AM_RAM /* tilemap ? */
+	map(0x1cc000, 0x1d7fff).ram(); /* tilemap ? */
 
 	/* whats the stuff below, buffers? */
 /*
-    AM_RANGE(0x1ec000, 0x1ef7ff) AM_READONLY
-    AM_RANGE(0x1ec000, 0x1ef7ff) AM_WRITEONLY
-    AM_RANGE(0x1f0000, 0x1f37ff) AM_READONLY
-    AM_RANGE(0x1f0000, 0x1f37ff) AM_WRITEONLY
-    AM_RANGE(0x1f4000, 0x1f77ff) AM_READONLY
-    AM_RANGE(0x1f4000, 0x1f77ff) AM_WRITEONLY
+    map(0x1ec000, 0x1ef7ff).readonly();
+    map(0x1ec000, 0x1ef7ff).writeonly();
+    map(0x1f0000, 0x1f37ff).readonly();
+    map(0x1f0000, 0x1f37ff).writeonly();
+    map(0x1f4000, 0x1f77ff).readonly();
+    map(0x1f4000, 0x1f77ff).writeonly();
 */
-	AM_RANGE(0x1ec000, 0x1f7fff) AM_RAM /* tilemap ? */
-ADDRESS_MAP_END
+	map(0x1ec000, 0x1f7fff).ram(); /* tilemap ? */
+}
 
 
 static INPUT_PORTS_START( xmen )
@@ -174,8 +178,8 @@ static INPUT_PORTS_START( xmen )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
@@ -203,8 +207,8 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x003c, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -239,8 +243,8 @@ static INPUT_PORTS_START( xmen6p )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
@@ -248,7 +252,7 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START5 ) /* not verified */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) /* not verified */
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xmen_state,xmen_frame_r, nullptr)  /* screen indicator? */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xmen_state,xmen_frame_r, nullptr)  /* screen indicator? */
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
@@ -297,16 +301,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 MACHINE_CONFIG_START(xmen_state::xmen)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xmen_state, xmen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -333,11 +337,12 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
@@ -349,22 +354,22 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(xmen_state::xmen6p)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(_6p_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(_6p_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xmen_state, xmen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -380,7 +385,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(16*8, 52*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xmen_state, screen_vblank_xmen6p))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xmen_state, screen_vblank_xmen6p))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)
@@ -397,12 +402,13 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 
 	MCFG_K053251_ADD("k053251")
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
@@ -821,15 +827,15 @@ ROM_END
 
 /* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? - For the Asia versions both D & E are 4 players */
 
-GAME( 1992, xmen,    0,    xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver UBB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmenj,   xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver JBA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmene,   xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver EBA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmena,   xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver AEA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmenaa,  xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pe, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver EAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pu, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver UAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pa, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver AAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pj, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen,    0,    xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver UBB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmenj,   xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver JBA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmene,   xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver EBA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmena,   xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver AEA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmenaa,  xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pe, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver EAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pu, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver UAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pa, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver AAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pj, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver JAA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, xmen6p,  xmen, xmen6p, xmen6p, xmen_state,  0,   ROT0, "Konami", "X-Men (6 Players ver ECB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen6pu, xmen, xmen6p, xmen6p, xmen_state,  0,   ROT0, "Konami", "X-Men (6 Players ver UCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen6p,  xmen, xmen6p, xmen6p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (6 Players ver ECB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen6pu, xmen, xmen6p, xmen6p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (6 Players ver UCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

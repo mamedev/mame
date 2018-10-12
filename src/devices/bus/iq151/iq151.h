@@ -48,6 +48,7 @@
 #pragma once
 
 #include "softlist_dev.h"
+#include "screen.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -67,12 +68,15 @@ public:
 	virtual void io_read(offs_t offset, uint8_t &data) { }
 	virtual void io_write(offs_t offset, uint8_t data) { }
 	virtual uint8_t* get_cart_base() { return nullptr; }
+	virtual void set_screen_device(screen_device *screen) { m_screen = screen; }
 
 	// video update
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) { }
 
 protected:
 	device_iq151cart_interface(const machine_config &mconfig, device_t &device);
+
+	screen_device *m_screen;
 };
 
 // ======================> iq151cart_slot_device
@@ -86,6 +90,7 @@ public:
 	iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~iq151cart_slot_device();
 
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
 	template <class Object> devcb_base &set_out_irq0_callback(Object &&cb) { return m_out_irq0_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_irq1_callback(Object &&cb) { return m_out_irq1_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_irq2_callback(Object &&cb) { return m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
@@ -101,11 +106,11 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
+	virtual bool is_readable()  const override { return true; }
+	virtual bool is_writeable() const override { return false; }
+	virtual bool is_creatable() const override { return false; }
+	virtual bool must_be_loaded() const override { return false; }
+	virtual bool is_reset_on_load() const override { return true; }
 	virtual const char *image_interface() const override { return "iq151_cart"; }
 	virtual const char *file_extensions() const override { return "bin,rom"; }
 
@@ -126,7 +131,8 @@ public:
 	devcb_write_line                m_out_irq4_cb;
 	devcb_write_line                m_out_drq_cb;
 
-	device_iq151cart_interface* m_cart;
+	device_iq151cart_interface*     m_cart;
+	required_device<screen_device>  m_screen;
 };
 
 
@@ -139,21 +145,24 @@ DECLARE_DEVICE_TYPE(IQ151CART_SLOT, iq151cart_slot_device)
 ***************************************************************************/
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ0_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq0_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_irq0_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ1_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq1_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_irq1_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ2_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ3_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ4_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_DRQ_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_drq_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_drq_callback(DEVCB_##_devcb);
+
+#define MCFG_IQ151CART_SLOT_SCREEN_TAG(screen_tag) \
+	downcast<iq151cart_slot_device &>(*device).set_screen_tag(screen_tag);
 
 #endif // MAME_BUS_IQ151_IQ151_H

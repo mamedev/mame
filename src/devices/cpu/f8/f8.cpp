@@ -7,6 +7,27 @@
  *  This work is based on Frank Palazzolo's F8 emulation in a standalone
  *  Fairchild Channel F emulator and the 'Fairchild F3850 CPU' data sheets.
  *
+ *  The 3850 CPU itself does not include the address bus, pointer registers
+ *  or an interrupt controller. Those functions are provided by at least one
+ *  of the following devices:
+ *
+ *  - 3851 Program Storage Unit (PSU)
+ *  - 3852 Dynamic Memory Interface (DMI)
+ *  - 3853 Static Memory Interface (SMI)
+ *  - 3856 Program Storage Unit (PSU)
+ *  - 3861 Peripheral Input/Output (PIO)
+ *  - 3871 Peripheral Input/Output (PIO)
+ *
+ *  Of these support devices, the 3851 PSU includes 1024 bytes of mask ROM,
+ *  and the 3856 PSU includes 2048 bytes of mask ROM; addressing for the PSU
+ *  is also determined by mask option. The 3853 SMI may be used with external
+ *  program ROMs.
+ *
+ *  The PSU does not have DC0 and DC1, only DC0; as a result, it does not
+ *  respond to the main CPU's DC0/DC1 swap instruction.  This may lead to two
+ *  devices responding to the same DC0 address and attempting to place their
+ *  bytes on the data bus simultaneously!
+ *
  *****************************************************************************/
 
 #include "emu.h"
@@ -54,9 +75,9 @@ device_memory_interface::space_config_vector f8_cpu_device::memory_space_config(
 	};
 }
 
-util::disasm_interface *f8_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> f8_cpu_device::create_disassembler()
 {
-	return new f8_disassembler;
+	return std::make_unique<f8_disassembler>();
 }
 
 void f8_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -77,7 +98,7 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 void f8_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_iospace = &space(AS_IO);
 
 	save_item(NAME(m_debug_pc));
@@ -170,7 +191,7 @@ void f8_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_debug_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_w).formatstr("%5s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void f8_cpu_device::device_reset()
@@ -315,7 +336,7 @@ void f8_cpu_device::ROMC_00(int insttim)
 	 * of PC0.
 	 */
 
-	m_dbus = m_direct->read_byte(m_pc0);
+	m_dbus = m_cache->read_byte(m_pc0);
 	m_pc0 += 1;
 	m_icount -= insttim; /* ROMC00 is usually short, not short+long, but DS is long */
 }
@@ -328,7 +349,7 @@ void f8_cpu_device::ROMC_01()
 	 * location addressed by PC0; then all devices add the 8-bit value
 	 * on the data bus as signed binary number to PC0.
 	 */
-	m_dbus = m_direct->read_byte(m_pc0);
+	m_dbus = m_cache->read_byte(m_pc0);
 	m_pc0 += (s8)m_dbus;
 	m_icount -= cL;
 }
@@ -352,7 +373,7 @@ void f8_cpu_device::ROMC_03(int insttim)
 	 * Similiar to 0x00, except that it is used for immediate operands
 	 * fetches (using PC0) instead of instruction fetches.
 	 */
-	m_dbus = m_io = m_direct->read_byte(m_pc0);
+	m_dbus = m_io = m_cache->read_byte(m_pc0);
 	m_pc0 += 1;
 	m_icount -= insttim;
 }
@@ -446,7 +467,7 @@ void f8_cpu_device::ROMC_0C()
 	 * by PC0 into the data bus; then all devices move the value that
 	 * has just been placed on the data bus into the low order byte of PC0.
 	 */
-	m_dbus = m_direct->read_byte(m_pc0);
+	m_dbus = m_cache->read_byte(m_pc0);
 	m_pc0 = (m_pc0 & 0xff00) | m_dbus;
 	m_icount -= cL;
 }
@@ -469,7 +490,7 @@ void f8_cpu_device::ROMC_0E()
 	 * The value on the data bus is then moved to the low order byte
 	 * of DC0 by all devices.
 	 */
-	m_dbus = m_direct->read_byte(m_pc0);
+	m_dbus = m_cache->read_byte(m_pc0);
 	m_dc0 = (m_dc0 & 0xff00) | m_dbus;
 	m_icount -= cL;
 }
@@ -507,7 +528,7 @@ void f8_cpu_device::ROMC_11()
 	 * data bus. All devices must then move the contents of the
 	 * data bus to the upper byte of DC0.
 	 */
-	m_dbus = m_direct->read_byte(m_pc0);
+	m_dbus = m_cache->read_byte(m_pc0);
 	m_dc0 = (m_dc0 & 0x00ff) | (m_dbus << 8);
 	m_icount -= cL;
 }
@@ -1655,7 +1676,7 @@ void f8_cpu_device::execute_run()
 		u8 op = m_dbus;
 
 		m_debug_pc = (m_pc0 - 1) & 0xffff;
-		debugger_instruction_hook(this, m_debug_pc);
+		debugger_instruction_hook(m_debug_pc);
 
 		switch( op )
 		{

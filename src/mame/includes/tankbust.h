@@ -1,5 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
+
+#include "emupal.h"
+
 class tankbust_state : public driver_device
 {
 public:
@@ -14,6 +17,9 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram") { }
 
+	void tankbust(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -60,7 +66,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(soundlatch_callback);
 	TIMER_CALLBACK_MEMBER(soundirqline_callback);
-	void tankbust(machine_config &config);
+
 	void main_map(address_map &map);
 	void map_cpu2(address_map &map);
 	void port_map_cpu2(address_map &map);

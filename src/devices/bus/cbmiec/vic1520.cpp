@@ -62,9 +62,9 @@ DEFINE_DEVICE_TYPE(VIC1520, vic1520_device, "vic1520", "VIC-1520 Color Printer P
 ROM_START( vic1520 )
 	ROM_REGION( 0x800, M6500_1_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "r01", "325340-01" )
-	ROMX_LOAD( "325340-01.u1", 0x000, 0x800, CRC(3757da6f) SHA1(8ab43603f74b0f269bbe890d1939a9ae31307eb1), ROM_BIOS(1) )
+	ROMX_LOAD( "325340-01.u1", 0x000, 0x800, CRC(3757da6f) SHA1(8ab43603f74b0f269bbe890d1939a9ae31307eb1), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r03", "325340-03" )
-	ROMX_LOAD( "325340-03.u1", 0x000, 0x800, CRC(f72ea2b6) SHA1(74c15b2cc1f7632bffa37439609cbdb50b82ea92), ROM_BIOS(2) )
+	ROMX_LOAD( "325340-03.u1", 0x000, 0x800, CRC(f72ea2b6) SHA1(74c15b2cc1f7632bffa37439609cbdb50b82ea92), ROM_BIOS(1) )
 ROM_END
 
 
@@ -82,11 +82,12 @@ const tiny_rom_entry *vic1520_device::device_rom_region() const
 //  ADDRESS_MAP( vic1520_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(vic1520_device::vic1520_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x000, 0x03f) AM_RAM
-	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION(M6500_1_TAG, 0)
-ADDRESS_MAP_END
+void vic1520_device::vic1520_mem(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x000, 0x03f).ram();
+	map(0x800, 0xfff).rom().region(M6500_1_TAG, 0);
+}
 
 
 //-------------------------------------------------
@@ -94,8 +95,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vic1520_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6500_1_TAG, M6502, XTAL(2'000'000)) // M6500/1
-	MCFG_CPU_PROGRAM_MAP(vic1520_mem)
+	MCFG_DEVICE_ADD(M6500_1_TAG, M6502, XTAL(2'000'000)) // M6500/1
+	MCFG_DEVICE_PROGRAM_MAP(vic1520_mem)
 MACHINE_CONFIG_END
 
 

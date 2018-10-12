@@ -170,9 +170,10 @@ DEFINE_DEVICE_TYPE(MOS7360, mos7360_device, "mos7360", "MOS 7360 TED")
 
 
 // default address maps
-ADDRESS_MAP_START(mos7360_device::mos7360_videoram_map)
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mos7360_device::mos7360_videoram_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
 //-------------------------------------------------
@@ -278,10 +279,6 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 
 void mos7360_device::device_start()
 {
-	// get the CPU device
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
-	assert(m_cpu != nullptr);
-
 	// resolve callbacks
 	m_write_irq.resolve_safe();
 	m_read_k.resolve_safe(0xff);

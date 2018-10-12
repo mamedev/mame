@@ -146,40 +146,43 @@ WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 }
 
 
-ADDRESS_MAP_START(crshrace_state::crshrace_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x300000, 0x3fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("user2", 0) AM_MIRROR(0x100000)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE(crshrace_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
-	AM_RANGE(0xffc000, 0xffc001) AM_WRITE(crshrace_roz_bank_w)
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1") AM_WRITE(crshrace_gfxctrl_w)
-	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
-	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
-	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0xfff044, 0xfff047) AM_WRITEONLY   // ??? moves during race
-ADDRESS_MAP_END
+void crshrace_state::crshrace_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x300000, 0x3fffff).rom().region("user1", 0);
+	map(0x400000, 0x4fffff).rom().region("user2", 0).mirror(0x100000);
+	map(0xa00000, 0xa0ffff).ram().share("spriteram2");
+	map(0xd00000, 0xd01fff).ram().w(FUNC(crshrace_state::crshrace_videoram1_w)).share("videoram1");
+	map(0xe00000, 0xe01fff).ram().share("spriteram");
+	map(0xfe0000, 0xfeffff).ram();
+	map(0xffc000, 0xffc001).w(FUNC(crshrace_state::crshrace_roz_bank_w));
+	map(0xffd000, 0xffdfff).ram().w(FUNC(crshrace_state::crshrace_videoram2_w)).share("videoram2");
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfff000, 0xfff001).portr("P1").w(FUNC(crshrace_state::crshrace_gfxctrl_w));
+	map(0xfff002, 0xfff003).portr("P2");
+	map(0xfff004, 0xfff005).portr("DSW0");
+	map(0xfff006, 0xfff007).portr("DSW2");
+	map(0xfff009, 0xfff009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xfff00a, 0xfff00b).portr("DSW1");
+	map(0xfff00e, 0xfff00f).portr("P3");
+	map(0xfff020, 0xfff03f).w(m_k053936, FUNC(k053936_device::ctrl_w));
+	map(0xfff044, 0xfff047).writeonly();   // ??? moves during race
+}
 
-ADDRESS_MAP_START(crshrace_state::sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void crshrace_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(crshrace_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(crshrace_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-ADDRESS_MAP_END
+void crshrace_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(crshrace_state::crshrace_sh_bankswitch_w));
+	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+}
 
 
 static INPUT_PORTS_START( crshrace )
@@ -326,7 +329,7 @@ static INPUT_PORTS_START( crshrace )
     PORT_DIPSETTING(      0x0e00, "5" )
     PORT_DIPSETTING(      0x0f00, "5" )
 */
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* pending sound command */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* pending sound command */
 INPUT_PORTS_END
 
 /* Same as 'crshrace', but additional "unknown" Dip Switch (see notes) */
@@ -376,7 +379,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( crshrace )
+static GFXDECODE_START( gfx_crshrace )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 32 )
@@ -402,26 +405,26 @@ void crshrace_state::machine_reset()
 MACHINE_CONFIG_START(crshrace_state::crshrace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000)    /* 16 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(crshrace_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crshrace_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,16000000)    /* 16 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(crshrace_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crshrace_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)   /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)   /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(crshrace_state, screen_update_crshrace)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(crshrace_state::screen_update_crshrace));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.screen_vblank().append(m_spriteram2, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crshrace)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crshrace)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
 
@@ -430,21 +433,22 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_WRAP(1)
 	MCFG_K053936_OFFSETS(-48, -21)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -534,14 +538,14 @@ void crshrace_state::crshrace_patch_code( uint16_t offset )
 #endif
 
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace)
+void crshrace_state::init_crshrace()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003778);
 	#endif
 }
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
+void crshrace_state::init_crshrace2()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003796);
@@ -549,5 +553,5 @@ DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
 }
 
 
-GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, init_crshrace,  ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, init_crshrace2, ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

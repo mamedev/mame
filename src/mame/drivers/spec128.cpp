@@ -233,20 +233,28 @@ READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
 	return vpos<193 ? m_screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }
 
-ADDRESS_MAP_START(spectrum_state::spectrum_128_io)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(spectrum_128_port_7ffd_w) AM_MIRROR(0x7ffc)   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x0001, 0x0001) AM_READ(spectrum_128_ula_r) AM_MIRROR(0xfffe)
-ADDRESS_MAP_END
+void spectrum_state::spectrum_128_io(address_map &map)
+{
+	map(0x0000, 0x0000).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x0001, 0x0001).w(FUNC(spectrum_state::spectrum_128_port_7ffd_w)).mirror(0x7ffc);   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
+	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
+	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
+	map(0x0001, 0x0001).r(FUNC(spectrum_state::spectrum_128_ula_r)).mirror(0xfffe);
+}
 
-ADDRESS_MAP_START(spectrum_state::spectrum_128_mem)
-	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE(spectrum_128_bank1_r, spectrum_128_bank1_w)
-	AM_RANGE( 0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE( 0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE( 0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void spectrum_state::spectrum_128_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_128_bank1_r), FUNC(spectrum_state::spectrum_128_bank1_w));
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
+
+void spectrum_state::init_spec128()
+{
+	// setup expansion slot
+	m_exp->set_io_space(&m_maincpu->space(AS_IO));
+}
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 {
@@ -293,10 +301,10 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", Z80, X1_128_SINCLAIR / 5)
-	MCFG_CPU_PROGRAM_MAP(spectrum_128_mem)
-	MCFG_CPU_IO_MAP(spectrum_128_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, X1_128_SINCLAIR / 5)
+	MCFG_DEVICE_PROGRAM_MAP(spectrum_128_mem)
+	MCFG_DEVICE_IO_MAP(spectrum_128_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
@@ -309,7 +317,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spec128)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ay8912", AY8912, X1_128_SINCLAIR / 10)
+	MCFG_DEVICE_ADD("ay8912", AY8912, X1_128_SINCLAIR / 10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* expansion port */
@@ -317,8 +325,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	MCFG_DEVICE_SLOT_INTERFACE(spec128_expansion_devices, nullptr, false)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 MACHINE_CONFIG_END
 
 
@@ -334,29 +341,29 @@ MACHINE_CONFIG_END
 ROM_START(spec128)
 	ROM_REGION(0x18000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
-	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(1))
-	ROMX_LOAD("zx128_1.rom",0x14000,0x4000, CRC(b96a36be) SHA1(80080644289ed93d71a1103992a154cc9802b2fa), ROM_BIOS(1))
+	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(0))
+	ROMX_LOAD("zx128_1.rom",0x14000,0x4000, CRC(b96a36be) SHA1(80080644289ed93d71a1103992a154cc9802b2fa), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
-	ROMX_LOAD("zx128s0.rom",0x10000,0x4000, CRC(453d86b2) SHA1(968937b1c750f0ef6205f01c6db4148da4cca4e3), ROM_BIOS(2))
-	ROMX_LOAD("zx128s1.rom",0x14000,0x4000, CRC(6010e796) SHA1(bea3f397cc705eafee995ea629f4a82550562f90), ROM_BIOS(2))
+	ROMX_LOAD("zx128s0.rom",0x10000,0x4000, CRC(453d86b2) SHA1(968937b1c750f0ef6205f01c6db4148da4cca4e3), ROM_BIOS(1))
+	ROMX_LOAD("zx128s1.rom",0x14000,0x4000, CRC(6010e796) SHA1(bea3f397cc705eafee995ea629f4a82550562f90), ROM_BIOS(1))
 ROM_END
 
 ROM_START(specpls2)
 	ROM_REGION(0x18000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
-	ROMX_LOAD("zxp2_0.rom",0x10000,0x4000, CRC(5d2e8c66) SHA1(72703f9a3e734f3c23ec34c0727aae4ccbef9a91), ROM_BIOS(1))
-	ROMX_LOAD("zxp2_1.rom",0x14000,0x4000, CRC(98b1320b) SHA1(de8b0d2d0379cfe7c39322a086ca6da68c7f23cb), ROM_BIOS(1))
+	ROMX_LOAD("zxp2_0.rom",0x10000,0x4000, CRC(5d2e8c66) SHA1(72703f9a3e734f3c23ec34c0727aae4ccbef9a91), ROM_BIOS(0))
+	ROMX_LOAD("zxp2_1.rom",0x14000,0x4000, CRC(98b1320b) SHA1(de8b0d2d0379cfe7c39322a086ca6da68c7f23cb), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "fr", "French" )
-	ROMX_LOAD("plus2fr0.rom",0x10000,0x4000, CRC(c684c535) SHA1(56684c4c85a616e726a50707483b9a42d8e724ed), ROM_BIOS(2))
-	ROMX_LOAD("plus2fr1.rom",0x14000,0x4000, CRC(f5e509c5) SHA1(7e398f62689c9d90a36d3a101351ec9987207308), ROM_BIOS(2))
+	ROMX_LOAD("plus2fr0.rom",0x10000,0x4000, CRC(c684c535) SHA1(56684c4c85a616e726a50707483b9a42d8e724ed), ROM_BIOS(1))
+	ROMX_LOAD("plus2fr1.rom",0x14000,0x4000, CRC(f5e509c5) SHA1(7e398f62689c9d90a36d3a101351ec9987207308), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "sp", "Spanish" )
-	ROMX_LOAD("plus2sp0.rom",0x10000,0x4000, CRC(e807d06e) SHA1(8259241b28ff85441f1bedc2bee53445767c51c5), ROM_BIOS(3))
-	ROMX_LOAD("plus2sp1.rom",0x14000,0x4000, CRC(41981d4b) SHA1(ec0d5a158842d20601b4fbeaefc6668db979d0e1), ROM_BIOS(3))
+	ROMX_LOAD("plus2sp0.rom",0x10000,0x4000, CRC(e807d06e) SHA1(8259241b28ff85441f1bedc2bee53445767c51c5), ROM_BIOS(2))
+	ROMX_LOAD("plus2sp1.rom",0x14000,0x4000, CRC(41981d4b) SHA1(ec0d5a158842d20601b4fbeaefc6668db979d0e1), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "ao", "ZX Spectrum +2c (Andrew Owen)" )
-	ROMX_LOAD("plus2c-0.rom",0x10000,0x4000, CRC(bfddf748) SHA1(3eba870bcb2c5efa906f2ca3febe960fc35d66bb), ROM_BIOS(4))
-	ROMX_LOAD("plus2c-1.rom",0x14000,0x4000, CRC(fd8552b6) SHA1(5ffcf79f2154ba2cf42cc1d9cb4be93cb5043e73), ROM_BIOS(4))
+	ROMX_LOAD("plus2c-0.rom",0x10000,0x4000, CRC(bfddf748) SHA1(3eba870bcb2c5efa906f2ca3febe960fc35d66bb), ROM_BIOS(3))
+	ROMX_LOAD("plus2c-1.rom",0x14000,0x4000, CRC(fd8552b6) SHA1(5ffcf79f2154ba2cf42cc1d9cb4be93cb5043e73), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 4, "namco", "ZX Spectrum +2c (Namco)" )
-	ROMX_LOAD("pl2namco.rom",0x10000,0x8000, CRC(72a54e75) SHA1(311400157df689450dadc3620f4c4afa960b05ad), ROM_BIOS(5))
+	ROMX_LOAD("pl2namco.rom",0x10000,0x8000, CRC(72a54e75) SHA1(311400157df689450dadc3620f4c4afa960b05ad), ROM_BIOS(4))
 ROM_END
 
 ROM_START(hc128)
@@ -368,15 +375,15 @@ ROM_END
 ROM_START(hc2000)
 	ROM_REGION(0x18000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
-	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(1))
-	ROMX_LOAD("hc2000.v1",  0x14000,0x4000, CRC(453c1a5a) SHA1(f8139fc38478691cf44944dc83fd6e70b0f002fb), ROM_BIOS(1))
+	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(0))
+	ROMX_LOAD("hc2000.v1",  0x14000,0x4000, CRC(453c1a5a) SHA1(f8139fc38478691cf44944dc83fd6e70b0f002fb), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
-	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(2))
-	ROMX_LOAD("hc2000.v2",  0x14000,0x4000, CRC(65d90464) SHA1(5e2096e6460ff2120c8ada97579fdf82c1199c09), ROM_BIOS(2))
+	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(1))
+	ROMX_LOAD("hc2000.v2",  0x14000,0x4000, CRC(65d90464) SHA1(5e2096e6460ff2120c8ada97579fdf82c1199c09), ROM_BIOS(1))
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE       INPUT      STATE           INIT  COMPANY                  FULLNAME           FLAGS
-COMP( 1986, spec128,  0,       0,      spectrum_128, spec128,   spectrum_state, 0,    "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
-COMP( 1986, specpls2, spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "Amstrad plc",           "ZX Spectrum +2",  0 )
-COMP( 1991, hc128,    spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "ICE-Felix",             "HC-128",          0 )
-COMP( 1992, hc2000,   spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "ICE-Felix",             "HC-2000",         MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE       CLASS      STATE           INIT          COMPANY                  FULLNAME           FLAGS
+COMP( 1986, spec128,  0,       0,      spectrum_128, spec128,   spectrum_state, init_spec128, "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
+COMP( 1986, specpls2, spec128, 0,      spectrum_128, spec_plus, spectrum_state, init_spec128, "Amstrad plc",           "ZX Spectrum +2",  0 )
+COMP( 1991, hc128,    spec128, 0,      spectrum_128, spec_plus, spectrum_state, init_spec128, "ICE-Felix",             "HC-128",          0 )
+COMP( 1992, hc2000,   spec128, 0,      spectrum_128, spec_plus, spectrum_state, init_spec128, "ICE-Felix",             "HC-2000",         MACHINE_NOT_WORKING )

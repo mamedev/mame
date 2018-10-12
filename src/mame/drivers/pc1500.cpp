@@ -16,6 +16,7 @@
 #include "cpu/lh5801/lh5801.h"
 #include "machine/lh5810.h"
 #include "machine/upd1990a.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "pc1500.lh"
@@ -34,6 +35,9 @@ public:
 	{
 	}
 
+	void pc1500(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 
@@ -53,26 +57,27 @@ public:
 
 	DECLARE_READ8_MEMBER( pc1500_kb_r );
 	DECLARE_PALETTE_INIT(pc1500);
-	void pc1500(machine_config &config);
 	void pc1500_mem(address_map &map);
 	void pc1500_mem_io(address_map &map);
 };
 
-ADDRESS_MAP_START(pc1500_state::pc1500_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff) AM_ROM    //module ROM/RAM
-	AM_RANGE( 0x4000, 0x47ff) AM_RAM    //user RAM
-	AM_RANGE( 0x4800, 0x6fff) AM_RAM    //expansion RAM
-	AM_RANGE( 0x7000, 0x71ff) AM_RAM    AM_MIRROR(0x0600)   AM_SHARE("lcd_data")
-	AM_RANGE( 0x7800, 0x7bff) AM_RAM    AM_REGION("maincpu", 0x7800)    AM_MIRROR(0x0400)
-	AM_RANGE( 0xa000, 0xbfff) AM_ROM    //expansion ROM
-	AM_RANGE( 0xc000, 0xffff) AM_ROM    //system ROM
-ADDRESS_MAP_END
+void pc1500_state::pc1500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();    //module ROM/RAM
+	map(0x4000, 0x47ff).ram();    //user RAM
+	map(0x4800, 0x6fff).ram();    //expansion RAM
+	map(0x7000, 0x71ff).ram().mirror(0x0600).share("lcd_data");
+	map(0x7800, 0x7bff).ram().region("maincpu", 0x7800).mirror(0x0400);
+	map(0xa000, 0xbfff).rom();    //expansion ROM
+	map(0xc000, 0xffff).rom();    //system ROM
+}
 
-ADDRESS_MAP_START(pc1500_state::pc1500_mem_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0xf000, 0xf00f) AM_DEVREADWRITE("lh5810", lh5810_device, data_r, data_w)
-ADDRESS_MAP_END
+void pc1500_state::pc1500_mem_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf000, 0xf00f).rw("lh5810", FUNC(lh5810_device::data_r), FUNC(lh5810_device::data_w));
+}
 
 READ8_MEMBER( pc1500_state::pc1500_kb_r )
 {
@@ -266,10 +271,10 @@ PALETTE_INIT_MEMBER(pc1500_state, pc1500)
 }
 
 MACHINE_CONFIG_START(pc1500_state::pc1500)
-	MCFG_CPU_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
-	MCFG_CPU_PROGRAM_MAP( pc1500_mem )
-	MCFG_CPU_IO_MAP( pc1500_mem_io )
-	MCFG_LH5801_IN(READ8(pc1500_state,pc1500_kb_r))
+	MCFG_DEVICE_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
+	MCFG_DEVICE_PROGRAM_MAP( pc1500_mem )
+	MCFG_DEVICE_IO_MAP( pc1500_mem_io )
+	MCFG_LH5801_IN(READ8(*this, pc1500_state,pc1500_kb_r))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -279,18 +284,18 @@ MACHINE_CONFIG_START(pc1500_state::pc1500)
 	MCFG_SCREEN_VISIBLE_AREA(0, 156-1, 0, 7-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_pc1500)
+	config.set_default_layout(layout_pc1500);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc1500_state, pc1500)
 
-	MCFG_DEVICE_ADD("lh5810", LH5810, 0)
-	MCFG_LH5810_PORTA_R_CB(READ8(pc1500_state, port_a_r))
-	MCFG_LH5810_PORTA_W_CB(WRITE8(pc1500_state, kb_matrix_w))
-	MCFG_LH5810_PORTB_R_CB(READ8(pc1500_state, port_b_r))
-	MCFG_LH5810_PORTC_W_CB(WRITE8(pc1500_state, port_c_w))
-	MCFG_LH5810_OUT_INT_CB(INPUTLINE("maincpu", LH5801_LINE_MI))
+	lh5810_device &ioports(LH5810(config, "lh5810"));
+	ioports.porta_r().set(FUNC(pc1500_state::port_a_r));
+	ioports.porta_w().set(FUNC(pc1500_state::kb_matrix_w));
+	ioports.portb_r().set(FUNC(pc1500_state::port_b_r));
+	ioports.portc_w().set(FUNC(pc1500_state::port_c_w));
+	ioports.out_int().set_inputline("maincpu", LH5801_LINE_MI);
 
-	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 MACHINE_CONFIG_END
 
 
@@ -301,5 +306,5 @@ ROM_START( pc1500 )
 	ROM_LOAD( "ce-150.rom", 0x0000, 0x2000, CRC(8fa1df6d) SHA1(a3aa02a641a46c27c0d4c0dc025b0dbe9b5b79c8))
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE INPUT   STATE          INIT  COMPANY  FULLNAME                FLAGS
-COMP( 198?, pc1500, 0,      0,       pc1500, pc1500, pc1500_state,  0,    "Sharp", "Pocket Computer 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY  FULLNAME                FLAGS
+COMP( 198?, pc1500, 0,      0,      pc1500, pc1500, pc1500_state, empty_init, "Sharp", "Pocket Computer 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

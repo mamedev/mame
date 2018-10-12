@@ -108,49 +108,52 @@ INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
  *
  *************************************/
 
-ADDRESS_MAP_START(brkthru_state::brkthru_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x0400, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1100, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("P2")
-	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW2/COIN")
-	AM_RANGE(0x1800, 0x1801) AM_WRITE(brkthru_1800_w)   /* bg scroll and color, ROM bank selection, flip screen */
-	AM_RANGE(0x1802, 0x1802) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1803, 0x1803) AM_WRITE(brkthru_1803_w)   /* NMI enable, + ? */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void brkthru_state::brkthru_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().w(FUNC(brkthru_state::brkthru_fgram_w)).share("fg_videoram");
+	map(0x0400, 0x0bff).ram();
+	map(0x0c00, 0x0fff).ram().w(FUNC(brkthru_state::brkthru_bgram_w)).share("videoram");
+	map(0x1000, 0x10ff).ram().share("spriteram");
+	map(0x1100, 0x17ff).ram();
+	map(0x1800, 0x1800).portr("P1");
+	map(0x1801, 0x1801).portr("P2");
+	map(0x1802, 0x1802).portr("DSW1");
+	map(0x1803, 0x1803).portr("DSW2/COIN");
+	map(0x1800, 0x1801).w(FUNC(brkthru_state::brkthru_1800_w));   /* bg scroll and color, ROM bank selection, flip screen */
+	map(0x1802, 0x1802).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1803, 0x1803).w(FUNC(brkthru_state::brkthru_1803_w));   /* NMI enable, + ? */
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x4000, 0xffff).rom();
+}
 
 /* same as brktrhu, but xor 0x1000 below 8k */
-ADDRESS_MAP_START(brkthru_state::darwin_map)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x1400, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0100, 0x01ff) AM_WRITENOP /*tidyup, nothing really here?*/
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("P1")
-	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
-	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("DSW2/COIN")
-	AM_RANGE(0x0800, 0x0801) AM_WRITE(brkthru_1800_w)     /* bg scroll and color, ROM bank selection, flip screen */
-	AM_RANGE(0x0802, 0x0802) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x0803, 0x0803) AM_WRITE(darwin_0803_w)     /* NMI enable, + ? */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void brkthru_state::darwin_map(address_map &map)
+{
+	map(0x1000, 0x13ff).ram().w(FUNC(brkthru_state::brkthru_fgram_w)).share("fg_videoram");
+	map(0x1400, 0x1bff).ram();
+	map(0x1c00, 0x1fff).ram().w(FUNC(brkthru_state::brkthru_bgram_w)).share("videoram");
+	map(0x0000, 0x00ff).ram().share("spriteram");
+	map(0x0100, 0x01ff).nopw(); /*tidyup, nothing really here?*/
+	map(0x0800, 0x0800).portr("P1");
+	map(0x0801, 0x0801).portr("P2");
+	map(0x0802, 0x0802).portr("DSW1");
+	map(0x0803, 0x0803).portr("DSW2/COIN");
+	map(0x0800, 0x0801).w(FUNC(brkthru_state::brkthru_1800_w));     /* bg scroll and color, ROM bank selection, flip screen */
+	map(0x0802, 0x0802).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0803, 0x0803).w(FUNC(brkthru_state::darwin_0803_w));     /* NMI enable, + ? */
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x4000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(brkthru_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void brkthru_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2001).w("ym2", FUNC(ym3526_device::write));
+	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x6000, 0x6001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
 /*************************************
@@ -327,7 +330,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( brkthru )
+static GFXDECODE_START( gfx_brkthru )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0x00,  1 )  /* use colors 0x00-0x07 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout1,  0x80, 16 )  /* use colors 0x80-0xff */
 	GFXDECODE_ENTRY( "gfx2", 0x01000, tilelayout2,  0x80, 16 )
@@ -364,25 +367,24 @@ void brkthru_state::machine_reset()
 	m_nmi_mask = 0;
 }
 
-INTERRUPT_GEN_MEMBER(brkthru_state::vblank_irq)
+WRITE_LINE_MEMBER(brkthru_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(brkthru_state::brkthru)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(brkthru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", brkthru_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(brkthru_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
@@ -392,20 +394,21 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3526, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("ym2", YM3526, MASTER_CLOCK/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -414,16 +417,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(brkthru_state::darwin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(darwin_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", brkthru_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(darwin_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)     /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
@@ -444,20 +446,21 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3526, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("ym2", YM3526, MASTER_CLOCK/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -638,7 +641,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(brkthru_state,brkthru)
+void brkthru_state::init_brkthru()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
@@ -650,7 +653,7 @@ DRIVER_INIT_MEMBER(brkthru_state,brkthru)
  *
  *************************************/
 
-GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, brkthru, ROT0,   "Data East USA",         "Break Thru (US)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, brkthru, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, brkthru, ROT0,   "bootleg",               "Force Break (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, init_brkthru, ROT0,   "Data East USA",         "Break Thru (US)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "bootleg",               "Force Break (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, init_brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)",   MACHINE_SUPPORTS_SAVE )

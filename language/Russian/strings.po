@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-28 14:01+1100\n"
+"POT-Creation-Date: 2018-04-28 15:32+1000\n"
 "PO-Revision-Date: 2017-10-23 16:22+0300\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -621,72 +621,6 @@ msgstr "Сохранить настройки"
 msgid "Settings"
 msgstr "Настройки"
 
-#: src/frontend/mame/ui/cheatopt.cpp:92 plugins/cheat/init.lua:653
-#, c-format, lua-format
-msgid ""
-"Cheat Comment:\n"
-"%s"
-msgstr ""
-"Коментарий чита:\n"
-"%s"
-
-#: src/frontend/mame/ui/cheatopt.cpp:105
-msgid "All cheats reloaded"
-msgstr "Все читы перезагружены"
-
-#: src/frontend/mame/ui/cheatopt.cpp:136
-msgid "Autofire Settings"
-msgstr "Настройка авто-огня"
-
-#: src/frontend/mame/ui/cheatopt.cpp:157 plugins/cheat/init.lua:581
-msgid "Reset All"
-msgstr "Сбросить все"
-
-#: src/frontend/mame/ui/cheatopt.cpp:160 plugins/cheat/init.lua:582
-msgid "Reload All"
-msgstr "Перезагрузить все"
-
-#: src/frontend/mame/ui/cheatopt.cpp:273
-msgid "Autofire Status"
-msgstr "Состояние"
-
-#: src/frontend/mame/ui/cheatopt.cpp:273 src/frontend/mame/ui/videoopt.cpp:208
-#: src/frontend/mame/ui/videoopt.cpp:212 src/frontend/mame/ui/videoopt.cpp:216
-#: src/frontend/mame/ui/videoopt.cpp:220 src/frontend/mame/ui/videoopt.cpp:224
-#: src/frontend/mame/ui/ui.cpp:1251
-msgid "Disabled"
-msgstr "Выключен"
-
-#: src/frontend/mame/ui/cheatopt.cpp:273 src/frontend/mame/ui/videoopt.cpp:208
-#: src/frontend/mame/ui/videoopt.cpp:212 src/frontend/mame/ui/videoopt.cpp:216
-#: src/frontend/mame/ui/videoopt.cpp:220 src/frontend/mame/ui/videoopt.cpp:224
-#: src/frontend/mame/ui/ui.cpp:1251
-msgid "Enabled"
-msgstr "Включен"
-
-#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
-#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/sndmenu.cpp:135
-#: src/frontend/mame/ui/sndmenu.cpp:137 src/frontend/mame/ui/menu.cpp:736
-#: plugins/cheat/init.lua:551 plugins/cheatfind/init.lua:589
-msgid "On"
-msgstr "Вкл"
-
-#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
-#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/sndmenu.cpp:135
-#: src/frontend/mame/ui/sndmenu.cpp:137 src/frontend/mame/ui/menu.cpp:739
-#: plugins/cheat/init.lua:554 plugins/cheat/init.lua:563
-#: plugins/cheatfind/init.lua:586
-msgid "Off"
-msgstr "Выкл"
-
-#: src/frontend/mame/ui/cheatopt.cpp:316
-msgid "No buttons found on this machine!"
-msgstr "У этой системы нет кнопок огонь!"
-
-#: src/frontend/mame/ui/cheatopt.cpp:327 src/frontend/mame/ui/cheatopt.cpp:331
-msgid "Autofire Delay"
-msgstr "Частота"
-
 #: src/frontend/mame/ui/tapectrl.cpp:85
 msgid "stopped"
 msgstr "остновлено"
@@ -855,6 +789,20 @@ msgstr "Поворот"
 msgid "Backdrops"
 msgstr "Задники"
 
+#: src/frontend/mame/ui/videoopt.cpp:208 src/frontend/mame/ui/videoopt.cpp:212
+#: src/frontend/mame/ui/videoopt.cpp:216 src/frontend/mame/ui/videoopt.cpp:220
+#: src/frontend/mame/ui/videoopt.cpp:224 src/frontend/mame/ui/cheatopt.cpp:273
+#: src/frontend/mame/ui/ui.cpp:1255
+msgid "Enabled"
+msgstr "Включен"
+
+#: src/frontend/mame/ui/videoopt.cpp:208 src/frontend/mame/ui/videoopt.cpp:212
+#: src/frontend/mame/ui/videoopt.cpp:216 src/frontend/mame/ui/videoopt.cpp:220
+#: src/frontend/mame/ui/videoopt.cpp:224 src/frontend/mame/ui/cheatopt.cpp:273
+#: src/frontend/mame/ui/ui.cpp:1255
+msgid "Disabled"
+msgstr "Выключен"
+
 #: src/frontend/mame/ui/videoopt.cpp:212
 msgid "Overlays"
 msgstr "Оверлеи"
@@ -994,7 +942,7 @@ msgstr ""
 msgid "Export list in TXT format (like -listfull)"
 msgstr "Экспортировать список в текстовом формате (как -listfull)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:710 src/frontend/mame/ui/ui.cpp:2225
+#: src/frontend/mame/ui/miscmenu.cpp:710 src/frontend/mame/ui/ui.cpp:2230
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -1031,6 +979,21 @@ msgstr "Сохранить настройки этой системы"
 #: src/frontend/mame/ui/miscmenu.cpp:792
 msgid "Configure machine:"
 msgstr "Настроить систему:"
+
+#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/sndmenu.cpp:135
+#: src/frontend/mame/ui/sndmenu.cpp:137 src/frontend/mame/ui/menu.cpp:736
+#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
+#: plugins/cheat/init.lua:551 plugins/cheatfind/init.lua:619
+msgid "On"
+msgstr "Вкл"
+
+#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/sndmenu.cpp:135
+#: src/frontend/mame/ui/sndmenu.cpp:137 src/frontend/mame/ui/menu.cpp:739
+#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
+#: plugins/cheat/init.lua:554 plugins/cheat/init.lua:563
+#: plugins/cheatfind/init.lua:616
+msgid "Off"
+msgstr "Выкл"
 
 #: src/frontend/mame/ui/miscmenu.cpp:909 src/frontend/mame/ui/selgame.cpp:441
 msgid "Plugins"
@@ -1143,237 +1106,6 @@ msgstr "Просмотр DAT-файлов"
 #: src/frontend/mame/ui/mainmenu.cpp:154
 msgid "Select New Machine"
 msgstr "Выбрать новую систему"
-
-#: src/frontend/mame/ui/ui.cpp:337
-msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "Этот драйвер требует загрузки образов в следующие устройства: "
-
-#: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
-msgid "Keyboard Emulation Status"
-msgstr "Состояние эмуляции клавиатуры"
-
-#: src/frontend/mame/ui/ui.cpp:1086
-msgid "Mode: PARTIAL Emulation"
-msgstr "Режим: ЧАСТИЧНАЯ эмуляция"
-
-#: src/frontend/mame/ui/ui.cpp:1087
-msgid "UI:   Enabled"
-msgstr "UI:   Включен"
-
-#: src/frontend/mame/ui/ui.cpp:1089 src/frontend/mame/ui/ui.cpp:1099
-msgid "**Use ScrLock to toggle**"
-msgstr "**Нажмите ScrLock для переключения**"
-
-#: src/frontend/mame/ui/ui.cpp:1096
-msgid "Mode: FULL Emulation"
-msgstr "Режим: ПОЛНАЯ эмуляция"
-
-#: src/frontend/mame/ui/ui.cpp:1097
-msgid "UI:   Disabled"
-msgstr "UI:   Выключен"
-
-#: src/frontend/mame/ui/ui.cpp:1245
-msgid "Autofire can't be enabled"
-msgstr "Авто-огонь не может быть включен"
-
-#: src/frontend/mame/ui/ui.cpp:1298
-#, c-format
-msgid ""
-"Are you sure you want to quit?\n"
-"\n"
-"Press ''%1$s'' to quit,\n"
-"Press ''%2$s'' to return to emulation."
-msgstr ""
-"Вы действительно хотите выйти?\n"
-"\n"
-"Нажмите ''%1$s'' для выхода,\n"
-"Нажмите ''%2$s'' для возврата к эмуляции."
-
-#: src/frontend/mame/ui/ui.cpp:1370
-msgid "Master Volume"
-msgstr "Общая громкость"
-
-#: src/frontend/mame/ui/ui.cpp:1379
-#, c-format
-msgid "%1$s Volume"
-msgstr "%1$s Громкость"
-
-#: src/frontend/mame/ui/ui.cpp:1403
-#, c-format
-msgid "Overclock CPU %1$s"
-msgstr "Разгон процессора %1$s"
-
-#: src/frontend/mame/ui/ui.cpp:1412
-#, c-format
-msgid "Overclock %1$s sound"
-msgstr "Разгон %1$s звука"
-
-#: src/frontend/mame/ui/ui.cpp:1433
-#, c-format
-msgid "%1$s Refresh Rate"
-msgstr "%1$s Частота обновления"
-
-#: src/frontend/mame/ui/ui.cpp:1438
-#, c-format
-msgid "%1$s Brightness"
-msgstr "%1$s Яркость"
-
-#: src/frontend/mame/ui/ui.cpp:1440
-#, c-format
-msgid "%1$s Contrast"
-msgstr "%1$s Контраст"
-
-#: src/frontend/mame/ui/ui.cpp:1442
-#, c-format
-msgid "%1$s Gamma"
-msgstr "%1$s Гамма"
-
-#: src/frontend/mame/ui/ui.cpp:1446
-#, c-format
-msgid "%1$s Horiz Stretch"
-msgstr "%1$s гориз. размер"
-
-#: src/frontend/mame/ui/ui.cpp:1448
-#, c-format
-msgid "%1$s Horiz Position"
-msgstr "%1$s гориз. позиция"
-
-#: src/frontend/mame/ui/ui.cpp:1450
-#, c-format
-msgid "%1$s Vert Stretch"
-msgstr "%1$s верт. размер"
-
-#: src/frontend/mame/ui/ui.cpp:1452
-#, c-format
-msgid "%1$s Vert Position"
-msgstr "%1$s верт. позиция"
-
-#: src/frontend/mame/ui/ui.cpp:1471
-#, c-format
-msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Лазердиск '%1$s' гориз. размер"
-
-#: src/frontend/mame/ui/ui.cpp:1473
-#, c-format
-msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "Лазердиск '%1$s' гориз. позиция"
-
-#: src/frontend/mame/ui/ui.cpp:1475
-#, c-format
-msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Лазердиск '%1$s' верт. размер"
-
-#: src/frontend/mame/ui/ui.cpp:1477
-#, c-format
-msgid "Laserdisc '%1$s' Vert Position"
-msgstr "Лазердиск '%1$s' верт. позиция"
-
-#: src/frontend/mame/ui/ui.cpp:1489
-msgid "Vector Flicker"
-msgstr "Мерцание луча"
-
-#: src/frontend/mame/ui/ui.cpp:1490
-msgid "Beam Width Minimum"
-msgstr "Минимальная ширина луча"
-
-#: src/frontend/mame/ui/ui.cpp:1491
-msgid "Beam Width Maximum"
-msgstr "Максимальная ширина луча"
-
-#: src/frontend/mame/ui/ui.cpp:1492
-msgid "Beam Intensity Weight"
-msgstr "Насыщенность луча"
-
-#: src/frontend/mame/ui/ui.cpp:1507
-#, c-format
-msgid "Crosshair Scale %1$s"
-msgstr "Масштаб прицела %1$s"
-
-#: src/frontend/mame/ui/ui.cpp:1507 src/frontend/mame/ui/ui.cpp:1509
-msgid "X"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1507 src/frontend/mame/ui/ui.cpp:1509
-msgid "Y"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1509
-#, c-format
-msgid "Crosshair Offset %1$s"
-msgstr "Смещение прицела %1$s"
-
-#: src/frontend/mame/ui/ui.cpp:1597
-#, c-format
-msgid "%1$3ddB"
-msgstr "%1$3dдБ"
-
-#: src/frontend/mame/ui/ui.cpp:1641
-#, c-format
-msgid "%1$d%%"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1657
-#, c-format
-msgid "%1$3.0f%%"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1680
-#, c-format
-msgid "%1$.3ffps"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1703 src/frontend/mame/ui/ui.cpp:1725
-#: src/frontend/mame/ui/ui.cpp:1746 src/frontend/mame/ui/ui.cpp:1768
-#: src/frontend/mame/ui/ui.cpp:1790 src/frontend/mame/ui/ui.cpp:1812
-#: src/frontend/mame/ui/ui.cpp:1834 src/frontend/mame/ui/ui.cpp:1856
-#: src/frontend/mame/ui/ui.cpp:1878 src/frontend/mame/ui/ui.cpp:1900
-#: src/frontend/mame/ui/ui.cpp:1922
-#, c-format
-msgid "%1$.3f"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1937 src/frontend/mame/ui/ui.cpp:1952
-#: src/frontend/mame/ui/ui.cpp:1967 src/frontend/mame/ui/ui.cpp:1982
-#, c-format
-msgid "%1$1.2f"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:2000
-#, c-format
-msgid "Crosshair Scale X %1$1.3f"
-msgstr "Масштаб прицела X %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2000
-#, c-format
-msgid "Crosshair Scale Y %1$1.3f"
-msgstr "Масштаб прицела Y %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2019
-#, c-format
-msgid "Crosshair Offset X %1$1.3f"
-msgstr "Смещение прицела X %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2019
-#, c-format
-msgid "Crosshair Offset Y %1$1.3f"
-msgstr "Смещение прицела Y %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2162
-msgid "**Error saving ui.ini**"
-msgstr "**Ошибка сохранения ui.ini**"
-
-#: src/frontend/mame/ui/ui.cpp:2221
-#, c-format
-msgid "**Error saving %s.ini**"
-msgstr "**Ошибка сохранения %s.ini**"
-
-#: src/frontend/mame/ui/viewgfx.cpp:406
-msgid " COLORS"
-msgstr " ЦВЕТА"
-
-#: src/frontend/mame/ui/viewgfx.cpp:406
-msgid " PENS"
-msgstr " ПЕРЬЯ"
 
 #: src/frontend/mame/ui/custui.cpp:31
 msgid "Show All"
@@ -2482,6 +2214,436 @@ msgstr "Возврат в предыдущее меню"
 msgid "Auto"
 msgstr "Авто"
 
+#: src/frontend/mame/ui/cheatopt.cpp:92 plugins/cheat/init.lua:653
+#, c-format, lua-format
+msgid ""
+"Cheat Comment:\n"
+"%s"
+msgstr ""
+"Коментарий чита:\n"
+"%s"
+
+#: src/frontend/mame/ui/cheatopt.cpp:105
+msgid "All cheats reloaded"
+msgstr "Все читы перезагружены"
+
+#: src/frontend/mame/ui/cheatopt.cpp:136
+msgid "Autofire Settings"
+msgstr "Настройка авто-огня"
+
+#: src/frontend/mame/ui/cheatopt.cpp:157 plugins/cheat/init.lua:581
+msgid "Reset All"
+msgstr "Сбросить все"
+
+#: src/frontend/mame/ui/cheatopt.cpp:160 plugins/cheat/init.lua:582
+msgid "Reload All"
+msgstr "Перезагрузить все"
+
+#: src/frontend/mame/ui/cheatopt.cpp:273
+msgid "Autofire Status"
+msgstr "Состояние"
+
+#: src/frontend/mame/ui/cheatopt.cpp:316
+msgid "No buttons found on this machine!"
+msgstr "У этой системы нет кнопок огонь!"
+
+#: src/frontend/mame/ui/cheatopt.cpp:327 src/frontend/mame/ui/cheatopt.cpp:331
+msgid "Autofire Delay"
+msgstr "Частота"
+
+#: src/frontend/mame/ui/ui.cpp:337
+msgid "This driver requires images to be loaded in the following device(s): "
+msgstr "Этот драйвер требует загрузки образов в следующие устройства: "
+
+#: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
+msgid "Keyboard Emulation Status"
+msgstr "Состояние эмуляции клавиатуры"
+
+#: src/frontend/mame/ui/ui.cpp:1086
+msgid "Mode: PARTIAL Emulation"
+msgstr "Режим: ЧАСТИЧНАЯ эмуляция"
+
+#: src/frontend/mame/ui/ui.cpp:1087
+msgid "UI:   Enabled"
+msgstr "UI:   Включен"
+
+#: src/frontend/mame/ui/ui.cpp:1089 src/frontend/mame/ui/ui.cpp:1099
+msgid "**Use ScrLock to toggle**"
+msgstr "**Нажмите ScrLock для переключения**"
+
+#: src/frontend/mame/ui/ui.cpp:1096
+msgid "Mode: FULL Emulation"
+msgstr "Режим: ПОЛНАЯ эмуляция"
+
+#: src/frontend/mame/ui/ui.cpp:1097
+msgid "UI:   Disabled"
+msgstr "UI:   Выключен"
+
+#: src/frontend/mame/ui/ui.cpp:1249
+msgid "Autofire can't be enabled"
+msgstr "Авто-огонь не может быть включен"
+
+#: src/frontend/mame/ui/ui.cpp:1302
+#, c-format
+msgid ""
+"Are you sure you want to quit?\n"
+"\n"
+"Press ''%1$s'' to quit,\n"
+"Press ''%2$s'' to return to emulation."
+msgstr ""
+"Вы действительно хотите выйти?\n"
+"\n"
+"Нажмите ''%1$s'' для выхода,\n"
+"Нажмите ''%2$s'' для возврата к эмуляции."
+
+#: src/frontend/mame/ui/ui.cpp:1374
+msgid "Master Volume"
+msgstr "Общая громкость"
+
+#: src/frontend/mame/ui/ui.cpp:1383
+#, c-format
+msgid "%1$s Volume"
+msgstr "%1$s Громкость"
+
+#: src/frontend/mame/ui/ui.cpp:1407
+#, c-format
+msgid "Overclock CPU %1$s"
+msgstr "Разгон процессора %1$s"
+
+#: src/frontend/mame/ui/ui.cpp:1416
+#, c-format
+msgid "Overclock %1$s sound"
+msgstr "Разгон %1$s звука"
+
+#: src/frontend/mame/ui/ui.cpp:1437
+#, c-format
+msgid "%1$s Refresh Rate"
+msgstr "%1$s Частота обновления"
+
+#: src/frontend/mame/ui/ui.cpp:1442
+#, c-format
+msgid "%1$s Brightness"
+msgstr "%1$s Яркость"
+
+#: src/frontend/mame/ui/ui.cpp:1444
+#, c-format
+msgid "%1$s Contrast"
+msgstr "%1$s Контраст"
+
+#: src/frontend/mame/ui/ui.cpp:1446
+#, c-format
+msgid "%1$s Gamma"
+msgstr "%1$s Гамма"
+
+#: src/frontend/mame/ui/ui.cpp:1450
+#, c-format
+msgid "%1$s Horiz Stretch"
+msgstr "%1$s гориз. размер"
+
+#: src/frontend/mame/ui/ui.cpp:1452
+#, c-format
+msgid "%1$s Horiz Position"
+msgstr "%1$s гориз. позиция"
+
+#: src/frontend/mame/ui/ui.cpp:1454
+#, c-format
+msgid "%1$s Vert Stretch"
+msgstr "%1$s верт. размер"
+
+#: src/frontend/mame/ui/ui.cpp:1456
+#, c-format
+msgid "%1$s Vert Position"
+msgstr "%1$s верт. позиция"
+
+#: src/frontend/mame/ui/ui.cpp:1475
+#, c-format
+msgid "Laserdisc '%1$s' Horiz Stretch"
+msgstr "Лазердиск '%1$s' гориз. размер"
+
+#: src/frontend/mame/ui/ui.cpp:1477
+#, c-format
+msgid "Laserdisc '%1$s' Horiz Position"
+msgstr "Лазердиск '%1$s' гориз. позиция"
+
+#: src/frontend/mame/ui/ui.cpp:1479
+#, c-format
+msgid "Laserdisc '%1$s' Vert Stretch"
+msgstr "Лазердиск '%1$s' верт. размер"
+
+#: src/frontend/mame/ui/ui.cpp:1481
+#, c-format
+msgid "Laserdisc '%1$s' Vert Position"
+msgstr "Лазердиск '%1$s' верт. позиция"
+
+#: src/frontend/mame/ui/ui.cpp:1493
+msgid "Vector Flicker"
+msgstr "Мерцание луча"
+
+#: src/frontend/mame/ui/ui.cpp:1494
+msgid "Beam Width Minimum"
+msgstr "Минимальная ширина луча"
+
+#: src/frontend/mame/ui/ui.cpp:1495
+msgid "Beam Width Maximum"
+msgstr "Максимальная ширина луча"
+
+#: src/frontend/mame/ui/ui.cpp:1496
+msgid "Beam Intensity Weight"
+msgstr "Насыщенность луча"
+
+#: src/frontend/mame/ui/ui.cpp:1511
+#, c-format
+msgid "Crosshair Scale %1$s"
+msgstr "Масштаб прицела %1$s"
+
+#: src/frontend/mame/ui/ui.cpp:1511 src/frontend/mame/ui/ui.cpp:1513
+msgid "X"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1511 src/frontend/mame/ui/ui.cpp:1513
+msgid "Y"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1513
+#, c-format
+msgid "Crosshair Offset %1$s"
+msgstr "Смещение прицела %1$s"
+
+#: src/frontend/mame/ui/ui.cpp:1601
+#, c-format
+msgid "%1$3ddB"
+msgstr "%1$3dдБ"
+
+#: src/frontend/mame/ui/ui.cpp:1645
+#, c-format
+msgid "%1$d%%"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1661
+#, c-format
+msgid "%1$3.0f%%"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1685
+#, c-format
+msgid "%1$.3ffps"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1708 src/frontend/mame/ui/ui.cpp:1730
+#: src/frontend/mame/ui/ui.cpp:1751 src/frontend/mame/ui/ui.cpp:1773
+#: src/frontend/mame/ui/ui.cpp:1795 src/frontend/mame/ui/ui.cpp:1817
+#: src/frontend/mame/ui/ui.cpp:1839 src/frontend/mame/ui/ui.cpp:1861
+#: src/frontend/mame/ui/ui.cpp:1883 src/frontend/mame/ui/ui.cpp:1905
+#: src/frontend/mame/ui/ui.cpp:1927
+#, c-format
+msgid "%1$.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1942 src/frontend/mame/ui/ui.cpp:1957
+#: src/frontend/mame/ui/ui.cpp:1972 src/frontend/mame/ui/ui.cpp:1987
+#, c-format
+msgid "%1$1.2f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2005
+#, c-format
+msgid "Crosshair Scale X %1$1.3f"
+msgstr "Масштаб прицела X %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2005
+#, c-format
+msgid "Crosshair Scale Y %1$1.3f"
+msgstr "Масштаб прицела Y %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2024
+#, c-format
+msgid "Crosshair Offset X %1$1.3f"
+msgstr "Смещение прицела X %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2024
+#, c-format
+msgid "Crosshair Offset Y %1$1.3f"
+msgstr "Смещение прицела Y %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2167
+msgid "**Error saving ui.ini**"
+msgstr "**Ошибка сохранения ui.ini**"
+
+#: src/frontend/mame/ui/ui.cpp:2226
+#, c-format
+msgid "**Error saving %s.ini**"
+msgstr "**Ошибка сохранения %s.ini**"
+
+#: src/frontend/mame/ui/viewgfx.cpp:406
+msgid " COLORS"
+msgstr " ЦВЕТА"
+
+#: src/frontend/mame/ui/viewgfx.cpp:406
+msgid " PENS"
+msgstr " ПЕРЬЯ"
+
+#: src/frontend/mame/ui/devopt.cpp:39
+#, c-format
+msgid ""
+"[This option is currently mounted in the running system]\n"
+"\n"
+"Option: %1$s\n"
+"Device: %2$s\n"
+"\n"
+"The selected option enables the following items:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:40
+#, c-format
+msgid ""
+"[This option is NOT currently mounted in the running system]\n"
+"\n"
+"Option: %1$s\n"
+"Device: %2$s\n"
+"\n"
+"If you select this option, the following items will be enabled:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:48
+msgid "* CPU:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:72 src/frontend/mame/ui/devopt.cpp:133
+#, c-format
+msgid "  %1$d×%2$s %3$d.%4$06d MHz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:72 src/frontend/mame/ui/devopt.cpp:133
+msgid "  %1$d×%2$s %5$d.%6$03d kHz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:73 src/frontend/mame/ui/devopt.cpp:134
+msgid "  %2$s %3$d.%4$06d MHz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:73 src/frontend/mame/ui/devopt.cpp:134
+msgid "  %2$s %5$d.%6$03d kHz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:85
+msgid "* Video:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:90
+#, c-format
+msgid "  Screen '%1$s': Vector\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:99
+#, c-format
+msgid "  Screen '%1$s': %2$d × %3$d (V) %4$f Hz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:100
+#, c-format
+msgid "  Screen '%1$s': %2$d × %3$d (H) %4$f Hz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:113
+msgid "* Sound:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:133
+#, c-format
+msgid "  %1$d×%2$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:134
+msgid "  %2$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:164
+#, c-format
+msgid ""
+"* BIOS settings:\n"
+"  %1$d options    [default: %2$s]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:204 src/frontend/mame/ui/devopt.cpp:220
+#: src/frontend/mame/ui/devopt.cpp:265
+#, c-format
+msgid "  %1$s    [default: %2$s]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:209 src/frontend/mame/ui/devopt.cpp:225
+#, c-format
+msgid "  %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:230
+msgid "* DIP switch settings:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:232
+msgid "* Configuration settings:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:234
+msgid "* Input device(s):\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:236
+#, c-format
+msgid "  User inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:238
+#, c-format
+msgid "  Mahjong inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:240
+#, c-format
+msgid "  Hanafuda inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:242
+#, c-format
+msgid "  Gambling inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:244
+#, c-format
+msgid "  Analog inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:246
+#, c-format
+msgid "  Adjuster inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:248
+#, c-format
+msgid "  Keypad inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:250
+#, c-format
+msgid "  Keyboard inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:255
+msgid "* Media Options:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:257
+#, c-format
+msgid "  %1$s    [tag: %2$s]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:263
+msgid "* Slot Options:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:270
+msgid "[None]\n"
+msgstr ""
+
 #: plugins/timer/init.lua:94
 msgid "Current time"
 msgstr "Текущее время"
@@ -2595,49 +2757,49 @@ msgstr "Иниц. игры"
 msgid "MARPScore"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:344
+#: plugins/cheatfind/init.lua:373
 msgid "Save Cheat"
 msgstr "Сохранить чит"
 
-#: plugins/cheatfind/init.lua:347
+#: plugins/cheatfind/init.lua:376
 msgid "Default"
 msgstr "По умолчанию"
 
-#: plugins/cheatfind/init.lua:347
+#: plugins/cheatfind/init.lua:376
 msgid "Custom"
 msgstr "Пользовательский"
 
-#: plugins/cheatfind/init.lua:348
+#: plugins/cheatfind/init.lua:377
 msgid "Cheat Name"
 msgstr "Имя чита"
 
-#: plugins/cheatfind/init.lua:354 plugins/cheatfind/init.lua:718
+#: plugins/cheatfind/init.lua:383 plugins/cheatfind/init.lua:748
 #, lua-format
 msgid "Default name is %s"
 msgstr "Имя по умолчанию %s"
 
-#: plugins/cheatfind/init.lua:362
+#: plugins/cheatfind/init.lua:391
 msgid "Player"
 msgstr "Игрок"
 
-#: plugins/cheatfind/init.lua:367
+#: plugins/cheatfind/init.lua:396
 msgid "Type"
 msgstr "Тип"
 
-#: plugins/cheatfind/init.lua:373
+#: plugins/cheatfind/init.lua:402
 msgid "Save"
 msgstr "Сохранить"
 
-#: plugins/cheatfind/init.lua:399
+#: plugins/cheatfind/init.lua:429
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
 msgstr "Чит записан в %s и добавлен в cheat.simple"
 
-#: plugins/cheatfind/init.lua:407
+#: plugins/cheatfind/init.lua:437
 msgid "Cheat added to cheat.simple"
 msgstr "Чит добавлен в cheat.simple"
 
-#: plugins/cheatfind/init.lua:412
+#: plugins/cheatfind/init.lua:442
 msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
@@ -2645,173 +2807,177 @@ msgstr ""
 "Не удалось сохранить файл\n"
 "Убедитесь что папка cheatpath существует"
 
-#: plugins/cheatfind/init.lua:421
+#: plugins/cheatfind/init.lua:451
 msgid "Cancel"
 msgstr "Отмена"
 
-#: plugins/cheatfind/init.lua:426
+#: plugins/cheatfind/init.lua:456
 msgid "CPU or RAM"
 msgstr "Процессор или память"
 
-#: plugins/cheatfind/init.lua:430
+#: plugins/cheatfind/init.lua:460
 msgid "Changes to this only take effect when \"Start new search\" is selected"
 msgstr ""
 "Эти изменения будут применены только после выбора \"Начать новый поиск\""
 
-#: plugins/cheatfind/init.lua:449
+#: plugins/cheatfind/init.lua:479
 msgid "Data cleared and current state saved"
 msgstr "Данные очищены и текущее состояние сохранено"
 
-#: plugins/cheatfind/init.lua:457
+#: plugins/cheatfind/init.lua:487
 msgid "Start new search"
 msgstr "Начать новый поиск"
 
-#: plugins/cheatfind/init.lua:467
+#: plugins/cheatfind/init.lua:497
 msgid "Current state saved"
 msgstr "Текущее состояние сохранено"
 
-#: plugins/cheatfind/init.lua:474
+#: plugins/cheatfind/init.lua:504
 msgid "Save current -- #"
 msgstr "Сохранить текущее -- #"
 
-#: plugins/cheatfind/init.lua:506
-msgid " total matches found"
-msgstr " всего найдено совпадений"
+#: plugins/cheatfind/init.lua:536
+#, lua-format
+msgid "%d total matches found"
+msgstr ""
 
-#: plugins/cheatfind/init.lua:513
+#: plugins/cheatfind/init.lua:543
 msgid "Compare"
 msgstr "Сравнить"
 
-#: plugins/cheatfind/init.lua:516
+#: plugins/cheatfind/init.lua:546
 msgid "Left operand"
 msgstr "Левый операнд"
 
-#: plugins/cheatfind/init.lua:519
+#: plugins/cheatfind/init.lua:549
 msgid "Current"
 msgstr "Текущий"
 
-#: plugins/cheatfind/init.lua:524
+#: plugins/cheatfind/init.lua:554
 msgid "Operator"
 msgstr "Оператор"
 
-#: plugins/cheatfind/init.lua:531
+#: plugins/cheatfind/init.lua:561
 msgid "Left less than right, value is difference"
 msgstr "Левый меньше правого, значения различаются"
 
-#: plugins/cheatfind/init.lua:533
+#: plugins/cheatfind/init.lua:563
 msgid "Left greater than right, value is difference"
 msgstr "Левый больше правого, значения различаются"
 
-#: plugins/cheatfind/init.lua:535
+#: plugins/cheatfind/init.lua:565
 msgid "Left equal to right"
 msgstr "Левый равен правому"
 
-#: plugins/cheatfind/init.lua:537
+#: plugins/cheatfind/init.lua:567
 msgid "Left not equal to right, value is difference"
 msgstr "Левый не равен правому, значения различаются"
 
-#: plugins/cheatfind/init.lua:539
+#: plugins/cheatfind/init.lua:569
 msgid "Left equal to right with bitmask"
 msgstr "Левый равен правому по маске"
 
-#: plugins/cheatfind/init.lua:541
+#: plugins/cheatfind/init.lua:571
 msgid "Left not equal to right with bitmask"
 msgstr "Левый не равен правому по маске"
 
-#: plugins/cheatfind/init.lua:543
+#: plugins/cheatfind/init.lua:573
 msgid "Left less than value"
 msgstr "Левый меньше значения"
 
-#: plugins/cheatfind/init.lua:545
+#: plugins/cheatfind/init.lua:575
 msgid "Left greater than value"
 msgstr "Левый больше значения"
 
-#: plugins/cheatfind/init.lua:547
+#: plugins/cheatfind/init.lua:577
 msgid "Left equal to value"
 msgstr "Левый равен значению"
 
-#: plugins/cheatfind/init.lua:549
+#: plugins/cheatfind/init.lua:579
 msgid "Left not equal to value"
 msgstr "Левый не равен значению"
 
-#: plugins/cheatfind/init.lua:560
+#: plugins/cheatfind/init.lua:590
 msgid "Right operand"
 msgstr "Правый операнд"
 
-#: plugins/cheatfind/init.lua:568
+#: plugins/cheatfind/init.lua:598
 msgid "Value"
 msgstr "Значение"
 
-#: plugins/cheatfind/init.lua:572
+#: plugins/cheatfind/init.lua:602
 msgid "Any"
 msgstr "Любое"
 
-#: plugins/cheatfind/init.lua:578
+#: plugins/cheatfind/init.lua:608
 msgid "Data Format"
 msgstr "Формат данных"
 
-#: plugins/cheatfind/init.lua:602
+#: plugins/cheatfind/init.lua:632
 msgid "Undo last search -- #"
 msgstr "Отменить последний поиск -- #"
 
-#: plugins/cheatfind/init.lua:606
+#: plugins/cheatfind/init.lua:636
 msgid "Match block"
 msgstr "Совпадает блок"
 
-#: plugins/cheatfind/init.lua:609
+#: plugins/cheatfind/init.lua:639
 msgid "All"
 msgstr "Все"
 
-#: plugins/cheatfind/init.lua:660
+#: plugins/cheatfind/init.lua:690
 #, lua-format
 msgid "Test cheat at addr %08X"
 msgstr "Проверить чит по адресу %08X"
 
-#: plugins/cheatfind/init.lua:692
+#: plugins/cheatfind/init.lua:722
 msgid "Cheat engine not available"
 msgstr "Движок читов не доступен"
 
-#: plugins/cheatfind/init.lua:741
+#: plugins/cheatfind/init.lua:771
 msgid "Test"
 msgstr "Тест"
 
-#: plugins/cheatfind/init.lua:741
+#: plugins/cheatfind/init.lua:771
 msgid "Write"
 msgstr "Запись"
 
-#: plugins/cheatfind/init.lua:741
+#: plugins/cheatfind/init.lua:771
 msgid "Watch"
 msgstr "Просмотр"
 
-#: plugins/cheatfind/init.lua:758
+#: plugins/cheatfind/init.lua:788
 msgid "Page"
 msgstr "Страница"
 
-#: plugins/cheatfind/init.lua:776
+#: plugins/cheatfind/init.lua:806
 msgid "Clear Watches"
 msgstr "Очистить просмотр"
 
-#: plugins/cheatfind/init.lua:786
+#: plugins/cheatfind/init.lua:816
 msgid "Cheat Finder"
 msgstr "Поиск читов"
 
-#: plugins/portname/init.lua:89
+#: plugins/portname/init.lua:69
 msgid "Save input names to file"
 msgstr ""
 
-#: plugins/portname/init.lua:115 plugins/portname/init.lua:120
-#: plugins/portname/init.lua:136
+#: plugins/portname/init.lua:100 plugins/portname/init.lua:105
+#: plugins/portname/init.lua:121
 msgid "Failed to save input name file"
 msgstr ""
 
-#: plugins/portname/init.lua:153
+#: plugins/portname/init.lua:133
 #, lua-format
 msgid "Input port name file saved to %s"
 msgstr ""
 
-#: plugins/portname/init.lua:158
+#: plugins/portname/init.lua:138
 msgid "Input ports"
 msgstr ""
+
+#~ msgid " total matches found"
+#~ msgstr " всего найдено совпадений"
 
 #~ msgid ""
 #~ "ROM Audit Disabled\t\n"

@@ -63,7 +63,7 @@ void bigevglf_state::video_start()
 
 	m_vidram = std::make_unique<uint8_t[]>(0x100 * 0x100 * 4);
 
-	save_pointer(NAME(m_vidram.get()), 0x100 * 0x100 * 4);
+	save_pointer(NAME(m_vidram), 0x100 * 0x100 * 4);
 }
 
 void bigevglf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )

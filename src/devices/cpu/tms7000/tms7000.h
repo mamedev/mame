@@ -16,29 +16,29 @@
 
 // read-only on 70x0
 #define MCFG_TMS7000_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(0, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_read_cb(0, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTA_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(0, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_write_cb(0, DEVCB_##_devcb);
 
 // write-only
 #define MCFG_TMS7000_OUT_PORTB_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(1, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_write_cb(1, DEVCB_##_devcb);
 
 #define MCFG_TMS7000_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(2, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_read_cb(2, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTC_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(2, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_write_cb(2, DEVCB_##_devcb);
 
 #define MCFG_TMS7000_IN_PORTD_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(3, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_read_cb(3, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTD_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(3, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_write_cb(3, DEVCB_##_devcb);
 
 // TMS70C46 only
 #define MCFG_TMS7000_IN_PORTE_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(4, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_read_cb(4, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTE_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(4, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_write_cb(4, DEVCB_##_devcb);
 
 
 enum { TMS7000_PC=1, TMS7000_SP, TMS7000_ST };
@@ -111,7 +111,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	uint32_t chip_get_family() const { return m_info_flags & CHIP_FAMILY_MASK; }
 
@@ -125,7 +125,7 @@ protected:
 	uint32_t m_info_flags;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	int m_icount;
 
 	bool m_irq_state[2];
@@ -172,8 +172,8 @@ protected:
 	inline uint16_t read_mem16(uint16_t address) { return m_program->read_byte(address) << 8 | m_program->read_byte((address + 1) & 0xffff); }
 	inline void write_mem16(uint16_t address, uint16_t data) { m_program->write_byte(address, data >> 8 & 0xff); m_program->write_byte((address + 1) & 0xffff, data & 0xff); }
 
-	inline uint8_t imm8() { return m_direct->read_byte(m_pc++); }
-	inline uint16_t imm16() { uint16_t ret = m_direct->read_byte(m_pc++) << 8; return ret | m_direct->read_byte(m_pc++); }
+	inline uint8_t imm8() { return m_cache->read_byte(m_pc++); }
+	inline uint16_t imm16() { uint16_t ret = m_cache->read_byte(m_pc++) << 8; return ret | m_cache->read_byte(m_pc++); }
 
 	inline uint8_t pull8() { return m_program->read_byte(m_sp--); }
 	inline void push8(uint8_t data) { m_program->write_byte(++m_sp, data); }

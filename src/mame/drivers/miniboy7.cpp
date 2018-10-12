@@ -138,6 +138,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -150,8 +151,8 @@
 class miniboy7_state : public driver_device
 {
 public:
-	miniboy7_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	miniboy7_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram_a(*this, "videoram_a"),
 		m_colorram_a(*this, "colorram_a"),
 		m_videoram_b(*this, "videoram_b"),
@@ -163,7 +164,26 @@ public:
 		m_dsw2(*this, "DSW2"),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
+
+	void miniboy7(machine_config &config);
+
+private:
+	DECLARE_WRITE8_MEMBER(ay_pa_w);
+	DECLARE_WRITE8_MEMBER(ay_pb_w);
+	DECLARE_READ8_MEMBER(pia_pb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+
+	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	DECLARE_PALETTE_INIT(miniboy7);
+
+	void miniboy7_map(address_map &map);
+
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_reset() override;
 
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_colorram_a;
@@ -177,21 +197,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	output_finder<5> m_lamps;
 
-	DECLARE_WRITE8_MEMBER(ay_pa_w);
-	DECLARE_WRITE8_MEMBER(ay_pb_w);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
-
-	void machine_reset() override;
-
-	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
-	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_PALETTE_INIT(miniboy7);
-
-	void miniboy7(machine_config &config);
-	void miniboy7_map(address_map &map);
-private:
 	uint8_t m_ay_pb;
 	int m_gpri;
 };
@@ -308,11 +315,11 @@ WRITE8_MEMBER(miniboy7_state::ay_pa_w)
 
 	data = data ^ 0xff;
 
-//    output().set_lamp_value(0, (data) & 1);         // [----x]
-//    output().set_lamp_value(1, (data >> 1) & 1);    // [---x-]
-//    output().set_lamp_value(2, (data >> 2) & 1);    // [--x--]
-//    output().set_lamp_value(3, (data >> 3) & 1);    // [-x---]
-//    output().set_lamp_value(4, (data >> 4) & 1);    // [x----]
+//    m_lamps[0] = BIT(data, 0);    // [----x]
+//    m_lamps[1] = BIT(data, 1);    // [---x-]
+//    m_lamps[2] = BIT(data, 2);    // [--x--]
+//    m_lamps[3] = BIT(data, 3);    // [-x---]
+//    m_lamps[4] = BIT(data, 4);    // [x----]
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);    // counter
 
@@ -345,19 +352,20 @@ WRITE_LINE_MEMBER(miniboy7_state::pia_ca2_w)
 *      Memory Map Information      *
 ***********************************/
 
-ADDRESS_MAP_START(miniboy7_state::miniboy7_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM? */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("videoram_a")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("colorram_a")
-	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("videoram_b")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("colorram_b")
-	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3000, 0x3001) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)  // FIXME
-	AM_RANGE(0x3080, 0x3083) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x3800, 0x3800) AM_READNOP // R (right after each read, another value is loaded to the ACCU, so it lacks of sense)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void miniboy7_state::miniboy7_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram"); /* battery backed RAM? */
+	map(0x0800, 0x0fff).ram().share("videoram_a");
+	map(0x1000, 0x17ff).ram().share("colorram_a");
+	map(0x1800, 0x1fff).ram().share("videoram_b");
+	map(0x2000, 0x27ff).ram().share("colorram_b");
+	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x3000, 0x3001).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));  // FIXME
+	map(0x3080, 0x3083).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x3800, 0x3800).nopr(); // R (right after each read, another value is loaded to the ACCU, so it lacks of sense)
+	map(0x4000, 0xffff).rom();
+}
 
 /*
 
@@ -488,7 +496,7 @@ static const gfx_layout tilelayout =
 *      Graphics Decode Information      *
 ****************************************/
 
-static GFXDECODE_START( miniboy7 )
+static GFXDECODE_START( gfx_miniboy7 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 128 ) /* text layer */
 
 	/* 0x000 cards
@@ -506,17 +514,17 @@ GFXDECODE_END
 MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
-	MCFG_CPU_PROGRAM_MAP(miniboy7_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(miniboy7_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("INPUT1"))
-	MCFG_PIA_READPB_HANDLER(READ8(miniboy7_state, pia_pb_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(miniboy7_state, pia_ca2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", 0))
+	pia6821_device &pia(PIA6821(config, "pia0", 0));
+	pia.readpa_handler().set_ioport("INPUT1");
+	pia.readpb_handler().set(FUNC(miniboy7_state::pia_pb_r));
+	pia.ca2_handler().set(FUNC(miniboy7_state::pia_ca2_w));
+	pia.irqa_handler().set_inputline("maincpu", 0);
+	pia.irqb_handler().set_inputline("maincpu", 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -526,7 +534,7 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", miniboy7)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_miniboy7)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)
@@ -535,14 +543,14 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(miniboy7_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("pia0", pia6821_device, ca1_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("pia0", pia6821_device, ca1_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK / 8)    /* guess */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK / 8)    /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(miniboy7_state, ay_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(miniboy7_state, ay_pb_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, miniboy7_state, ay_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, miniboy7_state, ay_pb_w))
 
 MACHINE_CONFIG_END
 
@@ -626,6 +634,6 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT   ROT   COMPANY                     FULLNAME              FLAGS                LAYOUT
-GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
-GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                     FULLNAME              FLAGS                LAYOUT
+GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
+GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL, layout_miniboy7 )

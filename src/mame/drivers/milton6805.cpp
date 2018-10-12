@@ -5,7 +5,7 @@ infos provided by Sean Riddle
 
 Milton Bradley Milton
 
-Chips labeled 
+Chips labeled
 
 SC87008P
 7834043001
@@ -76,7 +76,7 @@ red
 C     F
  B   G
    A
-   
+
 yellow
    A
  G   B
@@ -107,9 +107,10 @@ private:
 	void prg_map(address_map &map);
 };
 
-ADDRESS_MAP_START(milton_state::prg_map)
-	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION("maincpu", 0) // Internal ROM
-ADDRESS_MAP_END
+void milton_state::prg_map(address_map &map)
+{
+	map(0x800, 0xfff).rom().region("maincpu", 0); // Internal ROM
+}
 
 static INPUT_PORTS_START( milton )
 INPUT_PORTS_END
@@ -117,17 +118,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(milton_state::milton)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6805, 3120000) // MC6805P2, needs a CPU core
-	MCFG_CPU_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_ADD("maincpu", M6805, 3120000) // MC6805P2, needs a CPU core
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
 
-	MCFG_DEVICE_ADD("grom3", TMC0430, 3120000 / 8)
-	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x0000, 0);
+	// GROMs. They still require a ready callback and external clock
+	// of 3120000/8 Hz, pulsing their glock_in line (see tmc0430.cpp and ti99_4x.cpp)
+	TMC0430(config, "grom3", "groms", 0x0000, 0);
+	TMC0430(config, "grom4", "groms", 0x2000, 1);
 
-	MCFG_DEVICE_ADD("grom4", TMC0430, 3120000 / 8)
-	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x2000, 1);
-
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("sp0250", SP0250, 3120000)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("sp0250", SP0250, 3120000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -146,4 +146,4 @@ ROM_START( milton )
 	ROM_LOAD("miltongrom4.bin", 0x2000, 0x1800, CRC(9ac929f7) SHA1(1a27d56fc49eb4e58ea3b5c58d7fbedc5a751592) )
 ROM_END
 
-CONS( 1980, milton,  0,  0, milton, milton, milton_state,  0, "Milton Bradley", "Electronic Milton",  MACHINE_IS_SKELETON )
+CONS( 1980, milton, 0, 0, milton, milton, milton_state, empty_init, "Milton Bradley", "Electronic Milton",  MACHINE_IS_SKELETON )

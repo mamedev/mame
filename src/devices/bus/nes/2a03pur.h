@@ -30,8 +30,7 @@ private:
 };
 
 
-
 // device type definition
-extern const device_type NES_2A03PURITANS;
+DECLARE_DEVICE_TYPE(NES_2A03PURITANS, nes_2a03pur_device)
 
 #endif // MAME_BUS_NES_2A03PUR_H

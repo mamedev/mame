@@ -232,7 +232,11 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/6840ptm.h"
+#include "machine/6850acia.h"
+#include "machine/mc68681.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -247,20 +251,37 @@ public:
 	goldngam_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ptm(*this, "ptm"),
+		m_duart(*this, "duart%u", 1U) { }
 
-	required_shared_ptr<uint16_t> m_videoram;
-	DECLARE_READ16_MEMBER(unk_r);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(goldngam);
-	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 	void swisspkr(machine_config &config);
 	void moviecrd(machine_config &config);
+
+protected:
+	void base(machine_config &config);
+
+private:
+	static constexpr int MOVIECRD_DUART1_IRQ = M68K_IRQ_2;
+	static constexpr int MOVIECRD_DUART2_IRQ = M68K_IRQ_4;
+
+	DECLARE_READ8_MEMBER(unk_r);
+	virtual void video_start() override;
+	void palette_init(palette_device &palette);
+	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	IRQ_CALLBACK_MEMBER(moviecrd_irq_ack);
+
 	void moviecrd_map(address_map &map);
 	void swisspkr_map(address_map &map);
+
+	required_shared_ptr<uint16_t> m_videoram;
+	required_device<cpu_device> m_maincpu;
+	required_device<ptm6840_device> m_ptm;
+	optional_device_array<mc68681_device, 2> m_duart;
 };
 
+constexpr int goldngam_state::MOVIECRD_DUART1_IRQ;
+constexpr int goldngam_state::MOVIECRD_DUART2_IRQ;
 
 /*************************
 *     Video Hardware     *
@@ -289,7 +310,7 @@ uint32_t goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(goldngam_state, goldngam)
+void goldngam_state::palette_init(palette_device &palette)
 {
 }
 
@@ -299,29 +320,36 @@ PALETTE_INIT_MEMBER(goldngam_state, goldngam)
 * Memory Map Information *
 *************************/
 
-READ16_MEMBER(goldngam_state::unk_r)
+READ8_MEMBER(goldngam_state::unk_r)
 {
-	int test1 = (machine().rand() & 0xae00);
-//  popmessage("VAL = %02x", test1);
-
-	return test1;
+	// hopper status read ?
+	return 1;
 }
 
-ADDRESS_MAP_START(goldngam_state::swisspkr_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x400002, 0x400003) AM_NOP // hopper status read ?
-	AM_RANGE(0x40000c, 0x40000d) AM_READ(unk_r)
-	AM_RANGE(0x40000e, 0x40000f) AM_READ_PORT("DSW2")   // not sure...
-	AM_RANGE(0x402000, 0x402001) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x402000, 0x402003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff) //wrong
-
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x500200, 0x50020f) AM_RAM //?
-	AM_RANGE(0x503000, 0x503001) AM_RAM //int ack ?
-	AM_RANGE(0x503002, 0x503003) AM_RAM //int ack ?
-	AM_RANGE(0x503006, 0x503007) AM_RAM //int ack ?
-ADDRESS_MAP_END
+void goldngam_state::swisspkr_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x400000, 0x40000f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x401000, 0x401003).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+	map(0x402001, 0x402001).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x402000, 0x402003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //wrong
+	map(0x500100, 0x500101).nopr(); //?
+	map(0x500200, 0x500201).portr("IN0");
+	map(0x500202, 0x500203).portr("IN1");
+	map(0x500204, 0x500205).portr("IN2");
+	map(0x500206, 0x500207).portr("IN3");
+	map(0x500208, 0x500209).nopr(); //?
+	map(0x50020c, 0x50020d).nopr(); //?
+	map(0x500300, 0x500301).nopr(); //?
+	map(0x50030f, 0x50030f).r(FUNC(goldngam_state::unk_r));
+	map(0x501500, 0x501501).nopw(); //?
+	map(0x503000, 0x503001).ram(); //int ack ?
+	map(0x503002, 0x503003).ram(); //int ack ?
+	map(0x503006, 0x503007).ram(); //int ack ?
+	map(0xc00000, 0xc3ffff).ram().share("videoram");
+	map(0xe00000, 0xe00001).noprw(); //?
+}
 
 
 /* unknown R/W:
@@ -357,19 +385,32 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(goldngam_state::moviecrd_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x503000, 0x5031ff) AM_RAM //int ack ?
-ADDRESS_MAP_END
+IRQ_CALLBACK_MEMBER(goldngam_state::moviecrd_irq_ack)
+{
+	switch (irqline)
+	{
+	case MOVIECRD_DUART1_IRQ:
+		return m_duart[0]->get_irq_vector();
 
-/*
+	case MOVIECRD_DUART2_IRQ:
+		return m_duart[1]->get_irq_vector();
 
-  502100-502102  YM2149?
+	default:
+		return M68K_INT_ACK_AUTOVECTOR;
+	}
+}
 
-
-*/
+void goldngam_state::moviecrd_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x502100, 0x502103).w("aysnd", FUNC(ym2149_device::address_data_w)).umask16(0x00ff);
+	map(0x503000, 0x50301f).rw("duart1", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x503100, 0x50311f).rw("duart2", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x504000, 0x50400f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0x505000, 0x505001).nopw(); //int ack ?
+	map(0xc00000, 0xc3ffff).ram().share("videoram");
+}
 
 /*************************
 *      Input Ports       *
@@ -378,40 +419,48 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( goldngam )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN0-0001")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN0-0002")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN0-0004")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN0-0008")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN0-0010")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN0-0020")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN0-0040")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN0-0080")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN0-0100")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN0-0200")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN0-0400")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN0-0800")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN0-1000")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN0-2000")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN0-4000")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN0-8000")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN0-01")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN0-02")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN0-04")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN0-08")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN0-10")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN0-20")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN0-40")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN0-80")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN1-0001")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN1-0002")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN1-0004")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN1-0008")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN1-0010")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN1-0020")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN1-0040")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN1-0080")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN1-0100")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN1-0200")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN1-0400")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN1-0800")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN1-1000")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN1-2000")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN1-4000")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN1-8000")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN1-01")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN1-02")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN1-04")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN1-08")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN1-10")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN1-20")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN1-40")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN1-80")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN2-01")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN2-02")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN2-04")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN2-08")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN2-10")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN2-20")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN2-40")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN2-80")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN3-01")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN3-02")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN3-04")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN3-08")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN3-10")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN3-20")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN3-40")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN3-80")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -540,7 +589,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( goldngam )
+static GFXDECODE_START( gfx_goldngam )
 	GFXDECODE_ENTRY( "maincpu", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -549,43 +598,58 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-
-MACHINE_CONFIG_START(goldngam_state::swisspkr)
-
+void goldngam_state::base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(swisspkr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldngam_state,  irq2_line_hold)
+	M68000(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldngam_state::swisspkr_map);
+
+	PTM6840(config, m_ptm, 2'000'000);
+	m_ptm->irq_callback().set_inputline("maincpu", M68K_IRQ_2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 43*8-1, 1*8, 37*8-1)  // 312x288
-	MCFG_SCREEN_UPDATE_DRIVER(goldngam_state, screen_update_goldngam)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(4*8, 43*8-1, 1*8, 37*8-1); // 312x288
+	screen.set_screen_update(FUNC(goldngam_state::screen_update_goldngam));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldngam)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_goldngam);
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(goldngam_state, goldngam)
+	PALETTE(config, "palette", 512).set_init(DEVICE_SELF, FUNC(goldngam_state::palette_init));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
+}
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+void goldngam_state::swisspkr(machine_config &config)
+{
+	base(config);
 
+	ACIA6850(config, "acia", 0).irq_handler().set_inputline("maincpu", M68K_IRQ_4);
+	AY8912(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
-MACHINE_CONFIG_START(goldngam_state::moviecrd)
-	swisspkr(config);
+void goldngam_state::moviecrd(machine_config &config)
+{
+	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(moviecrd_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldngam_state::moviecrd_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(goldngam_state::moviecrd_irq_ack));
+
+	m_ptm->irq_callback().set_inputline("maincpu", M68K_IRQ_1);
+
+	MC68681(config, m_duart[0], 3'686'400);
+	m_duart[0]->irq_cb().set_inputline("maincpu", MOVIECRD_DUART1_IRQ);
+
+	MC68681(config, m_duart[1], 3'686'400);
+	m_duart[1]->irq_cb().set_inputline("maincpu", MOVIECRD_DUART2_IRQ);
+
+	YM2149(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 /*************************
@@ -619,6 +683,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT    MACHINE    INPUT     STATE            INIT  ROT   COMPANY                           FULLNAME                           FLAGS
-GAME( 1990, swisspkr, 0,        swisspkr,  goldngam, goldngam_state,  0,    ROT0, "Golden Games / C+M Technics AG", "Swiss Poker ('50 SG-.10', V2.5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, moviecrd, 0,        moviecrd,  goldngam, goldngam_state,  0,    ROT0, "Golden Games / C+M Technics AG", "Movie Card",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT        ROT   COMPANY                           FULLNAME                           FLAGS
+GAME( 1990, swisspkr, 0,        swisspkr,  goldngam, goldngam_state, empty_init, ROT0, "Golden Games / C+M Technics AG", "Swiss Poker ('50 SG-.10', V2.5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, moviecrd, 0,        moviecrd,  goldngam, goldngam_state, empty_init, ROT0, "Golden Games / C+M Technics AG", "Movie Card",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

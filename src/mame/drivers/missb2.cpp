@@ -21,6 +21,7 @@ written, so it may be normal behaviour.
 #include "sound/3526intf.h"
 #include "sound/okim6295.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -35,21 +36,24 @@ public:
 		, m_oki(*this, "oki")
 	{ }
 
+	void missb2(machine_config &config);
+	void bublpong(machine_config &config);
+
+	void init_missb2();
+
+private:
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 	DECLARE_WRITE8_MEMBER(missb2_oki_w);
 	DECLARE_READ8_MEMBER(missb2_oki_r);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_DRIVER_INIT(missb2);
 	DECLARE_MACHINE_START(missb2);
 	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void missb2(machine_config &config);
-	void bublpong(machine_config &config);
 	void maincpu_map(address_map &map);
 	void sound_map(address_map &map);
 	void subcpu_map(address_map &map);
-protected:
+
 	void configure_banks();
 
 	required_shared_ptr<uint8_t> m_bgvram;
@@ -179,56 +183,59 @@ READ8_MEMBER(missb2_state::missb2_oki_r)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(missb2_state::maincpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xfa00, 0xfa00) AM_MIRROR(0x007c) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write)
-	AM_RANGE(0xfa01, 0xfa01) AM_MIRROR(0x007c) AM_READ(common_sound_semaphores_r)
-	AM_RANGE(0xfa03, 0xfa03) AM_MIRROR(0x007c) AM_WRITE(bublbobl_soundcpu_reset_w)
-	AM_RANGE(0xfa80, 0xfa80) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xfb40, 0xfb40) AM_WRITE(bublbobl_bankswitch_w)
-	AM_RANGE(0xfc00, 0xfcff) AM_RAM
-	AM_RANGE(0xfd00, 0xfdff) AM_RAM         // ???
-	AM_RANGE(0xfe00, 0xfe03) AM_RAM         // ???
-	AM_RANGE(0xfe80, 0xfe83) AM_RAM         // ???
-	AM_RANGE(0xff00, 0xff00) AM_READ_PORT("DSW1")
-	AM_RANGE(0xff01, 0xff01) AM_READ_PORT("DSW2")
-	AM_RANGE(0xff02, 0xff02) AM_READ_PORT("P1")
-	AM_RANGE(0xff03, 0xff03) AM_READ_PORT("P2")
-	AM_RANGE(0xff94, 0xff94) AM_WRITENOP    // ???
-	AM_RANGE(0xff98, 0xff98) AM_WRITENOP    // ???
-ADDRESS_MAP_END
+void missb2_state::maincpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdcff).ram().share("videoram");
+	map(0xdd00, 0xdfff).ram().share("objectram");
+	map(0xe000, 0xf7ff).ram().share("share1");
+	map(0xf800, 0xf9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xfa00, 0xfa00).mirror(0x007c).r(m_sound_to_main, FUNC(generic_latch_8_device::read)).w(m_main_to_sound, FUNC(generic_latch_8_device::write));
+	map(0xfa01, 0xfa01).mirror(0x007c).r(FUNC(missb2_state::common_sound_semaphores_r));
+	map(0xfa03, 0xfa03).mirror(0x007c).w(FUNC(missb2_state::bublbobl_soundcpu_reset_w));
+	map(0xfa80, 0xfa80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xfb40, 0xfb40).w(FUNC(missb2_state::bublbobl_bankswitch_w));
+	map(0xfc00, 0xfcff).ram();
+	map(0xfd00, 0xfdff).ram();         // ???
+	map(0xfe00, 0xfe03).ram();         // ???
+	map(0xfe80, 0xfe83).ram();         // ???
+	map(0xff00, 0xff00).portr("DSW1");
+	map(0xff01, 0xff01).portr("DSW2");
+	map(0xff02, 0xff02).portr("P1");
+	map(0xff03, 0xff03).portr("P2");
+	map(0xff94, 0xff94).nopw();    // ???
+	map(0xff98, 0xff98).nopw();    // ???
+}
 
-ADDRESS_MAP_START(missb2_state::subcpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")    // ROM data for the background palette ram
-	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")    // ROM data for the background palette ram
-	AM_RANGE(0xb000, 0xb1ff) AM_ROM         // banked ???
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("bgpalette", palette_device, write8) AM_SHARE("bgpalette")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM         // main ???
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(missb2_bg_bank_w)
-	AM_RANGE(0xd002, 0xd002) AM_WRITENOP
-	AM_RANGE(0xd003, 0xd003) AM_RAM AM_SHARE("bgvram")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void missb2_state::subcpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x9000, 0x9fff).bankr("bank2");    // ROM data for the background palette ram
+	map(0xa000, 0xafff).bankr("bank3");    // ROM data for the background palette ram
+	map(0xb000, 0xb1ff).rom();         // banked ???
+	map(0xc000, 0xc1ff).ram().w(m_bgpalette, FUNC(palette_device::write8)).share("bgpalette");
+	map(0xc800, 0xcfff).ram();         // main ???
+	map(0xd000, 0xd000).w(FUNC(missb2_state::missb2_bg_bank_w));
+	map(0xd002, 0xd002).nopw();
+	map(0xd003, 0xd003).ram().share("bgvram");
+	map(0xe000, 0xf7ff).ram().share("share1");
+}
 
 // Looks like the original bublbobl code modified to support the OKI M6295.
 // due to some really wacky bugs in the way the oki6295 was hacked in place, writes will happen to
 // many addresses other than 9000: 9000-9001, 0000-0001, 3827-3828, 44a8-44a9
-ADDRESS_MAP_START(missb2_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(missb2_oki_r, missb2_oki_w) //AM_MIRROR(0x0fff) ???
-	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_DEVREAD("main_to_sound", generic_latch_8_device, read) AM_DEVWRITE("sound_to_main", generic_latch_8_device, write)
-	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_READ(common_sound_semaphores_r) AM_DEVWRITE("soundnmi", input_merger_device, in_set<0>)
-	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<0>)
-	AM_RANGE(0xe000, 0xefff) AM_ROM         // space for diagnostic ROM?
-ADDRESS_MAP_END
+void missb2_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9000).rw(FUNC(missb2_state::missb2_oki_r), FUNC(missb2_state::missb2_oki_w)); //AM_MIRROR(0x0fff) ???
+	map(0xa000, 0xa001).mirror(0x0ffe).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
+	map(0xb000, 0xb000).mirror(0x0ffc).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
+	map(0xb001, 0xb001).mirror(0x0ffc).r(FUNC(missb2_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
+	map(0xb002, 0xb002).mirror(0x0ffc).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
+	map(0xe000, 0xefff).rom();         // space for diagnostic ROM?
+}
 
 /* Input Ports */
 
@@ -417,12 +424,12 @@ static const gfx_layout bglayout_alt =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( missb2 )
+static GFXDECODE_START( gfx_missb2 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, bglayout,   0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( bublpong )
+static GFXDECODE_START( gfx_bublpong )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, bglayout_alt,   0, 2 )
 GFXDECODE_END
@@ -455,28 +462,27 @@ MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
 	m_oki->reset();
-	bublbobl_bankswitch_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 
 MACHINE_CONFIG_START(missb2_state::missb2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(subcpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128);
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128);
 
 	MCFG_MACHINE_START_OVERRIDE(missb2_state,missb2)
 	MCFG_MACHINE_RESET_OVERRIDE(missb2_state,missb2)
@@ -489,7 +495,7 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(missb2_state, screen_update_missb2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", missb2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_missb2)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -499,27 +505,27 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<1>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
 
 	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, MAIN_XTAL/8)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(missb2_state, irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3526, MAIN_XTAL/8)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, missb2_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(missb2_state::bublpong)
 	missb2(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bublpong)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bublpong)
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -604,7 +610,7 @@ void missb2_state::configure_banks()
 	membank("bank3")->configure_entries(0, 7, &SUBCPU[0x9000], 0x1000);
 }
 
-DRIVER_INIT_MEMBER(missb2_state,missb2)
+void missb2_state::init_missb2()
 {
 	configure_banks();
 	m_video_enable = 0;
@@ -612,5 +618,5 @@ DRIVER_INIT_MEMBER(missb2_state,missb2)
 
 /* Game Drivers */
 
-GAME( 1996, missb2,   0,      missb2,   missb2, missb2_state, missb2, ROT0,  "Alpha Co.", "Miss Bubble II",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bublpong, missb2, bublpong, missb2, missb2_state, missb2, ROT0,  "Top Ltd.",  "Bubble Pong Pong", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, missb2,   0,      missb2,   missb2, missb2_state, init_missb2, ROT0,  "Alpha Co.", "Miss Bubble II",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bublpong, missb2, bublpong, missb2, missb2_state, init_missb2, ROT0,  "Top Ltd.",  "Bubble Pong Pong", MACHINE_SUPPORTS_SAVE )

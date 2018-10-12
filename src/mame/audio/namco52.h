@@ -10,7 +10,7 @@
 	MCFG_DEVICE_ADD(_tag, NAMCO_52XX, _clock)
 
 #define MCFG_NAMCO_52XX_DISCRETE(_tag) \
-	downcast<namco_52xx_device &>(*device).set_discrete("^" _tag);
+	downcast<namco_52xx_device &>(*device).set_discrete(_tag);
 
 #define MCFG_NAMCO_52XX_BASENODE(_node) \
 	downcast<namco_52xx_device &>(*device).set_basenote(_node);
@@ -19,10 +19,10 @@
 	downcast<namco_52xx_device &>(*device).set_extclock(_clock);
 
 #define MCFG_NAMCO_52XX_ROMREAD_CB(_devcb) \
-	devcb = &downcast<namco_52xx_device &>(*device).set_romread_callback(DEVCB_##_devcb);
+	downcast<namco_52xx_device &>(*device).set_romread_callback(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_52XX_SI_CB(_devcb) \
-	devcb = &downcast<namco_52xx_device &>(*device).set_si_callback(DEVCB_##_devcb);
+	downcast<namco_52xx_device &>(*device).set_si_callback(DEVCB_##_devcb);
 
 
 class namco_52xx_device : public device_t

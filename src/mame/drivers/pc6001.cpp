@@ -208,7 +208,7 @@ READ8_MEMBER(pc6001_state::nec_ppi8255_r)
 		return res;
 	}
 
-	return m_ppi->read(space, offset);
+	return m_ppi->read(offset);
 }
 
 WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
@@ -224,30 +224,31 @@ WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
 			m_bank1->set_base(m_region_gfx1->base());
 	}
 
-	m_ppi->write(space,offset,data);
+	m_ppi->write(offset,data);
 }
 
-ADDRESS_MAP_START(pc6001_state::pc6001_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP
+void pc6001_state::pc6001_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().nopw();
 //  AM_RANGE(0x4000, 0x5fff) // mapped by the cartslot
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(pc6001_state::pc6001_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, nec_ppi8255_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE(system_latch_w)
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_NOP // disk device
-ADDRESS_MAP_END
+void pc6001_state::pc6001_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001_state::nec_ppi8255_r), FUNC(pc6001_state::nec_ppi8255_w));
+	map(0xa0, 0xa0).mirror(0x0c).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0xa1, 0xa1).mirror(0x0c).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0xa2, 0xa2).mirror(0x0c).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0xa3, 0xa3).mirror(0x0c).nopw();
+	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001_state::system_latch_w));
+	map(0xd0, 0xd3).mirror(0x0c).noprw(); // disk device
+}
 
 /*****************************************
  *
@@ -565,7 +566,7 @@ WRITE8_MEMBER(pc6001mk2_state::necmk2_ppi8255_w)
 		}
 	}
 
-	m_ppi->write(space,offset,data);
+	m_ppi->write(offset,data);
 }
 
 void pc6001mk2_state::vram_bank_change(uint8_t vram_bank)
@@ -677,50 +678,51 @@ READ8_MEMBER(pc6001mk2_state::mk2_bank_w0_r)
 	return m_bank_w;
 }
 
-ADDRESS_MAP_START(pc6001mk2_state::pc6001mk2_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(mk2_work_ram0_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(mk2_work_ram1_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3") AM_WRITE(mk2_work_ram2_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4") AM_WRITE(mk2_work_ram3_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank5") AM_WRITE(mk2_work_ram4_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank6") AM_WRITE(mk2_work_ram5_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank7") AM_WRITE(mk2_work_ram6_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(mk2_work_ram7_w)
-ADDRESS_MAP_END
+void pc6001mk2_state::pc6001mk2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankr("bank1").w(FUNC(pc6001mk2_state::mk2_work_ram0_w));
+	map(0x2000, 0x3fff).bankr("bank2").w(FUNC(pc6001mk2_state::mk2_work_ram1_w));
+	map(0x4000, 0x5fff).bankr("bank3").w(FUNC(pc6001mk2_state::mk2_work_ram2_w));
+	map(0x6000, 0x7fff).bankr("bank4").w(FUNC(pc6001mk2_state::mk2_work_ram3_w));
+	map(0x8000, 0x9fff).bankr("bank5").w(FUNC(pc6001mk2_state::mk2_work_ram4_w));
+	map(0xa000, 0xbfff).bankr("bank6").w(FUNC(pc6001mk2_state::mk2_work_ram5_w));
+	map(0xc000, 0xdfff).bankr("bank7").w(FUNC(pc6001mk2_state::mk2_work_ram6_w));
+	map(0xe000, 0xffff).bankr("bank8").w(FUNC(pc6001mk2_state::mk2_work_ram7_w));
+}
 
-ADDRESS_MAP_START(pc6001mk2_state::pc6001mk2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+void pc6001mk2_state::pc6001mk2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necmk2_ppi8255_w)
+	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2_state::nec_ppi8255_r), FUNC(pc6001mk2_state::necmk2_ppi8255_w));
 
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
+	map(0xa0, 0xa0).mirror(0x0c).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0xa1, 0xa1).mirror(0x0c).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0xa2, 0xa2).mirror(0x0c).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0xa3, 0xa3).mirror(0x0c).noprw();
 
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE(mk2_system_latch_w)
+	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001mk2_state::mk2_system_latch_w));
 
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(mk2_col_bank_w)
-	AM_RANGE(0xc1, 0xc1) AM_WRITE(mk2_vram_bank_w)
-	AM_RANGE(0xc2, 0xc2) AM_WRITE(mk2_opt_bank_w)
+	map(0xc0, 0xc0).w(FUNC(pc6001mk2_state::mk2_col_bank_w));
+	map(0xc1, 0xc1).w(FUNC(pc6001mk2_state::mk2_vram_bank_w));
+	map(0xc2, 0xc2).w(FUNC(pc6001mk2_state::mk2_opt_bank_w));
 
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_NOP // disk device
+	map(0xd0, 0xd3).mirror(0x0c).noprw(); // disk device
 
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("upd7752", upd7752_device, read, write)
+	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
 
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(mk2_bank_r0_r, mk2_bank_r0_w)
-	AM_RANGE(0xf1, 0xf1) AM_READWRITE(mk2_bank_r1_r, mk2_bank_r1_w)
-	AM_RANGE(0xf2, 0xf2) AM_READWRITE(mk2_bank_w0_r, mk2_bank_w0_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(mk2_0xf3_w)
+	map(0xf0, 0xf0).rw(FUNC(pc6001mk2_state::mk2_bank_r0_r), FUNC(pc6001mk2_state::mk2_bank_r0_w));
+	map(0xf1, 0xf1).rw(FUNC(pc6001mk2_state::mk2_bank_r1_r), FUNC(pc6001mk2_state::mk2_bank_r1_w));
+	map(0xf2, 0xf2).rw(FUNC(pc6001mk2_state::mk2_bank_w0_r), FUNC(pc6001mk2_state::mk2_bank_w0_w));
+	map(0xf3, 0xf3).w(FUNC(pc6001mk2_state::mk2_0xf3_w));
 //  AM_RANGE(0xf4
 //  AM_RANGE(0xf5
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(mk2_timer_adj_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(mk2_timer_irqv_w)
-ADDRESS_MAP_END
+	map(0xf6, 0xf6).w(FUNC(pc6001mk2_state::mk2_timer_adj_w));
+	map(0xf7, 0xf7).w(FUNC(pc6001mk2_state::mk2_timer_irqv_w));
+}
 
 /*****************************************
  *
@@ -739,18 +741,19 @@ WRITE8_MEMBER(pc6601_state::fdc_w)
 {
 }
 
-ADDRESS_MAP_START(pc6601_state::pc6601_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_IMPORT_FROM( pc6001mk2_io )
+void pc6601_state::pc6601_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	pc6001mk2_io(map);
 
 	// these are disk related
 //  AM_RANGE(0xb1
 //  AM_RANGE(0xb2
 //  AM_RANGE(0xb3
 
-	AM_RANGE(0xd0, 0xdf) AM_READWRITE(fdc_r, fdc_w)
-ADDRESS_MAP_END
+	map(0xd0, 0xdf).rw(FUNC(pc6601_state::fdc_r), FUNC(pc6601_state::fdc_w));
+}
 
 /*****************************************
  *
@@ -899,7 +902,7 @@ WRITE8_MEMBER(pc6001sr_state::necsr_ppi8255_w)
 		}
 	}
 
-	m_ppi->write(space,offset,data);
+	m_ppi->write(offset,data);
 }
 
 READ8_MEMBER(pc6001sr_state::hw_rev_r)
@@ -908,63 +911,64 @@ READ8_MEMBER(pc6001sr_state::hw_rev_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(pc6001sr_state::pc6001sr_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(sr_work_ram0_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(sr_work_ram1_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3") AM_WRITE(sr_work_ram2_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4") AM_WRITE(sr_work_ram3_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank5") AM_WRITE(sr_work_ram4_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank6") AM_WRITE(sr_work_ram5_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank7") AM_WRITE(sr_work_ram6_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(sr_work_ram7_w)
-ADDRESS_MAP_END
+void pc6001sr_state::pc6001sr_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankr("bank1").w(FUNC(pc6001sr_state::sr_work_ram0_w));
+	map(0x2000, 0x3fff).bankr("bank2").w(FUNC(pc6001sr_state::sr_work_ram1_w));
+	map(0x4000, 0x5fff).bankr("bank3").w(FUNC(pc6001sr_state::sr_work_ram2_w));
+	map(0x6000, 0x7fff).bankr("bank4").w(FUNC(pc6001sr_state::sr_work_ram3_w));
+	map(0x8000, 0x9fff).bankr("bank5").w(FUNC(pc6001sr_state::sr_work_ram4_w));
+	map(0xa000, 0xbfff).bankr("bank6").w(FUNC(pc6001sr_state::sr_work_ram5_w));
+	map(0xc000, 0xdfff).bankr("bank7").w(FUNC(pc6001sr_state::sr_work_ram6_w));
+	map(0xe000, 0xffff).bankr("bank8").w(FUNC(pc6001sr_state::sr_work_ram7_w));
+}
 
-ADDRESS_MAP_START(pc6001sr_state::pc6001sr_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void pc6001sr_state::pc6001sr_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 //  0x40-0x43 palette indexes
-	AM_RANGE(0x60, 0x67) AM_READWRITE(sr_bank_rn_r, sr_bank_rn_w)
-	AM_RANGE(0x68, 0x6f) AM_READWRITE(sr_bank_wn_r, sr_bank_wn_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+	map(0x60, 0x67).rw(FUNC(pc6001sr_state::sr_bank_rn_r), FUNC(pc6001sr_state::sr_bank_rn_w));
+	map(0x68, 0x6f).rw(FUNC(pc6001sr_state::sr_bank_wn_r), FUNC(pc6001sr_state::sr_bank_wn_w));
+	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necsr_ppi8255_w)
+	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001sr_state::nec_ppi8255_r), FUNC(pc6001sr_state::necsr_ppi8255_w));
 
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
+	map(0xa0, 0xa0).mirror(0x0c).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0xa1, 0xa1).mirror(0x0c).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0xa2, 0xa2).mirror(0x0c).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0xa3, 0xa3).mirror(0x0c).noprw();
 
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(sr_system_latch_w)
+	map(0xb0, 0xb0).w(FUNC(pc6001sr_state::sr_system_latch_w));
 	/* these are disk related */
 //  AM_RANGE(0xb1
-	AM_RANGE(0xb2, 0xb2) AM_READ(hw_rev_r)
+	map(0xb2, 0xb2).r(FUNC(pc6001sr_state::hw_rev_r));
 //  AM_RANGE(0xb3
 
-	AM_RANGE(0xb8, 0xbf) AM_RAM AM_SHARE("irq_vectors")
+	map(0xb8, 0xbf).ram().share("irq_vectors");
 //  AM_RANGE(0xc0, 0xc0) AM_WRITE(mk2_col_bank_w)
 //  AM_RANGE(0xc1, 0xc1) AM_WRITE(mk2_vram_bank_w)
 //  AM_RANGE(0xc2, 0xc2) AM_WRITE(opt_bank_w)
 
-	AM_RANGE(0xc8, 0xc8) AM_WRITE(sr_mode_w)
-	AM_RANGE(0xc9, 0xc9) AM_WRITE(sr_vram_bank_w)
-	AM_RANGE(0xce, 0xce) AM_WRITE(sr_bitmap_yoffs_w)
-	AM_RANGE(0xcf, 0xcf) AM_WRITE(sr_bitmap_xoffs_w)
+	map(0xc8, 0xc8).w(FUNC(pc6001sr_state::sr_mode_w));
+	map(0xc9, 0xc9).w(FUNC(pc6001sr_state::sr_vram_bank_w));
+	map(0xce, 0xce).w(FUNC(pc6001sr_state::sr_bitmap_yoffs_w));
+	map(0xcf, 0xcf).w(FUNC(pc6001sr_state::sr_bitmap_xoffs_w));
 
-	AM_RANGE(0xd0, 0xdf) AM_READWRITE(fdc_r,fdc_w) // disk device
+	map(0xd0, 0xdf).rw(FUNC(pc6001sr_state::fdc_r), FUNC(pc6001sr_state::fdc_w)); // disk device
 
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("upd7752", upd7752_device, read, write)
+	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
 
 //  AM_RANGE(0xf0, 0xf0) AM_READWRITE(mk2_bank_r0_r, mk2_bank_r0_w)
 //  AM_RANGE(0xf1, 0xf1) AM_READWRITE(mk2_bank_r1_r, mk2_bank_r1_w)
 //  AM_RANGE(0xf2, 0xf2) AM_READWRITE(mk2_bank_w0_r, mk2_bank_w0_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(mk2_0xf3_w)
+	map(0xf3, 0xf3).w(FUNC(pc6001sr_state::mk2_0xf3_w));
 //  AM_RANGE(0xf4
 //  AM_RANGE(0xf5
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(mk2_timer_adj_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(mk2_timer_irqv_w)
-ADDRESS_MAP_END
+	map(0xf6, 0xf6).w(FUNC(pc6001sr_state::mk2_timer_adj_w));
+	map(0xf7, 0xf7).w(FUNC(pc6001sr_state::mk2_timer_irqv_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pc6001 )
@@ -1470,7 +1474,7 @@ static const gfx_layout kanji_layout =
 	8*16
 };
 
-static GFXDECODE_START( pc6001m2 )
+static GFXDECODE_START( gfx_pc6001m2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, char_layout, 2, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, kanji_layout, 2, 1 )
 GFXDECODE_END
@@ -1479,15 +1483,15 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pc6001_state::pc6001)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // PD 780C-1, ~4 Mhz
-	MCFG_CPU_PROGRAM_MAP(pc6001_map)
-	MCFG_CPU_IO_MAP(pc6001_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
+	MCFG_DEVICE_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // PD 780C-1, ~4 Mhz
+	MCFG_DEVICE_PROGRAM_MAP(pc6001_map)
+	MCFG_DEVICE_IO_MAP(pc6001_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 
-//  MCFG_CPU_ADD("subcpu", I8049, 7987200)
+//  MCFG_DEVICE_ADD("subcpu", I8049, 7987200)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc6001m2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc6001m2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1500,13 +1504,13 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	MCFG_PALETTE_ADD("palette", 16+4)
 	MCFG_PALETTE_INIT_OWNER(pc6001_state, pc6001)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pc6001_state, ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc6001_state, ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pc6001_state, ppi_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc6001_state, ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pc6001_state, ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc6001_state, ppi_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(pc6001_state::ppi_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(pc6001_state::ppi_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(pc6001_state::ppi_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(pc6001_state::ppi_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(pc6001_state::ppi_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(pc6001_state::ppi_portc_w));
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
@@ -1517,13 +1521,12 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	MCFG_GENERIC_CARTSLOT_ADD("cas_hack", generic_plain_slot, "pc6001_cass")
 	MCFG_GENERIC_EXTENSIONS("cas,p6")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-//  MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+//  WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* TODO: accurate timing on this */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", pc6001_state, keyboard_callback, attotime::from_hz(250))
@@ -1535,9 +1538,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 	pc6001(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pc6001mk2_map)
-	MCFG_CPU_IO_MAP(pc6001mk2_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pc6001mk2_map)
+	MCFG_DEVICE_IO_MAP(pc6001mk2_io)
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
 
@@ -1548,9 +1551,9 @@ MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 	MCFG_PALETTE_ENTRIES(16+16)
 	MCFG_PALETTE_INIT_OWNER(pc6001mk2_state,pc6001mk2)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pc6001m2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pc6001m2)
 
-	MCFG_SOUND_ADD("upd7752", UPD7752, PC6001_MAIN_CLOCK/4)
+	MCFG_DEVICE_ADD("upd7752", UPD7752, PC6001_MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 MACHINE_CONFIG_END
@@ -1559,11 +1562,11 @@ MACHINE_CONFIG_START(pc6601_state::pc6601)
 	pc6001mk2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(pc6001mk2_map)
-	MCFG_CPU_IO_MAP(pc6601_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pc6001mk2_map)
+	MCFG_DEVICE_IO_MAP(pc6601_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc6001sr_state::pc6001sr)
@@ -1571,11 +1574,11 @@ MACHINE_CONFIG_START(pc6001sr_state::pc6001sr)
 
 	/* basic machine hardware */
 	//*Yes*, PC-6001 SR Z80 CPU is actually slower than older models (better waitstates tho?)
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(pc6001sr_map)
-	MCFG_CPU_IO_MAP(pc6001sr_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001sr_state,  sr_vrtc_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(pc6001sr_map)
+	MCFG_DEVICE_IO_MAP(pc6001sr_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001sr_state,  sr_vrtc_irq)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
 
@@ -1673,9 +1676,9 @@ ROM_START( pc6001sr )
 	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT MACHINE    INPUT   STATE            INIT    COMPANY  FULLNAME                 FLAGS
-COMP( 1981, pc6001,   0,       0,     pc6001,    pc6001, pc6001_state,    0,      "NEC",   "PC-6001 (Japan)",       MACHINE_NOT_WORKING )
-COMP( 1981, pc6001a,  pc6001,  0,     pc6001,    pc6001, pc6001_state,    0,      "NEC",   "PC-6001A (US)",         MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
-COMP( 1983, pc6001mk2,pc6001,  0,     pc6001mk2, pc6001, pc6001mk2_state, 0,      "NEC",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
-COMP( 1983, pc6601,   pc6001,  0,     pc6601,    pc6001, pc6601_state,    0,      "NEC",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
-COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr,  pc6001, pc6001sr_state,  0,      "NEC",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT   STATE            INIT        COMPANY  FULLNAME                 FLAGS
+COMP( 1981, pc6001,    0,      0,     pc6001,    pc6001, pc6001_state,    empty_init, "NEC",   "PC-6001 (Japan)",       MACHINE_NOT_WORKING )
+COMP( 1981, pc6001a,   pc6001, 0,     pc6001,    pc6001, pc6001_state,    empty_init, "NEC",   "PC-6001A (US)",         MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
+COMP( 1983, pc6001mk2, pc6001, 0,     pc6001mk2, pc6001, pc6001mk2_state, empty_init, "NEC",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
+COMP( 1983, pc6601,    pc6001, 0,     pc6601,    pc6001, pc6601_state,    empty_init, "NEC",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
+COMP( 1984, pc6001sr,  pc6001, 0,     pc6001sr,  pc6001, pc6001sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )

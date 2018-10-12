@@ -17,9 +17,7 @@ FDC board contains Z80A DMA and NEC 765A (XTAL on it is 8MHZ)
 Mega board contains 74LS612 and memory chips (32x 41256)
 
 Status:
-  It prints 2 lines of text, then:
-  - If fdc is enabled in address map, it hangs waiting for a fdc response.
-  - Otherwise, it displays an error, and you can press a key to try again.
+  It prints 2 lines of text, then waits for a floppy.
 
 ToDo:
 - Everything... no diagram or manuals, so EVERYTHING below is guesswork.
@@ -43,13 +41,12 @@ I/O ports: These ranges are what is guessed
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class czk80_state : public driver_device
 {
@@ -61,23 +58,23 @@ public:
 		, m_fdc(*this, "fdc")
 	{ }
 
-	DECLARE_DRIVER_INIT(czk80);
+	void czk80(machine_config &config);
+	void init_czk80();
+
+private:
 	DECLARE_MACHINE_RESET(czk80);
 	TIMER_CALLBACK_MEMBER(czk80_reset);
 	DECLARE_READ8_MEMBER(port80_r);
 	DECLARE_READ8_MEMBER(port81_r);
-	DECLARE_READ8_MEMBER(portc0_r);
 	DECLARE_WRITE8_MEMBER(port40_w);
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	void czk80(machine_config &config);
 	void czk80_io(address_map &map);
 	void czk80_mem(address_map &map);
-private:
 	uint8_t m_term_data;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<upd765a_device> m_fdc;
 };
@@ -95,34 +92,30 @@ READ8_MEMBER( czk80_state::port80_r )
 	return ret;
 }
 
-READ8_MEMBER( czk80_state::portc0_r )
-{
-	return 0x80;
-}
-
 READ8_MEMBER( czk80_state::port81_r )
 {
 	return (m_term_data) ? 3 : 1;
 }
 
-ADDRESS_MAP_START(czk80_state::czk80_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x2000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
-ADDRESS_MAP_END
+void czk80_state::czk80_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bankr0").bankw("bankw0");
+	map(0x2000, 0xdfff).ram();
+	map(0xe000, 0xffff).bankr("bankr1").bankw("bankw1");
+}
 
-ADDRESS_MAP_START(czk80_state::czk80_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)
-	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("pio", z80pio_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(port80_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
-	AM_RANGE(0x81, 0x81) AM_READ(port81_r)
-	/* Select one of the below */
-	//AM_RANGE(0xc0, 0xc0) AM_READ(portc0_r)
-	AM_RANGE(0xc0, 0xc1) AM_DEVICE("fdc", upd765a_device, map)
-ADDRESS_MAP_END
+void czk80_state::czk80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).w(FUNC(czk80_state::port40_w));
+	map(0x4c, 0x4f).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x50, 0x53).rw("dart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+	map(0x54, 0x57).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	// 80, 81 - no setup bytes
+	map(0x80, 0x80).r(FUNC(czk80_state::port80_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x81, 0x81).r(FUNC(czk80_state::port81_r));
+	map(0xc0, 0xc1).m(m_fdc, FUNC(upd765a_device::map));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( czk80 )
@@ -168,7 +161,7 @@ MACHINE_RESET_MEMBER( czk80_state, czk80 )
 	membank("bankw1")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( czk80_state, czk80 )
+void czk80_state::init_czk80()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -181,9 +174,10 @@ DRIVER_INIT_MEMBER( czk80_state, czk80 )
 	membank("bankw1")->configure_entry(0, &main[0xe000]);
 }
 
-static SLOT_INTERFACE_START( czk80_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void czk80_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 void czk80_state::kbd_put(u8 data)
 {
@@ -192,31 +186,32 @@ void czk80_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(czk80_state::czk80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(czk80_mem)
-	MCFG_CPU_IO_MAP(czk80_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(16'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &czk80_state::czk80_mem);
+	m_maincpu->set_addrmap(AS_IO, &czk80_state::czk80_io);
+	m_maincpu->set_daisy_config(daisy_chain);
+
 	MCFG_MACHINE_RESET_OVERRIDE(czk80_state, czk80)
 
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(czk80_state, kbd_put))
-	MCFG_UPD765A_ADD("fdc", false, true)
+	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(czk80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(czk80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(czk80_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(czk80_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(czk80_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(FUNC(czk80_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(16'000'000) / 4)
-	//MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80dart_device& dart(Z80DART(config, "dart", XTAL(16'000'000) / 4));
+	//dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	//dart.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	//dart.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	dart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000)/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL(16'000'000)/4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 MACHINE_CONFIG_END
 
 
@@ -228,5 +223,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT   COMPAT MACHINE  INPUT  CLASS        INIT   COMPANY       FULLNAME  FLAGS
-COMP( 198?, czk80,  0,       0,     czk80,   czk80, czk80_state, czk80, "<unknown>",  "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 198?, czk80, 0,      0,      czk80,   czk80, czk80_state, init_czk80, "<unknown>", "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

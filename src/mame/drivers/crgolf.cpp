@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 		uint8_t data = memregion("adpcm")->base()[m_sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		m_msm->data_w((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
+		m_msm->write_data((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
 		m_sample_offset++;
 
 		/* every 256 clocks, we decrement the length */
@@ -276,21 +276,23 @@ WRITE_LINE_MEMBER(crgolf_state::screenb_enable_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(crgolf_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x8800, 0x8800) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x8800, 0x8800) AM_DEVWRITE("soundlatch1", generic_latch_8_device, write)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void crgolf_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x8007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x8800, 0x8800).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x8800, 0x8800).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0x9000, 0x9000).w(FUNC(crgolf_state::rom_bank_select_w));
+	map(0xa000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(crgolf_state::vrambank_map)
-	AM_RANGE(0x0000, 0x5fff) AM_RAM AM_SHARE("vrama")
-	AM_RANGE(0x8000, 0xdfff) AM_RAM AM_SHARE("vramb")
-ADDRESS_MAP_END
+void crgolf_state::vrambank_map(address_map &map)
+{
+	map(0x0000, 0x5fff).ram().share("vrama");
+	map(0x8000, 0xdfff).ram().share("vramb");
+}
 
 
 /*************************************
@@ -299,16 +301,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(crgolf_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITENOP
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(switch_input_r, switch_input_select_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(analog_input_r, unknown_w)
-	AM_RANGE(0xe003, 0xe003) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
-	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void crgolf_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xc000, 0xc001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xc002, 0xc002).nopw();
+	map(0xe000, 0xe000).rw(FUNC(crgolf_state::switch_input_r), FUNC(crgolf_state::switch_input_select_w));
+	map(0xe001, 0xe001).rw(FUNC(crgolf_state::analog_input_r), FUNC(crgolf_state::unknown_w));
+	map(0xe003, 0xe003).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xe003, 0xe003).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
 
 
@@ -316,30 +319,33 @@ ADDRESS_MAP_END
 
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6000, 0x8fff) AM_RAM // maybe RAM and ROM here?
-	AM_RANGE(0x9000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
+void crgolf_state::mastrglf_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).bankr("bank1");
+	map(0x6000, 0x8fff).ram(); // maybe RAM and ROM here?
+	map(0x9000, 0x9fff).ram();
+	map(0xa000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
 
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+void crgolf_state::mastrglf_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
 //  AM_RANGE(0x20, 0x20) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("soundlatch1", generic_latch_8_device, write)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-ADDRESS_MAP_END
+	map(0x40, 0x40).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xa0, 0xa0).r("soundlatch2", FUNC(generic_latch_8_device::read));
+}
 
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_submap)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void crgolf_state::mastrglf_submap(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+}
 
 
 READ8_MEMBER(crgolf_state::unk_sub_02_r)
@@ -362,17 +368,18 @@ WRITE8_MEMBER(crgolf_state::unk_sub_0c_w)
 }
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_subio)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch1", generic_latch_8_device, read) AM_WRITENOP
-	AM_RANGE(0x02, 0x02) AM_READ(unk_sub_02_r )
-	AM_RANGE(0x05, 0x05) AM_READ(unk_sub_05_r )
-	AM_RANGE(0x06, 0x06) AM_READNOP
-	AM_RANGE(0x07, 0x07) AM_READ(unk_sub_07_r )
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(unk_sub_0c_w)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void crgolf_state::mastrglf_subio(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch1", FUNC(generic_latch_8_device::read)).nopw();
+	map(0x02, 0x02).r(FUNC(crgolf_state::unk_sub_02_r));
+	map(0x05, 0x05).r(FUNC(crgolf_state::unk_sub_05_r));
+	map(0x06, 0x06).nopr();
+	map(0x07, 0x07).r(FUNC(crgolf_state::unk_sub_07_r));
+	map(0x08, 0x08).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x0c, 0x0c).w(FUNC(crgolf_state::unk_sub_0c_w));
+	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 
 
@@ -461,22 +468,22 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(crgolf_state::crgolf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/3/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,MASTER_CLOCK/3/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80,MASTER_CLOCK/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1H
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(crgolf_state, color_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(crgolf_state, screen_flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(crgolf_state, screen_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(crgolf_state, screenb_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(crgolf_state, screena_enable_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1H
+	mainlatch.q_out_cb<3>().set(FUNC(crgolf_state::color_select_w));
+	mainlatch.q_out_cb<4>().set(FUNC(crgolf_state::screen_flip_w));
+	mainlatch.q_out_cb<5>().set(FUNC(crgolf_state::screen_select_w));
+	mainlatch.q_out_cb<6>().set(FUNC(crgolf_state::screenb_enable_w));
+	mainlatch.q_out_cb<7>().set(FUNC(crgolf_state::screena_enable_w));
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -484,12 +491,9 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000) /* technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
+
+	/* stride is technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&crgolf_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
 
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(crgolf_state, crgolf)
@@ -504,8 +508,8 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -513,8 +517,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(crgolf_state::crgolfhi)
 	crgolf(config);
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(crgolf_state, vck_callback))
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, crgolf_state, vck_callback))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -524,15 +528,15 @@ MACHINE_CONFIG_START(crgolf_state::mastrglf)
 	crgolfhi(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mastrglf_map)
-	MCFG_CPU_IO_MAP(mastrglf_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mastrglf_map)
+	MCFG_DEVICE_IO_MAP(mastrglf_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(mastrglf_submap)
-	MCFG_CPU_IO_MAP(mastrglf_subio)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(mastrglf_submap)
+	MCFG_DEVICE_IO_MAP(mastrglf_subio)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
 
 	MCFG_DEVICE_REMOVE("palette")
 
@@ -731,22 +735,22 @@ ROM_END
 
 ROM_START( mastrglf )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "M-GF_A1.4A.27128", 0x00000, 0x04000, CRC(55b89e8f) SHA1(2860fd3f8e4241dc25bb9a14e8967cdcaf769432) )
+	ROM_LOAD( "m-gf_a1.4a.27128", 0x00000, 0x04000, CRC(55b89e8f) SHA1(2860fd3f8e4241dc25bb9a14e8967cdcaf769432) )
 
 	ROM_REGION( 0x30000, "maindata", 0 ) // 24 (0x18) * 0x2000 banks
-	ROM_LOAD( "M-GF_A2.5A.27256.ROM5",   0x00000, 0x08000, CRC(98aa20d8) SHA1(64007c4706f8e2e3b57c4a8467b37d44e8be9a01) )
-	ROM_LOAD( "M-GF_A3.7A.27256.ROM4",   0x08000, 0x08000, CRC(3f62b979) SHA1(90cc784230f6ed7fd3dd943e0808f0c3d722806a) )
-	ROM_LOAD( "M-GF_A4.8A.27256.ROM3",   0x10000, 0x08000, CRC(08a470d1) SHA1(4dabff8fc915406b1d4f7936d925378eec0df915) )
-	ROM_LOAD( "M-GF_A5.10A.27256.ROM2",  0x18000, 0x08000, CRC(4397c8a0) SHA1(deb9de1cf7ce6ddc69addf18ff5bf2f25ed11602) )
-	ROM_LOAD( "M-GF_A6.12A.27256.ROM1",  0x20000, 0x08000, CRC(b1fccecf) SHA1(8fb5e40f34596d9faa73255afc2c2635e9008954) )
-	ROM_LOAD( "M-GF_A7.13A.27256.ROM0",  0x28000, 0x08000, CRC(06075e41) SHA1(3426f4ede8449288519e25bc8a1d679bb5137279) )
+	ROM_LOAD( "m-gf_a2.5a.27256.rom5",   0x00000, 0x08000, CRC(98aa20d8) SHA1(64007c4706f8e2e3b57c4a8467b37d44e8be9a01) )
+	ROM_LOAD( "m-gf_a3.7a.27256.rom4",   0x08000, 0x08000, CRC(3f62b979) SHA1(90cc784230f6ed7fd3dd943e0808f0c3d722806a) )
+	ROM_LOAD( "m-gf_a4.8a.27256.rom3",   0x10000, 0x08000, CRC(08a470d1) SHA1(4dabff8fc915406b1d4f7936d925378eec0df915) )
+	ROM_LOAD( "m-gf_a5.10a.27256.rom2",  0x18000, 0x08000, CRC(4397c8a0) SHA1(deb9de1cf7ce6ddc69addf18ff5bf2f25ed11602) )
+	ROM_LOAD( "m-gf_a6.12a.27256.rom1",  0x20000, 0x08000, CRC(b1fccecf) SHA1(8fb5e40f34596d9faa73255afc2c2635e9008954) )
+	ROM_LOAD( "m-gf_a7.13a.27256.rom0",  0x28000, 0x08000, CRC(06075e41) SHA1(3426f4ede8449288519e25bc8a1d679bb5137279) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // next to large module
-	ROM_LOAD( "M-GF_A10.12K.27256", 0x00000, 0x08000, CRC(d145b144) SHA1(52370d56106f0280c52266b5a727493a3396a8e3) )
+	ROM_LOAD( "m-gf_a10.12k.27256", 0x00000, 0x08000, CRC(d145b144) SHA1(52370d56106f0280c52266b5a727493a3396a8e3) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 ) // MSM5205 samples
-	ROM_LOAD( "M-GF_A8.15A.27256",  0x00000, 0x08000, CRC(9ea9183b) SHA1(55f54575cd662b6194f69532baa25c9b2272760f) )
-	ROM_LOAD( "M-GF_A9.16A.27256",  0x08000, 0x08000, CRC(61ab715f) SHA1(6b9cccaa83a9a9e44a46bae796e2f9eaa9f9c951) )
+	ROM_LOAD( "m-gf_a8.15a.27256",  0x00000, 0x08000, CRC(9ea9183b) SHA1(55f54575cd662b6194f69532baa25c9b2272760f) )
+	ROM_LOAD( "m-gf_a9.16a.27256",  0x08000, 0x08000, CRC(61ab715f) SHA1(6b9cccaa83a9a9e44a46bae796e2f9eaa9f9c951) )
 
 	ROM_REGION( 0x0300,  "proms", 0 )
 	ROM_LOAD( "tbp24s10n.1", 0x0000, 0x0100, NO_DUMP )
@@ -764,7 +768,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(crgolf_state,crgolfhi)
+void crgolf_state::init_crgolfhi()
 {
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(FUNC(crgolf_state::crgolfhi_sample_w),this));
 }
@@ -777,11 +781,11 @@ DRIVER_INIT_MEMBER(crgolf_state,crgolfhi)
  *
  *************************************/
 
-GAME( 1984, crgolf,   0,      crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state, crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolf,   0,      crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state, init_crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, mastrglf, 0,      mastrglf, crgolf, crgolf_state, 0,        ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, mastrglf, 0,      mastrglf, crgolf, crgolf_state, empty_init,    ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

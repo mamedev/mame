@@ -27,6 +27,7 @@
 #include "machine/pic8259.h"
 #include "machine/km035.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -78,6 +79,9 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::KEYBOARD; }
 
+	void sm7238(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(sm7238);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -89,11 +93,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sm7238(machine_config &config);
 	void sm7238_io(address_map &map);
 	void sm7238_mem(address_map &map);
 	void videobank_map(address_map &map);
-private:
+
 	void recompute_parameters();
 
 	struct
@@ -125,37 +128,37 @@ private:
 	required_device<screen_device> m_screen;
 };
 
-ADDRESS_MAP_START(sm7238_state::sm7238_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x0000, 0x9fff) AM_ROM
-	AM_RANGE (0xa000, 0xa7ff) AM_RAM
-	AM_RANGE (0xb000, 0xb3ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE (0xb800, 0xb800) AM_WRITE(text_control_w)
-	AM_RANGE (0xbc00, 0xbc00) AM_WRITE(control_w)
-	AM_RANGE (0xc000, 0xcfff) AM_RAM // chargen
-	AM_RANGE (0xe000, 0xffff) AM_DEVICE("videobank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void sm7238_state::sm7238_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xa7ff).ram();
+	map(0xb000, 0xb3ff).ram().share("nvram");
+	map(0xb800, 0xb800).w(FUNC(sm7238_state::text_control_w));
+	map(0xbc00, 0xbc00).w(FUNC(sm7238_state::control_w));
+	map(0xc000, 0xcfff).ram(); // chargen
+	map(0xe000, 0xffff).m(m_videobank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(sm7238_state::videobank_map)
-	AM_RANGE (0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE (0x2000, 0x2fff) AM_MIRROR(0x1000) AM_WRITE(vmem_w)
-ADDRESS_MAP_END
+void sm7238_state::videobank_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("videoram");
+	map(0x2000, 0x2fff).mirror(0x1000).w(FUNC(sm7238_state::vmem_w));
+}
 
-ADDRESS_MAP_START(sm7238_state::sm7238_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void sm7238_state::sm7238_io(address_map &map)
+{
+	map.unmap_value_high();
 //  AM_RANGE (0x40, 0x4f) AM_RAM // LUT
-	AM_RANGE (0xa0, 0xa0) AM_DEVREADWRITE("i8251line", i8251_device, data_r, data_w)
-	AM_RANGE (0xa1, 0xa1) AM_DEVREADWRITE("i8251line", i8251_device, status_r, control_w)
-	AM_RANGE (0xa4, 0xa4) AM_DEVREADWRITE("i8251kbd", i8251_device, data_r, data_w)
-	AM_RANGE (0xa5, 0xa5) AM_DEVREADWRITE("i8251kbd", i8251_device, status_r, control_w)
-	AM_RANGE (0xa8, 0xab) AM_DEVREADWRITE("t_color", pit8253_device, read, write)
-	AM_RANGE (0xac, 0xad) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE (0xb0, 0xb3) AM_DEVREADWRITE("t_hblank", pit8253_device, read, write)
-	AM_RANGE (0xb4, 0xb7) AM_DEVREADWRITE("t_vblank", pit8253_device, read, write)
-	AM_RANGE (0xb8, 0xb8) AM_DEVREADWRITE("i8251prn", i8251_device, data_r, data_w)
-	AM_RANGE (0xb9, 0xb9) AM_DEVREADWRITE("i8251prn", i8251_device, status_r, control_w)
-	AM_RANGE (0xbc, 0xbf) AM_DEVREADWRITE("t_iface", pit8253_device, read, write)
-ADDRESS_MAP_END
+	map(0xa0, 0xa1).rw(m_i8251line, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xa4, 0xa5).rw(m_i8251kbd, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xa8, 0xab).rw(m_t_color, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xac, 0xad).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xb0, 0xb3).rw(m_t_hblank, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xb4, 0xb7).rw(m_t_vblank, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xb8, 0xb9).rw(m_i8251prn, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xbc, 0xbf).rw(m_t_iface, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+}
 
 void sm7238_state::machine_reset()
 {
@@ -346,7 +349,7 @@ static const gfx_layout sm7238_charlayout =
 	16*8                 /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( sm7238 )
+static GFXDECODE_START( gfx_sm7238 )
 	GFXDECODE_ENTRY("chargen", 0x0000, sm7238_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -358,77 +361,73 @@ PALETTE_INIT_MEMBER(sm7238_state, sm7238)
 }
 
 MACHINE_CONFIG_START(sm7238_state::sm7238)
-	MCFG_CPU_ADD("maincpu", I8080, 16.5888_MHz_XTAL/9)
-	MCFG_CPU_PROGRAM_MAP(sm7238_mem)
-	MCFG_CPU_IO_MAP(sm7238_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8080, 16.5888_MHz_XTAL/9)
+	MCFG_DEVICE_PROGRAM_MAP(sm7238_mem)
+	MCFG_DEVICE_IO_MAP(sm7238_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("videobank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(videobank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "videobank").set_map(&sm7238_state::videobank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(20.625_MHz_XTAL, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
 	MCFG_SCREEN_UPDATE_DRIVER(sm7238_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm7238_state, sm7238)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm7238)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm7238)
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("t_hblank", PIT8253, 0)
 	MCFG_PIT8253_CLK1(16.384_MHz_XTAL/9) // XXX workaround -- keyboard is slower and doesn't sync otherwise
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(sm7238_state, write_keyboard_clock))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, sm7238_state, write_keyboard_clock))
 
 	MCFG_DEVICE_ADD("t_vblank", PIT8253, 0)
 	MCFG_PIT8253_CLK2(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(sm7238_state, write_printer_clock))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, sm7238_state, write_printer_clock))
 
 	MCFG_DEVICE_ADD("t_color", PIT8253, 0)
 
 	MCFG_DEVICE_ADD("t_iface", PIT8253, 0)
 	MCFG_PIT8253_CLK1(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_txc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("i8251line", i8251_device, write_txc))
 	MCFG_PIT8253_CLK2(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("i8251line", i8251_device, write_rxc))
 
 	// serial connection to host
-	MCFG_DEVICE_ADD("i8251line", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir1_w))
+	I8251(config, m_i8251line, 0);
+	m_i8251line->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251line->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_i8251line->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_i8251line->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251line", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
 
 	// serial connection to KM-035 keyboard
-	MCFG_DEVICE_ADD("i8251kbd", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", km035_device, write_rxd))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
+	I8251(config, m_i8251kbd, 0);
+	m_i8251kbd->txd_handler().set("keyboard", FUNC(km035_device::write_rxd));
+	m_i8251kbd->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir3_w));
 
 	MCFG_DEVICE_ADD("keyboard", KM035, 0)
-	MCFG_KM035_TX_HANDLER(DEVWRITELINE("i8251kbd", i8251_device, write_rxd))
-	MCFG_KM035_RTS_HANDLER(DEVWRITELINE("i8251kbd", i8251_device, write_cts))
+	MCFG_KM035_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
+	MCFG_KM035_RTS_HANDLER(WRITELINE("i8251kbd", i8251_device, write_cts))
 
 	// serial connection to printer
-	MCFG_DEVICE_ADD("i8251prn", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
+	I8251(config, m_i8251prn, 0);
+	m_i8251prn->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir3_w));
 
-	MCFG_RS232_PORT_ADD("prtr", default_rs232_devices, 0)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251prn", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("i8251prn", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251prn", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("prtr", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251prn", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251prn", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251prn", i8251_device, write_dsr))
 MACHINE_CONFIG_END
 
 ROM_START( sm7238 )
@@ -446,5 +445,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE             INIT   COMPANY     FULLNAME       FLAGS
-COMP( 1989, sm7238,   0,      0,       sm7238,    0,       sm7238_state,     0,     "USSR",     "SM 7238",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1989, sm7238, 0,      0,      sm7238,  0,     sm7238_state, empty_init, "USSR",  "SM 7238", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )

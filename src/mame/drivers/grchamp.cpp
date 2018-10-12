@@ -95,6 +95,7 @@
 
 void grchamp_state::machine_start()
 {
+	m_digits.resolve();
 	m_soundlatch_data = 0x00;
 	m_soundlatch_flag = false;
 	save_item(NAME(m_cpu0_out));
@@ -245,7 +246,7 @@ WRITE8_MEMBER(grchamp_state::led_board_w)
 
 		case 0x0c:
 			m_ledram[m_ledaddr & 0x07] = m_ledlatch;
-			output().set_digit_value(m_ledaddr & 0x07, ls247_map[m_ledram[m_ledaddr & 0x07] & 0x0f]);
+			m_digits[m_ledaddr & 0x07] = ls247_map[m_ledram[m_ledaddr & 0x07] & 0x0f];
 			/*
 			    ledram[0] & 0x0f = score LSD
 			    ledram[1] & 0x0f = score
@@ -527,7 +528,7 @@ static const gfx_layout tile_layout =
 	16*8
 };
 
-static GFXDECODE_START( grchamp )
+static GFXDECODE_START( gfx_grchamp )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,  0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,       0, 2 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,       0, 2 )
@@ -544,49 +545,53 @@ GFXDECODE_END
  *************************************/
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(grchamp_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("radarram")
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x5800, 0x58ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void grchamp_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().share("radarram");
+	map(0x5000, 0x53ff).mirror(0x0400).ram().share("videoram");
+	map(0x5800, 0x58ff).mirror(0x0700).ram().share("spriteram");
+}
 
 
-ADDRESS_MAP_START(grchamp_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x78) AM_READ_PORT("ACCEL")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x78) AM_READ(sub_to_main_comm_r)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x78) AM_READ_PORT("WHEEL")
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x78) AM_READ_PORT("DSWA")
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_READ_PORT("DSWB")
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0x78) AM_READ_PORT("TILT")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x60) AM_READ(pc3259_0_r)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0x60) AM_READ(pc3259_1_r)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x60) AM_READ(pc3259_2_r)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0x60) AM_READ(pc3259_3_r)
-	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x40) AM_WRITE(cpu0_outputs_w)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0x40) AM_WRITE(main_to_sub_comm_w)
-	AM_RANGE(0x20, 0x20) AM_SELECT(0x0c) AM_MIRROR(0x53) AM_WRITE(led_board_w)
-ADDRESS_MAP_END
+void grchamp_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x78).portr("ACCEL");
+	map(0x02, 0x02).mirror(0x78).r(FUNC(grchamp_state::sub_to_main_comm_r));
+	map(0x03, 0x03).mirror(0x78).portr("WHEEL");
+	map(0x04, 0x04).mirror(0x78).portr("DSWA");
+	map(0x05, 0x05).mirror(0x78).portr("DSWB");
+	map(0x06, 0x06).mirror(0x78).portr("TILT");
+	map(0x01, 0x01).mirror(0x60).r(FUNC(grchamp_state::pc3259_0_r));
+	map(0x09, 0x09).mirror(0x60).r(FUNC(grchamp_state::pc3259_1_r));
+	map(0x11, 0x11).mirror(0x60).r(FUNC(grchamp_state::pc3259_2_r));
+	map(0x19, 0x19).mirror(0x60).r(FUNC(grchamp_state::pc3259_3_r));
+	map(0x00, 0x0f).mirror(0x40).w(FUNC(grchamp_state::cpu0_outputs_w));
+	map(0x10, 0x13).mirror(0x40).w(FUNC(grchamp_state::main_to_sub_comm_w));
+	map(0x20, 0x20).select(0x0c).mirror(0x53).w(FUNC(grchamp_state::led_board_w));
+}
 
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(grchamp_state::sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(left_w) AM_SHARE("leftram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(right_w) AM_SHARE("rightram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(center_w) AM_SHARE("centerram")
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x5000, 0x6fff) AM_ROM
-ADDRESS_MAP_END
+void grchamp_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram().w(FUNC(grchamp_state::left_w)).share("leftram");
+	map(0x2800, 0x2fff).ram().w(FUNC(grchamp_state::right_w)).share("rightram");
+	map(0x3000, 0x37ff).ram().w(FUNC(grchamp_state::center_w)).share("centerram");
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x5000, 0x6fff).rom();
+}
 
 
-ADDRESS_MAP_START(grchamp_state::sub_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_READ(main_to_sub_comm_r)
-	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x70) AM_WRITE(cpu1_outputs_w)
-ADDRESS_MAP_END
+void grchamp_state::sub_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).r(FUNC(grchamp_state::main_to_sub_comm_r));
+	map(0x00, 0x0f).mirror(0x70).w(FUNC(grchamp_state::cpu1_outputs_w));
+}
 
 
 /* complete memory map derived from schematics;
@@ -619,19 +624,20 @@ ADDRESS_MAP_END
  0  1  0  1  0  x  x  x  x  x  x  x  x  x  0  1   W   OPEN BUS
  0  1  0  1  0  x  x  x  x  x  x  x  x  x  1  x   RW  OPEN BUS
 */
-ADDRESS_MAP_START(grchamp_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	// 2000-3fff are empty rom sockets
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x4801) AM_MIRROR(0x07f8) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x4801, 0x4801) AM_MIRROR(0x07f8) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x4802, 0x4803) AM_MIRROR(0x07f8) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x4803, 0x4803) AM_MIRROR(0x07f8) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x4804, 0x4805) AM_MIRROR(0x07fa) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-	AM_RANGE(0x4805, 0x4805) AM_MIRROR(0x07fa) AM_DEVREAD("ay3", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x07fc) AM_READ(soundlatch_r) AM_WRITE(soundlatch_clear7_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0x07fc) AM_READ(soundlatch_flags_r) AM_WRITENOP // writes here on taitosj reset the secondary semaphore, which doesn't exist on grchamp, but the code tries to reset it anyway!
-ADDRESS_MAP_END
+void grchamp_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3005).nopr().nopw();
+	map(0x4000, 0x43ff).ram();
+	map(0x4800, 0x4801).mirror(0x07f8).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x4801, 0x4801).mirror(0x07f8).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x4802, 0x4803).mirror(0x07f8).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x4803, 0x4803).mirror(0x07f8).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x4804, 0x4805).mirror(0x07fa).w("ay3", FUNC(ay8910_device::address_data_w));
+	map(0x4805, 0x4805).mirror(0x07fa).r("ay3", FUNC(ay8910_device::data_r));
+	map(0x5000, 0x5000).mirror(0x07fc).r(FUNC(grchamp_state::soundlatch_r)).w(FUNC(grchamp_state::soundlatch_clear7_w));
+	map(0x5001, 0x5001).mirror(0x07fc).r(FUNC(grchamp_state::soundlatch_flags_r)).nopw(); // writes here on taitosj reset the secondary semaphore, which doesn't exist on grchamp, but the code tries to reset it anyway!
+}
 
 
 
@@ -733,58 +739,56 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 
 	/* basic machine hardware */
 	/* CPU BOARD */
-	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu0_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu0_interrupt)
 
 	/* GAME BOARD */
-	MCFG_CPU_ADD("sub", Z80, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(sub_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu1_interrupt)
+	MCFG_DEVICE_ADD("sub", Z80, PIXEL_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_IO_MAP(sub_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu1_interrupt)
 
 	/* SOUND BOARD */
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grchamp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grchamp)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(grchamp_state, grchamp)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(grchamp_state, screen_update)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, portB_0_w))
+	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, grchamp_state, portA_0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("ay2", AY8910, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, portB_2_w))
+	MCFG_DEVICE_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, grchamp_state, portA_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(grchamp)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, grchamp_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -843,6 +847,103 @@ ROM_START( grchamp )
 	ROM_LOAD( "gr09.bpr", 0x20, 0x20, CRC(260fb2b9) SHA1(db0bf49f12a944613d113317d7dfea25bd7469fc) ) /* sprite/text colors */
 ROM_END
 
+ROM_START( grchampa )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "gr05a",  0x0000, 0x1000, CRC(4e54eeeb) SHA1(e8327e2a4596233f5f4a4dbf7cdf90f67447fc2a) )
+	ROM_LOAD( "gr06",   0x1000, 0x1000, CRC(4afd9fb2) SHA1(93b6829b5196cbeb37925bda29722f02a9ef83be) )
+	ROM_LOAD( "gr07-1", 0x2000, 0x1000, CRC(4deed8a1) SHA1(4616e1467bc696272117ad3f55cbff420c7e1deb) )
+	ROM_LOAD( "gr08",   0x3000, 0x1000, CRC(2e0670ab) SHA1(b9a39133d60f1d8316005f9d029db63f4e486174) )
+
+	ROM_REGION( 0x8000, "sub", 0 )
+	ROM_LOAD( "gr18",   0x0000, 0x1000, CRC(becd0e81) SHA1(a5469711efab6c4befed7a5ecdccf5d14e6e0aa9) )
+	ROM_LOAD( "gr17",   0x1000, 0x1000, CRC(aeba2f28) SHA1(c3efe5fede642465d42a1317d114bddd0b961884) )
+	ROM_LOAD( "gr16",   0x5000, 0x1000, CRC(885d708e) SHA1(d5d2978a0eeca167ec1fb9f6f981388de46fbf81) )
+	ROM_LOAD( "gr15",   0x6000, 0x1000, CRC(a822430b) SHA1(4d29612489362d2dc3f3a9eab609902a50c34aff) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "gr24",   0x0000, 0x0800, CRC(66621fa8) SHA1(957f60fbf4bc0a36931a8c2bde05aea1f9e6671f) )
+	ROM_LOAD( "gr25",   0x0800, 0x0800, CRC(9b8cdbf1) SHA1(e96af63896b8af0e2ed5a94172c6efdaaf56f678) )
+	ROM_LOAD( "gr26",   0x1000, 0x0800, CRC(335b0f73) SHA1(790c31cda27efd149ddaab695852cad121fa1586) )
+	ROM_LOAD( "gr27",   0x1800, 0x0800, CRC(3bad8c2e) SHA1(0a429c687f95b995979f995a44238f44c00a5a63) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* characters/sprites */
+	ROM_LOAD( "gr04",   0x0000, 0x0800, CRC(7617e65c) SHA1(c83c15cff14a9d7acc2696807b3f0c1b83d095c8) )
+	ROM_LOAD( "gr03",   0x0800, 0x0800, CRC(e7bdf2ee) SHA1(343d8a2b9e11cbe47d66f698150036f4a7d51c84) )
+	ROM_LOAD( "gr02",   0x1000, 0x0800, CRC(7d60dd41) SHA1(9021ad635acc65341532280f9ba1f349ac3a5af0) )
+	ROM_LOAD( "gr01",   0x1800, 0x0800, CRC(5f13ae33) SHA1(b9c05c9e3f5676c6bcd4019f6ac82277d56d253e) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 ) /* left tiles */
+	ROM_LOAD( "gr20",   0x0000, 0x1000, CRC(88ba2c03) SHA1(4dfd136f122663223043c6cd79566f8eeec72681) )
+	ROM_LOAD( "gr19",   0x1000, 0x1000, CRC(ff34b444) SHA1(51c67a1691da3a2d8ddcff5fd8fa816b1f9c60c0) )
+
+	ROM_REGION( 0x2000, "gfx3", 0 ) /* right tiles */
+	ROM_LOAD( "gr21",   0x0000, 0x1000, CRC(2f77a9f3) SHA1(9e20a776c5e8c7577c3e8467d4f8ac7ac909901f) )
+	ROM_LOAD( "gr22",   0x1000, 0x1000, CRC(31bb5fc7) SHA1(9f638e632e7c72461bedecb710ac9b30f015eebf) )
+
+	ROM_REGION( 0x2000, "gfx4", 0 ) /* center tiles */
+	ROM_LOAD( "gr13",   0x0000, 0x1000, CRC(d5e19ebd) SHA1(d0ca553eec87619ec489f7ba6238f1fdde7c480b) )
+	ROM_LOAD( "gr14",   0x1000, 0x1000, CRC(d129b8e4) SHA1(db25bfde2a48e14d38a43133d88d479c3cc1397a) )
+
+	ROM_REGION( 0x0800, "gfx5", 0 ) /* rain */
+	ROM_LOAD( "gr10",   0x0000, 0x0800, CRC(b1f0a873) SHA1(f7ef1a16556ae3e7d70209bcb38ea3ae94208789) )
+
+	ROM_REGION( 0x0800, "gfx6", 0 ) /* headlights */
+	ROM_LOAD( "gr12",   0x0000, 0x0800, CRC(f3bc599e) SHA1(3ec19584896a0bf10b9c5750f3c78ad3e722cc49) )
+
+	ROM_REGION( 0x1000, "gfx7", 0 ) /* player */
+	ROM_LOAD( "gr11",   0x0000, 0x1000, CRC(54eb3ec9) SHA1(22739240f53c708d8e53094d96916778e12beeed) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "gr23.bpr", 0x00, 0x20, CRC(41c6c48d) SHA1(8bd14b5f02f9da0a68e3125955be18462b57401d) ) /* background colors */
+	ROM_LOAD( "gr09.bpr", 0x20, 0x20, CRC(260fb2b9) SHA1(db0bf49f12a944613d113317d7dfea25bd7469fc) ) /* sprite/text colors */
+ROM_END
+
+ROM_START( grchampb )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "gg01-a", 0x0000, 0x1000, CRC(9a815139) SHA1(0f4ea577c12dd13da9fa114d6a1653cb516324f3) )
+	ROM_LOAD( "gg02-a", 0x1000, 0x1000, CRC(e35ac684) SHA1(202899f1b55f68ea6017b18b149f254735661bea) )
+	ROM_LOAD( "gg03",   0x2000, 0x1000, CRC(feb0ad96) SHA1(1335725d25777f9c462b4c97f7a268378dc7753d) )
+	ROM_LOAD( "gg04",   0x3000, 0x1000, CRC(afabfe96) SHA1(d265595522ccf94395f2235c02d8c37f1ada9950) )
+
+	ROM_REGION( 0x8000, "sub", 0 )
+	ROM_LOAD( "gm09",   0x0000, 0x1000, CRC(d57bd109) SHA1(d1cb5ba783eaceda45893f6404fe9dbac740a2de) )
+	ROM_LOAD( "gm10",   0x1000, 0x1000, CRC(41ba07f1) SHA1(103eeacdd36b4347fc62debb6b5f4163083313f4) )
+	ROM_LOAD( "gr16",   0x5000, 0x1000, CRC(885d708e) SHA1(d5d2978a0eeca167ec1fb9f6f981388de46fbf81) )
+	ROM_LOAD( "gr15",   0x6000, 0x1000, CRC(a822430b) SHA1(4d29612489362d2dc3f3a9eab609902a50c34aff) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "gm07",   0x0000, 0x1000, CRC(65dcc572) SHA1(c9b19af365fa7ade2698be0bb892591ba281ecb0) )
+	ROM_LOAD( "gm08",   0x1000, 0x1000, CRC(224d880c) SHA1(68aaaa0213d09cf34ba50c91d8c031d041f8a76f) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* characters/sprites */
+	ROM_LOAD( "gm02",   0x0000, 0x1000, CRC(5911948d) SHA1(6f3a9a7f8d6a04b8e6d83756764c9c4185983d9b) )
+	ROM_LOAD( "gm01",   0x1000, 0x1000, CRC(846f8e89) SHA1(346bfd69268606fde27643b4d135b481536b73b1) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 ) /* left tiles */
+	ROM_LOAD( "gr20",   0x0000, 0x1000, CRC(88ba2c03) SHA1(4dfd136f122663223043c6cd79566f8eeec72681) )
+	ROM_LOAD( "gr19",   0x1000, 0x1000, CRC(ff34b444) SHA1(51c67a1691da3a2d8ddcff5fd8fa816b1f9c60c0) )
+
+	ROM_REGION( 0x2000, "gfx3", 0 ) /* right tiles */
+	ROM_LOAD( "gr21",   0x0000, 0x1000, CRC(2f77a9f3) SHA1(9e20a776c5e8c7577c3e8467d4f8ac7ac909901f) )
+	ROM_LOAD( "gr22",   0x1000, 0x1000, CRC(31bb5fc7) SHA1(9f638e632e7c72461bedecb710ac9b30f015eebf) )
+
+	ROM_REGION( 0x2000, "gfx4", 0 ) /* center tiles */
+	ROM_LOAD( "gr13",   0x0000, 0x1000, CRC(d5e19ebd) SHA1(d0ca553eec87619ec489f7ba6238f1fdde7c480b) )
+	ROM_LOAD( "gr14",   0x1000, 0x1000, CRC(d129b8e4) SHA1(db25bfde2a48e14d38a43133d88d479c3cc1397a) )
+
+	ROM_REGION( 0x0800, "gfx5", 0 ) /* rain */
+	ROM_LOAD( "gr10",   0x0000, 0x0800, CRC(b1f0a873) SHA1(f7ef1a16556ae3e7d70209bcb38ea3ae94208789) )
+
+	ROM_REGION( 0x0800, "gfx6", 0 ) /* headlights */
+	ROM_LOAD( "gr12",   0x0000, 0x0800, CRC(f3bc599e) SHA1(3ec19584896a0bf10b9c5750f3c78ad3e722cc49) )
+
+	ROM_REGION( 0x1000, "gfx7", 0 ) /* player */
+	ROM_LOAD( "gr11",   0x0000, 0x1000, CRC(54eb3ec9) SHA1(22739240f53c708d8e53094d96916778e12beeed) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "gr23.bpr", 0x00, 0x20, CRC(41c6c48d) SHA1(8bd14b5f02f9da0a68e3125955be18462b57401d) ) /* background colors */
+	ROM_LOAD( "gr09.bpr", 0x20, 0x20, CRC(260fb2b9) SHA1(db0bf49f12a944613d113317d7dfea25bd7469fc) ) /* sprite/text colors */
+ROM_END
 
 
 /*************************************
@@ -851,4 +952,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, grchamp, 0, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
+GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )

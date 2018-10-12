@@ -30,7 +30,7 @@ enum
 #define Z8000_HALT      0x0100  /* halted flag  */
 
 #define MCFG_Z8000_MO(_devcb) \
-	devcb = &downcast<z8002_device &>(*device).set_mo_callback(DEVCB_##_devcb);
+	downcast<z8002_device &>(*device).set_mo_callback(DEVCB_##_devcb);
 
 class z8002_device : public cpu_device, public z8000_disassembler::config
 {
@@ -53,7 +53,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 2; }
 	virtual uint32_t execute_max_cycles() const override { return 744; }
 	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -64,7 +65,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	void init_tables();
 
@@ -96,7 +97,7 @@ protected:
 	int m_mi;
 	address_space *m_program;
 	address_space *m_data;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_io;
 	int m_icount;
 	int m_vector_mult;

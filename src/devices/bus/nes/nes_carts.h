@@ -13,7 +13,7 @@
 
 
 // supported devices
-SLOT_INTERFACE_EXTERN(nes_cart);
-SLOT_INTERFACE_EXTERN(disksys_only);
+void nes_cart(device_slot_interface &device);
+void disksys_only(device_slot_interface &device);
 
 #endif // MAME_BUS_NES_NES_CARTS_H

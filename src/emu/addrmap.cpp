@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "romload.h"
 #include "validity.h"
 
 
@@ -73,6 +74,7 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 		m_share(nullptr),
 		m_region(nullptr),
 		m_rgnoffs(0),
+		m_submap_device(nullptr),
 		m_memory(nullptr)
 {
 }
@@ -97,7 +99,7 @@ address_map_entry &address_map_entry::mask(offs_t _mask)
 
 address_map_entry &address_map_entry::umask16(u16 _mask)
 {
-	m_mask = (u64(_mask) << 48) | (u64(_mask) << 32) | (_mask << 16) | _mask;
+	m_mask = (u64(_mask) << 48) | (u64(_mask) << 32) | (u64(_mask) << 16) | _mask;
 	return *this;
 }
 
@@ -135,6 +137,18 @@ address_map_entry &address_map_entry::m(const char *tag, address_map_constructor
 	m_read.m_tag = tag;
 	m_write.m_type = AMH_DEVICE_SUBMAP;
 	m_write.m_tag = tag;
+	m_submap_device = nullptr;
+	m_submap_delegate = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::m(device_t *device, address_map_constructor func)
+{
+	m_read.m_type = AMH_DEVICE_SUBMAP;
+	m_read.m_tag = nullptr;
+	m_write.m_type = AMH_DEVICE_SUBMAP;
+	m_write.m_tag = nullptr;
+	m_submap_device = device;
 	m_submap_delegate = func;
 	return *this;
 }
@@ -155,7 +169,6 @@ address_map_entry &address_map_entry::r(read8_delegate func)
 	return *this;
 }
 
-
 address_map_entry &address_map_entry::w(write8_delegate func)
 {
 	assert(!func.isnull());
@@ -166,11 +179,103 @@ address_map_entry &address_map_entry::w(write8_delegate func)
 	return *this;
 }
 
-
-address_map_entry &address_map_entry::rw(read8_delegate rfunc, write8_delegate wfunc)
+address_map_entry &address_map_entry::r(read8m_delegate func)
 {
-	r(rfunc);
-	w(wfunc);
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_M;
+	m_read.m_bits = 8;
+	m_read.m_name = func.name();
+	m_rproto8m = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write8m_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_M;
+	m_write.m_bits = 8;
+	m_write.m_name = func.name();
+	m_wproto8m = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read8s_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_S;
+	m_read.m_bits = 8;
+	m_read.m_name = func.name();
+	m_rproto8s = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write8s_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_S;
+	m_write.m_bits = 8;
+	m_write.m_name = func.name();
+	m_wproto8s = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read8sm_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_SM;
+	m_read.m_bits = 8;
+	m_read.m_name = func.name();
+	m_rproto8sm = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write8sm_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_SM;
+	m_write.m_bits = 8;
+	m_write.m_name = func.name();
+	m_wproto8sm = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read8mo_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_MO;
+	m_read.m_bits = 8;
+	m_read.m_name = func.name();
+	m_rproto8mo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write8mo_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_MO;
+	m_write.m_bits = 8;
+	m_write.m_name = func.name();
+	m_wproto8mo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read8smo_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_SMO;
+	m_read.m_bits = 8;
+	m_read.m_name = func.name();
+	m_rproto8smo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write8smo_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_SMO;
+	m_write.m_bits = 8;
+	m_write.m_name = func.name();
+	m_wproto8smo = func;
 	return *this;
 }
 
@@ -190,7 +295,6 @@ address_map_entry &address_map_entry::r(read16_delegate func)
 	return *this;
 }
 
-
 address_map_entry &address_map_entry::w(write16_delegate func)
 {
 	assert(!func.isnull());
@@ -201,11 +305,103 @@ address_map_entry &address_map_entry::w(write16_delegate func)
 	return *this;
 }
 
-
-address_map_entry &address_map_entry::rw(read16_delegate rfunc, write16_delegate wfunc)
+address_map_entry &address_map_entry::r(read16m_delegate func)
 {
-	r(rfunc);
-	w(wfunc);
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_M;
+	m_read.m_bits = 16;
+	m_read.m_name = func.name();
+	m_rproto16m = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write16m_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_M;
+	m_write.m_bits = 16;
+	m_write.m_name = func.name();
+	m_wproto16m = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read16s_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_S;
+	m_read.m_bits = 16;
+	m_read.m_name = func.name();
+	m_rproto16s = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write16s_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_S;
+	m_write.m_bits = 16;
+	m_write.m_name = func.name();
+	m_wproto16s = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read16sm_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_SM;
+	m_read.m_bits = 16;
+	m_read.m_name = func.name();
+	m_rproto16sm = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write16sm_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_SM;
+	m_write.m_bits = 16;
+	m_write.m_name = func.name();
+	m_wproto16sm = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read16mo_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_MO;
+	m_read.m_bits = 16;
+	m_read.m_name = func.name();
+	m_rproto16mo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write16mo_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_MO;
+	m_write.m_bits = 16;
+	m_write.m_name = func.name();
+	m_wproto16mo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read16smo_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_SMO;
+	m_read.m_bits = 16;
+	m_read.m_name = func.name();
+	m_rproto16smo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write16smo_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_SMO;
+	m_write.m_bits = 16;
+	m_write.m_name = func.name();
+	m_wproto16smo = func;
 	return *this;
 }
 
@@ -225,7 +421,6 @@ address_map_entry &address_map_entry::r(read32_delegate func)
 	return *this;
 }
 
-
 address_map_entry &address_map_entry::w(write32_delegate func)
 {
 	assert(!func.isnull());
@@ -236,14 +431,105 @@ address_map_entry &address_map_entry::w(write32_delegate func)
 	return *this;
 }
 
-
-address_map_entry &address_map_entry::rw(read32_delegate rfunc, write32_delegate wfunc)
+address_map_entry &address_map_entry::r(read32m_delegate func)
 {
-	r(rfunc);
-	w(wfunc);
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_M;
+	m_read.m_bits = 32;
+	m_read.m_name = func.name();
+	m_rproto32m = func;
 	return *this;
 }
 
+address_map_entry &address_map_entry::w(write32m_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_M;
+	m_write.m_bits = 32;
+	m_write.m_name = func.name();
+	m_wproto32m = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read32s_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_S;
+	m_read.m_bits = 32;
+	m_read.m_name = func.name();
+	m_rproto32s = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write32s_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_S;
+	m_write.m_bits = 32;
+	m_write.m_name = func.name();
+	m_wproto32s = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read32sm_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_SM;
+	m_read.m_bits = 32;
+	m_read.m_name = func.name();
+	m_rproto32sm = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write32sm_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_SM;
+	m_write.m_bits = 32;
+	m_write.m_name = func.name();
+	m_wproto32sm = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read32mo_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_MO;
+	m_read.m_bits = 32;
+	m_read.m_name = func.name();
+	m_rproto32mo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write32mo_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_MO;
+	m_write.m_bits = 32;
+	m_write.m_name = func.name();
+	m_wproto32mo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read32smo_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_SMO;
+	m_read.m_bits = 32;
+	m_read.m_name = func.name();
+	m_rproto32smo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write32smo_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_SMO;
+	m_write.m_bits = 32;
+	m_write.m_name = func.name();
+	m_wproto32smo = func;
+	return *this;
+}
 
 //-------------------------------------------------
 //  r/w/rw - handler setters for
@@ -260,7 +546,6 @@ address_map_entry &address_map_entry::r(read64_delegate func)
 	return *this;
 }
 
-
 address_map_entry &address_map_entry::w(write64_delegate func)
 {
 	assert(!func.isnull());
@@ -271,28 +556,106 @@ address_map_entry &address_map_entry::w(write64_delegate func)
 	return *this;
 }
 
-
-address_map_entry &address_map_entry::rw(read64_delegate rfunc, write64_delegate wfunc)
-{
-	r(rfunc);
-	w(wfunc);
-	return *this;
-}
-
-
-//-------------------------------------------------
-//  set_handler - handler setter for setoffset
-//-------------------------------------------------
-
-address_map_entry &address_map_entry::set_handler(setoffset_delegate func)
+address_map_entry &address_map_entry::r(read64m_delegate func)
 {
 	assert(!func.isnull());
-	m_setoffsethd.m_type = AMH_DEVICE_DELEGATE;
-	m_setoffsethd.m_bits = 0;
-	m_setoffsethd.m_name = func.name();
-	m_soproto = func;
+	m_read.m_type = AMH_DEVICE_DELEGATE_M;
+	m_read.m_bits = 64;
+	m_read.m_name = func.name();
+	m_rproto64m = func;
 	return *this;
 }
+
+address_map_entry &address_map_entry::w(write64m_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_M;
+	m_write.m_bits = 64;
+	m_write.m_name = func.name();
+	m_wproto64m = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read64s_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_S;
+	m_read.m_bits = 64;
+	m_read.m_name = func.name();
+	m_rproto64s = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write64s_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_S;
+	m_write.m_bits = 64;
+	m_write.m_name = func.name();
+	m_wproto64s = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read64sm_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_SM;
+	m_read.m_bits = 64;
+	m_read.m_name = func.name();
+	m_rproto64sm = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write64sm_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_SM;
+	m_write.m_bits = 64;
+	m_write.m_name = func.name();
+	m_wproto64sm = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read64mo_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_MO;
+	m_read.m_bits = 64;
+	m_read.m_name = func.name();
+	m_rproto64mo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write64mo_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_MO;
+	m_write.m_bits = 64;
+	m_write.m_name = func.name();
+	m_wproto64mo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::r(read64smo_delegate func)
+{
+	assert(!func.isnull());
+	m_read.m_type = AMH_DEVICE_DELEGATE_SMO;
+	m_read.m_bits = 64;
+	m_read.m_name = func.name();
+	m_rproto64smo = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::w(write64smo_delegate func)
+{
+	assert(!func.isnull());
+	m_write.m_type = AMH_DEVICE_DELEGATE_SMO;
+	m_write.m_bits = 64;
+	m_write.m_name = func.name();
+	m_wproto64smo = func;
+	return *this;
+}
+
 
 //-------------------------------------------------
 //  unitmask_is_appropriate - verify that the
@@ -488,11 +851,14 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 	{
 		if (entry->m_read.m_type == AMH_DEVICE_SUBMAP)
 		{
-			std::string tag = owner.subtag(entry->m_read.m_tag);
-			device_t *mapdevice = machine.device(tag.c_str());
-			if (mapdevice == nullptr) {
-				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, m_device->basetag());
+			device_t *mapdevice = entry->m_submap_device;
+			if (!mapdevice)
+			{
+				mapdevice = owner.subdevice(entry->m_read.m_tag);
+				if (mapdevice == nullptr)
+					throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", owner.subtag(entry->m_read.m_tag).c_str(), m_spacenum, m_device->basetag());
 			}
+
 			// Grab the submap
 			address_map submap(*mapdevice, entry);
 
@@ -659,6 +1025,12 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 			osd_printf_error("In %s memory range %x-%x, start address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
 		if (entry.m_addrend & ~globalmask)
 			osd_printf_error("In %s memory range %x-%x, end address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
+		if (entry.m_addrmask & ~globalmask)
+			osd_printf_error("In %s range %x-%x mask %x mirror %x select %x, mask is outside of the global address mask %x, did you mean %x ?\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, globalmask, entry.m_addrmask & globalmask);
+		if ((entry.m_addrmirror & ~globalmask) && (entry.m_addrmirror | globalmask) != 0xffffffff >> (32 - spaceconfig.m_addr_width))
+			osd_printf_error("In %s range %x-%x mask %x mirror %x select %x, mirror is outside of the global address mask %x, did you mean %x ?\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, globalmask, entry.m_addrmirror & globalmask);
+		if (entry.m_addrselect & ~globalmask)
+			osd_printf_error("In %s range %x-%x mask %x mirror %x select %x, select is outside of the global address mask %x, did you mean %x ?\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, globalmask, entry.m_addrselect & globalmask);
 
 		// look for misaligned entries
 		if (entry.m_read.m_type != AMH_NONE)
@@ -740,49 +1112,149 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 		}
 
 		// make sure all devices exist
-		if (entry.m_read.m_type == AMH_DEVICE_DELEGATE)
+		if (entry.m_read.m_type == AMH_DEVICE_DELEGATE || entry.m_read.m_type == AMH_DEVICE_DELEGATE_M || entry.m_read.m_type == AMH_DEVICE_DELEGATE_S || entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM || entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO || entry.m_read.m_type == AMH_DEVICE_DELEGATE_SMO)
 		{
 			// extract the device tag from the proto-delegate
 			const char *devtag = nullptr;
 			switch (entry.m_read.m_bits)
 			{
-				case 8: devtag = entry.m_rproto8.device_name(); break;
-				case 16: devtag = entry.m_rproto16.device_name(); break;
-				case 32: devtag = entry.m_rproto32.device_name(); break;
-				case 64: devtag = entry.m_rproto64.device_name(); break;
+				case 8:
+					if (entry.m_read.m_type == AMH_DEVICE_DELEGATE)
+						devtag = entry.m_rproto8.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_M)
+						devtag = entry.m_rproto8m.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
+						devtag = entry.m_rproto8s.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
+						devtag = entry.m_rproto8sm.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO)
+						devtag = entry.m_rproto8mo.device_name();
+					else
+						devtag = entry.m_rproto8smo.device_name();
+					break;
+
+				case 16:
+					if (entry.m_read.m_type == AMH_DEVICE_DELEGATE)
+						devtag = entry.m_rproto16.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_M)
+						devtag = entry.m_rproto16m.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
+						devtag = entry.m_rproto16s.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
+						devtag = entry.m_rproto16sm.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO)
+						devtag = entry.m_rproto16mo.device_name();
+					else
+						devtag = entry.m_rproto16smo.device_name();
+					break;
+
+				case 32:
+					if (entry.m_read.m_type == AMH_DEVICE_DELEGATE)
+						devtag = entry.m_rproto32.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_M)
+						devtag = entry.m_rproto32m.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
+						devtag = entry.m_rproto32s.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
+						devtag = entry.m_rproto32sm.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO)
+						devtag = entry.m_rproto32mo.device_name();
+					else
+						devtag = entry.m_rproto32smo.device_name();
+					break;
+
+				case 64:
+					if (entry.m_read.m_type == AMH_DEVICE_DELEGATE)
+						devtag = entry.m_rproto64.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_M)
+						devtag = entry.m_rproto64m.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
+						devtag = entry.m_rproto64s.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
+						devtag = entry.m_rproto64sm.device_name();
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO)
+						devtag = entry.m_rproto64mo.device_name();
+					else
+						devtag = entry.m_rproto64smo.device_name();
+					break;
 			}
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name,
-					devtag != nullptr ? devtag : "<unspecified>");
+				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name, devtag ? devtag : "<unspecified>");
 #ifndef MAME_DEBUG // assert will catch this earlier
 			(void)entry.unitmask_is_appropriate(entry.m_read.m_bits, entry.m_mask, entry.m_read.m_name);
 #endif
 		}
-		if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
+		if (entry.m_write.m_type == AMH_DEVICE_DELEGATE || entry.m_read.m_type == AMH_DEVICE_DELEGATE_M || entry.m_write.m_type == AMH_DEVICE_DELEGATE_S || entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM || entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO || entry.m_write.m_type == AMH_DEVICE_DELEGATE_SMO)
 		{
 			// extract the device tag from the proto-delegate
 			const char *devtag = nullptr;
 			switch (entry.m_write.m_bits)
 			{
-				case 8: devtag = entry.m_wproto8.device_name(); break;
-				case 16: devtag = entry.m_wproto16.device_name(); break;
-				case 32: devtag = entry.m_wproto32.device_name(); break;
-				case 64: devtag = entry.m_wproto64.device_name(); break;
+				case 8:
+					if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
+						devtag = entry.m_wproto8.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_M)
+						devtag = entry.m_wproto8m.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
+						devtag = entry.m_wproto8s.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
+						devtag = entry.m_wproto8sm.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_MO)
+						devtag = entry.m_wproto8mo.device_name();
+					else
+						devtag = entry.m_wproto8smo.device_name();
+					break;
+
+				case 16:
+					if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
+						devtag = entry.m_wproto16.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_M)
+						devtag = entry.m_wproto16m.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
+						devtag = entry.m_wproto16s.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
+						devtag = entry.m_wproto16sm.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_MO)
+						devtag = entry.m_wproto16mo.device_name();
+					else
+						devtag = entry.m_wproto16smo.device_name();
+					break;
+
+				case 32:
+					if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
+						devtag = entry.m_wproto32.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_M)
+						devtag = entry.m_wproto32m.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
+						devtag = entry.m_wproto32s.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
+						devtag = entry.m_wproto32sm.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_MO)
+						devtag = entry.m_wproto32mo.device_name();
+					else
+						devtag = entry.m_wproto32smo.device_name();
+					break;
+
+				case 64:
+					if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
+						devtag = entry.m_wproto64.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_M)
+						devtag = entry.m_wproto64m.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
+						devtag = entry.m_wproto64s.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
+						devtag = entry.m_wproto64sm.device_name();
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_MO)
+						devtag = entry.m_wproto64mo.device_name();
+					else
+						devtag = entry.m_wproto64smo.device_name();
+					break;
 			}
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name,
-					devtag != nullptr ? devtag : "<unspecified>");
+				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name, devtag ? devtag : "<unspecified>");
 #ifndef MAME_DEBUG // assert will catch this earlier
 			(void)entry.unitmask_is_appropriate(entry.m_write.m_bits, entry.m_mask, entry.m_write.m_name);
 #endif
-		}
-		if (entry.m_setoffsethd.m_type == AMH_DEVICE_DELEGATE)
-		{
-			// extract the device tag from the proto-delegate
-			const char *devtag = entry.m_soproto.device_name();
-			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry references nonexistent device '%s'\n", spaceconfig.m_name,
-					devtag != nullptr ? devtag : "<unspecified>");
 		}
 
 		// make sure ports exist

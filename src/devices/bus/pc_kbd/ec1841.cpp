@@ -67,12 +67,12 @@ const tiny_rom_entry *ec_1841_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(ec_1841_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL(5'460'000))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ec_1841_keyboard_device, bus_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(ec_1841_keyboard_device, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ec_1841_keyboard_device, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ec_1841_keyboard_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ec_1841_keyboard_device, t1_r))
+	MCFG_DEVICE_ADD(I8048_TAG, I8048, XTAL(5'460'000))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, ec_1841_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, ec_1841_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ec_1841_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ec_1841_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ec_1841_keyboard_device, t1_r))
 MACHINE_CONFIG_END
 
 

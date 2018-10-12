@@ -4,8 +4,10 @@
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "includes/galaxold.h"
-#include "sound/tms5110.h"
 #include "sound/digitalk.h"
+#include "sound/flt_rc.h"
+#include "sound/tms5110.h"
+#include "emupal.h"
 
 class scramble_state : public galaxold_state
 {
@@ -41,8 +43,6 @@ public:
 	DECLARE_READ8_MEMBER(hustler_portB_r);
 	DECLARE_WRITE8_MEMBER(hotshock_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(hotshock_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(scramble_filter_w);
-	DECLARE_WRITE8_MEMBER(frogger_filter_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
 	DECLARE_WRITE8_MEMBER(ad2083_tms5110_ctrl_w);
@@ -54,30 +54,30 @@ public:
 	DECLARE_READ8_MEMBER(harem_digitalker_intr_r);
 	DECLARE_WRITE8_MEMBER(harem_digitalker_control_w);
 
-	DECLARE_DRIVER_INIT(cavelon);
-	DECLARE_DRIVER_INIT(mariner);
-	DECLARE_DRIVER_INIT(scramble_ppi);
-	DECLARE_DRIVER_INIT(mars);
-	DECLARE_DRIVER_INIT(ckongs);
-	DECLARE_DRIVER_INIT(mimonscr);
-	DECLARE_DRIVER_INIT(hotshock);
-	DECLARE_DRIVER_INIT(ad2083);
-	DECLARE_DRIVER_INIT(devilfsh);
-	DECLARE_DRIVER_INIT(mrkougar);
-	DECLARE_DRIVER_INIT(harem);
-	DECLARE_DRIVER_INIT(newsin7a);
+	void init_cavelon();
+	void init_mariner();
+	void init_scramble_ppi();
+	void init_mars();
+	void init_ckongs();
+	void init_mimonscr();
+	void init_hotshock();
+	void init_ad2083();
+	void init_devilfsh();
+	void init_mrkougar();
+	void init_harem();
+	void init_newsin7a();
 
-	DECLARE_DRIVER_INIT(scobra);
-	DECLARE_DRIVER_INIT(stratgyx);
-	DECLARE_DRIVER_INIT(tazmani2);
-	DECLARE_DRIVER_INIT(darkplnt);
-	DECLARE_DRIVER_INIT(mimonkey);
-	DECLARE_DRIVER_INIT(mimonsco);
-	DECLARE_DRIVER_INIT(rescue);
-	DECLARE_DRIVER_INIT(minefld);
-	DECLARE_DRIVER_INIT(hustler);
-	DECLARE_DRIVER_INIT(hustlerd);
-	DECLARE_DRIVER_INIT(billiard);
+	void init_scobra();
+	void init_stratgyx();
+	void init_tazmani2();
+	void init_darkplnt();
+	void init_mimonkey();
+	void init_mimonsco();
+	void init_rescue();
+	void init_minefld();
+	void init_hustler();
+	void init_hustlerd();
+	void init_billiard();
 	DECLARE_MACHINE_RESET(scramble);
 	DECLARE_MACHINE_RESET(explorer);
 	DECLARE_WRITE_LINE_MEMBER(scramble_sh_7474_q_callback);
@@ -131,6 +131,7 @@ public:
 	void scramble_sound_map(address_map &map);
 	void triplep_io_map(address_map &map);
 	void triplep_map(address_map &map);
+
 private:
 	void cavelon_banksw();
 	inline int bit(int i,int n);

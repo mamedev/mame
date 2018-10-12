@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class wwfsstar_state : public driver_device
@@ -20,6 +21,11 @@ public:
 		m_fg0_videoram(*this, "fg0_videoram"),
 		m_bg0_videoram(*this, "bg0_videoram") { }
 
+	void wwfsstar(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -43,8 +49,6 @@ public:
 	DECLARE_WRITE16_MEMBER(fg0_videoram_w);
 	DECLARE_WRITE16_MEMBER(bg0_videoram_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
@@ -55,7 +59,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void wwfsstar(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

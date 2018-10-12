@@ -40,26 +40,27 @@ Notes:
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(scramble_state::scramble_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror address */
-	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x5080, 0x50ff) AM_RAM
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0x6804, 0x6804) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x7800, 0x7800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x8110, 0x8113) AM_DEVREAD("ppi8255_0", i8255_device, read)  /* mirror for Frog */
-	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-ADDRESS_MAP_END
+void scramble_state::scramble_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)); /* mirror address */
+	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x5040, 0x505f).ram().share("spriteram");
+	map(0x5060, 0x507f).ram().share("bulletsram");
+	map(0x5080, 0x50ff).ram();
+	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_nmi_enable_w));
+	map(0x6802, 0x6802).w(FUNC(scramble_state::galaxold_coin_counter_w));
+	map(0x6804, 0x6804).w(FUNC(scramble_state::galaxold_stars_enable_w));
+	map(0x6806, 0x6806).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
+	map(0x6807, 0x6807).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
+	map(0x7000, 0x7000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8100, 0x8103).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x8110, 0x8113).r(m_ppi8255_0, FUNC(i8255_device::read));  /* mirror for Frog */
+	map(0x8200, 0x8203).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 READ8_MEMBER(scramble_state::scramble_soundram_r)
 {
@@ -71,259 +72,272 @@ WRITE8_MEMBER(scramble_state::scramble_soundram_w)
 	m_soundram[offset & 0x03ff] = data;
 }
 
-ADDRESS_MAP_START(scramble_state::scramble_sound_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scramble_soundram_r, scramble_soundram_w) AM_SHARE("soundram")
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
-ADDRESS_MAP_END
+void scramble_state::scramble_sound_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x8000, 0x8fff).rw(FUNC(scramble_state::scramble_soundram_r), FUNC(scramble_state::scramble_soundram_w)).share("soundram");
+	map(0x9000, 0x9fff).nopw(); // w(FUNC(scramble_state::scramble_filter_w)); - scramble doesn't instantiate any RC filters. This is dead code!
+}
 
-ADDRESS_MAP_START(scramble_state::scramble_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("8910.1", ay8910_device, address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("8910.1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("8910.2", ay8910_device, address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("8910.2", ay8910_device, data_r, data_w)
-ADDRESS_MAP_END
+void scramble_state::scramble_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).w("8910.1", FUNC(ay8910_device::address_w));
+	map(0x20, 0x20).rw("8910.1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x40, 0x40).w("8910.2", FUNC(ay8910_device::address_w));
+	map(0x80, 0x80).rw("8910.2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+}
 
 
-ADDRESS_MAP_START(scramble_state::ckongs_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6bff) AM_RAM
-	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9860, 0x987f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x9880, 0x98ff) AM_RAM
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xa802, 0xa802) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+void scramble_state::ckongs_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6bff).ram();
+	map(0x7000, 0x7003).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7800, 0x7803).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x9000, 0x93ff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x9800, 0x983f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x9840, 0x985f).ram().share("spriteram");
+	map(0x9860, 0x987f).ram().share("bulletsram");
+	map(0x9880, 0x98ff).ram();
+	map(0xa801, 0xa801).w(FUNC(scramble_state::galaxold_nmi_enable_w));
+	map(0xa802, 0xa802).w(FUNC(scramble_state::galaxold_coin_counter_w));
+	map(0xa806, 0xa806).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
+	map(0xa807, 0xa807).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
+	map(0xb000, 0xb000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
 
 
 READ8_MEMBER(scramble_state::mars_ppi8255_0_r)
 {
-	return m_ppi8255_0->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
+	return m_ppi8255_0->read(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 READ8_MEMBER(scramble_state::mars_ppi8255_1_r)
 {
-	return m_ppi8255_1->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
+	return m_ppi8255_1->read(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 WRITE8_MEMBER(scramble_state::mars_ppi8255_0_w)
 {
-	m_ppi8255_0->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+	m_ppi8255_0->write(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 WRITE8_MEMBER(scramble_state::mars_ppi8255_1_w)
 {
-	m_ppi8255_1->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+	m_ppi8255_1->write(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
-ADDRESS_MAP_START(scramble_state::mars_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4c00, 0x4fff) AM_READ(galaxold_videoram_r)
-	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x5080, 0x50ff) AM_RAM
-	AM_RANGE(0x6800, 0x6800) AM_WRITE(galaxold_coin_counter_1_w)
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0x6808, 0x6808) AM_WRITE(galaxold_coin_counter_0_w)
-	AM_RANGE(0x6809, 0x6809) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0x680b, 0x680b) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x7000, 0x7000) AM_READNOP
-	AM_RANGE(0x8100, 0x810f) AM_READWRITE(mars_ppi8255_0_r, mars_ppi8255_0_w)
-	AM_RANGE(0x8200, 0x820f) AM_READWRITE(mars_ppi8255_1_r, mars_ppi8255_1_w)
-ADDRESS_MAP_END
+void scramble_state::mars_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).r(FUNC(scramble_state::galaxold_videoram_r));
+	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x5040, 0x505f).ram().share("spriteram");
+	map(0x5060, 0x507f).ram().share("bulletsram");
+	map(0x5080, 0x50ff).ram();
+	map(0x6800, 0x6800).w(FUNC(scramble_state::galaxold_coin_counter_1_w));
+	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_stars_enable_w));
+	map(0x6802, 0x6802).w(FUNC(scramble_state::galaxold_nmi_enable_w));
+	map(0x6808, 0x6808).w(FUNC(scramble_state::galaxold_coin_counter_0_w));
+	map(0x6809, 0x6809).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
+	map(0x680b, 0x680b).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
+	map(0x7000, 0x7000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x7000, 0x7000).nopr();
+	map(0x8100, 0x810f).rw(FUNC(scramble_state::mars_ppi8255_0_r), FUNC(scramble_state::mars_ppi8255_0_w));
+	map(0x8200, 0x820f).rw(FUNC(scramble_state::mars_ppi8255_1_r), FUNC(scramble_state::mars_ppi8255_1_w));
+}
 
 
 
-ADDRESS_MAP_START(scramble_state::newsin7_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4c00, 0x4fff) AM_READ(galaxold_videoram_r)
-	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x5080, 0x50ff) AM_RAM
-	AM_RANGE(0x6800, 0x6800) AM_WRITE(galaxold_coin_counter_1_w)
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_stars_enable_w)
+void scramble_state::newsin7_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).r(FUNC(scramble_state::galaxold_videoram_r));
+	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x5040, 0x505f).ram().share("spriteram");
+	map(0x5060, 0x507f).ram().share("bulletsram");
+	map(0x5080, 0x50ff).ram();
+	map(0x6800, 0x6800).w(FUNC(scramble_state::galaxold_coin_counter_1_w));
+	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_stars_enable_w));
 	//AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0x6808, 0x6808) AM_WRITE(galaxold_coin_counter_0_w)
-	AM_RANGE(0x6809, 0x6809) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0x680b, 0x680b) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8200, 0x820f) AM_READWRITE(mars_ppi8255_1_r, mars_ppi8255_1_w)
-	AM_RANGE(0xa000, 0xafff) AM_ROM
-	AM_RANGE(0xc100, 0xc10f) AM_READWRITE(mars_ppi8255_0_r, mars_ppi8255_0_w)
-ADDRESS_MAP_END
+	map(0x6808, 0x6808).w(FUNC(scramble_state::galaxold_coin_counter_0_w));
+	map(0x6809, 0x6809).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
+	map(0x680b, 0x680b).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
+	map(0x7000, 0x7000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8200, 0x820f).rw(FUNC(scramble_state::mars_ppi8255_1_r), FUNC(scramble_state::mars_ppi8255_1_w));
+	map(0xa000, 0xafff).rom();
+	map(0xc100, 0xc10f).rw(FUNC(scramble_state::mars_ppi8255_0_r), FUNC(scramble_state::mars_ppi8255_0_w));
+}
 
 
 
-ADDRESS_MAP_START(scramble_state::mrkougar_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)
-	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x5080, 0x50ff) AM_RAM
-	AM_RANGE(0x6800, 0x6800) AM_WRITE(galaxold_coin_counter_1_w)
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0x6808, 0x6808) AM_WRITE(galaxold_coin_counter_0_w)
-	AM_RANGE(0x6809, 0x6809) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0x680b, 0x680b) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8100, 0x810f) AM_READWRITE(mars_ppi8255_0_r, mars_ppi8255_0_w)
-	AM_RANGE(0x8200, 0x820f) AM_READWRITE(mars_ppi8255_1_r, mars_ppi8255_1_w)
-ADDRESS_MAP_END
+void scramble_state::mrkougar_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w));
+	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x5040, 0x505f).ram().share("spriteram");
+	map(0x5060, 0x507f).ram().share("bulletsram");
+	map(0x5080, 0x50ff).ram();
+	map(0x6800, 0x6800).w(FUNC(scramble_state::galaxold_coin_counter_1_w));
+	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_nmi_enable_w));
+	map(0x6808, 0x6808).w(FUNC(scramble_state::galaxold_coin_counter_0_w));
+	map(0x6809, 0x6809).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
+	map(0x680b, 0x680b).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
+	map(0x7000, 0x7000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8100, 0x810f).rw(FUNC(scramble_state::mars_ppi8255_0_r), FUNC(scramble_state::mars_ppi8255_0_w));
+	map(0x8200, 0x820f).rw(FUNC(scramble_state::mars_ppi8255_1_r), FUNC(scramble_state::mars_ppi8255_1_w));
+}
 
 
 
-ADDRESS_MAP_START(scramble_state::hotshock_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4c00, 0x4fff) AM_READ(galaxold_videoram_r)
-	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x5080, 0x50ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(galaxold_coin_counter_2_w)
-	AM_RANGE(0x6002, 0x6002) AM_WRITE(galaxold_coin_counter_1_w)
-	AM_RANGE(0x6004, 0x6004) AM_WRITE(hotshock_flip_screen_w)
-	AM_RANGE(0x6005, 0x6005) AM_WRITE(galaxold_coin_counter_0_w)
-	AM_RANGE(0x6006, 0x6006) AM_WRITE(galaxold_gfxbank_w)
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
-	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(hotshock_sh_irqtrigger_w)
-ADDRESS_MAP_END
+void scramble_state::hotshock_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).r(FUNC(scramble_state::galaxold_videoram_r));
+	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x5040, 0x505f).ram().share("spriteram");
+	map(0x5060, 0x507f).ram().share("bulletsram");
+	map(0x5080, 0x50ff).ram();
+	map(0x6000, 0x6000).w(FUNC(scramble_state::galaxold_coin_counter_2_w));
+	map(0x6002, 0x6002).w(FUNC(scramble_state::galaxold_coin_counter_1_w));
+	map(0x6004, 0x6004).w(FUNC(scramble_state::hotshock_flip_screen_w));
+	map(0x6005, 0x6005).w(FUNC(scramble_state::galaxold_coin_counter_0_w));
+	map(0x6006, 0x6006).w(FUNC(scramble_state::galaxold_gfxbank_w));
+	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_nmi_enable_w));
+	map(0x7000, 0x7000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x8000, 0x8000).portr("IN0").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x8001, 0x8001).portr("IN1");
+	map(0x8002, 0x8002).portr("IN2");
+	map(0x8003, 0x8003).portr("IN3");
+	map(0x9000, 0x9000).w(FUNC(scramble_state::hotshock_sh_irqtrigger_w));
+}
 
 
 
-ADDRESS_MAP_START(scramble_state::hunchbks_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1210, 0x1213) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x1400, 0x143f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x1440, 0x145f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1460, 0x147f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x1480, 0x14ff) AM_RAM
-	AM_RANGE(0x1500, 0x1503) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x1606, 0x1606) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0x1607, 0x1607) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x1680, 0x1680) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x1780, 0x1780) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(hunchbks_mirror_r, hunchbks_mirror_w)
-	AM_RANGE(0x4000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(hunchbks_mirror_r, hunchbks_mirror_w)
-	AM_RANGE(0x6000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(hunchbks_mirror_r, hunchbks_mirror_w)
-ADDRESS_MAP_END
+void scramble_state::hunchbks_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1210, 0x1213).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x1400, 0x143f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x1440, 0x145f).ram().share("spriteram");
+	map(0x1460, 0x147f).ram().share("bulletsram");
+	map(0x1480, 0x14ff).ram();
+	map(0x1500, 0x1503).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x1606, 0x1606).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
+	map(0x1607, 0x1607).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
+	map(0x1680, 0x1680).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x1780, 0x1780).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x1800, 0x1bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x1c00, 0x1fff).ram();
+	map(0x2000, 0x2fff).rom();
+	map(0x3000, 0x3fff).rw(FUNC(scramble_state::hunchbks_mirror_r), FUNC(scramble_state::hunchbks_mirror_w));
+	map(0x4000, 0x4fff).rom();
+	map(0x5000, 0x5fff).rw(FUNC(scramble_state::hunchbks_mirror_r), FUNC(scramble_state::hunchbks_mirror_w));
+	map(0x6000, 0x6fff).rom();
+	map(0x7000, 0x7fff).rw(FUNC(scramble_state::hunchbks_mirror_r), FUNC(scramble_state::hunchbks_mirror_w));
+}
 
 
 
-ADDRESS_MAP_START(scramble_state::mimonscr_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror address?, probably not */
-	AM_RANGE(0x4400, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x5080, 0x50ff) AM_RAM
-	AM_RANGE(0x6800, 0x6802) AM_WRITE(galaxold_gfxbank_w)
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void scramble_state::mimonscr_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)); /* mirror address */
+	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x5040, 0x505f).ram().share("spriteram");
+	map(0x5060, 0x507f).ram().share("bulletsram");
+	map(0x5080, 0x50ff).ram();
+	map(0x6800, 0x6802).w(FUNC(scramble_state::galaxold_gfxbank_w));
+	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_nmi_enable_w));
+	map(0x6806, 0x6806).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
+	map(0x6807, 0x6807).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
+	map(0x7000, 0x7000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8100, 0x8103).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x8200, 0x8203).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc000, 0xffff).rom();
+}
 
 
 
-ADDRESS_MAP_START(scramble_state::ad2083_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x6004, 0x6004) AM_WRITE(hotshock_flip_screen_w)
-	AM_RANGE(0x6800, 0x6800) AM_WRITE(galaxold_coin_counter_2_w)
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_coin_counter_0_w)
-	AM_RANGE(0x6803, 0x6803) AM_WRITE(scrambold_background_blue_w)
-	AM_RANGE(0x6805, 0x6805) AM_WRITE(galaxold_coin_counter_1_w)
-	AM_RANGE(0x6806, 0x6806) AM_WRITE(scrambold_background_red_w)
-	AM_RANGE(0x6807, 0x6807) AM_WRITE(scrambold_background_green_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(hotshock_sh_irqtrigger_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
-	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
-	AM_RANGE(0xa000, 0xdfff) AM_ROM
-	AM_RANGE(0xe800, 0xebff) AM_RAM
-ADDRESS_MAP_END
+void scramble_state::ad2083_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x5040, 0x505f).ram().share("spriteram");
+	map(0x5060, 0x507f).ram().share("bulletsram");
+	map(0x6004, 0x6004).w(FUNC(scramble_state::hotshock_flip_screen_w));
+	map(0x6800, 0x6800).w(FUNC(scramble_state::galaxold_coin_counter_2_w));
+	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_nmi_enable_w));
+	map(0x6802, 0x6802).w(FUNC(scramble_state::galaxold_coin_counter_0_w));
+	map(0x6803, 0x6803).w(FUNC(scramble_state::scrambold_background_blue_w));
+	map(0x6805, 0x6805).w(FUNC(scramble_state::galaxold_coin_counter_1_w));
+	map(0x6806, 0x6806).w(FUNC(scramble_state::scrambold_background_red_w));
+	map(0x6807, 0x6807).w(FUNC(scramble_state::scrambold_background_green_w));
+	map(0x8000, 0x8000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x9000, 0x9000).w(FUNC(scramble_state::hotshock_sh_irqtrigger_w));
+	map(0x7000, 0x7000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8000, 0x8000).portr("IN0");
+	map(0x8001, 0x8001).portr("IN1");
+	map(0x8002, 0x8002).portr("IN2");
+	map(0x8003, 0x8003).portr("IN3");
+	map(0xa000, 0xdfff).rom();
+	map(0xe800, 0xebff).ram();
+}
 
 
 
-ADDRESS_MAP_START(scramble_state::triplep_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror address */
-	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x5080, 0x50ff) AM_RAM
-	AM_RANGE(0x5800, 0x67ff) AM_ROM
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0x6804, 0x6804) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-ADDRESS_MAP_END
+void scramble_state::triplep_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)); /* mirror address */
+	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x5040, 0x505f).ram().share("spriteram");
+	map(0x5060, 0x507f).ram().share("bulletsram");
+	map(0x5080, 0x50ff).ram();
+	map(0x5800, 0x67ff).rom();
+	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_nmi_enable_w));
+	map(0x6802, 0x6802).w(FUNC(scramble_state::galaxold_coin_counter_w));
+	map(0x6804, 0x6804).w(FUNC(scramble_state::galaxold_stars_enable_w));
+	map(0x6806, 0x6806).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
+	map(0x6807, 0x6807).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
+	map(0x7000, 0x7000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8100, 0x8103).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(scramble_state::triplep_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("8910.1", ay8910_device, data_address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("8910.1", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x02) AM_READ(triplep_pip_r)
-	AM_RANGE(0x03, 0x03) AM_READ(triplep_pap_r)
-ADDRESS_MAP_END
+void scramble_state::triplep_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("8910.1", FUNC(ay8910_device::data_address_w));
+	map(0x01, 0x01).r("8910.1", FUNC(ay8910_device::data_r));
+	map(0x02, 0x02).r(FUNC(scramble_state::triplep_pip_r));
+	map(0x03, 0x03).r(FUNC(scramble_state::triplep_pap_r));
+}
 
-ADDRESS_MAP_START(scramble_state::hotshock_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("8910.1", ay8910_device, address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("8910.1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("8910.2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("8910.2", ay8910_device, address_w)
-ADDRESS_MAP_END
+void scramble_state::hotshock_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).w("8910.1", FUNC(ay8910_device::address_w));
+	map(0x20, 0x20).rw("8910.1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x40, 0x40).rw("8910.2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).w("8910.2", FUNC(ay8910_device::address_w));
+}
 
 
 
@@ -335,68 +349,73 @@ READ8_MEMBER(scramble_state::hncholms_prot_r)
 		return 0;
 }
 
-ADDRESS_MAP_START(scramble_state::hunchbks_readport)
-	AM_RANGE(0x00, 0x00) AM_READ(hncholms_prot_r)
-ADDRESS_MAP_END
+void scramble_state::hunchbks_readport(address_map &map)
+{
+	map(0x00, 0x00).r(FUNC(scramble_state::hncholms_prot_r));
+}
 
 
 // Harem
 
-ADDRESS_MAP_START(scramble_state::harem_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+void scramble_state::harem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
 
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	map(0x2000, 0x27ff).ram();
 
-	AM_RANGE(0x4000, 0x403f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x4040, 0x405f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x4060, 0x407f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x4080, 0x47ff) AM_RAM
+	map(0x4000, 0x403f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x4040, 0x405f).ram().share("spriteram");
+	map(0x4060, 0x407f).ram().share("bulletsram");
+	map(0x4080, 0x47ff).ram();
 
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) // mirror address
+	map(0x4800, 0x4bff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)); // mirror address
 
-	AM_RANGE(0x5000, 0x5000) AM_RAM_WRITE(racknrol_tiles_bank_w) AM_SHARE("racknrol_tbank") // high bits of tiles, 1 bit every 4 columns
-	AM_RANGE(0x5800, 0x5800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(galaxold_nmi_enable_w)
+	map(0x5000, 0x5000).ram().w(FUNC(scramble_state::racknrol_tiles_bank_w)).share("racknrol_tbank"); // high bits of tiles, 1 bit every 4 columns
+	map(0x5800, 0x5800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(scramble_state::galaxold_nmi_enable_w));
 
-	AM_RANGE(0x5801, 0x5801) AM_WRITE(harem_decrypt_clk_w)          // run-time bitswap selection
-	AM_RANGE(0x5802, 0x5802) AM_WRITE(harem_decrypt_bit_w)
-	AM_RANGE(0x5803, 0x5803) AM_WRITE(harem_decrypt_rst_w)
+	map(0x5801, 0x5801).w(FUNC(scramble_state::harem_decrypt_clk_w));          // run-time bitswap selection
+	map(0x5802, 0x5802).w(FUNC(scramble_state::harem_decrypt_bit_w));
+	map(0x5803, 0x5803).w(FUNC(scramble_state::harem_decrypt_rst_w));
 
-	AM_RANGE(0x5804, 0x5804) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0x5805, 0x5805) AM_WRITE(galaxold_gfxbank_w)           // bit 0 = sprite tiles high bit
-	AM_RANGE(0x5806, 0x5806) AM_WRITE(galaxold_flip_screen_x_w)     // maybe (0 at boot)
-	AM_RANGE(0x5807, 0x5807) AM_WRITE(galaxold_flip_screen_y_w)     // ""
+	map(0x5804, 0x5804).w(FUNC(scramble_state::galaxold_coin_counter_w));
+	map(0x5805, 0x5805).w(FUNC(scramble_state::galaxold_gfxbank_w));           // bit 0 = sprite tiles high bit
+	map(0x5806, 0x5806).w(FUNC(scramble_state::galaxold_flip_screen_x_w));     // maybe (0 at boot)
+	map(0x5807, 0x5807).w(FUNC(scramble_state::galaxold_flip_screen_y_w));     // ""
 
-	AM_RANGE(0x6100, 0x6103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x6200, 0x6203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	map(0x6100, 0x6103).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6200, 0x6203).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("rombank")                  // bitswapped rom
-ADDRESS_MAP_END
+	map(0x8000, 0x9fff).bankr("rombank");                  // bitswapped rom
+}
 
-ADDRESS_MAP_START(scramble_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("rombank_decrypted")
-ADDRESS_MAP_END
+void scramble_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("maincpu", 0);
+	map(0x8000, 0x9fff).bankr("rombank_decrypted");
+}
 
-ADDRESS_MAP_START(scramble_state::harem_sound_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x6000, 0x6000) AM_READ(harem_digitalker_intr_r)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xafff) AM_WRITE(scramble_filter_w)
-ADDRESS_MAP_END
+void scramble_state::harem_sound_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x6000, 0x6000).r(FUNC(scramble_state::harem_digitalker_intr_r));
+	map(0x8000, 0x83ff).ram();
+	map(0xa000, 0xafff).nopw(); // w(FUNC(scramble_state::scramble_filter_w)); - scramble/harem don't instantiate any RC filters. This is dead code!
+}
 
-ADDRESS_MAP_START(scramble_state::harem_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void scramble_state::harem_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 
 	// ports->speech:
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("8910.3", ay8910_device, address_w)
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("8910.3", ay8910_device, data_r, data_w)
+	map(0x04, 0x04).w("8910.3", FUNC(ay8910_device::address_w));
+	map(0x08, 0x08).rw("8910.3", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	// same as scramble:
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("8910.1", ay8910_device, address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("8910.1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("8910.2", ay8910_device, address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("8910.2", ay8910_device, data_r, data_w)  // read soundlatch
-ADDRESS_MAP_END
+	map(0x10, 0x10).w("8910.1", FUNC(ay8910_device::address_w));
+	map(0x20, 0x20).rw("8910.1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x40, 0x40).w("8910.2", FUNC(ay8910_device::address_w));
+	map(0x80, 0x80).rw("8910.2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));  // read soundlatch
+}
 
 
 
@@ -437,9 +456,9 @@ static INPUT_PORTS_START( scramble )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )    /* protection bit */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    /* protection bit */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )    /* protection bit */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )    /* protection bit */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( 800fath )
@@ -477,9 +496,9 @@ static INPUT_PORTS_START( 800fath )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )    /* protection bit */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    /* protection bit */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )    /* protection bit */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )    /* protection bit */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( triplep )
@@ -554,8 +573,8 @@ static INPUT_PORTS_START( ckongs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scramble_state,ckongs_coinage_r, (void *)0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scramble_state,ckongs_coinage_r, (void *)0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scramble_state,ckongs_coinage_r, (void *)0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scramble_state,ckongs_coinage_r, (void *)0x02)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -571,7 +590,7 @@ static INPUT_PORTS_START( ckongs )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scramble_state,ckongs_coinage_r, (void *)0x04)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scramble_state,ckongs_coinage_r, (void *)0x04)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -1255,27 +1274,27 @@ static const gfx_layout ad2083_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( scramble )
+static GFXDECODE_START( gfx_scramble )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( devilfsh )
+static GFXDECODE_START( gfx_devilfsh )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, devilfsh_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, devilfsh_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( newsin7 )
+static GFXDECODE_START( gfx_newsin7 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, newsin7_charlayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, newsin7_spritelayout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( mrkougar )
+static GFXDECODE_START( gfx_mrkougar )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mrkougar_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mrkougar_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( ad2083 )
+static GFXDECODE_START( gfx_ad2083 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ad2083_charlayout,    0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ad2083_spritelayout,  0, 8 )
 GFXDECODE_END
@@ -1286,37 +1305,37 @@ GFXDECODE_END
 MACHINE_CONFIG_START(scramble_state::scramble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(scramble_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(scramble_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
-	MCFG_CPU_PROGRAM_MAP(scramble_sound_map)
-	MCFG_CPU_IO_MAP(scramble_sound_io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(scramble_sound_map)
+	MCFG_DEVICE_IO_MAP(scramble_sound_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_1_callback))
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_9m_2.comp_output_cb().set(FUNC(scramble_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,scramble_sh_7474_q_callback))
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,scramble)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi8255_0);
+	m_ppi8255_0->in_pa_callback().set_ioport("IN0");
+	m_ppi8255_0->in_pb_callback().set_ioport("IN1");
+	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
+	I8255A(config, m_ppi8255_1);
+	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1327,23 +1346,23 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scramble)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scramble)
 	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scrambold)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("8910.1", AY8910, 14318000/8)
+	MCFG_DEVICE_ADD("8910.1", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 
-	MCFG_SOUND_ADD("8910.2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
+	MCFG_DEVICE_ADD("8910.2", AY8910, 14318000/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
@@ -1351,14 +1370,12 @@ MACHINE_CONFIG_START(scramble_state::mars)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mars_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
+	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
+	m_ppi8255_1->in_pc_callback().set_ioport("IN3");
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1370,11 +1387,11 @@ MACHINE_CONFIG_START(scramble_state::devilfsh)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mars_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", devilfsh)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_devilfsh)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
@@ -1384,12 +1401,12 @@ MACHINE_CONFIG_START(scramble_state::newsin7)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(newsin7_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(newsin7_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", newsin7)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_newsin7)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
@@ -1400,13 +1417,12 @@ MACHINE_CONFIG_START(scramble_state::mrkougb)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mrkougar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mrkougar_map)
 
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, mrkougar_sh_irqtrigger_w))
+	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::mrkougar_sh_irqtrigger_w));
+	m_ppi8255_1->in_pc_callback().set_constant(0);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1418,15 +1434,15 @@ MACHINE_CONFIG_START(scramble_state::mrkougar)
 	mrkougb(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mrkougar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mrkougar)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::ckongs)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ckongs_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ckongs_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1439,14 +1455,14 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hotshock_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hotshock_map)
 
 	MCFG_DEVICE_REMOVE( "ppi8255_0" )
 	MCFG_DEVICE_REMOVE( "ppi8255_1" )
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_IO_MAP(hotshock_sound_io_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_IO_MAP(hotshock_sound_io_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 
@@ -1456,13 +1472,13 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
 
-	MCFG_SOUND_MODIFY("8910.1")
+	MCFG_DEVICE_MODIFY("8910.1")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_MODIFY("8910.2")
-	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, hotshock_soundlatch_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
+	MCFG_DEVICE_MODIFY("8910.2")
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, hotshock_soundlatch_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
@@ -1483,8 +1499,8 @@ MACHINE_CONFIG_START(scramble_state::mimonscr)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mimonscr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mimonscr_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,mimonkey)
@@ -1495,9 +1511,9 @@ MACHINE_CONFIG_START(scramble_state::triplep)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(triplep_map)
-	MCFG_CPU_IO_MAP(triplep_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(triplep_map)
+	MCFG_DEVICE_IO_MAP(triplep_io_map)
 
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
@@ -1509,8 +1525,8 @@ MACHINE_CONFIG_START(scramble_state::triplep)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("8910.1")
-	MCFG_SOUND_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
+	MCFG_DEVICE_MODIFY("8910.1")
+	MCFG_DEVICE_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
 
 
 	MCFG_SOUND_ROUTES_RESET()
@@ -1537,11 +1553,11 @@ MACHINE_CONFIG_START(scramble_state::hunchbks)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", S2650, 18432000/6)
-	MCFG_CPU_PROGRAM_MAP(hunchbks_map)
-	MCFG_CPU_IO_MAP(hunchbks_readport)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", scramble_state,  hunchbks_vh_interrupt)
+	MCFG_DEVICE_REPLACE("maincpu", S2650, 18432000/6)
+	MCFG_DEVICE_PROGRAM_MAP(hunchbks_map)
+	MCFG_DEVICE_IO_MAP(hunchbks_readport)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  hunchbks_vh_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
@@ -1557,29 +1573,29 @@ MACHINE_CONFIG_START(scramble_state::hncholms)
 	hunchbks(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(18432000/6/2/2)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(18432000/6/2/2)
 
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scorpion)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::ad2083)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(ad2083_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ad2083_map)
 
-	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,scramble_sh_7474_q_callback))
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_1_callback))
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_9m_2.comp_output_cb().set(FUNC(scramble_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 
@@ -1592,7 +1608,7 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ad2083)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ad2083)
 	MCFG_PALETTE_ADD("palette", 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,turtles)
@@ -1609,21 +1625,21 @@ MACHINE_CONFIG_START(scramble_state::harem)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(harem_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(harem_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(harem_sound_map)
-	MCFG_CPU_IO_MAP(harem_sound_io_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(harem_sound_map)
+	MCFG_DEVICE_IO_MAP(harem_sound_io_map)
 
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,harem)
 
 	/* extra AY8910 with I/O ports */
-	MCFG_SOUND_ADD("8910.3", AY8910, 14318000/8)
+	MCFG_DEVICE_ADD("8910.3", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("digitalker", digitalker_device, digitalker_data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(scramble_state, harem_digitalker_control_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("digitalker", digitalker_device, digitalker_data_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, scramble_state, harem_digitalker_control_w))
 
 	MCFG_DIGITALKER_ADD("digitalker", 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
@@ -1732,7 +1748,6 @@ ROM_START( knockoutc )
 	ROM_LOAD( "ta.6e", 0x0000, 0x0020, CRC(624f75df) SHA1(0e9a7c48dd976af1dca1d5351236d4d5bf7a9dc8) )
 ROM_END
 
-
 ROM_START( mariner )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tp1.2h",       0x0000, 0x1000, CRC(dac1dfd0) SHA1(57b9106bb7452640544ba0ab2d2ba290cccb45f0) )
@@ -1763,6 +1778,29 @@ ROM_START( 800fath )
 	ROM_LOAD( "tm3.2l",       0x2000, 0x1000, CRC(027881a6) SHA1(47953aa5140a157ade484341609d477510e8342b) )
 	ROM_LOAD( "tm4.2m",       0x3000, 0x1000, CRC(a0fde7dc) SHA1(ea6700520b1bd31e6c6bfac6f067bbf652676eef) )
 	ROM_LOAD( "tu5.2p",       0x6000, 0x0800, CRC(f864a8a6) SHA1(bd0c84284d13d099da4e139db7c9948a074d6774) )
+	ROM_CONTINUE(             0x5800, 0x0800             )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "tm8.5f",       0x0000, 0x1000, CRC(70ae611f) SHA1(2686dc6d3910bd58b290d6296f30c552686709f5) )
+	ROM_LOAD( "tm9.5h",       0x1000, 0x1000, CRC(8e4e999e) SHA1(195e6896ca2f3175137d8c92777ba32c41e835d3) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "t4.6e",        0x0000, 0x0020, CRC(ca42b6dd) SHA1(d1e224e788e3dcf57249e72f03f9fe3fd71e6c12) )
+
+	ROM_REGION( 0x0100, "user1", 0 )
+	ROM_LOAD( "t6.6p",        0x0000, 0x0100, CRC(ad208ccc) SHA1(66a4122e46467344a7f3ddcc953a5f7f451411fa) )    /* background color prom */
+
+	ROM_REGION( 0x0020, "user2", 0 )
+	ROM_LOAD( "t5.7p",        0x0000, 0x0020, CRC(1bd88cff) SHA1(8d1620386ef654d99c51e489c822eeb2e8a4fe76) )    /* char banking and star placement */
+ROM_END
+
+ROM_START( 800fatha )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tq1.2h",       0x0000, 0x1000, CRC(d858c242) SHA1(3f236ae6ac60067eec4f5df0746435e6dfde0401) ) /* older based on letter revision, Q vs U */
+	ROM_LOAD( "tm2.2k",       0x1000, 0x1000, CRC(efe7ca28) SHA1(496f8eb2ebc9edeed5b19d87f437f23bbeb2a007) )
+	ROM_LOAD( "tm3.2l",       0x2000, 0x1000, CRC(027881a6) SHA1(47953aa5140a157ade484341609d477510e8342b) )
+	ROM_LOAD( "tm4.2m",       0x3000, 0x1000, CRC(a0fde7dc) SHA1(ea6700520b1bd31e6c6bfac6f067bbf652676eef) )
+	ROM_LOAD( "tm5.2p",       0x6000, 0x0800, CRC(d7ebcb8e) SHA1(bddefdc5f04c2f940e08a6968fbd6f930d16b8e4) )
 	ROM_CONTINUE(             0x5800, 0x0800             )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -2245,45 +2283,46 @@ ROM_START( harem ) /* Main PCB version similar to Scorpion (also developed by I.
 ROM_END
 
 
-GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockoutb,triplep,  triplep,  knockoutb,scramble_state, scramble_ppi, ROT90, "bootleg",             "Knock Out!! (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockoutc,triplep,  triplep,  knockoutb,scramble_state, scramble_ppi, ROT90, "bootleg (ESG)",       "Knock Out!! (bootleg, set 3)",         MACHINE_SUPPORTS_SAVE ) // ESG = Elektronik Spiel Gerate
+GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg, set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockoutb,triplep,  triplep,  knockoutb,scramble_state, init_scramble_ppi, ROT90, "bootleg",             "Knock Out!! (bootleg, set 2)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockoutc,triplep,  triplep,  knockoutb,scramble_state, init_scramble_ppi, ROT90, "bootleg (ESG)",       "Knock Out!! (bootleg, set 3)",      MACHINE_SUPPORTS_SAVE ) // ESG = Elektronik Spiel Gerate
 
-GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, mariner,      ROT90, "Amenip",              "Mariner",                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, init_mariner,      ROT90, "Amenip",              "Mariner",                            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 800fatha, mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, ckongs,       ROT90, "bootleg",             "Crazy Kong (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, init_ckongs,       ROT90, "bootleg",             "Crazy Kong (Scramble hardware)",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, mars,     0,        mars,     mars,     scramble_state, mars,         ROT90, "Artic",               "Mars",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mars,     0,        mars,     mars,     scramble_state, init_mars,         ROT90, "Artic",               "Mars",                               MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, devilfsh,     ROT90, "Artic",               "Devil Fish",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, init_devilfsh,     ROT90, "Artic",               "Devil Fish",                         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, mars,         ROT90, "ATW USA, Inc.",       "New Sinbad 7 (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, newsin7a,     ROT90, "ATW USA, Inc",        "New Sinbad 7 (set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, init_mars,         ROT90, "ATW USA, Inc.",       "New Sinbad 7 (set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, init_newsin7a,     ROT90, "ATW USA, Inc",        "New Sinbad 7 (set 2)",               MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, mrkougar,     ROT90, "ATW",                 "Mr. Kougar",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, 0,            ROT90, "bootleg (Gross)",     "Mr. Kougar (German bootleg)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, 0,            ROT90, "bootleg",             "Mr. Kougar (bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong loading / decoding or bad GFX ROMs?
+GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg (Gross)",     "Mr. Kougar (German bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg",             "Mr. Kougar (bootleg)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, init_mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong loading / decoding or bad GFX ROMs?
 
-GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",  MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino
+GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",      MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino
 
-GAME( 198?, conquer,  0,        hotshock, hotshock, scramble_state, 0,            ROT90, "<unknown>",           "Conqueror",                      MACHINE_NOT_WORKING   )
+GAME( 198?, conquer,  0,        hotshock, hotshock, scramble_state, empty_init,        ROT90, "<unknown>",           "Conqueror",                          MACHINE_NOT_WORKING )
 
-GAME( 1983, hunchbks, hunchbak, hunchbks, hunchbks, scramble_state, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hunchbks2,hunchbak, hunchbks, hunchbks, scramble_state, scramble_ppi, ROT90, "bootleg (Sig)",       "Hunchback (Scramble hardware, bootleg)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbks, hunchbak, hunchbks, hunchbks, scramble_state, init_scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbks2,hunchbak, hunchbks, hunchbks, scramble_state, init_scramble_ppi, ROT90, "bootleg (Sig)",       "Hunchback (Scramble hardware, bootleg)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, hncholms, huncholy, hncholms, hncholms, scramble_state, scramble_ppi, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hncholms, huncholy, hncholms, hncholms, scramble_state, init_scramble_ppi, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, cavelon,  0,        cavelon,  cavelon,  scramble_state, cavelon,      ROT90, "Jetsoft",             "Cavelon",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cavelon,  0,        cavelon,  cavelon,  scramble_state, init_cavelon,      ROT90, "Jetsoft",             "Cavelon",                            MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,     ROT90, "bootleg",              "Mighty Monkey (bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mimonscra,mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,     ROT90, "bootleg (Kaina Games)","Mighty Monkey (Kaina Games, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, init_mimonscr,     ROT90, "bootleg",              "Mighty Monkey (bootleg on Scramble hardware)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mimonscra,mimonkey, mimonscr, mimonscr, scramble_state, init_mimonscr,     ROT90, "bootleg (Kaina Games)","Mighty Monkey (Kaina Games, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, ad2083,       ROT90, "Midcoin",             "A. D. 2083",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, init_ad2083,       ROT90, "Midcoin",             "A. D. 2083",                         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1983, harem,    0,        harem,    harem,    scramble_state, harem,        ROT90, "I.G.R.",              "Harem",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, harem,    0,        harem,    harem,    scramble_state, init_harem,        ROT90, "I.G.R.",              "Harem",                              MACHINE_SUPPORTS_SAVE )

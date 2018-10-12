@@ -30,29 +30,30 @@
 //  ADDRESS_MAP( coco3_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(coco3_state::coco3_mem)
-	AM_RANGE(0x0000, 0x1FFF) AM_READ_BANK("rbank0") AM_WRITE_BANK("wbank0")
-	AM_RANGE(0x2000, 0x3FFF) AM_READ_BANK("rbank1") AM_WRITE_BANK("wbank1")
-	AM_RANGE(0x4000, 0x5FFF) AM_READ_BANK("rbank2") AM_WRITE_BANK("wbank2")
-	AM_RANGE(0x6000, 0x7FFF) AM_READ_BANK("rbank3") AM_WRITE_BANK("wbank3")
-	AM_RANGE(0x8000, 0x9FFF) AM_READ_BANK("rbank4") AM_WRITE_BANK("wbank4")
-	AM_RANGE(0xA000, 0xBFFF) AM_READ_BANK("rbank5") AM_WRITE_BANK("wbank5")
-	AM_RANGE(0xC000, 0xDFFF) AM_READ_BANK("rbank6") AM_WRITE_BANK("wbank6")
-	AM_RANGE(0xE000, 0xFDFF) AM_READ_BANK("rbank7") AM_WRITE_BANK("wbank7")
-	AM_RANGE(0xFE00, 0xFEFF) AM_READ_BANK("rbank8") AM_WRITE_BANK("wbank8")
-	AM_RANGE(0xFF00, 0xFF1F) AM_READWRITE(ff00_read, ff00_write)
-	AM_RANGE(0xFF20, 0xFF3F) AM_READWRITE(ff20_read, ff20_write)
-	AM_RANGE(0xFF40, 0xFF5F) AM_READWRITE(ff40_read, ff40_write)
-	AM_RANGE(0xFF60, 0xFF8F) AM_READWRITE(ff60_read, ff60_write)
-	AM_RANGE(0xFF90, 0xFFDF) AM_DEVREADWRITE(GIME_TAG, gime_device, read, write)
+void coco3_state::coco3_mem(address_map &map)
+{
+	map(0x0000, 0x1FFF).bankr("rbank0").bankw("wbank0");
+	map(0x2000, 0x3FFF).bankr("rbank1").bankw("wbank1");
+	map(0x4000, 0x5FFF).bankr("rbank2").bankw("wbank2");
+	map(0x6000, 0x7FFF).bankr("rbank3").bankw("wbank3");
+	map(0x8000, 0x9FFF).bankr("rbank4").bankw("wbank4");
+	map(0xA000, 0xBFFF).bankr("rbank5").bankw("wbank5");
+	map(0xC000, 0xDFFF).bankr("rbank6").bankw("wbank6");
+	map(0xE000, 0xFDFF).bankr("rbank7").bankw("wbank7");
+	map(0xFE00, 0xFEFF).bankr("rbank8").bankw("wbank8");
+	map(0xFF00, 0xFF1F).rw(FUNC(coco3_state::ff00_read), FUNC(coco3_state::ff00_write));
+	map(0xFF20, 0xFF3F).rw(FUNC(coco3_state::ff20_read), FUNC(coco3_state::ff20_write));
+	map(0xFF40, 0xFF5F).rw(FUNC(coco3_state::ff40_read), FUNC(coco3_state::ff40_write));
+	map(0xFF60, 0xFF8F).rw(FUNC(coco3_state::ff60_read), FUNC(coco3_state::ff60_write));
+	map(0xFF90, 0xFFDF).rw(m_gime, FUNC(gime_device::bus_r), FUNC(gime_device::bus_w));
 
 	// While Tepolt and other sources say that the interrupt vectors are mapped to
 	// the same memory accessed at $BFFx, William Astle offered evidence that this
 	// memory on a CoCo 3 is not the same.
 	//
 	// http://lost.l-w.ca/0x05/coco3-and-interrupt-vectors/
-	AM_RANGE(0xFFE0, 0xFFFF) AM_ROM AM_REGION(MAINCPU_TAG, 0x7FE0)
-ADDRESS_MAP_END
+	map(0xFFE0, 0xFFFF).rom().region(MAINCPU_TAG, 0x7FE0);
+}
 
 
 
@@ -111,7 +112,7 @@ static INPUT_PORTS_START( coco3_keyboard )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("UP") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP), '^')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("UP") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN), 10)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(LEFT), 8)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT), 9)
@@ -119,30 +120,30 @@ static INPUT_PORTS_START( coco3_keyboard )
 
 	PORT_START("row4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!') PORT_CHAR('|')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#') PORT_CHAR('~')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'') PORT_CHAR('^')
 
 	PORT_START("row5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(') PORT_CHAR('[')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')') PORT_CHAR(']')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<') PORT_CHAR('{')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=') PORT_CHAR('_')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>') PORT_CHAR('}')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?') PORT_CHAR('\\')
 
 	PORT_START("row6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_HOME) PORT_CHAR(12)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("BREAK") PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("ALT") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL), UCHAR_SHIFT_2)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, nullptr) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -246,28 +247,28 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_DEVICE_CLOCK(XTAL(28'636'363) / 32)
 
 	// basic machine hardware
-	MCFG_CPU_ADD(MAINCPU_TAG, MC6809E, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(coco3_mem)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
+	MCFG_DEVICE_ADD(MAINCPU_TAG, MC6809E, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(coco3_mem)
+	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
 
 	// devices
-	MCFG_DEVICE_ADD(PIA0_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_state, pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(coco_state, pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(coco_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(coco_state, pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia0_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia0_irq_b))
+	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
+	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
+	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
+	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
+	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
+	pia0.irqa_handler().set(FUNC(coco_state::pia0_irq_a));
+	pia0.irqb_handler().set(FUNC(coco_state::pia0_irq_b));
 
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(coco_state, pia1_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(coco_state, pia1_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_state, pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(coco_state, pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(coco_state, pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(coco_state, pia1_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia1_firq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
+	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
+	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
+	pia1.readpb_handler().set(FUNC(coco_state::pia1_pb_r));
+	pia1.writepa_handler().set(FUNC(coco_state::pia1_pa_w));
+	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
+	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
+	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
+	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
+	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
 
 	// Becker Port device
 	MCFG_DEVICE_ADD(DWSOCK_TAG, COCO_DWSOCK, 0)
@@ -276,30 +277,27 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "printer")
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(PIA1_TAG, pia6821_device, ca1_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("printer", printer)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "printer")
+	MCFG_RS232_DCD_HANDLER(WRITELINE(PIA1_TAG, pia6821_device, ca1_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("printer", printer)
 
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "fdcv11")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
-	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	MCFG_COCO_VHD_ADD(VHD0_TAG)
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_coco3)
+	config.set_default_layout(layout_coco3);
 
-	MCFG_DEVICE_ADD(GIME_TAG, GIME_NTSC, XTAL(28'636'363))
-	MCFG_GIME_MAINCPU(MAINCPU_TAG)
-	MCFG_GIME_RAM(RAM_TAG)
-	MCFG_GIME_EXT(CARTRIDGE_TAG)
-	MCFG_GIME_HSYNC_CALLBACK(DEVWRITELINE(PIA0_TAG, pia6821_device, ca1_w))
-	MCFG_GIME_FSYNC_CALLBACK(DEVWRITELINE(PIA0_TAG, pia6821_device, cb1_w))
-	MCFG_GIME_IRQ_CALLBACK(WRITELINE(coco3_state, gime_irq_w))
-	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(coco3_state, gime_firq_w))
-	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(coco_state, floating_bus_read))
+	MCFG_DEVICE_ADD(GIME_TAG, GIME_NTSC, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG)
+	MCFG_GIME_HSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, ca1_w))
+	MCFG_GIME_FSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, cb1_w))
+	MCFG_GIME_IRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_irq_w))
+	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_firq_w))
+	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(*this, coco_state, floating_bus_r))
 
 	// composite monitor
 	MCFG_SCREEN_ADD(COMPOSITE_SCREEN_TAG, RASTER)
@@ -321,9 +319,7 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	coco_sound(config);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K,2M,8M");
 
 	// floating space
 	coco_floating(config);
@@ -342,28 +338,28 @@ MACHINE_CONFIG_START(coco3_state::coco3p)
 	MCFG_DEVICE_CLOCK(XTAL(28'475'000) / 32)
 
 	// An additional 4.433618 MHz XTAL is required for PAL color encoding
-	MCFG_DEVICE_REPLACE(GIME_TAG, GIME_PAL, XTAL(28'475'000))
-	MCFG_GIME_MAINCPU(MAINCPU_TAG)
-	MCFG_GIME_RAM(RAM_TAG)
-	MCFG_GIME_EXT(CARTRIDGE_TAG)
-	MCFG_GIME_HSYNC_CALLBACK(DEVWRITELINE(PIA0_TAG, pia6821_device, ca1_w))
-	MCFG_GIME_FSYNC_CALLBACK(DEVWRITELINE(PIA0_TAG, pia6821_device, cb1_w))
-	MCFG_GIME_IRQ_CALLBACK(WRITELINE(coco3_state, gime_irq_w))
-	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(coco3_state, gime_firq_w))
-	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(coco_state, floating_bus_read))
+	MCFG_DEVICE_REPLACE(GIME_TAG, GIME_PAL, XTAL(28'475'000), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG)
+	MCFG_GIME_HSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, ca1_w))
+	MCFG_GIME_FSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, cb1_w))
+	MCFG_GIME_IRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_irq_w))
+	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_firq_w))
+	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(*this, coco_state, floating_bus_r))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco3_state::coco3h)
 	coco3(config);
-	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(coco3_mem)
+	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(coco3_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coco3_state::coco3dw1)
+void coco3_state::coco3dw1(machine_config &config)
+{
 	coco3(config);
-	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "cc3hdb1")
-MACHINE_CONFIG_END
+	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "cc3hdb1"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+}
 
 //**************************************************************************
 //  ROMS
@@ -386,7 +382,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP(  1986,    coco3,      coco,   0,      coco3,     coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
-COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
-COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
-COMP(  19??,    coco3dw1,   coco,   0,      coco3dw1,  coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )
+COMP( 1986, coco3,    coco, 0, coco3,    coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
+COMP( 1986, coco3p,   coco, 0, coco3p,   coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
+COMP( 19??, coco3h,   coco, 0, coco3h,   coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
+COMP( 19??, coco3dw1, coco, 0, coco3dw1, coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )

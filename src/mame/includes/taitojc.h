@@ -8,6 +8,7 @@
 
 #include "video/tc0780fpa.h"
 #include "machine/taitoio.h"
+#include "emupal.h"
 #include "screen.h"
 
 class taitojc_state : public driver_device
@@ -28,13 +29,23 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_analog_ports(*this, "AN.%u", 0),
-		m_tc0780fpa(*this, "tc0780fpa")
+		m_tc0780fpa(*this, "tc0780fpa"),
+		m_lamps(*this, "lamp%u", 0U),
+		m_counters(*this, "counter%u", 0U)
 	{
 		m_mcu_output = 0;
 		m_speed_meter = 0;
 		m_brake_meter = 0;
 	}
 
+	void taitojc(machine_config &config);
+	void dendego(machine_config &config);
+
+	void init_dendego2();
+	void init_dangcurv();
+	void init_taitojc();
+
+private:
 	// device/memory pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
@@ -53,6 +64,9 @@ public:
 	optional_ioport_array<8> m_analog_ports;
 
 	required_device<tc0780fpa_device> m_tc0780fpa;
+
+	output_finder<8> m_lamps;
+	output_finder<5> m_counters;
 
 	uint32_t m_dsp_rom_pos;
 
@@ -123,9 +137,7 @@ public:
 	DECLARE_READ32_MEMBER(taitojc_char_r);
 	DECLARE_WRITE32_MEMBER(taitojc_tile_w);
 	DECLARE_WRITE32_MEMBER(taitojc_char_w);
-	DECLARE_DRIVER_INIT(dendego2);
-	DECLARE_DRIVER_INIT(dangcurv);
-	DECLARE_DRIVER_INIT(taitojc);
+
 	TILE_GET_INFO_MEMBER(taitojc_tile_info);
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -135,8 +147,7 @@ public:
 	INTERRUPT_GEN_MEMBER(taitojc_vblank);
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t w1, uint32_t w2, uint8_t bank_type);
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri);
-	void taitojc(machine_config &config);
-	void dendego(machine_config &config);
+
 	void dendego_map(address_map &map);
 	void hc11_io_map(address_map &map);
 	void hc11_pgm_map(address_map &map);

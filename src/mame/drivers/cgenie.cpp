@@ -52,8 +52,8 @@ public:
 		m_rs232_dcd(1)
 	{}
 
-	DECLARE_DRIVER_INIT(cgenie_eu);
-	DECLARE_DRIVER_INIT(cgenie_nz);
+	void init_cgenie_eu();
+	void init_cgenie_nz();
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -108,25 +108,27 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(cgenie_state::cgenie_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+void cgenie_state::cgenie_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in machine_start
-	AM_RANGE(0xc000, 0xefff) AM_NOP // cartridge space
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(colorram_r, colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM AM_SHARE("fontram")
-	AM_RANGE(0xf800, 0xf8ff) AM_MIRROR(0x300) AM_READ(keyboard_r)
-	AM_RANGE(0xfc00, 0xffff) AM_NOP // cartridge space
-ADDRESS_MAP_END
+	map(0xc000, 0xefff).noprw(); // cartridge space
+	map(0xf000, 0xf3ff).rw(FUNC(cgenie_state::colorram_r), FUNC(cgenie_state::colorram_w)).share("colorram");
+	map(0xf400, 0xf7ff).ram().share("fontram");
+	map(0xf800, 0xf8ff).mirror(0x300).r(FUNC(cgenie_state::keyboard_r));
+	map(0xfc00, 0xffff).noprw(); // cartridge space
+}
 
-ADDRESS_MAP_START(cgenie_state::cgenie_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
-	AM_RANGE(0xfa, 0xfa) AM_DEVWRITE("crtc", hd6845_device, address_w)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("crtc", hd6845_device, register_r, register_w)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(control_r, control_w)
-ADDRESS_MAP_END
+void cgenie_state::cgenie_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf8, 0xf8).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0xf9, 0xf9).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xfa, 0xfa).w(m_crtc, FUNC(hd6845_device::address_w));
+	map(0xfb, 0xfb).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
+	map(0xff, 0xff).rw(FUNC(cgenie_state::control_r), FUNC(cgenie_state::control_w));
+}
 
 
 //**************************************************************************
@@ -290,12 +292,12 @@ WRITE_LINE_MEMBER( cgenie_state::rs232_dcd_w )
 //  DRIVER INIT
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( cgenie_state, cgenie_eu )
+void cgenie_state::init_cgenie_eu()
 {
 	m_palette = &m_palette_eu[0];
 }
 
-DRIVER_INIT_MEMBER( cgenie_state, cgenie_nz )
+void cgenie_state::init_cgenie_nz()
 {
 	m_palette = &m_palette_nz[0];
 }
@@ -438,9 +440,9 @@ const rgb_t cgenie_state::m_palette_nz[] =
 
 MACHINE_CONFIG_START(cgenie_state::cgenie)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(17'734'470) / 8)  // 2.2168 MHz
-	MCFG_CPU_PROGRAM_MAP(cgenie_mem)
-	MCFG_CPU_IO_MAP(cgenie_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(17'734'470) / 8)  // 2.2168 MHz
+	MCFG_DEVICE_PROGRAM_MAP(cgenie_mem)
+	MCFG_DEVICE_IO_MAP(cgenie_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -454,12 +456,12 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_MC6845_UPDATE_ROW_CB(cgenie_state, crtc_update_row)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pa_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pa_w))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pb_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pb_w))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("par", cg_parallel_slot_device, pa_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pa_w))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("par", cg_parallel_slot_device, pb_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -470,9 +472,9 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
 
 	// serial port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(cgenie_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(cgenie_state, rs232_dcd_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, cgenie_state, rs232_rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, cgenie_state, rs232_dcd_w))
 
 	// cartridge expansion slot
 	MCFG_CG_EXP_SLOT_ADD("exp")
@@ -482,9 +484,7 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_CG_PARALLEL_SLOT_ADD("par")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 MACHINE_CONFIG_END
 
 
@@ -509,9 +509,9 @@ ROM_END
 ROM_START( cgenienz )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "old", "Old ROM")
-	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom", 0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(1))
+	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom", 0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "new", "New ROM")
-	ROMX_LOAD("cgromv2.rom", 0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(2))
+	ROMX_LOAD("cgromv2.rom", 0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(1))
 
 	ROM_REGION(0x0800, "gfx1", 0)
 	ROM_LOAD("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))
@@ -522,6 +522,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE INPUT   CLASS         INIT       COMPANY FULLNAME                             FLAGS
-COMP( 1982, cgenie,   0,        0,      cgenie, cgenie, cgenie_state, cgenie_eu, "EACA", "Colour Genie EG2000",               0)
-COMP( 1982, cgenienz, cgenie,   0,      cgenie, cgenie, cgenie_state, cgenie_nz, "EACA", "Colour Genie EG2000 (New Zealand)", 0)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE INPUT   CLASS         INIT            COMPANY FULLNAME                             FLAGS
+COMP( 1982, cgenie,   0,      0,      cgenie, cgenie, cgenie_state, init_cgenie_eu, "EACA", "Colour Genie EG2000",               0)
+COMP( 1982, cgenienz, cgenie, 0,      cgenie, cgenie, cgenie_state, init_cgenie_nz, "EACA", "Colour Genie EG2000 (New Zealand)", 0)

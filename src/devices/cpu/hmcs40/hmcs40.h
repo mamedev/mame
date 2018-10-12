@@ -16,15 +16,15 @@
 
 // max 8 4-bit R ports
 #define MCFG_HMCS40_READ_R_CB(R, _devcb) \
-	devcb = &downcast<hmcs40_cpu_device &>(*device).set_read_r##R##_callback(DEVCB_##_devcb);
+	downcast<hmcs40_cpu_device &>(*device).set_read_r##R##_callback(DEVCB_##_devcb);
 #define MCFG_HMCS40_WRITE_R_CB(R, _devcb) \
-	devcb = &downcast<hmcs40_cpu_device &>(*device).set_write_r##R##_callback(DEVCB_##_devcb);
+	downcast<hmcs40_cpu_device &>(*device).set_write_r##R##_callback(DEVCB_##_devcb);
 
 // 16-bit discrete
 #define MCFG_HMCS40_READ_D_CB(_devcb) \
-	devcb = &downcast<hmcs40_cpu_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
+	downcast<hmcs40_cpu_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
 #define MCFG_HMCS40_WRITE_D_CB(_devcb) \
-	devcb = &downcast<hmcs40_cpu_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
+	downcast<hmcs40_cpu_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
 
 enum
 {
@@ -158,7 +158,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// memorymaps

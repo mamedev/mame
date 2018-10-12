@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -67,20 +68,22 @@ WRITE8_MEMBER(beehive_state::beehive_62_w)
 	m_keyline = data;
 }
 
-ADDRESS_MAP_START(beehive_state::beehive_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x17ff ) AM_ROM
-	AM_RANGE( 0x8000, 0x8fff ) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void beehive_state::beehive_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x17ff).rom();
+	map(0x8000, 0x8fff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(beehive_state::beehive_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("DIPS")
-	AM_RANGE(0x60, 0x60) AM_READ(beehive_60_r)
-	AM_RANGE(0x61, 0x61) AM_READ_PORT("MODIFIERS")
-	AM_RANGE(0x62, 0x62) AM_WRITE(beehive_62_w)
-ADDRESS_MAP_END
+void beehive_state::beehive_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x11, 0x11).portr("DIPS");
+	map(0x60, 0x60).r(FUNC(beehive_state::beehive_60_r));
+	map(0x61, 0x61).portr("MODIFIERS");
+	map(0x62, 0x62).w(FUNC(beehive_state::beehive_62_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( beehive )
@@ -290,9 +293,9 @@ uint32_t beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 MACHINE_CONFIG_START(beehive_state::beehive)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(beehive_mem)
-	MCFG_CPU_IO_MAP(beehive_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(beehive_mem)
+	MCFG_DEVICE_IO_MAP(beehive_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -320,5 +323,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT   COMPANY    FULLNAME  FLAGS
-COMP( 1982, beehive, 0,      0,       beehive,   beehive, beehive_state, 0,     "BeeHive", "DM3270", MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME  FLAGS
+COMP( 1982, beehive, 0,      0,      beehive, beehive, beehive_state, empty_init, "BeeHive", "DM3270", MACHINE_NO_SOUND)

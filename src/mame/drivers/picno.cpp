@@ -42,31 +42,35 @@ public:
 	{ }
 
 	void picno(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(picno_state::mem_map)
-	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("roms", 0) // 32kb internal rom
-	AM_RANGE(0x0fb80, 0x0ff7f) AM_RAM // internal ram
-	AM_RANGE(0x0ff80, 0x0ffff) // internal controls
-	AM_RANGE(0x10000, 0x8ffff) AM_ROM AM_REGION("roms", 0x8000) // guess
-ADDRESS_MAP_END
+void picno_state::mem_map(address_map &map)
+{
+	map(0x00000, 0x07fff).rom().region("roms", 0); // 32kb internal rom
+	map(0x0fb80, 0x0ff7f).ram(); // internal ram
+	map(0x0ff80, 0x0ffff); // internal controls
+	map(0x10000, 0x8ffff).rom().region("roms", 0x8000); // guess
+}
 
-ADDRESS_MAP_START(picno_state::io_map)
+void picno_state::io_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( picno )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(picno_state::picno)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  H83002, XTAL(20'000'000)) /* TODO: correct CPU type (H8/532), crystal is a guess, divided by 2 in the cpu */
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",  H83002, XTAL(20'000'000)) /* TODO: correct CPU type (H8/532), crystal is a guess, divided by 2 in the cpu */
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	//MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // no speaker in the unit, but there's a couple of sockets on the back
 	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -89,6 +93,6 @@ ROM_START( picno2 )
 	ROM_LOAD( "rx001-z8-v4j.u2",    0x08000, 0x80000, CRC(ae89a9a5) SHA1(51ed458ffd151e19019beb23517263efce4be272) ) //HN62334BP
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY   FULLNAME       FLAGS
-CONS( 1993, picno,    0,      0,      picno,    picno,    picno_state,    0,    "Konami", "Picno",      MACHINE_IS_SKELETON )
-CONS( 1993, picno2,   0,      0,      picno,    picno,    picno_state,    0,    "Konami", "Picno 2",     MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME   FLAGS
+CONS( 1993, picno,  0,      0,      picno,   picno, picno_state, empty_init, "Konami", "Picno",   MACHINE_IS_SKELETON )
+CONS( 1993, picno2, 0,      0,      picno,   picno, picno_state, empty_init, "Konami", "Picno 2", MACHINE_IS_SKELETON )

@@ -99,38 +99,41 @@ WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
 
 
 
-ADDRESS_MAP_START(aquarium_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_SHARE("mid_videoram")
-	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_SHARE("bak_videoram")
-	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_SHARE("txt_videoram")
-	AM_RANGE(0xc80000, 0xc81fff) AM_DEVREADWRITE8("spritegen", excellent_spr_device, read, write, 0x00ff)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP        /* probably not used */
-	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
-	AM_RANGE(0xd80082, 0xd80083) AM_READNOP /* stored but not read back ? check code at 0x01f440 */
-	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xd80086, 0xd80087) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd80088, 0xd80089) AM_WRITE8(aquarium_watchdog_w, 0xff00)
-	AM_RANGE(0xd8008a, 0xd8008b) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void aquarium_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0xc00000, 0xc00fff).ram().w(FUNC(aquarium_state::aquarium_mid_videoram_w)).share("mid_videoram");
+	map(0xc01000, 0xc01fff).ram().w(FUNC(aquarium_state::aquarium_bak_videoram_w)).share("bak_videoram");
+	map(0xc02000, 0xc03fff).ram().w(FUNC(aquarium_state::aquarium_txt_videoram_w)).share("txt_videoram");
+	map(0xc80000, 0xc81fff).rw(m_sprgen, FUNC(excellent_spr_device::read), FUNC(excellent_spr_device::write)).umask16(0x00ff);
+	map(0xd00000, 0xd00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd80014, 0xd8001f).writeonly().share("scroll");
+	map(0xd80068, 0xd80069).nopw();        /* probably not used */
+	map(0xd80080, 0xd80081).portr("DSW");
+	map(0xd80082, 0xd80083).nopr(); /* stored but not read back ? check code at 0x01f440 */
+	map(0xd80084, 0xd80085).portr("INPUTS");
+	map(0xd80086, 0xd80087).portr("SYSTEM");
+	map(0xd80088, 0xd80088).w(FUNC(aquarium_state::aquarium_watchdog_w));
+	map(0xd8008b, 0xd8008b).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xff0000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(aquarium_state::snd_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void aquarium_state::snd_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(aquarium_state::snd_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(aquarium_oki_r, aquarium_oki_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w) // only written with 0 for some reason
-	AM_RANGE(0x08, 0x08) AM_WRITE(aquarium_z80_bank_w)
-ADDRESS_MAP_END
+void aquarium_state::snd_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x02, 0x02).rw(FUNC(aquarium_state::aquarium_oki_r), FUNC(aquarium_state::aquarium_oki_w));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x06, 0x06).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w)); // only written with 0 for some reason
+	map(0x08, 0x08).w(FUNC(aquarium_state::aquarium_z80_bank_w));
+}
 
 static INPUT_PORTS_START( aquarium )
 	PORT_START("DSW")
@@ -197,7 +200,7 @@ static INPUT_PORTS_START( aquarium )
 	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 INPUT_PORTS_END
 
 static const gfx_layout char5bpplayout =
@@ -233,7 +236,7 @@ static const gfx_layout tilelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-DRIVER_INIT_MEMBER(aquarium_state,aquarium)
+void aquarium_state::init_aquarium()
 {
 	uint8_t *Z80 = memregion("audiocpu")->base();
 
@@ -277,7 +280,7 @@ DRIVER_INIT_MEMBER(aquarium_state,aquarium)
 }
 
 
-static GFXDECODE_START( aquarium )
+static GFXDECODE_START( gfx_aquarium )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,       0x300, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, char5bpplayout,   0x400, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_8x8_layout,  0x200, 32 )
@@ -287,13 +290,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(aquarium_state::aquarium)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // clock not verified on pcb
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarium_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // clock not verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aquarium_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/6) // clock not verified on pcb
-	MCFG_CPU_PROGRAM_MAP(snd_map)
-	MCFG_CPU_IO_MAP(snd_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/6) // clock not verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(snd_map)
+	MCFG_DEVICE_IO_MAP(snd_portmap)
 
 	// Is this the actual IC type? Some other Excellent games from this period use a MAX693.
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
@@ -307,25 +310,26 @@ MACHINE_CONFIG_START(aquarium_state::aquarium)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarium_state, screen_update_aquarium)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarium)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarium)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_DEVICE_ADD("spritegen", EXCELLENT_SPRITE, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) // clock not verified on pcb
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) // clock not verified on pcb
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'056'000), PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'056'000), okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -388,5 +392,5 @@ ROM_START( aquariumj )
 	ROM_LOAD( "excellent_4.7d",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
 
-GAME( 1996, aquarium,  0,        aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, aquariumj, aquarium, aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, aquarium,  0,        aquarium, aquarium, aquarium_state, init_aquarium, ROT0, "Excellent System", "Aquarium (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, aquariumj, aquarium, aquarium, aquarium, aquarium_state, init_aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

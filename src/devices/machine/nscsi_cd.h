@@ -6,12 +6,15 @@
 #pragma once
 
 #include "machine/nscsi_bus.h"
+#include "imagedev/chd_cd.h"
 #include "cdrom.h"
 
 class nscsi_cdrom_device : public nscsi_full_device
 {
 public:
 	nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_block_size(u32 block_size);
 
 protected:
 	virtual void device_start() override;
@@ -20,12 +23,17 @@ protected:
 
 	virtual void scsi_command() override;
 	virtual uint8_t scsi_get_data(int id, int pos) override;
+	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
 
 private:
-	uint8_t block[2048];
+	static constexpr uint32_t bytes_per_sector = 2048;
+
+	uint8_t sector_buffer[bytes_per_sector];
 	cdrom_file *cdrom;
-	int bytes_per_sector;
-	int lba, cur_lba, blocks;
+	uint32_t bytes_per_block;
+	int lba, cur_sector;
+	required_device<cdrom_image_device> image;
+	uint8_t mode_data[12];
 
 	void return_no_cd();
 };

@@ -28,78 +28,80 @@
 
 #include "bus/rs232/rs232.h"
 
+#include "machine/input_merger.h"
+
 #include "softlist.h"
 #include "speaker.h"
 
-ADDRESS_MAP_START(apple3_state::apple3_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
-ADDRESS_MAP_END
+void apple3_state::apple3_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(apple3_state::apple3_memory_r), FUNC(apple3_state::apple3_memory_w));
+}
 
-static SLOT_INTERFACE_START(apple3_cards)
-	SLOT_INTERFACE("cffa2", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
-	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)    /* PCPI Applicard */
-	SLOT_INTERFACE("thclock", A2BUS_THUNDERCLOCK)    /* ThunderWare ThunderClock Plus - driver assumes slot 2 by default */
-	SLOT_INTERFACE("mouse", A2BUS_MOUSE)    /* Apple II Mouse Card */
-SLOT_INTERFACE_END
+static void apple3_cards(device_slot_interface &device)
+{
+	device.option_add("cffa2", A2BUS_CFFA2_6502);       // CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware
+	device.option_add("applicard", A2BUS_APPLICARD);    // PCPI Applicard
+	device.option_add("thclock", A2BUS_THUNDERCLOCK);   // ThunderWare ThunderClock Plus - driver assumes slot 2 by default
+	device.option_add("mouse", A2BUS_MOUSE);            // Apple II Mouse Card
+}
 
-static SLOT_INTERFACE_START( a3_floppies )
-	SLOT_INTERFACE( "525", FLOPPY_525_SD )
-SLOT_INTERFACE_END
+static void a3_floppies(device_slot_interface &device)
+{
+	device.option_add("525", FLOPPY_525_SD);
+}
 
 FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
-	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT
+	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT
 FLOPPY_FORMATS_END
 
 MACHINE_CONFIG_START(apple3_state::apple3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
-	MCFG_M6502_SYNC_CALLBACK(WRITELINE(apple3_state, apple3_sync_w))
-	MCFG_CPU_PROGRAM_MAP(apple3_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 14.318181_MHz_XTAL / 7)        /* 2 MHz */
+	MCFG_M6502_SYNC_CALLBACK(WRITELINE(*this, apple3_state, apple3_sync_w))
+	MCFG_DEVICE_PROGRAM_MAP(apple3_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET_OVERRIDE(apple3_state, apple3 )
+	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
+	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
+	mainirq.output_handler().append(m_via[1], FUNC(via6522_device::write_pa7)).invert(); // this is active low
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE((280*2)+32, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
-	MCFG_SCREEN_UPDATE_DRIVER(apple3_state, screen_update_apple3)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(14.318181_MHz_XTAL, 910, 0, 560, 262, 0, 192);
+	m_screen->set_screen_update(FUNC(apple3_state::screen_update));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(m_via[1], FUNC(via6522_device::write_cb1));
+	m_screen->screen_vblank().append(m_via[1], FUNC(via6522_device::write_cb2));
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(apple3_state, apple3 )
 
-	MCFG_VIDEO_START_OVERRIDE(apple3_state, apple3 )
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple3_state, apple3_interrupt, "screen", 0, 1)
-
 	/* keyboard controller */
-	MCFG_DEVICE_ADD("ay3600", AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(apple3_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(apple3_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(apple3_state, ay3600_data_ready_w))
+	AY3600(config, m_ay3600, 0);
+	m_ay3600->x0().set_ioport("X0");
+	m_ay3600->x1().set_ioport("X1");
+	m_ay3600->x2().set_ioport("X2");
+	m_ay3600->x3().set_ioport("X3");
+	m_ay3600->x4().set_ioport("X4");
+	m_ay3600->x5().set_ioport("X5");
+	m_ay3600->x6().set_ioport("X6");
+	m_ay3600->x7().set_ioport("X7");
+	m_ay3600->x8().set_ioport("X8");
+	m_ay3600->shift().set(FUNC(apple3_state::ay3600_shift_r));
+	m_ay3600->control().set(FUNC(apple3_state::ay3600_control_r));
+	m_ay3600->data_ready().set(FUNC(apple3_state::ay3600_data_ready_w));
 
 	/* slot bus */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
+	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
 	MCFG_A2BUS_CPU("maincpu")
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple3_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple3_state, a2bus_nmi_w))
-	//MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple3_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple3_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple3_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple3_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple3_cards, nullptr)
+	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple3_state, a2bus_irq_w))
+	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple3_state, a2bus_nmi_w))
+	//MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple3_state, a2bus_inh_w))
+	A2BUS_SLOT(config, "sl1", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", m_a2bus, apple3_cards, nullptr);
 
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", APPLEIII_FDC, 1021800*2)
@@ -112,50 +114,48 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple3")
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200)) // HACK: The schematic shows an external clock generator but using a XTAL is faster to emulate.
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(apple3_state, apple3_acia_irq_func))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(XTAL(1'843'200)); // HACK: The schematic shows an external clock generator but using a XTAL is faster to emulate.
+	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
 	// TODO: remove cts kludge from machine/apple3.c and come up with a good way of coping with pull up resistors.
 
 	/* paddle */
 	MCFG_TIMER_DRIVER_ADD("pdltimer", apple3_state, paddle_timer);
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_0_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_0_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple3_via_0_irq_func))
+	VIA6522(config, m_via[0], 14.318181_MHz_XTAL / 14);
+	m_via[0]->writepa_handler().set(FUNC(apple3_state::apple3_via_0_out_a));
+	m_via[0]->writepb_handler().set(FUNC(apple3_state::apple3_via_0_out_b));
+	m_via[0]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_1_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_1_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple3_via_1_irq_func))
+	VIA6522(config, m_via[1], 14.318181_MHz_XTAL / 14);
+	m_via[1]->writepa_handler().set(FUNC(apple3_state::apple3_via_1_out_a));
+	m_via[1]->writepb_handler().set(FUNC(apple3_state::apple3_via_1_out_b));
+	m_via[1]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("bell", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("bell", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "bell", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "bell", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("c040", apple3_state, apple3_c040_tick, attotime::from_hz(2000))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 512K")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 512K");
 MACHINE_CONFIG_END
 
 
@@ -351,5 +351,5 @@ ROM_START(apple3)
 	ROM_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967))
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE    INPUT   STATE         INIT    COMPANY           FULLNAME */
-COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state, apple3, "Apple Computer", "Apple ///", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME */
+COMP( 1980, apple3, 0,      0,      apple3,  apple3, apple3_state, init_apple3, "Apple Computer", "Apple ///", MACHINE_SUPPORTS_SAVE )

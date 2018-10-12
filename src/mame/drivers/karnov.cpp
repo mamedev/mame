@@ -428,35 +428,39 @@ READ16_MEMBER(karnov_state::karnov_control_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(karnov_state::karnov_map)
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(karnov_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0a0800, 0x0a0fff) AM_WRITE(karnov_videoram_w) /* Wndrplnt Mirror */
-	AM_RANGE(0x0a1000, 0x0a17ff) AM_WRITEONLY AM_SHARE("pf_data")
-	AM_RANGE(0x0a1800, 0x0a1fff) AM_WRITE(karnov_playfield_swap_w)
-	AM_RANGE(0x0c0000, 0x0c0007) AM_READ(karnov_control_r)
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(karnov_control_w)
-ADDRESS_MAP_END
+void karnov_state::karnov_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0x060000, 0x063fff).ram().share("ram");
+	map(0x080000, 0x080fff).ram().share("spriteram");
+	map(0x0a0000, 0x0a07ff).ram().w(FUNC(karnov_state::karnov_videoram_w)).share("videoram");
+	map(0x0a0800, 0x0a0fff).w(FUNC(karnov_state::karnov_videoram_w)); /* Wndrplnt Mirror */
+	map(0x0a1000, 0x0a17ff).writeonly().share("pf_data");
+	map(0x0a1800, 0x0a1fff).w(FUNC(karnov_state::karnov_playfield_swap_w));
+	map(0x0c0000, 0x0c0007).r(FUNC(karnov_state::karnov_control_r));
+	map(0x0c0000, 0x0c000f).w(FUNC(karnov_state::karnov_control_w));
+}
 
 
-ADDRESS_MAP_START(karnov_state::base_sound_map)
-	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void karnov_state::base_sound_map(address_map &map)
+{
+	map(0x0000, 0x05ff).ram();
+	map(0x0800, 0x0800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1000, 0x1001).w("ym1", FUNC(ym2203_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(karnov_state::karnov_sound_map)
-	AM_IMPORT_FROM(base_sound_map)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3526_device, write)
-ADDRESS_MAP_END
+void karnov_state::karnov_sound_map(address_map &map)
+{
+	base_sound_map(map);
+	map(0x1800, 0x1801).w("ym2", FUNC(ym3526_device::write));
+}
 
-ADDRESS_MAP_START(karnov_state::karnovjbl_sound_map)
-	AM_IMPORT_FROM(base_sound_map)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3812_device, write)
-ADDRESS_MAP_END
+void karnov_state::karnovjbl_sound_map(address_map &map)
+{
+	base_sound_map(map);
+	map(0x1800, 0x1801).w("ym2", FUNC(ym3812_device::write));
+}
 
 
 /*************************************
@@ -724,7 +728,7 @@ static const gfx_layout tiles =
 	16*16
 };
 
-static GFXDECODE_START( karnov )
+static GFXDECODE_START( gfx_karnov )
 	GFXDECODE_ENTRY( "gfx1", 0, chars,     0,  4 )  /* colors 0-31 */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,   512, 16 )  /* colors 512-767 */
 	GFXDECODE_ENTRY( "gfx3", 0, sprites, 256, 16 )  /* colors 256-511 */
@@ -737,8 +741,11 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
+WRITE_LINE_MEMBER(karnov_state::vbint_w)
 {
+	if (!state)
+		return;
+
 	uint8_t port = ioport("FAKE")->read();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
@@ -755,14 +762,14 @@ INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
 		else
 		{
 			m_i8751_return = port | 0x8000;
-			device.execute().set_input_line(6, HOLD_LINE);
+			m_maincpu->set_input_line(6, ASSERT_LINE);
 			m_i8751_needs_ack = 1;
 		}
 
 		m_latch = 0;
 	}
 
-	device.execute().set_input_line(7, HOLD_LINE);  /* VBL */
+	m_maincpu->set_input_line(7, ASSERT_LINE);
 }
 
 /*************************************
@@ -805,16 +812,15 @@ void karnov_state::machine_reset()
 MACHINE_CONFIG_START(karnov_state::karnov)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(karnov_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", karnov_state,  karnov_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(karnov_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)    /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(karnov_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)    /* Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(karnov_sound_map)
 
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -823,8 +829,9 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update_karnov)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
@@ -834,15 +841,15 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -853,28 +860,29 @@ MACHINE_CONFIG_START(karnov_state::karnovjbl)
 	Top board next to #9 is 20.000 MHz
 	Top board next to the microcontroller is 6.000 MHz
 	Bottom board next to the ribbon cable is 12.000 MHz*/
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(karnovjbl_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(karnovjbl_sound_map)
 
-	MCFG_SOUND_REPLACE("ym2", YM3812, 3000000)
+	MCFG_DEVICE_REPLACE("ym2", YM3812, 3000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(karnov_state::chelnovjbl_mcu_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void karnov_state::chelnovjbl_mcu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
 
 
 MACHINE_CONFIG_START(karnov_state::chelnovjbl)
 	karnov(config);
-	MCFG_CPU_ADD("mcu", I8031, 2000000) // ??mhz
-	MCFG_CPU_PROGRAM_MAP(chelnovjbl_mcu_map)
-//  MCFG_MCS51_PORT_P1_IN_CB(READ8(karnov_state, p1_r))
-//  MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(karnov_state, p1_w))
-//  MCFG_MCS51_PORT_P3_IN_CB(READ8(karnov_state, p3_r))
-//  MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(karnov_state, p3_w))
+	MCFG_DEVICE_ADD("mcu", I8031, 2000000) // ??mhz
+	MCFG_DEVICE_PROGRAM_MAP(chelnovjbl_mcu_map)
+//  MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, karnov_state, p1_r))
+//  MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, karnov_state, p1_w))
+//  MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, karnov_state, p3_r))
+//  MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, karnov_state, p3_w))
 MACHINE_CONFIG_END
 
 
@@ -882,16 +890,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(karnov_state::wndrplnt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(karnov_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", karnov_state,  karnov_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(karnov_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)    /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(karnov_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)    /* Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(karnov_sound_map)
 
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -900,8 +907,9 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update_karnov)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
@@ -911,15 +919,15 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1338,25 +1346,25 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(karnov_state,karnov)
+void karnov_state::init_karnov()
 {
 	m_microcontroller_id = KARNOV;
 	m_coin_mask = 0x07;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,karnovj)
+void karnov_state::init_karnovj()
 {
 	m_microcontroller_id = KARNOVJ;
 	m_coin_mask = 0x07;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,wndrplnt)
+void karnov_state::init_wndrplnt()
 {
 	m_microcontroller_id = WNDRPLNT;
 	m_coin_mask = 0x00;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnov)
+void karnov_state::init_chelnov()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1365,7 +1373,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnov)
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnovu)
+void karnov_state::init_chelnovu()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1374,7 +1382,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnovj)
+void karnov_state::init_chelnovj()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1390,13 +1398,13 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovj)
  *
  *************************************/
 
-GAME( 1987, karnov,      0,       karnov,     karnov,   karnov_state, karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 6)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnova,     karnov,  karnov,     karnov,   karnov_state, karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 5)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnovj,     karnov,  karnov,     karnov,   karnov_state, karnovj,  ROT0,   "Data East Corporation",       "Karnov (Japan)",                                             MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnovjbl,   karnov,  karnovjbl,  karnov,   karnov_state, karnovj,  ROT0,   "bootleg (K. J. Corporation)", "Karnov (Japan, bootleg with NEC D8748HD)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wndrplnt,    0,       wndrplnt,   wndrplnt, karnov_state, wndrplnt, ROT270, "Data East Corporation",       "Wonder Planet (Japan)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnov,     0,       karnov,     chelnov,  karnov_state, chelnov,  ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (World)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovu,    chelnov, karnov,     chelnovu, karnov_state, chelnovu, ROT0,   "Data East USA",               "Chelnov - Atomic Runner (US)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovj,    chelnov, karnov,     chelnovj, karnov_state, chelnovj, ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (Japan)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovjbl,  chelnov, chelnovjbl, chelnovj, karnov_state, chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE ) // todo: hook up MCU instead of using simulation code
-GAME( 1988, chelnovjbla, chelnov, chelnovjbl, chelnovj, karnov_state, chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 1987, karnov,      0,       karnov,     karnov,   karnov_state, init_karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 6)",                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnova,     karnov,  karnov,     karnov,   karnov_state, init_karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 5)",                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnovj,     karnov,  karnov,     karnov,   karnov_state, init_karnovj,  ROT0,   "Data East Corporation",       "Karnov (Japan)",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnovjbl,   karnov,  karnovjbl,  karnov,   karnov_state, init_karnovj,  ROT0,   "bootleg (K. J. Corporation)", "Karnov (Japan, bootleg with NEC D8748HD)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wndrplnt,    0,       wndrplnt,   wndrplnt, karnov_state, init_wndrplnt, ROT270, "Data East Corporation",       "Wonder Planet (Japan)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnov,     0,       karnov,     chelnov,  karnov_state, init_chelnov,  ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (World)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovu,    chelnov, karnov,     chelnovu, karnov_state, init_chelnovu, ROT0,   "Data East USA",               "Chelnov - Atomic Runner (US)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovj,    chelnov, karnov,     chelnovj, karnov_state, init_chelnovj, ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (Japan)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovjbl,  chelnov, chelnovjbl, chelnovj, karnov_state, init_chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE ) // todo: hook up MCU instead of using simulation code
+GAME( 1988, chelnovjbla, chelnov, chelnovjbl, chelnovj, karnov_state, init_chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE ) // ^^

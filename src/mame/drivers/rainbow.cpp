@@ -356,16 +356,17 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "bus/rs232/rs232.h"
 #include "imagedev/bitbngr.h"
 #include "machine/com8116.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/terminal.h"
-#include "bus/rs232/ser_mouse.h"
 
 #include "machine/i8251.h"
-#include "machine/clock.h"
 #include "machine/dec_lk201.h"
 #include "machine/nvram.h"
+#include "machine/ripple_counter.h"
 #include "machine/timer.h"
 
 #include "machine/ds1315.h"
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 
@@ -506,12 +507,13 @@ public:
 		m_z80(*this, "subcpu"),
 
 		m_fdc(*this, FD1793_TAG),
+		m_floppies(*this, FD1793_TAG ":%u", 0U),
 		m_hdc(*this, "hdc"),
 		m_corvus_hdc(*this, "corvus"),
 
-		m_mpsc(*this, "upd7201"),
-		m_dbrg_A(*this, "com8116_a"),
-		m_dbrg_B(*this, "com8116_b"),
+		m_mpsc(*this, "mpsc"),
+		m_dbrg(*this, "dbrg"),
+		m_comm_port(*this, "comm"),
 
 		m_kbd8251(*this, "kbdser"),
 		m_lk201(*this, LK201_TAG),
@@ -529,9 +531,19 @@ public:
 
 		m_screen2(*this, "screen2"),
 		m_palette2(*this, "palette2"), // GDC-NEW
-		m_video_ram(*this, "vram")
+		m_video_ram(*this, "vram"),
+
+		m_digits(*this, "digit%u", 0U)
 	{
 	}
+
+	void rainbow(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 
 	DECLARE_READ8_MEMBER(read_video_ram_r);
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
@@ -600,10 +612,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mpsc_irq);
 	DECLARE_WRITE8_MEMBER(comm_bitrate_w);
 	DECLARE_WRITE8_MEMBER(printer_bitrate_w);
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_ft_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_b_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_b_ft_w );
+	DECLARE_WRITE8_MEMBER(bitrate_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(dbrg_fr_w);
+	DECLARE_WRITE_LINE_MEMBER(dbrg_ft_w);
 
 	DECLARE_WRITE8_MEMBER(GDC_EXTRA_REGISTER_w);
 	DECLARE_READ8_MEMBER(GDC_EXTRA_REGISTER_r);
@@ -611,7 +622,6 @@ public:
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	TIMER_DEVICE_CALLBACK_MEMBER(hd_motor_tick);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -621,17 +631,11 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
 
-	void rainbow(machine_config &config);
 	void rainbow8088_io(address_map &map);
 	void rainbow8088_map(address_map &map);
 	void rainbowz80_io(address_map &map);
 	void rainbowz80_mem(address_map &map);
 	void upd7220_map(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
 	enum
 	{   // LOWEST PRIORITY
 		// Mnemonic - - - - - -  TYPE  ADDRESS - Source
@@ -665,13 +669,14 @@ private:
 	required_device<cpu_device> m_z80;
 
 	required_device<fd1793_device> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppies;
 	optional_device<wd2010_device> m_hdc;
 
 	required_device<corvus_hdc_device> m_corvus_hdc;
 
 	required_device<upd7201_new_device> m_mpsc;
-	required_device<com8116_device> m_dbrg_A;
-	required_device<com8116_device> m_dbrg_B;
+	required_device<com8116_003_device> m_dbrg;
+	required_device<rs232_port_device> m_comm_port;
 
 	required_device<i8251_device> m_kbd8251;
 	required_device<lk201_device> m_lk201;
@@ -687,6 +692,8 @@ private:
 	required_device<screen_device> m_screen2;
 	required_device<palette_device> m_palette2;
 	required_shared_ptr<uint16_t> m_video_ram;
+
+	output_finder<2> m_digits;
 
 	void raise_8088_irq(int ref);
 	void lower_8088_irq(int ref);
@@ -721,6 +728,8 @@ private:
 	bool m_zflip;                   // Z80 alternate memory map with A15 inverted
 	bool m_z80_halted;
 	int  m_z80_diskcontrol;         // retains values needed for status register
+
+	uint8_t m_printer_bitrate;
 
 	bool m_kbd_tx_ready, m_kbd_rx_ready;
 	int m_KBD;
@@ -858,12 +867,13 @@ FLOPPY_IMD_FORMAT,
 FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START(rainbow_floppies)
-SLOT_INTERFACE("525qd", FLOPPY_525_QD) // QD means 80 tracks with DD data rate (single or double sided).
-SLOT_INTERFACE("525dd", FLOPPY_525_DD) // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.
-SLOT_INTERFACE("35dd", FLOPPY_35_DD) // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
-SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster
-SLOT_INTERFACE_END
+static void rainbow_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD); // QD means 80 tracks with DD data rate (single or double sided).
+	device.option_add("525dd", FLOPPY_525_DD); // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.
+	device.option_add("35dd", FLOPPY_35_DD); // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
+	device.option_add("525ssdd", FLOPPY_525_SSDD); // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster
+}
 
 void rainbow_state::machine_start()
 {
@@ -874,15 +884,19 @@ void rainbow_state::machine_start()
 	switch_off_timer = timer_alloc(1);
 	switch_off_timer->adjust(attotime::from_msec(10));
 
+	m_digits.resolve();
+
 	m_SCREEN_BLANK = false;
 
-	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-	maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(rainbow_state::irq_callback), this));
+	auto *printer_port = subdevice<rs232_port_device>("printer");
+	printer_port->write_dtr(0);
+	printer_port->write_rts(0);
 
 	save_item(NAME(m_z80_private));
 	save_item(NAME(m_z80_mailbox));
 	save_item(NAME(m_8088_mailbox));
 	save_item(NAME(m_zflip));
+	save_item(NAME(m_printer_bitrate));
 	save_item(NAME(m_kbd_tx_ready));
 	save_item(NAME(m_kbd_rx_ready));
 	save_item(NAME(m_irq_high));
@@ -904,229 +918,232 @@ void rainbow_state::machine_start()
 #endif
 }
 
-ADDRESS_MAP_START(rainbow_state::rainbow8088_map)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
-AM_RANGE(0x10000, END_OF_RAM) AM_RAM AM_SHARE("ext_ram") AM_WRITE(ext_ram_w)
+void rainbow_state::rainbow8088_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x0ffff).ram().share("sh_ram");
+	map(0x10000, END_OF_RAM).ram().share("ext_ram").w(FUNC(rainbow_state::ext_ram_w));
 
-// There is a 2212 (256 x 4 bit) NVRAM from 0xed000 to 0xed0ff (*)
-// shadowed at $ec000 - $ecfff and from $ed100 - $edfff.
+	// There is a 2212 (256 x 4 bit) NVRAM from 0xed000 to 0xed0ff (*)
+	// shadowed at $ec000 - $ecfff and from $ed100 - $edfff.
 
-// (*) ED000 - ED0FF is the area the DEC-100-B Bios accesses and checks
+	// (*) ED000 - ED0FF is the area the DEC-100-B Bios accesses and checks
 
-//  - Specs say that the CPU has direct access to volatile RAM only.
-//    So NVRAM is hidden and loads & saves are triggered within the
-//    'diagnostic_w' handler (similar to real hardware).
+	//  - Specs say that the CPU has direct access to volatile RAM only.
+	//    So NVRAM is hidden and loads & saves are triggered within the
+	//    'diagnostic_w' handler (similar to real hardware).
 
-//  - Address bits 8-12 are ignored (-> AM_MIRROR).
-AM_RANGE(0xed000, 0xed0ff) AM_RAM AM_SHARE("vol_ram") //AM_MIRROR(0x1f00)
-AM_RANGE(0xed100, 0xed1ff) AM_RAM AM_SHARE("nvram")
+	//  - Address bits 8-12 are ignored (-> AM_MIRROR).
+	map(0xed000, 0xed0ff).ram().share("vol_ram"); //AM_MIRROR(0x1f00)
+	map(0xed100, 0xed1ff).ram().share("nvram");
 
-AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
-AM_RANGE(0xf0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xee000, 0xeffff).ram().share("p_ram");
+	map(0xf0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(rainbow_state::rainbow8088_io)
-ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_GLOBAL_MASK(0x1ff)
-AM_RANGE(0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
-AM_RANGE(0x02, 0x02) AM_READWRITE(comm_control_r, comm_control_w) // Communication status / control register (8088)
-AM_RANGE(0x04, 0x04) AM_DEVWRITE("vt100_video", rainbow_video_device, dc011_w)
+void rainbow_state::rainbow8088_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x1ff);
+	map(0x00, 0x00).rw(FUNC(rainbow_state::i8088_latch_r), FUNC(rainbow_state::i8088_latch_w));
+	map(0x02, 0x02).rw(FUNC(rainbow_state::comm_control_r), FUNC(rainbow_state::comm_control_w)); // Communication status / control register (8088)
+	map(0x04, 0x04).w(m_crtc, FUNC(rainbow_video_device::dc011_w));
 
-AM_RANGE(0x06, 0x06) AM_WRITE(comm_bitrate_w)
+	map(0x06, 0x06).w(FUNC(rainbow_state::comm_bitrate_w));
 
-AM_RANGE(0x08, 0x08) AM_READ(system_parameter_r)
-AM_RANGE(0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
-AM_RANGE(0x0c, 0x0c) AM_SELECT(0x100) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
+	map(0x08, 0x08).r(FUNC(rainbow_state::system_parameter_r));
+	map(0x0a, 0x0a).rw(FUNC(rainbow_state::diagnostic_r), FUNC(rainbow_state::diagnostic_w));
+	map(0x0c, 0x0c).select(0x100).w(m_crtc, FUNC(rainbow_video_device::dc012_w));
 
-AM_RANGE(0x0e, 0x0e) AM_WRITE(printer_bitrate_w)
+	map(0x0e, 0x0e).w(FUNC(rainbow_state::printer_bitrate_w));
 
-AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("kbdser", i8251_device, data_r, data_w)
-AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w)
+	map(0x10, 0x11).rw(m_kbd8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
-// ===========================================================
-// There are 4 select lines for Option Select 1 to 4
-// Option Select ------------------- Bundle Option Present
-// 1 2 3 4:                          BDL PRES (L):
-// X X o o Communication Option----- X
-// o X o o RD51 hard disk controller X --------- (X = SELECT)
-// ===========================================================
-// 0x20 -> 0x2f ***** EXTENDED COMM. OPTION / Option Select 1.
-// See boot rom @1EA6: 0x27 (<- RESET EXTENDED COMM OPTION  )
+	// ===========================================================
+	// There are 4 select lines for Option Select 1 to 4
+	// Option Select ------------------- Bundle Option Present
+	// 1 2 3 4:                          BDL PRES (L):
+	// X X o o Communication Option----- X
+	// o X o o RD51 hard disk controller X --------- (X = SELECT)
+	// ===========================================================
+	// 0x20 -> 0x2f ***** EXTENDED COMM. OPTION / Option Select 1.
+	// See boot rom @1EA6: 0x27 (<- RESET EXTENDED COMM OPTION  )
 
-// Corvus B/H harddisk controller (incompatible with EXT.COMM OPTION):
-AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("corvus", corvus_hdc_device, read, write)
-AM_RANGE(0x21, 0x21) AM_READ(corvus_status_r)
+	// Corvus B/H harddisk controller (incompatible with EXT.COMM OPTION):
+	map(0x20, 0x20).rw(m_corvus_hdc, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
+	map(0x21, 0x21).r(FUNC(rainbow_state::corvus_status_r));
 
-// ===========================================================
-// 0x30 -> 0x3f ***** Option Select 3
-// ===========================================================
-// 0x40  COMMUNICATIONS DATA REGISTER (MPSC)
-// 0x41  PRINTER DATA REGISTER (MPSC)
-// 0x42  COMMUNICATIONS CONTROL / STATUS REGISTER (MPSC)
-// 0x43  PRINTER CONTROL / STATUS REGISTER (MPSC)
-// ===========================================================
-// 0x50 - 0x57 ***** COLOR GRAPHICS OPTION:
+	// ===========================================================
+	// 0x30 -> 0x3f ***** Option Select 3
+	// ===========================================================
+	// 0x40  COMMUNICATIONS DATA REGISTER (MPSC)
+	// 0x41  PRINTER DATA REGISTER (MPSC)
+	// 0x42  COMMUNICATIONS CONTROL / STATUS REGISTER (MPSC)
+	// 0x43  PRINTER CONTROL / STATUS REGISTER (MPSC)
+	// ===========================================================
+	// 0x50 - 0x57 ***** COLOR GRAPHICS OPTION:
 
-// * Color graphics option (NEC upd7220 GDC plus external hw.). See Programmer's Reference AA-AE36A-TV.
-// Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 x 64 K video RAM.
-// (Write Buffer, Pattern Register/Multiplier, ALU/PS, Color Map, readback and offset/scroll hardware):
-AM_RANGE(0x50, 0x55) AM_READWRITE(GDC_EXTRA_REGISTER_r, GDC_EXTRA_REGISTER_w)
-AM_RANGE(0x56, 0x57) AM_DEVREADWRITE("upd7220", upd7220_device, read, write) // 56 param, 57 command
+	// * Color graphics option (NEC upd7220 GDC plus external hw.). See Programmer's Reference AA-AE36A-TV.
+	// Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 x 64 K video RAM.
+	// (Write Buffer, Pattern Register/Multiplier, ALU/PS, Color Map, readback and offset/scroll hardware):
+	map(0x50, 0x55).rw(FUNC(rainbow_state::GDC_EXTRA_REGISTER_r), FUNC(rainbow_state::GDC_EXTRA_REGISTER_w));
+	map(0x56, 0x57).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)); // 56 param, 57 command
 
-// ===========================================================
-// 0x60 -> 0x6f ***** EXTENDED COMM. OPTION / Option Select 2.
-// ===========================================================
-// 0x60 -> 0x6f ***** RD51 HD. CONTROLLER   / Option Select 2.
-AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("hdc", wd2010_device, read, write) AM_MIRROR(0x100)
-AM_RANGE(0x68, 0x68) AM_READWRITE(hd_status_68_r, hd_status_68_w)
-AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
-// ===========================================================
-// THE RD51 CONTROLLER: WD1010AL - 00 (WDC '83)
-// + 2 K x 8 SRAM (SY2128-4 or Japan 8328) 21-17872-01
-// + 74(L)Sxxx glue logic (drive/head select, buffers etc.)
-// + 10 Mhz Quartz (/2)
-// SERVICE JUMPERS (not to be removed for normal operation):
-//   JUMPER "W1" : bridge between 10 Mhz master clock and board
-//   JUMPER "W2" : bridges SYNC within Read Data Circuit
-//   JUMPER "W3" : bridges 'drive read data' (from hard disk)
-// Later RD51 boards (> '83 week 28 ?) have no jumpers at all.
-// ===========================================================
-// DEC RD TYPE (MByte) CYL ---- HEADS ---- MODEL (typical)
-// DEC RD50 (5 Mbyte): 153 cyl. 4 heads -- ST506
-// DEC RD51(10 Mbyte); 306 cyl. 4 heads -- ST412
-// DEC RD31(20 Mbyte); 615 cyl. 4 heads -- ST225
-// DEC RD52(32 Mbyte); 512 cyl. 8 heads -- Q540  [!]
-// DEC RD32(40 Mbyte); 820 cyl. 6 heads -- ST251 [!]
-// DEC RD53(67 Mbyte); 1024 cyl.8 heads -- 1325  [!]
-// [!] More than 4 heads. Prepare with WUTIL and / or DSKPREP.
+	// ===========================================================
+	// 0x60 -> 0x6f ***** EXTENDED COMM. OPTION / Option Select 2.
+	// ===========================================================
+	// 0x60 -> 0x6f ***** RD51 HD. CONTROLLER   / Option Select 2.
+	map(0x60, 0x67).rw(m_hdc, FUNC(wd2010_device::read), FUNC(wd2010_device::write)).mirror(0x100);
+	map(0x68, 0x68).rw(FUNC(rainbow_state::hd_status_68_r), FUNC(rainbow_state::hd_status_68_w));
+	map(0x69, 0x69).r(FUNC(rainbow_state::hd_status_69_r));
+	// ===========================================================
+	// THE RD51 CONTROLLER: WD1010AL - 00 (WDC '83)
+	// + 2 K x 8 SRAM (SY2128-4 or Japan 8328) 21-17872-01
+	// + 74(L)Sxxx glue logic (drive/head select, buffers etc.)
+	// + 10 Mhz Quartz (/2)
+	// SERVICE JUMPERS (not to be removed for normal operation):
+	//   JUMPER "W1" : bridge between 10 Mhz master clock and board
+	//   JUMPER "W2" : bridges SYNC within Read Data Circuit
+	//   JUMPER "W3" : bridges 'drive read data' (from hard disk)
+	// Later RD51 boards (> '83 week 28 ?) have no jumpers at all.
+	// ===========================================================
+	// DEC RD TYPE (MByte) CYL ---- HEADS ---- MODEL (typical)
+	// DEC RD50 (5 Mbyte): 153 cyl. 4 heads -- ST506
+	// DEC RD51(10 Mbyte); 306 cyl. 4 heads -- ST412
+	// DEC RD31(20 Mbyte); 615 cyl. 4 heads -- ST225
+	// DEC RD52(32 Mbyte); 512 cyl. 8 heads -- Q540  [!]
+	// DEC RD32(40 Mbyte); 820 cyl. 6 heads -- ST251 [!]
+	// DEC RD53(67 Mbyte); 1024 cyl.8 heads -- 1325  [!]
+	// [!] More than 4 heads. Prepare with WUTIL and / or DSKPREP.
 
-// SIZE RESTRICTIONS
-// * HARDWARE:
-//      WD1010 controller has a built-in limit of 8 heads / 1024 cylinders.
-// * BOOT LOADERS:
-//   - the DEC boot loader (and FDISK from DOS 3.10) initially allowed a maximum hard disc size of 20 MB.
-//   - the custom boot loader that comes with 'WUTIL 3.2' allows 117 MB and 8 surfaces.
-// * SOFTWARE:
-//   - MS-DOS 2 allows a maximum partition size of 16 MB (sizes > 15 MB are incompatible to DOS 3)
-//     [ no more than 4 partitions of 8 MB size on one hard disk possible ]
-//   - MS-DOS 3 - and Concurrent CPM - have a global 32 MB (1024 cylinder) limit
-//   - a CP/M-86-80 partition can have up to 8 MB (all CP/M partitions together must not exceed 10 MB)
-// ===========================================================
-// 0x70 -> 0x7f ***** Option Select 4
-// ===========================================================
-// 0x10c -> (MHFU disable register handled by 0x0c + AM_SELECT)
-ADDRESS_MAP_END
+	// SIZE RESTRICTIONS
+	// * HARDWARE:
+	//      WD1010 controller has a built-in limit of 8 heads / 1024 cylinders.
+	// * BOOT LOADERS:
+	//   - the DEC boot loader (and FDISK from DOS 3.10) initially allowed a maximum hard disc size of 20 MB.
+	//   - the custom boot loader that comes with 'WUTIL 3.2' allows 117 MB and 8 surfaces.
+	// * SOFTWARE:
+	//   - MS-DOS 2 allows a maximum partition size of 16 MB (sizes > 15 MB are incompatible to DOS 3)
+	//     [ no more than 4 partitions of 8 MB size on one hard disk possible ]
+	//   - MS-DOS 3 - and Concurrent CPM - have a global 32 MB (1024 cylinder) limit
+	//   - a CP/M-86-80 partition can have up to 8 MB (all CP/M partitions together must not exceed 10 MB)
+	// ===========================================================
+	// 0x70 -> 0x7f ***** Option Select 4
+	// ===========================================================
+	// 0x10c -> (MHFU disable register handled by 0x0c + AM_SELECT)
+}
 
-ADDRESS_MAP_START(rainbow_state::rainbowz80_mem)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE(0x0000, 0xffff) AM_READWRITE(share_z80_r, share_z80_w)
-ADDRESS_MAP_END
+void rainbow_state::rainbowz80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(rainbow_state::share_z80_r), FUNC(rainbow_state::share_z80_w));
+}
 
-ADDRESS_MAP_START(rainbow_state::rainbowz80_io)
-ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_GLOBAL_MASK(0xff)
-AM_RANGE(0x00, 0x00) AM_READWRITE(z80_latch_r, z80_latch_w)
-AM_RANGE(0x20, 0x20) AM_READWRITE(z80_generalstat_r, z80_diskdiag_read_w) // read to port 0x20 used by MS-DOS 2.x diskette loader.
-AM_RANGE(0x21, 0x21) AM_READWRITE(z80_generalstat_r, z80_diskdiag_write_w)
-AM_RANGE(0x40, 0x40) AM_READWRITE(z80_diskstatus_r, z80_diskcontrol_w)
-AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(FD1793_TAG, fd1793_device, read, write)
+void rainbow_state::rainbowz80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(FUNC(rainbow_state::z80_latch_r), FUNC(rainbow_state::z80_latch_w));
+	map(0x20, 0x20).rw(FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_read_w)); // read to port 0x20 used by MS-DOS 2.x diskette loader.
+	map(0x21, 0x21).rw(FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_write_w));
+	map(0x40, 0x40).rw(FUNC(rainbow_state::z80_diskstatus_r), FUNC(rainbow_state::z80_diskcontrol_w));
+	map(0x60, 0x63).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 
-// Z80 I/O shadow area > $80
-AM_RANGE(0x80, 0x80) AM_READWRITE(z80_latch_r, z80_latch_w)
-AM_RANGE(0xA0, 0xA0) AM_READWRITE(z80_generalstat_r, z80_diskdiag_read_w) // read to port 0x20 used by MS-DOS 2.x diskette loader.
-AM_RANGE(0xA1, 0xA1) AM_READWRITE(z80_generalstat_r, z80_diskdiag_write_w)
-AM_RANGE(0xC0, 0xC0) AM_READWRITE(z80_diskstatus_r, z80_diskcontrol_w)
-AM_RANGE(0xE0, 0xE3) AM_DEVREADWRITE(FD1793_TAG, fd1793_device, read, write)
-ADDRESS_MAP_END
+	// Z80 I/O shadow area > $80
+	map(0x80, 0x80).rw(FUNC(rainbow_state::z80_latch_r), FUNC(rainbow_state::z80_latch_w));
+	map(0xA0, 0xA0).rw(FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_read_w)); // read to port 0x20 used by MS-DOS 2.x diskette loader.
+	map(0xA1, 0xA1).rw(FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_write_w));
+	map(0xC0, 0xC0).rw(FUNC(rainbow_state::z80_diskstatus_r), FUNC(rainbow_state::z80_diskcontrol_w));
+	map(0xE0, 0xE3).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+}
 
 /* Input ports */
 
 /* DIP switches */
 static INPUT_PORTS_START(rainbow100b_in)
 
-PORT_START("MONO MONITOR TYPE")
-PORT_DIPNAME(0x03, 0x03, "MONO MONITOR TYPE")
-PORT_DIPSETTING(0x01, "WHITE (VR201-A)")
-PORT_DIPSETTING(0x02, "GREEN (VR201-B)")
-PORT_DIPSETTING(0x03, "AMBER (VR201-C)")
+	PORT_START("MONO MONITOR TYPE")
+	PORT_DIPNAME(0x03, 0x03, "MONO MONITOR TYPE")
+	PORT_DIPSETTING(0x01, "WHITE (VR201-A)")
+	PORT_DIPSETTING(0x02, "GREEN (VR201-B)")
+	PORT_DIPSETTING(0x03, "AMBER (VR201-C)")
 
-// MEMORY, FLOPPY, BUNDLE, GRAPHICS affect 'system_parameter_r':
-PORT_START("MEMORY PRESENT")
-PORT_DIPNAME(0xF0000, 0x20000, "MEMORY PRESENT")
-PORT_DIPSETTING(0x10000, "64  K (MINIMUM ON 100-A)") // see MOTHERBOARD_RAM
-PORT_DIPSETTING(0x20000, "128 K (MINIMUM ON 100-B)")
-PORT_DIPSETTING(0x30000, "192 K (w. MEMORY OPTION)")
-PORT_DIPSETTING(0x40000, "256 K (w. MEMORY OPTION)")
-PORT_DIPSETTING(0x50000, "320 K (100-B MEMORY OPTION)")
-PORT_DIPSETTING(0x60000, "384 K (100-B MEMORY OPTION)")
-PORT_DIPSETTING(0x70000, "448 K (100-B MEMORY OPTION)")
-PORT_DIPSETTING(0x80000, "512 K (100-B MEMORY OPTION)")
-PORT_DIPSETTING(0x90000, "576 K (100-B MEMORY OPTION)")
-PORT_DIPSETTING(0xA0000, "640 K (100-B MEMORY OPTION)")
-PORT_DIPSETTING(0xB0000, "704 K (100-B MEMORY OPTION)")
-PORT_DIPSETTING(0xC0000, "768 K (100-B MEMORY OPTION)")
-PORT_DIPSETTING(0xD0000, "832 K (100-B MEMORY OPTION)") // see END_OF_RAM
-PORT_DIPSETTING(0xE0000, "896 K (100-B MAX.   MEMORY)")
+	// MEMORY, FLOPPY, BUNDLE, GRAPHICS affect 'system_parameter_r':
+	PORT_START("MEMORY PRESENT")
+	PORT_DIPNAME(0xF0000, 0x20000, "MEMORY PRESENT")
+	PORT_DIPSETTING(0x10000, "64  K (MINIMUM ON 100-A)") // see MOTHERBOARD_RAM
+	PORT_DIPSETTING(0x20000, "128 K (MINIMUM ON 100-B)")
+	PORT_DIPSETTING(0x30000, "192 K (w. MEMORY OPTION)")
+	PORT_DIPSETTING(0x40000, "256 K (w. MEMORY OPTION)")
+	PORT_DIPSETTING(0x50000, "320 K (100-B MEMORY OPTION)")
+	PORT_DIPSETTING(0x60000, "384 K (100-B MEMORY OPTION)")
+	PORT_DIPSETTING(0x70000, "448 K (100-B MEMORY OPTION)")
+	PORT_DIPSETTING(0x80000, "512 K (100-B MEMORY OPTION)")
+	PORT_DIPSETTING(0x90000, "576 K (100-B MEMORY OPTION)")
+	PORT_DIPSETTING(0xA0000, "640 K (100-B MEMORY OPTION)")
+	PORT_DIPSETTING(0xB0000, "704 K (100-B MEMORY OPTION)")
+	PORT_DIPSETTING(0xC0000, "768 K (100-B MEMORY OPTION)")
+	PORT_DIPSETTING(0xD0000, "832 K (100-B MEMORY OPTION)") // see END_OF_RAM
+	PORT_DIPSETTING(0xE0000, "896 K (100-B MAX.   MEMORY)")
 
-// EXT.COMM.card -or- RD51 HD. controller (marketed later).
-PORT_START("DEC HARD DISK") // BUNDLE_OPTION
-PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK (#1)") PORT_TOGGLE
-PORT_DIPSETTING(0x00, DEF_STR(Off))
-PORT_DIPSETTING(0x01, DEF_STR(On))
+	// EXT.COMM.card -or- RD51 HD. controller (marketed later).
+	PORT_START("DEC HARD DISK") // BUNDLE_OPTION
+	PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK (#1)") PORT_TOGGLE
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-PORT_START("CORVUS HARD DISKS")
-PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS (#2 to #5)") PORT_TOGGLE
-PORT_DIPSETTING(0x00, DEF_STR(Off))
-PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_START("CORVUS HARD DISKS")
+	PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS (#2 to #5)") PORT_TOGGLE
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-PORT_START("CLIKCLOK") // DS1315 RTC
-PORT_DIPNAME(0x01, 0x00, "REAL TIME CLOCK (CLIKCLOK)") PORT_TOGGLE
-PORT_DIPSETTING(0x00, DEF_STR(Off))
-PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_START("CLIKCLOK") // DS1315 RTC
+	PORT_DIPNAME(0x01, 0x00, "REAL TIME CLOCK (CLIKCLOK)") PORT_TOGGLE
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-PORT_START("GRAPHICS OPTION") // GDC-NEW
-PORT_DIPNAME(0x01, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
-PORT_DIPSETTING(0x00, DEF_STR(Off))
-PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_START("GRAPHICS OPTION") // GDC-NEW
+	PORT_DIPNAME(0x01, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-// W13 - W18 are used for factory tests and affect the boot process -
-PORT_START("W13")
-PORT_DIPNAME(0x02, 0x02, "W13 (FACTORY TEST A, LEAVE OFF)") PORT_TOGGLE
-PORT_DIPSETTING(0x02, DEF_STR(Off))
-PORT_DIPSETTING(0x00, DEF_STR(On))
+	// W13 - W18 are used for factory tests and affect the boot process -
+	PORT_START("W13")
+	PORT_DIPNAME(0x02, 0x02, "W13 (FACTORY TEST A, LEAVE OFF)") PORT_TOGGLE
+	PORT_DIPSETTING(0x02, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
 
-PORT_START("W14")
-PORT_DIPNAME(0x04, 0x04, "W14 (FACTORY TEST B, LEAVE OFF)") PORT_TOGGLE
-PORT_DIPSETTING(0x04, DEF_STR(Off))
-PORT_DIPSETTING(0x00, DEF_STR(On))
-PORT_START("W15")
-PORT_DIPNAME(0x08, 0x08, "W15 (FACTORY TEST C, LEAVE OFF)") PORT_TOGGLE
-PORT_DIPSETTING(0x08, DEF_STR(Off))
-PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_START("W14")
+	PORT_DIPNAME(0x04, 0x04, "W14 (FACTORY TEST B, LEAVE OFF)") PORT_TOGGLE
+	PORT_DIPSETTING(0x04, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_START("W15")
+	PORT_DIPNAME(0x08, 0x08, "W15 (FACTORY TEST C, LEAVE OFF)") PORT_TOGGLE
+	PORT_DIPSETTING(0x08, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
 
-PORT_START("W18") // DSR = 1 when switch is OFF - see i8251.c
-PORT_DIPNAME(0x01, 0x00, "W18 (FACTORY TEST D, LEAVE OFF) (8251A: DSR)") PORT_TOGGLE
-PORT_DIPSETTING(0x00, DEF_STR(Off))
-PORT_DIPSETTING(0x01, DEF_STR(On))
-PORT_WRITE_LINE_DEVICE_MEMBER("kbdser", i8251_device, write_dsr)
+	PORT_START("W18") // DSR = 1 when switch is OFF - see i8251.c
+	PORT_DIPNAME(0x01, 0x00, "W18 (FACTORY TEST D, LEAVE OFF) (8251A: DSR)") PORT_TOGGLE
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_WRITE_LINE_DEVICE_MEMBER("kbdser", i8251_device, write_dsr)
 
-// J17 jumper on FDC controller board shifts drive select (experimental) -
-PORT_START("J17")
-PORT_DIPNAME(0x02, 0x00, "J17 DRIVE SELECT (A => C and B => D)") PORT_TOGGLE
-PORT_DIPSETTING(0x00, DEF_STR(Off))
-PORT_DIPSETTING(0x02, DEF_STR(On))
+	// J17 jumper on FDC controller board shifts drive select (experimental) -
+	PORT_START("J17")
+	PORT_DIPNAME(0x02, 0x00, "J17 DRIVE SELECT (A => C and B => D)") PORT_TOGGLE
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, DEF_STR(On))
 
-PORT_START("WATCHDOG")
-PORT_DIPNAME(0x01, 0x00, "WATCHDOG ENABLED (MHFU)") PORT_TOGGLE
-PORT_DIPSETTING(0x00, DEF_STR(Off))
-PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_START("WATCHDOG")
+	PORT_DIPNAME(0x01, 0x00, "WATCHDOG ENABLED (MHFU)") PORT_TOGGLE
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-PORT_START("MONITOR CONFIGURATION") // GDC-NEW
-PORT_DIPNAME(0x03, 0x03, "MONITOR CONFIGURATION")
-PORT_DIPSETTING(0x01, "MONO ONLY / 4 to 16 monochrome shades (single VR-201)")
-PORT_DIPSETTING(0x02, "COLOR ONLY (single VR-241 with BCC-17 cable)")
-PORT_DIPSETTING(0x03, "DUAL MONITOR (SCREEN 1: TEXT;  SCREEN 2: R-G-B)")
+	PORT_START("MONITOR CONFIGURATION") // GDC-NEW
+	PORT_DIPNAME(0x03, 0x03, "MONITOR CONFIGURATION")
+	PORT_DIPSETTING(0x01, "MONO ONLY / 4 to 16 monochrome shades (single VR-201)")
+	PORT_DIPSETTING(0x02, "COLOR ONLY (single VR-241 with BCC-17 cable)")
+	PORT_DIPSETTING(0x03, "DUAL MONITOR (SCREEN 1: TEXT;  SCREEN 2: R-G-B)")
 INPUT_PORTS_END
 
 void rainbow_state::machine_reset()
@@ -1136,7 +1153,7 @@ void rainbow_state::machine_reset()
 	popmessage("Reset");
 
 	// Configure RAM
-	address_space &program = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space &program = m_i8088->space(AS_PROGRAM);
 	uint32_t unmap_start = m_inp8->read();
 
 	// Verify RAM size matches hardware (DIP switches)
@@ -1193,7 +1210,7 @@ void rainbow_state::machine_reset()
 	m_rtc->chip_reset();     // * Reset RTC to a defined state *
 
 	//  *********** HARD DISK CONTROLLERS...
-	address_space &io = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	address_space &io = m_i8088->space(AS_IO);
 	if (m_inp5->read() == 0x01) // ...PRESENT?
 	{
 		// Install 8088 read / write handler
@@ -1261,6 +1278,7 @@ void rainbow_state::machine_reset()
 	// *********** SERIAL COMM. (7201)
 	m_mpsc->reset();
 	m_mpsc_irq = 0;
+	m_printer_bitrate = 0;
 
 	// *********** KEYBOARD + IRQ
 	m_kbd_tx_ready = m_kbd_rx_ready = false;
@@ -1410,42 +1428,52 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 {
-	m_dbrg_A->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
+	m_dbrg->write_str(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
 
-	m_dbrg_A->stt_w( ((data & 0xf0) >> 4) );
+	m_dbrg->write_stt( ((data & 0xf0) >> 4) );
 	logerror("(COMM.) transmit bitrate = %d ($%02x)\n", comm_rates[((data & 0xf0) >> 4)] ,(data & 0xf0) >> 4);
 }
 
 // PORT 0x0e : Printer bit rates
 WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
 {
-	m_dbrg_B->str_w(data & 7); // bits 0 - 2
-	m_dbrg_B->stt_w(data & 7); // TX and RX rate cannot be programmed independently.
+	m_printer_bitrate = data & 7;
+	// bits 0 - 2 = 0: nominally 75 bps, actually 75.35 bps
+	// bits 0 - 2 = 1: nominally 150 bps, actually 150.7 bps
+	// bits 0 - 2 = 2: nominally 300 bps, actually 301.4 bps
+	// bits 0 - 2 = 3: nominally 600 bps, actually 602.8 bps
+	// bits 0 - 2 = 4: nominally 1200 bps, actually 1205.6 bps
+	// bits 0 - 2 = 5: nominally 2400 bps, actually 2411.2 bps
+	// bits 0 - 2 = 6: nominally 4800 bps, actually 4822.4 bps (keyboard is tied to this rate)
+	// bits 0 - 2 = 7: nominally 9600 bps, actually 9644.8 bps
+	// TX and RX rate cannot be programmed independently.
 	logerror("\n(PRINTER) receive = transmit bitrate: %d ($%02x)", 9600 / ( 1 << (7 - (data & 7))) , data & 7);
 
 	// "bit 3 controls the communications port clock (RxC,TxC). External clock when 1, internal when 0"
 	logerror(" - CLOCK (0 = internal): %02x", data & 8);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_a_fr_w)
+WRITE_LINE_MEMBER(rainbow_state::dbrg_fr_w)
 {
 	m_mpsc->rxca_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_a_ft_w)
+WRITE_LINE_MEMBER(rainbow_state::dbrg_ft_w)
 {
 	m_mpsc->txca_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_b_fr_w)
+WRITE8_MEMBER(rainbow_state::bitrate_counter_w)
 {
-	m_mpsc->rxcb_w(state);
-}
+	bool prt_rxtxc = BIT(data, 7 - m_printer_bitrate);
+	bool kbd_rxtxc = BIT(data, 1);
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_b_ft_w)
-{
-	m_mpsc->txcb_w(state);
+	m_mpsc->rxcb_w(prt_rxtxc);
+	m_mpsc->txcb_w(prt_rxtxc);
+
+	m_kbd8251->write_rxc(kbd_rxtxc);
+	m_kbd8251->write_txc(kbd_rxtxc);
 }
 
 // Only Z80 * private SRAM * is wait state free
@@ -1514,7 +1542,7 @@ WRITE8_MEMBER(rainbow_state::ext_ram_w)
 #ifndef OLD_RAM_BOARD_PRESENT
 	if(m_diagnostic & 0x08)
 		if( (offset + 0x10000) >= (MOTHERBOARD_RAM + 1))
-			m_i8088->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_i8088->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 #endif
 }
 
@@ -1655,7 +1683,7 @@ void rainbow_state::hdc_reset()
 
 // Return 'hard_disk_file' object for harddisk 1 (fixed).
 // < nullptr if geometry is insane or other errors occured >
-hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
+hard_disk_file *rainbow_state::rainbow_hdc_file(int drv)
 {
 	m_hdc_drive_ready = false;
 
@@ -1666,7 +1694,7 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 		return nullptr;
 
 	harddisk_image_device *img = nullptr;
-	img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("decharddisk1").c_str()));
+	img = dynamic_cast<harddisk_image_device *>(subdevice("decharddisk1"));
 
 	if (!img)
 		return nullptr;
@@ -2172,13 +2200,12 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 //  [02] COMMUNICATIONS STATUS REGISTER - PAGE 154 (**** READ **** )
 //  Used to read status of SERIAL port, IRQ line of each CPU, and MHFU logic enable signal.
 
-// ******* TODO: 5 status bits * MISSING * ********************************************************
 // 0 COMM RI   (reflects status of RI line at COMM port)
 // 1 COMM SI / SCF(reflects status of speed indicator line or
 //                 the secondary receive line signal detect at COMM port)
 // 2 COMM DSR  (reflects status of DSR at COMM)
 // 3 COMM CTS  (reflects status of CTS at COMM)
-// 4 COMM RLSD (receive line signal detect at COMM)
+// 4 COMM RLSD (receive line signal detect at COMM; also connected to DCDA on MPSC)
 READ8_MEMBER(rainbow_state::comm_control_r)
 {
 	bool is_mhfu_enabled = false;
@@ -2186,6 +2213,11 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 		is_mhfu_enabled = m_crtc->MHFU(MHFU_IS_ENABLED);
 
 	return          (
+			(m_comm_port->ri_r() ? 0x01 : 0x00) |
+			(m_comm_port->si_r() ? 0x02 : 0x00) |
+			(m_comm_port->dsr_r() ? 0x04 : 0x00) |
+			(m_comm_port->cts_r() ? 0x08 : 0x00) |
+			(m_comm_port->dcd_r() ? 0x10 : 0x00) |
 			(is_mhfu_enabled ? 0x00 : 0x20) |   // (L) status of MHFU flag => bit pos.5
 			((INT88) ? 0x00 : 0x40) |           // (L)
 			((INTZ80) ? 0x00 : 0x80)            // (L)
@@ -2193,7 +2225,6 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 
 }
 
-// ******* TODO: 4 control bits * MISSING * ********************************************************
 //  Communication control register of -COMM- port (when written):
 // (these 4 bits talk DIRECTLY to the COMM port according to schematics):
 // 0 COMM SPD SEL H (controls speed select line of COMM port)
@@ -2203,6 +2234,11 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 WRITE8_MEMBER(rainbow_state::comm_control_w)
 {
 	logerror("%02x to COMM.CONTROL REGISTER ", data);
+
+	m_comm_port->write_spds(BIT(data, 0));
+	// SRTS not currently emulated
+	m_comm_port->write_dtr(BIT(data, 2));
+	m_comm_port->write_rts(BIT(data, 3));
 
 	/* 8088 LEDs:
 	5  7  6  4    <- BIT POSITION
@@ -2316,7 +2352,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 
 	if(m_fdc)
 	{
-		track = m_fdc->track_r(space, 0);
+		track = m_fdc->track_r();
 		if(track == 0)
 			tk00 = 1;
 
@@ -2367,7 +2403,7 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 	{
 		data |= m_fdc->drq_r()   ? 0x80 : 0x00;
 		data |= m_fdc->intrq_r() ? 0x40 : 0x00;
-		track = m_fdc->track_r(space, 0);
+		track = m_fdc->track_r();
 
 		// D2: TG43 * LOW ACTIVE * :  0 = INDICATES TRACK > 43 SIGNAL FROM FDC TO DISK DRIVE.
 		// (asserted when writing data to tracks 44 through 79)
@@ -2386,8 +2422,8 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 	// Print HEX track number
 	static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
 	// 0...9 ,A (0x77), b (0x7c), C (0x39) , d (0x5e), E (0x79), F (0x71)
-	output().set_digit_value(0, bcd2hex[(track >> 4) & 0x0f]);
-	output().set_digit_value(1, bcd2hex[ track & 0x0f]);
+	m_digits[0] = bcd2hex[(track >> 4) & 0x0f];
+	m_digits[1] = bcd2hex[track & 0x0f];
 
 	// D1: DS1 H: reflect status of bits 0 and 1 from disk.control reg.
 	// D0: DS0 H: "
@@ -2406,7 +2442,6 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	int disable_start; // set defaults
 
 	int selected_drive = INVALID_DRIVE;
-	static const char *names[] = { FD1793_TAG ":0", FD1793_TAG ":1", FD1793_TAG ":2", FD1793_TAG ":3" };
 
 	int drive = 0;
 	if (m_inp10->read() && ((data & 3) < 2))
@@ -2414,13 +2449,9 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	else
 		drive = data & 3;
 
-	floppy_connector *con = nullptr;
-	if (drive < MAX_FLOPPIES)
-		con = machine().device<floppy_connector>(names[drive]);
-
-	if (con)
+	if (m_floppies[drive])
 	{
-		m_floppy = con->get_device();
+		m_floppy = m_floppies[drive]->get_device();
 		if (m_floppy)
 			selected_drive = drive;
 	}
@@ -2475,9 +2506,10 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		// Assume the other one is switched off -
 		for (int f_num = 0; f_num < MAX_FLOPPIES; f_num++)
 		{
-		floppy_connector *con = machine().device<floppy_connector>(names[f_num]);
-		floppy_image_device *tmp_floppy = con->get_device();
+		floppy_image_device *tmp_floppy = m_floppies[f_num]->get_device();
 
+		if (!tmp_floppy)
+			continue;
 		tmp_floppy->mon_w(ASSERT_LINE);
 		if ((f_num >= enable_start) && (f_num < disable_start))
 			tmp_floppy->mon_w(CLEAR_LINE); // enable
@@ -2740,7 +2772,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 		printf("\nWARNING: UNEMULATED DIAG LOOPBACK (directs RX50 and DC12 output to printer port) **** ");
 	}
 
-	address_space &io = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	address_space &io = m_i8088->space(AS_IO);
 	if (data & 32)
 	{
 		/* BIT 5: PORT LOOPBACK (1 enables loopback for COMM, PRINTER, KEYBOARD ports)
@@ -2798,12 +2830,6 @@ WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
 {
 	m_kbd_tx_ready = (state == 1) ? true : false;
 	update_kbd_irq();
-}
-
-WRITE_LINE_MEMBER(rainbow_state::write_keyboard_clock)
-{
-	m_kbd8251->write_txc(state);
-	m_kbd8251->write_rxc(state);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::hd_motor_tick)
@@ -2971,7 +2997,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			if(last_message != 1)
 			{
 				popmessage("\nCOLOR GRAPHICS ADAPTER INVOKED.  PLEASE TURN ON THE APPROPRIATE DIP SWITCH, THEN REBOOT.\n");
-				printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , machine().device("maincpu")->safe_pc());
+				printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , m_i8088->pc());
 				last_message = 1;
 			}
 			return;
@@ -3174,160 +3200,157 @@ static const gfx_layout rainbow_charlayout =
 	8 * 16      /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START(rainbow)
-GFXDECODE_ENTRY("chargen", 0x0000, rainbow_charlayout, 0, 1)
+static GFXDECODE_START(gfx_rainbow)
+	GFXDECODE_ENTRY("chargen", 0x0000, rainbow_charlayout, 0, 1)
 GFXDECODE_END
 
 // Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC-NEW):
-ADDRESS_MAP_START(rainbow_state::upd7220_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
-ADDRESS_MAP_END
+void rainbow_state::upd7220_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rw(FUNC(rainbow_state::vram_r), FUNC(rainbow_state::vram_w)).share("vram");
+}
 
 MACHINE_CONFIG_START(rainbow_state::rainbow)
-MCFG_DEFAULT_LAYOUT(layout_rainbow)
+	config.set_default_layout(layout_rainbow);
 
-/* basic machine hardware */
-MCFG_CPU_ADD("maincpu", I8088, XTAL(24'073'400) / 5)
-MCFG_CPU_PROGRAM_MAP(rainbow8088_map)
-MCFG_CPU_IO_MAP(rainbow8088_io)
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", I8088, 24.0734_MHz_XTAL / 5) // approximately 4.815 MHz
+	MCFG_DEVICE_PROGRAM_MAP(rainbow8088_map)
+	MCFG_DEVICE_IO_MAP(rainbow8088_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(rainbow_state, irq_callback)
 
-MCFG_CPU_ADD("subcpu", Z80, XTAL(24'073'400) / 6)
-MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
-MCFG_CPU_IO_MAP(rainbowz80_io)
+	MCFG_DEVICE_ADD("subcpu", Z80, 24.0734_MHz_XTAL / 6)
+	MCFG_DEVICE_PROGRAM_MAP(rainbowz80_mem)
+	MCFG_DEVICE_IO_MAP(rainbowz80_io)
 
-/* video hardware */
-MCFG_SCREEN_ADD("screen", RASTER)
-MCFG_SCREEN_RAW_PARAMS(XTAL(24'073'400) / 6, 442, 0, 400, 264, 0, 240) // ~NTSC compatible video timing (?)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(24.0734_MHz_XTAL / 6, 442, 0, 400, 264, 0, 240) // ~NTSC compatible video timing (?)
 
-MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
-MCFG_SCREEN_PALETTE("vt100_video:palette")
-MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", rainbow)
+	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
+	MCFG_SCREEN_PALETTE("vt100_video:palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_rainbow)
 
-MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, XTAL(24'073'400))
+	MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, 24.0734_MHz_XTAL)
 
-MCFG_VT_SET_SCREEN("screen")
-MCFG_VT_CHARGEN("chargen")
-MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
-MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(rainbow_state, video_interrupt))
+	MCFG_VT_SET_SCREEN("screen")
+	MCFG_VT_CHARGEN("chargen")
+	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(*this, rainbow_state, read_video_ram_r))
+	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(*this, rainbow_state, video_interrupt))
 
-// *************************** COLOR GRAPHICS (OPTION) **************************************
-// While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).
-MCFG_DEVICE_ADD("upd7220", UPD7220, 31188000 / 32) // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
-MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE(rainbow_state, GDC_vblank_irq)) // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
+	// *************************** COLOR GRAPHICS (OPTION) **************************************
+	// While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).
+	MCFG_DEVICE_ADD("upd7220", UPD7220, 31188000 / 32) // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
+	MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE(*this, rainbow_state, GDC_vblank_irq)) // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
-MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(rainbow_state, hgdc_display_pixels)
-MCFG_VIDEO_SET_SCREEN("screen2") // SET_SCREEN needs to be added after 7720 device in the machine config, not after the screen.
-MCFG_PALETTE_ADD("palette2", 32)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(rainbow_state, hgdc_display_pixels)
+	MCFG_VIDEO_SET_SCREEN("screen2") // SET_SCREEN needs to be added after 7720 device in the machine config, not after the screen.
+	MCFG_PALETTE_ADD("palette2", 32)
 
-MCFG_SCREEN_ADD("screen2", RASTER)
-MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_ADD("screen2", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
 
-// VR241 color monitor is specified for 20 MHz bandwidth ( 60 Hz / 15.72 kHz horizontal rate )
-// - sufficient for 800 x 240 non-interlaced at 60 Hz (non interlaced).
-//MCFG_SCREEN_RAW_PARAMS(31188000 / 2 , 992, 0, 800, 262, 0, 240)
+	// VR241 color monitor is specified for 20 MHz bandwidth ( 60 Hz / 15.72 kHz horizontal rate )
+	// - sufficient for 800 x 240 non-interlaced at 60 Hz (non interlaced).
+	//MCFG_SCREEN_RAW_PARAMS(31188000 / 2 , 992, 0, 800, 262, 0, 240)
 
-// Alternate configuration:
-MCFG_SCREEN_RAW_PARAMS(31188000 / 4 , 496, 0, 400, 262, 0, 240)
+	// Alternate configuration:
+	MCFG_SCREEN_RAW_PARAMS(31188000 / 4 , 496, 0, 400, 262, 0, 240)
 
-MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
-MCFG_FD1793_ADD(FD1793_TAG, XTAL(24'073'400) / 24) // no separate 1 Mhz quartz
-MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats)
-MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats)
-MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
+	FD1793(config, m_fdc, 24.0734_MHz_XTAL / 24); // no separate 1 Mhz quartz
+	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
+	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
+	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
 
-/// ********************************* HARD DISK CONTROLLER *****************************************
-MCFG_DEVICE_ADD("hdc", WD2010, 5000000) // 10 Mhz quartz on controller (divided by 2 for WCLK)
-MCFG_WD2010_OUT_INTRQ_CB(WRITELINE(rainbow_state, bundle_irq)) // FIRST IRQ SOURCE (OR'ed with DRQ)
-MCFG_WD2010_OUT_BDRQ_CB(WRITELINE(rainbow_state, hdc_bdrq))  // BUFFER DATA REQUEST
+	/// ********************************* HARD DISK CONTROLLER *****************************************
+	WD2010(config, m_hdc, 5000000); // 10 Mhz quartz on controller (divided by 2 for WCLK)
+	m_hdc->out_intrq_callback().set(FUNC(rainbow_state::bundle_irq)); // FIRST IRQ SOURCE (OR'ed with DRQ)
+	m_hdc->out_bdrq_callback().set(FUNC(rainbow_state::hdc_bdrq));  // BUFFER DATA REQUEST
 
-// SIGNALS -FROM- WD CONTROLLER:
-MCFG_WD2010_OUT_BCS_CB(WRITELINE(rainbow_state, hdc_read_sector)) // Problem: OUT_BCS_CB = WRITE8 ... (!)
-MCFG_WD2010_OUT_BCR_CB(WRITELINE(rainbow_state, hdc_bcr))         // BUFFER COUNTER RESET (pulses)
+	// SIGNALS -FROM- WD CONTROLLER:
+	m_hdc->out_bcs_callback().set(FUNC(rainbow_state::hdc_read_sector)); // Problem: OUT_BCS_CB = WRITE8 ... (!)
+	m_hdc->out_bcr_callback().set(FUNC(rainbow_state::hdc_bcr));         // BUFFER COUNTER RESET (pulses)
 
-MCFG_WD2010_OUT_WG_CB(WRITELINE(rainbow_state, hdc_write_sector))   // WRITE GATE
-MCFG_WD2010_OUT_STEP_CB(WRITELINE(rainbow_state, hdc_step))         // STEP PULSE
-MCFG_WD2010_OUT_DIRIN_CB(WRITELINE(rainbow_state, hdc_direction))
+	m_hdc->out_wg_callback().set(FUNC(rainbow_state::hdc_write_sector));   // WRITE GATE
+	m_hdc->out_step_callback().set(FUNC(rainbow_state::hdc_step));         // STEP PULSE
+	m_hdc->out_dirin_callback().set(FUNC(rainbow_state::hdc_direction));
 
-MCFG_WD2010_IN_WF_CB(READLINE(rainbow_state, hdc_write_fault))   // WRITE FAULT  (set to GND if not serviced)
+	m_hdc->in_wf_callback().set(FUNC(rainbow_state::hdc_write_fault));   // WRITE FAULT  (set to GND if not serviced)
 
-MCFG_WD2010_IN_DRDY_CB(READLINE(rainbow_state, hdc_drive_ready)) // DRIVE_READY  (set to VCC if not serviced)
-MCFG_WD2010_IN_SC_CB(VCC)                                        // SEEK COMPLETE (set to VCC if not serviced)
+	m_hdc->in_drdy_callback().set(FUNC(rainbow_state::hdc_drive_ready)); // DRIVE_READY  (set to VCC if not serviced)
 
-MCFG_WD2010_IN_TK000_CB(VCC) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
-MCFG_WD2010_IN_INDEX_CB(VCC) //    "
+	m_hdc->in_sc_callback().set_constant(1);                                        // SEEK COMPLETE (set to VCC if not serviced)
 
-MCFG_HARDDISK_ADD("decharddisk1")
-/// ******************************** / HARD DISK CONTROLLER ****************************************
+	m_hdc->in_tk000_callback().set_constant(1); // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
+	m_hdc->in_wf_callback().set_constant(1); //    "
 
-MCFG_DEVICE_ADD("corvus", CORVUS_HDC, 0)
-MCFG_HARDDISK_ADD("harddisk1")
-MCFG_HARDDISK_INTERFACE("corvus_hdd")
-MCFG_HARDDISK_ADD("harddisk2")
-MCFG_HARDDISK_INTERFACE("corvus_hdd")
-MCFG_HARDDISK_ADD("harddisk3")
-MCFG_HARDDISK_INTERFACE("corvus_hdd")
-MCFG_HARDDISK_ADD("harddisk4")
-MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("decharddisk1")
+	/// ******************************** / HARD DISK CONTROLLER ****************************************
 
-MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
+	MCFG_DEVICE_ADD("corvus", CORVUS_HDC, 0)
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
 
-MCFG_DEVICE_ADD("com8116_a", COM8116, XTAL(5'068'800))     // Baud rate generator A
-MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_a_fr_w))
-MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_a_ft_w))
+	DS1315(config, m_rtc, 0); // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-MCFG_DEVICE_ADD("com8116_b", COM8116, XTAL(5'068'800)) // Baud rate generator B
-MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_b_fr_w))
-MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_b_ft_w))
+	COM8116_003(config, m_dbrg, 24.0734_MHz_XTAL / 4); // 6.01835 MHz (nominally 6 MHz)
+	m_dbrg->fr_handler().set(FUNC(rainbow_state::dbrg_fr_w));
+	m_dbrg->ft_handler().set(FUNC(rainbow_state::dbrg_ft_w));
 
-MCFG_DEVICE_ADD("upd7201", UPD7201_NEW, XTAL(2'500'000))    // 2.5 Mhz from schematics
-MCFG_Z80SIO_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))
+	UPD7201_NEW(config, m_mpsc, 24.0734_MHz_XTAL / 5 / 2); // 2.4073 MHz (nominally 2.5 MHz)
+	m_mpsc->out_int_callback().set(FUNC(rainbow_state::mpsc_irq));
+	m_mpsc->out_txda_callback().set("comm", FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	// RTS and DTR outputs are not connected
 
-MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
-MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
-MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, dcda_w))
 
-MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
-MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_dtr))
-MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, ctsb_w)) // actually DTR
 
-MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, rxa_w))
-MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsa_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, dcda_w))
+	MCFG_DEVICE_MODIFY("comm")
+	MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE)
+	MCFG_SLOT_OPTION_ADD("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE)
+	MCFG_SLOT_OPTION_ADD("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE)
+	MCFG_SLOT_DEFAULT_OPTION("logitech_mouse")
 
-MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, rxb_w))
-MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsb_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, dcdb_w))
+	MCFG_DEVICE_MODIFY("printer")
+	MCFG_SLOT_DEFAULT_OPTION("printer")
 
-MCFG_DEVICE_MODIFY("rs232_a")
-MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_SERIAL_MOUSE)
-MCFG_SLOT_OPTION_ADD("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
-MCFG_SLOT_DEFAULT_OPTION("microsoft_mouse")
+	I8251(config, m_kbd8251, 24.0734_MHz_XTAL / 5 / 2);
+	m_kbd8251->txd_handler().set(FUNC(rainbow_state::kbd_tx));
+	m_kbd8251->dtr_handler().set(FUNC(rainbow_state::irq_hi_w));
+	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_state::kbd_rxready_w));
+	m_kbd8251->txrdy_handler().set(FUNC(rainbow_state::kbd_txready_w));
 
-MCFG_DEVICE_MODIFY("rs232_b")
-MCFG_SLOT_DEFAULT_OPTION("printer")
+	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
+	MCFG_LK201_TX_HANDLER(WRITELINE("kbdser", i8251_device, write_rxd))
 
-MCFG_DEVICE_ADD("kbdser", I8251, 0)
-MCFG_I8251_TXD_HANDLER(WRITELINE(rainbow_state, kbd_tx))
-MCFG_I8251_DTR_HANDLER(WRITELINE(rainbow_state, irq_hi_w))
-MCFG_I8251_RXRDY_HANDLER(WRITELINE(rainbow_state, kbd_rxready_w))
-MCFG_I8251_TXRDY_HANDLER(WRITELINE(rainbow_state, kbd_txready_w))
+	ripple_counter_device &prtbrg(RIPPLE_COUNTER(config, "prtbrg", 24.0734_MHz_XTAL / 6 / 13)); // 74LS393 at E17 (both halves)
+	// divided clock should ideally be 307.2 kHz, but is actually approximately 308.6333 kHz
+	prtbrg.set_stages(8);
+	prtbrg.count_out_cb().set(FUNC(rainbow_state::bitrate_counter_w));
 
-MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
-MCFG_LK201_TX_HANDLER(DEVWRITELINE("kbdser", i8251_device, write_rxd))
-MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800 * 16) // 8251 is set to /16 on the clock input
-MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(rainbow_state, write_keyboard_clock))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
 
-MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
-
-MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 //----------------------------------------------------------------------------------------
@@ -3353,22 +3376,22 @@ MACHINE_CONFIG_END
 // - smaller ROMs (3 x 2764) with fewer routines (no documented way to beep...)
 // - socketed NVRAM chip: X2212D 8238AES
 ROM_START(rainbow100a)
-ROM_REGION(0x100000, "maincpu", 0)
+	ROM_REGION(0x100000, "maincpu", 0)
 
-ROM_LOAD("23-176e4-00.bin", 0xFA000, 0x2000, NO_DUMP) // ROM (FA000-FBFFF) (E89) 8 K
-ROM_LOAD("23-177e4-00.bin", 0xFC000, 0x2000, NO_DUMP) // ROM (FC000-FDFFF) (E90) 8 K
+	ROM_LOAD("23-176e4-00.bin", 0xFA000, 0x2000, NO_DUMP) // ROM (FA000-FBFFF) (E89) 8 K
+	ROM_LOAD("23-177e4-00.bin", 0xFC000, 0x2000, NO_DUMP) // ROM (FC000-FDFFF) (E90) 8 K
 
-// SOCKETED LANGUAGE ROM (E91) with 1 single localization per ROM -
-ROM_LOAD("23-092e4-00.bin", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - English (?)
-// See also MP-01491-00 - PC100A FIELD MAINTENANCE SET. Appendix A of EK-RB100 Rainbow
-// Technical Manual Addendum f.100A and 100B (Dec.84) lists 15 localizations / part numbers
+	// SOCKETED LANGUAGE ROM (E91) with 1 single localization per ROM -
+	ROM_LOAD("23-092e4-00.bin", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - English (?)
+	// See also MP-01491-00 - PC100A FIELD MAINTENANCE SET. Appendix A of EK-RB100 Rainbow
+	// Technical Manual Addendum f.100A and 100B (Dec.84) lists 15 localizations / part numbers
 
-ROM_REGION(0x1000, "chargen", 0) // [E98] 2732 (4 K) EPROM
-ROM_LOAD("23-020e3-00.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+	ROM_REGION(0x1000, "chargen", 0) // [E98] 2732 (4 K) EPROM
+	ROM_LOAD("23-020e3-00.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 
-// Z80 ARBITRATION PROM
-ROM_REGION(0x100, "prom", 0)
-ROM_LOAD("23-090b1.mmi6308-ij.e11", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E11, same prom is @E13 on 100-B
+	// Z80 ARBITRATION PROM
+	ROM_REGION(0x100, "prom", 0)
+	ROM_LOAD("23-090b1.mmi6308-ij.e11", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E11, same prom is @E13 on 100-B
 ROM_END
 
 //----------------------------------------------------------------------------------------
@@ -3377,32 +3400,32 @@ ROM_END
 // - 32 K ROM (version 5.03)
 // - 128 K base and 896 K max. mem.
 ROM_START(rainbow)
-ROM_REGION(0x100000, "maincpu", 0)
+	ROM_REGION(0x100000, "maincpu", 0)
 
-// Note that the 'Field Maintenance Print Set 1984' also lists alternate revision 'A1' with
-//              23-063e3-00 (for chargen) and '23-074e5-00' / '23-073e5-00' for E5-01 / E5-02.
+	// Note that the 'Field Maintenance Print Set 1984' also lists alternate revision 'A1' with
+	//              23-063e3-00 (for chargen) and '23-074e5-00' / '23-073e5-00' for E5-01 / E5-02.
 
-// Part numbers 22E5, 20E5 and 37E3 verified to match revision "B" (FCC ID : A0994Q - PC100 - B).
+	// Part numbers 22E5, 20E5 and 37E3 verified to match revision "B" (FCC ID : A0994Q - PC100 - B).
 
-// BOOT ROM
-ROM_LOAD("23-022e5-00.bin", 0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e))
-ROM_RELOAD(0xf4000, 0x4000)
+	// BOOT ROM
+	ROM_LOAD("23-022e5-00.bin", 0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e))
+	ROM_RELOAD(0xf4000, 0x4000)
 
-// LANGUAGE ROM
-ROM_LOAD("23-020e5-00.bin", 0xf8000, 0x4000, CRC(8638712f) SHA1(8269b0d95dc6efbe67d500dac3999df4838625d8)) // German, French, English
-//ROM_LOAD( "23-015e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Dutch, French, English
-//ROM_LOAD( "23-016e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Finish, Swedish, English
-//ROM_LOAD( "23-017e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Danish, Norwegian, English
-//ROM_LOAD( "23-018e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Spanish, Italian, English
-ROM_RELOAD(0xfc000, 0x4000)
+	// LANGUAGE ROM
+	ROM_LOAD("23-020e5-00.bin", 0xf8000, 0x4000, CRC(8638712f) SHA1(8269b0d95dc6efbe67d500dac3999df4838625d8)) // German, French, English
+	//ROM_LOAD( "23-015e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Dutch, French, English
+	//ROM_LOAD( "23-016e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Finish, Swedish, English
+	//ROM_LOAD( "23-017e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Danish, Norwegian, English
+	//ROM_LOAD( "23-018e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Spanish, Italian, English
+	ROM_RELOAD(0xfc000, 0x4000)
 
-// CHARACTER GENERATOR (E3-03)
-ROM_REGION(0x1000, "chargen", 0)
-ROM_LOAD("23-037e3.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+	// CHARACTER GENERATOR (E3-03)
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD("23-037e3.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 
-// Z80 ARBITRATION PROM
-ROM_REGION(0x100, "prom", 0)
-ROM_LOAD("23-090b1.mmi6308-ij.e13", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E13, same prom is @E11 on 100-A
+	// Z80 ARBITRATION PROM
+	ROM_REGION(0x100, "prom", 0)
+	ROM_LOAD("23-090b1.mmi6308-ij.e13", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E13, same prom is @E11 on 100-A
 ROM_END
 
 //----------------------------------------------------------------------------------------
@@ -3417,25 +3440,25 @@ ROM_END
 // It is *likely* that the sole differences between 5.05 and 5.03 affect terminal emulation.
 
 ROM_START(rainbow190)
-ROM_REGION(0x100000, "maincpu", 0)
-ROM_LOAD("dec190rom0.bin", 0xf0000, 0x4000, CRC(fac191d2) SHA1(4aff5b1e031d3b5eafc568b23e68235270bb34de)) //FIXME: need correct rom name
-ROM_RELOAD(0xf4000, 0x4000)
-ROM_LOAD("dec190rom1.bin", 0xf8000, 0x4000, CRC(5ce59632) SHA1(d29793f7014c57a4e7cb77bbf6e84f9113635ed2)) //FIXME: need correct rom name
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("dec190rom0.bin", 0xf0000, 0x4000, CRC(fac191d2) SHA1(4aff5b1e031d3b5eafc568b23e68235270bb34de)) //FIXME: need correct rom name
+	ROM_RELOAD(0xf4000, 0x4000)
+	ROM_LOAD("dec190rom1.bin", 0xf8000, 0x4000, CRC(5ce59632) SHA1(d29793f7014c57a4e7cb77bbf6e84f9113635ed2)) //FIXME: need correct rom name
 
-ROM_RELOAD(0xfc000, 0x4000)
-ROM_REGION(0x1000, "chargen", 0)
-ROM_LOAD("23-037e3.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+	ROM_RELOAD(0xfc000, 0x4000)
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD("23-037e3.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 
-// Z80 ARBITRATION PROM
-ROM_REGION(0x100, "prom", 0)
-ROM_LOAD("23-090b1.mmi6308-ij.e13", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E13, same prom is @E11 on 100-A
+	// Z80 ARBITRATION PROM
+	ROM_REGION(0x100, "prom", 0)
+	ROM_LOAD("23-090b1.mmi6308-ij.e13", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E13, same prom is @E11 on 100-A
 ROM_END
 //----------------------------------------------------------------------------------------
 
 /* Driver */
 
-/*   YEAR  NAME         PARENT   COMPAT  MACHINE  INPUT           STATE          INIT  COMPANY                          FULLNAME         FLAGS */
-COMP(1982, rainbow100a, rainbow, 0,      rainbow, rainbow100b_in, rainbow_state, 0,    "Digital Equipment Corporation", "Rainbow 100-A", MACHINE_IS_SKELETON)
-COMP(1983, rainbow,     0,       0,      rainbow, rainbow100b_in, rainbow_state, 0,    "Digital Equipment Corporation", "Rainbow 100-B", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS)
-COMP(1985, rainbow190,  rainbow, 0,      rainbow, rainbow100b_in, rainbow_state, 0,    "Digital Equipment Corporation", "Rainbow 190-B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS)
+/*   YEAR  NAME         PARENT   COMPAT  MACHINE  INPUT           STATE          INIT        COMPANY                          FULLNAME         FLAGS */
+COMP(1982, rainbow100a, rainbow, 0,      rainbow, rainbow100b_in, rainbow_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-A", MACHINE_IS_SKELETON)
+COMP(1983, rainbow,     0,       0,      rainbow, rainbow100b_in, rainbow_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-B", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS)
+COMP(1985, rainbow190,  rainbow, 0,      rainbow, rainbow100b_in, rainbow_state, empty_init, "Digital Equipment Corporation", "Rainbow 190-B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS)
 

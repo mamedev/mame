@@ -149,7 +149,7 @@ private:
 DECLARE_DEVICE_TYPE(DECO_BAC06, deco_bac06_device)
 
 #define MCFG_DECO_BAC06_GFXDECODE(_gfxtag) \
-	downcast<deco_bac06_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<deco_bac06_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #define MCFG_DECO_BAC06_GFX_REGION_WIDE(_8x8, _16x16, _wide) \
 	downcast<deco_bac06_device &>(*device).set_gfx_region_wide(_8x8, _16x16, _wide);

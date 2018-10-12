@@ -69,6 +69,9 @@ public:
 		m_joykeymap(*this, "JOYKEYMAP%u", 0)
 	{ }
 
+	void mc1000(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	optional_device<mc6845_device> m_crtc;
@@ -120,9 +123,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
 
-	DECLARE_DRIVER_INIT(mc1000);
+	void init_mc1000();
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
-	void mc1000(machine_config &config);
 	void mc1000_banking_mem(address_map &map);
 	void mc1000_io(address_map &map);
 	void mc1000_mem(address_map &map);
@@ -232,38 +234,41 @@ WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(mc1000_state::mc1000_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_SHARE("mc6845_vram")
-	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_SHARE("ram2800")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x8000, 0x97ff) AM_RAMBANK("bank4") AM_SHARE("mc6847_vram")
-	AM_RANGE(0x9800, 0xbfff) AM_RAMBANK("bank5")
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(Z80_TAG, 0)
-ADDRESS_MAP_END
+void mc1000_state::mc1000_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).bankrw("bank1");
+	map(0x2000, 0x27ff).bankrw("bank2").share("mc6845_vram");
+	map(0x2800, 0x3fff).ram().share("ram2800");
+	map(0x4000, 0x7fff).bankrw("bank3");
+	map(0x8000, 0x97ff).bankrw("bank4").share("mc6847_vram");
+	map(0x9800, 0xbfff).bankrw("bank5");
+	map(0xc000, 0xffff).rom().region(Z80_TAG, 0);
+}
 
-ADDRESS_MAP_START(mc1000_state::mc1000_banking_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_SHARE("mc6845_vram")
-	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_SHARE("ram2800")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x8000, 0x97ff) AM_RAMBANK("bank4") AM_SHARE("mc6847_vram")
-	AM_RANGE(0x9800, 0xbfff) AM_RAMBANK("bank5")
-	AM_RANGE(0xc000, 0xffff) AM_READ(rom_banking_r)
-ADDRESS_MAP_END
+void mc1000_state::mc1000_banking_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).bankrw("bank1");
+	map(0x2000, 0x27ff).bankrw("bank2").share("mc6845_vram");
+	map(0x2800, 0x3fff).ram().share("ram2800");
+	map(0x4000, 0x7fff).bankrw("bank3");
+	map(0x8000, 0x97ff).bankrw("bank4").share("mc6847_vram");
+	map(0x9800, 0xbfff).bankrw("bank5");
+	map(0xc000, 0xffff).r(FUNC(mc1000_state::rom_banking_r));
+}
 
-ADDRESS_MAP_START(mc1000_state::mc1000_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(printer_r, printer_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("cent_data_out", output_latch_device, write)
+void mc1000_state::mc1000_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x04, 0x04).rw(FUNC(mc1000_state::printer_r), FUNC(mc1000_state::printer_w));
+	map(0x05, 0x05).w("cent_data_out", FUNC(output_latch_device::bus_w));
 //  AM_RANGE(0x10, 0x10) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 //  AM_RANGE(0x11, 0x11) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(mc6845_ctrl_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD(AY8910_TAG, ay8910_device, data_r)
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE(AY8910_TAG, ay8910_device, data_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(mc6847_attr_w)
-ADDRESS_MAP_END
+	map(0x12, 0x12).w(FUNC(mc1000_state::mc6845_ctrl_w));
+	map(0x20, 0x20).w(AY8910_TAG, FUNC(ay8910_device::address_w));
+	map(0x40, 0x40).r(AY8910_TAG, FUNC(ay8910_device::data_r));
+	map(0x60, 0x60).w(AY8910_TAG, FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).w(FUNC(mc1000_state::mc6847_attr_w));
+}
 
 /* Input Ports */
 
@@ -471,7 +476,7 @@ void mc1000_state::machine_start()
 	bankswitch();
 
 	/* register for state saving */
-	save_pointer(NAME(m_banked_ram.get()), 0xc000);
+	save_pointer(NAME(m_banked_ram), 0xc000);
 	save_item(NAME(m_rom0000));
 	save_item(NAME(m_mc6845_bank));
 	save_item(NAME(m_mc6847_bank));
@@ -539,10 +544,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc1000_state::ne555_tick)
 MACHINE_CONFIG_START(mc1000_state::mc1000)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(mc1000_mem)
-	MCFG_CPU_OPCODES_MAP(mc1000_banking_mem)
-	MCFG_CPU_IO_MAP(mc1000_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(mc1000_mem)
+	MCFG_DEVICE_OPCODES_MAP(mc1000_banking_mem)
+	MCFG_DEVICE_IO_MAP(mc1000_io)
 
 	/* timers */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ne555clear", mc1000_state, ne555_tick, attotime::from_hz(MC1000_NE555_FREQ))
@@ -556,17 +561,17 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
 	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(mc1000_state, hs_w))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(mc1000_state, fs_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(mc1000_state, videoram_r))
+	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, mc1000_state, hs_w))
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, mc1000_state, fs_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, mc1000_state, videoram_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 3579545/2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 3579545/2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(2.2), 0, 0)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(mc1000_state, keydata_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(mc1000_state, keylatch_w))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mc1000_state, keydata_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mc1000_state, keylatch_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
@@ -576,15 +581,13 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc1000_cass")
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(mc1000_state, write_centronics_busy))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mc1000_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("48K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("48K");
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -598,5 +601,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE         INIT  COMPANY   FULLNAME        FLAGS */
-COMP( 1985, mc1000,     0,          0,      mc1000,     mc1000, mc1000_state, 0,    "CCE",    "MC-1000",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS */
+COMP( 1985, mc1000, 0,      0,      mc1000,  mc1000, mc1000_state, empty_init, "CCE",   "MC-1000", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

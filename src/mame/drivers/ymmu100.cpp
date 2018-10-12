@@ -122,7 +122,6 @@
 #include "video/hd44780.h"
 
 #include "debugger.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -152,12 +151,6 @@ INPUT_PORTS_END
 class mu100_state : public driver_device
 {
 public:
-	enum {
-		P2_LCD_RS     = 0x01,
-		P2_LCD_RW     = 0x02,
-		P2_LCD_ENABLE = 0x04
-	};
-
 	mu100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
@@ -165,6 +158,18 @@ public:
 			m_ioport_p7(*this, "P7"),
 			m_ioport_p8(*this, "P8")
 	{ }
+
+	void mu100(machine_config &config);
+
+protected:
+	virtual DECLARE_READ16_MEMBER(adc7_r);
+
+private:
+	enum {
+		P2_LCD_RS     = 0x01,
+		P2_LCD_RW     = 0x02,
+		P2_LCD_ENABLE = 0x04
+	};
 
 	required_device<h8s2655_device> m_maincpu;
 	required_device<hd44780_device> m_lcd;
@@ -179,7 +184,6 @@ public:
 	DECLARE_READ16_MEMBER(adc2_r);
 	DECLARE_READ16_MEMBER(adc4_r);
 	DECLARE_READ16_MEMBER(adc6_r);
-	virtual DECLARE_READ16_MEMBER(adc7_r);
 
 	DECLARE_WRITE16_MEMBER(p1_w);
 	DECLARE_READ16_MEMBER(p1_r);
@@ -199,7 +203,6 @@ public:
 	float lightlevel(const uint8_t *src, const uint8_t *render);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
-	void mu100(machine_config &config);
 	void mu100_iomap(address_map &map);
 	void mu100_map(address_map &map);
 };
@@ -210,6 +213,7 @@ public:
 		: mu100_state(mconfig, type, tag)
 	{ }
 
+private:
 	virtual DECLARE_READ16_MEMBER(adc7_r) override;
 };
 
@@ -268,11 +272,12 @@ uint32_t mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-ADDRESS_MAP_START(mu100_state::mu100_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM // 128K work RAM
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(snd_r, snd_w)
-ADDRESS_MAP_END
+void mu100_state::mu100_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
+	map(0x200000, 0x21ffff).ram(); // 128K work RAM
+	map(0x400000, 0x401fff).rw(FUNC(mu100_state::snd_r), FUNC(mu100_state::snd_w));
+}
 
 READ16_MEMBER(mu100_state::snd_r)
 {
@@ -418,26 +423,27 @@ WRITE16_MEMBER(mu100_state::pg_w)
 	logerror("pbsel3 %d\n", data & 1);
 }
 
-ADDRESS_MAP_START(mu100_state::mu100_iomap)
-	AM_RANGE(h8_device::PORT_1,  h8_device::PORT_1)  AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(h8_device::PORT_2,  h8_device::PORT_2)  AM_WRITE(p2_w)
-	AM_RANGE(h8_device::PORT_3,  h8_device::PORT_3)  AM_WRITE(p3_w)
-	AM_RANGE(h8_device::PORT_5,  h8_device::PORT_5)  AM_WRITE(p5_w)
-	AM_RANGE(h8_device::PORT_6,  h8_device::PORT_6)  AM_READWRITE(p6_r, p6_w)
-	AM_RANGE(h8_device::PORT_A,  h8_device::PORT_A)  AM_READWRITE(pa_r, pa_w)
-	AM_RANGE(h8_device::PORT_F,  h8_device::PORT_F)  AM_WRITE(pf_w)
-	AM_RANGE(h8_device::PORT_G,  h8_device::PORT_G)  AM_WRITE(pg_w)
-	AM_RANGE(h8_device::ADC_0,   h8_device::ADC_0)   AM_READ(adc0_r)
-	AM_RANGE(h8_device::ADC_2,   h8_device::ADC_2)   AM_READ(adc2_r)
-	AM_RANGE(h8_device::ADC_4,   h8_device::ADC_4)   AM_READ(adc4_r)
-	AM_RANGE(h8_device::ADC_6,   h8_device::ADC_6)   AM_READ(adc6_r)
-	AM_RANGE(h8_device::ADC_7,   h8_device::ADC_7)   AM_READ(adc7_r)
-ADDRESS_MAP_END
+void mu100_state::mu100_iomap(address_map &map)
+{
+	map(h8_device::PORT_1, h8_device::PORT_1).rw(FUNC(mu100_state::p1_r), FUNC(mu100_state::p1_w));
+	map(h8_device::PORT_2, h8_device::PORT_2).w(FUNC(mu100_state::p2_w));
+	map(h8_device::PORT_3, h8_device::PORT_3).w(FUNC(mu100_state::p3_w));
+	map(h8_device::PORT_5, h8_device::PORT_5).w(FUNC(mu100_state::p5_w));
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu100_state::p6_r), FUNC(mu100_state::p6_w));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r), FUNC(mu100_state::pa_w));
+	map(h8_device::PORT_F, h8_device::PORT_F).w(FUNC(mu100_state::pf_w));
+	map(h8_device::PORT_G, h8_device::PORT_G).w(FUNC(mu100_state::pg_w));
+	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc0_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc2_r));
+	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc4_r));
+	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc6_r));
+	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc7_r));
+}
 
 MACHINE_CONFIG_START(mu100_state::mu100)
-	MCFG_CPU_ADD( "maincpu", H8S2655, XTAL(16'000'000) )
-	MCFG_CPU_PROGRAM_MAP( mu100_map )
-	MCFG_CPU_IO_MAP( mu100_iomap )
+	MCFG_DEVICE_ADD( "maincpu", H8S2655, XTAL(16'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( mu100_map )
+	MCFG_DEVICE_IO_MAP( mu100_iomap )
 
 	MCFG_HD44780_ADD("lcd")
 	MCFG_HD44780_LCD_SIZE(4, 20)
@@ -448,20 +454,20 @@ MACHINE_CONFIG_START(mu100_state::mu100)
 	MCFG_SCREEN_UPDATE_DRIVER(mu100_state, screen_update)
 	MCFG_SCREEN_SIZE(900, 241)
 	MCFG_SCREEN_VISIBLE_AREA(0, 899, 0, 240)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("maincpu:sci0", h8_sci_device, rx_w))
+	MCFG_MIDI_RX_HANDLER(WRITELINE("maincpu:sci0", h8_sci_device, rx_w))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 	MCFG_DEVICE_MODIFY("maincpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":mdout", midi_port_device, write_txd))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("mdout", midi_port_device, write_txd))
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 ROM_START( mu100 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -500,5 +506,5 @@ ROM_START( mu100r )
 	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
-CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  0, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
-CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, 0, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
+CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
+CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )

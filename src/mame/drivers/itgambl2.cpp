@@ -56,6 +56,7 @@
 #include "emu.h"
 #include "cpu/h8/h83337.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,6 +72,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
+	void itgambl2(machine_config &config);
+
+private:
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
@@ -80,7 +84,6 @@ public:
 	uint32_t screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	void itgambl2(machine_config &config);
 	void itgambl2_map(address_map &map);
 };
 
@@ -155,9 +158,10 @@ uint32_t itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rg
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(itgambl2_state::itgambl2_map)
-	AM_RANGE(0x000000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void itgambl2_state::itgambl2_map(address_map &map)
+{
+	map(0x000000, 0x3fff).rom();
+}
 
 
 /*************************
@@ -239,7 +243,7 @@ static const gfx_layout gfxlayout_8x8x8 =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( itgambl2 )
+static GFXDECODE_START( gfx_itgambl2 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x8,  0, 16  )
 GFXDECODE_END
 
@@ -275,8 +279,8 @@ PALETTE_INIT_MEMBER(itgambl2_state, itgambl2)
 MACHINE_CONFIG_START(itgambl2_state::itgambl2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83337, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(itgambl2_map)
+	MCFG_DEVICE_ADD("maincpu", H83337, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(itgambl2_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -287,13 +291,13 @@ MACHINE_CONFIG_START(itgambl2_state::itgambl2)
 	MCFG_SCREEN_UPDATE_DRIVER(itgambl2_state, screen_update_itgambl2)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itgambl2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_itgambl2)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(itgambl2_state, itgambl2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1102,24 +1106,24 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT ROT   COMPANY      FULLNAME                                 FLAGS
-GAME( 1999, ntcash,   0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "NtCash",                                MACHINE_IS_SKELETON )
-GAME( 1999, wizard,   0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "A.A.",      "Wizard (Ver 1.0)",                      MACHINE_IS_SKELETON )
-GAME( 200?, trstar2k, 0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "A.M.",      "Triple Star 2000",                      MACHINE_IS_SKELETON )
-GAME( 2001, laser2k1, 0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Laser 2001 (Ver 1.2)",                  MACHINE_IS_SKELETON )
-GAME( 2001, mdrink,   0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Magic Drink (Ver 1.2)",                 MACHINE_IS_SKELETON )
-GAME( 2001, te0144,   0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Puzzle Bobble (Italian Gambling Game)", MACHINE_IS_SKELETON )
-GAME( 200?, cmagica,  0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Carta Magica (Ver 1.8)",                MACHINE_IS_SKELETON )
-GAME( 200?, mcard_h8, cmagica,  itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Magic Card (H8, English)",              MACHINE_IS_SKELETON )
-GAME( 200?, millsun,  0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Millennium Sun",                        MACHINE_IS_SKELETON )
-GAME( 200?, sspac2k1, 0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Super Space 2001",                      MACHINE_IS_SKELETON )
-GAME( 200?, elvis,    0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Elvis?",                                MACHINE_IS_SKELETON )
-GAME( 200?, sstar,    0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Super Star",                            MACHINE_IS_SKELETON )
-GAME( 2001, pirati,   0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "Cin",       "Pirati",                                MACHINE_IS_SKELETON )
-GAME( 200?, mnumitg,  0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Magic Number (Italian Gambling Game, Ver 1.5)", MACHINE_IS_SKELETON )
-GAME( 200?, mclass,   0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Magic Class (Ver 2.2)",                 MACHINE_IS_SKELETON )
-GAME( 200?, europass, 0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Euro Pass (Ver 1.1)",                   MACHINE_IS_SKELETON )
-GAME( 200?, thedrink, 0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "The Drink",                             MACHINE_IS_SKELETON )
-GAME( 200?, unkh8gam, 0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "unknown H8 Italian Gambling game",      MACHINE_IS_SKELETON )
-GAME( 200?, eurodsr,  0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Euro Double Star Record (ver.1.2)",     MACHINE_IS_SKELETON )
-GAME( 200?, granfrat, 0,        itgambl2, itgambl2, itgambl2_state, 0,   ROT0, "<unknown>", "Grande Fratello (Ver. 1.7)",            MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        ROT   COMPANY      FULLNAME                                 FLAGS
+GAME( 1999, ntcash,   0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "NtCash",                                MACHINE_IS_SKELETON )
+GAME( 1999, wizard,   0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "A.A.",      "Wizard (Ver 1.0)",                      MACHINE_IS_SKELETON )
+GAME( 200?, trstar2k, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "A.M.",      "Triple Star 2000",                      MACHINE_IS_SKELETON )
+GAME( 2001, laser2k1, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Laser 2001 (Ver 1.2)",                  MACHINE_IS_SKELETON )
+GAME( 2001, mdrink,   0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Magic Drink (Ver 1.2)",                 MACHINE_IS_SKELETON )
+GAME( 2001, te0144,   0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Puzzle Bobble (Italian Gambling Game)", MACHINE_IS_SKELETON )
+GAME( 200?, cmagica,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Carta Magica (Ver 1.8)",                MACHINE_IS_SKELETON )
+GAME( 200?, mcard_h8, cmagica,  itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Magic Card (H8, English)",              MACHINE_IS_SKELETON )
+GAME( 200?, millsun,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Millennium Sun",                        MACHINE_IS_SKELETON )
+GAME( 200?, sspac2k1, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Super Space 2001",                      MACHINE_IS_SKELETON )
+GAME( 200?, elvis,    0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Elvis?",                                MACHINE_IS_SKELETON )
+GAME( 200?, sstar,    0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Super Star",                            MACHINE_IS_SKELETON )
+GAME( 2001, pirati,   0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "Cin",       "Pirati",                                MACHINE_IS_SKELETON )
+GAME( 200?, mnumitg,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Magic Number (Italian Gambling Game, Ver 1.5)", MACHINE_IS_SKELETON )
+GAME( 200?, mclass,   0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Magic Class (Ver 2.2)",                 MACHINE_IS_SKELETON )
+GAME( 200?, europass, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Euro Pass (Ver 1.1)",                   MACHINE_IS_SKELETON )
+GAME( 200?, thedrink, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "The Drink",                             MACHINE_IS_SKELETON )
+GAME( 200?, unkh8gam, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "unknown H8 Italian Gambling game",      MACHINE_IS_SKELETON )
+GAME( 200?, eurodsr,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Euro Double Star Record (ver.1.2)",     MACHINE_IS_SKELETON )
+GAME( 200?, granfrat, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Grande Fratello (Ver. 1.7)",            MACHINE_IS_SKELETON )

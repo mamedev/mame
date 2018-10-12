@@ -145,8 +145,6 @@ void k053251_device::device_start()
 	save_item(NAME(m_ram));
 	save_item(NAME(m_tilemaps_set));
 	save_item(NAME(m_dirty_tmap));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(k053251_device::reset_indexes), this));
 }
 
 //-------------------------------------------------
@@ -165,6 +163,15 @@ void k053251_device::device_reset()
 	for (i = 0; i < 5; i++)
 		m_dirty_tmap[i] = 0;
 
+	reset_indexes();
+}
+
+//-------------------------------------------------
+//  device_post_load - device-specific postload
+//-------------------------------------------------
+
+void k053251_device::device_post_load()
+{
 	reset_indexes();
 }
 

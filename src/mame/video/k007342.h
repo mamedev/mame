@@ -61,7 +61,7 @@ DECLARE_DEVICE_TYPE(K007342, k007342_device)
 #define MCFG_K007342_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K007342, 0)
 #define MCFG_K007342_GFXDECODE(_gfxtag) \
-	downcast<k007342_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<k007342_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #define MCFG_K007342_GFXNUM(_gfxnum) \
 	downcast<k007342_device &>(*device).set_gfxnum(_gfxnum);

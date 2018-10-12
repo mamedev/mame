@@ -244,7 +244,7 @@ void k052109_device::device_start()
 	m_firq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
 
-	save_pointer(NAME(m_ram.get()), 0x6000);
+	save_pointer(NAME(m_ram), 0x6000);
 	save_item(NAME(m_rmrd_line));
 	save_item(NAME(m_romsubbank));
 	save_item(NAME(m_scrollctrl));
@@ -252,7 +252,6 @@ void k052109_device::device_start()
 	save_item(NAME(m_charrombank));
 	save_item(NAME(m_charrombank_2));
 	save_item(NAME(m_has_extra_video_ram));
-	machine().save().register_postload(save_prepost_delegate(FUNC(k052109_device::tileflip_reset), this));
 }
 
 //-------------------------------------------------
@@ -273,6 +272,15 @@ void k052109_device::device_reset()
 		m_charrombank[i] = 0;
 		m_charrombank_2[i] = 0;
 	}
+}
+
+//-------------------------------------------------
+//  device_post_load - device-specific postload
+//-------------------------------------------------
+
+void k052109_device::device_post_load()
+{
+	tileflip_reset();
 }
 
 /*****************************************************************************

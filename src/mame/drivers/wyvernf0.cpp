@@ -39,6 +39,7 @@ TODO:
 #include "sound/msm5232.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -46,8 +47,8 @@ TODO:
 class wyvernf0_state : public driver_device
 {
 public:
-	wyvernf0_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wyvernf0_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bgram(*this,"bgram"),
 		m_fgram(*this,"fgram"),
 		m_scrollram(*this,"scrollram"),
@@ -57,8 +58,12 @@ public:
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void wyvernf0(machine_config &config);
+
+private:
 	// memory pointers
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_fgram;
@@ -107,7 +112,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void wyvernf0(machine_config &config);
+
 	void sound_map(address_map &map);
 	void wyvernf0_map(address_map &map);
 };
@@ -359,7 +364,7 @@ WRITE8_MEMBER(wyvernf0_state::rombank_w)
 TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
 {
 	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_pending_nmi = 1;
 }
@@ -380,65 +385,67 @@ WRITE8_MEMBER(wyvernf0_state::nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_pending_nmi = 0;
 	}
 }
 
-ADDRESS_MAP_START(wyvernf0_state::wyvernf0_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
+void wyvernf0_state::wyvernf0_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
 
-	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("rambank")
+	map(0x9000, 0x9fff).bankrw("rambank");
 
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("rombank")
+	map(0xa000, 0xbfff).bankr("rombank");
 
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
+	map(0xc000, 0xc7ff).ram().w(FUNC(wyvernf0_state::fgram_w)).share("fgram");
+	map(0xc800, 0xcfff).ram().w(FUNC(wyvernf0_state::bgram_w)).share("bgram");
 
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // d000 write (02)
-	AM_RANGE(0xd100, 0xd100) AM_WRITE(rambank_w)
-	AM_RANGE(0xd200, 0xd200) AM_WRITE(rombank_w)
+	map(0xd000, 0xd000).nopw(); // d000 write (02)
+	map(0xd100, 0xd100).w(FUNC(wyvernf0_state::rambank_w));
+	map(0xd200, 0xd200).w(FUNC(wyvernf0_state::rombank_w));
 
-	AM_RANGE(0xd300, 0xd303) AM_RAM AM_SHARE("scrollram")
+	map(0xd300, 0xd303).ram().share("scrollram");
 
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(fake_mcu_r, fake_mcu_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(fake_status_r)
+	map(0xd400, 0xd400).rw(FUNC(wyvernf0_state::fake_mcu_r), FUNC(wyvernf0_state::fake_mcu_w));
+	map(0xd401, 0xd401).r(FUNC(wyvernf0_state::fake_status_r));
 
-	AM_RANGE(0xd500, 0xd5ff) AM_RAM AM_SHARE("spriteram")
+	map(0xd500, 0xd5ff).ram().share("spriteram");
 
-	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd602, 0xd602) AM_READ_PORT("DSW3")
-	AM_RANGE(0xd603, 0xd603) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd604, 0xd604) AM_READ_PORT("JOY1")
-	AM_RANGE(0xd605, 0xd605) AM_READ_PORT("FIRE1")
-	AM_RANGE(0xd606, 0xd606) AM_READ_PORT("JOY2")
-	AM_RANGE(0xd607, 0xd607) AM_READ_PORT("FIRE2")
+	map(0xd600, 0xd600).portr("DSW1");
+	map(0xd601, 0xd601).portr("DSW2");
+	map(0xd602, 0xd602).portr("DSW3");
+	map(0xd603, 0xd603).portr("SYSTEM");
+	map(0xd604, 0xd604).portr("JOY1");
+	map(0xd605, 0xd605).portr("FIRE1");
+	map(0xd606, 0xd606).portr("JOY2");
+	map(0xd607, 0xd607).portr("FIRE2");
 
-	AM_RANGE(0xd610, 0xd610) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_command_w)
+	map(0xd610, 0xd610).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(wyvernf0_state::sound_command_w));
 	// d613 write (FF -> 00 at boot)
 
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP    // irq ack?
-ADDRESS_MAP_END
+	map(0xdc00, 0xdc00).nopw();    // irq ack?
+}
 
-ADDRESS_MAP_START(wyvernf0_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay1", ym2149_device, address_data_w)
-	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE("ay2", ym2149_device, address_data_w)
-	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE("msm", msm5232_device, write)
+void wyvernf0_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xc801).w("ay1", FUNC(ym2149_device::address_data_w));
+	map(0xc802, 0xc803).w("ay2", FUNC(ym2149_device::address_data_w));
+	map(0xc900, 0xc90d).w("msm", FUNC(msm5232_device::write));
 	// ca00 write
 	// cb00 write
 	// cc00 write
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
-	AM_RANGE(0xd200, 0xd200) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xd600, 0xd600) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe000, 0xefff) AM_ROM // space for diagnostics ROM
-ADDRESS_MAP_END
+	map(0xd000, 0xd000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+	map(0xd200, 0xd200).w(FUNC(wyvernf0_state::nmi_enable_w));
+	map(0xd400, 0xd400).w(FUNC(wyvernf0_state::nmi_disable_w));
+	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0xe000, 0xefff).rom(); // space for diagnostics ROM
+}
 
 
 /***************************************************************************
@@ -599,7 +606,7 @@ static const gfx_layout layout_8x8x4 =
 	8*8
 };
 
-static GFXDECODE_START( wyvernf0 )
+static GFXDECODE_START( gfx_wyvernf0 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_8x8x4, 0, 32 ) // [0] sprites
 	GFXDECODE_ENTRY( "tiles",   0, layout_8x8x4, 0, 32 ) // [1] tilemaps
 GFXDECODE_END
@@ -618,7 +625,7 @@ MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 
 	// sprite codes lookup in banked RAM
 	m_objram = std::make_unique<uint8_t[]>(0x1000 * 2);
-	save_pointer(NAME(m_objram.get()), 0x1000 * 2);
+	save_pointer(NAME(m_objram), 0x1000 * 2);
 	membank("rambank")->configure_entries(0, 2, m_objram.get(), 0x1000);
 
 	save_item(NAME(m_sound_nmi_enable));
@@ -642,15 +649,15 @@ MACHINE_RESET_MEMBER(wyvernf0_state,wyvernf0)
 MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 6000000) // ?
-	MCFG_CPU_PROGRAM_MAP(wyvernf0_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wyvernf0_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(wyvernf0_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wyvernf0_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // ?
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wyvernf0_state, irq0_line_hold, 60*2)  // IRQ generated by ??? (drives music tempo), NMI by main cpu
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wyvernf0_state, irq0_line_hold, 60*2)  // IRQ generated by ??? (drives music tempo), NMI by main cpu
 
-//  MCFG_CPU_ADD("mcu", M68705P5, 4000000) // ?
+//  MCFG_DEVICE_ADD("mcu", M68705P5, 4000000) // ?
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
@@ -666,7 +673,7 @@ MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 	MCFG_SCREEN_UPDATE_DRIVER(wyvernf0_state, screen_update_wyvernf0)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wyvernf0)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wyvernf0)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -674,20 +681,20 @@ MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 	MCFG_VIDEO_START_OVERRIDE(wyvernf0_state,wyvernf0)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	// coin, fire, lift-off
-	MCFG_SOUND_ADD("ay1", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
+	MCFG_DEVICE_ADD("ay1", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// lift-off, explosion (saucers), boss alarm
-	MCFG_SOUND_ADD("ay2", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
+	MCFG_DEVICE_ADD("ay2", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// music
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000) // ?
+	MCFG_DEVICE_ADD("msm", MSM5232, 2000000) // ?
 	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 0.5)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)    // pin 29  4'-1
@@ -701,9 +708,9 @@ MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -743,4 +750,4 @@ ROM_START( wyvernf0 )
 	ROM_LOAD( "a39_12.ic74",  0x6000, 0x2000, CRC(1cc389de) SHA1(4213484d3a82688f312811e7a5c4d128e40584c3) )
 ROM_END
 
-GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, wyvernf0_state, 0, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
+GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)

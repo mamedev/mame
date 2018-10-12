@@ -50,6 +50,7 @@ Note
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,44 +59,29 @@ class jackie_state : public driver_device
 {
 public:
 	jackie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_bg_scroll2(*this, "bg_scroll2"),
-		m_bg_scroll(*this, "bg_scroll"),
-		m_reel1_ram(*this, "reel1_ram"),
-		m_reel2_ram(*this, "reel2_ram"),
-		m_reel3_ram(*this, "reel3_ram"),
-		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_bg_scroll2(*this, "bg_scroll2")
+		, m_bg_scroll(*this, "bg_scroll")
+		, m_reel1_ram(*this, "reel1_ram")
+		, m_reel2_ram(*this, "reel2_ram")
+		, m_reel3_ram(*this, "reel3_ram")
+		, m_fg_tile_ram(*this, "fg_tile_ram")
+		, m_fg_color_ram(*this, "fg_color_ram")
+		, m_led(*this, "led")
+		, m_lamps(*this, "lamp%u", 1U)
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	void jackie(machine_config &config);
 
-	required_shared_ptr<uint8_t> m_bg_scroll2;
-	required_shared_ptr<uint8_t> m_bg_scroll;
-	required_shared_ptr<uint8_t> m_reel1_ram;
-	required_shared_ptr<uint8_t> m_reel2_ram;
-	required_shared_ptr<uint8_t> m_reel3_ram;
-	required_shared_ptr<uint8_t> m_fg_tile_ram;
-	required_shared_ptr<uint8_t> m_fg_color_ram;
+	void init_jackie();
 
-	int m_exp_bank;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_reel1_tilemap;
-	tilemap_t *m_reel2_tilemap;
-	tilemap_t *m_reel3_tilemap;
-	int m_irq_enable;
-	int m_nmi_enable;
-	int m_bg_enable;
-	int m_hopper;
-	uint8_t m_out[3];
-	uint16_t m_unk_reg[3][5];
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 
+private:
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_w);
@@ -118,23 +104,48 @@ public:
 	void unk_reg_hi_w( int offset, uint8_t data, int reg );
 	void show_out();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
 
-	DECLARE_DRIVER_INIT(jackie);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	void jackie_io_map(address_map &map);
+	void jackie_prg_map(address_map &map);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	void jackie(machine_config &config);
-	void jackie_io_map(address_map &map);
-	void jackie_prg_map(address_map &map);
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_bg_scroll2;
+	required_shared_ptr<uint8_t> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_reel1_ram;
+	required_shared_ptr<uint8_t> m_reel2_ram;
+	required_shared_ptr<uint8_t> m_reel3_ram;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
+	output_finder<> m_led;
+	output_finder<6> m_lamps;
+
+	int m_exp_bank;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_reel1_tilemap;
+	tilemap_t *m_reel2_tilemap;
+	tilemap_t *m_reel3_tilemap;
+	int m_irq_enable;
+	int m_nmi_enable;
+	int m_bg_enable;
+	int m_hopper;
+	uint8_t m_out[3];
+	uint16_t m_unk_reg[3][5];
 };
 
 
@@ -271,6 +282,9 @@ uint32_t jackie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void jackie_state::machine_start()
 {
+	m_led.resolve();
+	m_lamps.resolve();
+
 	save_item(NAME(m_exp_bank));
 	// save_item(NAME(m_irq_enable)); //always 1?
 	save_item(NAME(m_nmi_enable));
@@ -330,7 +344,7 @@ WRITE8_MEMBER(jackie_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
 
-	output().set_led_value(6,        data & 0x20);   // led for coin m_out / m_hopper active
+	m_led = BIT(data, 5);   // led for coin m_out / m_hopper active
 
 	m_exp_bank   = (data & 0x02) ? 1 : 0;       // expram bank number
 	m_nmi_enable = data & 0x80;     // nmi enable?
@@ -352,12 +366,12 @@ WRITE8_MEMBER(jackie_state::lamps_w)
     ---- -x--  Hold5 lamp.
     ---- ---x  Start lamp.
 */
-	output().set_lamp_value(1, (data >> 1) & 1);      /* Lamp 1 - HOLD 1 */
-	output().set_lamp_value(2, (data >> 5) & 1);      /* Lamp 2 - HOLD 2  */
-	output().set_lamp_value(3, (data >> 4) & 1);      /* Lamp 3 - HOLD 3 */
-	output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-	output().set_lamp_value(5, (data >> 2) & 1);      /* Lamp 5 - HOLD 5 */
-	output().set_lamp_value(6, (data & 1));           /* Lamp 6 - START */
+	m_lamps[0] = BIT(data, 1);      /* Lamp 1 - HOLD 1 */
+	m_lamps[1] = BIT(data, 5);      /* Lamp 2 - HOLD 2  */
+	m_lamps[2] = BIT(data, 4);      /* Lamp 3 - HOLD 3 */
+	m_lamps[3] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamps[4] = BIT(data, 2);      /* Lamp 5 - HOLD 5 */
+	m_lamps[5] = BIT(data, 0);           /* Lamp 6 - START */
 
 	m_hopper            =   (~data)& 0x80;
 
@@ -388,39 +402,41 @@ READ8_MEMBER(jackie_state::expram_r)
 }
 
 
-ADDRESS_MAP_START(jackie_state::jackie_prg_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
-ADDRESS_MAP_END
+void jackie_state::jackie_prg_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram().region("maincpu", 0xf000);
+}
 
-ADDRESS_MAP_START(jackie_state::jackie_io_map)
-	AM_RANGE(0x0520, 0x0524) AM_WRITE(unk_reg1_lo_w)
-	AM_RANGE(0x0d20, 0x0d24) AM_WRITE(unk_reg1_hi_w)
-	AM_RANGE(0x0560, 0x0564) AM_WRITE(unk_reg2_lo_w)
-	AM_RANGE(0x0d60, 0x0d64) AM_WRITE(unk_reg2_hi_w)
-	AM_RANGE(0x05a0, 0x05a4) AM_WRITE(unk_reg3_lo_w)
-	AM_RANGE(0x0da0, 0x0da4) AM_WRITE(unk_reg3_hi_w)
-	AM_RANGE(0x1000, 0x1107) AM_RAM AM_SHARE("bg_scroll2")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")           /* DSW4 */
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")           /* DSW5 */
-	AM_RANGE(0x5080, 0x5083) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0x5090, 0x5093) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
-	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
-	AM_RANGE(0x6000, 0x60ff) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
-	AM_RANGE(0x6800, 0x69ff) AM_RAM_WRITE(reel1_ram_w )  AM_SHARE("reel1_ram")
-	AM_RANGE(0x6a00, 0x6bff) AM_RAM_WRITE(reel2_ram_w )  AM_SHARE("reel2_ram")
-	AM_RANGE(0x6c00, 0x6dff) AM_RAM_WRITE(reel3_ram_w )  AM_SHARE("reel3_ram")
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
-	AM_RANGE(0x8000, 0xffff) AM_READ(expram_r)
-ADDRESS_MAP_END
+void jackie_state::jackie_io_map(address_map &map)
+{
+	map(0x0520, 0x0524).w(FUNC(jackie_state::unk_reg1_lo_w));
+	map(0x0d20, 0x0d24).w(FUNC(jackie_state::unk_reg1_hi_w));
+	map(0x0560, 0x0564).w(FUNC(jackie_state::unk_reg2_lo_w));
+	map(0x0d60, 0x0d64).w(FUNC(jackie_state::unk_reg2_hi_w));
+	map(0x05a0, 0x05a4).w(FUNC(jackie_state::unk_reg3_lo_w));
+	map(0x0da0, 0x0da4).w(FUNC(jackie_state::unk_reg3_hi_w));
+	map(0x1000, 0x1107).ram().share("bg_scroll2");
+	map(0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2800, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x4000, 0x4000).portr("DSW1");           /* DSW1 */
+	map(0x4001, 0x4001).portr("DSW2");           /* DSW2 */
+	map(0x4002, 0x4002).portr("DSW3");           /* DSW3 */
+	map(0x4003, 0x4003).portr("DSW4");           /* DSW4 */
+	map(0x4004, 0x4004).portr("DSW5");           /* DSW5 */
+	map(0x5080, 0x5083).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5090, 0x5093).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x50a0, 0x50a0).portr("BUTTONS2");
+	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x50c0, 0x50c0).r(FUNC(jackie_state::igs_irqack_r)).w(FUNC(jackie_state::igs_irqack_w));
+	map(0x6000, 0x60ff).ram().w(FUNC(jackie_state::bg_scroll_w)).share("bg_scroll");
+	map(0x6800, 0x69ff).ram().w(FUNC(jackie_state::reel1_ram_w)).share("reel1_ram");
+	map(0x6a00, 0x6bff).ram().w(FUNC(jackie_state::reel2_ram_w)).share("reel2_ram");
+	map(0x6c00, 0x6dff).ram().w(FUNC(jackie_state::reel3_ram_w)).share("reel3_ram");
+	map(0x7000, 0x77ff).ram().w(FUNC(jackie_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x7800, 0x7fff).ram().w(FUNC(jackie_state::fg_color_w)).share("fg_color_ram");
+	map(0x8000, 0xffff).r(FUNC(jackie_state::expram_r));
+}
 
 CUSTOM_INPUT_MEMBER(jackie_state::hopper_r)
 {
@@ -501,7 +517,7 @@ static INPUT_PORTS_START( jackie )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9) PORT_NAME("Attendent")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jackie_state,hopper_r, nullptr) PORT_NAME("HPSW")    // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jackie_state,hopper_r, nullptr) PORT_NAME("HPSW")    // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -562,17 +578,16 @@ static const gfx_layout layout_8x32x6 =
 	8*32*2
 };
 
-static GFXDECODE_START( jackie )
+static GFXDECODE_START( gfx_jackie )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x6,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(jackie_state,jackie)
+void jackie_state::init_jackie()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (A = 0;A < 0xf000;A++)
+	for (int A = 0; A < 0xf000; A++)
 	{
 		rom[A] = rom[A] ^ 0x21;
 
@@ -580,7 +595,7 @@ DRIVER_INIT_MEMBER(jackie_state,jackie)
 		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
 		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
 	}
-	memset( &rom[0xf000], 0, 0x1000);
+	memset(&rom[0xf000], 0, 0x1000);
 
 	// Patch trap
 	rom[0x7e86] = 0xc3;
@@ -596,25 +611,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
 	if((scanline % 64) == 32 && m_irq_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	else if ((scanline % 64) == 0 && m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(jackie_state::jackie)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(jackie_prg_map)
-	MCFG_CPU_IO_MAP(jackie_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(jackie_prg_map)
+	MCFG_DEVICE_IO_MAP(jackie_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jackie_state, irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0) // D8255AC
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(jackie_state, nmi_and_coins_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+	i8255_device &ppi1(I8255A(config, "ppi1")); // D8255AC
+	ppi1.out_pa_callback().set(FUNC(jackie_state::nmi_and_coins_w));
+	ppi1.in_pb_callback().set_ioport("SERVICE");
+	ppi1.in_pc_callback().set_ioport("COINS");
 
-	MCFG_DEVICE_ADD("ppi2", I8255A, 0) // D8255AC
-	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(jackie_state, lamps_w))
+	i8255_device &ppi2(I8255A(config, "ppi2")); // D8255AC
+	ppi2.in_pa_callback().set_ioport("BUTTONS1");
+	ppi2.out_pb_callback().set(FUNC(jackie_state::lamps_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -625,13 +640,13 @@ MACHINE_CONFIG_START(jackie_state::jackie)
 	MCFG_SCREEN_UPDATE_DRIVER(jackie_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackie)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackie)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -662,4 +677,4 @@ ROM_START( jackie )
 ROM_END
 
 
-GAME( 1993,  jackie,   0,        jackie,   jackie, jackie_state, jackie,  ROT0, "IGS",    "Happy Jackie (v110U)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, jackie, 0, jackie, jackie, jackie_state, init_jackie, ROT0, "IGS", "Happy Jackie (v110U)", MACHINE_SUPPORTS_SAVE )

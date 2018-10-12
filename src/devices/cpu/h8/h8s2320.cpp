@@ -3,15 +3,15 @@
 #include "emu.h"
 #include "h8s2320.h"
 
-DEFINE_DEVICE_TYPE(H8S2320, h8s2320_device, "h8s2320", "H8S/2320")
-DEFINE_DEVICE_TYPE(H8S2321, h8s2321_device, "h8s2321", "H8S/2321")
-DEFINE_DEVICE_TYPE(H8S2322, h8s2322_device, "h8s2322", "H8S/2322")
-DEFINE_DEVICE_TYPE(H8S2323, h8s2323_device, "h8s2323", "H8S/2323")
-DEFINE_DEVICE_TYPE(H8S2324, h8s2324_device, "h8s2324", "H8S/2324")
-DEFINE_DEVICE_TYPE(H8S2326, h8s2326_device, "h8s2326", "H8S/2326")
-DEFINE_DEVICE_TYPE(H8S2327, h8s2327_device, "h8s2327", "H8S/2327")
-DEFINE_DEVICE_TYPE(H8S2328, h8s2328_device, "h8s2328", "H8S/2328")
-DEFINE_DEVICE_TYPE(H8S2329, h8s2329_device, "h8s2329", "H8S/2329")
+DEFINE_DEVICE_TYPE(H8S2320, h8s2320_device, "h8s2320", "Hitachi H8S/2320")
+DEFINE_DEVICE_TYPE(H8S2321, h8s2321_device, "h8s2321", "Hitachi H8S/2321")
+DEFINE_DEVICE_TYPE(H8S2322, h8s2322_device, "h8s2322", "Hitachi H8S/2322")
+DEFINE_DEVICE_TYPE(H8S2323, h8s2323_device, "h8s2323", "Hitachi H8S/2323")
+DEFINE_DEVICE_TYPE(H8S2324, h8s2324_device, "h8s2324", "Hitachi H8S/2324")
+DEFINE_DEVICE_TYPE(H8S2326, h8s2326_device, "h8s2326", "Hitachi H8S/2326")
+DEFINE_DEVICE_TYPE(H8S2327, h8s2327_device, "h8s2327", "Hitachi H8S/2327")
+DEFINE_DEVICE_TYPE(H8S2328, h8s2328_device, "h8s2328", "Hitachi H8S/2328")
+DEFINE_DEVICE_TYPE(H8S2329, h8s2329_device, "h8s2329", "Hitachi H8S/2329")
 
 
 h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
@@ -98,168 +98,169 @@ h8s2329_device::h8s2329_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-ADDRESS_MAP_START(h8s2320_device::map)
-	AM_RANGE(ram_start, 0xfffbff) AM_RAM
+void h8s2320_device::map(address_map &map)
+{
+	map(ram_start, 0xfffbff).ram();
 
-	AM_RANGE(0xfffe80, 0xfffe81) AM_DEVREADWRITE8("timer16:3", h8_timer16_channel_device, tcr_r,    tcr_w,    0xff00)
-	AM_RANGE(0xfffe80, 0xfffe81) AM_DEVREADWRITE8("timer16:3", h8_timer16_channel_device, tmdr_r,   tmdr_w,   0x00ff)
-	AM_RANGE(0xfffe82, 0xfffe83) AM_DEVREADWRITE8("timer16:3", h8_timer16_channel_device, tior_r,   tior_w,   0xffff)
-	AM_RANGE(0xfffe84, 0xfffe85) AM_DEVREADWRITE8("timer16:3", h8_timer16_channel_device, tier_r,   tier_w,   0xff00)
-	AM_RANGE(0xfffe84, 0xfffe85) AM_DEVREADWRITE8("timer16:3", h8_timer16_channel_device, tsr_r,    tsr_w,    0x00ff)
-	AM_RANGE(0xfffe86, 0xfffe87) AM_DEVREADWRITE( "timer16:3", h8_timer16_channel_device, tcnt_r,   tcnt_w          )
-	AM_RANGE(0xfffe88, 0xfffe8f) AM_DEVREADWRITE( "timer16:3", h8_timer16_channel_device, tgr_r,    tgr_w           )
-	AM_RANGE(0xfffe90, 0xfffe91) AM_DEVREADWRITE8("timer16:4", h8_timer16_channel_device, tcr_r,    tcr_w,    0xff00)
-	AM_RANGE(0xfffe90, 0xfffe91) AM_DEVREADWRITE8("timer16:4", h8_timer16_channel_device, tmdr_r,   tmdr_w,   0x00ff)
-	AM_RANGE(0xfffe92, 0xfffe93) AM_DEVREADWRITE8("timer16:4", h8_timer16_channel_device, tior_r,   tior_w,   0xff00)
-	AM_RANGE(0xfffe94, 0xfffe95) AM_DEVREADWRITE8("timer16:4", h8_timer16_channel_device, tier_r,   tier_w,   0xff00)
-	AM_RANGE(0xfffe94, 0xfffe95) AM_DEVREADWRITE8("timer16:4", h8_timer16_channel_device, tsr_r,    tsr_w,    0x00ff)
-	AM_RANGE(0xfffe96, 0xfffe97) AM_DEVREADWRITE( "timer16:4", h8_timer16_channel_device, tcnt_r,   tcnt_w          )
-	AM_RANGE(0xfffe98, 0xfffe9b) AM_DEVREADWRITE( "timer16:4", h8_timer16_channel_device, tgr_r,    tgr_w           )
-	AM_RANGE(0xfffea0, 0xfffea1) AM_DEVREADWRITE8("timer16:5", h8_timer16_channel_device, tcr_r,    tcr_w,    0xff00)
-	AM_RANGE(0xfffea0, 0xfffea1) AM_DEVREADWRITE8("timer16:5", h8_timer16_channel_device, tmdr_r,   tmdr_w,   0x00ff)
-	AM_RANGE(0xfffea2, 0xfffea3) AM_DEVREADWRITE8("timer16:5", h8_timer16_channel_device, tior_r,   tior_w,   0xff00)
-	AM_RANGE(0xfffea4, 0xfffea5) AM_DEVREADWRITE8("timer16:5", h8_timer16_channel_device, tier_r,   tier_w,   0xff00)
-	AM_RANGE(0xfffea4, 0xfffea5) AM_DEVREADWRITE8("timer16:5", h8_timer16_channel_device, tsr_r,    tsr_w,    0x00ff)
-	AM_RANGE(0xfffea6, 0xfffea7) AM_DEVREADWRITE( "timer16:5", h8_timer16_channel_device, tcnt_r,   tcnt_w          )
-	AM_RANGE(0xfffea8, 0xfffeab) AM_DEVREADWRITE( "timer16:5", h8_timer16_channel_device, tgr_r,    tgr_w           )
-	AM_RANGE(0xfffeb0, 0xfffeb1) AM_DEVWRITE8(    "port1",     h8_port_device,                      ddr_w,    0xff00)
-	AM_RANGE(0xfffeb0, 0xfffeb1) AM_DEVWRITE8(    "port2",     h8_port_device,                      ddr_w,    0x00ff)
-	AM_RANGE(0xfffeb2, 0xfffeb3) AM_DEVWRITE8(    "port3",     h8_port_device,                      ddr_w,    0xff00)
-	AM_RANGE(0xfffeb4, 0xfffeb5) AM_DEVWRITE8(    "port5",     h8_port_device,                      ddr_w,    0xff00)
-	AM_RANGE(0xfffeb4, 0xfffeb5) AM_DEVWRITE8(    "port6",     h8_port_device,                      ddr_w,    0x00ff)
-	AM_RANGE(0xfffeb8, 0xfffeb9) AM_DEVWRITE8(    "porta",     h8_port_device,                      ddr_w,    0x00ff)
-	AM_RANGE(0xfffeba, 0xfffebb) AM_DEVWRITE8(    "portb",     h8_port_device,                      ddr_w,    0xff00)
-	AM_RANGE(0xfffeba, 0xfffebb) AM_DEVWRITE8(    "portc",     h8_port_device,                      ddr_w,    0x00ff)
-	AM_RANGE(0xfffebc, 0xfffebd) AM_DEVWRITE8(    "portd",     h8_port_device,                      ddr_w,    0xff00)
-	AM_RANGE(0xfffebc, 0xfffebd) AM_DEVWRITE8(    "porte",     h8_port_device,                      ddr_w,    0x00ff)
-	AM_RANGE(0xfffebe, 0xfffebf) AM_DEVWRITE8(    "portf",     h8_port_device,                      ddr_w,    0xff00)
-	AM_RANGE(0xfffebe, 0xfffebf) AM_DEVWRITE8(    "portg",     h8_port_device,                      ddr_w,    0x00ff)
-	AM_RANGE(0xfffec0, 0xfffec1) AM_DEVREADWRITE8("intc",      h8s_intc_device,           icr_r,    icr_w,    0xffff)
-	AM_RANGE(0xfffec2, 0xfffec3) AM_DEVREADWRITE8("intc",      h8s_intc_device,           icrc_r,   icrc_w,   0xff00)
-	AM_RANGE(0xfffec4, 0xfffecd) AM_DEVREADWRITE8("intc",      h8s_intc_device,           ipr_r,    ipr_w,    0xffff)
-	AM_RANGE(0xfffece, 0xfffecf) AM_DEVREADWRITE8("intc",      h8s_intc_device,           iprk_r,   iprk_w,   0xff00)
+	map(0xfffe80, 0xfffe80).rw("timer16:3", FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
+	map(0xfffe81, 0xfffe81).rw("timer16:3", FUNC(h8_timer16_channel_device::tmdr_r), FUNC(h8_timer16_channel_device::tmdr_w));
+	map(0xfffe82, 0xfffe83).rw("timer16:3", FUNC(h8_timer16_channel_device::tior_r), FUNC(h8_timer16_channel_device::tior_w));
+	map(0xfffe84, 0xfffe84).rw("timer16:3", FUNC(h8_timer16_channel_device::tier_r), FUNC(h8_timer16_channel_device::tier_w));
+	map(0xfffe85, 0xfffe85).rw("timer16:3", FUNC(h8_timer16_channel_device::tsr_r), FUNC(h8_timer16_channel_device::tsr_w));
+	map(0xfffe86, 0xfffe87).rw("timer16:3", FUNC(h8_timer16_channel_device::tcnt_r), FUNC(h8_timer16_channel_device::tcnt_w));
+	map(0xfffe88, 0xfffe8f).rw("timer16:3", FUNC(h8_timer16_channel_device::tgr_r), FUNC(h8_timer16_channel_device::tgr_w));
+	map(0xfffe90, 0xfffe90).rw("timer16:4", FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
+	map(0xfffe91, 0xfffe91).rw("timer16:4", FUNC(h8_timer16_channel_device::tmdr_r), FUNC(h8_timer16_channel_device::tmdr_w));
+	map(0xfffe92, 0xfffe92).rw("timer16:4", FUNC(h8_timer16_channel_device::tior_r), FUNC(h8_timer16_channel_device::tior_w));
+	map(0xfffe94, 0xfffe94).rw("timer16:4", FUNC(h8_timer16_channel_device::tier_r), FUNC(h8_timer16_channel_device::tier_w));
+	map(0xfffe95, 0xfffe95).rw("timer16:4", FUNC(h8_timer16_channel_device::tsr_r), FUNC(h8_timer16_channel_device::tsr_w));
+	map(0xfffe96, 0xfffe97).rw("timer16:4", FUNC(h8_timer16_channel_device::tcnt_r), FUNC(h8_timer16_channel_device::tcnt_w));
+	map(0xfffe98, 0xfffe9b).rw("timer16:4", FUNC(h8_timer16_channel_device::tgr_r), FUNC(h8_timer16_channel_device::tgr_w));
+	map(0xfffea0, 0xfffea0).rw("timer16:5", FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
+	map(0xfffea1, 0xfffea1).rw("timer16:5", FUNC(h8_timer16_channel_device::tmdr_r), FUNC(h8_timer16_channel_device::tmdr_w));
+	map(0xfffea2, 0xfffea2).rw("timer16:5", FUNC(h8_timer16_channel_device::tior_r), FUNC(h8_timer16_channel_device::tior_w));
+	map(0xfffea4, 0xfffea4).rw("timer16:5", FUNC(h8_timer16_channel_device::tier_r), FUNC(h8_timer16_channel_device::tier_w));
+	map(0xfffea5, 0xfffea5).rw("timer16:5", FUNC(h8_timer16_channel_device::tsr_r), FUNC(h8_timer16_channel_device::tsr_w));
+	map(0xfffea6, 0xfffea7).rw("timer16:5", FUNC(h8_timer16_channel_device::tcnt_r), FUNC(h8_timer16_channel_device::tcnt_w));
+	map(0xfffea8, 0xfffeab).rw("timer16:5", FUNC(h8_timer16_channel_device::tgr_r), FUNC(h8_timer16_channel_device::tgr_w));
+	map(0xfffeb0, 0xfffeb0).w("port1", FUNC(h8_port_device::ddr_w));
+	map(0xfffeb1, 0xfffeb1).w("port2", FUNC(h8_port_device::ddr_w));
+	map(0xfffeb2, 0xfffeb2).w("port3", FUNC(h8_port_device::ddr_w));
+	map(0xfffeb4, 0xfffeb4).w("port5", FUNC(h8_port_device::ddr_w));
+	map(0xfffeb5, 0xfffeb5).w("port6", FUNC(h8_port_device::ddr_w));
+	map(0xfffeb9, 0xfffeb9).w("porta", FUNC(h8_port_device::ddr_w));
+	map(0xfffeba, 0xfffeba).w("portb", FUNC(h8_port_device::ddr_w));
+	map(0xfffebb, 0xfffebb).w("portc", FUNC(h8_port_device::ddr_w));
+	map(0xfffebc, 0xfffebc).w("portd", FUNC(h8_port_device::ddr_w));
+	map(0xfffebd, 0xfffebd).w("porte", FUNC(h8_port_device::ddr_w));
+	map(0xfffebe, 0xfffebe).w("portf", FUNC(h8_port_device::ddr_w));
+	map(0xfffebf, 0xfffebf).w("portg", FUNC(h8_port_device::ddr_w));
+	map(0xfffec0, 0xfffec1).rw("intc", FUNC(h8s_intc_device::icr_r), FUNC(h8s_intc_device::icr_w));
+	map(0xfffec2, 0xfffec2).rw("intc", FUNC(h8s_intc_device::icrc_r), FUNC(h8s_intc_device::icrc_w));
+	map(0xfffec4, 0xfffecd).rw("intc", FUNC(h8s_intc_device::ipr_r), FUNC(h8s_intc_device::ipr_w));
+	map(0xfffece, 0xfffece).rw("intc", FUNC(h8s_intc_device::iprk_r), FUNC(h8s_intc_device::iprk_w));
 
-	AM_RANGE(0xfffee0, 0xfffee1) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     marah_r,  marah_w         )
-	AM_RANGE(0xfffee2, 0xfffee3) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     maral_r,  maral_w         )
-	AM_RANGE(0xfffee4, 0xfffee5) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     ioara_r,  ioara_w         )
-	AM_RANGE(0xfffee6, 0xfffee7) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     etcra_r,  etcra_w         )
-	AM_RANGE(0xfffee8, 0xfffee9) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     marbh_r,  marbh_w         )
-	AM_RANGE(0xfffeea, 0xfffeeb) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     marbl_r,  marbl_w         )
-	AM_RANGE(0xfffeec, 0xfffeed) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     ioarb_r,  ioarb_w         )
-	AM_RANGE(0xfffeee, 0xfffeef) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     etcrb_r,  etcrb_w         )
-	AM_RANGE(0xfffef0, 0xfffef1) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     marah_r,  marah_w         )
-	AM_RANGE(0xfffef2, 0xfffef3) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     maral_r,  maral_w         )
-	AM_RANGE(0xfffef4, 0xfffef5) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     ioara_r,  ioara_w         )
-	AM_RANGE(0xfffef6, 0xfffef7) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     etcra_r,  etcra_w         )
-	AM_RANGE(0xfffef8, 0xfffef9) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     marbh_r,  marbh_w         )
-	AM_RANGE(0xfffefa, 0xfffefb) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     marbl_r,  marbl_w         )
-	AM_RANGE(0xfffefc, 0xfffefd) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     ioarb_r,  ioarb_w         )
-	AM_RANGE(0xfffefe, 0xfffeff) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     etcrb_r,  etcrb_w         )
-	AM_RANGE(0xffff00, 0xffff01) AM_DEVREADWRITE8("dma",       h8_dma_device,             dmawer_r, dmawer_w, 0xff00)
-	AM_RANGE(0xffff00, 0xffff01) AM_DEVREADWRITE8("dma",       h8_dma_device,             dmatcr_r, dmatcr_w, 0x00ff)
-	AM_RANGE(0xffff02, 0xffff03) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     dmacr_r,  dmacr_w         )
-	AM_RANGE(0xffff04, 0xffff05) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     dmacr_r,  dmacr_w         )
-	AM_RANGE(0xffff06, 0xffff07) AM_DEVREADWRITE( "dma",       h8_dma_device,             dmabcr_r, dmabcr_w        )
-	AM_RANGE(0xffff2c, 0xffff2d) AM_DEVREADWRITE8("intc",      h8s_intc_device,           iscrh_r,  iscrh_w,  0xff00)
-	AM_RANGE(0xffff2c, 0xffff2d) AM_DEVREADWRITE8("intc",      h8s_intc_device,           iscrl_r,  iscrl_w,  0x00ff)
-	AM_RANGE(0xffff2e, 0xffff2f) AM_DEVREADWRITE8("intc",      h8s_intc_device,           ier_r,    ier_w,    0xff00)
-	AM_RANGE(0xffff2e, 0xffff2f) AM_DEVREADWRITE8("intc",      h8s_intc_device,           isr_r,    isr_w,    0x00ff)
-	AM_RANGE(0xffff30, 0xffff35) AM_DEVREADWRITE8("dtc",       h8_dtc_device,             dtcer_r,  dtcer_w,  0xffff)
-	AM_RANGE(0xffff36, 0xffff37) AM_DEVREADWRITE8("dtc",       h8_dtc_device,             dtvecr_r, dtvecr_w, 0x00ff)
-	AM_RANGE(0xffff38, 0xffff39) AM_READWRITE8(                                           syscr_r,  syscr_w,  0x00ff)
+	map(0xfffee0, 0xfffee1).rw("dma:0", FUNC(h8_dma_channel_device::marah_r), FUNC(h8_dma_channel_device::marah_w));
+	map(0xfffee2, 0xfffee3).rw("dma:0", FUNC(h8_dma_channel_device::maral_r), FUNC(h8_dma_channel_device::maral_w));
+	map(0xfffee4, 0xfffee5).rw("dma:0", FUNC(h8_dma_channel_device::ioara_r), FUNC(h8_dma_channel_device::ioara_w));
+	map(0xfffee6, 0xfffee7).rw("dma:0", FUNC(h8_dma_channel_device::etcra_r), FUNC(h8_dma_channel_device::etcra_w));
+	map(0xfffee8, 0xfffee9).rw("dma:0", FUNC(h8_dma_channel_device::marbh_r), FUNC(h8_dma_channel_device::marbh_w));
+	map(0xfffeea, 0xfffeeb).rw("dma:0", FUNC(h8_dma_channel_device::marbl_r), FUNC(h8_dma_channel_device::marbl_w));
+	map(0xfffeec, 0xfffeed).rw("dma:0", FUNC(h8_dma_channel_device::ioarb_r), FUNC(h8_dma_channel_device::ioarb_w));
+	map(0xfffeee, 0xfffeef).rw("dma:0", FUNC(h8_dma_channel_device::etcrb_r), FUNC(h8_dma_channel_device::etcrb_w));
+	map(0xfffef0, 0xfffef1).rw("dma:1", FUNC(h8_dma_channel_device::marah_r), FUNC(h8_dma_channel_device::marah_w));
+	map(0xfffef2, 0xfffef3).rw("dma:1", FUNC(h8_dma_channel_device::maral_r), FUNC(h8_dma_channel_device::maral_w));
+	map(0xfffef4, 0xfffef5).rw("dma:1", FUNC(h8_dma_channel_device::ioara_r), FUNC(h8_dma_channel_device::ioara_w));
+	map(0xfffef6, 0xfffef7).rw("dma:1", FUNC(h8_dma_channel_device::etcra_r), FUNC(h8_dma_channel_device::etcra_w));
+	map(0xfffef8, 0xfffef9).rw("dma:1", FUNC(h8_dma_channel_device::marbh_r), FUNC(h8_dma_channel_device::marbh_w));
+	map(0xfffefa, 0xfffefb).rw("dma:1", FUNC(h8_dma_channel_device::marbl_r), FUNC(h8_dma_channel_device::marbl_w));
+	map(0xfffefc, 0xfffefd).rw("dma:1", FUNC(h8_dma_channel_device::ioarb_r), FUNC(h8_dma_channel_device::ioarb_w));
+	map(0xfffefe, 0xfffeff).rw("dma:1", FUNC(h8_dma_channel_device::etcrb_r), FUNC(h8_dma_channel_device::etcrb_w));
+	map(0xffff00, 0xffff00).rw("dma", FUNC(h8_dma_device::dmawer_r), FUNC(h8_dma_device::dmawer_w));
+	map(0xffff01, 0xffff01).rw("dma", FUNC(h8_dma_device::dmatcr_r), FUNC(h8_dma_device::dmatcr_w));
+	map(0xffff02, 0xffff03).rw("dma:0", FUNC(h8_dma_channel_device::dmacr_r), FUNC(h8_dma_channel_device::dmacr_w));
+	map(0xffff04, 0xffff05).rw("dma:1", FUNC(h8_dma_channel_device::dmacr_r), FUNC(h8_dma_channel_device::dmacr_w));
+	map(0xffff06, 0xffff07).rw("dma", FUNC(h8_dma_device::dmabcr_r), FUNC(h8_dma_device::dmabcr_w));
+	map(0xffff2c, 0xffff2c).rw("intc", FUNC(h8s_intc_device::iscrh_r), FUNC(h8s_intc_device::iscrh_w));
+	map(0xffff2d, 0xffff2d).rw("intc", FUNC(h8s_intc_device::iscrl_r), FUNC(h8s_intc_device::iscrl_w));
+	map(0xffff2e, 0xffff2e).rw("intc", FUNC(h8s_intc_device::ier_r), FUNC(h8s_intc_device::ier_w));
+	map(0xffff2f, 0xffff2f).rw("intc", FUNC(h8s_intc_device::isr_r), FUNC(h8s_intc_device::isr_w));
+	map(0xffff30, 0xffff35).rw("dtc", FUNC(h8_dtc_device::dtcer_r), FUNC(h8_dtc_device::dtcer_w));
+	map(0xffff37, 0xffff37).rw("dtc", FUNC(h8_dtc_device::dtvecr_r), FUNC(h8_dtc_device::dtvecr_w));
+	map(0xffff39, 0xffff39).rw(FUNC(h8s2320_device::syscr_r), FUNC(h8s2320_device::syscr_w));
 
-	AM_RANGE(0xffff50, 0xffff51) AM_DEVREAD8(     "port1",     h8_port_device,            port_r,             0xff00)
-	AM_RANGE(0xffff50, 0xffff51) AM_DEVREAD8(     "port2",     h8_port_device,            port_r,             0x00ff)
-	AM_RANGE(0xffff52, 0xffff53) AM_DEVREAD8(     "port3",     h8_port_device,            port_r,             0xff00)
-	AM_RANGE(0xffff52, 0xffff53) AM_DEVREAD8(     "port4",     h8_port_device,            port_r,             0x00ff)
-	AM_RANGE(0xffff54, 0xffff55) AM_DEVREAD8(     "port5",     h8_port_device,            port_r,             0xff00)
-	AM_RANGE(0xffff54, 0xffff55) AM_DEVREAD8(     "port6",     h8_port_device,            port_r,             0x00ff)
-	AM_RANGE(0xffff58, 0xffff59) AM_DEVREAD8(     "porta",     h8_port_device,            port_r,             0x00ff)
-	AM_RANGE(0xffff5a, 0xffff5b) AM_DEVREAD8(     "portb",     h8_port_device,            port_r,             0xff00)
-	AM_RANGE(0xffff5a, 0xffff5b) AM_DEVREAD8(     "portc",     h8_port_device,            port_r,             0x00ff)
-	AM_RANGE(0xffff5c, 0xffff5d) AM_DEVREAD8(     "portd",     h8_port_device,            port_r,             0xff00)
-	AM_RANGE(0xffff5c, 0xffff5d) AM_DEVREAD8(     "porte",     h8_port_device,            port_r,             0x00ff)
-	AM_RANGE(0xffff5e, 0xffff5f) AM_DEVREAD8(     "portf",     h8_port_device,            port_r,             0xff00)
-	AM_RANGE(0xffff5e, 0xffff5f) AM_DEVREAD8(     "portg",     h8_port_device,            port_r,             0x00ff)
-	AM_RANGE(0xffff60, 0xffff61) AM_DEVREADWRITE8("port1",     h8_port_device,            dr_r,     dr_w,     0xff00)
-	AM_RANGE(0xffff60, 0xffff61) AM_DEVREADWRITE8("port2",     h8_port_device,            dr_r,     dr_w,     0x00ff)
-	AM_RANGE(0xffff62, 0xffff63) AM_DEVREADWRITE8("port3",     h8_port_device,            dr_r,     dr_w,     0xff00)
-	AM_RANGE(0xffff64, 0xffff65) AM_DEVREADWRITE8("port5",     h8_port_device,            dr_r,     dr_w,     0xff00)
-	AM_RANGE(0xffff64, 0xffff65) AM_DEVREADWRITE8("port6",     h8_port_device,            dr_r,     dr_w,     0x00ff)
-	AM_RANGE(0xffff68, 0xffff69) AM_DEVREADWRITE8("porta",     h8_port_device,            dr_r,     dr_w,     0x00ff)
-	AM_RANGE(0xffff6a, 0xffff6b) AM_DEVREADWRITE8("portb",     h8_port_device,            dr_r,     dr_w,     0xff00)
-	AM_RANGE(0xffff6a, 0xffff6b) AM_DEVREADWRITE8("portc",     h8_port_device,            dr_r,     dr_w,     0x00ff)
-	AM_RANGE(0xffff6c, 0xffff6d) AM_DEVREADWRITE8("portd",     h8_port_device,            dr_r,     dr_w,     0xff00)
-	AM_RANGE(0xffff6c, 0xffff6d) AM_DEVREADWRITE8("porte",     h8_port_device,            dr_r,     dr_w,     0x00ff)
-	AM_RANGE(0xffff6e, 0xffff6f) AM_DEVREADWRITE8("portf",     h8_port_device,            dr_r,     dr_w,     0xff00)
-	AM_RANGE(0xffff6e, 0xffff6f) AM_DEVREADWRITE8("portg",     h8_port_device,            dr_r,     dr_w,     0x00ff)
-	AM_RANGE(0xffff70, 0xffff71) AM_DEVREADWRITE8("porta",     h8_port_device,            pcr_r,    pcr_w,    0xff00)
-	AM_RANGE(0xffff70, 0xffff71) AM_DEVREADWRITE8("portb",     h8_port_device,            pcr_r,    pcr_w,    0x00ff)
-	AM_RANGE(0xffff72, 0xffff73) AM_DEVREADWRITE8("portc",     h8_port_device,            pcr_r,    pcr_w,    0xff00)
-	AM_RANGE(0xffff72, 0xffff73) AM_DEVREADWRITE8("portd",     h8_port_device,            pcr_r,    pcr_w,    0x00ff)
-	AM_RANGE(0xffff74, 0xffff75) AM_DEVREADWRITE8("porte",     h8_port_device,            pcr_r,    pcr_w,    0xff00)
-	AM_RANGE(0xffff76, 0xffff77) AM_DEVREADWRITE8("port3",     h8_port_device,            odr_r,    odr_w,    0xff00)
-	AM_RANGE(0xffff76, 0xffff77) AM_DEVREADWRITE8("porta",     h8_port_device,            odr_r,    odr_w,    0x00ff)
-	AM_RANGE(0xffff78, 0xffff79) AM_DEVREADWRITE8("sci0",      h8_sci_device,             smr_r,    smr_w,    0xff00)
-	AM_RANGE(0xffff78, 0xffff79) AM_DEVREADWRITE8("sci0",      h8_sci_device,             brr_r,    brr_w,    0x00ff)
-	AM_RANGE(0xffff7a, 0xffff7b) AM_DEVREADWRITE8("sci0",      h8_sci_device,             scr_r,    scr_w,    0xff00)
-	AM_RANGE(0xffff7a, 0xffff7b) AM_DEVREADWRITE8("sci0",      h8_sci_device,             tdr_r,    tdr_w,    0x00ff)
-	AM_RANGE(0xffff7c, 0xffff7d) AM_DEVREADWRITE8("sci0",      h8_sci_device,             ssr_r,    ssr_w,    0xff00)
-	AM_RANGE(0xffff7c, 0xffff7d) AM_DEVREAD8(     "sci0",      h8_sci_device,             rdr_r,              0x00ff)
-	AM_RANGE(0xffff7e, 0xffff7f) AM_DEVREADWRITE8("sci0",      h8_sci_device,             scmr_r,   scmr_w,   0xff00)
-	AM_RANGE(0xffff80, 0xffff81) AM_DEVREADWRITE8("sci1",      h8_sci_device,             smr_r,    smr_w,    0xff00)
-	AM_RANGE(0xffff80, 0xffff81) AM_DEVREADWRITE8("sci1",      h8_sci_device,             brr_r,    brr_w,    0x00ff)
-	AM_RANGE(0xffff82, 0xffff83) AM_DEVREADWRITE8("sci1",      h8_sci_device,             scr_r,    scr_w,    0xff00)
-	AM_RANGE(0xffff82, 0xffff83) AM_DEVREADWRITE8("sci1",      h8_sci_device,             tdr_r,    tdr_w,    0x00ff)
-	AM_RANGE(0xffff84, 0xffff85) AM_DEVREADWRITE8("sci1",      h8_sci_device,             ssr_r,    ssr_w,    0xff00)
-	AM_RANGE(0xffff84, 0xffff85) AM_DEVREAD8(     "sci1",      h8_sci_device,             rdr_r,              0x00ff)
-	AM_RANGE(0xffff86, 0xffff87) AM_DEVREADWRITE8("sci1",      h8_sci_device,             scmr_r,   scmr_w,   0xff00)
-	AM_RANGE(0xffff88, 0xffff89) AM_DEVREADWRITE8("sci2",      h8_sci_device,             smr_r,    smr_w,    0xff00)
-	AM_RANGE(0xffff88, 0xffff89) AM_DEVREADWRITE8("sci2",      h8_sci_device,             brr_r,    brr_w,    0x00ff)
-	AM_RANGE(0xffff8a, 0xffff8b) AM_DEVREADWRITE8("sci2",      h8_sci_device,             scr_r,    scr_w,    0xff00)
-	AM_RANGE(0xffff8a, 0xffff8b) AM_DEVREADWRITE8("sci2",      h8_sci_device,             tdr_r,    tdr_w,    0x00ff)
-	AM_RANGE(0xffff8c, 0xffff8d) AM_DEVREADWRITE8("sci2",      h8_sci_device,             ssr_r,    ssr_w,    0xff00)
-	AM_RANGE(0xffff8c, 0xffff8d) AM_DEVREAD8(     "sci2",      h8_sci_device,             rdr_r,              0x00ff)
-	AM_RANGE(0xffff8e, 0xffff8f) AM_DEVREADWRITE8("sci2",      h8_sci_device,             scmr_r,   scmr_w,   0xff00)
-	AM_RANGE(0xffff90, 0xffff97) AM_DEVREAD8(     "adc",       h8_adc_device,             addr8_r,            0xffff)
-	AM_RANGE(0xffff98, 0xffff99) AM_DEVREADWRITE8("adc",       h8_adc_device,             adcsr_r,  adcsr_w,  0xff00)
-	AM_RANGE(0xffff98, 0xffff99) AM_DEVREADWRITE8("adc",       h8_adc_device,             adcr_r,   adcr_w,   0x00ff)
+	map(0xffff50, 0xffff50).r("port1", FUNC(h8_port_device::port_r));
+	map(0xffff51, 0xffff51).r("port2", FUNC(h8_port_device::port_r));
+	map(0xffff52, 0xffff52).r("port3", FUNC(h8_port_device::port_r));
+	map(0xffff53, 0xffff53).r("port4", FUNC(h8_port_device::port_r));
+	map(0xffff54, 0xffff54).r("port5", FUNC(h8_port_device::port_r));
+	map(0xffff55, 0xffff55).r("port6", FUNC(h8_port_device::port_r));
+	map(0xffff59, 0xffff59).r("porta", FUNC(h8_port_device::port_r));
+	map(0xffff5a, 0xffff5a).r("portb", FUNC(h8_port_device::port_r));
+	map(0xffff5b, 0xffff5b).r("portc", FUNC(h8_port_device::port_r));
+	map(0xffff5c, 0xffff5c).r("portd", FUNC(h8_port_device::port_r));
+	map(0xffff5d, 0xffff5d).r("porte", FUNC(h8_port_device::port_r));
+	map(0xffff5e, 0xffff5e).r("portf", FUNC(h8_port_device::port_r));
+	map(0xffff5f, 0xffff5f).r("portg", FUNC(h8_port_device::port_r));
+	map(0xffff60, 0xffff60).rw("port1", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff61, 0xffff61).rw("port2", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff62, 0xffff62).rw("port3", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff64, 0xffff64).rw("port5", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff65, 0xffff65).rw("port6", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff69, 0xffff69).rw("porta", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff6a, 0xffff6a).rw("portb", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff6b, 0xffff6b).rw("portc", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff6c, 0xffff6c).rw("portd", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff6d, 0xffff6d).rw("porte", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff6e, 0xffff6e).rw("portf", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff6f, 0xffff6f).rw("portg", FUNC(h8_port_device::dr_r), FUNC(h8_port_device::dr_w));
+	map(0xffff70, 0xffff70).rw("porta", FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
+	map(0xffff71, 0xffff71).rw("portb", FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
+	map(0xffff72, 0xffff72).rw("portc", FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
+	map(0xffff73, 0xffff73).rw("portd", FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
+	map(0xffff74, 0xffff74).rw("porte", FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
+	map(0xffff76, 0xffff76).rw("port3", FUNC(h8_port_device::odr_r), FUNC(h8_port_device::odr_w));
+	map(0xffff77, 0xffff77).rw("porta", FUNC(h8_port_device::odr_r), FUNC(h8_port_device::odr_w));
+	map(0xffff78, 0xffff78).rw("sci0", FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	map(0xffff79, 0xffff79).rw("sci0", FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
+	map(0xffff7a, 0xffff7a).rw("sci0", FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(0xffff7b, 0xffff7b).rw("sci0", FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
+	map(0xffff7c, 0xffff7c).rw("sci0", FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(0xffff7d, 0xffff7d).r("sci0", FUNC(h8_sci_device::rdr_r));
+	map(0xffff7e, 0xffff7e).rw("sci0", FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
+	map(0xffff80, 0xffff80).rw("sci1", FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	map(0xffff81, 0xffff81).rw("sci1", FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
+	map(0xffff82, 0xffff82).rw("sci1", FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(0xffff83, 0xffff83).rw("sci1", FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
+	map(0xffff84, 0xffff84).rw("sci1", FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(0xffff85, 0xffff85).r("sci1", FUNC(h8_sci_device::rdr_r));
+	map(0xffff86, 0xffff86).rw("sci1", FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
+	map(0xffff88, 0xffff88).rw("sci2", FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	map(0xffff89, 0xffff89).rw("sci2", FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
+	map(0xffff8a, 0xffff8a).rw("sci2", FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(0xffff8b, 0xffff8b).rw("sci2", FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
+	map(0xffff8c, 0xffff8c).rw("sci2", FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(0xffff8d, 0xffff8d).r("sci2", FUNC(h8_sci_device::rdr_r));
+	map(0xffff8e, 0xffff8e).rw("sci2", FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
+	map(0xffff90, 0xffff97).r("adc", FUNC(h8_adc_device::addr8_r));
+	map(0xffff98, 0xffff98).rw("adc", FUNC(h8_adc_device::adcsr_r), FUNC(h8_adc_device::adcsr_w));
+	map(0xffff99, 0xffff99).rw("adc", FUNC(h8_adc_device::adcr_r), FUNC(h8_adc_device::adcr_w));
 
-	AM_RANGE(0xffffb0, 0xffffb1) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcr_r,    tcr_w,    0xff00)
-	AM_RANGE(0xffffb0, 0xffffb1) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcr_r,    tcr_w,    0x00ff)
-	AM_RANGE(0xffffb2, 0xffffb3) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcsr_r,   tcsr_w,   0xff00)
-	AM_RANGE(0xffffb2, 0xffffb3) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcsr_r,   tcsr_w,   0x00ff)
-	AM_RANGE(0xffffb4, 0xffffb7) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcor_r,   tcor_w,   0xff00)
-	AM_RANGE(0xffffb4, 0xffffb7) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcor_r,   tcor_w,   0x00ff)
-	AM_RANGE(0xffffb8, 0xffffb9) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcnt_r,   tcnt_w,   0xff00)
-	AM_RANGE(0xffffb8, 0xffffb9) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcnt_r,   tcnt_w,   0x00ff)
-	AM_RANGE(0xffffbc, 0xffffbd) AM_DEVREADWRITE( "watchdog",  h8_watchdog_device,        wd_r,     wd_w            )
-	AM_RANGE(0xffffbe, 0xffffbf) AM_DEVREADWRITE( "watchdog",  h8_watchdog_device,        rst_r,    rst_w           )
-	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVREADWRITE8("timer16",   h8_timer16_device,         tstr_r,   tstr_w,   0xff00)
-	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVREADWRITE8("timer16",   h8_timer16_device,         tsyr_r,   tsyr_w,   0x00ff)
+	map(0xffffb0, 0xffffb0).rw("timer8_0", FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
+	map(0xffffb1, 0xffffb1).rw("timer8_1", FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
+	map(0xffffb2, 0xffffb2).rw("timer8_0", FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
+	map(0xffffb3, 0xffffb3).rw("timer8_1", FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
+	map(0xffffb4, 0xffffb7).rw("timer8_0", FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w)).umask16(0xff00);
+	map(0xffffb4, 0xffffb7).rw("timer8_1", FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w)).umask16(0x00ff);
+	map(0xffffb8, 0xffffb8).rw("timer8_0", FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
+	map(0xffffb9, 0xffffb9).rw("timer8_1", FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
+	map(0xffffbc, 0xffffbd).rw("watchdog", FUNC(h8_watchdog_device::wd_r), FUNC(h8_watchdog_device::wd_w));
+	map(0xffffbe, 0xffffbf).rw("watchdog", FUNC(h8_watchdog_device::rst_r), FUNC(h8_watchdog_device::rst_w));
+	map(0xffffc0, 0xffffc0).rw("timer16", FUNC(h8_timer16_device::tstr_r), FUNC(h8_timer16_device::tstr_w));
+	map(0xffffc1, 0xffffc1).rw("timer16", FUNC(h8_timer16_device::tsyr_r), FUNC(h8_timer16_device::tsyr_w));
 
-	AM_RANGE(0xffffd0, 0xffffd1) AM_DEVREADWRITE8("timer16:0", h8_timer16_channel_device, tcr_r,    tcr_w,    0xff00)
-	AM_RANGE(0xffffd0, 0xffffd1) AM_DEVREADWRITE8("timer16:0", h8_timer16_channel_device, tmdr_r,   tmdr_w,   0x00ff)
-	AM_RANGE(0xffffd2, 0xffffd3) AM_DEVREADWRITE8("timer16:0", h8_timer16_channel_device, tior_r,   tior_w,   0xffff)
-	AM_RANGE(0xffffd4, 0xffffd5) AM_DEVREADWRITE8("timer16:0", h8_timer16_channel_device, tier_r,   tier_w,   0xff00)
-	AM_RANGE(0xffffd4, 0xffffd5) AM_DEVREADWRITE8("timer16:0", h8_timer16_channel_device, tsr_r,    tsr_w,    0x00ff)
-	AM_RANGE(0xffffd6, 0xffffd7) AM_DEVREADWRITE( "timer16:0", h8_timer16_channel_device, tcnt_r,   tcnt_w          )
-	AM_RANGE(0xffffd8, 0xffffdf) AM_DEVREADWRITE( "timer16:0", h8_timer16_channel_device, tgr_r,    tgr_w           )
-	AM_RANGE(0xffffe0, 0xffffe1) AM_DEVREADWRITE8("timer16:1", h8_timer16_channel_device, tcr_r,    tcr_w,    0xff00)
-	AM_RANGE(0xffffe0, 0xffffe1) AM_DEVREADWRITE8("timer16:1", h8_timer16_channel_device, tmdr_r,   tmdr_w,   0x00ff)
-	AM_RANGE(0xffffe2, 0xffffe3) AM_DEVREADWRITE8("timer16:1", h8_timer16_channel_device, tior_r,   tior_w,   0xff00)
-	AM_RANGE(0xffffe4, 0xffffe5) AM_DEVREADWRITE8("timer16:1", h8_timer16_channel_device, tier_r,   tier_w,   0xff00)
-	AM_RANGE(0xffffe4, 0xffffe5) AM_DEVREADWRITE8("timer16:1", h8_timer16_channel_device, tsr_r,    tsr_w,    0x00ff)
-	AM_RANGE(0xffffe6, 0xffffe7) AM_DEVREADWRITE( "timer16:1", h8_timer16_channel_device, tcnt_r,   tcnt_w          )
-	AM_RANGE(0xffffe8, 0xffffeb) AM_DEVREADWRITE( "timer16:1", h8_timer16_channel_device, tgr_r,    tgr_w           )
-	AM_RANGE(0xfffff0, 0xfffff1) AM_DEVREADWRITE8("timer16:2", h8_timer16_channel_device, tcr_r,    tcr_w,    0xff00)
-	AM_RANGE(0xfffff0, 0xfffff1) AM_DEVREADWRITE8("timer16:2", h8_timer16_channel_device, tmdr_r,   tmdr_w,   0x00ff)
-	AM_RANGE(0xfffff2, 0xfffff3) AM_DEVREADWRITE8("timer16:2", h8_timer16_channel_device, tior_r,   tior_w,   0xff00)
-	AM_RANGE(0xfffff4, 0xfffff5) AM_DEVREADWRITE8("timer16:2", h8_timer16_channel_device, tier_r,   tier_w,   0xff00)
-	AM_RANGE(0xfffff4, 0xfffff5) AM_DEVREADWRITE8("timer16:2", h8_timer16_channel_device, tsr_r,    tsr_w,    0x00ff)
-	AM_RANGE(0xfffff6, 0xfffff7) AM_DEVREADWRITE( "timer16:2", h8_timer16_channel_device, tcnt_r,   tcnt_w          )
-	AM_RANGE(0xfffff8, 0xfffffb) AM_DEVREADWRITE( "timer16:2", h8_timer16_channel_device, tgr_r,    tgr_w           )
-ADDRESS_MAP_END
+	map(0xffffd0, 0xffffd0).rw("timer16:0", FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
+	map(0xffffd1, 0xffffd1).rw("timer16:0", FUNC(h8_timer16_channel_device::tmdr_r), FUNC(h8_timer16_channel_device::tmdr_w));
+	map(0xffffd2, 0xffffd3).rw("timer16:0", FUNC(h8_timer16_channel_device::tior_r), FUNC(h8_timer16_channel_device::tior_w));
+	map(0xffffd4, 0xffffd4).rw("timer16:0", FUNC(h8_timer16_channel_device::tier_r), FUNC(h8_timer16_channel_device::tier_w));
+	map(0xffffd5, 0xffffd5).rw("timer16:0", FUNC(h8_timer16_channel_device::tsr_r), FUNC(h8_timer16_channel_device::tsr_w));
+	map(0xffffd6, 0xffffd7).rw("timer16:0", FUNC(h8_timer16_channel_device::tcnt_r), FUNC(h8_timer16_channel_device::tcnt_w));
+	map(0xffffd8, 0xffffdf).rw("timer16:0", FUNC(h8_timer16_channel_device::tgr_r), FUNC(h8_timer16_channel_device::tgr_w));
+	map(0xffffe0, 0xffffe0).rw("timer16:1", FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
+	map(0xffffe1, 0xffffe1).rw("timer16:1", FUNC(h8_timer16_channel_device::tmdr_r), FUNC(h8_timer16_channel_device::tmdr_w));
+	map(0xffffe2, 0xffffe2).rw("timer16:1", FUNC(h8_timer16_channel_device::tior_r), FUNC(h8_timer16_channel_device::tior_w));
+	map(0xffffe4, 0xffffe4).rw("timer16:1", FUNC(h8_timer16_channel_device::tier_r), FUNC(h8_timer16_channel_device::tier_w));
+	map(0xffffe5, 0xffffe5).rw("timer16:1", FUNC(h8_timer16_channel_device::tsr_r), FUNC(h8_timer16_channel_device::tsr_w));
+	map(0xffffe6, 0xffffe7).rw("timer16:1", FUNC(h8_timer16_channel_device::tcnt_r), FUNC(h8_timer16_channel_device::tcnt_w));
+	map(0xffffe8, 0xffffeb).rw("timer16:1", FUNC(h8_timer16_channel_device::tgr_r), FUNC(h8_timer16_channel_device::tgr_w));
+	map(0xfffff0, 0xfffff0).rw("timer16:2", FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
+	map(0xfffff1, 0xfffff1).rw("timer16:2", FUNC(h8_timer16_channel_device::tmdr_r), FUNC(h8_timer16_channel_device::tmdr_w));
+	map(0xfffff2, 0xfffff2).rw("timer16:2", FUNC(h8_timer16_channel_device::tior_r), FUNC(h8_timer16_channel_device::tior_w));
+	map(0xfffff4, 0xfffff4).rw("timer16:2", FUNC(h8_timer16_channel_device::tier_r), FUNC(h8_timer16_channel_device::tier_w));
+	map(0xfffff5, 0xfffff5).rw("timer16:2", FUNC(h8_timer16_channel_device::tsr_r), FUNC(h8_timer16_channel_device::tsr_w));
+	map(0xfffff6, 0xfffff7).rw("timer16:2", FUNC(h8_timer16_channel_device::tcnt_r), FUNC(h8_timer16_channel_device::tcnt_w));
+	map(0xfffff8, 0xfffffb).rw("timer16:2", FUNC(h8_timer16_channel_device::tgr_r), FUNC(h8_timer16_channel_device::tgr_w));
+}
 
 // TODO: the 2321 doesn't have the dma subdevice
 

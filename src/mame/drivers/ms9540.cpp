@@ -38,11 +38,11 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	void kbd_put(u8 data);
-
 	void ms9540(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void kbd_put(u8 data);
+	void mem_map(address_map &map);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
@@ -51,13 +51,14 @@ private:
 };
 
 
-ADDRESS_MAP_START(ms9540_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x010000, 0x013fff) AM_ROM AM_REGION("9540", 0)
-	AM_RANGE(0x018000, 0x018fff) AM_RAM
-ADDRESS_MAP_END
+void ms9540_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xffffff);
+	map(0x000000, 0x00ffff).ram().share("rambase");
+	map(0x010000, 0x013fff).rom().region("9540", 0);
+	map(0x018000, 0x018fff).ram();
+}
 
 
 /* Input ports */
@@ -79,11 +80,11 @@ void ms9540_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(ms9540_state::ms9540)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ms9540_state, kbd_put))
 
 MACHINE_CONFIG_END
@@ -91,8 +92,8 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( ms9540 )
 	ROM_REGION16_BE(0x4000, "9540", 0)
-	ROM_LOAD16_BYTE("0954-0135-01.20n", 0x00000, 0x2000, CRC(93ee9363) SHA1(73bc09e0379e06e0da96279cb5cc1581a0f0bf77) )
-	ROM_LOAD16_BYTE("0954-0135-02.16n", 0x00001, 0x2000, CRC(a21077c5) SHA1(51dcbe543317d2042fb1acb1885461ba1790721e) )
+	ROM_LOAD16_BYTE("0954-0135-01.20n", 0x00001, 0x2000, CRC(93ee9363) SHA1(73bc09e0379e06e0da96279cb5cc1581a0f0bf77) )
+	ROM_LOAD16_BYTE("0954-0135-02.16n", 0x00000, 0x2000, CRC(a21077c5) SHA1(51dcbe543317d2042fb1acb1885461ba1790721e) )
 
 	ROM_REGION(0x1800, "9520", 0)
 	ROM_LOAD( "z80-hd.bin",   0x0000, 0x1000, CRC(b1c37286) SHA1(36b38fec9ef46e3e594423bbd1c64c5e9a4bc74d) )
@@ -102,5 +103,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY               FULLNAME  FLAGS
-COMP( 198?, ms9540, 0,      0,      ms9540,  ms9540, ms9540_state, 0,    "Millennium Systems", "ms9540", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY               FULLNAME  FLAGS
+COMP( 198?, ms9540, 0,      0,      ms9540,  ms9540, ms9540_state, empty_init, "Millennium Systems", "ms9540", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

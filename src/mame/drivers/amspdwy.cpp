@@ -71,26 +71,28 @@ READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 	return (m_ym2151->status_r(space, 0) & ~0x30) | ioport("IN0")->read();
 }
 
-ADDRESS_MAP_START(amspdwy_state::amspdwy_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x801f) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM // unused?
+void amspdwy_state::amspdwy_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x801f).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(amspdwy_state::amspdwy_videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).ram().w(FUNC(amspdwy_state::amspdwy_colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram(); // unused?
 //  AM_RANGE(0xa000, 0xa000) AM_WRITENOP // ?
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW2") AM_WRITE(amspdwy_flipscreen_w)
-	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)
-	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP // irq ack?
-	AM_RANGE(0xb400, 0xb400) AM_READ(amspdwy_sound_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+	map(0xa000, 0xa000).portr("DSW1");
+	map(0xa400, 0xa400).portr("DSW2").w(FUNC(amspdwy_state::amspdwy_flipscreen_w));
+	map(0xa800, 0xa800).r(FUNC(amspdwy_state::amspdwy_wheel_0_r));
+	map(0xac00, 0xac00).r(FUNC(amspdwy_state::amspdwy_wheel_1_r));
+	map(0xb000, 0xb000).nopw(); // irq ack?
+	map(0xb400, 0xb400).r(FUNC(amspdwy_state::amspdwy_sound_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xc000, 0xc0ff).ram().share("spriteram");
+	map(0xe000, 0xe7ff).ram();
+}
 
-ADDRESS_MAP_START(amspdwy_state::amspdwy_portmap)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("tracks", 0)
-ADDRESS_MAP_END
+void amspdwy_state::amspdwy_portmap(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("tracks", 0);
+}
 
 
 
@@ -102,14 +104,15 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(amspdwy_state::amspdwy_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void amspdwy_state::amspdwy_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 //  AM_RANGE(0x8000, 0x8000) AM_WRITENOP // ? writes 0 at start
-	AM_RANGE(0x9000, 0x9000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xffff, 0xffff) AM_READNOP // ??? IY = FFFF at the start ?
-ADDRESS_MAP_END
+	map(0x9000, 0x9000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xa000, 0xa001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc000, 0xdfff).ram();
+	map(0xffff, 0xffff).nopr(); // ??? IY = FFFF at the start ?
+}
 
 
 
@@ -161,18 +164,18 @@ static INPUT_PORTS_START( amspdwy )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:1" )        /* Listed as "Unused" */
 
 	PORT_START("WHEEL1")    // Player 1 Wheel + Coins
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )   // wheel
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )   // wheel
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2) // 2-3f
 
 	PORT_START("WHEEL2")    // Player 2 Wheel + Coins
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_START("IN0")   // Player 1&2 Pedals + YM2151 Sound Status
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("AN1")   // Player 1 Analog Fake Port
 	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_PLAYER(1)
@@ -213,7 +216,7 @@ static const gfx_layout layout_8x8x2 =
 	8*8
 };
 
-static GFXDECODE_START( amspdwy )
+static GFXDECODE_START( gfx_amspdwy )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x2, 0, 8 )
 GFXDECODE_END
 
@@ -247,13 +250,13 @@ void amspdwy_state::machine_reset()
 MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(amspdwy_map)
-	MCFG_CPU_IO_MAP(amspdwy_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(amspdwy_map)
+	MCFG_DEVICE_IO_MAP(amspdwy_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(amspdwy_sound_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -266,17 +269,18 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	MCFG_SCREEN_UPDATE_DRIVER(amspdwy_state, screen_update_amspdwy)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amspdwy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amspdwy)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -378,5 +382,5 @@ ROM_END
 
 /* (C) 1987 ETI 8402 MAGNOLIA ST. #C SANTEE, CA 92071 */
 
-GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  amspdwy_state, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, amspdwy_state, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  amspdwy_state, empty_init, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, amspdwy_state, empty_init, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )

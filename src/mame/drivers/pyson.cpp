@@ -153,6 +153,7 @@ Notes:
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -164,11 +165,12 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void pyson(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void pyson(machine_config &config);
 	void ps2_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -187,19 +189,20 @@ uint32_t pyson_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-ADDRESS_MAP_START(pyson_state::ps2_map)
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM in consumer PS2s, do these have more?
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void pyson_state::ps2_map(address_map &map)
+{
+	map(0x00000000, 0x01ffffff).ram(); // 32 MB RAM in consumer PS2s, do these have more?
+	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
+}
 
 static INPUT_PORTS_START( pyson )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pyson_state::pyson)
-	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // imported from namcops2.c driver
+	MCFG_DEVICE_ADD("maincpu", R5000LE, 294000000) // imported from namcops2.c driver
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_CPU_PROGRAM_MAP(ps2_map)
+	MCFG_DEVICE_PROGRAM_MAP(ps2_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -253,6 +256,6 @@ ROM_START( wswe2k3 )
 ROM_END
 
 
-GAME(2002, pyson,          0,   pyson,   pyson, pyson_state, 0, ROT0, "Konami", "Konami Pyson BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
-GAME(2002, wswe,       pyson,   pyson,   pyson, pyson_state, 0, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
-GAME(2003, wswe2k3,    pyson,   pyson,   pyson, pyson_state, 0, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)
+GAME(2002, pyson,          0,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "Konami Pyson BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2002, wswe,       pyson,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
+GAME(2003, wswe2k3,    pyson,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)

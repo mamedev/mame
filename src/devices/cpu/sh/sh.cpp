@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "sh.h"
 #include "sh_dasm.h"
+#include "cpu/drcumlsh.h"
 
 void sh_common_execution::device_start()
 {
@@ -79,7 +80,7 @@ void sh_common_execution::device_start()
 	state_add(STATE_GENSP, "GENSP", m_sh2_state->r[15]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sh2_state->sr).formatstr("%20s").noshow();
 
-	m_icountptr = &m_sh2_state->icount;
+	set_icountptr(m_sh2_state->icount);
 
 	m_program = &space(AS_PROGRAM);
 }
@@ -2018,8 +2019,6 @@ void sh_common_execution::sh2drc_add_fastram(offs_t start, offs_t end, uint8_t r
 	}
 }
 
-using namespace uml;
-
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
@@ -2039,10 +2038,10 @@ uint32_t sh_common_execution::epc(const opcode_desc *desc)
     already allocated
 -------------------------------------------------*/
 
-void sh_common_execution::alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
+void sh_common_execution::alloc_handle(uml::code_handle *&handleptr, const char *name)
 {
-	if (*handleptr == nullptr)
-		*handleptr = drcuml->handle_alloc(name);
+	if (!handleptr)
+		handleptr = m_drcuml->handle_alloc(name);
 }
 
 /*-------------------------------------------------
@@ -2050,11 +2049,9 @@ void sh_common_execution::alloc_handle(drcuml_state *drcuml, code_handle **handl
     registers
 -------------------------------------------------*/
 
-void sh_common_execution::load_fast_iregs(drcuml_block *block)
+void sh_common_execution::load_fast_iregs(drcuml_block &block)
 {
-	int regnum;
-
-	for (regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (int regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
@@ -2069,11 +2066,9 @@ void sh_common_execution::load_fast_iregs(drcuml_block *block)
     registers
 -------------------------------------------------*/
 
-void sh_common_execution::save_fast_iregs(drcuml_block *block)
+void sh_common_execution::save_fast_iregs(drcuml_block &block)
 {
-	int regnum;
-
-	for (regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (int regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
@@ -2143,7 +2138,7 @@ const char *sh_common_execution::log_desc_flags_to_string(uint32_t flags)
     log_register_list - log a list of GPR registers
 -------------------------------------------------*/
 
-void sh_common_execution::log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist)
+void sh_common_execution::log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist)
 {
 	int count = 0;
 	int regnum;
@@ -2152,72 +2147,72 @@ void sh_common_execution::log_register_list(drcuml_state *drcuml, const char *st
 	if (reglist[0] == 0 && reglist[1] == 0 && reglist[2] == 0)
 		return;
 
-	drcuml->log_printf("[%s:", string);
+	m_drcuml->log_printf("[%s:", string);
 
 	for (regnum = 0; regnum < 16; regnum++)
 	{
 		if (reglist[0] & REGFLAG_R(regnum))
 		{
-			drcuml->log_printf("%sr%d", (count++ == 0) ? "" : ",", regnum);
+			m_drcuml->log_printf("%sr%d", (count++ == 0) ? "" : ",", regnum);
 			if (regnostarlist != nullptr && !(regnostarlist[0] & REGFLAG_R(regnum)))
-				drcuml->log_printf("*");
+				m_drcuml->log_printf("*");
 		}
 	}
 
 	if (reglist[1] & REGFLAG_PR)
 	{
-		drcuml->log_printf("%spr", (count++ == 0) ? "" : ",");
+		m_drcuml->log_printf("%spr", (count++ == 0) ? "" : ",");
 		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_PR))
-			drcuml->log_printf("*");
+			m_drcuml->log_printf("*");
 	}
 
 	if (reglist[1] & REGFLAG_SR)
 	{
-		drcuml->log_printf("%ssr", (count++ == 0) ? "" : ",");
+		m_drcuml->log_printf("%ssr", (count++ == 0) ? "" : ",");
 		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_SR))
-			drcuml->log_printf("*");
+			m_drcuml->log_printf("*");
 	}
 
 	if (reglist[1] & REGFLAG_MACL)
 	{
-		drcuml->log_printf("%smacl", (count++ == 0) ? "" : ",");
+		m_drcuml->log_printf("%smacl", (count++ == 0) ? "" : ",");
 		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_MACL))
-			drcuml->log_printf("*");
+			m_drcuml->log_printf("*");
 	}
 
 	if (reglist[1] & REGFLAG_MACH)
 	{
-		drcuml->log_printf("%smach", (count++ == 0) ? "" : ",");
+		m_drcuml->log_printf("%smach", (count++ == 0) ? "" : ",");
 		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_MACH))
-			drcuml->log_printf("*");
+			m_drcuml->log_printf("*");
 	}
 
 	if (reglist[1] & REGFLAG_GBR)
 	{
-		drcuml->log_printf("%sgbr", (count++ == 0) ? "" : ",");
+		m_drcuml->log_printf("%sgbr", (count++ == 0) ? "" : ",");
 		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_GBR))
-			drcuml->log_printf("*");
+			m_drcuml->log_printf("*");
 	}
 
 	if (reglist[1] & REGFLAG_VBR)
 	{
-		drcuml->log_printf("%svbr", (count++ == 0) ? "" : ",");
+		m_drcuml->log_printf("%svbr", (count++ == 0) ? "" : ",");
 		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_VBR))
-			drcuml->log_printf("*");
+			m_drcuml->log_printf("*");
 	}
 
-	drcuml->log_printf("] ");
+	m_drcuml->log_printf("] ");
 }
 
 /*-------------------------------------------------
     log_opcode_desc - log a list of descriptions
 -------------------------------------------------*/
 
-void sh_common_execution::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent)
+void sh_common_execution::log_opcode_desc(const opcode_desc *desclist, int indent)
 {
 	/* open the file, creating it if necessary */
 	if (indent == 0)
-		drcuml->log_printf("\nDescriptor list @ %08X\n", desclist->pc);
+		m_drcuml->log_printf("\nDescriptor list @ %08X\n", desclist->pc);
 
 	/* output each descriptor */
 	for ( ; desclist != nullptr; desclist = desclist->next())
@@ -2225,7 +2220,7 @@ void sh_common_execution::log_opcode_desc(drcuml_state *drcuml, const opcode_des
 		std::ostringstream stream;
 
 		/* disassemle the current instruction and output it to the log */
-		if (drcuml->logging() || drcuml->logging_native())
+		if (m_drcuml->logging() || m_drcuml->logging_native())
 		{
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
 				stream << "<virtual nop>";
@@ -2237,20 +2232,20 @@ void sh_common_execution::log_opcode_desc(drcuml_state *drcuml, const opcode_des
 		}
 		else
 			stream << "???";
-		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), stream.str().c_str());
+		m_drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), stream.str().c_str());
 
 		/* output register states */
-		log_register_list(drcuml, "use", desclist->regin, nullptr);
-		log_register_list(drcuml, "mod", desclist->regout, desclist->regreq);
-		drcuml->log_printf("\n");
+		log_register_list("use", desclist->regin, nullptr);
+		log_register_list("mod", desclist->regout, desclist->regreq);
+		m_drcuml->log_printf("\n");
 
 		/* if we have a delay slot, output it recursively */
 		if (desclist->delay.first() != nullptr)
-			log_opcode_desc(drcuml, desclist->delay.first(), indent + 1);
+			log_opcode_desc(desclist->delay.first(), indent + 1);
 
 		/* at the end of a sequence add a dividing line */
 		if (desclist->flags & OPFLAG_END_SEQUENCE)
-			drcuml->log_printf("-----\n");
+			m_drcuml->log_printf("-----\n");
 	}
 }
 
@@ -2259,14 +2254,14 @@ void sh_common_execution::log_opcode_desc(drcuml_state *drcuml, const opcode_des
     including disassembly of an SH2 instruction
 -------------------------------------------------*/
 
-void sh_common_execution::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op)
+void sh_common_execution::log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op)
 {
 	if (m_drcuml->logging())
 	{
 		sh_disassembler sh2d(false);
 		std::ostringstream stream;
 		sh2d.dasm_one(stream, pc, op);
-		block->append_comment("%08X: %s", pc, stream.str().c_str());
+		block.append_comment("%08X: %s", pc, stream.str().c_str());
 	}
 }
 
@@ -2278,10 +2273,8 @@ void sh_common_execution::log_add_disasm_comment(drcuml_block *block, uint32_t p
 
 void sh_common_execution::code_flush_cache()
 {
-	drcuml_state *drcuml = m_drcuml.get();
-
 	/* empty the transient cache contents */
-	drcuml->reset();
+	m_drcuml->reset();
 
 	try
 	{
@@ -2291,12 +2284,12 @@ void sh_common_execution::code_flush_cache()
 		static_generate_entry_point();
 
 		/* add subroutines for memory accesses */
-		static_generate_memory_accessor(1, false, "read8", &m_read8);
-		static_generate_memory_accessor(1, true,  "write8", &m_write8);
-		static_generate_memory_accessor(2, false, "read16", &m_read16);
-		static_generate_memory_accessor(2, true,  "write16", &m_write16);
-		static_generate_memory_accessor(4, false, "read32", &m_read32);
-		static_generate_memory_accessor(4, true,  "write32", &m_write32);
+		static_generate_memory_accessor(1, false, "read8", m_read8);
+		static_generate_memory_accessor(1, true,  "write8", m_write8);
+		static_generate_memory_accessor(2, false, "read16", m_read16);
+		static_generate_memory_accessor(2, true,  "write16", m_write16);
+		static_generate_memory_accessor(4, false, "read32", m_read32);
+		static_generate_memory_accessor(4, true,  "write32", m_write32);
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
@@ -2309,7 +2302,6 @@ void sh_common_execution::code_flush_cache()
 /* Execute cycles - returns number of cycles actually run */
 void sh_common_execution::execute_run_drc()
 {
-	drcuml_state *drcuml = m_drcuml.get();
 	int execute_result;
 
 	/* reset the cache if dirty */
@@ -2320,7 +2312,7 @@ void sh_common_execution::execute_run_drc()
 	do
 	{
 		/* run as much as we can */
-		execute_result = drcuml->execute(*m_entry);
+		execute_result = m_drcuml->execute(*m_entry);
 
 		/* if we need to recompile, do it */
 		if (execute_result == EXECUTE_MISSING_CODE)
@@ -2346,20 +2338,18 @@ void sh_common_execution::execute_run_drc()
 
 void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 {
-	drcuml_state *drcuml = m_drcuml.get();
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
 	const opcode_desc *desclist;
 	bool override = false;
-	drcuml_block *block;
 
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
 	desclist = get_desclist(pc);
 
-	if (drcuml->logging() || drcuml->logging_native())
-		log_opcode_desc(drcuml, desclist, 0);
+	if (m_drcuml->logging() || m_drcuml->logging_native())
+		log_opcode_desc(desclist, 0);
 
 	bool succeeded = false;
 	while (!succeeded)
@@ -2367,7 +2357,7 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 		try
 		{
 			/* start the block */
-			block = drcuml->begin_block(4096);
+			drcuml_block &block(m_drcuml->begin_block(4096));
 
 			/* loop until we get through all instruction sequences */
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
@@ -2376,8 +2366,8 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 				uint32_t nextpc;
 
 				/* add a code log entry */
-				if (drcuml->logging())
-					block->append_comment("-------------------------");                 // comment
+				if (m_drcuml->logging())
+					block.append_comment("-------------------------");                 // comment
 
 				/* determine the last instruction in this sequence */
 				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
@@ -2386,7 +2376,7 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 				assert(seqlast != nullptr);
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
-				if (override || !drcuml->hash_exists(mode, seqhead->pc))
+				if (override || !m_drcuml->hash_exists(mode, seqhead->pc))
 					UML_HASH(block, mode, seqhead->pc);                                     // hash    mode,pc
 
 				/* if we already have a hash, and this is the first sequence, assume that we */
@@ -2408,7 +2398,7 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 
 				/* validate this code block if we're not pointing into ROM */
 				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
-					generate_checksum_block(block, &compiler, seqhead, seqlast);
+					generate_checksum_block(block, compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
 				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
@@ -2419,7 +2409,7 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 				/* iterate over instructions in the sequence and compile them */
 				for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
 				{
-					generate_sequence_instruction(block, &compiler, curdesc, 0xffffffff);
+					generate_sequence_instruction(block, compiler, curdesc, 0xffffffff);
 				}
 
 				/* if we need to return to the start, do it */
@@ -2434,7 +2424,7 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 				}
 
 				/* count off cycles and go there */
-				generate_update_cycles(block, &compiler, nextpc, true);                // <subtract cycles>
+				generate_update_cycles(block, compiler, nextpc, true);                // <subtract cycles>
 
 				/* SH2 has no modes */
 				if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
@@ -2445,7 +2435,7 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 			}
 
 			/* end the sequence */
-			block->end();
+			block.end();
 			g_profiler.stop();
 			succeeded = true;
 		}
@@ -2464,21 +2454,18 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 
 void sh_common_execution::static_generate_nocode_handler()
 {
-	drcuml_state *drcuml = m_drcuml.get();
-	drcuml_block *block;
-
 	/* begin generating */
-	block = drcuml->begin_block(10);
+	drcuml_block &block(m_drcuml->begin_block(10));
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(drcuml, &m_nocode, "nocode");
+	alloc_handle(m_nocode, "nocode");
 	UML_HANDLE(block, *m_nocode);                                    // handle  nocode
 	UML_GETEXP(block, I0);                                  // getexp  i0
 	UML_MOV(block, mem(&m_sh2_state->pc), I0);                              // mov     [pc],i0
 	save_fast_iregs(block);
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                          // exit    EXECUTE_MISSING_CODE
 
-	block->end();
+	block.end();
 }
 
 
@@ -2489,21 +2476,18 @@ void sh_common_execution::static_generate_nocode_handler()
 
 void sh_common_execution::static_generate_out_of_cycles()
 {
-	drcuml_state *drcuml = m_drcuml.get();
-	drcuml_block *block;
-
 	/* begin generating */
-	block = drcuml->begin_block(10);
+	drcuml_block &block(m_drcuml->begin_block(10));
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(drcuml, &m_out_of_cycles, "out_of_cycles");
+	alloc_handle(m_out_of_cycles, "out_of_cycles");
 	UML_HANDLE(block, *m_out_of_cycles);                             // handle  out_of_cycles
 	UML_GETEXP(block, I0);                                  // getexp  i0
 	UML_MOV(block, mem(&m_sh2_state->pc), I0);                              // mov     <pc>,i0
 	save_fast_iregs(block);
 	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);                         // exit    EXECUTE_OUT_OF_CYCLES
 
-	block->end();
+	block.end();
 }
 
 /*-------------------------------------------------
@@ -2511,21 +2495,18 @@ void sh_common_execution::static_generate_out_of_cycles()
     validate a sequence of opcodes
 -------------------------------------------------*/
 
-void sh_common_execution::generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
+void sh_common_execution::generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
 {
 	const opcode_desc *curdesc;
 	if (m_drcuml->logging())
-		block->append_comment("[Validation for %08X]", seqhead->pc);                // comment
+		block.append_comment("[Validation for %08X]", seqhead->pc);                // comment
 
 	/* loose verify or single instruction: just compare and fail */
 	if (!(m_drcoptions & SH2DRC_STRICT_VERIFY) || seqhead->next() == nullptr)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			void *base;
-			if (m_xor == 0) base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
-			else if (m_xor == 1) base = m_direct->read_ptr(seqhead->physpc, SH34LE_CODE_XOR(0));
-			else base = m_direct->read_ptr(seqhead->physpc, SH34BE_CODE_XOR(0));
+			const void *base = m_prptr(seqhead->physpc);
 
 			UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x2);                          // load    i0,base,word
 			UML_CMP(block, I0, seqhead->opptr.w[0]);                        // cmp     i0,*opptr
@@ -2537,19 +2518,14 @@ void sh_common_execution::generate_checksum_block(drcuml_block *block, compiler_
 	else
 	{
 		uint32_t sum = 0;
-		void *base;
-		if (m_xor == 0) base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
-		else if (m_xor == 1) base = m_direct->read_ptr(seqhead->physpc, SH34LE_CODE_XOR(0));
-		else base = m_direct->read_ptr(seqhead->physpc, SH34BE_CODE_XOR(0));
+		const void *base = m_prptr(seqhead->physpc);
 
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x4);                              // load    i0,base,word
 		sum += seqhead->opptr.w[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				if (m_xor == 0) base = m_direct->read_ptr(curdesc->physpc, SH2_CODE_XOR(0));
-				else if (m_xor == 1) base = m_direct->read_ptr(curdesc->physpc, SH34LE_CODE_XOR(0));
-				else base = m_direct->read_ptr(curdesc->physpc, SH34BE_CODE_XOR(0));
+				base = m_prptr(curdesc->physpc);
 
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x2);                      // load    i1,*opptr,word
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
@@ -2567,7 +2543,7 @@ void sh_common_execution::generate_checksum_block(drcuml_block *block, compiler_
     for a single instruction in a sequence
 -------------------------------------------------*/
 
-void sh_common_execution::generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
+void sh_common_execution::generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t ovrpc)
 {
 	offs_t expc;
 
@@ -2580,10 +2556,10 @@ void sh_common_execution::generate_sequence_instruction(drcuml_block *block, com
 	UML_MAPVAR(block, MAPVAR_PC, expc);                                             // mapvar  PC,expc
 
 	/* accumulate total cycles */
-	compiler->cycles += desc->cycles;
+	compiler.cycles += desc->cycles;
 
 	/* update the icount map variable */
-	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                             // mapvar  CYCLES,compiler->cycles
+	UML_MAPVAR(block, MAPVAR_CYCLES, compiler.cycles);                             // mapvar  CYCLES,compiler.cycles
 
 	/* if we want a probe, add it here */
 	if (desc->pc == PROBE_ADDRESS)
@@ -2652,16 +2628,16 @@ void sh_common_execution::generate_sequence_instruction(drcuml_block *block, com
     generate_delay_slot
 ------------------------------------------------------------------*/
 
-void sh_common_execution::generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
+void sh_common_execution::generate_delay_slot(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t ovrpc)
 {
-	compiler_state compiler_temp = *compiler;
+	compiler_state compiler_temp(compiler);
 
 	/* compile the delay slot using temporary compiler state */
 	assert(desc->delay.first() != nullptr);
-	generate_sequence_instruction(block, &compiler_temp, desc->delay.first(), ovrpc);              // <next instruction>
+	generate_sequence_instruction(block, compiler_temp, desc->delay.first(), ovrpc);              // <next instruction>
 
 	/* update the label */
-	compiler->labelnum = compiler_temp.labelnum;
+	compiler.labelnum = compiler_temp.labelnum;
 }
 
 void sh_common_execution::func_unimplemented()
@@ -2793,7 +2769,7 @@ void sh_common_execution::func_printf_probe()
     opcode
 -------------------------------------------------*/
 
-bool sh_common_execution::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
+bool sh_common_execution::generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t ovrpc)
 {
 	uint32_t scratch, scratch2;
 	int32_t disp;
@@ -2942,13 +2918,13 @@ bool sh_common_execution::generate_opcode(drcuml_block *block, compiler_state *c
 	return false;
 }
 
-bool sh_common_execution::generate_group_15(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_15(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	// no ops here on sh1/2
 	return false;
 }
 
-bool sh_common_execution::generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 15)
 	{
@@ -3027,33 +3003,33 @@ bool sh_common_execution::generate_group_2(drcuml_block *block, compiler_state *
 		UML_AND(block, I0, I0, ~(SH_Q|SH_M|SH_T));       // and r0, r0, ~(Q|M|T) (clear the Q,M, and T bits)
 
 		UML_TEST(block, R32(Rn), 0x80000000);           // test Rn, #0x80000000
-		UML_JMPc(block, COND_Z, compiler->labelnum);            // jz labelnum
+		UML_JMPc(block, COND_Z, compiler.labelnum);            // jz labelnum
 
 		UML_OR(block, I0, I0, SH_Q);               // or r0, r0, Q
-		UML_LABEL(block, compiler->labelnum++);             // labelnum:
+		UML_LABEL(block, compiler.labelnum++);             // labelnum:
 
 		UML_TEST(block, R32(Rm), 0x80000000);           // test Rm, #0x80000000
-		UML_JMPc(block, COND_Z, compiler->labelnum);            // jz labelnum
+		UML_JMPc(block, COND_Z, compiler.labelnum);            // jz labelnum
 
 		UML_OR(block, I0, I0, SH_M);               // or r0, r0, M
-		UML_LABEL(block, compiler->labelnum++);             // labelnum:
+		UML_LABEL(block, compiler.labelnum++);             // labelnum:
 
 		UML_XOR(block, I1, R32(Rn), R32(Rm));           // xor r1, Rn, Rm
 		UML_TEST(block, I1, 0x80000000);            // test r1, #0x80000000
-		UML_JMPc(block, COND_Z, compiler->labelnum);            // jz labelnum
+		UML_JMPc(block, COND_Z, compiler.labelnum);            // jz labelnum
 
 		UML_OR(block, I0, I0, SH_T);               // or r0, r0, T
-		UML_LABEL(block, compiler->labelnum++);             // labelnum:
+		UML_LABEL(block, compiler.labelnum++);             // labelnum:
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);              // mov sr, r0
 		return true;
 
 	case  8: // TST(Rm, Rn);
 		UML_AND(block, I0, mem(&m_sh2_state->sr), ~SH_T);  // and r0, sr, ~T (clear the T bit)
 		UML_TEST(block, R32(Rm), R32(Rn));      // test Rm, Rn
-		UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum
+		UML_JMPc(block, COND_NZ, compiler.labelnum);   // jnz compiler.labelnum
 
 		UML_OR(block, I0, I0, SH_T);   // or r0, r0, T
-		UML_LABEL(block, compiler->labelnum++);         // desc->pc:
+		UML_LABEL(block, compiler.labelnum++);         // desc->pc:
 
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
 		return true;
@@ -3075,18 +3051,18 @@ bool sh_common_execution::generate_group_2(drcuml_block *block, compiler_state *
 		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and sr, sr, ~T (clear the T bit)
 
 		UML_CMP(block, I1, 0);      // cmp r1, #0
-		UML_JMPc(block, COND_Z, compiler->labelnum);    // jnz labelnum
+		UML_JMPc(block, COND_Z, compiler.labelnum);    // jnz labelnum
 		UML_CMP(block, I2, 0);      // cmp r2, #0
-		UML_JMPc(block, COND_Z, compiler->labelnum);    // jnz labelnum
+		UML_JMPc(block, COND_Z, compiler.labelnum);    // jnz labelnum
 		UML_CMP(block, I3, 0);      // cmp r3, #0
-		UML_JMPc(block, COND_Z, compiler->labelnum);    // jnz labelnum
+		UML_JMPc(block, COND_Z, compiler.labelnum);    // jnz labelnum
 		UML_CMP(block, I7, 0);      // cmp r7, #0
-		UML_JMPc(block, COND_NZ, compiler->labelnum+1); // jnz labelnum
+		UML_JMPc(block, COND_NZ, compiler.labelnum+1); // jnz labelnum
 
-		UML_LABEL(block, compiler->labelnum++);     // labelnum:
+		UML_LABEL(block, compiler.labelnum++);     // labelnum:
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 
-		UML_LABEL(block, compiler->labelnum++);     // labelnum+1:
+		UML_LABEL(block, compiler.labelnum++);     // labelnum+1:
 		return true;
 
 	case  9: // AND(Rm, Rn);
@@ -3118,7 +3094,7 @@ bool sh_common_execution::generate_group_2(drcuml_block *block, compiler_state *
 }
 
 
-bool sh_common_execution::generate_group_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, uint32_t ovrpc)
+bool sh_common_execution::generate_group_3(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, uint32_t ovrpc)
 {
 	switch (opcode & 15)
 	{
@@ -3219,7 +3195,7 @@ bool sh_common_execution::generate_group_3(drcuml_block *block, compiler_state *
 }
 
 
-bool sh_common_execution::generate_group_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_6(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 15)
 	{
@@ -3337,11 +3313,11 @@ bool sh_common_execution::generate_group_6(drcuml_block *block, compiler_state *
 		UML_CARRY(block, I0, 0);    // carry = T (T is bit 0 of SR)
 		UML_SUBB(block, R32(Rn), 0, R32(Rm));   // subb Rn, #0, Rm
 
-		UML_JMPc(block, COND_NC, compiler->labelnum);   // jnc labelnum
+		UML_JMPc(block, COND_NC, compiler.labelnum);   // jnc labelnum
 
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 
-		UML_LABEL(block, compiler->labelnum++);     // labelnum:
+		UML_LABEL(block, compiler.labelnum++);     // labelnum:
 
 		return true;
 	}
@@ -3349,11 +3325,11 @@ bool sh_common_execution::generate_group_6(drcuml_block *block, compiler_state *
 	return false;
 }
 
-bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_8(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	int32_t disp;
 	uint32_t udisp;
-	code_label templabel;
+	uml::code_label templabel;
 
 	switch ( opcode  & (15<<8) )
 	{
@@ -3413,17 +3389,17 @@ bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *
 
 		UML_SEXT(block, I1, opcode&0xff, SIZE_BYTE);    // sext r1, opcode&0xff, BYTE
 		UML_CMP(block, I1, R32(0));         // cmp r1, R0
-		UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum   (if negative)
+		UML_JMPc(block, COND_NZ, compiler.labelnum);   // jnz compiler.labelnum   (if negative)
 
 		UML_OR(block, I0, I0, SH_T);   // or r0, r0, T
 
-		UML_LABEL(block, compiler->labelnum++);         // labelnum:
+		UML_LABEL(block, compiler.labelnum++);         // labelnum:
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
 		return true;
 
 	case  9<< 8: // BT(opcode & 0xff);
 		UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
-		UML_JMPc(block, COND_Z, compiler->labelnum);    // jz compiler->labelnum
+		UML_JMPc(block, COND_Z, compiler.labelnum);    // jz compiler.labelnum
 
 		disp = ((int32_t)opcode << 24) >> 24;
 		m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;    // m_sh2_state->ea = destination
@@ -3431,12 +3407,12 @@ bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *
 		generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
 		UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // jmp m_sh2_state->ea
 
-		UML_LABEL(block, compiler->labelnum++);         // labelnum:
+		UML_LABEL(block, compiler.labelnum++);         // labelnum:
 		return true;
 
 	case 11<< 8: // BF(opcode & 0xff);
 		UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
-		UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum
+		UML_JMPc(block, COND_NZ, compiler.labelnum);   // jnz compiler.labelnum
 
 		disp = ((int32_t)opcode << 24) >> 24;
 		m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
@@ -3444,20 +3420,20 @@ bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *
 		generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
 		UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // jmp m_sh2_state->ea
 
-		UML_LABEL(block, compiler->labelnum++);         // labelnum:
+		UML_LABEL(block, compiler.labelnum++);         // labelnum:
 		return true;
 
 	case 13<< 8: // BTS(opcode & 0xff);
 		if (m_cpu_type > CPU_TYPE_SH1)
 		{
 			UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
-			UML_JMPc(block, COND_Z, compiler->labelnum);    // jz compiler->labelnum
+			UML_JMPc(block, COND_Z, compiler.labelnum);    // jz compiler.labelnum
 
 			disp = ((int32_t)opcode << 24) >> 24;
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
-			templabel = compiler->labelnum;         // save our label
-			compiler->labelnum++;               // make sure the delay slot doesn't use it
+			templabel = compiler.labelnum;         // save our label
+			compiler.labelnum++;               // make sure the delay slot doesn't use it
 			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
 
 			generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
@@ -3472,13 +3448,13 @@ bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *
 		if (m_cpu_type > CPU_TYPE_SH1)
 		{
 			UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
-			UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum
+			UML_JMPc(block, COND_NZ, compiler.labelnum);   // jnz compiler.labelnum
 
 			disp = ((int32_t)opcode << 24) >> 24;
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
-			templabel = compiler->labelnum;         // save our label
-			compiler->labelnum++;               // make sure the delay slot doesn't use it
+			templabel = compiler.labelnum;         // save our label
+			compiler.labelnum++;               // make sure the delay slot doesn't use it
 			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2); // delay slot only if the branch is taken
 
 			generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
@@ -3493,7 +3469,7 @@ bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *
 	return false;
 }
 
-bool sh_common_execution::generate_group_12_TRAPA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_12_TRAPA(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	uint32_t scratch = (opcode & 0xff) * 4;
 	UML_ADD(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->vbr), scratch); // add ea, vbr, scratch
@@ -3515,7 +3491,7 @@ bool sh_common_execution::generate_group_12_TRAPA(drcuml_block *block, compiler_
 	return true;
 }
 
-bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_12(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	uint32_t scratch;
 
@@ -3597,11 +3573,11 @@ bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state 
 		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and sr, sr, ~T (clear the T bit)
 		UML_AND(block, I0, R32(0), scratch);        // and r0, R0, scratch
 		UML_CMP(block, I0, 0);          // cmp r0, #0
-		UML_JMPc(block, COND_NZ, compiler->labelnum);       // jnz labelnum
+		UML_JMPc(block, COND_NZ, compiler.labelnum);       // jnz labelnum
 
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 
-		UML_LABEL(block, compiler->labelnum++);         // labelnum:
+		UML_LABEL(block, compiler.labelnum++);         // labelnum:
 		return true;
 
 	case  9<<8: // ANDI(opcode & 0xff);
@@ -3623,11 +3599,11 @@ bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state 
 
 		UML_AND(block, I0, I0, opcode & 0xff);
 		UML_CMP(block, I0, 0);          // cmp r0, #0
-		UML_JMPc(block, COND_NZ, compiler->labelnum);       // jnz labelnum
+		UML_JMPc(block, COND_NZ, compiler.labelnum);       // jnz labelnum
 
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 
-		UML_LABEL(block, compiler->labelnum++);         // labelnum:
+		UML_LABEL(block, compiler.labelnum++);         // labelnum:
 		return true;
 
 	case 13<<8: // ANDM(opcode & 0xff);
@@ -3664,7 +3640,7 @@ bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state 
 	return false;
 }
 
-bool sh_common_execution::generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_0_RTE(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	generate_delay_slot(block, compiler, desc, 0xffffffff);
 
@@ -3678,16 +3654,16 @@ bool sh_common_execution::generate_group_0_RTE(drcuml_block *block, compiler_sta
 	UML_MOV(block, mem(&m_sh2_state->sr), I0);          // mov sr, r0
 	UML_ADD(block, R32(15), R32(15), 4);        // add R15, R15, #4
 
-	compiler->checkints = true;
+	compiler.checkints = true;
 	UML_MOV(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->pc));       // mov ea, pc
-	generate_update_cycles(block, compiler, mem(&m_sh2_state->ea), true);  // <subtract cycles>
+	generate_update_cycles(block, compiler, uml::mem(&m_sh2_state->ea), true);  // <subtract cycles>
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); // and jump to the "resume PC"
 
 	return true;
 }
 
 
-bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 0x3F)
 	{
@@ -3727,7 +3703,7 @@ bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *
 
 			generate_delay_slot(block, compiler, desc, m_sh2_state->target);
 
-			generate_update_cycles(block, compiler, mem(&m_sh2_state->target), true);  // <subtract cycles>
+			generate_update_cycles(block, compiler, uml::mem(&m_sh2_state->target), true);  // <subtract cycles>
 			UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode); // jmp target
 			return true;
 		}
@@ -3793,7 +3769,7 @@ bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *
 
 		generate_delay_slot(block, compiler, desc, m_sh2_state->target);
 
-		generate_update_cycles(block, compiler, mem(&m_sh2_state->target), true);  // <subtract cycles>
+		generate_update_cycles(block, compiler, uml::mem(&m_sh2_state->target), true);  // <subtract cycles>
 		UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode);
 		return true;
 
@@ -3866,18 +3842,18 @@ bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *
 	case 0x1b: // SLEEP();
 		UML_MOV(block, I0, mem(&m_sh2_state->sleep_mode));                          // mov i0, sleep_mode
 		UML_CMP(block, I0, 0x2);                                            // cmp i0, #2
-		UML_JMPc(block, COND_E, compiler->labelnum);                        // beq labelnum
+		UML_JMPc(block, COND_E, compiler.labelnum);                        // beq labelnum
 		// sleep mode != 2
 		UML_MOV(block, mem(&m_sh2_state->sleep_mode), 0x1);                         // mov sleep_mode, #1
 		generate_update_cycles(block, compiler, desc->pc, true);       // repeat this insn
-		UML_JMP(block, compiler->labelnum+1);                               // jmp labelnum+1
+		UML_JMP(block, compiler.labelnum+1);                               // jmp labelnum+1
 
-		UML_LABEL(block, compiler->labelnum++);                             // labelnum:
+		UML_LABEL(block, compiler.labelnum++);                             // labelnum:
 		// sleep_mode == 2
 		UML_MOV(block, mem(&m_sh2_state->sleep_mode), 0x0);                         // sleep_mode = 0
 		generate_update_cycles(block, compiler, desc->pc+2, true);     // go to next insn
 
-		UML_LABEL(block, compiler->labelnum++);                             // labelnum+1:
+		UML_LABEL(block, compiler.labelnum++);                             // labelnum+1:
 		return true;
 
 	case 0x22: // STCVBR(Rn);
@@ -3891,7 +3867,7 @@ bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *
 
 			generate_delay_slot(block, compiler, desc, m_sh2_state->target);
 
-			generate_update_cycles(block, compiler, mem(&m_sh2_state->target), true);  // <subtract cycles>
+			generate_update_cycles(block, compiler, uml::mem(&m_sh2_state->target), true);  // <subtract cycles>
 			UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode); // jmp target
 			return true;
 		}
@@ -3917,18 +3893,18 @@ bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *
 	return false;
 }
 
-bool sh_common_execution::generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_4_LDCSR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	// needs to be different on SH2 / 4
 	UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
 	UML_AND(block, I0, I0, SH_FLAGS);  // and r0, r0, FLAGS
 	UML_MOV(block, mem(&m_sh2_state->sr), I0);
 
-	compiler->checkints = true;
+	compiler.checkints = true;
 	return true;
 }
 
-bool sh_common_execution::generate_group_4_LDCMSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_4_LDCMSR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
 	SETEA(0);
@@ -3936,13 +3912,13 @@ bool sh_common_execution::generate_group_4_LDCMSR(drcuml_block *block, compiler_
 	UML_ADD(block, R32(Rn), R32(Rn), 4);    // add Rn, #4
 	UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov sr, r0
 
-	compiler->checkints = true;
+	compiler.checkints = true;
 	if (!in_delay_slot)
 		generate_update_cycles(block, compiler, desc->pc + 2, true);
 	return true;
 }
 
-bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+bool sh_common_execution::generate_group_4(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 0x3F)
 	{
@@ -4041,7 +4017,7 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 
 		generate_delay_slot(block, compiler, desc, m_sh2_state->target-4);
 
-		generate_update_cycles(block, compiler, mem(&m_sh2_state->target), true);  // <subtract cycles>
+		generate_update_cycles(block, compiler, uml::mem(&m_sh2_state->target), true);  // <subtract cycles>
 		UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode); // and do the jump
 		return true;
 
@@ -4063,10 +4039,10 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 		{
 			UML_AND(block, I0, mem(&m_sh2_state->sr), ~SH_T);  // and r0, sr, ~T (clear the T bit)
 			UML_SUB(block, R32(Rn), R32(Rn), 1);    // sub Rn, Rn, 1
-			UML_JMPc(block, COND_NZ, compiler->labelnum);   // jz compiler->labelnum
+			UML_JMPc(block, COND_NZ, compiler.labelnum);   // jz compiler.labelnum
 
 			UML_OR(block, I0, I0, SH_T);   // or r0, r0, T
-			UML_LABEL(block, compiler->labelnum++);         // desc->pc:
+			UML_LABEL(block, compiler.labelnum++);         // desc->pc:
 
 			UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
 			return true;
@@ -4077,10 +4053,10 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 		UML_AND(block, I0, mem(&m_sh2_state->sr), ~SH_T);  // and r0, sr, ~T (clear the T bit)
 
 		UML_CMP(block, R32(Rn), 0);     // cmp Rn, 0
-		UML_JMPc(block, COND_S, compiler->labelnum);    // js compiler->labelnum    (if negative)
+		UML_JMPc(block, COND_S, compiler.labelnum);    // js compiler.labelnum    (if negative)
 
 		UML_OR(block, I0, I0, SH_T);   // or r0, r0, T
-		UML_LABEL(block, compiler->labelnum++);         // desc->pc:
+		UML_LABEL(block, compiler.labelnum++);         // desc->pc:
 
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
 		return true;
@@ -4090,12 +4066,12 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 
 		UML_CMP(block, R32(Rn), 0);     // cmp Rn, 0
 
-		UML_JMPc(block, COND_S, compiler->labelnum);    // js compiler->labelnum    (if negative)
-		UML_JMPc(block, COND_Z, compiler->labelnum);    // jz compiler->labelnum    (if zero)
+		UML_JMPc(block, COND_S, compiler.labelnum);    // js compiler.labelnum    (if negative)
+		UML_JMPc(block, COND_Z, compiler.labelnum);    // jz compiler.labelnum    (if zero)
 
 		UML_OR(block, I0, I0, SH_T);   // or r0, r0, T
 
-		UML_LABEL(block, compiler->labelnum++);         // desc->pc:
+		UML_LABEL(block, compiler.labelnum++);         // desc->pc:
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
 		return true;
 
@@ -4155,11 +4131,11 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and sr, sr, ~T
 
 		UML_CMP(block, I0, 0);      // cmp r0, #0
-		UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz labelnum
+		UML_JMPc(block, COND_NZ, compiler.labelnum);   // jnz labelnum
 
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 
-		UML_LABEL(block, compiler->labelnum++);     // labelnum:
+		UML_LABEL(block, compiler.labelnum++);     // labelnum:
 
 		UML_OR(block, I1, I0, 0x80);    // or r1, r0, #0x80
 
@@ -4256,7 +4232,7 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 
 		generate_delay_slot(block, compiler, desc, m_sh2_state->target);
 
-		generate_update_cycles(block, compiler, mem(&m_sh2_state->target), true);  // <subtract cycles>
+		generate_update_cycles(block, compiler, uml::mem(&m_sh2_state->target), true);  // <subtract cycles>
 		UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode); // jmp (target)
 		return true;
 

@@ -20,7 +20,7 @@ class speaker_sound_device : public device_t,
 								public device_sound_interface
 {
 public:
-	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~speaker_sound_device() {}
 
 	// configuration
@@ -32,6 +32,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -77,8 +78,6 @@ private:
 	attotime      m_next_interm_sample_time;
 	int           m_interm_sample_index;              /* counts interm. samples between stream samples */
 	attotime      m_last_update_time;                 /* internal timestamp */
-
-	void speaker_postload();
 
 	// DC blocker state
 	double  m_prevx, m_prevy;

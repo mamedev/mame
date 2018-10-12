@@ -26,6 +26,7 @@
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -37,14 +38,14 @@
 class chinsan_state : public driver_device
 {
 public:
-	chinsan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	chinsan_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_video_ram(*this, "video_ram"), m_color_ram(*this, "color_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_adpcm(*this, "adpcm"),
-		m_inputs_p1{ {*this, "p1_0"}, {*this, "p1_1"}, {*this, "p1_2"}, {*this, "p1_3"}, {*this, "p1_4"} },
-		m_inputs_p2{ {*this, "p2_0"}, {*this, "p2_1"}, {*this, "p2_2"}, {*this, "p2_3"}, {*this, "p2_4"} },
+		m_inputs_p1(*this, "p1_%u", 0U),
+		m_inputs_p2(*this, "p2_%u", 0U),
 		m_bank1(*this, "bank1"), m_bank0d(*this, "bank0d"), m_bank1d(*this, "bank1d"),
 		m_tilemap(nullptr),
 		m_int_enabled(false),
@@ -64,7 +65,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_DRIVER_INIT(chinsan);
+	void init_chinsan();
 
 	void chinsan(machine_config &config);
 	void mayumi(machine_config &config);
@@ -82,8 +83,8 @@ private:
 	required_shared_ptr<uint8_t> m_color_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<msm5205_device> m_adpcm;
-	required_ioport m_inputs_p1[5];
-	required_ioport m_inputs_p2[5];
+	required_ioport_array<5> m_inputs_p1;
+	required_ioport_array<5> m_inputs_p2;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
@@ -105,33 +106,37 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(chinsan_state::chinsan_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("color_ram")
-ADDRESS_MAP_END
+void chinsan_state::chinsan_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdfff).ram().share("nvram");
+	map(0xe000, 0xefff).ram().share("video_ram");
+	map(0xf000, 0xf7ff).ram().share("color_ram");
+}
 
-ADDRESS_MAP_START(chinsan_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-ADDRESS_MAP_END
+void chinsan_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+}
 
-ADDRESS_MAP_START(chinsan_state::chinsan_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_WRITE(adpcm_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)
-ADDRESS_MAP_END
+void chinsan_state::chinsan_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x11).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x20, 0x20).w(FUNC(chinsan_state::adpcm_w));
+	map(0x30, 0x30).w(FUNC(chinsan_state::ctrl_w));
+}
 
-ADDRESS_MAP_START(chinsan_state::mayumi_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("extra") AM_WRITE(ctrl_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-ADDRESS_MAP_END
+void chinsan_state::mayumi_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x30, 0x30).portr("extra").w(FUNC(chinsan_state::ctrl_w));
+	map(0xc0, 0xc3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xd0, 0xd1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 //**************************************************************************
@@ -374,7 +379,7 @@ uint32_t chinsan_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 //  DRAWGFX LAYOUTS
 //**************************************************************************
 
-static GFXDECODE_START( chinsan )
+static GFXDECODE_START( gfx_chinsan )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x3_planar, 0, 32)
 GFXDECODE_END
 
@@ -414,7 +419,7 @@ WRITE_LINE_MEMBER( chinsan_state::adpcm_int_w )
 		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
-		m_adpcm->data_w(m_adpcm_data & 0xf);
+		m_adpcm->write_data(m_adpcm_data & 0xf);
 		m_trigger ^= 1;
 		if (m_trigger == 0)
 		{
@@ -489,7 +494,7 @@ void chinsan_state::machine_reset()
 	m_trigger = 0;
 }
 
-DRIVER_INIT_MEMBER( chinsan_state, chinsan )
+void chinsan_state::init_chinsan()
 {
 	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
 	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x18000);
@@ -502,18 +507,18 @@ DRIVER_INIT_MEMBER( chinsan_state, chinsan )
 
 // C1-00114-B
 MACHINE_CONFIG_START(chinsan_state::chinsan)
-	MCFG_CPU_ADD("maincpu", MC8123, XTAL(10'000'000)/2) // 317-5012
-	MCFG_CPU_PROGRAM_MAP(chinsan_map)
-	MCFG_CPU_IO_MAP(chinsan_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
+	MCFG_DEVICE_ADD("maincpu", MC8123, XTAL(10'000'000)/2) // 317-5012
+	MCFG_DEVICE_PROGRAM_MAP(chinsan_map)
+	MCFG_DEVICE_IO_MAP(chinsan_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(chinsan_state, input_select_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(chinsan_state, input_p2_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(chinsan_state, input_p1_r))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(chinsan_state::input_select_w));
+	ppi.in_pb_callback().set(FUNC(chinsan_state::input_p2_r));
+	ppi.in_pc_callback().set(FUNC(chinsan_state::input_p1_r));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -524,13 +529,13 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinsan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinsan)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(10'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(10'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -538,8 +543,8 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(chinsan_state, adpcm_int_w))
+	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, chinsan_state, adpcm_int_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B) // 8kHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -548,10 +553,10 @@ MACHINE_CONFIG_START(chinsan_state::mayumi)
 	chinsan(config);
 	// standard Z80 instead of MC-8123
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(chinsan_map)
-	MCFG_CPU_IO_MAP(mayumi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(chinsan_map)
+	MCFG_DEVICE_IO_MAP(mayumi_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
 
 	// no ADPCM
 	MCFG_DEVICE_REMOVE("adpcm")
@@ -609,6 +614,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT    CLASS          INIT     ROTATION  COMPANY           FULLNAME                                         FLAGS
-GAME( 1987, chinsan,  0,      chinsan, chinsan, chinsan_state, chinsan, ROT0,     "Sanritsu",       "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mayumi,   0,      mayumi,  mayumi,  chinsan_state, 0,       ROT0,     "Victory L.L.C.", "Kiki-Ippatsu Mayumi-chan",                      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT          ROT   COMPANY           FULLNAME                                         FLAGS
+GAME( 1987, chinsan, 0,      chinsan, chinsan, chinsan_state, init_chinsan, ROT0, "Sanritsu",       "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mayumi,  0,      mayumi,  mayumi,  chinsan_state, empty_init,   ROT0, "Victory L.L.C.", "Kiki-Ippatsu Mayumi-chan",                      MACHINE_SUPPORTS_SAVE )

@@ -36,16 +36,16 @@
 	MCFG_SCREEN_VBLANK_TIME(0)
 
 #define MCFG_MC6847_HSYNC_CALLBACK(_write) \
-	devcb = &downcast<mc6847_friend_device &>(*device).set_hsync_wr_callback(DEVCB_##_write);
+	downcast<mc6847_friend_device &>(*device).set_hsync_wr_callback(DEVCB_##_write);
 
 #define MCFG_MC6847_FSYNC_CALLBACK(_write) \
-	devcb = &downcast<mc6847_friend_device &>(*device).set_fsync_wr_callback(DEVCB_##_write);
+	downcast<mc6847_friend_device &>(*device).set_fsync_wr_callback(DEVCB_##_write);
 
 #define MCFG_MC6847_CHARROM_CALLBACK(_class, _method) \
 	downcast<mc6847_friend_device &>(*device).set_get_char_rom(mc6847_friend_device::get_char_rom_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6847_INPUT_CALLBACK(_read) \
-	devcb = &downcast<mc6847_base_device &>(*device).set_input_callback(DEVCB_##_read);
+	downcast<mc6847_base_device &>(*device).set_input_callback(DEVCB_##_read);
 
 #define MCFG_MC6847_FIXED_MODE(_mode) \
 	downcast<mc6847_base_device &>(*device).set_get_fixed_mode(_mode);
@@ -88,6 +88,8 @@ public:
 
 	template <class Object> devcb_base &set_hsync_wr_callback(Object &&cb) { return m_write_hsync.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_fsync_wr_callback(Object &&cb) { return m_write_fsync.set_callback(std::forward<Object>(cb)); }
+	auto hsync_wr_callback() { return m_write_hsync.bind(); }
+	auto fsync_wr_callback() { return m_write_fsync.bind(); }
 
 	template <typename Object> void set_get_char_rom(Object &&cb) { m_charrom_cb = std::forward<Object>(cb); }
 
@@ -512,6 +514,7 @@ class mc6847_base_device : public mc6847_friend_device
 {
 public:
 	template <class Object> devcb_base &set_input_callback(Object &&cb) { return m_input_cb.set_callback(std::forward<Object>(cb)); }
+	auto input_callback() { return m_input_cb.bind(); }
 
 	void set_get_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
 	void set_black_and_white(bool bw) { m_black_and_white = bw; }
@@ -688,7 +691,7 @@ public:
 
 DECLARE_DEVICE_TYPE(MC6847_NTSC,   mc6847_ntsc_device)
 DECLARE_DEVICE_TYPE(MC6847_PAL,    mc6847_pal_device)
-DECLARE_DEVICE_TYPE(MC6847Y_NTSC,  mc6847t1_ntsc_device)
+DECLARE_DEVICE_TYPE(MC6847Y_NTSC,  mc6847y_ntsc_device)
 DECLARE_DEVICE_TYPE(MC6847Y_PAL,   mc6847y_pal_device)
 DECLARE_DEVICE_TYPE(MC6847T1_NTSC, mc6847t1_ntsc_device)
 DECLARE_DEVICE_TYPE(MC6847T1_PAL,  mc6847t1_pal_device)

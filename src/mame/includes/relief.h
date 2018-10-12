@@ -11,9 +11,11 @@
 #pragma once
 
 #include "machine/atarigen.h"
-#include "video/atarimo.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "video/atarimo.h"
+#include "video/atarivad.h"
+#include "screen.h"
 
 class relief_state : public atarigen_state
 {
@@ -26,10 +28,11 @@ public:
 		m_okibank(*this, "okibank")
 	{ }
 
-	DECLARE_DRIVER_INIT(relief);
 	void relief(machine_config &config);
 
-protected:
+	void init_relief();
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void update_interrupts() override;
@@ -43,7 +46,6 @@ protected:
 	void main_map(address_map &map);
 	void oki_map(address_map &map);
 
-private:
 	required_device<atari_vad_device> m_vad;
 	required_device<okim6295_device> m_oki;
 	required_device<ym2413_device> m_ym2413;

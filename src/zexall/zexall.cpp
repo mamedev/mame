@@ -120,12 +120,13 @@ WRITE8_MEMBER( zexall_state::output_data_w )
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(zexall_state::z80_mem)
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0xfffd, 0xfffd) AM_READWRITE(output_ack_r, output_ack_w)
-	AM_RANGE(0xfffe, 0xfffe) AM_READWRITE(output_req_r, output_req_w)
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE(output_data_r, output_data_w)
-ADDRESS_MAP_END
+void zexall_state::z80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).ram().share("main_ram");
+	map(0xfffd, 0xfffd).rw(this, FUNC(zexall_state::output_ack_r), FUNC(zexall_state::output_ack_w));
+	map(0xfffe, 0xfffe).rw(this, FUNC(zexall_state::output_req_r), FUNC(zexall_state::output_req_w));
+	map(0xffff, 0xffff).rw(this, FUNC(zexall_state::output_data_r), FUNC(zexall_state::output_data_w));
+}
 
 
 /******************************************************************************
@@ -142,8 +143,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(zexall_state::zexall)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
 MACHINE_CONFIG_END
 
 

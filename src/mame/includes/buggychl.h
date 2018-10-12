@@ -10,6 +10,7 @@
 #include "sound/msm5232.h"
 #include "sound/ta7630.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 class buggychl_state : public driver_device
@@ -35,8 +36,9 @@ public:
 		m_soundnmi(*this, "soundnmi"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_pedal_input(*this, "PEDAL")
-		{ }
+		m_pedal_input(*this, "PEDAL"),
+		m_led(*this, "led%u", 0U)
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_charram;
@@ -60,6 +62,8 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_ioport m_pedal_input;
+
+	output_finder<1> m_led;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_enable_w);

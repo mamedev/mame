@@ -58,6 +58,7 @@ Notes added 2014-09-10:
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -70,13 +71,14 @@ public:
 	m_subcpu(*this, "subcpu")
 	{ }
 
+	void rcorsair(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void rcorsair(machine_config &config);
 	void rcorsair_main_map(address_map &map);
 	void rcorsair_sub_io_map(address_map &map);
 	void rcorsair_sub_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -87,17 +89,20 @@ protected:
 };
 
 
-ADDRESS_MAP_START(rcorsair_state::rcorsair_main_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xa03f) AM_RAM
-ADDRESS_MAP_END
+void rcorsair_state::rcorsair_main_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0xa000, 0xa03f).ram();
+}
 
-ADDRESS_MAP_START(rcorsair_state::rcorsair_sub_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void rcorsair_state::rcorsair_sub_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(rcorsair_state::rcorsair_sub_io_map)
-ADDRESS_MAP_END
+void rcorsair_state::rcorsair_sub_io_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( inports )
 	PORT_START("IN0")
@@ -138,7 +143,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( rcorsair )
+static GFXDECODE_START( gfx_rcorsair )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -156,13 +161,13 @@ MACHINE_CONFIG_START(rcorsair_state::rcorsair)
 	/* Main CPU is probably inside Custom Block with
 	   program code, unknown type */
 
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(rcorsair_main_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(rcorsair_main_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", I8035, 8000000)
-	MCFG_CPU_PROGRAM_MAP(rcorsair_sub_map)
-	MCFG_CPU_IO_MAP(rcorsair_sub_io_map)
+	MCFG_DEVICE_ADD("subcpu", I8035, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(rcorsair_sub_map)
+	MCFG_DEVICE_IO_MAP(rcorsair_sub_io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -172,7 +177,7 @@ MACHINE_CONFIG_START(rcorsair_state::rcorsair)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rcorsair)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rcorsair)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
@@ -196,4 +201,4 @@ ROM_START( rcorsair )
 ROM_END
 
 
-GAME( 1984, rcorsair,  0,    rcorsair, inports, rcorsair_state, 0, ROT90, "Nakasawa", "Red Corsair", MACHINE_IS_SKELETON )
+GAME( 1984, rcorsair,  0,    rcorsair, inports, rcorsair_state, empty_init, ROT90, "Nakasawa", "Red Corsair", MACHINE_IS_SKELETON )

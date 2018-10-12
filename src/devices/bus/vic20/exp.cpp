@@ -201,6 +201,14 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint
 	}
 }
 
+void vic20_expansion_slot_device::add_passthrough(machine_config &config, const char *_tag)
+{
+	vic20_expansion_slot_device &slot(VIC20_EXPANSION_SLOT(config, _tag, DERIVED_CLOCK(1, 1), vic20_expansion_cards, nullptr));
+	slot.irq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(vic20_expansion_slot_device::irq_w));
+	slot.nmi_wr_callback().set(DEVICE_SELF_OWNER, FUNC(vic20_expansion_slot_device::nmi_w));
+	slot.res_wr_callback().set(DEVICE_SELF_OWNER, FUNC(vic20_expansion_slot_device::res_w));
+}
+
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( vic20_expansion_cards )
@@ -218,18 +226,18 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint
 #include "videopak.h"
 #include "speakeasy.h"
 
-SLOT_INTERFACE_START( vic20_expansion_cards )
-	SLOT_INTERFACE("exp", VIC1010)
-	SLOT_INTERFACE("3k", VIC1210)
-	SLOT_INTERFACE("8k", VIC1110)
-	SLOT_INTERFACE("16k", VIC1111)
-	SLOT_INTERFACE("fe3", VIC20_FE3)
-	SLOT_INTERFACE("speakez", VIC20_SPEAKEASY)
-	SLOT_INTERFACE("videopak", VIC20_VIDEO_PAK)
+void vic20_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("exp", VIC1010);
+	device.option_add("3k", VIC1210);
+	device.option_add("8k", VIC1110);
+	device.option_add("16k", VIC1111);
+	device.option_add("fe3", VIC20_FE3);
+	device.option_add("speakez", VIC20_SPEAKEASY);
+	device.option_add("videopak", VIC20_VIDEO_PAK);
 
 	// the following need ROMs from the software list
-	SLOT_INTERFACE_INTERNAL("standard", VIC20_STD)
-	SLOT_INTERFACE_INTERNAL("ieee488", VIC1112)
-	MCFG_SLOT_OPTION_CLOCK("ieee488", DERIVED_CLOCK(1, 1))
-	SLOT_INTERFACE_INTERNAL("megacart", VIC20_MEGACART)
-SLOT_INTERFACE_END
+	device.option_add_internal("standard", VIC20_STD);
+	device.option_add_internal("ieee488", VIC1112);
+	device.option_add_internal("megacart", VIC20_MEGACART);
+}

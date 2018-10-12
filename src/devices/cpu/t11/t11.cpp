@@ -36,7 +36,7 @@
 #define PSW     m_psw.b.l
 
 
-DEFINE_DEVICE_TYPE(T11,      t11_device,      "t11",      "T11")
+DEFINE_DEVICE_TYPE(T11,      t11_device,      "t11",      "DEC T11")
 DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
 
 
@@ -78,7 +78,7 @@ device_memory_interface::space_config_vector t11_device::memory_space_config() c
 int t11_device::ROPCODE()
 {
 	PC &= 0xfffe;
-	int val = m_direct->read_word(PC);
+	int val = m_cache->read_word(PC);
 	PC += 2;
 	return val;
 }
@@ -261,7 +261,7 @@ void t11_device::device_start()
 
 	m_initial_pc = initial_pc[c_initial_mode >> 13];
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 	m_out_reset_func.resolve_safe();
 
 	save_item(NAME(m_ppc.w.l));
@@ -293,7 +293,7 @@ void t11_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc.w.l).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_psw.b.l).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void t11_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -415,7 +415,7 @@ void t11_device::execute_run()
 
 		m_ppc = m_reg[7];   /* copy PC to previous PC */
 
-		debugger_instruction_hook(this, PCD);
+		debugger_instruction_hook(PCD);
 
 		op = ROPCODE();
 		(this->*s_opcode_table[op >> 3])(op);
@@ -423,7 +423,7 @@ void t11_device::execute_run()
 	} while (m_icount > 0);
 }
 
-util::disasm_interface *t11_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> t11_device::create_disassembler()
 {
-	return new t11_disassembler;
+	return std::make_unique<t11_disassembler>();
 }

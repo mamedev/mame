@@ -29,14 +29,16 @@ public:
 		m_maincpu(*this, "maincpu")
 	{}
 
+	void attckufo(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
 
-	void attckufo(machine_config &config);
 	void cpu_map(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -45,22 +47,25 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(attckufo_state::cpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("mos6560", mos6560_device, read, write)
-	AM_RANGE(0x1400, 0x1403) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void attckufo_state::cpu_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x100f).rw("mos6560", FUNC(mos6560_device::read), FUNC(mos6560_device::write));
+	map(0x1400, 0x1403).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1c00, 0x1fff).ram();
+	map(0x2000, 0x3fff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(attckufo_state::vic_videoram_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
-ADDRESS_MAP_END
+void attckufo_state::vic_videoram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(FUNC(attckufo_state::vic_videoram_r));
+}
 
-ADDRESS_MAP_START(attckufo_state::vic_colorram_map)
-	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
-ADDRESS_MAP_END
+void attckufo_state::vic_colorram_map(address_map &map)
+{
+	map(0x000, 0x3ff).r(FUNC(attckufo_state::vic_colorram_r));
+}
 
 
 //**************************************************************************
@@ -115,15 +120,26 @@ READ8_MEMBER(attckufo_state::vic_colorram_r)
 //**************************************************************************
 
 MACHINE_CONFIG_START(attckufo_state::attckufo)
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("INPUT"))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.readpa_handler().set_ioport("DSW");
+	pia.readpb_handler().set_ioport("INPUT");
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS656X_ATTACK_UFO_ADD("mos6560", "screen", XTAL(14'318'181) / 14, vic_videoram_map, vic_colorram_map)
+	SPEAKER(config, "mono").front_center();
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE)
+	MCFG_SCREEN_VISIBLE_AREA(0, 23*8 - 1, 0, 22*8 - 1)
+	MCFG_SCREEN_UPDATE_DEVICE("mos6560", mos6560_device, screen_update)
+
+	MCFG_DEVICE_ADD("mos6560", MOS656X_ATTACK_UFO, XTAL(14'318'181) / 14)
+	MCFG_VIDEO_SET_SCREEN("screen")
+	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -149,5 +165,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT  ROTATION  COMPANY               FULLNAME      FLAGS
-GAME( 1980, attckufo, 0,      attckufo, attckufo, attckufo_state, 0,    ROT270,   "Ryoto Electric Co.", "Attack UFO", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY               FULLNAME      FLAGS
+GAME( 1980, attckufo, 0,      attckufo, attckufo, attckufo_state, empty_init, ROT270,   "Ryoto Electric Co.", "Attack UFO", MACHINE_SUPPORTS_SAVE )

@@ -97,33 +97,34 @@ READ8_MEMBER(badlandsbl_state::sound_response_r)
 	return m_sound_response;
 }
 
-ADDRESS_MAP_START(badlandsbl_state::bootleg_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void badlandsbl_state::bootleg_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE(0x400000, 0x400005) AM_READWRITE8(bootleg_shared_r,bootleg_shared_w,0xffff)
-	AM_RANGE(0x400006, 0x400007) AM_READ8(sound_response_r,0xff00)
-	AM_RANGE(0x400008, 0x40000f) AM_RAM // breaks tilemap gfxs otherwise?
-	AM_RANGE(0x400010, 0x4000ff) AM_RAM AM_SHARE("spriteram")
+	map(0x400000, 0x400005).rw(FUNC(badlandsbl_state::bootleg_shared_r), FUNC(badlandsbl_state::bootleg_shared_w));
+	map(0x400006, 0x400006).r(FUNC(badlandsbl_state::sound_response_r));
+	map(0x400008, 0x40000f).ram(); // breaks tilemap gfxs otherwise?
+	map(0x400010, 0x4000ff).ram().share("spriteram");
 
 	// sound comms?
-	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(badlandsb_unk_r) AM_WRITENOP
+	map(0xfc0000, 0xfc0001).r(FUNC(badlandsbl_state::badlandsb_unk_r)).nopw();
 
-	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
+	map(0xfd0000, 0xfd1fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	//AM_RANGE(0xfe0000, 0xfe1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE(video_int_ack_w)
+	map(0xfe2000, 0xfe3fff).w(FUNC(badlandsbl_state::video_int_ack_w));
 
-	AM_RANGE(0xfe0000, 0xfe0001) AM_WRITENOP
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("FE4000")
-	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("P1")
-	AM_RANGE(0xfe4006, 0xfe4007) AM_READ_PORT("P2")
-	AM_RANGE(0xfe4008, 0xfe4009) AM_WRITE(badlands_pf_bank_w)
-	AM_RANGE(0xfe400c, 0xfe400d) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
+	map(0xfe0000, 0xfe0001).nopw();
+	map(0xfe4000, 0xfe4001).portr("FE4000");
+	map(0xfe4004, 0xfe4005).portr("P1");
+	map(0xfe4006, 0xfe4007).portr("P2");
+	map(0xfe4008, 0xfe4009).w(FUNC(badlandsbl_state::badlands_pf_bank_w));
+	map(0xfe400c, 0xfe400d).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 
-	AM_RANGE(0xffc000, 0xffc3ff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0xff00) AM_SHARE("palette")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
+	map(0xffc000, 0xffc3ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
+	map(0xffe000, 0xffefff).ram().w("playfield", FUNC(tilemap_device::write16)).share("playfield");
 
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xfff000, 0xffffff).ram();
+}
 
 WRITE8_MEMBER(badlandsbl_state::bootleg_main_irq_w)
 {
@@ -131,15 +132,16 @@ WRITE8_MEMBER(badlandsbl_state::bootleg_main_irq_w)
 	m_sound_response = data;
 }
 
-ADDRESS_MAP_START(badlandsbl_state::bootleg_audio_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiorom", 0)
-	AM_RANGE(0x2000, 0x2005) AM_RAM AM_SHARE("b_sharedram")
-	AM_RANGE(0x2006, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xcfff) AM_ROM AM_REGION("audiorom", 0x4000)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(bootleg_main_irq_w)
-	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_NOP // either RAM mirror or left-over
-ADDRESS_MAP_END
+void badlandsbl_state::bootleg_audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("audiorom", 0);
+	map(0x2000, 0x2005).ram().share("b_sharedram");
+	map(0x2006, 0x3fff).ram();
+	map(0x4000, 0xcfff).rom().region("audiorom", 0x4000);
+	map(0xd400, 0xd400).w(FUNC(badlandsbl_state::bootleg_main_irq_w));
+	map(0xd800, 0xd801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe000, 0xffff).noprw(); // either RAM mirror or left-over
+}
 
 
 static INPUT_PORTS_START( badlandsb )
@@ -192,7 +194,7 @@ static const gfx_layout badlands_molayout =
 	64*8
 };
 
-static GFXDECODE_START( badlandsb )
+static GFXDECODE_START( gfx_badlandsb )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout_bootleg,    0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, badlands_molayout,  128, 8 )
 GFXDECODE_END
@@ -201,7 +203,6 @@ GFXDECODE_END
 void badlandsbl_state::machine_reset()
 {
 //  m_pedal_value[0] = m_pedal_value[1] = 0x80;
-	atarigen_state::machine_reset();
 //  scanline_timer_reset(*m_screen, 32);
 
 //  memcpy(m_bank_base, &m_bank_source_data[0x0000], 0x1000);
@@ -219,23 +220,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(badlandsbl_state::bootleg_sound_scanline)
 MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/4)   /* Divisor estimated */
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlandsbl_state,  irq1_line_hold) //vblank_int)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/4)   /* Divisor estimated */
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", badlandsbl_state,  irq1_line_hold) //vblank_int)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(20'000'000)/12)    /* Divisor estimated */
-	MCFG_CPU_PROGRAM_MAP(bootleg_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(20'000'000)/12)    /* Divisor estimated */
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_audio_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", badlandsbl_state, bootleg_sound_scanline, "screen", 0, 1)
 
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlandsb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlandsb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -255,9 +255,9 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(20'000'000)/8)  /* Divisor estimated */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(20'000'000)/8)  /* Divisor estimated */
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -330,5 +330,5 @@ ROM_END
 
 
 
-GAME( 1989, badlandsb, badlands, badlandsb, badlandsb, badlandsbl_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", MACHINE_NOT_WORKING )
-GAME( 1989, badlandsb2,badlands, badlandsb, badlandsb, badlandsbl_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", MACHINE_NOT_WORKING )
+GAME( 1989, badlandsb,  badlands, badlandsb, badlandsb, badlandsbl_state, empty_init, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", MACHINE_NOT_WORKING )
+GAME( 1989, badlandsb2, badlands, badlandsb, badlandsb, badlandsbl_state, empty_init, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", MACHINE_NOT_WORKING )

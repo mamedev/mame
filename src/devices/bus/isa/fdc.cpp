@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "fdc.h"
+#include "machine/busmouse.h"
 #include "machine/pc_fdc.h"
 #include "imagedev/flopdrv.h"
 #include "formats/pc_dsk.h"
@@ -19,17 +20,19 @@ FLOPPY_FORMATS_MEMBER( isa8_fdc_device::floppy_formats )
 	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pc_dd_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void pc_dd_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
-static SLOT_INTERFACE_START( pc_hd_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void pc_hd_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 
 isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
@@ -82,8 +85,8 @@ isa8_fdc_xt_device::isa8_fdc_xt_device(const machine_config &mconfig, const char
 
 MACHINE_CONFIG_START(isa8_fdc_xt_device::device_add_mconfig)
 	MCFG_PC_FDC_XT_ADD("fdc")
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(isa8_fdc_device, irq_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(isa8_fdc_device, drq_w))
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -95,8 +98,8 @@ isa8_fdc_at_device::isa8_fdc_at_device(const machine_config &mconfig, const char
 
 MACHINE_CONFIG_START(isa8_fdc_at_device::device_add_mconfig)
 	MCFG_PC_FDC_AT_ADD("fdc")
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(isa8_fdc_device, irq_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(isa8_fdc_device, drq_w))
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -105,36 +108,66 @@ isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const ch
 {
 }
 
-MACHINE_CONFIG_START(isa8_fdc_smc_device::device_add_mconfig)
-	MCFG_SMC37C78_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isa8_fdc_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isa8_fdc_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void isa8_fdc_smc_device::device_add_mconfig(machine_config &config)
+{
+	smc37c78_device &smc(SMC37C78(config, fdc));
+	smc.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
+	smc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+}
 
 isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_PS2, tag, owner, clock)
 {
 }
 
-MACHINE_CONFIG_START(isa8_fdc_ps2_device::device_add_mconfig)
-	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isa8_fdc_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isa8_fdc_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void isa8_fdc_ps2_device::device_add_mconfig(machine_config &config)
+{
+	n82077aa_device &n82077aa(N82077AA(config, fdc, n82077aa_device::MODE_PS2));
+	n82077aa.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
+	n82077aa.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+}
 
 isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_SUPERIO, tag, owner, clock)
 {
 }
 
-MACHINE_CONFIG_START(isa8_fdc_superio_device::device_add_mconfig)
-	MCFG_PC_FDC_SUPERIO_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isa8_fdc_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isa8_fdc_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
+void isa8_fdc_superio_device::device_add_mconfig(machine_config &config)
+{
+	pc_fdc_superio_device &superio(PC_FDC_SUPERIO(config, fdc));
+	superio.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
+	superio.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+}
+
+isa8_ec1841_0003_device::isa8_ec1841_0003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: isa8_fdc_device(mconfig, ISA8_EC1841_0003, tag, owner, clock)
+	, m_bus_mouse(*this, "bus_mouse")
+{
+}
+
+void isa8_ec1841_0003_device::device_start()
+{
+	isa8_fdc_device::device_start();
+	m_isa->install_device(0x023c, 0x023f, *m_bus_mouse, &bus_mouse_device::map);
+}
+
+WRITE_LINE_MEMBER( isa8_ec1841_0003_device::aux_irq_w )
+{
+	m_isa->irq4_w(state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+MACHINE_CONFIG_START( isa8_ec1841_0003_device::device_add_mconfig )
+	MCFG_PC_FDC_XT_ADD("fdc")
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats)
+
+	BUS_MOUSE(config, "bus_mouse", 0).extint_callback().set(FUNC(isa8_ec1841_0003_device::aux_irq_w));
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(ISA8_FDC_XT,      isa8_fdc_xt_device,      "isa8_fdc_xt",      "ISA 8bits XT FDC hookup")
@@ -142,3 +175,4 @@ DEFINE_DEVICE_TYPE(ISA8_FDC_AT,      isa8_fdc_at_device,      "isa8_fdc_at",    
 DEFINE_DEVICE_TYPE(ISA8_FDC_SMC,     isa8_fdc_smc_device,     "isa8_fdc_smc",     "ISA 8bits SMC FDC hookup")
 DEFINE_DEVICE_TYPE(ISA8_FDC_PS2,     isa8_fdc_ps2_device,     "isa8_fdc_ps2",     "ISA 8bits PS/2 FDC hookup")
 DEFINE_DEVICE_TYPE(ISA8_FDC_SUPERIO, isa8_fdc_superio_device, "isa8_fdc_superio", "ISA 8bits SUPERIO FDC hookup")
+DEFINE_DEVICE_TYPE(ISA8_EC1841_0003, isa8_ec1841_0003_device, "isa8_ec1841_0003", "ISA 8bits EC1841.0003 FDC hookup")

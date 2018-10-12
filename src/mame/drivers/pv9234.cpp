@@ -22,6 +22,7 @@ be found!
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -35,15 +36,17 @@ public:
 	{
 	}
 
+	void pv9234(machine_config &config);
+
+private:
 	DECLARE_WRITE32_MEMBER(debug_w);
 	DECLARE_WRITE32_MEMBER(debug1_w);
 	DECLARE_WRITE32_MEMBER(debug2_w);
 
 	uint32_t screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pv9234(machine_config &config);
 	void pv9234_map(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -105,23 +108,24 @@ WRITE32_MEMBER( pv9234_state::debug2_w )
 		logerror("debug2=%02x\n",data); // ignore the huge amount of zeroes here
 }
 
-ADDRESS_MAP_START(pv9234_state::pv9234_map)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu",0) //FLASH ROM!
+void pv9234_state::pv9234_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom().region("maincpu", 0); //FLASH ROM!
 	// AM_RANGE(0x00000000, 0x00000033) AM_WRITE something
 	// AM_RANGE(0x00000044, 0x00000047) AM_WRITE something
 	// AM_RANGE(0x00000060, 0x0000006b) AM_WRITE something
 	// AM_RANGE(0x00007000, 0x00007003) AM_WRITE something
 	// AM_RANGE(0x00008000, 0x00008003) AM_WRITE something
-	AM_RANGE(0x00008014, 0x00008017) AM_WRITE(debug1_w)
+	map(0x00008014, 0x00008017).w(FUNC(pv9234_state::debug1_w));
 	// AM_RANGE(0x00008020, 0x00008027) AM_WRITE something
-	AM_RANGE(0x000080c0, 0x000080c3) AM_WRITE(debug2_w)
-	AM_RANGE(0x000080cc, 0x000080cf) AM_WRITE(debug_w)
+	map(0x000080c0, 0x000080c3).w(FUNC(pv9234_state::debug2_w));
+	map(0x000080cc, 0x000080cf).w(FUNC(pv9234_state::debug_w));
 	// AM_RANGE(0x000080d0, 0x000080d3) AM_WRITE something
-	AM_RANGE(0x0003e000, 0x0003efff) AM_RAM AM_SHARE("p_ram")
-	AM_RANGE(0x00080000, 0x00087fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("share1")//mirror is a guess, writes a prg at 0xc0200 then it jumps at b0200 (!)
-	AM_RANGE(0xe0000000, 0xe0007fff) AM_MIRROR(0x0fff8000) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xffffff00, 0xffffffff) AM_RAM //i/o? stack ram?
-ADDRESS_MAP_END
+	map(0x0003e000, 0x0003efff).ram().share("p_ram");
+	map(0x00080000, 0x00087fff).mirror(0x78000).ram().share("share1");//mirror is a guess, writes a prg at 0xc0200 then it jumps at b0200 (!)
+	map(0xe0000000, 0xe0007fff).mirror(0x0fff8000).ram().share("share1");
+	map(0xffffff00, 0xffffffff).ram(); //i/o? stack ram?
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pv9234 )
@@ -147,8 +151,8 @@ uint32_t pv9234_state::screen_update_pv9234(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(pv9234_state::pv9234)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
-	MCFG_CPU_PROGRAM_MAP(pv9234_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
+	MCFG_DEVICE_PROGRAM_MAP(pv9234_map)
 
 
 	/* video hardware */
@@ -175,5 +179,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY               FULLNAME         FLAGS
-SYST( 1997, pv9234, 0,      0,      pv9234,  pv9234, pv9234_state, 0,    "Scientific Atlanta", "PowerVu D9234", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY               FULLNAME         FLAGS
+SYST( 1997, pv9234, 0,      0,      pv9234,  pv9234, pv9234_state, empty_init, "Scientific Atlanta", "PowerVu D9234", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -204,6 +204,7 @@ ioport_constructor mephisto_buttons_board_device::device_input_ports() const
 mephisto_board_device::mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_sensors(*this, "IN.%u", 0)
+	, m_led(*this, "led%u", 0U)
 	, m_disable_leds(false)
 {
 }
@@ -231,6 +232,7 @@ mephisto_buttons_board_device::mephisto_buttons_board_device(const machine_confi
 
 void mephisto_board_device::device_start()
 {
+	m_led.resolve();
 	m_leds_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mephisto_board_device::leds_update_callback), this));
 	m_leds_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mephisto_board_device::leds_refresh_callback), this));
 	m_leds_update_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
@@ -268,7 +270,7 @@ TIMER_CALLBACK_MEMBER(mephisto_board_device::leds_refresh_callback)
 		for (int j=0; j<8; j++)
 		{
 			if (!m_disable_leds)
-				machine().output().set_led_value(i*8 + j, (m_leds_state[i*8 + j] > 1) ? 1 : 0);
+				m_led[i*8 + j] = (m_leds_state[i*8 + j] > 1) ? 1 : 0;
 
 			if (m_leds_state[i*8 + j])
 				m_leds_state[i*8 + j]--;
@@ -333,8 +335,8 @@ MACHINE_CONFIG_START(mephisto_display_modul_device::device_add_mconfig)
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

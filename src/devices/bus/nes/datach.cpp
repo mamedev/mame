@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "datach.h"
-#include "cpu/m6502/m6502.h"
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -233,8 +232,8 @@ void nes_datach_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	serial_timer = timer_alloc(TIMER_SERIAL);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	serial_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1000));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+	serial_timer->adjust(attotime::zero, 0, clocks_to_attotime(1000));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -362,14 +361,15 @@ WRITE8_MEMBER(nes_datach_device::write_h)
 //  BARCODE READER + CART SLOT + X24C02
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START(datach_cart)
-	SLOT_INTERFACE_INTERNAL("datach_rom", NES_DATACH_ROM)
-	SLOT_INTERFACE_INTERNAL("datach_ep1", NES_DATACH_24C01)
-SLOT_INTERFACE_END
+static void datach_cart(device_slot_interface &device)
+{
+	device.option_add_internal("datach_rom", NES_DATACH_ROM);
+	device.option_add_internal("datach_ep1", NES_DATACH_24C01);
+}
 
 
 MACHINE_CONFIG_START(nes_datach_device::device_add_mconfig)
-	MCFG_BARCODE_READER_ADD("datach")
+	BARCODE_READER(config, "datach", 0);
 	MCFG_DATACH_MINICART_ADD("datach_slot", datach_cart)
 	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END
@@ -395,7 +395,7 @@ void nes_datach_device::device_timer(emu_timer &timer, device_timer_id id, int p
 
 			if (!m_irq_count)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 				m_irq_enable = 0;
 			}
 		}

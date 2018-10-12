@@ -35,7 +35,6 @@
 void atarig42_state::update_interrupts()
 {
 	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(5, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -43,7 +42,6 @@ void atarig42_state::machine_start()
 {
 	atarigen_state::machine_start();
 
-	save_item(NAME(m_analog_data));
 	save_item(NAME(m_sloop_bank));
 	save_item(NAME(m_sloop_next_bank));
 	save_item(NAME(m_sloop_offset));
@@ -65,25 +63,22 @@ void atarig42_state::machine_reset()
  *
  *************************************/
 
-READ16_MEMBER(atarig42_state::special_port2_r)
+WRITE8_MEMBER(atarig42_state::a2d_select_w)
 {
-	int temp = ioport("IN2")->read();
-	temp ^= 0x0008;     /* A2D.EOC always high for now */
-	return temp;
+	if (m_adc.found())
+		m_adc->address_offset_start_w(space, offset, 0);
 }
 
 
-WRITE16_MEMBER(atarig42_state::a2d_select_w)
+READ8_MEMBER(atarig42_state::a2d_data_r)
 {
-	static const char *const portnames[] = { "A2D0", "A2D1" };
+	if (!m_adc.found())
+		return 0xff;
 
-	m_analog_data = ioport(portnames[offset != 0])->read();
-}
-
-
-READ16_MEMBER(atarig42_state::a2d_data_r)
-{
-	return m_analog_data << 8;
+	uint8_t result = m_adc->data_r(space, 0);
+	if (!machine().side_effects_disabled())
+		m_adc->address_offset_start_w(space, offset, 0);
+	return result;
 }
 
 
@@ -320,31 +315,32 @@ WRITE16_MEMBER(atarig42_0x400_state::guardians_sloop_data_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(atarig42_state::main_map)
-	AM_RANGE(0x000000, 0x080001) AM_ROM
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
-	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("IN1")
-	AM_RANGE(0xe00010, 0xe00011) AM_READ(special_port2_r)
-	AM_RANGE(0xe00012, 0xe00013) AM_READ_PORT("jsa:JSAIII")
-	AM_RANGE(0xe00020, 0xe00027) AM_READWRITE(a2d_data_r, a2d_select_w)
-	AM_RANGE(0xe00030, 0xe00031) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
-	AM_RANGE(0xe00040, 0xe00041) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
-	AM_RANGE(0xe00050, 0xe00051) AM_WRITE(io_latch_w)
-	AM_RANGE(0xe00060, 0xe00061) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xe03800, 0xe03801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xe80000, 0xe80fff) AM_RAM
-	AM_RANGE(0xf40000, 0xf40001) AM_DEVREAD("asic65", asic65_device, io_r)
-	AM_RANGE(0xf60000, 0xf60001) AM_DEVREAD("asic65", asic65_device, read)
-	AM_RANGE(0xf80000, 0xf80003) AM_DEVWRITE("asic65", asic65_device, data_w)
-	AM_RANGE(0xfa0000, 0xfa0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
-	AM_RANGE(0xff2000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0xff7000, 0xff7001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-ADDRESS_MAP_END
+void atarig42_state::main_map(address_map &map)
+{
+	map(0x000000, 0x080001).rom();
+	map(0xe00000, 0xe00001).portr("IN0");
+	map(0xe00002, 0xe00003).portr("IN1");
+	map(0xe00010, 0xe00011).portr("IN2");
+	map(0xe00012, 0xe00013).portr("jsa:JSAIII");
+	map(0xe00020, 0xe0002f).rw(FUNC(atarig42_state::a2d_data_r), FUNC(atarig42_state::a2d_select_w)).umask16(0xff00);
+	map(0xe00031, 0xe00031).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
+	map(0xe00041, 0xe00041).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
+	map(0xe00050, 0xe00051).w(FUNC(atarig42_state::io_latch_w));
+	map(0xe00060, 0xe00061).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0xe03000, 0xe03001).w(FUNC(atarig42_state::video_int_ack_w));
+	map(0xe03800, 0xe03801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xe80000, 0xe80fff).ram();
+	map(0xf40000, 0xf40001).r(m_asic65, FUNC(asic65_device::io_r));
+	map(0xf60000, 0xf60001).r(m_asic65, FUNC(asic65_device::read));
+	map(0xf80000, 0xf80003).w(m_asic65, FUNC(asic65_device::data_w));
+	map(0xfa0000, 0xfa0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0xfc0000, 0xfc0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xff0fff).ram().share("rle");
+	map(0xff2000, 0xff5fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0xff6000, 0xff6fff).w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0xff7000, 0xff7001).w(FUNC(atarig42_state::mo_command_w)).share("mo_command");
+}
 
 
 
@@ -366,7 +362,8 @@ static INPUT_PORTS_START( roadriot )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* e00010 */
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
@@ -423,12 +420,6 @@ static INPUT_PORTS_START( guardian )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("A2D0")      /* analog 0 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("A2D1")      /* analog 1 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -472,7 +463,7 @@ static const gfx_layout anlayout =
 	32*8
 };
 
-static GFXDECODE_START( atarig42 )
+static GFXDECODE_START( gfx_atarig42 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
@@ -525,17 +516,15 @@ static const atari_rle_objects_config modesc_0x400 =
 MACHINE_CONFIG_START(atarig42_state::atarig42)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarig42_state, video_int_gen)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarig42)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig42)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -549,13 +538,14 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarig42_state, screen_update_atarig42)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarig42_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarig42_state, sound_int_write_line))
+	MCFG_ATARI_JSA_III_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_5))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -563,6 +553,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atarig42_0x200_state::atarig42_0x200)
 	atarig42(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
+
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz / 16);
+	m_adc->in_callback<0>().set_ioport("A2D0");
+	m_adc->in_callback<1>().set_ioport("A2D1");
 
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
@@ -823,7 +817,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarig42_0x200_state,roadriot)
+void atarig42_0x200_state::init_roadriot()
 {
 	m_playfield_base = 0x400;
 
@@ -854,7 +848,7 @@ DRIVER_INIT_MEMBER(atarig42_0x200_state,roadriot)
 }
 
 
-DRIVER_INIT_MEMBER(atarig42_0x400_state,guardian)
+void atarig42_0x400_state::init_guardian()
 {
 	m_playfield_base = 0x000;
 
@@ -896,7 +890,7 @@ DRIVER_INIT_MEMBER(atarig42_0x400_state,guardian)
  *
  *************************************/
 
-GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 04 Dec 1991)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 13 Nov 1991)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 3, 04 Jun 1991)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1992, guardian,  0,        atarig42_0x400, guardian, atarig42_0x400_state, guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )
+GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 04 Dec 1991)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 13 Nov 1991)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 3, 04 Jun 1991)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1992, guardian,  0,        atarig42_0x400, guardian, atarig42_0x400_state, init_guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )

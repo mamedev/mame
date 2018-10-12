@@ -10,20 +10,24 @@
 
 #pragma once
 
-#include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
+#include "video/atarivad.h"
+#include "emupal.h"
+#include "screen.h"
 
-class batman_state : public atarigen_state
+class batman_state : public driver_device
 {
 public:
 	batman_state(const machine_config &mconfig, device_type type, const char *tag) :
-		atarigen_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_jsa(*this, "jsa"),
 		m_vad(*this, "vad")
 	{ }
 
-	DECLARE_DRIVER_INIT(batman);
+	void init_batman();
 	void batman(machine_config &config);
 
 protected:
@@ -34,10 +38,11 @@ protected:
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 	uint32_t screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void update_interrupts() override;
 	void main_map(address_map &map);
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<atari_jsa_iii_device> m_jsa;
 	required_device<atari_vad_device> m_vad;
 

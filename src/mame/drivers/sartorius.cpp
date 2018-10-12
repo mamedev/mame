@@ -63,30 +63,35 @@ public:
 	}
 
 	void sart3733(machine_config &config);
+
+private:
 	void sart3733_memory(address_map &map);
 	void sart3733_rom(address_map &map);
 	void sart3733_status(address_map &map);
 };
 
 
-	ADDRESS_MAP_START(sart3733_state::sart3733_rom)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("maincpu", 0x0000)
-ADDRESS_MAP_END
+	void sart3733_state::sart3733_rom(address_map &map)
+{
+	map(0x0000, 0x07ff).rom().region("maincpu", 0x0000);
+}
 
-	ADDRESS_MAP_START(sart3733_state::sart3733_memory)
-	AM_RANGE(0x0000, 0x007f) AM_RAM // 2 * 4002
-ADDRESS_MAP_END
+	void sart3733_state::sart3733_memory(address_map &map)
+{
+	map(0x0000, 0x007f).ram(); // 2 * 4002
+}
 
-	ADDRESS_MAP_START(sart3733_state::sart3733_status)
-	AM_RANGE(0x0000, 0x001f) AM_RAM // 2 * 4002
-ADDRESS_MAP_END
+	void sart3733_state::sart3733_status(address_map &map)
+{
+	map(0x0000, 0x001f).ram(); // 2 * 4002
+}
 
 
 MACHINE_CONFIG_START(sart3733_state::sart3733)
-	MCFG_CPU_ADD("maincpu", I4040, 750'000) // clock speed is a complete guess - can't see crystal or multi-phase clock generator
-	MCFG_I4040_ROM_MAP(sart3733_rom)
-	MCFG_I4040_RAM_MEMORY_MAP(sart3733_memory)
-	MCFG_I4040_RAM_STATUS_MAP(sart3733_status)
+	i4040_cpu_device &cpu(I4040(config, "maincpu", 750'000)); // clock speed is a complete guess - can't see crystal or multi-phase clock generator
+	cpu.set_rom_map(&sart3733_state::sart3733_rom);
+	cpu.set_ram_memory_map(&sart3733_state::sart3733_memory);
+	cpu.set_ram_status_map(&sart3733_state::sart3733_status);
 MACHINE_CONFIG_END
 
 
@@ -102,4 +107,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1978?, sart3733, 0, 0, sart3733, sart3733, sart3733_state, 0, "Sartorius-Werke GmbH", "3733 (digital scale)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+SYST( 1978?, sart3733, 0, 0, sart3733, sart3733, sart3733_state, empty_init, "Sartorius-Werke GmbH", "3733 (digital scale)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

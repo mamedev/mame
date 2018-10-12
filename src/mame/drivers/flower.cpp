@@ -82,6 +82,7 @@ CHIP #  POSITION   TYPE
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "audio/flower.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -107,30 +108,32 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void flower(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(audio_nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(bgvram_w);
 	DECLARE_WRITE8_MEMBER(fgvram_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void flower(machine_config &config);
 	void audio_map(address_map &map);
 	void shared_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<cpu_device> m_audiocpu;
@@ -315,7 +318,7 @@ WRITE8_MEMBER(flower_state::sound_command_w)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	if(m_audio_nmi_enable == true)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(flower_state::audio_nmi_mask_w)
@@ -335,36 +338,38 @@ WRITE8_MEMBER(flower_state::fgvram_w)
 	m_fg_tilemap->mark_tile_dirty(offset & 0xff);
 }
 
-ADDRESS_MAP_START(flower_state::shared_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITENOP // master irq related (0 at start, 1 at end)
-	AM_RANGE(0xa003, 0xa003) AM_WRITENOP // slave irq related (0 at start, 1 at end)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(coin_counter_w)
-	AM_RANGE(0xa005, 0xa005) AM_WRITENOP
-	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("P1")
-	AM_RANGE(0xa101, 0xa101) AM_READ_PORT("P2")
-	AM_RANGE(0xa102, 0xa102) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa103, 0xa103) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(sound_command_w)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("txvram")
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(fgvram_w) AM_SHARE("fgvram")
-	AM_RANGE(0xf200, 0xf200) AM_RAM AM_SHARE("fgscroll")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(bgvram_w) AM_SHARE("bgvram")
-	AM_RANGE(0xfa00, 0xfa00) AM_RAM AM_SHARE("bgscroll")
-ADDRESS_MAP_END
+void flower_state::shared_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xdfff).ram().share("workram");
+	map(0xa000, 0xa000).nopw();
+	map(0xa001, 0xa001).w(FUNC(flower_state::flipscreen_w));
+	map(0xa002, 0xa002).nopw(); // master irq related (0 at start, 1 at end)
+	map(0xa003, 0xa003).nopw(); // slave irq related (0 at start, 1 at end)
+	map(0xa004, 0xa004).w(FUNC(flower_state::coin_counter_w));
+	map(0xa005, 0xa005).nopw();
+	map(0xa100, 0xa100).portr("P1");
+	map(0xa101, 0xa101).portr("P2");
+	map(0xa102, 0xa102).portr("DSW1");
+	map(0xa103, 0xa103).portr("DSW2");
+	map(0xa400, 0xa400).w(FUNC(flower_state::sound_command_w));
+	map(0xe000, 0xefff).ram().share("txvram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(flower_state::fgvram_w)).share("fgvram");
+	map(0xf200, 0xf200).ram().share("fgscroll");
+	map(0xf800, 0xf9ff).ram().w(FUNC(flower_state::bgvram_w)).share("bgvram");
+	map(0xfa00, 0xfa00).ram().share("bgscroll");
+}
 
-ADDRESS_MAP_START(flower_state::audio_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_WRITENOP // audio irq related (0 at start, 1 at end)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(audio_nmi_mask_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE("flower", flower_sound_device, lower_write)
-	AM_RANGE(0xa000, 0xa03f) AM_DEVWRITE("flower", flower_sound_device, upper_write)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void flower_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4000).nopw(); // audio irq related (0 at start, 1 at end)
+	map(0x4001, 0x4001).w(FUNC(flower_state::audio_nmi_mask_w));
+	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x803f).w("flower", FUNC(flower_sound_device::lower_write));
+	map(0xa000, 0xa03f).w("flower", FUNC(flower_sound_device::upper_write));
+	map(0xc000, 0xc7ff).ram();
+}
 
 INPUT_CHANGED_MEMBER(flower_state::coin_inserted)
 {
@@ -460,7 +465,7 @@ static const gfx_layout tilelayout =
 	16*16*2
 };
 
-static GFXDECODE_START( flower )
+static GFXDECODE_START( gfx_flower )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0,  64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0,  16 )
@@ -490,17 +495,17 @@ INTERRUPT_GEN_MEMBER(flower_state::slave_vblank_irq)
 
 
 MACHINE_CONFIG_START(flower_state::flower)
-	MCFG_CPU_ADD("mastercpu",Z80,MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(shared_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state, master_vblank_irq)
+	MCFG_DEVICE_ADD("mastercpu",Z80,MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(shared_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flower_state, master_vblank_irq)
 
-	MCFG_CPU_ADD("slavecpu",Z80,MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(shared_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state, slave_vblank_irq)
+	MCFG_DEVICE_ADD("slavecpu",Z80,MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(shared_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flower_state, slave_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold, 90)
+	MCFG_DEVICE_ADD("audiocpu",Z80,MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold, 90)
 
 	MCFG_QUANTUM_PERFECT_CPU("mastercpu")
 
@@ -509,14 +514,14 @@ MACHINE_CONFIG_START(flower_state::flower)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3,384,0,288,264,16,240) // derived from Galaxian HW, 60.606060
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flower)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flower)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("flower", FLOWER_CUSTOM, 96000)
+	MCFG_DEVICE_ADD("flower", FLOWER_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -608,5 +613,5 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
-GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flower,  0,      flower, flower, flower_state, empty_init, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flowerj, flower, flower, flower, flower_state, empty_init, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )

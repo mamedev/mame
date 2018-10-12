@@ -184,8 +184,8 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	// bits 2 & 3: control the lamps, allowing for overrides
 	if (((m_video_control ^ data) & 0x0c) && !m_lamp_changed_w.isnull())
 		m_lamp_changed_w(m_video_control ^ data, data);
-	output().set_led_value(1, data & 0x08);
-	output().set_led_value(0, data & 0x04);
+	m_lamps[1] = BIT(data, 3);
+	m_lamps[0] = BIT(data, 2);
 
 	m_video_control = data;
 
@@ -247,7 +247,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return m_i8255->read(space, offset & 3);
+			return m_i8255->read(offset & 3);
 
 		case 0x1000/2:
 		{
@@ -371,14 +371,15 @@ WRITE8_MEMBER( segas16a_state::n7751_control_w )
 //  n7751_rom_offset_w - post expander callback
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::n7751_rom_offset_w )
+template<int Shift>
+void segas16a_state::n7751_rom_offset_w(uint8_t data)
 {
 	// P4 - address lines 0-3
 	// P5 - address lines 4-7
 	// P6 - address lines 8-11
 	// P7 - address lines 12-13
-	int mask = (0xf << (4 * offset)) & 0x3fff;
-	int newdata = (data << (4 * offset)) & mask;
+	int mask = (0xf << Shift) & 0x3fff;
+	int newdata = (data << Shift) & mask;
 	m_n7751_rom_address = (m_n7751_rom_address & ~mask) | newdata;
 }
 
@@ -405,7 +406,7 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 {
 	// read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048)
 	// bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used
-	return 0x80 | ((m_n7751_command & 0x07) << 4) | (m_n7751_i8243->p2_r(space, offset) & 0x0f);
+	return 0x80 | ((m_n7751_command & 0x07) << 4) | (m_n7751_i8243->p2_r() & 0x0f);
 }
 
 
@@ -416,7 +417,7 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 WRITE8_MEMBER( segas16a_state::n7751_p2_w )
 {
 	// write to P2; low 4 bits go to 8243
-	m_n7751_i8243->p2_w(space, offset, data & 0x0f);
+	m_n7751_i8243->p2_w(data & 0x0f);
 
 	// output of bit $80 indicates we are ready (1) or busy (0)
 	// no other outputs are used
@@ -570,32 +571,25 @@ READ8_MEMBER( segas16a_state::mcu_io_r )
 //**************************************************************************
 
 //-------------------------------------------------
-//  mcu_irq_assert - signal an interrupt to the
-//  I8751 MCU, and boost interleave to ensure
-//  good synchronization with the main CPU
-//-------------------------------------------------
-
-INTERRUPT_GEN_MEMBER( segas16a_state::mcu_irq_assert )
-{
-	// toggle the INT0 line on the MCU
-	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-	m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
-
-	// boost interleave to ensure that the MCU can break the M68000 out of a STOP
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
-}
-
-
-//-------------------------------------------------
-//  i8751_main_cpu_vblank - if we have a fake
+//  i8751_main_cpu_vblank_w - if we have a fake
 //  handler, we hook this to execute it
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( segas16a_state::i8751_main_cpu_vblank )
+WRITE_LINE_MEMBER(segas16a_state::i8751_main_cpu_vblank_w)
 {
 	// if we have a fake 8751 handler, call it on VBLANK
-	if (!m_i8751_vblank_hook.isnull())
+	if (state && !m_i8751_vblank_hook.isnull())
 		m_i8751_vblank_hook();
+
+	// if we have a 8751, toggle the INT0 line on the MCU
+	if (m_mcu.found())
+	{
+		m_mcu->set_input_line(MCS51_INT0_LINE, state);
+
+		// boost interleave to ensure that the MCU can break the M68000 out of a STOP
+		if (state)
+			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	}
 }
 
 
@@ -634,7 +628,7 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
-			m_i8255->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+			m_i8255->write(param >> 8, param & 0xff);
 			break;
 	}
 }
@@ -960,52 +954,58 @@ void segas16a_state::sjryuko_lamp_changed_w(uint8_t changed, uint8_t newval)
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segas16a_state::system16a_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x380000) AM_ROM
-	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE(misc_io_r, misc_io_w)
-	AM_RANGE(0xc60000, 0xc6ffff) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void segas16a_state::system16a_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).mirror(0x380000).rom();
+	map(0x400000, 0x407fff).mirror(0xb88000).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).mirror(0xb8f000).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x4407ff).mirror(0x3bf800).ram().share("sprites");
+	map(0x840000, 0x840fff).mirror(0x3bf000).ram().w(FUNC(segas16a_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc43fff).mirror(0x39c000).rw(FUNC(segas16a_state::misc_io_r), FUNC(segas16a_state::misc_io_w));
+	map(0xc60000, 0xc6ffff).r(m_watchdog, FUNC(watchdog_timer_device::reset16_r));
+	map(0xc70000, 0xc73fff).mirror(0x38c000).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(segas16a_state::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segas16a_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
 //**************************************************************************
 //  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segas16a_state::sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe800, 0xe800) AM_READ(sound_data_r)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas16a_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0xe800, 0xe800).r(FUNC(segas16a_state::sound_data_r));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segas16a_state::sound_decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("sound_decrypted_opcodes")
-ADDRESS_MAP_END
+void segas16a_state::sound_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("sound_decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(segas16a_state::sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(n7751_command_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segas16a_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x80).mirror(0x3f).w(FUNC(segas16a_state::n7751_command_w));
+	map(0xc0, 0xc0).mirror(0x3f).r(FUNC(segas16a_state::sound_data_r));
+}
 
-ADDRESS_MAP_START(segas16a_state::sound_no7751_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_NOP
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segas16a_state::sound_no7751_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x80).mirror(0x3f).noprw();
+	map(0xc0, 0xc0).mirror(0x3f).r(FUNC(segas16a_state::sound_data_r));
+}
 
 
 
@@ -1013,9 +1013,10 @@ ADDRESS_MAP_END
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segas16a_state::mcu_io_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
-ADDRESS_MAP_END
+void segas16a_state::mcu_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(segas16a_state::mcu_io_r), FUNC(segas16a_state::mcu_io_w));
+}
 
 
 
@@ -1241,7 +1242,7 @@ static INPUT_PORTS_START( afighter_analog )
 	PORT_INCLUDE( afighter )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_accel_r, nullptr)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_accel_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // SHOT
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // WEAPON1
@@ -1249,10 +1250,10 @@ static INPUT_PORTS_START( afighter_analog )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) // WEAPON3
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_handl_left_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_handl_left_r, nullptr)
 
 	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_handl_right_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_handl_right_r, nullptr)
 
 	PORT_START("STEER")  // steering
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
@@ -1397,14 +1398,14 @@ static INPUT_PORTS_START( mjleague )
 	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )   // upper bit of trackball
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   // upper bit of trackball
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   // upper bit of trackball
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // upper bit of trackball
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:1")
@@ -1630,7 +1631,7 @@ static INPUT_PORTS_START( sdi )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_MODIFY("UNUSED")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )  PORT_8WAY
@@ -1643,7 +1644,7 @@ static INPUT_PORTS_START( sdi )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )  PORT_8WAY PORT_PLAYER(2)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:1")
@@ -1952,7 +1953,7 @@ INPUT_PORTS_END
 //  GRAPHICS DECODING
 //**************************************************************************
 
-static GFXDECODE_START( segas16a )
+static GFXDECODE_START( gfx_segas16a )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
@@ -1965,32 +1966,36 @@ GFXDECODE_END
 MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(system16a_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(system16a_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_CPU_ADD("n7751", N7751, 6000000)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(segas16a_state, n7751_rom_r))
-	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(segas16a_state, n7751_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(segas16a_state, n7751_p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("n7751_8243", i8243_device, prog_w))
+	MCFG_DEVICE_ADD("n7751", N7751, 6000000)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, segas16a_state, n7751_rom_r))
+	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, segas16a_state, n7751_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, segas16a_state, n7751_p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("n7751_8243", i8243_device, prog_w))
 
-	MCFG_I8243_ADD("n7751_8243", NOOP, WRITE8(segas16a_state,n7751_rom_offset_w))
+	I8243(config, m_n7751_i8243);
+	m_n7751_i8243->p4_out_cb().set(FUNC(segas16a_state::n7751_rom_offset_w<0>));
+	m_n7751_i8243->p5_out_cb().set(FUNC(segas16a_state::n7751_rom_offset_w<4>));
+	m_n7751_i8243->p6_out_cb().set(FUNC(segas16a_state::n7751_rom_offset_w<8>));
+	m_n7751_i8243->p7_out_cb().set(FUNC(segas16a_state::n7751_rom_offset_w<12>));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(segas16a_state, misc_control_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segas16a_state, tilemap_sound_w))
+	I8255(config, m_i8255);
+	m_i8255->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_i8255->out_pb_callback().set(FUNC(segas16a_state::misc_control_w));
+	m_i8255->out_pc_callback().set(FUNC(segas16a_state::tilemap_sound_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2000,48 +2005,47 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16a_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SEGA_SYS16A_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16A_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16a)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas16a)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(segas16a_state, n7751_control_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, segas16a_state, n7751_control_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.43)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1089a)
 	system16a(config);
-	MCFG_CPU_REPLACE("maincpu", FD1089A, 10000000)
-	MCFG_CPU_PROGRAM_MAP(system16a_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1089A, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(system16a_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1089b)
 	system16a(config);
-	MCFG_CPU_REPLACE("maincpu", FD1089B, 10000000)
-	MCFG_CPU_PROGRAM_MAP(system16a_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1089B, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(system16a_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1094)
 	system16a(config);
-	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
-	MCFG_CPU_PROGRAM_MAP(system16a_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1094, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(system16a_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::aceattaca_fd1094)
@@ -2052,35 +2056,37 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_i8751)
 	system16a(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, i8751_main_cpu_vblank)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_REMOVE()
 
-	MCFG_CPU_ADD("mcu", I8751, 8000000)
-	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(segas16a_state, mcu_control_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, mcu_irq_assert)
+	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, segas16a_state, mcu_control_w))
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, segas16a_state, i8751_main_cpu_vblank_w))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(segas16a_state::system16a_no7751)
 	system16a(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_no7751p)
 	system16a_no7751(config);
-	MCFG_CPU_REPLACE("soundcpu", SEGA_315_5177, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_no7751_portmap)
-	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("soundcpu", SEGA_315_5177, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_no7751_portmap)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":sound_decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -2091,47 +2097,47 @@ static MACHINE_CONFIG_START( system16a_i8751_no7751 )
     MCFG_DEVICE_REMOVE("dac")
     MCFG_DEVICE_REMOVE("vref")
 
-    MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+    MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 */
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1089a_no7751)
 	system16a_fd1089a(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1089b_no7751)
 	system16a_fd1089b(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1094_no7751)
 	system16a_fd1094(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -3843,7 +3849,7 @@ ROM_END
 //  init_generic - common initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16a_state,generic)
+void segas16a_state::init_generic()
 {
 	// configure the NVRAM to point to our workram
 	m_nvram->set_base(m_workram, m_workram.bytes());
@@ -3868,47 +3874,47 @@ DRIVER_INIT_MEMBER(segas16a_state,generic)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16a_state,aceattaca)
+void segas16a_state::init_aceattaca()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::aceattaca_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16a_state::aceattaca_custom_io_w), this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,dumpmtmt)
+void segas16a_state::init_dumpmtmt()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16a_state::dumpmtmt_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,mjleague)
+void segas16a_state::init_mjleague()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::mjleague_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,passsht16a)
+void segas16a_state::init_passsht16a()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::passsht16a_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,quartet)
+void segas16a_state::init_quartet()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16a_state::quartet_i8751_sim, this);
 }
 
 
-DRIVER_INIT_MEMBER(segas16a_state,sdi)
+void segas16a_state::init_sdi()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sdi_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,sjryukoa)
+void segas16a_state::init_sjryukoa()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sjryuko_custom_io_r), this);
 	m_lamp_changed_w = lamp_changed_delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
 }
@@ -3921,61 +3927,61 @@ DRIVER_INIT_MEMBER(segas16a_state,sjryukoa)
 
 //    YEAR, NAME,       PARENT,   MACHINE,                  INPUT,      INIT,                            MONITOR,COMPANY,FULLNAME,FLAGS
 // "Pre-System 16"
-GAME( 1986, bodyslam,   0,        system16a_i8751,          bodyslam,   segas16a_state,generic,     ROT0,   "Sega", "Body Slam (8751 317-0015)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dumpmtmt,   bodyslam, system16a_i8751,          bodyslam,   segas16a_state,dumpmtmt,    ROT0,   "Sega", "Dump Matsumoto (Japan, 8751 317-0011a)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bodyslam,   0,        system16a_i8751,          bodyslam,        segas16a_state,            init_generic,     ROT0,   "Sega", "Body Slam (8751 317-0015)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dumpmtmt,   bodyslam, system16a_i8751,          bodyslam,        segas16a_state,            init_dumpmtmt,    ROT0,   "Sega", "Dump Matsumoto (Japan, 8751 317-0011a)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, mjleague,   0,        system16a,                mjleague,   segas16a_state,mjleague,    ROT270, "Sega", "Major League", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, mjleague,   0,        system16a,                mjleague,        segas16a_state,            init_mjleague,    ROT270, "Sega", "Major League", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, quartet,    0,        system16a_i8751,          quartet,    segas16a_state,quartet,     ROT0,   "Sega", "Quartet (Rev A, 8751 315-5194)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quartet,    0,        system16a_i8751,          quartet,         segas16a_state,            init_quartet,     ROT0,   "Sega", "Quartet (Rev A, 8751 315-5194)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, quarteta,   quartet,  system16a_i8751,          quartet,    segas16a_state,quartet,     ROT0,   "Sega", "Quartet (8751 315-5194)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, quartet2,   quartet,  system16a_i8751,          quart2,     segas16a_state,generic,     ROT0,   "Sega", "Quartet 2 (8751 317-0010)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, quartet2a,  quartet,  system16a,                quart2,     segas16a_state,generic,     ROT0,   "Sega", "Quartet 2 (unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quarteta,   quartet,  system16a_i8751,          quartet,         segas16a_state,            init_quartet,     ROT0,   "Sega", "Quartet (8751 315-5194)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quartet2,   quartet,  system16a_i8751,          quart2,          segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet 2 (8751 317-0010)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quartet2a,  quartet,  system16a,                quart2,          segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet 2 (unprotected)", MACHINE_SUPPORTS_SAVE )
 
 // System 16A
-GAME( 1987, aliensyn5,  aliensyn, system16a_fd1089b,        aliensyn,   segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, aliensyn2,  aliensyn, system16a_fd1089a,        aliensyn,   segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, aliensynjo, aliensyn, system16a_fd1089a,        aliensynj,  segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 1, Japan, old, System 16A, FD1089A 317-0033)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, aliensyn5,  aliensyn, system16a_fd1089b,        aliensyn,        segas16a_state,            init_generic,     ROT0,   "Sega", "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, aliensyn2,  aliensyn, system16a_fd1089a,        aliensyn,        segas16a_state,            init_generic,     ROT0,   "Sega", "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, aliensynjo, aliensyn, system16a_fd1089a,        aliensynj,       segas16a_state,            init_generic,     ROT0,   "Sega", "Alien Syndrome (set 1, Japan, old, System 16A, FD1089A 317-0033)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, aceattaca,  aceattac, aceattaca_fd1094,         aceattaca,  segas16a_state,aceattaca,   ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, aceattaca,  aceattac, aceattaca_fd1094,         aceattaca,       segas16a_state,            init_aceattaca,   ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, afighter,    0,        system16a_fd1089a_no7751, afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, afightera,   afighter, system16a_no7751,         afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, afighterb,   afighter, system16a_no7751,         afighter_analog,   afighter_16a_analog_state,generic,     ROT270, "Sega", "Action Fighter (unprotected, analog controls)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, afighterc,   afighter, system16a_fd1089b_no7751, afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (FD1089B 317-unknown)", MACHINE_SUPPORTS_SAVE ) // encrypted version of afightera (maybe 317-0017)
-GAME( 1986, afighterd,   afighter, system16a_fd1089b_no7751, afighter_analog,   afighter_16a_analog_state,generic,     ROT270, "Sega", "Action Fighter (FD1089B 317-unknown, analog controls)", MACHINE_SUPPORTS_SAVE ) // encrypted version of afighterb
+GAME( 1986, afighter,   0,        system16a_fd1089a_no7751, afighter,        segas16a_state,            init_generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, afightera,  afighter, system16a_no7751,         afighter,        segas16a_state,            init_generic,     ROT270, "Sega", "Action Fighter (unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, afighterb,  afighter, system16a_no7751,         afighter_analog, afighter_16a_analog_state, init_generic,     ROT270, "Sega", "Action Fighter (unprotected, analog controls)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, afighterc,  afighter, system16a_fd1089b_no7751, afighter,        segas16a_state,            init_generic,     ROT270, "Sega", "Action Fighter (FD1089B 317-unknown)", MACHINE_SUPPORTS_SAVE ) // encrypted version of afightera (maybe 317-0017)
+GAME( 1986, afighterd,  afighter, system16a_fd1089b_no7751, afighter_analog, afighter_16a_analog_state, init_generic,     ROT270, "Sega", "Action Fighter (FD1089B 317-unknown, analog controls)", MACHINE_SUPPORTS_SAVE ) // encrypted version of afighterb
 
-GAME( 1986, alexkidd,   0,        system16a,                alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 2, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, alexkidd,   0,        system16a,                alexkidd,        segas16a_state,            init_generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 2, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,        segas16a_state,            init_generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, fantzonep,  fantzone, system16a_no7751p,        fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (317-5000)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad / missing gfx roms
+GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, fantzonep,  fantzone, system16a_no7751p,        fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (317-5000)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad / missing gfx roms
 
-GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a, segas16a_state,passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A) (FD1094 317-0071)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a,      segas16a_state,            init_passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A) (FD1094 317-0071)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, sdi,        0,        system16a_fd1089b_no7751, sdi,        segas16a_state,sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, newer, System 16A, FD1089B 317-0027)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sdia,     sdi,        system16a_fd1089b_no7751, sdi,        segas16a_state,sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sdi,        0,        system16a_fd1089b_no7751, sdi,             segas16a_state,            init_sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, newer, System 16A, FD1089B 317-0027)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sdia,       sdi,      system16a_fd1089b_no7751, sdi,             segas16a_state,            init_sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, shinobi,    0,        system16a,                shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 6, System 16A) (unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, shinobi1,   shinobi,  system16a_fd1094,         shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 1, System 16A) (FD1094 317-0050)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, shinobls,   shinobi,  system16a,                shinobi,    segas16a_state,generic,     ROT0,   "bootleg (Star)", "Shinobi (Star bootleg, System 16A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, shinoblb,   shinobi,  system16a,                shinobi,    segas16a_state,generic,     ROT0,   "bootleg (Beta)", "Shinobi (Beta bootleg)", MACHINE_SUPPORTS_SAVE ) // should have different sound hw? using original ATM
+GAME( 1987, shinobi,    0,        system16a,                shinobi,         segas16a_state,            init_generic,     ROT0,   "Sega", "Shinobi (set 6, System 16A) (unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, shinobi1,   shinobi,  system16a_fd1094,         shinobi,         segas16a_state,            init_generic,     ROT0,   "Sega", "Shinobi (set 1, System 16A) (FD1094 317-0050)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, shinobls,   shinobi,  system16a,                shinobi,         segas16a_state,            init_generic,     ROT0,   "bootleg (Star)", "Shinobi (Star bootleg, System 16A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, shinoblb,   shinobi,  system16a,                shinobi,         segas16a_state,            init_generic,     ROT0,   "bootleg (Beta)", "Shinobi (Beta bootleg)", MACHINE_SUPPORTS_SAVE ) // should have different sound hw? using original ATM
 
-GAME( 1987, sjryuko1,   sjryuko,  system16a_fd1089b,        sjryuko,    segas16a_state,sjryukoa,    ROT0,   "White Board", "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sjryuko1,   sjryuko,  system16a_fd1089b,        sjryuko,         segas16a_state,            init_sjryukoa,    ROT0,   "White Board", "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, tetris,     0,        system16a_fd1094_no7751,  tetris,     segas16a_state,generic,     ROT0,   "Sega", "Tetris (set 4, Japan, System 16A) (FD1094 317-0093)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetris3,    tetris,   system16a_fd1094_no7751,  tetris,     segas16a_state,generic,     ROT0,   "Sega", "Tetris (set 3, Japan, System 16A) (FD1094 317-0093a)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetris,     0,        system16a_fd1094_no7751,  tetris,          segas16a_state,            init_generic,     ROT0,   "Sega", "Tetris (set 4, Japan, System 16A) (FD1094 317-0093)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetris3,    tetris,   system16a_fd1094_no7751,  tetris,          segas16a_state,            init_generic,     ROT0,   "Sega", "Tetris (set 3, Japan, System 16A) (FD1094 317-0093a)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, timescan1,  timescan, system16a_fd1089b,        timescan,   segas16a_state,generic,     ROT270, "Sega", "Time Scanner (set 1, System 16A, FD1089B 317-0024)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, timescan1,  timescan, system16a_fd1089b,        timescan,        segas16a_state,            init_generic,     ROT270, "Sega", "Time Scanner (set 1, System 16A, FD1089B 317-0024)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, wb31,       wb3,      system16a_fd1094_no7751,  wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, Japan, System 16A) (FD1094 317-0084)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, wb35,       wb3,      system16a_fd1089a_no7751, wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, Japan, System 16A) (FD1089A 317-0086)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, wb31,       wb3,      system16a_fd1094_no7751,  wb3,             segas16a_state,            init_generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, Japan, System 16A) (FD1094 317-0084)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, wb35,       wb3,      system16a_fd1089a_no7751, wb3,             segas16a_state,            init_generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, Japan, System 16A) (FD1089A 317-0086)", MACHINE_SUPPORTS_SAVE )
 
 
-GAME( 1988, wb31d,     wb3,      system16a_no7751,  wb3,        segas16a_state,generic,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 1, Japan, System 16A) (bootleg of FD1094 317-0084 set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, wb35d,     wb3,      system16a_no7751,  wb3,        segas16a_state,generic,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 5, Japan, System 16A) (bootleg of FD1089A 317-0086 set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, shinobi1d, shinobi,  system16a,         shinobi,    segas16a_state,generic,     ROT0,   "bootleg", "Shinobi (set 1, System 16A) (bootleg of FD1094 317-0050 set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetrisd,   tetris,   system16a_no7751,  tetris,     segas16a_state,generic,     ROT0,   "bootleg", "Tetris (set 4, Japan, System 16A) (bootleg of FD1094 317-0093 set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetris3d,  tetris,   system16a_no7751,  tetris,     segas16a_state,generic,     ROT0,   "bootleg", "Tetris (set 3, Japan, System 16A) (bootleg of FD1094 317-0093a set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, wb31d,      wb3,      system16a_no7751,         wb3,             segas16a_state,            init_generic,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 1, Japan, System 16A) (bootleg of FD1094 317-0084 set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, wb35d,      wb3,      system16a_no7751,         wb3,             segas16a_state,            init_generic,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 5, Japan, System 16A) (bootleg of FD1089A 317-0086 set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, shinobi1d,  shinobi,  system16a,                shinobi,         segas16a_state,            init_generic,     ROT0,   "bootleg", "Shinobi (set 1, System 16A) (bootleg of FD1094 317-0050 set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetrisd,    tetris,   system16a_no7751,         tetris,          segas16a_state,            init_generic,     ROT0,   "bootleg", "Tetris (set 4, Japan, System 16A) (bootleg of FD1094 317-0093 set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetris3d,   tetris,   system16a_no7751,         tetris,          segas16a_state,            init_generic,     ROT0,   "bootleg", "Tetris (set 3, Japan, System 16A) (bootleg of FD1094 317-0093a set)", MACHINE_SUPPORTS_SAVE )

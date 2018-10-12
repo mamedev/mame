@@ -12,7 +12,7 @@
 #include "m6509.h"
 #include "m6509d.h"
 
-DEFINE_DEVICE_TYPE(M6509, m6509_device, "m6509", "M6509")
+DEFINE_DEVICE_TYPE(M6509, m6509_device, "m6509", "MOS Technology M6509")
 
 m6509_device::m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6509, tag, owner, clock), bank_i(0), bank_y(0)
@@ -25,7 +25,7 @@ m6509_device::m6509_device(const machine_config &mconfig, const char *tag, devic
 
 void m6509_device::device_start()
 {
-	if(direct_disabled)
+	if(cache_disabled)
 		mintf = std::make_unique<mi_6509_nd>(this);
 	else
 		mintf = std::make_unique<mi_6509_normal>(this);
@@ -50,9 +50,9 @@ offs_t m6509_device::pc_to_external(u16 pc)
 	return adr_in_bank_i(pc);
 }
 
-util::disasm_interface *m6509_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6509_device::create_disassembler()
 {
-	return new m6509_disassembler;
+	return std::make_unique<m6509_disassembler>();
 }
 
 m6509_device::mi_6509_normal::mi_6509_normal(m6509_device *_base)
@@ -72,7 +72,7 @@ uint8_t m6509_device::mi_6509_normal::read(uint16_t adr)
 
 uint8_t m6509_device::mi_6509_normal::read_sync(uint16_t adr)
 {
-	uint8_t res = sdirect->read_byte(base->adr_in_bank_i(adr));
+	uint8_t res = scache->read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)
@@ -82,7 +82,7 @@ uint8_t m6509_device::mi_6509_normal::read_sync(uint16_t adr)
 
 uint8_t m6509_device::mi_6509_normal::read_arg(uint16_t adr)
 {
-	uint8_t res = direct->read_byte(base->adr_in_bank_i(adr));
+	uint8_t res = cache->read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)

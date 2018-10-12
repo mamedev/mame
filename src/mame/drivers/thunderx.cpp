@@ -402,63 +402,70 @@ WRITE8_MEMBER(thunderx_state::k052109_051960_w)
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(thunderx_state::scontra_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)       /* video RAM + sprite RAM */
+void thunderx_state::scontra_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rw(FUNC(thunderx_state::k052109_051960_r), FUNC(thunderx_state::k052109_051960_w));       /* video RAM + sprite RAM */
 
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(scontra_bankswitch_w) /* bankswitch control + coin counters */
-	AM_RANGE(0x1f84, 0x1f84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(sh_irqtrigger_w)     /* cause interrupt on audio CPU */
-	AM_RANGE(0x1f8c, 0x1f8c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
-	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
-	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
-	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE(_1f98_r, scontra_1f98_w)
+	map(0x1f80, 0x1f80).w(FUNC(thunderx_state::scontra_bankswitch_w)); /* bankswitch control + coin counters */
+	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x1f88, 0x1f88).w(FUNC(thunderx_state::sh_irqtrigger_w));     /* cause interrupt on audio CPU */
+	map(0x1f8c, 0x1f8c).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1f90, 0x1f90).portr("SYSTEM");
+	map(0x1f91, 0x1f91).portr("P1");
+	map(0x1f92, 0x1f92).portr("P2");
+	map(0x1f93, 0x1f93).portr("DSW3");
+	map(0x1f94, 0x1f94).portr("DSW1");
+	map(0x1f95, 0x1f95).portr("DSW2");
+	map(0x1f98, 0x1f98).rw(FUNC(thunderx_state::_1f98_r), FUNC(thunderx_state::scontra_1f98_w));
 
-	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_DEVICE("bank5800", address_map_bank_device, amap8)  /* palette + work RAM + PMC */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x4000, 0x57ff).ram();
+	map(0x5800, 0x5fff).m(m_bank5800, FUNC(address_map_bank_device::amap8));  /* palette + work RAM + PMC */
+	map(0x6000, 0x7fff).bankr("rombank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(thunderx_state::thunderx_map)
-	AM_IMPORT_FROM(scontra_map)
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(thunderx_videobank_w)
-	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE(_1f98_r, thunderx_1f98_w) /* registers */
-ADDRESS_MAP_END
+void thunderx_state::thunderx_map(address_map &map)
+{
+	scontra_map(map);
+	map(0x1f80, 0x1f80).w(FUNC(thunderx_state::thunderx_videobank_w));
+	map(0x1f98, 0x1f98).rw(FUNC(thunderx_state::_1f98_r), FUNC(thunderx_state::thunderx_1f98_w)); /* registers */
+}
 
-ADDRESS_MAP_START(thunderx_state::gbusters_map)
-	AM_IMPORT_FROM(scontra_map)
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_videobank_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(thunderx_state::scontra_bank5800_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(thunderx_state::thunderx_bank5800_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(pmc_r, pmc_w) AM_SHARE("pmcram")
-ADDRESS_MAP_END
+void thunderx_state::gbusters_map(address_map &map)
+{
+	scontra_map(map);
+	map(0x1f80, 0x1f80).w(FUNC(thunderx_state::gbusters_videobank_w));
+}
 
 
-ADDRESS_MAP_START(thunderx_state::thunderx_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-ADDRESS_MAP_END
+void thunderx_state::scontra_bank5800_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x0800, 0x0fff).ram();
+}
 
-ADDRESS_MAP_START(thunderx_state::scontra_sound_map)
-	AM_IMPORT_FROM(thunderx_sound_map)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(k007232_bankswitch_w)
-ADDRESS_MAP_END
+void thunderx_state::thunderx_bank5800_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x0800, 0x0fff).ram();
+	map(0x1000, 0x17ff).rw(FUNC(thunderx_state::pmc_r), FUNC(thunderx_state::pmc_w)).share("pmcram");
+}
+
+
+void thunderx_state::thunderx_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+}
+
+void thunderx_state::scontra_sound_map(address_map &map)
+{
+	thunderx_sound_map(map);
+	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xf000, 0xf000).w(FUNC(thunderx_state::k007232_bankswitch_w));
+}
 
 /***************************************************************************
 
@@ -634,21 +641,16 @@ void thunderx_state::machine_reset()
 MACHINE_CONFIG_START(thunderx_state::scontra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)     /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(scontra_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)     /* 052001 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(scontra_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thunderx_state,  vblank_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(scontra_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(scontra_sound_map)
 
-	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(scontra_bank5800_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+	ADDRESS_MAP_BANK(config, m_bank5800).set_map(&thunderx_state::scontra_bank5800_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -673,16 +675,16 @@ MACHINE_CONFIG_START(thunderx_state::scontra)
 	MCFG_K051960_CB(thunderx_state, sprite_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(thunderx_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, thunderx_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -690,7 +692,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER( thunderx_state::banking_callback )
 {
-	//logerror("thunderx %04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), data);
+	//logerror("%s thunderx bank select %02x\n", machine().describe_context(), data);
 	m_rombank->set_entry(data & 0x0f);
 }
 
@@ -699,15 +701,13 @@ MACHINE_CONFIG_START(thunderx_state::thunderx)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(thunderx_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(thunderx_state, banking_callback))
+	MCFG_DEVICE_PROGRAM_MAP(thunderx_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, thunderx_state, banking_callback))
 
 	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(thunderx_sound_map)
+	MCFG_DEVICE_PROGRAM_MAP(thunderx_sound_map)
 
-	MCFG_DEVICE_MODIFY("bank5800")
-	MCFG_DEVICE_PROGRAM_MAP(thunderx_bank5800_map)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
+	m_bank5800->set_map(&thunderx_state::thunderx_bank5800_map).set_addr_width(13);
 
 	MCFG_DEVICE_REMOVE("k007232")
 MACHINE_CONFIG_END
@@ -717,8 +717,8 @@ MACHINE_CONFIG_START(thunderx_state::gbusters)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052526 */
-	MCFG_CPU_PROGRAM_MAP(gbusters_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(thunderx_state, banking_callback))
+	MCFG_DEVICE_PROGRAM_MAP(gbusters_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, thunderx_state, banking_callback))
 
 	MCFG_DEVICE_MODIFY("k052109")
 	MCFG_K052109_CB(thunderx_state, gbusters_tile_callback)
@@ -1037,19 +1037,19 @@ ROM_START( crazycop )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(thunderx_state, thunderx)
+void thunderx_state::init_thunderx()
 {
 	m_thunderx_firq_timer = timer_alloc(TIMER_THUNDERX_FIRQ);
 }
 
 /***************************************************************************/
 
-GAME( 1988, scontra,   0,        scontra,  scontra,  thunderx_state, 0,        ROT90, "Konami", "Super Contra",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, scontraj,  scontra,  scontra,  scontra,  thunderx_state, 0,        ROT90, "Konami", "Super Contra (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gbusters,  0,        gbusters, gbusters, thunderx_state, 0,        ROT90, "Konami", "Gang Busters (set 1)",  MACHINE_SUPPORTS_SAVE ) // N02 & J03 program ROMs
-GAME( 1988, gbustersa, gbusters, gbusters, gbusters, thunderx_state, 0,        ROT90, "Konami", "Gang Busters (set 2)",  MACHINE_SUPPORTS_SAVE ) // unknown region program ROMs
-GAME( 1988, crazycop,  gbusters, gbusters, gbusters, thunderx_state, 0,        ROT90, "Konami", "Crazy Cop (Japan)",     MACHINE_SUPPORTS_SAVE ) // M02 & J03 program ROMs
+GAME( 1988, scontra,   0,        scontra,  scontra,  thunderx_state, empty_init,    ROT90, "Konami", "Super Contra",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, scontraj,  scontra,  scontra,  scontra,  thunderx_state, empty_init,    ROT90, "Konami", "Super Contra - Alien no Gyakushuu (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, init_thunderx, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, init_thunderx, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, init_thunderx, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, thunderx_state, init_thunderx, ROT0,  "Konami", "Thunder Cross (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gbusters,  0,        gbusters, gbusters, thunderx_state, empty_init,    ROT90, "Konami", "Gang Busters (set 1)",  MACHINE_SUPPORTS_SAVE ) // N02 & J03 program ROMs
+GAME( 1988, gbustersa, gbusters, gbusters, gbusters, thunderx_state, empty_init,    ROT90, "Konami", "Gang Busters (set 2)",  MACHINE_SUPPORTS_SAVE ) // unknown region program ROMs
+GAME( 1988, crazycop,  gbusters, gbusters, gbusters, thunderx_state, empty_init,    ROT90, "Konami", "Crazy Cop (Japan)",     MACHINE_SUPPORTS_SAVE ) // M02 & J03 program ROMs

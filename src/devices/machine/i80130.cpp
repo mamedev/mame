@@ -19,15 +19,17 @@
 DEFINE_DEVICE_TYPE(I80130, i80130_device, "i80130", "I80130")
 
 
-ADDRESS_MAP_START(i80130_device::rom_map)
+void i80130_device::rom_map(address_map &map)
+{
 	//AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("rom", 0)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(i80130_device::io_map)
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(io_r, io_w)
+void i80130_device::io_map(address_map &map)
+{
+	map(0x00, 0x0f).rw(FUNC(i80130_device::io_r), FUNC(i80130_device::io_w));
 	//AM_RANGE(0x00, 0x01) AM_MIRROR(0x2) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
 	//AM_RANGE(0x08, 0x0f) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+}
 
 READ16_MEMBER( i80130_device::io_r )
 {
@@ -38,14 +40,14 @@ READ16_MEMBER( i80130_device::io_r )
 	case 0: case 1:
 		if (ACCESSING_BITS_0_7)
 		{
-			data = m_pic->read(space, offset & 0x01);
+			data = m_pic->read(offset & 0x01);
 		}
 		break;
 
 	case 4: case 5: case 6: case 7:
 		if (ACCESSING_BITS_0_7)
 		{
-			data = m_pit->read(space, offset & 0x03);
+			data = m_pit->read(offset & 0x03);
 		}
 		break;
 	}
@@ -60,14 +62,14 @@ WRITE16_MEMBER( i80130_device::io_w )
 	case 0: case 1:
 		if (ACCESSING_BITS_0_7)
 		{
-			m_pic->write(space, offset & 0x01, data & 0xff);
+			m_pic->write(offset & 0x01, data & 0xff);
 		}
 		break;
 
 	case 4: case 5: case 6: case 7:
 		if (ACCESSING_BITS_0_7)
 		{
-			m_pit->write(space, offset & 0x03, data & 0xff);
+			m_pit->write(offset & 0x03, data & 0xff);
 		}
 		break;
 	}
@@ -100,15 +102,15 @@ const tiny_rom_entry *i80130_device::device_rom_region() const
 
 MACHINE_CONFIG_START(i80130_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(i80130_device, irq_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, i80130_device, irq_w))
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(i80130_device, systick_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, i80130_device, systick_w))
 	MCFG_PIT8253_CLK1(0)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(i80130_device, delay_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, i80130_device, delay_w))
 	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(i80130_device, baud_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, i80130_device, baud_w))
 MACHINE_CONFIG_END
 
 

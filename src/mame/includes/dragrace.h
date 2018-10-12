@@ -13,6 +13,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Discrete Sound Input Nodes */
@@ -48,11 +49,9 @@ public:
 
 	void dragrace(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(speed1_w);
 	DECLARE_WRITE8_MEMBER(speed2_w);
-	DECLARE_WRITE_LINE_MEMBER(p1_start_w);
-	DECLARE_WRITE_LINE_MEMBER(p2_start_w);
 	DECLARE_READ8_MEMBER(dragrace_input_r);
 	DECLARE_READ8_MEMBER(dragrace_steering_r);
 	DECLARE_READ8_MEMBER(dragrace_scanline_r);
@@ -67,7 +66,6 @@ protected:
 	virtual void video_start() override;
 	void dragrace_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
 	required_shared_ptr<uint8_t> m_position_ram;
@@ -87,6 +85,6 @@ private:
 };
 
 /*----------- defined in audio/dragrace.c -----------*/
-DISCRETE_SOUND_EXTERN( dragrace );
+DISCRETE_SOUND_EXTERN( dragrace_discrete );
 
 #endif // MAME_INCLUDES_DRAGRACE_H

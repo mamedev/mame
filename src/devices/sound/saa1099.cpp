@@ -201,6 +201,19 @@ void saa1099_device::device_start()
 
 
 //-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void saa1099_device::device_clock_changed()
+{
+	m_master_clock = clock();
+	m_sample_rate = clock() / 256;
+
+	m_stream->set_sample_rate(m_sample_rate);
+}
+
+
+//-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 

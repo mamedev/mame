@@ -42,7 +42,6 @@
 void atarigx2_state::update_interrupts()
 {
 	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(5, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -63,7 +62,6 @@ void atarigx2_state::machine_reset()
 READ32_MEMBER(atarigx2_state::special_port2_r)
 {
 	int temp = ioport("SERVICE")->read();
-	temp ^= 0x0008;     /* A2D.EOC always high for now */
 	return (temp << 16) | temp;
 }
 
@@ -76,21 +74,12 @@ READ32_MEMBER(atarigx2_state::special_port3_r)
 
 
 
-READ32_MEMBER(atarigx2_state::a2d_data_r)
+READ8_MEMBER(atarigx2_state::a2d_data_r)
 {
-	switch (offset)
-	{
-		case 0:
-			return (ioport("A2D0")->read() << 24) | (ioport("A2D1")->read() << 8);
-		case 1:
-			return (ioport("A2D2")->read() << 24) | (ioport("A2D3")->read() << 8);
-		case 2:
-			return (ioport("A2D4")->read() << 24) | (ioport("A2D5")->read() << 8);
-		case 3:
-			return (ioport("A2D6")->read() << 24) | (ioport("A2D7")->read() << 8);
-	}
-
-	return 0;
+	uint8_t result = m_adc->data_r(space, 0);
+	if (!machine().side_effects_disabled())
+		m_adc->address_offset_start_w(space, offset, 0);
+	return result;
 }
 
 
@@ -1196,29 +1185,30 @@ READ32_MEMBER( atarigx2_state::rrreveng_prot_r )
  *
  *************************************/
 
-ADDRESS_MAP_START(atarigx2_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc80000, 0xc80fff) AM_RAM
-	AM_RANGE(0xd00000, 0xd1ffff) AM_READ(a2d_data_r)
-	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xff00ff00)
-	AM_RANGE(0xd40000, 0xd40fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
-	AM_RANGE(0xd72000, 0xd75fff) AM_DEVWRITE("playfield", tilemap_device, write32) AM_SHARE("playfield")
-	AM_RANGE(0xd76000, 0xd76fff) AM_DEVWRITE("alpha", tilemap_device, write32) AM_SHARE("alpha")
-	AM_RANGE(0xd78000, 0xd78fff) AM_RAM AM_SHARE("rle")
-	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-	AM_RANGE(0xd80000, 0xd9ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write32)
-	AM_RANGE(0xe06000, 0xe06003) AM_DEVWRITE8("jsa", atari_jsa_iiis_device, main_command_w, 0xff000000)
-	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
-	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE16(video_int_ack_w, 0xffffffff)
-	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITENOP//watchdog_reset_w },
-	AM_RANGE(0xe80000, 0xe80003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xe82000, 0xe82003) AM_READ(special_port2_r)
-	AM_RANGE(0xe82004, 0xe82007) AM_READ(special_port3_r)
-	AM_RANGE(0xe86000, 0xe86003) AM_DEVREAD8("jsa", atari_jsa_iiis_device, main_response_r, 0xff000000)
-	AM_RANGE(0xff8000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void atarigx2_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).rom();
+	map(0xc80000, 0xc80fff).ram();
+	map(0xd00000, 0xd0000f).r(FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
+	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
+	map(0xd40000, 0xd40fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xd70000, 0xd7ffff).ram();
+	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
+	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
+	map(0xd78000, 0xd78fff).ram().share("rle");
+	map(0xd7a200, 0xd7a203).w(FUNC(atarigx2_state::mo_command_w)).share("mo_command");
+	map(0xd80000, 0xd9ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
+	map(0xe06000, 0xe06000).w(m_jsa, FUNC(atari_jsa_iiis_device::main_command_w));
+	map(0xe08000, 0xe08003).w(FUNC(atarigx2_state::latch_w));
+	map(0xe0c000, 0xe0c003).w(FUNC(atarigx2_state::video_int_ack_w));
+	map(0xe0e000, 0xe0e003).nopw();//watchdog_reset_w },
+	map(0xe80000, 0xe80003).portr("P1_P2");
+	map(0xe82000, 0xe82003).r(FUNC(atarigx2_state::special_port2_r));
+	map(0xe82004, 0xe82007).r(FUNC(atarigx2_state::special_port3_r));
+	map(0xe86000, 0xe86000).r(m_jsa, FUNC(atari_jsa_iiis_device::main_response_r));
+	map(0xff8000, 0xffffff).ram();
+}
 
 
 
@@ -1236,10 +1226,10 @@ static INPUT_PORTS_START( spclords )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   /* Co-Pilot Right Thumb (P2 Nuke) */
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   /* Co-Pilot Right Trigger (P2 Laser)*/
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)   /* Pilot Throttle reverse */
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_SPECIAL )                  /* TODO: RIGHT of DOUBLE */
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_SPECIAL )                  /* TODO: DOUBLE SYSTEM */
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_CUSTOM )                  /* TODO: RIGHT of DOUBLE */
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_CUSTOM )                  /* TODO: DOUBLE SYSTEM */
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )                  /* TODO: 4 COIN COUNTERS */
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM )                  /* TODO: 4 COIN COUNTERS */
 	PORT_BIT( 0x00ff0000, IP_ACTIVE_LOW, IPT_UNUSED )                   /* Freeze / Unfreeze */
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_START2 )                   /* Co-Pilot BLUE button (P2 Start / Cloak) */
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)   /* Pilot Left Thumb (P1 Nuke) */
@@ -1251,8 +1241,8 @@ static INPUT_PORTS_START( spclords )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SERVICE")      /* 68.STATUS (A2=0) */
-	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* A2D.EOC */
+	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_CUSTOM )  /* +5V */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r) // A2D.EOC
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa") // /AUDIRQ
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") // /AUDFULL
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
@@ -1260,28 +1250,28 @@ static INPUT_PORTS_START( spclords )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")     /* 68.STATUS (A2=1) */
-	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XFULL */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SERVICER */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SER.L */
-	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_CUSTOM )  /* +5V */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XIRQ */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XFULL */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /SERVICER */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /SER.L */
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_CUSTOM )  /* +5V */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A2D0")      /* A2D @ 0xD00000 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A2D1")      /* A2D @ 0xD00002 */
-	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) // Pilot L/R
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) // Co-Pilot U/D
 
 	PORT_START("A2D2")      /* A2D @ 0xD00004 */
-	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) // Pilot U/D
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) // Pilot L/R
 
 	PORT_START("A2D3")      /* A2D @ 0xD00006 */
-	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) // Co-Pilot L/R
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) // Pilot U/D
 
 	PORT_START("A2D4")      /* A2D @ 0xD00008 */
-	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) // Co-Pilot U/D
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) // Co-Pilot L/R
 
 	PORT_START("A2D5")      /* A2D @ 0xD0000A */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1306,7 +1296,7 @@ static INPUT_PORTS_START( motofren )
 
 	PORT_START("SERVICE")       /* 68.STATUS (A2=0) */
 	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_UNUSED )   /* +5V */
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* A2D.EOC */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r) // A2D.EOC
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa") // /AUDIRQ
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") // /AUDFULL
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
@@ -1314,22 +1304,22 @@ static INPUT_PORTS_START( motofren )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")       /* 68.STATUS (A2=1) */
-	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XFULL */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SERVICER */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SER.L */
-	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_CUSTOM )  /* +5V */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XIRQ */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XFULL */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /SERVICER */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /SER.L */
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_CUSTOM )  /* +5V */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A2D0")      /* A2D @ 0xD00000 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_NAME("Throttle") PORT_REVERSE
-
-	PORT_START("A2D1")      /* A2D @ 0xD00002 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("A2D2")      /* A2D @ 0xD00004 */
+	PORT_START("A2D1")      /* A2D @ 0xD00002 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE
+
+	PORT_START("A2D2")      /* A2D @ 0xD00004 */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_NAME("Throttle") PORT_REVERSE
 
 	PORT_START("A2D3")      /* A2D @ 0xD00006 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1363,8 +1353,8 @@ static INPUT_PORTS_START( rrreveng )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SERVICE")       /* 68.STATUS (A2=0) */
-	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* A2D.EOC */
+	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_CUSTOM )  /* +5V */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r) // A2D.EOC
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa") // /AUDIRQ
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") // /AUDFULL
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
@@ -1372,22 +1362,22 @@ static INPUT_PORTS_START( rrreveng )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")       /* 68.STATUS (A2=1) */
-	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XFULL */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SERVICER */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SER.L */
-	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_CUSTOM )  /* +5V */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XIRQ */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XFULL */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /SERVICER */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /SER.L */
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_CUSTOM )  /* +5V */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A2D0")      /* A2D @ 0xD00000 */
-	PORT_BIT ( 0xff, 0x10, IPT_PEDAL ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
-
-	PORT_START("A2D1")      /* A2D @ 0xD00002 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START("A2D1")      /* A2D @ 0xD00002 */
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
 	PORT_START("A2D2")      /* A2D @ 0xD00004 */
-	PORT_BIT ( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x10, IPT_PEDAL ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 	PORT_START("A2D3")      /* A2D @ 0xD00006 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1446,7 +1436,7 @@ static const gfx_layout anlayout =
 	32*8
 };
 
-static GFXDECODE_START( atarigx2 )
+static GFXDECODE_START( gfx_atarigx2 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
@@ -1497,15 +1487,23 @@ static const atari_rle_objects_config modesc_0x400 =
 MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigx2_state, video_int_gen)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	m_adc->in_callback<0>().set_ioport("A2D0");
+	m_adc->in_callback<1>().set_ioport("A2D1");
+	m_adc->in_callback<2>().set_ioport("A2D2");
+	m_adc->in_callback<3>().set_ioport("A2D3");
+	m_adc->in_callback<4>().set_ioport("A2D4");
+	m_adc->in_callback<5>().set_ioport("A2D5");
+	m_adc->in_callback<6>().set_ioport("A2D6");
+	m_adc->in_callback<7>().set_ioport("A2D7");
+
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarigx2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigx2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -1519,11 +1517,13 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarigx2_state, screen_update_atarigx2)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarigx2_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_IIIS_ADD("jsa", WRITELINE(atarigx2_state, sound_int_write_line))
+	MCFG_ATARI_JSA_IIIS_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_5))
 	MCFG_ATARI_JSA_TEST_PORT("SERVICE", 6)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -2251,7 +2251,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarigx2_state,spclords)
+void atarigx2_state::init_spclords()
 {
 	m_playfield_base = 0x000;
 
@@ -2260,7 +2260,7 @@ DRIVER_INIT_MEMBER(atarigx2_state,spclords)
 }
 
 
-DRIVER_INIT_MEMBER(atarigx2_state,motofren)
+void atarigx2_state::init_motofren()
 {
 	m_playfield_base = 0x400;
 /*
@@ -2288,7 +2288,7 @@ XMEM=68.A23*E.A22*!E.A21*68.A20                                 = 1101 xxxx = d0
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atari_xga_device::read),&(*m_xga)), write32_delegate(FUNC(atari_xga_device::write),&(*m_xga)));
 }
 
-DRIVER_INIT_MEMBER(atarigx2_state,rrreveng)
+void atarigx2_state::init_rrreveng()
 {
 	m_playfield_base = 0x000;
 
@@ -2303,16 +2303,16 @@ DRIVER_INIT_MEMBER(atarigx2_state,rrreveng)
  *
  *************************************/
 
-GAME( 1992, spclords,  0,         atarigx2_0x400, spclords, atarigx2_state, spclords, ROT0, "Atari Games", "Space Lords (rev C)", 0 )
-GAME( 1992, spclordsb, spclords,  atarigx2_0x400, spclords, atarigx2_state, spclords, ROT0, "Atari Games", "Space Lords (rev B)", 0 )
-GAME( 1992, spclordsg, spclords,  atarigx2_0x400, spclords, atarigx2_state, spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", 0 )
-GAME( 1992, spclordsa, spclords,  atarigx2_0x400, spclords, atarigx2_state, spclords, ROT0, "Atari Games", "Space Lords (rev A)", 0 )
+GAME( 1992, spclords,  0,         atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev C)", 0 )
+GAME( 1992, spclordsb, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev B)", 0 )
+GAME( 1992, spclordsg, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", 0 )
+GAME( 1992, spclordsa, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A)", 0 )
 
-GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy", 0 )
-GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", 0 )
-GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", 0 )
-GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", 0 )
+GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy", 0 )
+GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", 0 )
+GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", 0 )
+GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", 0 )
 
-GAME( 1993, rrreveng,  0,         atarigx2_0x400, rrreveng, atarigx2_state, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, rrrevenga, rrreveng,  atarigx2_0x400, rrreveng, atarigx2_state, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, rrrevengb, rrreveng,  atarigx2_0x400, rrreveng, atarigx2_state, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, rrreveng,   0,        atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, rrrevenga,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, rrrevengb,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

@@ -473,24 +473,25 @@ WRITE16_MEMBER(kickgoal_state::kickgoal_eeprom_w)
 
 /* Memory Maps *****************************************************************/
 
-ADDRESS_MAP_START(kickgoal_state::kickgoal_program_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+void kickgoal_state::kickgoal_program_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
 /// AM_RANGE(0x30001e, 0x30001f) AM_WRITE(kickgoal_snd_w)
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("SYSTEM")
+	map(0x800000, 0x800001).portr("P1_P2");
+	map(0x800002, 0x800003).portr("SYSTEM");
 /// AM_RANGE(0x800004, 0x800005) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)
-	AM_RANGE(0x800004, 0x800005) AM_WRITE(actionhw_snd_w)
-	AM_RANGE(0x900000, 0x900005) AM_WRITE(kickgoal_eeprom_w)
-	AM_RANGE(0x900006, 0x900007) AM_READ(kickgoal_eeprom_r)
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(kickgoal_fgram_w) AM_SHARE("fgram") /* FG Layer */
-	AM_RANGE(0xa04000, 0xa07fff) AM_RAM_WRITE(kickgoal_bgram_w) AM_SHARE("bgram") /* Higher BG Layer */
-	AM_RANGE(0xa08000, 0xa0bfff) AM_RAM_WRITE(kickgoal_bg2ram_w) AM_SHARE("bg2ram") /* Lower BG Layer */
-	AM_RANGE(0xa0c000, 0xa0ffff) AM_RAM // more tilemap?
-	AM_RANGE(0xa10000, 0xa1000f) AM_WRITEONLY AM_SHARE("scrram") /* Scroll Registers */
-	AM_RANGE(0xb00000, 0xb007ff) AM_WRITEONLY AM_SHARE("spriteram") /* Sprites */
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette */ // actionhw reads this
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x800004, 0x800005).w(FUNC(kickgoal_state::actionhw_snd_w));
+	map(0x900000, 0x900005).w(FUNC(kickgoal_state::kickgoal_eeprom_w));
+	map(0x900006, 0x900007).r(FUNC(kickgoal_state::kickgoal_eeprom_r));
+	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::kickgoal_fgram_w)).share("fgram"); /* FG Layer */
+	map(0xa04000, 0xa07fff).ram().w(FUNC(kickgoal_state::kickgoal_bgram_w)).share("bgram"); /* Higher BG Layer */
+	map(0xa08000, 0xa0bfff).ram().w(FUNC(kickgoal_state::kickgoal_bg2ram_w)).share("bg2ram"); /* Lower BG Layer */
+	map(0xa0c000, 0xa0ffff).ram(); // more tilemap?
+	map(0xa10000, 0xa1000f).writeonly().share("scrram"); /* Scroll Registers */
+	map(0xb00000, 0xb007ff).writeonly().share("spriteram"); /* Sprites */
+	map(0xc00000, 0xc007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette */ // actionhw reads this
+	map(0xff0000, 0xffffff).ram();
+}
 
 
 /* INPUT ports ***************************************************************/
@@ -586,13 +587,13 @@ static const gfx_layout bg3232_charlayout =
 	32*32,
 };
 
-static GFXDECODE_START( kickgoal )
+static GFXDECODE_START( gfx_kickgoal )
 	GFXDECODE_ENTRY( "gfx1", 0, fg88_charlayout,    0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,  0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg3232_charlayout,  0x000, 0x40 )
 GFXDECODE_END
 
-static GFXDECODE_START( actionhw )
+static GFXDECODE_START( gfx_actionhw )
 	GFXDECODE_ENTRY( "gfx1", 0, fg88_alt_charlayout,    0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,      0x000, 0x40 )
 GFXDECODE_END
@@ -626,25 +627,25 @@ void kickgoal_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(kickgoal_state::oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void kickgoal_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kickgoal_state, kickgoal_interrupt,  240)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kickgoal_state, kickgoal_interrupt,  240)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000/4)  /* 3MHz ? */
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000/4)  /* 3MHz ? */
 	MCFG_DEVICE_DISABLE()   /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(kickgoal_default_eeprom_type1, 128)
+	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -655,18 +656,18 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kickgoal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kickgoal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,kickgoal)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 12000000/8, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/8, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -674,16 +675,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kickgoal_state::actionhw)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL(12'000'000)/3)    /* verified on pcb */
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(12'000'000)/3)    /* verified on pcb */
 	MCFG_DEVICE_DISABLE() /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(kickgoal_default_eeprom_type1, 128)
+	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -694,18 +694,18 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", actionhw)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actionhw)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,actionhw)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -721,41 +721,41 @@ ROM_START( kickgoal )
 
 	ROM_REGION( 0x2000, "audiocpu", 0 ) /* sound */
 	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
-	ROM_LOAD( "pic16c57-xt-p_protected.IC18",     0x0000, 0x1fff, BAD_DUMP CRC(9e678719) SHA1(ff8edf149e4c12de620e40eaa42161cd1d08bad0) )
+	ROM_LOAD( "pic16c57-xt-p_protected.ic18",     0x0000, 0x1fff, BAD_DUMP CRC(9e678719) SHA1(ff8edf149e4c12de620e40eaa42161cd1d08bad0) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46_16bit.IC12",     0x00, 0x80, CRC(58f512ff) SHA1(67ffb7e2d817087d8158ee53974e46ec85a3e1ed) )
+	ROM_LOAD( "93c46_16bit.ic12",     0x00, 0x80, CRC(58f512ff) SHA1(67ffb7e2d817087d8158ee53974e46ec85a3e1ed) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "TCH__4.tms27c040.IC33",   0x000000, 0x80000, CRC(5038f52a) SHA1(22ed0e2c8a99056e73cff912731626689996a276) )
-	ROM_LOAD( "TCH__5.tms27c040.IC34",   0x080000, 0x80000, CRC(06e7094f) SHA1(e41b893ef91d541d2623d76ce6c69ecf4218c16d) )
-	ROM_LOAD( "TCH__6.tms27c040.IC35",   0x100000, 0x80000, CRC(ea010563) SHA1(5e474db372550e9d33f933ab00881a9b29a712d1) )
-	ROM_LOAD( "TCH__7.tms27c040.IC36",   0x180000, 0x80000, CRC(b6a86860) SHA1(73ab43830d5e62154bc8953615cdb397c7a742aa) )
+	ROM_LOAD( "tch__4.tms27c040.ic33",   0x000000, 0x80000, CRC(5038f52a) SHA1(22ed0e2c8a99056e73cff912731626689996a276) )
+	ROM_LOAD( "tch__5.tms27c040.ic34",   0x080000, 0x80000, CRC(06e7094f) SHA1(e41b893ef91d541d2623d76ce6c69ecf4218c16d) )
+	ROM_LOAD( "tch__6.tms27c040.ic35",   0x100000, 0x80000, CRC(ea010563) SHA1(5e474db372550e9d33f933ab00881a9b29a712d1) )
+	ROM_LOAD( "tch__7.tms27c040.ic36",   0x180000, 0x80000, CRC(b6a86860) SHA1(73ab43830d5e62154bc8953615cdb397c7a742aa) )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* OKIM6295 samples */
-	ROM_LOAD( "TCH__3.tms27c040.ic13",        0x00000, 0x80000, CRC(51272b0b) SHA1(ba94385183a9d74bb1d5159d2908492bf500f31e) )
+	ROM_LOAD( "tch__3.tms27c040.ic13",        0x00000, 0x80000, CRC(51272b0b) SHA1(ba94385183a9d74bb1d5159d2908492bf500f31e) )
 ROM_END
 
 ROM_START( kickgoala )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "TCH__2.mc27c2001.IC6",  0x000000, 0x40000, CRC(3ce2743a) SHA1(7998c476c8e630487213dd23ef4fec94a95497ca) )
-	ROM_LOAD16_BYTE( "TCH__1.am27c020.IC5",   0x000001, 0x40000, CRC(d7d7f83c) SHA1(4ee66a379a0c7ecb15ee4923ac98ba28bfb1e4bd) )
+	ROM_LOAD16_BYTE( "tch__2.mc27c2001.ic6",  0x000000, 0x40000, CRC(3ce2743a) SHA1(7998c476c8e630487213dd23ef4fec94a95497ca) )
+	ROM_LOAD16_BYTE( "tch__1.am27c020.ic5",   0x000001, 0x40000, CRC(d7d7f83c) SHA1(4ee66a379a0c7ecb15ee4923ac98ba28bfb1e4bd) )
 
 	ROM_REGION( 0x2000, "audiocpu", 0 ) /* sound */
 	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
-	ROM_LOAD( "pic16c57-xt-p_protected.IC18",     0x0000, 0x1fff, BAD_DUMP CRC(9e678719) SHA1(ff8edf149e4c12de620e40eaa42161cd1d08bad0) )
+	ROM_LOAD( "pic16c57-xt-p_protected.ic18",     0x0000, 0x1fff, BAD_DUMP CRC(9e678719) SHA1(ff8edf149e4c12de620e40eaa42161cd1d08bad0) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46_16bit.IC12",     0x00, 0x80, CRC(58f512ff) SHA1(67ffb7e2d817087d8158ee53974e46ec85a3e1ed) )
+	ROM_LOAD( "93c46_16bit.ic12",     0x00, 0x80, CRC(58f512ff) SHA1(67ffb7e2d817087d8158ee53974e46ec85a3e1ed) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "TCH__4.tms27c040.IC33",   0x000000, 0x80000, CRC(5038f52a) SHA1(22ed0e2c8a99056e73cff912731626689996a276) )
-	ROM_LOAD( "TCH__5.tms27c040.IC34",   0x080000, 0x80000, CRC(06e7094f) SHA1(e41b893ef91d541d2623d76ce6c69ecf4218c16d) )
-	ROM_LOAD( "TCH__6.tms27c040.IC35",   0x100000, 0x80000, CRC(ea010563) SHA1(5e474db372550e9d33f933ab00881a9b29a712d1) )
-	ROM_LOAD( "TCH__7.tms27c040.IC36",   0x180000, 0x80000, CRC(b6a86860) SHA1(73ab43830d5e62154bc8953615cdb397c7a742aa) )
+	ROM_LOAD( "tch__4.tms27c040.ic33",   0x000000, 0x80000, CRC(5038f52a) SHA1(22ed0e2c8a99056e73cff912731626689996a276) )
+	ROM_LOAD( "tch__5.tms27c040.ic34",   0x080000, 0x80000, CRC(06e7094f) SHA1(e41b893ef91d541d2623d76ce6c69ecf4218c16d) )
+	ROM_LOAD( "tch__6.tms27c040.ic35",   0x100000, 0x80000, CRC(ea010563) SHA1(5e474db372550e9d33f933ab00881a9b29a712d1) )
+	ROM_LOAD( "tch__7.tms27c040.ic36",   0x180000, 0x80000, CRC(b6a86860) SHA1(73ab43830d5e62154bc8953615cdb397c7a742aa) )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* OKIM6295 samples */
-	ROM_LOAD( "TCH__3.tms27c040.ic13",        0x00000, 0x80000, CRC(51272b0b) SHA1(ba94385183a9d74bb1d5159d2908492bf500f31e) )
+	ROM_LOAD( "tch__3.tms27c040.ic13",        0x00000, 0x80000, CRC(51272b0b) SHA1(ba94385183a9d74bb1d5159d2908492bf500f31e) )
 ROM_END
 
 
@@ -784,7 +784,7 @@ ROM_END
 
 /* GAME drivers **************************************************************/
 
-DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
+void kickgoal_state::init_kickgoal()
 {
 #if 0 /* we should find a real fix instead  */
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -795,7 +795,7 @@ DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
 }
 
 
-GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, actionhw, 0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, actionhw,  0,        actionhw, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

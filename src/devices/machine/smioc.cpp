@@ -99,38 +99,30 @@ const tiny_rom_entry *smioc_device::device_rom_region() const
 //  ADDRESS_MAP( smioc_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(smioc_device::smioc_mem)
-	AM_RANGE(0x00000, 0x07FFF) AM_RAM AM_SHARE("smioc_ram")
-	AM_RANGE(0xC0080, 0xC008F) AM_DEVREADWRITE("dma8237_1",am9517a_device,read,write) // Probably RAM DMA
-	AM_RANGE(0xC0090, 0xC009F) AM_DEVREADWRITE("dma8237_2",am9517a_device,read,write) // Serial DMA
-	AM_RANGE(0xC00A0, 0xC00AF) AM_DEVREADWRITE("dma8237_3",am9517a_device,read,write) // Serial DMA
-	AM_RANGE(0xC00B0, 0xC00BF) AM_DEVREADWRITE("dma8237_4",am9517a_device,read,write) // Serial DMA
-	AM_RANGE(0xC00C0, 0xC00CF) AM_DEVREADWRITE("dma8237_5",am9517a_device,read,write) // Serial DMA
-	AM_RANGE(0xF8000, 0xFFFFF) AM_ROM AM_REGION("rom", 0)
-ADDRESS_MAP_END
+void smioc_device::smioc_mem(address_map &map)
+{
+	map(0x00000, 0x07FFF).ram().share("smioc_ram");
+	map(0xC0080, 0xC008F).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Probably RAM DMA
+	map(0xC0090, 0xC009F).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xC00A0, 0xC00AF).rw("dma8237_3", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xC00B0, 0xC00BF).rw("dma8237_4", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xC00C0, 0xC00CF).rw("dma8237_5", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xF8000, 0xFFFFF).rom().region("rom", 0);
+}
 
 MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* CPU - Intel 80C188 */
-	MCFG_CPU_ADD(I188_TAG, I80188, XTAL(20'000'000) / 2) // Clock division unknown
-	MCFG_CPU_PROGRAM_MAP(smioc_mem)
+	MCFG_DEVICE_ADD(I188_TAG, I80188, XTAL(20'000'000) / 2) // Clock division unknown
+	MCFG_DEVICE_PROGRAM_MAP(smioc_mem)
 
 	/* DMA */
-	MCFG_DEVICE_ADD("dma8237_1", AM9517A, XTAL(20'000'000) / 4) // Clock division unknown
-	MCFG_DEVICE_ADD("dma8237_2", AM9517A, XTAL(20'000'000) / 4)
-	MCFG_DEVICE_ADD("dma8237_3", AM9517A, XTAL(20'000'000) / 4)
-	MCFG_DEVICE_ADD("dma8237_4", AM9517A, XTAL(20'000'000) / 4)
-	MCFG_DEVICE_ADD("dma8237_5", AM9517A, XTAL(20'000'000) / 4)
+	for (required_device<am9517a_device> &dma : m_dma8237)
+		AM9517A(config, dma, 20_MHz_XTAL / 4); // Clock division unknown
 
 	/* RS232 */
 	/* Port 1: Console */
-	MCFG_RS232_PORT_ADD("rs232_p1", default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD("rs232_p2", default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD("rs232_p3", default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD("rs232_p4", default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD("rs232_p5", default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD("rs232_p6", default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD("rs232_p7", default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD("rs232_p8", default_rs232_devices, nullptr)
+	for (required_device<rs232_port_device> &rs232_port : m_rs232_p)
+		RS232_PORT(config, rs232_port, default_rs232_devices, nullptr);
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -144,19 +136,8 @@ MACHINE_CONFIG_END
 smioc_device::smioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMIOC, tag, owner, clock),
 	m_smioccpu(*this, I188_TAG),
-	m_dma8237_1(*this, "dma8237_1"),
-	m_dma8237_2(*this, "dma8237_2"),
-	m_dma8237_3(*this, "dma8237_3"),
-	m_dma8237_4(*this, "dma8237_4"),
-	m_dma8237_5(*this, "dma8237_5"),
-	m_rs232_p1(*this, "rs232_p1"),
-	m_rs232_p2(*this, "rs232_p2"),
-	m_rs232_p3(*this, "rs232_p3"),
-	m_rs232_p4(*this, "rs232_p4"),
-	m_rs232_p5(*this, "rs232_p5"),
-	m_rs232_p6(*this, "rs232_p6"),
-	m_rs232_p7(*this, "rs232_p7"),
-	m_rs232_p8(*this, "rs232_p8"),
+	m_dma8237(*this, "dma8237_%u", 1),
+	m_rs232_p(*this, "rs232_p%u", 1),
 	m_smioc_ram(*this, "smioc_ram")
 {
 }

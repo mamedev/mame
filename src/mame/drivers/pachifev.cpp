@@ -96,6 +96,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void pachifev(machine_config &config);
+
+private:
 	/* controls related */
 	int m_power;
 	int m_max_power;
@@ -103,17 +106,18 @@ public:
 	int m_previous_power;
 	int m_cnt;
 
+#if USE_MSM
 	uint32_t m_adpcm_pos;
 	uint8_t m_adpcm_idle;
 	uint8_t m_trigger;
 	uint8_t m_adpcm_data;
+#endif
 	DECLARE_WRITE8_MEMBER(controls_w);
 	DECLARE_READ8_MEMBER(controls_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
-	required_device<cpu_device> m_maincpu;
-	void pachifev(machine_config &config);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	required_device<tms9995_device> m_maincpu;
 	void pachifev_cru(address_map &map);
 	void pachifev_map(address_map &map);
 };
@@ -140,29 +144,31 @@ READ8_MEMBER(pachifev_state::controls_r)
 	return output_bit;
 }
 
-ADDRESS_MAP_START(pachifev_state::pachifev_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
+void pachifev_state::pachifev_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf0fb) AM_NOP  /* internal ram */
-	AM_RANGE(0xff00, 0xff00) AM_READ_PORT("IN0")
-	AM_RANGE(0xff02, 0xff02) AM_READ_PORT("IN1")
-	AM_RANGE(0xff04, 0xff04) AM_READ_PORT("DSW1")
-	AM_RANGE(0xff06, 0xff06) AM_READ_PORT("DSW2")
-	AM_RANGE(0xff08, 0xff08) AM_READ_PORT("DSW3")
-	AM_RANGE(0xff10, 0xff10) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xff12, 0xff12) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0xff20, 0xff20) AM_DEVWRITE("y2404_1", y2404_device, write)
-	AM_RANGE(0xff30, 0xff30) AM_DEVWRITE("y2404_2", y2404_device, write)
-	AM_RANGE(0xff40, 0xff40) AM_WRITE(controls_w)
-	AM_RANGE(0xff50, 0xff50) AM_WRITENOP /* unknown */
-	AM_RANGE(0xfffa, 0xfffb) AM_NOP /* decrementer */
-	AM_RANGE(0xfffc, 0xffff) AM_NOP /* nmi */
-ADDRESS_MAP_END
+	map(0xe000, 0xe7ff).ram();
+	map(0xf000, 0xf0fb).noprw();  /* internal ram */
+	map(0xff00, 0xff00).portr("IN0");
+	map(0xff02, 0xff02).portr("IN1");
+	map(0xff04, 0xff04).portr("DSW1");
+	map(0xff06, 0xff06).portr("DSW2");
+	map(0xff08, 0xff08).portr("DSW3");
+	map(0xff10, 0xff10).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xff12, 0xff12).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0xff20, 0xff20).w("y2404_1", FUNC(y2404_device::command_w));
+	map(0xff30, 0xff30).w("y2404_2", FUNC(y2404_device::command_w));
+	map(0xff40, 0xff40).w(FUNC(pachifev_state::controls_w));
+	map(0xff50, 0xff50).nopw(); /* unknown */
+	map(0xfffa, 0xfffb).noprw(); /* decrementer */
+	map(0xfffc, 0xffff).noprw(); /* nmi */
+}
 
-ADDRESS_MAP_START(pachifev_state::pachifev_cru)
-	AM_RANGE(0x000, 0x000) AM_READ(controls_r)
-ADDRESS_MAP_END
+void pachifev_state::pachifev_cru(address_map &map)
+{
+	map(0x000, 0x000).r(FUNC(pachifev_state::controls_r));
+}
 
 
 /* verified from TMS9995 code */
@@ -286,11 +292,10 @@ WRITE_LINE_MEMBER(pachifev_state::pf_adpcm_int)
 
 void pachifev_state::machine_reset()
 {
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
-	cpu->ready_line(CLEAR_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(CLEAR_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 
 	m_power=0;
 	m_max_power=0;
@@ -304,15 +309,16 @@ void pachifev_state::machine_reset()
 }
 
 
-INTERRUPT_GEN_MEMBER(pachifev_state::pachifev_vblank_irq)
+WRITE_LINE_MEMBER(pachifev_state::vblank_w)
 {
+	if (state)
 	{
 		static const char *const inname[2] = { "PLUNGER_P1", "PLUNGER_P2" };
 
 		/* I wish I had found a better way to handle cocktail inputs, but I can't find a way to access internal RAM */
 		/* (bit 5 of 0xf0aa : 0 = player 1 and 1 = player 2 - bit 6 of 0xf0aa : 0 = upright and 1 = cocktail). */
 		/* All I found is that in main RAM, 0xe00f.b determines the player : 0x00 = player 1 and 0x01 = player 2. */
-		address_space &ramspace = device.memory().space(AS_PROGRAM);
+		address_space &ramspace = m_maincpu->space(AS_PROGRAM);
 		uint8_t player = 0;
 
 		if ((ramspace.read_byte(0xe00f) == 0x01) && ((ioport("DSW1")->read() & 0x08) == 0x00))
@@ -347,26 +353,29 @@ void pachifev_state::machine_start()
 MACHINE_CONFIG_START(pachifev_state::pachifev)
 
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), pachifev_map, pachifev_cru)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pachifev_state, pachifev_vblank_irq)
+	TMS9995(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pachifev_state::pachifev_map);
+	m_maincpu->set_addrmap(AS_IO, &pachifev_state::pachifev_cru);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.screen_vblank().set(FUNC(pachifev_state::vblank_w));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 #if USE_MSM
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL(384'000))  /* guess */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(pachifev_state,pf_adpcm_int))    /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))  /* guess */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pachifev_state,pf_adpcm_int))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)    /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
-	MCFG_SOUND_ADD("y2404_1", Y2404, XTAL(10'738'635)/3) /* guess */
+	MCFG_DEVICE_ADD("y2404_1", Y2404, XTAL(10'738'635)/3) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_SOUND_ADD("y2404_2", Y2404, XTAL(10'738'635)/3) /* guess */
+	MCFG_DEVICE_ADD("y2404_2", Y2404, XTAL(10'738'635)/3) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -385,4 +394,4 @@ ROM_START( pachifev )
 
 ROM_END
 
-GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state, empty_init, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )

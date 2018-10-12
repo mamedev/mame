@@ -23,6 +23,7 @@ Other:  BMC B816140 (CPLD)
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -235,11 +236,10 @@ void bmcpokr_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 	{
 		if (linescroll)
 		{
-			if ( (y < cliprect.min_y) || (y > cliprect.max_y) )
+			if ( (y < cliprect.top()) || (y > cliprect.bottom()) )
 				continue;
 
-			clip.min_y = y;
-			clip.max_y = y;
+			clip.sety(y, y);
 		}
 
 		int sx = (scroll[y] & 0xff) * 4;
@@ -380,50 +380,51 @@ WRITE16_MEMBER(bmcpokr_state::irq_ack_w)
 	}
 }
 
-ADDRESS_MAP_START(bmcpokr_state::bmcpokr_mem)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("nvram")
+void bmcpokr_state::bmcpokr_mem(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x210000, 0x21ffff).ram().share("nvram");
 
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(videoram_1_w) AM_SHARE("videoram_1")
-	AM_RANGE(0x288000, 0x28ffff) AM_RAM_WRITE(videoram_2_w) AM_SHARE("videoram_2")
-	AM_RANGE(0x290000, 0x297fff) AM_RAM
+	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_1_w)).share("videoram_1");
+	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_2_w)).share("videoram_2");
+	map(0x290000, 0x297fff).ram();
 
-	AM_RANGE(0x2a0000, 0x2dffff) AM_RAM_WRITE(pixram_w) AM_SHARE("pixram")
+	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share("pixram");
 
-	AM_RANGE(0x2ff800, 0x2ff9ff) AM_RAM AM_SHARE("scrollram_1")
-	AM_RANGE(0x2ffa00, 0x2ffbff) AM_RAM AM_SHARE("scrollram_2")
-	AM_RANGE(0x2ffc00, 0x2ffdff) AM_RAM AM_SHARE("scrollram_3")
-	AM_RANGE(0x2ffe00, 0x2fffff) AM_RAM
+	map(0x2ff800, 0x2ff9ff).ram().share("scrollram_1");
+	map(0x2ffa00, 0x2ffbff).ram().share("scrollram_2");
+	map(0x2ffc00, 0x2ffdff).ram().share("scrollram_3");
+	map(0x2ffe00, 0x2fffff).ram();
 
-	AM_RANGE(0x320000, 0x320003) AM_RAM AM_SHARE("layerctrl")
+	map(0x320000, 0x320003).ram().share("layerctrl");
 
-	AM_RANGE(0x330000, 0x330001) AM_READWRITE(prot_r, prot_w)
+	map(0x330000, 0x330001).rw(FUNC(bmcpokr_state::prot_r), FUNC(bmcpokr_state::prot_w));
 
-	AM_RANGE(0x340000, 0x340001) AM_RAM // 340001.b, rw
-	AM_RANGE(0x340002, 0x340003) AM_RAM // 340003.b, w(9d)
-	AM_RANGE(0x340006, 0x340007) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x340008, 0x340009) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x34000e, 0x34000f) AM_RAM AM_SHARE("priority")    // 34000f.b, w (priority?)
-	AM_RANGE(0x340016, 0x340017) AM_WRITE(pixpal_w)
-	AM_RANGE(0x340018, 0x340019) AM_RAM // 340019.b, w
-	AM_RANGE(0x34001a, 0x34001b) AM_READ(unk_r) AM_WRITENOP
-	AM_RANGE(0x34001c, 0x34001d) AM_RAM // 34001d.b, w(0)
+	map(0x340000, 0x340001).ram(); // 340001.b, rw
+	map(0x340002, 0x340003).ram(); // 340003.b, w(9d)
+	map(0x340006, 0x340007).w(FUNC(bmcpokr_state::irq_ack_w));
+	map(0x340008, 0x340009).w(FUNC(bmcpokr_state::irq_enable_w));
+	map(0x34000e, 0x34000f).ram().share("priority");    // 34000f.b, w (priority?)
+	map(0x340016, 0x340017).w(FUNC(bmcpokr_state::pixpal_w));
+	map(0x340018, 0x340019).ram(); // 340019.b, w
+	map(0x34001a, 0x34001b).r(FUNC(bmcpokr_state::unk_r)).nopw();
+	map(0x34001c, 0x34001d).ram(); // 34001d.b, w(0)
 
-	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x00ff )
-	AM_RANGE(0x350002, 0x350003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w,   0x00ff )
-	AM_RANGE(0x350004, 0x350005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w,  0x00ff )
+	map(0x350001, 0x350001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x350003, 0x350003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x350005, 0x350005).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x360000, 0x360001) AM_READ(dsw_r)
+	map(0x360000, 0x360001).r(FUNC(bmcpokr_state::dsw_r));
 
-	AM_RANGE(0x370000, 0x370001) AM_READ_PORT("INPUTS")
+	map(0x370000, 0x370001).portr("INPUTS");
 
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(mux_w)
+	map(0x380000, 0x380001).w(FUNC(bmcpokr_state::mux_w));
 
-	AM_RANGE(0x390000, 0x390003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
-	AM_RANGE(0x398000, 0x398001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x390000, 0x390003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x398001, 0x398001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x3b0000, 0x3b0001) AM_READ_PORT("INPUTS2")
-ADDRESS_MAP_END
+	map(0x3b0000, 0x3b0001).portr("INPUTS2");
+}
 
 
 READ16_MEMBER(bmcpokr_state::mjmaglmp_dsw_r)
@@ -452,46 +453,47 @@ READ16_MEMBER(bmcpokr_state::mjmaglmp_key_r)
 	return ioport("INPUTS")->read() | (key & 0x3f);
 }
 
-ADDRESS_MAP_START(bmcpokr_state::mjmaglmp_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("nvram")
+void bmcpokr_state::mjmaglmp_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x210000, 0x21ffff).ram().share("nvram");
 
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(videoram_1_w) AM_SHARE("videoram_1")
-	AM_RANGE(0x288000, 0x28ffff) AM_RAM_WRITE(videoram_2_w) AM_SHARE("videoram_2")
-	AM_RANGE(0x290000, 0x297fff) AM_RAM
+	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_1_w)).share("videoram_1");
+	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_2_w)).share("videoram_2");
+	map(0x290000, 0x297fff).ram();
 
-	AM_RANGE(0x2a0000, 0x2dffff) AM_RAM_WRITE(pixram_w) AM_SHARE("pixram")
+	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share("pixram");
 
-	AM_RANGE(0x2ff800, 0x2ff9ff) AM_RAM AM_SHARE("scrollram_1")
-	AM_RANGE(0x2ffa00, 0x2ffbff) AM_RAM AM_SHARE("scrollram_2")
-	AM_RANGE(0x2ffc00, 0x2ffdff) AM_RAM AM_SHARE("scrollram_3")
-	AM_RANGE(0x2ffe00, 0x2fffff) AM_RAM
+	map(0x2ff800, 0x2ff9ff).ram().share("scrollram_1");
+	map(0x2ffa00, 0x2ffbff).ram().share("scrollram_2");
+	map(0x2ffc00, 0x2ffdff).ram().share("scrollram_3");
+	map(0x2ffe00, 0x2fffff).ram();
 
-	AM_RANGE(0x320000, 0x320003) AM_RAM AM_SHARE("layerctrl")
+	map(0x320000, 0x320003).ram().share("layerctrl");
 
-	AM_RANGE(0x388000, 0x388001) AM_WRITE(mux_w)
+	map(0x388000, 0x388001).w(FUNC(bmcpokr_state::mux_w));
 
-	AM_RANGE(0x390000, 0x390001) AM_READ(mjmaglmp_dsw_r)
+	map(0x390000, 0x390001).r(FUNC(bmcpokr_state::mjmaglmp_dsw_r));
 
-	AM_RANGE(0x398000, 0x398001) AM_READ(mjmaglmp_key_r)
+	map(0x398000, 0x398001).r(FUNC(bmcpokr_state::mjmaglmp_key_r));
 
-	AM_RANGE(0x3c8800, 0x3c8803) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
-	AM_RANGE(0x3c9000, 0x3c9001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x3c8800, 0x3c8803).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x3c9001, 0x3c9001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x3c9800, 0x3c9801) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x00ff )
-	AM_RANGE(0x3c9802, 0x3c9803) AM_DEVWRITE8("ramdac",ramdac_device, pal_w,   0x00ff )
-	AM_RANGE(0x3c9804, 0x3c9805) AM_DEVWRITE8("ramdac",ramdac_device, mask_w,  0x00ff )
+	map(0x3c9801, 0x3c9801).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x3c9803, 0x3c9803).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x3c9805, 0x3c9805).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x3ca000, 0x3ca001) AM_RAM // 3ca001.b, rw
-	AM_RANGE(0x3ca002, 0x3ca003) AM_RAM // 3ca003.b, w(9d)
-	AM_RANGE(0x3ca006, 0x3ca007) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x3ca008, 0x3ca009) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x3ca00e, 0x3ca00f) AM_RAM AM_SHARE("priority")    // 3ca00f.b, w (priority?)
-	AM_RANGE(0x3ca016, 0x3ca017) AM_WRITE(pixpal_w)
-	AM_RANGE(0x3ca018, 0x3ca019) AM_RAM // 3ca019.b, w
-	AM_RANGE(0x3ca01a, 0x3ca01b) AM_READ(unk_r) AM_WRITENOP
-	AM_RANGE(0x3ca01c, 0x3ca01d) AM_RAM // 3ca01d.b, w(0)
-ADDRESS_MAP_END
+	map(0x3ca000, 0x3ca001).ram(); // 3ca001.b, rw
+	map(0x3ca002, 0x3ca003).ram(); // 3ca003.b, w(9d)
+	map(0x3ca006, 0x3ca007).w(FUNC(bmcpokr_state::irq_ack_w));
+	map(0x3ca008, 0x3ca009).w(FUNC(bmcpokr_state::irq_enable_w));
+	map(0x3ca00e, 0x3ca00f).ram().share("priority");    // 3ca00f.b, w (priority?)
+	map(0x3ca016, 0x3ca017).w(FUNC(bmcpokr_state::pixpal_w));
+	map(0x3ca018, 0x3ca019).ram(); // 3ca019.b, w
+	map(0x3ca01a, 0x3ca01b).r(FUNC(bmcpokr_state::unk_r)).nopw();
+	map(0x3ca01c, 0x3ca01d).ram(); // 3ca01d.b, w(0)
+}
 
 /***************************************************************************
                                 Input Ports
@@ -509,7 +511,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // SCORE
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // BET             [BET, credit -1]
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HP [HOPPER, credit -100]
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // ACCOUNT         [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // KEY-OUT         [KEY-OUT, no hopper]
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // DOUBLE-UP
@@ -527,7 +529,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Left>2 (3rd)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Down>1 (2nd)   [BET, credit -1]
-//  PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HP [HOPPER, credit -100]
+//  PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // A2              [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // C2              [KEY-OUT, no hopper]
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // S1              [START, ESC in service mode]
@@ -629,7 +631,7 @@ static INPUT_PORTS_START( mjmaglmp )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2          ) // NOTE
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  ) // KEY DOWN
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // PAY
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL        ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HOPPER
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM        ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HOPPER
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW       ) // ACCOUNT
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1       ) PORT_NAME("Reset") // RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // (unused)
@@ -779,7 +781,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8*4
 };
 
-static GFXDECODE_START( bmcpokr )
+static GFXDECODE_START( gfx_bmcpokr )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -801,13 +803,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
 		if (m_irq_enable & (1<<6)) m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
-ADDRESS_MAP_START(bmcpokr_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void bmcpokr_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(42'000'000) / 4) // 68000 @10.50MHz (42/4)
-	MCFG_CPU_PROGRAM_MAP(bmcpokr_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(42'000'000) / 4) // 68000 @10.50MHz (42/4)
+	MCFG_DEVICE_PROGRAM_MAP(bmcpokr_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bmcpokr_state, interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -821,27 +824,28 @@ MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmcpokr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmcpokr)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(10), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)    // hopper stuck low if too slow
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(42'000'000) / 12)    // UM3567 @3.50MHz (42/12)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(42'000'000) / 12)    // UM3567 @3.50MHz (42/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(42'000'000) / 40, PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bmcpokr_state::mjmaglmp)
 	bmcpokr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjmaglmp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mjmaglmp_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -956,5 +960,5 @@ ROM_START( mjmaglmp )
 	ROM_LOAD( "ja-a-901.u6", 0x00000, 0x40000, CRC(25f36d00) SHA1(c182348340ca67ad69d1a67c58b47d6371a725c9) )
 ROM_END
 
-GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  bmcpokr_state, 0, ROT0, "BMC", "Dongfang Shenlong",             MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, bmcpokr_state, 0, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC", "Dongfang Shenlong",             MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )

@@ -52,8 +52,8 @@ public:
 	void set_clock2(int clock2) { m_clock2 = clock2; }
 	void set_clock2(const XTAL &xtal) { xtal.validate("selecting cdp1863 clock"); set_clock2(xtal.value()); }
 
-	DECLARE_WRITE8_MEMBER( str_w );
-	void str_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER( str_w ) { write_str(data); }
+	void write_str(uint8_t data) { m_latch = data; }
 
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
 

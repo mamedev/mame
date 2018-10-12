@@ -151,7 +151,7 @@ WRITE8_MEMBER(dec8_state::gondo_scroll_w)
 void dec8_state::allocate_buffered_spriteram16()
 {
 	m_buffered_spriteram16 = make_unique_clear<uint16_t[]>(0x800/2);
-	save_pointer(NAME(m_buffered_spriteram16.get()), 0x800/2);
+	save_pointer(NAME(m_buffered_spriteram16), 0x800/2);
 }
 
 /******************************************************************************/
@@ -280,6 +280,9 @@ VIDEO_START_MEMBER(dec8_state,ghostb)
 
 	m_game_uses_priority = 0;
 	m_tilegen[0]->set_colmask(0xf);
+
+	m_nmi_enable = false;
+	save_item(NAME(m_nmi_enable));
 }
 
 /******************************************************************************/

@@ -31,37 +31,43 @@ public:
 	zac_proto_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void zac_proto(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(out0_w);
 	DECLARE_WRITE8_MEMBER(out1_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
-	void zac_proto(machine_config &config);
 	void zac_proto_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
+	output_finder<11> m_digits;
 };
 
 
-ADDRESS_MAP_START(zac_proto_state::zac_proto_map)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0d00, 0x0dff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("PL0")
-	AM_RANGE(0x0e01, 0x0e01) AM_READ_PORT("PL1")
-	AM_RANGE(0x0e02, 0x0e02) AM_READ_PORT("PL2")
-	AM_RANGE(0x0e03, 0x0e03) AM_READ_PORT("PL3")
-	AM_RANGE(0x0e04, 0x0e04) AM_READ_PORT("PL4")
-	AM_RANGE(0x0e05, 0x0e05) AM_READ_PORT("PL5")
-	AM_RANGE(0x0e06, 0x0e06) AM_READ_PORT("PL6")
-	AM_RANGE(0x0e07, 0x0e07) AM_READ_PORT("PL7")
-	AM_RANGE(0x0e00, 0x0e01) AM_WRITE(out0_w)
-	AM_RANGE(0x0e02, 0x0e06) AM_WRITE(digit_w)
-	AM_RANGE(0x0e07, 0x0e08) AM_WRITE(sound_w)
-	AM_RANGE(0x0e09, 0x0e16) AM_WRITE(out1_w)
-	AM_RANGE(0x1400, 0x1bff) AM_ROM
-ADDRESS_MAP_END
+void zac_proto_state::zac_proto_map(address_map &map)
+{
+	map(0x0000, 0x0bff).rom();
+	map(0x0d00, 0x0dff).ram().share("nvram");
+	map(0x0e00, 0x0e00).portr("PL0");
+	map(0x0e01, 0x0e01).portr("PL1");
+	map(0x0e02, 0x0e02).portr("PL2");
+	map(0x0e03, 0x0e03).portr("PL3");
+	map(0x0e04, 0x0e04).portr("PL4");
+	map(0x0e05, 0x0e05).portr("PL5");
+	map(0x0e06, 0x0e06).portr("PL6");
+	map(0x0e07, 0x0e07).portr("PL7");
+	map(0x0e00, 0x0e01).w(FUNC(zac_proto_state::out0_w));
+	map(0x0e02, 0x0e06).w(FUNC(zac_proto_state::digit_w));
+	map(0x0e07, 0x0e08).w(FUNC(zac_proto_state::sound_w));
+	map(0x0e09, 0x0e16).w(FUNC(zac_proto_state::out1_w));
+	map(0x1400, 0x1bff).rom();
+}
 
 static INPUT_PORTS_START( zac_proto )
 	// playfield inputs
@@ -220,9 +226,9 @@ WRITE8_MEMBER( zac_proto_state::digit_w )
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // 9368 (outputs 0-9,A-F)
 	static const uint8_t decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
 	offset<<=1;
-	output().set_digit_value(offset, patterns[data&15] | decimals[offset]);
+	m_digits[offset] = patterns[data&15] | decimals[offset];
 	offset++;
-	output().set_digit_value(offset, patterns[data>>4] | decimals[offset]);
+	m_digits[offset] = patterns[data>>4] | decimals[offset];
 }
 
 WRITE8_MEMBER( zac_proto_state::sound_w )
@@ -232,17 +238,17 @@ WRITE8_MEMBER( zac_proto_state::sound_w )
 
 void zac_proto_state::machine_reset()
 {
-	output().set_digit_value(10, 0x3f); // units shows zero all the time
+	m_digits[10] = 0x3f; // units shows zero all the time
 }
 
 MACHINE_CONFIG_START(zac_proto_state::zac_proto)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", INS8060, XTAL(4'000'000) / 2) // Using SC/MP II chip which has an internal /2 circuit.
-	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_DEVICE_ADD("maincpu", INS8060, XTAL(4'000'000) / 2) // Using SC/MP II chip which has an internal /2 circuit.
+	MCFG_DEVICE_PROGRAM_MAP(zac_proto_map)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_zac_proto)
+	config.set_default_layout(layout_zac_proto);
 
 	/* Sound */
 	genpin_audio(config);
@@ -281,6 +287,6 @@ ROM_START(spacecty)
 	ROM_LOAD("zsc4.dat", 0x1400, 0x0400, CRC(69e0bb95) SHA1(d9a1d0159bf49445b0ece0f9d7806ed80657c2b2))
 ROM_END
 
-GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Ski Jump",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Strike",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Ski Jump",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Strike",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

@@ -123,105 +123,113 @@ WRITE8_MEMBER( sg1000_state::peripheral_w )
     ADDRESS_MAP( sg1000_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::sg1000_map)
-	AM_RANGE(0x0000, 0xbfff) AM_DEVREADWRITE(CARTSLOT_TAG, sega8_cart_slot_device, read_cart, write_cart)
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_RAM
-ADDRESS_MAP_END
+void sg1000_state::sg1000_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(m_cart, FUNC(sega8_cart_slot_device::read_cart), FUNC(sega8_cart_slot_device::write_cart));
+	map(0xc000, 0xc3ff).mirror(0x3c00).ram();
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( sg1000_io_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::sg1000_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-	AM_RANGE(0xdc, 0xdf) AM_READWRITE(peripheral_r, peripheral_w)
-ADDRESS_MAP_END
+void sg1000_state::sg1000_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( omv_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::omv_map)
-	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(omv_r, omv_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
-ADDRESS_MAP_END
+void sg1000_state::omv_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(FUNC(sg1000_state::omv_r), FUNC(sg1000_state::omv_w));
+	map(0xc000, 0xc7ff).mirror(0x3800).ram();
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( omv_io_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::omv_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x38) AM_READ_PORT("C0")
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x38) AM_READ_PORT("C1")
-	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x38) AM_READ_PORT("C2")
-	AM_RANGE(0xc3, 0xc3) AM_MIRROR(0x38) AM_READ_PORT("C3")
-	AM_RANGE(0xc4, 0xc4) AM_MIRROR(0x3a) AM_READ_PORT("C4")
-	AM_RANGE(0xc5, 0xc5) AM_MIRROR(0x3a) AM_READ_PORT("C5")
-ADDRESS_MAP_END
+void sg1000_state::omv_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xc0, 0xc0).mirror(0x38).portr("C0");
+	map(0xc1, 0xc1).mirror(0x38).portr("C1");
+	map(0xc2, 0xc2).mirror(0x38).portr("C2");
+	map(0xc3, 0xc3).mirror(0x38).portr("C3");
+	map(0xc4, 0xc4).mirror(0x3a).portr("C4");
+	map(0xc5, 0xc5).mirror(0x3a).portr("C5");
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( sc3000_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::sc3000_map)
-	AM_RANGE(0x0000, 0xbfff) AM_DEVREADWRITE(CARTSLOT_TAG, sega8_cart_slot_device, read_cart, write_cart)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
-ADDRESS_MAP_END
+void sg1000_state::sc3000_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(CARTSLOT_TAG, FUNC(sega8_cart_slot_device::read_cart), FUNC(sega8_cart_slot_device::write_cart));
+	map(0xc000, 0xc7ff).mirror(0x3800).ram();
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( sc3000_io_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::sc3000_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-	AM_RANGE(0xdc, 0xdf) AM_READWRITE(peripheral_r, peripheral_w)
-ADDRESS_MAP_END
+void sg1000_state::sc3000_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
+}
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
-ADDRESS_MAP_START(sg1000_state::sc3000_io_map)
-    ADDRESS_MAP_GLOBAL_MASK(0xff)
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255_device, read, write)
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0xae) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-    AM_RANGE(0x01, 0x01) AM_MIRROR(0xae) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-    AM_RANGE(0x60, 0x60) AM_MIRROR(0x9f) AM_READ(sc3000_r_r)
-ADDRESS_MAP_END
+void sg1000_state::sc3000_io_map(address_map &map)
+{
+    map.global_mask(0xff);
+    map(0x00, 0x00).mirror(0xdf).rw(UPD9255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+    map(0x00, 0x00).mirror(0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+    map(0x00, 0x00).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+    map(0x01, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+    map(0x60, 0x60).mirror(0x9f).r(FUNC(sg1000_state::sc3000_r_r));
+}
 */
 
 /*-------------------------------------------------
     ADDRESS_MAP( sf7000_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sf7000_state::sf7000_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0x4000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sf7000_state::sf7000_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1").bankw("bank2");
+	map(0x4000, 0xffff).ram();
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( sf7000_io_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sf7000_state::sf7000_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-	AM_RANGE(0xdc, 0xdf) AM_READWRITE(peripheral_r, peripheral_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVICE(UPD765_TAG, upd765a_device, map)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(UPD9255_1_TAG, i8255_device, read, write)
-	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void sf7000_state::sf7000_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xdc, 0xdf).rw(FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
+	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
+	map(0xe4, 0xe7).rw(UPD9255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe8, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
+}
 
 /***************************************************************************
     INPUT PORTS
@@ -446,9 +454,10 @@ FLOPPY_FORMATS_END
     floppy_interface sf7000_floppy_interface
 -------------------------------------------------*/
 
-static SLOT_INTERFACE_START( sf7000_floppies )
-	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
-SLOT_INTERFACE_END
+static void sf7000_floppies(device_slot_interface &device)
+{
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
+}
 
 /*-------------------------------------------------
     MACHINE_START( sg1000 )
@@ -519,21 +528,21 @@ void sf7000_state::machine_reset()
 
 MACHINE_CONFIG_START(sg1000_state::sg1000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3)
-	MCFG_CPU_PROGRAM_MAP(sg1000_map)
-	MCFG_CPU_IO_MAP(sg1000_io_map)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3)
+	MCFG_DEVICE_PROGRAM_MAP(sg1000_map)
+	MCFG_DEVICE_IO_MAP(sg1000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
+	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* expansion slot */
@@ -546,8 +555,7 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, m_ram).set_default_size("1K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -556,15 +564,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sg1000_state::omv)
 	sg1000(config);
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_PROGRAM_MAP(omv_map)
-	MCFG_CPU_IO_MAP(omv_io_map)
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(omv_map)
+	MCFG_DEVICE_IO_MAP(omv_io_map)
 
 	MCFG_DEVICE_REMOVE(CARTSLOT_TAG)
 	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
+	m_ram->set_default_size("2K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -573,21 +580,21 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sc3000_state::sc3000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3) // LH0080A
-	MCFG_CPU_PROGRAM_MAP(sc3000_map)
-	MCFG_CPU_IO_MAP(sc3000_io_map)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3) // LH0080A
+	MCFG_DEVICE_PROGRAM_MAP(sc3000_map)
+	MCFG_DEVICE_IO_MAP(sc3000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
+	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* sc3000 has all sk1100 features built-in, so add it as a fixed slot */
@@ -601,8 +608,7 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	/* the sk1100 device will add sc3000 cart and cass lists */
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
+	RAM(config, m_ram).set_default_size("2K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -611,42 +617,42 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sf7000_state::sf7000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3)
-	MCFG_CPU_PROGRAM_MAP(sf7000_map)
-	MCFG_CPU_IO_MAP(sf7000_io_map)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3)
+	MCFG_DEVICE_PROGRAM_MAP(sf7000_map)
+	MCFG_DEVICE_IO_MAP(sf7000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
+	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_DEVICE_ADD(UPD9255_1_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(sf7000_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(sf7000_state, ppi_pc_w))
+	i8255_device &ppi(I8255(config, UPD9255_1_TAG));
+	ppi.in_pa_callback().set(FUNC(sf7000_state::ppi_pa_r));
+	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	i8251_device &upd8251(I8251(config, UPD8251_TAG, 0));
+	upd8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	upd8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	upd8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UPD8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(UPD8251_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(UPD8251_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(UPD8251_TAG, i8251_device, write_dsr))
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
+	UPD765A(config, m_fdc, false, false);
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -657,8 +663,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -694,11 +699,11 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT    STATE            INIT    COMPANY             FULLNAME                                    FLAGS */
-CONS( 1983, sg1000,     0,          0,          sg1000,     sg1000,  sg1000_state,    0,      "Sega",             "SG-1000",                                  MACHINE_SUPPORTS_SAVE )
-CONS( 1984, sg1000m2,   sg1000,     0,          sc3000,     sc3000,  sc3000_state,    0,      "Sega",             "SG-1000 II",                               MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sc3000,     0,          sg1000,     sc3000,     sc3000,  sc3000_state,    0,      "Sega",             "SC-3000",                                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sc3000h,    sc3000,     0,          sc3000,     sc3000,  sc3000_state,    0,      "Sega",             "SC-3000H",                                 MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sf7000,     sc3000,     0,          sf7000,     sf7000,  sf7000_state,    0,      "Sega",             "SC-3000/Super Control Station SF-7000",    MACHINE_SUPPORTS_SAVE )
-CONS( 1984, omv1000,    sg1000,     0,          omv,        omv1000, sg1000_state,    0,      "Tsukuda Original", "Othello Multivision FG-1000",              MACHINE_SUPPORTS_SAVE )
-CONS( 1984, omv2000,    sg1000,     0,          omv,        omv2000, sg1000_state,    0,      "Tsukuda Original", "Othello Multivision FG-2000",              MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY             FULLNAME                                    FLAGS */
+CONS( 1983, sg1000,   0,      0,      sg1000,  sg1000,  sg1000_state, empty_init, "Sega",             "SG-1000",                                  MACHINE_SUPPORTS_SAVE )
+CONS( 1984, sg1000m2, sg1000, 0,      sc3000,  sc3000,  sc3000_state, empty_init, "Sega",             "SG-1000 II",                               MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sc3000,   0,      sg1000, sc3000,  sc3000,  sc3000_state, empty_init, "Sega",             "SC-3000",                                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sc3000h,  sc3000, 0,      sc3000,  sc3000,  sc3000_state, empty_init, "Sega",             "SC-3000H",                                 MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sf7000,   sc3000, 0,      sf7000,  sf7000,  sf7000_state, empty_init, "Sega",             "SC-3000/Super Control Station SF-7000",    MACHINE_SUPPORTS_SAVE )
+CONS( 1984, omv1000,  sg1000, 0,      omv,     omv1000, sg1000_state, empty_init, "Tsukuda Original", "Othello Multivision FG-1000",              MACHINE_SUPPORTS_SAVE )
+CONS( 1984, omv2000,  sg1000, 0,      omv,     omv2000, sg1000_state, empty_init, "Tsukuda Original", "Othello Multivision FG-2000",              MACHINE_SUPPORTS_SAVE )

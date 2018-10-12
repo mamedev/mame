@@ -43,21 +43,23 @@ uint32_t pc8500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 /* SED1330 Interface */
 
-ADDRESS_MAP_START(pc8401a_state::pc8401a_lcdc)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void pc8401a_state::pc8401a_lcdc(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x1fff).ram();
+}
 
-ADDRESS_MAP_START(pc8401a_state::pc8500_lcdc)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void pc8401a_state::pc8500_lcdc(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).ram();
+}
 
 
 /* Machine Drivers */
 
 MACHINE_CONFIG_START(pc8401a_state::pc8401a_video)
-//  MCFG_DEFAULT_LAYOUT(layout_pc8401a)
+//  config.set_default_layout(layout_pc8401a);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc8401a_state,pc8401a)
@@ -70,11 +72,13 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SED1330_ADD(SED1330_TAG, 0, SCREEN_TAG, pc8401a_lcdc)
+	SED1330(config, m_lcdc, 0);
+	m_lcdc->set_screen(SCREEN_TAG);
+	m_lcdc->set_addrmap(0, &pc8401a_state::pc8401a_lcdc);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8500_state::pc8500_video)
-	MCFG_DEFAULT_LAYOUT(layout_pc8500)
+	config.set_default_layout(layout_pc8500);
 
 	MCFG_PALETTE_ADD("palette", 2+8)
 	MCFG_PALETTE_INIT_OWNER(pc8401a_state,pc8401a)
@@ -87,7 +91,9 @@ MACHINE_CONFIG_START(pc8500_state::pc8500_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 200-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SED1330_ADD(SED1330_TAG, 0, SCREEN_TAG, pc8500_lcdc)
+	SED1330(config, m_lcdc, 0);
+	m_lcdc->set_screen(SCREEN_TAG);
+	m_lcdc->set_addrmap(0, &pc8500_state::pc8500_lcdc);
 
 	/* PC-8441A CRT */
 	MCFG_SCREEN_ADD(CRT_SCREEN_TAG, RASTER)

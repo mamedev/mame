@@ -68,6 +68,7 @@ Notes:
 #include "cpu/h8/h83048.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -81,6 +82,11 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
+	void lastfght(machine_config &config);
+
+	void init_lastfght();
+
+private:
 	/* memory */
 	DECLARE_WRITE16_MEMBER(hi_w);
 	DECLARE_WRITE16_MEMBER(x_w);
@@ -99,18 +105,15 @@ public:
 	DECLARE_WRITE16_MEMBER(c00006_w);
 	DECLARE_READ16_MEMBER(sound_r);
 	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_DRIVER_INIT(lastfght);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void lastfght(machine_config &config);
 	void lastfght_map(address_map &map);
 	void ramdac_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];
 	int m_dest;
@@ -407,40 +410,42 @@ WRITE16_MEMBER(lastfght_state::sound_w)
                                 Memory Maps
 ***************************************************************************/
 
-ADDRESS_MAP_START(lastfght_state::lastfght_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+void lastfght_state::lastfght_map(address_map &map)
+{
+	map.global_mask(0xffffff);
 
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("maincpu", 0)
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
 
-	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_SHARE("nvram") // battery
+	map(0x200000, 0x20ffff).ram().share("nvram"); // battery
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_WRITE(hi_w )
-	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE(sound_r, sound_w )
-	AM_RANGE( 0x600006, 0x600007 ) AM_WRITE(blit_w )
-	AM_RANGE( 0x600008, 0x600009 ) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff )
-	AM_RANGE( 0x600008, 0x600009 ) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00 )
-	AM_RANGE( 0x60000a, 0x60000b ) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00 )
+	map(0x600000, 0x600001).w(FUNC(lastfght_state::hi_w));
+	map(0x600002, 0x600003).rw(FUNC(lastfght_state::sound_r), FUNC(lastfght_state::sound_w));
+	map(0x600006, 0x600007).w(FUNC(lastfght_state::blit_w));
+	map(0x600009, 0x600009).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x600008, 0x600008).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x60000a, 0x60000a).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE( 0x800000, 0x800001 ) AM_WRITE(sx_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_WRITE(sd_w )
-	AM_RANGE( 0x800004, 0x800005 ) AM_WRITE(sy_w )
-	AM_RANGE( 0x800006, 0x800007 ) AM_WRITE(sr_w )
-	AM_RANGE( 0x800008, 0x800009 ) AM_WRITE(x_w )
-	AM_RANGE( 0x80000a, 0x80000b ) AM_WRITE(yw_w )
-	AM_RANGE( 0x80000c, 0x80000d ) AM_WRITE(h_w )
+	map(0x800000, 0x800001).w(FUNC(lastfght_state::sx_w));
+	map(0x800002, 0x800003).w(FUNC(lastfght_state::sd_w));
+	map(0x800004, 0x800005).w(FUNC(lastfght_state::sy_w));
+	map(0x800006, 0x800007).w(FUNC(lastfght_state::sr_w));
+	map(0x800008, 0x800009).w(FUNC(lastfght_state::x_w));
+	map(0x80000a, 0x80000b).w(FUNC(lastfght_state::yw_w));
+	map(0x80000c, 0x80000d).w(FUNC(lastfght_state::h_w));
 
-	AM_RANGE( 0x800014, 0x800015 ) AM_WRITE(dest_w )
+	map(0x800014, 0x800015).w(FUNC(lastfght_state::dest_w));
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ(c00000_r )
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ(c00002_r )
-	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(c00004_r )
-	AM_RANGE( 0xc00006, 0xc00007 ) AM_READWRITE(c00006_r, c00006_w )
-ADDRESS_MAP_END
+	map(0xc00000, 0xc00001).r(FUNC(lastfght_state::c00000_r));
+	map(0xc00002, 0xc00003).r(FUNC(lastfght_state::c00002_r));
+	map(0xc00004, 0xc00005).r(FUNC(lastfght_state::c00004_r));
+	map(0xc00006, 0xc00007).rw(FUNC(lastfght_state::c00006_r), FUNC(lastfght_state::c00006_w));
+}
 
-ADDRESS_MAP_START(lastfght_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void lastfght_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 /***************************************************************************
                                 Input Ports
@@ -459,9 +464,9 @@ static INPUT_PORTS_START( lastfght )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH,IPT_SPECIAL        )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH,IPT_SPECIAL        )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH,IPT_SPECIAL        )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH,IPT_CUSTOM        )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH,IPT_CUSTOM        )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH,IPT_CUSTOM        )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
@@ -551,12 +556,11 @@ void lastfght_state::machine_reset()
 MACHINE_CONFIG_START(lastfght_state::lastfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP( lastfght_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", H83044, 32000000/2)
+	MCFG_DEVICE_PROGRAM_MAP( lastfght_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD( "palette", 256 )
@@ -590,7 +594,7 @@ ROM_START( lastfght )
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
 ROM_END
 
-DRIVER_INIT_MEMBER(lastfght_state,lastfght)
+void lastfght_state::init_lastfght()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -601,4 +605,4 @@ DRIVER_INIT_MEMBER(lastfght_state,lastfght)
 	rom[0x01b86 / 2] = 0x5670;
 }
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

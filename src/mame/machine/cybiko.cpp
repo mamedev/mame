@@ -25,13 +25,13 @@
 // DRIVER INIT & EXIT //
 ////////////////////////
 
-DRIVER_INIT_MEMBER(cybiko_state,cybiko)
+void cybiko_state::init_cybiko()
 {
 	_logerror( 0, ("init_cybikov1\n"));
 	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());
 }
 
-DRIVER_INIT_MEMBER(cybiko_state,cybikoxt)
+void cybiko_state::init_cybikoxt()
 {
 	_logerror( 0, ("init_cybikoxt\n"));
 	m_maincpu->space(AS_PROGRAM).install_ram(0x400000, 0x400000 + m_ram->size() - 1, m_ram->pointer());

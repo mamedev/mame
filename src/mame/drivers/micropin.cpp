@@ -43,8 +43,15 @@ public:
 		, m_v2cpu(*this, "v2cpu")
 		, m_pia51(*this, "pia51")
 		, m_beep(*this, "beeper")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void pentacup2(machine_config &config);
+	void micropin(machine_config &config);
+
+	void init_micropin();
+
+private:
 	DECLARE_READ8_MEMBER(pia51_r);
 	DECLARE_WRITE8_MEMBER(pia51_w);
 	DECLARE_READ8_MEMBER(p51b_r);
@@ -55,59 +62,61 @@ public:
 	DECLARE_WRITE8_MEMBER(p50a_w);
 	DECLARE_WRITE8_MEMBER(p50b_w);
 	DECLARE_WRITE8_MEMBER(p51a_w);
-	DECLARE_DRIVER_INIT(micropin);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void pentacup2(machine_config &config);
-	void micropin(machine_config &config);
 	void micropin_map(address_map &map);
 	void pentacup2_io(address_map &map);
 	void pentacup2_map(address_map &map);
-private:
+
 	uint8_t m_row;
 	uint8_t m_counter;
 	uint8_t m_beep_time;
 	uint8_t m_led_time[8];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	optional_device<m6800_cpu_device> m_v1cpu;
 	optional_device<i8085a_cpu_device> m_v2cpu;
 	optional_device<pia6821_device> m_pia51;
 	optional_device<beep_device> m_beep;
+	output_finder<76> m_digits;
 };
 
 
-ADDRESS_MAP_START(micropin_state::micropin_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("nvram") // 4x 6561 RAM
-	AM_RANGE(0x4000, 0x4005) AM_WRITE(sw_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("X1")
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("X2")
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("X3")
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("X4")
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("X5")
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia50", pia6821_device, read, write)
-	AM_RANGE(0x5100, 0x5103) AM_READWRITE(pia51_r,pia51_w)
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(sol_w);
-	AM_RANGE(0x5202, 0x5202) AM_WRITE(lamp_w);
-	AM_RANGE(0x5203, 0x5203) AM_WRITENOP
-	AM_RANGE(0x6400, 0x7fff) AM_ROM AM_REGION("v1cpu", 0)
-ADDRESS_MAP_END
+void micropin_state::micropin_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x01ff).ram().share("nvram"); // 4x 6561 RAM
+	map(0x4000, 0x4005).w(FUNC(micropin_state::sw_w));
+	map(0x4000, 0x4000).portr("X1");
+	map(0x4001, 0x4001).portr("X2");
+	map(0x4002, 0x4002).portr("X3");
+	map(0x4003, 0x4003).portr("X4");
+	map(0x4004, 0x4004).portr("X5");
+	map(0x5000, 0x5003).rw("pia50", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x5100, 0x5103).rw(FUNC(micropin_state::pia51_r), FUNC(micropin_state::pia51_w));
+	map(0x5200, 0x5200).w(FUNC(micropin_state::sol_w));
+	map(0x5202, 0x5202).w(FUNC(micropin_state::lamp_w));
+	map(0x5203, 0x5203).nopw();
+	map(0x6400, 0x7fff).rom().region("v1cpu", 0);
+}
 
-ADDRESS_MAP_START(micropin_state::pentacup2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-ADDRESS_MAP_END
+void micropin_state::pentacup2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
 
-ADDRESS_MAP_START(micropin_state::pentacup2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0e) AM_WRITE(sw_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(lamp_w)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("X0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("X1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("X2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("X3")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("X4")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("X5")
-ADDRESS_MAP_END
+void micropin_state::pentacup2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0e).w(FUNC(micropin_state::sw_w));
+	map(0x0f, 0x0f).w(FUNC(micropin_state::lamp_w));
+	map(0x00, 0x00).portr("X0");
+	map(0x01, 0x01).portr("X1");
+	map(0x02, 0x02).portr("X2");
+	map(0x03, 0x03).portr("X3");
+	map(0x04, 0x04).portr("X4");
+	map(0x05, 0x05).portr("X5");
+}
 
 static INPUT_PORTS_START( micropin )
 	PORT_START("X0")
@@ -200,8 +209,8 @@ WRITE8_MEMBER( micropin_state::p50a_w )
 	if (m_counter == 1)
 	{
 		static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
-		output().set_digit_value(m_row, patterns[data&15]);
-		output().set_digit_value(m_row+20, patterns[data>>4]);
+		m_digits[m_row] = patterns[data&15];
+		m_digits[m_row+20] = patterns[data>>4];
 	}
 }
 
@@ -211,8 +220,8 @@ WRITE8_MEMBER( micropin_state::p50b_w )
 	if (m_counter == 2)
 	{
 		static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
-		output().set_digit_value(m_row+40, patterns[data&15]);
-		output().set_digit_value(m_row+60, patterns[data>>4]);
+		m_digits[m_row+40] = patterns[data&15];
+		m_digits[m_row+60] = patterns[data>>4];
 	}
 }
 
@@ -285,55 +294,55 @@ void micropin_state::machine_reset()
 		m_led_time[i] = 5;
 }
 
-DRIVER_INIT_MEMBER( micropin_state, micropin )
+void micropin_state::init_micropin()
 {
 }
 
 MACHINE_CONFIG_START(micropin_state::micropin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("v1cpu", M6800, XTAL(2'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(micropin_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
+	MCFG_DEVICE_ADD("v1cpu", M6800, XTAL(2'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(micropin_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_micropin)
+	config.set_default_layout(layout_micropin);
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 387)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 387)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia50", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(micropin_state, p50a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(micropin_state, p50a_w))
-	//MCFG_PIA_READPB_HANDLER(READ8(micropin_state, p50b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(micropin_state, p50b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(micropin_state, p50ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(micropin_state, p50cb2_w))
+	pia6821_device &pia50(PIA6821(config, "pia50", 0));
+	//pia50.readpa_handler().set(FUNC(micropin_state::p50a_r));
+	pia50.writepa_handler().set(FUNC(micropin_state::p50a_w));
+	//pia50.readpb_handler().set(FUNC(micropin_state::p50b_r));
+	pia50.writepb_handler().set(FUNC(micropin_state::p50b_w));
+	pia50.ca2_handler().set(FUNC(micropin_state::p50ca2_w));
+	//pia50.cb2_handler().set(FUNC(micropin_state::p50cb2_w));
 
-	MCFG_DEVICE_ADD("pia51", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(micropin_state, p51a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(micropin_state, p51a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(micropin_state, p51b_r))
-	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(micropin_state, p51b_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(micropin_state, p51ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(micropin_state, p51cb2_w))
+	PIA6821(config, m_pia51, 0);
+	//m_pia51->readpa_handler().set(FUNC(micropin_state::p51a_r));
+	m_pia51->writepa_handler().set(FUNC(micropin_state::p51a_w));
+	m_pia51->readpb_handler().set(FUNC(micropin_state::p51b_r));
+	//m_pia51->writepb_handler().set(FUNC(micropin_state::p51b_w));
+	//m_pia51->ca2_handler().set(FUNC(micropin_state::p51ca2_w));
+	//m_pia51->cb2_handler().set(FUNC(micropin_state::p51cb2_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", micropin_state, timer_a, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(micropin_state::pentacup2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("v2cpu", I8085A, 2000000)
-	MCFG_CPU_PROGRAM_MAP(pentacup2_map)
-	MCFG_CPU_IO_MAP(pentacup2_io)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
+	MCFG_DEVICE_ADD("v2cpu", I8085A, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(pentacup2_map)
+	MCFG_DEVICE_IO_MAP(pentacup2_io)
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Sound */
 	genpin_audio(config);
@@ -363,5 +372,5 @@ ROM_START(pentacup2)
 ROM_END
 
 
-GAME(1978,  pentacup,  0,         micropin,   micropin, micropin_state,  micropin,  ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  pentacup2, pentacup,  pentacup2,  micropin, micropin_state,  micropin,  ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  pentacup,  0,         micropin,   micropin, micropin_state, init_micropin, ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  pentacup2, pentacup,  pentacup2,  micropin, micropin_state, init_micropin, ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL)

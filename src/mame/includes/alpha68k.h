@@ -6,13 +6,15 @@
 
 *************************************************************************/
 
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class alpha68k_state : public driver_device
 {
 public:
-	alpha68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	alpha68k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
@@ -20,39 +22,43 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_outlatch(*this, "outlatch"),
+		m_soundlatch(*this, "soundlatch"),
+		m_color_proms(*this, "color_proms"),
+		m_in(*this, "IN%u", 0U),
+		m_audiobank(*this, "audiobank") { }
 
-	/* memory pointers */
-	optional_shared_ptr<uint16_t> m_shared_ram;
-	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_videoram;
+	void tnextspc(machine_config &config);
+	void alpha68k_II(machine_config &config);
+	void btlfieldb(machine_config &config);
+	void alpha68k_I(machine_config &config);
+	void kyros(machine_config &config);
+	void alpha68k_V_sb(machine_config &config);
+	void sstingry(machine_config &config);
+	void jongbou(machine_config &config);
+	void alpha68k_V(machine_config &config);
+	void alpha68k_II_gm(machine_config &config);
 
-	/* video-related */
-	tilemap_t     *m_fix_tilemap;
-	int         m_bank_base;
-	int         m_flipscreen;
-	int         m_last_bank;
-	int         m_buffer_28;
-	int         m_buffer_60;
-	int         m_buffer_68;
+	void init_paddlema();
+	void init_btlfield();
+	void init_jongbou();
+	void init_goldmedl();
+	void init_skyadvnt();
+	void init_goldmedla();
+	void init_gangwarsu();
+	void init_gangwars();
+	void init_tnextspc();
+	void init_timesold1();
+	void init_sbasebal();
+	void init_sbasebalj();
+	void init_skysoldr();
+	void init_skyadvntu();
+	void init_btlfieldb();
+	void init_timesold();
+	void init_kyros();
+	void init_sstingry();
 
-	/* misc */
-	int         m_invert_controls;
-	int         m_microcontroller_id;
-	int         m_coin_id;
-	unsigned    m_trigstate;
-	unsigned    m_deposits1;
-	unsigned    m_deposits2;
-	unsigned    m_credits;
-	unsigned    m_coinvalue;
-	unsigned    m_microcontroller_data;
-	int         m_latch;
-	unsigned    m_game_id;  // see below
-
-	/* devices */
-	required_device<cpu_device> m_audiocpu;
-	uint8_t       m_sound_nmi_mask;
-	uint8_t       m_sound_pa_latch;
+private:
 	DECLARE_WRITE16_MEMBER(tnextspc_coin_counters_w);
 	DECLARE_WRITE16_MEMBER(tnextspc_unknown_w);
 	DECLARE_WRITE16_MEMBER(alpha_microcontroller_w);
@@ -63,11 +69,8 @@ public:
 	DECLARE_READ16_MEMBER(control_3_r);
 	DECLARE_READ16_MEMBER(control_4_r);
 	DECLARE_READ16_MEMBER(jongbou_inputs_r);
-	DECLARE_WRITE16_MEMBER(kyros_sound_w);
-	DECLARE_WRITE16_MEMBER(alpha68k_II_sound_w);
-	DECLARE_WRITE16_MEMBER(alpha68k_V_sound_w);
-	DECLARE_WRITE16_MEMBER(paddlema_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(tnextspc_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(outlatch_w);
+	DECLARE_WRITE8_MEMBER(tnextspc_soundlatch_w);
 	DECLARE_READ16_MEMBER(kyros_alpha_trigger_r);
 	DECLARE_READ16_MEMBER(alpha_II_trigger_r);
 	DECLARE_READ16_MEMBER(alpha_V_trigger_r);
@@ -75,26 +78,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE16_MEMBER(alpha68k_videoram_w);
-	DECLARE_WRITE16_MEMBER(alpha68k_II_video_bank_w);
-	DECLARE_WRITE16_MEMBER(alpha68k_V_video_control_w);
-	DECLARE_DRIVER_INIT(paddlema);
-	DECLARE_DRIVER_INIT(btlfield);
-	DECLARE_DRIVER_INIT(jongbou);
-	DECLARE_DRIVER_INIT(goldmedl);
-	DECLARE_DRIVER_INIT(skyadvnt);
-	DECLARE_DRIVER_INIT(goldmedla);
-	DECLARE_DRIVER_INIT(gangwarsu);
-	DECLARE_DRIVER_INIT(gangwars);
-	DECLARE_DRIVER_INIT(tnextspc);
-	DECLARE_DRIVER_INIT(timesold1);
-	DECLARE_DRIVER_INIT(sbasebal);
-	DECLARE_DRIVER_INIT(sbasebalj);
-	DECLARE_DRIVER_INIT(skysoldr);
-	DECLARE_DRIVER_INIT(skyadvntu);
-	DECLARE_DRIVER_INIT(btlfieldb);
-	DECLARE_DRIVER_INIT(timesold);
-	DECLARE_DRIVER_INIT(kyros);
-	DECLARE_DRIVER_INIT(sstingry);
+	DECLARE_WRITE_LINE_MEMBER(video_control2_w);
+	DECLARE_WRITE_LINE_MEMBER(video_control3_w);
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_RESET(common);
@@ -113,7 +99,7 @@ public:
 	uint32_t screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(alpha68k_sound_nmi);
 	void alpha68k_flipscreen_w( int flip );
-	void alpha68k_V_video_bank_w( int bank );
+	DECLARE_WRITE8_MEMBER(video_bank_w);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e );
 	void draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask );
 	void draw_sprites_I( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d, int yshift );
@@ -121,20 +107,6 @@ public:
 	void jongbou_video_banking(int *bank, int data);
 	void kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d );
 	void sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d );
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-	void tnextspc(machine_config &config);
-	void alpha68k_II(machine_config &config);
-	void btlfieldb(machine_config &config);
-	void alpha68k_I(machine_config &config);
-	void kyros(machine_config &config);
-	void alpha68k_V_sb(machine_config &config);
-	void sstingry(machine_config &config);
-	void jongbou(machine_config &config);
-	void alpha68k_V(machine_config &config);
-	void alpha68k_II_gm(machine_config &config);
 	void alpha68k_II_map(address_map &map);
 	void alpha68k_I_map(address_map &map);
 	void alpha68k_I_s_map(address_map &map);
@@ -150,6 +122,45 @@ public:
 	void tnextspc_map(address_map &map);
 	void tnextspc_sound_map(address_map &map);
 	void tnextspc_sound_portmap(address_map &map);
+
+	/* memory pointers */
+	optional_shared_ptr<uint16_t> m_shared_ram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_videoram;
+
+	/* devices */
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_device<ls259_device> m_outlatch;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	optional_region_ptr<uint8_t> m_color_proms;
+
+	optional_ioport_array<7> m_in;
+	optional_memory_bank m_audiobank;
+
+	uint8_t       m_sound_nmi_mask;
+	uint8_t       m_sound_pa_latch;
+
+	/* video-related */
+	tilemap_t     *m_fix_tilemap;
+	int           m_bank_base;
+	int           m_flipscreen;
+
+	/* misc */
+	int           m_invert_controls;
+	int           m_microcontroller_id;
+	int           m_coin_id;
+	unsigned      m_trigstate;
+	unsigned      m_deposits1;
+	unsigned      m_deposits2;
+	unsigned      m_credits;
+	unsigned      m_coinvalue;
+	unsigned      m_microcontroller_data;
+	int           m_latch;
+	unsigned      m_game_id;  // see below
 };
 
 /* game_id - used to deal with a few game specific situations */

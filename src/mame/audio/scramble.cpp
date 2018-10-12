@@ -18,7 +18,6 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/7474.h"
-#include "sound/flt_rc.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
@@ -124,34 +123,6 @@ READ8_MEMBER( scramble_state::hotshock_soundlatch_r )
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch->read(m_audiocpu->space(AS_PROGRAM),0);
-}
-
-static void filter_w(device_t *device, int data)
-{
-	int C = 0;
-	if (data & 1)
-		C += 220000;    /* 220000pF = 0.220uF */
-	if (data & 2)
-		C +=  47000;    /*  47000pF = 0.047uF */
-	if (device)
-		downcast<filter_rc_device*>(device)->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 5100, 0, CAP_P(C));
-}
-
-WRITE8_MEMBER(scramble_state::scramble_filter_w)
-{
-	filter_w(machine().device("filter.1.0"), (offset >>  0) & 3);
-	filter_w(machine().device("filter.1.1"), (offset >>  2) & 3);
-	filter_w(machine().device("filter.1.2"), (offset >>  4) & 3);
-	filter_w(machine().device("filter.0.0"), (offset >>  6) & 3);
-	filter_w(machine().device("filter.0.1"), (offset >>  8) & 3);
-	filter_w(machine().device("filter.0.2"), (offset >> 10) & 3);
-}
-
-WRITE8_MEMBER(scramble_state::frogger_filter_w)
-{
-	filter_w(machine().device("filter.0.0"), (offset >>  6) & 3);
-	filter_w(machine().device("filter.0.1"), (offset >>  8) & 3);
-	filter_w(machine().device("filter.0.2"), (offset >> 10) & 3);
 }
 
 void scramble_state::sh_init()
@@ -276,25 +247,27 @@ WRITE8_MEMBER( scramble_state::ad2083_tms5110_ctrl_w )
 	m_tmsprom->enable_w(1);
 }
 
-ADDRESS_MAP_START(scramble_state::ad2083_sound_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-ADDRESS_MAP_END
+void scramble_state::ad2083_sound_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x8000, 0x83ff).ram();
+}
 
-ADDRESS_MAP_START(scramble_state::ad2083_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ad2083_tms5110_ctrl_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay2", ay8910_device, address_w)
-ADDRESS_MAP_END
+void scramble_state::ad2083_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).w(FUNC(scramble_state::ad2083_tms5110_ctrl_w));
+	map(0x10, 0x10).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x20, 0x20).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x40, 0x40).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).w("ay2", FUNC(ay8910_device::address_w));
+}
 
 MACHINE_CONFIG_START(scramble_state::ad2083_audio)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
-	MCFG_CPU_PROGRAM_MAP(ad2083_sound_map)
-	MCFG_CPU_IO_MAP(ad2083_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ad2083_sound_map)
+	MCFG_DEVICE_IO_MAP(ad2083_sound_io_map)
 
 	MCFG_DEVICE_ADD("tmsprom", TMSPROM, AD2083_TMS5110_CLOCK / 2)  /* rom clock */
 	MCFG_TMSPROM_REGION("5110ctrl") /* prom memory region - sound region is automatically assigned */
@@ -307,23 +280,23 @@ MACHINE_CONFIG_START(scramble_state::ad2083_audio)
 	MCFG_TMSPROM_CTL8_BIT(2)        /* bit # of ctl8 line */
 	MCFG_TMSPROM_RESET_BIT(6)       /* bit # of rom reset */
 	MCFG_TMSPROM_STOP_BIT(7)        /* bit # of stop */
-	MCFG_TMSPROM_PDC_CB(DEVWRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
-	MCFG_TMSPROM_CTL_CB(DEVWRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
+	MCFG_TMSPROM_PDC_CB(WRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
+	MCFG_TMSPROM_CTL_CB(WRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, scramble_portB_r))
+	MCFG_DEVICE_ADD("ay1", AY8910, 14318000/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, hotshock_soundlatch_r))
+	MCFG_DEVICE_ADD("ay2", AY8910, 14318000/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, hotshock_soundlatch_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)
-	MCFG_TMS5110_M0_CB(DEVWRITELINE("tmsprom", tmsprom_device, m0_w))
-	MCFG_TMS5110_DATA_CB(DEVREADLINE("tmsprom", tmsprom_device, data_r))
+	MCFG_DEVICE_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)
+	MCFG_TMS5110_M0_CB(WRITELINE("tmsprom", tmsprom_device, m0_w))
+	MCFG_TMS5110_DATA_CB(READLINE("tmsprom", tmsprom_device, data_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

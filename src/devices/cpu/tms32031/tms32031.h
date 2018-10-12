@@ -41,6 +41,7 @@ const int TMS3203X_DINT     = 10;       // DMA interrupt
 const int TMS3203X_DINT0    = 10;       // DMA 0 interrupt (32032 only)
 const int TMS3203X_DINT1    = 11;       // DMA 1 interrupt (32032 only)
 const int TMS3203X_MCBL     = 12;       // Microcomputer/boot loader mode
+const int TMS3203X_HOLD     = 13;       // Primary bus interface hold signal
 
 // register enumeration
 enum
@@ -94,14 +95,16 @@ enum
 	downcast<tms3203x_device &>(*device).set_mcbl_mode(_mode);
 
 #define MCFG_TMS3203X_XF0_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_xf0_callback(DEVCB_##_devcb);
+	downcast<tms3203x_device &>(*device).set_xf0_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS3203X_XF1_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_xf1_callback(DEVCB_##_devcb);
+	downcast<tms3203x_device &>(*device).set_xf1_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS3203X_IACK_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_iack_callback(DEVCB_##_devcb);
+	downcast<tms3203x_device &>(*device).set_iack_callback(DEVCB_##_devcb);
 
+#define MCFG_TMS3203X_HOLDA_CB(_devcb) \
+	downcast<tms3203x_device &>(*device).set_holda_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -143,6 +146,7 @@ public:
 	template <class Object> devcb_base &set_xf0_callback(Object &&cb) { return m_xf0_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_xf1_callback(Object &&cb) { return m_xf1_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_iack_callback(Object &&cb) { return m_iack_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_holda_callback(Object &&cb) { return m_holda_cb.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	static float fp_to_float(uint32_t floatdata);
@@ -153,12 +157,14 @@ public:
 protected:
 	enum
 	{
+		CHIP_TYPE_TMS32030,
 		CHIP_TYPE_TMS32031,
 		CHIP_TYPE_TMS32032
 	};
 
 	// construction/destruction
 	tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, address_map_constructor internal_map);
+	void common_3203x(address_map &map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -182,7 +188,11 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	// internal peripheral device handlers
+	DECLARE_READ32_MEMBER(primary_bus_control_r) { return m_primary_bus_control; }
+	DECLARE_WRITE32_MEMBER(primary_bus_control_w);
 
 	// memory helpers
 	uint32_t ROPCODE(offs_t pc);
@@ -755,6 +765,20 @@ protected:
 	tmsreg              m_r[36];
 	uint32_t              m_bkmask;
 
+	// internal peripheral registers
+	enum primary_bus_control_mask : uint32_t
+	{
+		HOLDST = 0x00000001, // hold status
+		NOHOLD = 0x00000002, // external hold disable
+		HIZ    = 0x00000004, // internal hold
+		SWW    = 0x00000018, // software wait mode
+		WTCNT  = 0x000000e0, // software wait count
+		BNKCMP = 0x00001f00, // bank compare
+
+		WMASK  = 0x00001ffe
+	};
+	uint32_t            m_primary_bus_control;
+
 	// internal stuff
 	uint16_t              m_irq_state;
 	bool                m_delayed;
@@ -764,13 +788,16 @@ protected:
 
 	uint32_t              m_iotemp;
 	address_space *     m_program;
-	direct_read_data<-2> *m_direct;
+	memory_access_cache<2, -2, ENDIANNESS_LITTLE> *m_cache;
 	uint32_t *            m_bootrom;
 
 	bool                m_mcbl_mode;
+	bool                m_hold_state;
+
 	devcb_write8        m_xf0_cb;
 	devcb_write8        m_xf1_cb;
 	devcb_write8        m_iack_cb;
+	devcb_write_line    m_holda_cb;
 
 	// tables
 	static void (tms3203x_device::*const s_tms32031ops[])(uint32_t op);
@@ -781,6 +808,17 @@ protected:
 #if (TMS_3203X_LOG_OPCODE_USAGE)
 	uint32_t              m_hits[0x200*4];
 #endif
+};
+
+
+// ======================> tms32030_device
+
+class tms32030_device : public tms3203x_device
+{
+public:
+	// construction/destruction
+	tms32030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void internal_32030(address_map &map);
 };
 
 
@@ -807,6 +845,7 @@ public:
 
 
 // device type definition
+DECLARE_DEVICE_TYPE(TMS32030, tms32030_device)
 DECLARE_DEVICE_TYPE(TMS32031, tms32031_device)
 DECLARE_DEVICE_TYPE(TMS32032, tms32032_device)
 

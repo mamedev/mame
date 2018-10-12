@@ -93,16 +93,17 @@ WRITE16_MEMBER(sh7604_bus_device::refresh_timer_constant_w)
 	COMBINE_DATA(&m_rtcor);
 }
 
-ADDRESS_MAP_START(sh7604_bus_device::bus_regs)
-	AM_RANGE(0x00, 0x01) AM_READWRITE(bus_control_1_r, bus_control_1_w)
-	AM_RANGE(0x02, 0x03) AM_READWRITE(bus_control_2_r, bus_control_2_w)
-	AM_RANGE(0x04, 0x05) AM_READWRITE(wait_control_r, wait_control_w)
-	AM_RANGE(0x06, 0x07) AM_READWRITE(memory_control_r, memory_control_w)
-	AM_RANGE(0x08, 0x09) AM_READWRITE(refresh_timer_status_r, refresh_timer_control_w)
-	AM_RANGE(0x0a, 0x0b) AM_READWRITE(refresh_timer_counter_r, refresh_timer_counter_w)
-	AM_RANGE(0x0c, 0x0d) AM_READWRITE(refresh_timer_constant_r, refresh_timer_constant_w)
+void sh7604_bus_device::bus_regs(address_map &map)
+{
+	map(0x00, 0x01).rw(FUNC(sh7604_bus_device::bus_control_1_r), FUNC(sh7604_bus_device::bus_control_1_w));
+	map(0x02, 0x03).rw(FUNC(sh7604_bus_device::bus_control_2_r), FUNC(sh7604_bus_device::bus_control_2_w));
+	map(0x04, 0x05).rw(FUNC(sh7604_bus_device::wait_control_r), FUNC(sh7604_bus_device::wait_control_w));
+	map(0x06, 0x07).rw(FUNC(sh7604_bus_device::memory_control_r), FUNC(sh7604_bus_device::memory_control_w));
+	map(0x08, 0x09).rw(FUNC(sh7604_bus_device::refresh_timer_status_r), FUNC(sh7604_bus_device::refresh_timer_control_w));
+	map(0x0a, 0x0b).rw(FUNC(sh7604_bus_device::refresh_timer_counter_r), FUNC(sh7604_bus_device::refresh_timer_counter_w));
+	map(0x0c, 0x0d).rw(FUNC(sh7604_bus_device::refresh_timer_constant_r), FUNC(sh7604_bus_device::refresh_timer_constant_w));
 //  AM_RANGE(0x0e, 0x0f) unmapped, mirror?
-ADDRESS_MAP_END
+}
 
 //-------------------------------------------------
 //  sh7604_bus_device - constructor

@@ -114,6 +114,7 @@ Sound processor - 6502
 #include "machine/ldp1000.h"
 #include "machine/gen_latch.h"
 #include "machine/6850acia.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -135,8 +136,14 @@ public:
 			m_attr0(*this, "attr0"),
 			m_vram1(*this, "vram1"),
 			m_attr1(*this, "attr1")
-
 			{ }
+
+	void rblaster(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -152,18 +159,14 @@ public:
 	required_shared_ptr<uint8_t> m_vram1;
 	required_shared_ptr<uint8_t> m_attr1;
 
-	uint8_t m_laserdisc_data;
 	int m_nmimask;
 	DECLARE_READ8_MEMBER(acia_status_hack_r);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(decold_sound_cmd_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
 	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
-	void rblaster(machine_config &config);
 	void rblaster_map(address_map &map);
 	void rblaster_sound_map(address_map &map);
 };
@@ -269,26 +272,27 @@ READ8_MEMBER(deco_ld_state::acia_status_hack_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(deco_ld_state::rblaster_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0") AM_WRITENOP // (w) coin lockout
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN1")
-	AM_RANGE(0x1004, 0x1004) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(decold_sound_cmd_w)
-	AM_RANGE(0x1005, 0x1005) AM_READ(sound_status_r)
+void deco_ld_state::rblaster_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1000).portr("IN0").nopw(); // (w) coin lockout
+	map(0x1001, 0x1001).portr("DSW1");
+	map(0x1002, 0x1002).portr("DSW2");
+	map(0x1003, 0x1003).portr("IN1");
+	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(FUNC(deco_ld_state::decold_sound_cmd_w));
+	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
 	//AM_RANGE(0x1006, 0x1007) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0x1006, 0x1006) AM_READ(acia_status_hack_r)
-	AM_RANGE(0x1007, 0x1007) AM_DEVREADWRITE("laserdisc", sony_ldp1000_device, status_r, command_w)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("vram0")
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("attr0")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("vram1")
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM AM_SHARE("attr1")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x1006, 0x1006).r(FUNC(deco_ld_state::acia_status_hack_r));
+	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
+	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2000, 0x27ff).ram();
+	map(0x2800, 0x2bff).ram().share("vram0");
+	map(0x2c00, 0x2fff).ram().share("attr0");
+	map(0x3000, 0x37ff).ram();
+	map(0x3800, 0x3bff).ram().share("vram1");
+	map(0x3c00, 0x3fff).ram().share("attr1");
+	map(0x4000, 0xffff).rom();
+}
 
 
 /* sound arrangement is pratically identical to Zero Target. */
@@ -302,19 +306,20 @@ WRITE8_MEMBER(deco_ld_state::nmimask_w)
 
 INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 {
-	if (!m_nmimask) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_nmimask) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-ADDRESS_MAP_START(deco_ld_state::rblaster_sound_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void deco_ld_state::rblaster_sound_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x2000, 0x2000).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x4000, 0x4000).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x8000, 0x8000).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0xe000, 0xffff).rom();
+}
 
 CUSTOM_INPUT_MEMBER( deco_ld_state::begas_vblank_r )
 {
@@ -359,7 +364,7 @@ static INPUT_PORTS_START( begas )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF,deco_ld_state,begas_vblank_r, nullptr) // TODO: IPT_VBLANK doesn't seem to work fine?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF,deco_ld_state,begas_vblank_r, nullptr) // TODO: IPT_VBLANK doesn't seem to work fine?
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
@@ -449,7 +454,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( rblaster )
+static GFXDECODE_START( gfx_rblaster )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 8 )
 GFXDECODE_END
@@ -461,13 +466,13 @@ void deco_ld_state::machine_start()
 MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(rblaster_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco_ld_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M6502,8000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(rblaster_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco_ld_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu",M6502,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(rblaster_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(deco_ld_state, sound_interrupt,  640)
+	MCFG_DEVICE_ADD("audiocpu",M6502,8000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(rblaster_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(deco_ld_state, sound_interrupt,  640)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -478,30 +483,31 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rblaster)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rblaster)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
-	//MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("laserdisc", sony_ldp1000_device, write))
-	//MCFG_ACIA6850_RXD_HANDLER(DEVREADLINE("laserdisc", sony_ldp1000_device, read))
+	//ACIA6850(config, m_acia, 0);
+	//m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1000_device::write));
+	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
 
 	/* sound hardware */
 	/* TODO: mixing */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -661,9 +667,9 @@ ROM_END
 
 
 
-GAME( 1983, begas,  0,       rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
-GAME( 1983, begas1, begas,   rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobra,  0,       rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobraa, cobra,   rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
+GAME( 1983, begas,    0,     rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
+GAME( 1983, begas1,   begas, rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobra,    0,     rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobraa,   cobra, rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
 // Thunder Storm (Cobra Command Japanese version)
-GAME( 1985, rblaster,  0,    rblaster,  rblaster, deco_ld_state,  0, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )
+GAME( 1985, rblaster, 0,     rblaster, rblaster, deco_ld_state, empty_init, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )

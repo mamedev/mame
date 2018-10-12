@@ -13,6 +13,6 @@
 
 
 // supported devices
-SLOT_INTERFACE_EXTERN(snes_cart);
+void snes_cart(device_slot_interface &device);
 
 #endif // MAME_BUS_SNES_SNES_CARTS_H

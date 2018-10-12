@@ -70,8 +70,8 @@ WRITE8_MEMBER(epos_state::port_1_w)
 	   D4-D7 - unused
 	 */
 
-	output().set_led_value(0, (data >> 0) & 0x01);
-	output().set_led_value(1, (data >> 1) & 0x01);
+	m_leds[0] = BIT(data, 0);
+	m_leds[1] = BIT(data, 1);
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 

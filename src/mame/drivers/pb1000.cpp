@@ -25,7 +25,7 @@
 #include "sound/beep.h"
 #include "video/hd44352.h"
 
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -46,6 +46,10 @@ public:
 			m_card2(*this, "cardslot2")
 		{ }
 
+	void pb2000c(machine_config &config);
+	void pb1000(machine_config &config);
+
+private:
 	required_device<hd61700_cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_device<hd44352_device> m_hd44352;
@@ -74,31 +78,31 @@ public:
 	uint16_t read_touchscreen(uint8_t line);
 	DECLARE_PALETTE_INIT(pb1000);
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
-	void pb2000c(machine_config &config);
-	void pb1000(machine_config &config);
 	void pb1000_mem(address_map &map);
 	void pb2000c_mem(address_map &map);
 };
 
-ADDRESS_MAP_START(pb1000_state::pb1000_mem)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE( 0x00000, 0x00bff ) AM_ROM
+void pb1000_state::pb1000_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x00000, 0x00bff).rom();
 	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O
-	AM_RANGE( 0x06000, 0x07fff ) AM_RAM                 AM_SHARE("nvram1")
-	AM_RANGE( 0x08000, 0x0ffff ) AM_ROMBANK("bank1")
-	AM_RANGE( 0x18000, 0x1ffff ) AM_RAM                 AM_SHARE("nvram2")
-ADDRESS_MAP_END
+	map(0x06000, 0x07fff).ram().share("nvram1");
+	map(0x08000, 0x0ffff).bankr("bank1");
+	map(0x18000, 0x1ffff).ram().share("nvram2");
+}
 
-ADDRESS_MAP_START(pb1000_state::pb2000c_mem)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE( 0x00000, 0x0ffff ) AM_ROMBANK("bank1")
-	AM_RANGE( 0x00000, 0x00bff ) AM_ROM
+void pb1000_state::pb2000c_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x00000, 0x0ffff).bankr("bank1");
+	map(0x00000, 0x00bff).rom();
 	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O
-	AM_RANGE( 0x00c10, 0x00c11 ) AM_WRITE(gatearray_w)
-	AM_RANGE( 0x10000, 0x1ffff ) AM_RAM                 AM_SHARE("nvram1")
-	AM_RANGE( 0x20000, 0x27fff ) AM_DEVREAD("cardslot1", generic_slot_device, read16_rom)
-	AM_RANGE( 0x28000, 0x2ffff ) AM_RAM                 AM_SHARE("nvram2")
-ADDRESS_MAP_END
+	map(0x00c10, 0x00c11).w(FUNC(pb1000_state::gatearray_w));
+	map(0x10000, 0x1ffff).ram().share("nvram1");
+	map(0x20000, 0x27fff).r(m_card1, FUNC(generic_slot_device::read16_rom));
+	map(0x28000, 0x2ffff).ram().share("nvram2");
+}
 
 
 /* Input ports */
@@ -322,7 +326,7 @@ static const gfx_layout pb1000_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( pb1000 )
+static GFXDECODE_START( gfx_pb1000 )
 	GFXDECODE_ENTRY( "hd44352", 0x0000, pb1000_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -480,15 +484,15 @@ void pb1000_state::machine_start()
 
 MACHINE_CONFIG_START(pb1000_state::pb1000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD61700, 910000)
-	MCFG_CPU_PROGRAM_MAP(pb1000_mem)
-	MCFG_HD61700_LCD_CTRL_CB(WRITE8(pb1000_state, lcd_control))
-	MCFG_HD61700_LCD_READ_CB(READ8(pb1000_state, lcd_data_r))
-	MCFG_HD61700_LCD_WRITE_CB(WRITE8(pb1000_state, lcd_data_w))
-	MCFG_HD61700_KB_READ_CB(READ16(pb1000_state, pb1000_kb_r))
-	MCFG_HD61700_KB_WRITE_CB(WRITE8(pb1000_state, kb_matrix_w))
-	MCFG_HD61700_PORT_READ_CB(READ8(pb1000_state, pb1000_port_r))
-	MCFG_HD61700_PORT_WRITE_CB(WRITE8(pb1000_state, port_w))
+	MCFG_DEVICE_ADD("maincpu", HD61700, 910000)
+	MCFG_DEVICE_PROGRAM_MAP(pb1000_mem)
+	MCFG_HD61700_LCD_CTRL_CB(WRITE8(*this, pb1000_state, lcd_control))
+	MCFG_HD61700_LCD_READ_CB(READ8(*this, pb1000_state, lcd_data_r))
+	MCFG_HD61700_LCD_WRITE_CB(WRITE8(*this, pb1000_state, lcd_data_w))
+	MCFG_HD61700_KB_READ_CB(READ16(*this, pb1000_state, pb1000_kb_r))
+	MCFG_HD61700_KB_WRITE_CB(WRITE8(*this, pb1000_state, kb_matrix_w))
+	MCFG_HD61700_PORT_READ_CB(READ8(*this, pb1000_state, pb1000_port_r))
+	MCFG_HD61700_PORT_WRITE_CB(WRITE8(*this, pb1000_state, port_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -499,30 +503,29 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 32-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pb1000_state, pb1000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pb1000 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pb1000)
 
 	MCFG_DEVICE_ADD("hd44352", HD44352, 910000)
 	MCFG_HD44352_ON_CB(INPUTLINE("maincpu", HD61700_ON_INT))
 
-	MCFG_NVRAM_ADD_0FILL("nvram1")
-	MCFG_NVRAM_ADD_0FILL("nvram2")
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pb1000_state::pb2000c)
 	pb1000(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pb2000c_mem)
-	MCFG_HD61700_KB_READ_CB(READ16(pb1000_state, pb2000c_kb_r))
-	MCFG_HD61700_PORT_READ_CB(READ8(pb1000_state, pb2000c_port_r))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pb2000c_mem)
+	MCFG_HD61700_KB_READ_CB(READ16(*this, pb1000_state, pb2000c_kb_r))
+	MCFG_HD61700_PORT_READ_CB(READ8(*this, pb1000_state, pb2000c_port_r))
 
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot1", generic_plain_slot, "pb2000c_card")
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot2", generic_plain_slot, "pb2000c_card")
@@ -539,9 +542,9 @@ ROM_START( pb1000 )
 
 	ROM_REGION( 0x10000, "rom", ROMREGION_ERASE )
 	ROM_SYSTEM_BIOS(0, "basic", "BASIC")
-	ROMX_LOAD( "pb1000.bin", 0x0000, 0x8000, CRC(8127a090) SHA1(067c1c2e7efb5249e95afa7805bb98543b30b630), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD( "pb1000.bin", 0x0000, 0x8000, CRC(8127a090) SHA1(067c1c2e7efb5249e95afa7805bb98543b30b630), ROM_BIOS(0) | ROM_SKIP(1))
 	ROM_SYSTEM_BIOS(1, "basicj", "BASIC Jap")
-	ROMX_LOAD( "pb1000j.bin", 0x0000, 0x8000, CRC(14a0df57) SHA1(ab47bb54eb2a24dcd9d2663462e9272d974fa7da), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD( "pb1000j.bin", 0x0000, 0x8000, CRC(14a0df57) SHA1(ab47bb54eb2a24dcd9d2663462e9272d974fa7da), ROM_BIOS(1) | ROM_SKIP(1))
 
 	ROM_REGION( 0x0800, "hd44352", 0 )
 	ROM_LOAD( "charset.bin", 0x0000, 0x0800, CRC(7f144716) SHA1(a02f1ecc6dc0ac55b94f00931d8f5cb6b9ffb7b4))
@@ -573,7 +576,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT    STATE          INIT    COMPANY   FULLNAME     FLAGS */
-COMP( 1987, pb1000,  0,       0,       pb1000,    pb1000,  pb1000_state,  0,      "Casio",  "PB-1000",   MACHINE_NOT_WORKING)
-COMP( 1989, pb2000c, 0,       0,       pb2000c,   pb2000c, pb1000_state,  0,      "Casio",  "PB-2000c",  MACHINE_NOT_WORKING)
-COMP( 1989, ai1000,  pb2000c, 0,       pb2000c,   pb2000c, pb1000_state,  0,      "Casio",  "AI-1000",   MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY  FULLNAME    FLAGS */
+COMP( 1987, pb1000,  0,       0,      pb1000,  pb1000,  pb1000_state, empty_init, "Casio", "PB-1000",  MACHINE_NOT_WORKING)
+COMP( 1989, pb2000c, 0,       0,      pb2000c, pb2000c, pb1000_state, empty_init, "Casio", "PB-2000c", MACHINE_NOT_WORKING)
+COMP( 1989, ai1000,  pb2000c, 0,      pb2000c, pb2000c, pb1000_state, empty_init, "Casio", "AI-1000",  MACHINE_NOT_WORKING)

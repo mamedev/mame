@@ -56,9 +56,10 @@ DEFINE_DEVICE_TYPE(ZX8301, zx8301_device, "zx8301", "Sinclair ZX8301")
 
 
 // default address map
-ADDRESS_MAP_START(zx8301_device::zx8301)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-ADDRESS_MAP_END
+void zx8301_device::zx8301(address_map &map)
+{
+	map(0x00000, 0x1ffff).ram();
+}
 
 
 //-------------------------------------------------

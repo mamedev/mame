@@ -66,30 +66,32 @@ Stephh's notes (based on the game M68000 code and some tests) :
                 MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(volfied_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM     /* program */
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM     /* tiles   */
-	AM_RANGE(0x100000, 0x103fff) AM_RAM     /* main    */
-	AM_RANGE(0x200000, 0x203fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)
-	AM_RANGE(0x400000, 0x47ffff) AM_READWRITE(video_ram_r, video_ram_w)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(video_mask_w)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(sprite_ctrl_w)
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(video_ctrl_r, video_ctrl_w)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0xf00000, 0xf007ff) AM_DEVREADWRITE8("cchip", taito_cchip_device, mem68_r, mem68_w, 0x00ff)
-	AM_RANGE(0xf00800, 0xf00fff) AM_DEVREADWRITE8("cchip", taito_cchip_device, asic_r, asic68_w, 0x00ff)
-ADDRESS_MAP_END
+void volfied_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();     /* program */
+	map(0x080000, 0x0fffff).rom();     /* tiles   */
+	map(0x100000, 0x103fff).ram();     /* main    */
+	map(0x200000, 0x203fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));
+	map(0x400000, 0x47ffff).rw(FUNC(volfied_state::video_ram_r), FUNC(volfied_state::video_ram_w));
+	map(0x500000, 0x503fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x600000, 0x600001).w(FUNC(volfied_state::video_mask_w));
+	map(0x700000, 0x700001).w(FUNC(volfied_state::sprite_ctrl_w));
+	map(0xd00000, 0xd00001).rw(FUNC(volfied_state::video_ctrl_r), FUNC(volfied_state::video_ctrl_w));
+	map(0xe00001, 0xe00001).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0xe00003, 0xe00003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0xf00000, 0xf007ff).rw(m_cchip, FUNC(taito_cchip_device::mem68_r), FUNC(taito_cchip_device::mem68_w)).umask16(0x00ff);
+	map(0xf00800, 0xf00fff).rw(m_cchip, FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic68_w)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(volfied_state::z80_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0x8801, 0x8801) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x9800, 0x9800) AM_WRITENOP    /* ? */
-ADDRESS_MAP_END
+void volfied_state::z80_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8800).w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0x8801, 0x8801).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x9800, 0x9800).nopw();    /* ? */
+}
 
 
 /***********************************************************
@@ -199,7 +201,7 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( volfied )
+static GFXDECODE_START( gfx_volfied )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 4096, 256 )
 GFXDECODE_END
 
@@ -224,20 +226,11 @@ WRITE8_MEMBER(volfied_state::counters_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::scanline)
+INTERRUPT_GEN_MEMBER(volfied_state::interrupt)
 {
-	if (param == 240)
-	{
-		m_maincpu->set_input_line(4, HOLD_LINE);
-	}
-	else if (param == 40)
-	{
-		/* it isn't clear when / how this should be generated.  if it's too close to the main vblank you get spurious inputs, including TILT and additional coins when ingame
-		   so for now we generate it at a fixed interval after vbl.  test mode doesn't use 68k interrupts so you get the odd bad frame in the input test as the idle loop
-		   drifts out of sync with the vbl signal */
-		m_cchip->ext_interrupt(ASSERT_LINE);
-		m_cchip_irq_clear->adjust(attotime::zero);
-	}
+	m_maincpu->set_input_line(4, HOLD_LINE);
+	m_cchip->ext_interrupt(ASSERT_LINE);
+	m_cchip_irq_clear->adjust(attotime::zero);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::cchip_irq_clear_cb)
@@ -249,20 +242,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::cchip_irq_clear_cb)
 MACHINE_CONFIG_START(volfied_state::volfied)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", volfied_state,  irq4_line_hold)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", volfied_state, scanline, "screen", 0, 1)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", volfied_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
-	MCFG_CPU_PROGRAM_MAP(z80_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
+	MCFG_DEVICE_PROGRAM_MAP(z80_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(20'000'000)/2) /* 20MHz OSC next to C-Chip, 10MHz?? */
-	MCFG_CCHIP_IN_PORTA_CB(IOPORT("F00007"))
-	MCFG_CCHIP_IN_PORTB_CB(IOPORT("F00009"))
-	MCFG_CCHIP_IN_PORTC_CB(IOPORT("F0000B"))
-	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("F0000D"))
-	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(volfied_state, counters_w))
+	TAITO_CCHIP(config, m_cchip, 20_MHz_XTAL/2); // 20MHz OSC next to C-Chip
+	m_cchip->in_pa_callback().set_ioport("F00007");
+	m_cchip->in_pb_callback().set_ioport("F00009");
+	m_cchip->in_pc_callback().set_ioport("F0000B");
+	m_cchip->in_ad_callback().set_ioport("F0000D");
+	m_cchip->out_pb_callback().set(FUNC(volfied_state::counters_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -277,7 +269,7 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	MCFG_SCREEN_UPDATE_DRIVER(volfied_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", volfied)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_volfied)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -286,9 +278,9 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
@@ -500,9 +492,9 @@ ROM_START( volfiedjo )
 ROM_END
 
 
-GAME( 1989, volfied,   0,       volfied, volfied,  volfied_state, 0, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedu,  volfied, volfied, volfiedu, volfied_state, 0, ROT270, "Taito America Corporation", "Volfied (US, revision 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedj,  volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedo,  volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation Japan",   "Volfied (World)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfieduo, volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito America Corporation", "Volfied (US)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedjo, volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation",         "Volfied (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfied,   0,       volfied, volfied,  volfied_state, empty_init, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedu,  volfied, volfied, volfiedu, volfied_state, empty_init, ROT270, "Taito America Corporation", "Volfied (US, revision 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedj,  volfied, volfied, volfiedj, volfied_state, empty_init, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedo,  volfied, volfied, volfiedj, volfied_state, empty_init, ROT270, "Taito Corporation Japan",   "Volfied (World)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfieduo, volfied, volfied, volfiedj, volfied_state, empty_init, ROT270, "Taito America Corporation", "Volfied (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedjo, volfied, volfied, volfiedj, volfied_state, empty_init, ROT270, "Taito Corporation",         "Volfied (Japan)",             MACHINE_SUPPORTS_SAVE )

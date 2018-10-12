@@ -16,33 +16,68 @@
 
   --- Hardware Notes ---
 
-  The hardware is normally composed by:
+There are at least 3 viariants for this hardware.
+
+---------  
+The oldest revision (green) is marked H83048 with the following hardware:
+(note that @IC2 is unpopulated)
+  CPU:
+    1x H8/3048 (HD64F3048F16)            @IC1
+    (128KB ROM; 4KB RAM)
+  Sound:
+    1x OKI 6295 or clones                @IC24
+	1x LM358N dual operational amplifier @IC27
+    1x TDA2003 audio amplifier           @IC26
+  PLDs:
+    1x ispLSI2064-80LJ                   @IC12
+  Clock:
+    1x Xtal 30.000 MHz                   @OSC1
+    1x Resonator ZTB1000J (1000 kHz)     @X1
+  ROMs:
+    1x 27C010 or 27C020 (sound)          @IC25
+    2x or 4x 27C040 (graphics)           @IC17,18,19,20
+  RAMs:
+    2x SRAM 32k x 8                      @IC13,14
+  Connectors:
+    1x 28x2 edge connector
+    1x 12 legs connector                 @CN1
+    1x 50 legs flat cable connector      @CN4
+  Other:
+    1x battery                           @BAT1
+    1x 12 DIP switches bank              @CN2,3
+    2x trimmer (VOLUME, SPARK)           @P1,2
+
+Known games on this hardware revision are:
+200x        Book Theatre (ver 1.2)
+2000.04.12  Capitan Uncino (Ver 1.2)
+2001.02     Capitani Coraggiosi (Ver 1.3)
+
+---------
+A slightly newer revision (green) is marked H83048 and adds a very small piggyback @IC2 with:
+
+  Timekeeping: 1x Dallas DS1302 Trickle Charge Timekeeping Chip
+  Clock:       1x Xtal 32.768
+  A jumper cable connects the piggyback with ICL7673 pin2 @IC31 Automatic battery back-up switch
+
+Known games on this hardware revision are:
+2001        Europa 2002 (Ver 2.0, set 1)
+2001        Europa 2002 (Ver 2.0, set 2)
+2002.01     La Perla Nera (Ver 2.0)
+2001.11     La Perla Nera Gold (Ver 2.0)
+2001.06     Labyrinth (Versione 1.5)
+200x        Pin Ups (Ver 1.0 Rev.A)
+2001.12     World Cup (Ver 1.4) - note ICs location are differently numbered
+2001        World Cup (Ver 1.5) - note RAMS are smaller SRAM 8k x 8
 
 
-  CPU:   1x H8/3048 (HD64F3048F16).
-           (128KB ROM; 4KB RAM)
-
-  Sound: 1x AD-65 (OKI 6295)
-         1x TDA2003 (audio amplifier).
-
-  PLDs:  1x ispLSI2064-80LJ.
-
-  Clock: 1x Xtal 30.000 MHz.
-         1x Resonator ZTB1000J (1000 kHz) or similar.
-
-  ROMs:  1x (up to) 27C2001 or similar (sound).
-         2x or more 27C4001 or similar (graphics).
-
-  Timekeeping: 1x Dallas DS1302 Trickle Charge Timekeeping Chip (optional).
-
-  Connectors: 1x 28x2 edge connector.
-              1x 12 legs connector.
-              1x 24 legs female connector.
-              1x 50 legs flat cable connector.
-
-  Other: 1x battery.
-         2x 12 DIP switches.
-         2x trimmer.
+---------
+A more recent revision (red) is marked H83048 Rev 1.1 and removes the piggyback putting Timekeeping and Clock (X2) directly on the board.
+  A jumper cable on the solder side connects Timekeeping pin5 to unpopulated IC2 pin11
+		 
+Known games on this hardware revision are:
+2001.08.24  Abacus (Ver 1.0)
+2002        Europa 2002 Space (Ver 3.0)
+2002.12     UFO Robot (Ver. 1.0 Rev.A)
 
 
 *******************************************************************/
@@ -50,6 +85,7 @@
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -72,12 +108,13 @@ public:
 			m_palette(*this, "palette")
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void mnumber(machine_config &config);
 	void itgamble(machine_config &config);
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void itgamble_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -108,10 +145,11 @@ uint32_t itgamble_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(itgamble_state::itgamble_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
+void itgamble_state::itgamble_map(address_map &map)
+{
+	map.global_mask(0xffffff);
+	map(0x000000, 0xffffff).rom();
+}
 
 
 /*************************
@@ -191,7 +229,7 @@ static const gfx_layout gfxlayout_8x8x8 =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( itgamble )
+static GFXDECODE_START( gfx_itgamble )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x8,   0, 16  )
 GFXDECODE_END
 
@@ -214,8 +252,8 @@ void itgamble_state::machine_reset()
 MACHINE_CONFIG_START(itgamble_state::itgamble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83048, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(itgamble_map)
+	MCFG_DEVICE_ADD("maincpu", H83048, MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(itgamble_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -226,22 +264,22 @@ MACHINE_CONFIG_START(itgamble_state::itgamble)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itgamble)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_itgamble)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", SND_CLOCK, PIN7_HIGH) /* 1MHz resonator */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, SND_CLOCK, okim6295_device::PIN7_HIGH) /* 1MHz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(itgamble_state::mnumber)
 	itgamble(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(MNUMBER_MAIN_CLOCK/2)    /* probably the wrong CPU */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(MNUMBER_MAIN_CLOCK/2)    /* probably the wrong CPU */
 
-	MCFG_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -250,10 +288,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ejollyx5 )
 	itgamble(config);
 	/* wrong CPU. we need a Renesas M16/62A 16bit microcomputer core */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(EJOLLYX5_MAIN_CLOCK/2)   /* up to 10MHz.*/
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(EJOLLYX5_MAIN_CLOCK/2)   /* up to 10MHz.*/
 
-	MCFG_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 #endif
@@ -263,36 +301,30 @@ MACHINE_CONFIG_END
 *        Rom Load        *
 *************************/
 
-/* Capitan Uncino (Ver 1.2)
-
-CPU:
-
-1x HD64F3048F16 (main)(ic1)
-1x ispLSI2064-80LJ (ic12)
-1x AD-65 (equivalent to M6295) (ic24)(sound)
-1x oscillator 30.00MHz (close to main)
-1x blu resonator 1000J (close to sound)
-
-ROMs:
-
-1x M27C2001 (1)
-2x M27C4001 (2,3)
-
-Note:
-
-1x 28x2 edge connector
-1x 12 legs connector
-1x 50 legs flat cable connector
-1x 12x2 jumpers
-1x trimmer (volume)
-1x trimmer (spark)
-
---------------------
-
-PCB is labeled Ver 1.3, while EPROMs are labeled Ver 1.2
-
+/* Book Theatre (ver 1.2)
+PCB is marked: "CE H83048" on component side
+PCB is marked: "H83048 bottom" on solder side
+PCB is labeled: "BOOK THEATER Vers. 1.2" on component side
 */
+ROM_START( bookthr )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "bookthr_ver1.2_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
+	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_LOAD( "2.ic18", 0x000000, 0x80000, CRC(39433a74) SHA1(088944bfb43b4f239f22d0d2213efd19cea7db30) )
+	ROM_LOAD( "3.ic17", 0x080000, 0x80000, CRC(893abdcc) SHA1(4dd28fd46bec8be5549d679d31c771888fcb1286) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) //same as Abacus
+ROM_END
+
+/* Capitan Uncino (Ver 1.2)
+PCB is marked: "CE H83048" on component side
+PCB is marked: "ET5" and "H83048 bottom" on solder side
+PCB is labeled: "Capitan Uncino Vers. 1.3" and " PASSED 12/04/00" on component side
+--
+PCB is labeled Ver 1.3, while EPROMs are labeled Ver 1.2
+*/
 ROM_START( capunc )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "capunc.ver1.2.mcu", 0x00000, 0x4000, NO_DUMP )
@@ -305,42 +337,11 @@ ROM_START( capunc )
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
-
 /* Capitani Coraggiosi (Ver 1.3)
-
-CPU:
-
-1x HD64F3048F16 (main)(ic1)
-1x ispLSI2064-80LJ (ic12)
-1x AD-65 (equivalent to M6295) (ic24)(sound)
-1x oscillator 30MHz (close to main)
-1x orange resonator ZTB1000J (close to sound)
-
-ROMs:
-
-1x M27C2001 (1)
-2x M27C4001 (2,3)
-
-Note:
-
-1x 28x2 edge connector
-1x 12 legs connector
-1x 50 legs flat cable connector
-1x 12x2 switches dip
-1x trimmer (volume)
-1x trimmer (spark)
-
-
-The differences between this set and the alternate one, are only 4 bytes
-in the samples ROM header. Replaced the sound ROM with the clean one.
-
-3 and 3 files
-2.ic18                  2.ic18                  IDENTICAL
-3.ic17                  3.ic17                  IDENTICAL
-1.ic25                  1.ic25                  99.998474%
-
+PCB is marked: "CE H83048" on component side
+PCB is marked: "H83048 bottom" on solder side
+PCB is labeled: "Capitani Coraggiosi Vers. 1.3" and "PASSED 02/2001" on component side
 */
-
 ROM_START( capcor )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "capcor.ver1.3.mcu", 0x00000, 0x4000, NO_DUMP )
@@ -353,120 +354,11 @@ ROM_START( capcor )
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
-
-/* La Perla Nera (Ver 2.0)
-
-CPU:
-
-1x HD64F3048F16 (main)(ic1)
-1x ispLSI2064-80LJ (ic12)
-1x AD-65 (equivalent to M6295) (ic24)(sound)
-1x oscillator 30.00MHz (close to main)
-1x red resonator ZTB1000J (close to sound)
-
-ROMs:
-
-1x M27C2001 (1)
-2x M27C4001 (2,3)
-
-Note:
-
-1x 28x2 edge connector
-1x 12 legs connector
-1x 50 legs flat cable connector
-1x 12x2 jumper
-1x trimmer (volume)
-1x trimmer (spark)
-
-*/
-
-ROM_START( laperla )
-	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
-	ROM_LOAD( "laperla_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "2jolly.ic18", 0x000000, 0x80000, CRC(7bf3d5f2) SHA1(f3a51dd642358a20f6324f28fdf458e8ceaca7a1) )
-	ROM_LOAD( "3jolly.ic17", 0x080000, 0x80000, CRC(c3a8d9a0) SHA1(cc95c56ebc6137e11c82ed17be7c9f83ed7b6cfc) )
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
-	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
-ROM_END
-
-
-/* La Perla Nera Gold (Ver 2.0)
-
-CPU:
-
-1x HD64F3048F16 (main)(ic1)
-1x ispLSI2064-80LJ (ic12)
-1x AD-65 (equivalent to M6295) (ic24)(sound)
-1x oscillator 30.00MHz (close to main)
-1x red resonator ZTB1000J (close to sound)
-
-ROMs:
-
-1x M27C2001 (1)
-2x M27C4001 (2,3)
-
-Note:
-
-1x 28x2 edge connector
-1x 12 legs connector
-1x 50 legs flat cable connector
-1x 12x2 jumper
-1x trimmer (volume)
-1x trimmer (spark)
-
----------------------------------------------
-
-laperla vs. laperlag
-
-3 and 3 files
-3jolly.ic17             ic17-laperlanera            11.018181%
-2jolly.ic18             ic18-laperlanera            10.766602%
-1.ic25                                          NO MATCH
-                        ic25-uno.bin            NO MATCH
-*/
-
-ROM_START( laperlag )
-	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
-	ROM_LOAD( "laperlag_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "ic18-laperlaneragold2.bin", 0x000000, 0x80000, CRC(ae37de44) SHA1(089f97678fa39aee1885d7c63c4bc7c88e7fe553) )
-	ROM_LOAD( "ic17-laperlaneragold3.bin", 0x080000, 0x80000, CRC(86da6d11) SHA1(e6b7f9ccbf2e91a60fdf38067ec7ac7e73dea8cd) )
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
-	ROM_LOAD( "ic25-uno.bin", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) )
-ROM_END
-
-
 /* Europa 2002 (Ver 2.0, set 1)
-
-CPU:
-
-1x HD64F3048F16 (main)(ic1)
-1x ispLSI2064-80LJ (ic12)
-1x AD-65 (equivalent to M6295) (ic24)(sound)
-1x oscillator 30MHz (close to main)
-1x blu resonator 1000J (close to sound)
-
-ROMs:
-
-3x M27C2001 (1,2,3)
-2x M27C4001 (4,5)
-
-Note:
-
-1x 28x2 edge connector
-1x 12 legs connector
-1x 50 legs flat cable connector
-1x 12x2 switches dip
-1x trimmer (volume)
-1x trimmer (spark)
-
+PCB is marked: "CE H83048" on component side
+PCB is marked: "H83048 bottom" on solder side
+PCB is labeled: "EUROPA 2002 Versione 2_0" and "Non rimuovere PASSED 11/2001 Garanzia 6 MESI" on component side
 */
-
 ROM_START( euro2k2 )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "euro2k2_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
@@ -481,47 +373,11 @@ ROM_START( euro2k2 )
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(b9b1aff0) SHA1(35622d7d099a10e5c6bcae152fded1f50692f740) )
 ROM_END
 
-
 /* Europa 2002 (Ver 2.0, set 2)
-
-CPU:
-
-1x HD64F3048F16 (main)(ic1)
-1x ispLSI2064-80LJ (ic12)
-1x U6295 (equivalent to M6295) (ic24)(sound)
-1x oscillator 30.00MHz (close to main)
-1x orange resonator ZTB1000J (close to sound)
-
-ROMs:
-
-2x M27C2001 (1,2)
-3x M27C4001 (3,4,5)
-
-Note:
-
-1x 28x2 edge connector
-1x 12 legs connector
-1x 50 legs flat cable connector
-1x 12x2 switches dip
-1x trimmer (volume)
-1x trimmer (spark)
-
----------------------------------------
-
-euro2k2 vs. euro2k2a
-
-5 and 5 files
-4a.ic18                                         FIXED BITS (xxxxxxx0)
-                        3a.ic19                 1ST AND 2ND HALF IDENTICAL
-                        4a.ic18                 FIXED BITS (xxxxxxx0)
-2a.ic20                 2a.ic20                 IDENTICAL
-4a.ic18                 4a.ic18                 IDENTICAL
-5a.ic17                 5a.ic17                 IDENTICAL
-1.ic25                  1.ic25                  99.998474%
-3a.ic19                                         NO MATCH
-                        3a.ic19                 NO MATCH
+PCB is marked: "CE H83048" on component side
+PCB is marked: "H83048 bottom" on solder side
+PCB is labeled: "EUROPA 2002 Versione 2_0" and "PASSED 10/2001" on component side
 */
-
 ROM_START( euro2k2a )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "euro2k2a_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
@@ -536,80 +392,85 @@ ROM_START( euro2k2a )
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) // sldh
 ROM_END
 
-
-/* Europa 2002 Space (Ver 3.0)
-
-Year:    2002
-Company: Nazionale Elettronica
-
-CPU:
-
-1x HD64F3048F16 (main)(ic1)
-1x ispLSI2064-80LJ (ic12)
-1x U6295 (equivalent to M6295) (ic24)(sound)
-1x TDA2003 (sound)(ic26)
-1x LM358N (sound)(ic27)
-1x oscillator 30MHz (close to main)(osc1)
-1x blue resonator (close to sound) (x1)
-
-ROMs:
-
-1x MX27C1000 (1)
-2x M27C2001 (2,3)
-2x M27C4001 (4,5)
-
-Note:
-
-1x 28x2 edge connector
-1x 12 legs connector
-1x 50 legs flat cable connector
-1x trimmer (volume)
-1x trimmer (spark)
-
+/* La Perla Nera (Ver 2.0)
+PCB is marked: "CE H83048" on component side
+PCB is marked: "H83048 bottom" on solder side
+PCB is labeled: "LA PERLA NERA Versione 2.0" and "Non Rimuovere PASSED 01/2002 garanzia 6 MESI" on component side
 */
-
-ROM_START( euro2k2s )
+ROM_START( laperla )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
-	ROM_LOAD( "euro2k2s_ver3.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "laperla_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
-	ROM_LOAD( "europa2002space4.ic18", 0x000000, 0x80000, CRC(cf4db4f1) SHA1(6c03e54e30eb83778d1cad5ade17c26a370ea8a3) )
-	ROM_LOAD( "europa2002space5.ic17", 0x080000, 0x80000, CRC(1070b4ac) SHA1(3492de52cd0c784479d2774f6050b24cf4591484) )
-	ROM_LOAD( "europa2002_2-a.ic20",   0x100000, 0x40000, CRC(971bc33b) SHA1(c385e5bef57cdb52a86c1e38fca471ef5ab3da7c) )
-	ROM_LOAD( "europa2002space3.ic19", 0x140000, 0x40000, CRC(d82dba04) SHA1(63d407dd036d3c7f190ad7b6d694288e9a9e56d0) ) /* identical halves */
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "2jolly.ic18", 0x000000, 0x80000, CRC(7bf3d5f2) SHA1(f3a51dd642358a20f6324f28fdf458e8ceaca7a1) )
+	ROM_LOAD( "3jolly.ic17", 0x080000, 0x80000, CRC(c3a8d9a0) SHA1(cc95c56ebc6137e11c82ed17be7c9f83ed7b6cfc) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
-	ROM_LOAD( "1-a.ic25", 0x00000, 0x20000, CRC(8fcb283d) SHA1(9e95c72967da13606eed6d16f84145273b9ffddf) )
+	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
-/*
 
-CPUs
-1x  H8/3048         ic1     16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
-1x  AD-65       ic24    4-Channel Mixing ADCPM Voice Synthesis LSI - sound
-1x  LM358N      ic27    Dual Operational Amplifier - sound
-1x  TDA2003         ic26    Audio Amplifier - sound
-1x  oscillator  30.000MHz   osc1
-1x  blu resonator   1000J   x1
-1x  oscillator  KDS0D   x2
-ROMs
-1x  W27C020     1   dumped
-2x  M27C4001    2,3     dumped
-RAMs
-2x  LST62832I-70LL-10L  ic13,ic14
-PLDs
-1x  ispLSI2064-80LJ     ic12    not dumped
+/* La Perla Nera Gold (Ver 2.0)
+PCB is marked: "CE H83048" on component side
+PCB is marked: "H83048 bottom" on solder side
+PCB is labeled: "LA PERLA NERA GOLD Versione 2.0" and "Non Rimuovere PASSED 11/2001 garanzia 6 MESI" on component side
+*/
+ROM_START( laperlag )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "laperlag_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-Others
-1x 28x2 edge connector
-1x 50 pins flat cable connector (CN4)
-1x 12 legs connector (CN1)
-2x trimmer (volume,spark)
-1x 12x2 switches DIP
-1x battery 3.6V
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "ic18-laperlaneragold2.bin", 0x000000, 0x80000, CRC(ae37de44) SHA1(089f97678fa39aee1885d7c63c4bc7c88e7fe553) )
+	ROM_LOAD( "ic17-laperlaneragold3.bin", 0x080000, 0x80000, CRC(86da6d11) SHA1(e6b7f9ccbf2e91a60fdf38067ec7ac7e73dea8cd) )
 
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_LOAD( "ic25-uno.bin", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) )
+ROM_END
+
+/* World Cup (Ver 1.5)
+PCB is marked: "CE H83048" on component side
+PCB is marked: "H83048 bottom" on solder side
+PCB is labeled: "WORLD CUP Versione 1.5" on component side
+---
+It is the same game as World Cup (Ver 1.4) but with less RAM
+*/
+ROM_START( wcup )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "wcup_ver1.5_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_LOAD( "world cup 2.ic18", 0x000000, 0x80000, CRC(4524445b) SHA1(50ec31ac9e4cd807fd4bf3d667644ed662681782) )
+	ROM_LOAD( "world cup 3.ic17", 0x080000, 0x80000, CRC(0df1af40) SHA1(f5050533e5a9cf2113e5aeffaeca23c7572cafae) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_LOAD( "1.ic25", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) ) // same as laperlag
+ROM_END
+
+/* World Cup (Ver 1.4)
+PCB is marked: "CE ND2001" on component side
+PCB is marked: "ND2001 Rev. 1.0" and "bottom" on solder side
+PCB is labeled: "WORLD CUP Versione 1.4" and "Non Rimuovere PASSED 12/2001 Garanzia 6 MESI" on component side
+---
+It is the same game as World Cup (Ver 1.5) but ICs location are numbered differently due to a different PCB layout
 */
 
+ROM_START( wcup14 )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "wcup_ver1.4_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_LOAD( "world cup 2.ic18", 0x000000, 0x80000, CRC(4524445b) SHA1(50ec31ac9e4cd807fd4bf3d667644ed662681782) )
+	ROM_LOAD( "world cup 3.ic17", 0x080000, 0x80000, CRC(0df1af40) SHA1(f5050533e5a9cf2113e5aeffaeca23c7572cafae) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_LOAD( "1.ic25", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) ) // same as laperlag
+ROM_END
+
+/* Abacus (Ver 1.0)
+PCB is marked: "CE H83048" on component side
+PCB is marked: "bottom" and "H83048 Rev. 1.1" on solder side
+PCB is labeled: "ABACUS Vers. 1.0" and "FR 24.08.01" on component side
+*/
 ROM_START( abacus )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "abacus_ver1.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
@@ -622,43 +483,24 @@ ROM_START( abacus )
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
-/*
 
-CPUs
-1x  H8/3048         ic1     16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
-1x  AD-65       ic24    4-Channel Mixing ADCPM Voice Synthesis LSI - sound
-1x  LM358N      ic27    Dual Operational Amplifier - sound
-1x  TDA2003         ic26    Audio Amplifier - sound
-1x  oscillator  30.000MHz   osc1
-1x  red resonator   ZTB1000J    x1
-ROMs
-1x  W27C020     1   dumped
-2x  M27C4001    2,3     dumped
-RAMs
-2x  MB8464C-10L     ic13,ic14
-PLDs
-1x  ispLSI2064-80LJ     ic12    not dumped
-
-Others
-1x 28x2 edge connector
-1x 50 pins flat cable connector (CN4)
-1x 12 legs connector (CN1)
-2x trimmer (volume,spark)
-1x 12x2 switches DIP
-1x battery 3V
-
+/* Europa 2002 Space (Ver 3.0)
+PCB is marked: "CE H83048" on component side
+PCB is marked: "bottom" and "H83048 Rev. 1.1" on solder side
+PCB is labeled: "EUROPA 2002 SPACE Ver. 3.0" and "Non rimuovere PASSED 04/2002 Garanzia 6 MESI" on component side
 */
-
-ROM_START( bookthr )
+ROM_START( euro2k2s )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
-	ROM_LOAD( "bookthr_ver1.2_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "euro2k2s_ver3.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
-	ROM_LOAD( "2.ic18", 0x000000, 0x80000, CRC(39433a74) SHA1(088944bfb43b4f239f22d0d2213efd19cea7db30) )
-	ROM_LOAD( "3.ic17", 0x080000, 0x80000, CRC(893abdcc) SHA1(4dd28fd46bec8be5549d679d31c771888fcb1286) )
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "europa2002space4.ic18", 0x000000, 0x80000, CRC(cf4db4f1) SHA1(6c03e54e30eb83778d1cad5ade17c26a370ea8a3) )
+	ROM_LOAD( "europa2002space5.ic17", 0x080000, 0x80000, CRC(1070b4ac) SHA1(3492de52cd0c784479d2774f6050b24cf4591484) )
+	ROM_LOAD( "europa2002_2-a.ic20",   0x100000, 0x40000, CRC(971bc33b) SHA1(c385e5bef57cdb52a86c1e38fca471ef5ab3da7c) )
+	ROM_LOAD( "europa2002space3.ic19", 0x140000, 0x40000, CRC(d82dba04) SHA1(63d407dd036d3c7f190ad7b6d694288e9a9e56d0) ) /* identical halves */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
-	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) //same as Abacus
+	ROM_LOAD( "1-a.ic25", 0x00000, 0x20000, CRC(8fcb283d) SHA1(9e95c72967da13606eed6d16f84145273b9ffddf) )
 ROM_END
 
 /********** DIFFERENT HARDWARE **********/
@@ -708,16 +550,23 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT ROT   COMPANY                  FULLNAME                         FLAGS
-GAME( 2000, capunc,   0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Capitan Uncino (Ver 1.2)",      MACHINE_IS_SKELETON )
-GAME( 2001, capcor,   0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)", MACHINE_IS_SKELETON )
-GAME( 2002, laperla,  0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",       MACHINE_IS_SKELETON )
-GAME( 2001, laperlag, 0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  MACHINE_IS_SKELETON )
-GAME( 2001, euro2k2,  0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  MACHINE_IS_SKELETON )
-GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  MACHINE_IS_SKELETON )
-GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   MACHINE_IS_SKELETON )
-GAME( 200?, abacus,   0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "<unknown>",             "Abacus (Ver 1.0)",              MACHINE_IS_SKELETON )
-GAME( 200?, bookthr,  0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                         FLAGS
+/* hardware green H83048*/
+GAME( 200?, bookthr,  0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Book Theatre (Ver 1.2)",        MACHINE_IS_SKELETON )
+GAME( 2000, capunc,   0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitan Uncino (Ver 1.2)",      MACHINE_IS_SKELETON )
+GAME( 2001, capcor,   0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)", MACHINE_IS_SKELETON )
+
+/* hardware green H83048 + piggyback for timekeeping*/
+GAME( 2001, euro2k2,  0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  MACHINE_IS_SKELETON )
+GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  MACHINE_IS_SKELETON )
+GAME( 2002, laperla,  0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",       MACHINE_IS_SKELETON )
+GAME( 2001, laperlag, 0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  MACHINE_IS_SKELETON )
+GAME( 2001, wcup,     0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.5)",           MACHINE_IS_SKELETON )
+GAME( 2001, wcup14,   wcup,    itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.4)",           MACHINE_IS_SKELETON )
+
+/* hardware red H83048 Rev 1.1 + timekeeping on board*/
+GAME( 2001, abacus,   0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Abacus (Ver 1.0)",              MACHINE_IS_SKELETON )
+GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   MACHINE_IS_SKELETON )
 
 /* different hardware */
-GAME( 2000, mnumber,  0,       mnumber,  itgamble, itgamble_state, 0,   ROT0, "MM / BRL Bologna",      "Mystery Number",                MACHINE_IS_SKELETON )
+GAME( 2000, mnumber,  0,       mnumber,  itgamble, itgamble_state, empty_init, ROT0, "MM / BRL Bologna",      "Mystery Number",                MACHINE_IS_SKELETON )

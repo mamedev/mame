@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 
 class shadfrce_state : public driver_device
@@ -31,6 +32,9 @@ public:
 		m_bg1videoram(*this, "bg1videoram"),
 		m_spvideoram(*this, "spvideoram") { }
 
+	void shadfrce(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
@@ -90,7 +94,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void shadfrce(machine_config &config);
+
 	void shadfrce_map(address_map &map);
 	void shadfrce_sound_map(address_map &map);
 };

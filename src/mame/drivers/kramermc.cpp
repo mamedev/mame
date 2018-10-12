@@ -17,27 +17,29 @@
 #include "screen.h"
 
 
-static GFXDECODE_START( kramermc )
+static GFXDECODE_START( gfx_kramermc )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, kramermc_charlayout, 0, 1 )
 GFXDECODE_END
 
 /* Address maps */
-ADDRESS_MAP_START(kramermc_state::kramermc_mem)
-	AM_RANGE( 0x0000, 0x03ff ) AM_ROM  // Monitor
-	AM_RANGE( 0x0400, 0x07ff ) AM_ROM  // Debugger
-	AM_RANGE( 0x0800, 0x0bff ) AM_ROM  // Reassembler
-	AM_RANGE( 0x0c00, 0x0fff ) AM_RAM  // System RAM
-	AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // User RAM
-	AM_RANGE( 0x8000, 0xafff ) AM_ROM  // BASIC
-	AM_RANGE( 0xc000, 0xc3ff ) AM_ROM  // Editor
-	AM_RANGE( 0xc400, 0xdfff ) AM_ROM  // Assembler
-	AM_RANGE( 0xfc00, 0xffff ) AM_RAM  // Video RAM
-ADDRESS_MAP_END
+void kramermc_state::kramermc_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();  // Monitor
+	map(0x0400, 0x07ff).rom();  // Debugger
+	map(0x0800, 0x0bff).rom();  // Reassembler
+	map(0x0c00, 0x0fff).ram();  // System RAM
+	map(0x1000, 0x7fff).ram();  // User RAM
+	map(0x8000, 0xafff).rom();  // BASIC
+	map(0xc000, 0xc3ff).rom();  // Editor
+	map(0xc400, 0xdfff).rom();  // Assembler
+	map(0xfc00, 0xffff).ram();  // Video RAM
+}
 
-ADDRESS_MAP_START(kramermc_state::kramermc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xfc, 0x0ff) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
-ADDRESS_MAP_END
+void kramermc_state::kramermc_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xfc, 0x0ff).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( kramermc )
@@ -111,14 +113,14 @@ INPUT_PORTS_END
 /* Machine driver */
 MACHINE_CONFIG_START(kramermc_state::kramermc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1500000)
-	MCFG_CPU_PROGRAM_MAP(kramermc_mem)
-	MCFG_CPU_IO_MAP(kramermc_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(kramermc_mem)
+	MCFG_DEVICE_IO_MAP(kramermc_io)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 1500000)
-	MCFG_Z80PIO_IN_PA_CB(READ8(kramermc_state, kramermc_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kramermc_state, kramermc_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(kramermc_state, kramermc_port_b_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio", 1500000));
+	pio.in_pa_callback().set(FUNC(kramermc_state::kramermc_port_a_r));
+	pio.out_pa_callback().set(FUNC(kramermc_state::kramermc_port_a_w));
+	pio.in_pb_callback().set(FUNC(kramermc_state::kramermc_port_b_r));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -129,7 +131,7 @@ MACHINE_CONFIG_START(kramermc_state::kramermc)
 	MCFG_SCREEN_UPDATE_DRIVER(kramermc_state, screen_update_kramermc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kramermc )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kramermc)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -150,5 +152,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     CLASS           INIT     COMPANY           FULLNAME       FLAGS */
-COMP( 1987, kramermc,  0,      0,      kramermc,  kramermc, kramermc_state, kramermc,"Manfred Kramer", "Kramer MC",   MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY           FULLNAME       FLAGS */
+COMP( 1987, kramermc, 0,      0,      kramermc, kramermc, kramermc_state, init_kramermc, "Manfred Kramer", "Kramer MC",   MACHINE_NO_SOUND)

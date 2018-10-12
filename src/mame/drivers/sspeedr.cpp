@@ -47,30 +47,28 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_int_ack_w)
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_lamp_w)
 {
-	output().set_value("lampGO", (data >> 0) & 1);
-	output().set_value("lampEP", (data >> 1) & 1);
+	output().set_value("lampGO", BIT(data, 0));
+	output().set_value("lampEP", BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, data & 8);
 }
 
 
 /* uses a 7447A, which is equivalent to an LS47/48 */
-static const uint8_t ls48_map[16] =
+constexpr uint8_t ls48_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_time_w)
 {
 	data = data & 15;
-	output().set_digit_value(0x18 + offset, ls48_map[data]);
+	m_digits[24 + offset] = ls48_map[data];
 	m_led_TIME[offset] = data;
 }
 
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_score_w)
 {
-	char buf[20];
-	sprintf(buf, "LED%02d", offset);
 	data = ~data & 15;
-	output().set_digit_value(offset, ls48_map[data]);
+	m_digits[offset] = ls48_map[data];
 	m_led_SCORE[offset] = data;
 }
 
@@ -81,37 +79,39 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_sound_w)
 }
 
 
-ADDRESS_MAP_START(sspeedr_state::sspeedr_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x21ff) AM_RAM
-	AM_RANGE(0x7f00, 0x7f17) AM_WRITE(sspeedr_score_w)
-ADDRESS_MAP_END
+void sspeedr_state::sspeedr_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x21ff).ram();
+	map(0x7f00, 0x7f17).w(FUNC(sspeedr_state::sspeedr_score_w));
+}
 
 
-ADDRESS_MAP_START(sspeedr_state::sspeedr_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x01) AM_WRITE(sspeedr_sound_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(sspeedr_lamp_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x04, 0x05) AM_WRITE(sspeedr_time_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(sspeedr_driver_horz_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(sspeedr_driver_pic_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(sspeedr_driver_horz_2_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(sspeedr_drones_horz_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(sspeedr_drones_horz_2_w)
-	AM_RANGE(0x15, 0x15) AM_WRITE(sspeedr_drones_mask_w)
-	AM_RANGE(0x16, 0x16) AM_WRITE(sspeedr_driver_vert_w)
-	AM_RANGE(0x17, 0x18) AM_WRITE(sspeedr_track_vert_w)
-	AM_RANGE(0x19, 0x19) AM_WRITE(sspeedr_track_horz_w)
-	AM_RANGE(0x1a, 0x1a) AM_WRITE(sspeedr_track_horz_2_w)
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(sspeedr_track_ice_w)
-	AM_RANGE(0x1c, 0x1e) AM_WRITE(sspeedr_drones_vert_w)
-	AM_RANGE(0x1f, 0x1f) AM_WRITE(sspeedr_int_ack_w)
-ADDRESS_MAP_END
+void sspeedr_state::sspeedr_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x00, 0x01).w(FUNC(sspeedr_state::sspeedr_sound_w));
+	map(0x02, 0x02).w(FUNC(sspeedr_state::sspeedr_lamp_w));
+	map(0x03, 0x03).portr("DSW");
+	map(0x04, 0x04).portr("IN2");
+	map(0x04, 0x05).w(FUNC(sspeedr_state::sspeedr_time_w));
+	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x10, 0x10).w(FUNC(sspeedr_state::sspeedr_driver_horz_w));
+	map(0x11, 0x11).w(FUNC(sspeedr_state::sspeedr_driver_pic_w));
+	map(0x12, 0x12).w(FUNC(sspeedr_state::sspeedr_driver_horz_2_w));
+	map(0x13, 0x13).w(FUNC(sspeedr_state::sspeedr_drones_horz_w));
+	map(0x14, 0x14).w(FUNC(sspeedr_state::sspeedr_drones_horz_2_w));
+	map(0x15, 0x15).w(FUNC(sspeedr_state::sspeedr_drones_mask_w));
+	map(0x16, 0x16).w(FUNC(sspeedr_state::sspeedr_driver_vert_w));
+	map(0x17, 0x18).w(FUNC(sspeedr_state::sspeedr_track_vert_w));
+	map(0x19, 0x19).w(FUNC(sspeedr_state::sspeedr_track_horz_w));
+	map(0x1a, 0x1a).w(FUNC(sspeedr_state::sspeedr_track_horz_2_w));
+	map(0x1b, 0x1b).w(FUNC(sspeedr_state::sspeedr_track_ice_w));
+	map(0x1c, 0x1e).w(FUNC(sspeedr_state::sspeedr_drones_vert_w));
+	map(0x1f, 0x1f).w(FUNC(sspeedr_state::sspeedr_int_ack_w));
+}
 
 
 static const ioport_value sspeedr_controller_table[] =
@@ -184,7 +184,7 @@ static const gfx_layout car_layout =
 };
 
 
-static GFXDECODE_START( sspeedr )
+static GFXDECODE_START( gfx_sspeedr )
 	GFXDECODE_ENTRY( "gfx1", 0, car_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, car_layout, 0, 1 )
 GFXDECODE_END
@@ -193,12 +193,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(19'968'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sspeedr_map)
-	MCFG_CPU_IO_MAP(sspeedr_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(19'968'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sspeedr_map)
+	MCFG_DEVICE_IO_MAP(sspeedr_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -207,10 +207,10 @@ MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 	MCFG_SCREEN_SIZE(376, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 375, 0, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(sspeedr_state, screen_update_sspeedr)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sspeedr_state, screen_vblank_sspeedr))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sspeedr_state, screen_vblank_sspeedr))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sspeedr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sspeedr)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(sspeedr_state, sspeedr)
 
@@ -234,4 +234,4 @@ ROM_START( sspeedr )
 ROM_END
 
 
-GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, 0, ROT270, "Midway", "Super Speed Race", MACHINE_NO_SOUND, layout_sspeedr )
+GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, empty_init, ROT270, "Midway", "Super Speed Race", MACHINE_NO_SOUND, layout_sspeedr )

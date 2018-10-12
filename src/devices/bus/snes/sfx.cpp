@@ -69,14 +69,15 @@ WRITE8_MEMBER( sns_rom_superfx_device::superfx_w_bank3 )
 	sfx_ram[offset & 0xfffff] = data;
 }
 
-ADDRESS_MAP_START(sns_rom_superfx_device::sfx_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(superfx_r_bank1, superfx_w_bank1)
-	AM_RANGE(0x400000, 0x5fffff) AM_READWRITE(superfx_r_bank2, superfx_w_bank2)
-	AM_RANGE(0x600000, 0x7dffff) AM_READWRITE(superfx_r_bank3, superfx_w_bank3)
-	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE(superfx_r_bank1, superfx_w_bank1)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(superfx_r_bank2, superfx_w_bank2)
-	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(superfx_r_bank3, superfx_w_bank3)
-ADDRESS_MAP_END
+void sns_rom_superfx_device::sfx_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank1), FUNC(sns_rom_superfx_device::superfx_w_bank1));
+	map(0x400000, 0x5fffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank2), FUNC(sns_rom_superfx_device::superfx_w_bank2));
+	map(0x600000, 0x7dffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank3), FUNC(sns_rom_superfx_device::superfx_w_bank3));
+	map(0x800000, 0xbfffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank1), FUNC(sns_rom_superfx_device::superfx_w_bank1));
+	map(0xc00000, 0xdfffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank2), FUNC(sns_rom_superfx_device::superfx_w_bank2));
+	map(0xe00000, 0xffffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank3), FUNC(sns_rom_superfx_device::superfx_w_bank3));
+}
 
 
 WRITE_LINE_MEMBER(sns_rom_superfx_device::snes_extern_irq_w)
@@ -86,9 +87,9 @@ WRITE_LINE_MEMBER(sns_rom_superfx_device::snes_extern_irq_w)
 
 
 MACHINE_CONFIG_START(sns_rom_superfx_device::device_add_mconfig)
-	MCFG_CPU_ADD("superfx", SUPERFX, 21480000)  /* 21.48MHz */
-	MCFG_CPU_PROGRAM_MAP(sfx_map)
-	MCFG_SUPERFX_OUT_IRQ(WRITELINE(sns_rom_superfx_device, snes_extern_irq_w))  /* IRQ line from cart */
+	MCFG_DEVICE_ADD("superfx", SUPERFX, 21480000)  /* 21.48MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sfx_map)
+	MCFG_SUPERFX_OUT_IRQ(WRITELINE(*this, sns_rom_superfx_device, snes_extern_irq_w))  /* IRQ line from cart */
 MACHINE_CONFIG_END
 
 READ8_MEMBER( sns_rom_superfx_device::chip_read )

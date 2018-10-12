@@ -134,11 +134,12 @@ const jaguar_cpu_device::op_func jaguar_cpu_device::dsp_op_table[64] =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)           (m_direct->read_word(pc, WORD_XOR_BE(0)))
+#define ROPCODE(pc)           (m_cache->read_word(pc))
 
-
-DEFINE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device, "jaguargpu", "Jaguar GPU")
-DEFINE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device, "jaguardsp", "Jaguar DSP")
+// SC414200AT
+DEFINE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device, "jaguargpu", "Motorola Atari Jaguar GPU \"Tom\"")
+// SC414201FT
+DEFINE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device, "jaguardsp", "Motorola Atari Jaguar DSP \"Jerry\"")
 
 
 jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool isdsp)
@@ -338,7 +339,7 @@ void jaguar_cpu_device::device_start()
 	init_tables();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
 	m_cpu_interrupt.resolve_safe();
 
 	save_item(NAME(m_r));
@@ -404,7 +405,7 @@ void jaguar_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_ppc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", FLAGS).formatstr("%11s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -479,7 +480,7 @@ void jaguargpu_cpu_device::execute_run()
 		/* debugging */
 		//if (PC < 0xf03000 || PC > 0xf04000) { fatalerror("GPU: PC = %06X (ppc = %06X)\n", PC, m_ppc); }
 		m_ppc = PC;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		/* instruction fetch */
 		op = ROPCODE(PC);
@@ -516,7 +517,7 @@ void jaguardsp_cpu_device::execute_run()
 		/* debugging */
 		//if (PC < 0xf1b000 || PC > 0xf1d000) { fatalerror(stderr, "DSP: PC = %06X\n", PC); }
 		m_ppc = PC;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		/* instruction fetch */
 		op = ROPCODE(PC);
@@ -727,7 +728,7 @@ void jaguar_cpu_device::jr_cc_n(uint16_t op)
 	{
 		int32_t r1 = (int8_t)((op >> 2) & 0xf8) >> 2;
 		uint32_t newpc = PC + r1;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		op = ROPCODE(PC);
 		PC = newpc;
 		(this->*m_table[op >> 10])(op);
@@ -744,7 +745,7 @@ void jaguar_cpu_device::jump_cc_rn(uint16_t op)
 
 		/* special kludge for risky code in the cojag DSP interrupt handlers */
 		uint32_t newpc = (m_icount == m_bankswitch_icount) ? m_a[reg] : m_r[reg];
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		op = ROPCODE(PC);
 		PC = newpc;
 		(this->*m_table[op >> 10])(op);
@@ -1437,12 +1438,12 @@ WRITE32_MEMBER( jaguardsp_cpu_device::ctrl_w )
 	}
 }
 
-util::disasm_interface *jaguargpu_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> jaguargpu_cpu_device::create_disassembler()
 {
-	return new jaguar_disassembler(jaguar_disassembler::JAGUAR_VARIANT_GPU);
+	return std::make_unique<jaguar_disassembler>(jaguar_disassembler::variant::GPU);
 }
 
-util::disasm_interface *jaguardsp_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> jaguardsp_cpu_device::create_disassembler()
 {
-	return new jaguar_disassembler(jaguar_disassembler::JAGUAR_VARIANT_DSP);
+	return std::make_unique<jaguar_disassembler>(jaguar_disassembler::variant::DSP);
 }

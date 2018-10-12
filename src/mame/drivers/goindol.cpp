@@ -81,38 +81,40 @@ WRITE8_MEMBER(goindol_state::prot_fcb0_w)
 
 
 
-ADDRESS_MAP_START(goindol_state::goindol_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // watchdog?
-	AM_RANGE(0xc810, 0xc810) AM_WRITE(goindol_bankswitch_w)
-	AM_RANGE(0xc820, 0xc820) AM_READ_PORT("DIAL")
-	AM_RANGE(0xc820, 0xd820) AM_WRITEONLY AM_SHARE("fg_scrolly")
-	AM_RANGE(0xc830, 0xc830) AM_READ_PORT("P1")
-	AM_RANGE(0xc830, 0xd830) AM_WRITEONLY AM_SHARE("fg_scrollx")
-	AM_RANGE(0xc834, 0xc834) AM_READ_PORT("P2")
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd040, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(goindol_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xe040, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goindol_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf422, 0xf422) AM_READ(prot_f422_r)
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc44, 0xfc44) AM_WRITE(prot_fc44_w)
-	AM_RANGE(0xfc66, 0xfc66) AM_WRITE(prot_fc66_w)
-	AM_RANGE(0xfcb0, 0xfcb0) AM_WRITE(prot_fcb0_w)
-	AM_RANGE(0xfd99, 0xfd99) AM_WRITE(prot_fd99_w)
-ADDRESS_MAP_END
+void goindol_state::goindol_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).ram().share("ram");
+	map(0xc800, 0xc800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write)); // watchdog?
+	map(0xc810, 0xc810).w(FUNC(goindol_state::goindol_bankswitch_w));
+	map(0xc820, 0xc820).portr("DIAL");
+	map(0xc820, 0xd820).writeonly().share("fg_scrolly");
+	map(0xc830, 0xc830).portr("P1");
+	map(0xc830, 0xd830).writeonly().share("fg_scrollx");
+	map(0xc834, 0xc834).portr("P2");
+	map(0xd000, 0xd03f).ram().share("spriteram");
+	map(0xd040, 0xd7ff).ram();
+	map(0xd800, 0xdfff).ram().w(FUNC(goindol_state::goindol_bg_videoram_w)).share("bg_videoram");
+	map(0xe000, 0xe03f).ram().share("spriteram2");
+	map(0xe040, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().w(FUNC(goindol_state::goindol_fg_videoram_w)).share("fg_videoram");
+	map(0xf000, 0xf000).portr("DSW1");
+	map(0xf422, 0xf422).r(FUNC(goindol_state::prot_f422_r));
+	map(0xf800, 0xf800).portr("DSW2");
+	map(0xfc44, 0xfc44).w(FUNC(goindol_state::prot_fc44_w));
+	map(0xfc66, 0xfc66).w(FUNC(goindol_state::prot_fc66_w));
+	map(0xfcb0, 0xfcb0).w(FUNC(goindol_state::prot_fcb0_w));
+	map(0xfd99, 0xfd99).w(FUNC(goindol_state::prot_fd99_w));
+}
 
-ADDRESS_MAP_START(goindol_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym2203_device, write)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void goindol_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa001).w("ymsnd", FUNC(ym2203_device::write));
+	map(0xc000, 0xc7ff).ram();
+	map(0xd800, 0xd800).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( goindol )
@@ -210,7 +212,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( goindol )
+static GFXDECODE_START( gfx_goindol )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 32 )
 GFXDECODE_END
@@ -236,13 +238,13 @@ void goindol_state::machine_reset()
 MACHINE_CONFIG_START(goindol_state::goindol)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* XTAL confirmed, divisor is not */
-	MCFG_CPU_PROGRAM_MAP(goindol_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goindol_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* XTAL confirmed, divisor is not */
+	MCFG_DEVICE_PROGRAM_MAP(goindol_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", goindol_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* XTAL confirmed, divisor is not */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(goindol_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* XTAL confirmed, divisor is not */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(goindol_state, irq0_line_hold, 4*60)
 
 
 	/* video hardware */
@@ -254,15 +256,15 @@ MACHINE_CONFIG_START(goindol_state::goindol)
 	MCFG_SCREEN_UPDATE_DRIVER(goindol_state, screen_update_goindol)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goindol)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goindol)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8)   /* Confirmed pitch from recording */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8)   /* Confirmed pitch from recording */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -376,7 +378,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(goindol_state,goindol)
+void goindol_state::init_goindol()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -407,7 +409,7 @@ DRIVER_INIT_MEMBER(goindol_state,goindol)
 
 
 
-GAME( 1987, goindol,  0,       goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, goindolu, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (US)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, goindolk, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, homo,     goindol, goindol, homo,    goindol_state, 0,       ROT90, "bootleg", "Homo",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, goindol,  0,       goindol, goindol, goindol_state, init_goindol, ROT90, "SunA",    "Goindol (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, goindolu, goindol, goindol, goindol, goindol_state, init_goindol, ROT90, "SunA",    "Goindol (US)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, goindolk, goindol, goindol, goindol, goindol_state, init_goindol, ROT90, "SunA",    "Goindol (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, homo,     goindol, goindol, homo,    goindol_state, empty_init,   ROT90, "bootleg", "Homo",            MACHINE_SUPPORTS_SAVE )

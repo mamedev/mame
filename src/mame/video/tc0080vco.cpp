@@ -177,8 +177,7 @@ void tc0080vco_device::device_start()
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(&m_gfxdecode->palette(), charlayout, (uint8_t *)m_char_ram, 0, 1, 512));
 
-	save_pointer(NAME(m_ram.get()), TC0080VCO_RAM_SIZE / 2);
-	machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_device::postload), this));
+	save_pointer(NAME(m_ram), TC0080VCO_RAM_SIZE / 2);
 }
 
 
@@ -680,8 +679,11 @@ READ_LINE_MEMBER( tc0080vco_device::flipscreen_r )
 	return m_flipscreen;
 }
 
+//-------------------------------------------------
+//  device_post_load - device-specific postload
+//-------------------------------------------------
 
-void tc0080vco_device::postload()
+void tc0080vco_device::device_post_load()
 {
 	m_flipscreen = m_scroll_ram[0] & 0x0c00;
 

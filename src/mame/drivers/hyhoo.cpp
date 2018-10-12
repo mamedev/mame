@@ -34,29 +34,31 @@ Memo:
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(hyhoo_state::hyhoo_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void hyhoo_state::hyhoo_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(hyhoo_state::hyhoo_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void hyhoo_state::hyhoo_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
-	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x90, 0x97) AM_WRITE(hyhoo_blitter_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport2_r, sndrombank1_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
-	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write)     // unknown read
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREAD("nb1413m3", nb1413m3_device, gfxrom_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
+	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
+	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x90, 0x90).portr("SYSTEM");
+	map(0x90, 0x97).w(FUNC(hyhoo_state::hyhoo_blitter_w));
+	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
+	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
+	map(0xc0, 0xcf).writeonly().share("clut");
+	map(0xd0, 0xd0).nopr().w("dac", FUNC(dac_byte_interface::data_w));     // unknown read
+	map(0xe0, 0xe0).w(FUNC(hyhoo_state::hyhoo_romsel_w));
+	map(0xe0, 0xe1).r(m_nb1413m3, FUNC(nb1413m3_device::gfxrom_r));
+	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
 //  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
-	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
-ADDRESS_MAP_END
+	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
+}
 
 CUSTOM_INPUT_MEMBER( hyhoo_state::nb1413m3_busyflag_r )
 {
@@ -109,7 +111,7 @@ static INPUT_PORTS_START( hyhoo )
 	PORT_DIPSETTING(    0x00, "95%" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hyhoo_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hyhoo_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         // NOT USED
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
@@ -184,7 +186,7 @@ static INPUT_PORTS_START( hyhoo2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hyhoo_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hyhoo_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         // NOT USED
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
@@ -227,12 +229,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(hyhoo_state::hyhoo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz ?? */
-	MCFG_CPU_PROGRAM_MAP(hyhoo_map)
-	MCFG_CPU_IO_MAP(hyhoo_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hyhoo_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz ?? */
+	MCFG_DEVICE_PROGRAM_MAP(hyhoo_map)
+	MCFG_DEVICE_IO_MAP(hyhoo_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hyhoo_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -247,16 +249,16 @@ MACHINE_CONFIG_START(hyhoo_state::hyhoo)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -310,5 +312,5 @@ ROM_START( hyhoo2 )
 ROM_END
 
 
-GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  hyhoo_state, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hyhoo2, 0, hyhoo2, hyhoo2, hyhoo_state, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  hyhoo_state, empty_init, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hyhoo2, 0, hyhoo2, hyhoo2, hyhoo_state, empty_init, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", MACHINE_SUPPORTS_SAVE )

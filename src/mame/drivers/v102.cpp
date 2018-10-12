@@ -28,13 +28,15 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void v102(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void v102(machine_config &config);
 	void io_map(address_map &map);
 	void kbd_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
@@ -46,37 +48,39 @@ u32 v102_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 }
 
 
-ADDRESS_MAP_START(v102_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xafff) AM_RAM
-	AM_RANGE(0xb800, 0xb9ff) AM_DEVREADWRITE("eeprom", eeprom_parallel_28xx_device, read, write)
-ADDRESS_MAP_END
+void v102_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);
+	map(0x8000, 0x8fff).ram();
+	map(0xa000, 0xafff).ram();
+	map(0xb800, 0xb9ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+}
 
-ADDRESS_MAP_START(v102_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void v102_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0x3f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
-	AM_RANGE(0x18, 0x19) AM_WRITENOP
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("mpsc", upd7201_new_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
-	AM_RANGE(0x80, 0x83) AM_DEVWRITE("pit", pit8253_device, write)
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	map(0x18, 0x19).nopw();
+	map(0x40, 0x43).rw("mpsc", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w));
+	map(0x60, 0x61).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x80, 0x83).w("pit", FUNC(pit8253_device::write));
+	map(0xa0, 0xa3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE(0xbf, 0xbf) ???
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(v102_state::kbd_map)
-	AM_RANGE(0x000, 0x7ff) AM_ROM AM_REGION("keyboard", 0)
-ADDRESS_MAP_END
+void v102_state::kbd_map(address_map &map)
+{
+	map(0x000, 0x7ff).rom().region("keyboard", 0);
+}
 
 static INPUT_PORTS_START( v102 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(v102_state::v102)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'575'000) / 5) // divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'575'000), 970, 0, 800, 319, 0, 300)
@@ -86,13 +90,13 @@ MACHINE_CONFIG_START(v102_state::v102)
 	//MCFG_DEVICE_ADD("vpac", CRT9007, CRTC_CLOCK)
 	//MCFG_CRT9007_CHARACTER_WIDTH(6 or 10)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
+	EEPROM_2804(config, "eeprom");
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
+	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", XTAL(18'575'000) / 5)); // divider not verified
+	mpsc.out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	i8251_device &usart(I8251(config, "usart", XTAL(18'575'000) / 5)); // divider not verified
+	usart.rxrdy_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
@@ -101,8 +105,8 @@ MACHINE_CONFIG_START(v102_state::v102)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 
-	MCFG_CPU_ADD("kbdcpu", I8039, 12000000)
-	MCFG_CPU_PROGRAM_MAP(kbd_map)
+	MCFG_DEVICE_ADD("kbdcpu", I8039, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(kbd_map)
 MACHINE_CONFIG_END
 
 
@@ -126,4 +130,4 @@ ROM_START( v102 )
 	ROM_LOAD( "150.kbd",     0x0000, 0x0800, CRC(afe55cff) SHA1(b26ebdde63ec0e94c08780285def39a282e128b3) )
 ROM_END
 
-COMP( 1984, v102, 0, 0, v102, v102, v102_state, 0, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )
+COMP( 1984, v102, 0, 0, v102, v102, v102_state, empty_init, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )

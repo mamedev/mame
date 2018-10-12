@@ -57,9 +57,9 @@ DECLARE_DEVICE_TYPE(TC0280GRD, tc0280grd_device)
 	downcast<tc0280grd_device &>(*device).set_gfx_region(_region);
 
 #define MCFG_TC0280GRD_GFXDECODE(_gfxtag) \
-	downcast<tc0280grd_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<tc0280grd_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #define MCFG_TC0430GRW_GFXDECODE(_gfxtag) \
-	downcast<tc0280grd_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<tc0280grd_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_TC0280GRD_H

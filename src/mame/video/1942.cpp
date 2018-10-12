@@ -92,7 +92,7 @@ PALETTE_INIT_MEMBER(_1942_state,1942)
 		m_palette->set_pen_indirect(colorbase + i, 0x40 | *color_prom++);
 }
 
-PALETTE_INIT_MEMBER(_1942_state,1942p)
+PALETTE_INIT_MEMBER(_1942p_state,1942p)
 {
 	for (int i = 0; i < 0x400; i++)
 	{
@@ -154,7 +154,7 @@ void _1942_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-void _1942_state::video_start_c1942p()
+void _1942p_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_1942_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_1942_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
@@ -169,20 +169,20 @@ void _1942_state::video_start_c1942p()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(_1942_state::c1942_fgvideoram_w)
+WRITE8_MEMBER(_1942_state::_1942_fgvideoram_w)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(_1942_state::c1942_bgvideoram_w)
+WRITE8_MEMBER(_1942_state::_1942_bgvideoram_w)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty((offset & 0x0f) | ((offset >> 1) & 0x01f0));
 }
 
 
-WRITE8_MEMBER(_1942_state::c1942_palette_bank_w)
+WRITE8_MEMBER(_1942_state::_1942_palette_bank_w)
 {
 	if (m_palette_bank != data)
 	{
@@ -191,14 +191,14 @@ WRITE8_MEMBER(_1942_state::c1942_palette_bank_w)
 	}
 }
 
-WRITE8_MEMBER(_1942_state::c1942_scroll_w)
+WRITE8_MEMBER(_1942_state::_1942_scroll_w)
 {
 	m_scroll[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll[0] | (m_scroll[1] << 8));
 }
 
 
-WRITE8_MEMBER(_1942_state::c1942_c804_w)
+WRITE8_MEMBER(_1942_state::_1942_c804_w)
 {
 	/* bit 7: flip screen
 	   bit 4: cpu B reset
@@ -218,7 +218,7 @@ WRITE8_MEMBER(_1942_state::c1942_c804_w)
 
 ***************************************************************************/
 
-void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
@@ -259,7 +259,7 @@ void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 }
 
-uint32_t _1942_state::screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t _1942_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -268,24 +268,19 @@ uint32_t _1942_state::screen_update_1942(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int i, code, col, sx, sy, dir;
-
-		code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 3] & 0x20)
-				+ 2 * (m_spriteram[offs] & 0x80);
-		col = m_spriteram[offs + 3] & 0x0f;
+		int code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 3] & 0x20)
+					+ 2 * (m_spriteram[offs] & 0x80);
+		int col = m_spriteram[offs + 3] & 0x0f;
 
 
-		sx = m_spriteram[offs + 2] - 0x10 * (m_spriteram[offs + 3] & 0x10);
-		sy = m_spriteram[offs + 1];
+		int sx = m_spriteram[offs + 2] - 0x10 * (m_spriteram[offs + 3] & 0x10);
+		int sy = m_spriteram[offs + 1];
 
-
-
+		int dir;
 		if (flip_screen())
 		{
 			sx = 240 - sx;
@@ -298,7 +293,7 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 		/* handle double / quadruple height */
-		i = (m_spriteram[offs + 3] & 0xc0) >> 6;
+		int i = (m_spriteram[offs + 3] & 0xc0) >> 6;
 		if (i == 2)
 			i = 3;
 
@@ -315,13 +310,4 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 		} while (i >= 0);
 	}
 
-
-}
-
-uint32_t _1942_state::screen_update_1942p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites_p(bitmap, cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
 }

@@ -11,9 +11,10 @@
     20 ... 2f, 40 ... 4f or 60 ... 6f.
 
 **********************************************************************/
-
 #ifndef MAME_MACHINE_RA17XX_H
 #define MAME_MACHINE_RA17XX_H
+
+#pragma once
 
 #include "device.h"
 #include "cpu/pps4/pps4.h"
@@ -32,7 +33,7 @@
 	downcast<ra17xx_device &>(*device).set_iowr(DEVCB_##devcb);
 
 #define MCFG_RA17XX_CPU(tag) \
-	downcast<ra17xx_device &>(*device).set_cpu_tag("^" tag);
+	downcast<ra17xx_device &>(*device).set_cpu_tag(tag);
 
 class ra17xx_device : public device_t
 {

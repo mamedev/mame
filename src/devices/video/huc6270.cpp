@@ -764,7 +764,7 @@ WRITE8_MEMBER( huc6270_device::write )
 
 				case RCR:       /* raster compare register MSB */
 					m_rcr = ( m_rcr & 0x00FF ) | ( ( data & 0x03 ) << 8 );
-//printf("%s: RCR set to %03x\n", machine().describe_context(), m_rcr);
+//printf("%s: RCR set to %03x\n", machine().describe_context().c_str(), m_rcr);
 //                  if ( m_raster_count == m_rcr && m_cr & 0x04 )
 //                  {
 //                      m_status |= HUC6270_RR;
@@ -842,7 +842,7 @@ void huc6270_device::device_start()
 	m_vram = make_unique_clear<uint16_t[]>(m_vram_size/sizeof(uint16_t));
 	m_vram_mask = (m_vram_size >> 1) - 1;
 
-	save_pointer(NAME(m_vram.get()), m_vram_size/sizeof(uint16_t));
+	save_pointer(NAME(m_vram), m_vram_size/sizeof(uint16_t));
 
 	save_item(NAME(m_register_index));
 	save_item(NAME(m_mawr));

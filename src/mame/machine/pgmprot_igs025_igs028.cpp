@@ -162,7 +162,7 @@ MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 	MACHINE_RESET_CALL_MEMBER(pgm);
 }
 
-DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
+void pgm_028_025_state::init_olds()
 {
 	pgm_basic_init();
 
@@ -172,11 +172,12 @@ DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
 
 }
 
-ADDRESS_MAP_START(pgm_028_025_state::olds_mem)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("sharedprotram") // Shared with protection device
-ADDRESS_MAP_END
+void pgm_028_025_state::olds_mem(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x3fffff).bankr("bank1"); /* Game ROM */
+	map(0x400000, 0x403fff).ram().share("sharedprotram"); // Shared with protection device
+}
 
 void pgm_028_025_state::igs025_to_igs028_callback( void )
 {
@@ -188,8 +189,8 @@ void pgm_028_025_state::igs025_to_igs028_callback( void )
 MACHINE_CONFIG_START(pgm_028_025_state::pgm_028_025_ol)
 	pgmbase(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(olds_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(olds_mem)
 
 	MCFG_DEVICE_ADD("igs025", IGS025, 0)
 	MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_028_025_state, igs025_to_igs028_callback )

@@ -52,43 +52,45 @@ WRITE16_MEMBER(galspnbl_state::soundcommand_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space,offset,data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
 
-ADDRESS_MAP_START(galspnbl_state::main_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x700000, 0x703fff) AM_RAM     /* galspnbl work RAM */
-	AM_RANGE(0x708000, 0x70ffff) AM_RAM     /* galspnbl work RAM, bitmaps are decompressed here */
-	AM_RANGE(0x800000, 0x803fff) AM_RAM     /* hotpinbl work RAM */
-	AM_RANGE(0x808000, 0x80ffff) AM_RAM     /* hotpinbl work RAM, bitmaps are decompressed here */
-	AM_RANGE(0x880000, 0x880fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8ff400, 0x8fffff) AM_WRITENOP    /* ??? */
-	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x901000, 0x903fff) AM_WRITENOP    /* ??? */
-	AM_RANGE(0x904000, 0x904fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP    /* ??? */
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bgvideoram")
-	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP    /* more palette ? */
-	AM_RANGE(0xa01000, 0xa017ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP    /* more palette ? */
-	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
-	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)
-	AM_RANGE(0xa80020, 0xa80021) AM_READ_PORT("SYSTEM") AM_WRITENOP     /* w - could be watchdog, but causes resets when picture is shown */
-	AM_RANGE(0xa80030, 0xa80031) AM_READ_PORT("DSW1") AM_WRITENOP       /* w - irq ack? */
-	AM_RANGE(0xa80040, 0xa80041) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa80050, 0xa80051) AM_WRITEONLY AM_SHARE("scroll")    /* ??? */
-ADDRESS_MAP_END
+void galspnbl_state::main_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x700000, 0x703fff).ram();     /* galspnbl work RAM */
+	map(0x708000, 0x70ffff).ram();     /* galspnbl work RAM, bitmaps are decompressed here */
+	map(0x800000, 0x803fff).ram();     /* hotpinbl work RAM */
+	map(0x808000, 0x80ffff).ram();     /* hotpinbl work RAM, bitmaps are decompressed here */
+	map(0x880000, 0x880fff).ram().share("spriteram");
+	map(0x8ff400, 0x8fffff).nopw();    /* ??? */
+	map(0x900000, 0x900fff).ram().share("colorram");
+	map(0x901000, 0x903fff).nopw();    /* ??? */
+	map(0x904000, 0x904fff).ram().share("videoram");
+	map(0x905000, 0x907fff).nopw();    /* ??? */
+	map(0x980000, 0x9bffff).ram().share("bgvideoram");
+	map(0xa00000, 0xa00fff).nopw();    /* more palette ? */
+	map(0xa01000, 0xa017ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa01800, 0xa027ff).nopw();    /* more palette ? */
+	map(0xa80000, 0xa80001).portr("IN0");
+	map(0xa80010, 0xa80011).portr("IN1").w(FUNC(galspnbl_state::soundcommand_w));
+	map(0xa80020, 0xa80021).portr("SYSTEM").nopw();     /* w - could be watchdog, but causes resets when picture is shown */
+	map(0xa80030, 0xa80031).portr("DSW1").nopw();       /* w - irq ack? */
+	map(0xa80040, 0xa80041).portr("DSW2");
+	map(0xa80050, 0xa80051).writeonly().share("scroll");    /* ??? */
+}
 
-ADDRESS_MAP_START(galspnbl_state::audio_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* irq ack ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void galspnbl_state::audio_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf810, 0xf811).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xfc00, 0xfc00).noprw(); /* irq ack ?? */
+	map(0xfc20, 0xfc20).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( galspnbl )
@@ -202,7 +204,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( galspnbl )
+static GFXDECODE_START( gfx_galspnbl )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   512, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
 GFXDECODE_END
@@ -215,12 +217,12 @@ void galspnbl_state::machine_start()
 MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galspnbl_state,  irq3_line_hold)/* also has vector for 6, but it does nothing */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galspnbl_state,  irq3_line_hold)/* also has vector for 6, but it does nothing */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))    /* 4 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000))    /* 4 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 								/* NMI is caused by the main CPU */
 
 
@@ -235,7 +237,7 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 
 	MCFG_VIDEO_START_OVERRIDE(galspnbl_state,galspnbl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galspnbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galspnbl)
 
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
 	MCFG_PALETTE_INIT_OWNER(galspnbl_state, galspnbl)
@@ -246,15 +248,15 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 	MCFG_TECMO_SPRITE_BOOTLEG(1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Use value from Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Use value from Super Pinball Action - NEEDS VERIFICATION!! */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -319,5 +321,5 @@ ROM_START( hotpinbl )
 ROM_END
 
 
-GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, galspnbl_state, 0, ROT90, "Comad & New Japan System", "Hot Pinball", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, galspnbl, 0, galspnbl, galspnbl, galspnbl_state, 0, ROT90, "Comad", "Gals Pinball", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, galspnbl_state, empty_init, ROT90, "Comad & New Japan System", "Hot Pinball", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, galspnbl, 0, galspnbl, galspnbl, galspnbl_state, empty_init, ROT90, "Comad", "Gals Pinball", MACHINE_SUPPORTS_SAVE )

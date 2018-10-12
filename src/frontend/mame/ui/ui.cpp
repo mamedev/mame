@@ -49,7 +49,7 @@ enum
 ***************************************************************************/
 
 // list of natural keyboard keys that are not associated with UI_EVENT_CHARs
-static const input_item_id non_char_keys[] =
+static input_item_id const non_char_keys[] =
 {
 	ITEM_ID_ESC,
 	ITEM_ID_F1,
@@ -92,7 +92,7 @@ static const input_item_id non_char_keys[] =
 	ITEM_ID_CANCEL
 };
 
-static const char *s_color_list[] = {
+static char const *const s_color_list[] = {
 	OPTION_UI_BORDER_COLOR,
 	OPTION_UI_BACKGROUND_COLOR,
 	OPTION_UI_GFXVIEWER_BG_COLOR,
@@ -129,7 +129,7 @@ slider_state *mame_ui_manager::slider_current;
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-static const uint32_t mouse_bitmap[32*32] =
+static uint32_t const mouse_bitmap[32*32] =
 {
 	0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,
 	0x09a46f30,0x81ac7c43,0x24af8049,0x00ad7d45,0x00a8753a,0x00a46f30,0x009f6725,0x009b611c,0x00985b14,0x0095560d,0x00935308,0x00915004,0x00904e02,0x008f4e01,0x008f4d00,0x008f4d00,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,
@@ -1213,9 +1213,13 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	if (machine().ui_input().pressed(IPT_UI_TOGGLE_CHEAT))
 		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
 
-	// toggle movie recording
-	if (machine().ui_input().pressed(IPT_UI_RECORD_MOVIE))
-		machine().video().toggle_record_movie();
+	// toggle MNG recording
+	if (machine().ui_input().pressed(IPT_UI_RECORD_MNG))
+		machine().video().toggle_record_mng();
+
+	// toggle MNG recording
+	if (machine().ui_input().pressed(IPT_UI_RECORD_AVI))
+		machine().video().toggle_record_avi();
 
 	// toggle profiler display
 	if (machine().ui_input().pressed(IPT_UI_SHOW_PROFILER))
@@ -1676,9 +1680,10 @@ int32_t mame_ui_manager::slider_refresh(running_machine &machine, void *arg, int
 		const rectangle &visarea = screen->visible_area();
 		screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
 	}
+
 	if (str)
-		*str = string_format(_("%1$.3ffps"), ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds()));
-	refresh = ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds());
+		*str = string_format(_("%1$.3ffps"), ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()));
+	refresh = ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds());
 	return floor((refresh - defrefresh) * 1000.0 + 0.5);
 }
 

@@ -3,6 +3,7 @@
 
 #include "sound/ay8910.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 class superqix_state_base : public driver_device
 {
@@ -19,6 +20,13 @@ public:
 		m_ay1(*this, "ay1"),
 		m_mcu(*this, "mcu") { }
 
+	void init_perestro();
+	void init_sqix();
+	void init_sqixr0();
+	void init_pbillian();
+	void init_hotsmash();
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -50,11 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(superqix_bitmapram_w);
 	DECLARE_WRITE8_MEMBER(superqix_bitmapram2_w);
 	DECLARE_WRITE8_MEMBER(superqix_0410_w);
-	DECLARE_DRIVER_INIT(perestro);
-	DECLARE_DRIVER_INIT(sqix);
-	DECLARE_DRIVER_INIT(sqixr0);
-	DECLARE_DRIVER_INIT(pbillian);
-	DECLARE_DRIVER_INIT(hotsmash);
+
 	TILE_GET_INFO_MEMBER(sqix_get_bg_tile_info);
 	DECLARE_VIDEO_START(superqix);
 	DECLARE_PALETTE_DECODER(BBGGRRII);
@@ -62,7 +66,7 @@ public:
 	void superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	void main_map(address_map &map);
-protected:
+
 	virtual void machine_init_common();
 };
 
@@ -76,6 +80,14 @@ public:
 	{
 	}
 
+	void sqix(machine_config &config);
+	void sqix_8031(machine_config &config);
+	void sqix_nomcu(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(fromz80_semaphore_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(frommcu_semaphore_input_r);
+
+private:
 	required_device<ay8910_device> m_ay2;
 
 	// 8031 and/or 8751 MCU related
@@ -95,19 +107,14 @@ public:
 	DECLARE_READ8_MEMBER(z80_ay2_iob_r);
 	DECLARE_WRITE8_MEMBER(z80_ay2_iob_w);
 	DECLARE_WRITE8_MEMBER(bootleg_flipscreen_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(fromz80_semaphore_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(frommcu_semaphore_input_r);
 	DECLARE_READ8_MEMBER(bootleg_in0_r);
 	INTERRUPT_GEN_MEMBER(sqix_timer_irq);
 	DECLARE_MACHINE_START(superqix);
 	DECLARE_MACHINE_RESET(superqix);
 
-	void sqix(machine_config &config);
-	void sqix_8031(machine_config &config);
-	void sqix_nomcu(machine_config &config);
 	void sqix_port_map(address_map &map);
 	void sqix_8031_map(address_map &map);
-protected:
+
 	virtual void machine_init_common() override;
 
 	TIMER_CALLBACK_MEMBER(z80_semaphore_assert_cb);
@@ -138,6 +145,11 @@ public:
 	{
 	}
 
+	void pbillian(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(pbillian_semaphore_input_r);
+
+private:
 	DECLARE_READ8_MEMBER(hotsmash_68705_portA_r);
 	DECLARE_WRITE8_MEMBER(hotsmash_68705_portB_w);
 	DECLARE_WRITE8_MEMBER(hotsmash_68705_portC_w);
@@ -146,9 +158,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(pbillian_sample_trigger_w);
 	DECLARE_WRITE8_MEMBER(pbillian_0410_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(pbillian_semaphore_input_r);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	SAMPLES_START_CB_MEMBER(pbillian_sh_start);
 
@@ -159,9 +170,8 @@ public:
 
 	u32 screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pbillian(machine_config &config);
 	void pbillian_port_map(address_map &map);
-protected:
+
 	virtual void machine_init_common() override;
 
 	int read_inputs(int player);

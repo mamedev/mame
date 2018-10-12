@@ -35,6 +35,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
 #include "video/resnet.h"
@@ -51,11 +52,15 @@ public:
 		m_proms(*this, "proms"),
 		m_palette(*this, "palette") { }
 
+	void sderby2(machine_config &config);
+
+	void init_sderby2();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_DRIVER_INIT(sderby2);
 	DECLARE_PALETTE_INIT(sderby2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -78,7 +83,6 @@ public:
 	uint8_t sub_data;
 	uint8_t main_data;
 	uint8_t host_io_40;
-	void sderby2(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sub_io_map(address_map &map);
@@ -182,25 +186,27 @@ READ8_MEMBER(sderby2_state::sub_io_0_r)
  2KB of palette per screen? (0x7FF)
 
 */
-ADDRESS_MAP_START(sderby2_state::main_program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM // Is this banked?
-ADDRESS_MAP_END
+void sderby2_state::main_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xcfff).ram();
+	map(0xe000, 0xe3ff).ram();
+	map(0xe400, 0xe7ff).ram();
+	map(0xe800, 0xebff).ram();
+	map(0xec00, 0xefff).ram();
+	map(0xf000, 0xffff).ram(); // Is this banked?
+}
 
-ADDRESS_MAP_START(sderby2_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ(host_r)
-	AM_RANGE(0x20, 0x20) AM_WRITE(sub_nmi)
-	AM_RANGE(0x30, 0x30) AM_WRITENOP // Written with 0x12 byte sequence at start
-	AM_RANGE(0x40, 0x40) AM_WRITE(host_io_40_w) // Occasionally written
-ADDRESS_MAP_END
+void sderby2_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).r(FUNC(sderby2_state::host_r));
+	map(0x20, 0x20).w(FUNC(sderby2_state::sub_nmi));
+	map(0x30, 0x30).nopw(); // Written with 0x12 byte sequence at start
+	map(0x40, 0x40).w(FUNC(sderby2_state::host_io_40_w)); // Occasionally written
+}
 
 
 /*
@@ -210,25 +216,27 @@ ADDRESS_MAP_END
 18 x 2148  (1024x4) Side
  4 x 2148  (1024x4) Near 316-5012 and 316-5011
 */
-ADDRESS_MAP_START(sderby2_state::sub_program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void sderby2_state::sub_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 
-	AM_RANGE(0xc000, 0xcfff) AM_RAM // Tested at FFF, 1016, 102D
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM // 2KB Tested
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM // 2KB Tested at 105B
-	AM_RANGE(0xd800, 0xdbff) AM_RAM // 2KB Tested at 105B
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM // 2KB Tested at 10B7
+	map(0xc000, 0xcfff).ram(); // Tested at FFF, 1016, 102D
+	map(0xd000, 0xd3ff).ram(); // 2KB Tested
+	map(0xd400, 0xd7ff).ram(); // 2KB Tested at 105B
+	map(0xd800, 0xdbff).ram(); // 2KB Tested at 105B
+	map(0xdc00, 0xdfff).ram(); // 2KB Tested at 10B7
 
-	AM_RANGE(0xe000, 0xffff) AM_RAM // Tested at FE8
-ADDRESS_MAP_END
+	map(0xe000, 0xffff).ram(); // Tested at FE8
+}
 
-ADDRESS_MAP_START(sderby2_state::sub_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sub_io_0_r)
-	AM_RANGE(0x20, 0x20) AM_READ(sub_r)
-	AM_RANGE(0x40, 0x40) AM_WRITE(main_nmi)
-	AM_RANGE(0x60, 0x60) AM_WRITENOP // Written with 0x12 byte sequence at start
-ADDRESS_MAP_END
+void sderby2_state::sub_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(sderby2_state::sub_io_0_r));
+	map(0x20, 0x20).r(FUNC(sderby2_state::sub_r));
+	map(0x40, 0x40).w(FUNC(sderby2_state::main_nmi));
+	map(0x60, 0x60).nopw(); // Written with 0x12 byte sequence at start
+}
 
 
 /*************************************
@@ -267,7 +275,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( sderby2 )
+static GFXDECODE_START( gfx_sderby2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1024 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1024 )
 GFXDECODE_END
@@ -290,15 +298,15 @@ void sderby2_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(sderby2_state::sderby2)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(main_program_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sub_program_map)
-	MCFG_CPU_IO_MAP(sub_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sub_program_map)
+	MCFG_DEVICE_IO_MAP(sub_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -312,7 +320,7 @@ MACHINE_CONFIG_START(sderby2_state::sderby2)
 	MCFG_PALETTE_ADD("palette", 256+256*3)
 	MCFG_PALETTE_INIT_OWNER(sderby2_state,sderby2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby2)
 
 	// sound hardware
 MACHINE_CONFIG_END
@@ -397,7 +405,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(sderby2_state, sderby2)
+void sderby2_state::init_sderby2()
 {
 
 }
@@ -409,4 +417,4 @@ DRIVER_INIT_MEMBER(sderby2_state, sderby2)
  *
  *************************************/
 
-GAME( 1985, sderby2, 0, sderby2, sderby2, sderby2_state, sderby2,  ROT0, "Sega", "Super Derby II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1985, sderby2, 0, sderby2, sderby2, sderby2_state, init_sderby2, ROT0, "Sega", "Super Derby II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

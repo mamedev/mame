@@ -44,6 +44,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_fdc(*this, "fdc")
 		, m_rtc(*this, "rtc")
+		, m_usart(*this, "usart%u", 1U)
 		, m_scsi(*this, "scsi")
 		, m_scsi_data_out(*this, "scsi_data_out")
 		, m_scsi_data_in(*this, "scsi_data_in")
@@ -51,6 +52,10 @@ public:
 		, m_req_hack(nullptr)
 	{ }
 
+	void pcx(machine_config &config);
+	void pcd(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( irq_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( timer0_tick );
 	DECLARE_WRITE_LINE_MEMBER( i186_timer1_w );
@@ -80,24 +85,22 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_msg);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_req);
 
-	void pcx(machine_config &config);
-	void pcd(machine_config &config);
 	void pcd_io(address_map &map);
 	void pcd_map(address_map &map);
 	void pcx_io(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<wd2793_device> m_fdc;
 	required_device<mc146818_device> m_rtc;
+	required_device_array<mc2661_device, 3> m_usart;
 	required_device<scsi_port_device> m_scsi;
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
@@ -172,7 +175,7 @@ READ8_MEMBER( pcd_state::nmi_io_r )
 		return 0;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	return 0;
 }
 
@@ -182,7 +185,7 @@ WRITE8_MEMBER( pcd_state::nmi_io_w )
 		return;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER( pcd_state::rtc_r )
@@ -437,48 +440,52 @@ READ16_MEMBER(pcd_state::mem_r)
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(pcd_state::pcd_map)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
-	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(mem_r, mem_w)
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void pcd_state::pcd_map(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0x00000, 0x7ffff).rw(FUNC(pcd_state::mem_r), FUNC(pcd_state::mem_w));
+	map(0xfc000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(pcd_state::pcd_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE8("pic1", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0xf820, 0xf821) AM_DEVREADWRITE8("pic2", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0xf840, 0xf841) AM_READWRITE8(stat_r, stat_w, 0x00ff)
-	AM_RANGE(0xf840, 0xf841) AM_READWRITE8(led_r, led_w, 0xff00)
-	AM_RANGE(0xf880, 0xf8bf) AM_READWRITE8(rtc_r, rtc_w, 0xffff)
-	AM_RANGE(0xf900, 0xf903) AM_DEVREADWRITE8("fdc", wd2793_device, read, write, 0xffff)
-	AM_RANGE(0xf904, 0xf905) AM_READWRITE(dskctl_r, dskctl_w)
-	AM_RANGE(0xf940, 0xf943) AM_READWRITE8(scsi_r, scsi_w, 0xffff)
-	AM_RANGE(0xf980, 0xf9bf) AM_DEVICE("video", pcdx_video_device, map)
-	AM_RANGE(0xf9c0, 0xf9c3) AM_DEVREADWRITE8("usart1",mc2661_device,read,write,0xffff)  // UARTs
-	AM_RANGE(0xf9d0, 0xf9d3) AM_DEVREADWRITE8("usart2",mc2661_device,read,write,0xffff)
-	AM_RANGE(0xf9e0, 0xf9e3) AM_DEVREADWRITE8("usart3",mc2661_device,read,write,0xffff)
+void pcd_state::pcd_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0xf000, 0xf7ff).ram().share("nvram");
+	map(0xf800, 0xf801).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xf820, 0xf821).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xf840, 0xf840).rw(FUNC(pcd_state::stat_r), FUNC(pcd_state::stat_w));
+	map(0xf841, 0xf841).rw(FUNC(pcd_state::led_r), FUNC(pcd_state::led_w));
+	map(0xf880, 0xf8bf).rw(FUNC(pcd_state::rtc_r), FUNC(pcd_state::rtc_w));
+	map(0xf900, 0xf903).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
+	map(0xf904, 0xf905).rw(FUNC(pcd_state::dskctl_r), FUNC(pcd_state::dskctl_w));
+	map(0xf940, 0xf943).rw(FUNC(pcd_state::scsi_r), FUNC(pcd_state::scsi_w));
+	map(0xf980, 0xf9bf).m("video", FUNC(pcdx_video_device::map));
+	map(0xf9c0, 0xf9c3).rw(m_usart[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write));  // UARTs
+	map(0xf9d0, 0xf9d3).rw(m_usart[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xf9e0, 0xf9e3).rw(m_usart[2], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 //  AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
-	AM_RANGE(0xfb00, 0xfb01) AM_READWRITE8(nmi_io_r, nmi_io_w, 0x00ff)
-	AM_RANGE(0xfb02, 0xffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
-ADDRESS_MAP_END
+	map(0xfb00, 0xfb00).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+	map(0xfb02, 0xffff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+}
 
-ADDRESS_MAP_START(pcd_state::pcx_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(pcd_io)
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(mmu_r, mmu_w)
-	AM_RANGE(0xfb00, 0xfb01) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xff00)
-ADDRESS_MAP_END
+void pcd_state::pcx_io(address_map &map)
+{
+	map.unmap_value_high();
+	pcd_io(map);
+	map(0x8000, 0x8fff).rw(FUNC(pcd_state::mmu_r), FUNC(pcd_state::mmu_w));
+	map(0xfb01, 0xfb01).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
+}
 
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static SLOT_INTERFACE_START( pcd_floppies )
-	SLOT_INTERFACE("55f", TEAC_FD_55F) // 80 tracks
-	SLOT_INTERFACE("55g", TEAC_FD_55G) // 77 tracks
-SLOT_INTERFACE_END
+static void pcd_floppies(device_slot_interface &device)
+{
+	device.option_add("55f", TEAC_FD_55F); // 80 tracks
+	device.option_add("55g", TEAC_FD_55G); // 77 tracks
+}
 
 FLOPPY_FORMATS_MEMBER( pcd_state::floppy_formats )
 	FLOPPY_PC_FORMAT
@@ -493,80 +500,81 @@ static INPUT_PORTS_START(pcx)
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pcd_state::pcd)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(pcd_map)
-	MCFG_CPU_IO_MAP(pcd_io)
-	MCFG_80186_TMROUT1_HANDLER(WRITELINE(pcd_state, i186_timer1_w))
-	MCFG_80186_IRQ_SLAVE_ACK(READ8(pcd_state, irq_callback))
+	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(pcd_map)
+	MCFG_DEVICE_IO_MAP(pcd_io)
+	MCFG_80186_TMROUT1_HANDLER(WRITELINE(*this, pcd_state, i186_timer1_w))
+	MCFG_80186_IRQ_SLAVE_ACK(READ8(*this, pcd_state, irq_callback))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL(16'000'000) / 24)) // adjusted to pass post
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(16_MHz_XTAL / 24)) // adjusted to pass post
 
-	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
+	MCFG_DEVICE_ADD(m_pic1, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int0_w))
 
-	MCFG_DEVICE_ADD("pic2", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int1_w))
+	MCFG_DEVICE_ADD(m_pic2, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int1_w))
 
 	MCFG_DEVICE_ADD("video", PCD_VIDEO, 0)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
+	RAM(config, RAM_TAG).set_default_size("1M");
 
 	// nvram
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// floppy disk controller
-	MCFG_WD2793_ADD("fdc", XTAL(16'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic1", pic8259_device, ir6_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
-	MCFG_WD_FDC_ENMF_CALLBACK(GND)
+	WD2793(config, m_fdc, 16_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir6_w));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+	m_fdc->enmf_rd_callback().set_constant(0);
 
 	// floppy drives
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcd_floppies, "55f", pcd_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcd_floppies, "55f", pcd_state::floppy_formats)
 
 	// usart
-	MCFG_DEVICE_ADD("usart1", MC2661, XTAL(4'915'200))
-	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
-	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD("usart2", MC2661, XTAL(4'915'200))
-	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w))
-	//MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w)) // this gets stuck high causing the keyboard to not work
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("keyboard", pcd_keyboard_device, t0_w))
-	MCFG_DEVICE_ADD("usart3", MC2661, XTAL(4'915'200))
-	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
-	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
+	MC2661(config, m_usart[0], 4.9152_MHz_XTAL);
+	m_usart[0]->rxrdy_handler().set(m_pic1, FUNC(pic8259_device::ir3_w));
+	m_usart[0]->txrdy_handler().set(m_pic1, FUNC(pic8259_device::ir3_w));
+	m_usart[0]->txd_handler().set("rs232_1", FUNC(rs232_port_device::write_txd));
 
-	MCFG_RS232_PORT_ADD("rs232_1", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("usart1", mc2661_device, rx_w))
-	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("usart3", mc2661_device, rx_w))
+	MC2661(config, m_usart[1], 4.9152_MHz_XTAL);
+	m_usart[1]->rxrdy_handler().set(m_pic1, FUNC(pic8259_device::ir2_w));
+	//m_usart[1]->.txrdy_handler().set(m_pic1, FUNC(pic8259_device::ir2_w)); // this gets stuck high causing the keyboard to not work
+	m_usart[1]->txd_handler().set("keyboard", FUNC(pcd_keyboard_device::t0_w));
+
+	MC2661(config, m_usart[2], 4.9152_MHz_XTAL);
+	m_usart[2]->rxrdy_handler().set(m_pic1, FUNC(pic8259_device::ir4_w));
+	m_usart[2]->txrdy_handler().set(m_pic1, FUNC(pic8259_device::ir4_w));
+	m_usart[2]->txd_handler().set("rs232_2", FUNC(rs232_port_device::write_txd));
+
+	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart[0], mc2661_device, rx_w))
+	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart[2], mc2661_device, rx_w))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// rtc
-	MCFG_MC146818_ADD("rtc", XTAL(32'768))
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir7_w))
-	MCFG_MC146818_BINARY(true)
-	MCFG_MC146818_BINARY_YEAR(true)
-	MCFG_MC146818_EPOCH(1900)
-	MCFG_MC146818_24_12(true)
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(m_pic1, FUNC(pic8259_device::ir7_w));
+	m_rtc->set_binary(true);
+	m_rtc->set_binary_year(true);
+	m_rtc->set_epoch(1900);
+	m_rtc->set_24hrs(true);
 
 	MCFG_DEVICE_ADD("keyboard", PCD_KEYBOARD, 0)
-	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE("usart2", mc2661_device, rx_w))
+	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(WRITELINE(m_usart[1], mc2661_device, rx_w))
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
-	MCFG_SCSI_MSG_HANDLER(WRITELINE(pcd_state, write_scsi_msg))
-	MCFG_SCSI_BSY_HANDLER(WRITELINE(pcd_state, write_scsi_bsy))
-	MCFG_SCSI_IO_HANDLER(WRITELINE(pcd_state, write_scsi_io))
-	MCFG_SCSI_CD_HANDLER(WRITELINE(pcd_state, write_scsi_cd))
-	MCFG_SCSI_REQ_HANDLER(WRITELINE(pcd_state, write_scsi_req))
+	MCFG_SCSI_MSG_HANDLER(WRITELINE(*this, pcd_state, write_scsi_msg))
+	MCFG_SCSI_BSY_HANDLER(WRITELINE(*this, pcd_state, write_scsi_bsy))
+	MCFG_SCSI_IO_HANDLER(WRITELINE(*this, pcd_state, write_scsi_io))
+	MCFG_SCSI_CD_HANDLER(WRITELINE(*this, pcd_state, write_scsi_cd))
+	MCFG_SCSI_REQ_HANDLER(WRITELINE(*this, pcd_state, write_scsi_req))
 
 	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", "scsi")
 	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
@@ -575,17 +583,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcd_state::pcx)
 	pcd(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(pcx_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(pcx_io)
 
 	MCFG_DEVICE_REPLACE("video", PCX_VIDEO, 0)
-	MCFG_PCX_VIDEO_TXD_HANDLER(DEVWRITELINE("keyboard", pcd_keyboard_device, t0_w))
+	MCFG_PCX_VIDEO_TXD_HANDLER(WRITELINE("keyboard", pcd_keyboard_device, t0_w))
 
 	MCFG_DEVICE_MODIFY("keyboard")
-	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE("video", pcx_video_device, rx_w))
+	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(WRITELINE("video", pcx_video_device, rx_w))
 
-	MCFG_DEVICE_MODIFY("usart2")
-	MCFG_MC2661_TXD_HANDLER(NOOP)
+	m_usart[1]->txd_handler().set_nop();
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -595,26 +602,26 @@ MACHINE_CONFIG_END
 ROM_START( pcd )
 	ROM_REGION(0x4000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v2", "V2 GS")  // from mainboard SYBAC S26361-D359 V2 GS
-	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v3", "V3 GS4") // from mainboard SYBAC S26361-D359 V3 GS4
-	ROMX_LOAD("361d0359.d42", 0x0001, 0x2000, CRC(5b4461e4) SHA1(db6756aeabb2e6d3921dc7571a5bed3497b964bf), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("361d0359.d43", 0x0000, 0x2000, CRC(71c3189d) SHA1(e8dd6c632bfc833074d3a833ea7f59bb5460f313), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("361d0359.d42", 0x0001, 0x2000, CRC(5b4461e4) SHA1(db6756aeabb2e6d3921dc7571a5bed3497b964bf), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("361d0359.d43", 0x0000, 0x2000, CRC(71c3189d) SHA1(e8dd6c632bfc833074d3a833ea7f59bb5460f313), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 ROM_START( pcx )
 	ROM_REGION(0x4000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v2", "V2 GS")  // from mainboard SYBAC S26361-D359 V2 GS
-	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v3", "V3 GS4") // from mainboard SYBAC S26361-D359 V3 GS4
-	ROMX_LOAD("361d0359.d42", 0x0001, 0x2000, CRC(5b4461e4) SHA1(db6756aeabb2e6d3921dc7571a5bed3497b964bf), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("361d0359.d43", 0x0000, 0x2000, CRC(71c3189d) SHA1(e8dd6c632bfc833074d3a833ea7f59bb5460f313), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("361d0359.d42", 0x0001, 0x2000, CRC(5b4461e4) SHA1(db6756aeabb2e6d3921dc7571a5bed3497b964bf), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("361d0359.d43", 0x0000, 0x2000, CRC(71c3189d) SHA1(e8dd6c632bfc833074d3a833ea7f59bb5460f313), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 //**************************************************************************
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1984, pcd, 0,   0, pcd, 0,   pcd_state, 0, "Siemens", "PC-D", MACHINE_NOT_WORKING )
-COMP( 1984, pcx, pcd, 0, pcx, pcx, pcd_state, 0, "Siemens", "PC-X", MACHINE_NOT_WORKING )
+COMP( 1984, pcd, 0,   0, pcd, 0,   pcd_state, empty_init, "Siemens", "PC-D", MACHINE_NOT_WORKING )
+COMP( 1984, pcx, pcd, 0, pcx, pcx, pcd_state, empty_init, "Siemens", "PC-X", MACHINE_NOT_WORKING )

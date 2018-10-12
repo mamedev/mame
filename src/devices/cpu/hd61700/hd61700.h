@@ -16,25 +16,25 @@
 //**************************************************************************
 
 #define MCFG_HD61700_LCD_CTRL_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_lcd_ctrl_callback(DEVCB_##_devcb);
+	downcast<hd61700_cpu_device &>(*device).set_lcd_ctrl_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_LCD_WRITE_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_lcd_write_callback(DEVCB_##_devcb);
+	downcast<hd61700_cpu_device &>(*device).set_lcd_write_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_LCD_READ_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_lcd_read_callback(DEVCB_##_devcb);
+	downcast<hd61700_cpu_device &>(*device).set_lcd_read_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_KB_WRITE_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_kb_write_callback(DEVCB_##_devcb);
+	downcast<hd61700_cpu_device &>(*device).set_kb_write_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_KB_READ_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_kb_read_callback(DEVCB_##_devcb);
+	downcast<hd61700_cpu_device &>(*device).set_kb_read_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_PORT_WRITE_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_port_write_callback(DEVCB_##_devcb);
+	downcast<hd61700_cpu_device &>(*device).set_port_write_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_PORT_READ_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_port_read_callback(DEVCB_##_devcb);
+	downcast<hd61700_cpu_device &>(*device).set_port_read_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -90,7 +90,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// interrupts
 	bool check_irqs();

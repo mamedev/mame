@@ -11,6 +11,7 @@
 #pragma once
 
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Discrete Sound Input Nodes */
@@ -25,11 +26,6 @@
 class videopin_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
-
 	videopin_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -37,12 +33,18 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram")
+		m_video_ram(*this, "video_ram"),
+		m_led(*this, "led0")
 	{ }
 
 	void videopin(machine_config &config);
 
-protected:
+private:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
+
 	DECLARE_READ8_MEMBER(misc_r);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
@@ -66,7 +68,6 @@ protected:
 	void update_plunger();
 	double calc_plunger_pos();
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -74,6 +75,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_video_ram;
+	output_finder<> m_led;
 
 	attotime m_time_pushed;
 	attotime m_time_released;
@@ -86,6 +88,6 @@ private:
 };
 
 /*----------- defined in audio/videopin.c -----------*/
-DISCRETE_SOUND_EXTERN( videopin );
+DISCRETE_SOUND_EXTERN( videopin_discrete );
 
 #endif // MAME_INCLUDES_VIDEOPIN_H

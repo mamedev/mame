@@ -16,29 +16,31 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM5A, sm5a_device, "sm5a", "SM5A") // 1.8K ROM, 5x13x4 RAM, shift registers for LCD
-DEFINE_DEVICE_TYPE(SM5L, sm5l_device, "sm5l", "SM5L") // low-power version of SM5A
+DEFINE_DEVICE_TYPE(SM5A, sm5a_device, "sm5a", "Sharp SM5A") // 1.8K ROM, 5x13x4 RAM, shift registers for LCD
+DEFINE_DEVICE_TYPE(SM5L, sm5l_device, "sm5l", "Sharp SM5L") // low-power version of SM5A
 DEFINE_DEVICE_TYPE(KB1013VK12, kb1013vk12_device, "kb1013vk1_2", "KB1013VK1-2") // Soviet-era clone of SM5A
 
 
 // internal memory maps
-ADDRESS_MAP_START(sm5a_device::program_1_8k)
-	AM_RANGE(0x000, 0x6ff) AM_ROM
-	AM_RANGE(0x700, 0x73f) AM_ROM AM_MIRROR(0x0c0)
-ADDRESS_MAP_END
+void sm5a_device::program_1_8k(address_map &map)
+{
+	map(0x000, 0x6ff).rom();
+	map(0x700, 0x73f).rom().mirror(0x0c0);
+}
 
-ADDRESS_MAP_START(sm5a_device::data_5x13x4)
-	AM_RANGE(0x00, 0x0b) AM_RAM
-	AM_RANGE(0x0c, 0x0c) AM_RAM AM_MIRROR(0x03)
-	AM_RANGE(0x10, 0x1b) AM_RAM
-	AM_RANGE(0x1c, 0x1c) AM_RAM AM_MIRROR(0x03)
-	AM_RANGE(0x20, 0x2b) AM_RAM
-	AM_RANGE(0x2c, 0x2c) AM_RAM AM_MIRROR(0x03)
-	AM_RANGE(0x30, 0x3b) AM_RAM
-	AM_RANGE(0x3c, 0x3c) AM_RAM AM_MIRROR(0x03)
-	AM_RANGE(0x40, 0x4b) AM_RAM AM_MIRROR(0x30)
-	AM_RANGE(0x4c, 0x4c) AM_RAM AM_MIRROR(0x33)
-ADDRESS_MAP_END
+void sm5a_device::data_5x13x4(address_map &map)
+{
+	map(0x00, 0x0b).ram();
+	map(0x0c, 0x0c).ram().mirror(0x03);
+	map(0x10, 0x1b).ram();
+	map(0x1c, 0x1c).ram().mirror(0x03);
+	map(0x20, 0x2b).ram();
+	map(0x2c, 0x2c).ram().mirror(0x03);
+	map(0x30, 0x3b).ram();
+	map(0x3c, 0x3c).ram().mirror(0x03);
+	map(0x40, 0x4b).ram().mirror(0x30);
+	map(0x4c, 0x4c).ram().mirror(0x33);
+}
 
 
 // device definitions
@@ -64,9 +66,9 @@ kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *
 
 
 // disasm
-util::disasm_interface *sm5a_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm5a_device::create_disassembler()
 {
-	return new sm5a_disassembler;
+	return std::make_unique<sm5a_disassembler>();
 }
 
 

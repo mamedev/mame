@@ -71,7 +71,7 @@ READ16_MEMBER(lethalj_state::lethalj_gun_r)
 			result = m_guny + 4;
 			break;
 	}
-/*  logerror("%08X:lethalj_gun_r(%d) = %04X\n", space.device().safe_pc(), offset, result); */
+/*  logerror("%s:lethalj_gun_r(%d) = %04X\n", machine().describe_context(), offset, result); */
 	return result;
 }
 
@@ -89,8 +89,7 @@ void lethalj_state::video_start()
 	m_screenram = std::make_unique<uint16_t[]>(BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
-	m_blitter_base = (uint16_t *)memregion("gfx1")->base();
-	m_blitter_rows = memregion("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
+	m_blitter_rows = m_blitter_base.length() / BLITTER_SOURCE_WIDTH;
 
 	m_gen_ext1_int_timer = timer_alloc(TIMER_GEN_EXT1_INT);
 }
@@ -136,8 +135,8 @@ void lethalj_state::do_blit()
 		/* clip in Y */
 		if (dsty >= 0 && dsty < BLITTER_DEST_HEIGHT/2)
 		{
-			uint16_t *source = m_blitter_base + (srcy % m_blitter_rows) * BLITTER_SOURCE_WIDTH;
-			uint16_t *dest = m_screenram.get() + (dsty + (m_vispage ^ 1) * 256) * BLITTER_DEST_WIDTH;
+			uint16_t *source = m_blitter_base + ((srcy % m_blitter_rows) << 10);
+			uint16_t *dest = m_screenram.get() + ((dsty + ((m_vispage ^ 1) << 8)) << 9);
 			int sx = srcx;
 			int dx = dstx;
 			int x;
@@ -145,9 +144,9 @@ void lethalj_state::do_blit()
 			/* loop over X coordinates */
 			for (x = 0; x <= width; x++, sx++, dx++)
 			{
-				dx &= BLITTER_DEST_WIDTH -1 ;
+				dx &= 0x1ff;
 
-				int pix = source[sx % BLITTER_SOURCE_WIDTH];
+				int pix = source[sx & 0x3ff];
 				if (pix)
 					dest[dx] = pix;
 
@@ -157,7 +156,7 @@ void lethalj_state::do_blit()
 }
 
 
-WRITE16_MEMBER(lethalj_state::lethalj_blitter_w)
+WRITE16_MEMBER(lethalj_state::blitter_w)
 {
 	/* combine the data */
 	COMBINE_DATA(&m_blitter_data[offset]);

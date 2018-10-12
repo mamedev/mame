@@ -140,8 +140,8 @@ static const char *const astrof_sample_names[] =
 };
 
 MACHINE_CONFIG_START(astrof_state::astrof_audio)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(astrof_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -196,8 +196,8 @@ WRITE8_MEMBER(astrof_state::tomahawk_audio_w)
 
 
 MACHINE_CONFIG_START(astrof_state::tomahawk_audio)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                   // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res: N/C

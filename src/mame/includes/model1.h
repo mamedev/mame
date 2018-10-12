@@ -11,10 +11,13 @@
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"
 #include "machine/i8251.h"
+#include "machine/gen_fifo.h"
+#include "machine/mb8421.h"
 #include "machine/m1comm.h"
 #include "machine/timer.h"
 #include "video/segaic24.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #include <glm/vec3.hpp>
@@ -33,15 +36,18 @@ public:
 	model1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_dpram(*this, "dpram")
 		, m_m1audio(*this, M1AUDIO_TAG)
 		, m_m1uart(*this, "m1uart")
 		, m_m1comm(*this, "m1comm")
 		, m_dsbz80(*this, DSBZ80_TAG)
-		, m_tgp(*this, "tgp")
+		, m_tgp_copro(*this, "tgp_copro")
 		, m_screen(*this, "screen")
-		, m_io_timer(*this, "iotimer")
+		, m_copro_fifo_in(*this, "copro_fifo_in")
+		, m_copro_fifo_out(*this, "copro_fifo_out")
 		, m_poly_rom(*this, "polygons")
-		, m_tgp_data(*this, "tgp_data")
+		, m_copro_tables(*this, "copro_tables")
+		, m_copro_data(*this, "copro_data")
 		, m_mr2(*this, "mr2")
 		, m_mr(*this, "mr")
 		, m_display_list0(*this, "display_list0")
@@ -50,67 +56,20 @@ public:
 		, m_paletteram16(*this, "palette")
 		, m_palette(*this, "palette")
 		, m_tiles(*this, "tile")
-		, m_analog_ports(*this, "AN.%u", 0)
-		, m_digital_ports(*this, "IN.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{
 	}
 
-	// Machine
-	DECLARE_MACHINE_START(model1);
-	DECLARE_MACHINE_RESET(model1);
-	DECLARE_MACHINE_RESET(model1_vr);
+	void model1(machine_config &config);
+	void model1_hle(machine_config &config);
 
-	DECLARE_READ16_MEMBER(network_ctl_r);
-	DECLARE_WRITE16_MEMBER(network_ctl_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(io_command_acknowledge);
-
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
-
-	DECLARE_WRITE16_MEMBER(bank_w);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
-	// TGP
-	DECLARE_READ16_MEMBER(fifoin_status_r);
-	DECLARE_WRITE16_MEMBER(md1_w);
-	DECLARE_WRITE16_MEMBER(md0_w);
-	DECLARE_WRITE16_MEMBER(p_w);
-	DECLARE_WRITE16_MEMBER(mr_w);
-	DECLARE_WRITE16_MEMBER(mr2_w);
-
-	DECLARE_READ16_MEMBER(model1_tgp_copro_r);
-	DECLARE_WRITE16_MEMBER(model1_tgp_copro_w);
-	DECLARE_READ16_MEMBER(model1_tgp_copro_adr_r);
-	DECLARE_WRITE16_MEMBER(model1_tgp_copro_adr_w);
-	DECLARE_READ16_MEMBER(model1_tgp_copro_ram_r);
-	DECLARE_WRITE16_MEMBER(model1_tgp_copro_ram_w);
-	DECLARE_READ16_MEMBER(model1_tgp_vr_adr_r);
-	DECLARE_WRITE16_MEMBER(model1_tgp_vr_adr_w);
-	DECLARE_READ16_MEMBER(model1_vr_tgp_ram_r);
-	DECLARE_WRITE16_MEMBER(model1_vr_tgp_ram_w);
-	DECLARE_READ16_MEMBER(model1_vr_tgp_r);
-	DECLARE_WRITE16_MEMBER(model1_vr_tgp_w);
-
-	DECLARE_READ32_MEMBER(copro_ram_r);
-	DECLARE_WRITE32_MEMBER(copro_ram_w);
-	DECLARE_READ_LINE_MEMBER(copro_fifoin_pop_ok);
-	DECLARE_READ32_MEMBER(copro_fifoin_pop);
-	DECLARE_WRITE32_MEMBER(copro_fifoout_push);
-
-	uint16_t m_r360_state;
-	DECLARE_DRIVER_INIT(wingwar360);
-	DECLARE_READ16_MEMBER(r360_r);
-	DECLARE_WRITE16_MEMBER(r360_w);
-
-	// Rendering
-	DECLARE_VIDEO_START(model1);
-	DECLARE_READ16_MEMBER(model1_listctl_r);
-	DECLARE_WRITE16_MEMBER(model1_listctl_w);
-
-	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
+	void vf(machine_config &config);
+	void vr(machine_config &config);
+	void vformula(machine_config &config);
+	void swa(machine_config &config);
+	void wingwar(machine_config &config);
+	void wingwar360(machine_config &config);
+	void netmerc(machine_config &config);
 
 	struct spoint_t
 	{
@@ -127,36 +86,108 @@ public:
 	class quad_t
 	{
 	public:
-		quad_t() : z(0), col(0) { p[0] = nullptr; p[1] = nullptr; p[2] = nullptr; p[3] = nullptr; }
+		quad_t() { }
 		quad_t(int ccol, float cz, point_t* p0, point_t* p1, point_t* p2, point_t* p3)
-			: z(cz)
+			: p{ p0, p1, p2, p3 }
+			, z(cz)
 			, col(ccol)
 		{
-			p[0] = p0;
-			p[1] = p1;
-			p[2] = p2;
-			p[3] = p3;
 		}
 
 		int compare(const quad_t* other) const;
 
-		point_t *p[4];
-		float z;
-		int col;
+		point_t *p[4] = { nullptr, nullptr, nullptr, nullptr };
+		float z = 0;
+		int col = 0;
 	};
+
+private:
+	// Machine
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
+
+	DECLARE_WRITE16_MEMBER(bank_w);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+
+	// TGP
+	DECLARE_READ16_MEMBER(fifoin_status_r);
+	DECLARE_WRITE16_MEMBER(md1_w);
+	DECLARE_WRITE16_MEMBER(md0_w);
+	DECLARE_WRITE16_MEMBER(p_w);
+	DECLARE_WRITE16_MEMBER(mr_w);
+	DECLARE_WRITE16_MEMBER(mr2_w);
+
+	DECLARE_READ16_MEMBER(v60_copro_fifo_r);
+	DECLARE_WRITE16_MEMBER(v60_copro_fifo_w);
+	DECLARE_READ16_MEMBER(v60_copro_ram_adr_r);
+	DECLARE_WRITE16_MEMBER(v60_copro_ram_adr_w);
+	DECLARE_READ16_MEMBER(v60_copro_ram_r);
+	DECLARE_WRITE16_MEMBER(v60_copro_ram_w);
+
+	DECLARE_READ32_MEMBER(copro_ram_r);
+	DECLARE_WRITE32_MEMBER(copro_ram_w);
+	DECLARE_READ32_MEMBER(copro_fifoin_pop);
+	DECLARE_WRITE32_MEMBER(copro_fifoout_push);
+
+	DECLARE_WRITE32_MEMBER(copro_sincos_w);
+	DECLARE_READ32_MEMBER(copro_sincos_r);
+	DECLARE_WRITE32_MEMBER(copro_inv_w);
+	DECLARE_READ32_MEMBER(copro_inv_r);
+	DECLARE_WRITE32_MEMBER(copro_isqrt_w);
+	DECLARE_READ32_MEMBER(copro_isqrt_r);
+	DECLARE_WRITE32_MEMBER(copro_atan_w);
+	DECLARE_READ32_MEMBER(copro_atan_r);
+	DECLARE_WRITE32_MEMBER(copro_data_w);
+	DECLARE_READ32_MEMBER(copro_data_r);
+	DECLARE_WRITE32_MEMBER(copro_ramadr_w);
+	DECLARE_READ32_MEMBER(copro_ramadr_r);
+	DECLARE_WRITE32_MEMBER(copro_ramdata_w);
+	DECLARE_READ32_MEMBER(copro_ramdata_r);
+
+	void copro_hle_vf();
+	void copro_hle_swa();
+	void copro_reset();
+
+	u32 m_copro_sincos_base;
+	u32 m_copro_inv_base;
+	u32 m_copro_isqrt_base;
+	u32 m_copro_atan_base[4];
+	u32 m_copro_data_base;
+	u32 m_copro_ram_adr;
+
+	uint16_t m_r360_state;
+	DECLARE_READ8_MEMBER(r360_r);
+	DECLARE_WRITE8_MEMBER(r360_w);
+
+	// Rendering
+	virtual void video_start() override;
+	DECLARE_READ16_MEMBER(model1_listctl_r);
+	DECLARE_WRITE16_MEMBER(model1_listctl_w);
+
+	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
 
 	struct lightparam_t
 	{
-		float a;
-		float d;
-		float s;
-		int p;
+		float a = 0;
+		float d = 0;
+		float s = 0;
+		int p = 0;
 	};
 
 	class view_t
 	{
 	public:
-		view_t() { }
+		view_t() {
+			light.x = 0;
+			light.y = 0;
+			light.z = 0;
+		}
 
 		void init_translation_matrix();
 
@@ -175,48 +206,49 @@ public:
 
 		void recompute_frustum();
 
-		int xc, yc, x1, y1, x2, y2;
-		float zoomx, zoomy, viewx, viewy;
-		float a_bottom, a_top, a_left, a_right;
-		float vxx, vyy, vzz, ayy, ayyc, ayys;
-		float translation[12];
+		int xc = 0, yc = 0, x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+		float zoomx = 0, zoomy = 0, viewx = 0, viewy = 0;
+		float a_bottom = 0, a_top = 0, a_left = 0, a_right = 0;
+		float vxx = 0, vyy = 0, vzz = 0, ayy = 0, ayyc = 0, ayys = 0;
+		float translation[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		glm::vec3 light;
 		lightparam_t lightparams[32];
 	};
 
-	void model1(machine_config &config);
-	void swa(machine_config &config);
-	void netmerc(machine_config &config);
-	void model1_vr(machine_config &config);
 	void model1_io(address_map &map);
 	void model1_mem(address_map &map);
-	void model1_vr_io(address_map &map);
-	void model1_vr_mem(address_map &map);
-	void model1_vr_tgp_map(address_map &map);
+	void model1_comm_mem(address_map &map);
+
+	void copro_prog_map(address_map &map);
+	void copro_data_map(address_map &map);
+	void copro_external_map(address_map &map);
+	void copro_io_map(address_map &map);
+	void copro_rf_map(address_map &map);
+
 	void polhemus_map(address_map &map);
-private:
+
 	// Machine
 	void irq_raise(int level);
 	void irq_init();
+	DECLARE_WRITE8_MEMBER(irq_control_w);
 
+	uint8_t m_irq_status;
 	int m_last_irq;
-	bool m_dump;
-	bool m_swa;
-
-	uint8_t m_io_command;
 
 	// Devices
 	required_device<v60_device> m_maincpu;          // V60
+	required_device<mb8421_device> m_dpram;
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
 	required_device<i8251_device> m_m1uart;
 	optional_device<m1comm_device> m_m1comm;        // Model 1 communication board
 	optional_device<dsbz80_device> m_dsbz80;        // Digital Sound Board
-	optional_device<mb86233_cpu_device> m_tgp;
+	optional_device<mb86233_device> m_tgp_copro;
 	required_device<screen_device> m_screen;
-	required_device<timer_device> m_io_timer;
+	required_device<generic_fifo_u32_device> m_copro_fifo_in, m_copro_fifo_out;
 
 	required_region_ptr<uint32_t> m_poly_rom;
-	optional_region_ptr<uint32_t> m_tgp_data;
+	required_region_ptr<uint32_t> m_copro_tables;
+	optional_memory_region        m_copro_data;
 
 	required_shared_ptr<uint16_t> m_mr2;
 	required_shared_ptr<uint16_t> m_mr;
@@ -228,32 +260,16 @@ private:
 	int m_sound_irq;
 
 	// TGP FIFO
-	uint32_t  fifoout_pop();
 	void    fifoout_push(uint32_t data);
 	void    fifoout_push_f(float data);
 	uint32_t  fifoin_pop();
-	void    fifoin_push(uint32_t data);
 	float   fifoin_pop_f();
 	uint16_t  ram_get_i();
 	float   ram_get_f();
-	void    copro_fifoin_push(uint32_t data);
-	uint32_t  copro_fifoout_pop();
-	void    next_fn();
-
-	uint32_t  m_copro_r;
-	uint32_t  m_copro_w;
-	int     m_copro_fifoout_rpos;
-	int     m_copro_fifoout_wpos;
-	uint32_t  m_copro_fifoout_data[FIFO_SIZE];
-	int     m_copro_fifoout_num;
-	int     m_copro_fifoin_rpos;
-	int     m_copro_fifoin_wpos;
-	uint32_t  m_copro_fifoin_data[FIFO_SIZE];
-	int     m_copro_fifoin_num;
+	u32 m_v60_copro_fifo_r, m_v60_copro_fifo_w;
 
 	// TGP
-	void    vr_tgp_reset();
-	void    tgp_reset(bool swa);
+	void    tgp_reset();
 
 	DECLARE_TGP_FUNCTION( fadd );
 	DECLARE_TGP_FUNCTION( fsub );
@@ -372,19 +388,15 @@ private:
 		std::function<void(view_t*, point_t*, point_t*, point_t*)> m_clip;
 	};
 
-	view_t      *m_view;
+	std::unique_ptr<view_t> m_view;
 	point_t *m_pointdb;
 	point_t *m_pointpt;
 	quad_t      *m_quaddb;
 	quad_t      *m_quadpt;
 	quad_t      **m_quadind;
 	offs_t      m_pushpc;
-	int         m_fifoin_rpos;
-	int         m_fifoin_wpos;
-	uint32_t      m_fifoin_data[FIFO_SIZE];
-	int         m_fifoin_cbcount;
+	u32 m_copro_hle_active_list_pos, m_copro_hle_active_list_length;
 	typedef void (model1_state::*tgp_func)();
-	tgp_func    m_fifoin_cb;
 
 	struct function
 	{
@@ -392,12 +404,12 @@ private:
 		int count;
 	};
 
+	static float tsin(s16 angle);
+	static float tcos(s16 angle);
+
 	static const struct function ftab_vf[];
 	static const struct function ftab_swa[];
-	int32_t   m_fifoout_rpos;
-	int32_t   m_fifoout_wpos;
-	uint32_t  m_fifoout_data[FIFO_SIZE];
-	uint32_t  m_list_length;
+	uint32_t  m_copro_hle_list_length;
 	float   m_cmat[12];
 	float   m_mat_stack[MAT_STACK_SIZE][12];
 	float   m_mat_vector[21][12];
@@ -420,21 +432,20 @@ private:
 	float   m_tgp_int_py;
 	float   m_tgp_int_pz;
 	uint32_t  m_tgp_int_adr;
-	uint16_t  m_ram_adr;
-	uint16_t  m_ram_latch[2];
-	uint16_t  m_ram_scanadr;
-	std::unique_ptr<uint32_t[]> m_ram_data;
+	uint16_t  m_v60_copro_ram_adr;
+	uint16_t  m_v60_copro_ram_latch[2];
+	uint16_t  m_copro_hle_ram_scan_adr;
+	std::unique_ptr<uint32_t[]> m_copro_ram_data;
 	float   m_tgp_vr_base[4];
-	int     m_puuu;
 	int     m_ccount;
-	uint32_t  m_vr_r;
-	uint32_t  m_vr_w;
 	uint16_t  m_listctl[2];
 	uint16_t  *m_glist;
 	bool    m_render_done;
 
 	std::unique_ptr<uint16_t[]> m_tgp_ram;
 	std::unique_ptr<uint32_t[]> m_poly_ram;
+
+	void configure_fifos();
 
 	// Rendering helper functions
 	uint32_t  readi(int adr) const;
@@ -493,10 +504,14 @@ private:
 	required_device<segas24_tile_device> m_tiles;
 
 	// I/O related
-	uint16_t  m_lamp_state;
-	optional_ioport_array<8> m_analog_ports;
-	required_ioport_array<3> m_digital_ports;
-
+	output_finder<2> m_digits;
+	DECLARE_READ8_MEMBER(dpram_r);
+	DECLARE_WRITE8_MEMBER(vf_outputs_w);
+	DECLARE_WRITE8_MEMBER(vr_outputs_w);
+	DECLARE_WRITE8_MEMBER(swa_outputs_w);
+	DECLARE_WRITE8_MEMBER(wingwar_outputs_w);
+	DECLARE_WRITE8_MEMBER(wingwar360_outputs_w);
+	DECLARE_WRITE8_MEMBER(netmerc_outputs_w);
 };
 
 

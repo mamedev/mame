@@ -19,13 +19,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(hp9845_io_slot_devices, nullptr, false)
 
 #define MCFG_HP9845_IO_IRQ_CB(_devcb) \
-	devcb = &downcast<hp9845_io_slot_device &>(*device).set_irq_cb_func(DEVCB_##_devcb);
+	downcast<hp9845_io_slot_device &>(*device).set_irq_cb_func(DEVCB_##_devcb);
 
 #define MCFG_HP9845_IO_STS_CB(_devcb) \
-	devcb = &downcast<hp9845_io_slot_device &>(*device).set_sts_cb_func(DEVCB_##_devcb);
+	downcast<hp9845_io_slot_device &>(*device).set_sts_cb_func(DEVCB_##_devcb);
 
 #define MCFG_HP9845_IO_FLG_CB(_devcb) \
-	devcb = &downcast<hp9845_io_slot_device &>(*device).set_flg_cb_func(DEVCB_##_devcb);
+	downcast<hp9845_io_slot_device &>(*device).set_flg_cb_func(DEVCB_##_devcb);
 
 #define HP9845_IO_FIRST_SC  1   // Lowest SC used by I/O cards
 
@@ -109,6 +109,6 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(HP9845_IO_SLOT, hp9845_io_slot_device)
 
-SLOT_INTERFACE_EXTERN(hp9845_io_slot_devices);
+void hp9845_io_slot_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_HP9845_IO_HP9845_IO_H

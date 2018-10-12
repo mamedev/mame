@@ -27,7 +27,7 @@
 
 
 #define MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(_write) \
-	devcb = &downcast<colecovision_control_port_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<colecovision_control_port_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 
 
@@ -95,7 +95,7 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(COLECOVISION_CONTROL_PORT, colecovision_control_port_device)
 
-SLOT_INTERFACE_EXTERN( colecovision_control_port_devices );
+void colecovision_control_port_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_COLECO_CTRL_H

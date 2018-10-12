@@ -350,34 +350,37 @@ WRITE8_MEMBER(playch10_state::time_w)
 /******************************************************************************/
 
 /* BIOS */
-ADDRESS_MAP_START(playch10_state::bios_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM // 8V
-	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_SHARE("ram_8w")    // 8W
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(playch10_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(pc10_prot_r, pc10_prot_w)
-ADDRESS_MAP_END
+void playch10_state::bios_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x87ff).ram(); // 8V
+	map(0x8800, 0x8fff).rw(FUNC(playch10_state::ram_8w_r), FUNC(playch10_state::ram_8w_w)).share("ram_8w");    // 8W
+	map(0x9000, 0x97ff).ram().w(FUNC(playch10_state::playch10_videoram_w)).share("videoram");
+	map(0xc000, 0xdfff).rom();
+	map(0xe000, 0xffff).rw(FUNC(playch10_state::pc10_prot_r), FUNC(playch10_state::pc10_prot_w));
+}
 
-ADDRESS_MAP_START(playch10_state::bios_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("BIOS")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SW1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SW2")
-	AM_RANGE(0x03, 0x03) AM_READ(pc10_detectclr_r)
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch1", ls259_device, write_d0)
-	AM_RANGE(0x08, 0x0f) AM_DEVWRITE("outlatch2", ls259_device, write_d0)
-	AM_RANGE(0x10, 0x13) AM_WRITE(time_w)
-ADDRESS_MAP_END
+void playch10_state::bios_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("BIOS");
+	map(0x01, 0x01).portr("SW1");
+	map(0x02, 0x02).portr("SW2");
+	map(0x03, 0x03).r(FUNC(playch10_state::pc10_detectclr_r));
+	map(0x00, 0x07).w("outlatch1", FUNC(ls259_device::write_d0));
+	map(0x08, 0x0f).w("outlatch2", FUNC(ls259_device::write_d0));
+	map(0x10, 0x13).w(FUNC(playch10_state::time_w));
+}
 
-ADDRESS_MAP_START(playch10_state::cart_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("work_ram")
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(pc10_in0_r, pc10_in0_w)
-	AM_RANGE(0x4017, 0x4017) AM_READ(pc10_in1_r)  /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void playch10_state::cart_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().mirror(0x1800).share("work_ram");
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(FUNC(playch10_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(playch10_state::pc10_in0_r), FUNC(playch10_state::pc10_in0_w));
+	map(0x4017, 0x4017).r(FUNC(playch10_state::pc10_in1_r));  /* IN1 - input port 2 / PSG second control register */
+	map(0x8000, 0xffff).rom();
+}
 
 /******************************************************************************/
 
@@ -386,7 +389,7 @@ static INPUT_PORTS_START( playch10 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Channel Select") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Enter") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Reset") PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, playch10_state,pc10_int_detect_r, nullptr)   // INT Detect
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, playch10_state,pc10_int_detect_r, nullptr)   // INT Detect
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -625,80 +628,81 @@ static const gfx_layout bios_charlayout =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( playch10 )
+static GFXDECODE_START( gfx_playch10 )
 	GFXDECODE_ENTRY( "gfx1", 0, bios_charlayout,   0,  32 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
-	/* LS161A, Sheet 1 - bottom left of Z80 */
-	if ( !m_pc10_dog_di && !m_pc10_nmi_enable ) {
-		device.execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE );
+WRITE_LINE_MEMBER(playch10_state::vblank_irq)
+{
+	if (state)
+	{
+		/* LS161A, Sheet 1 - bottom left of Z80 */
+		if (!m_pc10_dog_di && !m_pc10_nmi_enable)
+			m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		else if (m_pc10_nmi_enable)
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
-
-	else if ( m_pc10_nmi_enable )
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 MACHINE_CONFIG_START(playch10_state::playch10)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) // 4 MHz
-	MCFG_CPU_PROGRAM_MAP(bios_map)
-	MCFG_CPU_IO_MAP(bios_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", playch10_state,  playch10_interrupt)
+	Z80(config, m_maincpu, 8000000/2); // 4 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &playch10_state::bios_map);
+	m_maincpu->set_addrmap(AS_IO, &playch10_state::bios_io_map);
 
-	MCFG_CPU_ADD("cart", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cart_map)
+	N2A03(config, m_cartcpu, NTSC_APU_CLOCK);
+	m_cartcpu->set_addrmap(AS_PROGRAM, &playch10_state::cart_map);
 
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // 7D
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(playch10_state, sdcs_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(playch10_state, cntrl_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(playch10_state, disp_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(playch10_state, sound_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("cart", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // GAMERES
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("cart", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // GAMESTOP
+	ls259_device &outlatch1(LS259(config, "outlatch1")); // 7D
+	outlatch1.q_out_cb<0>().set(FUNC(playch10_state::sdcs_w));
+	outlatch1.q_out_cb<1>().set(FUNC(playch10_state::cntrl_mask_w));
+	outlatch1.q_out_cb<2>().set(FUNC(playch10_state::disp_mask_w));
+	outlatch1.q_out_cb<3>().set(FUNC(playch10_state::sound_mask_w));
+	outlatch1.q_out_cb<4>().set_inputline(m_cartcpu, INPUT_LINE_RESET).invert(); // GAMERES
+	outlatch1.q_out_cb<5>().set_inputline(m_cartcpu, INPUT_LINE_HALT).invert(); // GAMESTOP
 
-	MCFG_DEVICE_ADD("outlatch2", LS259, 0) // 7E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(playch10_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(playch10_state, dog_di_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(playch10_state, ppu_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(playch10_state, up8w_w))
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(playch10_state, cart_sel_w)) MCFG_DEVCB_MASK(0x78) MCFG_DEVCB_RSHIFT(-3)
+	ls259_device &outlatch2(LS259(config, "outlatch2")); // 7E
+	outlatch2.q_out_cb<0>().set(FUNC(playch10_state::nmi_enable_w));
+	outlatch2.q_out_cb<1>().set(FUNC(playch10_state::dog_di_w));
+	outlatch2.q_out_cb<2>().set(FUNC(playch10_state::ppu_reset_w));
+	outlatch2.q_out_cb<7>().set(FUNC(playch10_state::up8w_w));
+	outlatch2.parallel_out_cb().set(FUNC(playch10_state::cart_sel_w)).rshift(3).mask(0x0f);
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", playch10)
-	MCFG_PALETTE_ADD("palette", 256+8*4*16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_playch10)
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
-	MCFG_DEFAULT_LAYOUT(layout_playch10)
+	config.set_default_layout(layout_playch10);
 
 	MCFG_SCREEN_ADD("top", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_top)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, playch10_state, vblank_irq))
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_bottom)
-	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PPU2C03B_ADD("ppu")
-	MCFG_PPU2C0X_SET_SCREEN("bottom")
-	MCFG_PPU2C0X_CPU("cart")
-	MCFG_PPU2C0X_COLORBASE(256)
-	MCFG_PPU2C0X_SET_NMI(playch10_state, ppu_irq)
+	PPU_2C03B(config, m_ppu, 0);
+	m_ppu->set_screen("bottom");
+	m_ppu->set_cpu_tag("cart");
+	m_ppu->int_callback().set_inputline(m_cartcpu, INPUT_LINE_NMI);
+	m_ppu->int_callback().append(FUNC(playch10_state::int_detect_w));
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(playch10_state::playchnv)
+void playch10_state::playchnv(machine_config &config)
+{
 	playch10(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 MACHINE_CONFIG_START(playch10_state::playch10_hboard)
 	playch10(config);
@@ -713,7 +717,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define BIOS_CPU                                            \
 	ROM_REGION( 0x10000, "maincpu", 0 )                     \
@@ -749,7 +753,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "pch1-c-6f.82s129an.6f",    0x0000, 0x0100, CRC(e5414ca3) SHA1(d2878411cda84ffe0afb2e538a67457f51bebffb) )    \
 	ROM_LOAD( "pch1-c-6e.82s129an.6e",    0x0100, 0x0100, CRC(a2625c6e) SHA1(a448b47c9289902e26a3d3c4c7d5a7968c385e81) )    \
 	ROM_LOAD( "pch1-c-6d.82s129an.6d",    0x0200, 0x0100, CRC(1213ebd4) SHA1(0ad386fc3eab5e53c0288ad1de33639a9e461b7c) )    \
-	ROM_REGION( 0xc0, "palette", 0 )                        \
+	ROM_REGION( 0xc0, "ppu:palette", 0 )                    \
 	ROM_LOAD( "rp2c0x.pal", 0x00, 0xc0, CRC(48de65dc) SHA1(d10acafc8da9ff479c270ec01180cca61efe62f5) )
 
 
@@ -1442,15 +1446,15 @@ ROM_END
 // TT-PRG.U5           = nes-ni-0 prg          nes:ttoonadvu Tiny Toon Adventures (USA)
 ROM_START( pc_ttoon )   /* Tiny Toon Adventures */
 	BIOS_CPU
-	ROM_LOAD( "TT-GM2.U3",   0x0c000, 0x2000, CRC(d2764d91) SHA1(393b54148e9250f14d83318aed6686cc04b923e6) ) /* extra bios code for this game */
+	ROM_LOAD( "tt-gm2.u3",   0x0c000, 0x2000, CRC(d2764d91) SHA1(393b54148e9250f14d83318aed6686cc04b923e6) ) /* extra bios code for this game */
 	BIOS_GFX
 
 	ROM_REGION( 0x50000, "cart", 0 )
-	ROM_LOAD( "TT-PRG.U5",    0x10000, 0x20000, CRC(9cb55b96) SHA1(437c326a4575895b9d7e567cab4f70b2f44ed8dd) )   /* banked */
+	ROM_LOAD( "tt-prg.u5",    0x10000, 0x20000, CRC(9cb55b96) SHA1(437c326a4575895b9d7e567cab4f70b2f44ed8dd) )   /* banked */
 	ROM_RELOAD(          0x30000, 0x20000 )
 
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
-	ROM_LOAD( "TT-CHR.U1",    0x00000, 0x20000, CRC(a024ae14) SHA1(2e797a173161a61c14ce299e3c5a31c6029f2b50) )
+	ROM_LOAD( "tt-chr.u1",    0x00000, 0x20000, CRC(a024ae14) SHA1(2e797a173161a61c14ce299e3c5a31c6029f2b50) )
 
 	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
 	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
@@ -1667,12 +1671,12 @@ ROM_END
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the other drivers, so that we do not have to include */
 /* them in every zip file */
-GAME( 1986, playch10, 0, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo of America", "PlayChoice-10 BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1986, playch10, 0, playch10, playch10, playch10_state, init_playch10, ROT0, "Nintendo of America", "PlayChoice-10 BIOS", MACHINE_IS_BIOS_ROOT )
 
 /******************************************************************************/
 
 
-DRIVER_INIT_MEMBER(playch10_state,virus)
+void playch10_state::init_virus()
 {
 	uint8_t *ROM = memregion("rp5h01")->base();
 	uint32_t len = memregion("rp5h01")->bytes();
@@ -1683,10 +1687,10 @@ DRIVER_INIT_MEMBER(playch10_state,virus)
 	}
 
 	/* common init */
-	DRIVER_INIT_CALL(pcfboard);
+	init_pcfboard();
 }
 
-DRIVER_INIT_MEMBER(playch10_state,ttoon)
+void playch10_state::init_ttoon()
 {
 	uint8_t *ROM = memregion("rp5h01")->base();
 	uint32_t len = memregion("rp5h01")->bytes();
@@ -1697,89 +1701,89 @@ DRIVER_INIT_MEMBER(playch10_state,ttoon)
 	}
 
 	/* common init */
-	DRIVER_INIT_CALL(pcgboard);
+	init_pcgboard();
 }
 
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  */
 
 /* Standard Games */
-GAME( 1983, pc_tenis, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Tennis (PlayChoice-10)", 0 )
-GAME( 1983, pc_mario, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Mario Bros. (PlayChoice-10)", 0 )
-GAME( 1984, pc_bball, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo of America",                      "Baseball (PlayChoice-10)", 0 )
-GAME( 1984, pc_bfght, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Balloon Fight (PlayChoice-10)", 0 )
-GAME( 1984, pc_ebike, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Excite Bike (PlayChoice-10)", 0 )
-GAME( 1984, pc_golf,  playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Golf (PlayChoice-10)", 0 )
-GAME( 1985, pc_kngfu, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Irem (Nintendo license)",                  "Kung Fu (PlayChoice-10)", 0 )
-GAME( 1985, pc_smb,   playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Super Mario Bros. (PlayChoice-10)", 0 )
-GAME( 1986, pc_vball, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Volley Ball (PlayChoice-10)", 0 )
-GAME( 1987, pc_1942,  playch10, playch10, playch10, playch10_state, pc_hrz,   ROT0, "Capcom",                                   "1942 (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pc_tenis, playch10, playch10, playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Tennis (PlayChoice-10)", 0 )
+GAME( 1983, pc_mario, playch10, playch10, playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Mario Bros. (PlayChoice-10)", 0 )
+GAME( 1984, pc_bball, playch10, playch10, playch10, playch10_state, init_playch10, ROT0, "Nintendo of America",                      "Baseball (PlayChoice-10)", 0 )
+GAME( 1984, pc_bfght, playch10, playch10, playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Balloon Fight (PlayChoice-10)", 0 )
+GAME( 1984, pc_ebike, playch10, playch10, playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Excite Bike (PlayChoice-10)", 0 )
+GAME( 1984, pc_golf,  playch10, playch10, playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Golf (PlayChoice-10)", 0 )
+GAME( 1985, pc_kngfu, playch10, playch10, playch10, playch10_state, init_playch10, ROT0, "Irem (Nintendo license)",                  "Kung Fu (PlayChoice-10)", 0 )
+GAME( 1985, pc_smb,   playch10, playch10, playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Super Mario Bros. (PlayChoice-10)", 0 )
+GAME( 1986, pc_vball, playch10, playch10, playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Volley Ball (PlayChoice-10)", 0 )
+GAME( 1987, pc_1942,  playch10, playch10, playch10, playch10_state, init_pc_hrz,   ROT0, "Capcom",                                   "1942 (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* Gun Games */
-GAME( 1984, pc_duckh, playch10, playch10, playc10g, playch10_state, pc_gun,   ROT0, "Nintendo",                                 "Duck Hunt (PlayChoice-10)", 0 )
-GAME( 1984, pc_hgaly, playch10, playch10, playc10g, playch10_state, pc_gun,   ROT0, "Nintendo",                                 "Hogan's Alley (PlayChoice-10)", 0 )
-GAME( 1984, pc_wgnmn, playch10, playch10, playc10g, playch10_state, pc_gun,   ROT0, "Nintendo",                                 "Wild Gunman (PlayChoice-10)", 0 )
+GAME( 1984, pc_duckh, playch10, playch10, playc10g, playch10_state, init_pc_gun,   ROT0, "Nintendo",                                 "Duck Hunt (PlayChoice-10)", 0 )
+GAME( 1984, pc_hgaly, playch10, playch10, playc10g, playch10_state, init_pc_gun,   ROT0, "Nintendo",                                 "Hogan's Alley (PlayChoice-10)", 0 )
+GAME( 1984, pc_wgnmn, playch10, playch10, playc10g, playch10_state, init_pc_gun,   ROT0, "Nintendo",                                 "Wild Gunman (PlayChoice-10)", 0 )
 
 /* A-Board Games */
-GAME( 1986, pc_grdus, playch10, playch10, playch10, playch10_state, pcaboard, ROT0, "Konami",                                   "Gradius (PlayChoice-10)" , 0) // date: 860917
-GAME( 1986, pc_grdue, pc_grdus, playch10, playch10, playch10_state, pcaboard, ROT0, "Konami",                                   "Gradius (PlayChoice-10, older)" , 0) // date: 860219
-GAME( 1987, pc_tkfld, playch10, playch10, playch10, playch10_state, pcaboard, ROT0, "Konami (Nintendo of America license)",     "Track & Field (PlayChoice-10)", 0 )
+GAME( 1986, pc_grdus, playch10, playch10, playch10, playch10_state, init_pcaboard, ROT0, "Konami",                                   "Gradius (PlayChoice-10)" , 0) // date: 860917
+GAME( 1986, pc_grdue, pc_grdus, playch10, playch10, playch10_state, init_pcaboard, ROT0, "Konami",                                   "Gradius (PlayChoice-10, older)" , 0) // date: 860219
+GAME( 1987, pc_tkfld, playch10, playch10, playch10, playch10_state, init_pcaboard, ROT0, "Konami (Nintendo of America license)",     "Track & Field (PlayChoice-10)", 0 )
 
 /* B-Board Games */
-GAME( 1986, pc_pwrst, playch10, playch10, playch10, playch10_state, pcbboard, ROT0, "Nintendo",                                 "Pro Wrestling (PlayChoice-10)", 0 )
-GAME( 1986, pc_trjan, playch10, playch10, playch10, playch10_state, pcbboard, ROT0, "Capcom USA (Nintendo of America license)", "Trojan (PlayChoice-10)", 0 )
-GAME( 1987, pc_cvnia, playch10, playch10, playch10, playch10_state, pcbboard, ROT0, "Konami (Nintendo of America license)",     "Castlevania (PlayChoice-10)", 0 )
-GAME( 1987, pc_dbldr, playch10, playch10, playch10, playch10_state, pcbboard, ROT0, "Konami (Nintendo of America license)",     "Double Dribble (PlayChoice-10)", 0 )
-GAME( 1987, pc_rnatk, playch10, playch10, playch10, playch10_state, pcbboard, ROT0, "Konami (Nintendo of America license)",     "Rush'n Attack (PlayChoice-10)", 0 )
-GAME( 1987, pc_rygar, playch10, playch10, playch10, playch10_state, pcbboard, ROT0, "Tecmo (Nintendo of America license)",      "Rygar (PlayChoice-10)", 0 )
-GAME( 1988, pc_cntra, playch10, playch10, playch10, playch10_state, pcbboard, ROT0, "Konami (Nintendo of America license)",     "Contra (PlayChoice-10)", 0 )
+GAME( 1986, pc_pwrst, playch10, playch10, playch10, playch10_state, init_pcbboard, ROT0, "Nintendo",                                 "Pro Wrestling (PlayChoice-10)", 0 )
+GAME( 1986, pc_trjan, playch10, playch10, playch10, playch10_state, init_pcbboard, ROT0, "Capcom USA (Nintendo of America license)", "Trojan (PlayChoice-10)", 0 )
+GAME( 1987, pc_cvnia, playch10, playch10, playch10, playch10_state, init_pcbboard, ROT0, "Konami (Nintendo of America license)",     "Castlevania (PlayChoice-10)", 0 )
+GAME( 1987, pc_dbldr, playch10, playch10, playch10, playch10_state, init_pcbboard, ROT0, "Konami (Nintendo of America license)",     "Double Dribble (PlayChoice-10)", 0 )
+GAME( 1987, pc_rnatk, playch10, playch10, playch10, playch10_state, init_pcbboard, ROT0, "Konami (Nintendo of America license)",     "Rush'n Attack (PlayChoice-10)", 0 )
+GAME( 1987, pc_rygar, playch10, playch10, playch10, playch10_state, init_pcbboard, ROT0, "Tecmo (Nintendo of America license)",      "Rygar (PlayChoice-10)", 0 )
+GAME( 1988, pc_cntra, playch10, playch10, playch10, playch10_state, init_pcbboard, ROT0, "Konami (Nintendo of America license)",     "Contra (PlayChoice-10)", 0 )
 
 /* C-Board Games */
-GAME( 1986, pc_goons, playch10, playch10, playch10, playch10_state, pccboard, ROT0, "Konami",                                   "The Goonies (PlayChoice-10)", 0 )
+GAME( 1986, pc_goons, playch10, playch10, playch10, playch10_state, init_pccboard, ROT0, "Konami",                                   "The Goonies (PlayChoice-10)", 0 )
 
 /* D-Board Games */
-GAME( 1986, pc_mtoid, playch10, playch10, playch10, playch10_state, pcdboard_2, ROT0, "Nintendo",                               "Metroid (PlayChoice-10)", 0 )
-GAME( 1987, pc_radrc, playch10, playch10, playch10, playch10_state, pcdboard, ROT0, "Square",                                   "Rad Racer (PlayChoice-10)", 0 )
+GAME( 1986, pc_mtoid, playch10, playch10, playch10, playch10_state, init_pcdboard_2, ROT0, "Nintendo",                               "Metroid (PlayChoice-10)", 0 )
+GAME( 1987, pc_radrc, playch10, playch10, playch10, playch10_state, init_pcdboard, ROT0, "Square",                                   "Rad Racer (PlayChoice-10)", 0 )
 
 /* E-Board Games */
-GAME( 1987, pc_miket, playch10, playchnv, playch10, playch10_state, pceboard, ROT0, "Nintendo",                                 "Mike Tyson's Punch-Out!! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, pc_miket, playch10, playchnv, playch10, playch10_state, init_pceboard, ROT0, "Nintendo",                                 "Mike Tyson's Punch-Out!! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* F-Board Games */
-GAME( 1987, pc_rcpam, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Rare",                                     "R.C. Pro-Am (PlayChoice-10)", 0 )
-GAME( 1987, pc_rrngr, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Chip'n Dale: Rescue Rangers (PlayChoice-10)", 0 )
-GAME( 1988, pc_ddrgn, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Technos Japan",                            "Double Dragon (PlayChoice-10)", 0 )
-GAME( 1989, pc_ngaid, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden (PlayChoice-10)", 0 )
-GAME( 1989, pc_tmnt,  playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles (PlayChoice-10)", 0 )
-GAME( 1989, pc_ftqst, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Sunsoft (Nintendo of America license)",    "Uncle Fester's Quest: The Addams Family (PlayChoice-10)", 0 )
-GAME( 1989, pc_bstar, playch10, playch10, playch10, playch10_state, pcfboard_2, ROT0, "SNK (Nintendo of America license)",      "Baseball Stars: Be a Champ! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1989, pc_tbowl, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Tecmo Bowl (PlayChoice-10)", 0 )
-GAME( 1990, pc_virus, pc_drmro, playch10, playch10, playch10_state, virus,    ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
-GAME( 1990, pc_drmro, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Nintendo",                                 "Dr. Mario (PlayChoice-10)", 0 )
-GAME( 1990, pc_bload, playch10, playch10, playch10, playch10_state, virus,    ROT0, "Jaleco (Nintendo of America license)",     "Bases Loaded (Prototype, PlayChoice-10)", 0 )
-GAME( 1990, pc_ynoid, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Yo! Noid (PlayChoice-10)", 0 )
+GAME( 1987, pc_rcpam, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Rare",                                     "R.C. Pro-Am (PlayChoice-10)", 0 )
+GAME( 1988, pc_ddrgn, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Technos Japan",                            "Double Dragon (PlayChoice-10)", 0 )
+GAME( 1989, pc_ngaid, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden (PlayChoice-10)", 0 )
+GAME( 1989, pc_tmnt,  playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles (PlayChoice-10)", 0 )
+GAME( 1989, pc_ftqst, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Sunsoft (Nintendo of America license)",    "Uncle Fester's Quest: The Addams Family (PlayChoice-10)", 0 )
+GAME( 1989, pc_bstar, playch10, playch10, playch10, playch10_state, init_pcfboard_2, ROT0, "SNK (Nintendo of America license)",      "Baseball Stars: Be a Champ! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, pc_tbowl, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Tecmo Bowl (PlayChoice-10)", 0 )
+GAME( 1990, pc_virus, pc_drmro, playch10, playch10, playch10_state, init_virus,    ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
+GAME( 1990, pc_rrngr, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Chip'n Dale: Rescue Rangers (PlayChoice-10)", 0 )
+GAME( 1990, pc_drmro, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Nintendo",                                 "Dr. Mario (PlayChoice-10)", 0 )
+GAME( 1990, pc_bload, playch10, playch10, playch10, playch10_state, init_virus,    ROT0, "Jaleco (Nintendo of America license)",     "Bases Loaded (Prototype, PlayChoice-10)", 0 )
+GAME( 1990, pc_ynoid, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Yo! Noid (PlayChoice-10)", 0 )
 
 /* G-Board Games */
-GAME( 1988, pc_smb2,  playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Nintendo",                                 "Super Mario Bros. 2 (PlayChoice-10)", 0 )
-GAME( 1988, pc_smb3,  playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Nintendo",                                 "Super Mario Bros. 3 (PlayChoice-10)", 0 )
-GAME( 1990, pc_mman3, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Capcom USA (Nintendo of America license)", "Mega Man III (PlayChoice-10)", 0 )
-GAME( 1990, pc_suprc, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Konami (Nintendo of America license)",     "Super C (PlayChoice-10)", 0 )
-GAME( 1990, pc_tmnt2, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles II: The Arcade Game (PlayChoice-10)", 0 )
-GAME( 1990, pc_wcup,  playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Technos Japan (Nintendo license)",         "Nintendo World Cup (PlayChoice-10)", 0 )
-GAME( 1990, pc_ngai2, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode II: The Dark Sword of Chaos (PlayChoice-10)", 0 )
-GAME( 1991, pc_ngai3, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode III: The Ancient Ship of Doom (PlayChoice-10)", 0 )
-GAME( 1991, pc_pwbld, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Taito (Nintendo of America license)",      "Power Blade (PlayChoice-10)", 0 )
-GAME( 1991, pc_rkats, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Atlus (Nintendo of America license)",      "Rockin' Kats (PlayChoice-10)", 0 )
-GAME( 1991, pc_ttoon, playch10, playch10, playch10, playch10_state, ttoon,    ROT0, "Konami (Nintendo of America license)",     "Tiny Toon Adventures (prototype) (PlayChoice-10)", 0 ) // Code is final USA NES version of the game, (which is MMC3C according to nes.xml, but this cart has MMC3B)
+GAME( 1988, pc_smb2,  playch10, playch10, playch10, playch10_state, init_pcgboard, ROT0, "Nintendo",                                 "Super Mario Bros. 2 (PlayChoice-10)", 0 )
+GAME( 1988, pc_smb3,  playch10, playch10, playch10, playch10_state, init_pcgboard, ROT0, "Nintendo",                                 "Super Mario Bros. 3 (PlayChoice-10)", 0 )
+GAME( 1990, pc_mman3, playch10, playch10, playch10, playch10_state, init_pcgboard, ROT0, "Capcom USA (Nintendo of America license)", "Mega Man III (PlayChoice-10)", 0 )
+GAME( 1990, pc_suprc, playch10, playch10, playch10, playch10_state, init_pcgboard, ROT0, "Konami (Nintendo of America license)",     "Super C (PlayChoice-10)", 0 )
+GAME( 1990, pc_tmnt2, playch10, playch10, playch10, playch10_state, init_pcgboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles II: The Arcade Game (PlayChoice-10)", 0 )
+GAME( 1990, pc_wcup,  playch10, playch10, playch10, playch10_state, init_pcgboard, ROT0, "Technos Japan (Nintendo license)",         "Nintendo World Cup (PlayChoice-10)", 0 )
+GAME( 1990, pc_ngai2, playch10, playch10, playch10, playch10_state, init_pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode II: The Dark Sword of Chaos (PlayChoice-10)", 0 )
+GAME( 1991, pc_ngai3, playch10, playch10, playch10, playch10_state, init_pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode III: The Ancient Ship of Doom (PlayChoice-10)", 0 )
+GAME( 1991, pc_pwbld, playch10, playch10, playch10, playch10_state, init_pcgboard, ROT0, "Taito (Nintendo of America license)",      "Power Blade (PlayChoice-10)", 0 )
+GAME( 1991, pc_rkats, playch10, playch10, playch10, playch10_state, init_pcgboard, ROT0, "Atlus (Nintendo of America license)",      "Rockin' Kats (PlayChoice-10)", 0 )
+GAME( 1991, pc_ttoon, playch10, playch10, playch10, playch10_state, init_ttoon,    ROT0, "Konami (Nintendo of America license)",     "Tiny Toon Adventures (prototype) (PlayChoice-10)", 0 ) // Code is final USA NES version of the game, (which is MMC3C according to nes.xml, but this cart has MMC3B)
 
 /* variant with 4 screen mirror */
-GAME( 1990, pc_radr2, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", 0 )
-GAME( 1985, pc_gntlt, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, pc_radr2, playch10, playch10, playch10, playch10_state, init_pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", 0 )
+GAME( 1985, pc_gntlt, playch10, playch10, playch10, playch10_state, init_pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* H-Board Games */
-GAME( 1988, pc_pinbt, playch10, playch10_hboard, playch10, playch10_state, pchboard, ROT0, "Rare (Nintendo of America license)", "PinBot (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, pc_pinbt, playch10, playch10_hboard, playch10, playch10_state, init_pchboard, ROT0, "Rare (Nintendo of America license)", "PinBot (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* i-Board Games */
-GAME( 1989, pc_cshwk, playch10, playch10, playch10, playch10_state, pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", 0 )
-GAME( 1990, pc_sjetm, playch10, playch10, playch10, playch10_state, pciboard, ROT0, "Rare",                                     "Solar Jetman (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, pc_cshwk, playch10, playch10, playch10, playch10_state, init_pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", 0 )
+GAME( 1990, pc_sjetm, playch10, playch10, playch10, playch10_state, init_pciboard, ROT0, "Rare",                                     "Solar Jetman (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* K-Board Games */
-GAME( 1991, pc_moglf, playch10, playch10, playch10, playch10_state, pckboard, ROT0, "Nintendo",                                 "Mario's Open Golf (PlayChoice-10)", 0 )
+GAME( 1991, pc_moglf, playch10, playch10, playch10, playch10_state, init_pckboard, ROT0, "Nintendo",                                 "Mario's Open Golf (PlayChoice-10)", 0 )

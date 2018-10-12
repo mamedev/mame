@@ -11,8 +11,8 @@
 DEFINE_DEVICE_TYPE(ISA8_SSI2001, ssi2001_device, "ssi2001", "Innovation SSI-2001 Audio Adapter")
 
 MACHINE_CONFIG_START(ssi2001_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sid6581", MOS6581, XTAL(14'318'181)/16)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sid6581", MOS6581, XTAL(14'318'181)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END

@@ -143,7 +143,7 @@ private:
 
 
 // device type definition
-extern const device_type VCS_CART_SLOT;
+DECLARE_DEVICE_TYPE(VCS_CART_SLOT, vcs_cart_slot_device)
 
 
 /***************************************************************************

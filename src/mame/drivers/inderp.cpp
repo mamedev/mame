@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 // PINBALL
 // Skeleton driver for early Inder pinballs on "Indertronic B-1" hardware.
-// Known pinballs to be dumped: Topaz (1979), Skateboard (1980)
+// Known pinballs to be dumped: Skateboard (1980)
 // Hardware listing and ROM definitions from PinMAME.
 
 /*
@@ -32,29 +32,32 @@ public:
 		, m_inputs(*this, "SW.%u", 0)
 		{ }
 
+	void inderp(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 	DECLARE_WRITE8_MEMBER(inputs_w);
 	DECLARE_READ8_MEMBER(inputs_r);
 
-	void inderp(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<10> m_inputs;
 	u8 m_inbank;
 	u8 m_irqcnt;
 };
 
-ADDRESS_MAP_START(inderp_state::maincpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x500) AM_RAM // 2x 5101/2101, battery-backed
-	AM_RANGE(0x0200, 0x02ff) AM_MIRROR(0x400) // outputs CI-110 (displays)
-	AM_RANGE(0x0300, 0x030f) AM_MIRROR(0x4c0) AM_READWRITE(inputs_r,inputs_w) // outputs, one per address CI-118; inputs: whole range CI-159
-	AM_RANGE(0x0310, 0x0310) AM_MIRROR(0x4cf) // outputs, D0-D2, BOB0-7 (solenoids) CI-121
-	AM_RANGE(0x0320, 0x0320) AM_MIRROR(0x4cf) // outputs, D0-D3, (sound) CI-122
-	AM_RANGE(0x0330, 0x0337) AM_MIRROR(0x4c8) // outputs, D0-D7, one per address to 16 sets of 4-bit outputs (lamps)
-	AM_RANGE(0x0800, 0x1fff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void inderp_state::maincpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).mirror(0x500).ram(); // 2x 5101/2101, battery-backed
+	map(0x0200, 0x02ff).mirror(0x400); // outputs CI-110 (displays)
+	map(0x0300, 0x030f).mirror(0x4c0).rw(FUNC(inderp_state::inputs_r), FUNC(inderp_state::inputs_w)); // outputs, one per address CI-118; inputs: whole range CI-159
+	map(0x0310, 0x0310).mirror(0x4cf); // outputs, D0-D2, BOB0-7 (solenoids) CI-121
+	map(0x0320, 0x0320).mirror(0x4cf); // outputs, D0-D3, (sound) CI-122
+	map(0x0330, 0x0337).mirror(0x4c8); // outputs, D0-D7, one per address to 16 sets of 4-bit outputs (lamps)
+	map(0x0800, 0x1fff).rom().region("roms", 0);
+}
 
 // dsw: don't know bit order yet
 static INPUT_PORTS_START( inderp )
@@ -196,11 +199,11 @@ WRITE_LINE_MEMBER( inderp_state::clock_tick )
 
 MACHINE_CONFIG_START(inderp_state::inderp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6504, 434000) // possible calculation of frequency-derived time constant 100k res and 10pf cap
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6504, 434000) // possible calculation of frequency-derived time constant 100k res and 10pf cap
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 
 	MCFG_DEVICE_ADD("cpoint_clock", CLOCK, 200) // crosspoint detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(inderp_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, inderp_state, clock_tick))
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
@@ -229,6 +232,13 @@ ROM_START(centauri2)
 	ROM_RELOAD(0x1400, 0x0400)
 ROM_END
 
+ROM_START(topaz)
+	ROM_REGION(0x1800, "roms", 0)
+	ROM_LOAD("topaz0.bin", 0x0400, 0x0400, CRC(d047aee0) SHA1(b2bc2e9fb088006fd3b7eb080feaa1eac479af58))
+	ROM_LOAD("topaz1.bin", 0x0800, 0x0400, CRC(72a423c2) SHA1(e3ba5d581739fc0871901f861a7692fd86e0f6aa))
+	ROM_LOAD("topaz2.bin", 0x0c00, 0x0400, CRC(b8d2e7c6) SHA1(e19bec04fab15536fea51c4298c6a4cb3817630c))
+ROM_END
 
-GAME( 1979, centauri,  0,        inderp, inderp, inderp_state, 0, ROT0, "Inder", "Centaur (Inder)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, centauri2, centauri, inderp, inderp, inderp_state, 0, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, centauri,  0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Centaur (Inder)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, centauri2, centauri, inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, topaz,     0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Topaz (Inder)",           MACHINE_IS_SKELETON_MECHANICAL )

@@ -2,6 +2,7 @@
 // copyright-holders:BUT
 
 #include "machine/taito68705interface.h"
+#include "emupal.h"
 
 class chaknpop_state : public driver_device
 {

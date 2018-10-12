@@ -66,16 +66,20 @@ public:
 	scregg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: btime_state(mconfig, type, tag) { }
 
+	void scregg(machine_config &config);
+	void dommy(machine_config &config);
+
+	void init_rockduck();
+
+private:
 	DECLARE_WRITE8_MEMBER(scregg_irqack_w);
 	DECLARE_READ8_MEMBER(scregg_irqack_r);
 
-	DECLARE_DRIVER_INIT(rockduck);
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
-	void scregg(machine_config &config);
-	void dommy(machine_config &config);
 	void dommy_map(address_map &map);
+
 	void eggs_map(address_map &map);
 };
 
@@ -99,36 +103,38 @@ READ8_MEMBER(scregg_state::scregg_irqack_r)
 }
 
 
-ADDRESS_MAP_START(scregg_state::dommy_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE(scregg_irqack_w)
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("P1")
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("P2")
-	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE("ay1", ay8910_device, address_data_w) AM_READ(scregg_irqack_r)
-	AM_RANGE(0x4006, 0x4007) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void scregg_state::dommy_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x23ff).ram().share("videoram");
+	map(0x2400, 0x27ff).ram().share("colorram");
+	map(0x2800, 0x2bff).rw(FUNC(scregg_state::btime_mirrorvideoram_r), FUNC(scregg_state::btime_mirrorvideoram_w));
+	map(0x4000, 0x4000).portr("DSW1").w(FUNC(scregg_state::scregg_irqack_w));
+	map(0x4001, 0x4001).portr("DSW2").w(FUNC(scregg_state::btime_video_control_w));
+	map(0x4002, 0x4002).portr("P1");
+	map(0x4003, 0x4003).portr("P2");
+	map(0x4004, 0x4005).w("ay1", FUNC(ay8910_device::address_data_w)).r(FUNC(scregg_state::scregg_irqack_r));
+	map(0x4006, 0x4007).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xa000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(scregg_state::eggs_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r,btime_mirrorcolorram_w)
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") AM_WRITE(scregg_irqack_w)
-	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P1")
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P2")
-	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE("ay1", ay8910_device, address_data_w) AM_READ(scregg_irqack_r)
-	AM_RANGE(0x2006, 0x2007) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x3000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM    /* reset/interrupt vectors */
-ADDRESS_MAP_END
+void scregg_state::eggs_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1000, 0x13ff).ram().share("videoram");
+	map(0x1400, 0x17ff).ram().share("colorram");
+	map(0x1800, 0x1bff).rw(FUNC(scregg_state::btime_mirrorvideoram_r), FUNC(scregg_state::btime_mirrorvideoram_w));
+	map(0x1c00, 0x1fff).rw(FUNC(scregg_state::btime_mirrorcolorram_r), FUNC(scregg_state::btime_mirrorcolorram_w));
+	map(0x2000, 0x2000).portr("DSW1").w(FUNC(scregg_state::btime_video_control_w));
+	map(0x2001, 0x2001).portr("DSW2").w(FUNC(scregg_state::scregg_irqack_w));
+	map(0x2002, 0x2002).portr("P1");
+	map(0x2003, 0x2003).portr("P2");
+	map(0x2004, 0x2005).w("ay1", FUNC(ay8910_device::address_data_w)).r(FUNC(scregg_state::scregg_irqack_r));
+	map(0x2006, 0x2007).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x3000, 0x7fff).rom();
+	map(0xf000, 0xffff).rom();    /* reset/interrupt vectors */
+}
 
 
 static INPUT_PORTS_START( scregg )
@@ -236,7 +242,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( scregg )
+static GFXDECODE_START( gfx_scregg )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 1 )     /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,        0, 1 )     /* sprites */
 GFXDECODE_END
@@ -265,8 +271,8 @@ MACHINE_RESET_MEMBER(scregg_state,scregg)
 MACHINE_CONFIG_START(scregg_state::dommy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(dommy_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(dommy_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq", scregg_state, scregg_interrupt, "screen", 0, 8)
 
 	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
@@ -278,18 +284,18 @@ MACHINE_CONFIG_START(scregg_state::dommy)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scregg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scregg)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
@@ -297,8 +303,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(scregg_state::scregg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(eggs_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(eggs_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq", scregg_state, scregg_interrupt, "screen", 0, 8)
 
 	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
@@ -310,18 +316,18 @@ MACHINE_CONFIG_START(scregg_state::scregg)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scregg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scregg)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
@@ -415,13 +421,12 @@ ROM_START( rockduck )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(scregg_state,rockduck)
+void scregg_state::init_rockduck()
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
-	int x;
-	uint8_t *src = memregion( "gfx1" )->base();
+	uint8_t *src = memregion("gfx1")->base();
 
-	for (x = 0x2000; x < 0x6000; x++)
+	for (int x = 0x2000; x < 0x6000; x++)
 	{
 		src[x] = bitswap<8>(src[x],2,0,3,6,1,4,7,5);
 
@@ -429,7 +434,7 @@ DRIVER_INIT_MEMBER(scregg_state,rockduck)
 }
 
 
-GAME( 1983, dommy,    0,        dommy,  scregg,   scregg_state,  0,        ROT270, "Technos Japan", "Dommy", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, scregg,   0,        scregg, scregg,   scregg_state,  0,        ROT270, "Technos Japan", "Scrambled Egg", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, eggs,     scregg,   scregg, scregg,   scregg_state,  0,        ROT270, "Technos Japan (Universal USA license)", "Eggs (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rockduck, 0,        scregg, rockduck, scregg_state,  rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dommy,    0,        dommy,  scregg,   scregg_state, empty_init,    ROT270, "Technos Japan", "Dommy", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, scregg,   0,        scregg, scregg,   scregg_state, empty_init,    ROT270, "Technos Japan", "Scrambled Egg", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, eggs,     scregg,   scregg, scregg,   scregg_state, empty_init,    ROT270, "Technos Japan (Universal USA license)", "Eggs (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rockduck, 0,        scregg, rockduck, scregg_state, init_rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

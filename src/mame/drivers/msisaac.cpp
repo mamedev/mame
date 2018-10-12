@@ -29,7 +29,7 @@ TO DO:
 TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 {
 	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_pending_nmi = 1;
 }
@@ -50,7 +50,7 @@ WRITE8_MEMBER(msisaac_state::nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_pending_nmi = 0;
 	}
 }
@@ -174,44 +174,45 @@ WRITE8_MEMBER(msisaac_state::msisaac_mcu_w)
 #endif
 }
 
-ADDRESS_MAP_START(msisaac_state::msisaac_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITENOP                    //???
-	AM_RANGE(0xf002, 0xf002) AM_WRITENOP                    //???
+void msisaac_state::msisaac_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf000).w(FUNC(msisaac_state::msisaac_bg2_textbank_w));
+	map(0xf001, 0xf001).nopw();                    //???
+	map(0xf002, 0xf002).nopw();                    //???
 
-	AM_RANGE(0xf060, 0xf060) AM_WRITE(sound_command_w)      //sound command
-	AM_RANGE(0xf061, 0xf061) AM_WRITENOP /*sound_reset*/    //????
+	map(0xf060, 0xf060).w(FUNC(msisaac_state::sound_command_w));      //sound command
+	map(0xf061, 0xf061).nopw(); /*sound_reset*/    //????
 
-	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE(ms_unknown_w)         //???? written in interrupt routine
+	map(0xf0a3, 0xf0a3).w(FUNC(msisaac_state::ms_unknown_w));         //???? written in interrupt routine
 
-	AM_RANGE(0xf0c0, 0xf0c0) AM_WRITE(msisaac_fg_scrollx_w)
-	AM_RANGE(0xf0c1, 0xf0c1) AM_WRITE(msisaac_fg_scrolly_w)
-	AM_RANGE(0xf0c2, 0xf0c2) AM_WRITE(msisaac_bg2_scrollx_w)
-	AM_RANGE(0xf0c3, 0xf0c3) AM_WRITE(msisaac_bg2_scrolly_w)
-	AM_RANGE(0xf0c4, 0xf0c4) AM_WRITE(msisaac_bg_scrollx_w)
-	AM_RANGE(0xf0c5, 0xf0c5) AM_WRITE(msisaac_bg_scrolly_w)
+	map(0xf0c0, 0xf0c0).w(FUNC(msisaac_state::msisaac_fg_scrollx_w));
+	map(0xf0c1, 0xf0c1).w(FUNC(msisaac_state::msisaac_fg_scrolly_w));
+	map(0xf0c2, 0xf0c2).w(FUNC(msisaac_state::msisaac_bg2_scrollx_w));
+	map(0xf0c3, 0xf0c3).w(FUNC(msisaac_state::msisaac_bg2_scrolly_w));
+	map(0xf0c4, 0xf0c4).w(FUNC(msisaac_state::msisaac_bg_scrollx_w));
+	map(0xf0c5, 0xf0c5).w(FUNC(msisaac_state::msisaac_bg_scrolly_w));
 
-	AM_RANGE(0xf0e0, 0xf0e0) AM_READWRITE(msisaac_mcu_r, msisaac_mcu_w)
-	AM_RANGE(0xf0e1, 0xf0e1) AM_READ(msisaac_mcu_status_r)
+	map(0xf0e0, 0xf0e0).rw(FUNC(msisaac_state::msisaac_mcu_r), FUNC(msisaac_state::msisaac_mcu_w));
+	map(0xf0e1, 0xf0e1).r(FUNC(msisaac_state::msisaac_mcu_status_r));
 
-	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf082, 0xf082) AM_READ_PORT("DSW3")
-	AM_RANGE(0xf083, 0xf083) AM_READ_PORT("IN0")
-	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("IN1")
+	map(0xf080, 0xf080).portr("DSW1");
+	map(0xf081, 0xf081).portr("DSW2");
+	map(0xf082, 0xf082).portr("DSW3");
+	map(0xf083, 0xf083).portr("IN0");
+	map(0xf084, 0xf084).portr("IN1");
 //  AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
 
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("spriteram")   //sprites
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_SHARE("videoram2")
+	map(0xf100, 0xf17f).ram().share("spriteram");   //sprites
+	map(0xf400, 0xf7ff).ram().w(FUNC(msisaac_state::msisaac_fg_videoram_w)).share("videoram");
+	map(0xf800, 0xfbff).ram().w(FUNC(msisaac_state::msisaac_bg2_videoram_w)).share("videoram3");
+	map(0xfc00, 0xffff).ram().w(FUNC(msisaac_state::msisaac_bg_videoram_w)).share("videoram2");
 //  AM_RANGE(0xf801, 0xf801) AM_WRITE(msisaac_bgcolor_w)
 //  AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
 //  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
-ADDRESS_MAP_END
+}
 
 WRITE8_MEMBER(msisaac_state::sound_control_0_w)
 {
@@ -240,20 +241,21 @@ WRITE8_MEMBER(msisaac_state::sound_control_1_w)
 	//popmessage("SND1 0=%2x 1=%2x", m_snd_ctrl0, m_snd_ctrl1);
 }
 
-ADDRESS_MAP_START(msisaac_state::msisaac_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8010, 0x801d) AM_DEVWRITE("msm", msm5232_device, write)
-	AM_RANGE(0x8020, 0x8020) AM_WRITE(sound_control_0_w)
-	AM_RANGE(0x8030, 0x8030) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /*???*/ /* this is NOT mixer_enable */
-	AM_RANGE(0xe000, 0xffff) AM_READNOP /*space for diagnostic ROM (not dumped, not reachable) */
-ADDRESS_MAP_END
+void msisaac_state::msisaac_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8010, 0x801d).w(m_msm, FUNC(msm5232_device::write));
+	map(0x8020, 0x8020).w(FUNC(msisaac_state::sound_control_0_w));
+	map(0x8030, 0x8030).w(FUNC(msisaac_state::sound_control_1_w));
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc001, 0xc001).w(FUNC(msisaac_state::nmi_enable_w));
+	map(0xc002, 0xc002).w(FUNC(msisaac_state::nmi_disable_w));
+	map(0xc003, 0xc003).nopw(); /*???*/ /* this is NOT mixer_enable */
+	map(0xe000, 0xffff).nopr(); /*space for diagnostic ROM (not dumped, not reachable) */
+}
 
 static INPUT_PORTS_START( msisaac )
 	PORT_START("DSW1")
@@ -397,7 +399,7 @@ static const gfx_layout tile_layout =
 	32*8
 };
 
-static GFXDECODE_START( msisaac )
+static GFXDECODE_START( gfx_msisaac )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 64 )
@@ -447,17 +449,17 @@ void msisaac_state::machine_reset()
 MACHINE_CONFIG_START(msisaac_state::msisaac)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(msisaac_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(msisaac_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(msisaac_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)    /* source of IRQs is unknown */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(msisaac_sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)    /* source of IRQs is unknown */
 
 #ifdef USE_MCU
-	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
+	MCFG_DEVICE_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(buggychl_mcu_map)
 	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 #endif
 
@@ -471,26 +473,26 @@ MACHINE_CONFIG_START(msisaac_state::msisaac)
 	MCFG_SCREEN_UPDATE_DRIVER(msisaac_state, screen_update_msisaac)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msisaac)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msisaac)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
 	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
 	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
+	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
@@ -542,4 +544,4 @@ ROM_START( msisaac )
 ROM_END
 
 
-GAME( 1985, msisaac, 0,     msisaac, msisaac, msisaac_state, 0, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, msisaac, 0,     msisaac, msisaac, msisaac_state, empty_init, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

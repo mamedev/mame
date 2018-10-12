@@ -75,54 +75,61 @@ class whouse_testcons_state : public driver_device
 public:
 	whouse_testcons_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_dsp(*this, "dsp%u", 0)
+		, m_dsp(*this, "dsp%u", 0U)
+		, m_digit(*this, "digit%u", 0U)
 	{
-	}
-
-	DECLARE_DRIVER_INIT(whousetc)
-	{
-	}
-
-	template <unsigned Dsp> DECLARE_WRITE16_MEMBER(update_dsp)
-	{
-		output().set_digit_value((Dsp << 2) | offset, data);
 	}
 
 	void whousetc(machine_config &config);
-	void io_map(address_map &map);
-	void program_map(address_map &map);
-protected:
+
+private:
+	template <unsigned Dsp> DECLARE_WRITE16_MEMBER(update_dsp)
+	{
+		m_digit[(Dsp << 2) | offset] = data;
+	}
+
+	virtual void machine_start() override
+	{
+		m_digit.resolve();
+	}
+
 	virtual void machine_reset() override
 	{
 		for (required_device<dl1416_device> const &dsp : m_dsp)
 			dsp->cu_w(1);
 	}
 
+	void io_map(address_map &map);
+	void program_map(address_map &map);
+
 	required_device_array<dl1416_device, 4> m_dsp;
+	output_finder<16> m_digit;
 };
 
 
-ADDRESS_MAP_START(whouse_testcons_state::program_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2003) AM_DEVWRITE("dsp0", dl1416_device, bus_w)
-	AM_RANGE(0x2004, 0x2007) AM_DEVWRITE("dsp1", dl1416_device, bus_w)
-	AM_RANGE(0x2008, 0x200b) AM_DEVWRITE("dsp2", dl1416_device, bus_w)
-	AM_RANGE(0x200c, 0x200f) AM_DEVWRITE("dsp3", dl1416_device, bus_w)
-	AM_RANGE(0x2800, 0x28ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("row0")
-	AM_RANGE(0x8801, 0x8801) AM_READ_PORT("row1")
-	AM_RANGE(0x8802, 0x8802) AM_READ_PORT("row2")
-	AM_RANGE(0x8803, 0x8803) AM_READ_PORT("row3")
-ADDRESS_MAP_END
+void whouse_testcons_state::program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x2003).w("dsp0", FUNC(dl1416_device::bus_w));
+	map(0x2004, 0x2007).w("dsp1", FUNC(dl1416_device::bus_w));
+	map(0x2008, 0x200b).w("dsp2", FUNC(dl1416_device::bus_w));
+	map(0x200c, 0x200f).w("dsp3", FUNC(dl1416_device::bus_w));
+	map(0x2800, 0x28ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x3000, 0x3fff).ram();
+	map(0x8800, 0x8800).portr("row0");
+	map(0x8801, 0x8801).portr("row1");
+	map(0x8802, 0x8802).portr("row2");
+	map(0x8803, 0x8803).portr("row3");
+}
 
-ADDRESS_MAP_START(whouse_testcons_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x80, 0x87) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE("i8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void whouse_testcons_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x80, 0x87).rw("i8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x88, 0x8b).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 INPUT_PORTS_START(whousetc)
@@ -169,27 +176,27 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(whouse_testcons_state::whousetc)
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(program_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(program_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("i8155", I8155, 6.144_MHz_XTAL)
+	I8155(config, "i8155", 6.144_MHz_XTAL);
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 
-	MCFG_DEVICE_ADD("dsp0", DL1416B, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<0>))
+	MCFG_DEVICE_ADD("dsp0", DL1416B, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<0>))
 
-	MCFG_DEVICE_ADD("dsp1", DL1416B, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<1>))
+	MCFG_DEVICE_ADD("dsp1", DL1416B, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<1>))
 
-	MCFG_DEVICE_ADD("dsp2", DL1416B, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<2>))
+	MCFG_DEVICE_ADD("dsp2", DL1416B, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<2>))
 
-	MCFG_DEVICE_ADD("dsp3", DL1416B, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<3>))
+	MCFG_DEVICE_ADD("dsp3", DL1416B, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<3>))
 
-	MCFG_DEFAULT_LAYOUT(layout_whousetc)
+	config.set_default_layout(layout_whousetc);
 MACHINE_CONFIG_END
 
 
@@ -201,5 +208,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE                  INIT      COMPANY         FULLNAME                  FLAGS
-COMP( 1980?, whousetc, 0,      0,      whousetc, whousetc, whouse_testcons_state, whousetc, "Westinghouse", "Test Console Serial #5", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS                  INIT        COMPANY         FULLNAME                  FLAGS
+COMP( 1980?, whousetc, 0,      0,      whousetc, whousetc, whouse_testcons_state, empty_init, "Westinghouse", "Test Console Serial #5", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )

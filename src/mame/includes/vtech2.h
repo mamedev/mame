@@ -12,7 +12,9 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 
 #define TRKSIZE_FM  3172    /* size of a standard FM mode track */
 
@@ -25,8 +27,58 @@ public:
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
 		m_cart(*this, "cartslot"),
+		m_laser_file(*this, {FLOPPY_0, FLOPPY_1}),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
+
+	void laser350(machine_config &config);
+	void laser700(machine_config &config);
+	void laser500(machine_config &config);
+
+	void init_laser();
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
+	DECLARE_WRITE8_MEMBER(laser_bank_select_w);
+	DECLARE_WRITE8_MEMBER(laser_fdc_w);
+	DECLARE_WRITE8_MEMBER(laser_bg_mode_w);
+	DECLARE_WRITE8_MEMBER(laser_two_color_w);
+	DECLARE_READ8_MEMBER(laser_fdc_r);
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(vtech2);
+	DECLARE_MACHINE_RESET(laser500);
+	DECLARE_MACHINE_RESET(laser700);
+	uint32_t screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vtech2_interrupt);
+
+	int mra_bank(int bank, int offs);
+	void mwa_bank(int bank, int offs, int data);
+
+	DECLARE_WRITE8_MEMBER(mwa_bank1);
+	DECLARE_WRITE8_MEMBER(mwa_bank2);
+	DECLARE_WRITE8_MEMBER(mwa_bank3);
+	DECLARE_WRITE8_MEMBER(mwa_bank4);
+	DECLARE_READ8_MEMBER(mra_bank1);
+	DECLARE_READ8_MEMBER(mra_bank2);
+	DECLARE_READ8_MEMBER(mra_bank3);
+	DECLARE_READ8_MEMBER(mra_bank4);
+
+	void laser_machine_init(int bank_mask, int video_mask);
+	void laser_get_track();
+	void laser_put_track();
+
+	void vtech2_io(address_map &map);
+	void vtech2_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
+	required_device<generic_slot_device> m_cart;
+	optional_device_array<legacy_floppy_image_device, 2> m_laser_file;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	uint8_t *m_videoram;
 	int m_laser_latch;
@@ -55,47 +107,8 @@ public:
 	int m_row_d;
 	int m_laser_bg_mode;
 	int m_laser_two_color;
-	DECLARE_WRITE8_MEMBER(laser_bank_select_w);
-	DECLARE_WRITE8_MEMBER(laser_fdc_w);
-	DECLARE_WRITE8_MEMBER(laser_bg_mode_w);
-	DECLARE_WRITE8_MEMBER(laser_two_color_w);
-	DECLARE_READ8_MEMBER(laser_fdc_r);
-	DECLARE_DRIVER_INIT(laser);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(vtech2);
-	DECLARE_MACHINE_RESET(laser500);
-	DECLARE_MACHINE_RESET(laser700);
-	uint32_t screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vtech2_interrupt);
 
-	int mra_bank(int bank, int offs);
-	void mwa_bank(int bank, int offs, int data);
 	memory_region *m_cart_rom;
-
-	DECLARE_WRITE8_MEMBER(mwa_bank1);
-	DECLARE_WRITE8_MEMBER(mwa_bank2);
-	DECLARE_WRITE8_MEMBER(mwa_bank3);
-	DECLARE_WRITE8_MEMBER(mwa_bank4);
-	DECLARE_READ8_MEMBER(mra_bank1);
-	DECLARE_READ8_MEMBER(mra_bank2);
-	DECLARE_READ8_MEMBER(mra_bank3);
-	DECLARE_READ8_MEMBER(mra_bank4);
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<cassette_image_device> m_cassette;
-	required_device<generic_slot_device> m_cart;
-	void laser_machine_init(int bank_mask, int video_mask);
-	void laser_get_track();
-	void laser_put_track();
-	device_t *laser_file();
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void laser350(machine_config &config);
-	void laser700(machine_config &config);
-	void laser500(machine_config &config);
-	void vtech2_io(address_map &map);
-	void vtech2_mem(address_map &map);
 };
 
 

@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "includes/kyocera.h"
 
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -42,10 +41,11 @@ uint32_t tandy200_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(tandy200_state::tandy200_lcdc)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void tandy200_state::tandy200_lcdc(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x1fff).ram();
+}
 
 MACHINE_CONFIG_START(kc85_state::kc85_video)
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -54,8 +54,6 @@ MACHINE_CONFIG_START(kc85_state::kc85_video)
 	MCFG_SCREEN_SIZE(240, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(kc85_state,kc85)
@@ -82,8 +80,6 @@ MACHINE_CONFIG_START(tandy200_state::tandy200_video)
 	MCFG_SCREEN_SIZE(240, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(tandy200_state,tandy200)

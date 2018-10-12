@@ -44,6 +44,7 @@ B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
 B0-006B                 2001-2  Funcube 2 - 5                           Namco
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
+P0-145-1                2002    Trophy Hunting - Bear & Moose (test)    Sammy
 -------------------------------------------------------------------------------------------
 
 TODO:
@@ -117,6 +118,8 @@ reelquak:
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
+
+#include "diserial.h"
 #include "speaker.h"
 
 
@@ -128,19 +131,44 @@ reelquak:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::sound_bank_w)
+void seta2_state::machine_start()
 {
-	if (ACCESSING_BITS_0_7)
+	if (memregion( "x1snd" ) != nullptr)
 	{
-		uint8_t *ROM = memregion( "x1snd" )->base();
-		int banks = (memregion( "x1snd" )->bytes() - 0x100000) / 0x20000;
-		if (data >= banks)
+		uint32_t const max = memregion( "x1snd" )->bytes() / 0x20000;
+		for (int i = 0; i < 8; i++)
 		{
-			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",m_maincpu->pc(),data);
-			data %= banks;
+			if (m_x1_bank[i] != nullptr)
+			{
+				uint32_t ind = 0;
+				while (ind < 256)
+				{
+					m_x1_bank[i]->configure_entries(ind, max, memregion( "x1snd" )->base(), 0x20000); // TODO : Mirrored?
+					ind += max;
+				}
+			}
 		}
-		memcpy(ROM + offset * 0x20000, ROM + 0x100000 + data * 0x20000, 0x20000);
 	}
+
+	m_leds.resolve();
+	m_lamps.resolve();
+}
+
+WRITE8_MEMBER(seta2_state::sound_bank_w)
+{
+	m_x1_bank[offset & 7]->set_entry(data);
+}
+
+void seta2_state::x1_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).bankr("x1_bank_1");
+	map(0x20000, 0x3ffff).bankr("x1_bank_2");
+	map(0x40000, 0x5ffff).bankr("x1_bank_3");
+	map(0x60000, 0x7ffff).bankr("x1_bank_4");
+	map(0x80000, 0x9ffff).bankr("x1_bank_5");
+	map(0xa0000, 0xbffff).bankr("x1_bank_6");
+	map(0xc0000, 0xdffff).bankr("x1_bank_7");
+	map(0xe0000, 0xfffff).bankr("x1_bank_8");
 }
 
 
@@ -159,25 +187,26 @@ WRITE16_MEMBER(seta2_state::grdians_lockout_w)
 //  popmessage("%04X", data & 0xffff);
 }
 
-ADDRESS_MAP_START(seta2_state::grdians_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0x304000, 0x30ffff) AM_RAM                             // ? seems tile data
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")                 // P1
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")                 // P2
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x70000c, 0x70000d) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM                             // cleared
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
-	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(sound_bank_w)       // Samples Banks
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
+void seta2_state::grdians_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();                             // ROM
+	map(0x200000, 0x20ffff).ram();                             // RAM
+	map(0x304000, 0x30ffff).ram();                             // ? seems tile data
+	map(0x600000, 0x600001).portr("DSW1");               // DSW 1
+	map(0x600002, 0x600003).portr("DSW2");               // DSW 2
+	map(0x700000, 0x700001).portr("P1");                 // P1
+	map(0x700002, 0x700003).portr("P2");                 // P2
+	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
+	map(0x70000c, 0x70000d).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0x800000, 0x800001).w(FUNC(seta2_state::grdians_lockout_w));
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
+	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0xc50000, 0xc5ffff).ram();                             // cleared
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
+}
 
 /***************************************************************************
                         Mobile Suit Gundam EX Revue
@@ -195,35 +224,37 @@ WRITE16_MEMBER(seta2_state::gundamex_eeprom_w)
 	m_eeprom->cs_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(seta2_state::gundamex_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0x500000, 0x57ffff) AM_ROM                             // ROM
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")                 // P1
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")                 // P2
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN0")                // P1
-	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN1")                // P2
-	AM_RANGE(0x70000c, 0x70000d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM                             // cleared
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
-	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(sound_bank_w)       // Samples Banks
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
+void seta2_state::gundamex_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();                             // ROM
+	map(0x200000, 0x20ffff).ram();                             // RAM
+	map(0x500000, 0x57ffff).rom();                             // ROM
+	map(0x600000, 0x600001).portr("DSW1");               // DSW 1
+	map(0x600002, 0x600003).portr("DSW2");               // DSW 2
+	map(0x700000, 0x700001).portr("P1");                 // P1
+	map(0x700002, 0x700003).portr("P2");                 // P2
+	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
+	map(0x700008, 0x700009).portr("IN0");                // P1
+	map(0x70000a, 0x70000b).portr("IN1");                // P2
+	map(0x70000c, 0x70000d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x800000, 0x800001).w(FUNC(seta2_state::grdians_lockout_w));
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
+	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0xc50000, 0xc5ffff).ram();                             // cleared
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
+}
 
 
 /***************************************************************************
                       Wakakusamonogatari Mahjong Yonshimai
 ***************************************************************************/
 
-MACHINE_START_MEMBER(seta2_state, mj4simai)
+void mj4simai_state::machine_start()
 {
+	seta2_state::machine_start();
 	save_item(NAME(m_keyboard_row));
 }
 
@@ -259,70 +290,73 @@ WRITE16_MEMBER(seta2_state::mj4simai_keyboard_w)
 		m_keyboard_row = data & 0xff;
 }
 
-ADDRESS_MAP_START(seta2_state::mj4simai_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ(mj4simai_p1_r)             // P1
-	AM_RANGE(0x600002, 0x600003) AM_READ(mj4simai_p2_r)             // P2
-	AM_RANGE(0x600004, 0x600005) AM_WRITE(mj4simai_keyboard_w)      // select keyboard row to read
-	AM_RANGE(0x600006, 0x600007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0x600100, 0x600101) AM_READ_PORT("SYSTEM")             //
-	AM_RANGE(0x600200, 0x600201) AM_WRITENOP                        // Leds? Coins?
-	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x600300, 0x60030f) AM_WRITE(sound_bank_w)       // Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
+void seta2_state::mj4simai_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();                             // ROM
+	map(0x200000, 0x20ffff).ram();                             // RAM
+	map(0x600000, 0x600001).r(FUNC(seta2_state::mj4simai_p1_r));             // P1
+	map(0x600002, 0x600003).r(FUNC(seta2_state::mj4simai_p2_r));             // P2
+	map(0x600004, 0x600005).w(FUNC(seta2_state::mj4simai_keyboard_w));      // select keyboard row to read
+	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0x600100, 0x600101).portr("SYSTEM");             //
+	map(0x600200, 0x600201).nopw();                        // Leds? Coins?
+	map(0x600300, 0x600301).portr("DSW1");               // DSW 1
+	map(0x600302, 0x600303).portr("DSW2");               // DSW 2
+	map(0x600300, 0x60030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
+	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
+}
 
 
 /***************************************************************************
                             Kosodate Quiz My Angel
 ***************************************************************************/
 
-ADDRESS_MAP_START(seta2_state::myangel_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")                 // P1
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")                 // P2
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x700006, 0x700007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0x700200, 0x700201) AM_WRITENOP                        // Leds? Coins?
-	AM_RANGE(0x700300, 0x700301) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x700310, 0x70031f) AM_WRITE(sound_bank_w)       // Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")              // Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
-ADDRESS_MAP_END
+void seta2_state::myangel_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();                             // ROM
+	map(0x200000, 0x20ffff).ram();                             // RAM
+	map(0x700000, 0x700001).portr("P1");                 // P1
+	map(0x700002, 0x700003).portr("P2");                 // P2
+	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
+	map(0x700006, 0x700007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0x700200, 0x700201).nopw();                        // Leds? Coins?
+	map(0x700300, 0x700301).portr("DSW1");               // DSW 1
+	map(0x700302, 0x700303).portr("DSW2");               // DSW 2
+	map(0x700310, 0x70031f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
+	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
+}
 
 
 /***************************************************************************
                             Kosodate Quiz My Angel 2
 ***************************************************************************/
 
-ADDRESS_MAP_START(seta2_state::myangel2_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")                 // P1
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")                 // P2
-	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x600006, 0x600007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0x600200, 0x600201) AM_WRITENOP                        // Leds? Coins?
-	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x600300, 0x60030f) AM_WRITE(sound_bank_w)       // Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0xd40000, 0xd4ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xd60000, 0xd6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")          // Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
-ADDRESS_MAP_END
+void seta2_state::myangel2_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();                             // ROM
+	map(0x200000, 0x20ffff).ram();                             // RAM
+	map(0x600000, 0x600001).portr("P1");                 // P1
+	map(0x600002, 0x600003).portr("P2");                 // P2
+	map(0x600004, 0x600005).portr("SYSTEM");             // Coins
+	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0x600200, 0x600201).nopw();                        // Leds? Coins?
+	map(0x600300, 0x600301).portr("DSW1");               // DSW 1
+	map(0x600302, 0x600303).portr("DSW2");               // DSW 2
+	map(0x600300, 0x60030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xd00000, 0xd3ffff).ram().share("spriteram");       // Sprites
+	map(0xd40000, 0xd4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0xd60000, 0xd6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");          // Video Registers
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
+}
 
 
 /***************************************************************************
@@ -351,61 +385,65 @@ WRITE16_MEMBER(seta2_state::pzlbowl_coin_counter_w)
 	}
 }
 
-ADDRESS_MAP_START(seta2_state::pzlbowl_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                 // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                                 // RAM
-	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")                   // DSW 1
-	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")                   // DSW 2
-	AM_RANGE(0x400300, 0x40030f) AM_WRITE(sound_bank_w)           // Samples Banks
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")                     // P1
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")                     // P2
-	AM_RANGE(0x500004, 0x500005) AM_READWRITE(pzlbowl_coins_r,pzlbowl_coin_counter_w)   // Coins + Protection?
-	AM_RANGE(0x500006, 0x500007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)          // Protection
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0x840000, 0x84ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x860000, 0x86003f) AM_WRITE(vregs_w) AM_SHARE("vregs")              // Video Registers
-	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
-ADDRESS_MAP_END
+void seta2_state::pzlbowl_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                 // ROM
+	map(0x200000, 0x20ffff).ram();                                 // RAM
+	map(0x400300, 0x400301).portr("DSW1");                   // DSW 1
+	map(0x400302, 0x400303).portr("DSW2");                   // DSW 2
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);           // Samples Banks
+	map(0x500000, 0x500001).portr("P1");                     // P1
+	map(0x500002, 0x500003).portr("P2");                     // P2
+	map(0x500004, 0x500005).rw(FUNC(seta2_state::pzlbowl_coins_r), FUNC(seta2_state::pzlbowl_coin_counter_w));   // Coins + Protection?
+	map(0x500006, 0x500007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0x700000, 0x700001).r(FUNC(seta2_state::pzlbowl_protection_r));          // Protection
+	map(0x800000, 0x83ffff).ram().share("spriteram");       // Sprites
+	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x860000, 0x86003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
+}
 
 
 /***************************************************************************
                             Penguin Bros
 ***************************************************************************/
 
-ADDRESS_MAP_START(seta2_state::penbros_base_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM // zeroed at startup, then never written again on originals, used on the bootleg
-	AM_RANGE(0x220000, 0x22ffff) AM_RAM // zeroed at startup, then never written again
-	AM_RANGE(0x230000, 0x23ffff) AM_RAM // zeroed at startup, then never written again on originals, used on the bootleg
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")
-	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x600004, 0x600005) AM_WRITE(pzlbowl_coin_counter_w)
-	AM_RANGE(0x600006, 0x600007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)
-	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-ADDRESS_MAP_END
+void seta2_state::penbros_base_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x210000, 0x21ffff).ram(); // zeroed at startup, then never written again on originals, used on the bootleg
+	map(0x220000, 0x22ffff).ram(); // zeroed at startup, then never written again
+	map(0x230000, 0x23ffff).ram(); // zeroed at startup, then never written again on originals, used on the bootleg
+	map(0x600000, 0x600001).portr("P1");
+	map(0x600002, 0x600003).portr("P2");
+	map(0x600004, 0x600005).portr("SYSTEM");
+	map(0x600004, 0x600005).w(FUNC(seta2_state::pzlbowl_coin_counter_w));
+	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0xa00000, 0xa03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));
+	map(0xb00000, 0xb3ffff).ram().share("spriteram");
+	map(0xb40000, 0xb4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
 
-ADDRESS_MAP_START(seta2_state::penbros_map)
-	AM_IMPORT_FROM(penbros_base_map)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM
-	AM_RANGE(0x500300, 0x500301) AM_READ_PORT("DSW1")
-	AM_RANGE(0x500302, 0x500303) AM_READ_PORT("DSW2")
-	AM_RANGE(0x500300, 0x50030f) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)
-ADDRESS_MAP_END
+void seta2_state::penbros_map(address_map &map)
+{
+	penbros_base_map(map);
+	map(0x300000, 0x30ffff).ram();
+	map(0x500300, 0x500301).portr("DSW1");
+	map(0x500302, 0x500303).portr("DSW2");
+	map(0x500300, 0x50030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);
+	map(0xb60000, 0xb6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
+}
 
-ADDRESS_MAP_START(seta2_state::ablastb_map)
-	AM_IMPORT_FROM(penbros_base_map)
-	AM_RANGE(0x508300, 0x508301) AM_READ_PORT("DSW1")
-	AM_RANGE(0x508302, 0x508303) AM_READ_PORT("DSW2")
+void seta2_state::ablastb_map(address_map &map)
+{
+	penbros_base_map(map);
+	map(0x508300, 0x508301).portr("DSW1");
+	map(0x508302, 0x508303).portr("DSW2");
 	// TODO: Is there samples banking like in the original?
-ADDRESS_MAP_END
+}
 
 
 /***************************************************************************
@@ -416,13 +454,13 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x0001 );  // start
-		output().set_led_value(1, data & 0x0002 );  // small
-		output().set_led_value(2, data & 0x0004 );  // bet
-		output().set_led_value(3, data & 0x0008 );  // big
-		output().set_led_value(4, data & 0x0010 );  // double up
-		output().set_led_value(5, data & 0x0020 );  // collect
-		output().set_led_value(6, data & 0x0040 );  // bet cancel
+		m_leds[0] = BIT(data, 0);  // start
+		m_leds[1] = BIT(data, 1);  // small
+		m_leds[2] = BIT(data, 2);  // bet
+		m_leds[3] = BIT(data, 3);  // big
+		m_leds[4] = BIT(data, 4);  // double up
+		m_leds[5] = BIT(data, 5);  // collect
+		m_leds[6] = BIT(data, 6);  // bet cancel
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -446,24 +484,25 @@ WRITE16_MEMBER(seta2_state::reelquak_coin_w)
 //  popmessage("COIN %04X", data & 0xffff);
 }
 
-ADDRESS_MAP_START(seta2_state::reelquak_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("nvram")           // NVRAM (Battery Backed)
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
-	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("TICKET")             // Tickets
-	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x400006, 0x400007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0x400200, 0x400201) AM_WRITE(reelquak_coin_w)          // Coin Counters / IRQ Ack
-	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x400300, 0x40030f) AM_WRITE(sound_bank_w)       // Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")              // Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
-ADDRESS_MAP_END
+void seta2_state::reelquak_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                             // ROM
+	map(0x200000, 0x20ffff).ram();                             // RAM
+	map(0x300000, 0x303fff).ram().share("nvram");           // NVRAM (Battery Backed)
+	map(0x400000, 0x400001).portr("P1");                 // P1
+	map(0x400002, 0x400003).portr("TICKET");             // Tickets
+	map(0x400004, 0x400005).portr("SYSTEM");             // Coins
+	map(0x400006, 0x400007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0x400200, 0x400201).w(FUNC(seta2_state::reelquak_coin_w));          // Coin Counters / IRQ Ack
+	map(0x400300, 0x400301).portr("DSW1");               // DSW 1
+	map(0x400302, 0x400303).portr("DSW2");               // DSW 2
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
+	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
+}
 
 
 /***************************************************************************
@@ -471,13 +510,14 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 // To be done:
-ADDRESS_MAP_START(seta2_state::namcostr_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
+void seta2_state::namcostr_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                             // ROM
+	map(0x200000, 0x20ffff).ram();                             // RAM
+	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
+	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
+}
 
 
 /***************************************************************************
@@ -497,32 +537,33 @@ WRITE16_MEMBER(seta2_state::samshoot_coin_w)
 //  popmessage("%04x",data);
 }
 
-ADDRESS_MAP_START(seta2_state::samshoot_map)
-	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
-	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM
-	AM_RANGE( 0x300000, 0x30ffff ) AM_RAM AM_SHARE("nvram")
+void seta2_state::samshoot_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x300000, 0x30ffff).ram().share("nvram");
 
-	AM_RANGE( 0x400000, 0x400001 ) AM_READ_PORT("DSW1")             // DSW 1
-	AM_RANGE( 0x400002, 0x400003 ) AM_READ_PORT("BUTTONS")          // Buttons
+	map(0x400000, 0x400001).portr("DSW1");             // DSW 1
+	map(0x400002, 0x400003).portr("BUTTONS");          // Buttons
 
-	AM_RANGE( 0x400300, 0x40030f ) AM_WRITE(sound_bank_w )    // Samples Banks
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);    // Samples Banks
 
-	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("GUN1")             // P1
-	AM_RANGE( 0x580000, 0x580001 ) AM_READ_PORT("GUN2")             // P2
+	map(0x500000, 0x500001).portr("GUN1");             // P1
+	map(0x580000, 0x580001).portr("GUN2");             // P2
 
-	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT("TRIGGER")          // Trigger
-	AM_RANGE( 0x700002, 0x700003 ) AM_READ_PORT("PUMP")             // Pump
-	AM_RANGE( 0x700004, 0x700005 ) AM_READ_PORT("COIN") AM_WRITE(samshoot_coin_w )  // Coins
-	AM_RANGE( 0x700006, 0x700007 ) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r ) // Watchdog?
+	map(0x700000, 0x700001).portr("TRIGGER");          // Trigger
+	map(0x700002, 0x700003).portr("PUMP");             // Pump
+	map(0x700004, 0x700005).portr("COIN").w(FUNC(seta2_state::samshoot_coin_w));  // Coins
+	map(0x700006, 0x700007).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog?
 
-	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_SHARE("spriteram") // Sprites
-	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")  // Palette
-	AM_RANGE( 0x860000, 0x86003f ) AM_WRITE(vregs_w) AM_SHARE("vregs")    // Video Registers
+	map(0x800000, 0x83ffff).ram().share("spriteram"); // Sprites
+	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
+	map(0x860000, 0x86003f).w(FUNC(seta2_state::vregs_w)).share("vregs");    // Video Registers
 
-	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
+	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 
-	AM_RANGE( 0xfffc00, 0xffffff ) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)    // TMP68301 Registers
-ADDRESS_MAP_END
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));    // TMP68301 Registers
+}
 
 
 /***************************************************************************
@@ -541,9 +582,9 @@ WRITE16_MEMBER(staraudi_state::staraudi_lamps1_w)
 	COMBINE_DATA(&m_lamps1);
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x0001 );  // Lamp 1 |
-		output().set_led_value(1, data & 0x0002 );  // Lamp 2 |- Camera Lamps
-		output().set_led_value(2, data & 0x0004 );  // Lamp 3 |
+		m_leds[0] = BIT(data, 0);  // Lamp 1 |
+		m_leds[1] = BIT(data, 1);  // Lamp 2 |- Camera Lamps
+		m_leds[2] = BIT(data, 2);  // Lamp 3 |
 		//                        data & 0x0008 );  // Degauss
 	}
 	staraudi_debug_outputs();
@@ -555,8 +596,8 @@ WRITE16_MEMBER(staraudi_state::staraudi_lamps2_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		//                        data & 0x0020 );  // ? Always On
-		output().set_led_value(3, data & 0x0040 );  // 2P Switch Lamp
-		output().set_led_value(4, data & 0x0080 );  // 1P Switch Lamp
+		m_leds[3] = BIT(data, 6);  // 2P Switch Lamp
+		m_leds[4] = BIT(data, 7);  // 1P Switch Lamp
 	}
 	staraudi_debug_outputs();
 }
@@ -592,39 +633,40 @@ WRITE16_MEMBER(staraudi_state::staraudi_tileram_w)
 		m_gfxdecode->gfx(i)->mark_dirty(tile);
 }
 
-ADDRESS_MAP_START(staraudi_state::staraudi_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM                             // RAM
+void staraudi_state::staraudi_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();                             // ROM
+	map(0x200000, 0x23ffff).ram();                             // RAM
 
-	AM_RANGE(0x400000, 0x45ffff) AM_READWRITE(staraudi_tileram_r, staraudi_tileram_w) AM_SHARE("tileram") // Tile RAM
+	map(0x400000, 0x45ffff).rw(FUNC(staraudi_state::staraudi_tileram_r), FUNC(staraudi_state::staraudi_tileram_w)).share("tileram"); // Tile RAM
 
 //  AM_RANGE(0x500000, 0x53ffff) AM_RAM                             // Camera RAM (r8g8)
 //  AM_RANGE(0x540000, 0x57ffff) AM_RAM                             // Camera RAM (00b8)
-	AM_RANGE(0x500000, 0x57ffff) AM_RAM AM_SHARE("rgbram")
+	map(0x500000, 0x57ffff).ram().share("rgbram");
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(staraudi_camera_w)        // Camera Outputs
+	map(0x600000, 0x600001).w(FUNC(staraudi_state::staraudi_camera_w));        // Camera Outputs
 
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")                 // P1
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")                 // P2
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x700006, 0x700007) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
+	map(0x700000, 0x700001).portr("P1");                 // P1
+	map(0x700002, 0x700003).portr("P2");                 // P2
+	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
+	map(0x700006, 0x700007).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 
-	AM_RANGE(0x700100, 0x700101) AM_WRITE(staraudi_lamps1_w)        // Lamps 1
-	AM_RANGE(0x700180, 0x70018f) AM_DEVREADWRITE8("rtc", upd4992_device, read, write, 0x00ff )
-	AM_RANGE(0x700200, 0x700201) AM_WRITE(staraudi_lamps2_w)        // Lamps 2
-	AM_RANGE(0x700300, 0x700301) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x700300, 0x70030f) AM_WRITE(sound_bank_w)             // Samples Banks
+	map(0x700100, 0x700101).w(FUNC(staraudi_state::staraudi_lamps1_w));        // Lamps 1
+	map(0x700180, 0x70018f).rw(m_rtc, FUNC(upd4992_device::read), FUNC(upd4992_device::write)).umask16(0x00ff);
+	map(0x700200, 0x700201).w(FUNC(staraudi_state::staraudi_lamps2_w));        // Lamps 2
+	map(0x700300, 0x700301).portr("DSW1");               // DSW 1
+	map(0x700302, 0x700303).portr("DSW2");               // DSW 2
+	map(0x700300, 0x70030f).w(FUNC(staraudi_state::sound_bank_w));             // Samples Banks
 
-	AM_RANGE(0x800000, 0x9fffff) AM_DEVREADWRITE("flash", intelfsh16_device, read, write)
+	map(0x800000, 0x9fffff).rw(m_flash, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM                             // cleared
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
+	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0xc50000, 0xc5ffff).ram();                             // cleared
+	map(0xc60000, 0xc6003f).w(FUNC(staraudi_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
+}
 
 
 /***************************************************************************
@@ -635,14 +677,14 @@ WRITE16_MEMBER(seta2_state::telpacfl_lamp1_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_lamp_value(0, data & 0x0001 ); //
-		output().set_lamp_value(1, data & 0x0002 ); //
-		output().set_lamp_value(2, data & 0x0004 ); //
-		output().set_lamp_value(3, data & 0x0008 ); //
-		output().set_lamp_value(4, data & 0x0010 ); //
-		output().set_lamp_value(5, data & 0x0020 ); //
-		output().set_lamp_value(6, data & 0x0040 ); //
-		output().set_lamp_value(7, data & 0x0080 ); //
+		m_lamps[0] = BIT(data, 0); //
+		m_lamps[1] = BIT(data, 1); //
+		m_lamps[2] = BIT(data, 2); //
+		m_lamps[3] = BIT(data, 3); //
+		m_lamps[4] = BIT(data, 4); //
+		m_lamps[5] = BIT(data, 5); //
+		m_lamps[6] = BIT(data, 6); //
+		m_lamps[7] = BIT(data, 7); //
 	}
 
 //  popmessage("LAMP1 %04X", data);
@@ -652,9 +694,9 @@ WRITE16_MEMBER(seta2_state::telpacfl_lamp2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_lamp_value( 8, data & 0x0001 ); // on/off lamp (throughout)
-		output().set_lamp_value( 9, data & 0x0002 ); // bet lamp
-		output().set_lamp_value(10, data & 0x0004 ); // payout lamp
+		m_lamps[8] = BIT(data, 0); // on/off lamp (throughout)
+		m_lamps[9] = BIT(data, 1); // bet lamp
+		m_lamps[10] = BIT(data, 2); // payout lamp
 		m_dispenser->motor_w(       data & 0x0008 ); // coin out motor
 		machine().bookkeeping().coin_counter_w(0,  data & 0x0010); // coin out counter
 		//                          data & 0x0020 ); // on credit increase
@@ -676,28 +718,29 @@ WRITE16_MEMBER(seta2_state::telpacfl_lockout_w)
 //  popmessage("LOCK %04X", data);
 }
 
-ADDRESS_MAP_START(seta2_state::telpacfl_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                              // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                              // RAM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("nvram")            // NVRAM (Battery Backed)
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW1")                // DSW 1
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW2")                // DSW 2
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("COIN")                // Coin
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1")                  // P1 + Dispenser
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SERVICE")             // Service
-	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("UNKNOWN")             // (unused?)
-	AM_RANGE(0x700008, 0x700009) AM_WRITE(telpacfl_lamp1_w)          // Lamps
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(telpacfl_lamp2_w)          // ""
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(telpacfl_lockout_w)        // Coin Blockers
-	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("spriteram")        // Sprites
-	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(vregs_w) AM_SHARE("vregs") // Video Registers
-	AM_RANGE(0xd00006, 0xd00007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
+void seta2_state::telpacfl_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                              // ROM
+	map(0x200000, 0x20ffff).ram();                              // RAM
+	map(0x300000, 0x303fff).ram().share("nvram");            // NVRAM (Battery Backed)
+	map(0x600000, 0x600001).portr("DSW1");                // DSW 1
+	map(0x600002, 0x600003).portr("DSW2");                // DSW 2
+	map(0x700000, 0x700001).portr("COIN");                // Coin
+	map(0x700002, 0x700003).portr("P1");                  // P1 + Dispenser
+	map(0x700004, 0x700005).portr("SERVICE");             // Service
+	map(0x700006, 0x700007).portr("UNKNOWN");             // (unused?)
+	map(0x700008, 0x700009).w(FUNC(seta2_state::telpacfl_lamp1_w));          // Lamps
+	map(0x70000c, 0x70000d).w(FUNC(seta2_state::telpacfl_lamp2_w));          // ""
+	map(0x800000, 0x800001).w(FUNC(seta2_state::telpacfl_lockout_w));        // Coin Blockers
+	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xb00000, 0xb3ffff).ram().share("spriteram");        // Sprites
+	map(0xb40000, 0xb4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0xb60000, 0xb6003f).w(FUNC(seta2_state::vregs_w)).share("vregs"); // Video Registers
+	map(0xd00006, 0xd00007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITE
-	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(sound_bank_w)              // Samples Banks
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
-ADDRESS_MAP_END
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);              // Samples Banks
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
+}
 
 
 /***************************************************************************
@@ -710,7 +753,7 @@ ADDRESS_MAP_END
 	MCFG_DEVICE_ADD( _tag, FUNCUBE_TOUCHSCREEN, _clock )
 
 #define MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(_devcb) \
-	devcb = &funcube_touchscreen_device::set_tx_cb(*device, DEVCB_##_devcb);
+	downcast<funcube_touchscreen_device &>(*device).set_tx_cb(DEVCB_##_devcb);
 
 class funcube_touchscreen_device : public device_t,
 									public device_serial_interface
@@ -719,7 +762,7 @@ public:
 	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
-	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<funcube_touchscreen_device &>(device).m_tx_cb.set_callback(object); }
+	template <class Object> devcb_base &set_tx_cb(Object &&cb) { return m_tx_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_start() override;
@@ -820,13 +863,13 @@ void funcube_touchscreen_device::tra_callback()
 // Bus conversion functions:
 
 // RAM shared with the sub CPU
-READ32_MEMBER(seta2_state::funcube_nvram_dword_r)
+READ32_MEMBER(funcube_state::funcube_nvram_dword_r)
 {
 	uint16_t val = m_nvram[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
-WRITE32_MEMBER(seta2_state::funcube_nvram_dword_w)
+WRITE32_MEMBER(funcube_state::funcube_nvram_dword_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -851,7 +894,7 @@ READ16_MEMBER(seta2_state::spriteram16_word_r)
 // Main CPU
 
 
-READ32_MEMBER(seta2_state::funcube_debug_r)
+READ32_MEMBER(funcube_state::funcube_debug_r)
 {
 	uint32_t ret = ioport("DEBUG")->read();
 
@@ -880,50 +923,53 @@ WRITE32_MEMBER(seta2_state::oki_write)
 	}
 }
 
-ADDRESS_MAP_START(seta2_state::funcube_map)
-	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
-	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
+void funcube_state::funcube_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom();
+	map(0x00200000, 0x0020ffff).ram();
 
-	AM_RANGE( 0x00400000, 0x00400003 ) AM_READ(funcube_debug_r)
-	AM_RANGE( 0x00400004, 0x00400007 ) AM_DEVREAD("watchdog", watchdog_timer_device, reset32_r) AM_WRITENOP
+	map(0x00400000, 0x00400003).r(FUNC(funcube_state::funcube_debug_r));
+	map(0x00400004, 0x00400007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
 
-	AM_RANGE( 0x00500000, 0x00500003 ) AM_READWRITE(oki_read, oki_write)
+	map(0x00500000, 0x00500003).rw(FUNC(seta2_state::oki_read), FUNC(seta2_state::oki_write));
 
-	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE16(spriteram16_word_r,  spriteram16_word_w, 0xffffffff ) AM_SHARE("spriteram")
-	AM_RANGE( 0x00840000, 0x0084ffff ) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")  // Palette
-	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE16(vregs_w, 0xffffffff ) AM_SHARE("vregs")
+	map(0x00800000, 0x0083ffff).rw(FUNC(seta2_state::spriteram16_word_r), FUNC(seta2_state::spriteram16_word_w)).share("spriteram");
+	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");  // Palette
+	map(0x00860000, 0x0086003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
 
-	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE(funcube_nvram_dword_r, funcube_nvram_dword_w )
+	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::funcube_nvram_dword_r), FUNC(funcube_state::funcube_nvram_dword_w));
 
-	AM_RANGE(0xf0000000, 0xf00001ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, seta2_coldfire_regs_r, seta2_coldfire_regs_w) // technically this can be moved with MBAR
-	AM_RANGE(0xffffe000, 0xffffffff ) AM_RAM    // SRAM
-ADDRESS_MAP_END
+	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
+	map(0xffffe000, 0xffffffff).ram();    // SRAM
+}
 
-ADDRESS_MAP_START(seta2_state::funcube2_map)
-	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
-	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
+void funcube_state::funcube2_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom();
+	map(0x00200000, 0x0020ffff).ram();
 
-	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ(funcube_debug_r )
-	AM_RANGE( 0x00500004, 0x00500007 ) AM_DEVREAD("watchdog", watchdog_timer_device, reset32_r) AM_WRITENOP
+	map(0x00500000, 0x00500003).r(FUNC(funcube_state::funcube_debug_r));
+	map(0x00500004, 0x00500007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
 
-	AM_RANGE( 0x00600000, 0x00600003 ) AM_READWRITE(oki_read, oki_write)
+	map(0x00600000, 0x00600003).rw(FUNC(seta2_state::oki_read), FUNC(seta2_state::oki_write));
 
-	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE16(spriteram16_word_r,  spriteram16_word_w, 0xffffffff ) AM_SHARE("spriteram")
-	AM_RANGE( 0x00840000, 0x0084ffff ) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE16(vregs_w, 0xffffffff ) AM_SHARE("vregs")
+	map(0x00800000, 0x0083ffff).rw(FUNC(seta2_state::spriteram16_word_r), FUNC(seta2_state::spriteram16_word_w)).share("spriteram");
+	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x00860000, 0x0086003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
 
-	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE(funcube_nvram_dword_r, funcube_nvram_dword_w )
+	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::funcube_nvram_dword_r), FUNC(funcube_state::funcube_nvram_dword_w));
 
-	AM_RANGE(0xf0000000, 0xf00001ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, seta2_coldfire_regs_r, seta2_coldfire_regs_w) // technically this can be moved with MBAR
-	AM_RANGE(0xffffe000, 0xffffffff ) AM_RAM    // SRAM
-ADDRESS_MAP_END
+	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
+	map(0xffffe000, 0xffffffff).ram();    // SRAM
+}
 
 // Sub CPU
 
-ADDRESS_MAP_START(seta2_state::funcube_sub_map)
-	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x200000, 0x20017f ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void funcube_state::funcube_sub_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x200000, 0x20017f).ram().share("nvram");
+}
 
 
 
@@ -932,7 +978,7 @@ ADDRESS_MAP_END
 
 #define FUNCUBE_SUB_CPU_CLOCK (XTAL(14'745'600))
 
-READ16_MEMBER(seta2_state::funcube_coins_r)
+READ16_MEMBER(funcube_state::funcube_coins_r)
 {
 	uint8_t ret = ioport("SWITCH")->read();
 	uint8_t coin_bit0 = 1;    // active low
@@ -962,36 +1008,36 @@ READ16_MEMBER(seta2_state::funcube_coins_r)
 	return (ret & ~7) | (hopper_bit << 2) | (coin_bit1 << 1) | coin_bit0;
 }
 
-void seta2_state::funcube_debug_outputs()
+void funcube_state::funcube_debug_outputs()
 {
 #ifdef MAME_DEBUG
 //  popmessage("LED: %02x OUT: %02x", (int)*m_funcube_leds, (int)*m_funcube_outputs);
 #endif
 }
 
-WRITE16_MEMBER(seta2_state::funcube_leds_w)
+WRITE16_MEMBER(funcube_state::funcube_leds_w)
 {
 	*m_funcube_leds = data;
 
-	output().set_led_value(0, (~data) & 0x01 ); // win lamp (red)
-	output().set_led_value(1, (~data) & 0x02 ); // win lamp (green)
+	m_leds[0] = BIT(~data, 0); // win lamp (red)
+	m_leds[1] = BIT(~data, 1); // win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	output().set_led_value(2, (~data) & 0x10 );
-	output().set_led_value(3, (~data) & 0x20 );
-	output().set_led_value(4, (~data) & 0x40 );
-	output().set_led_value(5, (~data) & 0x80 );
+	m_leds[2] = BIT(~data, 4);
+	m_leds[3] = BIT(~data, 5);
+	m_leds[4] = BIT(~data, 6);
+	m_leds[5] = BIT(~data, 7);
 
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(seta2_state::funcube_outputs_r)
+READ16_MEMBER(funcube_state::funcube_outputs_r)
 {
 	// Bits 1,2,3 read
 	return *m_funcube_outputs;
 }
 
-WRITE16_MEMBER(seta2_state::funcube_outputs_w)
+WRITE16_MEMBER(funcube_state::funcube_outputs_w)
 {
 	*m_funcube_outputs = data;
 
@@ -1003,30 +1049,32 @@ WRITE16_MEMBER(seta2_state::funcube_outputs_w)
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	output().set_led_value(6, (~data) & 0x08 );
+	m_leds[6] = BIT(~data, 3);
 
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(seta2_state::funcube_battery_r)
+READ16_MEMBER(funcube_state::funcube_battery_r)
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }
 
 // cabinet linking on sci0
-ADDRESS_MAP_START(seta2_state::funcube_sub_io)
-	AM_RANGE( h8_device::PORT_7,   h8_device::PORT_7   )    AM_READ(funcube_coins_r )
-	AM_RANGE( h8_device::PORT_4,   h8_device::PORT_4   )    AM_READ(funcube_battery_r )
-	AM_RANGE( h8_device::PORT_A,   h8_device::PORT_A   )    AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_SHARE("funcube_outputs")
-	AM_RANGE( h8_device::PORT_B,   h8_device::PORT_B   )    AM_WRITE(funcube_leds_w )                           AM_SHARE("funcube_leds")
-ADDRESS_MAP_END
+void funcube_state::funcube_sub_io(address_map &map)
+{
+	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::funcube_coins_r));
+	map(h8_device::PORT_4, h8_device::PORT_4).r(FUNC(funcube_state::funcube_battery_r));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::funcube_outputs_r), FUNC(funcube_state::funcube_outputs_w)).share("funcube_outputs");
+	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::funcube_leds_w)).share("funcube_leds");
+}
 
-ADDRESS_MAP_START(seta2_state::funcube2_sub_io)
-	AM_RANGE( h8_device::PORT_7,   h8_device::PORT_7   )    AM_READ(funcube_coins_r )
-	AM_RANGE( h8_device::PORT_4,   h8_device::PORT_4   )    AM_NOP  // unused
-	AM_RANGE( h8_device::PORT_A,   h8_device::PORT_A   )    AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_SHARE("funcube_outputs")
-	AM_RANGE( h8_device::PORT_B,   h8_device::PORT_B   )    AM_WRITE(funcube_leds_w )                           AM_SHARE("funcube_leds")
-ADDRESS_MAP_END
+void funcube_state::funcube2_sub_io(address_map &map)
+{
+	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::funcube_coins_r));
+	map(h8_device::PORT_4, h8_device::PORT_4).noprw();  // unused
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::funcube_outputs_r), FUNC(funcube_state::funcube_outputs_w)).share("funcube_outputs");
+	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::funcube_leds_w)).share("funcube_leds");
+}
 
 
 
@@ -1664,7 +1712,7 @@ static INPUT_PORTS_START( pzlbowl )
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )    // Protection?
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM )    // Protection?
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1819,7 +1867,7 @@ static INPUT_PORTS_START( reelquak )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
 	PORT_START("TICKET")    // $400003.b
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r)    // ticket sensor
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r)    // ticket sensor
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Knock Down")    // knock down
@@ -2002,12 +2050,12 @@ static INPUT_PORTS_START( deerhunt )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )  // P2 gun, read but not used
 
 	PORT_START("TRIGGER")   // $700000
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL )  // trigger
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM )  // trigger
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0xff3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("PUMP")  // $700003.b
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL )  // pump
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM )  // pump
 	PORT_BIT( 0xffbf, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COIN")  // $700005.b
@@ -2072,14 +2120,14 @@ static INPUT_PORTS_START( wschamp )
 	PORT_BIT( 0xff00, 0x8000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0x0800,0xf800) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	PORT_MODIFY("TRIGGER")  // $700000
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  // trigger P2
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL )  // trigger P1
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  // trigger P2
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM )  // trigger P1
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0xff1f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("PUMP") // $700003.b
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  // pump P2
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL )  // pump P1
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  // pump P2
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM )  // pump P1
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2  )
 	PORT_BIT( 0xff1f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -2105,6 +2153,29 @@ static INPUT_PORTS_START( trophyh )
 	PORT_DIPNAME( 0x0020, 0x0020, "Blood Color" ) PORT_DIPLOCATION("SW2:6") /* WSChamp doesn't use Blood Color, so add it back in */
 	PORT_DIPSETTING(      0x0020, "Red" )
 	PORT_DIPSETTING(      0x0000, "Yellow" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( trophyht )
+	PORT_INCLUDE(wschamp)
+
+	PORT_MODIFY("DSW2") // fffd0a.w
+	PORT_DIPNAME( 0x0020, 0x0020, "Blood Color" ) PORT_DIPLOCATION("SW2:6") /* WSChamp doesn't use Blood Color, so add it back in */
+	PORT_DIPSETTING(      0x0020, "Red" )
+	PORT_DIPSETTING(      0x0000, "Yellow" )
+	PORT_DIPNAME( 0x0080, 0x0000, "Gun Type (Leave on Hand Gun)" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, "Pump Action" )
+	PORT_DIPSETTING(      0x0000, "Hand Gun" )
+
+	PORT_MODIFY("TRIGGER")  // $700000
+	PORT_BIT( 0xff3f, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PCB only allows for two 4 pin gun connections - trigger p1
+
+	PORT_MODIFY("PUMP") // $700003.b
+	PORT_BIT( 0xff3f, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PCB only allows for two 4 pin gun connections - trigger p2
+
+	PORT_MODIFY("BUTTONS")  // $400002
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )  // trigger P1
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(2)  // trigger P2
+	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -2184,7 +2255,7 @@ static INPUT_PORTS_START( telpacfl )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1       ) PORT_NAME("Bet") // bet switch (converts credits into balls)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR   ) // door switch
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r) // coin out switch (medals jam error when stuck i.e. メダルづまり)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r) // coin out switch (medals jam error when stuck i.e. メダルづまり)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
@@ -2222,8 +2293,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( funcube )
 	PORT_START("SWITCH")    // c00030.l
 	PORT_BIT(     0x01, IP_ACTIVE_LOW,  IPT_COIN1    ) PORT_IMPULSE(1)  // coin solenoid 1
-	PORT_BIT(     0x02, IP_ACTIVE_HIGH, IPT_SPECIAL  )                  // coin solenoid 2
-	PORT_BIT(     0x04, IP_ACTIVE_HIGH, IPT_SPECIAL  )                  // hopper sensor
+	PORT_BIT(     0x02, IP_ACTIVE_HIGH, IPT_CUSTOM  )                  // coin solenoid 2
+	PORT_BIT(     0x04, IP_ACTIVE_HIGH, IPT_CUSTOM  )                  // hopper sensor
 	PORT_BIT(     0x08, IP_ACTIVE_LOW,  IPT_BUTTON2  )                  // game select
 	PORT_BIT(     0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT(     0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 ) PORT_NAME( "Reset Key" )
@@ -2357,7 +2428,7 @@ static const gfx_layout layout_2bpp_hi =
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( seta2 )
+static GFXDECODE_START( gfx_seta2 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_4bpp_lo, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_4bpp_hi, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
@@ -2439,7 +2510,7 @@ static const gfx_layout funcube_layout_2bpp_hi =
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( funcube )
+static GFXDECODE_START( gfx_funcube )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_lo, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_hi, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
@@ -2476,7 +2547,7 @@ static const gfx_layout staraudi_layout_6bpp =
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( staraudi )
+static GFXDECODE_START( gfx_staraudi )
 	GFXDECODE_ENTRY( "sprites", 0, staraudi_layout_4bpp_lo, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_hi,  0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, staraudi_layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
@@ -2504,15 +2575,15 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 }
 
 MACHINE_CONFIG_START(seta2_state::seta2)
-	MCFG_CPU_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
-	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
+	MCFG_DEVICE_PROGRAM_MAP(mj4simai_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2521,38 +2592,32 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta2_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seta2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(50'000'000)/3)   // clock?
+	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(50'000'000)/3)   // clock?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(seta2_state::mj4simai)
-	seta2(config);
-	MCFG_MACHINE_START_OVERRIDE(seta2_state, mj4simai)
-
+	MCFG_DEVICE_ADDRESS_MAP(0, x1_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(seta2_state::gundamex)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gundamex_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gundamex_map)
 
 	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(READ16(seta2_state, gundamex_eeprom_r))
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta2_state, gundamex_eeprom_w))
+	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, seta2_state, gundamex_eeprom_r))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, gundamex_eeprom_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2562,8 +2627,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::grdians)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(grdians_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(grdians_map)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2573,8 +2638,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::myangel)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(myangel_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(myangel_map)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2586,8 +2651,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::myangel2)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(myangel2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(myangel2_map)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2599,8 +2664,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::pzlbowl)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pzlbowl_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pzlbowl_map)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2610,8 +2675,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::penbros)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(penbros_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(penbros_map)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2620,22 +2685,22 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::ablastb)
 	penbros(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000P-16
-	MCFG_CPU_PROGRAM_MAP(ablastb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000P-16
+	MCFG_DEVICE_PROGRAM_MAP(ablastb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
 
 	MCFG_DEVICE_REMOVE("tmp68301")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::reelquak)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(reelquak_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(reelquak_map)
 
 	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta2_state, reelquak_leds_w))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, reelquak_leds_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	// video hardware
@@ -2648,14 +2713,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::samshoot)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(samshoot_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(samshoot_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
 
 	MCFG_DEVICE_MODIFY("tmp68301")
 	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("DSW2"))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2665,32 +2730,32 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(staraudi_state::staraudi)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(staraudi_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(staraudi_map)
 
-	MCFG_SHARP_LH28F016S_16BIT_ADD("flash")
-	MCFG_UPD4992_ADD("rtc")
+	SHARP_LH28F016S_16BIT(config, "flash");
+	UPD4992(config, m_rtc);
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
 	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x100, 0x1f0-1)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", staraudi)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_staraudi)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(seta2_state::telpacfl)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(telpacfl_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(telpacfl_map)
 
 	MCFG_DEVICE_MODIFY("tmp68301")
 	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("KNOB"))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") // not hooked up, seems unused
+	EEPROM_93C46_16BIT(config, "eeprom"); // not hooked up, seems unused
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_HOPPER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	// video hardware
@@ -2704,7 +2769,7 @@ MACHINE_CONFIG_END
                                Funcube series
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(funcube_state::funcube_interrupt)
 {
 	int scanline = param;
 
@@ -2715,39 +2780,37 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-MACHINE_START_MEMBER(seta2_state, funcube)
+void funcube_state::machine_start()
 {
+	seta2_state::machine_start();
 	save_item(NAME(m_funcube_coin_start_cycles));
 	save_item(NAME(m_funcube_hopper_motor));
 }
 
-MACHINE_RESET_MEMBER(seta2_state, funcube)
+void funcube_state::machine_reset()
 {
 	m_funcube_coin_start_cycles = 0;
 	m_funcube_hopper_motor = 0;
 }
 
-MACHINE_CONFIG_START(seta2_state::funcube)
+MACHINE_CONFIG_START(funcube_state::funcube)
 
-	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL(25'447'000))
-	MCFG_CPU_PROGRAM_MAP(funcube_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta2_state, funcube_interrupt, "screen", 0, 1)
+	MCFG_DEVICE_ADD("maincpu", MCF5206E, XTAL(25'447'000))
+	MCFG_DEVICE_PROGRAM_MAP(funcube_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", funcube_state, funcube_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(funcube_sub_map)
-	MCFG_CPU_IO_MAP(funcube_sub_io)
+	MCFG_DEVICE_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(funcube_sub_map)
+	MCFG_DEVICE_IO_MAP(funcube_sub_io)
 
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	MCFG_FUNCUBE_TOUCHSCREEN_ADD("touchscreen", 200)
-	MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(DEVWRITELINE(":sub:sci1", h8_sci_device, rx_w))
+	MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(WRITELINE(":sub:sci1", h8_sci_device, rx_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-
-	MCFG_MACHINE_START_OVERRIDE(seta2_state, funcube)
-	MCFG_MACHINE_RESET_OVERRIDE(seta2_state, funcube)
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2756,29 +2819,30 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta2_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
+	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(seta2_state::funcube2)
+MACHINE_CONFIG_START(funcube_state::funcube2)
 	funcube(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(funcube2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(funcube2_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_IO_MAP(funcube2_sub_io)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_IO_MAP(funcube2_sub_io)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2786,7 +2850,7 @@ MACHINE_CONFIG_START(seta2_state::funcube2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(seta2_state::funcube3)
+MACHINE_CONFIG_START(funcube_state::funcube3)
 	funcube2(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2795,10 +2859,10 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(seta2_state::namcostr)
-	MCFG_CPU_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
-	MCFG_CPU_PROGRAM_MAP(namcostr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
+	MCFG_DEVICE_PROGRAM_MAP(namcostr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)  // does this have a ticket dispenser?
 	MCFG_TMP68301_CPU("maincpu")
@@ -2810,17 +2874,18 @@ MACHINE_CONFIG_START(seta2_state::namcostr)
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta2_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
+	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -3025,7 +3090,7 @@ ROM_START( funcube5 )
 	ROM_LOAD( "fc51_snd-0.u47", 0x000000, 0x200000, CRC(2a504fe1) SHA1(911ad650bf48aa78d9cb3c64284aa526ceb519ba) )
 ROM_END
 
-DRIVER_INIT_MEMBER(seta2_state,funcube)
+void funcube_state::init_funcube()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -3036,7 +3101,7 @@ DRIVER_INIT_MEMBER(seta2_state,funcube)
 	sub_cpu[0x506/2] = 0x5470;  // rte -> rts
 }
 
-DRIVER_INIT_MEMBER(seta2_state,funcube2)
+void funcube_state::init_funcube2()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -3049,7 +3114,7 @@ DRIVER_INIT_MEMBER(seta2_state,funcube2)
 	sub_cpu[0x4d4/2] = 0x5470;  // rte -> rts
 }
 
-DRIVER_INIT_MEMBER(seta2_state,funcube3)
+void funcube_state::init_funcube3()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -3067,43 +3132,176 @@ DRIVER_INIT_MEMBER(seta2_state,funcube3)
 Guardians
 Banpresto, 1995
 
-This hardware is not common Banpresto hardware. Possibly licensed
-to them from another manufacturer? Or an early design that they decided
-not to use for future games? Either way, this game is _extremely_ rare :-)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP, @ U10)
+        NEC DX-102 (52 Pin PQFP x2, @ U28 & U45)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz
+ Other: 8 Position Dipswitch x 2
+        GAL 16V8 at U38
 
-PCB Layout
-----------
+Memory:
+M1 are HM628128LFP-10L at U42 & U43
+M2 is  W2465K-70LL at U27
+M3 are LH5168D-10L at U8 & U9
+M4 are CXK58257AM-10L at U6, U7, U13 & U14
 
-P-FG01-1
-------------------------------------------------------
-|        X1-010 6264          U32 CXK581000          |
-|                                 CXK581000      U16 |
-|                                                    |
-|                                                U20 |
-|    U3 U5 U2 U4 62256 CXK58257                      |
-|                62256 CXK58257                  U15 |
-|                                                    |
-|J                                               U19 |
-|A    TMP68301AF-16                                  |
-|M                                               U18 |
-|M                           NEC                     |
-|A          NEC              DX-101              U22 |
-|           DX-102                                   |
-|                                                U17 |
-|                   PAL   50MHz                      |
-|                                                U21 |
-|           DSW1(8)                                  |
-|           DSW2(8)                   CXK58257 NEC   |
-|                                     CXK58257 DX-102|
-------------------------------------------------------
+PCB Number: P-FG01-1
++-----------------------------------------------------------+
+|             +------+      U  U             CN4*           |
+| VOL         |Seta  |   M  5  5            +--------------+|
+|             |X1-010|   2  8  7    +-+  M  |      U16     ||
+|             +------+      *  *    | |  1  +--------------+|
++-+                                 |U|     +--------------+|
+  |  +-++-++-++-+                   |3|     |      U20     ||
++-+  | || || || |      M            |2|  M  +--------------+|
+|    |U||U||U||U| M M  4            | |  1  +--------------+|
+|J   |3||5||2||4| 3 3               +-+     |      U15     ||
+|A   | || || || |      M                    +--------------+|
+|M   +-++-++-++-+      4                    +--------------+|
+|M                                          |      U19     ||
+|A                                          +--------------+|
+|                                           +--------------+|
+|C                                          |      U18     ||
+|o                           +----------+   +--------------+|
+|n          +-------+        |          |   +--------------+|
+|n          |Toshiba|        |   NEC    |   |      U22     ||
+|e          |  TMP  |        |  DX-101  |   +--------------+|
+|c          | 68301 |        |          |   +--------------+|
+|t        U +-------+        |          |   |      U17     ||
+|e        5                  +----------+   +--------------+|
+|r        6                                 +--------------+|
+|         *                                 |      U21     ||
++-+            +---+       U                +--------------+|
+  |            |DX |       3  50MHz 32MHz*                  |
+  |            |102|       8                                |
++-+            +---+                    M  M   +---+        |
+|       SW1*   D D                      4  4   |DX |        |
+|              S S                             |102|        |
+|              W W                             +---+        |
+|              2 1                                          |
++-----------------------------------------------------------+
+
+U56 is unpopulated 93C45 EEPROM
+SW1 is unpopulated Reset push button
+CN4 - 96 pin connector (3 rows by 32 pins)
+* Denotes not populated.
 
 Notes:
       HSync: 15.23kHz
       VSync: 58.5Hz
 
+NOTE:  There is known to exist an undumped version of Guardians on the
+       P-FG01-1 PCB half as many but larger ROMs.
+
+  The following sockets have double size ROMS:
+   U4 & U5 - program ROMs
+   U15, U16, U17 & U18 - graphics ROMS
+  The following sockets are unpopulated:
+   U2 & U3 - program ROMs
+   U19, U20, U21 & U22 - graphics ROMS
+**********************************************************
+
+There is known to exist an undumped version of Guardians on the
+ P0-113A PCB with P1-106-1 & P1-107-1 duaghtercards
+
+ It's assumed the programs roms (at least) are different to cope
+ with the different hardware configuration.
+
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: Allumer X1-020 (208 Pin PQFP)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz, 32.530MHz
+ Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
+        93C46 EEPROM
+
+Memory:
+M1 are TC551001BFL-70L at U56 & U57
+M2 is  CY7C185-25PC at U27
+M3 are N341256P-20
+
+PCB Number: P0-113A  BP49KA
++---------------------------------------------------------------+
+|             +------+            +---+                         |
+| VOL         |Seta  |          M |   |        +---------------+|
+|             |X1-010|          2 | U |     M  |KA2-001-014 U19||
+|             +------+            | 2 |     1  +---------------+|
++-+                               | 8 |        +---------------+|
+  |  +-++-+   +-++-+              |   |        |KA2-001-013 U17||
++-+  | || |   | || |              +---+     M  +---------------+|
+|    |U||U| M |U||U| M                      1  +---------------+|
+|J   |3||5| 3 |2||4| 3                         |      U15      ||
+|A   | || |   | || |                           +---------------+|
+|M   +-++-+   +-++-+                           +---------------+|
+|M                                             |KA2-001-011 U20||
+|A                              +----------+   +---------------+|
+|                               |          |   +---------------+|
+|C                              | ALLUMER  |   |KA2-001-010 U18||
+|o     +---+                    | X1-020   |   +---------------+|
+|n     |   |  +-------+         |          |   +---------------+|
+|n     | U |  |Toshiba|         | 9426HK003|   |       U16*    ||
+|e C   | 7 |  |  TMP  |         +----------+   +---------------+|
+|c N   | 7 |  | 68301 |                        +---------------+|
+|t 2   |   |  +-------+                        |KA2-001-008 U23||
+|e     +---+                                   +---------------+|
+|r          93C46                              +---------------+|
+|                                              |KA2-001-007 U22||
++-+                           50MHz 32.530MHz  +---------------+|
+  |                                            +---------------+|
+  |                    P P                     |      U21*     ||
++-+  C                 A A       M M           +---------------+|
+|    N    DSW1         L L       3 3                            |
+|    1    DSW2 SW1                                              |
++---------------------------------------------------------------+
+
+U2 is KA2 001 001 EPROM
+U4 is KA2 001 002 EPROM
+U5 is KA2 001 003 EPROM
+U3 is KA2 001 004 EPROM
+U28 is KA2-001-015 mask ROM (silkscreened SOUND ROM)
+U15 is socketted to receive P1-106-1 daughtercard
+U77 is socketted to receive P1-107-1 daughtercard
+CN2 - 5 Pin header
+CN1 - 10 Pin header
+* Denotes not populated.
+
+The daughtercards below are NOT to scale with the above main board.
+
+P1-107-1  (additional RAM)
++-------------------------------+
+| LOGIC              JP5 JP6 JP7|
+| CXK58257AM-10L CXK58257AM-10L |
+|   +-----------------------+   |
+|   |U7 42 pin header to U77|   |
+|   +-----------------------+   |
++-------------------------------+
+
+Unknown LOGIC chip
+JP5 - JP7 single wire connections for power
+
+
+P1-106-1
++-------------------------------+
+|  HD74HC373P       HD74HC373P  |
+|   +-----------------------+   |
+|   |U3 42 pin header to U15|   |
+|   +-----------------------+   |
+|   +-----------------------+   |
+|   |    KA2-001-017  U2    |   |
+|   +-----------------------+   |
+|   +-----------------------+   |
+|   |    KA2-001-016  U1    |   |
+|   +-----------------------+   |
+|JP1 JP2 JP3 JP4          LOGIC |
++-------------------------------+
+
+Unknown LOGIC chip
+JP1 - JP4 single wire connections for power
+
 ***************************************************************************/
 
-ROM_START( grdians )
+ROM_START( grdians ) /* P-FG01-1 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "u2.bin", 0x000000, 0x080000, CRC(36adc6f2) SHA1(544e87f88179fe1342e7a06a8948ac1828e85108) )
 	ROM_LOAD16_BYTE( "u3.bin", 0x000001, 0x080000, CRC(2704f416) SHA1(9081a12cbb9927d36e1c50b52aa2c6003810ee42) )
@@ -3127,9 +3325,8 @@ ROM_START( grdians )
 	ROM_LOAD( "u21.bin",  0x1e00000, 0x200000, CRC(6f95e466) SHA1(28482fad16a3ac9302f152d81552e6f84a44f3e4) )
 	ROM_CONTINUE(         0x1c00000, 0x200000 )
 
-	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "u32.bin", 0x100000, 0x100000, CRC(cf0f3017) SHA1(8376d3a674f71aec72f52c72758fbc53d9feb1a1) )
+	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "u32.bin", 0x000000, 0x100000, CRC(cf0f3017) SHA1(8376d3a674f71aec72f52c72758fbc53d9feb1a1) )
 ROM_END
 
 /***************************************************************************
@@ -3139,57 +3336,84 @@ Banpresto, 1994
 
 This game runs on Seta/Allumer hardware
 
-PCB Layout
-----------
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: Allumer X1-020 (208 Pin PQFP)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz, 32.530MHz
+ Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
+        93C46 EEPROM
 
-P0-113A   BP949KA
-|----------------------------------|
-|  X1-010  6264  U28               |
-|                     581001   U19 |
-|     U3  U5  U2  U4  581001   U17 |
-|      62256   62256           U15 |
-|J                             U20 |
-|A    U77  68301               U18 |
-|M                     *       U16 |
-|M    93C46                    U23 |
-|A                             U22 |
-|                              U21 |
-|  DSW1            50MHz           |
-|  DSW2       PAL  32.5304MHz      |
-|       20MHz PAL                  |
-|----------------------------------|
+Memory:
+M1 are TC551001BFL-70L at U56 & U57
+M2 is  CY7C185-25PC at U27
+M3 are N341256P-20
 
-Notes:
-      *: unknown QFP208 (has large heatsink on it). Should be similar to other known
-         graphics chips used on Seta hardware of this era.
-      68301 clock: 16.000MHz (?? From what OSC + divider??)
+PCB Number: P0-113A  BP49KA
++--------------------------------------------------------------+
+|             +------+            +---+                        |
+| VOL         |Seta  |          M |   |        +--------------+|
+|             |X1-010|          2 | U |     M  |KA-001-014 U19||
+|             +------+            | 2 |     1  +--------------+|
++-+                               | 8 |        +--------------+|
+  |  +-++-+   +-++-+              |   |        |KA-001-013 U17||
++-+  | || |   | || |              +---+     M  +--------------+|
+|    |U||U| M |U||U| M                      1  +--------------+|
+|J   |3||5| 3 |2||4| 3                         |KA-001-012 U15||
+|A   | || |   | || |                           +--------------+|
+|M   +-++-+   +-++-+                           +--------------+|
+|M                                             |KA-001-011 U20||
+|A                              +----------+   +--------------+|
+|                               |          |   +--------------+|
+|C                              | ALLUMER  |   |KA-001-010 U18||
+|o     +---+                    | X1-020   |   +--------------+|
+|n     |   |  +-------+         |          |   +--------------+|
+|n     | U |  |Toshiba|         | 9426HK003|   |KA-001-009 U16||
+|e C   | 7 |  |  TMP  |         +----------+   +--------------+|
+|c N   | 7 |  | 68301 |                        +--------------+|
+|t 2   |   |  +-------+                        |KA-001-008 U23||
+|e     +---+                                   +--------------+|
+|r          93C46                              +--------------+|
+|                                              |KA-001-007 U22||
++-+                           50MHz 32.530MHz  +--------------+|
+  |                                            +--------------+|
+  |                    P P                     |KA-001-006 U21||
++-+  C                 A A       M M           +--------------+|
+|    N    DSW1         L L       3 3                           |
+|    1    DSW2 SW1                                             |
++--------------------------------------------------------------+
+
+U28 is KA-001-015 mask ROM (silkscreened SOUND ROM)
+U77 is KA-001-005 mask ROM
+CN2 - 5 Pin header
+CN1 - 10 Pin header
+
       VSync: 60Hz
 
 ***************************************************************************/
 
 ROM_START( gundamex )
 	ROM_REGION( 0x600000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE(      "ka002002.u2",  0x000000, 0x080000, CRC(e850f6d8) SHA1(026325e305676b1f8d3d9e7573920f8b70d7bccb) )
-	ROM_LOAD16_BYTE(      "ka002004.u3",  0x000001, 0x080000, CRC(c0fb1208) SHA1(84b25e4c73cb8e023ee5dbf69f588be98700b43f) )
-	ROM_LOAD16_BYTE(      "ka002001.u4",  0x100000, 0x080000, CRC(553ebe6b) SHA1(7fb8a159513d31a1d60520ff14e4c4d133fd3e19) )
-	ROM_LOAD16_BYTE(      "ka002003.u5",  0x100001, 0x080000, CRC(946185aa) SHA1(524911c4c510d6c3e17a7ab42c7077c2fffbf06b) )
-	ROM_LOAD16_WORD_SWAP( "ka001005.u77", 0x500000, 0x080000, CRC(f01d3d00) SHA1(ff12834e99a76261d619f10d186f4b329fb9cb7a) )
+	ROM_LOAD16_BYTE(      "ka_002_002.u2",  0x000000, 0x080000, CRC(e850f6d8) SHA1(026325e305676b1f8d3d9e7573920f8b70d7bccb) )
+	ROM_LOAD16_BYTE(      "ka_002_004.u3",  0x000001, 0x080000, CRC(c0fb1208) SHA1(84b25e4c73cb8e023ee5dbf69f588be98700b43f) )
+	ROM_LOAD16_BYTE(      "ka_002_001.u4",  0x100000, 0x080000, CRC(553ebe6b) SHA1(7fb8a159513d31a1d60520ff14e4c4d133fd3e19) )
+	ROM_LOAD16_BYTE(      "ka_002_003.u5",  0x100001, 0x080000, CRC(946185aa) SHA1(524911c4c510d6c3e17a7ab42c7077c2fffbf06b) )
+	ROM_LOAD16_WORD_SWAP( "ka-001-005.u77", 0x500000, 0x080000, CRC(f01d3d00) SHA1(ff12834e99a76261d619f10d186f4b329fb9cb7a) )
 
 	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE)  // Sprites
-	ROM_LOAD( "ka001009.u16",  0x0000000, 0x200000, CRC(997d8d93) SHA1(4cb4cdb7e8208af4b14483610d9d6aa5e13acd89) )
-	ROM_LOAD( "ka001010.u18",  0x0200000, 0x200000, CRC(811b67ca) SHA1(c8cfae6f54c76d63bd625ff011c872ffb75fd2e2) )
-	ROM_LOAD( "ka001011.u20",  0x0400000, 0x200000, CRC(08a72700) SHA1(fb8003aa02dd249c30a757cb43b516260b41c1bf) )
-	ROM_LOAD( "ka001012.u15",  0x0800000, 0x200000, CRC(b789e4a8) SHA1(400b773f24d677a9d47466fdbbe68cb6efc1ad37) )
-	ROM_LOAD( "ka001013.u17",  0x0a00000, 0x200000, CRC(d8a0201f) SHA1(fe8a2407c872adde8aec8e9340b00be4f00a2872) )
-	ROM_LOAD( "ka001014.u19",  0x0c00000, 0x200000, CRC(7635e026) SHA1(116a3daab14a17faca85c4a956b356aaf0fc2276) )
-	ROM_LOAD( "ka001006.u21",  0x1000000, 0x200000, CRC(6aac2f2f) SHA1(fac5478ca2941a93c57f670a058ff626e537bcde) )
-	ROM_LOAD( "ka001007.u22",  0x1200000, 0x200000, CRC(588f9d63) SHA1(ed5148d09d02e3bc12c50c39c5c86e6356b2dd7a) )
-	ROM_LOAD( "ka001008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
+	ROM_LOAD( "ka-001-009.u16",  0x0000000, 0x200000, CRC(997d8d93) SHA1(4cb4cdb7e8208af4b14483610d9d6aa5e13acd89) )
+	ROM_LOAD( "ka-001-010.u18",  0x0200000, 0x200000, CRC(811b67ca) SHA1(c8cfae6f54c76d63bd625ff011c872ffb75fd2e2) )
+	ROM_LOAD( "ka-001-011.u20",  0x0400000, 0x200000, CRC(08a72700) SHA1(fb8003aa02dd249c30a757cb43b516260b41c1bf) )
+	ROM_LOAD( "ka-001-012.u15",  0x0800000, 0x200000, CRC(b789e4a8) SHA1(400b773f24d677a9d47466fdbbe68cb6efc1ad37) )
+	ROM_LOAD( "ka-001-013.u17",  0x0a00000, 0x200000, CRC(d8a0201f) SHA1(fe8a2407c872adde8aec8e9340b00be4f00a2872) )
+	ROM_LOAD( "ka-001-014.u19",  0x0c00000, 0x200000, CRC(7635e026) SHA1(116a3daab14a17faca85c4a956b356aaf0fc2276) )
+	ROM_LOAD( "ka-001-006.u21",  0x1000000, 0x200000, CRC(6aac2f2f) SHA1(fac5478ca2941a93c57f670a058ff626e537bcde) )
+	ROM_LOAD( "ka-001-007.u22",  0x1200000, 0x200000, CRC(588f9d63) SHA1(ed5148d09d02e3bc12c50c39c5c86e6356b2dd7a) )
+	ROM_LOAD( "ka-001-008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
 	ROM_FILL(                  0x1800000, 0x600000, 0x00 ) // 6bpp instead of 8bpp
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "ka001015.u28", 0x100000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "ka-001-015.u28", 0x000000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom.bin", 0x0000, 0x0080, CRC(80f8e248) SHA1(1a9787811e56d95f7acbedfb00225b6e7df265eb) )
@@ -3226,9 +3450,8 @@ ROM_START( mj4simai )
 	ROM_LOAD( "cha-02.u22",  0x1400000, 0x400000, CRC(f6346860) SHA1(4eebd3fa315b97964fa39b88224f9de7622ba881) )
 	ROM_FILL(                0x1800000, 0x800000, 0x00 )   // 6bpp instead of 8bpp
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "cha-07.u32",  0x100000, 0x400000, CRC(817519ee) SHA1(ed09740cdbf61a328f7b50eb569cf498fb749416) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "cha-07.u32",  0x000000, 0x400000, CRC(817519ee) SHA1(ed09740cdbf61a328f7b50eb569cf498fb749416) )
 ROM_END
 
 /***************************************************************************
@@ -3236,13 +3459,70 @@ ROM_END
 Kosodate Quiz My Angel (JPN Ver.)
 (c)1996 Namco
 
-Board:  KE (Namco) ; P0-125A (Seta)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP, @ U10)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz
+ Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
+        GAL 16V8 at U38
 
-CPU:    TMP68301 (68000 core)
-OSC:    50.0000MHz
-        32.5304MHz
+Memory:
+M1 are HM628128LFP-10L at U42 & U43
+M2 is  W2465K-70LL at U27
+M3 are LH5168D-10L at U8 & U9 (unpopulated)
+M4 are CXK58257AM-10L at U6, U7, U13 & U14
 
-Sound:  X1-010
+PCB Number:  namco KE / P0-125A
++-----------------------------------------------------------+
+|             +------+      U  U             CN4*           |
+| VOL         |Seta  |   M  5  5            +--------------+|
+|             |X1-010|   2  8  7    +-+  M  | KQ1 CG0  U16 ||
+|             +------+      *  *    | |  1  +--------------+|
++-+                                 |U|     +--------------+|
+  |  +-++-++-++-+            BT1*   |3|     | KQ1 CG2  U20 ||
++-+  | || || || |      M            |2|  M  +--------------+|
+|    |U||U||U||U| M M  4            | |  1  +--------------+|
+|J   |3||5||2||4| 3 3               +-+     | KQ1 CG1  U15 ||
+|A   | || || || | * *  M                    +--------------+|
+|M   +-++-++-++-+      4                    +--------------+|
+|M  C                                       | KQ1 CG3  U19 ||
+|A  N                                       +--------------+|
+|   1                                       +--------------+|
+|C  *                                       | KQ1 CG4  U18 ||
+|o                           +----------+   +--------------+|
+|n  C       +-------+        |          |   +--------------+|
+|n  N       |Toshiba|        |   NEC    |   | KQ1 CG6  U22 ||
+|e  2       |  TMP  |        |  DX-101  |   +--------------+|
+|c  *       | 68301 |        |          |   +--------------+|
+|t        U +-------+        |          |   | KQ1 CG5  U17 ||
+|e  C     5                  +----------+   +--------------+|
+|r  N     6                                 +--------------+|
+|   3     *                                 | KQ1 CG7  U21 ||
++-+ * +---+    +---+       U                +--------------+|
+  |   |DX |  S |DX |       3  50MHz 32MHz*                  |
+  |   |102|  W |102|       8                                |
++-+   +---+  1 +---+                    M  M   +---+        |
+|              D D                      4  4   |DX |        |
+|              S S                             |102|        |
+|              W W                             +---+        |
+|              2 1                                          |
++-----------------------------------------------------------+
+
+U2 is KQ1 PRG E EPROM
+U3 is KQ1 PRG O EPROM
+U4 is KQ1 TBL E EPROM
+U5 is KQ1 TBL O EPROM
+U32 is KG SND mask ROM (silkscreened SOUND ROM)
+
+CN1 unpopulated 7 pin header
+CN2 unpopulated 5 pin header
+CN3 unpopulated 10 pin header
+BT1 is unpopulated battery
+U56 is unpopulated 93C45 EEPROM
+CN4 - 96 pin connector (3 rows by 32 pins)
+* Denotes not populated.
 
 ***************************************************************************/
 
@@ -3263,9 +3543,8 @@ ROM_START( myangel )
 	ROM_LOAD( "kq1-cg7.u21", 0xc00000, 0x200000, CRC(9f48382c) SHA1(80dfc33a55123b5d3cdb3ed97b43a527f0254d61) )
 	ROM_LOAD( "kq1-cg5.u17", 0xe00000, 0x200000, CRC(a4bc4516) SHA1(0eb11fa54d16bba1b96f9dd943a68949a3bb9a2f) )
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "kq1-snd.u32", 0x100000, 0x200000, CRC(8ca1b449) SHA1(f54096fb5400843af4879135c96760485b6cb319) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kq1-snd.u32", 0x000000, 0x200000, CRC(8ca1b449) SHA1(f54096fb5400843af4879135c96760485b6cb319) )
 ROM_END
 
 /***************************************************************************
@@ -3300,9 +3579,8 @@ ROM_START( myangel2 )
 	ROM_LOAD( "kqs1-cg7.u21", 0x1200000, 0x200000, CRC(2c977904) SHA1(2589447f2471cdc414266b34aff552044c680d93) )
 	ROM_LOAD( "kqs1-cg3.u17", 0x1400000, 0x400000, CRC(de3b2191) SHA1(d7d6ea07b665cfd834747d3c0776b968ce03bc6a) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "kqs1-snd.u32", 0x100000, 0x400000, CRC(792a6b49) SHA1(341b4e8f248b5032217733bada32e353c67e3888) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kqs1-snd.u32", 0x000000, 0x400000, CRC(792a6b49) SHA1(341b4e8f248b5032217733bada32e353c67e3888) )
 ROM_END
 
 /***************************************************************************
@@ -3349,6 +3627,7 @@ ROM_END
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
    OSC: 50MHz & 32.53047MHz
  Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
         Lattice ispLSI2032 - stamped "KUDEC"
 
 PCB Number: P0-142A
@@ -3422,14 +3701,13 @@ ROM_START( pzlbowl )
 	ROM_LOAD( "kuc-u40.i00", 0x800000, 0x400000, CRC(7e49a2cf) SHA1(d24683addbc54515c33fb620ac500e6702bd9e17) )
 	ROM_LOAD( "kuc-u41.i00", 0xc00000, 0x400000, CRC(2febf19b) SHA1(8081ac590c0463529777b5e4817305a1a6f6ea41) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "kus-u18.i00", 0x100000, 0x400000, CRC(e2b1dfcf) SHA1(fb0b8be119531a1a27efa46ed7b86b05a37ed585) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kus-u18.i00", 0x000000, 0x400000, CRC(e2b1dfcf) SHA1(fb0b8be119531a1a27efa46ed7b86b05a37ed585) )
 ROM_END
 
 /***************************************************************************
 
-Penguin Brothers / A-Blast
+Penguin Brothers / 轟天雷 (A-Blast)
 (c)2000 Subsino
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
@@ -3438,6 +3716,7 @@ Penguin Brothers / A-Blast
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
    OSC: 50MHz, 32.53047MHz & 28MHz
  Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
         Lattice ispLSI2032
 
 PCB Number: P0-142A
@@ -3483,8 +3762,9 @@ Notes:  pzlbowl PCB with these extra parts:
         2x 62256 SRAM
         74HC00
 
-U50*  Unpopulated 93LC46BX EEPROM
-BAT1* Unpopulated CR2032 3Volt battery
+U50  Unpopulated 93LC46BX EEPROM
+BAT1 Unpopulated CR2032 3 Volt battery
+* Denotes not populated.
 
 Ram M1 are NEC D43001GU-70LL
 Ram M2 are LGS GM76C8128ALLFW70
@@ -3508,9 +3788,8 @@ ROM_START( penbros ) // Genuine P0-142A PCB & original ROM labels
 	ROM_LOAD( "a-blast_jpn_u40.u40", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
 	ROM_FILL(                        0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "a-blast_jpn_u18.u18", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "a-blast_jpn_u18.u18", 0x000000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
 ROM_START( ablast ) // Genuine P0-142A PCB & original ROM labels
@@ -3524,9 +3803,8 @@ ROM_START( ablast ) // Genuine P0-142A PCB & original ROM labels
 	ROM_LOAD( "a-blast_twn_u40.u40", 0x800000, 0x400000, CRC(db94847d) SHA1(fd2e29a45bb0acbd9e709256c7fc27bdd64a6634) )
 	ROM_FILL(                        0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "a-blast_twn_u18.u18", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "a-blast_twn_u18.u18", 0x000000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
 ROM_START( ablastb ) // bootleg PCB with standard 68000 instead of TMP68301 and 4 FPGAs (3 A40MX04 and 1 A54SX16A)
@@ -3540,7 +3818,7 @@ ROM_START( ablastb ) // bootleg PCB with standard 68000 instead of TMP68301 and 
 	ROM_FILL(          0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples. ROM content matches the penbros' one, but there's no proper X1-010 on the PCB. Possibly one of the FPGAs acts as a substitute?
-	ROM_LOAD( "29F1610.bin", 0x000000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
+	ROM_LOAD( "29f1610.bin", 0x000000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
 /***************************************************************************
@@ -3549,11 +3827,11 @@ Reel'N Quake!
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: NEC DX-101 (240 Pin PQFP, @ U10)
-        NEC DX-102 (52 Pin PQFP x3, @ U28 U30 & U45)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
-        Push Button SW1
+        Reset Push Button at SW1
         3.6V Battery at BT1
         GAL 16V8 - labeled "KF-001" at U38
 
@@ -3590,9 +3868,9 @@ PCB Number: P-FG-02
 |r N      6                                                 |
 |  3      *                                        U21*     |
 +-+   +---+    +---+       U  50MHz 32MHz*                  |
-  |   |DX | S  |DX |       3                                |
-  |   |102| W  |102|       8                   +---+   28MHz|
-+-+   +---+ 1  +---+                    M  M   |DX |        |
+  |   |DX |  S |DX |       3                                |
+  |   |102|  W |102|       8                   +---+   28MHz|
++-+   +---+  1 +---+                    M  M   |DX |        |
 |              D D                      4  4   |102|        |
 |              S S                             +---+        |
 |              W W                                          |
@@ -3604,7 +3882,8 @@ CN2-1 - 3 Pin connector
 CN2-2 - 3 Pin connector
 CN3   - 10 Pin connector (used for extra buttons)
 
-* Denotes not populated. U56 is unpopulated 93C45 EEPROM
+U56 is unpopulated 93C45 EEPROM
+* Denotes not populated.
 
     U3-U5 silkscreened 27C4001
   U57-U58 silkscreened 23C8001E
@@ -3643,9 +3922,8 @@ ROM_START( reelquak )
 	ROM_LOAD( "kf-001-007_t44.u18", 0x400000, 0x200000, CRC(9daec83d) SHA1(07de144898deac5058d05466f29682d7840323b7) )
 	ROM_LOAD( "kf-001-008_t45.u17", 0x600000, 0x200000, CRC(f6ef6e41) SHA1(c3e838dd4dc340f44abdf45ec0b90de24f50dda9) )
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "kf-001-009_t46.u32", 0x100000, 0x200000, CRC(2a9641f9) SHA1(efb9df78f1877eddf29c4dae2461546adb9cea8f) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kf-001-009_t46.u32", 0x000000, 0x200000, CRC(2a9641f9) SHA1(efb9df78f1877eddf29c4dae2461546adb9cea8f) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
@@ -3658,11 +3936,11 @@ Endless Riches
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: NEC DX-101 (240 Pin PQFP, @ U10)
-        NEC DX-102 (52 Pin PQFP x3, @ U28 U30 & U45)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
-        Push Button SW1
+        Reset Push Button at SW1
         3.6V Battery at BT1
         GAL 16V8 - labeled "KF-001" at U38
 
@@ -3698,27 +3976,29 @@ PCB Number: P-FG-03
 |e C      5                  +----------+   +---------------+|
 |c N      6                                                  |
 |t 2      *                                        U21*      |
-|e  +---+    +---+       U  50MHz 28MHz                      |
-|r    |DX | S  |DX |       3                                 |
-|     |102| W  |102|       8                   +---+    OSC2*|
-|     +---+ 1  +---+                    M  M   |DX |         |
+|e    +---+    +---+       U  50MHz 28MHz                    |
+|r    |DX |  S |DX |       3                                 |
+|     |102|  W |102|       8                   +---+    OSC2*|
+|     +---+  1 +---+                    M  M   |DX |         |
 +-+            D D                      4  4   |102|         |
   |            S S                             +---+         |
 +-+            W W                                           |
 |              2 1                                           |
 +------------------------------------------------------------+
 
-CN1   - 7 Pin connector
-CN2   - 8 Pin connector
+CN1 - 7 Pin connector
+CN2 - 8 Pin connector
 
+U56 is unpopulated 93C45 EEPROM
+DSW2 is unpopulated
 * Denotes not populated.
-  U56 is unpopulated 93C45 EEPROM
-  DSW2 is unpopulated
 
     U3-U5 silkscreened 27C4001
   U57-U58 silkscreened 23C8001E
   U15-U22 silkscreened 23C32000
       U32 silkscreened 23C32000
+
+KFP is Program, KFC is Character Graphics and KFS is Sound
 
 Note:
   8-Liner version of P-FG-02 (see Reel'N Quake! above)
@@ -3738,9 +4018,8 @@ ROM_START( endrichs )
 	ROM_LOAD( "kfc-u18-c00.u18", 0x400000, 0x200000, CRC(561ac136) SHA1(96da493157405a5d3d72b8cc3004abd3fa3eadfa) )
 	ROM_LOAD( "kfc-u17-c00.u17", 0x600000, 0x200000, CRC(34660029) SHA1(cf09b97422497d739f71e6ff8b9974fca0329928) )
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "kfs-u32-c00.u32", 0x100000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) ) // Yes, it's actually "KFS" here
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
@@ -3789,9 +4068,8 @@ ROM_START( staraudi )
 	ROM_REGION( 0x200000, "flash", ROMREGION_ERASE )
 	ROM_LOAD( "lh28f016sat_flash.u08", 0x000000, 0x200000, CRC(002255bd) SHA1(5e94c29e9a785fe49229f57bc94234ac79dd2f3b) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "su1_snd.u32", 0x100000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "su1_snd.u32", 0x000000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
 ROM_END
 
 void staraudi_state::driver_start()
@@ -3799,7 +4077,7 @@ void staraudi_state::driver_start()
 	seta2_state::driver_start();
 
 	// bad sound rom: replace the missing (zero) sample with the previous one
-	uint8_t *samples = memregion("x1snd")->base() + 0x100000;
+	uint8_t *samples = memregion("x1snd")->base();
 	for (int i = 0; i < 0x400000; i += 2)
 		samples[i + 1] = samples[i];
 }
@@ -3817,17 +4095,6 @@ PCB B0-010A:
    Trophy Hunting - Bear & Moose (c) 2002 Sammy USA
 
 
-   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
- Video: NEC DX-101 (240 Pin PQFP)
-        NEC DX-102 (52 Pin PQFP x3)
- Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
-EEPROM: 93LC46BX (1K Low-power 64 x 16-bit organization serial EEPROM)
-   OSC: 50MHz & 28MHz
- Other: 8 Position Dipswitch x 2
-        Lattice ispLSI2032 - stamped "KW001"
-        Lattice isp1016E - stamped "GUN" (2 for PCB B0-010A, used for light gun input)
-        BAT1 - CR2032 3Volt
-
 PCB Number: B0-003A (or B0-003B)
 +-----------------------------------------------------------+
 |             VOL                          +------+         |
@@ -3835,8 +4102,8 @@ PCB Number: B0-003A (or B0-003B)
 |   +---+ +---+                            |M60016|         |
 |   |   | |   |  M    M                    |CALRUA|  +---+  |
 +-+ | U | | U |  2    1                    +------+  |   |  |
-  | | 0 | | 0 |                                      |   |  |
-+-+ | 7 | | 6 |  M    M                              | U |  |
+  | | 0 | | 0 |                   D4992              |   |  |
++-+ | 7 | | 6 |  M    M         32.768kHz            | U |  |
 |   |   | |   |  2    1                              | 1 |  |
 |   +---+ +---+                                      | 8 |  |
 |                                          Lattice   |   |  |
@@ -3848,22 +4115,22 @@ PCB Number: B0-003A (or B0-003B)
 |            N  Lattice         +-------+  2              2 |
 |C           6  isp1016E                                    |
 |o                              +----------+    50MHz       |
-|n    +---+                     |          |                |
-|n    |DX |  SW1                |   NEC    |    M   M       |
-|e    |102|                     |  DX-101  |    3   3       |
-|c    +---+         M  M        |          |                |
-|t                  1  1        |          |                |
-|e                              +----------+                |
-|r                                                          |
-|                             +---+      +---++---++---+    |
-|                  28MHz      |   |      |   ||   ||   |    |
-|     +---+                   |   |      |   ||   ||   |    |
-+-+   |DX |                   | U |      | U || U || U |    |
-  |   |102|                   | 4 |      | 4 || 3 || 3 |    |
-+-+   +---+                   | 0 |      | 1 || 8 || 9 |    |
-|                             |   |      |   ||   ||   |    |
-|                             |   |      |   ||   ||   |    |
-|                             +---+      +---++---++---+    |
+|n    +---+                     |          |              +-+
+|n    |DX |  SW1                |   NEC    |    M   M     | |
+|e    |102|                     |  DX-101  |    3   3     | |
+|c    +---+         M  M        |          |              | |
+|t                  1  1        |          |              | |
+|e                              +----------+              | |
+|r                                                        |C|
+|                             +---+      +---++---++---+  |N|
+|                  28MHz      |   |      |   ||   ||   |  |3|
+|     +---+                   |   |      |   ||   ||   |  | |
++-+   |DX |                   | U |      | U || U || U |  | |
+  |   |102|                   | 4 |      | 4 || 3 || 3 |  | |
++-+   +---+                   | 0 |      | 1 || 8 || 9 |  | |
+| C                           |   |      |   ||   ||   |  | |
+| N                           |   |      |   ||   ||   |  +-+
+| 1                           +---+      +---++---++---+    |
 +-----------------------------------------------------------+
 
 PCB Number: B0-010A - This PCB is slightly revised for 2 player play
@@ -3873,8 +4140,8 @@ PCB Number: B0-010A - This PCB is slightly revised for 2 player play
 |   +---+ +---+                            |M60016|         |
 |   |   | |   |  M    M                    |CALRUA|  +---+  |
 +-+ | U | | U |  2    1                    +------+  |   |  |
-  | | 0 | | 0 |                                      |   |  |
-+-+ | 7 | | 6 |  M    M                              | U |  |
+  | | 0 | | 0 |                   D4992              |   |  |
++-+ | 7 | | 6 |  M    M         32.768kHz            | U |  |
 |   |   | |   |  2    1                              | 1 |  |
 |   +---+ +---+                                      | 8 |  |
 |                                          Lattice   |   |  |
@@ -3886,23 +4153,36 @@ PCB Number: B0-010A - This PCB is slightly revised for 2 player play
 |            N  Lattice         +-------+  2              2 |
 |C           6  isp1016E                                    |
 |o                              +----------+    50MHz       |
-|n    +---+                     |          |                |
-|n    |DX |  SW1                |   NEC    |    M   M       |
-|e    |102|                     |  DX-101  |    3   3       |
-|c    +---+         M  M        |          |                |
-|t                  1  1        |          |                |
-|e                              +----------+                |
-|r                                                          |
-|                             +---+      +---++---++---+    |
-|                  28MHz      |   |      |   ||   ||   |    |
-|     +---+              C    |   |      |   ||   ||   |    |
-+-+   |DX |              N    | U |      | U || U || U |    |
-  |   |102|              7    | 4 |      | 4 || 3 || 3 |    |
-+-+   +---+                   | 0 |      | 1 || 8 || 9 |    |
-|             Lattice    C    |   |      |   ||   ||   |    |
-|             isp1016E   N    |   |      |   ||   ||   |    |
-|                        8    +---+      +---++---++---+    |
+|n    +---+                     |          |              +-+
+|n    |DX |  SW1                |   NEC    |    M   M     | |
+|e    |102|                     |  DX-101  |    3   3     | |
+|c    +---+         M  M        |          |              | |
+|t                  1  1        |          |              | |
+|e                              +----------+              | |
+|r                                                        |C|
+|                             +---+      +---++---++---+  |N|
+|                  28MHz      |   |      |   ||   ||   |  |3|
+|     +---+              C    |   |      |   ||   ||   |  | |
++-+   |DX |              N    | U |      | U || U || U |  | |
+  |   |102|              7    | 4 |      | 4 || 3 || 3 |  | |
++-+   +---+                   | 0 |      | 1 || 8 || 9 |  | |
+| C           Lattice    C    |   |      |   ||   ||   |  | |
+| N           isp1016E   N    |   |      |   ||   ||   |  +-+
+| 1                      8    +---+      +---++---++---+    |
 +-----------------------------------------------------------+
+
+
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP)
+        NEC DX-102 (52 Pin PQFP x3)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
+EEPROM: 93LC46BX (1K Low-power 64 x 16-bit organization serial EEPROM)
+   OSC: 50MHz, 28MHz & 32.768kHz
+ Other: 8 Position Dipswitch x 2
+        Lattice ispLSI2032 - stamped "KW001"
+        Lattice isp1016E - stamped "GUN" (2 for PCB B0-010A, used for light gun input)
+        NEC D4992 CMOS 8-Bit Parallel I/O Calendar Clock
+        BAT1 - CR2032 3Volt
 
 Ram M1 are Toshiba TC55257DFL-70L
 Ram M2 are NEC D43001GU-70L
@@ -3914,6 +4194,111 @@ U07 Program rom ST27C801 (odd)
 U18 Mask rom (Samples 23C32000 32Mbit (read as 27C322))
 
 U38 - U40 Mask roms (Graphics 23c64020 64Mbit) - 23C64020 read as 27C322 with pin11 +5v & 27C322 with pin11 GND
+
+Connectors:
+  CN1 - Unpopulated 8 pin header
+  CN2 - 8 Pin header - use unknown
+  CN3 - Unpopulated 3 row, 96 pin header
+  CN5 + CN6 labeled GUN:
+   CN6-4 Pin (1-4)          CN5-4 Pin (7-10, standard HAPP light gun pinout)
+    1 No Connection          7 Red    +5VDC
+    2 Green  Pump Switch     8 White  Trigger Switch
+    3 Brown  Pump Switch     9 Black  Ground
+    4 No Connection         10 Blue   Optical
+  CN7 + CN8 labeled GUN (on B0-010A only, same pinout as CN5 + CN6)
+
+==========================================
+
+Location Test version of Trophy Hunter:
+
+On service menu is an additional option: "9. PLAY DATA ( for LOC TEST )"
+
+  Under "7. OPTIONAL SETTING" is an added option:
+        3. PLAY DATA CLEAR
+        4. RETURN TO TEST MENU
+    Release versions show selection 3. RETURN TO TEST MENU, with no fourth selection
+
+Although in the I/O TEST screen seems to test for the shotgun PUMP, The PCB seems to be set up
+ for two standard HAPP light guns.  It's unknown how, if at all, the PUMP buttons are mapped or
+ hooked up through the PCB
+
+PCB Number: P0-145-1
++-----------------------------------------------------------+
+|             VOL                          +------+         |
+|                                          |X1-010|     M1  |
+|   +---+ +---+                            |M60016|         |
+|   |   | |   |  M    M                    |CALRUA|  +---+  |
++-+ | U | | U |  2    1                    +------+  |   |  |
+  | | 0 | | 0 |                   D4992              |   |  |
++-+ | 7 | | 6 |  M    M         32.768kHz            | U |  |
+|   |   | |   |  2    1                              | 1 |  |
+|   +---+ +---+                                      | 8 |  |
+|                                          Lattice   |   |  |
+|J  D +---+  C                            ispLSI2032 |   |  |
+|A  S |DX |  N   BAT1           +-------+            +---+  |
+|M  W |102|  5                  |Toshiba|  D                |
+|M  1 +---+                     |  TMP  |  S EEPROM       C |
+|A           C                  | 68301 |  W              N |
+|            N  Lattice         +-------+  2              2 |
+|C           6  isp1016E                                    |
+|o                              +----------+    50MHz       |
+|n    +---+                     |          |              +-+
+|n    |DX |  SW1                |   NEC    |    M   M     | |
+|e    |102|                     |  DX-101  |    3   3     | |
+|c    +---+         M  M        |          |              | |
+|t                  1  1        |          |              | |
+|e                              +----------+              | |
+|r                                                        |C|
+|                             +---+      +---++---++---+  |N|
+|                  28MHz      |   |      |   ||   ||   |  |3|
+|     +---+                   |   |      |   ||   ||   |  | |
++-+   |DX |                   | U |      | U || U || U |  | |
+  |   |102|                   | 4 |      | 4 || 3 || 3 |  | |
++-+   +---+                   | 0 |      | 1 || 8 || 9 |  | |
+| C                           |   |      |   ||   ||   |  | |
+| N                           |   |      |   ||   ||   |  +-+
+| 1                           +---+      +---++---++---+    |
++-----------------------------------------------------------+
+
+Differences from PCB B0-003A (or B0-003B):
+
+CN1 is 8 pin header - unknown use
+CN3 Female 3 row, 96 pin connection populated on the underside to connect to the P1-115A flash ROM PCB
+CN5 is labeled pins 1-4 and silkscreened GUN1
+CN6 is labeled pins 1-4 and silkscreened GUN2
+Lattice isp1016E - labeled "2GUN"
+
+U38 - U40 unpopulated (data comes from P0-145-1 PCB)
+
+P1-115A
++-+--------------------+------------------------------------+
+| |        CN3         |                   SW3              |
+| +--------------------+                                    |
+| |        CN4         |                           U  J  U  |
+| +--------------------+                           5  P  6  |
+|                                                  9  4  0  |
+|                                                           |
+|                                                           |
+|    28F016.U23    28F016.U31    28F016.U27    28F016.U35   |
+|                                                           |
+|    28F016.U22    28F016.U30    28F016.U26    28F016.U34   |
+|                                                           |
+|    28F016.U21    28F016.U29    28F016.U25    28F016.U33   |
+|                                                           |
+|    28F016.U20    28F016.U28    28F016.U24    28F016.U32   |
+|  +--------------------+                                   |
+|  |        CN6         |                                   |
++--+--------------------+-----------------------------------+
+
+Flash ROMs are SHARP LH28F016SAT-70
+
+SW3 unpopulated switch
+CN3 Unused 3 row, 96 pin connection (underside)
+CN4 Male 3 row, 96 pin connection (underside, to main P0-145-1 PCB)
+CN6 Unused 3 row, 96 pin connection (top side)
+JP4 3 pin Jumper header - unknown use
+U59 GAL labeled FLASHA02U59 3869
+U60 GAL labeled FLASH3A 2A29
 
 --------------------------------------------------------------------------
 
@@ -3948,9 +4333,8 @@ ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) - The "E05" breaks ve
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 ROM_START( deerhunta ) /* Deer Hunting USA V4.2 (xx/x/2000) */
@@ -3964,9 +4348,8 @@ ROM_START( deerhunta ) /* Deer Hunting USA V4.2 (xx/x/2000) */
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 ROM_START( deerhuntb ) /* Deer Hunting USA V4.0 (6/15/2000) */
@@ -3980,9 +4363,8 @@ ROM_START( deerhuntb ) /* Deer Hunting USA V4.0 (6/15/2000) */
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 	/* Are there versions 3.x of Deer Hunting USA with labels "AS0906 E03 U06" & "AS0907 E03 U07" ?? */
@@ -3998,9 +4380,8 @@ ROM_START( deerhuntc ) /* These rom labels break label conventions but is correc
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 ROM_START( deerhuntd ) /* Deer Hunting USA V2.x - No version number is printed to screen but "E02" in EPROM label signifies V2 */
@@ -4014,9 +4395,8 @@ ROM_START( deerhuntd ) /* Deer Hunting USA V2.x - No version number is printed t
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 ROM_START( deerhunte ) /* Deer Hunting USA V1.x - No version number is printed to screen but "E01" in EPROM label signifies V1 */
@@ -4030,9 +4410,8 @@ ROM_START( deerhunte ) /* Deer Hunting USA V1.x - No version number is printed t
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 ROM_START( turkhunt ) /* V1.0 is currently the only known version */
@@ -4046,15 +4425,14 @@ ROM_START( turkhunt ) /* V1.0 is currently the only known version */
 	ROM_LOAD( "asx903m01.u40", 0x1000000, 0x800000, CRC(5f86c322) SHA1(5a72adb99eea176199f172384cb051e2b045ab94) )
 	ROM_LOAD( "asx904m01.u41", 0x1800000, 0x800000, CRC(c77e0b66) SHA1(0eba30e62e4bd38c198fa6cb69fb94d002ded77a) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "asx905m01.u18", 0x100000, 0x400000, CRC(8d9dd9a9) SHA1(1fc2f3688d2c24c720dca7357bca6bf5f4016c53) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "asx905m01.u18", 0x000000, 0x400000, CRC(8d9dd9a9) SHA1(1fc2f3688d2c24c720dca7357bca6bf5f4016c53) )
 ROM_END
 
 ROM_START( wschamp ) /* Wing Shooting Championship V2.00 (01/23/2002) */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as1006e03.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* checksum 421E printed on label */
-	ROM_LOAD16_BYTE( "as1007e03.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* checksum A48F printed on label */
+	ROM_LOAD16_BYTE( "as1006e03.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* also commonly labeled as: WSC U6 Ver. 2.00 421E */
+	ROM_LOAD16_BYTE( "as1007e03.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* also commonly labeled as: WSC U7 Ver. 2.00 A48F */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
@@ -4062,9 +4440,8 @@ ROM_START( wschamp ) /* Wing Shooting Championship V2.00 (01/23/2002) */
 	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
 	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1005m01.u18", 0x100000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
 ROM_START( wschampa ) /* Wing Shooting Championship V1.01 */
@@ -4078,9 +4455,8 @@ ROM_START( wschampa ) /* Wing Shooting Championship V1.01 */
 	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
 	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1005m01.u18", 0x100000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
 ROM_START( wschampb ) /* Wing Shooting Championship V1.00, dumps match listed checksum but shows as "NG" on boot screen - need to verify correct at some point if possible */
@@ -4094,15 +4470,14 @@ ROM_START( wschampb ) /* Wing Shooting Championship V1.00, dumps match listed ch
 	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
 	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1005m01.u18", 0x100000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
-ROM_START( trophyh ) /* V1.0 is currently the only known version */
+ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a B0-010A PCB with all MASK ROMs */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as1106e01.u06", 0x000000, 0x100000, CRC(b4950882) SHA1(2749f7ffc5b543c9f39815f0913a1d1e385b63f4) ) /* checksum D8DA printed on label */
-	ROM_LOAD16_BYTE( "as1107e01.u07", 0x000001, 0x100000, CRC(19ee67cb) SHA1(e75ce66d3ff5aad46ba997c09d6514260e617f55) ) /* checksum CEEF printed on label */
+	ROM_LOAD16_BYTE( "as1106e01.u06", 0x000000, 0x100000, CRC(b4950882) SHA1(2749f7ffc5b543c9f39815f0913a1d1e385b63f4) ) /* also commonly labeled as: Trophy U6 Ver. 1.00 D8DA */
+	ROM_LOAD16_BYTE( "as1107e01.u07", 0x000001, 0x100000, CRC(19ee67cb) SHA1(e75ce66d3ff5aad46ba997c09d6514260e617f55) ) /* also commonly labeled as: Trophy U7 Ver. 1.00 CEEF */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD( "as1101m01.u38", 0x0000000, 0x800000, CRC(855ed675) SHA1(84ce229a9feb6331413253a5aed10b362e8102e5) )
@@ -4110,9 +4485,39 @@ ROM_START( trophyh ) /* V1.0 is currently the only known version */
 	ROM_LOAD( "as1103m01.u40", 0x1000000, 0x800000, CRC(adf8a54e) SHA1(bb28bf219d18082246f7964851a5c49b9c0ba7f5) )
 	ROM_LOAD( "as1104m01.u41", 0x1800000, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
+ROM_END
+
+ROM_START( trophyht ) /* V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9 - on a P0-145-1 main PCB with a P1-115A flash ROM board */
+	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "trophy_2-26_u6_2e9c.u06", 0x000000, 0x100000, CRC(74496d65) SHA1(8af7bce528557efe68e0ed8be8b60d0ba4409c35) ) /* hand written label:  Trophy 2/26 U6  2E9C */
+	ROM_LOAD16_BYTE( "trophy_2-26_u6_de45.u07", 0x000001, 0x100000, CRC(9ae364f6) SHA1(9df8352345e59f1e0a5cb66a8b43d5ad7785ca29) ) /* hand written label:  Trophy 2/26 U7  DE45 */
+
+	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
+	ROM_LOAD( "lh28f016sat.u20", 0x0000000, 0x200000, NO_DUMP ) /* None of the 28F016 flash ROMs are dumped */
+	ROM_LOAD( "lh28f016sat.u21", 0x0200000, 0x200000, NO_DUMP ) /* The correct loading order is unknown    */
+	ROM_LOAD( "lh28f016sat.u22", 0x0400000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u23", 0x0600000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u24", 0x0800000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u25", 0x0a00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u26", 0x0c00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u27", 0x0e00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u28", 0x1000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u29", 0x1200000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u30", 0x1400000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u31", 0x1600000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u32", 0x1800000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u33", 0x1a00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u34", 0x1c00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u35", 0x1e00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "as1101m01.u38",   0x0000000, 0x800000, CRC(855ed675) SHA1(84ce229a9feb6331413253a5aed10b362e8102e5) ) /* Load these in until the flash ROMs are dumped */
+	ROM_LOAD( "as1102m01.u39",   0x0800000, 0x800000, CRC(d186d271) SHA1(3c54438b35adfab8be91df0a633270d6db49beef) ) /* Load these in until the flash ROMs are dumped */
+	ROM_LOAD( "as1103m01.u40",   0x1000000, 0x800000, CRC(adf8a54e) SHA1(bb28bf219d18082246f7964851a5c49b9c0ba7f5) ) /* Load these in until the flash ROMs are dumped */
+	ROM_LOAD( "as1104m01.u41",   0x1800000, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) ) /* Load these in until the flash ROMs are dumped */
+
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) /* unlabeled 27C322 with same data as AS1105M01 MASK rom */
 ROM_END
 
 /***************************************************************************
@@ -4120,21 +4525,77 @@ ROM_END
  TelePachi Fever Lion
  (C) 1996 Sunsoft
 
- PCB: Sunsoft 2MP1-E00 (P0-121A, serial 0503), similar to Reel'N Quake.
-
-   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP @ U1)
- Video: Allumer X1-020 9426HK003 (@ U9 - Same as DX-101?)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: Allumer X1-020 9426HK003 (@ U9)
         NEC DX-102               (52 Pin PQFP @ U8)
         Allumer X1-007 505100    (SDIP42 @ U110 - Feeds RGB DACs)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
 Inputs: Allumer X1-004 546100    (SDIP52)
-   OSC: 50.0000 MHz (@ X1) & 32.5304 MHz (@ X2)
- Other: 8 Position Dipswitch x 2 (@ DSW1, DSW2)
-        Push Button
-        Battery (@ BT1)
+   OSC: 50.0000 MHz (@ X1), 32.5304 MHz (@ X2) & 32.768kHz (@ X3)
+ Other: 8 Position Dipswitch x 2
+        Ricoh RP5C62 RTC (@ U128)
+        3.6v Battery (@ BT1)
         93C46 EEPROM (@ U101)
-        Jamma Connector
-        GALs - labeled "KC-001C", "KC-002C" (@ U51, U52)
+        SW1 Push Button Reset
+
+Memory:
+M1 are TC551001BFL-70L at U56 & U57
+M2 is  W2465K-70LL at U27
+M3 are HM62256BLSP-7
+M4 is LH5168D-80L
+
+PCB Number: P0-121A / Sunsoft 2MP1-E00 (serial 0503)
++--------------------------------------------------------------+
+|             +------+       +---++---+           CN3*         |
+| VOL         |Seta  |   M   |   ||   |        +--------------+|
+|             |X1-010|   2   | U || U |        |      U19*    ||
+|             +------+       | 1 || 1 |        +--------------+|
++-+           U52  U51  BT1  | 1 || 1 |        +--------------+|
+  |  +-++-+   +-++-+         | 2 || 1 |        |      U17*    ||
++-+  | || |   | || |         +---++---+   M M  +--------------+|
+|    |U||U| M |U||U| M M  32.768kHz       1 1  +--------------+|
+|J   |3||5| 3 |2||4| 3 4 RP5C62                | MP3 CG-1 U15 ||
+|A   | ||*|   | ||*|                           +--------------+|
+|M   +-++-+   +-++-+                           +--------------+|
+|M                                             |      U20*    ||
+|A                              +----------+   +--------------+|
+|                               |          |   +--------------+|
+|C                              | ALLUMER  |   |      U18*    ||
+|o                              | X1-020   |   +--------------+|
+|n          +-------+           |          |   +--------------+|
+|n          |Toshiba|           | 9426HK003|   | MP3 CG-0 U16 ||
+|e C        |  TMP  |           +----------+   +--------------+|
+|c N        | 68301 |                          +--------------+|
+|t 2        +-------+                          |      U23*    ||
+|e         93C46                               +--------------+|
+|r              D                              +--------------+|
+|               S                              |      U22*    ||
++-+         X   W  +---+     50MHz 32.5304MHz  +--------------+|
+  |         1   2  |DX |                       +--------------+|
+  |  C      |   D  |102|                       | MP3 CG-2 U21 ||
++-+  N C    0   S  +---+         M M           +--------------+|
+|    7 N    0   W        SW1     3 3                           |
+|      6    4   1                                 X1-007 R G B |
++--------------------------------------------------------------+
+
+U2 ST M27C4001 EPROM MP3prgEVEN  U2 V1.0
+U3 ST M27C4001 EPROM MP3 prgODD  U3 V1.0
+U4 unpopulated silkscreened 27C4001 TBL EVEN
+U5 unpopulated silkscreened 27C4001 TBL ODD
+U15 ST M27C160 EPROM  PM# CG-1 U15 V1.0
+U16 ST M27C160 EPROM  PM# CG-0 U16 V1.0
+U21 ST M27C160 EPROM  PM# CG-2 U21 V1.0
+U51 GAL KC-001C
+U52 GAL KC-002C
+U111 ST M27C4001 EPROM  MP3 SOUND0 U111 V1.0
+U112 ST M27C4001 EPROM  MP3 SOUND1 U112 V1.0
+U17, U18, U19, U20, U22 & U23 silkscreened 23C16000
+* Denotes not populated.
+
+R, G & B are resistor packs
+CN3 - 96 pin connector (3 rows by 32 pins)
+CN6 - Dual row 10 pin header
+CN7 - 12 pin header
 
 ***************************************************************************/
 
@@ -4142,52 +4603,50 @@ ROM_START( telpacfl )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "mp3_prgeven__u2_v1.0.u2", 0x000000, 0x080000, CRC(9ab450c5) SHA1(57d9118df8a444e295cbda453a7c3238bd672ddd) )
 	ROM_LOAD16_BYTE( "mp3_prgodd__u3_v1.0.u3",  0x000001, 0x080000, CRC(2a324139) SHA1(1812a7a8a2c4e222a1e5c7cb6d39cf7bf7f037db) )
-	// Empty sockets: 27C4001 TBL EVEN (@ U4) & 27C4001 TBL ODD (@ U5)
 
 	ROM_REGION( 0x800000, "sprites", ROMREGION_ERASE00 )    // Sprites
 	ROM_LOAD( "mp3_cg-0__u16_v1.0.u16", 0x000000, 0x200000, CRC(9d8453ba) SHA1(d97240ce68d6e64527930e919710764a7b669cdf) )
 	ROM_LOAD( "mp3_cg-1__u15_v1.0.u15", 0x200000, 0x200000, CRC(8ab83f38) SHA1(5ebc682b80d0d97025a97824a899946712e7acd4) )
 	ROM_LOAD( "mp3_cg-2__u21_v1.0.u21", 0x400000, 0x200000, BAD_DUMP CRC(54dc430b) SHA1(a2e55866249d01f6f2f2dd998421baf9fe0c6972) ) // physically damaged eprom
 	ROM_FILL (                          0x400000, 0x200000, 0 ) // wipe out the bad rom
-	// Empty sockets: 23C16000 (@ U17-20, U22-23)
 
-	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "mp3_sound0__u111_v1.0.u111", 0x100000, 0x080000, CRC(711c915e) SHA1(d654a0c158cf54aab5faca913583c5620388aa46) )
-	ROM_LOAD( "mp3_sound1__u112_v1.0.u112", 0x180000, 0x080000, CRC(27fd83cd) SHA1(d0261b2c5354ea17061e71bcea747d70efc18a49) )
+	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "mp3_sound0__u111_v1.0.u111", 0x000000, 0x080000, CRC(711c915e) SHA1(d654a0c158cf54aab5faca913583c5620388aa46) )
+	ROM_LOAD( "mp3_sound1__u112_v1.0.u112", 0x080000, 0x080000, CRC(27fd83cd) SHA1(d0261b2c5354ea17061e71bcea747d70efc18a49) )
 
 	ROM_REGION( 0x117 * 2, "plds", 0 )
 	ROM_LOAD( "kc-001c.u51", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "kc-002c.u52", 0x117, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state, 0,        ROT0,   "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
-GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state, 0,        ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II",          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, mj4simai,  0,        mj4simai, mj4simai, seta2_state, 0,        ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", MACHINE_NO_COCKTAIL )
-GAME( 1996, myangel,   0,        myangel,  myangel,  seta2_state, 0,        ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, myangel2,  0,        myangel2, myangel2, seta2_state, 0,        ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, telpacfl,  0,        telpacfl, telpacfl, seta2_state, 0,        ROT270, "Sunsoft",               "TelePachi Fever Lion (V1.0)",                  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state, 0,        ROT0,   "<unknown>",             "Reel'N Quake! (Version 1.05)",                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state, 0,        ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, 0,     ROT0,   "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state, 0,        ROT0,   "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
-GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
-GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "A-Blast (Japan)",                              MACHINE_NO_COCKTAIL )
-GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state, 0,        ROT0,   "bootleg",               "A-Blast (bootleg)",                            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
-GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state, 0,        ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
-GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhuntb, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.0",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhuntc, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V3",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhuntd, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V2",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhunte, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V1",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, turkhunt,  0,        samshoot, turkhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Turkey Hunting USA V1.0",                      MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, wschamp,   0,        samshoot, wschamp,  seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V2.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, wschampa,  wschamp,  samshoot, wschamp,  seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.01",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, wschampb,  wschamp,  samshoot, wschamp,  seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, trophyh,   0,        samshoot, trophyh,  seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, funcube,   0,        funcube,  funcube,  seta2_state, funcube,  ROT0,   "Namco",                 "Funcube (v1.5)",                               MACHINE_NO_COCKTAIL )
-GAME( 2001, funcube2,  0,        funcube2, funcube,  seta2_state, funcube2, ROT0,   "Namco",                 "Funcube 2 (v1.1)",                             MACHINE_NO_COCKTAIL )
-GAME( 2001, funcube3,  0,        funcube3, funcube,  seta2_state, funcube3, ROT0,   "Namco",                 "Funcube 3 (v1.1)",                             MACHINE_NO_COCKTAIL )
-GAME( 2001, funcube4,  0,        funcube2, funcube,  seta2_state, funcube2, ROT0,   "Namco",                 "Funcube 4 (v1.0)",                             MACHINE_NO_COCKTAIL )
-GAME( 2002, funcube5,  0,        funcube2, funcube,  seta2_state, funcube2, ROT0,   "Namco",                 "Funcube 5 (v1.0)",                             MACHINE_NO_COCKTAIL )
+GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state,    empty_init,    ROT0,   "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
+GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II",          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, mj4simai,  0,        seta2,    mj4simai, mj4simai_state, empty_init,    ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1996, myangel,   0,        myangel,  myangel,  seta2_state,    empty_init,    ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, myangel2,  0,        myangel2, myangel2, seta2_state,    empty_init,    ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, telpacfl,  0,        telpacfl, telpacfl, seta2_state,    empty_init,    ROT270, "Sunsoft",               "TelePachi Fever Lion (V1.0)",                  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state,    empty_init,    ROT0,   "<unknown>",             "Reel'N Quake! (Version 1.05)",                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, empty_init,    ROT0,   "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,    ROT0,   "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
+GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
+GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",              MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
+GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state,    empty_init,    ROT0,   "bootleg",               "Hong Tian Lei (A-Blast) (bootleg)",            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
+GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state,    empty_init,    ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
+GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuntb, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.0",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuntc, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V3",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuntd, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V2",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhunte, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V1",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, turkhunt,  0,        samshoot, turkhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Turkey Hunting USA V1.00",                     MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, wschamp,   0,        samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V2.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, wschampa,  wschamp,  samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.01",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, wschampb,  wschamp,  samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, trophyh,   0,        samshoot, trophyh,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.00",          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, trophyht,  trophyh,  samshoot, trophyht, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.00 (location test)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, funcube,   0,        funcube,  funcube,  funcube_state,  init_funcube,  ROT0,   "Namco",                 "Funcube (v1.5)",                               MACHINE_NO_COCKTAIL )
+GAME( 2001, funcube2,  0,        funcube2, funcube,  funcube_state,  init_funcube2, ROT0,   "Namco",                 "Funcube 2 (v1.1)",                             MACHINE_NO_COCKTAIL )
+GAME( 2001, funcube3,  0,        funcube3, funcube,  funcube_state,  init_funcube3, ROT0,   "Namco",                 "Funcube 3 (v1.1)",                             MACHINE_NO_COCKTAIL )
+GAME( 2001, funcube4,  0,        funcube2, funcube,  funcube_state,  init_funcube2, ROT0,   "Namco",                 "Funcube 4 (v1.0)",                             MACHINE_NO_COCKTAIL )
+GAME( 2002, funcube5,  0,        funcube2, funcube,  funcube_state,  init_funcube2, ROT0,   "Namco",                 "Funcube 5 (v1.0)",                             MACHINE_NO_COCKTAIL )

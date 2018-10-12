@@ -138,6 +138,7 @@ Find lamps/reels after UPD changes.
 #include "sound/upd7759.h"
 #include "sound/ym2413.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -212,13 +213,47 @@ struct i82716_t
 class maygayv1_state : public driver_device
 {
 public:
-	maygayv1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	maygayv1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_upd7759(*this, "upd"),
 		m_duart68681(*this, "duart68681"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
+
+	void maygayv1(machine_config &config);
+
+	void init_screenpl();
+
+private:
+	DECLARE_WRITE16_MEMBER(i82716_w);
+	DECLARE_READ16_MEMBER(i82716_r);
+	DECLARE_WRITE16_MEMBER(write_odd);
+	DECLARE_READ16_MEMBER(read_odd);
+	DECLARE_WRITE16_MEMBER(vsync_int_ctrl);
+	DECLARE_READ8_MEMBER(mcu_r);
+	DECLARE_WRITE8_MEMBER(mcu_w);
+	DECLARE_READ8_MEMBER(b_read);
+	DECLARE_WRITE8_MEMBER(b_writ);
+	DECLARE_WRITE8_MEMBER(strobe_w);
+	DECLARE_WRITE8_MEMBER(lamp_data_w);
+	DECLARE_READ8_MEMBER(kbd_r);
+	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_maygayv1);
+	DECLARE_WRITE8_MEMBER(data_from_i8031);
+	DECLARE_READ8_MEMBER(data_to_i8031);
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(duart_txa);
+	void main_map(address_map &map);
+	void sound_data(address_map &map);
+	void sound_io(address_map &map);
+	void sound_prg(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8052_device> m_soundcpu;
@@ -233,34 +268,7 @@ public:
 	uint8_t m_p3;
 	int m_d68681_val;
 	i82716_t m_i82716;
-	DECLARE_WRITE16_MEMBER(i82716_w);
-	DECLARE_READ16_MEMBER(i82716_r);
-	DECLARE_WRITE16_MEMBER(write_odd);
-	DECLARE_READ16_MEMBER(read_odd);
-	DECLARE_WRITE16_MEMBER(vsync_int_ctrl);
-	DECLARE_READ8_MEMBER(mcu_r);
-	DECLARE_WRITE8_MEMBER(mcu_w);
-	DECLARE_READ8_MEMBER(b_read);
-	DECLARE_WRITE8_MEMBER(b_writ);
-	DECLARE_WRITE8_MEMBER(strobe_w);
-	DECLARE_WRITE8_MEMBER(lamp_data_w);
-	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_DRIVER_INIT(screenpl);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_maygayv1);
-	INTERRUPT_GEN_MEMBER(vsync_interrupt);
-	DECLARE_WRITE8_MEMBER(data_from_i8031);
-	DECLARE_READ8_MEMBER(data_to_i8031);
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart_txa);
-	void maygayv1(machine_config &config);
-	void main_map(address_map &map);
-	void sound_data(address_map &map);
-	void sound_io(address_map &map);
-	void sound_prg(address_map &map);
+	output_finder<8 * 256> m_lamp;
 };
 
 
@@ -473,6 +481,9 @@ WRITE_LINE_MEMBER(maygayv1_state::screen_vblank_maygayv1)
 				m_palette->set_pen_color(entry & 0xf, pal4bit(entry >> 12), pal4bit(entry >> 8), pal4bit(entry >> 4));
 			}
 		}
+
+		if (m_vsync_latch_preset)
+			m_maincpu->set_input_line(3, ASSERT_LINE);
 	}
 }
 
@@ -532,7 +543,7 @@ WRITE8_MEMBER( maygayv1_state::lamp_data_w )
 
 		for (int i = 0; i < 8; i++)
 		{
-			output().set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << i)) !=0));
+			m_lamp[(8*m_lamp_strobe)+i] = BIT(data, i);
 		}
 		m_old_lamp_strobe = m_lamp_strobe;
 	}
@@ -555,20 +566,21 @@ WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
 		m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(maygayv1_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("maincpu", 0x80000)
-	AM_RANGE(0x820000, 0x820001) AM_DEVREADWRITE8("i8279", i8279_device, data_r, data_w ,0xff)
-	AM_RANGE(0x820002, 0x820003) AM_DEVREADWRITE8("i8279", i8279_device, status_r, cmd_w,0xff)
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
-	AM_RANGE(0x860000, 0x86000d) AM_READWRITE(read_odd, write_odd)
-	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
-	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE(i82716_r, i82716_w)
-	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff)
-	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREAD8("pia", pia6821_device, read, 0x00ff)
-	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVWRITE8("pia", pia6821_device, write, 0xff00)
-ADDRESS_MAP_END
+void maygayv1_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x083fff).ram().share("nvram");
+	map(0x100000, 0x17ffff).rom().region("maincpu", 0x80000);
+	map(0x820001, 0x820001).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
+	map(0x820003, 0x820003).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
+	map(0x800000, 0x800003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
+	map(0x860000, 0x86000d).rw(FUNC(maygayv1_state::read_odd), FUNC(maygayv1_state::write_odd));
+	map(0x86000e, 0x86000f).w(FUNC(maygayv1_state::vsync_int_ctrl));
+	map(0x880000, 0x89ffff).rw(FUNC(maygayv1_state::i82716_r), FUNC(maygayv1_state::i82716_w));
+	map(0x8a0000, 0x8a001f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x8c0000, 0x8c000f).r("pia", FUNC(pia6821_device::read)).umask16(0x00ff);
+	map(0x8c0000, 0x8c000f).w("pia", FUNC(pia6821_device::write)).umask16(0xff00);
+}
 
 
 /*************************************
@@ -647,17 +659,20 @@ WRITE8_MEMBER(maygayv1_state::mcu_w)
 }
 
 
-ADDRESS_MAP_START(maygayv1_state::sound_prg)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void maygayv1_state::sound_prg(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(maygayv1_state::sound_data)
-	AM_RANGE(0x0000, 0x1ff) AM_RAM // nothing?
-ADDRESS_MAP_END
+void maygayv1_state::sound_data(address_map &map)
+{
+	map(0x0000, 0x1ff).ram(); // nothing?
+}
 
-ADDRESS_MAP_START(maygayv1_state::sound_io)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(mcu_r, mcu_w)
-ADDRESS_MAP_END
+void maygayv1_state::sound_io(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(maygayv1_state::mcu_r), FUNC(maygayv1_state::mcu_w));
+}
 
 
 /*************************************
@@ -846,11 +861,12 @@ WRITE8_MEMBER(maygayv1_state::b_writ)
 
 void maygayv1_state::machine_start()
 {
+	m_lamp.resolve();
 	i82716_t &i82716 = m_i82716;
 	i82716.dram = std::make_unique<uint16_t[]>(0x80000/2);   // ???
 	i82716.line_buf = std::make_unique<uint8_t[]>(512);
 
-	save_pointer(NAME(i82716.dram.get()), 0x40000);
+	save_pointer(NAME(i82716.dram), 0x40000);
 }
 
 void maygayv1_state::machine_reset()
@@ -862,33 +878,25 @@ void maygayv1_state::machine_reset()
 }
 
 
-INTERRUPT_GEN_MEMBER(maygayv1_state::vsync_interrupt)
-{
-	if (m_vsync_latch_preset)
-		m_maincpu->set_input_line(3, ASSERT_LINE);
-}
-
-
 MACHINE_CONFIG_START(maygayv1_state::maygayv1)
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", maygayv1_state,  vsync_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("soundcpu", I8052, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sound_prg)
-	MCFG_CPU_DATA_MAP(sound_data)
-	MCFG_CPU_IO_MAP(sound_io)
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(maygayv1_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(maygayv1_state, data_to_i8031))
+	MCFG_DEVICE_ADD("soundcpu", I8052, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sound_prg)
+	MCFG_DEVICE_DATA_MAP(sound_data)
+	MCFG_DEVICE_IO_MAP(sound_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, maygayv1_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, maygayv1_state, data_to_i8031))
 
 	/* U25 ST 2 9148 EF68B21P */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(maygayv1_state, b_read))
-	MCFG_PIA_READPB_HANDLER(READ8(maygayv1_state, b_read))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(maygayv1_state, b_writ))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maygayv1_state, b_writ))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.readpa_handler().set(FUNC(maygayv1_state::b_read));
+	pia.readpb_handler().set(FUNC(maygayv1_state::b_read));
+	pia.writepa_handler().set(FUNC(maygayv1_state::b_writ));
+	pia.writepb_handler().set(FUNC(maygayv1_state::b_writ));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* TODO: Use real video timings */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -897,26 +905,26 @@ MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_SCREEN_SIZE(640, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 300 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(maygayv1_state, screen_update_maygayv1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(maygayv1_state, screen_vblank_maygayv1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, maygayv1_state, screen_vblank_maygayv1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, DUART_CLOCK)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(maygayv1_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygayv1_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, maygayv1_state, duart_txa))
 
-	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(maygayv1_state, strobe_w))      // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(maygayv1_state, lamp_data_w)) // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(maygayv1_state, kbd_r))                   // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));         // unknown clock
+	kbdc.out_sl_callback().set(FUNC(maygayv1_state::strobe_w));         // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(maygayv1_state::lamp_data_w));    // display A&B
+	kbdc.in_rl_callback().set(FUNC(maygayv1_state::kbd_r));             // kbd RL lines
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd",YM2413, MASTER_CLOCK / 4)
+	MCFG_DEVICE_ADD("ymsnd",YM2413, MASTER_CLOCK / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1253,32 +1261,32 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(maygayv1_state,screenpl)
+void maygayv1_state::init_screenpl()
 {
 	m_p1 = m_p3 = 0xff;
 }
 
 #define GAME_FLAGS MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK
 
-GAME( 1991, screenpl, 0,        maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 4.0)",               GAME_FLAGS )
-GAME( 1991, screenp1, screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 1)",               GAME_FLAGS )
-GAME( 1991, screenp1a,screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 2)",               GAME_FLAGS )
-GAME( 1991, screenp2, screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man, set 1)",  GAME_FLAGS )
-GAME( 1991, screenp2a,screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man, set 2)",  GAME_FLAGS )
-GAME( 1991, screenp3, screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, SA5-082)",  GAME_FLAGS )
-GAME( 1991, screenp3a,screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, SA5-083)",  GAME_FLAGS )
-GAME( 1991, screenp4 ,screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. ?.?)",  GAME_FLAGS )
+GAME( 1991, screenpl,  0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 4.0)",               GAME_FLAGS )
+GAME( 1991, screenp1,  screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 1)",               GAME_FLAGS )
+GAME( 1991, screenp1a, screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 2)",               GAME_FLAGS )
+GAME( 1991, screenp2,  screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man, set 1)",  GAME_FLAGS )
+GAME( 1991, screenp2a, screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man, set 2)",  GAME_FLAGS )
+GAME( 1991, screenp3,  screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, SA5-082)",  GAME_FLAGS )
+GAME( 1991, screenp3a, screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, SA5-083)",  GAME_FLAGS )
+GAME( 1991, screenp4,  screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. ?.?)",  GAME_FLAGS )
 
 // incomplete sets
-GAME( 199?, mv1bon  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Believe It Or Not (Maygay, MV1 Video)",  GAME_FLAGS )
-GAME( 199?, mv1cpc  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1cpca , mv1cpc    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1cpcb , mv1cpc    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 3)",  GAME_FLAGS )
-GAME( 199?, mv1cwq  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1cwqa , mv1cwq    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1guac , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1guaca, mv1guac   ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1sfx  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1sfxa , mv1sfx    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1sfx2 , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects V2 (Maygay, MV1 Video)",  GAME_FLAGS )
-GAME( 199?, mv1wc   , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "World Cup (Maygay, MV1 Video)",  GAME_FLAGS )
+GAME( 199?, mv1bon,    0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Believe It Or Not (Maygay, MV1 Video)",  GAME_FLAGS )
+GAME( 199?, mv1cpc,    0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1cpca,   mv1cpc,    maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1cpcb,   mv1cpc,    maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 3)",  GAME_FLAGS )
+GAME( 199?, mv1cwq,    0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1cwqa,   mv1cwq,    maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1guac,   0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1guaca,  mv1guac,   maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1sfx,    0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1sfxa,   mv1sfx,    maygayv1, screenpl, maygayv1_state, init_screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1sfx2,   0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT90, "Maygay", "Special Effects V2 (Maygay, MV1 Video)",  GAME_FLAGS )
+GAME( 199?, mv1wc,     0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "World Cup (Maygay, MV1 Video)",  GAME_FLAGS )

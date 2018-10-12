@@ -63,18 +63,19 @@ void nmk004_device::ym2203_irq_handler(int irq)
 	m_cpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(nmk004_device::nmk004_sound_mem_map)
+void nmk004_device::nmk004_sound_mem_map(address_map &map)
+{
 	//AM_RANGE(0x0000, 0x1fff) AM_ROM /* 0x0000 - 0x1fff = internal ROM */
-	AM_RANGE(0x2000, 0xefff) AM_ROM AM_REGION(":audiocpu", 0x2000 )
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE(":ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xf900, 0xf900) AM_DEVREADWRITE(":oki1", okim6295_device, read, write)
-	AM_RANGE(0xfa00, 0xfa00) AM_DEVREADWRITE(":oki2", okim6295_device, read, write)
-	AM_RANGE(0xfb00, 0xfb00) AM_READ(nmk004_tonmk004_r)    // from main cpu
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(nmk004_tomain_w)  // to main cpu
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmk004_oki0_bankswitch_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(nmk004_oki1_bankswitch_w)
-ADDRESS_MAP_END
+	map(0x2000, 0xefff).rom().region(":audiocpu", 0x2000);
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf801).rw(":ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf900, 0xf900).rw(":oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xfa00, 0xfa00).rw(":oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xfb00, 0xfb00).r(FUNC(nmk004_device::nmk004_tonmk004_r));    // from main cpu
+	map(0xfc00, 0xfc00).w(FUNC(nmk004_device::nmk004_tomain_w));  // to main cpu
+	map(0xfc01, 0xfc01).w(FUNC(nmk004_device::nmk004_oki0_bankswitch_w));
+	map(0xfc02, 0xfc02).w(FUNC(nmk004_device::nmk004_oki1_bankswitch_w));
+}
 
 
 ROM_START( nmk004 )
@@ -110,9 +111,9 @@ void nmk004_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 MACHINE_CONFIG_START(nmk004_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
-	MCFG_CPU_PROGRAM_MAP(nmk004_sound_mem_map)
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(nmk004_device, nmk004_port4_w))
+	MCFG_DEVICE_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
+	MCFG_DEVICE_PROGRAM_MAP(nmk004_sound_mem_map)
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, nmk004_device, nmk004_port4_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

@@ -27,26 +27,26 @@ enum
 
 
 #define MCFG_V25_PORT_PT_READ_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_pt_in_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_pt_in_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P0_READ_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p0_in_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p0_in_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P1_READ_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p1_in_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p1_in_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P2_READ_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p2_in_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p2_in_cb(DEVCB_##_devcb);
 
 
 #define MCFG_V25_PORT_P0_WRITE_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p0_out_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p0_out_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P1_WRITE_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p1_out_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p1_out_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P2_WRITE_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p2_out_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p2_out_cb(DEVCB_##_devcb);
 
 class v25_common_device : public cpu_device
 {
@@ -58,10 +58,17 @@ public:
 	template <class Object> devcb_base &set_p0_in_cb(Object &&cb) { return m_p0_in.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_p1_in_cb(Object &&cb) { return m_p1_in.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_p2_in_cb(Object &&cb) { return m_p2_in.set_callback(std::forward<Object>(cb)); }
+	auto pt_in_cb() { return m_pt_in.bind(); }
+	auto p0_in_cb() { return m_p0_in.bind(); }
+	auto p1_in_cb() { return m_p1_in.bind(); }
+	auto p2_in_cb() { return m_p2_in.bind(); }
 
 	template <class Object> devcb_base &set_p0_out_cb(Object &&cb) { return m_p0_out.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_p1_out_cb(Object &&cb) { return m_p1_out.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_p2_out_cb(Object &&cb) { return m_p2_out.set_callback(std::forward<Object>(cb)); }
+	auto p0_out_cb() { return m_p0_out.bind(); }
+	auto p1_out_cb() { return m_p1_out.bind(); }
+	auto p2_out_cb() { return m_p2_out.bind(); }
 
 	TIMER_CALLBACK_MEMBER(v25_timer_callback);
 
@@ -80,7 +87,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 80; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI || (inputnum >= NEC_INPUT_LINE_INTP0 && inputnum <= NEC_INPUT_LINE_INTP2); }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -93,7 +101,7 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -141,7 +149,7 @@ private:
 	uint32_t  m_IDB;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u8 (offs_t address)> m_dr8;
 	address_space *m_io;
 	int     m_icount;
 

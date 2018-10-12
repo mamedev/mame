@@ -77,51 +77,58 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::stamp_timer_callback )
 }
 
 
-ADDRESS_MAP_START(sega_segacd_device::segacd_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("prgram")
-	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_SHARE("dataram")
-	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) //AM_SHARE("dataram2")
+void sega_segacd_device::segacd_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("prgram");
+	map(0x080000, 0x0bffff).rw(FUNC(sega_segacd_device::segacd_sub_dataram_part1_r), FUNC(sega_segacd_device::segacd_sub_dataram_part1_w)).share("dataram");
+	map(0x0c0000, 0x0dffff).rw(FUNC(sega_segacd_device::segacd_sub_dataram_part2_r), FUNC(sega_segacd_device::segacd_sub_dataram_part2_w)); //AM_SHARE("dataram2")
 
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE8(backupram_r, backupram_w, 0x00ff) // backup RAM, odd bytes only!
+	map(0xfe0000, 0xfe3fff).rw(FUNC(sega_segacd_device::backupram_r), FUNC(sega_segacd_device::backupram_w)).umask16(0x00ff); // backup RAM, odd bytes only!
 
-	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_device, rf5c68_w, 0x00ff)  // PCM, RF5C164
-	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8("rfsnd", rf5c68_device, rf5c68_r, 0x00ff)
-	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8("rfsnd", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
+	map(0xff0000, 0xff001f).w("rfsnd", FUNC(rf5c68_device::rf5c68_w)).umask16(0x00ff);  // PCM, RF5C164
+	map(0xff0020, 0xff003f).r("rfsnd", FUNC(rf5c68_device::rf5c68_r)).umask16(0x00ff);
+	map(0xff2000, 0xff3fff).rw("rfsnd", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w)).umask16(0x00ff);  // PCM, RF5C164
 
-	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
-	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
+	map(0xff8000, 0xff8001).rw(FUNC(sega_segacd_device::segacd_sub_led_ready_r), FUNC(sega_segacd_device::segacd_sub_led_ready_w));
+	map(0xff8002, 0xff8003).rw(FUNC(sega_segacd_device::segacd_sub_memory_mode_r), FUNC(sega_segacd_device::segacd_sub_memory_mode_w));
 
-	AM_RANGE(0xff8004 ,0xff8005) AM_DEVREADWRITE("tempcdc",lc89510_temp_device, segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
-	AM_RANGE(0xff8006 ,0xff8007) AM_DEVREADWRITE("tempcdc",lc89510_temp_device,segacd_cdc_data_r, segacd_cdc_data_w)
-	AM_RANGE(0xff8008, 0xff8009) AM_DEVREAD("tempcdc",lc89510_temp_device, cdc_data_sub_r)
-	AM_RANGE(0xff800a, 0xff800b) AM_READWRITE(segacd_dmaaddr_r,segacd_dmaaddr_w) // DMA Address (not CDC, used in conjunction with)
-	AM_RANGE(0xff800c, 0xff800d) AM_READWRITE(segacd_stopwatch_timer_r, segacd_stopwatch_timer_w)// Stopwatch timer
-	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
-	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
-	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
-	AM_RANGE(0xff8030, 0xff8031) AM_READWRITE(segacd_irq3timer_r, segacd_irq3timer_w) // Timer W/INT3
-	AM_RANGE(0xff8032, 0xff8033) AM_DEVREADWRITE("tempcdc",lc89510_temp_device,segacd_irq_mask_r,segacd_irq_mask_w)
-	AM_RANGE(0xff8034, 0xff8035) AM_DEVREADWRITE("tempcdc",lc89510_temp_device,segacd_cdfader_r,segacd_cdfader_w) // CD Fader
-	AM_RANGE(0xff8036, 0xff8037) AM_DEVREADWRITE("tempcdc",lc89510_temp_device,segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
-	AM_RANGE(0xff8038, 0xff8041) AM_DEVREAD8("tempcdc",lc89510_temp_device,segacd_cdd_rx_r,0xffff)
-	AM_RANGE(0xff8042, 0xff804b) AM_DEVWRITE8("tempcdc",lc89510_temp_device,segacd_cdd_tx_w,0xffff)
-	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE8(font_color_r, font_color_w, 0x00ff)
-	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_SHARE("font_bits")
-	AM_RANGE(0xff8050, 0xff8057) AM_READ(font_converted_r)
-	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
-	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
-	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
-	AM_RANGE(0xff805e, 0xff805f) AM_READWRITE(segacd_imagebuffer_start_address_r, segacd_imagebuffer_start_address_w) // Image buffer start address
-	AM_RANGE(0xff8060, 0xff8061) AM_READWRITE(segacd_imagebuffer_offset_r, segacd_imagebuffer_offset_w)
-	AM_RANGE(0xff8062, 0xff8063) AM_READWRITE(segacd_imagebuffer_hdot_size_r, segacd_imagebuffer_hdot_size_w) // Image buffer H dot size
-	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
-	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
+	map(0xff8004, 0xff8005).rw("tempcdc", FUNC(lc89510_temp_device::segacd_cdc_mode_address_r), FUNC(lc89510_temp_device::segacd_cdc_mode_address_w));
+	map(0xff8006, 0xff8007).rw("tempcdc", FUNC(lc89510_temp_device::segacd_cdc_data_r), FUNC(lc89510_temp_device::segacd_cdc_data_w));
+	map(0xff8008, 0xff8009).r("tempcdc", FUNC(lc89510_temp_device::cdc_data_sub_r));
+	map(0xff800a, 0xff800b).rw(FUNC(sega_segacd_device::segacd_dmaaddr_r), FUNC(sega_segacd_device::segacd_dmaaddr_w)); // DMA Address (not CDC, used in conjunction with)
+	map(0xff800c, 0xff800d).rw(FUNC(sega_segacd_device::segacd_stopwatch_timer_r), FUNC(sega_segacd_device::segacd_stopwatch_timer_w));// Stopwatch timer
+	map(0xff800e, 0xff800f).rw(FUNC(sega_segacd_device::segacd_comms_flags_r), FUNC(sega_segacd_device::segacd_comms_flags_subcpu_w));
+	map(0xff8010, 0xff801f).rw(FUNC(sega_segacd_device::segacd_comms_sub_part1_r), FUNC(sega_segacd_device::segacd_comms_sub_part1_w));
+	map(0xff8020, 0xff802f).rw(FUNC(sega_segacd_device::segacd_comms_sub_part2_r), FUNC(sega_segacd_device::segacd_comms_sub_part2_w));
+	map(0xff8030, 0xff8031).rw(FUNC(sega_segacd_device::segacd_irq3timer_r), FUNC(sega_segacd_device::segacd_irq3timer_w)); // Timer W/INT3
+	map(0xff8032, 0xff8033).rw("tempcdc", FUNC(lc89510_temp_device::segacd_irq_mask_r), FUNC(lc89510_temp_device::segacd_irq_mask_w));
+	map(0xff8034, 0xff8035).rw("tempcdc", FUNC(lc89510_temp_device::segacd_cdfader_r), FUNC(lc89510_temp_device::segacd_cdfader_w)); // CD Fader
+	map(0xff8036, 0xff8037).rw("tempcdc", FUNC(lc89510_temp_device::segacd_cdd_ctrl_r), FUNC(lc89510_temp_device::segacd_cdd_ctrl_w));
+	map(0xff8038, 0xff8041).r("tempcdc", FUNC(lc89510_temp_device::segacd_cdd_rx_r));
+	map(0xff8042, 0xff804b).w("tempcdc", FUNC(lc89510_temp_device::segacd_cdd_tx_w));
+	map(0xff804d, 0xff804d).rw(FUNC(sega_segacd_device::font_color_r), FUNC(sega_segacd_device::font_color_w));
+	map(0xff804e, 0xff804f).ram().share("font_bits");
+	map(0xff8050, 0xff8057).r(FUNC(sega_segacd_device::font_converted_r));
+	map(0xff8058, 0xff8059).rw(FUNC(sega_segacd_device::segacd_stampsize_r), FUNC(sega_segacd_device::segacd_stampsize_w)); // Stamp size
+	map(0xff805a, 0xff805b).rw(FUNC(sega_segacd_device::segacd_stampmap_base_address_r), FUNC(sega_segacd_device::segacd_stampmap_base_address_w)); // Stamp map base address
+	map(0xff805c, 0xff805d).rw(FUNC(sega_segacd_device::segacd_imagebuffer_vcell_size_r), FUNC(sega_segacd_device::segacd_imagebuffer_vcell_size_w));// Image buffer V cell size
+	map(0xff805e, 0xff805f).rw(FUNC(sega_segacd_device::segacd_imagebuffer_start_address_r), FUNC(sega_segacd_device::segacd_imagebuffer_start_address_w)); // Image buffer start address
+	map(0xff8060, 0xff8061).rw(FUNC(sega_segacd_device::segacd_imagebuffer_offset_r), FUNC(sega_segacd_device::segacd_imagebuffer_offset_w));
+	map(0xff8062, 0xff8063).rw(FUNC(sega_segacd_device::segacd_imagebuffer_hdot_size_r), FUNC(sega_segacd_device::segacd_imagebuffer_hdot_size_w)); // Image buffer H dot size
+	map(0xff8064, 0xff8065).rw(FUNC(sega_segacd_device::segacd_imagebuffer_vdot_size_r), FUNC(sega_segacd_device::segacd_imagebuffer_vdot_size_w)); // Image buffer V dot size
+	map(0xff8066, 0xff8067).w(FUNC(sega_segacd_device::segacd_trace_vector_base_address_w));// Trace vector base address
 //  AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
 //  AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
 //  AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
 
-ADDRESS_MAP_END
+}
+
+void sega_segacd_device::segacd_pcm_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram();
+}
 
 
 // the tiles in RAM are 8x8 tiles
@@ -145,7 +152,7 @@ ADDRESS_MAP_END
 	16,16, \
 	SEGACD_NUM_TILES16, \
 	4, \
-	{ 0,1,2,3 },
+	{ STEP4(0,1) },
 #define _16x16_END \
 		8*128 \
 };
@@ -154,7 +161,7 @@ ADDRESS_MAP_END
 	32,32, \
 	SEGACD_NUM_TILES32, \
 	4, \
-	{ 0,1,2,3 },
+	{ STEP4(0,1) },
 
 #define _32x32_END \
 	8*512 \
@@ -265,7 +272,7 @@ _32x32_START
 	_32x32_SEQUENCE_1_FLIP
 _32x32_END
 
-static GFXDECODE_START( segacd )
+static GFXDECODE_START( gfx_segacd )
 	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f0_layout, 0, 0 )
 	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f0_layout, 0, 0 )
 	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f0_layout, 0, 0 )
@@ -287,9 +294,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 
-	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(segacd_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, sega_segacd_device, segacd_sub_int_callback)
+	MCFG_DEVICE_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(segacd_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, sega_segacd_device, segacd_sub_int_callback)
 
 	MCFG_DEVICE_ADD("cdc", LC89510, 0) // cd controller
 
@@ -302,13 +309,14 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD("irq3_timer", sega_segacd_device, irq3_timer_callback)
 	MCFG_TIMER_DRIVER_ADD("dma_timer", sega_segacd_device, dma_timer_callback)
 
-	MCFG_DEFAULT_LAYOUT( layout_megacd )
+	config.set_default_layout(layout_megacd);
 
-	MCFG_RF5C68_ADD("rfsnd", SEGACD_CLOCK) // RF5C164!
+	MCFG_DEVICE_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
 	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
+	MCFG_DEVICE_ADDRESS_MAP(0, segacd_pcm_map)
 
-	MCFG_NVRAM_ADD_0FILL("backupram")
+	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
 MACHINE_CONFIG_END
@@ -316,7 +324,7 @@ MACHINE_CONFIG_END
 
 sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, GFXDECODE_NAME( segacd )),
+		device_gfx_interface(mconfig, *this, gfx_segacd),
 		m_scdcpu(*this, "segacd_68k"),
 		m_rfsnd(*this, "rfsnd"),
 		m_lc89510_temp(*this, "tempcdc"),
@@ -1064,8 +1072,8 @@ inline uint8_t sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(int xp
 
 	int wraparound = segacd_stampsize&1;
 
-	int xtile = xpos / (1<<tilesize);
-	int ytile = ypos / (1<<tilesize);
+	int xtile = xpos >> tilesize;
+	int ytile = ypos >> tilesize;
 
 	if (wraparound)
 	{
@@ -1102,8 +1110,8 @@ inline uint8_t sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(int xp
 
 	int wraparound = segacd_stampsize&1;
 
-	int xtile = xpos / (1<<tilesize);
-	int ytile = ypos / (1<<tilesize);
+	int xtile = xpos >> tilesize;
+	int ytile = ypos >> tilesize;
 
 	if (wraparound)
 	{
@@ -1140,8 +1148,8 @@ inline uint8_t sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(int 
 
 	int wraparound = segacd_stampsize&1;
 
-	int xtile = xpos / (1<<tilesize);
-	int ytile = ypos / (1<<tilesize);
+	int xtile = xpos >> tilesize;
+	int ytile = ypos >> tilesize;
 
 	if (wraparound)
 	{
@@ -1178,8 +1186,8 @@ inline uint8_t sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(int 
 
 	int wraparound = segacd_stampsize&1;
 
-	int xtile = xpos / (1<<tilesize);
-	int ytile = ypos / (1<<tilesize);
+	int xtile = xpos >> tilesize;
+	int ytile = ypos >> tilesize;
 
 	if (wraparound)
 	{

@@ -214,7 +214,7 @@ static const discrete_lfsr_desc stinger_lfsr =
 	16          /* Output bit is feedback bit */
 };
 
-static DISCRETE_SOUND_START(stinger)
+static DISCRETE_SOUND_START(stinger_discrete)
 
 #define STINGER_SHOT_OUT    NODE_90
 #define STINGER_BOOM_OUT    NODE_91
@@ -309,48 +309,52 @@ WRITE8_MEMBER(wiz_state::wiz_main_nmi_mask_w)
 }
 
 
-ADDRESS_MAP_START(wiz_state::kungfut_main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("colorram2")
-	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_SHARE("attrram2")
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_SHARE("attrram")
-	AM_RANGE(0xe840, 0xe85f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW0")
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(wiz_main_nmi_mask_w)
-	AM_RANGE(0xf002, 0xf003) AM_WRITE(wiz_palette_bank_w)
-	AM_RANGE(0xf004, 0xf005) AM_WRITE(wiz_char_bank_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(wiz_flipx_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(wiz_flipy_w)
-	AM_RANGE(0xf008, 0xf008) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
-	AM_RANGE(0xf018, 0xf018) AM_READ_PORT("IN1")
-	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf818, 0xf818) AM_WRITE(wiz_bgcolor_w)
-ADDRESS_MAP_END
+void wiz_state::kungfut_main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd3ff).ram().share("videoram2");
+	map(0xd400, 0xd7ff).ram().share("colorram2");
+	map(0xd800, 0xd83f).ram().share("attrram2");
+	map(0xd840, 0xd85f).ram().share("spriteram2");
+	map(0xe000, 0xe3ff).ram().share("videoram");
+	map(0xe400, 0xe7ff).ram().share("colorram");
+	map(0xe800, 0xe83f).ram().share("attrram");
+	map(0xe840, 0xe85f).ram().share("spriteram");
+	map(0xf000, 0xf000).portr("DSW0");
+	map(0xf001, 0xf001).w(FUNC(wiz_state::wiz_main_nmi_mask_w));
+	map(0xf002, 0xf003).w(FUNC(wiz_state::wiz_palette_bank_w));
+	map(0xf004, 0xf005).w(FUNC(wiz_state::wiz_char_bank_w));
+	map(0xf006, 0xf006).w(FUNC(wiz_state::wiz_flipx_w));
+	map(0xf007, 0xf007).w(FUNC(wiz_state::wiz_flipy_w));
+	map(0xf008, 0xf008).portr("DSW1");
+	map(0xf010, 0xf010).portr("IN0");
+	map(0xf018, 0xf018).portr("IN1");
+	map(0xf800, 0xf800).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xf818, 0xf818).w(FUNC(wiz_state::wiz_bgcolor_w));
+}
 
-ADDRESS_MAP_START(wiz_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void wiz_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(wiz_state::wiz_main_map)
-	AM_IMPORT_FROM( kungfut_main_map )
-	AM_RANGE(0xc800, 0xc801) AM_WRITE(wiz_coin_counter_w)
-	AM_RANGE(0xd400, 0xd400) AM_READ(wiz_protection_r)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(wiz_sprite_bank_w)
-ADDRESS_MAP_END
+void wiz_state::wiz_main_map(address_map &map)
+{
+	kungfut_main_map(map);
+	map(0xc800, 0xc801).w(FUNC(wiz_state::wiz_coin_counter_w));
+	map(0xd400, 0xd400).r(FUNC(wiz_state::wiz_protection_r));
+	map(0xf000, 0xf000).w(FUNC(wiz_state::wiz_sprite_bank_w));
+}
 
-ADDRESS_MAP_START(wiz_state::stinger_main_map)
-	AM_IMPORT_FROM( kungfut_main_map )
+void wiz_state::stinger_main_map(address_map &map)
+{
+	kungfut_main_map(map);
 //  AM_RANGE(0xf008, 0xf00f) AM_WRITENOP // ?
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(stinger_explosion_w)
-	AM_RANGE(0xf80a, 0xf80a) AM_WRITE(stinger_shot_w)
-ADDRESS_MAP_END
+	map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xf808, 0xf808).w(FUNC(wiz_state::stinger_explosion_w));
+	map(0xf80a, 0xf80a).w(FUNC(wiz_state::stinger_shot_w));
+}
 
 
 /**************************************************************************/
@@ -361,26 +365,28 @@ WRITE8_MEMBER(wiz_state::wiz_sound_nmi_mask_w)
 }
 
 
-ADDRESS_MAP_START(wiz_state::kungfut_sound_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("8910.3", ay8910_device, address_data_w)
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_device, address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_device, address_data_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(wiz_sound_nmi_mask_w)
-ADDRESS_MAP_END
+void wiz_state::kungfut_sound_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x4001).w("8910.3", FUNC(ay8910_device::address_data_w));
+	map(0x5000, 0x5001).w("8910.1", FUNC(ay8910_device::address_data_w));
+	map(0x6000, 0x6001).w("8910.2", FUNC(ay8910_device::address_data_w));
+	map(0x7000, 0x7000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(wiz_state::wiz_sound_nmi_mask_w));
+}
 
-ADDRESS_MAP_START(wiz_state::stinger_sound_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(wiz_sound_nmi_mask_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITENOP // ?
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_device, address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_device, address_data_w)
-	AM_RANGE(0x5000, 0x7fff) AM_READNOP // prevent error.log spam, cpu jumps here by accident
-ADDRESS_MAP_END
+void wiz_state::stinger_sound_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(wiz_state::wiz_sound_nmi_mask_w));
+	map(0x4000, 0x4000).nopw(); // ?
+	map(0x5000, 0x5001).w("8910.1", FUNC(ay8910_device::address_data_w));
+	map(0x6000, 0x6001).w("8910.2", FUNC(ay8910_device::address_data_w));
+	map(0x5000, 0x7fff).nopr(); // prevent error.log spam, cpu jumps here by accident
+}
 
 
 
@@ -717,7 +723,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( wiz )
+static GFXDECODE_START( gfx_wiz )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x6000, charlayout,   0, 32 )
@@ -729,7 +735,7 @@ static GFXDECODE_START( wiz )
 	GFXDECODE_ENTRY( "gfx2", 0x6000, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( stinger )
+static GFXDECODE_START( gfx_stinger )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   0, 32 )
@@ -775,25 +781,25 @@ void wiz_state::machine_start()
 INTERRUPT_GEN_MEMBER(wiz_state::wiz_vblank_interrupt)
 {
 	if (m_main_nmi_mask & 1)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(wiz_state::wiz_sound_interrupt)
 {
 	if (m_sound_nmi_mask & 1)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(wiz_state::kungfut)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6) /* 3.072 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(kungfut_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wiz_state, wiz_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6) /* 3.072 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(kungfut_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wiz_state, wiz_vblank_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 18432000/6) /* 3.072 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(kungfut_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wiz_state, wiz_sound_interrupt, 4*60) /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 18432000/6) /* 3.072 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(kungfut_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wiz_state, wiz_sound_interrupt, 4*60) /* ??? */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -804,22 +810,22 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_kungfut)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stinger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stinger)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wiz_state, wiz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("8910.1", AY8910, 18432000/12)
+	MCFG_DEVICE_ADD("8910.1", AY8910, 18432000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("8910.2", AY8910, 18432000/12)
+	MCFG_DEVICE_ADD("8910.2", AY8910, 18432000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("8910.3", AY8910, 18432000/12)
+	MCFG_DEVICE_ADD("8910.3", AY8910, 18432000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -827,11 +833,11 @@ MACHINE_CONFIG_START(wiz_state::wiz)
 	kungfut(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wiz_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wiz_main_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wiz)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wiz)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_wiz)
 MACHINE_CONFIG_END
@@ -841,15 +847,15 @@ MACHINE_CONFIG_START(wiz_state::stinger)
 	kungfut(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(stinger_main_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(stinger_main_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(stinger_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(stinger_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -858,15 +864,14 @@ MACHINE_CONFIG_START(wiz_state::stinger)
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("8910.3")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(stinger)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, stinger_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wiz_state::scion)
 	stinger(config);
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
 	/* video hardware */
@@ -1126,7 +1131,7 @@ ROM_START( scionc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(wiz_state,stinger)
+void wiz_state::init_stinger()
 {
 	static const uint8_t swap_xor_table[4][4] =
 	{
@@ -1141,9 +1146,6 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 
 	for (int a = 0x0000; a < 0xc000; a++)
 	{
-		int row;
-		uint8_t src;
-
 		if (a & 0x2040)
 		{
 			/* not encrypted */
@@ -1151,10 +1153,10 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 		}
 		else
 		{
-			src = rom[a];
+			const uint8_t src = rom[a];
 
 			/* pick the translation table from bits 3 and 5 of the address */
-			row = ((a >> 3) & 1) + (((a >> 5) & 1) << 1);
+			int row = ((a >> 3) & 1) + (((a >> 5) & 1) << 1);
 
 			/* decode the opcodes */
 			tbl = swap_xor_table[row];
@@ -1164,12 +1166,12 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 }
 
 
-GAME( 1983, stinger,  0,       stinger, stinger,  wiz_state, stinger, ROT90,  "Seibu Denshi", "Stinger", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, stinger2, stinger, stinger, stinger2, wiz_state, stinger, ROT90,  "Seibu Denshi", "Stinger (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, scion,    0,       scion,   scion,    wiz_state, 0,       ROT0,   "Seibu Denshi", "Scion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, scionc,   scion,   scion,   scion,    wiz_state, 0,       ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kungfut,  0,       kungfut, kungfut,  wiz_state, 0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE )
-GAME( 1984, kungfuta, kungfut, kungfut, kungfut,  wiz_state, 0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE ) /* board was a bootleg but set might still be original */
-GAME( 1985, wiz,      0,       wiz,     wiz,      wiz_state, 0,       ROT270, "Seibu Kaihatsu", "Wiz", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz_state, 0,       ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz_state, 0,       ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, stinger,  0,       stinger, stinger,  wiz_state, init_stinger, ROT90,  "Seibu Denshi", "Stinger", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, stinger2, stinger, stinger, stinger2, wiz_state, init_stinger, ROT90,  "Seibu Denshi", "Stinger (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, scion,    0,       scion,   scion,    wiz_state, empty_init,   ROT0,   "Seibu Denshi", "Scion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, scionc,   scion,   scion,   scion,    wiz_state, empty_init,   ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kungfut,  0,       kungfut, kungfut,  wiz_state, empty_init,   ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE )
+GAME( 1984, kungfuta, kungfut, kungfut, kungfut,  wiz_state, empty_init,   ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE ) /* board was a bootleg but set might still be original */
+GAME( 1985, wiz,      0,       wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu", "Wiz", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 2)", MACHINE_SUPPORTS_SAVE )

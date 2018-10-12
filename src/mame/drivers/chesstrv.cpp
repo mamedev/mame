@@ -16,132 +16,172 @@
 #include "chesstrv.lh"
 #include "borisdpl.lh"
 
-class chesstrv_state : public driver_device
+class chesstrv_base_state : public driver_device
 {
-public:
-	chesstrv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+protected:
+	chesstrv_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( ram_addr_r );
-	DECLARE_WRITE8_MEMBER( ram_addr_w );
-	DECLARE_READ8_MEMBER( ram_r );
-	DECLARE_WRITE8_MEMBER( ram_w );
-	DECLARE_WRITE8_MEMBER( display_w );
-	DECLARE_WRITE8_MEMBER( matrix_w );
-	DECLARE_READ8_MEMBER( keypad_r );
-	DECLARE_WRITE8_MEMBER( diplomat_display_w );
-	DECLARE_READ8_MEMBER( diplomat_keypad_r );
+	DECLARE_READ8_MEMBER(ram_addr_r);
+	DECLARE_WRITE8_MEMBER(ram_addr_w);
+	DECLARE_READ8_MEMBER(ram_r);
+	DECLARE_WRITE8_MEMBER(ram_w);
+	DECLARE_WRITE8_MEMBER(matrix_w);
+
+	void chesstrv_mem(address_map &map);
 
 	uint8_t m_ram_addr;
 	uint8_t *m_ram;
 	uint8_t m_matrix;
-	//TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_timer_interrupt);
 	required_device<cpu_device> m_maincpu;
-	void chesstrv(machine_config &config);
-	void borisdpl(machine_config &config);
-	void borisdpl_io(address_map &map);
-	void chesstrv_io(address_map &map);
-	void chesstrv_mem(address_map &map);
 };
 
-WRITE8_MEMBER( chesstrv_state::ram_addr_w )
+class chesstrv_state : public chesstrv_base_state
+{
+public:
+	chesstrv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: chesstrv_base_state(mconfig, type, tag)
+		, m_digits(*this, "digit%u", 0U)
+		, m_keypad(*this, "LINE%u", 1U)
+	{
+	}
+
+	void chesstrv(machine_config &config);
+protected:
+	virtual void machine_start() override;
+private:
+	void chesstrv_io(address_map &map);
+
+	DECLARE_WRITE8_MEMBER(display_w);
+	DECLARE_READ8_MEMBER(keypad_r);
+
+	output_finder<4> m_digits;
+	required_ioport_array<4> m_keypad;
+};
+
+class borisdpl_state : public chesstrv_base_state
+{
+public:
+	borisdpl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: chesstrv_base_state(mconfig, type, tag)
+		, m_digits(*this, "digit%u", 0U)
+		, m_keypad(*this, "LINE%u", 1U)
+	{
+	}
+
+	void borisdpl(machine_config &config);
+protected:
+	virtual void machine_start() override;
+private:
+	void borisdpl_io(address_map &map);
+
+	DECLARE_WRITE8_MEMBER(display_w);
+	DECLARE_READ8_MEMBER(keypad_r);
+
+	//TIMER_DEVICE_CALLBACK_MEMBER(timer_interrupt);
+
+	output_finder<8> m_digits;
+	required_ioport_array<4> m_keypad;
+};
+
+WRITE8_MEMBER(chesstrv_base_state::ram_addr_w)
 {
 	m_ram_addr = data;
 }
 
-READ8_MEMBER( chesstrv_state::ram_addr_r )
+READ8_MEMBER(chesstrv_base_state::ram_addr_r)
 {
 	return m_ram_addr;
 }
 
-READ8_MEMBER( chesstrv_state::ram_r )
+READ8_MEMBER(chesstrv_base_state::ram_r)
 {
 	return m_ram[m_ram_addr];
 }
 
-WRITE8_MEMBER( chesstrv_state::ram_w )
+WRITE8_MEMBER(chesstrv_base_state::ram_w)
 {
 	m_ram[m_ram_addr] = data;
 }
 
-WRITE8_MEMBER( chesstrv_state::display_w )
+WRITE8_MEMBER(chesstrv_state::display_w)
 {
 	uint8_t seg_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 
-	if(!(m_matrix & 0x01))
-		output().set_digit_value( 3, seg_data );
-	if(!(m_matrix & 0x02))
-		output().set_digit_value( 2, seg_data );
-	if(!(m_matrix & 0x04))
-		output().set_digit_value( 1, seg_data );
-	if(!(m_matrix & 0x08))
-		output().set_digit_value( 0, seg_data );
+	for (int digit = 0; digit < 4; digit++)
+		if (!BIT(m_matrix, 3 - digit))
+			m_digits[digit] = seg_data;
 }
 
-WRITE8_MEMBER( chesstrv_state::matrix_w )
+WRITE8_MEMBER(chesstrv_base_state::matrix_w)
 {
 	m_matrix = data;
 }
 
-READ8_MEMBER( chesstrv_state::keypad_r )
+READ8_MEMBER(chesstrv_state::keypad_r)
 {
 	uint8_t data = 0;
 
-	data |= ioport("LINE1")->read();
-	data |= ioport("LINE2")->read();
-	data |= ioport("LINE3")->read();
-	data |= ioport("LINE4")->read();
-	data |= (ioport("LINE1")->read() ? 0x10 : 0);
-	data |= (ioport("LINE2")->read() ? 0x20 : 0);
-	data |= (ioport("LINE3")->read() ? 0x40 : 0);
-	data |= (ioport("LINE4")->read() ? 0x80 : 0);
+	data |= m_keypad[0]->read();
+	data |= m_keypad[1]->read();
+	data |= m_keypad[2]->read();
+	data |= m_keypad[3]->read();
+	data |= (m_keypad[0]->read() ? 0x10 : 0);
+	data |= (m_keypad[1]->read() ? 0x20 : 0);
+	data |= (m_keypad[2]->read() ? 0x40 : 0);
+	data |= (m_keypad[3]->read() ? 0x80 : 0);
 
 	return data;
 }
 
-WRITE8_MEMBER( chesstrv_state::diplomat_display_w )
+WRITE8_MEMBER(borisdpl_state::display_w)
 {
-	output().set_digit_value( m_matrix & 7, data ^ 0xff );
+	m_digits[m_matrix & 7] = data ^ 0xff;
 }
 
-READ8_MEMBER( chesstrv_state::diplomat_keypad_r )
+READ8_MEMBER(borisdpl_state::keypad_r)
 {
 	uint8_t data = m_matrix & 0x07;
 
 	switch (m_matrix & 7)
 	{
-		case 0:     data |= ioport("LINE1")->read();    break;
-		case 1:     data |= ioport("LINE2")->read();    break;
-		case 2:     data |= ioport("LINE3")->read();    break;
-		case 3:     data |= ioport("LINE4")->read();    break;
+		case 0:     data |= m_keypad[0]->read();    break;
+		case 1:     data |= m_keypad[1]->read();    break;
+		case 2:     data |= m_keypad[2]->read();    break;
+		case 3:     data |= m_keypad[3]->read();    break;
 	}
 
 	return data;
 }
 
 
-ADDRESS_MAP_START(chesstrv_state::chesstrv_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
-ADDRESS_MAP_END
+void chesstrv_base_state::chesstrv_mem(address_map &map)
+{
+	map.global_mask(0x7ff);
+	map(0x0000, 0x07ff).rom();
+}
 
 
-ADDRESS_MAP_START(chesstrv_state::chesstrv_io)
-	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( ram_addr_r, ram_addr_w )
-	AM_RANGE( 0x01, 0x01 ) AM_WRITE( display_w )
-	AM_RANGE( 0x04, 0x04 ) AM_READWRITE( ram_r, ram_w )
-	AM_RANGE( 0x05, 0x05 ) AM_READWRITE( keypad_r, matrix_w )
-ADDRESS_MAP_END
+void chesstrv_state::chesstrv_io(address_map &map)
+{
+	map(0x00, 0x00).rw(FUNC(chesstrv_state::ram_addr_r), FUNC(chesstrv_state::ram_addr_w));
+	map(0x01, 0x01).w(FUNC(chesstrv_state::display_w));
+	map(0x04, 0x04).rw(FUNC(chesstrv_state::ram_r), FUNC(chesstrv_state::ram_w));
+	map(0x05, 0x05).rw(FUNC(chesstrv_state::keypad_r), FUNC(chesstrv_state::matrix_w));
+}
 
-ADDRESS_MAP_START(chesstrv_state::borisdpl_io)
-	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( diplomat_keypad_r, matrix_w )
-	AM_RANGE( 0x01, 0x01 ) AM_WRITE( diplomat_display_w )
-	AM_RANGE( 0x04, 0x04 ) AM_READWRITE( ram_r, ram_w )
-	AM_RANGE( 0x05, 0x05 ) AM_READWRITE( ram_addr_r, ram_addr_w )
-ADDRESS_MAP_END
+void borisdpl_state::borisdpl_io(address_map &map)
+{
+	map(0x00, 0x00).rw(FUNC(borisdpl_state::keypad_r), FUNC(borisdpl_state::matrix_w));
+	map(0x01, 0x01).w(FUNC(borisdpl_state::display_w));
+	map(0x04, 0x04).rw(FUNC(borisdpl_state::ram_r), FUNC(borisdpl_state::ram_w));
+	map(0x05, 0x05).rw(FUNC(borisdpl_state::ram_addr_r), FUNC(borisdpl_state::ram_addr_w));
+}
 
 static INPUT_PORTS_START( chesstrv )
 	PORT_START("LINE1")
@@ -205,13 +245,13 @@ static INPUT_PORTS_START( borisdpl )
 INPUT_PORTS_END
 
 /*
-TIMER_DEVICE_CALLBACK_MEMBER(chesstrv_state::borisdpl_timer_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_state::timer_interrupt)
 {
     m_maincpu->set_input_line_and_vector(F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
 }
 */
 
-void chesstrv_state::machine_start()
+void chesstrv_base_state::machine_start()
 {
 	m_ram = memregion("ram")->base();
 
@@ -219,32 +259,52 @@ void chesstrv_state::machine_start()
 	save_item(NAME(m_matrix));
 }
 
+void chesstrv_state::machine_start()
+{
+	chesstrv_base_state::machine_start();
+	m_digits.resolve();
+}
+
+void borisdpl_state::machine_start()
+{
+	chesstrv_base_state::machine_start();
+	m_digits.resolve();
+}
+
 MACHINE_CONFIG_START(chesstrv_state::chesstrv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
-	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )
-	MCFG_CPU_IO_MAP( chesstrv_io )
+	MCFG_DEVICE_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
+	MCFG_DEVICE_PROGRAM_MAP( chesstrv_mem )
+	MCFG_DEVICE_IO_MAP( chesstrv_io )
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_chesstrv )
+	config.set_default_layout(layout_chesstrv);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(chesstrv_state::borisdpl)
+MACHINE_CONFIG_START(borisdpl_state::borisdpl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
-	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )
-	MCFG_CPU_IO_MAP( borisdpl_io )
+	MCFG_DEVICE_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
+	MCFG_DEVICE_PROGRAM_MAP( chesstrv_mem )
+	MCFG_DEVICE_IO_MAP( borisdpl_io )
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_borisdpl )
+	config.set_default_layout(layout_borisdpl);
 
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_interrupt", chesstrv_state, borisdpl_timer_interrupt, attotime::from_hz(40))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_interrupt", borisdpl_state, timer_interrupt, attotime::from_hz(40))
 MACHINE_CONFIG_END
 
 
 ROM_START( chesstrv )
 	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_LOAD("3870-sl90387", 0x0000, 0x0800, CRC(b76214d8) SHA1(7760903a64d9c513eb54c4787f535dabec62eb64))
+
+	ROM_REGION(0x0100, "ram", ROMREGION_ERASE)
+ROM_END
+
+ROM_START( boris )
+	ROM_REGION(0x0c00, "maincpu", 0)
+	ROM_LOAD("007-7020-00_c10502_korea.bin", 0x0000, 0x0800, CRC(18182870) SHA1(cb717a4b5269b04b0d7ae61aaf4a8f6a019626a5))
+	ROM_LOAD("007-7021-00_c10503_korea.bin", 0x0800, 0x0400, CRC(49b77505) SHA1(474b665ee2955497f6d70878d817f1783ba1a835))
 
 	ROM_REGION(0x0100, "ram", ROMREGION_ERASE)
 ROM_END
@@ -257,6 +317,7 @@ ROM_START( borisdpl )
 ROM_END
 
 
-//    YEAR   NAME       PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY             FULLNAME           FLAGS
-CONS( 1980,  chesstrv,  0,      0,      chesstrv, chesstrv, chesstrv_state, 0,    "Acetronic",        "Chess Traveller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-CONS( 1979,  borisdpl,  0,      0,      borisdpl, borisdpl, chesstrv_state, 0,    "Applied Concepts", "Boris Diplomat",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY             FULLNAME           FLAGS
+CONS( 1980,  chesstrv, 0,      0,      chesstrv, chesstrv, chesstrv_state, empty_init, "Acetronic",        "Chess Traveller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+CONS( 1979,  boris,    0,      0,      borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris - Electronic Chess Computer",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+CONS( 1979,  borisdpl, 0,      0,      borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris Diplomat",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

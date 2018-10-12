@@ -51,24 +51,25 @@ MACHINE_CONFIG_START(msx_cart_sfg_device::device_add_mconfig)
 	// YM3012 (DAC)
 	// YM2148 (MKS)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(msx_cart_sfg_device, ym2151_irq_w))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, msx_cart_sfg_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_DEVICE_ADD("ym2148", YM2148, XTAL(4'000'000))
-	MCFG_YM2148_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_YM2148_PORT_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
-	MCFG_YM2148_PORT_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
-	MCFG_YM2148_IRQ_HANDLER(WRITELINE(msx_cart_sfg_device, ym2148_irq_w))
+	YM2148(config, m_ym2148, XTAL(4'000'000));
+	m_ym2148->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_ym2148->port_write_handler().set("kbdc", FUNC(msx_audio_kbdc_port_device::write));
+	m_ym2148->port_read_handler().set("kbdc", FUNC(msx_audio_kbdc_port_device::read));
+	m_ym2148->irq_handler().set(FUNC(msx_cart_sfg_device::ym2148_irq_w));
 
 	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("ym2148", ym2148_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE("ym2148", ym2148_device, write_rxd))
 MACHINE_CONFIG_END
 
 

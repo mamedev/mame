@@ -108,28 +108,28 @@ private:
 	downcast<nsc810_device *>(device)->set_timer1_clock(_t1clk);
 
 #define MCFG_NSC810_PORTA_READ(_read) \
-	devcb = &downcast<nsc810_device &>(*device).set_portA_read_callback(DEVCB_##_read);
+	downcast<nsc810_device &>(*device).set_portA_read_callback(DEVCB_##_read);
 
 #define MCFG_NSC810_PORTB_READ(_read) \
-	devcb = &downcast<nsc810_device &>(*device).set_portB_read_callback(DEVCB_##_read);
+	downcast<nsc810_device &>(*device).set_portB_read_callback(DEVCB_##_read);
 
 #define MCFG_NSC810_PORTC_READ(_read) \
-	devcb = &downcast<nsc810_device &>(*device).set_portC_read_callback(DEVCB_##_read);
+	downcast<nsc810_device &>(*device).set_portC_read_callback(DEVCB_##_read);
 
 #define MCFG_NSC810_PORTA_WRITE(_write) \
-	devcb = &downcast<nsc810_device &>(*device).set_portA_write_callback(DEVCB_##_write);
+	downcast<nsc810_device &>(*device).set_portA_write_callback(DEVCB_##_write);
 
 #define MCFG_NSC810_PORTB_WRITE(_write) \
-	devcb = &downcast<nsc810_device &>(*device).set_portB_write_callback(DEVCB_##_write);
+	downcast<nsc810_device &>(*device).set_portB_write_callback(DEVCB_##_write);
 
 #define MCFG_NSC810_PORTC_WRITE(_write) \
-	devcb = &downcast<nsc810_device &>(*device).set_portC_write_callback(DEVCB_##_write);
+	downcast<nsc810_device &>(*device).set_portC_write_callback(DEVCB_##_write);
 
 #define MCFG_NSC810_TIMER0_OUT(_write) \
-	devcb = &downcast<nsc810_device &>(*device).set_timer0_callback(DEVCB_##_write);
+	downcast<nsc810_device &>(*device).set_timer0_callback(DEVCB_##_write);
 
 #define MCFG_NSC810_TIMER1_OUT(_write) \
-	devcb = &downcast<nsc810_device &>(*device).set_timer1_callback(DEVCB_##_write);
+	downcast<nsc810_device &>(*device).set_timer1_callback(DEVCB_##_write);
 
 // device type definition
 DECLARE_DEVICE_TYPE(NSC810, nsc810_device)

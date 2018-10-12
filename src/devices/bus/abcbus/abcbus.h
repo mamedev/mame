@@ -120,34 +120,34 @@
 
 
 #define MCFG_ABCBUS_SLOT_IRQ_CALLBACK(_irq) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_irq_callback(DEVCB_##_irq);
+	downcast<abcbus_slot_device *>(device)->set_irq_callback(DEVCB_##_irq);
 
 #define MCFG_ABCBUS_SLOT_NMI_CALLBACK(_nmi) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
+	downcast<abcbus_slot_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_ABCBUS_SLOT_RDY_CALLBACK(_rdy) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_rdy_callback(DEVCB_##_rdy);
+	downcast<abcbus_slot_device *>(device)->set_rdy_callback(DEVCB_##_rdy);
 
 #define MCFG_ABCBUS_SLOT_RESIN_CALLBACK(_resin) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_resin_callback(DEVCB_##_resin);
+	downcast<abcbus_slot_device *>(device)->set_resin_callback(DEVCB_##_resin);
 
 #define MCFG_ABCBUS_SLOT_PREN_CALLBACK(_pren) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_pren_callback(DEVCB_##_pren);
+	downcast<abcbus_slot_device *>(device)->set_pren_callback(DEVCB_##_pren);
 
 #define MCFG_ABCBUS_SLOT_TRRQ_CALLBACK(_trrq) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_trrq_callback(DEVCB_##_trrq);
+	downcast<abcbus_slot_device *>(device)->set_trrq_callback(DEVCB_##_trrq);
 
 #define MCFG_ABCBUS_SLOT_XINT2_CALLBACK(_xint2) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_xint2_callback(DEVCB_##_xint2);
+	downcast<abcbus_slot_device *>(device)->set_xint2_callback(DEVCB_##_xint2);
 
 #define MCFG_ABCBUS_SLOT_XINT3_CALLBACK(_xint3) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_xint3_callback(DEVCB_##_xint3);
+	downcast<abcbus_slot_device *>(device)->set_xint3_callback(DEVCB_##_xint3);
 
 #define MCFG_ABCBUS_SLOT_XINT4_CALLBACK(_xint4) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_xint4_callback(DEVCB_##_xint4);
+	downcast<abcbus_slot_device *>(device)->set_xint4_callback(DEVCB_##_xint4);
 
 #define MCFG_ABCBUS_SLOT_XINT5_CALLBACK(_xint5) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_xint5_callback(DEVCB_##_xint5);
+	downcast<abcbus_slot_device *>(device)->set_xint5_callback(DEVCB_##_xint5);
 
 
 
@@ -220,15 +220,15 @@ public:
 	template <class Object> devcb_base &set_xint5_callback(Object &&cb) { return m_write_xint5.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
-	void cs_w(uint8_t data) { if (m_card) m_card->abcbus_cs(data); }
-	uint8_t rst_r() { device_reset(); return 0xff; }
-	uint8_t inp_r() { return m_card ? m_card->abcbus_inp() : 0xff; }
-	void out_w(uint8_t data) { if (m_card) m_card->abcbus_out(data); }
-	uint8_t stat_r() { return m_card ? m_card->abcbus_stat() : 0xff; }
-	void c1_w(uint8_t data) { if (m_card) m_card->abcbus_c1(data); }
-	void c2_w(uint8_t data) { if (m_card) m_card->abcbus_c2(data); }
-	void c3_w(uint8_t data) { if (m_card) m_card->abcbus_c3(data); }
-	void c4_w(uint8_t data) { if (m_card) m_card->abcbus_c4(data); }
+	void write_cs(uint8_t data) { if (m_card) m_card->abcbus_cs(data); }
+	uint8_t read_rst() { device_reset(); return 0xff; }
+	uint8_t read_inp() { return m_card ? m_card->abcbus_inp() : 0xff; }
+	void write_out(uint8_t data) { if (m_card) m_card->abcbus_out(data); }
+	uint8_t read_stat() { return m_card ? m_card->abcbus_stat() : 0xff; }
+	void write_c1(uint8_t data) { if (m_card) m_card->abcbus_c1(data); }
+	void write_c2(uint8_t data) { if (m_card) m_card->abcbus_c2(data); }
+	void write_c3(uint8_t data) { if (m_card) m_card->abcbus_c3(data); }
+	void write_c4(uint8_t data) { if (m_card) m_card->abcbus_c4(data); }
 	uint8_t xmemfl_r(offs_t offset) { return m_card ? m_card->abcbus_xmemfl(offset) : 0xff; }
 	void xmemw_w(offs_t offset, uint8_t data) { if (m_card) m_card->abcbus_xmemw(offset, data); }
 	DECLARE_READ_LINE_MEMBER( csb_r ) { return m_card ? m_card->abcbus_csb() : 1; }
@@ -241,15 +241,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tren_w ) { if (m_card) m_card->abcbus_tren(state); }
 	DECLARE_WRITE_LINE_MEMBER( prac_w ) { if (m_card) m_card->abcbus_prac(state); }
 
-	DECLARE_WRITE8_MEMBER( cs_w ) { cs_w(data); }
-	DECLARE_READ8_MEMBER( rst_r ) { return rst_r(); }
-	DECLARE_READ8_MEMBER( inp_r ) { return inp_r(); }
-	DECLARE_WRITE8_MEMBER( out_w ) { out_w(data); }
-	DECLARE_READ8_MEMBER( stat_r ) { return stat_r(); }
-	DECLARE_WRITE8_MEMBER( c1_w ) { c1_w(data); }
-	DECLARE_WRITE8_MEMBER( c2_w ) { c2_w(data); }
-	DECLARE_WRITE8_MEMBER( c3_w ) { c3_w(data); }
-	DECLARE_WRITE8_MEMBER( c4_w ) { c4_w(data); }
+	DECLARE_WRITE8_MEMBER( cs_w ) { write_cs(data); }
+	DECLARE_READ8_MEMBER( rst_r ) { return read_rst(); }
+	DECLARE_READ8_MEMBER( inp_r ) { return read_inp(); }
+	DECLARE_WRITE8_MEMBER( out_w ) { write_out(data); }
+	DECLARE_READ8_MEMBER( stat_r ) { return read_stat(); }
+	DECLARE_WRITE8_MEMBER( c1_w ) { write_c1(data); }
+	DECLARE_WRITE8_MEMBER( c2_w ) { write_c2(data); }
+	DECLARE_WRITE8_MEMBER( c3_w ) { write_c3(data); }
+	DECLARE_WRITE8_MEMBER( c4_w ) { write_c4(data); }
 	DECLARE_READ8_MEMBER( xmemfl_r ) { return xmemfl_r(offset); }
 	DECLARE_WRITE8_MEMBER( xmemw_w ) { xmemw_w(offset, data); }
 
@@ -307,9 +307,9 @@ protected:
 DECLARE_DEVICE_TYPE(ABCBUS_SLOT, abcbus_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( abc80_cards );
-SLOT_INTERFACE_EXTERN( abcbus_cards );
-SLOT_INTERFACE_EXTERN( abc1600bus_cards );
+void abc80_cards(device_slot_interface &device);
+void abcbus_cards(device_slot_interface &device);
+void abc1600bus_cards(device_slot_interface &device);
 
 
 typedef device_type_iterator<abcbus_slot_device> abcbus_slot_device_iterator;

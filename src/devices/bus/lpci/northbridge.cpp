@@ -30,12 +30,12 @@ void northbridge_device::device_start()
 
 	machine().root_device().membank("bank10")->set_base(m_ram->pointer());
 
-	if (m_ram->size() > 0x0a0000)
+	if (m_ram->size() > 0x100000)
 	{
-		offs_t ram_limit = 0x100000 + m_ram->size() - 0x0a0000;
-		space.install_read_bank(0x100000,  ram_limit - 1, "bank1");
-		space.install_write_bank(0x100000,  ram_limit - 1, "bank1");
-		machine().root_device().membank("bank1")->set_base(m_ram->pointer() + 0xa0000);
+		offs_t ram_limit = 0x100000 + m_ram->size() - 0x100000;
+		space.install_read_bank (0x100000, ram_limit - 1, "bank1");
+		space.install_write_bank(0x100000, ram_limit - 1, "bank1");
+		machine().root_device().membank("bank1")->set_base(m_ram->pointer() + 0x100000);
 	}
 }
 

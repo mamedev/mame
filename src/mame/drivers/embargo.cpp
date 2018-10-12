@@ -19,6 +19,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
+	void embargo(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -35,7 +38,6 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_embargo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void embargo(machine_config &config);
 	void main_data_map(address_map &map);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
@@ -162,11 +164,12 @@ WRITE8_MEMBER(embargo_state::input_select_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(embargo_state::main_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1e00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void embargo_state::main_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1e00, 0x1fff).ram();
+	map(0x2000, 0x3fff).ram().share("videoram");
+}
 
 
 
@@ -176,16 +179,18 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(embargo_state::main_io_map)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(port_1_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(dial_r, port_2_w)
-	AM_RANGE(0x03, 0x03) AM_WRITENOP /* always 0xFE */
-ADDRESS_MAP_END
+void embargo_state::main_io_map(address_map &map)
+{
+	map(0x01, 0x01).portr("IN0").w(FUNC(embargo_state::port_1_w));
+	map(0x02, 0x02).rw(FUNC(embargo_state::dial_r), FUNC(embargo_state::port_2_w));
+	map(0x03, 0x03).nopw(); /* always 0xFE */
+}
 
-ADDRESS_MAP_START(embargo_state::main_data_map)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ_PORT("IN2")
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(input_port_bit_r, input_select_w)
-ADDRESS_MAP_END
+void embargo_state::main_data_map(address_map &map)
+{
+	map(S2650_DATA_PORT, S2650_DATA_PORT).portr("IN2");
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(embargo_state::input_port_bit_r), FUNC(embargo_state::input_select_w));
+}
 
 
 
@@ -264,10 +269,10 @@ void embargo_state::machine_reset()
 MACHINE_CONFIG_START(embargo_state::embargo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 625000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_DATA_MAP(main_data_map)
+	MCFG_DEVICE_ADD("maincpu", S2650, 625000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_DATA_MAP(main_data_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -306,4 +311,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, embargo, 0, embargo, embargo, embargo_state, 0, ROT0, "Cinematronics", "Embargo", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, embargo, 0, embargo, embargo, embargo_state, empty_init, ROT0, "Cinematronics", "Embargo", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

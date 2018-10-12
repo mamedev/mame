@@ -9,9 +9,6 @@
 
 #include "machine/pci.h"
 
-#define MCFG_SEGA_LINDBERGH_BASEBOARD_ADD(_tag) \
-	MCFG_PCI_DEVICE_ADD(_tag, SEGA_LINDBERGH_BASEBOARD, 0x105718c1, 0x10, 0x068000, 0x11db067b)
-
 class sega_lindbergh_baseboard_device : public pci_device {
 public:
 	sega_lindbergh_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

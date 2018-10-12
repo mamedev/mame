@@ -33,9 +33,10 @@ DEFINE_DEVICE_TYPE(EF9345, ef9345_device, "ef9345", "EF9345")
 DEFINE_DEVICE_TYPE(TS9347, ts9347_device, "ts9347", "TS9347")
 
 // default address map
-ADDRESS_MAP_START(ef9345_device::ef9345)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void ef9345_device::ef9345(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+}
 
 //-------------------------------------------------
 //  memory_space_config - return a description of

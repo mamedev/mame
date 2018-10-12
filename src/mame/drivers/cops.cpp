@@ -53,11 +53,11 @@ class cops_state : public driver_device
 {
 public:
 	cops_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_sn(*this, "snsnd"),
-			m_ld(*this, "laserdisc"),
-			m_irq(0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_sn(*this, "snsnd")
+		, m_ld(*this, "laserdisc")
+		, m_irq(0)
 	{ }
 
 	// devices
@@ -69,6 +69,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void revlatns(machine_config &config);
+	void base(machine_config &config);
 	void cops(machine_config &config);
 	void cops_map(address_map &map);
 	void revlatns_map(address_map &map);
@@ -99,7 +100,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cdrom_data_w);
 	DECLARE_WRITE8_MEMBER(cdrom_ctrl_w);
 	DECLARE_READ8_MEMBER(cdrom_data_r);
-	DECLARE_DRIVER_INIT(cops);
+	void init_cops();
 	int m_irq;
 
 	uint8_t m_lcd_addr_l, m_lcd_addr_h;
@@ -764,7 +765,7 @@ WRITE8_MEMBER(cops_state::via1_b_w)
 	m_sn_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	if (m_sn_cb1)
 	{
-		m_sn->write(space,0,m_sn_data);
+		m_sn->write(m_sn_data);
 	}
 }
 
@@ -802,27 +803,29 @@ WRITE_LINE_MEMBER(cops_state::via2_irq)
  *
  *************************************/
 
-ADDRESS_MAP_START(cops_state::cops_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x9fff) AM_ROM AM_REGION("program", 0)
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE(io1_r, io1_w)
-	AM_RANGE(0xb000, 0xb00f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  /* VIA 1 */
-	AM_RANGE(0xb800, 0xb80f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)  /* VIA 2 */
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(io2_r, io2_w)
-	AM_RANGE(0xd000, 0xd007) AM_READWRITE(dacia_r, dacia_w)
-	AM_RANGE(0xd800, 0xd80f) AM_DEVREADWRITE("via6522_3", via6522_device, read, write)  /* VIA 3 */
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("sysbank1")
-ADDRESS_MAP_END
+void cops_state::cops_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x9fff).rom().region("program", 0);
+	map(0xa000, 0xafff).rw(FUNC(cops_state::io1_r), FUNC(cops_state::io1_w));
+	map(0xb000, 0xb00f).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 1 */
+	map(0xb800, 0xb80f).rw("via6522_2", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 2 */
+	map(0xc000, 0xcfff).rw(FUNC(cops_state::io2_r), FUNC(cops_state::io2_w));
+	map(0xd000, 0xd007).rw(FUNC(cops_state::dacia_r), FUNC(cops_state::dacia_w));
+	map(0xd800, 0xd80f).rw("via6522_3", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 3 */
+	map(0xe000, 0xffff).bankr("sysbank1");
+}
 
-ADDRESS_MAP_START(cops_state::revlatns_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x9fff) AM_ROM AM_REGION("program", 0)
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE(io1_lm_r, io1_w)
-	AM_RANGE(0xb000, 0xb00f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  /* VIA 1 */
-	AM_RANGE(0xc000, 0xc00f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE(0xd000, 0xd007) AM_READWRITE(dacia_r, dacia_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("sysbank1")
-ADDRESS_MAP_END
+void cops_state::revlatns_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x9fff).rom().region("program", 0);
+	map(0xa000, 0xafff).rw(FUNC(cops_state::io1_lm_r), FUNC(cops_state::io1_w));
+	map(0xb000, 0xb00f).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 1 */
+	map(0xc000, 0xc00f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xd000, 0xd007).rw(FUNC(cops_state::dacia_r), FUNC(cops_state::dacia_w));
+	map(0xe000, 0xffff).bankr("sysbank1");
+}
 
 static INPUT_PORTS_START( cops )
 	PORT_START("SW0")
@@ -876,10 +879,10 @@ static INPUT_PORTS_START( revlatns )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("20p")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("10p")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("100p")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 INPUT_PORTS_END
 
@@ -907,7 +910,7 @@ void cops_state::machine_reset()
 }
 
 
-DRIVER_INIT_MEMBER(cops_state,cops)
+void cops_state::init_cops()
 {
 	//The hardware is designed and programmed to use multiple system ROM banks, but for some reason it's hardwired to bank 2.
 	//For documentation's sake, here's the init
@@ -916,70 +919,54 @@ DRIVER_INIT_MEMBER(cops_state,cops)
 	membank("sysbank1")->set_entry(2);
 }
 
-MACHINE_CONFIG_START(cops_state::cops)
+void cops_state::base(machine_config &config)
+{
+	M6502(config, m_maincpu, MAIN_CLOCK/2);
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(cops_map)
+	SONY_LDP1450(config, m_ld, 9600);
+	m_ld->set_screen("screen");
 
-	/* video hardware */
-	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_SELF_RENDER);
+	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
+	screen.set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via1_irq))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, via1_b_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITE8(cops_state, via1_cb1_w))
+	via6522_device &via1(VIA6522(config, "via6522_1", MAIN_CLOCK/2));
+	via1.irq_handler().set(FUNC(cops_state::via1_irq));
+	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
+	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
 
-	MCFG_DEVICE_ADD("via6522_2", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via2_irq))
-
-	MCFG_DEVICE_ADD("via6522_3", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_READPA_HANDLER(READ8(cops_state, cdrom_data_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cops_state, cdrom_data_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, cdrom_ctrl_w))
+	SPEAKER(config, "mono").front_center();
 
 	/* acia (really a 65C52)*/
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
 	/* TODO: Verify clock */
-	MCFG_SOUND_ADD("snsnd", SN76489, MAIN_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489(config, m_sn, MAIN_CLOCK/2);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_END
+void cops_state::cops(machine_config &config)
+{
+	base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::cops_map);
 
+	via6522_device &via2(VIA6522(config, "via6522_2", MAIN_CLOCK/2));
+	via2.irq_handler().set(FUNC(cops_state::via2_irq));
 
-MACHINE_CONFIG_START(cops_state::revlatns)
+	via6522_device &via3(VIA6522(config, "via6522_3", MAIN_CLOCK/2));
+	via3.readpa_handler().set(FUNC(cops_state::cdrom_data_r));
+	via3.writepa_handler().set(FUNC(cops_state::cdrom_data_w));
+	via3.writepb_handler().set(FUNC(cops_state::cdrom_ctrl_w));
+}
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(revlatns_map)
+void cops_state::revlatns(machine_config &config)
+{
+	base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::revlatns_map);
 
-	/* video hardware */
-	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-
-	/* via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via1_irq))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, via1_b_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITE8(cops_state, via1_cb1_w))
-
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-
-	/* acia (really a 65C52)*/
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	/* TODO: Verify clock */
-	MCFG_SOUND_ADD("snsnd", SN76489, MAIN_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	MSM6242(config, "rtc", XTAL(32'768));
+}
 
 /***************************************************************************
 
@@ -1027,6 +1014,6 @@ ROM_START( revlatns )
 ROM_END
 
 
-GAMEL( 1994, cops,      0,   cops,      cops,      cops_state, cops,       ROT0, "Atari Games",                     "Cops (USA)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, copsuk,    cops,cops,      cops,      cops_state, cops,       ROT0, "Nova Productions / Deith Leisure","Cops (UK)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, revlatns,  0,   revlatns,  revlatns,  cops_state, cops,       ROT0, "Nova Productions",                "Revelations",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                      "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions / Deith Leisure", "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions",                 "Revelations", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )

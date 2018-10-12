@@ -7,8 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "bus/ss50/mps.h"
-#include "bus/ss50/interface.h"
+#include "mps.h"
 
 #include "bus/rs232/rs232.h"
 #include "machine/6850acia.h"
@@ -98,14 +97,14 @@ DEVICE_INPUT_DEFAULTS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(ss50_mps_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE(ss50_mps_device, reader_control_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(ss50_mps_device, acia_irq_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//m_acia->rts_handler().set(FUNC(ss50_mps_device::reader_control_w));
+	m_acia->irq_handler().set(FUNC(ss50_mps_device::acia_irq_w));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 MACHINE_CONFIG_END
 
 
@@ -180,4 +179,4 @@ WRITE_LINE_MEMBER(ss50_mps_device::acia_irq_w)
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(SS50_MPS, ss50_mps_device, "ss50_mps", "MP-S Serial Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(SS50_MPS, ss50_card_interface, ss50_mps_device, "ss50_mps", "MP-S Serial Interface")

@@ -4,28 +4,31 @@
 
 #include "emu.h"
 #include "st0016.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
 DEFINE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device, "st0016_cpu", "ST0016")
 
-ADDRESS_MAP_START(st0016_cpu_device::st0016_cpu_internal_map)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
-	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
-	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_device, st0016_snd_r, st0016_snd_w) /* sound regs 8 x $20 bytes, see notes */
-ADDRESS_MAP_END
+void st0016_cpu_device::st0016_cpu_internal_map(address_map &map)
+{
+	map(0xc000, 0xcfff).r(FUNC(st0016_cpu_device::st0016_sprite_ram_r)).w(FUNC(st0016_cpu_device::st0016_sprite_ram_w));
+	map(0xd000, 0xdfff).r(FUNC(st0016_cpu_device::st0016_sprite2_ram_r)).w(FUNC(st0016_cpu_device::st0016_sprite2_ram_w));
+	map(0xea00, 0xebff).r(FUNC(st0016_cpu_device::st0016_palette_ram_r)).w(FUNC(st0016_cpu_device::st0016_palette_ram_w));
+	map(0xec00, 0xec1f).r(FUNC(st0016_cpu_device::st0016_character_ram_r)).w(FUNC(st0016_cpu_device::st0016_character_ram_w));
+	map(0xe900, 0xe9ff).rw("stsnd", FUNC(st0016_device::st0016_snd_r), FUNC(st0016_device::st0016_snd_w)); /* sound regs 8 x $20 bytes, see notes */
+}
 
 
-ADDRESS_MAP_START(st0016_cpu_device::st0016_cpu_internal_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
-	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
-	AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
-	AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
-ADDRESS_MAP_END
+void st0016_cpu_device::st0016_cpu_internal_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xbf).r(FUNC(st0016_cpu_device::st0016_vregs_r)).w(FUNC(st0016_cpu_device::st0016_vregs_w)); /* video/crt regs ? */
+	map(0xe2, 0xe2).w(FUNC(st0016_cpu_device::st0016_sprite_bank_w));
+	map(0xe3, 0xe4).w(FUNC(st0016_cpu_device::st0016_character_bank_w));
+	map(0xe5, 0xe5).w(FUNC(st0016_cpu_device::st0016_palette_bank_w));
+	map(0xf0, 0xf0).r(FUNC(st0016_cpu_device::st0016_dma_r));
+}
 
 // note: a lot of bits are left uninitialized by the games, the default values are uncertain
 
@@ -117,12 +120,13 @@ READ8_MEMBER(st0016_cpu_device::soundram_read)
 
 /* CPU interface */
 MACHINE_CONFIG_START(st0016_cpu_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
 	MCFG_DEVICE_ADD("stsnd", ST0016, 0)
-	MCFG_ST0016_SOUNDRAM_READ_CB(READ8(st0016_cpu_device, soundram_read))
+	MCFG_ST0016_SOUNDRAM_READ_CB(READ8(*this, st0016_cpu_device, soundram_read))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -324,7 +328,7 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
 			{
 				/* samples ? sound dma ? */
 				// speaglsht:  unknown DMA copy : src - 2B6740, dst - 4400, len - 1E400
-				logerror("unknown DMA copy : src - %X, dst - %X, len - %X, PC - %X\n",srcadr,dstadr,length,space.device().safe_pcbase());
+				logerror("%s unknown DMA copy : src - %X, dst - %X, len - %X\n", machine().describe_context(), srcadr, dstadr, length);
 				break;
 			}
 		}
@@ -569,9 +573,9 @@ void st0016_cpu_device::st0016_save_init()
 	save_item(NAME(m_dma_offset));
 	//save_item(NAME(st0016_rom_bank));
 	save_item(NAME(st0016_vregs));
-	save_pointer(NAME(m_charram.get()), MAX_CHAR_BANK*CHAR_BANK_SIZE);
-	save_pointer(NAME(st0016_paletteram.get()), MAX_PAL_BANK*PAL_BANK_SIZE);
-	save_pointer(NAME(st0016_spriteram.get()), MAX_SPR_BANK*SPR_BANK_SIZE);
+	save_pointer(NAME(m_charram), MAX_CHAR_BANK*CHAR_BANK_SIZE);
+	save_pointer(NAME(st0016_paletteram), MAX_PAL_BANK*PAL_BANK_SIZE);
+	save_pointer(NAME(st0016_spriteram), MAX_SPR_BANK*SPR_BANK_SIZE);
 }
 
 

@@ -11,9 +11,9 @@ h8h_device::h8h_device(const machine_config &mconfig, device_type type, const ch
 	mode_advanced = true;
 }
 
-util::disasm_interface *h8h_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> h8h_device::create_disassembler()
 {
-	return new h8h_disassembler;
+	return std::make_unique<h8h_disassembler>();
 }
 
 #include "cpu/h8/h8h.hxx"

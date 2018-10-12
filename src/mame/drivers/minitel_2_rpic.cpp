@@ -26,6 +26,7 @@
     - Modem and sound output.
     - The rear serial port.
     - Parameters I2C 24C02 EEPROM.
+    - Screen should go blank when switched off
 
     The original firmware and the experimental demo rom are currently both working.
 
@@ -52,6 +53,7 @@
 #include "machine/timer.h"
 #include "video/ef9345.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -92,6 +94,9 @@ public:
 		{
 		}
 
+	void minitel2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ts9347_device> m_ts9347;
 	required_device<palette_device> m_palette;
@@ -109,10 +114,9 @@ public:
 	DECLARE_READ8_MEMBER ( ts9347_io_r );
 	DECLARE_WRITE8_MEMBER ( ts9347_io_w );
 
-	void minitel2(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
-protected:
+
 	required_ioport_array<16> m_io_kbd;
 	virtual void machine_start() override;
 
@@ -277,15 +281,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(minitel_state::minitel_scanline)
 	m_ts9347->update_scanline((uint16_t)param);
 }
 
-ADDRESS_MAP_START(minitel_state::mem_prg)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void minitel_state::mem_prg(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(minitel_state::mem_io)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dev_keyb_ser_r, dev_crtl_reg_w)
+void minitel_state::mem_io(address_map &map)
+{
+	map(0x2000, 0x3fff).rw(FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_crtl_reg_w));
 	/* ts9347 */
-	AM_RANGE(0x4000, 0x5ffF) AM_READWRITE(ts9347_io_r, ts9347_io_w)
-ADDRESS_MAP_END
+	map(0x4000, 0x5ffF).rw(FUNC(minitel_state::ts9347_io_r), FUNC(minitel_state::ts9347_io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( minitel2 )
@@ -397,12 +403,13 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(minitel_state::minitel2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL(14'318'181)) //verified on pcb
-	MCFG_CPU_PROGRAM_MAP(mem_prg)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(minitel_state, port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(minitel_state, port1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(minitel_state, port3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(minitel_state, port3_w))
+	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(14'318'181)) //verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
+	MCFG_DEVICE_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, minitel_state, port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, minitel_state, port1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, minitel_state, port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, minitel_state, port3_w))
 
 	MCFG_DEVICE_ADD("ts9347", TS9347, 0)
 	MCFG_EF9345_PALETTE("palette")
@@ -424,13 +431,16 @@ ROM_START( minitel2 )
 	ROM_DEFAULT_BIOS("ft_bv4")
 
 	ROM_SYSTEM_BIOS(0, "ft_bv4", "Minitel 2 ROM BV4")
-	ROMX_LOAD( "MINITEL2_BV4.BIN",   0x0000, 0x8000, CRC(8844A0A7) SHA1(D3E9079B080DBCEE27AD870EC6C39AC42E7DEACF), ROM_BIOS(1) )
+	ROMX_LOAD( "minitel2_bv4.bin",   0x0000, 0x8000, CRC(8844a0a7) SHA1(d3e9079b080dbcee27ad870ec6c39ac42e7deacf), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS(1, "demov1", "Minitel 2 Demo")
-	ROMX_LOAD( "demo_minitel.bin",   0x0000, 0x8000, CRC(607F2482) SHA1(7965EDBEF68E45D09DC67A4684DA56003EFF6328), ROM_BIOS(2) )
+	ROMX_LOAD( "demo_minitel.bin",   0x0000, 0x8000, CRC(607f2482) SHA1(7965edbef68e45d09dc67a4684da56003eff6328), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "ft_bv9", "Minitel 2 ROM Bv9")
+	ROMX_LOAD( "bv9.1402",           0x0000, 0x8000, CRC(ace5d65e) SHA1(c8d589f8af6bd7d339964fdece937a76db972115), ROM_BIOS(2) )
 
 	ROM_REGION( 0x4000, "ts9347", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
 
-COMP( 1989, minitel2,      0,     0, minitel2,    minitel2, minitel_state,   0, "Philips", "Minitel 2", MACHINE_NO_SOUND )
+COMP( 1989, minitel2, 0, 0, minitel2, minitel2, minitel_state, empty_init, "Philips", "Minitel 2", MACHINE_NO_SOUND )

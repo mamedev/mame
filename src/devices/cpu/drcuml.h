@@ -7,14 +7,18 @@
     Universal machine language for dynamic recompiling CPU cores.
 
 ***************************************************************************/
+#ifndef MAME_CPU_DRCUML_H
+#define MAME_CPU_DRCUML_H
 
 #pragma once
 
-#ifndef MAME_DEVICES_CPU_DRCUML_H
-#define MAME_DEVICES_CPU_DRCUML_H
-
 #include "drccache.h"
 #include "uml.h"
+
+#include <iostream>
+#include <list>
+#include <memory>
+#include <vector>
 
 
 //**************************************************************************
@@ -37,11 +41,11 @@ class drcuml_state;
 union drcuml_ireg
 {
 #ifdef LSB_FIRST
-	struct { uint32_t l,h; } w;               // 32-bit low, high parts of the register
+	struct { u32 l, h; }    w;                      // 32-bit low, high parts of the register
 #else
-	struct { uint32_t h,l; } w;               // 32-bit low, high parts of the register
+	struct { u32 h, l; }    w;                      // 32-bit low, high parts of the register
 #endif
-	uint64_t              d;                  // 64-bit full register
+	u64                     d;                      // 64-bit full register
 };
 
 
@@ -49,47 +53,46 @@ union drcuml_ireg
 union drcuml_freg
 {
 #ifdef LSB_FIRST
-	struct { float l,h; } s;                // 32-bit low, high parts of the register
+	struct { float l, h; }  s;                      // 32-bit low, high parts of the register
 #else
-	struct { float h,l; } s;                // 32-bit low, high parts of the register
+	struct { float h, l; }  s;                      // 32-bit low, high parts of the register
 #endif
-	double              d;                  // 64-bit full register
+	double                  d;                      // 64-bit full register
 };
 
 
 // the collected machine state of a system
 struct drcuml_machine_state
 {
-	drcuml_ireg         r[uml::REG_I_COUNT];    // integer registers
-	drcuml_freg         f[uml::REG_F_COUNT];    // floating-point registers
-	uint32_t              exp;                // exception parameter register
-	uint8_t               fmod;               // fmod (floating-point mode) register
-	uint8_t               flags;              // flags state
+	drcuml_ireg             r[uml::REG_I_COUNT];    // integer registers
+	drcuml_freg             f[uml::REG_F_COUNT];    // floating-point registers
+	u32                     exp;                    // exception parameter register
+	u8                      fmod;                   // fmod (floating-point mode) register
+	u8                      flags;                  // flags state
 };
 
 
 // hints and information about the back-end
 struct drcbe_info
 {
-	uint8_t               direct_iregs;       // number of direct-mapped integer registers
-	uint8_t               direct_fregs;       // number of direct-mapped floating point registers
+	u8                      direct_iregs;           // number of direct-mapped integer registers
+	u8                      direct_fregs;           // number of direct-mapped floating point registers
 };
 
 
 // a drcuml_block describes a basic block of instructions
 class drcuml_block
 {
-	friend class simple_list<drcuml_block>;
-
 public:
 	// construction/destruction
-	drcuml_block(drcuml_state &drcuml, uint32_t maxinst);
+	drcuml_block(drcuml_state &drcuml, u32 maxinst);
+	drcuml_block(drcuml_block const &) = delete;
+	drcuml_block &operator=(drcuml_block const &) = delete;
 	~drcuml_block();
 
 	// getters
-	drcuml_block *next() const { return m_next; }
 	bool inuse() const { return m_inuse; }
-	uint32_t maxinst() const { return m_maxinst; }
+	u32 maxinst() const { return m_maxinst; }
 
 	// code generation
 	void begin();
@@ -111,15 +114,14 @@ private:
 	// internal helpers
 	void optimize();
 	void disassemble();
-	const char *get_comment_text(const uml::instruction &inst, std::string &comment);
+	char const *get_comment_text(uml::instruction const &inst, std::string &comment);
 
 	// internal state
-	drcuml_state &          m_drcuml;           // pointer back to the owning UML
-	drcuml_block *          m_next;             // pointer to next block
-	uint32_t                  m_nextinst;         // next instruction to fill in the cache
-	uint32_t                  m_maxinst;          // maximum number of instructions
-	std::vector<uml::instruction> m_inst;     // pointer to the instruction list
-	bool                    m_inuse;            // this block is in use
+	drcuml_state &                  m_drcuml;   // pointer back to the owning UML
+	u32                             m_nextinst; // next instruction to fill in the cache
+	u32                             m_maxinst;  // maximum number of instructions
+	std::vector<uml::instruction>   m_inst;     // pointer to the instruction list
+	bool                            m_inuse;    // this block is in use
 };
 
 
@@ -127,26 +129,28 @@ private:
 class drcbe_interface
 {
 public:
-	// construction/destruction
-	drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_t &device);
+	// allow deleting through base pointer
 	virtual ~drcbe_interface();
 
 	// required overrides
 	virtual void reset() = 0;
 	virtual int execute(uml::code_handle &entry) = 0;
-	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) = 0;
-	virtual bool hash_exists(uint32_t mode, uint32_t pc) = 0;
+	virtual void generate(drcuml_block &block, uml::instruction const *instlist, u32 numinst) = 0;
+	virtual bool hash_exists(u32 mode, u32 pc) = 0;
 	virtual void get_info(drcbe_info &info) = 0;
 	virtual bool logging() const { return false; }
 
 protected:
+	// base constructor
+	drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_t &device);
+
 	// internal state
-	drcuml_state &               m_drcuml;      // pointer back to our owner
-	drc_cache &                  m_cache;       // pointer to the cache
-	device_t &                   m_device;      // CPU device we are associated with
-	std::vector<address_space *> m_space;       // pointers to CPU's address space
-	drcuml_machine_state &       m_state;       // state of the machine (in near cache)
-	data_accessors *             m_accessors;   // memory accessors (in near cache)
+	drcuml_state &                  m_drcuml;      // pointer back to our owner
+	drc_cache &                     m_cache;       // pointer to the cache
+	device_t &                      m_device;      // CPU device we are associated with
+	std::vector<address_space *>    m_space;       // pointers to CPU's address space
+	drcuml_machine_state &          m_state;       // state of the machine (in near cache)
+	data_accessors *                m_accessors;   // memory accessors (in near cache)
 };
 
 
@@ -155,7 +159,7 @@ class drcuml_state
 {
 public:
 	// construction/destruction
-	drcuml_state(device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits);
+	drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits);
 	~drcuml_state();
 
 	// getters
@@ -164,64 +168,66 @@ public:
 
 	// reset the state
 	void reset();
-	int execute(uml::code_handle &entry) { return m_beintf.execute(entry); }
+	int execute(uml::code_handle &entry) { return m_beintf->execute(entry); }
 
 	// code generation
-	drcuml_block *begin_block(uint32_t maxinst);
+	drcuml_block &begin_block(u32 maxinst);
 
 	// back-end interface
-	void get_backend_info(drcbe_info &info) { m_beintf.get_info(info); }
-	bool hash_exists(uint32_t mode, uint32_t pc) { return m_beintf.hash_exists(mode, pc); }
-	void generate(drcuml_block &block, uml::instruction *instructions, uint32_t count) { m_beintf.generate(block, instructions, count); }
+	void get_backend_info(drcbe_info &info) { m_beintf->get_info(info); }
+	bool hash_exists(u32 mode, u32 pc) { return m_beintf->hash_exists(mode, pc); }
+	void generate(drcuml_block &block, uml::instruction *instructions, u32 count) { m_beintf->generate(block, instructions, count); }
 
 	// handle management
-	uml::code_handle *handle_alloc(const char *name);
+	uml::code_handle *handle_alloc(char const *name);
 
 	// symbol management
-	void symbol_add(void *base, uint32_t length, const char *name);
-	const char *symbol_find(void *base, uint32_t *offset = nullptr);
+	void symbol_add(void *base, u32 length, char const *name);
+	char const *symbol_find(void *base, u32 *offset = nullptr);
 
 	// logging
-	bool logging() const { return (m_umllog != nullptr); }
-	void log_printf(const char *format, ...) ATTR_PRINTF(2,3);
-	void log_flush() { if (logging()) fflush(m_umllog); }
-	bool logging_native() const { return m_beintf.logging(); }
+	bool logging() const { return bool(m_umllog); }
+	template <typename Format, typename... Params>
+	void log_printf(Format &&fmt, Params &&...args)
+	{
+		log_vprintf(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+	void log_vprintf(util::format_argument_pack<std::ostream> const &args);
+	void log_flush() { if (logging()) m_umllog->flush(); }
+	bool logging_native() const { return m_beintf->logging(); }
 
 private:
 	// symbol class
 	class symbol
 	{
-		friend class drcuml_state;
-		friend class simple_list<symbol>;
-
-		// construction/destruction
-		symbol(void *base, uint32_t length, const char *name)
-			: m_next(nullptr),
-				m_base(drccodeptr(base)),
-				m_length(length),
-				m_name(name) { }
-
 	public:
+		// construction/destruction
+		symbol(void *base, u32 length, char const *name)
+			: m_base(reinterpret_cast<drccodeptr>(base))
+			, m_length(length)
+			, m_name(name)
+		{ }
+
 		// getters
-		symbol *next() const { return m_next; }
+		bool includes(drccodeptr search) const { return (m_base <= search) && ((m_base + m_length) > search); }
+		drccodeptr base() const { return m_base; }
+		std::string const &name() const { return m_name; }
 
 	private:
 		// internal state
-		symbol *                m_next;             // link to the next symbol
-		drccodeptr              m_base;             // base of the symbol
-		uint32_t                  m_length;           // length of the region covered
-		std::string             m_name;             // name of the symbol
+		drccodeptr  m_base;     // base of the symbol
+		u32         m_length;   // length of the region covered
+		std::string m_name;     // name of the symbol
 	};
 
 	// internal state
-	device_t &                  m_device;           // CPU device we are associated with
-	drc_cache &                 m_cache;            // pointer to the codegen cache
-	std::unique_ptr<drcbe_interface> m_drcbe_interface;
-	drcbe_interface &           m_beintf;           // backend interface pointer
-	FILE *                      m_umllog;           // handle to the UML logfile
-	simple_list<drcuml_block>   m_blocklist;        // list of active blocks
-	simple_list<uml::code_handle> m_handlelist;     // list of active handles
-	simple_list<symbol>         m_symlist;          // list of symbols
+	device_t &                              m_device;           // CPU device we are associated with
+	drc_cache &                             m_cache;            // pointer to the codegen cache
+	std::unique_ptr<drcbe_interface> const  m_beintf;           // backend interface pointer
+	std::unique_ptr<std::ostream> const     m_umllog;           // handle to the UML logfile
+	std::list<drcuml_block>                 m_blocklist;        // list of active blocks
+	std::list<uml::code_handle>             m_handlelist;       // list of active handles
+	std::list<symbol>                       m_symlist;          // list of symbols
 };
 
 
@@ -239,11 +245,11 @@ template <typename Format, typename... Params>
 inline void drcuml_block::append_comment(Format &&fmt, Params &&... args)
 {
 	// do the printf
-	std::string temp(util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	std::string const temp(util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 
 	// allocate space in the cache to hold the comment
-	char *comment = (char *)m_drcuml.cache().alloc_temporary(temp.length() + 1);
-	if (comment != nullptr)
+	char *const comment = reinterpret_cast<char *>(m_drcuml.cache().alloc_temporary(temp.length() + 1));
+	if (comment)
 	{
 		strcpy(comment, temp.c_str());
 
@@ -253,4 +259,4 @@ inline void drcuml_block::append_comment(Format &&fmt, Params &&... args)
 }
 
 
-#endif /* MAME_DEVICES_CPU_DRCUML_H */
+#endif // MAME_CPU_DRCUML_H

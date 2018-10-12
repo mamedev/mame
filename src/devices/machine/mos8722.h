@@ -46,19 +46,19 @@
 //**************************************************************************
 
 #define MCFG_MOS8722_Z80EN_CALLBACK(_write) \
-	devcb = &downcast<mos8722_device &>(*device).set_z80en_wr_callback(DEVCB_##_write);
+	downcast<mos8722_device &>(*device).set_z80en_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS8722_FSDIR_CALLBACK(_write) \
-	devcb = &downcast<mos8722_device &>(*device).set_fsdir_wr_callback(DEVCB_##_write);
+	downcast<mos8722_device &>(*device).set_fsdir_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS8722_GAME_CALLBACK(_read) \
-	devcb = &downcast<mos8722_device &>(*device).set_game_rd_callback(DEVCB_##_read);
+	downcast<mos8722_device &>(*device).set_game_rd_callback(DEVCB_##_read);
 
 #define MCFG_MOS8722_EXROM_CALLBACK(_read) \
-	devcb = &downcast<mos8722_device &>(*device).set_exrom_rd_callback(DEVCB_##_read);
+	downcast<mos8722_device &>(*device).set_exrom_rd_callback(DEVCB_##_read);
 
 #define MCFG_MOS8722_SENSE40_CALLBACK(_read) \
-	devcb = &downcast<mos8722_device &>(*device).set_sense40_rd_callback(DEVCB_##_read);
+	downcast<mos8722_device &>(*device).set_sense40_rd_callback(DEVCB_##_read);
 
 
 

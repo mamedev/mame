@@ -12,6 +12,7 @@
 #include "machine/hp_taco.h"
 #include "sound/beep.h"
 #include "bus/hp9845_io/hp9845_io.h"
+#include "emupal.h"
 #include "screen.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -37,12 +38,12 @@ protected:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_irq();
 	DECLARE_WRITE8_MEMBER(irq_w);
-	void irq_w(uint8_t sc , int state);
+	void set_irq(uint8_t sc , int state);
 	void update_flg_sts();
 	DECLARE_WRITE8_MEMBER(sts_w);
-	void sts_w(uint8_t sc , int state);
+	void set_sts(uint8_t sc , int state);
 	DECLARE_WRITE8_MEMBER(flg_w);
-	void flg_w(uint8_t sc , int state);
+	void set_flg(uint8_t sc , int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	DECLARE_READ16_MEMBER(kb_scancode_r);

@@ -44,6 +44,7 @@ ToDo:
 #include "machine/i8257.h"
 #include "video/i8275.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -61,6 +62,9 @@ public:
 		, m_p_vram(*this, "vram")
 	{ }
 
+	void unior(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_READ8_MEMBER(ppi0_b_r);
@@ -75,10 +79,9 @@ public:
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
-	void unior(machine_config &config);
 	void unior_io(address_map &map);
 	void unior_mem(address_map &map);
-private:
+
 	uint8_t m_4c;
 	uint8_t m_4e;
 	virtual void machine_reset() override;
@@ -90,24 +93,25 @@ private:
 	required_region_ptr<u8> m_p_vram;
 };
 
-ADDRESS_MAP_START(unior_state::unior_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(vram_w) // main video
-ADDRESS_MAP_END
+void unior_state::unior_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xf7ff).ram();
+	map(0xf800, 0xffff).rom().w(FUNC(unior_state::vram_w)); // main video
+}
 
-ADDRESS_MAP_START(unior_state::unior_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x38) AM_DEVREADWRITE("dma", i8257_device, read, write) // dma data
-	AM_RANGE(0x3c, 0x3f) AM_DEVREADWRITE("ppi0", i8255_device, read, write) // cassette player control
-	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0x50, 0x50) AM_WRITE(scroll_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("crtc", i8275_device, read, write)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("pit", pit8253_device, read, write )
-	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
-	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void unior_state::unior_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x30, 0x38).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write)); // dma data
+	map(0x3c, 0x3f).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write)); // cassette player control
+	map(0x4c, 0x4f).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x50, 0x50).w(FUNC(unior_state::scroll_w));
+	map(0x60, 0x61).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0xdc, 0xdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xec, 0xed).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( unior )
@@ -243,7 +247,7 @@ static const gfx_layout unior_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( unior )
+static GFXDECODE_START( gfx_unior )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unior_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -263,9 +267,6 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
-
-	if(linecount == 8)
-		gfx = 0;
 
 	if (vsp)
 		gfx = 0;
@@ -378,9 +379,9 @@ void unior_state::machine_reset()
 
 MACHINE_CONFIG_START(unior_state::unior)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(20'000'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(unior_mem)
-	MCFG_CPU_IO_MAP(unior_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(20'000'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(unior_mem)
+	MCFG_DEVICE_IO_MAP(unior_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -388,49 +389,48 @@ MACHINE_CONFIG_START(unior_state::unior)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unior)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unior)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(unior_state,unior)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(20'000'000) / 12)
-	MCFG_PIT8253_CLK1(XTAL(20'000'000) / 9)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK2(XTAL(16'000'000) / 9 / 64) // unknown frequency
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(20_MHz_XTAL / 12);
+	m_pit->set_clk<1>(20_MHz_XTAL / 9);
+	m_pit->out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
+	m_pit->out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
+	m_pit->set_clk<2>(16_MHz_XTAL / 9 / 64); // unknown frequency
+	m_pit->out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
 
-	MCFG_DEVICE_ADD("ppi0", I8255, 0)
+	i8255_device &ppi0(I8255(config, "ppi0"));
 	// ports a & c connect to an external slot
-	MCFG_I8255_IN_PORTB_CB(READ8(unior_state, ppi0_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(unior_state, ppi0_b_w))
+	ppi0.in_pb_callback().set(FUNC(unior_state::ppi0_b_r));
+	ppi0.out_pb_callback().set(FUNC(unior_state::ppi0_b_w));
 
-	MCFG_DEVICE_ADD("ppi1", I8255, 0)
+	i8255_device &ppi1(I8255(config, "ppi1"));
 	// ports a & b are for the keyboard
 	// port c operates various control lines for mostly unknown purposes
-	MCFG_I8255_IN_PORTA_CB(READ8(unior_state, ppi1_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(unior_state, ppi1_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(unior_state, ppi1_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(unior_state, ppi1_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(unior_state, ppi1_c_w))
+	ppi1.in_pa_callback().set(FUNC(unior_state::ppi1_a_r));
+	ppi1.in_pb_callback().set(FUNC(unior_state::ppi1_b_r));
+	ppi1.in_pc_callback().set(FUNC(unior_state::ppi1_c_r));
+	ppi1.out_pa_callback().set(FUNC(unior_state::ppi1_a_w));
+	ppi1.out_pc_callback().set(FUNC(unior_state::ppi1_c_w));
 
-	MCFG_DEVICE_ADD("dma", I8257, XTAL(20'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(unior_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(unior_state, dma_r))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275_device, dack_w))
+	I8257(config, m_dma, XTAL(20'000'000) / 9);
+	m_dma->out_hrq_cb().set(FUNC(unior_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(unior_state::dma_r));
+	m_dma->out_iow_cb<2>().set("crtc", FUNC(i8275_device::dack_w));
 
 	MCFG_DEVICE_ADD("crtc", I8275, XTAL(20'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(unior_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma",i8257_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma",i8257_device, dreq2_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
@@ -449,5 +449,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT    COMPAT   MACHINE    INPUT  CLASS          INIT  COMPANY      FULLNAME  FLAGS */
-COMP( 19??, unior,  radio86,  0,       unior,     unior, unior_state,   0,    "<unknown>", "Unior",  MACHINE_NOT_WORKING )
+/*    YEAR  NAME   PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS */
+COMP( 19??, unior, radio86, 0,      unior,   unior, unior_state, empty_init, "<unknown>", "Unior",  MACHINE_NOT_WORKING )

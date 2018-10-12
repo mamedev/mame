@@ -20,10 +20,10 @@
 	MCFG_PPU2C0X_ADD(_tag, PPU_VT03)
 
 #define MCFG_PPU_VT03_READ_BG_CB(_devcb) \
-	devcb = &downcast<ppu_vt03_device &>(*device).set_read_bg_callback(DEVCB_##_devcb);
+	downcast<ppu_vt03_device &>(*device).set_read_bg_callback(DEVCB_##_devcb);
 
 #define MCFG_PPU_VT03_READ_SP_CB(_devcb) \
-	devcb = &downcast<ppu_vt03_device &>(*device).set_read_sp_callback(DEVCB_##_devcb);
+	downcast<ppu_vt03_device &>(*device).set_read_sp_callback(DEVCB_##_devcb);
 
 #define MCFG_PPU_VT03_MODIFY MCFG_DEVICE_MODIFY
 
@@ -56,15 +56,17 @@ public:
 	virtual DECLARE_READ8_MEMBER(palette_read) override;
 	virtual DECLARE_WRITE8_MEMBER(palette_write) override;
 
-	virtual void init_palette( palette_device &palette, int first_entry ) override;
+	virtual uint32_t palette_entries() const override { return 256; }
+	virtual uint32_t palette_indirect_entries() const override { return 4*16*8; }
+	virtual void init_palette() override;
 
 	virtual void read_tile_plane_data(int address, int color) override;
 	virtual void shift_tile_plane_data(uint8_t &pix) override;
-	virtual void draw_tile_pixel(uint8_t pix, int color, uint16_t back_pen, uint16_t *&dest, const pen_t *color_table) override;
+	virtual void draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t *&dest, const pen_t *color_table) override;
 
 	virtual void read_sprite_plane_data(int address) override;
 	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx) override;
-	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_ind16& bitmap) override;
+	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
 	virtual void read_extra_sprite_bits(int sprite_index) override;
 
 	virtual void device_start() override;
@@ -88,8 +90,6 @@ private:
 
 	uint8_t m_extplanebuf[2];
 	uint8_t m_extra_sprite_bits;
-
-	palette_device *m_palette;
 
 	uint8_t m_201x_regs[0x20];
 

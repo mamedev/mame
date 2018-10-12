@@ -87,14 +87,11 @@ public:
 	DECLARE_WRITE8_MEMBER(cham24_IN0_w);
 	DECLARE_READ8_MEMBER(cham24_IN1_r);
 	DECLARE_WRITE8_MEMBER(cham24_mapper_w);
-	DECLARE_DRIVER_INIT(cham24);
+	void init_cham24();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cham24);
-	uint32_t screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
-	void ppu_irq(int *ppu_regs);
 	void cham24(machine_config &config);
 	void cham24_map(address_map &map);
 };
@@ -222,14 +219,15 @@ WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 	}
 }
 
-ADDRESS_MAP_START(cham24_state::cham24_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(cham24_IN0_r,        cham24_IN0_w)            /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(cham24_IN1_r)    /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(cham24_mapper_w)
-ADDRESS_MAP_END
+void cham24_state::cham24_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(FUNC(cham24_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(cham24_state::cham24_IN0_r), FUNC(cham24_state::cham24_IN0_w));            /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(cham24_state::cham24_IN1_r));    /* IN1 - input port 2 / PSG second control register */
+	map(0x8000, 0xffff).rom().w(FUNC(cham24_state::cham24_mapper_w));
+}
 
 static INPUT_PORTS_START( cham24 )
 	PORT_START("P1") /* IN0 */
@@ -253,25 +251,8 @@ static INPUT_PORTS_START( cham24 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(cham24_state, cham24)
-{
-	m_ppu->init_palette(palette, 0);
-}
-
-void cham24_state::ppu_irq(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void cham24_state::video_start()
 {
-}
-
-uint32_t cham24_state::screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	/* render the ppu */
-	m_ppu->render(bitmap, 0, 0, 0, 0);
-	return 0;
 }
 
 
@@ -303,37 +284,28 @@ void cham24_state::machine_reset()
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff,read8_delegate(FUNC(cham24_state::nt_r), this), write8_delegate(FUNC(cham24_state::nt_w), this));
 }
 
-DRIVER_INIT_MEMBER(cham24_state,cham24)
+void cham24_state::init_cham24()
 {
 }
 
-static GFXDECODE_START( cham24 )
-	/* none, the ppu generates one */
-GFXDECODE_END
-
 MACHINE_CONFIG_START(cham24_state::cham24)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cham24_map)
+	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cham24_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cham24_state, screen_update_cham24)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cham24)
-	MCFG_PALETTE_ADD("palette", 8*4*16)
-	MCFG_PALETTE_INIT_OWNER(cham24_state, cham24)
-
-	MCFG_PPU2C04_ADD("ppu")
+	MCFG_PPU2C02_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(cham24_state, ppu_irq)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 ROM_START( cham24 )
@@ -349,4 +321,4 @@ ROM_START( cham24 )
 	ROM_LOAD( "24-3.u3", 0x0000, 0x10000, CRC(e97955fa) SHA1(6d686c5d0967c9c2f40dbd8e6a0c0907606f2c7d) ) // unknown rom
 ROM_END
 
-GAME( 2002, cham24, 0, cham24, cham24, cham24_state, cham24, ROT0, "bootleg", "Chameleon 24", MACHINE_NOT_WORKING )
+GAME( 2002, cham24, 0, cham24, cham24, cham24_state, init_cham24, ROT0, "bootleg", "Chameleon 24", MACHINE_NOT_WORKING )

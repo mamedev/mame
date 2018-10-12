@@ -175,24 +175,25 @@ void hng64_state::reset_sound()
 // ----------------------------------------------
 
 
-ADDRESS_MAP_START(hng64_state::hng_sound_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("bank0")
-	AM_RANGE(0x10000, 0x1ffff) AM_RAMBANK("bank1")
-	AM_RANGE(0x20000, 0x2ffff) AM_RAMBANK("bank2")
-	AM_RANGE(0x30000, 0x3ffff) AM_RAMBANK("bank3")
-	AM_RANGE(0x40000, 0x4ffff) AM_RAMBANK("bank4")
-	AM_RANGE(0x50000, 0x5ffff) AM_RAMBANK("bank5")
-	AM_RANGE(0x60000, 0x6ffff) AM_RAMBANK("bank6")
-	AM_RANGE(0x70000, 0x7ffff) AM_RAMBANK("bank7")
-	AM_RANGE(0x80000, 0x8ffff) AM_RAMBANK("bank8")
-	AM_RANGE(0x90000, 0x9ffff) AM_RAMBANK("bank9")
-	AM_RANGE(0xa0000, 0xaffff) AM_RAMBANK("banka")
-	AM_RANGE(0xb0000, 0xbffff) AM_RAMBANK("bankb")
-	AM_RANGE(0xc0000, 0xcffff) AM_RAMBANK("bankc")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAMBANK("bankd")
-	AM_RANGE(0xe0000, 0xeffff) AM_RAMBANK("banke")
-	AM_RANGE(0xf0000, 0xfffff) AM_RAMBANK("bankf")
-ADDRESS_MAP_END
+void hng64_state::hng_sound_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).bankrw("bank0");
+	map(0x10000, 0x1ffff).bankrw("bank1");
+	map(0x20000, 0x2ffff).bankrw("bank2");
+	map(0x30000, 0x3ffff).bankrw("bank3");
+	map(0x40000, 0x4ffff).bankrw("bank4");
+	map(0x50000, 0x5ffff).bankrw("bank5");
+	map(0x60000, 0x6ffff).bankrw("bank6");
+	map(0x70000, 0x7ffff).bankrw("bank7");
+	map(0x80000, 0x8ffff).bankrw("bank8");
+	map(0x90000, 0x9ffff).bankrw("bank9");
+	map(0xa0000, 0xaffff).bankrw("banka");
+	map(0xb0000, 0xbffff).bankrw("bankb");
+	map(0xc0000, 0xcffff).bankrw("bankc");
+	map(0xd0000, 0xdffff).bankrw("bankd");
+	map(0xe0000, 0xeffff).bankrw("banke");
+	map(0xf0000, 0xfffff).bankrw("bankf");
+}
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 {
@@ -219,7 +220,7 @@ READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 // but why not just use the V33/V53 XA mode??
 WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
 {
-	logerror("%08x hng64_sound_bank_w? %02x %04x\n", space.device().safe_pc(), offset, data);
+	logerror("%s hng64_sound_bank_w? %02x %04x\n", machine().describe_context(), offset, data);
 	// buriki writes 0x3f to 0x200 before jumping to the low addresses..
 	// where it expects to find data from 0x1f0000
 
@@ -251,18 +252,18 @@ WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_000a_w)
 {
-	logerror("%08x: hng64_port hng64_sound_port_000a_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
+	logerror("%s: hng64_port hng64_sound_port_000a_w %04x mask (%04x)\n", machine().describe_context(), data, mem_mask);
 }
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_000c_w)
 {
-	logerror("%08x: hng64_port hng64_sound_port_000c_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
+	logerror("%s: hng64_port hng64_sound_port_000c_w %04x mask (%04x)\n", machine().describe_context(), data, mem_mask);
 }
 
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0080_w)
 {
-	logerror("hng64_port 0x0080 %04x\n", data);
+	logerror("%s: hng64_port 0x0080 %04x\n", machine().describe_context(), data);
 }
 
 
@@ -301,20 +302,21 @@ READ16_MEMBER(hng64_state::sound_comms_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(hng64_state::hng_sound_io)
-	AM_RANGE(0x0000, 0x0007) AM_DEVREADWRITE("l7a1045", l7a1045_sound_device, l7a1045_sound_r, l7a1045_sound_w )
+void hng64_state::hng_sound_io(address_map &map)
+{
+	map(0x0000, 0x0007).rw(m_dsp, FUNC(l7a1045_sound_device::l7a1045_sound_r), FUNC(l7a1045_sound_device::l7a1045_sound_w));
 
-	AM_RANGE(0x0008, 0x0009) AM_READWRITE( hng64_sound_port_0008_r, hng64_sound_port_0008_w )
-	AM_RANGE(0x000a, 0x000b) AM_WRITE( hng64_sound_port_000a_w )
-	AM_RANGE(0x000c, 0x000d) AM_WRITE( hng64_sound_port_000c_w )
+	map(0x0008, 0x0009).rw(FUNC(hng64_state::hng64_sound_port_0008_r), FUNC(hng64_state::hng64_sound_port_0008_w));
+	map(0x000a, 0x000b).w(FUNC(hng64_state::hng64_sound_port_000a_w));
+	map(0x000c, 0x000d).w(FUNC(hng64_state::hng64_sound_port_000c_w));
 
-	AM_RANGE(0x0080, 0x0081) AM_WRITE( hng64_sound_port_0080_w )
+	map(0x0080, 0x0081).w(FUNC(hng64_state::hng64_sound_port_0080_w));
 
-	AM_RANGE(0x0100, 0x010f) AM_READWRITE( sound_comms_r,sound_comms_w )
+	map(0x0100, 0x010f).rw(FUNC(hng64_state::sound_comms_r), FUNC(hng64_state::sound_comms_w));
 
-	AM_RANGE(0x0200, 0x021f) AM_WRITE( hng64_sound_bank_w ) // ??
+	map(0x0200, 0x021f).w(FUNC(hng64_state::hng64_sound_bank_w)); // ??
 
-ADDRESS_MAP_END
+}
 
 WRITE_LINE_MEMBER(hng64_state::dma_hreq_cb)
 {
@@ -387,20 +389,21 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 
 
 MACHINE_CONFIG_START(hng64_state::hng64_audio)
-	MCFG_CPU_ADD("audiocpu", V53A, 32000000/2)              // V53A, 16? mhz!
-	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
-	MCFG_CPU_IO_MAP(hng_sound_io)
-	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE(hng64_state, dma_hreq_cb))
-	MCFG_V53_DMAU_IN_MEMR_CB(READ8(hng64_state, dma_memr_cb))
-	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8(hng64_state,dma_iow3_cb))
+	MCFG_DEVICE_ADD("audiocpu", V53A, 32000000/2)              // V53A, 16? mhz!
+	MCFG_DEVICE_PROGRAM_MAP(hng_sound_map)
+	MCFG_DEVICE_IO_MAP(hng_sound_io)
+	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE(*this, hng64_state, dma_hreq_cb))
+	MCFG_V53_DMAU_IN_MEMR_CB(READ8(*this, hng64_state, dma_memr_cb))
+	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8(*this, hng64_state,dma_iow3_cb))
 
-	MCFG_V53_TCU_OUT0_HANDLER(WRITELINE(hng64_state, tcu_tm0_cb))
-	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(hng64_state, tcu_tm1_cb))
-	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(hng64_state, tcu_tm2_cb))
+	MCFG_V53_TCU_OUT0_HANDLER(WRITELINE(*this, hng64_state, tcu_tm0_cb))
+	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(*this, hng64_state, tcu_tm1_cb))
+	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(*this, hng64_state, tcu_tm2_cb))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("l7a1045", L7A1045, 32000000/2 ) // ??
+	MCFG_DEVICE_ADD("l7a1045", L7A1045, 32000000/2 ) // ??
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

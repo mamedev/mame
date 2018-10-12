@@ -10,45 +10,45 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/kan_pand.h"
+#include "emupal.h"
 #include "screen.h"
 
 class airbustr_state : public driver_device
 {
 public:
 	airbustr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_devram(*this, "devram"),
-		m_videoram2(*this, "videoram2"),
-		m_colorram2(*this, "colorram2"),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_master(*this, "master"),
-		m_slave(*this, "slave"),
-		m_audiocpu(*this, "audiocpu"),
-		m_pandora(*this, "pandora"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_watchdog(*this, "watchdog"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_devram(*this, "devram")
+		, m_videoram(*this, "videoram%u", 1)
+		, m_colorram(*this, "colorram%u", 1)
+		, m_masterbank(*this, "masterbank")
+		, m_slavebank(*this, "slavebank")
+		, m_audiobank(*this, "audiobank")
+		, m_master(*this, "master")
+		, m_slave(*this, "slave")
+		, m_audiocpu(*this, "audiocpu")
+		, m_pandora(*this, "pandora")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_watchdog(*this, "watchdog")
+		, m_soundlatch(*this, "soundlatch%u", 1)
+	{
+	}
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_devram;
-	required_shared_ptr<uint8_t> m_videoram2;
-	required_shared_ptr<uint8_t> m_colorram2;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_colorram;
+
+	required_memory_bank m_masterbank;
+	required_memory_bank m_slavebank;
+	required_memory_bank m_audiobank;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
-	bitmap_ind16 m_sprites_bitmap;
-	int        m_bg_scrollx;
-	int        m_bg_scrolly;
-	int        m_fg_scrollx;
-	int        m_fg_scrolly;
+	tilemap_t    *m_tilemap[2];
+	int        m_scrollx[2];
+	int        m_scrolly[2];
 	int        m_highbits;
 
 	/* devices */
@@ -60,8 +60,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
 	DECLARE_READ8_MEMBER(devram_r);
 	DECLARE_WRITE8_MEMBER(master_nmi_trigger_w);
@@ -70,14 +69,11 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_READ8_MEMBER(soundcommand_status_r);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(colorram2_w);
+	template<int Layer> DECLARE_WRITE8_MEMBER(videoram_w);
+	template<int Layer> DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE8_MEMBER(scrollregs_w);
-	DECLARE_DRIVER_INIT(airbustr);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void init_airbustr();
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

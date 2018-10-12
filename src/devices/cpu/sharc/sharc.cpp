@@ -54,26 +54,28 @@ enum
 	SHARC_B12,      SHARC_B13,      SHARC_B14,      SHARC_B15
 };
 
-DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "ADSP21062")
+DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "Analog Devices ADSP21062 \"SHARC\"")
 
-ADDRESS_MAP_START(adsp21062_device::internal_pgm)
-	AM_RANGE(0x20000, 0x24fff) AM_READWRITE(pm0_r, pm0_w)
-	AM_RANGE(0x28000, 0x2cfff) AM_READWRITE(pm1_r, pm1_w)
-	AM_RANGE(0x30000, 0x34fff) AM_READWRITE(pm1_r, pm1_w)
-	AM_RANGE(0x38000, 0x3cfff) AM_READWRITE(pm1_r, pm1_w)
-ADDRESS_MAP_END
+void adsp21062_device::internal_pgm(address_map &map)
+{
+	map(0x20000, 0x24fff).rw(FUNC(adsp21062_device::pm0_r), FUNC(adsp21062_device::pm0_w));
+	map(0x28000, 0x2cfff).rw(FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
+	map(0x30000, 0x34fff).rw(FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
+	map(0x38000, 0x3cfff).rw(FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
+}
 
-ADDRESS_MAP_START(adsp21062_device::internal_data)
-	AM_RANGE(0x00000, 0x000ff) AM_READWRITE(iop_r, iop_w)
-	AM_RANGE(0x20000, 0x27fff) AM_RAM AM_SHARE("block0")
-	AM_RANGE(0x28000, 0x2ffff) AM_RAM AM_SHARE("block1")
-	AM_RANGE(0x30000, 0x37fff) AM_RAM AM_SHARE("block1")
-	AM_RANGE(0x38000, 0x3ffff) AM_RAM AM_SHARE("block1")
-	AM_RANGE(0x40000, 0x4ffff) AM_READWRITE(dmw0_r, dmw0_w)
-	AM_RANGE(0x50000, 0x5ffff) AM_READWRITE(dmw1_r, dmw1_w)
-	AM_RANGE(0x60000, 0x6ffff) AM_READWRITE(dmw1_r, dmw1_w)
-	AM_RANGE(0x70000, 0x7ffff) AM_READWRITE(dmw1_r, dmw1_w)
-ADDRESS_MAP_END
+void adsp21062_device::internal_data(address_map &map)
+{
+	map(0x00000, 0x000ff).rw(FUNC(adsp21062_device::iop_r), FUNC(adsp21062_device::iop_w));
+	map(0x20000, 0x27fff).ram().share("block0");
+	map(0x28000, 0x2ffff).ram().share("block1");
+	map(0x30000, 0x37fff).ram().share("block1");
+	map(0x38000, 0x3ffff).ram().share("block1");
+	map(0x40000, 0x4ffff).rw(FUNC(adsp21062_device::dmw0_r), FUNC(adsp21062_device::dmw0_w));
+	map(0x50000, 0x5ffff).rw(FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
+	map(0x60000, 0x6ffff).rw(FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
+	map(0x70000, 0x7ffff).rw(FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
+}
 
 adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, ADSP21062, tag, owner, clock)
@@ -89,6 +91,10 @@ adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *ta
 {
 }
 
+adsp21062_device::~adsp21062_device()
+{
+}
+
 device_memory_interface::space_config_vector adsp21062_device::memory_space_config() const
 {
 	return space_config_vector {
@@ -97,9 +103,9 @@ device_memory_interface::space_config_vector adsp21062_device::memory_space_conf
 	};
 }
 
-util::disasm_interface *adsp21062_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> adsp21062_device::create_disassembler()
 {
-	return new sharc_disassembler;
+	return std::make_unique<sharc_disassembler>();
 }
 
 void adsp21062_device::enable_recompiler()
@@ -863,7 +869,7 @@ void adsp21062_device::device_start()
 	state_add( STATE_GENPC, "GENPC", m_core->pc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
-	m_icountptr = &m_core->icount;
+	set_icountptr(m_core->icount);
 }
 
 void adsp21062_device::device_reset()
@@ -1014,7 +1020,7 @@ void adsp21062_device::execute_run()
 		if (m_core->idle && m_core->irq_pending == 0)
 		{
 			m_core->icount = 0;
-			debugger_instruction_hook(this, m_core->daddr);
+			debugger_instruction_hook(m_core->daddr);
 		}
 		if (m_core->irq_pending != 0)
 		{
@@ -1033,7 +1039,7 @@ void adsp21062_device::execute_run()
 			m_core->astat_old_old = m_core->astat_old;
 			m_core->astat_old = m_core->astat;
 
-			debugger_instruction_hook(this, m_core->pc);
+			debugger_instruction_hook(m_core->pc);
 
 			m_core->opcode = m_program->read_qword(m_core->pc);
 

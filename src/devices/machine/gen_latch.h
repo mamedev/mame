@@ -32,7 +32,7 @@ DECLARE_DEVICE_TYPE(GENERIC_LATCH_16, generic_latch_16_device)
 	MCFG_DEVICE_ADD(_tag, GENERIC_LATCH_16, 0)
 
 #define MCFG_GENERIC_LATCH_DATA_PENDING_CB(_devcb) \
-	devcb = &downcast<generic_latch_base_device &>(*device).set_data_pending_callback(DEVCB_##_devcb);
+	downcast<generic_latch_base_device &>(*device).set_data_pending_callback(DEVCB_##_devcb);
 
 #define MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(_ack) \
 	downcast<generic_latch_base_device &>(*device).set_separate_acknowledge(_ack);
@@ -46,18 +46,21 @@ DECLARE_DEVICE_TYPE(GENERIC_LATCH_16, generic_latch_16_device)
 
 class generic_latch_base_device : public device_t
 {
-protected:
-	// construction/destruction
-	generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
 public:
 	// configuration
 	template <class Object> devcb_base &set_data_pending_callback(Object &&cb) { return m_data_pending_cb.set_callback(std::forward<Object>(cb)); }
+	auto data_pending_callback() { return m_data_pending_cb.bind(); }
 	void set_separate_acknowledge(bool ack) { m_separate_acknowledge = ack; }
 
 	DECLARE_READ_LINE_MEMBER(pending_r);
 
+	DECLARE_READ8_MEMBER( acknowledge_r );
+	DECLARE_WRITE8_MEMBER( acknowledge_w );
+
 protected:
+	// construction/destruction
+	generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -80,18 +83,15 @@ class generic_latch_8_device : public generic_latch_base_device
 {
 public:
 	// construction/destruction
-	generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_WRITE8_MEMBER( preset_w );
 	DECLARE_WRITE8_MEMBER( clear_w );
-	DECLARE_WRITE_LINE_MEMBER( preset_w );
-	DECLARE_WRITE_LINE_MEMBER( clear_w );
-
-	DECLARE_READ8_MEMBER( acknowledge_r );
-	DECLARE_WRITE8_MEMBER( acknowledge_w );
+	DECLARE_WRITE_LINE_MEMBER( preset );
+	DECLARE_WRITE_LINE_MEMBER( clear );
 
 	void preset_w(u8 value) { m_latched_value = value; }
 
@@ -111,15 +111,15 @@ class generic_latch_16_device : public generic_latch_base_device
 {
 public:
 	// construction/destruction
-	generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
 	DECLARE_WRITE16_MEMBER( preset_w );
 	DECLARE_WRITE16_MEMBER( clear_w );
-	DECLARE_WRITE_LINE_MEMBER( preset_w );
-	DECLARE_WRITE_LINE_MEMBER( clear_w );
+	DECLARE_WRITE_LINE_MEMBER( preset );
+	DECLARE_WRITE_LINE_MEMBER( clear );
 
 	void preset_w(u16 value) { m_latched_value = value; }
 
@@ -131,6 +131,5 @@ protected:
 private:
 	u16 m_latched_value;
 };
-
 
 #endif  // MAME_MACHINE_GEN_LATCH_H

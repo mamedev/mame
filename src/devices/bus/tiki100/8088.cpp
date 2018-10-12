@@ -49,16 +49,18 @@ const tiny_rom_entry *tiki100_8088_device::device_rom_region() const
 }
 
 
-ADDRESS_MAP_START(tiki100_8088_device::i8088_mem)
-	AM_RANGE(0x00000, 0xbffff) AM_RAM
-	AM_RANGE(0xc0000, 0xcffff) AM_DEVREADWRITE(":" TIKI100_BUS_TAG, tiki100_bus_device, exin_mrq_r, exin_mrq_w)
-	AM_RANGE(0xff000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
-ADDRESS_MAP_END
+void tiki100_8088_device::i8088_mem(address_map &map)
+{
+	map(0x00000, 0xbffff).ram();
+	map(0xc0000, 0xcffff).rw(":" TIKI100_BUS_TAG, FUNC(tiki100_bus_device::exin_mrq_r), FUNC(tiki100_bus_device::exin_mrq_w));
+	map(0xff000, 0xfffff).rom().region(I8088_TAG, 0);
+}
 
 
-ADDRESS_MAP_START(tiki100_8088_device::i8088_io)
-	AM_RANGE(0x7f, 0x7f) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void tiki100_8088_device::i8088_io(address_map &map)
+{
+	map(0x7f, 0x7f).rw(FUNC(tiki100_8088_device::read), FUNC(tiki100_8088_device::write));
+}
 
 
 //-------------------------------------------------
@@ -66,9 +68,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(tiki100_8088_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8088_TAG, I8088, 6000000)
-	MCFG_CPU_PROGRAM_MAP(i8088_mem)
-	MCFG_CPU_IO_MAP(i8088_io)
+	MCFG_DEVICE_ADD(I8088_TAG, I8088, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(i8088_mem)
+	MCFG_DEVICE_IO_MAP(i8088_io)
 MACHINE_CONFIG_END
 
 

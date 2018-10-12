@@ -52,8 +52,16 @@ class jpms80_state : public driver_device
 public:
 	jpms80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_duart(*this, "tms9902duart")
 	{ }
+
+	void jpms80(machine_config &config);
+
+	void init_jpms80();
+
+
+private:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(int1_enable_w);
@@ -61,15 +69,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
 	DECLARE_WRITE_LINE_MEMBER(io_enable_w);
 
-	void jpms80(machine_config &config);
 	void jpms80_io_map(address_map &map);
 	void jpms80_map(address_map &map);
-protected:
 
 	// devices
-	required_device<cpu_device> m_maincpu;
-public:
-	DECLARE_DRIVER_INIT(jpms80);
+	required_device<tms9995_device> m_maincpu;
+	required_device<tms9902_device> m_duart;
 };
 
 WRITE_LINE_MEMBER(jpms80_state::int1_enable_w)
@@ -88,29 +93,31 @@ WRITE_LINE_MEMBER(jpms80_state::io_enable_w)
 {
 }
 
-ADDRESS_MAP_START(jpms80_state::jpms80_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void jpms80_state::jpms80_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x3fff).ram();
+}
 
-ADDRESS_MAP_START(jpms80_state::jpms80_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
+void jpms80_state::jpms80_io_map(address_map &map)
+{
+	map.global_mask(0x1ff);
 //  AM_RANGE(0x0000, 0x001f) // I/O & Optic (in)
-	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("outlatch0", ls259_device, write_d0)
-	AM_RANGE(0x0008, 0x000f) AM_DEVWRITE("outlatch1", ls259_device, write_d0)
-	AM_RANGE(0x0010, 0x0017) AM_DEVWRITE("outlatch2", ls259_device, write_d0)
-	AM_RANGE(0x0018, 0x001f) AM_DEVWRITE("outlatch3", ls259_device, write_d0)
-	AM_RANGE(0x0020, 0x0027) AM_DEVWRITE("outlatch4", ls259_device, write_d0)
-	AM_RANGE(0x0028, 0x002f) AM_DEVWRITE("outlatch5", ls259_device, write_d0)
-	AM_RANGE(0x0030, 0x0037) AM_DEVWRITE("outlatch6", ls259_device, write_d0)
-	AM_RANGE(0x0038, 0x003f) AM_DEVWRITE("outlatch7", ls259_device, write_d0)
-	AM_RANGE(0x0040, 0x0047) AM_DEVWRITE("outlatch8", ls259_device, write_d0)
-	AM_RANGE(0x0048, 0x004f) AM_DEVWRITE("outlatch9", ls259_device, write_d0)
-	AM_RANGE(0x0050, 0x0057) AM_DEVWRITE("outlatch10", ls259_device, write_d0)
+	map(0x0000, 0x0007).w("outlatch0", FUNC(ls259_device::write_d0));
+	map(0x0008, 0x000f).w("outlatch1", FUNC(ls259_device::write_d0));
+	map(0x0010, 0x0017).w("outlatch2", FUNC(ls259_device::write_d0));
+	map(0x0018, 0x001f).w("outlatch3", FUNC(ls259_device::write_d0));
+	map(0x0020, 0x0027).w("outlatch4", FUNC(ls259_device::write_d0));
+	map(0x0028, 0x002f).w("outlatch5", FUNC(ls259_device::write_d0));
+	map(0x0030, 0x0037).w("outlatch6", FUNC(ls259_device::write_d0));
+	map(0x0038, 0x003f).w("outlatch7", FUNC(ls259_device::write_d0));
+	map(0x0040, 0x0047).w("outlatch8", FUNC(ls259_device::write_d0));
+	map(0x0048, 0x004f).w("outlatch9", FUNC(ls259_device::write_d0));
+	map(0x0050, 0x0057).w("outlatch10", FUNC(ls259_device::write_d0));
 //  AM_RANGE(0x0140, 0x015f) // AY
-	AM_RANGE(0x01e0, 0x01ff) AM_DEVREADWRITE("tms9902duart", tms9902_device, cruread, cruwrite)
+	map(0x01e0, 0x01ff).rw("tms9902duart", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 //  Lamps, Meters etc. can move around
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( jpms80 )
@@ -124,40 +131,42 @@ INPUT_PORTS_END
 void jpms80_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(ASSERT_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(jpms80_state::jpms80)
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	TMS9995(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpms80_state::jpms80_map);
+	m_maincpu->set_addrmap(AS_IO, &jpms80_state::jpms80_io_map);
 
-	MCFG_DEVICE_ADD("outlatch0", LS259, 0) // I/O IC5
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // I/O IC6
-	MCFG_DEVICE_ADD("outlatch2", LS259, 0) // I/O IC7
-	MCFG_DEVICE_ADD("outlatch3", LS259, 0) // I/O IC8
-	MCFG_DEVICE_ADD("outlatch4", LS259, 0) // I/O IC9
-	MCFG_DEVICE_ADD("outlatch5", LS259, 0) // I/O IC10
-	MCFG_DEVICE_ADD("outlatch6", LS259, 0) // I/O IC11
-	MCFG_DEVICE_ADD("outlatch7", LS259, 0) // I/O IC12
-	MCFG_DEVICE_ADD("outlatch8", LS259, 0) // I/O IC13
-	MCFG_DEVICE_ADD("outlatch9", LS259, 0) // I/O IC14
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("outlatch10", LS259, 0) // I/O IC15
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jpms80_state, int1_enable_w)) // 50 - INT1 enable (lv3)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jpms80_state, int2_enable_w)) // 51 - INT2 enable (lv4)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(jpms80_state, watchdog_w)) // 52 - Watchdog
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(jpms80_state, io_enable_w)) // 53 - I/O Enable
+	LS259(config, "outlatch0"); // I/O IC5
+	LS259(config, "outlatch1"); // I/O IC6
+	LS259(config, "outlatch2"); // I/O IC7
+	LS259(config, "outlatch3"); // I/O IC8
+	LS259(config, "outlatch4"); // I/O IC9
+	LS259(config, "outlatch5"); // I/O IC10
+	LS259(config, "outlatch6"); // I/O IC11
+	LS259(config, "outlatch7"); // I/O IC12
+	LS259(config, "outlatch8"); // I/O IC13
+	LS259(config, "outlatch9"); // I/O IC14
 
-	MCFG_DEVICE_ADD("tms9902duart", TMS9902, DUART_CLOCK)
+	ls259_device &outlatch10(LS259(config, "outlatch10")); // I/O IC15
+	outlatch10.q_out_cb<0>().set(FUNC(jpms80_state::int1_enable_w)); // 50 - INT1 enable (lv3)
+	outlatch10.q_out_cb<1>().set(FUNC(jpms80_state::int2_enable_w)); // 51 - INT2 enable (lv4)
+	outlatch10.q_out_cb<2>().set(FUNC(jpms80_state::watchdog_w)); // 52 - Watchdog
+	outlatch10.q_out_cb<3>().set(FUNC(jpms80_state::io_enable_w)); // 53 - I/O Enable
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	TMS9902(config, m_duart, DUART_CLOCK);
+
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(jpms80_state,jpms80)
+void jpms80_state::init_jpms80()
 {
 }
 
@@ -354,29 +363,29 @@ ROM_END
 
 
 
-GAMEL(198?, j80bac   ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Bank A Coin (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80bac )
-GAMEL(198?, j80bounc ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Bouncer (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80bounc )
-GAMEL(198?, j80frogh ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Frog Hop (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80frogh )
-GAME (198?, j80fruit ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Fruit Snappa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL(198?, j80golds ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Golden Steppa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80golds )
-GAMEL(198?, j80hotln ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Hot Lines (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80hotln )
-GAMEL(198?, j80myspn ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Mystery Spin (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80myspn )
-GAMEL(198?, j80nudg2 ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Nudge Double Up MkII (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80nudg2 )
-GAMEL(198?, j80rr    ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Road Runner (JPM) (SYSTEM80, set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80rr ) // was also in a set named 'Route 66' with identical roms, but text in ROM indicates name is Road Runner, maybe a reskin?
-GAMEL(198?, j80rra   ,j80rr      ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Road Runner (JPM) (SYSTEM80, set 2)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80rr )
-GAMEL(198?, j80supst ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Supa Steppa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80supst )
-GAMEL(198?, j80supbk ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Superbank (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80supbk )
-GAMEL(198?, j80topsp ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Top Sprint (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80topsp )
-GAME (198?, j80topup ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Top Up (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME (198?, j80tumbl ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Tumble (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL(198?, j80wsprt, 0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V4, 5x20p) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80wsprt2 )
-GAMEL(198?, j80wsprt3, j80wsprt  ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V3, 50p, 5 credits) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80wsprt2 )
-GAMEL(198?, j80wsprt2,j80wsprt   ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V2, 10x10p) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80wsprt2 )
+GAMEL( 198?, j80bac,    0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Bank A Coin (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80bac )
+GAMEL( 198?, j80bounc,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Bouncer (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80bounc )
+GAMEL( 198?, j80frogh,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Frog Hop (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80frogh )
+GAME(  198?, j80fruit,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Fruit Snappa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
+GAMEL( 198?, j80golds,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Golden Steppa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80golds )
+GAMEL( 198?, j80hotln,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Hot Lines (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80hotln )
+GAMEL( 198?, j80myspn,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Mystery Spin (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80myspn )
+GAMEL( 198?, j80nudg2,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Nudge Double Up MkII (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80nudg2 )
+GAMEL( 198?, j80rr,     0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Road Runner (JPM) (SYSTEM80, set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80rr ) // was also in a set named 'Route 66' with identical roms, but text in ROM indicates name is Road Runner, maybe a reskin?
+GAMEL( 198?, j80rra,    j80rr,    jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Road Runner (JPM) (SYSTEM80, set 2)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80rr )
+GAMEL( 198?, j80supst,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Supa Steppa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80supst )
+GAMEL( 198?, j80supbk,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Superbank (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80supbk )
+GAMEL( 198?, j80topsp,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Top Sprint (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80topsp )
+GAME(  198?, j80topup,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Top Up (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  198?, j80tumbl,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Tumble (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
+GAMEL( 198?, j80wsprt,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Winsprint (JPM) (V4, 5x20p) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80wsprt2 )
+GAMEL( 198?, j80wsprt3, j80wsprt, jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Winsprint (JPM) (V3, 50p, 5 credits) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80wsprt2 )
+GAMEL( 198?, j80wsprt2, j80wsprt, jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Winsprint (JPM) (V2, 10x10p) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80wsprt2 )
 
-GAME (198?, j80blbnk ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "PCP","Blankity Bank (PCP) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  198?, j80blbnk,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "PCP", "Blankity Bank (PCP) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
 
 // these look like they're probably SYSTEM80, not 100% sure tho
-GAME (198?, j80alad  ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Aladdin's Cave (PCP)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME (198?, j80fortr ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Fortune Trail (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME (198?, j80mster ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Masterspy (Pcp)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME (198?, j80plsnd ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Plus Nudge (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  198?, j80alad,   0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Aladdin's Cave (PCP)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  198?, j80fortr,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Fortune Trail (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  198?, j80mster,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Masterspy (Pcp)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  198?, j80plsnd,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Plus Nudge (JPM)", MACHINE_IS_SKELETON_MECHANICAL )

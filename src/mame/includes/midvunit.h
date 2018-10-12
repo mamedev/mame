@@ -6,12 +6,14 @@
 
 **************************************************************************/
 
-#include "video/poly.h"
 #include "audio/dcs.h"
+#include "machine/adc0844.h"
+#include "machine/ataintf.h"
 #include "machine/midwayic.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "machine/adc0844.h"
+#include "video/poly.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MIDVUNIT_VIDEO_CLOCK    33000000
@@ -45,54 +47,76 @@ private:
 class midvunit_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_SCANLINE
-	};
-
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_nvram(*this, "nvram"),
-			m_ram_base(*this, "ram_base"),
-			m_fastram_base(*this, "fastram_base"),
-			m_tms32031_control(*this, "32031_control"),
-			m_midvplus_misc(*this, "midvplus_misc"),
-			m_videoram(*this, "videoram", 32),
-			m_textureram(*this, "textureram") ,
+		m_videoram(*this, "videoram", 32),
+		m_textureram(*this, "textureram"),
+		m_screen(*this, "screen"),
+		m_nvram(*this, "nvram"),
+		m_ram_base(*this, "ram_base"),
+		m_fastram_base(*this, "fastram_base"),
+		m_tms32031_control(*this, "32031_control"),
+		m_midvplus_misc(*this, "midvplus_misc"),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
-		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_adc(*this, "adc"),
 		m_midway_serial_pic(*this, "serial_pic"),
 		m_midway_serial_pic2(*this, "serial_pic2"),
 		m_midway_ioasic(*this, "ioasic"),
+		m_ata(*this, "ata"),
+		m_timer(*this, "timer%u", 0U),
 		m_dcs(*this, "dcs"),
-		m_generic_paletteram_32(*this, "paletteram") { }
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_optional_drivers(*this, "lamp%u", 0U),
+		m_motion(*this, "MOTION") { }
+
+	void midvcommon(machine_config &config);
+	void crusnwld(machine_config &config);
+	void midvplus(machine_config &config);
+	void offroadc(machine_config &config);
+	void midvunit(machine_config &config);
+
+	void init_crusnu40();
+	void init_crusnu21();
+	void init_crusnwld();
+	void init_wargods();
+	void init_offroadc();
+	void init_crusnusa();
+
+	uint16_t m_page_control;
+	uint16_t m_dma_data[16];
+	uint8_t m_video_changed;
+
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint32_t> m_textureram;
+	required_device<screen_device> m_screen;
+
+	DECLARE_CUSTOM_INPUT_MEMBER(motion_r);
+
+private:
+	enum
+	{
+		TIMER_SCANLINE
+	};
 
 	optional_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_ram_base;
 	optional_shared_ptr<uint32_t> m_fastram_base;
 	required_shared_ptr<uint32_t> m_tms32031_control;
 	optional_shared_ptr<uint32_t> m_midvplus_misc;
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint32_t> m_textureram;
 
 	uint8_t m_cmos_protected;
 	uint16_t m_control_data;
 	uint8_t m_adc_shift;
 	uint16_t m_last_port0;
 	uint8_t m_shifter_state;
-	timer_device *m_timer[2];
 	double m_timer_rate;
 	uint16_t m_bit_index;
 	int m_lastval;
 	uint32_t *m_generic_speedup;
 	uint16_t m_video_regs[16];
-	uint16_t m_dma_data[16];
 	uint8_t m_dma_data_index;
-	uint16_t m_page_control;
-	uint8_t m_video_changed;
 	emu_timer *m_scanline_timer;
 	std::unique_ptr<midvunit_renderer> m_poly;
 	uint8_t m_galil_input_index;
@@ -100,7 +124,7 @@ public:
 	const char *m_galil_input;
 	uint8_t m_galil_output_index;
 	char m_galil_output[450];
-	uint32_t m_wheel_board_output;
+	uint8_t m_wheel_board_output;
 	uint32_t m_wheel_board_last;
 	uint32_t m_wheel_board_u8_latch;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
@@ -140,12 +164,6 @@ public:
 	DECLARE_READ32_MEMBER(generic_speedup_r);
 	DECLARE_READ32_MEMBER(midvunit_wheel_board_r);
 	DECLARE_WRITE32_MEMBER(midvunit_wheel_board_w);
-	DECLARE_DRIVER_INIT(crusnu40);
-	DECLARE_DRIVER_INIT(crusnu21);
-	DECLARE_DRIVER_INIT(crusnwld);
-	DECLARE_DRIVER_INIT(wargods);
-	DECLARE_DRIVER_INIT(offroadc);
-	DECLARE_DRIVER_INIT(crusnusa);
 	void set_input(const char *s);
 	void init_crusnwld_common(offs_t speedup);
 	void init_crusnusa_common(offs_t speedup);
@@ -157,23 +175,21 @@ public:
 	TIMER_CALLBACK_MEMBER(scanline_timer_cb);
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<adc0844_device> m_adc;
 	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
 	optional_device<midway_ioasic_device> m_midway_ioasic;
+	optional_device<ata_interface_device> m_ata;
+	required_device_array<timer_device, 2> m_timer;
 	required_device<dcs_audio_device> m_dcs;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	output_finder<8> m_optional_drivers;
+	optional_ioport m_motion;
 	void postload();
 
-	void midvcommon(machine_config &config);
-	void crusnwld(machine_config &config);
-	void midvplus(machine_config &config);
-	void offroadc(machine_config &config);
-	void midvunit(machine_config &config);
 	void midvplus_map(address_map &map);
 	void midvunit_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

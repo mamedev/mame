@@ -64,6 +64,7 @@ ToDo: verify QS1000 hook-up
 //#include "machine/smartmed.h"
 #include "machine/i2cmem.h"
 #include "sound/qs1000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -98,6 +99,14 @@ public:
 	{
 	}
 
+	void ghosteo(machine_config &config);
+	void touryuu(machine_config &config);
+	void bballoon(machine_config &config);
+
+	void init_touryuu();
+	void init_bballoon();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<s3c2410_device> m_s3c2410;
@@ -116,8 +125,6 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	int m_rom_pagesize;
-	DECLARE_DRIVER_INIT(touryuu);
-	DECLARE_DRIVER_INIT(bballoon);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
@@ -130,9 +137,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_scl_w );
 	DECLARE_READ_LINE_MEMBER(s3c2410_i2c_sda_r );
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_sda_w );
-	void ghosteo(machine_config &config);
-	void touryuu(machine_config &config);
-	void bballoon(machine_config &config);
 	void bballoon_map(address_map &map);
 	void touryuu_map(address_map &map);
 };
@@ -269,7 +273,6 @@ READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	#endif
@@ -294,7 +297,6 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	#endif
@@ -329,7 +331,6 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	uint8_t data = 0;
 	switch (nand.mode)
 	{
@@ -375,7 +376,6 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_data_w )
 {
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_data_w %02X\n", data);
 	#endif
@@ -420,21 +420,23 @@ READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
 }
 
 
-ADDRESS_MAP_START(ghosteo_state::bballoon_map)
-	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
-	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
-	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
-	AM_RANGE(0x10300000, 0x10300003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
-ADDRESS_MAP_END
+void ghosteo_state::bballoon_map(address_map &map)
+{
+	map(0x10000000, 0x10000003).portr("10000000");
+	map(0x10100000, 0x10100003).portr("10100000");
+	map(0x10200000, 0x10200003).portr("10200000");
+	map(0x10300000, 0x10300000).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0x30000000, 0x31ffffff).ram().share("systememory").mirror(0x02000000);
+}
 
-ADDRESS_MAP_START(ghosteo_state::touryuu_map)
-	AM_RANGE(0x10000000, 0x10000003) AM_READ(touryuu_port_10000000_r)
-	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
-	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
-	AM_RANGE(0x10300000, 0x10300003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
-ADDRESS_MAP_END
+void ghosteo_state::touryuu_map(address_map &map)
+{
+	map(0x10000000, 0x10000003).r(FUNC(ghosteo_state::touryuu_port_10000000_r));
+	map(0x10100000, 0x10100003).portr("10100000");
+	map(0x10200000, 0x10200003).portr("10200000");
+	map(0x10300000, 0x10300000).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0x30000000, 0x31ffffff).ram().share("systememory").mirror(0x02000000);
+}
 
 
 /*
@@ -602,7 +604,7 @@ void ghosteo_state::machine_reset()
 MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM9, 200000000)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 200000000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -617,54 +619,53 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
 	MCFG_S3C2410_PALETTE("palette")
 	MCFG_S3C2410_SCREEN("screen")
-	MCFG_S3C2410_CORE_PIN_R_CB(READ32(ghosteo_state, s3c2410_core_pin_r))
-	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(ghosteo_state, s3c2410_gpio_port_r))
-	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(ghosteo_state, s3c2410_gpio_port_w))
-	MCFG_S3C2410_I2C_SCL_W_CB(WRITELINE(ghosteo_state, s3c2410_i2c_scl_w))
-	MCFG_S3C2410_I2C_SDA_R_CB(READLINE(ghosteo_state, s3c2410_i2c_sda_r))
-	MCFG_S3C2410_I2C_SDA_W_CB(WRITELINE(ghosteo_state, s3c2410_i2c_sda_w))
-	MCFG_S3C2410_NAND_COMMAND_W_CB(WRITE8(ghosteo_state, s3c2410_nand_command_w))
-	MCFG_S3C2410_NAND_ADDRESS_W_CB(WRITE8(ghosteo_state, s3c2410_nand_address_w))
-	MCFG_S3C2410_NAND_DATA_R_CB(READ8(ghosteo_state, s3c2410_nand_data_r))
-	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(ghosteo_state, s3c2410_nand_data_w))
+	MCFG_S3C2410_CORE_PIN_R_CB(READ32(*this, ghosteo_state, s3c2410_core_pin_r))
+	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(*this, ghosteo_state, s3c2410_gpio_port_r))
+	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(*this, ghosteo_state, s3c2410_gpio_port_w))
+	MCFG_S3C2410_I2C_SCL_W_CB(WRITELINE(*this, ghosteo_state, s3c2410_i2c_scl_w))
+	MCFG_S3C2410_I2C_SDA_R_CB(READLINE(*this, ghosteo_state, s3c2410_i2c_sda_r))
+	MCFG_S3C2410_I2C_SDA_W_CB(WRITELINE(*this, ghosteo_state, s3c2410_i2c_sda_w))
+	MCFG_S3C2410_NAND_COMMAND_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_command_w))
+	MCFG_S3C2410_NAND_ADDRESS_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_address_w))
+	MCFG_S3C2410_NAND_DATA_R_CB(READ8(*this, ghosteo_state, s3c2410_nand_data_r))
+	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_data_w))
 
 //  MCFG_DEVICE_ADD("nand", NAND, 0)
 //  MCFG_NAND_TYPE(NAND_CHIP_K9F5608U0D)    // or another variant with ID 0xEC 0x75 ?
-//  MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2410", s3c2410_device, s3c24xx_pin_frnb_w))
+//  MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2410", s3c2410_device, s3c24xx_pin_frnb_w))
 
-//  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, nullptr)
+//  I2CMEM(config, "i2cmem", 0, 0xA0, 0, 0x100, nullptr);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("qs1000", qs1000_device, set_irq))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
+	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(ghosteo_state, qs1000_p1_w))
-	MCFG_QS1000_OUT_P2_CB(WRITE8(ghosteo_state, qs1000_p2_w))
-	MCFG_QS1000_OUT_P3_CB(WRITE8(ghosteo_state, qs1000_p3_w))
+	MCFG_QS1000_IN_P1_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, ghosteo_state, qs1000_p1_w))
+	MCFG_QS1000_OUT_P2_CB(WRITE8(*this, ghosteo_state, qs1000_p2_w))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(*this, ghosteo_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ghosteo_state::bballoon)
 	ghosteo(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bballoon_map)
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(256)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bballoon_map)
+	I2CMEM(config, "i2cmem", 0).set_data_size(256);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ghosteo_state::touryuu)
 	ghosteo(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(touryuu_map)
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(1024)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(touryuu_map)
+	I2CMEM(config, "i2cmem", 0).set_data_size(1024);
 MACHINE_CONFIG_END
 
 
@@ -746,23 +747,23 @@ ROM_START( touryuu )
 
 	// banked every 0x10000 bytes ?
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 )
-	ROM_LOAD( "4m.eeprom_c.s(bad1h).u20",       0x000000, 0x080000, CRC(f81a6530) SHA1(c7fa412102328d06823e73d7d07cadfc25db6d28) )
+	ROM_LOAD( "4m.eeprom_c.s,bad1h.u20",       0x000000, 0x080000, CRC(f81a6530) SHA1(c7fa412102328d06823e73d7d07cadfc25db6d28) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 )
-	ROM_LOAD( "8m.eprom_c.s(f8b1h).u16",       0x000000, 0x100000, CRC(238a85ab) SHA1(ddd79429c0c1e67fcbca1e4ebded97ea46229f0b) ) /* QDSP samples (SFX) */
+	ROM_LOAD( "8m.eprom_c.s,f8b1h.u16",       0x000000, 0x100000, CRC(238a85ab) SHA1(ddd79429c0c1e67fcbca1e4ebded97ea46229f0b) ) /* QDSP samples (SFX) */
 	ROM_LOAD( "qs1001a.u17",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) /* QDSP wavetable rom */
 ROM_END
 
-DRIVER_INIT_MEMBER(ghosteo_state,bballoon)
+void ghosteo_state::init_bballoon()
 {
 	m_rom_pagesize = 0x200; // extra data is missing from the FLASH dumps and needs to be simulated
 }
 
-DRIVER_INIT_MEMBER(ghosteo_state,touryuu)
+void ghosteo_state::init_touryuu()
 {
 	m_rom_pagesize = 0x210;
 }
 
-GAME( 2003, bballoon, 0, bballoon, bballoon, ghosteo_state, bballoon, ROT0, "Eolith",          "BnB Arcade",         MACHINE_IMPERFECT_SOUND )
-GAME( 2005, hapytour, 0, bballoon, bballoon, ghosteo_state, bballoon, ROT0, "GAV Company",     "Happy Tour",         MACHINE_IMPERFECT_SOUND )
-GAME( 2005, touryuu,  0, touryuu,  touryuu,  ghosteo_state, touryuu,  ROT0, "Yuki Enterprise", "Touryuumon (V1.1)?", MACHINE_IMPERFECT_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom
+GAME( 2003, bballoon, 0, bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "Eolith",          "BnB Arcade",         MACHINE_IMPERFECT_SOUND )
+GAME( 2005, hapytour, 0, bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "GAV Company",     "Happy Tour",         MACHINE_IMPERFECT_SOUND )
+GAME( 2005, touryuu,  0, touryuu,  touryuu,  ghosteo_state, init_touryuu,  ROT0, "Yuki Enterprise", "Touryuumon (V1.1)?", MACHINE_IMPERFECT_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom

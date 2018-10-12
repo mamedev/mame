@@ -20,28 +20,28 @@
 //**************************************************************************
 
 #define MCFG_M5074X_PORT0_READ_CALLBACK(_read) \
-	devcb = &downcast<m5074x_device &>(*device).set_p0_rd_callback(DEVCB_##_read);
+	downcast<m5074x_device &>(*device).set_p0_rd_callback(DEVCB_##_read);
 
 #define MCFG_M5074X_PORT1_READ_CALLBACK(_read) \
-	devcb = &downcast<m5074x_device &>(*device).set_p1_rd_callback(DEVCB_##_read);
+	downcast<m5074x_device &>(*device).set_p1_rd_callback(DEVCB_##_read);
 
 #define MCFG_M5074X_PORT2_READ_CALLBACK(_read) \
-	devcb = &downcast<m5074x_device &>(*device).set_p2_rd_callback(DEVCB_##_read);
+	downcast<m5074x_device &>(*device).set_p2_rd_callback(DEVCB_##_read);
 
 #define MCFG_M5074X_PORT3_READ_CALLBACK(_read) \
-	devcb = &downcast<m5074x_device &>(*device).set_p3_rd_callback(DEVCB_##_read);
+	downcast<m5074x_device &>(*device).set_p3_rd_callback(DEVCB_##_read);
 
 #define MCFG_M5074X_PORT0_WRITE_CALLBACK(_write) \
-	devcb = &downcast<m5074x_device &>(*device).set_p0_wr_callback(DEVCB_##_write);
+	downcast<m5074x_device &>(*device).set_p0_wr_callback(DEVCB_##_write);
 
 #define MCFG_M5074X_PORT1_WRITE_CALLBACK(_write) \
-	devcb = &downcast<m5074x_device &>(*device).set_p1_wr_callback(DEVCB_##_write);
+	downcast<m5074x_device &>(*device).set_p1_wr_callback(DEVCB_##_write);
 
 #define MCFG_M5074X_PORT2_WRITE_CALLBACK(_write) \
-	devcb = &downcast<m5074x_device &>(*device).set_p2_wr_callback(DEVCB_##_write);
+	downcast<m5074x_device &>(*device).set_p2_wr_callback(DEVCB_##_write);
 
 #define MCFG_M5074X_PORT3_WRITE_CALLBACK(_write) \
-	devcb = &downcast<m5074x_device &>(*device).set_p3_wr_callback(DEVCB_##_write);
+	downcast<m5074x_device &>(*device).set_p3_wr_callback(DEVCB_##_write);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

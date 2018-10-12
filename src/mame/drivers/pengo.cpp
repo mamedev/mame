@@ -77,18 +77,26 @@ class pengo_state : public pacman_state
 {
 public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes") { }
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_DRIVER_INIT(penta);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+		: pacman_state(mconfig, type, tag)
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_latch(*this, "latch")
+	{ }
 
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void jrpacmbl(machine_config &config);
 	void pengoe(machine_config &config);
 	void pengou(machine_config &config);
 	void pengo(machine_config &config);
+
+	void init_penta();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	optional_device<ls259_device> m_latch;
 	void decrypted_opcodes_map(address_map &map);
 	void jrpacmbl_map(address_map &map);
 	void pengo_map(address_map &map);
@@ -139,44 +147,47 @@ WRITE_LINE_MEMBER(pengo_state::irq_mask_w)
 	m_irq_mask = state;
 }
 
-ADDRESS_MAP_START(pengo_state::pengo_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram") /* video and color RAM, scratchpad RAM, sprite codes */
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8800, 0x8fef) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x9000, 0x903f) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9040, 0x907f) AM_READ_PORT("DSW0")
-	AM_RANGE(0x9040, 0x9047) AM_DEVWRITE("latch", ls259_device, write_d0)
-	AM_RANGE(0x9070, 0x9070) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("IN1")
-	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("IN0")
-ADDRESS_MAP_END
+void pengo_state::pengo_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram().w(FUNC(pengo_state::pacman_videoram_w)).share("videoram"); /* video and color RAM, scratchpad RAM, sprite codes */
+	map(0x8400, 0x87ff).ram().w(FUNC(pengo_state::pacman_colorram_w)).share("colorram");
+	map(0x8800, 0x8fef).ram().share("mainram");
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
+	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x9020, 0x902f).writeonly().share("spriteram2");
+	map(0x9000, 0x903f).portr("DSW1");
+	map(0x9040, 0x907f).portr("DSW0");
+	map(0x9040, 0x9047).w(m_latch, FUNC(ls259_device::write_d0));
+	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x9080, 0x90bf).portr("IN1");
+	map(0x90c0, 0x90ff).portr("IN0");
+}
 
 
-ADDRESS_MAP_START(pengo_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8800, 0x8fef) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void pengo_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8800, 0x8fef).ram().share("mainram");
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
+}
 
 
-ADDRESS_MAP_START(pengo_state::jrpacmbl_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x9030, 0x9030) AM_WRITE(jrpacman_scroll_w)
-	AM_RANGE(0x9040, 0x904f) AM_READ_PORT("DSW")
-	AM_RANGE(0x9040, 0x9047) AM_DEVWRITE("latch", ls259_device, write_d0)
-	AM_RANGE(0x9070, 0x9070) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("P2")
-	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("P1")
-ADDRESS_MAP_END
+void pengo_state::jrpacmbl_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(FUNC(pengo_state::jrpacman_videoram_w)).share("videoram");
+	map(0x8800, 0x8fef).ram();
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
+	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x9020, 0x902f).writeonly().share("spriteram2");
+	map(0x9030, 0x9030).w(FUNC(pengo_state::jrpacman_scroll_w));
+	map(0x9040, 0x904f).portr("DSW");
+	map(0x9040, 0x9047).w(m_latch, FUNC(ls259_device::write_d0));
+	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x9080, 0x90bf).portr("P2");
+	map(0x90c0, 0x90ff).portr("P1");
+}
 
 
 
@@ -354,7 +365,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( pengo )
+static GFXDECODE_START( gfx_pengo )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x2000, spritelayout, 0, 128 )
 GFXDECODE_END
@@ -366,35 +377,34 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pengo_state::vblank_irq)
+WRITE_LINE_MEMBER(pengo_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 
 MACHINE_CONFIG_START(pengo_state::pengo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(pengo_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(pengo_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // U27
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pengo_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("namco", namco_device, pacman_sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(pengo_state, pengo_palettebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pengo_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pengo_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pengo_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pengo_state, pengo_colortablebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pengo_state, pengo_gfxbank_w))
+	LS259(config, m_latch); // U27
+	m_latch->q_out_cb<0>().set(FUNC(pengo_state::irq_mask_w));
+	m_latch->q_out_cb<1>().set("namco", FUNC(namco_device::sound_enable_w));
+	m_latch->q_out_cb<2>().set(FUNC(pengo_state::pengo_palettebank_w));
+	m_latch->q_out_cb<3>().set(FUNC(pengo_state::flipscreen_w));
+	m_latch->q_out_cb<4>().set(FUNC(pengo_state::coin_counter_1_w));
+	m_latch->q_out_cb<5>().set(FUNC(pengo_state::coin_counter_2_w));
+	m_latch->q_out_cb<6>().set(FUNC(pengo_state::pengo_colortablebank_w));
+	m_latch->q_out_cb<7>().set(FUNC(pengo_state::pengo_gfxbank_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pengo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pengo)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pengo_state,pacman)
@@ -403,13 +413,14 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(pengo_state, screen_update_pacman)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pengo_state, vblank_irq))
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,pengo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
+	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -417,16 +428,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pengo_state::pengou)
 	pengo(config);
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pengo_state::pengoe)
 	pengo(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5010, MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(pengo_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5010, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(pengo_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -434,14 +444,13 @@ MACHINE_CONFIG_START(pengo_state::jrpacmbl)
 	pengo(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jrpacmbl_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jrpacmbl_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
-	MCFG_DEVICE_MODIFY("latch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pengo_state, jrpacman_bgpriority_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pengo_state, jrpacman_spritebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pengo_state, jrpacman_charbank_w))
+	m_latch->q_out_cb<4>().set(FUNC(pengo_state::jrpacman_bgpriority_w));
+	m_latch->q_out_cb<5>().set(FUNC(pengo_state::jrpacman_spritebank_w));
+	m_latch->q_out_cb<7>().set(FUNC(pengo_state::jrpacman_charbank_w));
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,jrpacman)
 MACHINE_CONFIG_END
@@ -590,14 +599,14 @@ ROM_END
 
 ROM_START( pengo5 ) // PCB has an additional label Bally N.E.
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "0_OCT6-82.bin",   0x0000, 0x1000, CRC(43e45441) SHA1(e94a9f9971e57cd53fe425059a6cb7cadbd206f1) )
-	ROM_LOAD( "1_OCT11-82.bin",  0x1000, 0x1000, CRC(30a52a90) SHA1(e5ff7e16f40b42e56847d63ecbf4a0793f510c42) )
-	ROM_LOAD( "2_OCT11-82.bin",  0x2000, 0x1000, CRC(09783cc2) SHA1(793559c86c690837041e611107589b94ed5831ed) )
-	ROM_LOAD( "3_OCT6-82.bin",   0x3000, 0x1000, CRC(452c80c9) SHA1(2432930b88b9b5e7acc19cdcac7262199545ac2a) )
-	ROM_LOAD( "4_OCT6-82.bin",   0x4000, 0x1000, CRC(b72084ec) SHA1(c0508951c2ad8dc31481be8b3bfee2063e3fb0d7) )
-	ROM_LOAD( "5_OCT11-82.bin",  0x5000, 0x1000, CRC(770570cf) SHA1(43ead8236f53d39041ffc21bdeef10b3a77ce7f2) )
-	ROM_LOAD( "6_OCT11-82.bin",  0x6000, 0x1000, CRC(af7b12c4) SHA1(207ed466546f40ca60a38031b83aef61446902e2) )
-	ROM_LOAD( "7_OCT11-82.bin",  0x7000, 0x1000, CRC(1350ca0e) SHA1(40619973d69176b05fa160372306ad50693db021) )
+	ROM_LOAD( "0_oct6-82.bin",   0x0000, 0x1000, CRC(43e45441) SHA1(e94a9f9971e57cd53fe425059a6cb7cadbd206f1) )
+	ROM_LOAD( "1_oct11-82.bin",  0x1000, 0x1000, CRC(30a52a90) SHA1(e5ff7e16f40b42e56847d63ecbf4a0793f510c42) )
+	ROM_LOAD( "2_oct11-82.bin",  0x2000, 0x1000, CRC(09783cc2) SHA1(793559c86c690837041e611107589b94ed5831ed) )
+	ROM_LOAD( "3_oct6-82.bin",   0x3000, 0x1000, CRC(452c80c9) SHA1(2432930b88b9b5e7acc19cdcac7262199545ac2a) )
+	ROM_LOAD( "4_oct6-82.bin",   0x4000, 0x1000, CRC(b72084ec) SHA1(c0508951c2ad8dc31481be8b3bfee2063e3fb0d7) )
+	ROM_LOAD( "5_oct11-82.bin",  0x5000, 0x1000, CRC(770570cf) SHA1(43ead8236f53d39041ffc21bdeef10b3a77ce7f2) )
+	ROM_LOAD( "6_oct11-82.bin",  0x6000, 0x1000, CRC(af7b12c4) SHA1(207ed466546f40ca60a38031b83aef61446902e2) )
+	ROM_LOAD( "7_oct11-82.bin",  0x7000, 0x1000, CRC(1350ca0e) SHA1(40619973d69176b05fa160372306ad50693db021) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ep1640.92",    0x0000, 0x1000, CRC(d7eec6cd) SHA1(e542bcc28f292be9a0a29d949de726e0b55e654a) ) /* tiles (bank 1), not dumped for this set but same label */
@@ -701,7 +710,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pengo_state,penta)
+void pengo_state::init_penta()
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -748,17 +757,13 @@ DRIVER_INIT_MEMBER(pengo_state,penta)
 
 	for (int A = 0x0000;A < 0x8000;A++)
 	{
-		int i,j;
-		uint8_t src;
-
-
-		src = rom[A];
+		uint8_t src = rom[A];
 
 		/* pick the translation table from bit 0 of the address */
-		i = A & 1;
+		int i = A & 1;
 
 		/* pick the offset in the table from bits 1, 3 and 5 of the source data */
-		j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
+		int j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
 		/* the bottom half of the translation table is the mirror image of the top */
 		if (src & 0x80) j = 7 - j;
 
@@ -779,12 +784,12 @@ DRIVER_INIT_MEMBER(pengo_state,penta)
  *
  *************************************/
 
-GAME( 1982, pengo,    0,        pengoe,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 1 rev c)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo2,   pengo,    pengoe,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 2)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 2 not encrypted)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 3 not encrypted)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 4)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 5)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, penta, ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, penta, ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
-GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, 0,     ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo,    0,        pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 1 rev c)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo2,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 2)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 2 not encrypted)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 3 not encrypted)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 4)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 5)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_penta, ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_penta, ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
+GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init, ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

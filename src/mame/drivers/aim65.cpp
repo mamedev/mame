@@ -33,25 +33,35 @@ Bugs
 #include "aim65.lh"
 
 
+/** R6502 Clock.
+ *
+ * The R6502 on AIM65 operates at 1 MHz. The frequency reference is a 4 MHz
+ * crystal controlled oscillator. Dual D-type flip-flop Z10 divides the 4 MHz
+ * signal by four to drive the R6502 phase 0 (O0) input with a 1 MHz clock.
+ */
+static constexpr XTAL AIM65_CLOCK(4_MHz_XTAL / 4);
+
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
 /* Note: RAM is mapped dynamically in machine/aim65.c */
-ADDRESS_MAP_START(aim65_state::aim65_mem)
-	AM_RANGE( 0x1000, 0x3fff ) AM_NOP /* User available expansions */
-	AM_RANGE( 0x4000, 0x7fff ) AM_ROM /* 4 ROM sockets in 16K PROM/ROM module */
-	AM_RANGE( 0x8000, 0x9fff ) AM_NOP /* User available expansions */
-	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_1", via6522_device, read, write) // user via
-	AM_RANGE( 0xa400, 0xa47f ) AM_DEVICE("riot", mos6532_new_device, ram_map)
-	AM_RANGE( 0xa480, 0xa497 ) AM_DEVICE("riot", mos6532_new_device, io_map)
-	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
-	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_0", via6522_device, read, write) // system via
-	AM_RANGE( 0xac00, 0xac03 ) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
-	AM_RANGE( 0xac04, 0xac43 ) AM_RAM /* PIA RAM */
-	AM_RANGE( 0xac44, 0xafff ) AM_NOP /* Not available */
-	AM_RANGE( 0xb000, 0xffff ) AM_ROM /* 5 ROM sockets */
-ADDRESS_MAP_END
+void aim65_state::aim65_mem(address_map &map)
+{
+	map(0x1000, 0x3fff).noprw(); /* User available expansions */
+	map(0x4000, 0x7fff).rom(); /* 4 ROM sockets in 16K PROM/ROM module */
+	map(0x8000, 0x9fff).noprw(); /* User available expansions */
+	map(0xa000, 0xa00f).mirror(0x3f0).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write)); // user via
+	map(0xa400, 0xa47f).m("riot", FUNC(mos6532_new_device::ram_map));
+	map(0xa480, 0xa497).m("riot", FUNC(mos6532_new_device::io_map));
+	map(0xa498, 0xa7ff).noprw(); /* Not available */
+	map(0xa800, 0xa80f).mirror(0x3f0).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write)); // system via
+	map(0xac00, 0xac03).rw("pia6821", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xac04, 0xac43).ram(); /* PIA RAM */
+	map(0xac44, 0xafff).noprw(); /* Not available */
+	map(0xb000, 0xffff).rom(); /* 5 ROM sockets */
+}
 
 
 /***************************************************************************
@@ -178,49 +188,48 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 
 MACHINE_CONFIG_START(aim65_state::aim65)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
-	MCFG_CPU_PROGRAM_MAP(aim65_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(aim65_mem)
 
-	MCFG_DEFAULT_LAYOUT(layout_aim65)
+	config.set_default_layout(layout_aim65);
 
 	/* alpha-numeric display */
-	MCFG_DEVICE_ADD("ds1", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<1>))
-	MCFG_DEVICE_ADD("ds2", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<2>))
-	MCFG_DEVICE_ADD("ds3", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<3>))
-	MCFG_DEVICE_ADD("ds4", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<4>))
-	MCFG_DEVICE_ADD("ds5", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<5>))
+	MCFG_DEVICE_ADD("ds1", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<1>))
+	MCFG_DEVICE_ADD("ds2", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<2>))
+	MCFG_DEVICE_ADD("ds3", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<3>))
+	MCFG_DEVICE_ADD("ds4", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<4>))
+	MCFG_DEVICE_ADD("ds5", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<5>))
 
 	/* Sound - wave sound only */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* other devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, AIM65_CLOCK)
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(aim65_state, aim65_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(aim65_state, aim65_riot_b_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, aim65_state, aim65_riot_a_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, aim65_state, aim65_riot_b_r))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, AIM65_CLOCK)
-	MCFG_VIA6522_READPB_HANDLER(READ8(aim65_state, aim65_pb_r))
+	via6522_device &via0(VIA6522(config, "via6522_0", AIM65_CLOCK));
+	via0.readpb_handler().set(FUNC(aim65_state::aim65_pb_r));
 	// in CA1 printer ready?
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pb_w))
+	via0.writepb_handler().set(FUNC(aim65_state::aim65_pb_w));
 	// out CB1 printer start
 	// out CA2 cass control (H=in)
 	// out CB2 turn printer on
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	via0.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, AIM65_CLOCK)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	via6522_device &via1(VIA6522(config, "via6522_1", AIM65_CLOCK));
+	via1.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aim65_state, aim65_pia_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pia_b_w))
+	pia6821_device &pia(PIA6821(config, "pia6821", 0));
+	pia.writepa_handler().set(FUNC(aim65_state::aim65_pia_a_w));
+	pia.writepb_handler().set(FUNC(aim65_state::aim65_pia_b_w));
 
 	// Deck 1 can play and record
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -260,9 +269,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_GENERIC_LOAD(aim65_state, z15_load)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
+	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("1K,2K,3K");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","aim65_cart")
@@ -276,11 +283,11 @@ MACHINE_CONFIG_END
 ROM_START( aim65 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "aim65",  "Rockwell AIM-65")
-	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
-	ROMX_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf), ROM_BIOS(1))
+	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(0))
+	ROMX_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "dynatem",  "Dynatem AIM-65")
-	ROMX_LOAD("dynaim65.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(2))
-	ROMX_LOAD("dynaim65.z22", 0xf000, 0x1000, CRC(83e1c6e7) SHA1(444134043edd83385bd70434cb100269901c4417), ROM_BIOS(2))
+	ROMX_LOAD("dynaim65.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
+	ROMX_LOAD("dynaim65.z22", 0xf000, 0x1000, CRC(83e1c6e7) SHA1(444134043edd83385bd70434cb100269901c4417), ROM_BIOS(1))
 ROM_END
 
 /* Currently dumped and available software:
@@ -306,5 +313,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT    COMPANY    FULLNAME  FLAGS
-COMP(1977, aim65,       0,      0,      aim65,   aim65, aim65_state,  0,     "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+//   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP(1977, aim65, 0,      0,      aim65,   aim65, aim65_state, empty_init, "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

@@ -109,36 +109,38 @@ WRITE16_MEMBER(oneshot_state::soundbank_w)
 
 
 
-ADDRESS_MAP_START(oneshot_state::oneshot_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x120000, 0x120fff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(oneshot_mid_videoram_w) AM_SHARE("mid_videoram") // some people , girl etc.
-	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE(oneshot_fg_videoram_w) AM_SHARE("fg_videoram") // credits etc.
-	AM_RANGE(0x182000, 0x182fff) AM_RAM_WRITE(oneshot_bg_videoram_w) AM_SHARE("bg_videoram") // credits etc.
-	AM_RANGE(0x188000, 0x18800f) AM_WRITEONLY AM_SHARE("scroll")    // scroll registers
-	AM_RANGE(0x190002, 0x190003) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff)
-	AM_RANGE(0x190010, 0x190011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x190018, 0x190019) AM_WRITE(soundbank_w)
-	AM_RANGE(0x190026, 0x190027) AM_READ(oneshot_gun_x_p1_r)
-	AM_RANGE(0x19002e, 0x19002f) AM_READ(oneshot_gun_x_p2_r)
-	AM_RANGE(0x190036, 0x190037) AM_READ(oneshot_gun_y_p1_r)
-	AM_RANGE(0x19003e, 0x19003f) AM_READ(oneshot_gun_y_p2_r)
-	AM_RANGE(0x19c020, 0x19c021) AM_READ(oneshot_in0_word_r)
-	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSW2")
-	AM_RANGE(0x19c02c, 0x19c02d) AM_READ_PORT("CREDITS")
-	AM_RANGE(0x19c030, 0x19c031) AM_READ_PORT("P1")
-	AM_RANGE(0x19c034, 0x19c035) AM_READ_PORT("P2")
-ADDRESS_MAP_END
+void oneshot_state::oneshot_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x087fff).ram();
+	map(0x0c0000, 0x0c07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x120000, 0x120fff).ram().share("sprites");
+	map(0x180000, 0x180fff).ram().w(FUNC(oneshot_state::oneshot_mid_videoram_w)).share("mid_videoram"); // some people , girl etc.
+	map(0x181000, 0x181fff).ram().w(FUNC(oneshot_state::oneshot_fg_videoram_w)).share("fg_videoram"); // credits etc.
+	map(0x182000, 0x182fff).ram().w(FUNC(oneshot_state::oneshot_bg_videoram_w)).share("bg_videoram"); // credits etc.
+	map(0x188000, 0x18800f).writeonly().share("scroll");    // scroll registers
+	map(0x190003, 0x190003).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x190011, 0x190011).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x190018, 0x190019).w(FUNC(oneshot_state::soundbank_w));
+	map(0x190026, 0x190027).r(FUNC(oneshot_state::oneshot_gun_x_p1_r));
+	map(0x19002e, 0x19002f).r(FUNC(oneshot_state::oneshot_gun_x_p2_r));
+	map(0x190036, 0x190037).r(FUNC(oneshot_state::oneshot_gun_y_p1_r));
+	map(0x19003e, 0x19003f).r(FUNC(oneshot_state::oneshot_gun_y_p2_r));
+	map(0x19c020, 0x19c021).r(FUNC(oneshot_state::oneshot_in0_word_r));
+	map(0x19c024, 0x19c025).portr("DSW2");
+	map(0x19c02c, 0x19c02d).portr("CREDITS");
+	map(0x19c030, 0x19c031).portr("P1");
+	map(0x19c034, 0x19c035).portr("P2");
+}
 
-ADDRESS_MAP_START(oneshot_state::oneshot_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
-	AM_RANGE(0x8001, 0x87ff) AM_RAM
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void oneshot_state::oneshot_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8000).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+	map(0x8001, 0x87ff).ram();
+	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0xe010, 0xe010).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 static INPUT_PORTS_START( oneshot )
@@ -333,7 +335,7 @@ static const gfx_layout oneshot8x8_layout =
 };
 
 
-static GFXDECODE_START( oneshot )
+static GFXDECODE_START( gfx_oneshot )
 	GFXDECODE_ENTRY( "gfx1", 0, oneshot16x16_layout,   0x00, 4  ) /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, oneshot8x8_layout,     0x00, 4  ) /* sprites */
 GFXDECODE_END
@@ -363,12 +365,12 @@ void oneshot_state::machine_reset()
 MACHINE_CONFIG_START(oneshot_state::oneshot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(oneshot_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", oneshot_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(oneshot_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", oneshot_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
-	MCFG_CPU_PROGRAM_MAP(oneshot_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(oneshot_sound_map)
 
 
 	/* video hardware */
@@ -380,19 +382,19 @@ MACHINE_CONFIG_START(oneshot_state::oneshot)
 	MCFG_SCREEN_UPDATE_DRIVER(oneshot_state, screen_update_oneshot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oneshot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_oneshot)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3500000)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 3500000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -495,6 +497,6 @@ ROM_END
 
 
 
-GAME( 1995, maddonna, 0,        maddonna, maddonna, oneshot_state, 0, ROT0, "Tuning",  "Mad Donna (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, maddonnb, maddonna, maddonna, maddonna, oneshot_state, 0, ROT0, "Tuning",  "Mad Donna (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, oneshot,  0,        oneshot,  oneshot , oneshot_state, 0, ROT0, "Promat",  "One Shot One Kill", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, maddonna, 0,        maddonna, maddonna, oneshot_state, empty_init, ROT0, "Tuning",  "Mad Donna (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, maddonnb, maddonna, maddonna, maddonna, oneshot_state, empty_init, ROT0, "Tuning",  "Mad Donna (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, oneshot,  0,        oneshot,  oneshot , oneshot_state, empty_init, ROT0, "Promat",  "One Shot One Kill", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

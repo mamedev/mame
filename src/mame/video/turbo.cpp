@@ -174,7 +174,7 @@ VIDEO_START_MEMBER(turbo_state,buckrog)
 
 	/* allocate the bitmap RAM */
 	m_buckrog_bitmap_ram = std::make_unique<uint8_t[]>(0xe000);
-	save_pointer(NAME(m_buckrog_bitmap_ram.get()), 0xe000);
+	save_pointer(NAME(m_buckrog_bitmap_ram), 0xe000);
 }
 
 

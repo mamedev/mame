@@ -161,13 +161,14 @@ ROM_START( aha1542 )
 	ROM_LOAD( "553801-00.u15", 0x0000, 0x8000, CRC(7824397e) SHA1(35bc2c8fab31aad3190a478f2dc8f3a72958cf04) ) /* ADAPTEC, INC MCODE */
 ROM_END
 
-ADDRESS_MAP_START(aha1542_device::z84c0010_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(Z84C0010_TAG, 0)
-	AM_RANGE(0x8000, 0x800f) AM_NOP        // something is mapped there
-	AM_RANGE(0x9000, 0xafff) AM_RAM        // 2kb RAM chip
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM        // probably PC<->Z80 communication area
-	AM_RANGE(0xb000, 0xb000) AM_NOP        // something?
-ADDRESS_MAP_END
+void aha1542_device::z84c0010_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region(Z84C0010_TAG, 0);
+	map(0x8000, 0x800f).noprw();        // something is mapped there
+	map(0x9000, 0xafff).ram();        // 2kb RAM chip
+	map(0xe000, 0xe0ff).ram();        // probably PC<->Z80 communication area
+	map(0xb000, 0xb000).noprw();        // something?
+}
 
 const tiny_rom_entry *aha1542_device::device_rom_region() const
 {
@@ -175,8 +176,8 @@ const tiny_rom_entry *aha1542_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(aha1542_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z84C0010_TAG, Z80, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP( z84c0010_mem )
+	MCFG_DEVICE_ADD(Z84C0010_TAG, Z80, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP( z84c0010_mem )
 MACHINE_CONFIG_END
 
 aha1542_device::aha1542_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

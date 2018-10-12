@@ -8,6 +8,8 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "romload.h"
+
 #include "emuopts.h"
 #include "drivenum.h"
 #include "softlist_dev.h"
@@ -68,7 +70,7 @@ std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *
 const rom_entry *rom_first_region(const device_t &device)
 {
 	const rom_entry *romp = &device.rom_region_vector().front();
-	while (ROMENTRY_ISPARAMETER(romp))
+	while (ROMENTRY_ISPARAMETER(romp) || ROMENTRY_ISSYSTEM_BIOS(romp) || ROMENTRY_ISDEFAULT_BIOS(romp))
 		romp++;
 	return !ROMENTRY_ISEND(romp) ? romp : nullptr;
 }
@@ -265,53 +267,35 @@ int rom_load_manager::set_disk_handle(const char *region, const char *fullpath)
 
 void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios)
 {
-	device.set_system_bios(0);
-
-	/* first determine the default BIOS name */
-	char const *defaultname(nullptr);
-	for (const rom_entry &rom : device.rom_region_vector())
+	// default is applied by the device at config complete time
+	if (specbios && *specbios && core_stricmp(specbios, "default"))
 	{
-		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+		bool found(false);
+		for (const rom_entry &rom : device.rom_region_vector())
 		{
-			defaultname = ROM_GETNAME(&rom);
-			break;
-		}
-	}
+			if (ROMENTRY_ISSYSTEM_BIOS(&rom))
+			{
+				char const *const biosname = ROM_GETNAME(&rom);
+				int const bios_flags = ROM_GETBIOSFLAGS(&rom);
+				char bios_number[20];
 
-	/* look for a BIOS with a matching name */
-	int bios_count = 0, default_no = 1;
-	for (const rom_entry &rom : device.rom_region_vector())
-	{
-		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
-		{
-			char const *const biosname = ROM_GETNAME(&rom);
-			int const bios_flags = ROM_GETBIOSFLAGS(&rom);
-			char bios_number[20];
-
-			/* Allow '-bios n' to still be used */
-			sprintf(bios_number, "%d", bios_flags - 1);
-			if (!core_stricmp(bios_number, specbios) || !core_stricmp(biosname, specbios))
-				device.set_system_bios(bios_flags);
-			if (defaultname && !core_stricmp(biosname, defaultname))
-				default_no = bios_flags;
-			bios_count++;
-		}
-	}
-
-	/* if none found, use the default */
-	if (device.system_bios() == 0 && bios_count > 0)
-	{
-		/* if we got neither an empty string nor 'default' then warn the user */
-		if (specbios[0] && !core_stricmp(specbios, "default"))
-		{
-			m_errorstring.append(string_format("%s: invalid bios, reverting to default\n", specbios));
-			m_warnings++;
+				// Allow '-bios n' to still be used
+				sprintf(bios_number, "%d", bios_flags - 1);
+				if (!core_stricmp(bios_number, specbios) || !core_stricmp(biosname, specbios))
+				{
+					found = true;
+					device.set_system_bios(bios_flags);
+					break;
+				}
+			}
 		}
 
-		/* set to default */
-		device.set_system_bios(default_no);
+		// if we got neither an empty string nor 'default' then warn the user
+		if (!found)
+			m_errorstring.append(util::string_format("%s: invalid BIOS \"%s\", reverting to default\n", device.tag(), specbios));
 	}
-	device.set_default_bios(default_no);
+
+	// log final result
 	LOG("For \"%s\" using System BIOS: %d\n", device.tag(), device.system_bios());
 }
 
@@ -1189,6 +1173,10 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 
 void rom_load_manager::process_disk_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag)
 {
+	/* remove existing disk entries for this region */
+	m_chd_list.erase(std::remove_if(m_chd_list.begin(), m_chd_list.end(),
+		[regiontag](std::unique_ptr<open_chd> &chd){ return !strcmp(chd->region(), regiontag); }), m_chd_list.end());
+
 	/* loop until we hit the end of this region */
 	for ( ; !ROMENTRY_ISREGIONEND(romp); romp++)
 	{
@@ -1257,11 +1245,11 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
     flags for the given device
 -------------------------------------------------*/
 
-void rom_load_manager::normalize_flags_for_device(running_machine &machine, const char *rgntag, u8 &width, endianness_t &endian)
+void rom_load_manager::normalize_flags_for_device(const char *rgntag, u8 &width, endianness_t &endian)
 {
-	device_t *device = machine.device(rgntag);
+	device_t *device = machine().root_device().subdevice(rgntag);
 	device_memory_interface *memory;
-	if (device->interface(memory))
+	if (device != nullptr && device->interface(memory))
 	{
 		const address_space_config *spaceconfig = memory->space_config();
 		if (spaceconfig != nullptr)
@@ -1269,13 +1257,13 @@ void rom_load_manager::normalize_flags_for_device(running_machine &machine, cons
 			int buswidth;
 
 			/* set the endianness */
-			if (spaceconfig->m_endianness == ENDIANNESS_LITTLE)
+			if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
 				endian = ENDIANNESS_LITTLE;
 			else
 				endian = ENDIANNESS_BIG;
 
 			/* set the width */
-			buswidth = spaceconfig->m_data_width;
+			buswidth = spaceconfig->data_width();
 			if (buswidth <= 8)
 				width = 1;
 			else if (buswidth <= 16)
@@ -1359,8 +1347,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		memory_region *memregion = machine().root_device().memregion(regiontag.c_str());
 		if (memregion != nullptr)
 		{
-			if (machine().device(regiontag.c_str()) != nullptr)
-				normalize_flags_for_device(machine(), regiontag.c_str(), width, endianness);
+			normalize_flags_for_device(regiontag.c_str(), width, endianness);
 
 			/* clear old region (todo: should be moved to an image unload function) */
 			machine().memory().region_free(memregion->name());
@@ -1436,8 +1423,7 @@ void rom_load_manager::process_region_list()
 				/* if this is a device region, override with the device width and endianness */
 				u8 width = ROMREGION_GETWIDTH(region) / 8;
 				endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
-				if (machine().device(regiontag.c_str()) != nullptr)
-					normalize_flags_for_device(machine(), regiontag.c_str(), width, endianness);
+				normalize_flags_for_device(regiontag.c_str(), width, endianness);
 
 				/* remember the base and length */
 				m_region = machine().memory().region_alloc(regiontag.c_str(), regionlength, width, endianness);
@@ -1490,7 +1476,7 @@ void rom_load_manager::process_region_list()
 rom_load_manager::rom_load_manager(running_machine &machine)
 	: m_machine(machine)
 {
-	/* figure out which BIOS we are using */
+	// figure out which BIOS we are using
 	std::map<std::string, std::string> card_bios;
 	for (device_t &device : device_iterator(machine.config().root_device()))
 	{
@@ -1523,16 +1509,16 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 		}
 	}
 
-	/* count the total number of ROMs */
+	// count the total number of ROMs
 	count_roms();
 
-	/* reset the disk list */
+	// reset the disk list
 	m_chd_list.clear();
 
-	/* process the ROM entries we were passed */
+	// process the ROM entries we were passed
 	process_region_list();
 
-	/* display the results and exit */
+	// display the results and exit
 	display_rom_load_results(false);
 }
 

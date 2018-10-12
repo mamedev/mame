@@ -181,17 +181,17 @@ uint64_t cassette_image_size(cassette_image *cassette);
 
 /* waveform accesses */
 cassette_image::error cassette_get_samples(cassette_image *cassette, int channel,
-	double time_index, double sample_period, size_t sample_count, size_t sample_bytes,
+	double time_index, double sample_period, size_t sample_count, size_t sample_spacing,
 	void *samples, int waveform_flags);
 cassette_image::error cassette_put_samples(cassette_image *cassette, int channel,
-	double time_index, double sample_period, size_t sample_count, size_t sample_bytes,
+	double time_index, double sample_period, size_t sample_count, size_t sample_spacing,
 	const void *samples, int waveform_flags);
 cassette_image::error cassette_get_sample(cassette_image *cassette, int channel,
 	double time_index, double sample_period, int32_t *sample);
 cassette_image::error cassette_put_sample(cassette_image *cassette, int channel,
 	double time_index, double sample_period, int32_t sample);
 
-/* waveform accesses to/from the raw image */
+/* waveform accesses to/from the raw image - these are only used by lib\formats\wavfile.cpp */
 cassette_image::error cassette_read_samples(cassette_image *cassette, int channels, double time_index,
 	double sample_period, size_t sample_count, uint64_t offset, int waveform_flags);
 cassette_image::error cassette_write_samples(cassette_image *cassette, int channels, double time_index,

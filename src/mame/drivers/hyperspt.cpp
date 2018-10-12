@@ -12,7 +12,6 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "includes/hyperspt.h"
 #include "includes/konamipt.h"
 #include "audio/hyprolyb.h"
-#include "audio/trackfld.h"
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
@@ -22,10 +21,8 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "machine/konami1.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -52,61 +49,68 @@ WRITE_LINE_MEMBER(hyperspt_state::irq_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(hyperspt_state::common_map)
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_SHARE("scroll")  /* Scroll amount */
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1480, 0x1487) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x1500, 0x1500) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void hyperspt_state::common_map(address_map &map)
+{
+	map(0x1000, 0x10bf).ram().share("spriteram");
+	map(0x10c0, 0x10ff).ram().share("scroll");  /* Scroll amount */
+	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1480, 0x1487).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1500, 0x1500).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x1600, 0x1600).portr("DSW2");
+	map(0x1680, 0x1680).portr("SYSTEM");
+	map(0x1683, 0x1683).portr("DSW1");
+	map(0x2000, 0x27ff).ram().w(FUNC(hyperspt_state::videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(hyperspt_state::colorram_w)).share("colorram");
+	map(0x3000, 0x37ff).ram();
+	map(0x3800, 0x3fff).ram().share("nvram");
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(hyperspt_state::hyperspt_map)
-	AM_IMPORT_FROM(common_map)
-	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P3_P4")
-ADDRESS_MAP_END
+void hyperspt_state::hyperspt_map(address_map &map)
+{
+	common_map(map);
+	map(0x1681, 0x1681).portr("P1_P2");
+	map(0x1682, 0x1682).portr("P3_P4");
+}
 
-ADDRESS_MAP_START(hyperspt_state::roadf_map)
-	AM_IMPORT_FROM(common_map)
-	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1")
-	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P2")
-ADDRESS_MAP_END
+void hyperspt_state::roadf_map(address_map &map)
+{
+	common_map(map);
+	map(0x1681, 0x1681).portr("P1");
+	map(0x1682, 0x1682).portr("P2");
+}
 
-ADDRESS_MAP_START(hyperspt_state::common_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
-ADDRESS_MAP_END
+void hyperspt_state::common_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).ram();
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8000).r(m_soundbrd, FUNC(trackfld_audio_device::hyperspt_sh_timer_r));
+	map(0xe000, 0xe000).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0xe001, 0xe001).w(FUNC(hyperspt_state::konami_SN76496_latch_w));  /* Loads the snd command into the snd latch */
+	map(0xe002, 0xe002).w(FUNC(hyperspt_state::konami_SN76496_w));  /* This address triggers the SN chip to read the data port. */
+}
 
-ADDRESS_MAP_START(hyperspt_state::hyperspt_sound_map)
-	AM_IMPORT_FROM(common_sound_map)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("vlm", vlm5030_device, data_w) /* speech data */
-	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, hyperspt_sound_w)      /* speech and output control */
-ADDRESS_MAP_END
+void hyperspt_state::hyperspt_sound_map(address_map &map)
+{
+	common_sound_map(map);
+	map(0xa000, 0xa000).w(m_vlm, FUNC(vlm5030_device::data_w)); /* speech data */
+	map(0xc000, 0xdfff).w(m_soundbrd, FUNC(trackfld_audio_device::hyperspt_sound_w));      /* speech and output control */
+}
 
-ADDRESS_MAP_START(hyperspt_state::roadf_sound_map)
-	AM_IMPORT_FROM(common_sound_map)
-	AM_RANGE(0xa000, 0xa000) AM_NOP // No VLM
-	AM_RANGE(0xc000, 0xdfff) AM_NOP // No VLM
-ADDRESS_MAP_END
+void hyperspt_state::roadf_sound_map(address_map &map)
+{
+	common_sound_map(map);
+	map(0xa000, 0xa000).noprw(); // No VLM
+	map(0xc000, 0xdfff).noprw(); // No VLM
+}
 
-ADDRESS_MAP_START(hyperspt_state::soundb_map)
-	AM_IMPORT_FROM(common_sound_map)
-	AM_RANGE(0xa000, 0xa000) AM_NOP // No VLM
-	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, write)   /* speech and output control */
-ADDRESS_MAP_END
+void hyperspt_state::soundb_map(address_map &map)
+{
+	common_sound_map(map);
+	map(0xa000, 0xa000).noprw(); // No VLM
+	map(0xc000, 0xdfff).w("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::write));   /* speech and output control */
+}
 
 static INPUT_PORTS_START( hyperspt )
 	PORT_START("SYSTEM")
@@ -247,7 +251,7 @@ static const gfx_layout hyperspt_spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( hyperspt )
+static GFXDECODE_START( gfx_hyperspt )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperspt_spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, hyperspt_charlayout,    16*16, 16 )
 GFXDECODE_END
@@ -277,78 +281,79 @@ static const gfx_layout roadf_spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( roadf )
+static GFXDECODE_START( gfx_roadf )
 	GFXDECODE_ENTRY( "gfx1", 0, roadf_spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, roadf_charlayout,    16*16, 16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
+WRITE_LINE_MEMBER(hyperspt_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/12)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(hyperspt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hyperspt_state,  vblank_irq)
+	MCFG_DEVICE_ADD(m_maincpu, KONAMI1, XTAL(18'432'000)/12)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(hyperspt_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(hyperspt_sound_map)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80,XTAL(14'318'181)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(hyperspt_sound_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // F2
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(hyperspt_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w)) // SOUND ON
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // END
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(hyperspt_state, coin_counter_1_w)) // COIN 1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(hyperspt_state, coin_counter_2_w)) // COIN 2
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // SA
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(hyperspt_state, irq_mask_w)) // INT
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // F2
+	mainlatch.q_out_cb<0>().set(FUNC(hyperspt_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(m_soundbrd, FUNC(trackfld_audio_device::sh_irqtrigger_w)); // SOUND ON
+	mainlatch.q_out_cb<2>().set_nop(); // END
+	mainlatch.q_out_cb<3>().set(FUNC(hyperspt_state::coin_counter_1_w)); // COIN 1
+	mainlatch.q_out_cb<4>().set(FUNC(hyperspt_state::coin_counter_2_w)); // COIN 2
+	mainlatch.q_out_cb<5>().set_nop(); // SA
+	mainlatch.q_out_cb<7>().set(FUNC(hyperspt_state::irq_mask_w)); // INT
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hyperspt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperspt_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperspt)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_hyperspt)
+	MCFG_PALETTE_ADD(m_palette, 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD(m_dac, DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76496, XTAL(14'318'181)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD(m_sn, SN76496, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(hyperspt_state::hyprolyb_adpcm_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, data_r)
-	AM_RANGE(0x1001, 0x1001) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, ready_r)
-	AM_RANGE(0x1002, 0x1002) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, msm_data_w)
-	AM_RANGE(0x1003, 0x1003) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, msm_vck_r)
+void hyperspt_state::hyprolyb_adpcm_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();
+	map(0x1000, 0x1000).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::data_r));
+	map(0x1001, 0x1001).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::ready_r));
+	map(0x1002, 0x1002).w("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::msm_data_w));
+	map(0x1003, 0x1003).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::msm_vck_r));
 		// on init:
 		//    $1003 = $00
 		//    $1002 = $FF
@@ -362,26 +367,25 @@ ADDRESS_MAP_START(hyperspt_state::hyprolyb_adpcm_map)
 		// $1002 & $0f (out) = 5205 data
 		// $1001 & $80 (in) = sound latch request
 		// $1000 (in) = sound latch data
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x8000, 0xffff).rom();
+}
 
 
 MACHINE_CONFIG_START(hyperspt_state::hypersptb)
 	hyperspt(config);
 	MCFG_DEVICE_REMOVE("vlm")
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(soundb_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::soundb_map, tag(), this));
 
-	MCFG_CPU_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
-	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
+	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
+	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
@@ -390,13 +394,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hyperspt_state::roadf)
 	hyperspt(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(roadf_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", roadf)
+	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::roadf_map, tag(), this));
+	m_audiocpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::roadf_sound_map, tag(), this));
+	m_gfxdecode->set_info(gfx_roadf);
+
 	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(roadf_sound_map)
 	MCFG_DEVICE_REMOVE("vlm")
 MACHINE_CONFIG_END
 
@@ -617,9 +620,9 @@ ROM_START( roadf3 ) // This hack was found on an original GX330 (Hyper Sports) P
 	ROM_LOAD( "82s129.a9",  0x0120, 0x0100, CRC(5b3b5f2a) SHA1(e83556fba6d50ad20dff6e19bd300ba0c30cc6e2) ) // identical to a09_c29.bin
 ROM_END
 
-GAME( 1984, hyperspt,  0,        hyperspt,  hyperspt, hyperspt_state, 0, ROT0,  "Konami (Centuri license)", "Hyper Sports", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, hyperspt_state, 0, ROT0,  "bootleg", "Hyper Sports (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has ADPCM vis MSM5205 instead of VLM
-GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, hyperspt_state, 0, ROT0,  "Konami",  "Hyper Olympic '84", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf,     0,        roadf,     roadf,    hyperspt_state, 0, ROT90, "Konami",  "Road Fighter (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf2,    roadf,    roadf,     roadf,    hyperspt_state, 0, ROT90, "Konami",  "Road Fighter (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf3,    roadf,    roadf,     roadf,    hyperspt_state, 0, ROT90, "hack",    "Road Fighter (set 3, conversion hack on Hyper Sports PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hyperspt,  0,        hyperspt,  hyperspt, hyperspt_state, empty_init, ROT0,  "Konami (Centuri license)", "Hyper Sports", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, hyperspt_state, empty_init, ROT0,  "bootleg", "Hyper Sports (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has ADPCM vis MSM5205 instead of VLM
+GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, hyperspt_state, empty_init, ROT0,  "Konami",  "Hyper Olympic '84", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf,     0,        roadf,     roadf,    hyperspt_state, empty_init, ROT90, "Konami",  "Road Fighter (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf2,    roadf,    roadf,     roadf,    hyperspt_state, empty_init, ROT90, "Konami",  "Road Fighter (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf3,    roadf,    roadf,     roadf,    hyperspt_state, empty_init, ROT90, "hack",    "Road Fighter (set 3, conversion hack on Hyper Sports PCB)", MACHINE_SUPPORTS_SAVE )

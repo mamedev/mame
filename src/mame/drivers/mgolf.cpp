@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mgolf_state : public driver_device
@@ -29,7 +30,7 @@ public:
 
 	void mgolf(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(wram_r);
 	DECLARE_READ8_MEMBER(dial_r);
@@ -53,7 +54,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void cpu_map(address_map &map);
 
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -135,7 +135,7 @@ void mgolf_state::update_plunger(  )
 			m_time_released = machine().time();
 
 			if (!m_mask)
-				m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+				m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 		else
 			m_time_pushed = machine().time();
@@ -230,34 +230,35 @@ WRITE8_MEMBER(mgolf_state::wram_w)
 
 
 
-ADDRESS_MAP_START(mgolf_state::cpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+void mgolf_state::cpu_map(address_map &map)
+{
+	map.global_mask(0x3fff);
 
-	AM_RANGE(0x0040, 0x0040) AM_READ_PORT("40")
-	AM_RANGE(0x0041, 0x0041) AM_READ(dial_r)
-	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("60")
-	AM_RANGE(0x0061, 0x0061) AM_READ(misc_r)
-	AM_RANGE(0x0080, 0x00ff) AM_READ(wram_r)
-	AM_RANGE(0x0180, 0x01ff) AM_READ(wram_r)
-	AM_RANGE(0x0800, 0x0bff) AM_READONLY
+	map(0x0040, 0x0040).portr("40");
+	map(0x0041, 0x0041).r(FUNC(mgolf_state::dial_r));
+	map(0x0060, 0x0060).portr("60");
+	map(0x0061, 0x0061).r(FUNC(mgolf_state::misc_r));
+	map(0x0080, 0x00ff).r(FUNC(mgolf_state::wram_r));
+	map(0x0180, 0x01ff).r(FUNC(mgolf_state::wram_r));
+	map(0x0800, 0x0bff).readonly();
 
-	AM_RANGE(0x0000, 0x0009) AM_WRITENOP
-	AM_RANGE(0x0024, 0x0024) AM_WRITENOP
-	AM_RANGE(0x0028, 0x0028) AM_WRITENOP
-	AM_RANGE(0x0042, 0x0042) AM_WRITENOP
-	AM_RANGE(0x0044, 0x0044) AM_WRITENOP /* watchdog? */
-	AM_RANGE(0x0046, 0x0046) AM_WRITENOP
-	AM_RANGE(0x0060, 0x0060) AM_WRITENOP
-	AM_RANGE(0x0061, 0x0061) AM_WRITENOP
-	AM_RANGE(0x006a, 0x006a) AM_WRITENOP
-	AM_RANGE(0x006c, 0x006c) AM_WRITENOP
-	AM_RANGE(0x006d, 0x006d) AM_WRITENOP
-	AM_RANGE(0x0080, 0x00ff) AM_WRITE(wram_w)
-	AM_RANGE(0x0180, 0x01ff) AM_WRITE(wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(vram_w) AM_SHARE("video_ram")
+	map(0x0000, 0x0009).nopw();
+	map(0x0024, 0x0024).nopw();
+	map(0x0028, 0x0028).nopw();
+	map(0x0042, 0x0042).nopw();
+	map(0x0044, 0x0044).nopw(); /* watchdog? */
+	map(0x0046, 0x0046).nopw();
+	map(0x0060, 0x0060).nopw();
+	map(0x0061, 0x0061).nopw();
+	map(0x006a, 0x006a).nopw();
+	map(0x006c, 0x006c).nopw();
+	map(0x006d, 0x006d).nopw();
+	map(0x0080, 0x00ff).w(FUNC(mgolf_state::wram_w));
+	map(0x0180, 0x01ff).w(FUNC(mgolf_state::wram_w));
+	map(0x0800, 0x0bff).w(FUNC(mgolf_state::vram_w)).share("video_ram");
 
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+	map(0x2000, 0x3fff).rom();
+}
 
 
 static INPUT_PORTS_START( mgolf )
@@ -275,8 +276,8 @@ static INPUT_PORTS_START( mgolf )
 	PORT_DIPSETTING(    0xc0, "40" )
 
 	PORT_START("41")
-	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* DIAL A */
-	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* DIAL B */
+	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* DIAL A */
+	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* DIAL B */
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
@@ -288,8 +289,8 @@ static INPUT_PORTS_START( mgolf )
 
 	PORT_START("61")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Course Select") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) /* PLUNGER 1 */
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) /* PLUNGER 2 */
+	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) /* PLUNGER 1 */
+	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) /* PLUNGER 2 */
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("DIAL")
@@ -342,7 +343,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( mgolf )
+static GFXDECODE_START( gfx_mgolf )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 2 )
 GFXDECODE_END
@@ -370,8 +371,8 @@ void mgolf_state::machine_reset()
 MACHINE_CONFIG_START(mgolf_state::mgolf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 
 	/* video hardware */
@@ -382,7 +383,7 @@ MACHINE_CONFIG_START(mgolf_state::mgolf)
 	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgolf)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(mgolf_state, mgolf)
 
@@ -414,4 +415,4 @@ ROM_START( mgolf )
 ROM_END
 
 
-GAME( 1978, mgolf, 0, mgolf, mgolf, mgolf_state, 0, ROT270, "Atari", "Atari Mini Golf (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, mgolf, 0, mgolf, mgolf, mgolf_state, empty_init, ROT270, "Atari", "Atari Mini Golf (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

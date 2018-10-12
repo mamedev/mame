@@ -121,7 +121,8 @@ bool sg1000_expansion_slot_device::is_writeable(uint8_t offset)
 //  SLOT_INTERFACE( sg1000_expansion_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( sg1000_expansion_devices )
-	SLOT_INTERFACE("sk1100", SEGA_SK1100)
-	SLOT_INTERFACE("fm", SEGA_FM_UNIT)
-SLOT_INTERFACE_END
+void sg1000_expansion_devices(device_slot_interface &device)
+{
+	device.option_add("sk1100", SEGA_SK1100);
+	device.option_add("fm", SEGA_FM_UNIT);
+}

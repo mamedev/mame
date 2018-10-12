@@ -93,7 +93,7 @@ class sn76477_device : public device_t,
 						public device_sound_interface
 {
 public:
-	sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_noise_params(double clock_res, double filter_res, double filter_cap)
 	{

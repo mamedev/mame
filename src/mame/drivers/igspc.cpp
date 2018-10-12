@@ -55,22 +55,26 @@ public:
 	{ }
 
 	void speeddrv(machine_config &config);
+
+	void init_speeddrv();
+
+private:
 	void speeddrv_io(address_map &map);
 	void speeddrv_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 public:
-	DECLARE_DRIVER_INIT(speeddrv);
 };
 
-ADDRESS_MAP_START(speeddrv_state::speeddrv_map)
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
-ADDRESS_MAP_END
+void speeddrv_state::speeddrv_map(address_map &map)
+{
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(speeddrv_state::speeddrv_io)
-ADDRESS_MAP_END
+void speeddrv_state::speeddrv_io(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( speeddrv )
@@ -80,9 +84,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(speeddrv_state::speeddrv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 40000000 ) // ?? at least a pentium
-	MCFG_CPU_PROGRAM_MAP(speeddrv_map)
-	MCFG_CPU_IO_MAP(speeddrv_io)
+	MCFG_DEVICE_ADD("maincpu", I486, 40000000 ) // ?? at least a pentium
+	MCFG_DEVICE_PROGRAM_MAP(speeddrv_map)
+	MCFG_DEVICE_IO_MAP(speeddrv_io)
 MACHINE_CONFIG_END
 
 
@@ -112,9 +116,9 @@ ROM_START( eztouch )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(speeddrv_state,speeddrv)
+void speeddrv_state::init_speeddrv()
 {
 }
 
-GAME( 2004,  speeddrv,  0,  speeddrv,  speeddrv, speeddrv_state,  speeddrv,  ROT0,  "IGS",    "Speed Driver",          MACHINE_IS_SKELETON )
-GAME( 200?,  eztouch,   0,  speeddrv,  speeddrv, speeddrv_state,  speeddrv,  ROT0,  "IGS",    "EZ Touch (v116 China)", MACHINE_IS_SKELETON )
+GAME( 2004, speeddrv, 0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "Speed Driver",          MACHINE_IS_SKELETON )
+GAME( 200?, eztouch,  0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "EZ Touch (v116 China)", MACHINE_IS_SKELETON )

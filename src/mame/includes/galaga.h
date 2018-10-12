@@ -9,25 +9,63 @@
 #include "sound/discrete.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 class galaga_state : public driver_device
 {
 public:
 	galaga_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_galaga_ram1(*this, "galaga_ram1"),
-		m_galaga_ram2(*this, "galaga_ram2"),
-		m_galaga_ram3(*this, "galaga_ram3"),
-		m_videolatch(*this, "videolatch"),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_subcpu2(*this, "sub2"),
-		m_namco_sound(*this, "namco"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_videoram(*this, "videoram")
+		, m_galaga_ram1(*this, "galaga_ram1")
+		, m_galaga_ram2(*this, "galaga_ram2")
+		, m_galaga_ram3(*this, "galaga_ram3")
+		, m_videolatch(*this, "videolatch")
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
+		, m_subcpu2(*this, "sub2")
+		, m_namco_sound(*this, "namco")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_leds(*this, "led%u", 0U)
+	{ }
+
+	DECLARE_READ8_MEMBER(bosco_dsw_r);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(irq1_clear_w);
+	DECLARE_WRITE_LINE_MEMBER(irq2_clear_w);
+	DECLARE_WRITE_LINE_MEMBER(nmion_w);
+	DECLARE_WRITE8_MEMBER(galaga_videoram_w);
+	DECLARE_WRITE_LINE_MEMBER(gatsbee_bank_w);
+	DECLARE_WRITE8_MEMBER(out_0);
+	DECLARE_WRITE8_MEMBER(out_1);
+	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
+	DECLARE_READ8_MEMBER(namco_52xx_si_r);
+	void init_galaga();
+	void init_gatsbee();
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	DECLARE_VIDEO_START(galaga);
+	DECLARE_PALETTE_INIT(galaga);
+	uint32_t screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_galaga);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	TIMER_CALLBACK_MEMBER(cpu3_interrupt_callback);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void galaga(machine_config &config);
+	void gatsbee(machine_config &config);
+	void galagab(machine_config &config);
+	void dzigzag_mem4(address_map &map);
+	void galaga_map(address_map &map);
+	void galaga_mem4(address_map &map);
+	void gatsbee_main_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_videoram;
@@ -42,6 +80,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<2> m_leds;
 	emu_timer *m_cpu3_interrupt_timer;
 
 	/* machine state */
@@ -61,32 +100,7 @@ public:
 	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;
 	uint8_t m_sub2_nmi_mask;
-	DECLARE_READ8_MEMBER(bosco_dsw_r);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE_LINE_MEMBER(irq1_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(irq2_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(nmion_w);
-	DECLARE_WRITE8_MEMBER(galaga_videoram_w);
-	DECLARE_WRITE_LINE_MEMBER(gatsbee_bank_w);
-	DECLARE_WRITE8_MEMBER(out_0);
-	DECLARE_WRITE8_MEMBER(out_1);
-	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
-	DECLARE_READ8_MEMBER(namco_52xx_si_r);
-	DECLARE_DRIVER_INIT(galaga);
-	DECLARE_DRIVER_INIT(gatsbee);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_MACHINE_START(galaga);
-	DECLARE_MACHINE_RESET(galaga);
-	DECLARE_VIDEO_START(galaga);
-	DECLARE_PALETTE_INIT(galaga);
-	uint32_t screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_galaga);
-	INTERRUPT_GEN_MEMBER(main_vblank_irq);
-	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
-	TIMER_CALLBACK_MEMBER(cpu3_interrupt_callback);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect );
+
 	struct star
 	{
 		uint16_t x,y;
@@ -94,16 +108,10 @@ public:
 	};
 
 	static struct star m_star_seed_tab[];
-	void galaga(machine_config &config);
-	void gatsbee(machine_config &config);
-	void galagab(machine_config &config);
-	void dzigzag_mem4(address_map &map);
-	void galaga_map(address_map &map);
-	void galaga_mem4(address_map &map);
-	void gatsbee_main_map(address_map &map);
+
 };
 
-DISCRETE_SOUND_EXTERN( galaga );
-DISCRETE_SOUND_EXTERN( bosco );
+DISCRETE_SOUND_EXTERN( galaga_discrete );
+DISCRETE_SOUND_EXTERN( bosco_discrete );
 
 #endif // MAME_INCLUDES_GALAGA_H

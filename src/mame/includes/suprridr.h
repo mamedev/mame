@@ -7,6 +7,7 @@
 **************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class suprridr_state : public driver_device
 {
@@ -20,8 +21,14 @@ public:
 		m_palette(*this, "palette"),
 		m_fgram(*this, "fgram"),
 		m_bgram(*this, "bgram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
+	void suprridr(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(control_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -49,8 +56,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(fgram_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(control_r);
-
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
@@ -63,7 +68,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int is_screen_flipped();
-	void suprridr(machine_config &config);
+
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 	void sound_map(address_map &map);

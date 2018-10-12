@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "debugbuf.h"
 
-debug_disasm_buffer::debug_data_buffer::debug_data_buffer(util::disasm_interface *intf) : m_intf(intf)
+debug_disasm_buffer::debug_data_buffer::debug_data_buffer(util::disasm_interface const &intf) : m_intf(intf)
 {
 	m_space = nullptr;
 	m_back = nullptr;
@@ -177,13 +177,13 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 {
 	address_space *space = m_space ? m_space : m_back->get_underlying_space();
 	int shift = space->addr_shift();
-	int alignment = m_intf->opcode_alignment();
+	int alignment = m_intf.opcode_alignment();
 	endianness_t endian = space->endianness();
 
 	m_pc_mask = space->logaddrmask();
 
-	if(m_intf->interface_flags() & util::disasm_interface::PAGED)
-		m_page_mask = (1 << m_intf->page_address_bits()) - 1;
+	if(m_intf.interface_flags() & util::disasm_interface::PAGED)
+		m_page_mask = (1 << m_intf.page_address_bits()) - 1;
 	else
 		m_page_mask = 0;
 
@@ -194,20 +194,20 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	case -1: m_pc_delta_to_bytes = [](offs_t delta) { return delta << 1; }; break;
 	case  0: m_pc_delta_to_bytes = [](offs_t delta) { return delta;      }; break;
 	case  3: m_pc_delta_to_bytes = [](offs_t delta) { return delta >> 3; }; break;
-	default: throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer::setup_methods: Abnormal address buf shift\n");
+	default: throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer::setup_methods: Abnormal address bus shift\n");
 	}
 
 	// Define the filler
 	if(m_space) {
 		// get the data from given space
-		if(m_intf->interface_flags() & util::disasm_interface::NONLINEAR_PC) {
+		if(m_intf.interface_flags() & util::disasm_interface::NONLINEAR_PC) {
 			switch(shift) {
 			case -1:
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
 					auto dis = m_space->device().machine().disable_side_effects();
 					u16 *dest = get_ptr<u16>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
-						offs_t tpc = m_intf->pc_linear_to_real(lpc);
+						offs_t tpc = m_intf.pc_linear_to_real(lpc);
 						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
 							*dest++ = m_space->read_word(tpc);
 						else
@@ -221,7 +221,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					u8 *dest = get_ptr<u8>(lstart);
 					u32 steps = 0;
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
-						offs_t tpc = m_intf->pc_linear_to_real(lpc);
+						offs_t tpc = m_intf.pc_linear_to_real(lpc);
 						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
 							*dest++ = m_space->read_byte(tpc);
 						else
@@ -308,14 +308,14 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	} else {
 		// get the data from a back buffer and decrypt it through the device
 		// size chosen is alignment * granularity
-		assert(!(m_intf->interface_flags() & util::disasm_interface::NONLINEAR_PC));
+		assert(!(m_intf.interface_flags() & util::disasm_interface::NONLINEAR_PC));
 
 		switch(shift) {
 		case -3: // bus granularity 64, endianness irrelevant
 			m_do_fill = [this](offs_t lstart, offs_t lend) {
 				u64 *dest = get_ptr<u64>(lstart);
 				for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask)
-					*dest++ = m_intf->decrypt64(m_back->r64(lpc), lpc, m_opcode);
+					*dest++ = m_intf.decrypt64(m_back->r64(lpc), lpc, m_opcode);
 			};
 			break;
 
@@ -325,7 +325,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
 					u32 *dest = get_ptr<u32>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask)
-						*dest++ = m_intf->decrypt32(m_back->r32(lpc), lpc, m_opcode);
+						*dest++ = m_intf.decrypt32(m_back->r32(lpc), lpc, m_opcode);
 				};
 				break;
 
@@ -335,7 +335,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u32 *dest = get_ptr<u32>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 2) & m_pc_mask) {
-							u64 val = m_intf->decrypt64(m_back->r64(lpc), lpc, m_opcode);
+							u64 val = m_intf.decrypt64(m_back->r64(lpc), lpc, m_opcode);
 							*dest++ = val;
 							*dest++ = val >> 32;
 						}
@@ -346,7 +346,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u32 *dest = get_ptr<u32>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 2) & m_pc_mask) {
-							u64 val = m_intf->decrypt64(m_back->r64(lpc), lpc, m_opcode);
+							u64 val = m_intf.decrypt64(m_back->r64(lpc), lpc, m_opcode);
 							*dest++ = val >> 32;
 							*dest++ = val;
 						}
@@ -363,7 +363,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
 					u16 *dest = get_ptr<u16>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask)
-						*dest++ = m_intf->decrypt16(m_back->r16(lpc), lpc, m_opcode);
+						*dest++ = m_intf.decrypt16(m_back->r16(lpc), lpc, m_opcode);
 				};
 				break;
 
@@ -373,7 +373,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u16 *dest = get_ptr<u16>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 2) & m_pc_mask) {
-							u32 val = m_intf->decrypt32(m_back->r32(lpc), lpc, m_opcode);
+							u32 val = m_intf.decrypt32(m_back->r32(lpc), lpc, m_opcode);
 							*dest++ = val;
 							*dest++ = val >> 16;
 						}
@@ -384,7 +384,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u16 *dest = get_ptr<u16>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 2) & m_pc_mask) {
-							u32 val = m_intf->decrypt32(m_back->r32(lpc), lpc, m_opcode);
+							u32 val = m_intf.decrypt32(m_back->r32(lpc), lpc, m_opcode);
 							*dest++ = val >> 16;
 							*dest++ = val;
 						}
@@ -399,7 +399,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u16 *dest = get_ptr<u16>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 4) & m_pc_mask) {
-							u64 val = m_intf->decrypt64(m_back->r64(lpc), lpc, m_opcode);
+							u64 val = m_intf.decrypt64(m_back->r64(lpc), lpc, m_opcode);
 							*dest++ = val;
 							*dest++ = val >> 16;
 							*dest++ = val >> 32;
@@ -412,7 +412,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u16 *dest = get_ptr<u16>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 4) & m_pc_mask) {
-							u64 val = m_intf->decrypt64(m_back->r64(lpc), lpc, m_opcode);
+							u64 val = m_intf.decrypt64(m_back->r64(lpc), lpc, m_opcode);
 							*dest++ = val >> 48;
 							*dest++ = val >> 32;
 							*dest++ = val >> 16;
@@ -431,7 +431,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
 					u8 *dest = get_ptr<u8>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask)
-						*dest++ = m_intf->decrypt8(m_back->r8(lpc), lpc, m_opcode);
+						*dest++ = m_intf.decrypt8(m_back->r8(lpc), lpc, m_opcode);
 				};
 				break;
 
@@ -441,7 +441,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u8 *dest = get_ptr<u8>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 2) & m_pc_mask) {
-							u16 val = m_intf->decrypt16(m_back->r16(lpc), lpc, m_opcode);
+							u16 val = m_intf.decrypt16(m_back->r16(lpc), lpc, m_opcode);
 							*dest++ = val;
 							*dest++ = val >>  8;
 						}
@@ -452,7 +452,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u8 *dest = get_ptr<u8>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 2) & m_pc_mask) {
-							u16 val = m_intf->decrypt16(m_back->r16(lpc), lpc, m_opcode);
+							u16 val = m_intf.decrypt16(m_back->r16(lpc), lpc, m_opcode);
 							*dest++ = val >>  8;
 							*dest++ = val;
 						}
@@ -467,7 +467,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u8 *dest = get_ptr<u8>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 4) & m_pc_mask) {
-							u32 val = m_intf->decrypt32(m_back->r32(lpc), lpc, m_opcode);
+							u32 val = m_intf.decrypt32(m_back->r32(lpc), lpc, m_opcode);
 							*dest++ = val;
 							*dest++ = val >>  8;
 							*dest++ = val >> 16;
@@ -480,7 +480,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u8 *dest = get_ptr<u8>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 4) & m_pc_mask) {
-							u32 val = m_intf->decrypt32(m_back->r32(lpc), lpc, m_opcode);
+							u32 val = m_intf.decrypt32(m_back->r32(lpc), lpc, m_opcode);
 							*dest++ = val >> 24;
 							*dest++ = val >> 16;
 							*dest++ = val >>  8;
@@ -498,7 +498,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u8 *dest = get_ptr<u8>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 8) & m_pc_mask) {
-							u64 val = m_intf->decrypt64(m_back->r64(lpc), lpc, m_opcode);
+							u64 val = m_intf.decrypt64(m_back->r64(lpc), lpc, m_opcode);
 							*dest++ = val;
 							*dest++ = val >>  8;
 							*dest++ = val >> 16;
@@ -515,7 +515,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_fill = [this](offs_t lstart, offs_t lend) {
 						u8 *dest = get_ptr<u8>(lstart);
 						for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 2) & m_pc_mask) {
-							u64 val = m_intf->decrypt64(m_back->r64(lpc), lpc, m_opcode);
+							u64 val = m_intf.decrypt64(m_back->r64(lpc), lpc, m_opcode);
 							*dest++ = val >> 56;
 							*dest++ = val >> 48;
 							*dest++ = val >> 40;
@@ -538,19 +538,19 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			m_do_fill = [this](offs_t lstart, offs_t lend) {
 				u16 *dest = reinterpret_cast<u16 *>(&m_buffer[0]) + ((lstart - m_lstart) >> 4);
 				for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 0x10) & m_pc_mask)
-					*dest++ = m_intf->decrypt16(m_back->r16(lpc), lpc, m_opcode);
+					*dest++ = m_intf.decrypt16(m_back->r16(lpc), lpc, m_opcode);
 			};
 			break;
 		}
 	}
 
 	// Define the accessors
-	if(m_intf->interface_flags() & util::disasm_interface::NONLINEAR_PC) {
+	if(m_intf.interface_flags() & util::disasm_interface::NONLINEAR_PC) {
 		switch(shift) {
 		case -1:
 			m_do_r8  = [](offs_t pc) -> u8  { throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer: r8 access on 16-bits granularity bus\n"); };
 			m_do_r16 = [this](offs_t pc) -> u16 {
-				offs_t lpc = m_intf->pc_real_to_linear(pc);
+				offs_t lpc = m_intf.pc_real_to_linear(pc);
 				fill(lpc, 1);
 				const u16 *src = get_ptr<u16>(lpc);
 				return src[0];
@@ -559,7 +559,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			switch(endian) {
 			case ENDIANNESS_LITTLE:
 				m_do_r32 = [this](offs_t pc) -> u32 {
-					offs_t lpc = m_intf->pc_real_to_linear(pc);
+					offs_t lpc = m_intf.pc_real_to_linear(pc);
 					fill(lpc, 2);
 					u32 r = 0;
 					for(int j=0; j != 2; j++) {
@@ -569,7 +569,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					return r;
 				};
 				m_do_r64 = [this](offs_t pc) -> u64 {
-					offs_t lpc = m_intf->pc_real_to_linear(pc);
+					offs_t lpc = m_intf.pc_real_to_linear(pc);
 					fill(lpc, 4);
 					u64 r = 0;
 					for(int j=0; j != 4; j++) {
@@ -582,7 +582,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 			case ENDIANNESS_BIG:
 				m_do_r32 = [this](offs_t pc) -> u32 {
-					offs_t lpc = m_intf->pc_real_to_linear(pc);
+					offs_t lpc = m_intf.pc_real_to_linear(pc);
 					fill(lpc, 2);
 					u32 r = 0;
 					for(int j=0; j != 2; j++) {
@@ -592,7 +592,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					return r;
 				};
 				m_do_r64 = [this](offs_t pc) -> u64 {
-					offs_t lpc = m_intf->pc_real_to_linear(pc);
+					offs_t lpc = m_intf.pc_real_to_linear(pc);
 					fill(lpc, 4);
 					u64 r = 0;
 					for(int j=0; j != 4; j++) {
@@ -607,7 +607,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 		case 0:
 			m_do_r8 = [this](offs_t pc) -> u8 {
-				offs_t lpc = m_intf->pc_real_to_linear(pc);
+				offs_t lpc = m_intf.pc_real_to_linear(pc);
 				fill(lpc, 1);
 				const u8 *src = get_ptr<u8>(lpc);
 				return src[0];
@@ -616,7 +616,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			switch(endian) {
 			case ENDIANNESS_LITTLE:
 				m_do_r16 = [this](offs_t pc) -> u16 {
-					offs_t lpc = m_intf->pc_real_to_linear(pc);
+					offs_t lpc = m_intf.pc_real_to_linear(pc);
 					fill(lpc, 2);
 					u16 r = 0;
 					for(int j=0; j != 2; j++) {
@@ -626,7 +626,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					return r;
 				};
 				m_do_r32 = [this](offs_t pc) -> u32 {
-					offs_t lpc = m_intf->pc_real_to_linear(pc);
+					offs_t lpc = m_intf.pc_real_to_linear(pc);
 					fill(lpc, 4);
 					u32 r = 0;
 					for(int j=0; j != 2; j++) {
@@ -636,7 +636,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					return r;
 				};
 				m_do_r64 = [this](offs_t pc) -> u64 {
-					offs_t lpc = m_intf->pc_real_to_linear(pc);
+					offs_t lpc = m_intf.pc_real_to_linear(pc);
 					fill(lpc, 8);
 					u64 r = 0;
 					for(int j=0; j != 8; j++) {
@@ -649,7 +649,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 			case ENDIANNESS_BIG:
 				m_do_r16 = [this](offs_t pc) -> u16 {
-					offs_t lpc = m_intf->pc_real_to_linear(pc);
+					offs_t lpc = m_intf.pc_real_to_linear(pc);
 					fill(lpc, 2);
 					u16 r = 0;
 					for(int j=0; j != 2; j++) {
@@ -659,7 +659,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					return r;
 				};
 				m_do_r32 = [this](offs_t pc) -> u32 {
-					offs_t lpc = m_intf->pc_real_to_linear(pc);
+					offs_t lpc = m_intf.pc_real_to_linear(pc);
 					fill(lpc, 4);
 					u32 r = 0;
 					for(int j=0; j != 2; j++) {
@@ -669,7 +669,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					return r;
 				};
 				m_do_r64 = [this](offs_t pc) -> u64 {
-					offs_t lpc = m_intf->pc_real_to_linear(pc);
+					offs_t lpc = m_intf.pc_real_to_linear(pc);
 					fill(lpc, 8);
 					u64 r = 0;
 					for(int j=0; j != 8; j++) {
@@ -719,7 +719,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 2);
 						const u32 *src = get_ptr<u32>(pc);
-						return src[0] | (u64(src[1]) << 32);
+						return u64(src[0]) | (u64(src[1]) << 32);
 					};
 				}
 				break;
@@ -782,7 +782,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 4);
 						const u16 *src = get_ptr<u16>(pc);
-						return src[0] | (src[1] << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
+						return u64(src[0]) | (u64(src[1]) << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
 					};
 				}
 				break;
@@ -815,7 +815,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 4);
 						const u16 *src = get_ptr<u16>(pc);
-						return (u64(src[0]) << 48) | (u64(src[1]) << 32) | u32(src[2] << 16) | src[3];
+						return (u64(src[0]) << 48) | (u64(src[1]) << 32) | u64(src[2] << 16) | u64(src[3]);
 					};
 				}
 				break;
@@ -872,7 +872,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 8);
 						const u8 *src = get_ptr<u8>(pc);
-						return src[0] | (src[1] << 8) | (src[2] << 16) | u32(src[3] << 24) |
+						return u64(src[0]) | (u64(src[1]) << 8) | (u64(src[2]) << 16) | (u64(src[3]) << 24) |
 						(u64(src[4]) << 32) | (u64(src[5]) << 40) | (u64(src[6]) << 48) | (u64(src[7]) << 56);
 					};
 				}
@@ -920,8 +920,8 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 8);
 						const u8 *src = get_ptr<u8>(pc);
-						return (u64(src[0]) << 56) | (u64(src[1]) << 32) | (u64(src[2]) << 40) | (u64(src[3]) << 32) |
-						(src[4] << 24) | (src[5] << 16) | (src[6] << 8) | src[7];
+						return (u64(src[0]) << 56) | (u64(src[1]) << 48) | (u64(src[2]) << 40) | (u64(src[3]) << 32) |
+						(u64(src[4]) << 24) | (u64(src[5]) << 16) | (u64(src[6]) << 8) | u64(src[7]);
 					};
 				}
 				break;
@@ -945,7 +945,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			m_do_r64 = [this](offs_t pc) -> u64 {
 				fill(pc, 64);
 				const u16 *src = reinterpret_cast<u16 *>(&m_buffer[0]) + ((pc - m_lstart) >> 4);
-				return src[0] | (src[1] << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
+				return u64(src[0]) | (u64(src[1]) << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
 			};
 			break;
 		}
@@ -1166,14 +1166,14 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	}
 
 	// Wrapped next pc computation
-	if(m_intf->interface_flags() & util::disasm_interface::NONLINEAR_PC) {
+	if(m_intf.interface_flags() & util::disasm_interface::NONLINEAR_PC) {
 		// lfsr pc is always paged
 		m_next_pc_wrap = [this](offs_t pc, offs_t size) {
-			offs_t lpc = m_intf->pc_real_to_linear(pc);
+			offs_t lpc = m_intf.pc_real_to_linear(pc);
 			offs_t lpce = (lpc & ~m_page_mask) | ((lpc + size) & m_page_mask);
-			return m_intf->pc_linear_to_real(lpce);
+			return m_intf.pc_linear_to_real(lpce);
 		};
-	} else if(m_intf->interface_flags() & util::disasm_interface::PAGED) {
+	} else if(m_intf.interface_flags() & util::disasm_interface::PAGED) {
 		m_next_pc_wrap = [this](offs_t pc, offs_t size) {
 			offs_t pce = (pc & ~m_page_mask) | ((pc + size) & m_page_mask);
 			return pce;
@@ -1186,32 +1186,32 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 }
 
 debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
+	m_dintf(dynamic_cast<device_disasm_interface *>(&device)->get_disassembler()),
+	m_mintf(dynamic_cast<device_memory_interface *>(&device)),
 	m_buf_raw(dynamic_cast<device_disasm_interface &>(device).get_disassembler()),
 	m_buf_opcodes(dynamic_cast<device_disasm_interface &>(device).get_disassembler()),
-	m_buf_params(dynamic_cast<device_disasm_interface &>(device).get_disassembler())
+	m_buf_params(dynamic_cast<device_disasm_interface &>(device).get_disassembler()),
+	m_flags(m_dintf.interface_flags())
 {
-	m_dintf = dynamic_cast<device_disasm_interface *>(&device)->get_disassembler();
-	m_mintf = dynamic_cast<device_memory_interface *>(&device);
-
-	m_flags = m_dintf->interface_flags();
+	address_space &pspace = m_mintf->space(AS_PROGRAM);
 
 	if(m_flags & util::disasm_interface::INTERNAL_DECRYPTION) {
-		m_buf_raw.set_source(m_mintf->space(AS_PROGRAM));
+		m_buf_raw.set_source(pspace);
 		m_buf_opcodes.set_source(m_buf_raw, true);
 		if((m_flags & util::disasm_interface::SPLIT_DECRYPTION) == util::disasm_interface::SPLIT_DECRYPTION)
 			m_buf_params.set_source(m_buf_raw, false);
 	} else {
 		if(m_mintf->has_space(AS_OPCODES)) {
 			m_buf_opcodes.set_source(m_mintf->space(AS_OPCODES));
-			m_buf_params.set_source(m_mintf->space(AS_PROGRAM));
+			m_buf_params.set_source(pspace);
 		} else
-			m_buf_opcodes.set_source(m_mintf->space(AS_PROGRAM));
+			m_buf_opcodes.set_source(pspace);
 	}
 
-	m_pc_mask = m_mintf->space(AS_PROGRAM).logaddrmask();
+	m_pc_mask = pspace.logaddrmask();
 
 	if(m_flags & util::disasm_interface::PAGED)
-		m_page_mask = (1 << m_dintf->page_address_bits()) - 1;
+		m_page_mask = (1 << m_dintf.page_address_bits()) - 1;
 	else
 		m_page_mask = 0;
 
@@ -1219,17 +1219,17 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 	if(m_flags & util::disasm_interface::NONLINEAR_PC) {
 		// lfsr pc is always paged
 		m_next_pc = [this](offs_t pc, offs_t size) {
-			offs_t lpc = m_dintf->pc_real_to_linear(pc);
+			offs_t lpc = m_dintf.pc_real_to_linear(pc);
 			offs_t lpce = lpc + size;
 			if((lpc ^ lpce) & ~m_page_mask)
 				lpce = (lpc | m_page_mask) + 1;
 			lpce &= m_pc_mask;
-			return m_dintf->pc_linear_to_real(lpce);
+			return m_dintf.pc_linear_to_real(lpce);
 		};
 		m_next_pc_wrap = [this](offs_t pc, offs_t size) {
-			offs_t lpc = m_dintf->pc_real_to_linear(pc);
+			offs_t lpc = m_dintf.pc_real_to_linear(pc);
 			offs_t lpce = (lpc & ~m_page_mask) | ((lpc + size) & m_page_mask);
-			return m_dintf->pc_linear_to_real(lpce);
+			return m_dintf.pc_linear_to_real(lpce);
 		};
 
 	} else if(m_flags & util::disasm_interface::PAGED) {
@@ -1255,11 +1255,11 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 	}
 
 	// pc to string conversion
-	int aw = m_mintf->space(AS_PROGRAM).addr_width();
-	bool is_octal = m_mintf->space(AS_PROGRAM).is_octal();
+	int aw = pspace.logaddr_width();
+	bool is_octal = pspace.is_octal();
 	if((m_flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
-		int bits1 = m_dintf->page_address_bits();
-		int bits2 = m_dintf->page2_address_bits();
+		int bits1 = m_dintf.page_address_bits();
+		int bits2 = m_dintf.page2_address_bits();
 		int bits3 = aw - bits1 - bits2;
 		offs_t sm1 = (1 << bits1) - 1;
 		int sh2 = bits1;
@@ -1289,7 +1289,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 		}
 
 	} else if(m_flags & util::disasm_interface::PAGED) {
-		int bits1 = m_dintf->page_address_bits();
+		int bits1 = m_dintf.page_address_bits();
 		int bits2 = aw - bits1;
 		offs_t sm1 = (1 << bits1) - 1;
 		int sh2 = bits1;
@@ -1334,7 +1334,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 void debug_disasm_buffer::disassemble(offs_t pc, std::string &instruction, offs_t &next_pc, offs_t &size, u32 &info) const
 {
 	std::ostringstream out;
-	u32 result = m_dintf->disassemble(out, pc, m_buf_opcodes, m_buf_params.active() ? m_buf_params : m_buf_opcodes);
+	u32 result = m_dintf.disassemble(out, pc, m_buf_opcodes, m_buf_params.active() ? m_buf_params : m_buf_opcodes);
 	instruction = out.str();
 	size = result & util::disasm_interface::LENGTHMASK;
 	next_pc = m_next_pc(pc, size);
@@ -1345,7 +1345,7 @@ void debug_disasm_buffer::disassemble(offs_t pc, std::string &instruction, offs_
 u32 debug_disasm_buffer::disassemble_info(offs_t pc) const
 {
 	std::ostringstream out;
-	return m_dintf->disassemble(out, pc, m_buf_opcodes, m_buf_params.active() ? m_buf_params : m_buf_opcodes);
+	return m_dintf.disassemble(out, pc, m_buf_opcodes, m_buf_params.active() ? m_buf_params : m_buf_opcodes);
 }
 
 std::string debug_disasm_buffer::pc_to_string(offs_t pc) const

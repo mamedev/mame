@@ -99,12 +99,6 @@ Non-Bugs (happen on real PCB)
 #include "emu.h"
 #include "includes/kaneko16.h"
 
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/watchdog.h"
-#include "sound/ym2151.h"
-#include "machine/kaneko_hit.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -184,14 +178,14 @@ template<int Mask>
 WRITE8_MEMBER(kaneko16_state::oki_bank0_w)
 {
 	m_okibank[0]->set_entry(data & Mask);
-//	logerror("%s:Selecting OKI1 bank %02X\n",machine().describe_context(),data&0xff);
+//  logerror("%s:Selecting OKI1 bank %02X\n",machine().describe_context(),data&0xff);
 }
 
 template<int Mask>
 WRITE8_MEMBER(kaneko16_state::oki_bank1_w)
 {
 	m_okibank[1]->set_entry(data & Mask);
-//	logerror("%s:Selecting OKI2 bank %02X\n",machine().describe_context(),data&0xff);
+//  logerror("%s:Selecting OKI2 bank %02X\n",machine().describe_context(),data&0xff);
 }
 
 /***************************************************************************
@@ -296,28 +290,29 @@ WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_spriteregs_w)
 	m_kaneko_spr->kaneko16_sprites_regs_w(space, offset, data, mem_mask);
 }
 
-ADDRESS_MAP_START(kaneko16_berlwall_state::berlwall)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM     // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x30e000, 0x30ffff) AM_READWRITE(berlwall_spriteram_r, berlwall_spriteram_w) AM_SHARE("spriteram")       // Sprites (scrambled RAM)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")                // Palette
-	AM_RANGE(0x480000, 0x480001) AM_RAM AM_SHARE("bg15_scroll")                                                       // High Color Background
-	AM_RANGE(0x500000, 0x500001) AM_READWRITE(kaneko16_bg15_bright_r, kaneko16_bg15_bright_w) AM_SHARE("bg15_bright") // ""
-	AM_RANGE(0x580000, 0x580001) AM_READWRITE(kaneko16_bg15_select_r, kaneko16_bg15_select_w) AM_SHARE("bg15_select") // ""
-	AM_RANGE(0x600000, 0x60003f) AM_READWRITE(berlwall_spriteregs_r, berlwall_spriteregs_w)                           // Sprite Regs (scrambled RAM)
-	AM_RANGE(0x680000, 0x680001) AM_READ_PORT("P1")
-	AM_RANGE(0x680002, 0x680003) AM_READ_PORT("P2")
-	AM_RANGE(0x680004, 0x680005) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x680006, 0x680007) AM_READ_PORT("UNK")
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(kaneko16_coin_lockout_w)  // Coin Lockout
-	AM_RANGE(0x780000, 0x780001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(kaneko16_ay_YM2149_r<0>, kaneko16_ay_YM2149_w<0>) // Sound
-	AM_RANGE(0x800200, 0x80021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>, kaneko16_ay_YM2149_w<1>)
-	AM_RANGE(0x8003fe, 0x8003ff) AM_NOP // for OKI when accessed as .l
-	AM_RANGE(0x800400, 0x800401) AM_READWRITE( berlwall_oki_r, berlwall_oki_w )
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-ADDRESS_MAP_END
+void kaneko16_berlwall_state::berlwall_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();     // ROM
+	map(0x200000, 0x20ffff).ram();     // Work RAM
+	map(0x30e000, 0x30ffff).rw(FUNC(kaneko16_berlwall_state::berlwall_spriteram_r), FUNC(kaneko16_berlwall_state::berlwall_spriteram_w)).share("spriteram");       // Sprites (scrambled RAM)
+	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");                // Palette
+	map(0x480000, 0x480001).ram().share("bg15_scroll");                                                       // High Color Background
+	map(0x500000, 0x500001).rw(FUNC(kaneko16_berlwall_state::kaneko16_bg15_bright_r), FUNC(kaneko16_berlwall_state::kaneko16_bg15_bright_w)).share("bg15_bright"); // ""
+	map(0x580000, 0x580001).rw(FUNC(kaneko16_berlwall_state::kaneko16_bg15_select_r), FUNC(kaneko16_berlwall_state::kaneko16_bg15_select_w)).share("bg15_select"); // ""
+	map(0x600000, 0x60003f).rw(FUNC(kaneko16_berlwall_state::berlwall_spriteregs_r), FUNC(kaneko16_berlwall_state::berlwall_spriteregs_w));                           // Sprite Regs (scrambled RAM)
+	map(0x680000, 0x680001).portr("P1");
+	map(0x680002, 0x680003).portr("P2");
+	map(0x680004, 0x680005).portr("SYSTEM");
+//  map(0x680006, 0x680007) AM_READ_PORT("UNK")
+	map(0x700000, 0x700001).w(FUNC(kaneko16_berlwall_state::kaneko16_coin_lockout_w));  // Coin Lockout
+	map(0x780000, 0x780001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0x800000, 0x80001f).rw(FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_r<0>), FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_w<0>)); // Sound
+	map(0x800200, 0x80021f).rw(FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_w<1>));
+	map(0x8003fe, 0x8003ff).noprw(); // for OKI when accessed as .l
+	map(0x800400, 0x800401).rw(FUNC(kaneko16_berlwall_state::berlwall_oki_r), FUNC(kaneko16_berlwall_state::berlwall_oki_w));
+	map(0xc00000, 0xc03fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0xd00000, 0xd0001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+}
 
 
 /***************************************************************************
@@ -328,54 +323,56 @@ ADDRESS_MAP_END
 /* The two YM2149 chips are only used when entering high score initials, and */
 /* when the game is fully completed. Overkill??? */
 
-ADDRESS_MAP_START(kaneko16_state::bakubrkr)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM     // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x400000, 0x40001f) AM_READ(kaneko16_ay_YM2149_r<0>) // Sound
-	AM_RANGE(0x400000, 0x40001d) AM_WRITE(kaneko16_ay_YM2149_w<0>)
-	AM_RANGE(0x40001e, 0x40001f) AM_WRITE8(oki_bank0_w<7>, 0x00ff) // OKI bank Switch
-	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>,kaneko16_ay_YM2149_w<1>)          // Sound
-	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)  //
-	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
-	AM_RANGE(0x700000, 0x700fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x900000, 0x90001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0xa80000, 0xa80001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(kaneko16_eeprom_w)    // EEPROM
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("P1")
-	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("P2")
-	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("UNK")
-ADDRESS_MAP_END
+void kaneko16_state::bakubrkr_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();     // ROM
+	map(0x100000, 0x10ffff).ram();     // Work RAM
+	map(0x400000, 0x40001f).r(FUNC(kaneko16_state::kaneko16_ay_YM2149_r<0>)); // Sound
+	map(0x400000, 0x40001d).w(FUNC(kaneko16_state::kaneko16_ay_YM2149_w<0>));
+	map(0x40001f, 0x40001f).w(FUNC(kaneko16_state::oki_bank0_w<7>)); // OKI bank Switch
+	map(0x400200, 0x40021f).rw(FUNC(kaneko16_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<1>));          // Sound
+	map(0x400401, 0x400401).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  //
+	map(0x500000, 0x503fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x580000, 0x583fff).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x600000, 0x601fff).ram().share("spriteram");                   // Sprites
+	map(0x700000, 0x700fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x800000, 0x80001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x900000, 0x90001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0xa80000, 0xa80001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0xb00000, 0xb0001f).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0xd00000, 0xd00001).w(FUNC(kaneko16_state::kaneko16_eeprom_w));    // EEPROM
+	map(0xe00000, 0xe00001).portr("P1");
+	map(0xe00002, 0xe00003).portr("P2");
+	map(0xe00004, 0xe00005).portr("SYSTEM");
+	map(0xe00006, 0xe00007).portr("UNK");
+}
 
 
 /***************************************************************************
                                     Blaze On
 ***************************************************************************/
 
-ADDRESS_MAP_START(kaneko16_state::blazeon)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM     // ROM
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
-	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x900000, 0x90001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0x980000, 0x98001f) AM_RAM                                                                             // Sprites Regs #2
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW2_P1")
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("DSW1_P2")
-	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("UNK")
-	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(kaneko16_coin_lockout_w)  // Coin Lockout
-	AM_RANGE(0xe00000, 0xe00001) AM_READNOP // Read = IRQ Ack ?
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
-	AM_RANGE(0xe40000, 0xe40001) AM_READNOP // IRQ Ack ?
-//  AM_RANGE(0xe80000, 0xe80001) AM_READNOP // IRQ Ack ?
-	AM_RANGE(0xec0000, 0xec0001) AM_READNOP // Lev 4 IRQ Ack ?
-ADDRESS_MAP_END
+void kaneko16_state::blazeon_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();     // ROM
+	map(0x300000, 0x30ffff).ram();     // Work RAM
+	map(0x500000, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x600000, 0x603fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x700000, 0x700fff).ram().share("spriteram");                   // Sprites
+	map(0x800000, 0x80001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x900000, 0x90001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0x980000, 0x98001f).ram();                                                                             // Sprites Regs #2
+	map(0xc00000, 0xc00001).portr("DSW2_P1");
+	map(0xc00002, 0xc00003).portr("DSW1_P2");
+	map(0xc00004, 0xc00005).portr("UNK");
+	map(0xc00006, 0xc00007).portr("SYSTEM");
+	map(0xd00000, 0xd00001).w(FUNC(kaneko16_state::kaneko16_coin_lockout_w));  // Coin Lockout
+	map(0xe00000, 0xe00001).nopr(); // Read = IRQ Ack ?
+	map(0xe00000, 0xe00000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xe40000, 0xe40001).nopr(); // IRQ Ack ?
+//  map(0xe80000, 0xe80001) AM_READNOP // IRQ Ack ?
+	map(0xec0000, 0xec0001).nopr(); // Lev 4 IRQ Ack ?
+}
 
 
 /***************************************************************************
@@ -393,70 +390,72 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_coin_lockout_w)
 	}
 }
 
-ADDRESS_MAP_START(kaneko16_gtmr_state::bloodwar)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM     // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("mcuram")
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)    // To MCU ?
-	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
-	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
-	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x60001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x680000, 0x68001f) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x900000, 0x900039) AM_DEVREADWRITE("kan_hit", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
-	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
-	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("EXTRA")
-	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)  // Coin Lockout
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank0_w<0xf>, 0x00ff)
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank1_w<0x3>, 0x00ff)
-ADDRESS_MAP_END
+void kaneko16_gtmr_state::bloodwar_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();     // ROM
+	map(0x100000, 0x10ffff).ram();     // Work RAM
+	map(0x200000, 0x20ffff).ram().share("mcuram");
+	map(0x2a0000, 0x2a0001).w("toybox", FUNC(kaneko_toybox_device::mcu_com0_w));    // To MCU ?
+	map(0x2b0000, 0x2b0001).w("toybox", FUNC(kaneko_toybox_device::mcu_com1_w));
+	map(0x2c0000, 0x2c0001).w("toybox", FUNC(kaneko_toybox_device::mcu_com2_w));
+	map(0x2d0000, 0x2d0001).w("toybox", FUNC(kaneko_toybox_device::mcu_com3_w));
+	map(0x300000, 0x30ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x400000, 0x401fff).ram().share("spriteram");                   // Sprites
+	map(0x500000, 0x503fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x580000, 0x583fff).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x600000, 0x60001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x680000, 0x68001f).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x700000, 0x70001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x880001, 0x880001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x900000, 0x900039).rw("kan_hit", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
+	map(0xa00000, 0xa00001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0xb00000, 0xb00001).portr("P1");
+	map(0xb00002, 0xb00003).portr("P2");
+	map(0xb00004, 0xb00005).portr("SYSTEM");
+	map(0xb00006, 0xb00007).portr("EXTRA");
+	map(0xb80000, 0xb80001).w(FUNC(kaneko16_gtmr_state::bloodwar_coin_lockout_w));  // Coin Lockout
+	map(0xc00000, 0xc00001).w(FUNC(kaneko16_gtmr_state::kaneko16_display_enable));
+	map(0xd00000, 0xd00001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
+	map(0xe00001, 0xe00001).w(FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));
+	map(0xe80001, 0xe80001).w(FUNC(kaneko16_gtmr_state::oki_bank1_w<0x3>));
+}
 
 
 /***************************************************************************
                                 Bonk's Adventure
 ***************************************************************************/
 
-ADDRESS_MAP_START(kaneko16_gtmr_state::bonkadv)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM     // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("mcuram")      // Shared With MCU
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)    // To MCU ?
-	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
-	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
-	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x60001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x680000, 0x68001f) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x900000, 0x900015) AM_DEVREADWRITE("kan_hit", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)   // Watchdog
-	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
-	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
-	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
-	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)  // Coin Lockout
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank0_w<0xf>, 0x00ff)
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank1_w<0xf>, 0x00ff)
-ADDRESS_MAP_END
+void kaneko16_gtmr_state::bonkadv_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();     // ROM
+	map(0x100000, 0x10ffff).ram();     // Work RAM
+	map(0x200000, 0x20ffff).ram().share("mcuram");      // Shared With MCU
+	map(0x2a0000, 0x2a0001).w("toybox", FUNC(kaneko_toybox_device::mcu_com0_w));    // To MCU ?
+	map(0x2b0000, 0x2b0001).w("toybox", FUNC(kaneko_toybox_device::mcu_com1_w));
+	map(0x2c0000, 0x2c0001).w("toybox", FUNC(kaneko_toybox_device::mcu_com2_w));
+	map(0x2d0000, 0x2d0001).w("toybox", FUNC(kaneko_toybox_device::mcu_com3_w));
+	map(0x300000, 0x30ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x400000, 0x401fff).ram().share("spriteram");                   // Sprites
+	map(0x500000, 0x503fff).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x580000, 0x583fff).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x600000, 0x60001f).rw("view2_0", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x680000, 0x68001f).rw("view2_1", FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x700000, 0x70001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x880001, 0x880001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x900000, 0x900015).rw("kan_hit", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
+	map(0xa00000, 0xa00001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));   // Watchdog
+	map(0xb00000, 0xb00001).portr("P1");
+	map(0xb00002, 0xb00003).portr("P2");
+	map(0xb00004, 0xb00005).portr("SYSTEM");
+	map(0xb00006, 0xb00007).portr("UNK");
+	map(0xb80000, 0xb80001).w(FUNC(kaneko16_gtmr_state::bloodwar_coin_lockout_w));  // Coin Lockout
+	map(0xc00000, 0xc00001).w(FUNC(kaneko16_gtmr_state::kaneko16_display_enable));
+	map(0xd00000, 0xd00001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
+	map(0xe00001, 0xe00001).w(FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));
+	map(0xe80001, 0xe80001).w(FUNC(kaneko16_gtmr_state::oki_bank1_w<0xf>));
+}
 
 
 /***************************************************************************
@@ -478,48 +477,49 @@ READ16_MEMBER(kaneko16_gtmr_state::gtmr_wheel_r)
 	}
 }
 
-ADDRESS_MAP_START(kaneko16_gtmr_state::gtmr_map)
-	AM_RANGE(0x000000, 0x0ffffd) AM_ROM                                                                     // ROM
-	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr_wheel_r)                                                      // Wheel Value
+void kaneko16_gtmr_state::gtmr_map(address_map &map)
+{
+	map(0x000000, 0x0ffffd).rom();                                                                     // ROM
+	map(0x0ffffe, 0x0fffff).r(FUNC(kaneko16_gtmr_state::gtmr_wheel_r));                                                      // Wheel Value
 
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                     // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("mcuram")                                          // Shared With MCU
+	map(0x100000, 0x10ffff).ram();                                                                     // Work RAM
+	map(0x200000, 0x20ffff).ram().share(m_mcuram);                                          // Shared With MCU
 
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)                                                // To MCU ?
-	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
-	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
+	map(0x2a0000, 0x2a0001).w(m_toybox, FUNC(kaneko_toybox_device::mcu_com0_w));                                                // To MCU ?
+	map(0x2b0000, 0x2b0001).w(m_toybox, FUNC(kaneko_toybox_device::mcu_com1_w));
+	map(0x2c0000, 0x2c0001).w(m_toybox, FUNC(kaneko_toybox_device::mcu_com2_w));
+	map(0x2d0000, 0x2d0001).w(m_toybox, FUNC(kaneko_toybox_device::mcu_com3_w));
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x310000, 0x327fff) AM_RAM                                                                     //
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
+	map(0x300000, 0x30ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x310000, 0x327fff).ram();                                                                     //
+	map(0x400000, 0x401fff).ram().share(m_spriteram);                       // Sprites
 
-	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
+	map(0x500000, 0x503fff).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x580000, 0x583fff).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
 
-	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x680000, 0x68001f) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
+	map(0x600000, 0x60000f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x680000, 0x68001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
 
-	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
+	map(0x700000, 0x70001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
 
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)                 // Samples
-	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
+	map(0x800001, 0x800001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));                 // Samples
+	map(0x880001, 0x880001).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x900000, 0x900039) AM_DEVREADWRITE("kan_hit", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w) // only used for random number
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
+	map(0x900000, 0x900039).rw(m_kaneko_hit, FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w)); // only used for random number
+	map(0xa00000, 0xa00001).rw(m_watchdog, FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
-	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
-	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
-	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(kaneko16_coin_lockout_w)                                          // Coin Lockout
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)                                          // might do more than that
+	map(0xb00000, 0xb00001).portr("P1");
+	map(0xb00002, 0xb00003).portr("P2");
+	map(0xb00004, 0xb00005).portr("SYSTEM");
+	map(0xb00006, 0xb00007).portr("UNK");
+	map(0xb80000, 0xb80001).w(FUNC(kaneko16_gtmr_state::kaneko16_coin_lockout_w));                                          // Coin Lockout
+	map(0xc00000, 0xc00001).w(FUNC(kaneko16_gtmr_state::kaneko16_display_enable));                                          // might do more than that
 
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
+	map(0xd00000, 0xd00001).r(m_toybox, FUNC(kaneko_toybox_device::mcu_status_r));
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank0_w<0xf>, 0x00ff)                                        // Samples Bankswitching
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank1_w<0x1>, 0x00ff)
-ADDRESS_MAP_END
+	map(0xe00001, 0xe00001).w(FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));                                        // Samples Bankswitching
+	map(0xe80001, 0xe80001).w(FUNC(kaneko16_gtmr_state::oki_bank1_w<0x1>));
+}
 
 /***************************************************************************
                             Great 1000 Miles Rally 2
@@ -528,14 +528,14 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(kaneko16_gtmr_state::gtmr2_wheel_r)
 {
-	switch (ioport("DSW1")->read() & 0x1800)
+	switch (m_dsw_port->read() & 0x1800)
 	{
 		case 0x0000:    // 270' A. Wheel
-			return  (ioport("WHEEL0")->read());
+			return  (m_wheel_port[0]->read());
 		case 0x1000:    // 270' D. Wheel
-			return  (ioport("WHEEL1")->read() << 8);
+			return  (m_wheel_port[1]->read() << 8);
 		case 0x0800:    // 360' Wheel
-			return  (ioport("WHEEL2")->read() << 8);
+			return  (m_wheel_port[2]->read() << 8);
 		default:
 			logerror("gtmr2_wheel_r : read at %06x with joystick\n", m_maincpu->pc());
 			return  (~0);
@@ -544,74 +544,76 @@ READ16_MEMBER(kaneko16_gtmr_state::gtmr2_wheel_r)
 
 READ16_MEMBER(kaneko16_gtmr_state::gtmr2_IN1_r)
 {
-	return  (ioport("P2")->read() & (ioport("FAKE")->read() | ~0x7100));
+	return  (m_p2_port->read() & (m_fake_port->read() | ~0x7100));
 }
 
-ADDRESS_MAP_START(kaneko16_gtmr_state::gtmr2_map)
-	AM_RANGE(0x000000, 0x0ffffd) AM_ROM // ROM
-	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr2_wheel_r) // Wheel Value
+void kaneko16_gtmr_state::gtmr2_map(address_map &map)
+{
+	map(0x000000, 0x0ffffd).rom(); // ROM
+	map(0x0ffffe, 0x0fffff).r(FUNC(kaneko16_gtmr_state::gtmr2_wheel_r)); // Wheel Value
 
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("mcuram") // Shared With MCU
+	map(0x100000, 0x10ffff).ram(); // Work RAM
+	map(0x200000, 0x20ffff).ram().share(m_mcuram); // Shared With MCU
 
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)    // To MCU ?
-	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
-	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
+	map(0x2a0000, 0x2a0001).w(m_toybox, FUNC(kaneko_toybox_device::mcu_com0_w));    // To MCU ?
+	map(0x2b0000, 0x2b0001).w(m_toybox, FUNC(kaneko_toybox_device::mcu_com1_w));
+	map(0x2c0000, 0x2c0001).w(m_toybox, FUNC(kaneko_toybox_device::mcu_com2_w));
+	map(0x2d0000, 0x2d0001).w(m_toybox, FUNC(kaneko_toybox_device::mcu_com3_w));
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x310000, 0x327fff) AM_RAM //
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram") // Sprites
+	map(0x300000, 0x30ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x310000, 0x327fff).ram(); //
+	map(0x400000, 0x401fff).ram().share(m_spriteram); // Sprites
 
-	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
+	map(0x500000, 0x503fff).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x580000, 0x583fff).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x600000, 0x60000f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x680000, 0x68001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
 
-	AM_RANGE(0x680000, 0x68001f) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // Samples
-	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
+	map(0x700000, 0x70001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0x800001, 0x800001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // Samples
+	map(0x880001, 0x880001).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x900000, 0x900039) AM_DEVREADWRITE("kan_hit", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w) // only used for random number
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)   // Watchdog
+	map(0x900000, 0x900039).rw(m_kaneko_hit, FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w)); // only used for random number
+	map(0xa00000, 0xa00001).rw(m_watchdog, FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));   // Watchdog
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
-//  AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
-	AM_RANGE(0xb00002, 0xb00003) AM_READ(gtmr2_IN1_r)
-	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("EXTRA")
-	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(kaneko16_coin_lockout_w)  // Coin Lockout
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)  // might do more than that
+	map(0xb00000, 0xb00001).portr("P1");
+//  map(0xb00002, 0xb00003) AM_READ_PORT("P2")
+	map(0xb00002, 0xb00003).r(FUNC(kaneko16_gtmr_state::gtmr2_IN1_r));
+	map(0xb00004, 0xb00005).portr("SYSTEM");
+	map(0xb00006, 0xb00007).portr("EXTRA");
+	map(0xb80000, 0xb80001).w(FUNC(kaneko16_gtmr_state::kaneko16_coin_lockout_w));  // Coin Lockout
+	map(0xc00000, 0xc00001).w(FUNC(kaneko16_gtmr_state::kaneko16_display_enable));  // might do more than that
 
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
+	map(0xd00000, 0xd00001).r(m_toybox, FUNC(kaneko_toybox_device::mcu_status_r));
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank0_w<0xf>, 0x00ff)    // Samples Bankswitching
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank1_w<0x1>, 0x00ff)
-ADDRESS_MAP_END
+	map(0xe00001, 0xe00001).w(FUNC(kaneko16_gtmr_state::oki_bank0_w<0xf>));    // Samples Bankswitching
+	map(0xe80001, 0xe80001).w(FUNC(kaneko16_gtmr_state::oki_bank1_w<0x1>));
+}
 
 /***************************************************************************
                                 Magical Crystal
 ***************************************************************************/
 
-ADDRESS_MAP_START(kaneko16_state::mgcrystl)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM     // ROM
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(kaneko16_ay_YM2149_r<0>, kaneko16_ay_YM2149_w<0>) // Sound
-	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>, kaneko16_ay_YM2149_w<1>)
-	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x680000, 0x683fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
-	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x900000, 0x90001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)    // Watchdog
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW_P1")
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P2")
-	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(kaneko16_eeprom_w)    // EEPROM
-ADDRESS_MAP_END
+void kaneko16_state::mgcrystl_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();     // ROM
+	map(0x300000, 0x30ffff).ram();     // Work RAM
+	map(0x400000, 0x40001f).rw(FUNC(kaneko16_state::kaneko16_ay_YM2149_r<0>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<0>)); // Sound
+	map(0x400200, 0x40021f).rw(FUNC(kaneko16_state::kaneko16_ay_YM2149_r<1>), FUNC(kaneko16_state::kaneko16_ay_YM2149_w<1>));
+	map(0x400401, 0x400401).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x500000, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x600000, 0x603fff).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x680000, 0x683fff).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x700000, 0x701fff).ram().share("spriteram");                   // Sprites
+	map(0x800000, 0x80001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x900000, 0x90001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0xb00000, 0xb0001f).rw(m_view2[1], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0xa00000, 0xa00001).r(m_watchdog, FUNC(watchdog_timer_device::reset16_r));    // Watchdog
+	map(0xc00000, 0xc00001).portr("DSW_P1");
+	map(0xc00002, 0xc00003).portr("P2");
+	map(0xc00004, 0xc00005).portr("SYSTEM");
+	map(0xd00000, 0xd00001).w(FUNC(kaneko16_state::kaneko16_eeprom_w));    // EEPROM
+}
 
 
 
@@ -628,31 +630,32 @@ WRITE16_MEMBER(kaneko16_shogwarr_state::shogwarr_oki_bank_w)
 	}
 }
 
-ADDRESS_MAP_START(kaneko16_shogwarr_state::shogwarr)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM     // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("mainram")     // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("mcuram")
-	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com0_w)
-	AM_RANGE(0x290000, 0x290001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com1_w)
-	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com2_w)
-	//AM_RANGE(0x2c0000, 0x2c0001) // run calc 3? or irq ack?
-	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com3_w)
-	AM_RANGE(0x380000, 0x380fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // Samples
-	AM_RANGE(0x480000, 0x480001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x580000, 0x581fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
-	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x900000, 0x90001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0xa00000, 0xa0007f) AM_DEVREADWRITE("kan_hit", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
-	AM_RANGE(0xa80000, 0xa80001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0xb80000, 0xb80001) AM_READ_PORT("P1")
-	AM_RANGE(0xb80002, 0xb80003) AM_READ_PORT("P2")
-	AM_RANGE(0xb80004, 0xb80005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb80006, 0xb80007) AM_READ_PORT("UNK")
-	AM_RANGE(0xd00000, 0xd00001) AM_NOP                         // ? (bit 0)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(shogwarr_oki_bank_w)  // Samples Bankswitching
-ADDRESS_MAP_END
+void kaneko16_shogwarr_state::shogwarr_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();     // ROM
+	map(0x100000, 0x10ffff).ram().share(m_mainram);     // Work RAM
+	map(0x200000, 0x20ffff).ram().share(m_mcuram);
+	map(0x280000, 0x280001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com0_w));
+	map(0x290000, 0x290001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com1_w));
+	map(0x2b0000, 0x2b0001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com2_w));
+	//map(0x2c0000, 0x2c0001) // run calc 3? or irq ack?
+	map(0x2d0000, 0x2d0001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com3_w));
+	map(0x380000, 0x380fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x400001, 0x400001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // Samples
+	map(0x480001, 0x480001).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x580000, 0x581fff).ram().share("spriteram");                   // Sprites
+	map(0x600000, 0x603fff).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x800000, 0x80001f).rw(m_view2[0], FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x900000, 0x90001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0xa00000, 0xa0007f).rw(m_kaneko_hit, FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
+	map(0xa80000, 0xa80001).rw(m_watchdog, FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0xb80000, 0xb80001).portr("P1");
+	map(0xb80002, 0xb80003).portr("P2");
+	map(0xb80004, 0xb80005).portr("SYSTEM");
+	map(0xb80006, 0xb80007).portr("UNK");
+	map(0xd00000, 0xd00001).noprw();                         // ? (bit 0)
+	map(0xe00000, 0xe00001).w(FUNC(kaneko16_shogwarr_state::shogwarr_oki_bank_w));  // Samples Bankswitching
+}
 
 /***************************************************************************
 
@@ -666,30 +669,33 @@ ADDRESS_MAP_END
                                     Blaze On
 ***************************************************************************/
 
-ADDRESS_MAP_START(kaneko16_state::blazeon_soundmem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM     // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM     // ROM (supposed to be banked?)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM     // RAM
-ADDRESS_MAP_END
+void kaneko16_state::blazeon_soundmem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();     // ROM
+	map(0x8000, 0xbfff).rom();     // ROM (supposed to be banked?)
+	map(0xc000, 0xdfff).ram();     // RAM
+}
 
-ADDRESS_MAP_START(kaneko16_state::blazeon_soundport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void kaneko16_state::blazeon_soundport(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x03).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 /***************************************************************************
                                  Wing Force
 ***************************************************************************/
 
-ADDRESS_MAP_START(kaneko16_state::wingforc_soundport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) // 02 written at boot
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x0a, 0x0a) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(oki_bank0_w<0x3>)
-ADDRESS_MAP_END
+void kaneko16_state::wingforc_soundport(address_map &map)
+{
+	map.global_mask(0xff);
+//  map(0x00, 0x00) // 02 written at boot
+	map(0x02, 0x03).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x0a, 0x0a).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0c, 0x0c).w(FUNC(kaneko16_state::oki_bank0_w<0x3>));
+}
 
 
 /***************************************************************************
@@ -1707,16 +1713,16 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( 1x4bit_1x4bit )
+static GFXDECODE_START( gfx_1x4bit_1x4bit )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0,          0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x40 * 16,  0x40 ) // [1] Layers
 GFXDECODE_END
-static GFXDECODE_START( 1x4bit_2x4bit )
+static GFXDECODE_START( gfx_1x4bit_2x4bit )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0,          0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x40 * 16,  0x40 ) // [1] Layers
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4, 0x40 * 16,  0x40 ) // [2] Layers
 GFXDECODE_END
-static GFXDECODE_START( 1x8bit_2x4bit )
+static GFXDECODE_START( gfx_1x8bit_2x4bit )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x40 * 256, 0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0,          0x40 ) // [1] Layers
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4, 0,          0x40 ) // [2] Layers
@@ -1765,55 +1771,55 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::kaneko16_interrupt)
 MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* MC68000P12 */
-	MCFG_CPU_PROGRAM_MAP(berlwall)
+	M68000(config, m_maincpu, 12000000); /* MC68000P12 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_berlwall_state::berlwall_map);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 //  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)    // mangled sprites otherwise
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_berlwall)
-//  MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
-	MCFG_PALETTE_ADD("palette", 2048 )
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_1x4bit_1x4bit)
+	MCFG_PALETTE_ADD(m_palette, 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_PALETTE_ADD("bgpalette", 32768) /* 32768 static colors for the bg */
+	MCFG_PALETTE_ADD(m_bgpalette, 32768) /* 32768 static colors for the bg */
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 	MCFG_PALETTE_INIT_OWNER(kaneko16_berlwall_state,berlwall)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(1)
-	MCFG_KANEKO_TMAP_OFFSET(0x5b, -0x8, 256, 240+16)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2[0]);
+	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_offset(0x5b, -0x8, 256, 240+16);
+	m_view2[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD_VU002_SPRITES
-	MCFG_KANEKO16_SPRITE_OFFSETS(0, -1*64)
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
+	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_offsets(0, -1*64);
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,berlwall)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ym2149_1", YM2149, 1000000)
+	device = &YM2149(config, m_ym2149[0], 1000000);
+	m_ym2149[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ym2149_2", YM2149, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_DEVICE_ADD(m_ym2149[1], YM2149, 1000000)
+	m_ym2149[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_OKIM6295_ADD("oki1", 12000000/6, PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 12000000/6, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -1821,70 +1827,68 @@ MACHINE_CONFIG_END
                             Bakuretsu Breaker
 ***************************************************************************/
 
-ADDRESS_MAP_START(kaneko16_state::bakubrkr_oki1_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank1")
-ADDRESS_MAP_END
+void kaneko16_state::bakubrkr_oki1_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank1");
+}
 
 MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(bakubrkr)
+	M68000(config, m_maincpu, XTAL(12'000'000)); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_state::bakubrkr_map);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,gtmr)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)    // mangled sprites otherwise
 	MCFG_SCREEN_REFRESH_RATE(59)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_2x4bit)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_1x4bit_2x4bit)
+	MCFG_PALETTE_ADD(m_palette, 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(1)
-	MCFG_KANEKO_TMAP_OFFSET(0x5b, -0x8, 256, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2[0]);
+	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_offset(0x5b, -0x8, 256, 240);
+	m_view2[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("view2_1", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(2)
-	MCFG_KANEKO_TMAP_OFFSET(0x5b, -0x8, 256, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2[1]);
+	m_view2[1]->set_gfx_region(2);
+	m_view2[1]->set_offset(0x5b, -0x8, 256, 240);
+	m_view2[1]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD_VU002_SPRITES
-	MCFG_KANEKO16_SPRITE_PRIORITIES(8,8,8,8) // above all
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
-
-
-
+	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_priorities(8,8,8,8); // above all
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym2149_1", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2149(config, m_ym2149[0], XTAL(12'000'000)/6); /* verified on pcb */
+	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_SOUND_ADD("ym2149_2", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	device = &YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
+	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, bakubrkr_oki1_map)
+	OKIM6295(config, m_oki[0], XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH); /* verified on pcb */
+	m_oki[0]->set_addrmap(0, &kaneko16_state::bakubrkr_oki1_map);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -1905,49 +1909,50 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kaneko16_state::blazeon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,12000000)    /* TMP68HC000-12 */
-	MCFG_CPU_PROGRAM_MAP(blazeon)
+	M68000(config, m_maincpu, 12000000);    /* TMP68HC000-12 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_state::blazeon_map);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)   /* D780C-2 (6 MHz) */
-	MCFG_CPU_PROGRAM_MAP(blazeon_soundmem)
-	MCFG_CPU_IO_MAP(blazeon_soundport)
+	Z80(config, m_audiocpu, 4000000);   /* D780C-2 (6 MHz) */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kaneko16_state::blazeon_soundmem);
+	m_audiocpu->set_addrmap(AS_IO, &kaneko16_state::blazeon_soundport);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1 -8)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_1x4bit_1x4bit)
+	MCFG_PALETTE_ADD(m_palette, 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(1)
-	MCFG_KANEKO_TMAP_OFFSET(0x33, 0x8, 320, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2[0], 0);
+	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_offset(0x33, 0x8, 320, 240);
+	m_view2[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD_VU002_SPRITES
-	MCFG_KANEKO16_SPRITE_PRIORITIES(1 /* "above tile[0], below the others" */ ,2 /* "above tile[0-1], below the others" */ ,8 /* above all */,8 /* above all */)
-	MCFG_KANEKO16_SPRITE_OFFSETS(0x10000 - 0x680, 0x000)
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
+	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_priorities(1 /* "above tile[0], below the others" */ ,2 /* "above tile[0-1], below the others" */ ,8 /* above all */,8 /* above all */);
+	m_kaneko_spr->set_offsets(0x10000 - 0x680, 0x000);
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD(m_ymsnd, YM2151, 4000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1960,54 +1965,54 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kaneko16_state::wingforc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))    /* TMP68HC000N-16 */
-	MCFG_CPU_PROGRAM_MAP(blazeon)
+	M68000(config, m_maincpu, XTAL(16'000'000));    /* TMP68HC000N-16 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_state::blazeon_map);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)   /* D780C-2 (6 MHz) */
-	MCFG_CPU_PROGRAM_MAP(blazeon_soundmem)
-	MCFG_CPU_IO_MAP(wingforc_soundport)
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);   /* D780C-2 (6 MHz) */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kaneko16_state::blazeon_soundmem);
+	m_audiocpu->set_addrmap(AS_IO, &kaneko16_state::wingforc_soundport);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(59.1854)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1 -16)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_1x4bit_1x4bit)
+	MCFG_PALETTE_ADD(m_palette, 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(1)
-	MCFG_KANEKO_TMAP_OFFSET(0x33, 0x8+1, 320, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2[0]);
+	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_offset(0x33, 0x8+1, 320, 240);
+	m_view2[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD_VU002_SPRITES
-	MCFG_KANEKO16_SPRITE_PRIORITIES(1 /* "above tile[0], below the others" */ ,2 /* "above tile[0-1], below the others" */ ,8 /* above all */,8 /* above all */)
-	MCFG_KANEKO16_SPRITE_OFFSETS(0x10000 - 0x680, 0x000)
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
+	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_priorities(1 /* "above tile[0], below the others" */ ,2 /* "above tile[0-1], below the others" */ ,8 /* above all */,8 /* above all */);
+	m_kaneko_spr->set_offsets(0x10000 - 0x680, 0x000);
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+	YM2151(config, m_ymsnd, XTAL(16'000'000)/4);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.4);
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/16, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, bakubrkr_oki1_map)
+	OKIM6295(config, m_oki[0], XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->set_addrmap(0, &kaneko16_state::bakubrkr_oki1_map);
 MACHINE_CONFIG_END
 
 
@@ -2025,79 +2030,79 @@ MACHINE_CONFIG_END
     VIDEO_UPDATE_AFTER_VBLANK fixes the mangled/wrong colored sprites
 */
 
-ADDRESS_MAP_START(kaneko16_state::gtmr_oki1_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank1")
-ADDRESS_MAP_END
+void kaneko16_state::gtmr_oki1_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank1");
+}
 
-ADDRESS_MAP_START(kaneko16_state::gtmr_oki2_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("okibank2")
-ADDRESS_MAP_END
+void kaneko16_state::gtmr_oki2_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).bankr("okibank2");
+}
 
 MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(gtmr_map)
+	M68000(config, m_maincpu, XTAL(16'000'000)); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_gtmr_state::gtmr_map);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state,gtmr)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x8bit_2x4bit)
-	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_1x8bit_2x4bit)
+	MCFG_PALETTE_ADD(m_palette, 32768)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(1)
-	MCFG_KANEKO_TMAP_OFFSET(0x33, 0x0, 320, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2[0]);
+	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_offset(0x33, 0x00, 320, 240);
+	m_view2[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("view2_1", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(2)
-	MCFG_KANEKO_TMAP_OFFSET(0x33, 0x0, 320, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2[1]);
+	m_view2[1]->set_gfx_region(2);
+	m_view2[1]->set_offset(0x33, 0x00, 320, 240);
+	m_view2[1]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD_KC002_SPRITES
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
+	KANEKO_KC002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+	KANEKO_TOYBOX(config, m_toybox, m_eeprom, m_dsw_port, m_mcuram, "mcudata");
 	/* part of the toybox? */
-	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(1)
-
+	KANEKO_HIT(config, m_kaneko_hit);
+	m_kaneko_hit->set_type(1);
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_gtmr_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/8, PIN7_LOW)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki1_map)
+	OKIM6295(config, m_oki[0], XTAL(16'000'000)/8, okim6295_device::PIN7_LOW);  /* verified on pcb */
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_oki[0]->set_addrmap(0, &kaneko16_gtmr_state::gtmr_oki1_map);
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/8, PIN7_LOW)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki2_map)
+	OKIM6295(config, m_oki[1], XTAL(16'000'000)/8, okim6295_device::PIN7_LOW);  /* verified on pcb */
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_oki[1]->set_addrmap(0, &kaneko16_gtmr_state::gtmr_oki2_map);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmre)
 	gtmr(config);
-	MCFG_DEVICE_MODIFY("toybox")
-	MCFG_TOYBOX_TABLE_TYPE(ALT)
+	m_toybox->set_table(kaneko_toybox_device::TABLE_ALT);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2106,10 +2111,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr2)
 	gtmre(config);
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gtmr2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_gtmr_state::gtmr2_map);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2120,16 +2122,10 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::bloodwar)
 	gtmr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bloodwar)
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_gtmr_state::bloodwar_map);
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state, gtmr)
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state, gtmr )
-
-	MCFG_DEVICE_MODIFY("kan_spr")
-	MCFG_KANEKO16_SPRITE_PRIORITIES(2 /* never used? */ ,3 /* character selection / vs. portraits */ ,5 /* winning portrait*/ ,7 /* ? */)
-
-
-
+	m_kaneko_spr->set_priorities(2 /* never used? */ ,3 /* character selection / vs. portraits */ ,5 /* winning portrait*/ ,7 /* ? */);
 MACHINE_CONFIG_END
 
 
@@ -2142,21 +2138,13 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::bonkadv)
 	gtmr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bonkadv)
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_gtmr_state::bonkadv_map);
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state, gtmr)
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state, gtmr )
+	m_kaneko_spr->set_priorities(2 /* never used? */ ,3 /* volcano lava on level 2 */ ,5 /* in-game player */ ,7 /* demostration text */);
 
-	MCFG_DEVICE_MODIFY("kan_spr")
-	MCFG_KANEKO16_SPRITE_PRIORITIES(2 /* never used? */ ,3 /* volcano lava on level 2 */ ,5 /* in-game player */ ,7 /* demostration text */)
-
-
-	MCFG_DEVICE_MODIFY("toybox")
-	MCFG_TOYBOX_GAME_TYPE(BONK)
-	MCFG_DEVICE_MODIFY("kan_hit")
-	MCFG_KANEKO_HIT_TYPE(0)
-
-
+	m_toybox->set_game_type(kaneko_toybox_device::GAME_BONK);
+	m_kaneko_hit->set_type(0);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2164,62 +2152,60 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
-
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb, TMP68HC000N-12 @U31 and X2 is 12MHz */
-	MCFG_CPU_PROGRAM_MAP(mgcrystl)
+	M68000(config, m_maincpu, XTAL(12'000'000)); /* verified on pcb, TMP68HC000N-12 @U31 and X2 is 12MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_state::mgcrystl_map);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,mgcrystl)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	EEPROM_93C46_16BIT(config, m_eeprom);
+
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_2x4bit)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_1x4bit_2x4bit)
+	MCFG_PALETTE_ADD(m_palette, 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(1)
-	MCFG_KANEKO_TMAP_OFFSET(0x5b, -0x8, 256, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2[0]);
+	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_offset(0x5b, -0x8, 256, 240);
+	m_view2[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("view2_1", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(2)
-	MCFG_KANEKO_TMAP_OFFSET(0x5b, -0x8, 256, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2[1]);
+	m_view2[1]->set_gfx_region(2);
+	m_view2[1]->set_offset(0x5b, -0x8, 256, 240);
+	m_view2[1]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD_VU002_SPRITES
-	MCFG_KANEKO16_SPRITE_PRIORITIES(2 /* below all */ ,3 /* above tile[0], below the other */ ,5 /* above all */ ,7 /* above all */)
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
-
-
+	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_priorities(2 /* below all */ ,3 /* above tile[0], below the other */ ,5 /* above all */ ,7 /* above all */);
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym2149_1", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2149(config, m_ym2149[0], XTAL(12'000'000)/6); /* verified on pcb */
+	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_SOUND_ADD("ym2149_2", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	device = &YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
+	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, m_oki[0], XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH); /* verified on pcb */
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -2286,60 +2272,58 @@ static const uint16_t shogwarr_default_eeprom[64] = {
 MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(shogwarr)
+	M68000(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_shogwarr_state::shogwarr_map);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_shogwarr_state, shogwarr_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(shogwarr_default_eeprom, 128)
+	EEPROM_93C46_16BIT(config, m_eeprom).default_data(shogwarr_default_eeprom, 128);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1854)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(40, 296-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_1x4bit_1x4bit)
+	MCFG_PALETTE_ADD(m_palette, 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(1)
-	MCFG_KANEKO_TMAP_OFFSET(0x33, -0x8, 320, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2[0]);
+	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_offset(0x33, -0x8, 320, 240);
+	m_view2[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_VIDEO_START_OVERRIDE(kaneko16_shogwarr_state,kaneko16)
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_shogwarr_state, kaneko16)
 
-	MCFG_DEVICE_ADD_VU002_SPRITES
-	MCFG_KANEKO16_SPRITE_PRIORITIES(1 /* below all */ ,3 /* above tile[0], below the others */ ,5 /* above all */ ,7 /* above all */)
-	MCFG_KANEKO16_SPRITE_OFFSETS(0xa00, -0x40)
-	MCFG_KANEKO16_SPRITE_FLIPTYPE(1)
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
+	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_priorities(1 /* below all */ ,3 /* above tile[0], below the others */ ,5 /* above all */ ,7 /* above all */);
+	m_kaneko_spr->set_offsets(0xa00, -0x40);
+	m_kaneko_spr->set_fliptype(1);
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(1)
+	KANEKO_HIT(config, m_kaneko_hit);
+	m_kaneko_hit->set_type(1);
 
-	MCFG_DEVICE_ADD("calc3_prot", KANEKO_CALC3, 0)
-
+	KANEKO_CALC3(config, m_calc3_prot, m_maincpu, m_eeprom, "calc3_rom");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/8, PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki1_map)
+	OKIM6295(config, m_oki[0], XTAL(16'000'000)/8, okim6295_device::PIN7_LOW);
+	m_oki[0]->set_addrmap(0, &kaneko16_shogwarr_state::gtmr_oki1_map);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/8, PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki2_map)
+	OKIM6295(config, m_oki[1], XTAL(16'000'000)/8, okim6295_device::PIN7_LOW);
+	m_oki[1]->set_addrmap(0, &kaneko16_shogwarr_state::gtmr_oki2_map);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -2355,23 +2339,19 @@ static const uint16_t brapboys_default_eeprom[64] = {
 };
 
 // sample banking is different on brap boys for the music, why? GALs / PALs ?
-ADDRESS_MAP_START(kaneko16_shogwarr_state::brapboys_oki2_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank2")
-ADDRESS_MAP_END
+void kaneko16_shogwarr_state::brapboys_oki2_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank2");
+}
 
-MACHINE_CONFIG_START(kaneko16_shogwarr_state::brapboys)
+void kaneko16_shogwarr_state::brapboys(machine_config &config)
+{
 	shogwarr(config);
-	MCFG_SOUND_MODIFY("oki2")
-	MCFG_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
-
-	MCFG_DEVICE_MODIFY("kan_hit")
-	MCFG_KANEKO_HIT_TYPE(2)
-
-	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(brapboys_default_eeprom, 128)
-MACHINE_CONFIG_END
+	m_oki[1]->set_addrmap(0, &kaneko16_shogwarr_state::brapboys_oki2_map);
+	m_kaneko_hit->set_type(2);
+	m_eeprom->default_data(brapboys_default_eeprom, 128);
+}
 
 /***************************************************************************
 
@@ -2448,16 +2428,16 @@ void kaneko16_gtmr_state::kaneko16_common_oki_bank_install(int bankno, size_t fi
 	}
 }
 
-DRIVER_INIT_MEMBER( kaneko16_state, kaneko16 )
+void kaneko16_state::init_kaneko16()
 {
 	kaneko16_unscramble_tiles("gfx2");
 	kaneko16_unscramble_tiles("gfx3");
 }
 
-DRIVER_INIT_MEMBER( kaneko16_state, bakubrkr )
+void kaneko16_state::init_bakubrkr()
 {
 	kaneko16_common_oki_bank_install(0, 0x20000, 0x20000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 /*
@@ -2508,40 +2488,38 @@ explanation ingame.
 // Sprite DMA decryption? @see berlwall_spriteram_r
 void kaneko16_berlwall_state::patch_protection(uint32_t bra_offset,uint16_t bra_value,uint16_t checksum)
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-
-	ROM[bra_offset/2] = bra_value;
-	ROM[0x3fffe/2] = checksum;
+	m_mainregion[bra_offset/2] = bra_value;
+	m_mainregion[0x3fffe/2] = checksum;
 }
 
-DRIVER_INIT_MEMBER(kaneko16_berlwall_state, berlwall_common)
+void kaneko16_berlwall_state::init_berlwall_common()
 {
 	kaneko16_unscramble_tiles("gfx2");
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwall )
+void kaneko16_berlwall_state::init_berlwall()
 {
-	DRIVER_INIT_CALL(berlwall_common);
+	init_berlwall_common();
 	patch_protection(0x1a3ea,0x602c,0xc40d);
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallt )
+void kaneko16_berlwall_state::init_berlwallt()
 {
-	DRIVER_INIT_CALL(berlwall_common);
+	init_berlwall_common();
 	patch_protection(0x1cf48,0x602c,0xaed4);
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallk )
+void kaneko16_berlwall_state::init_berlwallk()
 {
-	DRIVER_INIT_CALL(berlwall_common);
+	init_berlwall_common();
 	patch_protection(0x1ceb0,0x602c,0x8364);
 }
 
-DRIVER_INIT_MEMBER( kaneko16_gtmr_state, gtmr )
+void kaneko16_gtmr_state::init_gtmr()
 {
 	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_install(1, 0x00000, 0x40000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 
@@ -2601,7 +2579,7 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( explbrkr )
+ROM_START( explbrkr ) /* MASTER UP= 92/10/08 20:10:16 */
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* 68000 Code */
 	ROM_LOAD16_BYTE( "ts100e.u18", 0x000000, 0x040000, CRC(cc84a985) SHA1(1732a607cc1f894dd45cfc915dfe0407335f0073) )
 	ROM_LOAD16_BYTE( "ts101e.u19", 0x000001, 0x040000, CRC(88f4afb7) SHA1(08b8efd6bd935bc1b8cf9753d58b38ccf9a70b4d) )
@@ -2609,9 +2587,9 @@ ROM_START( explbrkr )
 	/* these actually match the other set but have different names on the board..*/
 	ROM_REGION( 0x240000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "ts001e.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
-	ROM_RELOAD(       0x100000, 0x080000             )
+	ROM_RELOAD(              0x100000, 0x080000  )
 	ROM_LOAD( "ts000e.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
-	ROM_RELOAD(       0x180000, 0x080000             )
+	ROM_RELOAD(              0x180000, 0x080000  )
 	ROM_LOAD( "ts002e.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles */
@@ -2626,16 +2604,41 @@ ROM_START( explbrkr )
 	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
 ROM_END
 
-ROM_START( bakubrkr )
+ROM_START( explbrkrk ) /* MASTER UP= 92/10/08 21:35:56 - No "For use in Korea.." but has the KA+<cat image> logo which was only used in Korea; the Kaneko logo is scratched out on all custom ICs */
+	ROM_REGION( 0x080000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "u18", 0x000000, 0x040000, CRC(08267644) SHA1(8a5c638b414d2b1a8bb68e0d8ba6747253734e82) ) /* TMS 27C020 with non descript label "MF" */
+	ROM_LOAD16_BYTE( "u19", 0x000001, 0x040000, CRC(f0a243b1) SHA1(3448c85c9388b590ea28b9adcaf81b68c14c678c) ) /* TMS 27C020 with non descript label "MF" */
+
+	/* these actually match the other set but have different names on the board..*/
+	ROM_REGION( 0x240000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "ts001e.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
+	ROM_RELOAD(              0x100000, 0x080000  )
+	ROM_LOAD( "ts000e.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
+	ROM_RELOAD(              0x180000, 0x080000  )
+	ROM_LOAD( "ts002e.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles */
+	ROM_LOAD( "ts010.u4",  0x000000, 0x100000, CRC(df935324) SHA1(73b7aff8800a4e88a47ad426190b73dabdfbf142) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles */
+	ROM_LOAD( "ts020.u33",  0x000000, 0x100000, CRC(eb58c35d) SHA1(762c5219de6f729a0fc1df90fce09cdf711c2a1e) )
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0x100000, "oki1", 0 )  /* OKI Sample ROM */
+	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
+ROM_END
+
+ROM_START( bakubrkr ) /* MASTER UP= 92/10/08 20:56:03 */
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* 68000 Code */
 	ROM_LOAD16_BYTE( "ts100j.u18", 0x000000, 0x040000, CRC(8cc0a4fd) SHA1(e7e18b5ea236522a79ba9db8f573ac8f7ade504b) )
 	ROM_LOAD16_BYTE( "ts101j.u19", 0x000001, 0x040000, CRC(aea92195) SHA1(e89f964e7e936fd7774f21956eb4ff5c9104837b) )
 
 	ROM_REGION( 0x240000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "ts001j.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
-	ROM_RELOAD(              0x100000, 0x080000             )
+	ROM_RELOAD(              0x100000, 0x080000  )
 	ROM_LOAD( "ts000j.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
-	ROM_RELOAD(              0x180000, 0x080000             )
+	ROM_RELOAD(              0x180000, 0x080000  )
 	ROM_LOAD( "ts002j.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles */
@@ -3858,11 +3861,11 @@ ROM_END
 
 ROM_START( shogwarrk )
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
-	ROM_LOAD16_BYTE( "fb-030a.U61", 0x000000, 0x020000, CRC(32ce7909) SHA1(02d87342706ac9547eb611bd542f8498ba41e34a) )
-	ROM_LOAD16_BYTE( "fb-031a.U62", 0x000001, 0x020000, CRC(bbffe957) SHA1(d916fde185985f6de216b8fb68a851fc75e3d04b) )
+	ROM_LOAD16_BYTE( "fb-030a.u61", 0x000000, 0x020000, CRC(32ce7909) SHA1(02d87342706ac9547eb611bd542f8498ba41e34a) )
+	ROM_LOAD16_BYTE( "fb-031a.u62", 0x000001, 0x020000, CRC(bbffe957) SHA1(d916fde185985f6de216b8fb68a851fc75e3d04b) )
 
 	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
-	ROM_LOAD( "fb-040a.U33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
+	ROM_LOAD( "fb-040a.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
 
 	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )  /* Sprites */
 	ROM_LOAD( "fb-020a.u1", 0x000000, 0x100000, CRC(87e55c6d) SHA1(87886c045d7c30b8dee3c8fb0bf8f2cdbc5fd7fb) )
@@ -3872,15 +3875,15 @@ ROM_START( shogwarrk )
 	ROM_LOAD( "fb-22a.u5",  0x400000, 0x100000, CRC(9039e5d3) SHA1(222452cd7947f7c99c68e495835cca62e0449b5c) )
 	ROM_LOAD( "fb-22b.u6",  0x500000, 0x100000, CRC(96ac9e54) SHA1(2b066375963dc57fe2ce89d65f6c0a9d183a838d) )
 	ROM_LOAD( "fb023.u7",   0x600000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
-	ROM_LOAD( "fb-024.U8",  0x700000, 0x080000, CRC(4bf3282d) SHA1(6058e46f20fe4faf32cddb6f2bb0fbf70f256a54) )  // extra censored gfx
+	ROM_LOAD( "fb-024.u8",  0x700000, 0x080000, CRC(4bf3282d) SHA1(6058e46f20fe4faf32cddb6f2bb0fbf70f256a54) )  // extra censored gfx
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )  // 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )  // 40 pin mask rom (verified correct)
 
 	ROM_REGION( 0x100000, "oki1", 0 )
-	ROM_LOAD( "fb-000.U43",  0x000000, 0x080000, CRC(f524aaa1) SHA1(006a886f9df2e57c51b61c6cea70a6574fc20304) )
-	ROM_LOAD( "fb-003.U101",  0x080000, 0x080000, CRC(969f1465) SHA1(4f56d1ad341b08f4db41b7ab2498740612ff7c3d) )
+	ROM_LOAD( "fb-000.u43",  0x000000, 0x080000, CRC(f524aaa1) SHA1(006a886f9df2e57c51b61c6cea70a6574fc20304) )
+	ROM_LOAD( "fb-003.u101",  0x080000, 0x080000, CRC(969f1465) SHA1(4f56d1ad341b08f4db41b7ab2498740612ff7c3d) )
 
 	ROM_REGION( 0x200000, "oki2", 0 )
 	ROM_LOAD( "fb-002.u45",   0x000000, 0x100000, CRC(010acc17) SHA1(2dc0897c7778eacf6bce12ff0adbadb307ea6c17) )
@@ -4361,21 +4364,21 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, shogwarr )
+void kaneko16_shogwarr_state::init_shogwarr()
 {
 	// default sample banks
 	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_install(1, 0x00000, 0x40000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 
-DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
+void kaneko16_shogwarr_state::init_brapboys()
 {
 	// default sample banks
 	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_install(1, 0x20000, 0x20000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 
@@ -4387,39 +4390,40 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 
 ***************************************************************************/
 
-GAME( 1991, berlwall,   0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, berlwallt,  berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwallt, ROT0,  "Kaneko", "The Berlin Wall (bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, berlwallk,  berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwallk, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, packbang,   0,        berlwall, packbang, kaneko16_berlwall_state, berlwall_common, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
+GAME( 1991, berlwall,   0,        berlwall, berlwall,  kaneko16_berlwall_state, init_berlwall,  ROT0,  "Kaneko", "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, berlwallt,  berlwall, berlwall, berlwallt, kaneko16_berlwall_state, init_berlwallt, ROT0,  "Kaneko", "The Berlin Wall (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, berlwallk,  berlwall, berlwall, berlwallk, kaneko16_berlwall_state, init_berlwallk, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, packbang,   0,        berlwall, packbang,  kaneko16_berlwall_state, init_berlwall_common, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
 
-GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mgcrystlj,  mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, blazeon,    0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Explosive Breaker", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wingforc,   0,        wingforc, wingforc, kaneko16_state,          bakubrkr, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystlj,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, blazeon,    0,        blazeon,  blazeon,   kaneko16_state,          init_kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Explosive Breaker (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, explbrkrk,  explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Explosive Breaker (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wingforc,   0,        wingforc, wingforc,  kaneko16_state,          init_bakubrkr, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodwar,   0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, oedfight,   bloodwar, bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gtmr,       0,        gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", MACHINE_SUPPORTS_SAVE ) // this set shows 'PCB by Jinwei Co Ltd. ROC'
-GAME( 1994, gtmra,      gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gtmrb,      gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/05/26)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gtmro,      gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/05/10)", MACHINE_SUPPORTS_SAVE ) // possible prototype
-GAME( 1994, gtmre,      gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gtmrusa,    gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", MACHINE_SUPPORTS_SAVE ) // U.S.A version seems part of the title, rather than region
-GAME( 1995, gtmr2,      0,        gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gtmr2a,     gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gtmr2u,     gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodwar,   0,        bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, oedfight,   bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmr,       0,        gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", MACHINE_SUPPORTS_SAVE ) // this set shows 'PCB by Jinwei Co Ltd. ROC'
+GAME( 1994, gtmra,      gtmr,     gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmrb,      gtmr,     gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/05/26)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmro,      gtmr,     gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/05/10)", MACHINE_SUPPORTS_SAVE ) // possible prototype
+GAME( 1994, gtmre,      gtmr,     gtmre,    gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmrusa,    gtmr,     gtmre,    gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", MACHINE_SUPPORTS_SAVE ) // U.S.A version seems part of the title, rather than region
+GAME( 1995, gtmr2,      0,        gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gtmr2a,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gtmr2u,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, brapboys,   0,        brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboysp,  brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboyspj, brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboyspu, brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboys,   0,        brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboysp,  brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboyspj, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboyspu, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", MACHINE_SUPPORTS_SAVE )
 // these 3 are all the same code revision (differ by region byte + extra gfx roms/sample roms)
-GAME( 1992, shogwarr,   0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, shogwarrk,  shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (Korea?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // censored Japanese flags etc.
-GAME( 1992, fjbuster,   shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, shogwarr,   0,        shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, shogwarrk,  shogwarr, shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Shogun Warriors (Korea?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // censored Japanese flags etc.
+GAME( 1992, fjbuster,   shogwarr, shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 // different revision
-GAME( 1992, shogwarru,  shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, shogwarru,  shogwarr, shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

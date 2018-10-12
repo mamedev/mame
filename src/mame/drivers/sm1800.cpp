@@ -20,6 +20,7 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -35,6 +36,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void sm1800(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8255_device> m_ppi;
@@ -50,28 +54,28 @@ public:
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
-	void sm1800(machine_config &config);
 	void sm1800_io(address_map &map);
 	void sm1800_mem(address_map &map);
 };
 
-ADDRESS_MAP_START(sm1800_state::sm1800_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
+void sm1800_state::sm1800_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
 	//AM_RANGE( 0x0fb0, 0x0fff ) AM_DEVWRITE("i8275", i8275_device, dack_w)
-	AM_RANGE( 0x1000, 0x17ff ) AM_RAM // videoram looks like 1080-17FF, normal ascii
-ADDRESS_MAP_END
+	map(0x1000, 0x17ff).ram(); // videoram looks like 1080-17FF, normal ascii
+}
 
-ADDRESS_MAP_START(sm1800_state::sm1800_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x3c, 0x3d ) AM_DEVREADWRITE("i8275", i8275_device, read, write)
-	AM_RANGE( 0x5c, 0x5c) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
-	AM_RANGE( 0x5d, 0x5d) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
-	AM_RANGE( 0x6c, 0x6f ) AM_DEVREADWRITE("i8255", i8255_device, read, write)
+void sm1800_state::sm1800_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x3c, 0x3d).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x5c, 0x5d).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x6c, 0x6f).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE( 0x74, 0x74 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 	//AM_RANGE( 0x75, 0x75 ) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sm1800 )
@@ -151,18 +155,18 @@ static const gfx_layout sm1800_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( sm1800 )
+static GFXDECODE_START( gfx_sm1800 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sm1800_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(sm1800_state::sm1800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(sm1800_mem)
-	MCFG_CPU_IO_MAP(sm1800_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sm1800_state,  sm1800_vblank_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(sm1800_state,sm1800_irq_callback)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sm1800_mem)
+	MCFG_DEVICE_IO_MAP(sm1800_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sm1800_state,  sm1800_vblank_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(sm1800_state,sm1800_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -174,14 +178,14 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm1800_state, sm1800)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm1800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm1800)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(sm1800_state, sm1800_8255_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(sm1800_state, sm1800_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(sm1800_state, sm1800_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(sm1800_state, sm1800_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(sm1800_state::sm1800_8255_porta_r));
+	m_ppi->out_pb_callback().set(FUNC(sm1800_state::sm1800_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_w));
 
 	MCFG_DEVICE_ADD("i8275", I8275, 2000000)
 	MCFG_I8275_CHARACTER_WIDTH(8)
@@ -201,5 +205,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE           INIT   COMPANY      FULLNAME   FLAGS */
-COMP( ????, sm1800,  0,      0,       sm1800,    sm1800, sm1800_state,   0,     "<unknown>", "SM1800",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY      FULLNAME   FLAGS */
+COMP( ????, sm1800, 0,      0,      sm1800,  sm1800, sm1800_state, empty_init, "<unknown>", "SM1800",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

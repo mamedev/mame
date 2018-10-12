@@ -60,134 +60,90 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
-#include "machine/decocrpt.h"
-#include "machine/gen_latch.h"
-#include "video/decospr.h"
-#include "video/deco16ic.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
-#include "screen.h"
-#include "speaker.h"
-
+#include "includes/supbtime.h"
+#include "emupal.h"
 
 #define TUMBLEP_HACK 0
-
-
-class supbtime_state : public driver_device
-{
-public:
-	supbtime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_maincpu(*this, "maincpu"),
-		m_deco_tilegen1(*this, "tilegen1"),
-		m_sprgen(*this, "spritegen")
-	{ }
-
-	DECLARE_DRIVER_INIT(tumblep);
-
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
-	DECLARE_READ16_MEMBER(vblank_ack_r);
-	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void chinatwn(machine_config &config);
-	void supbtime(machine_config &config);
-	void tumblep(machine_config &config);
-	void chinatwn_map(address_map &map);
-	void sound_map(address_map &map);
-	void supbtime_map(address_map &map);
-	void tumblep_map(address_map &map);
-private:
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_pf1_rowscroll;
-	required_shared_ptr<uint16_t> m_pf2_rowscroll;
-	required_device<cpu_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen1;
-	required_device<decospr_device> m_sprgen;
-};
 
 
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(supbtime_state::supbtime_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x104000, 0x11ffff) AM_WRITENOP // Nothing there
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x120800, 0x13ffff) AM_WRITENOP // Nothing there
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ(vblank_ack_r)
-	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP // ?
-	AM_RANGE(0x1a0000, 0x1a0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_r, pf_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_SHARE("pf2_rowscroll")
-ADDRESS_MAP_END
+void supbtime_state::supbtime_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram();
+	map(0x104000, 0x11ffff).nopw(); // Nothing there
+	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x120800, 0x13ffff).nopw(); // Nothing there
+	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x180001).portr("INPUTS");
+	map(0x180002, 0x180003).portr("DSW");
+	map(0x180008, 0x180009).portr("SYSTEM");
+	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000d).nopw(); // ?
+	map(0x1a0001, 0x1a0001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x340000, 0x3407ff).ram().share("pf1_rowscroll");
+	map(0x342000, 0x3427ff).ram().share("pf2_rowscroll");
+}
 
-ADDRESS_MAP_START(supbtime_state::chinatwn_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ(vblank_ack_r)
-	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP // ?
-	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_r, pf_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("pf1_rowscroll") // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_SHARE("pf2_rowscroll") // unused
-ADDRESS_MAP_END
+void supbtime_state::chinatwn_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x180001).portr("INPUTS");
+	map(0x180002, 0x180003).portr("DSW");
+	map(0x180008, 0x180009).portr("SYSTEM");
+	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000d).nopw(); // ?
+	map(0x1a0000, 0x1a3fff).ram();
+	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x340000, 0x3407ff).ram().share("pf1_rowscroll"); // unused
+	map(0x342000, 0x3427ff).ram().share("pf2_rowscroll"); // unused
+}
 
-ADDRESS_MAP_START(supbtime_state::tumblep_map)
+void supbtime_state::tumblep_map(address_map &map)
+{
 #if TUMBLEP_HACK
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY   // To write levels modifications
+	map(0x000000, 0x07ffff).writeonly();   // To write levels modifications
 #endif
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ(vblank_ack_r)
-	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP // ?
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x320000, 0x320fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x322000, 0x322fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_SHARE("pf1_rowscroll") // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_SHARE("pf2_rowscroll") // unused
-ADDRESS_MAP_END
+	map(0x000000, 0x07ffff).rom();
+	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x120000, 0x123fff).ram();
+	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x180001).portr("INPUTS");
+	map(0x180002, 0x180003).portr("DSW");
+	map(0x180008, 0x180009).portr("SYSTEM");
+	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000d).nopw(); // ?
+	map(0x1a0000, 0x1a07ff).ram().share("spriteram");
+	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x320fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x322fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x340000, 0x3407ff).writeonly().share("pf1_rowscroll"); // unused
+	map(0x342000, 0x3427ff).writeonly().share("pf2_rowscroll"); // unused
+}
 
 // Physical memory map (21 bits)
-ADDRESS_MAP_START(supbtime_state::sound_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP // YM2203 - this board doesn't have one
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_NOP // This board only has 1 oki chip
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void supbtime_state::sound_map(address_map &map)
+{
+	map.global_mask(0x1fffff);
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).noprw(); // YM2203 - this board doesn't have one
+	map(0x110000, 0x110001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).noprw(); // This board only has 1 oki chip
+	map(0x140000, 0x140001).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x1f0000, 0x1f1fff).ram();
+}
 
 
 //**************************************************************************
@@ -204,61 +160,6 @@ READ16_MEMBER( supbtime_state::vblank_ack_r )
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	return 0xffff;
-}
-
-// End sequence uses rowscroll '98 c0' on pf1 (jmp to 1d61a on supbtimj)
-uint32_t supbtime_state::screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-
-	flip_screen_set(BIT(flip, 7));
-	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
-
-	bitmap.fill(768, cliprect);
-
-	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-
-	return 0;
-}
-
-// Tumblepop is one of few games to take advantage of the playfields ability
-// to switch between 8*8 tiles and 16*16 tiles.
-uint32_t supbtime_state::screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-
-	flip_screen_set(BIT(flip, 7));
-	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
-
-	bitmap.fill(256+512, cliprect); // not verified
-
-	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-
-	return 0;
-}
-
-
-//**************************************************************************
-//  MACHINE
-//**************************************************************************
-
-DRIVER_INIT_MEMBER( supbtime_state, tumblep )
-{
-	deco56_decrypt_gfx(machine(), "tiles");
-
-#if TUMBLEP_HACK
-	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
-	RAM[(offset + 0)/2] = 0x0240;
-	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
-#endif
 }
 
 
@@ -425,7 +326,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( supbtime )
+static GFXDECODE_START( gfx_supbtime )
 	GFXDECODE_ENTRY( "tiles",   0, tile_8x8_layout,   256, 32 ) // 8x8
 	GFXDECODE_ENTRY( "tiles",   0, tile_16x16_layout, 256, 32 ) // 16x16
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,        0, 16 ) // 16x16
@@ -437,24 +338,25 @@ GFXDECODE_END
 //**************************************************************************
 
 MACHINE_CONFIG_START(supbtime_state::supbtime)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(supbtime_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(supbtime_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &supbtime_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(supbtime_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, supbtime_state, vblank_w))
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supbtime)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supbtime)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DEVICE_ADD("tilegen", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
 	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
@@ -473,30 +375,30 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000) / 9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ 2
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(21'477'272) / 20, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(21'477'272) / 20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(supbtime_state::chinatwn)
 	supbtime(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(chinatwn_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(chinatwn_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(supbtime_state::tumblep)
 	supbtime(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tumblep_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tumblep_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_tumblep)
@@ -632,13 +534,28 @@ ROM_END
 
 
 //**************************************************************************
+//  MACHINE
+//**************************************************************************
+
+void supbtime_state::init_tumblep()
+{
+	deco56_decrypt_gfx(machine(), "tiles");
+
+#if TUMBLEP_HACK
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
+	RAM[(offset + 0)/2] = 0x0240;
+	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
+#endif
+}
+
+//**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT     ROT   COMPANY                  FULLNAME                            FLAGS
-GAME( 1990, supbtime,  0,        supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, supbtimea, supbtime, supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, supbtimej, supbtime, supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, chinatwn,  0,        chinatwn, chinatwn, supbtime_state,       0, ROT0, "Data East Corporation", "China Town (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tumblep,   0,        tumblep,  tumblep,  supbtime_state, tumblep, ROT0, "Data East Corporation", "Tumble Pop (World)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tumblepj,  tumblep,  tumblep,  tumblep,  supbtime_state, tumblep, ROT0, "Data East Corporation", "Tumble Pop (Japan)",               MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT          ROT   COMPANY                  FULLNAME                            FLAGS
+GAME( 1990, supbtime,  0,        supbtime, supbtime, supbtime_state, empty_init,   ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, supbtimea, supbtime, supbtime, supbtime, supbtime_state, empty_init,   ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, supbtimej, supbtime, supbtime, supbtime, supbtime_state, empty_init,   ROT0, "Data East Corporation", "Super Burger Time (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, chinatwn,  0,        chinatwn, chinatwn, supbtime_state, empty_init,   ROT0, "Data East Corporation", "China Town (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tumblep,   0,        tumblep,  tumblep,  supbtime_state, init_tumblep, ROT0, "Data East Corporation", "Tumble Pop (World)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tumblepj,  tumblep,  tumblep,  tumblep,  supbtime_state, init_tumblep, ROT0, "Data East Corporation", "Tumble Pop (Japan)",               MACHINE_SUPPORTS_SAVE )

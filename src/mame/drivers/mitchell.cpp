@@ -315,70 +315,76 @@ WRITE8_MEMBER(mitchell_state::input_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(mitchell_state::mgakuen_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8)   /* palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_SHARE("colorram") /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_SHARE("videoram") /* char RAM */
-	AM_RANGE(0xe000, 0xefff) AM_RAM /* Work RAM */
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r, mgakuen_objram_w)   /* OBJ RAM */
-ADDRESS_MAP_END
+void mitchell_state::mgakuen_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8));   /* palette RAM */
+	map(0xc800, 0xcfff).rw(FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram"); /* Attribute RAM */
+	map(0xd000, 0xdfff).rw(FUNC(mitchell_state::mgakuen_videoram_r), FUNC(mitchell_state::mgakuen_videoram_w)).share("videoram"); /* char RAM */
+	map(0xe000, 0xefff).ram(); /* Work RAM */
+	map(0xf000, 0xffff).rw(FUNC(mitchell_state::mgakuen_objram_r), FUNC(mitchell_state::mgakuen_objram_w));   /* OBJ RAM */
+}
 
-ADDRESS_MAP_START(mitchell_state::mitchell_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_SHARE("colorram") /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_SHARE("videoram")/* Banked char / OBJ RAM */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram") /* Work RAM */
-ADDRESS_MAP_END
+void mitchell_state::mitchell_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).rw(FUNC(mitchell_state::pang_paletteram_r), FUNC(mitchell_state::pang_paletteram_w)); /* Banked palette RAM */
+	map(0xc800, 0xcfff).rw(FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram"); /* Attribute RAM */
+	map(0xd000, 0xdfff).rw(FUNC(mitchell_state::pang_videoram_r), FUNC(mitchell_state::pang_videoram_w)).share("videoram");/* Banked char / OBJ RAM */
+	map(0xe000, 0xffff).ram().share("nvram"); /* Work RAM */
+}
 
-ADDRESS_MAP_START(mitchell_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram") /* Work RAM */
-ADDRESS_MAP_END
+void mitchell_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+	map(0xe000, 0xffff).ram().share("nvram"); /* Work RAM */
+}
 
-ADDRESS_MAP_START(mitchell_state::mitchell_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)   /* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x00, 0x02) AM_READ(input_r)           /* The Mahjong games and Block Block need special input treatment */
-	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)    /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_device, data_port_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_device, register_port_w)
-	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0x06, 0x06) AM_NOP                     /* watchdog? IRQ ack? video buffering? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)    /* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
-ADDRESS_MAP_END
+void mitchell_state::mitchell_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(mitchell_state::pang_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
+	map(0x00, 0x02).r(FUNC(mitchell_state::input_r));           /* The Mahjong games and Block Block need special input treatment */
+	map(0x01, 0x01).w(FUNC(mitchell_state::input_w));
+	map(0x02, 0x02).w(FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
+	map(0x03, 0x03).w("ymsnd", FUNC(ym2413_device::data_port_w));
+	map(0x04, 0x04).w("ymsnd", FUNC(ym2413_device::register_port_w));
+	map(0x05, 0x05).r(FUNC(mitchell_state::pang_port5_r)).w(m_oki, FUNC(okim6295_device::write));
+	map(0x06, 0x06).noprw();                     /* watchdog? IRQ ack? video buffering? */
+	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));    /* Video RAM bank register */
+	map(0x08, 0x08).w(FUNC(mitchell_state::eeprom_cs_w));
+	map(0x10, 0x10).w(FUNC(mitchell_state::eeprom_clock_w));
+	map(0x18, 0x18).w(FUNC(mitchell_state::eeprom_serial_w));
+}
 
 /* spangbl */
-ADDRESS_MAP_START(mitchell_state::spangbl_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w) /* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_SHARE("colorram")/* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w) AM_SHARE("videoram") /* Banked char / OBJ RAM */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")     /* Work RAM */
-ADDRESS_MAP_END
+void mitchell_state::spangbl_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1").nopw();
+	map(0xc000, 0xc7ff).rw(FUNC(mitchell_state::pang_paletteram_r), FUNC(mitchell_state::pang_paletteram_w)); /* Banked palette RAM */
+	map(0xc800, 0xcfff).rw(FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram");/* Attribute RAM */
+	map(0xd000, 0xdfff).rw(FUNC(mitchell_state::pang_videoram_r), FUNC(mitchell_state::pang_videoram_w)).share("videoram"); /* Banked char / OBJ RAM */
+	map(0xe000, 0xffff).ram().share("nvram");     /* Work RAM */
+}
 
-ADDRESS_MAP_START(mitchell_state::spangbl_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x02) AM_READ(input_r)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")
-	AM_RANGE(0x06, 0x06) AM_WRITENOP    /* watchdog? irq ack? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
-ADDRESS_MAP_END
+void mitchell_state::spangbl_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x02).r(FUNC(mitchell_state::input_r));
+	map(0x00, 0x00).w(FUNC(mitchell_state::pangbl_gfxctrl_w));    /* Palette bank, layer enable, coin counters, more */
+	map(0x02, 0x02).w(FUNC(mitchell_state::pang_bankswitch_w));      /* Code bank register */
+	map(0x03, 0x03).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x05, 0x05).portr("SYS0");
+	map(0x06, 0x06).nopw();    /* watchdog? irq ack? */
+	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));      /* Video RAM bank register */
+	map(0x08, 0x08).w(FUNC(mitchell_state::eeprom_cs_w));
+	map(0x10, 0x10).w(FUNC(mitchell_state::eeprom_clock_w));
+	map(0x18, 0x18).w(FUNC(mitchell_state::eeprom_serial_w));
+}
 
 WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
 {
@@ -387,25 +393,27 @@ WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
 	m_soundbank->set_entry(data & 7);
 }
 
-ADDRESS_MAP_START(mitchell_state::spangbl_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
-	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0xf000, 0xf4ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void mitchell_state::spangbl_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");
+	map(0xe000, 0xe000).w(FUNC(mitchell_state::sound_bankswitch_w));
+	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
+	map(0xec00, 0xec01).w("ymsnd", FUNC(ym2413_device::write));
+	map(0xf000, 0xf4ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(mitchell_state::pangba_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
-	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xf000, 0xf4ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void mitchell_state::pangba_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");
+	map(0xe000, 0xe000).w(FUNC(mitchell_state::sound_bankswitch_w));
+	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
+	map(0xec00, 0xec01).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xf000, 0xf4ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /**** Monsters World ****/
@@ -414,13 +422,14 @@ WRITE8_MEMBER(mitchell_state::oki_banking_w)
 	m_oki->set_rom_bank(data & 3);
 }
 
-ADDRESS_MAP_START(mitchell_state::mstworld_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_banking_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void mitchell_state::mstworld_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(FUNC(mitchell_state::oki_banking_w));
+	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 {
@@ -428,18 +437,19 @@ WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-ADDRESS_MAP_START(mitchell_state::mstworld_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mstworld_gfxctrl_w)   /* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(pang_bankswitch_w)    /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(mstworld_sound_w)    /* write to sound cpu */
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")   /* dips? */
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")   /* special? */
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")   /* dips? */
-	AM_RANGE(0x06, 0x06) AM_WRITENOP        /* watchdog? irq ack? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(mstworld_video_bank_w)    /* Video RAM bank register */
-ADDRESS_MAP_END
+void mitchell_state::mstworld_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w(FUNC(mitchell_state::mstworld_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2").w(FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
+	map(0x03, 0x03).portr("DSW0").w(FUNC(mitchell_state::mstworld_sound_w));    /* write to sound cpu */
+	map(0x04, 0x04).portr("DSW1");   /* dips? */
+	map(0x05, 0x05).portr("SYS0");   /* special? */
+	map(0x06, 0x06).portr("DSW2");   /* dips? */
+	map(0x06, 0x06).nopw();        /* watchdog? irq ack? */
+	map(0x07, 0x07).w(FUNC(mitchell_state::mstworld_video_bank_w));    /* Video RAM bank register */
+}
 
 
 /*************************************
@@ -455,7 +465,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -714,7 +724,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -881,7 +891,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    /* same as the service mode farther down */
@@ -921,7 +931,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -937,7 +947,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )    /* dial direction */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    /* dial direction */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
@@ -945,7 +955,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )    /* dial direction */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    /* dial direction */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
@@ -963,7 +973,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -979,7 +989,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )    /* dial direction */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    /* dial direction */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -989,7 +999,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )    /* dial direction */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    /* dial direction */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1052,22 +1062,22 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( mgakuen )
+static GFXDECODE_START( gfx_mgakuen )
 	GFXDECODE_ENTRY( "gfx1", 0, marukin_charlayout, 0,  64 ) /* colors 0-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
 
-static GFXDECODE_START( marukin )
+static GFXDECODE_START( gfx_marukin )
 	GFXDECODE_ENTRY( "gfx1", 0, marukin_charlayout, 0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
 
-static GFXDECODE_START( pkladiesbl )
+static GFXDECODE_START( gfx_pkladiesbl )
 	GFXDECODE_ENTRY( "gfx1", 0, pkladiesbl_charlayout, 0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
 
-static GFXDECODE_START( mitchell )
+static GFXDECODE_START( gfx_mitchell )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
@@ -1098,7 +1108,7 @@ static const gfx_layout mstworld_spritelayout =
 };
 
 
-static GFXDECODE_START( mstworld )
+static GFXDECODE_START( gfx_mstworld )
 	GFXDECODE_ENTRY( "gfx1", 0, mstworld_charlayout,   0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx2", 0, mstworld_spritelayout, 0x000, 0x40 )
 GFXDECODE_END
@@ -1154,15 +1164,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
 MACHINE_CONFIG_START(mitchell_state::mgakuen)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* probably same clock as the other mitchell hardware games */
-	MCFG_CPU_PROGRAM_MAP(mgakuen_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* probably same clock as the other mitchell hardware games */
+	MCFG_DEVICE_PROGRAM_MAP(mgakuen_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1173,7 +1183,7 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgakuen)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgakuen)
 
 	MCFG_PALETTE_ADD("palette", 1024)   /* less colors than the others */
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1181,12 +1191,12 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* probably same clock as the other mitchell hardware games */
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* probably same clock as the other mitchell hardware games */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1194,16 +1204,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mitchell_state::pang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1214,7 +1224,7 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mitchell)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mitchell)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1222,19 +1232,20 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mitchell_state::pangnv)
+void mitchell_state::pangnv(machine_config &config)
+{
 	pang(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 
 static const gfx_layout blcharlayout =
@@ -1249,7 +1260,7 @@ static const gfx_layout blcharlayout =
 };
 
 
-static GFXDECODE_START( spangbl )
+static GFXDECODE_START( gfx_spangbl )
 	GFXDECODE_ENTRY( "gfx1", 0, blcharlayout,     0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
@@ -1270,36 +1281,36 @@ WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 MACHINE_CONFIG_START(mitchell_state::spangbl)
 	pangnv(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spangbl_map)
-	MCFG_CPU_IO_MAP(spangbl_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spangbl_map)
+	MCFG_DEVICE_IO_MAP(spangbl_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
 	MCFG_DEVICE_REMOVE("scantimer")
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // Z80A CPU; clock unknown
-	MCFG_CPU_PROGRAM_MAP(spangbl_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Z80A CPU; clock unknown
+	MCFG_DEVICE_PROGRAM_MAP(spangbl_sound_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spangbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spangbl)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_SOUND_ADD("msm", MSM5205, 400000) // clock and prescaler unknown
-	MCFG_MSM5205_VCLK_CB(WRITELINE(mitchell_state, spangbl_adpcm_int)) // controls music as well as ADCPM rate
+	MCFG_DEVICE_ADD("msm", MSM5205, 400000) // clock and prescaler unknown
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mitchell_state, spangbl_adpcm_int)) // controls music as well as ADCPM rate
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mitchell_state::pangba)
 	spangbl(config);
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(pangba_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(pangba_sound_map)
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1311,14 +1322,14 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
 	  the interrupt handling (and probably various irq flags / vbl flags handling etc.) is
 	  more likely wrong.. the game appears to run too fast anyway .. */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000*4)
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mstworld_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000*4)
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mstworld_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
-	MCFG_CPU_PROGRAM_MAP(mstworld_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(mstworld_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
@@ -1332,7 +1343,7 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mstworld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mstworld)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1340,11 +1351,11 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 990000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 990000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1352,13 +1363,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mitchell_state::marukin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1369,7 +1380,7 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marukin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marukin)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1377,12 +1388,12 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1407,13 +1418,13 @@ Vsync is 59.09hz
 MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1424,7 +1435,7 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkladiesbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkladiesbl)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1432,12 +1443,12 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2062,6 +2073,60 @@ ROM_START( spangbl )
 	ROM_LOAD( "ic125.14",  0x030000, 0x10000, CRC(bd5c2f4b) SHA1(3c71d63637633a98ab513e4336e2954af3f964f4) )
 ROM_END
 
+ROM_START( spangbl2 )
+	ROM_REGION( 0x50000*2, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "ic2.1",  0x00000, 0x08000, CRC(4403f652) SHA1(62a232985a334ea8af840c2c3e766f316cc9e3da) ) // 1ST AND 2ND HALF IDENTICAL, but found as is on two different boards
+	ROM_CONTINUE(0x50000,0x8000)
+	ROM_LOAD( "ic18.2",   0x60000, 0x04000, CRC(6f377832) SHA1(25755ed77a797f50fdfbb4c42a04f51d3d08f87c) )
+	ROM_CONTINUE(0x10000,0x4000)
+	ROM_CONTINUE(0x64000,0x4000)
+	ROM_CONTINUE(0x14000,0x4000)
+	ROM_CONTINUE(0x68000,0x4000)
+	ROM_CONTINUE(0x18000,0x4000)
+	ROM_CONTINUE(0x6c000,0x4000)
+	ROM_CONTINUE(0x1c000,0x4000)
+	ROM_CONTINUE(0x70000,0x4000)
+	ROM_CONTINUE(0x20000,0x4000)
+	ROM_CONTINUE(0x74000,0x4000)
+	ROM_CONTINUE(0x24000,0x4000)
+	ROM_CONTINUE(0x78000,0x4000)
+	ROM_CONTINUE(0x28000,0x4000)
+	ROM_CONTINUE(0x7c000,0x4000)
+	ROM_CONTINUE(0x2c000,0x4000)
+	ROM_LOAD( "ic19.3",   0x40000, 0x04000, CRC(7c776309) SHA1(8861ed11484ca0727dfbc3003888a9de32ed8ecc) )
+	ROM_CONTINUE(0x48000,0x4000)
+	ROM_CONTINUE(0x44000,0x4000)
+	ROM_CONTINUE(0x4c000,0x4000)
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound Z80 + M5205 samples */
+	ROM_LOAD( "ic28.4",   0x00000, 0x10000, CRC(02b07d0a) SHA1(77cb9bf1b0d93ebad1bd8cdbedb7fdbad23697be) )
+	ROM_LOAD( "ic45.5",   0x10000, 0x10000, CRC(95c32824) SHA1(02de90a7bfbe89feb7708fda8dfac4ed32bc0773) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT| ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "ic79.11",  0x000001, 0x10000, CRC(10839ddd) SHA1(bfb56aa5d6ee1d3aa19e346264bee90d64545e51) )
+	ROM_LOAD16_BYTE( "ic78.7",   0x000000, 0x10000, CRC(c1d5df89) SHA1(a86e641af1b41c8f642fe3a14ebcbe6c27f80c79) )
+	ROM_LOAD16_BYTE( "ic49.10",  0x020001, 0x10000, CRC(113c2753) SHA1(37b480b5d9c581d3c807c81924b4bbbc21d0698d) )
+	ROM_LOAD16_BYTE( "ic48.6",   0x020000, 0x10000, CRC(4ffae6c9) SHA1(71df3c374a24d6a90e78d33929cb91d05bd10b78) )
+	ROM_LOAD16_BYTE( "ic81.13",  0x080001, 0x10000, CRC(ebe9c63a) SHA1(1aeeea5051086405ceb803ca7a5bfd82a07ade0f) )
+	ROM_LOAD16_BYTE( "ic80.9",   0x080000, 0x10000, CRC(f680051d) SHA1(b6e09e14baf839961f46e0986d2c17f7edfaf13d) )
+	ROM_LOAD16_BYTE( "ic51.12",  0x0a0001, 0x10000, CRC(beb49dc9) SHA1(c93f65b0f4ce0a0f400202f2998b89abad1f6942) )
+	ROM_LOAD16_BYTE( "ic50.8",   0x0a0000, 0x10000, CRC(3f91014c) SHA1(b3947caa0c667d871c19d7dda6536d043ad296f2) )
+
+	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD( "ic94.17",   0x000000, 0x10000, CRC(a56f3c20) SHA1(cb440e0e612da8b8a50fe25a6336869b62ab4cfd) )
+	ROM_LOAD( "ic95.16",   0x020000, 0x10000, CRC(14df4659) SHA1(d73fab0a8c1e56a26cc15333a294e876f1552bc9) )
+	ROM_LOAD( "ic124.15",  0x010000, 0x10000, CRC(4702c768) SHA1(ff996f1355f32451fa57836c2255027a8108eb40) )
+	ROM_LOAD( "ic125.14",  0x030000, 0x10000, CRC(bd5c2f4b) SHA1(3c71d63637633a98ab513e4336e2954af3f964f4) )
+
+	/* Unused */
+	ROM_REGION( 0x008000, "key", 0)
+        ROM_LOAD( "extra-27c256.bin", 0x00000, 0x08000, CRC(100dda13) SHA1(9a0b6d4439127abc4995c9df3839bfe1f13d8bc2) )
+
+	/* Unsused */
+	ROM_REGION( 0x000104, "plds", 0)
+        ROM_LOAD( "1-pal16l8.ic32",  0x0000, 0x0104, CRC(b78ee715) SHA1(df9ed2bef394b4e26ac87bd39d81f4df2b5cefe5) )	
+ROM_END
+
 /* seems to be the same basic hardware, but the memory map and io map are different at least.. */
 ROM_START( mstworld )
 	ROM_REGION( 0x50000*2, "maincpu", 0 )   /* CPU1 code */
@@ -2305,109 +2370,108 @@ void mitchell_state::configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, 
 }
 
 
-DRIVER_INIT_MEMBER(mitchell_state,dokaben)
+void mitchell_state::init_dokaben()
 {
 	m_input_type = 0;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pang)
+void mitchell_state::init_pang()
 {
 	m_input_type = 0;
 	configure_banks(pang_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pangb)
+void mitchell_state::init_pangb()
 {
 	m_input_type = 0;
 	bootleg_decode();
 }
-DRIVER_INIT_MEMBER(mitchell_state,cworld)
+void mitchell_state::init_cworld()
 {
 	m_input_type = 0;
 	configure_banks(cworld_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,hatena)
+void mitchell_state::init_hatena()
 {
 	m_input_type = 0;
 	configure_banks(hatena_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,spang)
+void mitchell_state::init_spang()
 {
 	m_input_type = 3;
 	configure_banks(spang_decode);
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,spangbl)
+void mitchell_state::init_spangbl()
 {
 	m_input_type = 3;
 	bootleg_decode();
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,spangj)
+void mitchell_state::init_spangj()
 {
 	m_input_type = 3;
 	configure_banks(spangj_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,sbbros)
+void mitchell_state::init_sbbros()
 {
 	m_input_type = 3;
 	configure_banks(sbbros_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,qtono1)
+void mitchell_state::init_qtono1()
 {
 	m_input_type = 0;
 	configure_banks(qtono1_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,qsangoku)
+void mitchell_state::init_qsangoku()
 {
 	m_input_type = 0;
 	configure_banks(qsangoku_decode);
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,mgakuen)
+void mitchell_state::init_mgakuen()
 {
 	m_input_type = 1;
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 	m_maincpu->space(AS_IO).install_read_port(0x03, 0x03, "DSW0");
 	m_maincpu->space(AS_IO).install_read_port(0x04, 0x04, "DSW1");
 }
-DRIVER_INIT_MEMBER(mitchell_state,mgakuen2)
+void mitchell_state::init_mgakuen2()
 {
 	m_input_type = 1;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pkladies)
+void mitchell_state::init_pkladies()
 {
 	m_input_type = 1;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pkladiesbl)
+void mitchell_state::init_pkladiesbl()
 {
 	m_input_type = 1;
 	bootleg_decode();
 }
-DRIVER_INIT_MEMBER(mitchell_state,marukin)
+void mitchell_state::init_marukin()
 {
 	m_input_type = 1;
 	configure_banks(marukin_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,block)
+void mitchell_state::init_block()
 {
 	m_input_type = 2;
 	configure_banks(block_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,blockbl)
+void mitchell_state::init_blockbl()
 {
 	m_input_type = 2;
 	bootleg_decode();
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,mstworld)
+void mitchell_state::init_mstworld()
 {
 	/* descramble the program rom .. */
 	int len = memregion("maincpu")->bytes();
 	std::vector<uint8_t> source(len);
 	uint8_t* dst = memregion("maincpu")->base() ;
-	int x;
 
 	static const int tablebank[]=
 	{
@@ -2434,7 +2498,7 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 	};
 
 	memcpy(&source[0], dst, len);
-	for (x = 0; x < 40; x += 2)
+	for (int x = 0; x < 40; x += 2)
 	{
 		if (tablebank[x] != -1)
 		{
@@ -2453,35 +2517,36 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
  *
  *************************************/
 
-GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,  mitchell_state, mgakuen,    ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,  mitchell_state, mgakuen,    ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mgakuen2,    0,        marukin,    marukin,  mitchell_state, mgakuen2,   ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladies,    0,        marukin,    pkladies, mitchell_state, pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies, mitchell_state, pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies, mitchell_state, pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladies, mitchell_state, pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 1)", MACHINE_NOT_WORKING ) // by Playmark? need to figure out CPU 'decryption' / ordering
-GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladies, mitchell_state, pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 2)", MACHINE_NOT_WORKING ) // by Playmark? gets further than the above
-GAME( 1989, dokaben,     0,        pang,       pang,     mitchell_state, dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pang,        0,        pang,       pang,     mitchell_state, pang,       ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbros,       pang,     pang,       pang,     mitchell_state, pang,       ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pompingw,    pang,     pang,       pang,     mitchell_state, pang,       ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangb,       pang,     pang,       pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbold,    pang,     pang,       pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangba,      pang,     pangba,     pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangb2,      pang,     pang,       pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbb,      pang,     spangbl,    pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cworld,      0,        pang,       qtono1,   mitchell_state, cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatena,      0,        pang,       qtono1,   mitchell_state, hatena,     ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spang,       0,        pangnv,     pang,     mitchell_state, spang,      ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, sbbros,      spang,    pangnv,     pang,     mitchell_state, sbbros,     ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangj,      spang,    pangnv,     pang,     mitchell_state, spangj,     ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangbl,     spang,    spangbl,    spangbl,  mitchell_state, spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
-GAME( 1994, mstworld,    0,        mstworld,   mstworld, mitchell_state, mstworld,   ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, marukin,     0,        marukin,    marukin,  mitchell_state, marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, qtono1,      0,        pang,       qtono1,   mitchell_state, qtono1,     ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, qsangoku,    0,        pang,       qtono1,   mitchell_state, qsangoku,   ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, block,       0,        pangnv,     blockjoy, mitchell_state, block,      ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr1,     block,    pangnv,     blockjoy, mitchell_state, block,      ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr2,     block,    pangnv,     block,    mitchell_state, block,      ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockj,      block,    pangnv,     block,    mitchell_state, block,      ROT270, "Capcom",                    "Block Block (Japan 910910)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockbl,     block,    pangnv,     block,    mitchell_state, blockbl,    ROT270, "bootleg",                   "Block Block (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,  mitchell_state, init_mgakuen,    ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,  mitchell_state, init_mgakuen,    ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mgakuen2,    0,        marukin,    marukin,  mitchell_state, init_mgakuen2,   ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladies,    0,        marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladies, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 1)", MACHINE_NOT_WORKING ) // by Playmark? need to figure out CPU 'decryption' / ordering
+GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladies, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 2)", MACHINE_NOT_WORKING ) // by Playmark? gets further than the above
+GAME( 1989, dokaben,     0,        pang,       pang,     mitchell_state, init_dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pang,        0,        pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbros,       pang,     pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pompingw,    pang,     pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangb,       pang,     pang,       pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbold,    pang,     pang,       pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangba,      pang,     pangba,     pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangb2,      pang,     pang,       pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbb,      pang,     spangbl,    pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cworld,      0,        pang,       qtono1,   mitchell_state, init_cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatena,      0,        pang,       qtono1,   mitchell_state, init_hatena,     ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spang,       0,        pangnv,     pang,     mitchell_state, init_spang,      ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, sbbros,      spang,    pangnv,     pang,     mitchell_state, init_sbbros,     ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangj,      spang,    pangnv,     pang,     mitchell_state, init_spangj,     ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangbl,     spang,    spangbl,    spangbl,  mitchell_state, init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
+GAME( 1990, spangbl2,    spang,    spangbl,    spangbl,  mitchell_state, init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 2)", MACHINE_NOT_WORKING )
+GAME( 1994, mstworld,    0,        mstworld,   mstworld, mitchell_state, init_mstworld,   ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, marukin,     0,        marukin,    marukin,  mitchell_state, init_marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qtono1,      0,        pang,       qtono1,   mitchell_state, init_qtono1,     ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qsangoku,    0,        pang,       qtono1,   mitchell_state, init_qsangoku,   ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, block,       0,        pangnv,     blockjoy, mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr1,     block,    pangnv,     blockjoy, mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr2,     block,    pangnv,     block,    mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockj,      block,    pangnv,     block,    mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (Japan 910910)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockbl,     block,    pangnv,     block,    mitchell_state, init_blockbl,    ROT270, "bootleg",                   "Block Block (bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -143,8 +143,8 @@ msx_cart_konami_scc_device::msx_cart_konami_scc_device(const machine_config &mco
 
 MACHINE_CONFIG_START(msx_cart_konami_scc_device::device_add_mconfig)
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("k051649", K051649, XTAL(10'738'635)/3/2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("k051649", K051649, XTAL(10'738'635)/3/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
@@ -474,10 +474,10 @@ msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &m
 
 MACHINE_CONFIG_START(msx_cart_synthesizer_device::device_add_mconfig)
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -547,8 +547,8 @@ msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config 
 
 MACHINE_CONFIG_START(msx_cart_konami_sound_device::device_add_mconfig)
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("k052539", K051649, XTAL(10'738'635)/3/2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("k052539", K051649, XTAL(10'738'635)/3/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
@@ -866,15 +866,16 @@ msx_cart_keyboard_master_device::msx_cart_keyboard_master_device(const machine_c
 }
 
 
-ADDRESS_MAP_START(msx_cart_keyboard_master_device::vlm_map)
-	AM_RANGE(0x0000, 0xffff) AM_READ(read_vlm)
-ADDRESS_MAP_END
+void msx_cart_keyboard_master_device::vlm_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(msx_cart_keyboard_master_device::read_vlm));
+}
 
 
 MACHINE_CONFIG_START(msx_cart_keyboard_master_device::device_add_mconfig)
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("vlm5030", VLM5030, XTAL(3'579'545))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("vlm5030", VLM5030, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 MACHINE_CONFIG_END

@@ -18,7 +18,7 @@
 	MCFG_DEVICE_ADD(_tag, PC_JOY, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, "basic_joy", false)
 
-SLOT_INTERFACE_EXTERN(pc_joysticks);
+void pc_joysticks(device_slot_interface &device);
 
 class device_pc_joy_interface : public device_slot_card_interface
 {

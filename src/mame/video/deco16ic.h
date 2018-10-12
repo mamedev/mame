@@ -35,8 +35,8 @@ public:
 	// configuration
 	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 //  void set_palette_tag(const char *tag);
-	template <typename Object> void set_bank1_callback(Object &&cb) { m_bank1_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_bank2_callback(Object &&cb) { m_bank2_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_bank1_callback(T &&... args) { m_bank1_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_bank2_callback(T &&... args) { m_bank2_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
 	void set_split(int split) { m_split = split; }
 	void set_pf1_size(int size) { m_pf1_size = size; }
 	void set_pf2_size(int size) { m_pf2_size = size; }
@@ -173,10 +173,10 @@ DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 #define MCFG_DECO16IC_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_DECO16IC_BANK1_CB(_class, _method) \
-	downcast<deco16ic_device &>(*device).set_bank1_callback(deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<deco16ic_device &>(*device).set_bank1_callback(&_class::_method, #_class "::" #_method, this);
 
 #define MCFG_DECO16IC_BANK2_CB(_class, _method) \
-	downcast<deco16ic_device &>(*device).set_bank2_callback(deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<deco16ic_device &>(*device).set_bank2_callback(&_class::_method, #_class "::" #_method, this);
 
 #define MCFG_DECO16IC_SPLIT(_split) \
 	downcast<deco16ic_device &>(*device).set_split(_split);
@@ -212,7 +212,7 @@ DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 	downcast<deco16ic_device &>(*device).set_pf12_16x16_bank(_bank);
 
 #define MCFG_DECO16IC_GFXDECODE(_gfxtag) \
-	downcast<deco16ic_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<deco16ic_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 // function definition for a callback
 #define DECO16IC_BANK_CB_MEMBER(_name)     int _name(int bank)

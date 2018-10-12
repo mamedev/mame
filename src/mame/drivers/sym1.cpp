@@ -52,8 +52,15 @@ public:
 		m_crt(*this, "crt"),
 		m_tty(*this, "tty"),
 		m_row(*this, "ROW-%u", 0),
-		m_wp(*this, "WP") { }
+		m_wp(*this, "WP"),
+		m_digits(*this, "digit%u", 0U)
+		{ }
 
+	void sym1(machine_config &config);
+
+	void init_sym1();
+
+private:
 	required_shared_ptr<uint8_t> m_ram_1k;
 	required_shared_ptr<uint8_t> m_ram_2k;
 	required_shared_ptr<uint8_t> m_ram_3k;
@@ -62,8 +69,8 @@ public:
 	uint8_t m_riot_port_a;
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
-	DECLARE_DRIVER_INIT(sym1);
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_0_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_1_w);
@@ -77,16 +84,16 @@ public:
 	DECLARE_WRITE8_MEMBER(riot_b_w);
 	DECLARE_WRITE8_MEMBER(via3_a_w);
 
-	void sym1(machine_config &config);
 	void sym1_map(address_map &map);
-protected:
-	required_device<cpu_device> m_maincpu;
+
+	required_device<m6502_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<ttl74145_device> m_ttl74145;
 	required_device<rs232_port_device> m_crt;
 	required_device<rs232_port_device> m_tty;
 	required_ioport_array<4> m_row;
 	required_ioport m_wp;
+	output_finder<6> m_digits;
 };
 
 
@@ -103,7 +110,7 @@ WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_5_w ) { if (state) m_led_update
 
 TIMER_CALLBACK_MEMBER(sym1_state::led_refresh)
 {
-	output().set_digit_value(param, m_riot_port_a);
+	m_digits[param] = m_riot_port_a;
 }
 
 READ8_MEMBER(sym1_state::riot_a_r)
@@ -125,7 +132,7 @@ READ8_MEMBER(sym1_state::riot_a_r)
 
 READ8_MEMBER(sym1_state::riot_b_r)
 {
-	int data = 0xff;
+	int data = 0x3f;
 
 	// determine column
 	if ( ((m_riot_port_a ^ 0xff) & (m_row[1]->read() ^ 0xff)) & 0x7f )
@@ -138,10 +145,10 @@ READ8_MEMBER(sym1_state::riot_b_r)
 		data &= ~0x04;
 
 	// PB6 in from TTY keyboard
-	data &= m_tty->rxd_r() << 6;
+	data |= m_tty->rxd_r() << 6;
 
 	// PB7 in from RS-232 CRT
-	data &= m_crt->rxd_r() << 7;
+	data |= m_crt->rxd_r() << 7;
 
 	data &= ~0x80; // else hangs 8b02
 
@@ -273,7 +280,7 @@ WRITE8_MEMBER( sym1_state::via3_a_w )
 	}
 }
 
-DRIVER_INIT_MEMBER( sym1_state, sym1 )
+void sym1_state::init_sym1()
 {
 	// wipe expansion memory banks that are not installed
 	if (m_ram->size() < 4*1024)
@@ -300,75 +307,73 @@ void sym1_state::machine_reset()
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(sym1_state::sym1_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM // U12/U13 RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAMBANK("bank2") AM_SHARE("ram_1k")
-	AM_RANGE(0x0800, 0x0bff) AM_RAMBANK("bank3") AM_SHARE("ram_2k")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAMBANK("bank4") AM_SHARE("ram_3k")
-	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_SHARE("monitor") // U20 Monitor ROM
-	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("via1", via6522_device, read, write)  // U25 VIA #1
-	AM_RANGE(0xa400, 0xa41f) AM_DEVICE("riot", mos6532_new_device, io_map)  // U27 RIOT
-	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK("bank5") AM_SHARE("riot_ram")   // U27 RIOT RAM
-	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("via2", via6522_device, read, write)  // U28 VIA #2
-	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE("via3", via6522_device, read, write)  // U29 VIA #3
-	AM_RANGE(0xb000, 0xefff) AM_ROM
-ADDRESS_MAP_END
+void sym1_state::sym1_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram(); // U12/U13 RAM
+	map(0x0400, 0x07ff).bankrw("bank2").share("ram_1k");
+	map(0x0800, 0x0bff).bankrw("bank3").share("ram_2k");
+	map(0x0c00, 0x0fff).bankrw("bank4").share("ram_3k");
+	map(0x8000, 0x8fff).rom().share("monitor"); // U20 Monitor ROM
+	map(0xa000, 0xa00f).rw("via1", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U25 VIA #1
+	map(0xa400, 0xa41f).m("riot", FUNC(mos6532_new_device::io_map));  // U27 RIOT
+	map(0xa600, 0xa67f).bankrw("bank5").share("riot_ram");   // U27 RIOT RAM
+	map(0xa800, 0xa80f).rw("via2", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U28 VIA #2
+	map(0xac00, 0xac0f).rw("via3", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U29 VIA #3
+	map(0xb000, 0xefff).rom();
+}
 
 
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(sym1_state::sym1)
+void sym1_state::sym1(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, SYM1_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sym1_map)
+	M6502(config, m_maincpu, SYM1_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sym1_state::sym1_map);
 
-	MCFG_DEFAULT_LAYOUT(layout_sym1)
+	config.set_default_layout(layout_sym1);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// devices
-	MCFG_DEVICE_ADD("riot", MOS6532_NEW, SYM1_CLOCK)
-	MCFG_MOS6530n_IN_PA_CB(READ8(sym1_state, riot_a_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(sym1_state, riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(sym1_state, riot_b_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(sym1_state, riot_b_w))
+	mos6532_new_device &riot(MOS6532_NEW(config, "riot", SYM1_CLOCK));
+	riot.pa_rd_callback().set(FUNC(sym1_state::riot_a_r));
+	riot.pa_wr_callback().set(FUNC(sym1_state::riot_a_w));
+	riot.pb_rd_callback().set(FUNC(sym1_state::riot_b_r));
+	riot.pb_wr_callback().set(FUNC(sym1_state::riot_b_w));
 
-	MCFG_DEVICE_ADD("ttl74145", TTL74145, 0)
-	MCFG_TTL74145_OUTPUT_LINE_0_CB(WRITELINE(sym1_state, sym1_74145_output_0_w))
-	MCFG_TTL74145_OUTPUT_LINE_1_CB(WRITELINE(sym1_state, sym1_74145_output_1_w))
-	MCFG_TTL74145_OUTPUT_LINE_2_CB(WRITELINE(sym1_state, sym1_74145_output_2_w))
-	MCFG_TTL74145_OUTPUT_LINE_3_CB(WRITELINE(sym1_state, sym1_74145_output_3_w))
-	MCFG_TTL74145_OUTPUT_LINE_4_CB(WRITELINE(sym1_state, sym1_74145_output_4_w))
-	MCFG_TTL74145_OUTPUT_LINE_5_CB(WRITELINE(sym1_state, sym1_74145_output_5_w))
-	MCFG_TTL74145_OUTPUT_LINE_6_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	TTL74145(config, m_ttl74145, 0);
+	m_ttl74145->output_line_callback<0>().set(FUNC(sym1_state::sym1_74145_output_0_w));
+	m_ttl74145->output_line_callback<1>().set(FUNC(sym1_state::sym1_74145_output_1_w));
+	m_ttl74145->output_line_callback<2>().set(FUNC(sym1_state::sym1_74145_output_2_w));
+	m_ttl74145->output_line_callback<3>().set(FUNC(sym1_state::sym1_74145_output_3_w));
+	m_ttl74145->output_line_callback<4>().set(FUNC(sym1_state::sym1_74145_output_4_w));
+	m_ttl74145->output_line_callback<5>().set(FUNC(sym1_state::sym1_74145_output_5_w));
+	m_ttl74145->output_line_callback<6>().set("speaker", FUNC(speaker_sound_device::level_w));
 	// lines 7-9 not connected
 
-	MCFG_DEVICE_ADD("via1", VIA6522, SYM1_CLOCK)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
+	VIA6522(config, "via1", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	VIA6522(config, "via2", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("via2", VIA6522, SYM1_CLOCK)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	via6522_device &via3(VIA6522(config, "via3", SYM1_CLOCK));
+	via3.writepa_handler().set(FUNC(sym1_state::via3_a_w));
+	via3.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	MCFG_DEVICE_ADD("via3", VIA6522, SYM1_CLOCK)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(sym1_state, via3_a_w))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<2>))
+	input_merger_device &merger(INPUT_MERGER_ANY_HIGH(config, "mainirq", 0)); // wire-or connection
+	merger.output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq") // wire-or connection
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
-
-	MCFG_RS232_PORT_ADD("crt", default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD("tty", default_rs232_devices, nullptr) // actually a 20 mA current loop; 110 bps assumed
+	RS232_PORT(config, "crt", default_rs232_devices, nullptr);
+	RS232_PORT(config, "tty", default_rs232_devices, nullptr); // actually a 20 mA current loop; 110 bps assumed
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("4K");
+	m_ram->set_extra_options("1K,2K,3K");
+}
 
 
 //**************************************************************************
@@ -378,9 +383,9 @@ MACHINE_CONFIG_END
 ROM_START( sym1 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "ver10",  "Version 1.0")
-	ROMX_LOAD("symon1_0.bin", 0x8000, 0x1000, CRC(97928583) SHA1(6ac52c54adb7a086d51bc7f6d55dd30ab3a0a331), ROM_BIOS(1))
+	ROMX_LOAD("symon1_0.bin", 0x8000, 0x1000, CRC(97928583) SHA1(6ac52c54adb7a086d51bc7f6d55dd30ab3a0a331), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ver11",  "Version 1.1")
-	ROMX_LOAD("symon1_1.bin", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786), ROM_BIOS(2))
+	ROMX_LOAD("symon1_1.bin", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786), ROM_BIOS(1))
 	ROM_LOAD("rae_b000", 0xb000, 0x1000, CRC(f6429326) SHA1(6f2f10649b54f54217bb35c8c453b5d05434bd86) )
 	ROM_LOAD("bas_c000", 0xc000, 0x1000, CRC(c168fe70) SHA1(7447a5e229140cbbde4cf90886966a5d93aa24e1) )
 	ROM_LOAD("bas_d000", 0xd000, 0x1000, CRC(8375a978) SHA1(240301bf8bb8ddb99b65a585f17895e1ad872631) )
@@ -392,5 +397,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT  COMPANY                   FULLNAME          FLAGS
-COMP( 1978, sym1, 0,      0,      sym1,    sym1,  sym1_state, sym1, "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY                   FULLNAME          FLAGS
+COMP( 1978, sym1, 0,      0,      sym1,    sym1,  sym1_state, init_sym1, "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )

@@ -84,6 +84,7 @@ www.andys-arcade.com
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -93,18 +94,25 @@ www.andys-arcade.com
 class imolagp_state : public driver_device
 {
 public:
-	imolagp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	imolagp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_slavecpu(*this, "slave"),
 		m_steer_pot_timer(*this, "pot"),
-		m_steer_inp(*this, "STEER")
+		m_steer_inp(*this, "STEER"),
+		m_digits(*this, "digit%u%u", 0U, 0U)
 	{ }
 
+	void imolagp(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<timer_device> m_steer_pot_timer;
 	required_ioport m_steer_inp;
+	output_finder<5, 6> m_digits;
 
 	uint8_t m_videoram[2][0x4000]; // 2 layers of 16KB
 	uint8_t m_comms_latch[2];
@@ -123,8 +131,7 @@ public:
 	DECLARE_READ8_MEMBER(imola_draw_mode_r);
 	DECLARE_WRITE8_MEMBER(vreg_control_w);
 	DECLARE_WRITE8_MEMBER(vreg_data_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
 	virtual void machine_start() override;
@@ -132,7 +139,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(imolagp);
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void imolagp(machine_config &config);
 	void imolagp_master_io(address_map &map);
 	void imolagp_master_map(address_map &map);
 	void imolagp_slave_io(address_map &map);
@@ -222,16 +228,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(imolagp_state::imolagp_pot_callback)
 		const int base = 6500;
 		const int range = 100000;
 		m_steer_pot_timer->adjust(attotime::from_usec(base + range * (1.0 / (double)(steer & 0x7f))));
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 		m_steer_pot_timer->adjust(attotime::from_msec(20));
 }
 
-INTERRUPT_GEN_MEMBER(imolagp_state::slave_vblank_irq)
+WRITE_LINE_MEMBER(imolagp_state::vblank_irq)
 {
-	m_scroll = m_vreg[0xe]; // latch scroll
-	device.execute().set_input_line(0, HOLD_LINE);
+	if (state)
+	{
+		m_scroll = m_vreg[0xe]; // latch scroll
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_slavecpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 
@@ -259,7 +269,8 @@ READ8_MEMBER(imolagp_state::receive_data_r)
 
 READ8_MEMBER(imolagp_state::trigger_slave_nmi_r)
 {
-	m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!machine().side_effects_disabled())
+		m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	return 0;
 }
 
@@ -270,17 +281,20 @@ WRITE8_MEMBER(imolagp_state::imola_led_board_w)
 	static const uint8_t ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-	output().set_digit_value(offset, ls48_map[data & 0x0f]);
+	int i = offset >> 3;
+	int j = offset & 7;
+	if (i < 5 && j < 6)
+		m_digits[i][j] = ls48_map[data & 0x0f];
 /*
-    score:         0,  1,  2,  3
-    time:          4,  5
-    result:       10, 11
-    credits:      12, 13
-    highscore 1:  32, 33, 34, 35
-    highscore 2:  36, 37, 24, 25
-    highscore 3:  26, 27, 28, 29
-    highscore 4:  16, 17, 18, 19
-    highscore 5:  20, 21,  8,  9
+    score:        00, 01, 02, 03
+    time:         04, 05
+    result:       12, 13
+    credits:      14, 15
+    highscore 1:  40, 41, 42, 43
+    highscore 2:  44, 45, 30, 31
+    highscore 3:  32, 33, 34, 35
+    highscore 4:  20, 21, 22, 23
+    highscore 5:  24, 25, 10, 11
 */
 }
 
@@ -329,39 +343,43 @@ READ8_MEMBER(imolagp_state::imola_draw_mode_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(imolagp_state::imolagp_master_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(vreg_control_w)
-	AM_RANGE(0x37f0, 0x37f0) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+void imolagp_state::imolagp_master_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x2800, 0x2803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x3000, 0x3000).w(FUNC(imolagp_state::vreg_control_w));
+	map(0x37f0, 0x37f0).w("aysnd", FUNC(ay8910_device::address_w));
 //  AM_RANGE(0x37f7, 0x37f7) AM_NOP
-	AM_RANGE(0x3800, 0x3800) AM_READWRITE(vreg_data_r, vreg_data_w)
-	AM_RANGE(0x3810, 0x3810) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSWA")
-	AM_RANGE(0x47ff, 0x4800) AM_WRITE(transmit_data_w)
-	AM_RANGE(0x5000, 0x50ff) AM_WRITE(imola_led_board_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("DSWA") // assume mirror
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSWB")
-ADDRESS_MAP_END
+	map(0x3800, 0x3800).rw(FUNC(imolagp_state::vreg_data_r), FUNC(imolagp_state::vreg_data_w));
+	map(0x3810, 0x3810).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x4000, 0x4000).portr("DSWA");
+	map(0x47ff, 0x4800).w(FUNC(imolagp_state::transmit_data_w));
+	map(0x5000, 0x50ff).w(FUNC(imolagp_state::imola_led_board_w));
+	map(0x5800, 0x5800).portr("DSWA"); // assume mirror
+	map(0x6000, 0x6000).portr("DSWB");
+}
 
-ADDRESS_MAP_START(imolagp_state::imolagp_master_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(trigger_slave_nmi_r)
-ADDRESS_MAP_END
+void imolagp_state::imolagp_master_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(imolagp_state::trigger_slave_nmi_r));
+}
 
 
-ADDRESS_MAP_START(imolagp_state::imolagp_slave_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x9fff, 0xa000) AM_READ(receive_data_r)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(screenram_w)
-ADDRESS_MAP_END
+void imolagp_state::imolagp_slave_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x9fff, 0xa000).r(FUNC(imolagp_state::receive_data_r));
+	map(0xc000, 0xffff).w(FUNC(imolagp_state::screenram_w));
+}
 
-ADDRESS_MAP_START(imolagp_state::imolagp_slave_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0xff) AM_READ(imola_draw_mode_r)
-ADDRESS_MAP_END
+void imolagp_state::imolagp_slave_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).r(FUNC(imolagp_state::imola_draw_mode_r));
+}
 
 
 
@@ -430,7 +448,7 @@ static INPUT_PORTS_START( imolagp )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -461,7 +479,7 @@ static INPUT_PORTS_START( imolagpo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, nullptr)
 INPUT_PORTS_END
 
 
@@ -474,6 +492,8 @@ INPUT_PORTS_END
 
 void imolagp_state::machine_start()
 {
+	m_digits.resolve();
+
 	save_item(NAME(m_vcontrol));
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_scroll));
@@ -493,25 +513,23 @@ void imolagp_state::machine_reset()
 MACHINE_CONFIG_START(imolagp_state::imolagp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)
-	MCFG_CPU_PROGRAM_MAP(imolagp_master_map)
-	MCFG_CPU_IO_MAP(imolagp_master_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", imolagp_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)
+	MCFG_DEVICE_PROGRAM_MAP(imolagp_master_map)
+	MCFG_DEVICE_IO_MAP(imolagp_master_io)
 	MCFG_TIMER_DRIVER_ADD("pot", imolagp_state, imolagp_pot_callback) // maincpu nmi
 
-	MCFG_CPU_ADD("slave", Z80, 4000000) // ?
-	MCFG_CPU_PROGRAM_MAP(imolagp_slave_map)
-	MCFG_CPU_IO_MAP(imolagp_slave_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", imolagp_state, slave_vblank_irq)
+	MCFG_DEVICE_ADD("slave", Z80, 4000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(imolagp_slave_map)
+	MCFG_DEVICE_IO_MAP(imolagp_slave_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	i8255_device &ppi(I8255A(config, "ppi8255", 0));
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B"))
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_log("PPI8255 - unmapped read port B");
+	ppi.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ppi.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -522,13 +540,14 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 	MCFG_SCREEN_UPDATE_DRIVER(imolagp_state, screen_update_imolagp)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, imolagp_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(imolagp_state, imolagp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000) // ?
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -578,6 +597,6 @@ ROM_START( imolagpo )
 ROM_END
 
 
-//    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    STATE,         INIT, MONITOR, COMPANY,       FULLNAME,                  FLAGS
-GAMEL(1983?, imolagp,  0,       imolagp, imolagp,  imolagp_state, 0,    ROT90,   "RB Bologna", "Imola Grand Prix (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // made by Alberici? year not shown, PCB labels suggests it's from 1983
-GAMEL(1983?, imolagpo, imolagp, imolagp, imolagpo, imolagp_state, 0,    ROT90,   "RB Bologna", "Imola Grand Prix (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // "
+//    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    CLASS,         INIT,       MONITOR, COMPANY,      FULLNAME,                   FLAGS
+GAMEL(1983?, imolagp,  0,       imolagp, imolagp,  imolagp_state, empty_init, ROT90,   "RB Bologna", "Imola Grand Prix (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // made by Alberici? year not shown, PCB labels suggests it's from 1983
+GAMEL(1983?, imolagpo, imolagp, imolagp, imolagpo, imolagp_state, empty_init, ROT90,   "RB Bologna", "Imola Grand Prix (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // "

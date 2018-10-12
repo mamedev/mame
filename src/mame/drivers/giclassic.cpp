@@ -50,6 +50,7 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -63,6 +64,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void giclassic(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
@@ -80,9 +84,8 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(vrom_r);
 
-	void giclassic(machine_config &config);
 	void satellite_main(address_map &map);
-private:
+
 	uint8_t m_control;
 };
 
@@ -143,18 +146,19 @@ READ16_MEMBER(giclassic_state::vrom_r)
 	return m_k056832->piratesh_rom_r(space, offset);
 }
 
-ADDRESS_MAP_START(giclassic_state::satellite_main)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0x900000, 0x90003f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
-	AM_RANGE(0xb00000, 0xb01fff) AM_READ(vrom_r)
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(control_w)
-	AM_RANGE(0xd00000, 0xd0003f) AM_RAM // these must read/write or 26S (LCD controller) fails
-	AM_RANGE(0xe00000, 0xe0001f) AM_DEVWRITE8("k056832", k056832_device, b_w, 0xff00)
-	AM_RANGE(0xf00000, 0xf00001) AM_NOP AM_WRITENOP // watchdog reset
-ADDRESS_MAP_END
+void giclassic_state::satellite_main(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x100000, 0x103fff).ram();
+	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x800000, 0x801fff).ram().rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0x900000, 0x90003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
+	map(0xb00000, 0xb01fff).r(FUNC(giclassic_state::vrom_r));
+	map(0xc00000, 0xc00001).w(FUNC(giclassic_state::control_w));
+	map(0xd00000, 0xd0003f).ram(); // these must read/write or 26S (LCD controller) fails
+	map(0xe00000, 0xe0001f).w(m_k056832, FUNC(k056832_device::b_w)).umask16(0xff00);
+	map(0xf00000, 0xf00001).noprw().nopw(); // watchdog reset
+}
 
 static INPUT_PORTS_START( giclassic )
 INPUT_PORTS_END
@@ -264,22 +268,23 @@ uint32_t giclassicsvr_state::screen_update_giclassicsvr(screen_device &screen, b
 	return 0;
 }
 
-ADDRESS_MAP_START(giclassicsvr_state::server_main)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x093fff) AM_RAM
-	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x183fff) AM_RAM
-	AM_RANGE(0x280000, 0x281fff) AM_RAM AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w) // SPRITES
-	AM_RANGE(0x300060, 0x30006f) AM_DEVREAD("k055673", k055673_device, k055673_ps_rom_word_r) // SPRITES
-	AM_RANGE(0x308000, 0x30803f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
-	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252a", k053252_device, read, write, 0x00ff) // CRTC 1
-	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252b", k053252_device, read, write, 0xff00) // CRTC 2
-	AM_RANGE(0x380000, 0x380001) AM_WRITENOP    // watchdog reset
-	AM_RANGE(0x398000, 0x398001) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM
-ADDRESS_MAP_END
+void giclassicsvr_state::server_main(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x080000, 0x08ffff).ram();
+	map(0x090000, 0x093fff).ram();
+	map(0x100000, 0x107fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x183fff).ram();
+	map(0x280000, 0x281fff).ram().rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0x300000, 0x300007).w(m_k055673, FUNC(k055673_device::k053246_word_w)); // SPRITES
+	map(0x300060, 0x30006f).r(m_k055673, FUNC(k055673_device::k055673_ps_rom_word_r)); // SPRITES
+	map(0x308000, 0x30803f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
+	map(0x320000, 0x32001f).rw("k053252a", FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); // CRTC 1
+	map(0x320000, 0x32001f).rw("k053252b", FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0xff00); // CRTC 2
+	map(0x380000, 0x380001).nopw();    // watchdog reset
+	map(0x398000, 0x398001).rw(FUNC(giclassicsvr_state::control_r), FUNC(giclassicsvr_state::control_w));
+	map(0x400000, 0x41ffff).ram();
+}
 
 static INPUT_PORTS_START( giclassvr )
 INPUT_PORTS_END
@@ -295,9 +300,9 @@ void giclassicsvr_state::machine_reset()
 MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
-	MCFG_CPU_PROGRAM_MAP(satellite_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
+	MCFG_DEVICE_PROGRAM_MAP(satellite_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -314,16 +319,16 @@ MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(giclassic_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
-	MCFG_CPU_PROGRAM_MAP(server_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
+	MCFG_DEVICE_PROGRAM_MAP(server_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,7 +345,7 @@ MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(giclassicsvr_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
@@ -348,11 +353,8 @@ MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_PS, -60, 24)
 	MCFG_K055673_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252a", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16) // TODO
-
-	MCFG_DEVICE_ADD("k053252b", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16) // TODO
+	K053252(config, "k053252a", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
+	K053252(config, "k053252b", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
 MACHINE_CONFIG_END
 
 ROM_START( giclasex )
@@ -377,5 +379,5 @@ ROM_START( giclassvr )
 	ROM_LOAD32_WORD( "gsgu_760_ad02.34k", 0x000002, 0x080000, CRC(8057a417) SHA1(82d4a1d84729e9f0a8aff4c219a19601b89caf15) )
 ROM_END
 
-GAME( 1998, giclasex,  0, giclassic, giclassic, giclassic_state,    0, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
-GAME( 1998, giclassvr, 0, giclassvr, giclassvr, giclassicsvr_state, 0, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclasex, 0, giclassic, giclassic, giclassic_state,    empty_init, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclassvr,0, giclassvr, giclassvr, giclassicsvr_state, empty_init, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)

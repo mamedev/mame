@@ -240,77 +240,84 @@ WRITE8_MEMBER(liberate_state::prosport_charram_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(liberate_state::prosport_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x0200, 0x021f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_SHARE("bg_vram")
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1fff isn't charram!
-	AM_RANGE(0x2400, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-	AM_RANGE(0x8000, 0x800f) AM_WRITE(prosport_io_w)
-	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void liberate_state::prosport_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x2000).ram();
+	map(0x0200, 0x021f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x0400, 0x07ff).ram().w(FUNC(liberate_state::prosport_bg_vram_w)).share("bg_vram");
+	map(0x0800, 0x1fff).rw(FUNC(liberate_state::prosport_charram_r), FUNC(liberate_state::prosport_charram_w)); //0x1e00-0x1fff isn't charram!
+	map(0x2400, 0x2fff).ram();
+	map(0x3000, 0x33ff).ram().w(FUNC(liberate_state::liberate_colorram_w)).share("colorram");
+	map(0x3400, 0x37ff).ram().w(FUNC(liberate_state::liberate_videoram_w)).share("videoram");
+	map(0x3800, 0x3fff).ram().share("spriteram");
+	map(0x4000, 0xffff).rom();
+	map(0x8000, 0x800f).w(FUNC(liberate_state::prosport_io_w));
+	map(0x8000, 0x800f).bankr("bank1");
+}
 
-ADDRESS_MAP_START(liberate_state::liberate_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_SHARE("scratchram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
-	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void liberate_state::liberate_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x3fff).rom(); /* Mirror of main rom */
+	map(0x4000, 0x7fff).r(FUNC(liberate_state::deco16_bank_r));
+	map(0x4000, 0x43ff).w(FUNC(liberate_state::liberate_colorram_w)).share("colorram");
+	map(0x4400, 0x47ff).w(FUNC(liberate_state::liberate_videoram_w)).share("videoram");
+	map(0x4800, 0x4fff).writeonly().share("spriteram");
+	map(0x6200, 0x67ff).writeonly().share("scratchram");
+	map(0x8000, 0xffff).rom();
+	map(0x8000, 0x800f).w(FUNC(liberate_state::deco16_io_w));
+	map(0x8000, 0x800f).bankr("bank1");
+}
 
-ADDRESS_MAP_START(liberate_state::decrypted_opcodes_map)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void liberate_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x8000, 0xffff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(liberate_state::prosoccr_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(prosoccr_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x800) AM_WRITE(liberate_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4c00, 0x4fff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_SHARE("scratchram")
-	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(prosoccr_charram_r, prosoccr_charram_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(prosoccr_char_bank_w)
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void liberate_state::prosoccr_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x3fff).rom(); /* Mirror of main rom */
+	map(0x4000, 0x7fff).r(FUNC(liberate_state::prosoccr_bank_r));
+	map(0x4000, 0x43ff).mirror(0x800).w(FUNC(liberate_state::liberate_colorram_w)).share("colorram");
+	map(0x4400, 0x47ff).w(FUNC(liberate_state::liberate_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).writeonly().share("spriteram");
+	map(0x6200, 0x67ff).writeonly().share("scratchram");
+	map(0x8000, 0x97ff).rw(FUNC(liberate_state::prosoccr_charram_r), FUNC(liberate_state::prosoccr_charram_w));
+	map(0x9800, 0x9800).w(FUNC(liberate_state::prosoccr_char_bank_w));
+	map(0xa000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(liberate_state::deco16_io_map)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(deco16_bank_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
-ADDRESS_MAP_END
+void liberate_state::deco16_io_map(address_map &map)
+{
+	map(0x00, 0x00).portr("IN0").w(FUNC(liberate_state::deco16_bank_w));
+	map(0x01, 0x01).portr("TILT");
+}
 
-ADDRESS_MAP_START(liberate_state::prosoccr_io_map)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(prosoccr_io_bank_w)
+void liberate_state::prosoccr_io_map(address_map &map)
+{
+	map(0x00, 0x00).portr("IN0").w(FUNC(liberate_state::prosoccr_io_bank_w));
 	//AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(liberate_state::liberatb_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x00fe, 0x00fe) AM_READ_PORT("IN0")
-	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_SHARE("scratchram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0xf000, 0xf00f) AM_WRITE(deco16_io_w)
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN1")
-	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("IN2")
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
-	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+void liberate_state::liberatb_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x00fe, 0x00fe).portr("IN0");
+	map(0x1000, 0x3fff).rom(); /* Mirror of main rom */
+	map(0x4000, 0x7fff).r(FUNC(liberate_state::deco16_bank_r));
+	map(0x4000, 0x43ff).w(FUNC(liberate_state::liberate_colorram_w)).share("colorram");
+	map(0x4400, 0x47ff).w(FUNC(liberate_state::liberate_videoram_w)).share("videoram");
+	map(0x4800, 0x4fff).writeonly().share("spriteram");
+	map(0x6200, 0x67ff).writeonly().share("scratchram");
+	map(0x8000, 0xffff).rom();
+	map(0xf000, 0xf00f).w(FUNC(liberate_state::deco16_io_w));
+	map(0xf000, 0xf000).portr("IN1");
+	map(0xf001, 0xf001).portr("IN2");
+	map(0xf002, 0xf002).portr("IN3");
+	map(0xf003, 0xf003).portr("DSW1");
+	map(0xf004, 0xf004).portr("DSW2");
+}
 
 /*************************************
  *
@@ -318,27 +325,29 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(liberate_state::prosoccr_sound_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8912_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8912_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8912_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8912_device, address_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xc000) AM_WRITENOP //irq ack
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void liberate_state::prosoccr_sound_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x2000, 0x2000).w("ay1", FUNC(ay8912_device::data_w));
+	map(0x4000, 0x4000).w("ay1", FUNC(ay8912_device::address_w));
+	map(0x6000, 0x6000).w("ay2", FUNC(ay8912_device::data_w));
+	map(0x8000, 0x8000).w("ay2", FUNC(ay8912_device::address_w));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xc000).nopw(); //irq ack
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(liberate_state::liberate_sound_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay1", ay8912_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8912_device, address_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8912_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8912_device, address_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void liberate_state::liberate_sound_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x1000, 0x1000).nopw();
+	map(0x3000, 0x3000).w("ay1", FUNC(ay8912_device::data_w));
+	map(0x4000, 0x4000).w("ay1", FUNC(ay8912_device::address_w));
+	map(0x7000, 0x7000).w("ay2", FUNC(ay8912_device::data_w));
+	map(0x8000, 0x8000).w("ay2", FUNC(ay8912_device::address_w));
+	map(0xb000, 0xb000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xffff).rom();
+}
 
 /*************************************
  *
@@ -646,14 +655,14 @@ static const gfx_layout pro_tiles =
 };
 
 
-static GFXDECODE_START( liberate )
+static GFXDECODE_START( gfx_liberate )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, sprites,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tiles1,      0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tiles2,      0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( prosport )
+static GFXDECODE_START( gfx_prosport )
 	GFXDECODE_ENTRY( "prosport_fg_gfx",  0x00000, charlayout,  0, 4 )
 	GFXDECODE_ENTRY( "protenns_fg_gfx",  0x00000, charlayout,  0, 4 )
 	GFXDECODE_ENTRY( "probowl_fg_gfx",   0x00000, charlayout,  0, 4 )
@@ -665,7 +674,7 @@ static GFXDECODE_START( prosport )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, pro_tiles,   0, 4 ) //backgrounds
 GFXDECODE_END
 
-static GFXDECODE_START( prosoccr )
+static GFXDECODE_START( gfx_prosoccr )
 	GFXDECODE_ENTRY( "fg_gfx", 0x00000, charlayout,        0, 4 )
 	GFXDECODE_ENTRY( "sp_gfx", 0x00000, sprites,           0, 4 )
 	GFXDECODE_ENTRY( "bg_gfx", 0x00000, prosoccr_bg_gfx,   8, 2 )
@@ -677,26 +686,30 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(liberate_state::deco16_interrupt)
+WRITE_LINE_MEMBER(liberate_state::deco16_interrupt)
 {
-	int p = ~ioport("IN3")->read();
-	if ((p & 0x43) && !m_latch)
+	if (state)
 	{
-		device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
-		m_latch = 1;
-	}
-	else
-	{
-		if (!(p & 0x43))
-			m_latch = 0;
+		int p = ~ioport("IN3")->read();
+		if ((p & 0x43) && !m_latch)
+		{
+			m_maincpu->set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
+			m_latch = 1;
+		}
+		else
+		{
+			if (!(p & 0x43))
+				m_latch = 0;
+		}
 	}
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
+WRITE_LINE_MEMBER(liberate_state::prosport_interrupt)
 {
 	/* ??? */
-	device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
+	if (state)
+		m_maincpu->set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
 }
 #endif
 
@@ -731,14 +744,13 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 MACHINE_CONFIG_START(liberate_state::liberate_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
-	MCFG_CPU_PROGRAM_MAP(liberate_map)
-	MCFG_CPU_IO_MAP(deco16_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
+	MCFG_DEVICE_ADD("maincpu",DECO16, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(liberate_map)
+	MCFG_DEVICE_IO_MAP(deco16_io_map)
 
-	MCFG_CPU_ADD("audiocpu",DECO_222, 1500000) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
-	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
+	MCFG_DEVICE_ADD("audiocpu",DECO_222, 1500000) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
+	MCFG_DEVICE_PROGRAM_MAP(liberate_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -753,38 +765,38 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", liberate)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_liberate)
 	MCFG_PALETTE_ADD("palette", 33)
 	MCFG_PALETTE_INIT_OWNER(liberate_state,liberate)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,liberate)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::liberate)
 	liberate_base(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::liberatb)
 	liberate_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(liberatb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
+	MCFG_DEVICE_REPLACE("maincpu", M6502, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(liberatb_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::boomrang)
@@ -799,14 +811,14 @@ MACHINE_CONFIG_START(liberate_state::prosoccr)
 	liberate_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(10000000/8) //xtal is unknown?
-	MCFG_CPU_PROGRAM_MAP(prosoccr_map)
-	MCFG_CPU_IO_MAP(prosoccr_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(10000000/8) //xtal is unknown?
+	MCFG_DEVICE_PROGRAM_MAP(prosoccr_map)
+	MCFG_DEVICE_IO_MAP(prosoccr_io_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
-	MCFG_CPU_PROGRAM_MAP(prosoccr_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
+	MCFG_DEVICE_PROGRAM_MAP(prosoccr_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -814,7 +826,7 @@ MACHINE_CONFIG_START(liberate_state::prosoccr)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosoccr)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", prosoccr)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_prosoccr)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
@@ -822,14 +834,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(liberate_state::prosport)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO16, 2000000)
-	MCFG_CPU_PROGRAM_MAP(prosport_map)
-	MCFG_CPU_IO_MAP(deco16_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
+	MCFG_DEVICE_ADD("maincpu", DECO16, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(prosport_map)
+	MCFG_DEVICE_IO_MAP(deco16_io_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000/2) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
-	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", DECO_222, 1500000/2) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
+	MCFG_DEVICE_PROGRAM_MAP(liberate_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -844,22 +855,23 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prosport)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prosport)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosport)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1271,25 +1283,23 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(liberate_state,prosport)
+void liberate_state::init_prosport()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
-	int i;
-
 	/* Main cpu has the nibbles swapped */
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 		RAM[i] = ((RAM[i] & 0x0f) << 4) | ((RAM[i] & 0xf0) >> 4);
 
 }
 
-DRIVER_INIT_MEMBER(liberate_state,yellowcb)
+void liberate_state::init_yellowcb()
 {
-	DRIVER_INIT_CALL(prosport);
+	init_prosport();
 
 	m_maincpu->space(AS_PROGRAM).install_read_port(0xa000, 0xa000, "IN0");
 }
 
-DRIVER_INIT_MEMBER(liberate_state,liberate)
+void liberate_state::init_liberate()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -1307,14 +1317,14 @@ DRIVER_INIT_MEMBER(liberate_state,liberate)
  *
  *************************************/
 
-GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Soccer", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, prosport,  0,        prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Sports - Bowling, Tennis, and Golf", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, prosporta, prosport, prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation (Digital Controls license)", "Pro Sports - Bowling, Tennis, and Golf (USA)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boomrang,  0,        boomrang,  boomrang, liberate_state, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boomranga, boomrang, boomrang,  boomrang, liberate_state, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kamikcab,  0,        boomrang,  kamikcab, liberate_state, prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, yellowcbj, kamikcab, boomrang,  yellowcb, liberate_state, yellowcb, ROT270, "Data East Corporation", "Yellow Cab (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, yellowcbb, kamikcab, boomrang,  yellowcb, liberate_state, yellowcb, ROT270, "bootleg",               "Yellow Cab (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, liberate,  0,        liberate,  liberate, liberate_state, liberate, ROT270, "Data East Corporation", "Liberation", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dualaslt,  liberate, liberate,  dualaslt, liberate_state, liberate, ROT270, "Data East USA",         "Dual Assault", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, liberateb, liberate, liberatb,  liberatb, liberate_state, prosport, ROT270, "bootleg",               "Liberation (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, prosoccr,  0,        prosoccr, prosoccr, liberate_state, init_prosport, ROT270, "Data East Corporation", "Pro Soccer", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, prosport,  0,        prosport, prosport, liberate_state, init_prosport, ROT270, "Data East Corporation", "Pro Sports - Bowling, Tennis, and Golf", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, prosporta, prosport, prosport, prosport, liberate_state, init_prosport, ROT270, "Data East Corporation (Digital Controls license)", "Pro Sports - Bowling, Tennis, and Golf (USA)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boomrang,  0,        boomrang, boomrang, liberate_state, init_prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boomranga, boomrang, boomrang, boomrang, liberate_state, init_prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kamikcab,  0,        boomrang, kamikcab, liberate_state, init_prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, yellowcbj, kamikcab, boomrang, yellowcb, liberate_state, init_yellowcb, ROT270, "Data East Corporation", "Yellow Cab (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, yellowcbb, kamikcab, boomrang, yellowcb, liberate_state, init_yellowcb, ROT270, "bootleg",               "Yellow Cab (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, liberate,  0,        liberate, liberate, liberate_state, init_liberate, ROT270, "Data East Corporation", "Liberation", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dualaslt,  liberate, liberate, dualaslt, liberate_state, init_liberate, ROT270, "Data East USA",         "Dual Assault", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, liberateb, liberate, liberatb, liberatb, liberate_state, init_prosport, ROT270, "bootleg",               "Liberation (bootleg)", MACHINE_SUPPORTS_SAVE )

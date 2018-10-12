@@ -60,19 +60,22 @@ public:
 		, m_sq1vfd(*this, "sq1vfd")
 	{ }
 
+	void asrx(machine_config &config);
+	void asr(machine_config &config);
+
+	void init_asr();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<es5510_device> m_esp;
 	optional_device<esq_5505_5510_pump_device> m_pump;
 	required_device<esq2x40_sq1_device> m_sq1vfd;
-	
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DRIVER_INIT(asr);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
-	void asrx(machine_config &config);
-	void asr(machine_config &config);
 	void asr_map(address_map &map);
 	void asrx_map(address_map &map);
 };
@@ -91,16 +94,18 @@ void esqasr_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(esqasr_state::asr_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void esqasr_state::asr_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom().region("maincpu", 0);
+	map(0xf00000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(esqasr_state::asrx_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x08000000, 0x081fffff) AM_RAM
-	AM_RANGE(0x0be00000, 0x0befffff) AM_RAM
-ADDRESS_MAP_END
+void esqasr_state::asrx_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom().region("maincpu", 0);
+	map(0x08000000, 0x081fffff).ram();
+	map(0x0be00000, 0x0befffff).ram();
+}
 
 WRITE_LINE_MEMBER(esqasr_state::esq5506_otto_irq)
 {
@@ -112,69 +117,71 @@ READ16_MEMBER(esqasr_state::esq5506_read_adc)
 }
 
 MACHINE_CONFIG_START(esqasr_state::asr)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // actually MC68302
-	MCFG_CPU_PROGRAM_MAP(asr_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // actually MC68302
+	MCFG_DEVICE_PROGRAM_MAP(asr_map)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
-	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL(16'000'000))
+
+	MCFG_DEVICE_ADD("ensoniq", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
 	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
 	MCFG_ES5506_CHANNELS(4)          /* channels, Not verified from real hardware */
-	MCFG_ES5506_IRQ_CB(WRITELINE(esqasr_state, esq5506_otto_irq)) /* irq */
-	MCFG_ES5506_READ_PORT_CB(READ16(esqasr_state, esq5506_read_adc))
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_ES5506_IRQ_CB(WRITELINE(*this, esqasr_state, esq5506_otto_irq)) /* irq */
+	MCFG_ES5506_READ_PORT_CB(READ16(*this, esqasr_state, esq5506_read_adc))
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esqasr_state::asrx)
-	MCFG_CPU_ADD("maincpu", M68340, XTAL(16'000'000)) // 68340
-	MCFG_CPU_PROGRAM_MAP(asrx_map)
+	MCFG_DEVICE_ADD("maincpu", M68340, XTAL(16'000'000)) // 68340
+	MCFG_DEVICE_PROGRAM_MAP(asrx_map)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000)) // Actually ES5511
+	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000)) // Actually ES5511
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32)) // Actually ES5511
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32)) // Actually ES5511
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
-	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL(16'000'000))
+
+	MCFG_DEVICE_ADD("ensoniq", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
 	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
 	MCFG_ES5506_CHANNELS(1)          /* channels */
-	MCFG_ES5506_IRQ_CB(WRITELINE(esqasr_state, esq5506_otto_irq)) /* irq */
-	MCFG_ES5506_READ_PORT_CB(READ16(esqasr_state, esq5506_read_adc))
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_ES5506_IRQ_CB(WRITELINE(*this, esqasr_state, esq5506_otto_irq)) /* irq */
+	MCFG_ES5506_READ_PORT_CB(READ16(*this, esqasr_state, esq5506_read_adc))
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( asr )
@@ -202,9 +209,9 @@ ROM_START( asrx )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqasr_state, asr)
+void esqasr_state::init_asr()
 {
 }
 
-CONS( 1992, asr10, 0, 0, asr, asr, esqasr_state, asr, "Ensoniq", "ASR-10", MACHINE_NOT_WORKING )
-CONS( 1997, asrx,  0, 0, asrx,asr, esqasr_state, asr, "Ensoniq", "ASR-X", MACHINE_NOT_WORKING )
+CONS( 1992, asr10, 0, 0, asr, asr, esqasr_state, init_asr, "Ensoniq", "ASR-10", MACHINE_NOT_WORKING )
+CONS( 1997, asrx,  0, 0, asrx,asr, esqasr_state, init_asr, "Ensoniq", "ASR-X",  MACHINE_NOT_WORKING )

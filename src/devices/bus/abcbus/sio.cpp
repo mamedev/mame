@@ -76,10 +76,11 @@ const tiny_rom_entry *abc_sio_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc_sio_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(4'915'200))
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80DART, 0)
-MACHINE_CONFIG_END
+void abc_sio_device::device_add_mconfig(machine_config &config)
+{
+	Z80CTC(config, m_ctc, XTAL(4'915'200));
+	Z80DART(config, m_sio, 0);
+}
 
 
 

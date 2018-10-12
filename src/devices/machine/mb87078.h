@@ -12,24 +12,12 @@
 
 #pragma once
 
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_MB87078_GAIN_CHANGED_CB(_devcb) \
-	devcb = &downcast<mb87078_device &>(*device).set_gain_changed_callback(DEVCB_##_devcb);
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
 class mb87078_device : public device_t
 {
 public:
-	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_gain_changed_callback(Object &&cb) { return m_gain_changed_cb.set_callback(std::forward<Object>(cb)); }
+	auto gain_changed() { return m_gain_changed_cb.bind(); }
 
 	void data_w(int data, int dsel);
 	void reset_comp_w(int level);

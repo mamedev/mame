@@ -146,97 +146,101 @@ WRITE16_MEMBER(spbactn_state::main_irq_ack_w)
 	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(spbactn_state::spbactn_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x40000, 0x43fff) AM_RAM   // main ram
-	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
-	AM_RANGE(0x60000, 0x67fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
-	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")
-	AM_RANGE(0x90020, 0x90021) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x90030, 0x90031) AM_READ_PORT("DSW1")
-	AM_RANGE(0x90040, 0x90041) AM_READ_PORT("DSW2")
+void spbactn_state::spbactn_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom();
+	map(0x40000, 0x43fff).ram();   // main ram
+	map(0x50000, 0x50fff).ram().share("spvideoram");
+	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
+	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
+	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x90000, 0x90001).portr("IN0");
+	map(0x90010, 0x90011).portr("IN1");
+	map(0x90020, 0x90021).portr("SYSTEM");
+	map(0x90030, 0x90031).portr("DSW1");
+	map(0x90040, 0x90041).portr("DSW2");
 
 	/* this are an awful lot of unknowns */
-	AM_RANGE(0x90000, 0x90001) AM_WRITENOP
-	AM_RANGE(0x90010, 0x90011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x90020, 0x90021) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x90030, 0x90031) AM_WRITENOP
-	AM_RANGE(0x90050, 0x90051) AM_WRITENOP
+	map(0x90000, 0x90001).nopw();
+	map(0x90011, 0x90011).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x90020, 0x90021).w(FUNC(spbactn_state::main_irq_ack_w));
+	map(0x90030, 0x90031).nopw();
+	map(0x90050, 0x90051).nopw();
 
-	AM_RANGE(0x90080, 0x90081) AM_WRITENOP
-	AM_RANGE(0x90090, 0x90091) AM_WRITENOP
-	AM_RANGE(0x900a0, 0x900a1) AM_WRITENOP
-	AM_RANGE(0x900b0, 0x900b1) AM_WRITENOP
-	AM_RANGE(0x900c0, 0x900c1) AM_WRITENOP
-	AM_RANGE(0x900d0, 0x900d1) AM_WRITENOP
-	AM_RANGE(0x900e0, 0x900e1) AM_WRITENOP
-	AM_RANGE(0x900f0, 0x900f1) AM_WRITENOP
+	map(0x90080, 0x90081).nopw();
+	map(0x90090, 0x90091).nopw();
+	map(0x900a0, 0x900a1).nopw();
+	map(0x900b0, 0x900b1).nopw();
+	map(0x900c0, 0x900c1).nopw();
+	map(0x900d0, 0x900d1).nopw();
+	map(0x900e0, 0x900e1).nopw();
+	map(0x900f0, 0x900f1).nopw();
 
-	AM_RANGE(0xa0000, 0xa0001) AM_WRITENOP
-	AM_RANGE(0xa0004, 0xa0005) AM_WRITENOP
-	AM_RANGE(0xa0008, 0xa0009) AM_WRITENOP
-	AM_RANGE(0xa000c, 0xa000d) AM_WRITENOP
-	AM_RANGE(0xa0010, 0xa0011) AM_WRITENOP
+	map(0xa0000, 0xa0001).nopw();
+	map(0xa0004, 0xa0005).nopw();
+	map(0xa0008, 0xa0009).nopw();
+	map(0xa000c, 0xa000d).nopw();
+	map(0xa0010, 0xa0011).nopw();
 
-	AM_RANGE(0xa0100, 0xa0101) AM_WRITENOP
-	AM_RANGE(0xa0104, 0xa0105) AM_WRITENOP
-	AM_RANGE(0xa0108, 0xa0109) AM_WRITENOP
-	AM_RANGE(0xa010c, 0xa010d) AM_WRITENOP
-	AM_RANGE(0xa0110, 0xa0111) AM_WRITENOP
+	map(0xa0100, 0xa0101).nopw();
+	map(0xa0104, 0xa0105).nopw();
+	map(0xa0108, 0xa0109).nopw();
+	map(0xa010c, 0xa010d).nopw();
+	map(0xa0110, 0xa0111).nopw();
 
-	AM_RANGE(0xa0200, 0xa0201) AM_WRITENOP
-	AM_RANGE(0xa0202, 0xa0203) AM_WRITENOP
-	AM_RANGE(0xa0204, 0xa0205) AM_WRITENOP
-	AM_RANGE(0xa0206, 0xa0207) AM_WRITENOP
-ADDRESS_MAP_END
-
-
-
-ADDRESS_MAP_START(spbactn_state::spbactnp_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x40000, 0x43fff) AM_RAM   // main ram
-	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
-	AM_RANGE(0x60000, 0x67fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // yes R and G are swapped vs. the released version
-
-	AM_RANGE(0x90002, 0x90003) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x90006, 0x90007) AM_WRITE(spbatnp_90006_w)
-	AM_RANGE(0x9000a, 0x9000b) AM_WRITE(spbatnp_9000a_w)
-	AM_RANGE(0x9000c, 0x9000d) AM_WRITE(spbatnp_9000c_w)
-	AM_RANGE(0x9000e, 0x9000f) AM_WRITE(spbatnp_9000e_w)
-
-	AM_RANGE(0x90124, 0x90125) AM_WRITE(spbatnp_90124_w) // bg scroll
-	AM_RANGE(0x9012c, 0x9012d) AM_WRITE(spbatnp_9012c_w) // bg scroll
+	map(0xa0200, 0xa0201).nopw();
+	map(0xa0202, 0xa0203).nopw();
+	map(0xa0204, 0xa0205).nopw();
+	map(0xa0206, 0xa0207).nopw();
+}
 
 
 
-	AM_RANGE(0x90000, 0x900ff) AM_READ(temp_read_handler_r) // temp
+void spbactn_state::spbactnp_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom();
+	map(0x40000, 0x43fff).ram();   // main ram
+	map(0x50000, 0x50fff).ram().share("spvideoram");
+	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
+	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
+	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // yes R and G are swapped vs. the released version
 
-ADDRESS_MAP_END
+	map(0x90002, 0x90003).w(FUNC(spbactn_state::main_irq_ack_w));
+	map(0x90006, 0x90007).w(FUNC(spbactn_state::spbatnp_90006_w));
+	map(0x9000a, 0x9000b).w(FUNC(spbactn_state::spbatnp_9000a_w));
+	map(0x9000c, 0x9000d).w(FUNC(spbactn_state::spbatnp_9000c_w));
+	map(0x9000e, 0x9000f).w(FUNC(spbactn_state::spbatnp_9000e_w));
 
-ADDRESS_MAP_START(spbactn_state::spbactn_sound_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_device, write)
-
-	AM_RANGE(0xfc00, 0xfc00) AM_READNOP AM_WRITENOP /* irq ack ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+	map(0x90124, 0x90125).w(FUNC(spbactn_state::spbatnp_90124_w)); // bg scroll
+	map(0x9012c, 0x9012d).w(FUNC(spbactn_state::spbatnp_9012c_w)); // bg scroll
 
 
 
-ADDRESS_MAP_START(spbactn_state::spbactnp_extra_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("extraram2")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE( extraram_w ) AM_SHARE("extraram")
-	AM_RANGE(0xd200, 0xd200) AM_RAM
-ADDRESS_MAP_END
+	map(0x90000, 0x900ff).r(FUNC(spbactn_state::temp_read_handler_r)); // temp
+
+}
+
+void spbactn_state::spbactn_sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf810, 0xf811).w("ymsnd", FUNC(ym3812_device::write));
+
+	map(0xfc00, 0xfc00).nopr().nopw(); /* irq ack ?? */
+	map(0xfc20, 0xfc20).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
+
+
+
+void spbactn_state::spbactnp_extra_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram().share("extraram2");
+	map(0xe000, 0xefff).ram();
+	map(0xd000, 0xd1ff).ram().w(FUNC(spbactn_state::extraram_w)).share("extraram");
+	map(0xd200, 0xd200).ram();
+}
 
 
 
@@ -360,7 +364,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( spbactn )
+static GFXDECODE_START( gfx_spbactn )
 	GFXDECODE_ENTRY( "gfx1", 0, fgtilelayout,   0x0200, 16 + 240 )
 	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x0300, 16 + 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x0000, 0x1000 )
@@ -392,7 +396,7 @@ static const gfx_layout proto_spr_layout =
 };
 
 
-static GFXDECODE_START( spbactnp )
+static GFXDECODE_START( gfx_spbactnp )
 	GFXDECODE_ENTRY( "gfx1", 0, proto_fgtilelayout,   0x0200, 16 + 240 )
 	GFXDECODE_ENTRY( "gfx2", 0, proto_fgtilelayout,   0x0300, 16 + 128 ) // wrong
 	GFXDECODE_ENTRY( "gfx3", 0, proto_spr_layout,   0x0000, 16 + 384 )
@@ -405,12 +409,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(spbactn_state::spbactn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(spbactn_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactn_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactn_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -427,7 +431,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spbactn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactn)
 	MCFG_PALETTE_ADD("palette", 0x2800/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -441,16 +445,16 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_TECMO_MIXER_BGPEN(0x800 + 0x300)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -458,18 +462,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(spbactn_state::spbactnp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(spbactnp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactnp_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactn_sound_map)
 
 	// yes another cpu..
-	MCFG_CPU_ADD("extracpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(spbactnp_extra_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq0_line_hold)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("extracpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactnp_extra_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  irq0_line_hold)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  nmi_line_pulse)
 
 
 	/* video hardware */
@@ -481,7 +485,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactnp)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactnp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spbactnp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactnp)
 	MCFG_PALETTE_ADD("palette", 0x2800/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
@@ -495,16 +499,16 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_TECMO_MIXER_BGPEN(0x800 + 0x300)
 
 	/* sound hardware  - different? */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -602,6 +606,6 @@ ROM_START( spbactnp )
 	ROM_LOAD( "tcm1.19g.bin", 0x00000, 0x53, CRC(2c54354a) SHA1(11d8b6cdaf052b5a9fbcf6b6fbf99c5f89575cfa) )
 ROM_END
 
-GAME( 1991, spbactn,  0,       spbactn,  spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, spbactnj, spbactn, spbactn,  spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!
+GAME( 1991, spbactn,  0,       spbactn,  spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, spbactnj, spbactn, spbactn,  spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!

@@ -75,54 +75,57 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_sound_bank_w)
 WRITE8_MEMBER(pokechmp_state::pokechmp_sound_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 
 
-ADDRESS_MAP_START(pokechmp_state::pokechmp_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pokechmp_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_SHARE("spriteram")
+void pokechmp_state::pokechmp_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0fff).ram().w(FUNC(pokechmp_state::pokechmp_videoram_w)).share("videoram");
+	map(0x1000, 0x11ff).ram().share("spriteram");
 
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1801, 0x1801) AM_WRITE(pokechmp_flipscreen_w)
+	map(0x1800, 0x1800).portr("P1");
+	map(0x1801, 0x1801).w(FUNC(pokechmp_state::pokechmp_flipscreen_w));
 	/* 1800 - 0x181f are unused BAC-06 registers, see video/dec0.c */
-	AM_RANGE(0x1802, 0x181f) AM_WRITENOP
+	map(0x1802, 0x181f).nopw();
 
-	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2") AM_WRITE(pokechmp_sound_w)
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pokechmp_bank_w)
+	map(0x1a00, 0x1a00).portr("P2").w(FUNC(pokechmp_state::pokechmp_sound_w));
+	map(0x1c00, 0x1c00).portr("DSW").w(FUNC(pokechmp_state::pokechmp_bank_w));
 
 	/* Extra on Poke Champ (not on Pocket Gal) */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("fixed")
-ADDRESS_MAP_END
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).bankr("fixed");
+}
 
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(pokechmp_state::pokechmp_sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0x1800, 0x1800) AM_WRITENOP    /* MSM5205 chip on Pocket Gal, not connected here? */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(pokechmp_sound_bank_w) /* sound rom bank seems to be replaced with OKI bank */
-	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE("oki", okim6295_device, read, write) // extra
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+void pokechmp_state::pokechmp_sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
+	map(0x1000, 0x1001).w("ym2", FUNC(ym3812_device::write));
+	map(0x1800, 0x1800).nopw();    /* MSM5205 chip on Pocket Gal, not connected here? */
+	map(0x2000, 0x2000).w(FUNC(pokechmp_state::pokechmp_sound_bank_w)); /* sound rom bank seems to be replaced with OKI bank */
+	map(0x2800, 0x2800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // extra
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 //  AM_RANGE(0x3400, 0x3400) AM_READ(pokechmp_adpcm_reset_r) /* not on here */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x4000, 0x7fff).bankr("bank3");
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(pokechmp_state::pokechmp_oki_map)
-	AM_RANGE(0x00000, 0x37fff) AM_ROM
-	AM_RANGE(0x38000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void pokechmp_state::pokechmp_oki_map(address_map &map)
+{
+	map(0x00000, 0x37fff).rom();
+	map(0x38000, 0x3ffff).bankr("okibank");
+}
 
 
 static INPUT_PORTS_START( pokechmp )
@@ -198,7 +201,7 @@ static const gfx_layout pokechmp_spritelayout =
 };
 
 
-static GFXDECODE_START( pokechmp )
+static GFXDECODE_START( gfx_pokechmp )
 	GFXDECODE_ENTRY( "bgs", 0x00000, pokechmp_charlayout,   0x100, 4 ) /* chars */
 	GFXDECODE_ENTRY( "sprites", 0x00000, pokechmp_spritelayout,   0,  32 ) /* sprites */
 GFXDECODE_END
@@ -216,48 +219,55 @@ OKI M6295 (an AD65 on this board, note pin 7 is low): 1.5mhz
 
 */
 
+WRITE_LINE_MEMBER(pokechmp_state::sound_irq)
+{
+	// VBLANK is probably not the source of this interrupt
+	if (state)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
 MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(pokechmp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  nmi_line_pulse)
+	M6502(config, m_maincpu, 4_MHz_XTAL/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pokechmp_state::pokechmp_map);
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(pokechmp_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  irq0_line_hold)
+	M6502(config, m_audiocpu, 4_MHz_XTAL/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pokechmp_state::pokechmp_sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pokechmp_state, screen_update_pokechmp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pokechmp_state::screen_update_pokechmp));
+	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	screen.screen_vblank().append(FUNC(pokechmp_state::sound_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pokechmp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pokechmp)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(4'000'000)/4)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(4'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL(24'000'000)/16)
+	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(24'000'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/16, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000)/16, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, pokechmp_oki_map)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(pokechmp_state,pokechmp)
+void pokechmp_state::init_pokechmp()
 {
 	// default sound rom bank
 	membank("bank3")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
@@ -347,6 +357,6 @@ ROM_START(billlist)
 	ROM_LOAD("billiard_list.x", 0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
 ROM_END
 
-GAME( 1995, pokechmp, 0,        pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 1)", 0 )
-GAME( 1995, pokechmpa,pokechmp, pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 2)", 0 )
-GAME( 1995, billlist, pokechmp, pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Billard List", 0)
+GAME( 1995, pokechmp, 0,        pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 1)", 0 )
+GAME( 1995, pokechmpa,pokechmp, pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 2)", 0 )
+GAME( 1995, billlist, pokechmp, pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Billard List", 0)

@@ -21,6 +21,7 @@
 #include "formats/sorc_dsk.h"
 #include "formats/sorc_cas.h"
 #include "machine/micropolis.h"
+#include "machine/wd_fdc.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -44,6 +45,33 @@ struct cass_data_t {
 class sorcerer_state : public driver_device
 {
 public:
+	sorcerer_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cassette1(*this, "cassette")
+		, m_cassette2(*this, "cassette2")
+		, m_wave1(*this, "wave")
+		, m_wave2(*this, "wave2")
+		, m_uart(*this, "uart")
+		, m_rs232(*this, "rs232")
+		, m_centronics(*this, "centronics")
+		, m_cart(*this, "cartslot")
+		, m_ram(*this, RAM_TAG)
+		, m_fdc(*this, "fdc")
+		, m_fdc2(*this, "fdc2")
+		, m_floppy20(*this, "fdc2:0")
+		, m_floppy21(*this, "fdc2:1")
+		, m_iop_config(*this, "CONFIG")
+		, m_iop_vs(*this, "VS")
+		, m_iop_x(*this, "X.%u", 0)
+	{ }
+
+	void sorcerer(machine_config &config);
+	void sorcererd(machine_config &config);
+
+	void init_sorcerer();
+
+private:
 	enum
 	{
 		TIMER_SERIAL,
@@ -51,42 +79,32 @@ public:
 		TIMER_RESET
 	};
 
-	sorcerer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_cassette1(*this, "cassette")
-		, m_cassette2(*this, "cassette2")
-		, m_wave1(*this, WAVE_TAG)
-		, m_wave2(*this, WAVE2_TAG)
-		, m_uart(*this, "uart")
-		, m_rs232(*this, "rs232")
-		, m_centronics(*this, "centronics")
-		, m_cart(*this, "cartslot")
-		, m_ram(*this, RAM_TAG)
-		, m_iop_config(*this, "CONFIG")
-		, m_iop_vs(*this, "VS")
-		, m_iop_x(*this, "X.%u", 0)
-	{ }
-
-	DECLARE_READ8_MEMBER(sorcerer_fd_r);
-	DECLARE_READ8_MEMBER(sorcerer_fe_r);
-	DECLARE_WRITE8_MEMBER(sorcerer_fd_w);
-	DECLARE_WRITE8_MEMBER(sorcerer_fe_w);
-	DECLARE_WRITE8_MEMBER(sorcerer_ff_w);
+	DECLARE_READ8_MEMBER(port_fd_r);
+	DECLARE_READ8_MEMBER(port_fe_r);
+	DECLARE_WRITE8_MEMBER(port_2c_w);
+	DECLARE_WRITE8_MEMBER(port_fd_w);
+	DECLARE_WRITE8_MEMBER(port_fe_w);
+	DECLARE_WRITE8_MEMBER(port_ff_w);
+	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_MACHINE_START(sorcererd);
-	DECLARE_DRIVER_INIT(sorcerer);
-	TIMER_CALLBACK_MEMBER(sorcerer_cassette_tc);
-	TIMER_CALLBACK_MEMBER(sorcerer_serial_tc);
+
+	TIMER_CALLBACK_MEMBER(cassette_tc);
+	TIMER_CALLBACK_MEMBER(serial_tc);
 	TIMER_CALLBACK_MEMBER(sorcerer_reset);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( sorcerer );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( sorcerer);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sorcerer(machine_config &config);
-	void sorcererd(machine_config &config);
+
 	void sorcerer_io(address_map &map);
+	void sorcererd_io(address_map &map);
 	void sorcerer_mem(address_map &map);
 	void sorcererd_mem(address_map &map);
-private:
+
+	bool m_wait;
+	bool m_drq_off;
+	bool m_intrq_off;
+	uint8_t m_2c;
 	uint8_t m_fe;
 	uint8_t m_keyboard_line;
 	const uint8_t *m_p_videoram;
@@ -107,6 +125,10 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
+	optional_device<micropolis_device> m_fdc;
+	optional_device<fd1793_device> m_fdc2;
+	optional_device<floppy_connector> m_floppy20;
+	optional_device<floppy_connector> m_floppy21;
 	required_ioport m_iop_config;
 	required_ioport m_iop_vs;
 	required_ioport_array<16> m_iop_x;

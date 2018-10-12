@@ -23,7 +23,9 @@ Todo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "render.h"
 #include "speaker.h"
 
@@ -42,30 +44,23 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void init_istellar();
+	void istellar(machine_config &config);
+private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
-	uint8_t m_ldp_latch1;
-	uint8_t m_ldp_latch2;
-	uint8_t m_z80_2_nmi_enable;
-	DECLARE_READ8_MEMBER(z80_0_latch1_read);
-	DECLARE_WRITE8_MEMBER(z80_0_latch2_write);
 	DECLARE_READ8_MEMBER(z80_2_ldp_read);
-	DECLARE_READ8_MEMBER(z80_2_latch2_read);
-	DECLARE_READ8_MEMBER(z80_2_nmienable);
 	DECLARE_READ8_MEMBER(z80_2_unknown_read);
-	DECLARE_WRITE8_MEMBER(z80_2_latch1_write);
 	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
-	DECLARE_DRIVER_INIT(istellar);
 	virtual void machine_start() override;
 	uint32_t screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback_istellar);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void istellar(machine_config &config);
 	void z80_0_io(address_map &map);
 	void z80_0_mem(address_map &map);
 	void z80_1_io(address_map &map);
@@ -113,26 +108,6 @@ void istellar_state::machine_start()
 
 
 /* MEMORY HANDLERS */
-/* Z80 0 R/W */
-READ8_MEMBER(istellar_state::z80_0_latch1_read)
-{
-	/*logerror("CPU0 : reading LDP status latch (%x)\n", m_ldp_latch1);*/
-	return m_ldp_latch1;
-}
-
-WRITE8_MEMBER(istellar_state::z80_0_latch2_write)
-{
-	/*logerror("CPU0 : writing cpu_latch2 (%x).  Potentially followed by an IRQ.\n", data);*/
-	m_ldp_latch2 = data;
-
-	/* A CPU2 NMI */
-	if (m_z80_2_nmi_enable)
-	{
-		logerror("Executing an NMI on CPU2\n");
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);      /* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
-		m_z80_2_nmi_enable = 0;
-	}
-}
 
 
 /* Z80 1 R/W */
@@ -146,29 +121,10 @@ READ8_MEMBER(istellar_state::z80_2_ldp_read)
 	return readResult;
 }
 
-READ8_MEMBER(istellar_state::z80_2_latch2_read)
-{
-	logerror("CPU2 : reading latch2 (%x)\n", m_ldp_latch2);
-	return m_ldp_latch2;
-}
-
-READ8_MEMBER(istellar_state::z80_2_nmienable)
-{
-	logerror("CPU2 : ENABLING NMI\n");
-	m_z80_2_nmi_enable = 1;
-	return 0x00;
-}
-
 READ8_MEMBER(istellar_state::z80_2_unknown_read)
 {
 	logerror("CPU2 : c000!\n");
 	return 0x00;
-}
-
-WRITE8_MEMBER(istellar_state::z80_2_latch1_write)
-{
-	logerror("CPU2 : writing latch1 (%x)\n", data);
-	m_ldp_latch1 = data;
 }
 
 WRITE8_MEMBER(istellar_state::z80_2_ldp_write)
@@ -180,50 +136,56 @@ WRITE8_MEMBER(istellar_state::z80_2_ldp_write)
 
 
 /* PROGRAM MAPS */
-ADDRESS_MAP_START(istellar_state::z80_0_mem)
-	AM_RANGE(0x0000,0x9fff) AM_ROM
-	AM_RANGE(0xa000,0xa7ff) AM_RAM
-	AM_RANGE(0xa800,0xabff) AM_RAM AM_SHARE("tile_ram")
-	AM_RANGE(0xac00,0xafff) AM_RAM AM_SHARE("tile_ctrl_ram")
-	AM_RANGE(0xb000,0xb3ff) AM_RAM AM_SHARE("sprite_ram")
-ADDRESS_MAP_END
+void istellar_state::z80_0_mem(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xa7ff).ram();
+	map(0xa800, 0xabff).ram().share("tile_ram");
+	map(0xac00, 0xafff).ram().share("tile_ctrl_ram");
+	map(0xb000, 0xb3ff).ram().share("sprite_ram");
+}
 
-ADDRESS_MAP_START(istellar_state::z80_1_mem)
-	AM_RANGE(0x0000,0x1fff) AM_ROM
-	AM_RANGE(0x4000,0x47ff) AM_RAM
-ADDRESS_MAP_END
+void istellar_state::z80_1_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).ram();
+}
 
-ADDRESS_MAP_START(istellar_state::z80_2_mem)
-	AM_RANGE(0x0000,0x17ff) AM_ROM
-	AM_RANGE(0x1800,0x1fff) AM_RAM
-	AM_RANGE(0xc000,0xc000) AM_READ(z80_2_unknown_read)     /* Seems to be thrown away every time it's read - maybe interrupt related? */
-ADDRESS_MAP_END
+void istellar_state::z80_2_mem(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+	map(0x1800, 0x1fff).ram();
+	map(0xc000, 0xc000).r(FUNC(istellar_state::z80_2_unknown_read));     /* Seems to be thrown away every time it's read - maybe interrupt related? */
+}
 
 
 /* IO MAPS */
-ADDRESS_MAP_START(istellar_state::z80_0_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x02,0x02) AM_READ_PORT("DSW1")
-	AM_RANGE(0x03,0x03) AM_READ_PORT("DSW2")
+void istellar_state::z80_0_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x02, 0x02).portr("DSW1");
+	map(0x03, 0x03).portr("DSW2");
 	/*AM_RANGE(0x04,0x04) AM_WRITE(volatile_palette_write)*/
-	AM_RANGE(0x05,0x05) AM_READWRITE(z80_0_latch1_read,z80_0_latch2_write)
-ADDRESS_MAP_END
+	map(0x05, 0x05).r("latch1", FUNC(generic_latch_8_device::read)).w("latch2", FUNC(generic_latch_8_device::write));
+}
 
-ADDRESS_MAP_START(istellar_state::z80_1_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_NOP /*AM_READWRITE(z80_1_slatch_read,z80_1_slatch_write)*/
-	AM_RANGE(0x01,0x01) AM_NOP /*AM_READWRITE(z80_1_nmienable,z80_1_soundwrite_front)*/
-	AM_RANGE(0x02,0x02) AM_NOP /*AM_WRITE(z80_1_soundwrite_rear)*/
-ADDRESS_MAP_END
+void istellar_state::z80_1_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).noprw(); /*AM_READWRITE(z80_1_slatch_read,z80_1_slatch_write)*/
+	map(0x01, 0x01).noprw(); /*AM_READWRITE(z80_1_nmienable,z80_1_soundwrite_front)*/
+	map(0x02, 0x02).noprw(); /*AM_WRITE(z80_1_soundwrite_rear)*/
+}
 
-ADDRESS_MAP_START(istellar_state::z80_2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READWRITE(z80_2_ldp_read,z80_2_ldp_write)
-	AM_RANGE(0x01,0x01) AM_READWRITE(z80_2_latch2_read,z80_2_latch1_write)
-	AM_RANGE(0x02,0x02) AM_READ(z80_2_nmienable)
+void istellar_state::z80_2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(FUNC(istellar_state::z80_2_ldp_read), FUNC(istellar_state::z80_2_ldp_write));
+	map(0x01, 0x01).r("latch2", FUNC(generic_latch_8_device::read)).w("latch1", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).r("latch2", FUNC(generic_latch_8_device::acknowledge_r));
 /*  AM_RANGE(0x03,0x03) AM_WRITE(z80_2_ldtrans_write)*/
-ADDRESS_MAP_END
+}
 
 
 /* PORTS */
@@ -293,38 +255,45 @@ static const gfx_layout istellar_gfx_layout =
 	8*8
 };
 
-static GFXDECODE_START( istellar )
+static GFXDECODE_START( gfx_istellar )
 	GFXDECODE_ENTRY( "gfx1", 0, istellar_gfx_layout, 0x0, 0x20 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(istellar_state::vblank_callback_istellar)
+WRITE_LINE_MEMBER(istellar_state::vblank_irq)
 {
-	/* Interrupt presumably comes from VBlank */
-	device.execute().set_input_line(0, HOLD_LINE);
+	if (state)
+	{
+		/* Interrupt presumably comes from VBlank */
+		m_maincpu->set_input_line(0, HOLD_LINE);
 
-	/* Interrupt presumably comes from the LDP's status strobe */
-	m_subcpu->set_input_line(0, ASSERT_LINE);
+		/* Interrupt presumably comes from the LDP's status strobe */
+		m_subcpu->set_input_line(0, ASSERT_LINE);
+	}
 }
 
 
 /* DRIVER */
 MACHINE_CONFIG_START(istellar_state::istellar)
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
-	MCFG_CPU_IO_MAP(z80_0_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", istellar_state,  vblank_callback_istellar)
+	MCFG_DEVICE_ADD("maincpu", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(z80_0_mem)
+	MCFG_DEVICE_IO_MAP(z80_0_io)
 
 	/* sound cpu */
-	MCFG_CPU_ADD("audiocpu", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(z80_1_mem)
-	MCFG_CPU_IO_MAP(z80_1_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(z80_1_mem)
+	MCFG_DEVICE_IO_MAP(z80_1_io)
 
 	/* ldp comm cpu */
-	MCFG_CPU_ADD("sub", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(z80_2_mem)
-	MCFG_CPU_IO_MAP(z80_2_io)
+	MCFG_DEVICE_ADD("sub", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(z80_2_mem)
+	MCFG_DEVICE_IO_MAP(z80_2_io)
 
+	MCFG_GENERIC_LATCH_8_ADD("latch1")
+
+	MCFG_GENERIC_LATCH_8_ADD("latch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, istellar_state, screen_update_istellar)
@@ -332,16 +301,18 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, istellar_state, vblank_irq))
 
 	// Daphne says "TODO: get the real interstellar resistor values"
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", istellar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_istellar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -382,9 +353,9 @@ ROM_START( istellar )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(istellar_state,istellar)
+void istellar_state::init_istellar()
 {
-	m_z80_2_nmi_enable = 0;
+	//m_z80_2_nmi_enable = 0;
 
 	#if 0
 	{
@@ -403,5 +374,5 @@ DRIVER_INIT_MEMBER(istellar_state,istellar)
 	#endif
 }
 
-//    YEAR  NAME      PARENT   MACHINE    INPUT     STATE            INIT      MONITOR  COMPANY          FULLNAME                       FLAGS)
-GAME( 1983, istellar, 0,       istellar,  istellar, istellar_state,  istellar, ROT0,    "Funai/Gakken",  "Interstellar Laser Fantasy",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT   MACHINE    INPUT     STATE            INIT           MONITOR  COMPANY          FULLNAME                       FLAGS)
+GAME( 1983, istellar, 0,       istellar,  istellar, istellar_state,  init_istellar, ROT0,    "Funai/Gakken",  "Interstellar Laser Fantasy",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

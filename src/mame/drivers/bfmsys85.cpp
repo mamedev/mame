@@ -74,7 +74,8 @@ ___________________________________________________________________________
 class bfmsys85_state : public driver_device
 {
 public:
-	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag),
+	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vfd(*this, "vfd"),
 		m_maincpu(*this, "maincpu"),
 		m_reel0(*this, "reel0"),
@@ -82,28 +83,14 @@ public:
 		m_reel2(*this, "reel2"),
 		m_reel3(*this, "reel3"),
 		m_acia6850_0(*this, "acia6850_0"),
-		m_meters(*this, "meters")
-	{
-	}
+		m_meters(*this, "meters"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	int m_mmtr_latch;
-	int m_triac_latch;
-	int m_alpha_clock;
-	int m_irq_status;
-	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
 	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
 	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	int m_locked;
-	int m_is_timer_enabled;
-	int m_coin_inhibits;
-	int m_mux_output_strobe;
-	int m_mux_input_strobe;
-	int m_mux_input;
-	uint8_t m_Inputs[64];
-	uint8_t m_codec_data[256];
-	uint8_t m_sys85_data_line_t;
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 	DECLARE_READ8_MEMBER(irqlatch_r);
 	DECLARE_WRITE8_MEMBER(reel12_w);
@@ -120,12 +107,31 @@ public:
 	DECLARE_READ8_MEMBER(triac_r);
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_DRIVER_INIT(decode);
-	DECLARE_DRIVER_INIT(nodecode);
+	void init_decode();
+	void init_nodecode();
+	INTERRUPT_GEN_MEMBER(timer_irq);
+	int b85_find_project_string();
+	void bfmsys85(machine_config &config);
+	void memmap(address_map &map);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(timer_irq);
-	int b85_find_project_string( );
+
+	int m_mmtr_latch;
+	int m_triac_latch;
+	int m_alpha_clock;
+	int m_irq_status;
+	int m_optic_pattern;
+	int m_locked;
+	int m_is_timer_enabled;
+	int m_coin_inhibits;
+	int m_mux_output_strobe;
+	int m_mux_input_strobe;
+	int m_mux_input;
+	uint8_t m_Inputs[64];
+	uint8_t m_codec_data[256];
+	uint8_t m_sys85_data_line_t;
 	optional_device<rocvfd_device> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_reel0;
@@ -134,8 +140,7 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
-	void bfmsys85(machine_config &config);
-	void memmap(address_map &map);
+	output_finder<256> m_lamps;
 };
 
 #define MASTER_CLOCK    (XTAL(4'000'000))
@@ -310,13 +315,11 @@ READ8_MEMBER(bfmsys85_state::mux_ctrl_r)
 
 WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 {
-	int pattern = 0x01, i,
-	off = m_mux_output_strobe<<4;
+	int off = m_mux_output_strobe<<4;
 
-	for ( i = 0; i < 8; i++ )
+	for (int i = 0; i < 8; i++ )
 	{
-		output().set_lamp_value(off, (data & pattern ? 1 : 0));
-		pattern <<= 1;
+		m_lamps[off] = BIT(data, i);
 		off++;
 	}
 }
@@ -352,72 +355,74 @@ READ8_MEMBER(bfmsys85_state::triac_r)
 
 void bfmsys85_state::machine_start()
 {
+	m_lamps.resolve();
 }
 
 // memory map for bellfruit system85 board ////////////////////////////////
 
-ADDRESS_MAP_START(bfmsys85_state::memmap)
+void bfmsys85_state::memmap(address_map &map)
+{
 
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k RAM
-	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)         // reel 3+4 latch
-	AM_RANGE(0x2200, 0x23FF) AM_WRITE(reel12_w)         // reel 1+2 latch
-	AM_RANGE(0x2400, 0x25FF) AM_WRITE(vfd_w)            // vfd latch
+	map(0x0000, 0x1fff).ram().share("nvram"); //8k RAM
+	map(0x2000, 0x21FF).w(FUNC(bfmsys85_state::reel34_w));         // reel 3+4 latch
+	map(0x2200, 0x23FF).w(FUNC(bfmsys85_state::reel12_w));         // reel 1+2 latch
+	map(0x2400, 0x25FF).w(FUNC(bfmsys85_state::vfd_w));            // vfd latch
 
-	AM_RANGE(0x2600, 0x27FF) AM_READWRITE(mmtr_r,mmtr_w)// mechanical meter latch
-	AM_RANGE(0x2800, 0x2800) AM_READ(triac_r)           // payslide triacs
-	AM_RANGE(0x2800, 0x29FF) AM_WRITE(triac_w)          // triacs
+	map(0x2600, 0x27FF).rw(FUNC(bfmsys85_state::mmtr_r), FUNC(bfmsys85_state::mmtr_w));// mechanical meter latch
+	map(0x2800, 0x2800).r(FUNC(bfmsys85_state::triac_r));           // payslide triacs
+	map(0x2800, 0x29FF).w(FUNC(bfmsys85_state::triac_w));          // triacs
 
-	AM_RANGE(0x2A00, 0x2A00) AM_READWRITE(mux_data_r,mux_data_w)// mux
-	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE(mux_ctrl_r,mux_ctrl_w)// mux status register
-	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)        // irq latch ( MC6850 / timer )
+	map(0x2A00, 0x2A00).rw(FUNC(bfmsys85_state::mux_data_r), FUNC(bfmsys85_state::mux_data_w));// mux
+	map(0x2A01, 0x2A01).rw(FUNC(bfmsys85_state::mux_ctrl_r), FUNC(bfmsys85_state::mux_ctrl_w));// mux status register
+	map(0x2E00, 0x2E00).r(FUNC(bfmsys85_state::irqlatch_r));        // irq latch ( MC6850 / timer )
 
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x3001, 0x3001) AM_READNOP //sound latch
-	AM_RANGE(0x3200, 0x3200) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	map(0x3000, 0x3000).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x3001, 0x3001).nopr(); //sound latch
+	map(0x3200, 0x3200).w("aysnd", FUNC(ay8910_device::address_w));
 
-	AM_RANGE(0x3402, 0x3403) AM_DEVWRITE("acia6850_0", acia6850_device, write)
-	AM_RANGE(0x3406, 0x3407) AM_DEVREAD("acia6850_0", acia6850_device, read)
+	map(0x3402, 0x3403).w(m_acia6850_0, FUNC(acia6850_device::write));
+	map(0x3406, 0x3407).r(m_acia6850_0, FUNC(acia6850_device::read));
 
-	AM_RANGE(0x3600, 0x3600) AM_WRITE(mux_enable_w)     // mux enable
+	map(0x3600, 0x3600).w(FUNC(bfmsys85_state::mux_enable_w));     // mux enable
 
-	AM_RANGE(0x4000, 0xffff) AM_ROM                     // 48K ROM
-	AM_RANGE(0x8000, 0xFFFF) AM_WRITE(watchdog_w)       // kick watchdog
+	map(0x4000, 0xffff).rom();                     // 48K ROM
+	map(0x8000, 0xFFFF).w(FUNC(bfmsys85_state::watchdog_w));       // kick watchdog
 
-ADDRESS_MAP_END
+}
 
 // machine driver for system85 board //////////////////////////////////////
 
 MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
-	MCFG_CPU_PROGRAM_MAP(memmap)                        // setup read and write memorymap
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second
+	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
+	MCFG_DEVICE_PROGRAM_MAP(memmap)                        // setup read and write memorymap
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second
 	MCFG_MSC1937_ADD("vfd",0)
 
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bfmsys85_state,sys85_data_w))
+	ACIA6850(config, m_acia6850_0, 0);
+	m_acia6850_0->txd_handler().set(FUNC(bfmsys85_state::sys85_data_w));
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bfmsys85_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfmsys85_state, write_acia_clock))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd",AY8912, MASTER_CLOCK/4)          // add AY8912 soundchip
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd",AY8912, MASTER_CLOCK/4)          // add AY8912 soundchip
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")                       // load/save nv RAM
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);                       // load/save nv RAM
 
-	MCFG_STARPOINT_48STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel0_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel1_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel2_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel3_optic_cb))
+	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel0_optic_cb))
+	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel1_optic_cb))
+	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel2_optic_cb))
+	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel3_optic_cb))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 
-	MCFG_DEFAULT_LAYOUT(layout_bfmsys85)
+	config.set_default_layout(layout_bfmsys85);
 MACHINE_CONFIG_END
 
 // input ports for system85 board /////////////////////////////////////////
@@ -743,13 +748,13 @@ int bfmsys85_state::b85_find_project_string( )
 }
 
 
-DRIVER_INIT_MEMBER(bfmsys85_state,decode)
+void bfmsys85_state::init_decode()
 {
 	bfm_decode_mainrom(machine(),"maincpu", m_codec_data);
 	b85_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfmsys85_state,nodecode)
+void bfmsys85_state::init_nodecode()
 {
 	b85_find_project_string();
 }
@@ -758,98 +763,98 @@ DRIVER_INIT_MEMBER(bfmsys85_state,nodecode)
 #define MACHINE_FLAGS_MECHANICAL        MACHINE_FLAGS|MACHINE_MECHANICAL
 
 // PROJECT NUMBER 5539  2P CASH EXPLOSION  GAME No 39-350-190 -   29-MAR-1989 11:45:25
-GAME( 1989, b85cexpl    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Cash Explosion (System 85)", MACHINE_FLAGS )
+GAME( 1989, b85cexpl,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Cash Explosion (System 85)", MACHINE_FLAGS )
 
 // PROJECT NUMBER 5150  THE ROYAL 10P PLAY  GAME No 39-350-128 -   21-JAN-1988 12:42:53
-GAME( 1988, b85royal    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "The Royal (System 85)", MACHINE_FLAGS ) // 'The Royal' ?? hack of the Ritz or Big Deal Club?
+GAME( 1988, b85royal,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "The Royal (System 85)", MACHINE_FLAGS ) // 'The Royal' ?? hack of the Ritz or Big Deal Club?
 
 // PROJECT NUMBER 4957  BIGDEAL 5P PLAY  GAME No 39-350-055 -    9-MAR-1987 11:12:05
-GAME( 1987, b85bdclb    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Big Deal Club (System 85, set 1)", MACHINE_FLAGS )
+GAME( 1987, b85bdclb,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Big Deal Club (System 85, set 1)", MACHINE_FLAGS )
 // PROJECT NUMBER 5035  BIGDEAL 5P PLAY  GAME No 39-350-045 -   25-FEB-1987 14:19:41
-GAME( 1987, b85bdclba   , b85bdclb  , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Big Deal Club (System 85, set 2)", MACHINE_FLAGS )
+GAME( 1987, b85bdclba,  b85bdclb,   bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Big Deal Club (System 85, set 2)", MACHINE_FLAGS )
 // PROJECT NUMBER 5034  BIGDEAL 20P PLAY  GAME No 39-350-047 -   25-FEB-1987 12:44:21
-GAME( 1987, b85bdclbb   , b85bdclb  , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Big Deal Club (System 85, set 3)", MACHINE_FLAGS )
+GAME( 1987, b85bdclbb,  b85bdclb,   bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Big Deal Club (System 85, set 3)", MACHINE_FLAGS )
 
 
 // PROJECT NUMBER 5145  CASH BLITZ  GAME No 39-351-091 -   13-AUG-1987 11:25:29
-GAME( 1987, b85cblit    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Cash Blitz (System 85, set 1)", MACHINE_FLAGS )
+GAME( 1987, b85cblit,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Cash Blitz (System 85, set 1)", MACHINE_FLAGS )
 // PROJECT NUMBER 5145  CASH BLITZ  GAME No 39-350-091 -   13-AUG-1987 11:08:54
-GAME( 1987, b85cblita   , b85cblit  , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Cash Blitz (System 85, set 2)", MACHINE_FLAGS )
+GAME( 1987, b85cblita,  b85cblit,   bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Cash Blitz (System 85, set 2)", MACHINE_FLAGS )
 // PROJECT NUMBER 5145  CASH BLITZ  GAME No 39-350-102 -    3-NOV-1987 16:24:39
-GAME( 1987, b85cblitb   , b85cblit  , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Cash Blitz (System 85, set 3)", MACHINE_FLAGS )
+GAME( 1987, b85cblitb,  b85cblit,   bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Cash Blitz (System 85, set 3)", MACHINE_FLAGS )
 
 // PROJECT NUMBER 5495  CLUB PREMIER 5P,10P AND 20P PLAY  GAME No 39-350-187 -   28-FEB-1989 15:26:47
-GAME( 1989, b85clbpm    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Club Premier (System 85)", MACHINE_FLAGS )
+GAME( 1989, b85clbpm,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Club Premier (System 85)", MACHINE_FLAGS )
 
 
 // PROJECT NUMBER 5116  HI LO SILVER DX  GAME No 39-350-049 -   27-FEB-1987 10:49:08
-GAME( 1987, b85hilo     , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Hi Lo Silver (System 85, set 1)", MACHINE_FLAGS )
+GAME( 1987, b85hilo,    0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Hi Lo Silver (System 85, set 1)", MACHINE_FLAGS )
 // PROJECT NUMBER 5407  HI LO SILVER 2P  GAME No 39-350-142 -   12-OCT-1988 09:39:26
-GAME( 1988, b85hiloa    , b85hilo   , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Hi Lo Silver (System 85, set 2)", MACHINE_FLAGS )
+GAME( 1988, b85hiloa,   b85hilo,    bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Hi Lo Silver (System 85, set 2)", MACHINE_FLAGS )
 
 
 // PROJECT NUMBER 5104  THE RITZ 10P PLAY  GAME No 39-350-084 -   28-AUG-1987 08:44:30
-GAME( 1987, b85ritzd    , b85ritz   , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "The Ritz (System 85, set 5)", MACHINE_FLAGS )
+GAME( 1987, b85ritzd,   b85ritz,    bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "The Ritz (System 85, set 5)", MACHINE_FLAGS )
 // PROJECT NUMBER 5184  THE RITZ 5P PLAY  GAME No 39-350-137 -   25-FEB-1988 11:07:18
-GAME( 1988, b85ritz     , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "The Ritz (System 85, set 1)", MACHINE_FLAGS ) // alt version of Big Deal Club?
+GAME( 1988, b85ritz,    0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "The Ritz (System 85, set 1)", MACHINE_FLAGS ) // alt version of Big Deal Club?
 // PROJECT NUMBER 5183  THE RITZ 20P PLAY  GAME No 39-350-136 -   25-FEB-1988 11:25:52
-GAME( 1988, b85ritzb    , b85ritz   , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "The Ritz (System 85, set 3)", MACHINE_FLAGS )
+GAME( 1988, b85ritzb,   b85ritz,    bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "The Ritz (System 85, set 3)", MACHINE_FLAGS )
 // PROJECT NUMBER 5183  THE RITZ 20P PLAY  GAME No 39-350-138 -   16-MAR-1988 10:46:30
-GAME( 1988, b85ritza    , b85ritz   , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "The Ritz (System 85, set 2)", MACHINE_FLAGS )
+GAME( 1988, b85ritza,   b85ritz,    bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "The Ritz (System 85, set 2)", MACHINE_FLAGS )
 // PROJECT NUMBER 5104  THE RITZ 10P PLAY  GAME No 39-350-139 -   16-MAR-1988 11:04:27
-GAME( 1988, b85ritzc    , b85ritz   , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "The Ritz (System 85, set 4)", MACHINE_FLAGS )
+GAME( 1988, b85ritzc,   b85ritz,    bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "The Ritz (System 85, set 4)", MACHINE_FLAGS )
 
 // PROJECT NUMBER 5137  V2 10P PLAY  GAME No 39-350-115 -    9-DEC-1987 12:39:16
-GAME( 1987, b85jpclb    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Jackpot Club (System 85, set 1)", MACHINE_FLAGS )
+GAME( 1987, b85jpclb,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Jackpot Club (System 85, set 1)", MACHINE_FLAGS )
 // PROJECT NUMBER 5357  V2 20P PLAY  GAME No 39-350-112 -    7-DEC-1987 14:32:31
-GAME( 1987, b85jpclba   , b85jpclb  , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Jackpot Club (System 85, set 2)", MACHINE_FLAGS )
+GAME( 1987, b85jpclba,  b85jpclb,   bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Jackpot Club (System 85, set 2)", MACHINE_FLAGS )
 // PROJECT NUMBER 5137  V2 10P PLAY  GAME No 39-350-141 -   16-MAR-1988 11:46:48
-GAME( 1988, b85jpclbb   , b85jpclb  , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Jackpot Club (System 85, set 3)", MACHINE_FLAGS )
+GAME( 1988, b85jpclbb,  b85jpclb,   bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Jackpot Club (System 85, set 3)", MACHINE_FLAGS )
 // PROJECT NUMBER 5357  V2 20P PLAY  GAME No 39-350-140 -   16-MAR-1988 11:21:43
-GAME( 1988, b85jpclbc   , b85jpclb  , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Jackpot Club (System 85, set 4)", MACHINE_FLAGS )
+GAME( 1988, b85jpclbc,  b85jpclb,   bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Jackpot Club (System 85, set 4)", MACHINE_FLAGS )
 
 
 // PROJECT NUMBER 5368  SUPER NUDGE GAMBLER #4.00  GAME No 39-340-230 -   27-JAN-1988 14:20:43
-GAME( 1988, b85sngam    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Super Nudge Gambler (System 85)", MACHINE_FLAGS )
+GAME( 1988, b85sngam,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Super Nudge Gambler (System 85)", MACHINE_FLAGS )
 
 // PROJECT NUMBER 4766  10P KING OF CLUBS  GAME No 39-340-026 -   25-NOV-1985 08:49:11
-GAME( 199?, b85koc      , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "King of Clubs (Bellfruit) (System 85, set 1)", MACHINE_FLAGS_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
+GAME( 199?, b85koc,     0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "King of Clubs (Bellfruit) (System 85, set 1)", MACHINE_FLAGS_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
 // PROJECT NUMBER 4766  10P KING OF CLUBS  GAME No 39340002 -   16-AUG-1985 15:53:13
-GAME( 199?, b85koca     , b85koc    , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "King of Clubs (Bellfruit) (System 85, set 2)", MACHINE_FLAGS_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
+GAME( 199?, b85koca,    b85koc,     bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "King of Clubs (Bellfruit) (System 85, set 2)", MACHINE_FLAGS_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
 
 // PROJECT NUMBER 5425  BAR SEVEN ARCADE  GAME No 39-341-236 -   11-APR-1988 11:30:33
-GAME( 199?, b85cb7p     , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Bar Sevens (Bellfruit) (Protocol) (System 85)",  MACHINE_FLAGS) // seems to work better here than in sc1
+GAME( 199?, b85cb7p,    0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Bar Sevens (Bellfruit) (Protocol) (System 85)",  MACHINE_FLAGS) // seems to work better here than in sc1
 
 // PROJECT NUMBER 5596  DISCOVERY 85 - 06-APR-1990 08:57:39
-GAME( 199?, b85disc     , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM/ELAM",   "Discovey (Dutch) (Bellfruit) (System 85)", MACHINE_FLAGS_MECHANICAL ) // GAME No 39-350-251
+GAME( 199?, b85disc,    0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM/ELAM", "Discovey (Dutch) (Bellfruit) (System 85)", MACHINE_FLAGS_MECHANICAL ) // GAME No 39-350-251
 
 // PROJECT NUMBER 5452  DUTCH SUPER CARDS  GAME No 39-340-271 - 04-JAN-1989 14:39:00
-GAME( 1989, b85scard    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       nodecode,     0,       "BFM/ELAM",   "Supercards (Dutch, Game Card 39-340-271?) (System 85)", MACHINE_FLAGS )
+GAME( 1989, b85scard,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_nodecode, 0, "BFM/ELAM", "Supercards (Dutch, Game Card 39-340-271?) (System 85)", MACHINE_FLAGS )
 
 // PROJECT NUMBER 4840  DUTCH JOKERS WILD PO  GAME No 39-340-345 - 31-JUL-1992 20:01:55
-GAME( 1992, b85jkwld    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       nodecode,     0,       "BFM/ELAM",   "Jokers Wild (Dutch) (System 85)", MACHINE_FLAGS )
+GAME( 1992, b85jkwld,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_nodecode, 0, "BFM/ELAM", "Jokers Wild (Dutch) (System 85)", MACHINE_FLAGS )
 
 // PROJECT NUMBER 4823  LUCKY CARDS 200 PO  GAME No 39-332-217 -    2-DEC-1986 15:57:19
-GAME( 1986, b85lucky    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       nodecode,     0,       "BFM/ELAM",   "Lucky Cards (Dutch) (System 85)", MACHINE_FLAGS )
+GAME( 1986, b85lucky,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_nodecode, 0, "BFM/ELAM", "Lucky Cards (Dutch) (System 85)", MACHINE_FLAGS )
 
 // PROJECT NUMBER 4902  DUTCH LUCKY DICE PO  GAME No 39-340-346 - 03-AUG-1992 16:30:00
-GAME( 1992, b85luckd    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM/ELAM",   "Lucky Dice (Dutch) (System 85)", MACHINE_FLAGS )
+GAME( 1992, b85luckd,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM/ELAM", "Lucky Dice (Dutch) (System 85)", MACHINE_FLAGS )
 
 // PROJECT NUMBER 4758  DUTCH C+R 200 PO  GAME No 39-332-215 -    2-DEC-1986 15:50:43
-GAME( 199?, b85cops     , 0         , bfmsys85, bfmsys85, bfmsys85_state,       nodecode,     0,       "BFM/ELAM",   "Cops 'n' Robbers (Dutch) (Bellfruit) (System 85)", MACHINE_FLAGS_MECHANICAL)
+GAME( 199?, b85cops,    0,          bfmsys85, bfmsys85, bfmsys85_state, init_nodecode, 0, "BFM/ELAM", "Cops 'n' Robbers (Dutch) (Bellfruit) (System 85)", MACHINE_FLAGS_MECHANICAL)
 
 
 // this might be system 85 or sc1, the rom config is 0x2000 + 0x8000, and it writes to the AY address we map on S85 for the alarm
 // however it still gives the same error message in both, has offset alpha text in s85 and appears to attempt to communicate with something we don't map, maybe it's some video based board / game with bits missing?
 
 // PROJECT NUMBER 5464  V3 10P/20P PLAY  GAME No 39-350-173 -   24-JAN-1989 10:48:53
-GAME( 1989, b85dbldl    , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Double Dealer (System 85, set 1)", MACHINE_FLAGS )
+GAME( 1989, b85dbldl,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Double Dealer (System 85, set 1)", MACHINE_FLAGS )
 // PROJECT NUMBER 5464  V3 10P/20P PLAY  GAME No 39-350-181 -   02-FEB-1989 15:19:20
-GAME( 1985, b85dbldla   , b85dbldl  , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Double Dealer (System 85, set 2)", MACHINE_FLAGS )
+GAME( 1985, b85dbldla,  b85dbldl,   bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Double Dealer (System 85, set 2)", MACHINE_FLAGS )
 // PROJECT NUMBER 5464  V3 10P/20P PLAY  GAME No 39-350-166 -   17-OCT-1988 14:56:38
-GAME( 199?, b85dbldlb   , b85dbldl  , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",   "Double Dealer (System 85, set 3)", MACHINE_FLAGS ) // found in a sc4 potp set ...
+GAME( 199?, b85dbldlb,  b85dbldl,   bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Double Dealer (System 85, set 3)", MACHINE_FLAGS ) // found in a sc4 potp set ...
 
 // appears to be the same as above with a different title
 
 // PROJECT NUMBER 5165  V1 10P PLAY  GAME No 39-350-179 -   02-FEB-1989 14:42:57
-GAME( 199?, b85potp     , 0         , bfmsys85, bfmsys85, bfmsys85_state,       decode  ,     0,       "BFM",    "Pick Of The Pack (System 85)", MACHINE_FLAGS ) // found in a sc4 potp set ...
+GAME( 199?, b85potp,    0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Pick Of The Pack (System 85)", MACHINE_FLAGS ) // found in a sc4 potp set ...

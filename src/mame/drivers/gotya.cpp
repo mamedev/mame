@@ -33,6 +33,29 @@ TODO: Emulated sound
 
  so despite the fact that 'gotya' might look like its a bootleg of thehand,
  its more likely just a prototype / alternate version, its hard to tell
+
+ ----
+According to Andrew Welburn:
+
+'The Hand' is the original game, GAT licensed it for US manufacture.
+It wasn't a runaway seller, they didn't make many, but they had to
+change certain aspect of the game to 'localise' it and re-badge it as
+their own. There are at least 3-4 scans of manuals online, if it was
+proto, a full manual would be rare, and then having several independent
+people find and scan the manual would be super rare.
+
+The hand labelling of ROMs is entirely normal for small-run games. The
+wire patching is on the underside and is minor tracking changes, common
+on small-runs of PCBs.
+
+The games themselves show the most obvious changes. The classic layout
+at the top of the screen for 'The hand' with the 'hi-score' is replaced
+with 'Got-Ya' in text, a fairly minor hack. The Copyright symbol is
+still there in Got-Ya but with the company name scrubbed out.
+
+All in all, Got-Ya should NOT be marked as a prototype in MAME, its a
+US territory license hack of another game 'The Hand'. Nothing about it
+says prototype, and the original base game is 'The Hand'.
 ****************************************************************************/
 
 #include "emu.h"
@@ -45,21 +68,22 @@ TODO: Emulated sound
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(gotya_state::gotya_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("P1")
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("P2")
-	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("DSW")
-	AM_RANGE(0x6004, 0x6004) AM_WRITE(gotya_video_control_w)
-	AM_RANGE(0x6005, 0x6005) AM_WRITE(gotya_soundlatch_w)
-	AM_RANGE(0x6006, 0x6006) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x6007, 0x6007) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gotya_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gotya_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xd3df) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0xd3e0, 0xd3ff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void gotya_state::gotya_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x5000, 0x5fff).ram();
+	map(0x6000, 0x6000).portr("P1");
+	map(0x6001, 0x6001).portr("P2");
+	map(0x6002, 0x6002).portr("DSW");
+	map(0x6004, 0x6004).w(FUNC(gotya_state::gotya_video_control_w));
+	map(0x6005, 0x6005).w(FUNC(gotya_state::gotya_soundlatch_w));
+	map(0x6006, 0x6006).writeonly().share("scroll");
+	map(0x6007, 0x6007).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(gotya_state::gotya_videoram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(gotya_state::gotya_colorram_w)).share("colorram");
+	map(0xd000, 0xd3df).ram().share("videoram2");
+	map(0xd3e0, 0xd3ff).ram().share("spriteram");
+}
 
 
 static INPUT_PORTS_START( gotya )
@@ -131,7 +155,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( gotya )
+static GFXDECODE_START( gfx_gotya )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )
 GFXDECODE_END
@@ -188,11 +212,11 @@ void gotya_state::machine_reset()
 MACHINE_CONFIG_START(gotya_state::gotya)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(gotya_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gotya_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(gotya_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gotya_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -203,15 +227,15 @@ MACHINE_CONFIG_START(gotya_state::gotya)
 	MCFG_SCREEN_UPDATE_DRIVER(gotya_state, screen_update_gotya)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotya)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotya)
 	MCFG_PALETTE_ADD("palette", 16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gotya_state, gotya)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -279,5 +303,5 @@ ROM_START( gotya )
 	ROM_LOAD( "gb-07.bin",  0x7000, 0x1000, CRC(92a9f8bf) SHA1(9231cd86f24f1e6a585c3a919add50c1f8e42a4c) )
 ROM_END
 
-GAME( 1981, thehand, 0,       gotya, gotya, gotya_state, 0, ROT270, "T.I.C.",      "The Hand",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, gotya,   thehand, gotya, gotya, gotya_state, 0, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981, prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, thehand, 0,       gotya, gotya, gotya_state, empty_init, ROT270, "T.I.C.",      "The Hand",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, gotya,   thehand, gotya, gotya, gotya_state, empty_init, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

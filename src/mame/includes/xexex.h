@@ -17,35 +17,45 @@
 #include "video/konami_helper.h"
 #include "machine/k054321.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class xexex_state : public driver_device
 {
 public:
 	xexex_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_workram(*this, "workram"),
-		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_k054539(*this, "k054539"),
-		m_filter1l(*this, "filter1l"),
-		m_filter1r(*this, "filter1r"),
-		m_filter2l(*this, "filter2l"),
-		m_filter2r(*this, "filter2r"),
-		m_k056832(*this, "k056832"),
-		m_k053246(*this, "k053246"),
-		m_k053250(*this, "k053250"),
-		m_k053251(*this, "k053251"),
-		m_k053252(*this, "k053252"),
-		m_k054338(*this, "k054338"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen"),
-		m_k054321(*this, "k054321") { }
+		: driver_device(mconfig, type, tag)
+		, m_workram(*this, "workram")
+		, m_spriteram(*this, "spriteram")
+		, m_z80bank(*this, "z80bank")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_k054539(*this, "k054539")
+		, m_filter_l(*this, "filter%u_l", 1)
+		, m_filter_r(*this, "filter%u_r", 1)
+		, m_k056832(*this, "k056832")
+		, m_k053246(*this, "k053246")
+		, m_k053250(*this, "k053250")
+		, m_k053251(*this, "k053251")
+		, m_k053252(*this, "k053252")
+		, m_k054338(*this, "k054338")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_k054321(*this, "k054321")
+	{
+	}
 
+	void xexex(machine_config &config);
+
+	void init_xexex();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_workram;
 	required_shared_ptr<uint16_t> m_spriteram;
+
+	/* memory regions */
+	required_memory_bank m_z80bank;
 
 	/* video-related */
 	int        m_layer_colorbase[4];
@@ -65,10 +75,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k054539_device> m_k054539;
-	required_device<filter_volume_device> m_filter1l;
-	required_device<filter_volume_device> m_filter1r;
-	required_device<filter_volume_device> m_filter2l;
-	required_device<filter_volume_device> m_filter2r;
+	required_device_array<filter_volume_device, 2> m_filter_l;
+	required_device_array<filter_volume_device, 2> m_filter_r;
 	required_device<k056832_device> m_k056832;
 	required_device<k053247_device> m_k053246;
 	required_device<k053250_device> m_k053250;
@@ -86,7 +94,7 @@ public:
 	DECLARE_WRITE16_MEMBER(control2_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(xexex);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -99,7 +107,7 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	K054539_CB_MEMBER(ym_set_mixing);
-	void xexex(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

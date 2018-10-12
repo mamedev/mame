@@ -93,7 +93,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_state::interrupt)
 
 	if (scanline == 256)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_screen->update_partial(256);
 	}
 	else if ((scanline % 8) == 0)

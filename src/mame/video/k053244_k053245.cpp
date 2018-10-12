@@ -42,7 +42,7 @@ main ram and the buffer.
 *****************************************************************************/
 
 DEFINE_DEVICE_TYPE(K053244, k05324x_device, "k05324x", "K053244/053245 Sprite Generator")
-device_type const K053245 = K053244;
+decltype(K053244) K053245 = K053244;
 
 const gfx_layout k05324x_device::spritelayout =
 {
@@ -137,8 +137,8 @@ void k05324x_device::device_start()
 	// bind callbacks
 	m_k05324x_cb.bind_relative_to(*owner());
 
-	save_pointer(NAME(m_ram.get()), m_ramsize / 2);
-	save_pointer(NAME(m_buffer.get()), m_ramsize / 2);
+	save_pointer(NAME(m_ram), m_ramsize / 2);
+	save_pointer(NAME(m_buffer), m_ramsize / 2);
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_z_rejection));
 	save_item(NAME(m_regs));

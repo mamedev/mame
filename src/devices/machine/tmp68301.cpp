@@ -21,20 +21,21 @@
 
 DEFINE_DEVICE_TYPE(TMP68301, tmp68301_device, "tmp68301", "Toshiba TMP68301")
 
-ADDRESS_MAP_START(tmp68301_device::tmp68301_regs)
+void tmp68301_device::tmp68301_regs(address_map &map)
+{
 //  AM_RANGE(0x000,0x3ff) AM_RAM
-	AM_RANGE(0x080,0x093) AM_READWRITE8(icr_r, icr_w,0x00ff)
+	map(0x080, 0x093).rw(FUNC(tmp68301_device::icr_r), FUNC(tmp68301_device::icr_w)).umask16(0x00ff);
 
-	AM_RANGE(0x094,0x095) AM_READWRITE(imr_r,imr_w)
-	AM_RANGE(0x098,0x099) AM_READWRITE(iisr_r,iisr_w)
+	map(0x094, 0x095).rw(FUNC(tmp68301_device::imr_r), FUNC(tmp68301_device::imr_w));
+	map(0x098, 0x099).rw(FUNC(tmp68301_device::iisr_r), FUNC(tmp68301_device::iisr_w));
 
 	/* Parallel Port */
-	AM_RANGE(0x100,0x101) AM_READWRITE(pdir_r,pdir_w)
-	AM_RANGE(0x10a,0x10b) AM_READWRITE(pdr_r,pdr_w)
+	map(0x100, 0x101).rw(FUNC(tmp68301_device::pdir_r), FUNC(tmp68301_device::pdir_w));
+	map(0x10a, 0x10b).rw(FUNC(tmp68301_device::pdr_r), FUNC(tmp68301_device::pdr_w));
 
 	/* Serial Port */
-	AM_RANGE(0x18e,0x18f) AM_READWRITE(scr_r,scr_w)
-ADDRESS_MAP_END
+	map(0x18e, 0x18f).rw(FUNC(tmp68301_device::scr_r), FUNC(tmp68301_device::scr_w));
+}
 
 // IRQ Mask register, 0x94
 READ16_MEMBER(tmp68301_device::imr_r)
@@ -205,7 +206,7 @@ inline void tmp68301_device::write_word(offs_t address, uint16_t data)
 IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)
 {
 	int vector = m_irq_vector[irqline];
-//  logerror("%s: irq callback returns %04X for level %x\n",machine.describe_context(),vector,int_level);
+//  logerror("%s: irq callback returns %04X for level %x\n",machine().describe_context(),vector,int_level);
 	return vector;
 }
 
@@ -216,7 +217,7 @@ TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
 	uint16_t ICR  =   m_regs[0x8e/2+i];    // Interrupt Controller Register (ICR7..9)
 	uint16_t IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
 
-//  logerror("s: callback timer %04X, j = %d\n",machine.describe_context(),i,tcount);
+//  logerror("s: callback timer %04X, j = %d\n",machine().describe_context(),i,tcount);
 
 	if  (   (TCR & 0x0004) &&   // INT
 			!(m_imr & (0x100<<i))

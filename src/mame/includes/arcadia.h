@@ -16,6 +16,7 @@
 #include "bus/arcadia/slot.h"
 #include "bus/arcadia/rom.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 // space vultures sprites above
@@ -51,7 +52,7 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	DECLARE_DRIVER_INIT(arcadia);
+	void init_arcadia();
 	void arcadia(machine_config &config);
 
 protected:

@@ -150,11 +150,19 @@ enum
 #define PCW m_pc.w.l
 #define PCD m_pc.d
 
+void h6280_device::internal_map(address_map &map)
+{
+	map(0x1fe800, 0x1fe80f).mirror(0x3f0).rw(FUNC(h6280_device::io_buffer_r), FUNC(h6280_device::psg_w));
+	map(0x1fec00, 0x1fec01).mirror(0x3fe).rw(FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
+	map(0x1ff000, 0x1ff000).mirror(0x3ff).rw(FUNC(h6280_device::port_r), FUNC(h6280_device::port_w));
+	map(0x1ff400, 0x1ff403).mirror(0x3fc).rw(FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
+}
+
 //**************************************************************************
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "HuC6280")
+DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "Hudson Soft HuC6280")
 
 //-------------------------------------------------
 //  h6280_device - constructor
@@ -162,8 +170,12 @@ DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "HuC6280")
 
 h6280_device::h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, H6280, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 21)
+	, device_mixer_interface(mconfig, *this, 2)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 21, 0, address_map_constructor(FUNC(h6280_device::internal_map), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 2)
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
+	, m_psg(*this, "psg")
 {
 	// build the opcode table
 	for (int op = 0; op < 256; op++)
@@ -214,8 +226,21 @@ const h6280_device::ophandler h6280_device::s_opcodetable[256] =
 	&h6280_device::op_f8, &h6280_device::op_f9, &h6280_device::op_fa, &h6280_device::op_fb, &h6280_device::op_fc, &h6280_device::op_fd, &h6280_device::op_fe, &h6280_device::op_ff
 };
 
+//-------------------------------------------------
+//  device_add_mconfig - add machine configuration
+//-------------------------------------------------
+void h6280_device::device_add_mconfig(machine_config &config)
+{
+	C6280(config, m_psg, DERIVED_CLOCK(1,2));
+	m_psg->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_psg->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+}
+
 void h6280_device::device_start()
 {
+	m_port_in_cb.resolve();
+	m_port_out_cb.resolve_safe();
+
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",        m_pc.w.l).noshow();
 	state_add(STATE_GENPCBASE,  "CURPC",        m_pc.w.l).noshow();
@@ -269,7 +294,7 @@ void h6280_device::device_start()
 	save_item(NAME(m_io_buffer));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_icount = 0;
 
 	/* clear pending interrupts */
@@ -301,7 +326,7 @@ void h6280_device::device_reset()
 	m_io_buffer = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	/* set I and B flags */
@@ -2225,9 +2250,9 @@ void h6280_device::state_string_export(const device_state_entry &entry, std::str
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *h6280_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> h6280_device::create_disassembler()
 {
-	return new h6280_disassembler;
+	return std::make_unique<h6280_disassembler>();
 }
 
 
@@ -2261,6 +2286,17 @@ uint32_t h6280_device::execute_max_cycles() const
 uint32_t h6280_device::execute_input_lines() const
 {
 	return 4;
+}
+
+
+//-------------------------------------------------
+//  execute_input_edge_triggered - return true if
+//  the input line has an asynchronous edge trigger
+//-------------------------------------------------
+
+bool h6280_device::execute_input_edge_triggered(int inputnum) const
+{
+	return inputnum == H6280_NMI_STATE;
 }
 
 
@@ -2375,7 +2411,7 @@ void h6280_device::pull(uint8_t &value)
  ***************************************************************/
 uint8_t h6280_device::read_opcode()
 {
-	return m_direct->read_byte(translated(PCW));
+	return m_cache->read_byte(translated(PCW));
 }
 
 /***************************************************************
@@ -2383,7 +2419,7 @@ uint8_t h6280_device::read_opcode()
  ***************************************************************/
 uint8_t h6280_device::read_opcode_arg()
 {
-	return m_direct->read_byte(translated(PCW));
+	return m_cache->read_byte(translated(PCW));
 }
 
 
@@ -2406,7 +2442,7 @@ void h6280_device::execute_run()
 	{
 		m_ppc = m_pc;
 
-		debugger_instruction_hook(this, PCW);
+		debugger_instruction_hook(PCW);
 
 		/* Execute 1 instruction */
 		in = read_opcode();
@@ -2547,6 +2583,32 @@ WRITE8_MEMBER( h6280_device::timer_w )
 			m_timer_status = data & 1;
 			return;
 	}
+}
+
+READ8_MEMBER( h6280_device::port_r )
+{
+	if (!m_port_in_cb.isnull())
+		return m_port_in_cb();
+	else
+		return m_io_buffer;
+}
+
+WRITE8_MEMBER( h6280_device::port_w )
+{
+	m_io_buffer = data;
+
+	m_port_out_cb(data);
+}
+
+READ8_MEMBER( h6280_device::io_buffer_r )
+{
+	return m_io_buffer;
+}
+
+WRITE8_MEMBER( h6280_device::psg_w )
+{
+	m_io_buffer = data;
+	m_psg->c6280_w(space,offset,data,mem_mask);
 }
 
 bool h6280_device::memory_translate(int spacenum, int intention, offs_t &address)

@@ -54,28 +54,26 @@
           - see the beginning of level 3: background screwed
           - gray tiles around the title in Top Secret
 
+    Note: The MCU rom contains the string
+          "<for dealer-location test & USA show. 87/03/10 >"
+          which indicates it could be from an earlier version, especially with it
+          coming from a 'Top Secret' bootleg with identical program but unprotected
+          MCU, however f1dream has a similar string, and is verified as being from
+          a production board.
+
+          The MCU hookup is currently wrong, maybe IRQ4 related?
+
     ToDo:
-    - get rid of input port hack
-
-        Controls appear to be mapped at 0xFE4000, alongside dip switches, but there
-        is something strange going on that I can't (yet) figure out.
-        Player controls and coin inputs are supposed to magically appear at
-        0xFFFFFB (coin/start)
-        0xFFFFFD (player 2)
-        0xFFFFFF (player 1)
-
-        This is probably done by the Intel C8751H MCU on the board (whose internal ROM
-        is not yet available).
-
-        The MCU also takes care of the commands for the sound CPU, which are stored
-        at FFFFF9.
-
         IRQ4 seems to be control related.
         On each interrupt, it reads 0xFE4000 (coin/start), shift the bits around
         and move the resulting byte into a dword RAM location. The dword RAM location
         is rotated by 8 bits each time this happens.
         This is probably done to be pedantic about coin insertions (might be protection
         related). In fact, currently coin insertions are not consistently recognized.
+
+        We have the schematics for this board and the protection circuit, there
+        are a number of incorrect assumptions in the code which need fixing, especially
+        regarding the two MCU interrupt hookups.
 
 
 ******************************************************************************************/
@@ -96,42 +94,66 @@
  *
  *************************************/
 
-WRITE16_MEMBER(bionicc_state::hacked_controls_w)
+
+READ8_MEMBER(bionicc_state::mcu_shared_r)
 {
-	logerror("%06x: hacked_controls_w %04x %02x\n", m_maincpu->pc(), offset, data);
-	COMBINE_DATA(&m_inp[offset]);
+	uint8_t ret = m_ram16[(0x3000 / 2) + offset];
+	return ret;
 }
 
-READ16_MEMBER(bionicc_state::hacked_controls_r)
+WRITE8_MEMBER(bionicc_state::mcu_shared_w)
 {
-	logerror("%06x: hacked_controls_r %04x %04x\n", m_maincpu->pc(), offset, m_inp[offset]);
-	return m_inp[offset];
+	m_ram16[(0x3000 / 2) + offset] = (m_ram16[(0x3000 / 2) + offset] & 0xff00) | data;
 }
+
+WRITE8_MEMBER(bionicc_state::out1_w)
+{
+	m_soundlatch->write(space,0,data);
+}
+
+WRITE8_MEMBER(bionicc_state::out3_w)
+{
+	if ((m_old_p3 & 0x20) != (data & 0x20))
+	{
+		// guess
+		if (!(data & 0x20))
+			m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+	}
+
+	if ((m_old_p3 & 0x40) != (data & 0x40))
+	{
+		// used, but for what?
+	}
+
+	if ((m_old_p3 & 0x01) != (data & 0x01))
+	{
+		// guess, toggles at the end of interrupt
+		if (!(data & 0x01))
+		{
+			m_maincpu->resume(SUSPEND_REASON_HALT);
+
+			// the MCU should be doing this but is writing to the wrong bits?!
+			data = ioport("SYSTEM")->read() >> 12;
+			m_ram16[0x3ffa/2] = /*(m_ram16[0x3ffa/2] & 0xff00) |*/ (data ^ 0x0f);
+
+			data = ioport("P2")->read();
+			m_ram16[0x3ffc/2] = /*(m_ram16[0x3ffc/2] & 0xff00) |*/ (data ^ 0xff);
+
+			data = ioport("P1")->read();
+			m_ram16[0x3ffe/2] = /*(m_ram16[0x3ffe/2] & 0xff00) |*/ (data ^ 0xff);
+		}
+	}
+
+	m_old_p3 = data;
+}
+
 
 WRITE16_MEMBER(bionicc_state::mpu_trigger_w)
 {
-	data = ioport("SYSTEM")->read() >> 12;
-	m_inp[0] = data ^ 0x0f;
+	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
 
-	data = ioport("P2")->read();
-	m_inp[1] = data ^ 0xff;
-
-	data = ioport("P1")->read();
-	m_inp[2] = data ^ 0xff;
+	m_maincpu->suspend(SUSPEND_REASON_HALT, true); // see notes in f1dream driver
 }
-
-
-WRITE16_MEMBER(bionicc_state::hacked_soundcommand_w)
-{
-	COMBINE_DATA(&m_soundcommand);
-	m_soundlatch->write(space, 0, m_soundcommand & 0xff);
-}
-
-READ16_MEMBER(bionicc_state::hacked_soundcommand_r)
-{
-	return m_soundcommand;
-}
-
 
 /********************************************************************
 
@@ -151,10 +173,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::scanline)
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if(scanline == 0) // vblank-in or i8751 related irq
+	if(scanline == 128) // vblank-in or i8751 related irq (can't happen when the CPU is suspended)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
-
 
 /*************************************
  *
@@ -162,34 +183,38 @@ TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::scanline)
  *
  *************************************/
 
-ADDRESS_MAP_START(bionicc_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xfe0000, 0xfe07ff) AM_RAM /* RAM? */
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfe0d00, 0xfe3fff) AM_RAM              /* RAM? */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(gfxctrl_w)    /* + coin counters */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("DSW")
-	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(scroll_w)
-	AM_RANGE(0xfe8018, 0xfe8019) AM_WRITENOP // vblank irq ack?
-	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(mpu_trigger_w)    /* ??? not sure, but looks like it */
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xffc000, 0xfffff7) AM_RAM /* working RAM */
-	AM_RANGE(0xfffff8, 0xfffff9) AM_READWRITE(hacked_soundcommand_r, hacked_soundcommand_w)      /* hack */
-	AM_RANGE(0xfffffa, 0xffffff) AM_READWRITE(hacked_controls_r, hacked_controls_w) /* hack */
-ADDRESS_MAP_END
+void bionicc_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0xfe0000, 0xfe07ff).ram(); /* RAM? */
+	map(0xfe0800, 0xfe0cff).ram().share("spriteram");
+	map(0xfe0d00, 0xfe3fff).ram();              /* RAM? */
+	map(0xfe4000, 0xfe4001).portr("SYSTEM");
+	map(0xfe4000, 0xfe4001).w(FUNC(bionicc_state::gfxctrl_w));    /* + coin counters */
+	map(0xfe4002, 0xfe4003).portr("DSW").nopw();
+	map(0xfe8010, 0xfe8017).w(FUNC(bionicc_state::scroll_w));
+	map(0xfe8018, 0xfe8019).nopw(); // vblank irq ack?
+	map(0xfe801a, 0xfe801b).w(FUNC(bionicc_state::mpu_trigger_w)); // based on the code this looks like the MCU trigger if compared to F1 Dream, but 0xfe4002 would match up closer in terms of addresses.  Maybe this is IRQ4 related instead?
+	map(0xfec000, 0xfecfff).ram().w(FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
+	map(0xff0000, 0xff3fff).ram().w(FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
+	map(0xff4000, 0xff7fff).ram().w(FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
+	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xffc000, 0xffffff).ram().share("ram16");
+}
 
 
-ADDRESS_MAP_START(bionicc_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void bionicc_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xc7ff).ram();
+}
 
+void bionicc_state::mcu_io(address_map &map)
+{
+	map(0x000, 0x7ff).rw(FUNC(bionicc_state::mcu_shared_r), FUNC(bionicc_state::mcu_shared_w));
+}
 
 /*************************************
  *
@@ -336,7 +361,7 @@ static const gfx_layout scroll1layout_bionicc=
 	512   /* each tile takes 512 consecutive bytes */
 };
 
-static GFXDECODE_START( bionicc )
+static GFXDECODE_START( gfx_bionicc )
 	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, scroll2layout_bionicc,   0,  4 )    /* colors   0-  63 */
 	GFXDECODE_ENTRY( "gfx3", 0, scroll1layout_bionicc, 256,  4 )    /* colors 256- 319 */
@@ -352,63 +377,61 @@ GFXDECODE_END
 
 void bionicc_state::machine_start()
 {
-	save_item(NAME(m_soundcommand));
-	save_item(NAME(m_inp));
 	save_item(NAME(m_scroll));
 }
 
 void bionicc_state::machine_reset()
 {
-	m_inp[0] = 0;
-	m_inp[1] = 0;
-	m_inp[2] = 0;
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;
 	m_scroll[2] = 0;
 	m_scroll[3] = 0;
-	m_soundcommand = 0;
 }
 
 MACHINE_CONFIG_START(bionicc_state::bionicc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2) /* 12 MHz - verified in schematics */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) /* 12 MHz - verified in schematics */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bionicc_state, scanline, "screen", 0, 1)
 
-	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181) / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181) / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	/* FIXME: interrupt timing
 	 * schematics indicate that nmi_line is set on  M680000 access with AB1=1
 	 * and IOCS=0 (active low), see pages A-1/10, A-4/10 in schematics
 	 */
-	MCFG_CPU_PERIODIC_INT_DRIVER(bionicc_state, nmi_line_pulse, 4*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bionicc_state, nmi_line_pulse, 4*60)
 
+	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(24'000'000) / 4)
+	MCFG_DEVICE_IO_MAP(mcu_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, bionicc_state, out1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, bionicc_state, out3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* FIXME: should be 257 visible horizontal pixels, first visible pixel should be repeated, back porch/front porch should be separated */
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 386, 0, 256, 260, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(bionicc_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bionicc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bionicc)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT_CLASS(2, bionicc_state, RRRRGGGGBBBBIIII)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181) / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -432,7 +455,7 @@ ROM_START( bionicc ) /* "Not for use in Japan" */
 	ROM_LOAD( "ts_01b.4e",  0x00000, 0x8000, CRC(a9a6cafa) SHA1(55e0a0e6ca11e8e73339d5b4604e130031211291) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "ts.2f",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "tsu_08.8l",   0x00000, 0x8000, CRC(9bf0b7a2) SHA1(1361335c3c2c8a9c6a7d99566048d8aac99e7c8f) )    /* VIDEORAM (text layer) tiles */
@@ -476,7 +499,7 @@ ROM_START( bionicc1 ) /* "Not for use outside of USA or Canada" revision B */
 	ROM_LOAD( "ts_01b.4e",  0x00000, 0x8000, CRC(a9a6cafa) SHA1(55e0a0e6ca11e8e73339d5b4604e130031211291) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "ts.2f",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "tsu_08.8l",   0x00000, 0x8000, CRC(9bf0b7a2) SHA1(1361335c3c2c8a9c6a7d99566048d8aac99e7c8f) )    /* VIDEORAM (text layer) tiles */
@@ -520,7 +543,7 @@ ROM_START( bionicc2 ) /* "Not for use outside of USA or Canada" 1st release */
 	ROM_LOAD( "ts_01b.4e",  0x00000, 0x8000, CRC(a9a6cafa) SHA1(55e0a0e6ca11e8e73339d5b4604e130031211291) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "ts.2f",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "tsu_08.8l",   0x00000, 0x8000, CRC(9bf0b7a2) SHA1(1361335c3c2c8a9c6a7d99566048d8aac99e7c8f) )    /* VIDEORAM (text layer) tiles */
@@ -564,8 +587,7 @@ ROM_START( topsecrt ) /* "Not for use in any other country but Japan" */
 	ROM_LOAD( "ts_01.4e",    0x00000, 0x8000, CRC(8ea07917) SHA1(e9ace70d89482fc3669860450a41aacacbee9083) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	//ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
-	ROM_LOAD( "d8751h.bin",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )
+	ROM_LOAD( "ts.2f",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ts_08.8l",    0x00000, 0x8000, CRC(96ad379e) SHA1(accd3a560b259c186bc28cdc004ed8de0b12f9d5) )    /* VIDEORAM (text layer) tiles */
@@ -609,7 +631,7 @@ ROM_START( bioniccbl )
 	ROM_LOAD( "01.bin",       0x00000, 0x8000, CRC(8ea07917) SHA1(e9ace70d89482fc3669860450a41aacacbee9083) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP ) // 19.bin (protected)
+	ROM_LOAD( "d8751h.bin",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "06.bin",       0x00000, 0x4000, CRC(4e6b81d9) SHA1(052784d789b0c9193edf218fa1883b6e3b7df988) )
@@ -649,7 +671,7 @@ ROM_START( bioniccbl2 ) // only the 4 maincpu ROMs differ, they came from an ori
 	ROM_LOAD( "ts_01.4e",    0x00000, 0x8000, CRC(8ea07917) SHA1(e9ace70d89482fc3669860450a41aacacbee9083) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "d8751h.bin",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ts_08.8l",    0x00000, 0x8000, CRC(96ad379e) SHA1(accd3a560b259c186bc28cdc004ed8de0b12f9d5) )    /* VIDEORAM (text layer) tiles */
@@ -689,11 +711,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bionicc,   0,       bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (Euro)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bionicc1,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (US set 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bionicc2,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (US set 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, topsecrt,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Top Secret (Japan, old revision)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bioniccbl, bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "bootleg", "Bionic Commandos (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bioniccbl2,bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "bootleg", "Bionic Commandos (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc,    0,       bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (Euro)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc1,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (US set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc2,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (US set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, topsecrt,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Top Secret (Japan, old revision)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bioniccbl,  bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "bootleg", "Bionic Commandos (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bioniccbl2, bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "bootleg", "Bionic Commandos (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
 // there's also an undumped JP new revision on which there are no extra lives after 1 million points, plus other bug-fixes / changes

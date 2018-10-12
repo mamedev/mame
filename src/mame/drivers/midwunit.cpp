@@ -17,8 +17,11 @@
         * WWF Wrestlemania
         * Rampage World Tour
 
-    Known bugs:
+    TODO:
         * WWF has an unimplemented and not Y2K compatible real-time clock
+
+    BTANB:
+        * umk3 Scorpion's "Get Over Here" sample gets cut off, ROM dumps confirmed good
 
     NOTE: There is known to exist (currently not dumped) a Wrestlemania PCB with the following labels:
           Wrestlemania 1.0 U63 #8549    &    Wrestlemania 1.0 U54 #40C7
@@ -110,21 +113,22 @@ Notes:
  *
  *************************************/
 
-ADDRESS_MAP_START(midwunit_state::main_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE(midtunit_vram_r, midtunit_vram_w)
-	AM_RANGE(0x01000000, 0x013fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x01400000, 0x0145ffff) AM_READWRITE(midwunit_cmos_r, midwunit_cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0x01480000, 0x014fffff) AM_WRITE(midwunit_cmos_enable_w)
-	AM_RANGE(0x01600000, 0x0160001f) AM_READWRITE(midwunit_security_r, midwunit_security_w)
-	AM_RANGE(0x01680000, 0x0168001f) AM_READWRITE(midwunit_sound_r, midwunit_sound_w)
-	AM_RANGE(0x01800000, 0x0187ffff) AM_READWRITE(midwunit_io_r, midwunit_io_w)
-	AM_RANGE(0x01880000, 0x018fffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x01a00000, 0x01a000ff) AM_MIRROR(0x00080000) AM_READWRITE(midtunit_dma_r, midtunit_dma_w)
-	AM_RANGE(0x01b00000, 0x01b0001f) AM_READWRITE(midwunit_control_r, midwunit_control_w)
-	AM_RANGE(0x02000000, 0x06ffffff) AM_READ(midwunit_gfxrom_r)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void midwunit_state::main_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rw(FUNC(midwunit_state::midtunit_vram_r), FUNC(midwunit_state::midtunit_vram_w));
+	map(0x01000000, 0x013fffff).ram().share("mainram");
+	map(0x01400000, 0x0145ffff).rw(FUNC(midwunit_state::midwunit_cmos_r), FUNC(midwunit_state::midwunit_cmos_w)).share("nvram");
+	map(0x01480000, 0x014fffff).w(FUNC(midwunit_state::midwunit_cmos_enable_w));
+	map(0x01600000, 0x0160001f).rw(FUNC(midwunit_state::midwunit_security_r), FUNC(midwunit_state::midwunit_security_w));
+	map(0x01680000, 0x0168001f).rw(FUNC(midwunit_state::midwunit_sound_r), FUNC(midwunit_state::midwunit_sound_w));
+	map(0x01800000, 0x0187ffff).rw(FUNC(midwunit_state::midwunit_io_r), FUNC(midwunit_state::midwunit_io_w));
+	map(0x01880000, 0x018fffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x01a00000, 0x01a000ff).mirror(0x00080000).rw(FUNC(midwunit_state::midtunit_dma_r), FUNC(midwunit_state::midtunit_dma_w));
+	map(0x01b00000, 0x01b0001f).rw(FUNC(midwunit_state::midwunit_control_r), FUNC(midwunit_state::midwunit_control_w));
+	map(0x02000000, 0x06ffffff).r(FUNC(midwunit_state::midwunit_gfxrom_r));
+	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xff800000, 0xffffffff).rom().region("maincpu", 0);
+}
 
 
 /*************************************
@@ -622,8 +626,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(midwunit_state::wunit)
 
-	MCFG_CPU_ADD("maincpu", TMS34010, 50000000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, 50000000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -632,7 +636,7 @@ MACHINE_CONFIG_START(midwunit_state::wunit)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_MACHINE_RESET_OVERRIDE(midwunit_state,midwunit)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)
@@ -676,6 +680,40 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
+/*
+A Mortal Kombat 3 PCB with V2.1 program ROMs was seen with different styled labels:
+
+L1.0  3/29/95 9200  MORTAL KOMBAT III SOUND  U2
+ - Labels missing for U3 through U5 -
+
+MORTAL KOMBAT 3  U54  REV 2.1 5/3/95  CCFB  FM.0
+MORTAL KOMBAT 3  U63  REV 2.1 5/3/95  015E  FM.1
+
+PROTO  991A 3/20/95  MORTAL KOMBAT III  U133  2M.0
+PROTO  9FA5 3/20/95  MORTAL KOMBAT III  U132  2M.1
+PROTO  056F 3/20/95  MORTAL KOMBAT III  U131  2M.2
+PROTO  775D 3/20/95  MORTAL KOMBAT III  U130  2M.3
+
+PROTO  DE07 3/20/95  MORTAL KOMBAT III  U129  4M.0   <these labels were missing, except for one hand written label.  Following format of U133 - U130>
+PROTO  EEE2 3/20/95  MORTAL KOMBAT III  U128  4M.1
+PROTO  D3C6 3/20/95  MORTAL KOMBAT III  U127  4M.2
+PROTO  0F4D 3/20/95  MORTAL KOMBAT III  U126  4M.3
+
+PROTO  985D 3/20/95  MORTAL KOMBAT III  U125  6M.0  <these labels were missing, except for one hand written label.  Following format of U133 - U130>
+PROTO  F576 3/20/95  MORTAL KOMBAT III  U124  6M.1
+PROTO  7C81 3/20/95  MORTAL KOMBAT III  U123  6M.2
+PROTO  49FE 3/20/95  MORTAL KOMBAT III  U122  6M.3
+
+0435 3/29/95  MORTAL KOMBAT III  U121  8M.0  <these labels were missing, except for one hand written label>
+E667 3/29/95  MORTAL KOMBAT III  U120  8M.1
+0493 3/29/95  MORTAL KOMBAT III  U119  8M.2
+B037 3/29/95  MORTAL KOMBAT III  U118  8M.3
+
+A83E 4/6/95  MORTAL KOMBAT III  U117  AM.0
+7B1E 4/6/95  MORTAL KOMBAT III  U116  AM.1
+94A7 4/6/95  MORTAL KOMBAT III  U115  AM.2
+7F0B 4/6/95  MORTAL KOMBAT III  U114  AM.3
+*/
 ROM_START( mk3 )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "l1_mortal_kombat_3_u2_music_spch.u2", 0x000000, 0x100000, CRC(5273436f) SHA1(e1735842a0159eafe79d878d44e3828df9bfa5bb) )
@@ -843,7 +881,7 @@ ROM_START( umk3 )
 	ROM_LOAD16_BYTE( "l1.2_mortal_kombat_3_u63_ultimate.u63",  0x00001, 0x80000, CRC(6d301faf) SHA1(18a8e29cc3e8ce5cc0e10f8386d43e7f44fd7b75) )
 
 	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
-	ROM_LOAD( "463_MK3_Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
+	ROM_LOAD( "463_mk3_ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_3_u133_game_rom.u133",  0x0000000, 0x100000, CRC(79b94667) SHA1(31bba640c351fdccc6685cadb74dd79a3f910ce8) ) /* all GAME ROMs here are also known to be labeled as P1.0 */
@@ -887,7 +925,7 @@ ROM_START( umk3r11 )
 	ROM_LOAD16_BYTE( "l1.1_mortal_kombat_3_u63_ultimate.u63",  0x00001, 0x80000, CRC(ea731783) SHA1(2915626090650c4b5adf5b26e736c3ec91ce81a6) )
 
 	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
-	ROM_LOAD( "463_MK3_Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
+	ROM_LOAD( "463_mk3_ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_3_u133_game_rom.u133",  0x0000000, 0x100000, CRC(79b94667) SHA1(31bba640c351fdccc6685cadb74dd79a3f910ce8) ) /* all GAME ROMs here are also known to be labeled as P1.0 */
@@ -931,7 +969,7 @@ ROM_START( umk3r10 )
 	ROM_LOAD16_BYTE( "l1.0_mortal_kombat_3_u63_ultimate.u63",  0x00001, 0x80000, CRC(2dff0c83) SHA1(8942ffa3addf134085ea8d77d56e82593312e7a5) )
 
 	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
-	ROM_LOAD( "463_MK3_Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
+	ROM_LOAD( "463_mk3_ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_3_u133_game_rom.u133",  0x0000000, 0x100000, CRC(79b94667) SHA1(31bba640c351fdccc6685cadb74dd79a3f910ce8) ) /* all GAME ROMs here are also known to be labeled as P1.0 */
@@ -1001,8 +1039,8 @@ ROM_START( openicea ) /* PCB had alternate ROM labels showing the dates & checks
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "open_ice_l1.2.u2", 0x000000, 0x100000, CRC(8adb5aab) SHA1(4c25bc051c90947f3366f83ac5ca8dc78e26b8a4) ) /* U2  OPEN ICE HOCKEY  R1.2  10/10/95  1900 */
 	ROM_LOAD16_BYTE( "open_ice_l1.u3",   0x200000, 0x100000, CRC(11c61ad6) SHA1(324621d6b486399b6d5ede1fed39d4e448cdeb32) ) /* U3  OPEN ICE HOCKEY  9/1/95  4D00 */
-	ROM_LOAD16_BYTE( "open_ice_l1.u4",   0x400000, 0x100000, CRC(04279290) SHA1(daf1e57137ae1c3434194054e69809bfe3ed1fc3) ) /* U3  OPEN ICE HOCKEY  9/1/95  4700 */
-	ROM_LOAD16_BYTE( "open_ice_l1.u5",   0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) ) /* U3  OPEN ICE HOCKEY  9/1/95  C200 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u4",   0x400000, 0x100000, CRC(04279290) SHA1(daf1e57137ae1c3434194054e69809bfe3ed1fc3) ) /* U4  OPEN ICE HOCKEY  9/1/95  4700 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u5",   0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) ) /* U5  OPEN ICE HOCKEY  9/1/95  C200 */
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "open_ice_781c_r1.2a.u54", 0x00000, 0x80000, CRC(63296053) SHA1(9f6fcb1f95a09165c211b569001563b56d06876c) ) /* hand written as  781C  R1.21 - game reports as Revision 1.2A */
@@ -1159,7 +1197,7 @@ ROM_START( rmpgwt )
 	ROM_LOAD16_BYTE( "1.3_rampage_world_u63_game.u63",  0x00001, 0x80000, CRC(403ae41e) SHA1(c08d9352efe63849f5d10c1bd1efe2b9dd7382e0) )
 
 	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
-	ROM_LOAD( "465 Rampage WT.u64",  0x0000, 0x1009, CRC(5c14d850) SHA1(f57aef8350e477252bff1fa0f930c1b5d0ceb03f) )
+	ROM_LOAD( "465 rampage wt.u64",  0x0000, 0x1009, CRC(5c14d850) SHA1(f57aef8350e477252bff1fa0f930c1b5d0ceb03f) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "1.0_rampage_world_tour_u133_image.u133",  0x0000000, 0x100000, CRC(5b5ac449) SHA1(1c01dde9a9dbd9f4a6cd30aea9f6410cab13c2c9) )
@@ -1196,7 +1234,7 @@ ROM_START( rmpgwt11 )
 	ROM_LOAD16_BYTE( "1.1_rampage_world_u63_game.u63",  0x00001, 0x80000, CRC(031c908f) SHA1(531669b13c33921ff199be1e841dd337c86fec50) )
 
 	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
-	ROM_LOAD( "465 Rampage WT.u64",  0x0000, 0x1009, CRC(5c14d850) SHA1(f57aef8350e477252bff1fa0f930c1b5d0ceb03f) )
+	ROM_LOAD( "465 rampage wt.u64",  0x0000, 0x1009, CRC(5c14d850) SHA1(f57aef8350e477252bff1fa0f930c1b5d0ceb03f) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "1.0_rampage_world_tour_u133_image.u133",  0x0000000, 0x100000, CRC(5b5ac449) SHA1(1c01dde9a9dbd9f4a6cd30aea9f6410cab13c2c9) )
@@ -1221,6 +1259,37 @@ ROM_START( rmpgwt11 )
 ROM_END
 
 
+/*
+A WWF: Wrestlemania PCB with V1.3 program ROMs was seen with different styled labels:
+
+SOUND  U2  WRESTLEMANIA 5/17/95  5D00 - crossed out and hand written 6-6-95 5500
+SOUND  U3  WRESTLEMANIA 5/2/95  8300
+SOUND  U4  WRESTLEMANIA 5/2/95  0F00
+SOUND  U5  WRESTLEMANIA 5/2/95  3000
+
+U54 WRESTLEMANIA Rev1.3 8/9/95 8A5D
+U63 WRESTLEMANIA Rev1.3 8/9/95 9EFE
+
+2M.0  U133  WRESTLEMANIA REV1.0 6/5/95  3A18
+2M.1  U132  WRESTLEMANIA REV1.0 6/5/95  5B68
+2M.2  U131  WRESTLEMANIA REV1.0 6/5/95  A478
+2M.3  U130  WRESTLEMANIA REV1.0 6/5/95  E4EA
+
+4M.0  U129  WRESTLEMANIA REV1.0 6/5/95  0B0E
+4M.1  U128  WRESTLEMANIA REV1.0 6/5/95  E646
+4M.2  U127  WRESTLEMANIA REV1.0 6/5/95  74A7
+4M.3  U126  WRESTLEMANIA REV1.0 6/5/95  37FD
+
+6M.0  U125  WRESTLEMANIA REV1.0 6/5/95  5EF3
+6M.1  U124  WRESTLEMANIA REV1.0 6/5/95  8CD6
+6M.2  U123  WRESTLEMANIA REV1.0 6/5/95  70EC
+6M.3  U122  WRESTLEMANIA REV1.0 6/5/95  2B4E
+
+8M.0  U121  WRESTLEMANIA REV1.0 6/5/95  5E15
+8M.1  U120  WRESTLEMANIA REV1.0 6/5/95  0572
+8M.2  U119  WRESTLEMANIA REV1.0 6/5/95  7FD4
+8M.3  U118  WRESTLEMANIA REV1.0 6/5/95  E4F1
+*/
 ROM_START( wwfmania )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u2", 0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) ) /* These 4 are labeled as L1 */
@@ -1323,6 +1392,40 @@ ROM_START( wwfmaniac )
 ROM_END
 
 
+ROM_START( wwfmaniap )
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u2", 0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) ) /* These 4 are labeled as L1 */
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u3", 0x200000, 0x100000, CRC(9442b6c9) SHA1(1f887c05ab9ca99078be584d7e9e6c59c8ec1818) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u4", 0x400000, 0x100000, CRC(cee78fac) SHA1(c37d3b4aef47dc80d864497b3013f03220d45482) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u5", 0x600000, 0x100000, CRC(5b31fd40) SHA1(35dcf19b223029e17616357d29dd04bbfeb83491) )
+
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
+	ROM_LOAD16_BYTE( "wwf_game_rom_p2.01.u54",  0x00000, 0x80000, CRC(a3d0b6d1) SHA1(974e0d40e3852b4c3233098079ded95110cca62e) ) /* missing labels */
+	ROM_LOAD16_BYTE( "wwf_game_rom_p2.01.u63",  0x00001, 0x80000, CRC(22b80ae4) SHA1(4e160df9caf43fcf43ce002af4c88c2a324c4d86) ) /* missing labels */
+
+	ROM_REGION( 0x2000000, "gfxrom", 0 )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u133", 0x0000000, 0x100000, CRC(5e1b1e3d) SHA1(55f54e4b0dc775058699b1c0abdd7241ffca0e76) ) /* All graphics roms labeled as L1 */
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u132", 0x0000001, 0x100000, CRC(5943b3b2) SHA1(8ba0b20e7993769736c961d0fda97b2850d1446b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u131", 0x0000002, 0x100000, CRC(0815db22) SHA1(ebd6a8c4f0e8d979af7f173b3f139d91e4857f6b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u130", 0x0000003, 0x100000, CRC(9ee9a145) SHA1(caeb8506e1414e8c58e3031d4a2e0619ef3922b7) )
+
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u129", 0x0400000, 0x100000, CRC(c644c2f4) SHA1(9094452eb37ec92932109ab2b209e12074111dd7) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u128", 0x0400001, 0x100000, CRC(fcda4e9a) SHA1(a05a12f606632034eae662cccfee5aaaffe0348b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u127", 0x0400002, 0x100000, CRC(45be7428) SHA1(a5d3e37c64cac03139028fe998494b76e6b6a7ae) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u126", 0x0400003, 0x100000, CRC(eaa276a8) SHA1(d0c2f4d4409830355c6e112e3eafb4d3a1b8c22e) )
+
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u125", 0x0800000, 0x100000, CRC(a19ebeed) SHA1(cf51bca29fd39c6189c2b431eb718a6341781d1f) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u124", 0x0800001, 0x100000, CRC(dc7d3dbb) SHA1(8982d9a1babce57ae7465bce3f4863dd336c20ac) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u123", 0x0800002, 0x100000, CRC(e0ade56f) SHA1(a15c672a45f39c0232d678e71380d4f58c4659ae) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u122", 0x0800003, 0x100000, CRC(2800c78d) SHA1(8012785f1c1eaf8d533a98e0a521a5d31efc7a42) )
+
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u121", 0x0c00000, 0x100000, CRC(a28ffcba) SHA1(f66be0793b12a7f04e32d3db8311d1f33b0c3fbe) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u120", 0x0c00001, 0x100000, CRC(3a05d371) SHA1(4ed73e1c06ea7bd33e6c72a6a752960ba55d1975) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u119", 0x0c00002, 0x100000, CRC(97ffa659) SHA1(986f8ec57085b808d33c85ed55b35a5e1cadf3b6) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u118", 0x0c00003, 0x100000, CRC(46668e97) SHA1(282ca2e561f7553717d60b5a745f8e3fc1bda610) )
+ROM_END
+
+
 
 /*************************************
  *
@@ -1330,27 +1433,28 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, mk3,       0,        wunit_picsim, mk3,      midwunit_state, mk3,      ROT0, "Midway", "Mortal Kombat 3 (rev 2.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3r20,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r20,   ROT0, "Midway", "Mortal Kombat 3 (rev 2.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3r10,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3p40,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3,       0,        wunit_picsim, mk3,      midwunit_state, init_mk3,      ROT0, "Midway", "Mortal Kombat 3 (rev 2.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3r20,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r20,   ROT0, "Midway", "Mortal Kombat 3 (rev 2.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3r10,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3p40,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, init_umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
 // Ultimate Mortal Kombat 3 rev 2.0.35 (TE? Hack?) version known to exist
 
-GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniab, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniac, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniab, wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniac, wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniap, wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (proto 2.01 06/07/95)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, openice,   0,        wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, openicea,  openice,  wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, openice,   0,        wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, openicea,  openice,  wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, nbahangt,  0,        wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbahangt,  0,        wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, nbamht,    0,        wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbamht1,   nbamht,   wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamht,    0,        wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamht1,   nbamht,   wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, rmpgwt,    0,        wunit_picemu, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, rmpgwt11,  rmpgwt,   wunit_picemu, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, rmpgwt,    0,        wunit_picemu, rmpgwt,   midwunit_state, init_rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, rmpgwt11,  rmpgwt,   wunit_picemu, rmpgwt,   midwunit_state, init_rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", MACHINE_SUPPORTS_SAVE )

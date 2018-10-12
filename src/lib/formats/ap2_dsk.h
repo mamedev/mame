@@ -102,4 +102,29 @@ private:
 
 extern const floppy_format_type FLOPPY_EDD_FORMAT;
 
+class a2_woz_format : public floppy_image_format_t
+{
+public:
+		a2_woz_format();
+
+		virtual int identify(io_generic *io, uint32_t form_factor) override;
+		virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) override;
+		virtual bool supports_save() const override;
+
+		virtual const char *name() const override;
+		virtual const char *description() const override;
+		virtual const char *extensions() const override;
+
+private:
+		static const uint8_t signature[8];
+
+		static uint32_t r32(const std::vector<uint8_t> &data, uint32_t offset);
+		static uint16_t r16(const std::vector<uint8_t> &data, uint32_t offset);
+		static uint8_t r8(const std::vector<uint8_t> &data, uint32_t offset);
+		static uint32_t crc32r(const uint8_t *data, uint32_t size);
+		static uint32_t find_tag(const std::vector<uint8_t> &data, uint32_t tag);
+};
+
+extern const floppy_format_type FLOPPY_WOZ_FORMAT;
+
 #endif /* AP2_DISK_H */

@@ -3,16 +3,14 @@
 /*
 
       F2 System
-         "bootleg tumble pop" hardware (like tumbleb.c)
+         "bootleg tumble pop" hardware (like tumbleb.cpp)
 
   Driver by Pierpaolo Prazzoli with some bits by David Haywood
 
 
   Cross Pang        (c)1998 F2 System
-  Heuk Sun Baek Sa  (c)199? Oksan / F2 System
-  Bestri            (c)199? F2 System
-
-  Cross Pang New - Is shown on the website but is not currently dumped
+  Heuk Sun Baek Sa  (c)1997 Oksan / F2 System
+  Bestri            (c)1998 F2 System
 
   No Copyright Notice is displayed for Cross Pang however http://www.f2.co.kr
   at one time did list it as being by F2 System, Released April 1998
@@ -23,10 +21,6 @@
     related to Cross Pang)
   Bestri:
     Bestri includes Heuk San Baek Sa as one of it's three sub games.
-
-  Note:
-  Bestri tile banking / enable wrong (corrupt gfx in some modes?)
-   - check and merge with other Tumble Pop based implementations?
 
   2008-08
   Added Service dipswitch and dip locations based on Service Mode.
@@ -39,77 +33,96 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 /* main cpu */
 
-ADDRESS_MAP_START(crospang_state::crospang_base_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
+void crospang_state::crospang_base_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom().nopw(); // writes to rom quite often
 
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x270000, 0x270001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x270004, 0x270007) AM_WRITENOP // ??
-	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
-	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+	map(0x100000, 0x100001).w(FUNC(crospang_state::bestri_tilebank_select_w));
+	map(0x10000e, 0x10000f).w(FUNC(crospang_state::bestri_tilebank_data_w));
 
-ADDRESS_MAP_START(crospang_state::crospang_map)
-	AM_IMPORT_FROM(crospang_base_map)
+	map(0x120000, 0x1207ff).ram().w(FUNC(crospang_state::crospang_fg_videoram_w)).share("fg_videoram");
+	map(0x122000, 0x1227ff).ram().w(FUNC(crospang_state::crospang_bg_videoram_w)).share("bg_videoram");
+	map(0x200000, 0x2005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x210000, 0x2107ff).ram().share("spriteram");
+	map(0x270001, 0x270001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x270004, 0x270007).nopw(); // ??
+	map(0x280000, 0x280001).portr("P1_P2");
+	map(0x280002, 0x280003).portr("COIN");
+	map(0x280004, 0x280005).portr("DSW");
+}
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITENOP
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(crospang_fg_scrolly_w)
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(crospang_bg_scrollx_w)
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(crospang_bg_scrolly_w)
-	AM_RANGE(0x100008, 0x100009) AM_WRITE(crospang_fg_scrollx_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITENOP
+// the main RAM and scroll values move around / scrambled between games
 
-	AM_RANGE(0x320000, 0x32ffff) AM_RAM
-ADDRESS_MAP_END
+void crospang_state::crospang_map(address_map &map)
+{
+	crospang_base_map(map);
 
-ADDRESS_MAP_START(crospang_state::bestri_map)
-	AM_IMPORT_FROM(crospang_base_map)
+	map(0x100002, 0x100003).w(FUNC(crospang_state::crospang_fg_scrolly_w));
+	map(0x100004, 0x100005).w(FUNC(crospang_state::crospang_bg_scrollx_w));
+	map(0x100006, 0x100007).w(FUNC(crospang_state::crospang_bg_scrolly_w));
+	map(0x100008, 0x100009).w(FUNC(crospang_state::crospang_fg_scrollx_w));
 
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(bestri_fg_scrollx_w)
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrolly_w)
-	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(bestri_bg_scrolly_w)
-	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(bestri_bg_scrollx_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(bestri_tilebank_w)
+	map(0x320000, 0x32ffff).ram();
+}
 
-	AM_RANGE(0x3a0000, 0x3affff) AM_RAM
-ADDRESS_MAP_END
+void crospang_state::pitapat_map(address_map &map)
+{
+	crospang_base_map(map);
 
-ADDRESS_MAP_START(crospang_state::bestria_map)
-	AM_IMPORT_FROM(crospang_base_map)
+	map(0x100002, 0x100003).w(FUNC(crospang_state::crospang_fg_scrolly_w));
+	map(0x100004, 0x100005).w(FUNC(crospang_state::crospang_bg_scrollx_w));
+	map(0x100006, 0x100007).w(FUNC(crospang_state::crospang_bg_scrolly_w));
+	map(0x100008, 0x100009).w(FUNC(crospang_state::crospang_fg_scrollx_w));
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITENOP // ??
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrollx_w)
-	AM_RANGE(0x100008, 0x100009) AM_WRITE(bestri_fg_scrolly_w)
-	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(bestri_bg_scrollx_w)
-	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(bestri_bg_scrolly_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(bestri_tilebank_w)
+	map(0x300000, 0x30ffff).ram();
+}
 
-	AM_RANGE(0x340000, 0x34ffff) AM_RAM
-ADDRESS_MAP_END
+void crospang_state::bestri_map(address_map &map)
+{
+	crospang_base_map(map);
+
+	map(0x100004, 0x100005).w(FUNC(crospang_state::bestri_fg_scrollx_w));
+	map(0x100006, 0x100007).w(FUNC(crospang_state::bestri_fg_scrolly_w));
+	map(0x10000a, 0x10000b).w(FUNC(crospang_state::bestri_bg_scrolly_w));
+	map(0x10000c, 0x10000d).w(FUNC(crospang_state::bestri_bg_scrollx_w));
+
+	map(0x3a0000, 0x3affff).ram();
+}
+
+void crospang_state::bestria_map(address_map &map)
+{
+	crospang_base_map(map);
+
+	map(0x100006, 0x100007).w(FUNC(crospang_state::bestri_fg_scrollx_w));
+	map(0x100008, 0x100009).w(FUNC(crospang_state::bestri_fg_scrolly_w));
+	map(0x10000a, 0x10000b).w(FUNC(crospang_state::bestri_bg_scrollx_w));
+	map(0x10000c, 0x10000d).w(FUNC(crospang_state::bestri_bg_scrolly_w));
+
+	map(0x340000, 0x34ffff).ram();
+}
 
 /* sound cpu */
 
-ADDRESS_MAP_START(crospang_state::crospang_sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void crospang_state::crospang_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+}
 
-ADDRESS_MAP_START(crospang_state::crospang_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void crospang_state::crospang_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x02, 0x02).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /* verified from M68000 code */
@@ -278,8 +291,8 @@ static INPUT_PORTS_START( bestri )
 	PORT_DIPNAME( 0x00c0, 0x00c0, "Girls" )                 PORT_DIPLOCATION("SW1:7,8")   /* stored at 0x3a6faa.w */
 	PORT_DIPSETTING(      0x00c0, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Yes ) )
-//  PORT_DIPSETTING(      0x0040, DEF_STR( No ) )
-//  PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0040, "No (duplicate 1)" )
+	PORT_DIPSETTING(      0x0000, "No (duplicate 2)" )
 	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:1,2,3") /* stored at 0x3a6fa6.w but not read back ? */
 	PORT_DIPSETTING(      0x0700, "0" )
 	PORT_DIPSETTING(      0x0300, "1" )
@@ -301,6 +314,79 @@ static INPUT_PORTS_START( bestri )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )        /* read once during initialisation but not even stored */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pitapat )
+	PORT_START("P1_P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "Boxes to Marvels" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x0004, "1" )
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") // this and the following dip might be difficulty related. By having one or both of them on, most of the times you win the first round without doing anything
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static const gfx_layout tlayout =
 {
 	16,16,
@@ -315,9 +401,7 @@ static const gfx_layout tlayout =
 };
 
 
-static GFXDECODE_START( crospang )
-	//GFXDECODE_ENTRY( "gfx1", 0, tcharlayout, 256, 16 )    /* Characters 8x8 */
-	//GFXDECODE_ENTRY( "gfx1", 0, tlayout,     512, 16 )    /* Tiles 16x16 */
+static GFXDECODE_START( gfx_crospang )
 	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
 GFXDECODE_END
@@ -325,26 +409,29 @@ GFXDECODE_END
 void crospang_state::machine_start()
 {
 	save_item(NAME(m_bestri_tilebank));
-
+	save_item(NAME(m_bestri_tilebankselect));
 }
 
 void crospang_state::machine_reset()
 {
-	m_bestri_tilebank = 0;
+	m_bestri_tilebank[0] = 0x00;
+	m_bestri_tilebank[1] = 0x01;
+	m_bestri_tilebank[2] = 0x02;
+	m_bestri_tilebank[3] = 0x03;
 
+	m_bestri_tilebankselect = 0;
 }
-
 
 MACHINE_CONFIG_START(crospang_state::crospang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(14'318'181)/2) /* 68000P10 @ 7.15909MHz */
-	MCFG_CPU_PROGRAM_MAP(crospang_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(14'318'181)/2) /* 68000P10 @ 7.15909MHz */
+	MCFG_DEVICE_PROGRAM_MAP(crospang_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* 3.579545MHz */
-	MCFG_CPU_PROGRAM_MAP(crospang_sound_map)
-	MCFG_CPU_IO_MAP(crospang_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* 3.579545MHz */
+	MCFG_DEVICE_PROGRAM_MAP(crospang_sound_map)
+	MCFG_DEVICE_IO_MAP(crospang_sound_io_map)
 
 
 	/* video hardware */
@@ -358,7 +445,7 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crospang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crospang)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
@@ -369,15 +456,15 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/16, PIN7_HIGH) // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/16, okim6295_device::PIN7_HIGH) // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -385,22 +472,32 @@ MACHINE_CONFIG_START(crospang_state::bestri)
 	crospang(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bestri_map)
-
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bestri_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(crospang_state::bestria)
 	crospang(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bestria_map)
-
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bestria_map)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(crospang_state::pitapat)
+	crospang(config);
 
-ROM_START( crospang )
+	// can't be 14'318'181 / 2 as the inputs barely respond and the background graphics glitch badly when the screen fills, doesn't appear to be a vblank bit anywhere to negate this either, P12 reated part
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(14'318'181))
+	MCFG_DEVICE_PROGRAM_MAP(pitapat_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pitapat_map)
+MACHINE_CONFIG_END
+
+ROM_START( crospang ) /* Developed April 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "p1.bin", 0x00001, 0x20000, CRC(0bcbbaad) SHA1(807f07be340d7af0aad8d49461b5a7f0221ea3b7) )
 	ROM_LOAD16_BYTE( "p2.bin", 0x00000, 0x20000, CRC(0947d204) SHA1(35e7e277c51888a66d305994bf05c3f6bfc3c29e) )
@@ -409,8 +506,7 @@ ROM_START( crospang )
 	ROM_LOAD( "s1.bin", 0x00000, 0x10000, CRC(d61a224c) SHA1(5cd1b2d136ad58ab550c7ba135558d6c8a4cd8f6) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
-	ROM_LOAD( "s2.bin", 0x00000, 0x20000, CRC(9f9ecd22) SHA1(631ffe14018ba39658c435b8ecb23b19a14569ee) ) // sample rom contains oksan?
-
+	ROM_LOAD( "s2.bin", 0x00000, 0x20000, CRC(9f9ecd22) SHA1(631ffe14018ba39658c435b8ecb23b19a14569ee) ) // sample rom contains oksan
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* bg tiles */
 	ROM_LOAD16_BYTE( "rom1.bin", 0x00000, 0x40000, CRC(905042bb) SHA1(ed5b97e88d24e55f8fcfaaa34251582976cb2527) )
@@ -470,7 +566,6 @@ ROM_START( heuksun )
 	ROM_CONTINUE ( 0x040000,0x20000)
 	ROM_CONTINUE ( 0x140000,0x20000)
 
-
 	ROM_REGION( 0x100000, "gfx2", 0 ) // sprites
 	ROM_LOAD16_BYTE( "ud14.p11", 0x00000, 0x40000, CRC(4fc2b574) SHA1(f3330d9cc3065b5a96e222300c2ae01e57241632) )
 	ROM_LOAD16_BYTE( "ud15.m11", 0x00001, 0x40000, CRC(1d6187a6) SHA1(51f1ac086d67e8b35081ddc14e28b218d3153779) )
@@ -523,7 +618,7 @@ ud17.e12 D
 
 */
 
-ROM_START( bestri )
+ROM_START( bestri ) /* Developed March 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ua02.i3", 0x00001, 0x80000, CRC(9e94023d) SHA1(61a07eb835d324cb4fe7e3d366dd3907838b2554) )
 	ROM_LOAD16_BYTE( "ua03.i5", 0x00000, 0x80000, CRC(08cfa8d8) SHA1(684729887bf2dd2fe22e5bd2e32073169d426e02) )
@@ -544,11 +639,11 @@ ROM_START( bestri )
 	ROM_CONTINUE ( 0x100000,0x20000)
 	ROM_CONTINUE ( 0x040000,0x20000)
 	ROM_CONTINUE ( 0x140000,0x20000)
-	ROM_LOAD16_BYTE( "uc28.n12", 0x80001, 0x20000, CRC(9938be27) SHA1(1da7861dc44eba6e4ed6a27997428f7652b2f3b5) )
+	ROM_LOAD16_BYTE( "uc29.k12", 0x80001, 0x20000, CRC(0260c321) SHA1(0ae7754c0f7de314bd72c51e273f7aaea2bae705) )
 	ROM_CONTINUE ( 0x180001,0x20000)
 	ROM_CONTINUE ( 0x0c0001,0x20000)
 	ROM_CONTINUE ( 0x1c0001,0x20000)
-	ROM_LOAD16_BYTE( "uc29.k12", 0x80000, 0x20000, CRC(0260c321) SHA1(0ae7754c0f7de314bd72c51e273f7aaea2bae705) )
+	ROM_LOAD16_BYTE( "uc28.n12", 0x80000, 0x20000, CRC(9938be27) SHA1(1da7861dc44eba6e4ed6a27997428f7652b2f3b5) )
 	ROM_CONTINUE ( 0x180000,0x20000)
 	ROM_CONTINUE ( 0x0c0000,0x20000)
 	ROM_CONTINUE ( 0x1c0000,0x20000)
@@ -560,43 +655,97 @@ ROM_START( bestri )
 	ROM_LOAD16_BYTE( "ud17.e12", 0x100001, 0x80000, CRC(3a3a3f1a) SHA1(48843140cd63c9387e09b84bd41b13dba35f48ad) )
 ROM_END
 
-ROM_START( bestria )
+ROM_START( bestria ) /* Developed March 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "O_UA02.I3", 0x00001, 0x80000, CRC(035c86f6) SHA1(d501553ed7fdb462c9c26fff6473cefe71424e26) )
-	ROM_LOAD16_BYTE( "E_UA03.I5", 0x00000, 0x80000, CRC(7c53d9f8) SHA1(92dc92471497292d3ba90f3f2fb35f7b4fba240c) )
+	ROM_LOAD16_BYTE( "o_ua02.i3", 0x00001, 0x80000, CRC(035c86f6) SHA1(d501553ed7fdb462c9c26fff6473cefe71424e26) )
+	ROM_LOAD16_BYTE( "e_ua03.i5", 0x00000, 0x80000, CRC(7c53d9f8) SHA1(92dc92471497292d3ba90f3f2fb35f7b4fba240c) )
 
 	ROM_REGION( 0x040000, "audiocpu", 0 ) /* Z80 */
-	ROM_LOAD( "US02.P3", 0x00000, 0x10000, CRC(c7cc05fa) SHA1(5fbf479be98f618c63e4c74a250d51279c2f5e3b)) // same as huek
+	ROM_LOAD( "us02.p3", 0x00000, 0x10000, CRC(c7cc05fa) SHA1(5fbf479be98f618c63e4c74a250d51279c2f5e3b)) // same as huek
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "US08.Q7", 0x00000, 0x40000, CRC(85d8f3de) SHA1(af55678bbe2c187cfee063c6f74cdd568307a7a2) )
+	ROM_LOAD( "us08.q7", 0x00000, 0x40000, CRC(85d8f3de) SHA1(af55678bbe2c187cfee063c6f74cdd568307a7a2) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) // tiles
 
-	ROM_LOAD16_BYTE( "2_UC08.M12", 0x00001, 0x20000, CRC(23778472) SHA1(00f54aefe52f2f76ab2f2628bf2e860d468e4a02) )
+	ROM_LOAD16_BYTE( "2_uc08.m12", 0x00001, 0x20000, CRC(23778472) SHA1(00f54aefe52f2f76ab2f2628bf2e860d468e4a02) )
 	ROM_CONTINUE ( 0x100001,0x20000)
 	ROM_CONTINUE ( 0x040001,0x20000)
 	ROM_CONTINUE ( 0x140001,0x20000)
-	ROM_LOAD16_BYTE( "0_UC07.P12", 0x00000, 0x20000, CRC(7aad194c) SHA1(5fc5882886576d939763200e705e1085be60671a) )
+	ROM_LOAD16_BYTE( "0_uc07.p12", 0x00000, 0x20000, CRC(7aad194c) SHA1(5fc5882886576d939763200e705e1085be60671a) )
 	ROM_CONTINUE ( 0x100000,0x20000)
 	ROM_CONTINUE ( 0x040000,0x20000)
 	ROM_CONTINUE ( 0x140000,0x20000)
-	ROM_LOAD16_BYTE( "1_UC28.N12", 0x80001, 0x20000, CRC(4f737007) SHA1(37f379f3b491da35153ed3d14d8920f94b060643) )
+	ROM_LOAD16_BYTE( "3_uc29.k12", 0x80001, 0x20000, CRC(2f5b244f) SHA1(1d9bf3d1dd55a87d52d2d614f46177605e32c6bf) )
 	ROM_CONTINUE ( 0x180001,0x20000)
 	ROM_CONTINUE ( 0x0c0001,0x20000)
 	ROM_CONTINUE ( 0x1c0001,0x20000)
-	ROM_LOAD16_BYTE( "3_UC29.K12", 0x80000, 0x20000, CRC(2f5b244f) SHA1(1d9bf3d1dd55a87d52d2d614f46177605e32c6bf) )
+	ROM_LOAD16_BYTE( "1_uc28.n12", 0x80000, 0x20000, CRC(4f737007) SHA1(37f379f3b491da35153ed3d14d8920f94b060643) )
 	ROM_CONTINUE ( 0x180000,0x20000)
 	ROM_CONTINUE ( 0x0c0000,0x20000)
 	ROM_CONTINUE ( 0x1c0000,0x20000)
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) // sprites
-	ROM_LOAD16_BYTE( "A_UD14.J12", 0x000000, 0x80000, CRC(3502f71b) SHA1(ec012c414ace560ab67d60ce407bd67a4640c217) )
-	ROM_LOAD16_BYTE( "B_UD15.H12", 0x000001, 0x80000, CRC(2636b837) SHA1(692987bd8ace452ee40a253437f1e3672f737f98) )
-	ROM_LOAD16_BYTE( "C_UD16.G12", 0x100000, 0x80000, CRC(68b0ff81) SHA1(969579c2a29b577b9077e70a03c0ec92997ddcc0) )
-	ROM_LOAD16_BYTE( "D_UD17.E12", 0x100001, 0x80000, CRC(60082aed) SHA1(1431afe1a8200bd87520e90051db0ec43207b265) )
+	ROM_LOAD16_BYTE( "a_ud14.j12", 0x000000, 0x80000, CRC(3502f71b) SHA1(ec012c414ace560ab67d60ce407bd67a4640c217) )
+	ROM_LOAD16_BYTE( "b_ud15.h12", 0x000001, 0x80000, CRC(2636b837) SHA1(692987bd8ace452ee40a253437f1e3672f737f98) )
+	ROM_LOAD16_BYTE( "c_ud16.g12", 0x100000, 0x80000, CRC(68b0ff81) SHA1(969579c2a29b577b9077e70a03c0ec92997ddcc0) )
+	ROM_LOAD16_BYTE( "d_ud17.e12", 0x100001, 0x80000, CRC(60082aed) SHA1(1431afe1a8200bd87520e90051db0ec43207b265) )
 ROM_END
 
+
+/*
+Pitapat Puzzle (c) 1997
+
++----------------------------------+
+|  YM3014 YM3812  M6295 us08       |
+|        6116                  uc07|
+|      us02  Z80               uc08|
+|J  6116                       ud14|
+|A  6116   GAL                 ud15|
+|M    62256 62256 6264         ud16|
+|M DSW2 ua02 ua03 6264         ud17|
+|A      68000  A1020B              |
+|  DSW1              GAL  GAL      |
+|                  6116        6116|
+|14.318MHz         6116   GAL  6116|
++----------------------------------+
+
+      CPU: Motorola MC68000P12
+Sound CPU: NEC D780C
+    Sound: YM3812/YM3014, OKI M6295
+      OSC: 14.318181MHz
+ Graphics: Actel A1020B PL84C
+      DSW: 8 position dipswitch x 2
+
+*/
+
+ROM_START( pitapat )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "ua02", 0x00001, 0x40000, CRC(b3d3ac7e) SHA1(7ff894cb6bcb724834de95bdefdb6a6c0ae1d39b) )
+	ROM_LOAD16_BYTE( "ua03", 0x00000, 0x40000, CRC(eda85635) SHA1(b6723f5c196c4a531e411fc0d1f2632f514050ac) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* z80  */
+	ROM_LOAD( "us02", 0x00000, 0x10000, CRC(c7cc05fa) SHA1(5fbf479be98f618c63e4c74a250d51279c2f5e3b) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
+	ROM_LOAD( "us08", 0x00000, 0x40000, CRC(dab99a43) SHA1(32d329f9423ec91eb83ea42ee04de70d92568328) ) // sample rom contains oksan?
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* bg tiles */
+	ROM_LOAD16_BYTE( "uc08", 0x00001, 0x20000, CRC(3f827218) SHA1(38a3f427fad1850776a21a6486251fe33d7af498) )
+	ROM_CONTINUE ( 0x100001,0x20000)
+	ROM_CONTINUE ( 0x040001,0x20000)
+	ROM_CONTINUE ( 0x140001,0x20000)
+	ROM_LOAD16_BYTE( "uc07", 0x00000, 0x20000, CRC(f4a529c1) SHA1(a7cd10e0f57c5495684d82f0471b092599ae4c26) )
+	ROM_CONTINUE ( 0x100000,0x20000)
+	ROM_CONTINUE ( 0x040000,0x20000)
+	ROM_CONTINUE ( 0x140000,0x20000)
+
+	ROM_REGION( 0x100000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "ud14", 0x000000, 0x40000, CRC(92e23e92) SHA1(4e1b85cef2a55a54ca571bf948809715dd789f30) )
+	ROM_LOAD16_BYTE( "ud15", 0x000001, 0x40000, CRC(7d3d6dba) SHA1(d543613fa22407bc8570e9e388c35620850ecd15) )
+	ROM_LOAD16_BYTE( "ud16", 0x080000, 0x40000, CRC(5c09dff8) SHA1(412260784e45c6d742e02a285e3adc7361034268) )
+	ROM_LOAD16_BYTE( "ud17", 0x080001, 0x40000, CRC(d4c67e2e) SHA1(e684b58333d64f5961983b42f56c61bb0bea2e5c) )
+ROM_END
 
 void crospang_state::tumblepb_gfx1_rearrange()
 {
@@ -619,12 +768,13 @@ void crospang_state::tumblepb_gfx1_rearrange()
 	}
 }
 
-DRIVER_INIT_MEMBER(crospang_state,crospang)
+void crospang_state::init_crospang()
 {
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1998, crospang,        0, crospang, crospang, crospang_state, crospang, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, heuksun,         0, crospang,  heuksun, crospang_state, crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestri,          0,   bestri,   bestri, crospang_state, crospang, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestria,    bestri,  bestria,   bestri, crospang_state, crospang, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, crospang, 0,      crospang, crospang, crospang_state, init_crospang, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, heuksun,  0,      crospang, heuksun,  crospang_state, init_crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestri,   0,      bestri,   bestri,   crospang_state, init_crospang, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestria,  bestri, bestria,  bestri,   crospang_state, init_crospang, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, pitapat,  0,      pitapat,  pitapat,  crospang_state, init_crospang, ROT0, "F2 System",         "Pitapat Puzzle", MACHINE_SUPPORTS_SAVE ) // Test Mode calls it 'Puzzle Ball'

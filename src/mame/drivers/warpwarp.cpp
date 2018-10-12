@@ -123,6 +123,14 @@ Notes:
 
 - There are images/videos on the net of kaitei and geebee running in 3bpp
   (aka 7 colors), this is assumed to be a homebrew repair or hack.
+  Update: Gee Bee definitely uses an overlay while kaitei actually outputs
+  colors depending on the monitor type used (color or b&w).
+  sos is the odd one: it seems to be running in a b&w environment but a pic
+  on the net shows it with reversed black and white compared to current
+  implementation.
+  Also the flyer shows the girl to be colorized purple, while the points
+  numbers are in cyan and text in red (and this arrangement doesn't
+  make much sense, different version maybe?).
 
 ***************************************************************************/
 
@@ -130,7 +138,6 @@ Notes:
 #include "includes/warpwarp.h"
 
 #include "cpu/i8085/i8085.h"
-#include "machine/74259.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -148,10 +155,10 @@ void warpwarp_state::machine_start()
 }
 
 /* Interrupt Gen */
-INTERRUPT_GEN_MEMBER(warpwarp_state::vblank_irq)
+WRITE_LINE_MEMBER(warpwarp_state::vblank_irq)
 {
-	if (m_ball_on)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_ball_on)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 /* B&W Games I/O */
@@ -192,21 +199,6 @@ WRITE8_MEMBER(warpwarp_state::geebee_out6_w)
 			m_geebee_sound->sound_w(space,0,data);
 			break;
 	}
-}
-
-WRITE_LINE_MEMBER(warpwarp_state::lamp_1_w)
-{
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(warpwarp_state::lamp_2_w)
-{
-	output().set_led_value(1, state);
-}
-
-WRITE_LINE_MEMBER(warpwarp_state::lamp_3_w)
-{
-	output().set_led_value(2, state);
 }
 
 WRITE_LINE_MEMBER(warpwarp_state::counter_w)
@@ -290,44 +282,48 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
 
 
 
-ADDRESS_MAP_START(warpwarp_state::geebee_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x400) AM_RAM_WRITE(geebee_videoram_w) AM_SHARE("geebee_videoram") // mirror used by kaitei due to a bug
-	AM_RANGE(0x3000, 0x37ff) AM_ROM AM_REGION("gfx1", 0) // 3000-33ff in geebee
-	AM_RANGE(0x4000, 0x40ff) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_READ(geebee_in_r)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(geebee_out6_w)
-	AM_RANGE(0x7000, 0x7007) AM_MIRROR(0x0ff8) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void warpwarp_state::geebee_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).mirror(0x400).ram().w(FUNC(warpwarp_state::geebee_videoram_w)).share("geebee_videoram"); // mirror used by kaitei due to a bug
+	map(0x3000, 0x37ff).rom().region("gfx1", 0); // 3000-33ff in geebee
+	map(0x4000, 0x40ff).ram();
+	map(0x5000, 0x53ff).r(FUNC(warpwarp_state::geebee_in_r));
+	map(0x6000, 0x6fff).w(FUNC(warpwarp_state::geebee_out6_w));
+	map(0x7000, 0x7007).mirror(0x0ff8).w(m_latch, FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(warpwarp_state::geebee_port_map)
-	AM_RANGE(0x50, 0x53) AM_READ(geebee_in_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(geebee_out6_w)
-	AM_RANGE(0x70, 0x77) AM_MIRROR(0x08) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void warpwarp_state::geebee_port_map(address_map &map)
+{
+	map(0x50, 0x53).r(FUNC(warpwarp_state::geebee_in_r));
+	map(0x60, 0x6f).w(FUNC(warpwarp_state::geebee_out6_w));
+	map(0x70, 0x77).mirror(0x08).w(m_latch, FUNC(ls259_device::write_d0));
+}
 
 
-ADDRESS_MAP_START(warpwarp_state::bombbee_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0x6000, 0x600f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
-	AM_RANGE(0x6010, 0x601f) AM_READ(warpwarp_vol_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music1_w)
-	AM_RANGE(0x6020, 0x602f) AM_READ(warpwarp_dsw1_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music2_w)
-	AM_RANGE(0x6030, 0x6037) AM_MIRROR(0x0008) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void warpwarp_state::bombbee_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x47ff).ram().w(FUNC(warpwarp_state::warpwarp_videoram_w)).share("videoram");
+	map(0x4800, 0x4fff).rom().region("gfx1", 0);
+	map(0x6000, 0x600f).rw(FUNC(warpwarp_state::warpwarp_sw_r), FUNC(warpwarp_state::warpwarp_out0_w));
+	map(0x6010, 0x601f).r(FUNC(warpwarp_state::warpwarp_vol_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music1_w));
+	map(0x6020, 0x602f).r(FUNC(warpwarp_state::warpwarp_dsw1_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music2_w));
+	map(0x6030, 0x6037).mirror(0x0008).w(m_latch, FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(warpwarp_state::warpwarp_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
-	AM_RANGE(0xc010, 0xc01f) AM_READ(warpwarp_vol_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music1_w)
-	AM_RANGE(0xc020, 0xc02f) AM_READ(warpwarp_dsw1_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music2_w)
-	AM_RANGE(0xc030, 0xc037) AM_MIRROR(0x0008) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void warpwarp_state::warpwarp_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x83ff).ram();
+	map(0x4000, 0x47ff).ram().w(FUNC(warpwarp_state::warpwarp_videoram_w)).share("videoram");
+	map(0x4800, 0x4fff).rom().region("gfx1", 0);
+	map(0xc000, 0xc00f).rw(FUNC(warpwarp_state::warpwarp_sw_r), FUNC(warpwarp_state::warpwarp_out0_w));
+	map(0xc010, 0xc01f).r(FUNC(warpwarp_state::warpwarp_vol_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music1_w));
+	map(0xc020, 0xc02f).r(FUNC(warpwarp_state::warpwarp_dsw1_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music2_w));
+	map(0xc030, 0xc037).mirror(0x0008).w(m_latch, FUNC(ls259_device::write_d0));
+}
 
 
 
@@ -434,7 +430,16 @@ static INPUT_PORTS_START( navarone )
 	PORT_BIT( 0x02, 0x00, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kaitei_config )
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x01, "Monitor Type" )
+	PORT_CONFSETTING(    0x00, "Monochrome" )
+	PORT_CONFSETTING(    0x01, "Color" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( kaitein )
+	PORT_INCLUDE( kaitei_config )
+
 	PORT_START("SW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_COCKTAIL
@@ -475,6 +480,8 @@ static INPUT_PORTS_START( kaitein )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kaitei )
+	PORT_INCLUDE( kaitei_config )
+
 	PORT_START("SW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
@@ -691,15 +698,15 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( 1k )
+static GFXDECODE_START( gfx_1k )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( 2k )
+static GFXDECODE_START( gfx_2k )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( color )
+static GFXDECODE_START( gfx_color )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -708,51 +715,51 @@ GFXDECODE_END
 MACHINE_CONFIG_START(warpwarp_state::geebee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(geebee_map)
-	MCFG_CPU_IO_MAP(geebee_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(geebee_map)
+	MCFG_DEVICE_IO_MAP(geebee_port_map)
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 5N
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(warpwarp_state, lamp_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(warpwarp_state, lamp_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(warpwarp_state, lamp_3_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(warpwarp_state, counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(warpwarp_state, lock_out_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(warpwarp_state, geebee_bgw_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(warpwarp_state, ball_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(warpwarp_state, inv_w))
+	LS259(config, m_latch); // 5N
+	m_latch->q_out_cb<0>().set_output("led0"); // LAMP 1
+	m_latch->q_out_cb<1>().set_output("led1"); // LAMP 2
+	m_latch->q_out_cb<2>().set_output("led2"); // LAMP 3
+	m_latch->q_out_cb<3>().set(FUNC(warpwarp_state::counter_w));
+	m_latch->q_out_cb<4>().set(FUNC(warpwarp_state::lock_out_w));
+	m_latch->q_out_cb<5>().set(FUNC(warpwarp_state::geebee_bgw_w));
+	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
+	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, warpwarp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1k)
 	MCFG_PALETTE_ADD("palette", 4*2)
 
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,geebee)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,geebee)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("geebee_custom", GEEBEE, 0)
+	MCFG_DEVICE_ADD("geebee_custom", GEEBEE_SOUND, MASTER_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(warpwarp_state::geebeeb)
+void warpwarp_state::geebeeb(machine_config &config)
+{
 	geebee(config);
-	MCFG_DEVICE_MODIFY("latch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // remove coin lockout
-MACHINE_CONFIG_END
+	m_latch->q_out_cb<4>().set_nop(); // remove coin lockout
+}
 
 MACHINE_CONFIG_START(warpwarp_state::navarone)
 	geebee(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", 2k)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_2k)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(2*2)
 
@@ -760,41 +767,53 @@ MACHINE_CONFIG_START(warpwarp_state::navarone)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(warpwarp_state::kaitei)
+	geebee(config);
+
+	/* basic machine hardware */
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_1k)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(4*2+1)
+
+	MCFG_MACHINE_RESET_OVERRIDE(warpwarp_state,kaitei)
+MACHINE_CONFIG_END
+
+
 MACHINE_CONFIG_START(warpwarp_state::bombbee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)
-	MCFG_CPU_PROGRAM_MAP(bombbee_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/9)
+	MCFG_DEVICE_PROGRAM_MAP(bombbee_map)
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 6L on Warp Warp
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(warpwarp_state, lamp_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(warpwarp_state, lamp_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(warpwarp_state, lamp_3_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(warpwarp_state, lock_out_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(warpwarp_state, counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(warpwarp_state, ball_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(warpwarp_state, inv_w))
+	LS259(config, m_latch); // 6L on Warp Warp
+	m_latch->q_out_cb<0>().set_output("led0"); // LAMP 1
+	m_latch->q_out_cb<1>().set_output("led1"); // LAMP 2
+	m_latch->q_out_cb<2>().set_output("led2"); // LAMP 3
+	m_latch->q_out_cb<3>().set_nop(); // n.c.
+	m_latch->q_out_cb<4>().set(FUNC(warpwarp_state::lock_out_w));
+	m_latch->q_out_cb<5>().set(FUNC(warpwarp_state::counter_w));
+	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
+	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, warpwarp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", color)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_color)
 
 	MCFG_PALETTE_ADD("palette", 2*256+1)
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,warpwarp)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,warpwarp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("warpwarp_custom", WARPWARP, 0)
+	MCFG_DEVICE_ADD("warpwarp_custom", WARPWARP_SOUND, MASTER_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -802,8 +821,8 @@ MACHINE_CONFIG_START(warpwarp_state::warpwarp)
 	bombbee(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(warpwarp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(warpwarp_map)
 MACHINE_CONFIG_END
 
 
@@ -946,7 +965,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(warpwarp_state,geebee)
+void warpwarp_state::init_geebee()
 {
 	m_handle_joystick = 0;
 
@@ -955,7 +974,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,geebee)
 	m_ball_sizey = 4;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,navarone)
+void warpwarp_state::init_navarone()
 {
 	m_handle_joystick = 1;
 
@@ -964,25 +983,25 @@ DRIVER_INIT_MEMBER(warpwarp_state,navarone)
 	m_ball_sizey = 4;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,kaitein)
+void warpwarp_state::init_kaitein()
 {
 	m_handle_joystick = 1;
 
-	m_ball_pen = 1;
+	m_ball_pen = 8;
 	m_ball_sizex = 1;
 	m_ball_sizey = 16;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,kaitei)
+void warpwarp_state::init_kaitei()
 {
 	m_handle_joystick = 0;
 
-	m_ball_pen = 1;
+	m_ball_pen = 8;
 	m_ball_sizex = 1;
 	m_ball_sizey = 16;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,sos)
+void warpwarp_state::init_sos()
 {
 	m_handle_joystick = 1;
 
@@ -991,7 +1010,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,sos)
 	m_ball_sizey = 2;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,bombbee)
+void warpwarp_state::init_bombbee()
 {
 	m_handle_joystick = 0;
 
@@ -1000,7 +1019,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,bombbee)
 	m_ball_sizey = 4;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,warpwarp)
+void warpwarp_state::init_warpwarp()
 {
 	m_handle_joystick = 1;
 
@@ -1011,19 +1030,19 @@ DRIVER_INIT_MEMBER(warpwarp_state,warpwarp)
 
 
 /* B & W games */
-GAMEL(1978, geebee,     0,        geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco", "Gee Bee (Japan)", MACHINE_SUPPORTS_SAVE, layout_geebee )
-GAMEL(1978, geebeea,    geebee,   geebeeb,  geebeeb,   warpwarp_state, geebee,   ROT90, "Namco (Alca license)", "Gee Bee (UK)", MACHINE_SUPPORTS_SAVE, layout_geebee )
-GAMEL(1978, geebeeb,    geebee,   geebeeb,  geebeeb,   warpwarp_state, geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", MACHINE_SUPPORTS_SAVE, layout_geebee ) // Fratelli Bertolino
-GAMEL(1978, geebeeg,    geebee,   geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", MACHINE_SUPPORTS_SAVE, layout_geebee )
+GAMEL( 1978, geebee,     0,        geebee,   geebee,    warpwarp_state, init_geebee,   ROT90, "Namco", "Gee Bee (Japan)", MACHINE_SUPPORTS_SAVE, layout_geebee )
+GAMEL( 1978, geebeea,    geebee,   geebeeb,  geebeeb,   warpwarp_state, init_geebee,   ROT90, "Namco (Alca license)", "Gee Bee (UK)", MACHINE_SUPPORTS_SAVE, layout_geebee )
+GAMEL( 1978, geebeeb,    geebee,   geebeeb,  geebeeb,   warpwarp_state, init_geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", MACHINE_SUPPORTS_SAVE, layout_geebee ) // Fratelli Bertolino
+GAMEL( 1978, geebeeg,    geebee,   geebee,   geebee,    warpwarp_state, init_geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", MACHINE_SUPPORTS_SAVE, layout_geebee )
 
-GAMEL(1980, navarone,   0,        navarone, navarone,  warpwarp_state, navarone, ROT90, "Namco", "Navarone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_navarone )
-GAME( 1980, kaitein,    kaitei,   navarone, kaitein,   warpwarp_state, kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", MACHINE_SUPPORTS_SAVE ) // pretty sure it didn't have a color overlay
-GAME( 1980, kaitei,     0,        navarone, kaitei,    warpwarp_state, kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1980, sos,        0,        navarone, sos,       warpwarp_state, sos,      ROT90, "Namco", "SOS", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // developed by Shoei?
+GAMEL( 1980, navarone,   0,        navarone, navarone,  warpwarp_state, init_navarone, ROT90, "Namco", "Navarone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_navarone )
+GAME(  1980, kaitein,    kaitei,   kaitei,   kaitein,   warpwarp_state, init_kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", MACHINE_SUPPORTS_SAVE ) // pretty sure it didn't have a color overlay
+GAME(  1980, kaitei,     0,        kaitei,   kaitei,    warpwarp_state, init_kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", MACHINE_SUPPORTS_SAVE ) // "
+GAME(  1980, sos,        0,        navarone, sos,       warpwarp_state, init_sos,      ROT90, "Namco", "SOS", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // developed by Shoei? Flyer shows a Shoei logo.
 
 /* Color games */
-GAME( 1979, bombbee,    0,        bombbee,  bombbee,   warpwarp_state, bombbee,  ROT90, "Namco", "Bomb Bee", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, cutieq,     0,        bombbee,  cutieq,    warpwarp_state, bombbee,  ROT90, "Namco", "Cutie Q", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, warpwarp,   0,        warpwarp, warpwarp,  warpwarp_state, warpwarp, ROT90, "Namco", "Warp & Warp", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, warpwarpr,  warpwarp, warpwarp, warpwarpr, warpwarp_state, warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, warpwarpr2, warpwarp, warpwarp, warpwarpr, warpwarp_state, warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1979, bombbee,    0,        bombbee,  bombbee,   warpwarp_state, init_bombbee,  ROT90, "Namco", "Bomb Bee", MACHINE_SUPPORTS_SAVE )
+GAME(  1979, cutieq,     0,        bombbee,  cutieq,    warpwarp_state, init_bombbee,  ROT90, "Namco", "Cutie Q", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, warpwarp,   0,        warpwarp, warpwarp,  warpwarp_state, init_warpwarp, ROT90, "Namco", "Warp & Warp", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, warpwarpr,  warpwarp, warpwarp, warpwarpr, warpwarp_state, init_warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, warpwarpr2, warpwarp, warpwarp, warpwarpr, warpwarp_state, init_warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 2)", MACHINE_SUPPORTS_SAVE )

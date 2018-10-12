@@ -85,19 +85,24 @@ class tec1_state : public driver_device
 {
 public:
 	tec1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
-		m_cass(*this, "cassette"),
-		m_wave(*this, WAVE_TAG),
-		m_key_pressed(0),
-		m_io_line0(*this, "LINE0"),
-		m_io_line1(*this, "LINE1"),
-		m_io_line2(*this, "LINE2"),
-		m_io_line3(*this, "LINE3"),
-		m_io_shift(*this, "SHIFT")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
+		, m_wave(*this, "wave")
+		, m_key_pressed(0)
+		, m_io_line0(*this, "LINE0")
+		, m_io_line1(*this, "LINE1")
+		, m_io_line2(*this, "LINE2")
+		, m_io_line3(*this, "LINE3")
+		, m_io_shift(*this, "SHIFT")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void tec1(machine_config &config);
+	void tecjmon(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cass;
@@ -108,6 +113,7 @@ public:
 	required_ioport m_io_line2;
 	required_ioport m_io_line3;
 	required_ioport m_io_shift;
+	output_finder<6> m_digits;
 	emu_timer *m_kbd_timer;
 	DECLARE_READ8_MEMBER( tec1_kbd_r );
 	DECLARE_READ8_MEMBER( latch_r );
@@ -123,8 +129,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
-	void tec1(machine_config &config);
-	void tecjmon(machine_config &config);
+
 	void tec1_io(address_map &map);
 	void tec1_map(address_map &map);
 	void tecjmon_io(address_map &map);
@@ -241,12 +246,12 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 		if (BIT(m_digit, i))
 		{
 			m_refresh[i] = 1;
-			output().set_digit_value(i, m_segment);
+			m_digits[i] = m_segment;
 		}
 		else
 		if (m_refresh[i] == 0x80)
 		{
-			output().set_digit_value(i, 0);
+			m_digits[i] = 0;
 			m_refresh[i] = 0;
 		}
 		else
@@ -310,6 +315,7 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 
 void tec1_state::machine_start()
 {
+	m_digits.resolve();
 	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tec1_state::tec1_kbd_callback),this));
 	m_kbd_timer->adjust( attotime::zero, 0, attotime::from_hz(500) );
 }
@@ -327,37 +333,41 @@ void tec1_state::machine_reset()
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(tec1_state::tec1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM // on main board
-	AM_RANGE(0x1000, 0x3fff) AM_RAM // expansion
-ADDRESS_MAP_END
+void tec1_state::tec1_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x0fff).ram(); // on main board
+	map(0x1000, 0x3fff).ram(); // expansion
+}
 
-ADDRESS_MAP_START(tec1_state::tec1_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(tec1_digit_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(tec1_segment_w)
-ADDRESS_MAP_END
+void tec1_state::tec1_io(address_map &map)
+{
+	map.global_mask(0x07);
+	map(0x00, 0x00).r(FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(FUNC(tec1_state::tec1_digit_w));
+	map(0x02, 0x02).w(FUNC(tec1_state::tec1_segment_w));
+}
 
 
-ADDRESS_MAP_START(tec1_state::tecjmon_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void tec1_state::tecjmon_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x37ff).ram();
+	map(0x3800, 0x3fff).rom();
+}
 
-ADDRESS_MAP_START(tec1_state::tecjmon_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(tecjmon_digit_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(tec1_segment_w)
-	AM_RANGE(0x03, 0x03) AM_READ(latch_r)
+void tec1_state::tecjmon_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(FUNC(tec1_state::tecjmon_digit_w));
+	map(0x02, 0x02).w(FUNC(tec1_state::tec1_segment_w));
+	map(0x03, 0x03).r(FUNC(tec1_state::latch_r));
 	//AM_RANGE(0x04, 0x04) AM_WRITE(lcd_en_w)
 	//AM_RANGE(0x84, 0x84) AM_WRITE(lcd_2nd_w)
-ADDRESS_MAP_END
+}
 
 
 /**************************************************************************
@@ -410,34 +420,32 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tec1_state::tec1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1000000)   /* speed can be varied between 250kHz and 2MHz */
-	MCFG_CPU_PROGRAM_MAP(tec1_map)
-	MCFG_CPU_IO_MAP(tec1_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 1000000)   /* speed can be varied between 250kHz and 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tec1_map)
+	MCFG_DEVICE_IO_MAP(tec1_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tec1)
+	config.set_default_layout(layout_tec1);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tec1_state::tecjmon)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545) / 2)
-	MCFG_CPU_PROGRAM_MAP(tecjmon_map)
-	MCFG_CPU_IO_MAP(tecjmon_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tecjmon_map)
+	MCFG_DEVICE_IO_MAP(tecjmon_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tec1)
+	config.set_default_layout(layout_tec1);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -453,11 +461,11 @@ MACHINE_CONFIG_END
 ROM_START(tec1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "mon1", "MON1")
-	ROMX_LOAD("mon1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(1))
+	ROMX_LOAD("mon1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "mon1b", "MON1B")
-	ROMX_LOAD("mon1b.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(2))
+	ROMX_LOAD("mon1b.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "mon2", "MON2")
-	ROMX_LOAD("mon2.rom",   0x0000, 0x0800, CRC(082fd7e7) SHA1(7659add30ca22b15a03d1cbac0892a5c25e47ecd), ROM_BIOS(3))
+	ROMX_LOAD("mon2.rom",   0x0000, 0x0800, CRC(082fd7e7) SHA1(7659add30ca22b15a03d1cbac0892a5c25e47ecd), ROM_BIOS(2))
 ROM_END
 
 ROM_START(tecjmon)
@@ -466,6 +474,6 @@ ROM_START(tecjmon)
 	ROM_LOAD("util.rom",    0x3800, 0x0800, CRC(7c19700d) SHA1(dc5b3ade66bb11c54430056966ed99cdd299d82b) )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT STATE       INIT  COMPANY                         FULLNAME            FLAGS
-COMP( 1984, tec1,     0,      0,      tec1,       tec1, tec1_state, 0,    "Talking Electronics magazine", "TEC-1",            0 )
-COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1, tec1_state, 0,    "Talking Electronics magazine", "TEC-1A with JMON", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                         FULLNAME            FLAGS
+COMP( 1984, tec1,     0,      0,      tec1,    tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1",            0 )
+COMP( 1984, tecjmon,  tec1,   0,      tecjmon, tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1A with JMON", 0 )

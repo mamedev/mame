@@ -141,40 +141,43 @@ WRITE_LINE_MEMBER(mario_state::coin_counter_2_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(mario_state::mario_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("spriteram") /* physical sprite ram */
-	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(mario_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_WRITE(mario_sh1_w) /* Mario run sample */
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(mario_sh2_w) /* Luigi run sample */
-	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
-	AM_RANGE(0x7e00, 0x7e00) AM_WRITE(mario_sh_tuneselect_w)
-	AM_RANGE(0x7e80, 0x7e87) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x7f00, 0x7f07) AM_WRITE(mario_sh3_w) /* Sound port */
-	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")    /* DSW */
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void mario_state::mario_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x73ff).ram().share("spriteram"); /* physical sprite ram */
+	map(0x7400, 0x77ff).ram().w(FUNC(mario_state::mario_videoram_w)).share("videoram");
+	map(0x7c00, 0x7c00).portr("IN0").w(FUNC(mario_state::mario_sh1_w)); /* Mario run sample */
+	map(0x7c80, 0x7c80).portr("IN1").w(FUNC(mario_state::mario_sh2_w)); /* Luigi run sample */
+	map(0x7d00, 0x7d00).w(FUNC(mario_state::mario_scroll_w));
+	map(0x7e00, 0x7e00).w(FUNC(mario_state::mario_sh_tuneselect_w));
+	map(0x7e80, 0x7e87).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x7f00, 0x7f07).w(FUNC(mario_state::mario_sh3_w)); /* Sound port */
+	map(0x7f80, 0x7f80).portr("DSW");    /* DSW */
+	map(0xf000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(mario_state::masao_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("spriteram") /* physical sprite ram */
-	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(mario_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")
-	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
-	AM_RANGE(0x7e00, 0x7e00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x7e80, 0x7e87) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x7f00, 0x7f00) AM_WRITE(masao_sh_irqtrigger_w)
-	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")    /* DSW */
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void mario_state::masao_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x73ff).ram().share("spriteram"); /* physical sprite ram */
+	map(0x7400, 0x77ff).ram().w(FUNC(mario_state::mario_videoram_w)).share("videoram");
+	map(0x7c00, 0x7c00).portr("IN0");
+	map(0x7c80, 0x7c80).portr("IN1");
+	map(0x7d00, 0x7d00).w(FUNC(mario_state::mario_scroll_w));
+	map(0x7e00, 0x7e00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x7e80, 0x7e87).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x7f00, 0x7f00).w(FUNC(mario_state::masao_sh_irqtrigger_w));
+	map(0x7f80, 0x7f80).portr("DSW");    /* DSW */
+	map(0xf000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(mario_state::mario_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)  /* dma controller */
-ADDRESS_MAP_END
+void mario_state::mario_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));  /* dma controller */
+}
 
 
 /*************************************
@@ -314,7 +317,7 @@ static const gfx_layout spritelayout =
 	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( mario )
+static GFXDECODE_START( gfx_mario )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
 GFXDECODE_END
@@ -326,42 +329,43 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(mario_state::vblank_irq)
+WRITE_LINE_MEMBER(mario_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(mario_state::mario_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, Z80_CLOCK) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mario_map)
-	MCFG_CPU_IO_MAP(mario_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mario_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, Z80_CLOCK) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mario_map)
+	MCFG_DEVICE_IO_MAP(mario_io_map)
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80dma", Z80DMA, Z80_CLOCK)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(mario_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(mario_state, memory_write_byte))
+	Z80DMA(config, m_z80dma, Z80_CLOCK);
+	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_z80dma->in_mreq_callback().set(FUNC(mario_state::memory_read_byte));
+	m_z80dma->out_mreq_callback().set(FUNC(mario_state::memory_write_byte));
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2L (7E80H)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mario_state, gfx_bank_w)) // ~T ROM
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // 2 PSL
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mario_state, flip_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mario_state, palette_bank_w)) // CREF 0
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mario_state, nmi_mask_w)) // NMI EI
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("z80dma", z80dma_device, rdy_w)) // DMA SET
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mario_state, coin_counter_1_w)) // COUNTER 2 (misnumbered on schematic)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mario_state, coin_counter_2_w)) // COUNTER 1 (misnumbered on schematic)
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2L (7E80H)
+	mainlatch.q_out_cb<0>().set(FUNC(mario_state::gfx_bank_w));         // ~T ROM
+	mainlatch.q_out_cb<1>().set_nop();                                  // 2 PSL
+	mainlatch.q_out_cb<2>().set(FUNC(mario_state::flip_w));             // FLIP
+	mainlatch.q_out_cb<3>().set(FUNC(mario_state::palette_bank_w));     // CREF 0
+	mainlatch.q_out_cb<4>().set(FUNC(mario_state::nmi_mask_w));         // NMI EI
+	mainlatch.q_out_cb<5>().set("z80dma", FUNC(z80dma_device::rdy_w));  // DMA SET
+	mainlatch.q_out_cb<6>().set(FUNC(mario_state::coin_counter_1_w));   // COUNTER 2 (misnumbered on schematic)
+	mainlatch.q_out_cb<7>().set(FUNC(mario_state::coin_counter_2_w));   // COUNTER 1 (misnumbered on schematic)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mario)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mario_state, vblank_irq))
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mario)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(mario_state, mario)
 
@@ -374,9 +378,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mario_state::masao)
 	mario_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(4000000)        /* 4.000 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(masao_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(4000000)        /* 4.000 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(masao_map)
 
 	/* sound hardware */
 	masao_audio(config);
@@ -558,8 +562,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,    0,       mario,   mario,  mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariof,   mario,   mario,   mariof, mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioe,   mario,   mario,   marioe, mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioj,   mario,   mario,   marioj, mario_state, 0, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, masao,    mario,   masao,   mario,  mario_state, 0, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mario,  0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariof, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioe, mario, mario, marioe, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioj, mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,  mario, masao, mario,  mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )

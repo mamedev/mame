@@ -39,6 +39,11 @@ public:
 		m_tms6100(*this, "tms6100")
 	{ }
 
+	void tms5110_route(machine_config &config);
+	void eva11(machine_config &config);
+	void eva24(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<tms5110_device> m_tms5100;
@@ -56,11 +61,6 @@ public:
 	DECLARE_WRITE16_MEMBER(eva11_write_o);
 	DECLARE_WRITE16_MEMBER(eva11_write_r);
 
-	void tms5110_route(machine_config &config);
-	void eva11(machine_config &config);
-	void eva24(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -161,44 +161,44 @@ MACHINE_CONFIG_START(eva_state::tms5110_route)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("tms5100")
-	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))
-	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, m1_w))
-	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
-	MCFG_TMS5110_DATA_CB(DEVREADLINE("tms6100", tms6100_device, data_line_r))
-	MCFG_TMS5110_ROMCLK_CB(DEVWRITELINE("tms6100", tms6100_device, clk_w))
+	MCFG_TMS5110_M0_CB(WRITELINE("tms6100", tms6100_device, m0_w))
+	MCFG_TMS5110_M1_CB(WRITELINE("tms6100", tms6100_device, m1_w))
+	MCFG_TMS5110_ADDR_CB(WRITE8("tms6100", tms6100_device, add_w))
+	MCFG_TMS5110_DATA_CB(READLINE("tms6100", tms6100_device, data_line_r))
+	MCFG_TMS5110_ROMCLK_CB(WRITELINE("tms6100", tms6100_device, clk_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(eva_state::eva24)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 640_kHz_XTAL/2) // guessed
+	MCFG_DEVICE_ADD("maincpu", COP420, 640_kHz_XTAL/2) // guessed
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(eva_state, eva24_write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(eva_state, eva24_write_g))
-	MCFG_COP400_READ_G_CB(READ8(eva_state, eva24_read_g))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, eva_state, eva24_write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, eva_state, eva24_write_g))
+	MCFG_COP400_READ_G_CB(READ8(*this, eva_state, eva24_read_g))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 640_kHz_XTAL/4)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
 	tms5110_route(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(eva_state::eva11)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 640_kHz_XTAL/2) // from TMS5110A CPU CK
-	MCFG_TMS1XXX_READ_K_CB(READ8(eva_state, eva11_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(eva_state, eva11_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(eva_state, eva11_write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 640_kHz_XTAL/2) // from TMS5110A CPU CK
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, eva_state, eva11_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, eva_state, eva11_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, eva_state, eva11_write_r))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 640_kHz_XTAL/4)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
 	tms5110_route(config);
 MACHINE_CONFIG_END
 
@@ -233,6 +233,6 @@ ROM_END
 
 
 
-//    YEAR  NAME   PARENT CMP MACHINE INPUT  STATE   INIT  COMPANY, FULLNAME, FLAGS
-SYST( 1984, eva24, 0,      0, eva24,  eva24, eva_state, 0, "Chrysler", "Electronic Voice Alert (24-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-SYST( 1983, eva11, eva24,  0, eva11,  eva11, eva_state, 0, "Chrysler", "Electronic Voice Alert (11-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT CMP MACHINE INPUT  CLASS      INIT        COMPANY     FULLNAME                                FLAGS
+SYST( 1984, eva24, 0,      0, eva24,  eva24, eva_state, empty_init, "Chrysler", "Electronic Voice Alert (24-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+SYST( 1983, eva11, eva24,  0, eva11,  eva11, eva_state, empty_init, "Chrysler", "Electronic Voice Alert (11-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

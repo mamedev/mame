@@ -125,7 +125,7 @@ private:
 //extern const device_type KANEKO16_SPRITE;
 
 #define MCFG_KANEKO16_SPRITE_GFXDECODE(_gfxtag) \
-	downcast<kaneko16_sprite_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<kaneko16_sprite_device &>(*device).set_gfxdecode_tag(_gfxtag);
 #define MCFG_KANEKO16_SPRITE_PRIORITIES(_pri0, _pri1, _pri2, _pri3) \
 	downcast<kaneko16_sprite_device &>(*device).set_priorities(_pri0, _pri1, _pri2, _pri3);
 #define MCFG_KANEKO16_SPRITE_OFFSETS(_xoffs, _yoffs) \
@@ -137,6 +137,11 @@ private:
 class kaneko_vu002_sprite_device : public kaneko16_sprite_device
 {
 public:
+	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: kaneko_vu002_sprite_device(mconfig, tag, owner, (uint32_t)0)
+	{
+	}
+
 	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void get_sprite_attributes(struct kan_tempsprite *s, uint16_t attr) override;
 	int get_sprite_type(void) override{ return 0; };
@@ -147,6 +152,11 @@ DECLARE_DEVICE_TYPE(KANEKO_VU002_SPRITE, kaneko_vu002_sprite_device)
 class kaneko_kc002_sprite_device : public kaneko16_sprite_device
 {
 public:
+	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: kaneko_kc002_sprite_device(mconfig, tag, owner, (uint32_t)0)
+	{
+	}
+
 	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void get_sprite_attributes(struct kan_tempsprite *s, uint16_t attr) override;
 	int get_sprite_type(void) override{ return 1; };

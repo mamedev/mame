@@ -99,24 +99,26 @@ WRITE_LINE_MEMBER(funkybee_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-ADDRESS_MAP_START(funkybee_state::funkybee_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(funkybee_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(funkybee_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(funkybee_scroll_w)
-	AM_RANGE(0xe800, 0xe807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xf000, 0xf000) AM_READNOP /* IRQ Ack */
-	AM_RANGE(0xf800, 0xf800) AM_READ(funkybee_input_port_0_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+void funkybee_state::funkybee_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xbfff).ram().w(FUNC(funkybee_state::funkybee_videoram_w)).share("videoram");
+	map(0xc000, 0xdfff).ram().w(FUNC(funkybee_state::funkybee_colorram_w)).share("colorram");
+	map(0xe000, 0xe000).w(FUNC(funkybee_state::funkybee_scroll_w));
+	map(0xe800, 0xe807).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf000).nopr(); /* IRQ Ack */
+	map(0xf800, 0xf800).r(FUNC(funkybee_state::funkybee_input_port_0_r)).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0xf801, 0xf801).portr("IN1");
+	map(0xf802, 0xf802).portr("IN2");
+}
 
-ADDRESS_MAP_START(funkybee_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void funkybee_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 static INPUT_PORTS_START( funkybee )
@@ -268,7 +270,7 @@ static const gfx_layout spritelayout =
 	4*16*8
 };
 
-static GFXDECODE_START( funkybee )
+static GFXDECODE_START( gfx_funkybee )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 16, 4 )
@@ -286,18 +288,18 @@ void funkybee_state::machine_start()
 MACHINE_CONFIG_START(funkybee_state::funkybee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(funkybee_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funkybee_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(funkybee_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funkybee_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(funkybee_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(funkybee_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(funkybee_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(funkybee_state, gfx_bank_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(funkybee_state::flipscreen_w));
+	mainlatch.q_out_cb<2>().set(FUNC(funkybee_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(funkybee_state::coin_counter_2_w));
+	mainlatch.q_out_cb<5>().set(FUNC(funkybee_state::gfx_bank_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -308,14 +310,14 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	MCFG_SCREEN_UPDATE_DRIVER(funkybee_state, screen_update_funkybee)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funkybee)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funkybee)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(funkybee_state, funkybee)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 1500000) // AY-3-8912 verified for Sky Lancer
+	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) // AY-3-8912 verified for Sky Lancer
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -426,7 +428,7 @@ ROM_START( skylancre )
 	ROM_LOAD( "18s030.1a",     0x0000, 0x0020, CRC(e645bacb) SHA1(5f4c299c4cf165fd229731c0e5799a34892bf28e) )
 ROM_END
 
-GAME( 1982, funkybee,  0,        funkybee, funkybee,  funkybee_state, 0, ROT90, "Orca",                           "Funky Bee",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1982, funkybeeb, funkybee, funkybee, funkybeeb, funkybee_state, 0, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skylancr,  0,        funkybee, skylancr,  funkybee_state, 0, ROT90, "Orca",                           "Sky Lancer",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skylancre, skylancr, funkybee, skylancre, funkybee_state, 0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, funkybee,  0,        funkybee, funkybee,  funkybee_state, empty_init, ROT90, "Orca",                           "Funky Bee",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1982, funkybeeb, funkybee, funkybee, funkybeeb, funkybee_state, empty_init, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skylancr,  0,        funkybee, skylancr,  funkybee_state, empty_init, ROT90, "Orca",                           "Sky Lancer",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skylancre, skylancr, funkybee, skylancre, funkybee_state, empty_init, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", MACHINE_SUPPORTS_SAVE )

@@ -26,6 +26,7 @@
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,17 +39,19 @@ class splus_state : public driver_device
 {
 public:
 	splus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_cmosl_ram(*this, "cmosl"),
-		m_cmosh_ram(*this, "cmosh"),
-		m_program_ram(*this, "program_ram"),
-		m_reel_ram(*this, "reel_ram"),
-		m_i10(*this, "I10"),
-		m_i20(*this, "I20"),
-		m_i30(*this, "I30"),
-		m_sensor(*this, "SENSOR"),
-		m_maincpu(*this, "maincpu"),
-		m_i2cmem(*this, "i2cmem")
+		: driver_device(mconfig, type, tag)
+		, m_cmosl_ram(*this, "cmosl")
+		, m_cmosh_ram(*this, "cmosh")
+		, m_program_ram(*this, "program_ram")
+		, m_reel_ram(*this, "reel_ram")
+		, m_i10(*this, "I10")
+		, m_i20(*this, "I20")
+		, m_i30(*this, "I30")
+		, m_sensor(*this, "SENSOR")
+		, m_maincpu(*this, "maincpu")
+		, m_i2cmem(*this, "i2cmem")
+		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "s_bnk%u%u", 0U, 0U)
 	{
 		m_sda_dir = 0;
 		m_coin_state = 0;
@@ -64,24 +67,32 @@ public:
 		m_p1_unknown = 0x00;
 	}
 
+	void splus(machine_config &config);
+
+	void init_splus();
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
 
-	// Pointers to External RAM
-	required_shared_ptr<uint8_t> m_cmosl_ram;
-	required_shared_ptr<uint8_t> m_cmosh_ram;
+	DECLARE_WRITE8_MEMBER(splus_p1_w);
+	DECLARE_WRITE8_MEMBER(splus_load_pulse_w);
+	DECLARE_WRITE8_MEMBER(splus_serial_w);
+	DECLARE_WRITE8_MEMBER(splus_7seg_w);
+	DECLARE_WRITE8_MEMBER(splus_duart_w);
+	DECLARE_READ8_MEMBER(splus_serial_r);
+	DECLARE_READ8_MEMBER(splus_m_reel_ram_r);
+	DECLARE_READ8_MEMBER(splus_p3_r);
+	DECLARE_READ8_MEMBER(splus_duart_r);
+	DECLARE_READ8_MEMBER(splus_watchdog_r);
+	DECLARE_READ8_MEMBER(splus_registers_r);
+	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
+	DECLARE_READ8_MEMBER(splus_reel_optics_r);
 
-	// Program and Reel Data
-	optional_shared_ptr<uint8_t> m_program_ram;
-	required_shared_ptr<uint8_t> m_reel_ram;
-
-	// IO Ports
-	required_ioport m_i10;
-	required_ioport m_i20;
-	required_ioport m_i30;
-	required_ioport m_sensor;
+	void splus_iomap(address_map &map);
+	void splus_map(address_map &map);
 
 	// EEPROM States
 	int m_sda_dir;
@@ -104,25 +115,29 @@ public:
 	int16_t m_stepper_pos[5];
 	uint8_t m_stop_pos[5];
 
-	DECLARE_WRITE8_MEMBER(splus_p1_w);
-	DECLARE_WRITE8_MEMBER(splus_load_pulse_w);
-	DECLARE_WRITE8_MEMBER(splus_serial_w);
-	DECLARE_WRITE8_MEMBER(splus_7seg_w);
-	DECLARE_WRITE8_MEMBER(splus_duart_w);
-	DECLARE_READ8_MEMBER(splus_serial_r);
-	DECLARE_READ8_MEMBER(splus_m_reel_ram_r);
-	DECLARE_READ8_MEMBER(splus_p3_r);
-	DECLARE_READ8_MEMBER(splus_duart_r);
-	DECLARE_READ8_MEMBER(splus_watchdog_r);
-	DECLARE_READ8_MEMBER(splus_registers_r);
-	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
-	DECLARE_READ8_MEMBER(splus_reel_optics_r);
-	DECLARE_DRIVER_INIT(splus);
+	virtual void machine_start() override
+	{
+		m_digits.resolve();
+		m_leds.resolve();
+	}
+
+	// Pointers to External RAM
+	required_shared_ptr<uint8_t> m_cmosl_ram;
+	required_shared_ptr<uint8_t> m_cmosh_ram;
+
+	// Program and Reel Data
+	optional_shared_ptr<uint8_t> m_program_ram;
+	required_shared_ptr<uint8_t> m_reel_ram;
+
+	// IO Ports
+	required_ioport m_i10;
+	required_ioport m_i20;
+	required_ioport m_i30;
+	required_ioport m_sensor;
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
-	void splus(machine_config &config);
-	void splus_iomap(address_map &map);
-	void splus_map(address_map &map);
+	output_finder<9> m_digits;
+	output_finder<5,8> m_leds;
 };
 
 /* Static Variables */
@@ -170,20 +185,26 @@ WRITE8_MEMBER(splus_state::splus_p1_w)
 		m_p1_unknown = (~data & 0x80);
 
 		// Stepper Motor Engaged
-		if (((m_bank40 >> 0) & 1) == 0x01) {
+		if (BIT(m_bank40, 0))
+		{
 			// Reel Controllers Only
 			m_p1_reels = (data & 0x1f);
 
 			// Loop through Reel Controllers
-			for (int x = 0; x < 5; x++) {
+			for (int x = 0; x < 5; x++)
+			{
 				// Test Reel Controller
-				if (((m_p1_reels >> x) & 1) == 0x01) {
+				if (BIT(m_p1_reels, x))
+				{
 					// Forward Direction
-					if (((m_bank10 >> 5) & 1) == 0x01) {
+					if (BIT(m_bank10, 5))
+					{
 						m_stepper_pos[x]++;
 						if (m_stepper_pos[x] == MAX_STEPPER)
 							m_stepper_pos[x] = 0;
-					} else {
+					}
+					else
+					{
 						m_stepper_pos[x]--;
 						if (m_stepper_pos[x] < 0)
 							m_stepper_pos[x] = MAX_STEPPER - 1;
@@ -194,7 +215,7 @@ WRITE8_MEMBER(splus_state::splus_p1_w)
 		}
 #if DEBUG_OUTPUT
 		if ((data & 0x1f) == 0x01)
-			osd_printf_info("Steppers %02X-%02X-%02X-%02X-%02X Motor=%02X Dir=%02X reels=%02X unk=%02X\n", m_stop_pos[0],m_stop_pos[1],m_stop_pos[2],m_stop_pos[3],m_stop_pos[4],((m_bank40 >> 0) & 1),((m_bank10 >> 5) & 1),(data & 0x1f), m_p1_unknown);
+			osd_printf_info("Steppers %02X-%02X-%02X-%02X-%02X Motor=%02X Dir=%02X reels=%02X unk=%02X\n", m_stop_pos[0],m_stop_pos[1],m_stop_pos[2],m_stop_pos[3],m_stop_pos[4],BIT(m_bank40, 0),BIT(m_bank10, 5),(data & 0x1f), m_p1_unknown);
 #endif
 	}
 }
@@ -213,135 +234,111 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 	switch (out)
 	{
 		case 0x00: // Bank 10
-			if (((m_bank10 >> 0) & 1) != ((data >> 0) & 1)) {
 #if DEBUG_OUTPUT
-				osd_printf_info("Coin Drop Meter =%02X\n",(data >> 0) & 1);
+			if (BIT(m_bank10, 0) != BIT(data, 0)) {
+				osd_printf_info("Coin Drop Meter =%02X\n",BIT(data, 0);
+			}
+			if (BIT(m_bank10, 1) != BIT(data, 1)) {
+				osd_printf_info("Coin Out Meter =%02X\n",BIT(data, 1);
+			}
+			if (BIT(m_bank10, 2) != BIT(data, 2)) {
+				osd_printf_info("Coin In Meter =%02X\n",BIT(data, 2);
+			}
+			if (BIT(m_bank10, 3) != BIT(data, 3)) {
+				//osd_printf_info("B Switch for SDS =%02X\n",BIT(data, 3);
+			}
+			if (BIT(m_bank10, 4) != BIT(data, 4)) {
+				osd_printf_info("Hopper Drive 2 =%02X\n",BIT(data, 4);
+			}
+			if (BIT(m_bank10, 5) != BIT(data, 5)) {
+				osd_printf_info("Stepper Motor Direction =%02X\n",BIT(data, 5);
+			}
+			if (BIT(m_bank10, 6) != BIT(data, 6)) {
+				osd_printf_info("Mechanical Bell =%02X\n",BIT(data, 6);
+			}
+			if (BIT(m_bank10, 7) != BIT(data, 7)) {
+				osd_printf_info("Cancelled Credits Meter =%02X\n",BIT(data, 7);
+			}
 #endif
-			}
-			if (((m_bank10 >> 1) & 1) != ((data >> 1) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Coin Out Meter =%02X\n",(data >> 1) & 1);
-#endif
-			}
-			if (((m_bank10 >> 2) & 1) != ((data >> 2) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Coin In Meter =%02X\n",(data >> 2) & 1);
-#endif
-			}
-			if (((m_bank10 >> 3) & 1) != ((data >> 3) & 1)) {
-				//osd_printf_info("B Switch for SDS =%02X\n",(data >> 3) & 1);
-			}
-			if (((m_bank10 >> 4) & 1) != ((data >> 4) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Hopper Drive 2 =%02X\n",(data >> 4) & 1);
-#endif
-			}
-			if (((m_bank10 >> 5) & 1) != ((data >> 5) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Stepper Motor Direction =%02X\n",(data >> 5) & 1);
-#endif
-			}
-			if (((m_bank10 >> 6) & 1) != ((data >> 6) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Mechanical Bell =%02X\n",(data >> 6) & 1);
-#endif
-			}
-			if (((m_bank10 >> 7) & 1) != ((data >> 7) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Cancelled Credits Meter =%02X\n",(data >> 7) & 1);
-#endif
-			}
 			m_bank10 = data;
 
-			output().set_value("s_bnk10",(data >> 0) & 1); // Coin Drop Meter
-			output().set_value("s_bnk11",(data >> 1) & 1); // Coin Out Meter
-			output().set_value("s_bnk12",(data >> 2) & 1); // Coin In Meter
-			output().set_value("s_bnk13",(data >> 3) & 1); // B Switch for SDS
-			output().set_value("s_bnk14",(data >> 4) & 1); // Hopper Drive 2
-			output().set_value("s_bnk15",(data >> 5) & 1); // Stepper Motor Direction
-			output().set_value("s_bnk16",(data >> 6) & 1); // Mechanical Bell
-			output().set_value("s_bnk17",(data >> 7) & 1); // Cancelled Credits Meter
+			m_leds[1][0] = BIT(data, 0); // Coin Drop Meter
+			m_leds[1][1] = BIT(data, 1); // Coin Out Meter
+			m_leds[1][2] = BIT(data, 2); // Coin In Meter
+			m_leds[1][3] = BIT(data, 3); // B Switch for SDS
+			m_leds[1][4] = BIT(data, 4); // Hopper Drive 2
+			m_leds[1][5] = BIT(data, 5); // Stepper Motor Direction
+			m_leds[1][6] = BIT(data, 6); // Mechanical Bell
+			m_leds[1][7] = BIT(data, 7); // Cancelled Credits Meter
 			break;
 		case 0x01: // Bank 20
-			if (((m_bank20 >> 5) & 1) != ((data >> 5) & 1)) {
 #if DEBUG_OUTPUT
-				osd_printf_info("Games Played Meter =%02X\n",(data >> 5) & 1);
-#endif
+			if (BIT(m_bank20, 5) != BIT(data, 5)) {
+				osd_printf_info("Games Played Meter =%02X\n",BIT(data, 5);
 			}
-			if (((m_bank20 >> 6) & 1) != ((data >> 6) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Bill Acceptor Enable =%02X\n",(data >> 6) & 1);
-#endif
+			if (BIT(m_bank20, 6) != BIT(data, 6)) {
+				osd_printf_info("Bill Acceptor Enable =%02X\n",BIT(data, 6);
 			}
-			if (((m_bank20 >> 7) & 1) != ((data >> 7) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Jackpots Meter =%02X\n",(data >> 7) & 1);
-#endif
+			if (BIT(m_bank20, 7) != BIT(data, 7)) {
+				osd_printf_info("Jackpots Meter =%02X\n",BIT(data, 7);
 			}
+#endif
 			m_bank20 = data;
 
-			output().set_value("s_bnk20",(data >> 0) & 1); // Payline Lamp 3
-			output().set_value("s_bnk21",(data >> 1) & 1); // Payline Lamp 4
-			output().set_value("s_bnk22",(data >> 2) & 1); // Payline Lamp 5
-			output().set_value("s_bnk23",(data >> 3) & 1); // Payline Lamp 6
-			output().set_value("s_bnk24",(data >> 4) & 1); // Door Optics Transmitter
-			output().set_value("s_bnk25",(data >> 5) & 1); // Games Played Meter
-			output().set_value("s_bnk26",(data >> 6) & 1); // Bill Acceptor Enable
-			output().set_value("s_bnk27",(data >> 7) & 1); // Jackpots Meter
+			m_leds[2][0] = BIT(data, 0); // Payline Lamp 3
+			m_leds[2][1] = BIT(data, 1); // Payline Lamp 4
+			m_leds[2][2] = BIT(data, 2); // Payline Lamp 5
+			m_leds[2][3] = BIT(data, 3); // Payline Lamp 6
+			m_leds[2][4] = BIT(data, 4); // Door Optics Transmitter
+			m_leds[2][5] = BIT(data, 5); // Games Played Meter
+			m_leds[2][6] = BIT(data, 6); // Bill Acceptor Enable
+			m_leds[2][7] = BIT(data, 7); // Jackpots Meter
 			break;
 		case 0x02: // Bank 30
-			if (((m_bank30 >> 2) & 1) != ((data >> 2) & 1)) {
 #if DEBUG_OUTPUT
-				osd_printf_info("Handle Release =%02X\n",(data >> 2) & 1);
-#endif
+			if (BIT(m_bank30, 2) != BIT(data, 2)) {
+				osd_printf_info("Handle Release =%02X\n",BIT(data, 2);
 			}
-			if (((m_bank30 >> 3) & 1) != ((data >> 3) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Diverter =%02X\n",(data >> 3) & 1);
-#endif
+			if (BIT(m_bank30, 3) != BIT(data, 3)) {
+				osd_printf_info("Diverter =%02X\n",BIT(data, 3);
 			}
-			if (((m_bank30 >> 4) & 1) != ((data >> 4) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Coin Lockout =%02X\n",(data >> 4) & 1);
-#endif
+			if (BIT(m_bank30, 4) != BIT(data, 4)) {
+				osd_printf_info("Coin Lockout =%02X\n",BIT(data, 4);
 			}
-			if (((m_bank30 >> 5) & 1) != ((data >> 5) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Hopper Drive 1 =%02X\n",(data >> 5) & 1);
-#endif
+			if (BIT(m_bank30, 5) != BIT(data, 5)) {
+				osd_printf_info("Hopper Drive 1 =%02X\n",BIT(data, 5);
 			}
+#endif
 			m_bank30 = data;
 
-			output().set_value("s_bnk30",(data >> 0) & 1); // Change Candle Lamp Bottom
-			output().set_value("s_bnk31",(data >> 1) & 1); // Change Candle Lamp Top
-			output().set_value("s_bnk32",(data >> 2) & 1); // Handle Release
-			output().set_value("s_bnk33",(data >> 3) & 1); // Diverter
-			output().set_value("s_bnk34",(data >> 4) & 1); // Coin Lockout
-			output().set_value("s_bnk35",(data >> 5) & 1); // Hopper Drive 1
-			output().set_value("s_bnk36",(data >> 6) & 1); // Payline Lamp 1
-			output().set_value("s_bnk37",(data >> 7) & 1); // Payline Lamp 2
+			m_leds[3][0] = BIT(data, 0); // Change Candle Lamp Bottom
+			m_leds[3][1] = BIT(data, 1); // Change Candle Lamp Top
+			m_leds[3][2] = BIT(data, 2); // Handle Release
+			m_leds[3][3] = BIT(data, 3); // Diverter
+			m_leds[3][4] = BIT(data, 4); // Coin Lockout
+			m_leds[3][5] = BIT(data, 5); // Hopper Drive 1
+			m_leds[3][6] = BIT(data, 6); // Payline Lamp 1
+			m_leds[3][7] = BIT(data, 7); // Payline Lamp 2
 			break;
 		case 0x04: // Bank 40
-			if (((m_bank40 >> 0) & 1) != ((data >> 0) & 1)) {
 #if DEBUG_OUTPUT
-				osd_printf_info("Stepper Motor Power Supply =%02X\n",(data >> 0) & 1);
-#endif
+			if (BIT(m_bank40, 0) != BIT(data, 0)) {
+				osd_printf_info("Stepper Motor Power Supply =%02X\n",BIT(data, 0);
 			}
-			if (((m_bank40 >> 3) & 1) != ((data >> 3) & 1)) {
-#if DEBUG_OUTPUT
-				osd_printf_info("Jackpot/Hand Pay Lamp =%02X\n",(data >> 3) & 1);
-#endif
+			if (BIT(m_bank40, 3) != BIT(data, 3)) {
+				osd_printf_info("Jackpot/Hand Pay Lamp =%02X\n",BIT(data, 3);
 			}
+#endif
 			m_bank40 = data;
 
-			output().set_value("s_bnk40",(data >> 0) & 1); // Stepper Motor Power Supply
-			output().set_value("s_bnk41",(data >> 1) & 1); // Insert Coin Lamp
-			output().set_value("s_bnk42",(data >> 2) & 1); // Coin Accepted Lamp
-			output().set_value("s_bnk43",(data >> 3) & 1); // Jackpot/Hand Pay Lamp
-			output().set_value("s_bnk44",(data >> 4) & 1); // Play Max Credits Lamp
-			output().set_value("s_bnk45",(data >> 5) & 1); // Bet One Credit Lamp
-			output().set_value("s_bnk46",(data >> 6) & 1); // Cashout Credit Lamp
-			output().set_value("s_bnk47",(data >> 7) & 1); // Spin Button Lamp
+			m_leds[4][0] = BIT(data, 0); // Stepper Motor Power Supply
+			m_leds[4][1] = BIT(data, 1); // Insert Coin Lamp
+			m_leds[4][2] = BIT(data, 2); // Coin Accepted Lamp
+			m_leds[4][3] = BIT(data, 3); // Jackpot/Hand Pay Lamp
+			m_leds[4][4] = BIT(data, 4); // Play Max Credits Lamp
+			m_leds[4][5] = BIT(data, 5); // Bet One Credit Lamp
+			m_leds[4][6] = BIT(data, 6); // Cashout Credit Lamp
+			m_leds[4][7] = BIT(data, 7); // Spin Button Lamp
 			break;
 	}
 }
@@ -357,8 +354,8 @@ WRITE8_MEMBER(splus_state::splus_7seg_w)
 	val = (~data & 0x0f); // Digit Value
 
 	// Need to add ~m_io_port1-1 to seg value
-	if (seg < 0x0a && (m_io_port1 & 0xe0) == 0xe0)
-		output().set_digit_value(seg, ls48_map[val]);
+	if (seg < 9 && (m_io_port1 & 0xe0) == 0xe0)
+		m_digits[seg] = ls48_map[val];
 }
 
 WRITE8_MEMBER(splus_state::splus_duart_w)
@@ -449,10 +446,10 @@ READ8_MEMBER(splus_state::splus_serial_r)
 			if ((m_i10->read() & 0x08) == 0x08)
 				door_optics = 0x08;
 			else
-				door_optics = (((m_bank20 >> 4) & 1) << 3); // Use Door Optics Transmitter
+				door_optics = BIT(m_bank20, 4) << 3; // Use Door Optics Transmitter
 
 			// Test if Hopper 1 and Hopper 2 Motors On
-			if (((m_bank10 >> 4) & 1) || ((m_bank30 >> 5) & 1)) {
+			if (BIT(m_bank10, 4) || BIT(m_bank30, 5)) {
 				if (m_coin_out_state == 0)
 					m_coin_out_state = 3;
 			} else {
@@ -576,7 +573,7 @@ READ8_MEMBER(splus_state::splus_reel_optics_r)
 * Driver Init *
 ***************/
 
-DRIVER_INIT_MEMBER(splus_state,splus)
+void splus_state::init_splus()
 {
 	uint8_t *reel_data = memregion( "reeldata" )->base();
 
@@ -589,39 +586,41 @@ DRIVER_INIT_MEMBER(splus_state,splus)
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(splus_state::splus_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
-ADDRESS_MAP_END
+void splus_state::splus_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share("prograram");
+}
 
-ADDRESS_MAP_START(splus_state::splus_iomap)
+void splus_state::splus_iomap(address_map &map)
+{
 	// Serial I/O
-	AM_RANGE(0x0000, 0x0000) AM_READ(splus_serial_r) AM_WRITE(splus_serial_w)
+	map(0x0000, 0x0000).r(FUNC(splus_state::splus_serial_r)).w(FUNC(splus_state::splus_serial_w));
 
 	// Battery-backed RAM (Lower 4K) 0x1500-0x16ff eeprom staging area
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("cmosl")
+	map(0x1000, 0x1fff).ram().share("cmosl");
 
 	// Watchdog, 7-segment Display
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE(splus_watchdog_r, splus_7seg_w)
+	map(0x2000, 0x2000).rw(FUNC(splus_state::splus_watchdog_r), FUNC(splus_state::splus_7seg_w));
 
 	// DUART
-	AM_RANGE(0x3000, 0x300f) AM_READWRITE(splus_duart_r, splus_duart_w)
+	map(0x3000, 0x300f).rw(FUNC(splus_state::splus_duart_r), FUNC(splus_state::splus_duart_w));
 
 	// Dip Switches, Sound
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SW1") AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	map(0x4000, 0x4000).portr("SW1").w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x4001, 0x4001).w("aysnd", FUNC(ay8910_device::data_w));
 
 	// Reel Optics, EEPROM
-	AM_RANGE(0x5000, 0x5000) AM_READ(splus_reel_optics_r) AM_WRITE(i2c_nvram_w)
+	map(0x5000, 0x5000).r(FUNC(splus_state::splus_reel_optics_r)).w(FUNC(splus_state::i2c_nvram_w));
 
 	// Reset Registers in Realtime Clock, Serial I/O Load Pulse
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(splus_registers_r, splus_load_pulse_w)
+	map(0x6000, 0x6000).rw(FUNC(splus_state::splus_registers_r), FUNC(splus_state::splus_load_pulse_w));
 
 	// Battery-backed RAM (Upper 4K)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("cmosh")
+	map(0x7000, 0x7fff).ram().share("cmosh");
 
 	// SSxxxx Reel Chip
-	AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_SHARE("reel_ram")
-ADDRESS_MAP_END
+	map(0x8000, 0x9fff).r(FUNC(splus_state::splus_m_reel_ram_r)).share("reel_ram");
+}
 
 /*************************
 *      Input ports       *
@@ -679,15 +678,15 @@ INPUT_PORTS_END
 *************************/
 
 MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
-	MCFG_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(splus_map)
-	MCFG_CPU_IO_MAP(splus_iomap)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(splus_state, splus_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(splus_state, splus_p3_r))
+	MCFG_DEVICE_ADD("maincpu", I80C32, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(splus_map)
+	MCFG_DEVICE_IO_MAP(splus_iomap)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, splus_state, splus_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, splus_state, splus_p3_r))
 
 	// Fill NVRAM
-	MCFG_NVRAM_ADD_0FILL("cmosl")
-	MCFG_NVRAM_ADD_0FILL("cmosh")
+	NVRAM(config, "cmosl", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "cmosh", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware (ALL FAKE, NO VIDEO)
 	MCFG_PALETTE_ADD("palette", 16*16)
@@ -702,9 +701,9 @@ MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
 	MCFG_X2404P_ADD("i2cmem")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -724,5 +723,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//     YEAR  NAME        PARENT  MACHINE  INPUT  STATE         INIT     ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
-GAMEL( 1994, spss4240,   0,      splus,   splus, splus_state,  splus,   ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )
+//     YEAR  NAME      PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
+GAMEL( 1994, spss4240, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )

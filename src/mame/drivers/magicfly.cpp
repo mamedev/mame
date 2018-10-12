@@ -446,6 +446,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -464,6 +465,11 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void bchance(machine_config &config);
+	void magicfly(machine_config &config);
+	void _7mezzo(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
@@ -482,9 +488,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void bchance(machine_config &config);
-	void magicfly(machine_config &config);
-	void _7mezzo(machine_config &config);
 	void magicfly_map(address_map &map);
 };
 
@@ -677,16 +680,17 @@ WRITE8_MEMBER(magicfly_state::mux_port_w)
 *           Memory map information           *
 *********************************************/
 
-ADDRESS_MAP_START(magicfly_state::magicfly_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")    /* MK48Z02B NVRAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_SHARE("videoram") /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_SHARE("colorram") /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x2800, 0x2800) AM_READ(mux_port_r)    /* multiplexed input port */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(mux_port_w)   /* output port */
-	AM_RANGE(0xc000, 0xffff) AM_ROM                 /* ROM space */
-ADDRESS_MAP_END
+void magicfly_state::magicfly_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");    /* MK48Z02B NVRAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x1000, 0x13ff).ram().w(FUNC(magicfly_state::magicfly_videoram_w)).share("videoram"); /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
+	map(0x1800, 0x1bff).ram().w(FUNC(magicfly_state::magicfly_colorram_w)).share("colorram"); /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
+	map(0x2800, 0x2800).r(FUNC(magicfly_state::mux_port_r));    /* multiplexed input port */
+	map(0x3000, 0x3000).w(FUNC(magicfly_state::mux_port_w));   /* output port */
+	map(0xc000, 0xffff).rom();                 /* ROM space */
+}
 
 
 /*********************************************
@@ -926,7 +930,7 @@ static const gfx_layout charlayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( magicfly )
+static GFXDECODE_START( gfx_magicfly )
 	GFXDECODE_ENTRY( "gfxbnk1", 0, tilelayout, 16, 1 )
 	GFXDECODE_ENTRY( "gfxbnk0", 0, charlayout, 0, 8 )
 GFXDECODE_END
@@ -939,11 +943,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(magicfly_state::magicfly)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
-	MCFG_CPU_PROGRAM_MAP(magicfly_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicfly_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(magicfly_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -954,19 +957,20 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magicfly)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magicfly)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(magicfly_state, magicfly)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1062,7 +1066,7 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT   ROT   COMPANY      FULLNAME                          FLAGS
-GAME( 198?, magicfly, 0,      magicfly, magicfly, magicfly_state, 0,     ROT0, "P&A Games", "Magic Fly",                      0 )
-GAME( 198?, 7mezzo,   0,      _7mezzo,  7mezzo,   magicfly_state, 0,     ROT0, "<unknown>", "7 e Mezzo",                      0 )
-GAME( 198?, bchance,  0,      bchance,  bchance,  magicfly_state, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY      FULLNAME                          FLAGS
+GAME( 198?, magicfly, 0,      magicfly, magicfly, magicfly_state, empty_init, ROT0, "P&A Games", "Magic Fly",                      0 )
+GAME( 198?, 7mezzo,   0,      _7mezzo,  7mezzo,   magicfly_state, empty_init, ROT0, "<unknown>", "7 e Mezzo",                      0 )
+GAME( 198?, bchance,  0,      bchance,  bchance,  magicfly_state, empty_init, ROT0, "<unknown>", "Bonne Chance! (French/English)", MACHINE_IMPERFECT_GRAPHICS )

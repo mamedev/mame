@@ -19,13 +19,13 @@
 
     Known issues:
         * Neither game registers coins and I can't find where the credit
-        count gets updated in the code. Each game requires a unique
-        security PAL - maybe this is related? I'm poking the coin values
-        directly into RAM for now.
-        * Game hangs when you try to 'collect' cash
+          count gets updated in the code. Each game requires a unique
+          security PAL - maybe this is related? I'm poking the coin values
+          directly into RAM for now.
+        * Game hangs when nothing is connected to the first ACIA when
+          you try to 'collect' cash
         * Verify WD FDC type
-        * Are IRQs 1 or 2 connected to something?
-        * Hook up ACIA properly (IRQ 4)
+        * Hook up ACIA properly
         * Hook up watchdog NMI
         * Verify clocks
         * Use real video timings
@@ -34,20 +34,29 @@
     Notes:
         * Toggle both 'Back door' and 'Key switch' to enter test mode
         * Video hardware seems to match JPM System 5
+        * IRQ 1 inits the PPIs, IRQ 2 does nothing
+        * Values send to the first ACIA serial port:
+          - Game ID: "JPMNA305v.." (guab) or "..JPMNN101}" (tenup)
+          - Coin 1-4: 1-4
+          - Game start: /
+          - Collect: D
 
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "bus/rs232/rs232.h"
 #include "formats/guab_dsk.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/wd_fdc.h"
 #include "sound/sn76496.h"
 #include "video/ef9369.h"
 #include "video/tms34061.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -62,8 +71,8 @@
 class guab_state : public driver_device
 {
 public:
-	guab_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	guab_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tms34061(*this, "tms34061"),
 		m_sn(*this, "snsnd"),
@@ -73,6 +82,11 @@ public:
 		m_sound_buffer(0), m_sound_latch(false)
 	{ }
 
+	void guab(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	EF9369_COLOR_UPDATE(ef9369_color_update);
 	DECLARE_WRITE16_MEMBER(tms34061_w);
 	DECLARE_READ16_MEMBER(tms34061_r);
@@ -90,16 +104,14 @@ public:
 	DECLARE_READ8_MEMBER(watchdog_r);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	void guab(machine_config &config);
 	void guab_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34061_device> m_tms34061;
 	required_device<sn76489_device> m_sn;
@@ -116,25 +128,26 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(guab_state::guab_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04ffff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0x0c0000, 0x0c0007) AM_DEVREADWRITE8("i8255_1", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0020, 0x0c0027) AM_DEVREADWRITE8("i8255_2", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0040, 0x0c0047) AM_DEVREADWRITE8("i8255_3", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0060, 0x0c0067) AM_DEVREADWRITE8("i8255_4", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0080, 0x0c0083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0x0c00a0, 0x0c00a3) AM_DEVREADWRITE8("acia6850_2", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0x0c00e0, 0x0c00e7) AM_DEVREADWRITE8("fdc", wd1773_device, read, write, 0x00ff)
-	AM_RANGE(0x080000, 0x080fff) AM_RAM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-	AM_RANGE(0x800000, 0xb0ffff) AM_READWRITE(tms34061_r, tms34061_w)
-	AM_RANGE(0xb10000, 0xb1ffff) AM_RAM
-	AM_RANGE(0xb80000, 0xb8ffff) AM_RAM
-	AM_RANGE(0xb90000, 0xb9ffff) AM_RAM
-ADDRESS_MAP_END
+void guab_state::guab_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x04ffff).rom().region("maincpu", 0x10000);
+	map(0x0c0000, 0x0c0007).rw("i8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0c0020, 0x0c0027).rw("i8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0c0040, 0x0c0047).rw("i8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0c0060, 0x0c0067).rw("i8255_4", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0c0080, 0x0c0083).rw("acia6850_1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x0c00a0, 0x0c00a3).rw("acia6850_2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x0c00c0, 0x0c00cf).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0x0c00e0, 0x0c00e7).rw(m_fdc, FUNC(wd1773_device::read), FUNC(wd1773_device::write)).umask16(0x00ff);
+	map(0x080000, 0x080fff).ram();
+	map(0x100001, 0x100001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
+	map(0x100003, 0x100003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0x800000, 0xb0ffff).rw(FUNC(guab_state::tms34061_r), FUNC(guab_state::tms34061_w));
+	map(0xb10000, 0xb1ffff).ram();
+	map(0xb80000, 0xb8ffff).ram();
+	map(0xb90000, 0xb9ffff).ram();
+}
 
 
 //**************************************************************************
@@ -415,6 +428,15 @@ WRITE8_MEMBER( guab_state::output6_w )
 	output().set_value("led_47", BIT(data, 7));
 }
 
+static DEVICE_INPUT_DEFAULTS_START( acia_1_rs232_defaults )
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_ODD)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
 
 //**************************************************************************
 //  AUDIO
@@ -440,9 +462,10 @@ FLOPPY_FORMATS_MEMBER( guab_state::floppy_formats )
 	FLOPPY_GUAB_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( guab_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void guab_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 
 //**************************************************************************
@@ -451,8 +474,8 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(guab_state::guab)
 	/* TODO: Verify clock */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(guab_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(guab_map)
 
 	/* TODO: Use real video timings */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -472,53 +495,66 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
 	MCFG_TMS34061_VRAM_SIZE(0x40000)
 	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", 5))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* TODO: Verify clock */
-	MCFG_SOUND_ADD("snsnd", SN76489, 2000000)
+	MCFG_DEVICE_ADD("snsnd", SN76489, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 3))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.irq_callback().set_inputline("maincpu", 3);
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi1(I8255(config, "i8255_1"));
+	ppi1.in_pa_callback().set_ioport("IN0");
+	ppi1.in_pb_callback().set_ioport("IN1");
+	ppi1.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(guab_state, output1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(guab_state, output2_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(guab_state, output3_w))
+	i8255_device &ppi2(I8255(config, "i8255_2"));
+	ppi2.out_pa_callback().set(FUNC(guab_state::output1_w));
+	ppi2.out_pb_callback().set(FUNC(guab_state::output2_w));
+	ppi2.out_pc_callback().set(FUNC(guab_state::output3_w));
 
-	MCFG_DEVICE_ADD("i8255_3", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(guab_state, output4_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(guab_state, output5_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(guab_state, output6_w))
+	i8255_device &ppi3(I8255(config, "i8255_3"));
+	ppi3.out_pa_callback().set(FUNC(guab_state::output4_w));
+	ppi3.out_pb_callback().set(FUNC(guab_state::output5_w));
+	ppi3.out_pc_callback().set(FUNC(guab_state::output6_w));
 
-	MCFG_DEVICE_ADD("i8255_4", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(guab_state, sn76489_ready_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(guab_state, sn76489_buffer_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(guab_state, system_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(guab_state, watchdog_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(guab_state, watchdog_w))
+	i8255_device &ppi4(I8255(config, "i8255_4"));
+	ppi4.in_pa_callback().set(FUNC(guab_state::sn76489_ready_r));
+	ppi4.out_pa_callback().set(FUNC(guab_state::sn76489_buffer_w));
+	ppi4.out_pb_callback().set(FUNC(guab_state::system_w));
+	ppi4.in_pc_callback().set(FUNC(guab_state::watchdog_r));
+	ppi4.out_pc_callback().set(FUNC(guab_state::watchdog_w));
 
-	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
+	acia6850_device &acia1(ACIA6850(config, "acia6850_1", 0));
+	acia1.txd_handler().set("rs232_1", FUNC(rs232_port_device::write_txd));
+	acia1.rts_handler().set("rs232_1", FUNC(rs232_port_device::write_rts));
+	acia1.irq_handler().set_inputline("maincpu", 4);
 
-	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
+	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", acia_1_rs232_defaults)
+
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600)); // source? the ptm doesn't seem to output any common baud values
+	acia_clock.signal_handler().set("acia6850_1", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia6850_1", FUNC(acia6850_device::write_rxc));
+
+	ACIA6850(config, "acia6850_2", 0);
 
 	// floppy
-	MCFG_WD1773_ADD("fdc", 8000000)
-	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", 6))
+	WD1773(config, m_fdc, 8000000);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, 6);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", guab_floppies, "dd", guab_state::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "guab")
 
-	MCFG_DEFAULT_LAYOUT(layout_guab)
+	config.set_default_layout(layout_guab);
 MACHINE_CONFIG_END
 
 
@@ -553,7 +589,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS       INIT  ROTATION  COMPANY  FULLNAME                FLAGS
-GAME( 1986, guab,     0,      guab,    guab,  guab_state, 0,    ROT0,     "JPM",   "Give us a Break",      0 )
-GAME( 1986, crisscrs, 0,      guab,    guab,  guab_state, 0,    ROT0,     "JPM",   "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
-GAME( 1988, tenup,    0,      guab,    tenup, guab_state, 0,    ROT0,     "JPM",   "Ten Up",               0 )
+//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS       INIT        ROTATION  COMPANY  FULLNAME                FLAGS
+GAME( 1986, guab,     0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Give us a Break",      0 )
+GAME( 1986, crisscrs, 0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
+GAME( 1988, tenup,    0,      guab,    tenup, guab_state, empty_init, ROT0,     "JPM",   "Ten Up",               0 )

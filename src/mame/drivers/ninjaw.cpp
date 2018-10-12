@@ -420,84 +420,89 @@ WRITE16_MEMBER(ninjaw_state::tc0100scn_triple_screen_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(ninjaw_state::ninjaw_master_map)
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM                                                     /* main ram */
-	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
-	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x220000, 0x220003) AM_READWRITE(sound_r,sound_w)
-	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
-	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_device, word_r, word_w)      /* tilemaps (2nd screen) */
-	AM_RANGE(0x2e0000, 0x2e000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x300000, 0x313fff) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_device, word_r, word_w)      /* tilemaps (3rd screen) */
-	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x340000, 0x340007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_device, word_r, step1_word_w)        /* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_device, word_r, step1_word_w)        /* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE("tc0110pcr_3", tc0110pcr_device, word_r, step1_word_w)        /* palette (3rd screen) */
-ADDRESS_MAP_END
+void ninjaw_state::ninjaw_master_map(address_map &map)
+{
+	map(0x000000, 0x0bffff).rom();
+	map(0x0c0000, 0x0cffff).ram();                                                     /* main ram */
+	map(0x200000, 0x200003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
+	map(0x210000, 0x210001).w(FUNC(ninjaw_state::cpua_ctrl_w));
+	map(0x220000, 0x220003).rw(FUNC(ninjaw_state::sound_r), FUNC(ninjaw_state::sound_w));
+	map(0x240000, 0x24ffff).ram().share("share1");
+	map(0x260000, 0x263fff).ram().share("spriteram");
+	map(0x280000, 0x293fff).r("tc0100scn_1", FUNC(tc0100scn_device::word_r)).w(FUNC(ninjaw_state::tc0100scn_triple_screen_w)); /* tilemaps (1st screen/all screens) */
+	map(0x2a0000, 0x2a000f).rw("tc0100scn_1", FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x2c0000, 0x2d3fff).rw("tc0100scn_2", FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));      /* tilemaps (2nd screen) */
+	map(0x2e0000, 0x2e000f).rw("tc0100scn_2", FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x300000, 0x313fff).rw("tc0100scn_3", FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));      /* tilemaps (3rd screen) */
+	map(0x320000, 0x32000f).rw("tc0100scn_3", FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x340000, 0x340007).rw("tc0110pcr_1", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (1st screen) */
+	map(0x350000, 0x350007).rw("tc0110pcr_2", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (2nd screen) */
+	map(0x360000, 0x360007).rw("tc0110pcr_3", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (3rd screen) */
+}
 
 // NB there could be conflicts between which cpu writes what to the
 // palette, as our interleaving won't match the original board.
 
-ADDRESS_MAP_START(ninjaw_state::ninjaw_slave_map)
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM /* main ram */
-	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
-	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
-	AM_RANGE(0x340000, 0x340007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_device, word_r, step1_word_w)        /* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_device, word_r, step1_word_w)        /* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE("tc0110pcr_3", tc0110pcr_device, word_r, step1_word_w)        /* palette (3rd screen) */
-ADDRESS_MAP_END
+void ninjaw_state::ninjaw_slave_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0x080000, 0x08ffff).ram(); /* main ram */
+	map(0x200000, 0x200003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
+	map(0x240000, 0x24ffff).ram().share("share1");
+	map(0x260000, 0x263fff).ram().share("spriteram");
+	map(0x280000, 0x293fff).r("tc0100scn_1", FUNC(tc0100scn_device::word_r)).w(FUNC(ninjaw_state::tc0100scn_triple_screen_w)); /* tilemaps (1st screen/all screens) */
+	map(0x340000, 0x340007).rw("tc0110pcr_1", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (1st screen) */
+	map(0x350000, 0x350007).rw("tc0110pcr_2", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (2nd screen) */
+	map(0x360000, 0x360007).rw("tc0110pcr_3", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (3rd screen) */
+}
 
-ADDRESS_MAP_START(ninjaw_state::darius2_master_map)
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM                         /* main ram */
-	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
-	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x220000, 0x220003) AM_READWRITE(sound_r,sound_w)
-	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
-	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_device, word_r, word_w)      /* tilemaps (2nd screen) */
-	AM_RANGE(0x2e0000, 0x2e000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x300000, 0x313fff) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_device, word_r, word_w)      /* tilemaps (3rd screen) */
-	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x340000, 0x340007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_device, word_r, step1_word_w)        /* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_device, word_r, step1_word_w)        /* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE("tc0110pcr_3", tc0110pcr_device, word_r, step1_word_w)        /* palette (3rd screen) */
-ADDRESS_MAP_END
+void ninjaw_state::darius2_master_map(address_map &map)
+{
+	map(0x000000, 0x0bffff).rom();
+	map(0x0c0000, 0x0cffff).ram();                         /* main ram */
+	map(0x200000, 0x200003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
+	map(0x210000, 0x210001).w(FUNC(ninjaw_state::cpua_ctrl_w));
+	map(0x220000, 0x220003).rw(FUNC(ninjaw_state::sound_r), FUNC(ninjaw_state::sound_w));
+	map(0x240000, 0x24ffff).ram().share("share1");
+	map(0x260000, 0x263fff).ram().share("spriteram");
+	map(0x280000, 0x293fff).r("tc0100scn_1", FUNC(tc0100scn_device::word_r)).w(FUNC(ninjaw_state::tc0100scn_triple_screen_w)); /* tilemaps (1st screen/all screens) */
+	map(0x2a0000, 0x2a000f).rw("tc0100scn_1", FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x2c0000, 0x2d3fff).rw("tc0100scn_2", FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));      /* tilemaps (2nd screen) */
+	map(0x2e0000, 0x2e000f).rw("tc0100scn_2", FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x300000, 0x313fff).rw("tc0100scn_3", FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));      /* tilemaps (3rd screen) */
+	map(0x320000, 0x32000f).rw("tc0100scn_3", FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x340000, 0x340007).rw("tc0110pcr_1", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (1st screen) */
+	map(0x350000, 0x350007).rw("tc0110pcr_2", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (2nd screen) */
+	map(0x360000, 0x360007).rw("tc0110pcr_3", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (3rd screen) */
+}
 
-ADDRESS_MAP_START(ninjaw_state::darius2_slave_map)
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM                                                     /* main ram */
-	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
-	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
-ADDRESS_MAP_END
+void ninjaw_state::darius2_slave_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0x080000, 0x08ffff).ram();                                                     /* main ram */
+	map(0x200000, 0x200003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
+	map(0x240000, 0x24ffff).ram().share("share1");
+	map(0x260000, 0x263fff).ram().share("spriteram");
+	map(0x280000, 0x293fff).r("tc0100scn_1", FUNC(tc0100scn_device::word_r)).w(FUNC(ninjaw_state::tc0100scn_triple_screen_w)); /* tilemaps (1st screen/all screens) */
+}
 
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(ninjaw_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r,slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(pancontrol_w) /* pan */
-	AM_RANGE(0xea00, 0xea00) AM_READNOP
-	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
-ADDRESS_MAP_END
+void ninjaw_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("z80bank");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
+	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
+	map(0xe400, 0xe403).w(FUNC(ninjaw_state::pancontrol_w)); /* pan */
+	map(0xea00, 0xea00).nopr();
+	map(0xee00, 0xee00).nopw(); /* ? */
+	map(0xf000, 0xf000).nopw(); /* ? */
+	map(0xf200, 0xf200).w(FUNC(ninjaw_state::sound_bankswitch_w));
+}
 
 
 /***********************************************************
@@ -624,7 +629,7 @@ static const gfx_layout charlayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( ninjaw )
+static GFXDECODE_START( gfx_ninjaw )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* scr tiles (screen 1) */
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )   /* scr tiles (screens 2+) */
@@ -731,16 +736,16 @@ void ninjaw_state::machine_reset()
 MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ninjaw_master_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ninjaw_master_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 16/4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 16/4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("sub", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ninjaw_slave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000,16000000/2)  /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ninjaw_slave_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
 	// TODO: if CPUs are unsynched then seldomly stages loads up with no enemies
 	//       Let's use a better timer (was 6000 before) based off actual CPU timing.
@@ -748,21 +753,21 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	MCFG_QUANTUM_TIME(attotime::from_hz(16000000/1024))  /* CPU slices */
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
-	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(ninjaw_state, coin_control_w))
-	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc.read_0_callback().set_ioport("DSWA");
+	tc0040ioc.read_1_callback().set_ioport("DSWB");
+	tc0040ioc.read_2_callback().set_ioport("IN0");
+	tc0040ioc.read_3_callback().set_ioport("IN1");
+	tc0040ioc.write_4_callback().set(FUNC(ninjaw_state::coin_control_w));
+	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjaw)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjaw)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_ADD("palette2", 4096)
 	MCFG_PALETTE_ADD("palette3", 4096)
 
-	MCFG_DEFAULT_LAYOUT(layout_ninjaw)
+	config.set_default_layout(layout_ninjaw);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -797,8 +802,7 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_1")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr_1", TC0110PCR, 0, "palette")
 
 	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(2)
@@ -809,8 +813,7 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette2")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_2")
-	MCFG_TC0110PCR_PALETTE("palette2")
+	MCFG_DEVICE_ADD("tc0110pcr_2", TC0110PCR, 0, "palette2")
 
 	MCFG_DEVICE_ADD("tc0100scn_3", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(2)
@@ -821,13 +824,13 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette3")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_3")
-	MCFG_TC0110PCR_PALETTE("palette3")
+	MCFG_DEVICE_ADD("tc0110pcr_3", TC0110PCR, 0, "palette3")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -836,16 +839,12 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-//  MCFG_SOUND_ADD("subwoofer", SUBWOOFER, 0)
+//  MCFG_DEVICE_ADD("subwoofer", SUBWOOFER, 0)
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
@@ -856,35 +855,35 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ninjaw_state::darius2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(darius2_master_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(darius2_master_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("sub", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(darius2_slave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000,16000000/2)  /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(darius2_slave_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(16000000/1024))  /* CPU slices */
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
-	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(ninjaw_state, coin_control_w))
-	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc.read_0_callback().set_ioport("DSWA");
+	tc0040ioc.read_1_callback().set_ioport("DSWB");
+	tc0040ioc.read_2_callback().set_ioport("IN0");
+	tc0040ioc.read_3_callback().set_ioport("IN1");
+	tc0040ioc.write_4_callback().set(FUNC(ninjaw_state::coin_control_w));
+	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjaw)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjaw)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_ADD("palette2", 4096)
 	MCFG_PALETTE_ADD("palette3", 4096)
 
-	MCFG_DEFAULT_LAYOUT(layout_ninjaw)
+	config.set_default_layout(layout_ninjaw);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -919,8 +918,7 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_1")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr_1", TC0110PCR, 0, "palette")
 
 	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(2)
@@ -931,8 +929,7 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette2")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_2")
-	MCFG_TC0110PCR_PALETTE("palette2")
+	MCFG_DEVICE_ADD("tc0110pcr_2", TC0110PCR, 0, "palette2")
 
 	MCFG_DEVICE_ADD("tc0100scn_3", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(2)
@@ -943,13 +940,13 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette3")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_3")
-	MCFG_TC0110PCR_PALETTE("palette3")
+	MCFG_DEVICE_ADD("tc0110pcr_3", TC0110PCR, 0, "palette3")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -958,16 +955,12 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-//  MCFG_SOUND_ADD("subwoofer", SUBWOOFER, 0)
+//  MCFG_DEVICE_ADD("subwoofer", SUBWOOFER, 0)
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
@@ -1245,8 +1238,8 @@ ROM_END
 /* Working Games */
 
 //    YEAR, NAME,     PARENT, MACHINE, INPUT,   STATE         INIT,MONITOR,COMPANY,                     FULLNAME,FLAGS
-GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, later version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, later version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Uses same coinage as World, see notes */
+GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, empty_init, ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

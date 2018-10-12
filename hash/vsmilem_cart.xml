@@ -34,12 +34,12 @@ Language:
 |        | 80-084004(GE)     | Sportskanone                                                               |
 |        | 80-084005(FR)     | Sporti Folies                                                              |
 |        | 80-084006(PT)     | Action Mania (84016 on cart)                                               |
-|        | 80-084007(SP)     | Action Mania                                                               |
+|        | 80-084007(SP)     | Action Manía                                                               |
 +========+===================+============================================================================+
-|        | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure                                |
-|        | 80-084021(US)     | Dora the Explorer: Dora's Fix It Adventure (pocket version)               |
+|        | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure                                 |
+|        | 80-084021(US)     | Dora the Explorer: Dora's Fix It Adventure (pocket version)                |
 |        | 80-084022(NL)     | Dora: Dora's Reparatie Avontuur                                            |
-|        | 80-084023(UK)     | Dora the Explorer: Dora's Fix It Adventure                                |
+|        | 80-084023(UK)     | Dora the Explorer: Dora's Fix It Adventure                                 |
 |   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer                                            |
 |        | 80-084025(FR)     | Dora L'Exploratrice : Les Adventures De Dora Apprentie Mecano              |
 |        | 80-084026(PT)     | Dora : em busca das pecas perdidas                                         |
@@ -78,7 +78,7 @@ Language:
 |        | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball                          |
 |        | 80-084163(UK)     | Disney's Little Einsteins: The Glass Slipper Ball                          |
 |   XX   | 80-084164(GE)     | Disney's Kleine Einsteins: Der Glaspantoffel-Ball                          |
-|        | 80-084167(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal               |
+|        | 80-084167(SP)     | Little Einsteins de Disney: El Baile del Zapatito de Cristal               |
 +========+===================+============================================================================+
 |        | 80-084180(US)     | Mickey Mouse Clubhouse                                                     |
 |        | 80-084182(NL)     | Mickey Mouse Clubhouse                                                     |
@@ -117,7 +117,7 @@ Language:
 |        | 80-084304(GE)     | Fussball Meisterschaft                                                     |
 |        | 80-084305(FR)     | Football Challenge                                                         |
 |        | 80-084306(PT)     | Football Challenge  (cart#??)                                              |
-|        | 80-084307(SP)     | Campeonato de Futbol                                                       |
+|        | 80-084307(SP)     | Campeonato de Fútbol                                                       |
 +========+===================+============================================================================+
 |        | 80-084320(US)     | Disney Fairies: TinkerBell                                                 |
 |        | 80-084321(US)     | Disney Fairies: TinkerBell (pocket version)                                |
@@ -149,7 +149,7 @@ Language:
 |   XX   | 80-084384(GE)     | Winnie Puuh - Die Honigjagd                                                |
 |        | 80-084385(FR)     | Winnie Rourson - La Chasse au miel de Winnie                               |
 |        | 80-084386(PT)     | Winnie - Em Busca do Mel (84396 on cart)                                   |
-|        | 80-084387(SP)     | Winnie the Pooh - En busca de la miel                                      |
+|        | 80-084387(SP)     | Winnie the Pooh - En Busca de la Miel                                      |
 +========+===================+============================================================================+
 |        | 80-084400(US)     | Cars: Rev It Up in Radiator Springs                                        |
 |        | 80-084402(NL)     | Cars: Spektakel in Radiator Springs                                        |
@@ -173,12 +173,12 @@ Language:
 |        | 80-084443(UK)     | Monsters vs. Aliens                                                        |
 |        | 80-084444(GE)     | Monsters vs. Aliens                                                        |
 |        | 80-084445(FR)     | Monsters vs. Aliens                                                        |
-|        | 80-084447(SP)     | Monstruos contra Alienigenas                                               |
+|        | 80-084447(SP)     | Monstruos contra Alienígenas                                               |
 +========+===================+============================================================================+
 |        | 80-084460(US)     | Noddy - Detective for a Day (unreleased in USA??) see 80-092540            |
 |        | 80-084463(UK)     | Noddy - Detective for a Day                                                |
 |        | 80-084465(FR)     | Oui-Oui - Detective d'un jour                                              |
-|        | 80-084467(SP)     | Noddy - Detective por un Dia                                               |
+|        | 80-084467(SP)     | Noddy - Detective por un día                                               |
 +========+===================+============================================================================+
 |        | 80-084480(US)     | The Princess and the Frog  (motion version)                                |
 |        | 80-084481(US)     | The Princess and the Frog  (pocket version)                                |
@@ -186,7 +186,7 @@ Language:
 |        | 80-084483(UK)     | The Princess and the Frog                                                  |
 |        | 80-084484(GE)     | Kuess den Frosch                                                           |
 |        | 80-084485(FR)     | La Princesse Et La Grenouille                                              |
-|        | 80-084487(SP)     | Tiana y el sapo - El gran Sueno de Tiana                                   |
+|        | 80-084487(SP)     | Tiana y el Sapo - El gran sueño de Tiana                                   |
 +========+===================+============================================================================+
 |        | 80-084500(US)     | Shrek Forever After                                                        |
 |        | 80-084502(NL)     | Sjrek voor eeuwig en altijd                                                |
@@ -221,7 +221,7 @@ Language:
 +========+===================+============================================================================+
 |        | 80-084640(US)     | <Unknown> (Should be Orange colored Spongebob)                             |
 |        | 80-084644(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                               |
-|        | 80-084647(SP)     | Bob Epsonja - Un dia en la vida de una esponja                             |
+|        | 80-084647(SP)     | Bob Esponja - Un día en la vida de una esponja                             |
 +========+===================+============================================================================+
 
 V.Smile Smartbooks

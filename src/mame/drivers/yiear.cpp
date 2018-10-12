@@ -99,12 +99,10 @@ Sound: VLM5030 at 7B
 #include "emu.h"
 #include "includes/yiear.h"
 #include "includes/konamipt.h"
-#include "audio/trackfld.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -124,46 +122,48 @@ WRITE8_MEMBER(yiear_state::yiear_VLM5030_control_w)
 	m_vlm->rst((data >> 2) & 1);
 }
 
-INTERRUPT_GEN_MEMBER(yiear_state::yiear_vblank_interrupt)
+WRITE_LINE_MEMBER(yiear_state::vblank_irq)
 {
-	if (m_yiear_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_yiear_irq_enable)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 
 INTERRUPT_GEN_MEMBER(yiear_state::yiear_nmi_interrupt)
 {
 	if (m_yiear_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-ADDRESS_MAP_START(yiear_state::main_map)
-	AM_RANGE(0x0000, 0x0000) AM_READ(yiear_speech_r)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(yiear_control_w)
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(konami_SN76496_latch_w)
-	AM_RANGE(0x4900, 0x4900) AM_WRITE(konami_SN76496_w)
-	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(yiear_VLM5030_control_w)
-	AM_RANGE(0x4b00, 0x4b00) AM_DEVWRITE("vlm", vlm5030_device, data_w)
-	AM_RANGE(0x4c00, 0x4c00) AM_READ_PORT("DSW2")
-	AM_RANGE(0x4d00, 0x4d00) AM_READ_PORT("DSW3")
-	AM_RANGE(0x4e00, 0x4e00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x4e01, 0x4e01) AM_READ_PORT("P1")
-	AM_RANGE(0x4e02, 0x4e02) AM_READ_PORT("P2")
-	AM_RANGE(0x4e03, 0x4e03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4f00, 0x4f00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x5000, 0x5fff) AM_RAM
-	AM_RANGE(0x5000, 0x502f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5400, 0x542f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void yiear_state::main_map(address_map &map)
+{
+	map(0x0000, 0x0000).r(FUNC(yiear_state::yiear_speech_r));
+	map(0x4000, 0x4000).w(FUNC(yiear_state::yiear_control_w));
+	map(0x4800, 0x4800).w(FUNC(yiear_state::konami_SN76496_latch_w));
+	map(0x4900, 0x4900).w(FUNC(yiear_state::konami_SN76496_w));
+	map(0x4a00, 0x4a00).w(FUNC(yiear_state::yiear_VLM5030_control_w));
+	map(0x4b00, 0x4b00).w(m_vlm, FUNC(vlm5030_device::data_w));
+	map(0x4c00, 0x4c00).portr("DSW2");
+	map(0x4d00, 0x4d00).portr("DSW3");
+	map(0x4e00, 0x4e00).portr("SYSTEM");
+	map(0x4e01, 0x4e01).portr("P1");
+	map(0x4e02, 0x4e02).portr("P2");
+	map(0x4e03, 0x4e03).portr("DSW1");
+	map(0x4f00, 0x4f00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x5000, 0x5fff).ram();
+	map(0x5000, 0x502f).ram().share("spriteram");
+	map(0x5400, 0x542f).ram().share("spriteram2");
+	map(0x5800, 0x5fff).w(FUNC(yiear_state::yiear_videoram_w)).share("videoram");
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(yiear_state::vlm_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void yiear_state::vlm_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x1fff).rom();
+}
 
 
 static INPUT_PORTS_START( yiear )
@@ -261,7 +261,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( yiear )
+static GFXDECODE_START( gfx_yiear )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  0, 1 )
 GFXDECODE_END
@@ -281,35 +281,35 @@ void yiear_state::machine_reset()
 MACHINE_CONFIG_START(yiear_state::yiear)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", yiear_state,  yiear_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(yiear_state, yiear_nmi_interrupt, 480) /* music tempo (correct frequency unknown) */
+	MCFG_DEVICE_ADD(m_maincpu, MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(yiear_state, yiear_nmi_interrupt, 480) /* music tempo (correct frequency unknown) */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.58)   /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(yiear_state, screen_update_yiear)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, yiear_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yiear)
-	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yiear)
+	MCFG_PALETTE_ADD(m_palette, 32)
 	MCFG_PALETTE_INIT_OWNER(yiear_state, yiear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_DEVICE_ADD(m_audio, TRACKFLD_AUDIO, 0, finder_base::DUMMY_TAG, m_vlm)
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL(18'432'000)/12)   /* verified on pcb */
+	MCFG_DEVICE_ADD(m_sn, SN76489A, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545))   /* verified on pcb */
+	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545))   /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -367,5 +367,5 @@ ROM_END
 
 
 
-GAME( 1985, yiear,  0,     yiear, yiear, yiear_state, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, yiear2, yiear, yiear, yiear, yiear_state, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear,  0,     yiear, yiear, yiear_state, empty_init, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear2, yiear, yiear, yiear, yiear_state, empty_init, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )

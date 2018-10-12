@@ -25,6 +25,7 @@
 #include "cpu/m6502/m7501.h"
 #include "imagedev/snapquik.h"
 #include "machine/cbm_snqk.h"
+#include "machine/input_merger.h"
 #include "machine/mos6529.h"
 #include "machine/mos6551.h"
 #include "machine/mos8706.h"
@@ -70,12 +71,14 @@ public:
 		m_c2(*this, "c2"),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
-		m_addr(0),
-		m_ted_irq(CLEAR_LINE),
-		m_acia_irq(CLEAR_LINE),
-		m_exp_irq(CLEAR_LINE)
+		m_addr(0)
 	{ }
 
+	void plus4(machine_config &config);
+
+	DECLARE_WRITE8_MEMBER( cpu_w );
+
+protected:
 	required_device<m7501_device> m_maincpu;
 	required_device<pla_device> m_pla;
 	required_device<mos7360_device> m_ted;
@@ -99,7 +102,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void check_interrupts();
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
 	uint8_t read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
 
@@ -108,9 +110,7 @@ public:
 	DECLARE_READ8_MEMBER( ted_videoram_r );
 
 	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
 
-	DECLARE_WRITE_LINE_MEMBER( ted_irq_w );
 	DECLARE_READ8_MEMBER( ted_k_r );
 
 	DECLARE_WRITE_LINE_MEMBER( write_kb0 ) { if (state) m_kb |= 1; else m_kb &= ~1; }
@@ -121,10 +121,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_kb5 ) { if (state) m_kb |= 32; else m_kb &= ~32; }
 	DECLARE_WRITE_LINE_MEMBER( write_kb6 ) { if (state) m_kb |= 64; else m_kb &= ~64; }
 	DECLARE_WRITE_LINE_MEMBER( write_kb7 ) { if (state) m_kb |= 128; else m_kb &= ~128; }
-
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-
-	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c16 );
 
@@ -147,15 +143,9 @@ public:
 	// memory state
 	uint8_t m_addr;
 
-	// interrupt state
-	int m_ted_irq;
-	int m_acia_irq;
-	int m_exp_irq;
-
 	// keyboard state
 	uint8_t m_kb;
 
-	void plus4(machine_config &config);
 	void plus4_mem(address_map &map);
 	void ted_videoram_map(address_map &map);
 };
@@ -168,13 +158,15 @@ public:
 		: plus4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( cpu_r );
 	void v364(machine_config &config);
 	void c16n(machine_config &config);
 	void c16p(machine_config &config);
 	void c232(machine_config &config);
 	void plus4p(machine_config &config);
 	void plus4n(machine_config &config);
+
+private:
+	DECLARE_READ8_MEMBER( cpu_r );
 };
 
 
@@ -202,21 +194,6 @@ QUICKLOAD_LOAD_MEMBER( plus4_state, cbm_c16 )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
-
-//**************************************************************************
-//  INTERRUPTS
-//**************************************************************************
-
-//-------------------------------------------------
-//  check_interrupts -
-//-------------------------------------------------
-
-void plus4_state::check_interrupts()
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ted_irq || m_acia_irq || m_exp_irq);
-}
-
-
 
 //**************************************************************************
 //  MEMORY MANAGEMENT
@@ -482,18 +459,20 @@ READ8_MEMBER( plus4_state::ted_videoram_r )
 //  ADDRESS_MAP( plus4_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(plus4_state::plus4_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void plus4_state::plus4_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(plus4_state::read), FUNC(plus4_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( ted_videoram_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(plus4_state::ted_videoram_map)
-	AM_RANGE(0x0000, 0xffff) AM_READ(ted_videoram_r)
-ADDRESS_MAP_END
+void plus4_state::ted_videoram_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(plus4_state::ted_videoram_r));
+}
 
 
 
@@ -707,13 +686,13 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 	//logerror("%s cpu write %02x\n", machine().describe_context(), data);
 
 	// serial data
-	m_iec->data_w(!BIT(data, 0));
+	m_iec->host_data_w(!BIT(data, 0));
 
 	// serial clock
-	m_iec->clk_w(!BIT(data, 1));
+	m_iec->host_clk_w(!BIT(data, 1));
 
 	// serial attention
-	m_iec->atn_w(!BIT(data, 2));
+	m_iec->host_atn_w(!BIT(data, 2));
 
 	// cassette motor
 	m_cassette->motor_w(BIT(data, 3));
@@ -726,13 +705,6 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 //-------------------------------------------------
 //  ted7360_interface ted_intf
 //-------------------------------------------------
-
-WRITE_LINE_MEMBER( plus4_state::ted_irq_w )
-{
-	m_ted_irq = state;
-
-	check_interrupts();
-}
 
 READ8_MEMBER( plus4_state::ted_k_r )
 {
@@ -756,7 +728,7 @@ READ8_MEMBER( plus4_state::ted_k_r )
 	// joystick
 	if (!BIT(offset, 2))
 	{
-		uint8_t joy_a = m_joy1->joy_r();
+		uint8_t joy_a = m_joy1->read_joy();
 
 		data &= (0xf0 | (joy_a & 0x0f));
 		data &= ~(!BIT(joy_a, 5) << 6);
@@ -764,7 +736,7 @@ READ8_MEMBER( plus4_state::ted_k_r )
 
 	if (!BIT(offset, 1))
 	{
-		uint8_t joy_b = m_joy2->joy_r();
+		uint8_t joy_b = m_joy2->read_joy();
 
 		data &= (0xf0 | (joy_b & 0x0f));
 		data &= ~(!BIT(joy_b, 5) << 7);
@@ -786,37 +758,14 @@ READ8_MEMBER( plus4_state::ted_k_r )
 
 
 //-------------------------------------------------
-//  MOS6551_INTERFACE( acia_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( plus4_state::acia_irq_w )
-{
-	m_acia_irq = state;
-
-	check_interrupts();
-}
-
-
-//-------------------------------------------------
-//  PLUS4_EXPANSION_INTERFACE( expansion_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( plus4_state::exp_irq_w )
-{
-	m_exp_irq = state;
-
-	check_interrupts();
-}
-
-
-//-------------------------------------------------
 //  SLOT_INTERFACE( cbm_datassette_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( plus4_datassette_devices )
-	SLOT_INTERFACE("c1531", C1531)
-	SLOT_INTERFACE("diag264", DIAG264_CASSETTE_LOOPBACK)
-SLOT_INTERFACE_END
+void plus4_datassette_devices(device_slot_interface &device)
+{
+	device.option_add("c1531", C1531);
+	device.option_add("diag264", DIAG264_CASSETTE_LOOPBACK);
+}
 
 
 
@@ -841,9 +790,6 @@ void plus4_state::machine_start()
 
 	// state saving
 	save_item(NAME(m_addr));
-	save_item(NAME(m_ted_irq));
-	save_item(NAME(m_acia_irq));
-	save_item(NAME(m_exp_irq));
 	save_item(NAME(m_kb));
 
 	if (m_acia)
@@ -896,81 +842,94 @@ void plus4_state::machine_reset()
 
 MACHINE_CONFIG_START(plus4_state::plus4)
 	// basic machine hardware
-	MCFG_CPU_ADD(MOS7501_TAG, M7501, 0)
-	MCFG_CPU_PROGRAM_MAP(plus4_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, cpu_r), WRITE8(plus4_state, cpu_w))
+	MCFG_DEVICE_ADD(MOS7501_TAG, M7501, 0)
+	MCFG_DEVICE_PROGRAM_MAP(plus4_mem)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M7501_PORT_CALLBACKS(READ8(*this, plus4_state, cpu_r), WRITE8(*this, plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 	MCFG_QUANTUM_PERFECT_CPU(MOS7501_TAG)
 
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m7501_device::IRQ_LINE);
+
 	// video and sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, MOS7501_TAG, 0, ted_videoram_map, WRITELINE(plus4_state, ted_irq_w), READ8(plus4_state, ted_k_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(mos7360_device::PAL_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(336, 216)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1)
+	MCFG_SCREEN_UPDATE_DEVICE(MOS7360_TAG, mos7360_device, screen_update)
+
+	SPEAKER(config, "mono").front_center();
+
+	MOS7360(config, m_ted, 0);
+	m_ted->set_addrmap(0, &plus4_state::ted_videoram_map);
+	m_ted->set_screen(SCREEN_TAG);
+	m_ted->write_irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_ted->read_k_callback().set(FUNC(plus4_state::ted_k_r));
+	m_ted->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, plus4_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_4_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p2)) // cassette sense
-	MCFG_PET_USER_PORT_5_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p3))
-	MCFG_PET_USER_PORT_6_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p4))
-	MCFG_PET_USER_PORT_7_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p5))
-	MCFG_PET_USER_PORT_8_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_rxc))
-	MCFG_PET_USER_PORT_B_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p0))
-	MCFG_PET_USER_PORT_C_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
-	MCFG_PET_USER_PORT_F_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p7))
-	MCFG_PET_USER_PORT_H_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dcd)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
-	MCFG_PET_USER_PORT_J_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p6))
-	MCFG_PET_USER_PORT_K_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p1))
-	MCFG_PET_USER_PORT_L_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dsr)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
+	PET_USER_PORT(config, m_user, plus4_user_port_cards, nullptr);
+	m_user->p4_handler().set(m_spi_user, FUNC(mos6529_device::write_p2)); // cassette sense
+	m_user->p5_handler().set(m_spi_user, FUNC(mos6529_device::write_p3));
+	m_user->p6_handler().set(m_spi_user, FUNC(mos6529_device::write_p4));
+	m_user->p7_handler().set(m_spi_user, FUNC(mos6529_device::write_p5));
+	m_user->p8_handler().set(m_acia, FUNC(mos6551_device::write_rxc));
+	m_user->pb_handler().set(m_spi_user, FUNC(mos6529_device::write_p0));
+	m_user->pc_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	m_user->pf_handler().set(m_spi_user, FUNC(mos6529_device::write_p7));
+	m_user->ph_handler().set(m_acia, FUNC(mos6551_device::write_dcd)).invert(); // TODO: add missing pull up before inverter
+	m_user->pj_handler().set(m_spi_user, FUNC(mos6529_device::write_p6));
+	m_user->pk_handler().set(m_spi_user, FUNC(mos6529_device::write_p1));
+	m_user->pl_handler().set(m_acia, FUNC(mos6551_device::write_dsr)).invert(); // TODO: add missing pull up before inverter
 
-	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_RXC_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_d)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_e)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(plus4_state, acia_irq_w))
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->rxc_handler().set(m_user, FUNC(pet_user_port_device::write_8));
+	m_acia->rts_handler().set(m_user, FUNC(pet_user_port_device::write_d)).invert();
+	m_acia->dtr_handler().set(m_user, FUNC(pet_user_port_device::write_e)).invert();
+	m_acia->txd_handler().set(m_user, FUNC(pet_user_port_device::write_m));
+	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD(MOS6529_USER_TAG, MOS6529, 0)
-	MCFG_MOS6529_P0_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
-	MCFG_MOS6529_P1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_k))
-	MCFG_MOS6529_P2_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
-	MCFG_MOS6529_P3_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
-	MCFG_MOS6529_P4_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
-	MCFG_MOS6529_P5_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
-	MCFG_MOS6529_P6_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_j))
-	MCFG_MOS6529_P7_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_f))
+	MCFG_DEVICE_ADD(m_spi_user, MOS6529, 0)
+	MCFG_MOS6529_P0_HANDLER(WRITELINE(m_user, pet_user_port_device, write_b))
+	MCFG_MOS6529_P1_HANDLER(WRITELINE(m_user, pet_user_port_device, write_k))
+	MCFG_MOS6529_P2_HANDLER(WRITELINE(m_user, pet_user_port_device, write_4))
+	MCFG_MOS6529_P3_HANDLER(WRITELINE(m_user, pet_user_port_device, write_5))
+	MCFG_MOS6529_P4_HANDLER(WRITELINE(m_user, pet_user_port_device, write_6))
+	MCFG_MOS6529_P5_HANDLER(WRITELINE(m_user, pet_user_port_device, write_7))
+	MCFG_MOS6529_P6_HANDLER(WRITELINE(m_user, pet_user_port_device, write_j))
+	MCFG_MOS6529_P7_HANDLER(WRITELINE(m_user, pet_user_port_device, write_f))
 
 	MCFG_DEVICE_ADD(MOS6529_KB_TAG, MOS6529, 0)
-	MCFG_MOS6529_P0_HANDLER(WRITELINE(plus4_state, write_kb0))
-	MCFG_MOS6529_P1_HANDLER(WRITELINE(plus4_state, write_kb1))
-	MCFG_MOS6529_P2_HANDLER(WRITELINE(plus4_state, write_kb2))
-	MCFG_MOS6529_P3_HANDLER(WRITELINE(plus4_state, write_kb3))
-	MCFG_MOS6529_P4_HANDLER(WRITELINE(plus4_state, write_kb4))
-	MCFG_MOS6529_P5_HANDLER(WRITELINE(plus4_state, write_kb5))
-	MCFG_MOS6529_P6_HANDLER(WRITELINE(plus4_state, write_kb6))
-	MCFG_MOS6529_P7_HANDLER(WRITELINE(plus4_state, write_kb7))
+	MCFG_MOS6529_P0_HANDLER(WRITELINE(*this, plus4_state, write_kb0))
+	MCFG_MOS6529_P1_HANDLER(WRITELINE(*this, plus4_state, write_kb1))
+	MCFG_MOS6529_P2_HANDLER(WRITELINE(*this, plus4_state, write_kb2))
+	MCFG_MOS6529_P3_HANDLER(WRITELINE(*this, plus4_state, write_kb3))
+	MCFG_MOS6529_P4_HANDLER(WRITELINE(*this, plus4_state, write_kb4))
+	MCFG_MOS6529_P5_HANDLER(WRITELINE(*this, plus4_state, write_kb5))
+	MCFG_MOS6529_P6_HANDLER(WRITELINE(*this, plus4_state, write_kb6))
+	MCFG_MOS6529_P7_HANDLER(WRITELINE(*this, plus4_state, write_kb7))
 
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, plus4_datassette_devices, "c1531", NOOP)
 
 	MCFG_CBM_IEC_ADD("c1541")
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(WRITELINE(m_user, pet_user_port_device, write_9))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL(14'318'181)/16, plus4_expansion_cards, nullptr)
-	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(plus4_state, exp_irq_w))
-	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(plus4_state, read))
-	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(plus4_state, write))
+	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<2>))
+	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(*this, plus4_state, read))
+	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, plus4_state, write))
 	MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(INPUTLINE(MOS7501_TAG, INPUT_LINE_HALT))
 
 	MCFG_QUICKLOAD_ADD("quickload", plus4_state, cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -1024,8 +983,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c16_state::c16n)
 	plus4n(config);
-	MCFG_CPU_MODIFY(MOS7501_TAG)
-	MCFG_M7501_PORT_CALLBACKS(READ8(c16_state, cpu_r), WRITE8(plus4_state, cpu_w))
+	MCFG_DEVICE_MODIFY(MOS7501_TAG)
+	MCFG_M7501_PORT_CALLBACKS(READ8(*this, c16_state, cpu_r), WRITE8(*this, plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 
 	MCFG_DEVICE_REMOVE(MOS6551_TAG)
@@ -1035,9 +994,7 @@ MACHINE_CONFIG_START(c16_state::c16n)
 	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
 	MCFG_CBM_IEC_BUS_ATN_CALLBACK(NOOP)
 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	m_ram->set_default_size("16K").set_extra_options("64K");
 MACHINE_CONFIG_END
 
 
@@ -1047,8 +1004,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c16_state::c16p)
 	plus4p(config);
-	MCFG_CPU_MODIFY(MOS7501_TAG)
-	MCFG_M7501_PORT_CALLBACKS(READ8(c16_state, cpu_r), WRITE8(plus4_state, cpu_w))
+	MCFG_DEVICE_MODIFY(MOS7501_TAG)
+	MCFG_M7501_PORT_CALLBACKS(READ8(*this, c16_state, cpu_r), WRITE8(*this, plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 
 	MCFG_DEVICE_REMOVE(MOS6551_TAG)
@@ -1058,21 +1015,15 @@ MACHINE_CONFIG_START(c16_state::c16p)
 	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
 	MCFG_CBM_IEC_BUS_ATN_CALLBACK(NOOP)
 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	m_ram->set_default_size("16K").set_extra_options("64K");
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  MACHINE_CONFIG( c232 )
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(c16_state::c232)
+void c16_state::c232(machine_config &config)
+{
 	c16p(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("32K");
+}
 
 
 //-------------------------------------------------
@@ -1081,7 +1032,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c16_state::v364)
 	plus4n(config);
-	MCFG_SOUND_ADD(T6721A_TAG, T6721A, XTAL(640'000))
+	MCFG_DEVICE_ADD(T6721A_TAG, T6721A, XTAL(640'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_MOS8706_ADD(MOS8706_TAG, XTAL(14'318'181)/16)
@@ -1156,11 +1107,11 @@ ROM_START( plus4 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
-	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(1) )
+	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
-	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(2) )
+	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(3) ) // first half contains R5 kernal
+	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(2) ) // first half contains R5 kernal
 
 	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
@@ -1183,11 +1134,11 @@ ROM_START( plus4p )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "318004-03.u24", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROMX_LOAD( "318004-03.u24", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318004-04.u24", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROMX_LOAD( "318004-04.u24", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
-	ROMX_LOAD( "318004-05.u24", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+	ROMX_LOAD( "318004-05.u24", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0x8000, "function", 0 )
 	ROM_LOAD( "317053-01.u25", 0x0000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
@@ -1206,11 +1157,11 @@ ROM_START( c16 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
-	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(1) )
+	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
-	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(2) )
+	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(3) ) // first half contains R5 kernal
+	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(2) ) // first half contains R5 kernal
 
 	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
@@ -1229,11 +1180,11 @@ ROM_START( c16p )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
-	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
@@ -1250,9 +1201,9 @@ ROM_START( c16_hu )
 
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "318030-01.u4", 0x4000, 0x4000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "318030-01.u4", 0x4000, 0x4000, NO_DUMP, ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "318030-02.u4", 0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee), ROM_BIOS(2) )
+	ROMX_LOAD( "318030-02.u4", 0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee), ROM_BIOS(1) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
@@ -1269,11 +1220,11 @@ ROM_START( c116 )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
-	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u101", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
@@ -1285,13 +1236,13 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   STATE       INIT    COMPANY                         FULLNAME                        FLAGS
-COMP( 1984, c264,   0,      0,      plus4n, plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore 264 (Prototype)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c232,   c264,   0,      c232,   plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore 232 (Prototype)",    MACHINE_SUPPORTS_SAVE )
-COMP( 1984, v364,   c264,   0,      v364,   plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore V364 (Prototype)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, plus4,  c264,   0,      plus4n, plus4,  c16_state,  0,      "Commodore Business Machines",  "Plus/4 (NTSC)",                MACHINE_SUPPORTS_SAVE )
-COMP( 1984, plus4p, c264,   0,      plus4p, plus4,  c16_state,  0,      "Commodore Business Machines",  "Plus/4 (PAL)",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16,    c264,   0,      c16n,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (NTSC)",          MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16p,   c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (PAL)",           MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16_hu, c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (Hungary)",       MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c116,   c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 116",                MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                        FULLNAME                      FLAGS
+COMP( 1984, c264,   0,      0,      plus4n,  plus4, c16_state, empty_init, "Commodore Business Machines", "Commodore 264 (Prototype)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c232,   c264,   0,      c232,    plus4, c16_state, empty_init, "Commodore Business Machines", "Commodore 232 (Prototype)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, v364,   c264,   0,      v364,    plus4, c16_state, empty_init, "Commodore Business Machines", "Commodore V364 (Prototype)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, plus4,  c264,   0,      plus4n,  plus4, c16_state, empty_init, "Commodore Business Machines", "Plus/4 (NTSC)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1984, plus4p, c264,   0,      plus4p,  plus4, c16_state, empty_init, "Commodore Business Machines", "Plus/4 (PAL)",               MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16,    c264,   0,      c16n,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 16 (NTSC)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16p,   c264,   0,      c16p,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 16 (PAL)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16_hu, c264,   0,      c16p,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 16 (Hungary)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c116,   c264,   0,      c16p,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 116",              MACHINE_SUPPORTS_SAVE )

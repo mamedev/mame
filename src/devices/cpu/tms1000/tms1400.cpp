@@ -16,20 +16,21 @@
 // TMS1400 follows the TMS1100, it doubles the ROM size again (4 chapters of 16 pages), and adds a 3-level callstack
 // - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
 // - the opla size is increased from 20 to 32 terms
-DEFINE_DEVICE_TYPE(TMS1400, tms1400_cpu_device, "tms1400", "TMS1400") // 28-pin DIP, 11 R pins (TMS1400CR is same, but with TMS1100 pinout)
-DEFINE_DEVICE_TYPE(TMS1470, tms1470_cpu_device, "tms1470", "TMS1470") // high voltage version, 1 R pin removed for Vdd
+DEFINE_DEVICE_TYPE(TMS1400, tms1400_cpu_device, "tms1400", "Texas Instruments TMS1400") // 28-pin DIP, 11 R pins (TMS1400CR is same, but with TMS1100 pinout)
+DEFINE_DEVICE_TYPE(TMS1470, tms1470_cpu_device, "tms1470", "Texas Instruments TMS1470") // high voltage version, 1 R pin removed for Vdd
 
 // TMS1600 adds more I/O to the TMS1400, input pins are doubled with added L1,2,4,8
 // - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
 // - the opla size is increased from 20 to 32 terms
-DEFINE_DEVICE_TYPE(TMS1600, tms1600_cpu_device, "tms1600", "TMS1600") // 40-pin DIP, 16 R pins
-DEFINE_DEVICE_TYPE(TMS1670, tms1670_cpu_device, "tms1670", "TMS1670") // high voltage version
+DEFINE_DEVICE_TYPE(TMS1600, tms1600_cpu_device, "tms1600", "Texas Instruments TMS1600") // 40-pin DIP, 16 R pins
+DEFINE_DEVICE_TYPE(TMS1670, tms1670_cpu_device, "tms1670", "Texas Instruments TMS1670") // high voltage version
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms1400_cpu_device::program_12bit_8)
-	AM_RANGE(0x000, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void tms1400_cpu_device::program_12bit_8(address_map &map)
+{
+	map(0x000, 0xfff).rom();
+}
 
 
 // device definitions

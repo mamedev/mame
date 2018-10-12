@@ -38,7 +38,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_battlnts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(battlnts_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	K007342_CALLBACK_MEMBER(battlnts_tile_callback);
 	K007420_CALLBACK_MEMBER(battlnts_sprite_callback);
 	void battlnts(machine_config &config);

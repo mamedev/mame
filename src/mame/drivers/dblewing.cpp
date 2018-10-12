@@ -79,14 +79,15 @@ Notes:
 #include "sound/ym2151.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class dblewing_state : public driver_device
 {
 public:
-	dblewing_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dblewing_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_spriteram(*this, "spriteram"),
@@ -99,6 +100,11 @@ public:
 		m_soundlatch_pending(false)
 	{ }
 
+	void dblewing(machine_config &config);
+
+	void init_dblewing();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_pf1_rowscroll;
 	required_shared_ptr<uint16_t> m_pf2_rowscroll;
@@ -114,7 +120,6 @@ public:
 
 	DECLARE_READ8_MEMBER(irq_latch_r);
 	DECLARE_WRITE_LINE_MEMBER(soundlatch_irq_w);
-	DECLARE_DRIVER_INIT(dblewing);
 	uint32_t screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -123,12 +128,10 @@ public:
 	READ16_MEMBER( wf_protection_region_0_104_r );
 	WRITE16_MEMBER( wf_protection_region_0_104_w );
 
-	void dblewing(machine_config &config);
 	void dblewing_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void sound_io(address_map &map);
 	void sound_map(address_map &map);
-private:
 	bool m_soundlatch_pending;
 };
 
@@ -173,29 +176,31 @@ WRITE_LINE_MEMBER( dblewing_state::soundlatch_irq_w )
 	m_soundlatch_pending = bool(state);
 }
 
-ADDRESS_MAP_START(dblewing_state::dblewing_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void dblewing_state::dblewing_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_SHARE("pf2_rowscroll")
+	map(0x100000, 0x100fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x102000, 0x102fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x104000, 0x104fff).ram().share("pf1_rowscroll");
+	map(0x106000, 0x106fff).ram().share("pf2_rowscroll");
 
 //  AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w) AM_SHARE("prot16ram")
-	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
+	map(0x280000, 0x283fff).rw(FUNC(dblewing_state::wf_protection_region_0_104_r), FUNC(dblewing_state::wf_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
 
-	AM_RANGE(0x284000, 0x284001) AM_RAM
-	AM_RANGE(0x288000, 0x288001) AM_RAM
-	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x320000, 0x3207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
-ADDRESS_MAP_END
+	map(0x284000, 0x284001).ram();
+	map(0x288000, 0x288001).ram();
+	map(0x28c000, 0x28c00f).ram().w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x300000, 0x3007ff).ram().share("spriteram");
+	map(0x320000, 0x3207ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xff0000, 0xff3fff).mirror(0xc000).ram();
+}
 
-ADDRESS_MAP_START(dblewing_state::decrypted_opcodes_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void dblewing_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().share("decrypted_opcodes");
+}
 
 READ8_MEMBER(dblewing_state::irq_latch_r)
 {
@@ -203,19 +208,21 @@ READ8_MEMBER(dblewing_state::irq_latch_r)
 	return m_soundlatch_pending ? 0 : 1;
 }
 
-ADDRESS_MAP_START(dblewing_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, status_r, write)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("ioprot", deco104_device, soundlatch_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void dblewing_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
+	map(0xb000, 0xb000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc000, 0xc000).r(m_deco104, FUNC(deco104_device::soundlatch_r));
+	map(0xd000, 0xd000).r(FUNC(dblewing_state::irq_latch_r)); //timing? sound latch?
+	map(0xf000, 0xf000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
-ADDRESS_MAP_START(dblewing_state::sound_io)
-	AM_RANGE(0x0000, 0xffff)  AM_ROM AM_REGION("audiocpu", 0)
-ADDRESS_MAP_END
+void dblewing_state::sound_io(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("audiocpu", 0);
+}
 
 
 
@@ -254,7 +261,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( dblewing )
+static GFXDECODE_START( gfx_dblewing )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0x000, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0x000, 32 )    /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,        0x200, 32 )    /* Sprites (16x16) */
@@ -348,14 +355,14 @@ DECOSPR_PRIORITY_CB_MEMBER(dblewing_state::pri_callback)
 MACHINE_CONFIG_START(dblewing_state::dblewing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* DE102 */
-	MCFG_CPU_PROGRAM_MAP(dblewing_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dblewing_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* DE102 */
+	MCFG_DEVICE_PROGRAM_MAP(dblewing_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dblewing_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'220'000)/9)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'220'000)/9)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
@@ -374,7 +381,7 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblewing)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblewing)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -397,23 +404,23 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	MCFG_DECO_SPRITE_PRIORITY_CB(dblewing_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
-	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(dblewing_state, soundlatch_irq_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
+	DECO104PROT(config, m_deco104, 0);
+	m_deco104->port_a_cb().set_ioport("INPUTS");
+	m_deco104->port_b_cb().set_ioport("SYSTEM");
+	m_deco104->port_c_cb().set_ioport("DSW");
+	m_deco104->set_interface_scramble_interleave();
+	m_deco104->set_use_magic_read_address_xor(true);
+	m_deco104->soundlatch_irq_cb().set(FUNC(dblewing_state::soundlatch_irq_w));
+	m_deco104->soundlatch_irq_cb().append("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(28'000'000)/28, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'000'000)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -442,7 +449,7 @@ ROM_START( dblewing )
 	ROM_RELOAD(                0x60000, 0x20000 )
 ROM_END
 
-DRIVER_INIT_MEMBER(dblewing_state,dblewing)
+void dblewing_state::init_dblewing()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x399d, 0x25, 0x3d);
@@ -451,4 +458,4 @@ DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 }
 
 
-GAME( 1993, dblewing, 0,     dblewing, dblewing, dblewing_state,  dblewing,  ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dblewing, 0, dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )

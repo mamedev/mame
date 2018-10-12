@@ -33,24 +33,24 @@ K055673_CB_MEMBER(rungun_state::sprite_callback)
 	*color = m_sprite_colorbase | (*color & 0x001f);
 }
 
-READ16_MEMBER(rungun_state::rng_ttl_ram_r)
+READ16_MEMBER(rungun_state::ttl_ram_r)
 {
 	return m_ttl_vram[offset+(m_video_mux_bank*0x1000)];
 }
 
-WRITE16_MEMBER(rungun_state::rng_ttl_ram_w)
+WRITE16_MEMBER(rungun_state::ttl_ram_w)
 {
 	COMBINE_DATA(&m_ttl_vram[offset+(m_video_mux_bank*0x1000)]);
 	m_ttl_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
-READ16_MEMBER(rungun_state::rng_psac2_videoram_r)
+READ16_MEMBER(rungun_state::psac2_videoram_r)
 {
 	return m_psac2_vram[offset+(m_video_mux_bank*0x80000)];
 }
 
-WRITE16_MEMBER(rungun_state::rng_psac2_videoram_w)
+WRITE16_MEMBER(rungun_state::psac2_videoram_w)
 {
 	COMBINE_DATA(&m_psac2_vram[offset+(m_video_mux_bank*0x80000)]);
 	m_936_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
@@ -136,7 +136,6 @@ uint32_t rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bi
 	}
 
 	m_ttl_tilemap[m_current_display_bank]->draw(screen, bitmap, cliprect, 0, 0);
-
 	return 0;
 }
 

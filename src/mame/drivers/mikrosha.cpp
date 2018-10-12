@@ -32,39 +32,43 @@ public:
 		: radio86_state(mconfig, type, tag)
 	{ }
 
+	void mikrosha(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
-	DECLARE_MACHINE_RESET(mikrosha);
+	virtual void machine_reset() override;
 
-	void mikrosha(machine_config &config);
 	void mikrosha_io(address_map &map);
 	void mikrosha_mem(address_map &map);
 };
 
-MACHINE_RESET_MEMBER(mikrosha_state,mikrosha)
+void mikrosha_state::machine_reset()
 {
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000+m_cart->get_rom_size()-1, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
-	MACHINE_RESET_CALL_MEMBER(radio86);
+	radio86_state::machine_reset();
 }
 
 /* Address maps */
-ADDRESS_MAP_START(mikrosha_state::mikrosha_mem)
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
-	AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x07fc)
-	AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x07fc)
-	AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x07fe) // video
-	AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write) AM_MIRROR(0x07fc) // Timer
-	AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
-	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+void mikrosha_state::mikrosha_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
+	map(0x1000, 0x7fff).ram(); // RAM
+	map(0xc000, 0xc003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x07fc);
+	map(0xc800, 0xc803).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x07fc);
+	map(0xd000, 0xd001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x07fe); // video
+	map(0xd800, 0xd803).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).mirror(0x07fc); // Timer
+	map(0xe000, 0xf7ff).r(FUNC(mikrosha_state::radio_cpu_state_r)); // Not connected
+	map(0xf800, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xf800, 0xffff).rom();  // System ROM
+}
 
-ADDRESS_MAP_START(mikrosha_state::mikrosha_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0xff ) AM_READWRITE(radio_io_r,radio_io_w)
-ADDRESS_MAP_END
+void mikrosha_state::mikrosha_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0xff).rw(FUNC(mikrosha_state::radio_io_r), FUNC(mikrosha_state::radio_io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mikrosha )
@@ -169,8 +173,6 @@ I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	const uint8_t *charmap = m_charmap + (m_mikrosha_font_page & 1) * 0x400;
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if(linecount == 8)
-		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}
@@ -199,37 +201,35 @@ static const gfx_layout mikrosha_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( mikrosha )
+static GFXDECODE_START( gfx_mikrosha )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikrosha_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(mikrosha_mem)
-	MCFG_CPU_IO_MAP(mikrosha_io)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(mikrosha_mem)
+	MCFG_DEVICE_IO_MAP(mikrosha_io)
 
-	MCFG_MACHINE_RESET_OVERRIDE(mikrosha_state, mikrosha)
+	I8255(config, m_ppi8255_1);
+	m_ppi8255_1->in_pa_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	m_ppi8255_1->out_pb_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
-
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, mikrosha_8255_font_page_w))
+	I8255(config, m_ppi8255_2);
+	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::mikrosha_8255_font_page_w));
 
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma8257,i8257_device, dreq2_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(0)
 	MCFG_PIT8253_CLK1(0)
 	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mikrosha_state, mikrosha_pit_out2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mikrosha_state, mikrosha_pit_out2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -238,20 +238,19 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikrosha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikrosha)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(mikrosha_state,radio86)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(radio86_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
-	MCFG_I8257_REVERSE_RW_MODE(1)
+	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(radio86_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(radio86_state::memory_write_byte));
+	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
+	m_dma8257->set_reverse_rw_mode(1);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rkm_cassette_formats)
@@ -283,6 +282,6 @@ ROM_START( m86rk )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME      PARENT   COMPAT    MACHINE     INPUT     STATE           INIT        COMPANY     FULLNAME        FLAGS
-COMP( 1987, mikrosha, radio86, 0,        mikrosha,   mikrosha, mikrosha_state, radio86,    "Lianozovo Electromechanical Factory",      "Mikrosha",     0)
-COMP( 1987, m86rk,    radio86, 0,        mikrosha,   mikrosha, mikrosha_state, radio86,    "<unknown>",        "Mikrosha-86RK",        0)
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY                                FULLNAME         FLAGS
+COMP( 1987, mikrosha, radio86, 0,      mikrosha, mikrosha, mikrosha_state, init_radio86, "Lianozovo Electromechanical Factory", "Mikrosha",      0)
+COMP( 1987, m86rk,    radio86, 0,      mikrosha, mikrosha, mikrosha_state, init_radio86, "<unknown>",                           "Mikrosha-86RK", 0)

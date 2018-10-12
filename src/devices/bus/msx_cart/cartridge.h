@@ -6,8 +6,8 @@
 #pragma once
 
 
-SLOT_INTERFACE_EXTERN(msx_cart);
-SLOT_INTERFACE_EXTERN(msx_yamaha_60pin);   // 60 pin expansion slots as found in yamaha machines
+void msx_cart(device_slot_interface &device);
+void msx_yamaha_60pin(device_slot_interface &device);   // 60 pin expansion slots as found in yamaha machines
 
 
 class msx_cart_interface : public device_slot_card_interface

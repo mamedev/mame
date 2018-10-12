@@ -27,21 +27,21 @@ class dac_bit_interface
 {
 public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write) = 0;
-	virtual DECLARE_WRITE8_MEMBER(write) = 0;
+	virtual DECLARE_WRITE8_MEMBER(data_w) = 0;
 };
 
 class dac_byte_interface
 {
 public:
 	virtual void write(unsigned char data) = 0;
-	virtual DECLARE_WRITE8_MEMBER(write) = 0;
+	virtual DECLARE_WRITE8_MEMBER(data_w) = 0;
 };
 
 class dac_word_interface
 {
 public:
 	virtual void write(unsigned short data) = 0;
-	virtual DECLARE_WRITE16_MEMBER(write) = 0;
+	virtual DECLARE_WRITE16_MEMBER(data_w) = 0;
 };
 
 template <unsigned bits>
@@ -213,7 +213,7 @@ public:
 	}
 
 	virtual WRITE_LINE_MEMBER(write) override { this->setCode(state); }
-	virtual WRITE8_MEMBER(write) override { this->setCode(data); }
+	virtual WRITE8_MEMBER(data_w) override { this->setCode(data); }
 };
 
 template <typename _dac_code>
@@ -228,7 +228,7 @@ public:
 	}
 
 	virtual void write(unsigned char data) override { this->setCode(data); }
-	virtual DECLARE_WRITE8_MEMBER(write) override { this->setCode(data); }
+	virtual DECLARE_WRITE8_MEMBER(data_w) override { this->setCode(data); }
 };
 
 template <typename _dac_code>
@@ -243,7 +243,7 @@ public:
 	}
 
 	virtual void write(unsigned short data) override { this->setCode(data); }
-	virtual DECLARE_WRITE16_MEMBER(write) override { this->setCode(data); }
+	virtual DECLARE_WRITE16_MEMBER(data_w) override { this->setCode(data); }
 };
 
 constexpr double dac_gain_r2r = 1.0;
@@ -280,9 +280,11 @@ DAC_GENERATOR(DAC1200, dac1200_device, dac_word_interface, dac_code_binary<12>, 
 DAC_GENERATOR(MC1408, mc1408_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "MC1408", "mc1408")
 DAC_GENERATOR(MC3408, mc3408_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "MC3408", "mc3408")
 DAC_GENERATOR(MC3410, mc3410_device, dac_word_interface, dac_code_binary<10>, dac_gain_r2r, "MC3410", "mc3410")
+DAC_GENERATOR(MP1210, mp1210_device, dac_word_interface, dac_code_twos_complement<12>, dac_gain_r2r, "MP1210", "mp1210") // also addressable with separate 8-bit and 4-bit input latches
 DAC_GENERATOR(PCM54HP, pcm54hp_device, dac_word_interface, dac_code_binary<16>, dac_gain_r2r, "PCM54HP", "pcm54hp")
 DAC_GENERATOR(UDA1341TS, uda1341ts_device, dac_word_interface, dac_code_twos_complement<16>, dac_gain_r2r, "UDA1341TS", "uda1341ts") // I2C stereo audio codec
 DAC_GENERATOR(ZN425E, zn425e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN425E", "zn425e")
+DAC_GENERATOR(ZN428E, zn428e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN428E-8", "zn428e")
 DAC_GENERATOR(ZN429E, zn429e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN429E-8", "zn429e")
 
 // DAC circuits/unidentified chips

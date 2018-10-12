@@ -145,21 +145,22 @@ WRITE_LINE_MEMBER(zaccaria_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(zaccaria_state::main_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_READONLY
-	AM_RANGE(0x6400, 0x6407) AM_READ(prot1_r)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(videoram_w) AM_SHARE("videoram") /* 6400-67ff is 4 bits wide */
-	AM_RANGE(0x6800, 0x683f) AM_WRITE(attributes_w) AM_SHARE("attributesram")
-	AM_RANGE(0x6840, 0x685f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x6c00, 0x6c07) AM_MIRROR(0x81f8) AM_READ(prot2_r) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x6e00, 0x6e00) AM_MIRROR(0x81f8) AM_READ(dsw_r) AM_DEVWRITE("audiopcb", zac1b11142_audio_device, hs_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x7c00, 0x7c00) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8000, 0xdfff) AM_ROM
-ADDRESS_MAP_END
+void zaccaria_state::main_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).readonly();
+	map(0x6400, 0x6407).r(FUNC(zaccaria_state::prot1_r));
+	map(0x6000, 0x67ff).w(FUNC(zaccaria_state::videoram_w)).share("videoram"); /* 6400-67ff is 4 bits wide */
+	map(0x6800, 0x683f).w(FUNC(zaccaria_state::attributes_w)).share("attributesram");
+	map(0x6840, 0x685f).ram().share("spriteram");
+	map(0x6881, 0x68c0).ram().share("spriteram2");
+	map(0x6c00, 0x6c07).mirror(0x81f8).r(FUNC(zaccaria_state::prot2_r)).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x6e00, 0x6e00).mirror(0x81f8).r(FUNC(zaccaria_state::dsw_r)).w(m_audiopcb, FUNC(zac1b11142_audio_device::hs_w));
+	map(0x7000, 0x77ff).ram();
+	map(0x7800, 0x7803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7c00, 0x7c00).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8000, 0xdfff).rom();
+}
 
 
 static INPUT_PORTS_START( monymony )
@@ -267,7 +268,7 @@ static INPUT_PORTS_START( monymony )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("audiopcb", zac1b11142_audio_device, acs_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("audiopcb", zac1b11142_audio_device, acs_r)
 	/* other bits come from a protection device */
 INPUT_PORTS_END
 
@@ -317,41 +318,41 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( zaccaria )
+static GFXDECODE_START( gfx_zaccaria )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 32*8, 32 )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(zaccaria_state::vblank_irq)
+WRITE_LINE_MEMBER(zaccaria_state::vblank_irq)
 {
-	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(18'432'000)/6)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaccaria_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(18'432'000)/6)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+
 //  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3G on 1B1141 I/O (Z80) board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(zaccaria_state, flip_screen_x_w)) // VCMA
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(zaccaria_state, flip_screen_y_w)) // HCMA
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("audiopcb", zac1b11142_audio_device, ressound_w)) // RESSOUND
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaccaria_state, coin_w)) // COUNT
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaccaria_state, nmi_mask_w)) // INTST
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3G on 1B1141 I/O (Z80) board
+	mainlatch.q_out_cb<0>().set(FUNC(zaccaria_state::flip_screen_x_w)); // VCMA
+	mainlatch.q_out_cb<1>().set(FUNC(zaccaria_state::flip_screen_y_w)); // HCMA
+	mainlatch.q_out_cb<2>().set("audiopcb", FUNC(zac1b11142_audio_device::ressound_w)); // RESSOUND
+	mainlatch.q_out_cb<6>().set(FUNC(zaccaria_state::coin_w)); // COUNT
+	mainlatch.q_out_cb<7>().set(FUNC(zaccaria_state::nmi_mask_w)); // INTST
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaccaria_state, dsw_sel_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("P1");
+	ppi.in_pb_callback().set_ioport("P2");
+	ppi.in_pc_callback().set_ioport("SYSTEM");
+	ppi.out_pc_callback().set(FUNC(zaccaria_state::dsw_sel_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -361,15 +362,16 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zaccaria_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, zaccaria_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zaccaria)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zaccaria)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(512)
 	MCFG_PALETTE_INIT_OWNER(zaccaria_state, zaccaria)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("audiopcb", ZACCARIA_1B11142, 0)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("audiopcb", ZACCARIA_1B11142)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -568,8 +570,8 @@ ROM_END
 
 
 
-GAME( 1983, monymony,  0,        zaccaria, monymony, zaccaria_state, 0, ROT90, "Zaccaria", "Money Money (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, monymony2, monymony, zaccaria, monymony, zaccaria_state, 0, ROT90, "Zaccaria", "Money Money (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (special)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, monymony,  0,        zaccaria, monymony, zaccaria_state, empty_init, ROT90, "Zaccaria", "Money Money (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, monymony2, monymony, zaccaria, monymony, zaccaria_state, empty_init, ROT90, "Zaccaria", "Money Money (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, zaccaria_state, empty_init, ROT90, "Zaccaria", "Jack Rabbit (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, zaccaria_state, empty_init, ROT90, "Zaccaria", "Jack Rabbit (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, zaccaria_state, empty_init, ROT90, "Zaccaria", "Jack Rabbit (special)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

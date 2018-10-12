@@ -48,6 +48,7 @@
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,8 +72,16 @@ public:
 		m_color_bank(0)
 	{ }
 
+	void ambush_base(machine_config &config);
+	void ambush(machine_config &config);
+	void mariobl(machine_config &config);
+	void mariobla(machine_config &config);
+	void dkong3abl(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(ambush);
 	DECLARE_PALETTE_INIT(mario);
+	DECLARE_PALETTE_INIT(mariobla);
 	DECLARE_PALETTE_INIT(dkong3);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -95,13 +104,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(output_latches_w);
 
-	void mariobl(machine_config &config);
-	void ambush(machine_config &config);
-	void dkong3abl(machine_config &config);
 	void bootleg_map(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
-private:
+
 	void register_save_states();
 
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -120,43 +126,46 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(ambush_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xc000, 0xc07f) AM_RAM
-	AM_RANGE(0xc080, 0xc09f) AM_RAM_WRITE(scroll_ram_w) AM_SHARE("scroll_ram")  // 1 byte for each column
-	AM_RANGE(0xc0a0, 0xc0ff) AM_RAM
-	AM_RANGE(0xc100, 0xc1ff) AM_RAM AM_SHARE("attribute_ram")  // 1 line corresponds to 4 in the video ram
-	AM_RANGE(0xc200, 0xc3ff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("sw1")
-	AM_RANGE(0xcc00, 0xcc07) AM_WRITE(output_latches_w)
-ADDRESS_MAP_END
+void ambush_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xc000, 0xc07f).ram();
+	map(0xc080, 0xc09f).ram().w(FUNC(ambush_state::scroll_ram_w)).share("scroll_ram");  // 1 byte for each column
+	map(0xc0a0, 0xc0ff).ram();
+	map(0xc100, 0xc1ff).ram().share("attribute_ram");  // 1 line corresponds to 4 in the video ram
+	map(0xc200, 0xc3ff).ram().share("sprite_ram");
+	map(0xc400, 0xc7ff).ram().share("video_ram");
+	map(0xc800, 0xc800).portr("sw1");
+	map(0xcc00, 0xcc07).w(FUNC(ambush_state::output_latches_w));
+}
 
-ADDRESS_MAP_START(ambush_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_w)
-	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ay2", ay8910_device, data_w)
-ADDRESS_MAP_END
+void ambush_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x81, 0x81).w("ay2", FUNC(ay8910_device::data_w));
+}
 
-ADDRESS_MAP_START(ambush_state::bootleg_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x7000, 0x71ff) AM_SHARE("sprite_ram")
-	AM_RANGE(0x7200, 0x72ff) AM_SHARE("attribute_ram")
-	AM_RANGE(0x7380, 0x739f) AM_SHARE("scroll_ram")  // not used on bootlegs?
-	AM_RANGE(0x7400, 0x77ff) AM_SHARE("video_ram")
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("sw1")
-	AM_RANGE(0xa200, 0xa207) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xb000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ambush_state::bootleg_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x77ff).ram();
+	map(0x7000, 0x71ff).share("sprite_ram");
+	map(0x7200, 0x72ff).share("attribute_ram");
+	map(0x7380, 0x739f).share("scroll_ram");  // not used on bootlegs?
+	map(0x7400, 0x77ff).share("video_ram");
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xa000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xa100, 0xa100).portr("sw1");
+	map(0xa200, 0xa207).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xb000, 0xbfff).rom();
+	map(0xe000, 0xffff).rom();
+}
 
 
 //**************************************************************************
@@ -353,6 +362,37 @@ PALETTE_INIT_MEMBER( ambush_state, mario )
 		b = 255 - (0x55 * bit0 + 0xaa * bit1);
 
 		palette.set_pen_color(i, rgb_t(r,g,b));
+	}
+}
+
+PALETTE_INIT_MEMBER(ambush_state, mariobla)
+{
+	const uint8_t *color_prom = memregion("colors")->base();
+
+	for (int c = 0; c < palette.entries(); c++)
+	{
+		int i = bitswap<9>(c, 2, 7, 6, 8, 5, 4, 3, 1, 0);
+		int bit0, bit1, bit2, r, g, b;
+
+		// red component
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = 0;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(c, rgb_t(r, g, b));
 	}
 }
 
@@ -554,7 +594,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( ambush )
+static GFXDECODE_START( gfx_ambush )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x2_planar, 0, 64)
 	GFXDECODE_ENTRY("gfx1", 0, spritelayout,     0, 64)
 GFXDECODE_END
@@ -573,12 +613,12 @@ static const gfx_layout spritelayout_mariobl =
 	32*8
 };
 
-static GFXDECODE_START( mariobl )
+static GFXDECODE_START( gfx_mariobl )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x2_planar,     0, 32)
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout_mariobl, 0, 32)
 GFXDECODE_END
 
-static GFXDECODE_START( dkong3abl )
+static GFXDECODE_START( gfx_dkong3abl )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x2_planar, 0, 64)
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout,     0, 32)
 GFXDECODE_END
@@ -684,22 +724,13 @@ WRITE8_MEMBER(ambush_state::output_latches_w)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(ambush_state::ambush)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ambush_state, irq0_line_hold)
+MACHINE_CONFIG_START(ambush_state::ambush_base)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ambush_state, irq0_line_hold)
 
-	// addressable latches at 8B and 8C
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ambush_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ambush_state, color_bank_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ambush_state, coin_counter_1_w))
-	MCFG_DEVICE_ADD("outlatch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ambush_state, color_bank_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ambush_state, coin_counter_2_w))
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, ambush)
 
@@ -709,58 +740,81 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ambush)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ambush)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ambush_state, ambush)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8912, XTAL(18'432'000)/6/2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay1", AY8912, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_ADD("ay2", AY8912, XTAL(18'432'000)/6/2)
+	MCFG_DEVICE_ADD("ay2", AY8912, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(ambush_state::ambush)
+	ambush_base(config);
+
+	// addressable latches at 8B and 8C
+	LS259(config, m_outlatch[0]);
+	m_outlatch[0]->q_out_cb<4>().set(FUNC(ambush_state::flip_screen_w));
+	m_outlatch[0]->q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
+	m_outlatch[0]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_1_w));
+
+	LS259(config, m_outlatch[1]);
+	m_outlatch[1]->q_out_cb<5>().set(FUNC(ambush_state::color_bank_2_w));
+	m_outlatch[1]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_2_w));
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(ambush_state::mariobl)
-	ambush(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+	ambush_base(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
 	// To be verified: do these bootlegs only have one LS259?
-	MCFG_DEVICE_REMOVE("outlatch1")
-	MCFG_DEVICE_REMOVE("outlatch2")
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ambush_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(ambush_state, color_bank_1_w))
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<4>().set(FUNC(ambush_state::coin_counter_1_w));
+	outlatch.q_out_cb<6>().set(FUNC(ambush_state::color_bank_1_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, mariobl)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update_bootleg)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mariobl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mariobl)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(ambush_state, mario)
 
-	MCFG_SOUND_REPLACE("ay1", AY8910, XTAL(18'432'000)/6/2)
+	MCFG_DEVICE_REPLACE("ay1", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_REPLACE("ay2", AY8910, XTAL(18'432'000)/6/2)
+	MCFG_DEVICE_REPLACE("ay2", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(ambush_state::mariobla)
+	mariobl(config);
+
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(ambush_state, mariobla)
+
+	auto &outlatch(*subdevice<ls259_device>("outlatch"));
+	outlatch.q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
+	outlatch.q_out_cb<6>().set_nop();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ambush_state::dkong3abl)
 	mariobl(config);
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dkong3abl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dkong3abl)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(ambush_state, dkong3)
@@ -879,6 +933,40 @@ ROM_START( mariobl )
 	ROM_LOAD("tma1-c-4p.4p", 0x000, 0x200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801))
 ROM_END
 
+ROM_START( mariobla )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("4.7i", 0x0000, 0x4000, CRC(9a364905) SHA1(82215e4724cc01cdf552adce0df739cb2a6bc3cd))
+	ROM_LOAD("3.7g", 0x4000, 0x2000, CRC(5c50209c) SHA1(e3fb4dbf9c866a346b20ec21a03d13e85b58669d))
+	ROM_LOAD("2.7f", 0xe000, 0x2000, CRC(5718fe0e) SHA1(dad7158f4e7a5552f6107b825387cb6aab8dd652))
+
+	ROM_REGION(0x8000, "gfx", 0)
+	ROM_LOAD("5.4n", 0x0000, 0x2000, CRC(903615df) SHA1(d20cdf64894ad9f48af71cf2e4e4c457ccb3d365)) // mbjba-3.3ns
+	ROM_CONTINUE(0x6000, 0x0800) // mbjba-5.4n [1/2]
+	ROM_CONTINUE(0x6000, 0x0800) // mbjba-5.4n [1/2]
+	ROM_CONTINUE(0x6800, 0x0800) // mbjba-5.4n [2/2]
+	ROM_CONTINUE(0x6800, 0x0800) // mbjba-5.4n [2/2]
+	ROM_LOAD("6.4l", 0x2000, 0x2000, CRC(7b58c92e) SHA1(25dfce7a4a93f661f495cc80378d445a2b064ba7)) // mbjba-2.3ls
+	ROM_LOAD("7.4n", 0x4000, 0x2000, CRC(04ef8165) SHA1(71d0ee903f2e442fd7f1c76e48d99a8bec49d482)) // mbjba-1.3l
+	ROM_CONTINUE(0x7000, 0x0800) // mbjba-4.4l [1/2]
+	ROM_CONTINUE(0x7000, 0x0800) // mbjba-4.4l [1/2]
+	ROM_CONTINUE(0x7800, 0x0800) // mbjba-4.4l [2/2]
+	ROM_CONTINUE(0x7800, 0x0800) // mbjba-4.4l [2/2]
+
+	ROM_REGION(0x2000, "gfx1", ROMREGION_INVERT)
+	ROM_COPY("gfx", 0x6000, 0x0000, 0x2000)
+
+	ROM_REGION(0x6000, "gfx2", 0)
+	ROM_COPY("gfx", 0x0000, 0x0000, 0x6000)
+
+	ROM_REGION(0x2eb, "prom", 0)
+	ROM_LOAD( "6349-2n.2m",     0x000000, 0x000200, CRC(a334e4f3) SHA1(b15e3d9851b43976e98c47e3365c1b69022b0a7d))
+	ROM_LOAD( "6349-2n-cpu.5b", 0x000000, 0x000200, CRC(7250ad28) SHA1(8f5342562cdcc67890cb4c4880d75f9a40e63cf8))
+	ROM_LOAD( "82s153.7n",      0x000000, 0x0000eb, CRC(9da5e80d) SHA1(3bd1a55e68a7e6b7590fe3c15ae2e3a36b298fa6))
+
+	ROM_REGION(0x200, "colors", 0)
+	ROM_LOAD("6349-2n.8h", 0x000, 0x200, CRC(6a109f4b) SHA1(b117f85728afc6d3efeff0a7075b797996916f6e))
+ROM_END
+
 ROM_START( dkong3abl )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("dk3ba-7.7i", 0x0000, 0x4000, CRC(a9263275) SHA1(c3867f6b0d379b70669b3b954e582533406db203))
@@ -907,10 +995,11 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT   MACHINE    INPUT      CLASS         INIT  ROTATION  COMPANY                              FULLNAME                                      FLAGS
-GAME( 1983, ambush,    0,       ambush,    ambusht,   ambush_state, 0,    ROT0,     "Tecfri",                            "Ambush",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ambushh,   ambush,  ambush,    ambusht,   ambush_state, 0,    ROT0,     "Tecfri",                            "Ambush (hack?)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ambushj,   ambush,  ambush,    ambush,    ambush_state, 0,    ROT0,     "Tecfri (Nippon Amuse license)",     "Ambush (Japan)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ambushv,   ambush,  ambush,    ambush,    ambush_state, 0,    ROT0,     "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariobl,   mario,   mariobl,   mariobl,   ambush_state, 0,    ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dkong3abl, dkong3,  dkong3abl, dkong3abl, ambush_state, 0,    ROT90,    "bootleg",                           "Donkey Kong 3 (bootleg on Ambush hardware)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   MACHINE    INPUT      CLASS         INIT        ROTATION  COMPANY                              FULLNAME                                           FLAGS
+GAME( 1983, ambush,    0,       ambush,    ambusht,   ambush_state, empty_init, ROT0,     "Tecfri",                            "Ambush",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ambushh,   ambush,  ambush,    ambusht,   ambush_state, empty_init, ROT0,     "Tecfri",                            "Ambush (hack?)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ambushj,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Nippon Amuse license)",     "Ambush (Japan)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ambushv,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariobl,   mario,   mariobl,   mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariobla,  mario,   mariobla,  mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3abl, dkong3,  dkong3abl, dkong3abl, ambush_state, empty_init, ROT90,    "bootleg",                           "Donkey Kong 3 (bootleg on Ambush hardware)",      MACHINE_SUPPORTS_SAVE )

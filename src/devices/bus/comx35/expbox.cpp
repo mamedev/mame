@@ -76,11 +76,11 @@ DEFINE_DEVICE_TYPE(COMX_EB, comx_eb_device, "comx_eb", "COMX-35E Expansion Box")
 ROM_START( comx_eb )
 	ROM_REGION( 0x1000, "e000", 0 )
 	ROM_SYSTEM_BIOS( 0, "comx", "Original" )
-	ROMX_LOAD( "expansion.e5",         0x0000, 0x1000, CRC(52cb44e2) SHA1(3f9a3d9940b36d4fee5eca9f1359c99d7ed545b9), ROM_BIOS(1) )
+	ROMX_LOAD( "expansion.e5",         0x0000, 0x1000, CRC(52cb44e2) SHA1(3f9a3d9940b36d4fee5eca9f1359c99d7ed545b9), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "fm31", "F&M 3.1" )
-	ROMX_LOAD( "f&m.expansion.3.1.e5", 0x0000, 0x1000, CRC(818ca2ef) SHA1(ea000097622e7fd472d53e7899e3c83773433045), ROM_BIOS(2) )
+	ROMX_LOAD( "f+m.expansion.3.1.e5", 0x0000, 0x1000, CRC(818ca2ef) SHA1(ea000097622e7fd472d53e7899e3c83773433045), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "fm32", "F&M 3.2" )
-	ROMX_LOAD( "f&m.expansion.3.2.e5", 0x0000, 0x1000, CRC(0f0fc960) SHA1(eb6b6e7bc9e761d13554482025d8cb5e260c0619), ROM_BIOS(3) )
+	ROMX_LOAD( "f+m.expansion.3.2.e5", 0x0000, 0x1000, CRC(0f0fc960) SHA1(eb6b6e7bc9e761d13554482025d8cb5e260c0619), ROM_BIOS(2) )
 ROM_END
 
 
@@ -98,16 +98,13 @@ const tiny_rom_entry *comx_eb_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(comx_eb_device::device_add_mconfig)
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, comx_expansion_cards, "fd")
-	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot1_irq_w))
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, comx_expansion_cards, "clm")
-	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot2_irq_w))
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT3_TAG, comx_expansion_cards, "joy")
-	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot3_irq_w))
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, comx_expansion_cards, "ram")
-	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot4_irq_w))
-MACHINE_CONFIG_END
+void comx_eb_device::device_add_mconfig(machine_config &config)
+{
+	COMX_EXPANSION_SLOT(config, SLOT1_TAG, 0, comx_expansion_cards, "fd").irq_callback().set(FUNC(comx_eb_device::slot1_irq_w));
+	COMX_EXPANSION_SLOT(config, SLOT2_TAG, 0, comx_expansion_cards, "clm").irq_callback().set(FUNC(comx_eb_device::slot2_irq_w));
+	COMX_EXPANSION_SLOT(config, SLOT3_TAG, 0, comx_expansion_cards, "joy").irq_callback().set(FUNC(comx_eb_device::slot3_irq_w));
+	COMX_EXPANSION_SLOT(config, SLOT4_TAG, 0, comx_expansion_cards, "ram").irq_callback().set(FUNC(comx_eb_device::slot4_irq_w));
+}
 
 
 

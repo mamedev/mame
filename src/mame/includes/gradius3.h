@@ -26,6 +26,9 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960") { }
 
+	void gradius3(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_gfxram;
 	required_region_ptr<uint8_t> m_gfxrom;
@@ -66,7 +69,6 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	void gradius3(machine_config &config);
 	void gradius3_map(address_map &map);
 	void gradius3_map2(address_map &map);
 	void gradius3_s_map(address_map &map);

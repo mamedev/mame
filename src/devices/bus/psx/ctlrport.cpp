@@ -39,7 +39,8 @@ void psx_controller_port_device::disable_card(bool state)
 
 psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSXCONTROLLERPORTS, tag, owner, clock),
-	m_port0(nullptr), m_port1(nullptr),
+	m_port0(*this, "^port1"),
+	m_port1(*this, "^port2"),
 	m_dsr_handler(*this),
 	m_rxd_handler(*this)
 {
@@ -50,26 +51,26 @@ void psxcontrollerports_device::device_start()
 	m_dsr_handler.resolve_safe();
 	m_rxd_handler.resolve_safe();
 
-	m_port0 = machine().device<psx_controller_port_device>("port1");
-	m_port1 = machine().device<psx_controller_port_device>("port2");
 	m_port0->setup_ack_cb(psx_controller_port_device::void_cb(&psxcontrollerports_device::ack, this));
 	m_port1->setup_ack_cb(psx_controller_port_device::void_cb(&psxcontrollerports_device::ack, this));
 }
 
 // add controllers to define so they can be connected to the multitap
 #define PSX_CONTROLLERS \
-		SLOT_INTERFACE("digital_pad", PSX_STANDARD_CONTROLLER) \
-		SLOT_INTERFACE("dualshock_pad", PSX_DUALSHOCK) \
-		SLOT_INTERFACE("analog_joystick", PSX_ANALOG_JOYSTICK)
+		device.option_add("digital_pad", PSX_STANDARD_CONTROLLER); \
+		device.option_add("dualshock_pad", PSX_DUALSHOCK); \
+		device.option_add("analog_joystick", PSX_ANALOG_JOYSTICK);
 
-SLOT_INTERFACE_START(psx_controllers)
+void psx_controllers(device_slot_interface &device)
+{
 	PSX_CONTROLLERS
-	SLOT_INTERFACE("multitap", PSX_MULTITAP)
-SLOT_INTERFACE_END
+	device.option_add("multitap", PSX_MULTITAP);
+}
 
-SLOT_INTERFACE_START(psx_controllers_nomulti)
+void psx_controllers_nomulti(device_slot_interface &device)
+{
 	PSX_CONTROLLERS
-SLOT_INTERFACE_END
+}
 
 WRITE_LINE_MEMBER(psxcontrollerports_device::write_dtr)
 {

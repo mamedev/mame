@@ -15,6 +15,7 @@
 
 #include "a2bus.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

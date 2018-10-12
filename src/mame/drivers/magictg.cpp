@@ -148,12 +148,17 @@ class magictg_state : public driver_device
 {
 public:
 	magictg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_mips(*this, "mips"),
-		m_adsp(*this, "adsp"),
-		m_pci(*this, "pcibus"),
-		m_adsp_pram(*this, "adsp_pram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_mips(*this, "mips")
+		, m_adsp(*this, "adsp")
+		, m_pci(*this, "pcibus")
+		, m_adsp_pram(*this, "adsp_pram")
+		, m_voodoo(*this, "voodoo_%u", 0U)
+	{ }
 
+	void magictg(machine_config &config);
+
+private:
 	required_device<cpu_device>         m_mips;
 	required_device<adsp2181_device>    m_adsp;
 	required_device<pci_bus_legacy_device>      m_pci;
@@ -182,7 +187,7 @@ public:
 
 
 	/* 3Dfx Voodoo */
-	voodoo_device*                           m_voodoo[2];
+	required_device_array<voodoo_device, 2> m_voodoo;
 
 	struct
 	{
@@ -226,7 +231,6 @@ public:
 
 	void zr36120_reset();
 
-	void magictg(machine_config &config);
 	void adsp_data_map(address_map &map);
 	void adsp_io_map(address_map &map);
 	void adsp_program_map(address_map &map);
@@ -259,8 +263,6 @@ public:
 
 void magictg_state::machine_start()
 {
-	m_voodoo[0] = (voodoo_device*)machine().device("voodoo_0");
-	m_voodoo[1] = (voodoo_device*)machine().device("voodoo_1");
 }
 
 
@@ -824,7 +826,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 				m_adsp_regs.bdma_control |= ((src_addr >> 14) & 0xff) << 8;
 
 				if (m_adsp_regs.bdma_control & 8)
-					m_adsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+					m_adsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			}
 			break;
 		}
@@ -843,25 +845,26 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(magictg_state::magictg_map)
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8MB RAM
-	AM_RANGE(0x00800000, 0x0081003f) AM_RAM // ?
-	AM_RANGE(0x0a000000, 0x0affffff) AM_DEVREADWRITE("voodoo_0", voodoo_device, voodoo_r, voodoo_w)
+void magictg_state::magictg_map(address_map &map)
+{
+	map(0x00000000, 0x007fffff).ram(); // 8MB RAM
+	map(0x00800000, 0x0081003f).ram(); // ?
+	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 #if defined(USE_TWO_3DFX)
-	AM_RANGE(0x0b000000, 0x0bffffff) AM_DEVREADWRITE("voodoo_1", voodoo_device, voodoo_r, voodoo_w)
-	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(zr36120_r, zr36120_w)
+	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x0c000000, 0x0c000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #else
-	AM_RANGE(0x0b000000, 0x0b000fff) AM_READWRITE(zr36120_r, zr36120_w)
+	map(0x0b000000, 0x0b000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #endif
-	AM_RANGE(0x0f000000, 0x0f000fff) AM_READWRITE(f0_r, f0_w) // Split this up?
-	AM_RANGE(0x14000100, 0x14000103) AM_READWRITE(adsp_idma_data_r, adsp_idma_data_w)
-	AM_RANGE(0x14000104, 0x14000107) AM_WRITE(adsp_idma_addr_w)
-	AM_RANGE(0x1b001024, 0x1b001027) AM_READ(adsp_status_r)
-	AM_RANGE(0x1b001108, 0x1b00110b) AM_READ(unk_r)
-	AM_RANGE(0x1e000000, 0x1e002fff) AM_RAM // NVRAM?
-	AM_RANGE(0x1e800000, 0x1e800007) AM_READWRITE(unk2_r, serial_w)
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("mips", 0)
-ADDRESS_MAP_END
+	map(0x0f000000, 0x0f000fff).rw(FUNC(magictg_state::f0_r), FUNC(magictg_state::f0_w)); // Split this up?
+	map(0x14000100, 0x14000103).rw(FUNC(magictg_state::adsp_idma_data_r), FUNC(magictg_state::adsp_idma_data_w));
+	map(0x14000104, 0x14000107).w(FUNC(magictg_state::adsp_idma_addr_w));
+	map(0x1b001024, 0x1b001027).r(FUNC(magictg_state::adsp_status_r));
+	map(0x1b001108, 0x1b00110b).r(FUNC(magictg_state::unk_r));
+	map(0x1e000000, 0x1e002fff).ram(); // NVRAM?
+	map(0x1e800000, 0x1e800007).rw(FUNC(magictg_state::unk2_r), FUNC(magictg_state::serial_w));
+	map(0x1fc00000, 0x1fffffff).rom().region("mips", 0);
+}
 
 
 /*************************************
@@ -870,21 +873,24 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(magictg_state::adsp_program_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pram")
-ADDRESS_MAP_END
+void magictg_state::adsp_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram().share("adsp_pram");
+}
 
-ADDRESS_MAP_START(magictg_state::adsp_data_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void magictg_state::adsp_data_map(address_map &map)
+{
+	map.unmap_value_high();
 //  AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
-	AM_RANGE(0x0400, 0x3fdf) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
-ADDRESS_MAP_END
+	map(0x0400, 0x3fdf).ram();
+	map(0x3fe0, 0x3fff).rw(FUNC(magictg_state::adsp_control_r), FUNC(magictg_state::adsp_control_w));
+}
 
-ADDRESS_MAP_START(magictg_state::adsp_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void magictg_state::adsp_io_map(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 
 /*************************************
@@ -905,22 +911,23 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(magictg_state::magictg)
-	MCFG_CPU_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
+	MCFG_DEVICE_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
 	//MCFG_MIPS3_ICACHE_SIZE(16384) /* TODO: Unknown */
 	//MCFG_MIPS3_DCACHE_SIZE(16384) /* TODO: Unknown */
-	MCFG_CPU_PROGRAM_MAP(magictg_map)
+	MCFG_DEVICE_PROGRAM_MAP(magictg_map)
 
-	MCFG_CPU_ADD("adsp", ADSP2181, 16000000)
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
-	MCFG_CPU_IO_MAP(adsp_io_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2181, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_IO_MAP(adsp_io_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
@@ -1020,5 +1027,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, empty_init, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, empty_init, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

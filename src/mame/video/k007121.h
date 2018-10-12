@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 class k007121_device : public device_t
 {
@@ -38,6 +40,6 @@ DECLARE_DEVICE_TYPE(K007121, k007121_device)
 	MCFG_DEVICE_ADD(_tag, K007121, 0)
 
 #define MCFG_K007121_PALETTE(_palette_tag) \
-	downcast<k007121_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<k007121_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_K007121_H

@@ -257,10 +257,13 @@ ToDo:
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "machine/input_merger.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -291,21 +294,24 @@ ToDo:
 
 #undef DEBUG_TEST_W
 
-#define DEBUG_SWYFT_VIA0 1
-#define DEBUG_SWYFT_VIA1 1
+#define LOG_VIA0 (1 << 1U)
+#define LOG_VIA1 (1 << 2U)
+
+//#define VERBOSE (LOG_VIA0 | LOG_VIA1)
+#include "logmacro.h"
 
 
 class swyft_state : public driver_device
 {
 public:
-	swyft_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	swyft_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ctx(*this, "ctx"),
 		m_ctx_data_out(*this, "ctx_data_out"),
 		m_acia6850(*this, "acia6850"),
-		m_via0(*this, "via6522_0"),
-		m_via1(*this, "via6522_1"),
+		m_via(*this, "via6522_%u", 0U),
+		m_bitlatch(*this, "bitlatch"),
 		m_speaker(*this, "speaker"),
 		m_p_swyft_videoram(*this, "p_swyft_vram")
 		/*m_y0(*this, "Y0"),
@@ -316,14 +322,17 @@ public:
 		m_y5(*this, "Y5"),
 		m_y6(*this, "Y6"),
 		m_y7(*this, "Y7")*/
-		{ }
+	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void swyft(machine_config &config);
+
+private:
+	required_device<m68008_device> m_maincpu;
 	optional_device<centronics_device> m_ctx;
 	optional_device<output_latch_device> m_ctx_data_out;
-	required_device<acia6850_device> m_acia6850; // only swyft uses this
-	required_device<via6522_device> m_via0; // only swyft uses this
-	required_device<via6522_device> m_via1; // only swyft uses this
+	required_device<acia6850_device> m_acia6850;
+	required_device_array<via6522_device, 2> m_via;
+	required_device<hct259_device> m_bitlatch;
 	optional_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_p_swyft_videoram;
 	/*optional_ioport m_y0;
@@ -341,7 +350,8 @@ public:
 
 	uint32_t screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(swyft_d0000);
+	DECLARE_READ8_MEMBER(bitlatch_r);
+	template<int B> DECLARE_WRITE_LINE_MEMBER(bitlatch_q_w);
 
 	DECLARE_READ8_MEMBER(swyft_via0_r);
 	DECLARE_WRITE8_MEMBER(swyft_via0_w);
@@ -352,7 +362,6 @@ public:
 	DECLARE_WRITE8_MEMBER(via0_pb_w);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via0_int_w);
 
 	DECLARE_READ8_MEMBER(swyft_via1_r);
 	DECLARE_WRITE8_MEMBER(swyft_via1_w);
@@ -363,25 +372,11 @@ public:
 	DECLARE_WRITE8_MEMBER(via1_pb_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via1_int_w);
 
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
-	/* gate array 2 has a 16-bit counter inside which counts at 10mhz and
-	   rolls over at FFFF->0000; on roll-over (or likely at FFFF terminal count)
-	   it triggers the KTOBF output. It does this every 6.5535ms, which causes
-	   a 74LS74 d-latch at IC100 to invert the state of the DUART IP2 line;
-	   this causes the DUART to fire an interrupt, which makes the 68000 read
-	   the keyboard.
-	   The watchdog counter and the 6ms counter are both incremented
-	   every time the KTOBF pulses.
-	 */
-	uint8_t m_keyboard_line;
-	uint8_t m_floppy_control;
-
-	void swyft(machine_config &config);
 	void swyft_mem(address_map &map);
-//protected:
+
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
@@ -570,28 +565,27 @@ x   x   x   x   1   1  ?1? ?0?  ?   1   0   0   x   x   *   *   *   *   x   x   
 
 */
 
-ADDRESS_MAP_START(swyft_state::swyft_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM // 64 KB ROM
-	AM_RANGE(0x040000, 0x07ffff) AM_RAM AM_SHARE("p_swyft_vram") // 256 KB RAM
-	AM_RANGE(0x0d0000, 0x0d000f) AM_READ(swyft_d0000) // status of something? reads from d0000, d0004, d0008, d000a, d000e
-	AM_RANGE(0x0e1000, 0x0e1000) AM_DEVWRITE("acia6850", acia6850_device, control_w) // 6850 ACIA lives here
-	AM_RANGE(0x0e2000, 0x0e2fff) AM_READWRITE(swyft_via0_r, swyft_via0_w) // io area with selector on a9 a8 a7 a6?
-	AM_RANGE(0x0e4000, 0x0e4fff) AM_READWRITE(swyft_via1_r, swyft_via1_w)
-ADDRESS_MAP_END
+void swyft_state::swyft_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xfffff);
+	map(0x000000, 0x00ffff).rom(); // 64 KB ROM
+	map(0x040000, 0x07ffff).ram().share("p_swyft_vram"); // 256 KB RAM
+	map(0x0d0000, 0x0d000f).r(FUNC(swyft_state::bitlatch_r)).w("bitlatch", FUNC(hct259_device::write_a0));
+	map(0x0e1000, 0x0e1001).rw(m_acia6850, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0e2000, 0x0e2fff).rw(FUNC(swyft_state::swyft_via0_r), FUNC(swyft_state::swyft_via0_w)); // io area with selector on a9 a8 a7 a6?
+	map(0x0e4000, 0x0e4fff).rw(FUNC(swyft_state::swyft_via1_r), FUNC(swyft_state::swyft_via1_w));
+}
 
 MACHINE_START_MEMBER(swyft_state,swyft)
 {
-	m_via0->write_ca1(1);
-	m_via0->write_ca2(1);
-	m_via0->write_cb1(1);
-	m_via0->write_cb2(1);
-
-	m_via1->write_ca1(1);
-	m_via1->write_ca2(1);
-	m_via1->write_cb1(1);
-	m_via1->write_cb2(1);
+	for (auto &via : m_via)
+	{
+		via->write_ca1(1);
+		via->write_ca2(1);
+		via->write_cb1(1);
+		via->write_cb2(1);
+	}
 }
 
 MACHINE_RESET_MEMBER(swyft_state,swyft)
@@ -623,12 +617,17 @@ uint32_t swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-READ8_MEMBER( swyft_state::swyft_d0000 )
+template<int B>
+WRITE_LINE_MEMBER(swyft_state::bitlatch_q_w)
 {
-	// wtf is this supposed to be?
-	uint8_t byte = 0xFF; // ?
-	logerror("mystery device: read from 0x%5X, returning %02X\n", offset+0xD0000, byte);
-	return byte;
+	logerror("74HCT259: Q%d %s\n", B, state ? "on" : "off");
+}
+
+READ8_MEMBER(swyft_state::bitlatch_r)
+{
+	if (!machine().side_effects_disabled())
+		m_bitlatch->write_bit(offset >> 1, BIT(offset, 0));
+	return 0xff;
 }
 
 
@@ -642,126 +641,108 @@ static const char *const swyft_via_regnames[] = { "0: ORB/IRB", "1: ORA/IRA", "2
 
 READ8_MEMBER( swyft_state::swyft_via0_r )
 {
-	if (offset&0x000C3F) fprintf(stderr,"VIA0: read from invalid offset in 68k space: %06X!\n", offset);
-	uint8_t data = m_via0->read(space, (offset>>6)&0xF);
-#ifdef DEBUG_SWYFT_VIA0
-	logerror("VIA0 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
-#endif
+	if (offset&0x000C3F) logerror("VIA0: read from invalid offset in 68k space: %06X!\n", offset);
+	uint8_t data = m_via[0]->read((offset>>6)&0xF);
+	LOGMASKED(LOG_VIA0, "VIA0 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 	return data;
 }
 
 WRITE8_MEMBER( swyft_state::swyft_via0_w )
 {
-#ifdef DEBUG_SWYFT_VIA0
-	logerror("VIA0 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
-#endif
-	if (offset&0x000C3F) fprintf(stderr,"VIA0: write to invalid offset in 68k space: %06X, data: %02X!\n", offset, data);
-	m_via1->write(space, (offset>>6)&0xF, data);
+	LOGMASKED(LOG_VIA0, "VIA0 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
+	if (offset&0x000C3F) logerror("VIA0: write to invalid offset in 68k space: %06X, data: %02X!\n", offset, data);
+	m_via[1]->write((offset>>6)&0xF, data);
 }
 
 READ8_MEMBER( swyft_state::swyft_via1_r )
 {
-	if (offset&0x000C3F) fprintf(stderr," VIA1: read from invalid offset in 68k space: %06X!\n", offset);
-	uint8_t data = m_via1->read(space, (offset>>6)&0xF);
-#ifdef DEBUG_SWYFT_VIA1
-	logerror(" VIA1 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
-#endif
+	if (offset&0x000C3F) logerror("VIA1: read from invalid offset in 68k space: %06X!\n", offset);
+	uint8_t data = m_via[1]->read((offset>>6)&0xF);
+	LOGMASKED(LOG_VIA1, "VIA1 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 	return data;
 }
 
 WRITE8_MEMBER( swyft_state::swyft_via1_w )
 {
-#ifdef DEBUG_SWYFT_VIA1
-	logerror(" VIA1 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
-#endif
-	if (offset&0x000C3F) fprintf(stderr," VIA1: write to invalid offset in 68k space: %06X, data: %02X!\n", offset, data);
-	m_via0->write(space, (offset>>6)&0xF, data);
+	LOGMASKED(LOG_VIA1, "VIA1 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
+	if (offset&0x000C3F) logerror("VIA1: write to invalid offset in 68k space: %06X, data: %02X!\n", offset, data);
+	m_via[0]->write((offset>>6)&0xF, data);
 }
 
 // first via
 READ8_MEMBER( swyft_state::via0_pa_r )
 {
-	logerror("VIA0: Port A read!\n");
+	LOGMASKED(LOG_VIA0, "VIA0: Port A read!\n");
 	return 0xFF;
 }
 
 WRITE8_MEMBER( swyft_state::via0_pa_w )
 {
-	logerror("VIA0: Port A written with data of 0x%02x!\n", data);
+	LOGMASKED(LOG_VIA0, "VIA0: Port A written with data of 0x%02x!\n", data);
 }
 
 WRITE_LINE_MEMBER ( swyft_state::via0_ca2_w )
 {
-	logerror("VIA0: CA2 written with %d!\n", state);
+	LOGMASKED(LOG_VIA0, "VIA0: CA2 written with %d!\n", state);
 }
 
 READ8_MEMBER( swyft_state::via0_pb_r )
 {
-	logerror("VIA0: Port B read!\n");
+	LOGMASKED(LOG_VIA0, "VIA0: Port B read!\n");
 	return 0xFF;
 }
 
 WRITE8_MEMBER( swyft_state::via0_pb_w )
 {
-	logerror("VIA0: Port B written with data of 0x%02x!\n", data);
+	LOGMASKED(LOG_VIA0, "VIA0: Port B written with data of 0x%02x!\n", data);
 }
 
 WRITE_LINE_MEMBER ( swyft_state::via0_cb1_w )
 {
-	logerror("VIA0: CB1 written with %d!\n", state);
+	LOGMASKED(LOG_VIA0, "VIA0: CB1 written with %d!\n", state);
 }
 
 WRITE_LINE_MEMBER ( swyft_state::via0_cb2_w )
 {
-	logerror("VIA0: CB2 written with %d!\n", state);
-}
-
-WRITE_LINE_MEMBER ( swyft_state::via0_int_w )
-{
-	logerror("VIA0: INT output set to %d!\n", state);
+	LOGMASKED(LOG_VIA0, "VIA0: CB2 written with %d!\n", state);
 }
 
 // second via
 READ8_MEMBER( swyft_state::via1_pa_r )
 {
-	logerror(" VIA1: Port A read!\n");
+	LOGMASKED(LOG_VIA1, "VIA1: Port A read!\n");
 	return 0xFF;
 }
 
 WRITE8_MEMBER( swyft_state::via1_pa_w )
 {
-	logerror(" VIA1: Port A written with data of 0x%02x!\n", data);
+	LOGMASKED(LOG_VIA1, "VIA1: Port A written with data of 0x%02x!\n", data);
 }
 
 WRITE_LINE_MEMBER ( swyft_state::via1_ca2_w )
 {
-	logerror(" VIA1: CA2 written with %d!\n", state);
+	LOGMASKED(LOG_VIA1, "VIA1: CA2 written with %d!\n", state);
 }
 
 READ8_MEMBER( swyft_state::via1_pb_r )
 {
-	logerror(" VIA1: Port B read!\n");
+	LOGMASKED(LOG_VIA1, "VIA1: Port B read!\n");
 	return 0xFF;
 }
 
 WRITE8_MEMBER( swyft_state::via1_pb_w )
 {
-	logerror(" VIA1: Port B written with data of 0x%02x!\n", data);
+	LOGMASKED(LOG_VIA1, "VIA1: Port B written with data of 0x%02x!\n", data);
 }
 
 WRITE_LINE_MEMBER ( swyft_state::via1_cb1_w )
 {
-	logerror(" VIA1: CB1 written with %d!\n", state);
+	LOGMASKED(LOG_VIA1, "VIA1: CB1 written with %d!\n", state);
 }
 
 WRITE_LINE_MEMBER ( swyft_state::via1_cb2_w )
 {
-	logerror(" VIA1: CB2 written with %d!\n", state);
-}
-
-WRITE_LINE_MEMBER ( swyft_state::via1_int_w )
-{
-	logerror(" VIA1: INT output set to %d!\n", state);
+	LOGMASKED(LOG_VIA1, "VIA1: CB2 written with %d!\n", state);
 }
 
 WRITE_LINE_MEMBER( swyft_state::write_acia_clock )
@@ -770,64 +751,73 @@ WRITE_LINE_MEMBER( swyft_state::write_acia_clock )
 	m_acia6850->write_rxc(state);
 }
 
-MACHINE_CONFIG_START(swyft_state::swyft)
-
+void swyft_state::swyft(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68008, XTAL(15'897'600)/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
-	MCFG_CPU_PROGRAM_MAP(swyft_mem)
+	M68008(config, m_maincpu, XTAL(15'897'600)/2); //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
+	m_maincpu->set_addrmap(AS_PROGRAM, &swyft_state::swyft_mem);
 
 	MCFG_MACHINE_START_OVERRIDE(swyft_state,swyft)
 	MCFG_MACHINE_RESET_OVERRIDE(swyft_state,swyft)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(320, 242)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 242-1)
-	MCFG_SCREEN_UPDATE_DRIVER(swyft_state, screen_update_swyft)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
 	MCFG_VIDEO_START_OVERRIDE(swyft_state,swyft)
 
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(15.8976_MHz_XTAL / 2, 500, 0, 320, 265, 0, 242); // total guess
+	screen.set_screen_update(FUNC(swyft_state::screen_update_swyft));
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+
+	ACIA6850(config, m_acia6850, 0);
 	// acia rx and tx clocks come from one of the VIA pins and are tied together, fix this below? acia e clock comes from 68008
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, (XTAL(15'897'600)/2)/5) // out e clock from 68008, ~ 10in clocks per out clock
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swyft_state, write_acia_clock))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", (XTAL(15'897'600)/2)/5)); // out e clock from 68008, ~ 10in clocks per out clock
+	acia_clock.signal_handler().set(FUNC(swyft_state::write_acia_clock));
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, (XTAL(15'897'600)/2)/5) // out e clock from 68008
-	MCFG_VIA6522_READPA_HANDLER(READ8(swyft_state, via0_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(swyft_state, via0_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(swyft_state, via0_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(swyft_state, via0_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(swyft_state, via0_cb1_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(swyft_state, via0_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(swyft_state, via0_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(swyft_state, via0_int_w))
+	via6522_device &via0(VIA6522(config, "via6522_0", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
+	via0.readpa_handler().set(FUNC(swyft_state::via0_pa_r));
+	via0.readpb_handler().set(FUNC(swyft_state::via0_pb_r));
+	via0.writepa_handler().set(FUNC(swyft_state::via0_pa_w));
+	via0.writepb_handler().set(FUNC(swyft_state::via0_pb_w));
+	via0.cb1_handler().set(FUNC(swyft_state::via0_cb1_w));
+	via0.ca2_handler().set(FUNC(swyft_state::via0_ca2_w));
+	via0.cb2_handler().set(FUNC(swyft_state::via0_cb2_w));
+	via0.irq_handler().set("viairq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, (XTAL(15'897'600)/2)/5) // out e clock from 68008
-	MCFG_VIA6522_READPA_HANDLER(READ8(swyft_state, via1_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(swyft_state, via1_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(swyft_state, via1_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(swyft_state, via1_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(swyft_state, via1_cb1_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(swyft_state, via1_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(swyft_state, via1_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(swyft_state, via1_int_w))
-MACHINE_CONFIG_END
+	via6522_device &via1(VIA6522(config, "via6522_1", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
+	via1.readpa_handler().set(FUNC(swyft_state::via1_pa_r));
+	via1.readpb_handler().set(FUNC(swyft_state::via1_pb_r));
+	via1.writepa_handler().set(FUNC(swyft_state::via1_pa_w));
+	via1.writepb_handler().set(FUNC(swyft_state::via1_pb_w));
+	via1.cb1_handler().set(FUNC(swyft_state::via1_cb1_w));
+	via1.ca2_handler().set(FUNC(swyft_state::via1_ca2_w));
+	via1.cb2_handler().set(FUNC(swyft_state::via1_cb2_w));
+	via1.irq_handler().set("viairq", FUNC(input_merger_device::in_w<1>));
+
+	input_merger_device &viairq(INPUT_MERGER_ANY_HIGH(config, "viairq"));
+	viairq.output_handler().set_inputline("maincpu", M68K_IRQ_2);
+
+	HCT259(config, m_bitlatch);
+	m_bitlatch->q_out_cb<0>().set(FUNC(swyft_state::bitlatch_q_w<0>));
+	m_bitlatch->q_out_cb<1>().set(FUNC(swyft_state::bitlatch_q_w<1>));
+	m_bitlatch->q_out_cb<2>().set(FUNC(swyft_state::bitlatch_q_w<2>));
+	m_bitlatch->q_out_cb<3>().set(FUNC(swyft_state::bitlatch_q_w<3>));
+	m_bitlatch->q_out_cb<4>().set(FUNC(swyft_state::bitlatch_q_w<4>));
+	m_bitlatch->q_out_cb<5>().set(FUNC(swyft_state::bitlatch_q_w<5>));
+	m_bitlatch->q_out_cb<6>().set(FUNC(swyft_state::bitlatch_q_w<6>));
+	m_bitlatch->q_out_cb<7>().set(FUNC(swyft_state::bitlatch_q_w<7>));
+}
 
 /* ROM definition */
 ROM_START( swyft )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v331", "IAI Swyft Version 331 Firmware")
-	ROMX_LOAD( "331-lo.u30", 0x0000, 0x8000, CRC(d6cc2e2f) SHA1(39ff26c18b1cf589fc48793263f280ef3780cc61), ROM_BIOS(1))
-	ROMX_LOAD( "331-hi.u31", 0x8000, 0x8000, CRC(4677630a) SHA1(8845d702fa8b8e1a08352f4c59d3076cc2e1307e), ROM_BIOS(1))
+	ROMX_LOAD( "331-lo.u30", 0x0000, 0x8000, CRC(d6cc2e2f) SHA1(39ff26c18b1cf589fc48793263f280ef3780cc61), ROM_BIOS(0))
+	ROMX_LOAD( "331-hi.u31", 0x8000, 0x8000, CRC(4677630a) SHA1(8845d702fa8b8e1a08352f4c59d3076cc2e1307e), ROM_BIOS(0))
 	/* this version of the swyft code identifies itself at 0x3FCB as version 330 */
 	ROM_SYSTEM_BIOS( 1, "v330", "IAI Swyft Version 330 Firmware")
-	ROMX_LOAD( "infoapp.lo.u30", 0x0000, 0x8000, CRC(52c1bd66) SHA1(b3266d72970f9d64d94d405965b694f5dcb23bca), ROM_BIOS(2))
-	ROMX_LOAD( "infoapp.hi.u31", 0x8000, 0x8000, CRC(83505015) SHA1(693c914819dd171114a8c408f399b56b470f6be0), ROM_BIOS(2))
+	ROMX_LOAD( "infoapp.lo.u30", 0x0000, 0x8000, CRC(52c1bd66) SHA1(b3266d72970f9d64d94d405965b694f5dcb23bca), ROM_BIOS(1))
+	ROMX_LOAD( "infoapp.hi.u31", 0x8000, 0x8000, CRC(83505015) SHA1(693c914819dd171114a8c408f399b56b470f6be0), ROM_BIOS(1))
 	ROM_REGION( 0x4000, "pals", ROMREGION_ERASEFF )
 	/* Swyft PALs:
 	 * The Swyft has four PALs, whose rough function can be derived from their names:
@@ -894,5 +884,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT    DEVICE       INIT  COMPANY                       FULLNAME  FLAGS
-COMP( 1985, swyft, 0,      0,       swyft,     swyft,   swyft_state, 0,    "Information Applicance Inc", "Swyft",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                       FULLNAME  FLAGS
+COMP( 1985, swyft, 0,      0,      swyft,   swyft, swyft_state, empty_init, "Information Applicance Inc", "Swyft",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

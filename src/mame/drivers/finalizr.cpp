@@ -36,7 +36,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::finalizr_scanline)
 	if (scanline == 240 && m_irq_enable) // vblank irq
 		m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	else if (((scanline % 32) == 0) && m_nmi_enable) // timer irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -104,41 +104,44 @@ WRITE8_MEMBER(finalizr_state::i8039_T0_w)
 	*/
 }
 
-ADDRESS_MAP_START(finalizr_state::main_map)
-	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
+void finalizr_state::main_map(address_map &map)
+{
+	map(0x0001, 0x0001).writeonly().share("scroll");
+	map(0x0003, 0x0003).w(FUNC(finalizr_state::finalizr_videoctrl_w));
+	map(0x0004, 0x0004).w(FUNC(finalizr_state::finalizr_flipscreen_w));
 //  AM_RANGE(0x0020, 0x003f) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0808, 0x0808) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0810, 0x0810) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0811, 0x0811) AM_READ_PORT("P1")
-	AM_RANGE(0x0812, 0x0812) AM_READ_PORT("P2")
-	AM_RANGE(0x0813, 0x0813) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0818, 0x0818) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
-	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("snsnd", sn76489a_device, write)   /* This address triggers the SN chip to read the data port. */
-	AM_RANGE(0x081b, 0x081b) AM_WRITENOP        /* Loads the snd command into the snd latch */
-	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w) /* custom sound chip */
-	AM_RANGE(0x081d, 0x081d) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* custom sound chip */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("colorram2")
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3200, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram_2")
-	AM_RANGE(0x3a00, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x0800, 0x0800).portr("DSW3");
+	map(0x0808, 0x0808).portr("DSW2");
+	map(0x0810, 0x0810).portr("SYSTEM");
+	map(0x0811, 0x0811).portr("P1");
+	map(0x0812, 0x0812).portr("P2");
+	map(0x0813, 0x0813).portr("DSW1");
+	map(0x0818, 0x0818).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x0819, 0x0819).w(FUNC(finalizr_state::finalizr_coin_w));
+	map(0x081a, 0x081a).w("snsnd", FUNC(sn76489a_device::command_w));   /* This address triggers the SN chip to read the data port. */
+	map(0x081b, 0x081b).nopw();        /* Loads the snd command into the snd latch */
+	map(0x081c, 0x081c).w(FUNC(finalizr_state::finalizr_i8039_irq_w)); /* custom sound chip */
+	map(0x081d, 0x081d).w("soundlatch", FUNC(generic_latch_8_device::write)); /* custom sound chip */
+	map(0x2000, 0x23ff).ram().share("colorram");
+	map(0x2400, 0x27ff).ram().share("videoram");
+	map(0x2800, 0x2bff).ram().share("colorram2");
+	map(0x2c00, 0x2fff).ram().share("videoram2");
+	map(0x3000, 0x31ff).ram().share("spriteram");
+	map(0x3200, 0x37ff).ram();
+	map(0x3800, 0x39ff).ram().share("spriteram_2");
+	map(0x3a00, 0x3fff).ram();
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(finalizr_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void finalizr_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(finalizr_state::sound_io_map)
-	AM_RANGE(0x00, 0xff)                   AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void finalizr_state::sound_io_map(address_map &map)
+{
+	map(0x00, 0xff).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( finalizr )
@@ -235,7 +238,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( finalizr )
+static GFXDECODE_START( gfx_finalizr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  16*16, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    16*16, 16 )  /* to handle 8x8 sprites */
@@ -263,19 +266,19 @@ void finalizr_state::machine_reset()
 MACHINE_CONFIG_START(finalizr_state::finalizr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/6) /* ??? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", KONAMI1, XTAL(18'432'000)/6) /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", finalizr_state, finalizr_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", I8039,XTAL(18'432'000)/2) /* 9.216MHz clkin ?? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(finalizr_state, i8039_irqen_w))
+	MCFG_DEVICE_ADD("audiocpu", I8039,XTAL(18'432'000)/2) /* 9.216MHz clkin ?? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, finalizr_state, i8039_irqen_w))
 	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(finalizr_state, i8039_T0_w)
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(finalizr_state, i8039_T1_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, finalizr_state, i8039_T1_r))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -286,22 +289,22 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	MCFG_SCREEN_UPDATE_DRIVER(finalizr_state, screen_update_finalizr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", finalizr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_finalizr)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(finalizr_state, finalizr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL(18'432'000)/12)
+	MCFG_DEVICE_ADD("snsnd", SN76489A, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.325) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.325) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -363,5 +366,5 @@ ROM_END
 
 
 
-GAME( 1985, finalizr,  0,        finalizr, finalizr,  finalizr_state, 0, ROT90, "Konami",  "Finalizer - Super Transformation",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, finalizr_state, 0, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizr,  0,        finalizr, finalizr,  finalizr_state, empty_init, ROT90, "Konami",  "Finalizer - Super Transformation",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, finalizr_state, empty_init, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

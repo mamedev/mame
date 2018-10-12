@@ -104,9 +104,9 @@
 
 
 
-DEFINE_DEVICE_TYPE(SH1,  sh1_device,  "sh1",  "SH-1")
-DEFINE_DEVICE_TYPE(SH2,  sh2_device,  "sh2",  "SH-2")
-DEFINE_DEVICE_TYPE(SH2A, sh2a_device, "sh21", "SH-2A")
+DEFINE_DEVICE_TYPE(SH1,  sh1_device,  "sh1",  "Hitachi SH-1")
+DEFINE_DEVICE_TYPE(SH2,  sh2_device,  "sh2",  "Hitachi SH-2")
+DEFINE_DEVICE_TYPE(SH2A, sh2a_device, "sh21", "Hitachi SH-2A")
 
 /*-------------------------------------------------
     sh2_internal_a5 - read handler for
@@ -123,36 +123,43 @@ READ32_MEMBER(sh2_device::sh2_internal_a5)
     sh2_internal_map - maps SH2 built-ins
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sh2_device::sh7604_map)
-	AM_RANGE(0x40000000, 0xbfffffff) AM_READ(sh2_internal_a5)
+void sh2_device::sh7604_map(address_map &map)
+{
+	map(0x40000000, 0xbfffffff).r(FUNC(sh2_device::sh2_internal_a5));
 /*!
   @todo: cps3boot breaks with this enabled. Needs customization ...
   */
 //  AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
 //  AM_RANGE(0xffffff88, 0xffffff8b) AM_READWRITE(dma_dtcr0_r,dma_dtcr0_w)
-	AM_RANGE(0xe0000000, 0xe00001ff) AM_MIRROR(0x1ffffe00) AM_READWRITE(sh7604_r, sh7604_w)
-ADDRESS_MAP_END
+	map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
+}
 
-ADDRESS_MAP_START(sh2a_device::sh7021_map)
+void sh2a_device::sh7021_map(address_map &map)
+{
 //  fall-back
-	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff) // SH-7032H internal i/o
+	map(0x05fffe00, 0x05ffffff).rw(FUNC(sh2a_device::sh7021_r), FUNC(sh2a_device::sh7021_w)); // SH-7032H internal i/o
 //  overrides
-	AM_RANGE(0x05ffff40, 0x05ffff43) AM_READWRITE(dma_sar0_r, dma_sar0_w)
-	AM_RANGE(0x05ffff44, 0x05ffff47) AM_READWRITE(dma_dar0_r, dma_dar0_w)
-	AM_RANGE(0x05ffff48, 0x05ffff4b) AM_READWRITE16(dmaor_r, dmaor_w,0xffff0000)
-	AM_RANGE(0x05ffff48, 0x05ffff4b) AM_READWRITE16(dma_tcr0_r, dma_tcr0_w,0x0000ffff)
-	AM_RANGE(0x05ffff4c, 0x05ffff4f) AM_READWRITE16(dma_chcr0_r, dma_chcr0_w, 0x0000ffff)
+	map(0x05ffff40, 0x05ffff43).rw(FUNC(sh2a_device::dma_sar0_r), FUNC(sh2a_device::dma_sar0_w));
+	map(0x05ffff44, 0x05ffff47).rw(FUNC(sh2a_device::dma_dar0_r), FUNC(sh2a_device::dma_dar0_w));
+	map(0x05ffff48, 0x05ffff49).rw(FUNC(sh2a_device::dmaor_r), FUNC(sh2a_device::dmaor_w));
+	map(0x05ffff4a, 0x05ffff4b).rw(FUNC(sh2a_device::dma_tcr0_r), FUNC(sh2a_device::dma_tcr0_w));
+	map(0x05ffff4e, 0x05ffff4f).rw(FUNC(sh2a_device::dma_chcr0_r), FUNC(sh2a_device::dma_chcr0_w));
 //  AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 //  AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(sh1_device::sh7032_map)
+void sh1_device::sh7032_map(address_map &map)
+{
 //  fall-back
-	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
-ADDRESS_MAP_END
+	map(0x05fffe00, 0x05ffffff).rw(FUNC(sh1_device::sh7032_r), FUNC(sh1_device::sh7032_w)); // SH-7032H internal i/o
+}
 
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh2_device(mconfig, SH2, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2_device::sh7604_map), this), 32)
+{
+}
+
+sh2_device::~sh2_device()
 {
 }
 
@@ -200,9 +207,9 @@ device_memory_interface::space_config_vector sh2_device::memory_space_config() c
 		};
 }
 
-util::disasm_interface *sh2_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sh2_device::create_disassembler()
 {
-	return new sh_disassembler(false);
+	return std::make_unique<sh_disassembler>(false);
 }
 
 uint8_t sh2_device::RB(offs_t A)
@@ -393,7 +400,7 @@ void sh2_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, m_sh2_state->pc);
+		debugger_instruction_hook(m_sh2_state->pc);
 
 		const uint16_t opcode = m_program->read_word(m_sh2_state->pc & SH12_AM);
 
@@ -441,7 +448,23 @@ void sh2_device::device_start()
 	m_ftcsr_read_cb.bind_relative_to(*owner());
 
 	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
-	m_direct = m_decrypted_program->direct<0>();
+	auto cache = m_decrypted_program->cache<2, 0, ENDIANNESS_BIG>();
+	m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+	if (m_decrypted_program->endianness() != ENDIANNESS_NATIVE)
+		m_prptr = [cache](offs_t address) -> const void * {
+			const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+			if(!(address & 2))
+				ptr++;
+			return ptr;
+		};
+	else
+		m_prptr = [cache](offs_t address) -> const void * {
+			const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+			if(address & 2)
+				ptr++;
+			return ptr;
+		};
+
 	m_internal = &space(AS_PROGRAM);
 
 	save_item(NAME(m_cpu_off));
@@ -679,12 +702,11 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "sh2.h"
 #include "sh2comn.h"
+#include "cpu/drcumlsh.h"
+#include "debugger.h"
 
-
-using namespace uml;
 
 const opcode_desc* sh2_device::get_desclist(offs_t pc)
 {
@@ -706,17 +728,15 @@ static void cfunc_fastirq(void *param) { ((sh2_device *)param)->func_fastirq(); 
 
 void sh2_device::static_generate_entry_point()
 {
-	drcuml_state *drcuml = m_drcuml.get();
-	code_label skip = 1;
-	drcuml_block *block;
+	uml::code_label const skip = 1;
 
 	/* begin generating */
-	block = drcuml->begin_block(200);
+	drcuml_block &block(m_drcuml->begin_block(200));
 
 	/* forward references */
-	alloc_handle(drcuml, &m_nocode, "nocode");
-	alloc_handle(drcuml, &m_write32, "write32");     // necessary?
-	alloc_handle(drcuml, &m_entry, "entry");
+	alloc_handle(m_nocode, "nocode");
+	alloc_handle(m_write32, "write32");     // necessary?
+	alloc_handle(m_entry, "entry");
 	UML_HANDLE(block, *m_entry);                         // handle  entry
 
 	/* load fast integer registers */
@@ -776,7 +796,7 @@ void sh2_device::static_generate_entry_point()
 	/* generate a hash jump via the current mode and PC */
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
 
-	block->end();
+	block.end();
 }
 
 
@@ -786,15 +806,15 @@ void sh2_device::static_generate_entry_point()
     an exception if out
 -------------------------------------------------*/
 
-void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
+void sh2_device::generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception)
 {
 	/* check full interrupts if pending */
-	if (compiler->checkints)
+	if (compiler.checkints)
 	{
-		code_label skip = compiler->labelnum++;
+		uml::code_label const skip = compiler.labelnum++;
 
-		compiler->checkints = false;
-		compiler->labelnum += 4;
+		compiler.checkints = false;
+		compiler.labelnum += 4;
 
 		/* check for interrupts */
 		UML_MOV(block, mem(&m_sh2_state->irqline), 0xffffffff);     // mov irqline, #-1
@@ -848,7 +868,7 @@ void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *com
 	}
 
 	/* account for cycles */
-	if (compiler->cycles > 0)
+	if (compiler.cycles > 0)
 	{
 		UML_SUB(block, mem(&m_sh2_state->icount), mem(&m_sh2_state->icount), MAPVAR_CYCLES);    // sub     icount,icount,cycles
 		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                        // mapvar  cycles,0
@@ -856,28 +876,26 @@ void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *com
 			UML_EXHc(block, COND_S, *m_out_of_cycles, param);
 																					// exh     out_of_cycles,nextpc
 	}
-	compiler->cycles = 0;
+	compiler.cycles = 0;
 }
 
 /*------------------------------------------------------------------
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-void sh2_device::static_generate_memory_accessor(int size, int iswrite, const char *name, code_handle **handleptr)
+void sh2_device::static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle *&handleptr)
 {
 	/* on entry, address is in I0; data for writes is in I1 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0 */
-	drcuml_state *drcuml = m_drcuml.get();
-	drcuml_block *block;
 	int label = 1;
 
 	/* begin generating */
-	block = drcuml->begin_block(1024);
+	drcuml_block &block(m_drcuml->begin_block(1024));
 
 	/* add a global entry for this */
-	alloc_handle(drcuml, handleptr, name);
-	UML_HANDLE(block, **handleptr);                         // handle  *handleptr
+	alloc_handle(handleptr, name);
+	UML_HANDLE(block, *handleptr);                         // handle  *handleptr
 
 	// with internal handlers this becomes easier.
 	// if addr < 0x40000000 AND it with AM and do the read/write, else just do the read/write
@@ -986,7 +1004,7 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 
 	UML_RET(block);                         // ret
 
-	block->end();
+	block.end();
 }
 
 

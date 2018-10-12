@@ -49,5 +49,5 @@ void diag264_serial_loopback_device::device_start()
 
 void diag264_serial_loopback_device::cbm_iec_atn(int state)
 {
-	m_bus->clk_w(state);
+	m_bus->host_clk_w(state);
 }

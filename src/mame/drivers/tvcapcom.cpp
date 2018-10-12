@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tvcapcom_state : public driver_device
@@ -21,16 +22,20 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void tvcapcom(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_tvcapcom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
-	void tvcapcom(machine_config &config);
+
 	void gc_map(address_map &map);
 };
 
-ADDRESS_MAP_START(tvcapcom_state::gc_map)
-ADDRESS_MAP_END
+void tvcapcom_state::gc_map(address_map &map)
+{
+}
 
 
 void tvcapcom_state::machine_start()
@@ -53,8 +58,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tvcapcom_state::tvcapcom)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC603, 72900000) // IBM PowerPC Broadway CPU @ 729 MHz  ?
-	MCFG_CPU_PROGRAM_MAP(gc_map)
+	MCFG_DEVICE_ADD("maincpu", PPC603, 72900000) // IBM PowerPC Broadway CPU @ 729 MHz  ?
+	MCFG_DEVICE_PROGRAM_MAP(gc_map)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -84,4 +89,4 @@ ROM_START( tvcapcom )
 
 ROM_END
 
-GAME( 2008, tvcapcom,  0, tvcapcom,    tvcapcom, tvcapcom_state, 0, ROT0, "Capcom",            "Tatsunoko Vs Capcom : Cross Generation of Heroes", MACHINE_IS_SKELETON )
+GAME( 2008, tvcapcom,  0, tvcapcom,    tvcapcom, tvcapcom_state, empty_init, ROT0, "Capcom",            "Tatsunoko Vs Capcom : Cross Generation of Heroes", MACHINE_IS_SKELETON )

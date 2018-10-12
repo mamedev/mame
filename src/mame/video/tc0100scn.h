@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 class tc0100scn_device : public device_t
 {
 public:
@@ -63,12 +65,11 @@ public:
 	register. Use this function to draw tilemaps in the correct order. */
 	int bottomlayer();
 
-	void postload();
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state
@@ -141,9 +142,9 @@ DECLARE_DEVICE_TYPE(TC0100SCN, tc0100scn_device)
 	downcast<tc0100scn_device &>(*device).set_multiscr_hack(_hack);
 
 #define MCFG_TC0100SCN_GFXDECODE(_gfxtag) \
-	downcast<tc0100scn_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<tc0100scn_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #define MCFG_TC0100SCN_PALETTE(_palette_tag) \
-	downcast<tc0100scn_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<tc0100scn_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_TC0100SCN_H

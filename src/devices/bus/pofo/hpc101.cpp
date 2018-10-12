@@ -34,26 +34,26 @@ DEFINE_DEVICE_TYPE(POFO_HPC101, pofo_hpc101_device, "pofo_hpc101", "Atari Portfo
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pofo_hpc101_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M82C55A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_ctrl_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTC_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
+	I8255A(config, m_ppi);
+	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi->out_pb_callback().set("cent_ctrl_out", FUNC(output_latch_device::bus_w));
+	m_ppi->in_pc_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
-	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit3))
-	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
-	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit0))
+	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit3))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit0))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
 	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_autofd))
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_init))
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_select_in))
+	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_autofd))
+	MCFG_OUTPUT_LATCH_BIT2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_init))
+	MCFG_OUTPUT_LATCH_BIT3_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_select_in))
 MACHINE_CONFIG_END
 
 
@@ -107,7 +107,7 @@ uint8_t pofo_hpc101_device::nrdi_r(address_space &space, offs_t offset, uint8_t 
 
 		if ((offset & 0x0c) == 0x08)
 		{
-			data = m_ppi->read(space, offset & 0x03);
+			data = m_ppi->read(offset & 0x03);
 		}
 	}
 
@@ -125,7 +125,7 @@ void pofo_hpc101_device::nwri_w(address_space &space, offs_t offset, uint8_t dat
 	{
 		if ((offset & 0x0c) == 0x08)
 		{
-			m_ppi->write(space, offset & 0x03, data);
+			m_ppi->write(offset & 0x03, data);
 		}
 	}
 }

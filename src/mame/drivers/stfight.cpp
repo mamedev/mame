@@ -267,60 +267,65 @@ TODO:
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(stfight_state::cpu1_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")                  /* sf02.bin */
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc100, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P1")
-	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("P2")
-	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("START")
-	AM_RANGE(0xc203, 0xc203) AM_READ_PORT("DSW0")
-	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc205, 0xc205) AM_READ(stfight_coin_r)
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(stfight_fm_w)
-	AM_RANGE(0xc600, 0xc600) AM_WRITE(stfight_mcu_w)
-	AM_RANGE(0xc700, 0xc700) AM_WRITE(stfight_coin_w)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(stfight_io_w)
-	AM_RANGE(0xc806, 0xc806) AM_WRITENOP                    /* TBD */
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void stfight_state::cpu1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("mainbank");                  /* sf02.bin */
+	map(0xc000, 0xc0ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xc100, 0xc1ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xc200, 0xc200).portr("P1");
+	map(0xc201, 0xc201).portr("P2");
+	map(0xc202, 0xc202).portr("START");
+	map(0xc203, 0xc203).portr("DSW0");
+	map(0xc204, 0xc204).portr("DSW1");
+	map(0xc205, 0xc205).r(FUNC(stfight_state::stfight_coin_r));
+	map(0xc500, 0xc500).w(FUNC(stfight_state::stfight_fm_w));
+	map(0xc600, 0xc600).w(FUNC(stfight_state::stfight_mcu_w));
+	map(0xc700, 0xc700).w(FUNC(stfight_state::stfight_coin_w));
+	map(0xc804, 0xc804).w(FUNC(stfight_state::stfight_io_w));
+	map(0xc806, 0xc806).nopw();                    /* TBD */
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(stfight_state::stfight_cpu1_map)
-	AM_IMPORT_FROM(cpu1_map)
-	AM_RANGE(0xc807, 0xc807) AM_DEVWRITE("stfight_vid", stfight_video_device, stfight_sprite_bank_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_text_char_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xd808) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_vh_latch_w) AM_SHARE("vregs")
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sprite_ram")
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(stfight_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void stfight_state::stfight_cpu1_map(address_map &map)
+{
+	cpu1_map(map);
+	map(0xc807, 0xc807).w("stfight_vid", FUNC(stfight_video_device::stfight_sprite_bank_w));
+	map(0xd000, 0xd7ff).ram().w("stfight_vid", FUNC(stfight_video_device::stfight_text_char_w)).share("txram");
+	map(0xd800, 0xd808).ram().w("stfight_vid", FUNC(stfight_video_device::stfight_vh_latch_w)).share("vregs");
+	map(0xf000, 0xffff).ram().share("sprite_ram");
+}
 
 
-ADDRESS_MAP_START(stfight_state::cshooter_cpu1_map)
-	AM_IMPORT_FROM(cpu1_map)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(stfight_bank_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, txram_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xd80f) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, vregs_w) AM_SHARE("vregs") // wrong?
-	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
-ADDRESS_MAP_END
+void stfight_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+}
+
+
+void stfight_state::cshooter_cpu1_map(address_map &map)
+{
+	cpu1_map(map);
+	map(0xc801, 0xc801).w(FUNC(stfight_state::stfight_bank_w));
+	map(0xd000, 0xd7ff).ram().w("airraid_vid", FUNC(airraid_video_device::txram_w)).share("txram");
+	map(0xd800, 0xd80f).ram().w("airraid_vid", FUNC(airraid_video_device::vregs_w)).share("vregs"); // wrong?
+	map(0xe000, 0xfdff).ram();
+	map(0xfe00, 0xffff).ram().share("sprite_ram");
+}
 
 
 
-ADDRESS_MAP_START(stfight_state::cpu2_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_READNOP
-	AM_RANGE(0xd800, 0xd800) AM_WRITENOP
-	AM_RANGE(0xe800, 0xe800) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf000) AM_READ(stfight_fm_r)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void stfight_state::cpu2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc800, 0xc801).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xd000, 0xd000).nopr();
+	map(0xd800, 0xd800).nopw();
+	map(0xe800, 0xe800).nopw();
+	map(0xf000, 0xf000).r(FUNC(stfight_state::stfight_fm_r));
+	map(0xf800, 0xffff).ram();
+}
 
 
 static INPUT_PORTS_START( stfight )
@@ -451,19 +456,19 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(stfight_state::stfight_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL(12'000'000) / 4)
-	MCFG_M68705_PORTB_R_CB(READ8(stfight_state, stfight_68705_port_b_r));
-	MCFG_M68705_PORTA_W_CB(WRITE8(stfight_state, stfight_68705_port_a_w));
-	MCFG_M68705_PORTB_W_CB(WRITE8(stfight_state, stfight_68705_port_b_w));
-	MCFG_M68705_PORTC_W_CB(WRITE8(stfight_state, stfight_68705_port_c_w));
+	MCFG_DEVICE_ADD("mcu", M68705P5, XTAL(12'000'000) / 4)
+	MCFG_M68705_PORTB_R_CB(READ8(*this, stfight_state, stfight_68705_port_b_r));
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_a_w));
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_b_w));
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_c_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -471,43 +476,43 @@ MACHINE_CONFIG_START(stfight_state::stfight_base)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000) / 8 * 3)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000) / 8 * 3)
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000) / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(stfight_state, stfight_adpcm_int)) // Interrupt function
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, stfight_state, stfight_adpcm_int)) // Interrupt function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // 8KHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(stfight_state::stfight)
 	stfight_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(stfight_cpu1_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(stfight_cpu1_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_STFIGHT_VIDEO_ADD("stfight_vid")
+	MCFG_DEVICE_ADD("stfight_vid", STFIGHT_VIDEO, 0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(stfight_state::cshooter)
 	stfight_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cshooter_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cshooter_cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)
 
 	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
 MACHINE_CONFIG_END
@@ -532,33 +537,33 @@ ROM_START( empcity )
 	ROM_LOAD( "empcityu_68705.3j",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
 
 	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
-	ROM_LOAD( "17.2N",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
+	ROM_LOAD( "17.2n",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
 	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
-	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
-	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
-	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
-	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
+	ROM_LOAD( "7.4c",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
+	ROM_LOAD( "8.5c",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
+	ROM_LOAD( "5.2c",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
+	ROM_LOAD( "6.3c",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
 	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
-	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
-	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
-	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
-	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
+	ROM_LOAD( "13.4c",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
+	ROM_LOAD( "14.5j",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
+	ROM_LOAD( "11.2j",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
+	ROM_LOAD( "12.3j",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
 	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
-	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
-	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
-	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
-	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
+	ROM_LOAD( "20.8w",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
+	ROM_LOAD( "21.9w",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
+	ROM_LOAD( "18.6w",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
+	ROM_LOAD( "19.7w",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
 	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
-	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
-	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
+	ROM_LOAD( "9.7c",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
+	ROM_LOAD( "10.8c",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
 	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
-	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
-	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
+	ROM_LOAD( "15.7j",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
+	ROM_LOAD( "16.8j",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
 	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
@@ -578,7 +583,7 @@ ROM_START( empcity )
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
-	ROM_LOAD( "5J",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
+	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
 /* set just contained the 3 roms cpu.4u, cpu.2u and vid.2p and the prom 82s123.a7 */
@@ -597,30 +602,30 @@ ROM_START( empcityu )
 	ROM_LOAD( "vid.2p",   0x0000, 0x2000, CRC(15593793) SHA1(ac9ca8a0aa0ce3810f45aa41e74d4946ecced245) )
 
 	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
-	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
-	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
-	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
-	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
+	ROM_LOAD( "7.4c",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
+	ROM_LOAD( "8.5c",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
+	ROM_LOAD( "5.2c",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
+	ROM_LOAD( "6.3c",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
 	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
-	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
-	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
-	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
-	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
+	ROM_LOAD( "13.4c",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
+	ROM_LOAD( "14.5j",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
+	ROM_LOAD( "11.2j",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
+	ROM_LOAD( "12.3j",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
 	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
-	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
-	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
-	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
-	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
+	ROM_LOAD( "20.8w",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
+	ROM_LOAD( "21.9w",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
+	ROM_LOAD( "18.6w",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
+	ROM_LOAD( "19.7w",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
 	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
-	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
-	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
+	ROM_LOAD( "9.7c",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
+	ROM_LOAD( "10.8c",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
 	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
-	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
-	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
+	ROM_LOAD( "15.7j",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
+	ROM_LOAD( "16.8j",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
 	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
@@ -641,7 +646,7 @@ ROM_START( empcityu )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
 	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
-	ROM_LOAD( "5J",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
+	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 
 	ROM_REGION( 0x020, "user1", 0 )
 	ROM_LOAD( "82s123.a7", 0x0000, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) )   /* ?*/
@@ -659,33 +664,33 @@ ROM_START( empcityj )
 	ROM_LOAD( "empcityj_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(19bdb0a9) SHA1(6baba9a46d64ae8349c7e9713419141f76a7af96) )
 
 	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
-	ROM_LOAD( "17.2N",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
+	ROM_LOAD( "17.2n",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
 	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
-	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
-	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
-	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
-	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
+	ROM_LOAD( "7.4c",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
+	ROM_LOAD( "8.5c",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
+	ROM_LOAD( "5.2c",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
+	ROM_LOAD( "6.3c",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
 	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
-	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
-	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
-	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
-	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
+	ROM_LOAD( "13.4c",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
+	ROM_LOAD( "14.5j",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
+	ROM_LOAD( "11.2j",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
+	ROM_LOAD( "12.3j",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
 	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
-	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
-	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
-	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
-	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
+	ROM_LOAD( "20.8w",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
+	ROM_LOAD( "21.9w",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
+	ROM_LOAD( "18.6w",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
+	ROM_LOAD( "19.7w",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
 	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
-	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
-	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
+	ROM_LOAD( "9.7c",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
+	ROM_LOAD( "10.8c",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
 	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
-	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
-	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
+	ROM_LOAD( "15.7j",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
+	ROM_LOAD( "16.8j",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
 	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
@@ -706,7 +711,7 @@ ROM_START( empcityj )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
 	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
-	ROM_LOAD( "5J",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
+	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
 ROM_START( stfight )
@@ -721,33 +726,33 @@ ROM_START( stfight )
 	ROM_LOAD( "stfight_68705.3j",  0x0000,  0x0800, BAD_DUMP  CRC(f4cc50d6) SHA1(2ff62a349b74fa965b5d19615e52b867c04988dc) )
 
 	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
-	ROM_LOAD( "17.2N",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
+	ROM_LOAD( "17.2n",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
 	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
-	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
-	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
-	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
-	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
+	ROM_LOAD( "7.4c",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
+	ROM_LOAD( "8.5c",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
+	ROM_LOAD( "5.2c",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
+	ROM_LOAD( "6.3c",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
 	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
-	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
-	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
-	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
-	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
+	ROM_LOAD( "13.4c",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
+	ROM_LOAD( "14.5j",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
+	ROM_LOAD( "11.2j",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
+	ROM_LOAD( "12.3j",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
 	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
-	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
-	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
-	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
-	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
+	ROM_LOAD( "20.8w",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
+	ROM_LOAD( "21.9w",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
+	ROM_LOAD( "18.6w",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
+	ROM_LOAD( "19.7w",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
 	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
-	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
-	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
+	ROM_LOAD( "9.7c",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
+	ROM_LOAD( "10.8c",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
 	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
-	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
-	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
+	ROM_LOAD( "15.7j",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
+	ROM_LOAD( "16.8j",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
 	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
@@ -768,7 +773,7 @@ ROM_START( stfight )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
 	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
-	ROM_LOAD( "5J",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
+	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
 /* not sure if this is a bootleg or not, it still displays the seibu copyright on a screen during the attract mode
@@ -785,33 +790,33 @@ ROM_START( stfighta )
 	ROM_LOAD( "stfight_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(f4cc50d6) SHA1(2ff62a349b74fa965b5d19615e52b867c04988dc) )
 
 	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
-	ROM_LOAD( "17.2N",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
+	ROM_LOAD( "17.2n",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
 	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
-	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
-	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
-	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
-	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
+	ROM_LOAD( "7.4c",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
+	ROM_LOAD( "8.5c",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
+	ROM_LOAD( "5.2c",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
+	ROM_LOAD( "6.3c",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
 	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
-	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
-	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
-	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
-	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
+	ROM_LOAD( "13.4c",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
+	ROM_LOAD( "14.5j",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
+	ROM_LOAD( "11.2j",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
+	ROM_LOAD( "12.3j",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
 	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
-	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
-	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
-	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
-	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
+	ROM_LOAD( "20.8w",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
+	ROM_LOAD( "21.9w",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
+	ROM_LOAD( "18.6w",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
+	ROM_LOAD( "19.7w",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
 	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
-	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
-	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
+	ROM_LOAD( "9.7c",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
+	ROM_LOAD( "10.8c",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
 	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
-	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
-	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
+	ROM_LOAD( "15.7j",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
+	ROM_LOAD( "16.8j",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
 	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
@@ -832,7 +837,7 @@ ROM_START( stfighta )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
 	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
-	ROM_LOAD( "5J",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
+	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
 ROM_START( empcityi ) // very similar to above set
@@ -847,33 +852,33 @@ ROM_START( empcityi ) // very similar to above set
 	ROM_LOAD( "empcityi_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(b1817d44) SHA1(395aad763eb054514f658a14c12b92c1b90c02ce) )
 
 	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
-	ROM_LOAD( "17.2N",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
+	ROM_LOAD( "17.2n",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
 	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
-	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
-	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
-	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
-	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
+	ROM_LOAD( "7.4c",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
+	ROM_LOAD( "8.5c",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
+	ROM_LOAD( "5.2c",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
+	ROM_LOAD( "6.3c",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
 	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
-	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
-	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
-	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
-	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
+	ROM_LOAD( "13.4c",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
+	ROM_LOAD( "14.5j",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
+	ROM_LOAD( "11.2j",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
+	ROM_LOAD( "12.3j",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
 	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
-	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
-	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
-	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
-	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
+	ROM_LOAD( "20.8w",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
+	ROM_LOAD( "21.9w",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
+	ROM_LOAD( "18.6w",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
+	ROM_LOAD( "19.7w",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
 	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
-	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
-	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
+	ROM_LOAD( "9.7c",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
+	ROM_LOAD( "10.8c",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
 	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
-	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
-	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
+	ROM_LOAD( "15.7j",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
+	ROM_LOAD( "16.8j",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
 	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
@@ -894,48 +899,48 @@ ROM_START( empcityi ) // very similar to above set
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
 	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
-	ROM_LOAD( "5J",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
+	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
 ROM_START( stfightgb )
 	ROM_REGION( 2*0x18000, "maincpu", 0 )   /* 96k for code + 96k for decrypted opcodes */
-	ROM_LOAD( "1.4T",  0x00000, 0x8000, CRC(0ce5ca11) SHA1(f753107a0c4ce52fe761ea2edce4c5e96169dfbd) )
-	ROM_LOAD( "2.2T",  0x10000, 0x8000, CRC(936ba873) SHA1(bab519c587692a44a9cd1e9af2aeb7e3347c3f1b) ) /* bank switched */
+	ROM_LOAD( "1.4t",  0x00000, 0x8000, CRC(0ce5ca11) SHA1(f753107a0c4ce52fe761ea2edce4c5e96169dfbd) )
+	ROM_LOAD( "2.2t",  0x10000, 0x8000, CRC(936ba873) SHA1(bab519c587692a44a9cd1e9af2aeb7e3347c3f1b) ) /* bank switched */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
-	ROM_LOAD( "C5",  0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
+	ROM_LOAD( "c5",  0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "stfightgb_68705.3J",  0x0000,  0x0800, BAD_DUMP  CRC(3b1b2660) SHA1(8d5d853a0861ff9cdea27eb3588586b441cc77b1) ) //hand-crafted, to be dumped
+	ROM_LOAD( "stfightgb_68705.3j",  0x0000,  0x0800, BAD_DUMP  CRC(3b1b2660) SHA1(8d5d853a0861ff9cdea27eb3588586b441cc77b1) ) //hand-crafted, to be dumped
 
 	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
-	ROM_LOAD( "17.2N",  0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
+	ROM_LOAD( "17.2n",  0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
 	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
-	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
-	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
-	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
-	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
+	ROM_LOAD( "7.4c",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
+	ROM_LOAD( "8.5c",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
+	ROM_LOAD( "5.2c",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
+	ROM_LOAD( "6.3c",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
 	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
-	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
-	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
-	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
-	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
+	ROM_LOAD( "13.4c",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
+	ROM_LOAD( "14.5j",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
+	ROM_LOAD( "11.2j",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
+	ROM_LOAD( "12.3j",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
 	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
-	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
-	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
-	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
-	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
+	ROM_LOAD( "20.8w",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
+	ROM_LOAD( "21.9w",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
+	ROM_LOAD( "18.6w",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
+	ROM_LOAD( "19.7w",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
 	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
-	ROM_LOAD( "9.7C",    0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
-	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
+	ROM_LOAD( "9.7c",    0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
+	ROM_LOAD( "10.8c",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
 	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
-	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
-	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
+	ROM_LOAD( "15.7j",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
+	ROM_LOAD( "16.8j",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
 	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
@@ -956,7 +961,7 @@ ROM_START( stfightgb )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
 	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
-	ROM_LOAD( "5J",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
+	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
 /*
@@ -1060,13 +1065,13 @@ ROM_END
 
 
 // Note: Marked MACHINE_IMPERFECT_SOUND due to YM2203 clock issue
-GAME( 1986, empcity,  0,       stfight,  stfight, stfight_state,  empcity,  ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityu, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
-GAME( 1986, empcityj, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityi, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfight,  empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfighta, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfightgb,empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcity,   0,       stfight,  stfight,  stfight_state, init_empcity,  ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityu,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
+GAME( 1986, empcityj,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityi,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfight,   empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfighta,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfightgb, empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // Cross Shooter uses the same base board, but different video board
-GAME( 1987, cshootert,airraid, cshooter, cshooter, stfight_state, cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cshootert, airraid, cshooter, cshooter, stfight_state, init_cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

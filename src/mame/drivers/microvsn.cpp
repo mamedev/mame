@@ -22,7 +22,7 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 #include "cpu/tms1000/tms1100.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
@@ -41,6 +41,9 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
+	void microvision(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_PALETTE_INIT(microvision);
@@ -90,8 +93,7 @@ public:
 	pcb_type    m_pcb_type;
 	rc_type     m_rc_type;
 
-	void microvision(machine_config &config);
-protected:
+
 	required_device<dac_byte_interface> m_dac;
 	required_device<cpu_device> m_i8021;
 	required_device<tms1100_cpu_device> m_tms1100;
@@ -634,18 +636,18 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(microvision_state::microvision)
-	MCFG_CPU_ADD("maincpu1", I8021, 2000000)    // approximately
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(microvision_state, i8021_p0_write))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(microvision_state, i8021_p1_write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(microvision_state, i8021_p2_write))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(microvision_state, i8021_t1_read))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(microvision_state, i8021_bus_read))
+	MCFG_DEVICE_ADD("maincpu1", I8021, 2000000)    // approximately
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, microvision_state, i8021_p0_write))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, microvision_state, i8021_p1_write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, microvision_state, i8021_p2_write))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, microvision_state, i8021_t1_read))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, microvision_state, i8021_bus_read))
 
-	MCFG_CPU_ADD("maincpu2", TMS1100, 500000)   // most games seem to be running at approximately this speed
+	MCFG_DEVICE_ADD("maincpu2", TMS1100, 500000)   // most games seem to be running at approximately this speed
 	MCFG_TMS1XXX_OUTPUT_PLA( microvision_output_pla_0 )
-	MCFG_TMS1XXX_READ_K_CB( READ8( microvision_state, tms1100_read_k ) )
-	MCFG_TMS1XXX_WRITE_O_CB( WRITE16( microvision_state, tms1100_write_o ) )
-	MCFG_TMS1XXX_WRITE_R_CB( WRITE16( microvision_state, tms1100_write_r ) )
+	MCFG_TMS1XXX_READ_K_CB( READ8( *this, microvision_state, tms1100_read_k ) )
+	MCFG_TMS1XXX_WRITE_O_CB( WRITE16( *this, microvision_state, tms1100_write_o ) )
+	MCFG_TMS1XXX_WRITE_R_CB( WRITE16( *this, microvision_state, tms1100_write_r ) )
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -656,7 +658,7 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_MACHINE_RESET_OVERRIDE(microvision_state, microvision )
 
 	MCFG_SCREEN_UPDATE_DRIVER(microvision_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(microvision_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, microvision_state, screen_vblank))
 	MCFG_SCREEN_SIZE(16, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 15, 0, 15)
 	MCFG_SCREEN_PALETTE("palette")
@@ -664,13 +666,11 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(microvision_state,microvision)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "microvision_cart")
 	MCFG_GENERIC_MANDATORY
@@ -691,4 +691,4 @@ ROM_START( microvsn )
 ROM_END
 
 
-CONS( 1979, microvsn, 0, 0, microvision, microvision, microvision_state, 0, "Milton Bradley", "MicroVision", MACHINE_NOT_WORKING )
+CONS( 1979, microvsn, 0, 0, microvision, microvision, microvision_state, empty_init, "Milton Bradley", "MicroVision", MACHINE_NOT_WORKING )

@@ -113,7 +113,7 @@ MACHINE_CONFIG_START(a2bus_videx160_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(a2bus_videx160_device, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(a2bus_videx160_device, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, a2bus_videx160_device, vsync_changed))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -183,7 +183,7 @@ void a2bus_videx160_device::device_reset()
 
 uint8_t a2bus_videx160_device::read_c0nx(uint8_t offset)
 {
-//    printf("Read c0n%x (PC=%x)\n", offset, machine().describe_context());
+//    printf("%s Read c0n%x\n", machine().describe_context().c_str(), offset);
 
 	if (!(m_ctrl1 & CT1_VTEMU))
 	{
@@ -193,7 +193,7 @@ uint8_t a2bus_videx160_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 1:
-			return m_crtc->register_r();   // status_r?
+			return m_crtc->read_register();   // status_r?
 
 		case 2:
 			return m_ctrl1;
@@ -212,16 +212,16 @@ uint8_t a2bus_videx160_device::read_c0nx(uint8_t offset)
 
 void a2bus_videx160_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-//    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, machine().describe_context());
+//    printf("%s Write %02x to c0n%x\n", machine().describe_context().c_str(), data, offset);
 
 	switch (offset)
 	{
 		case 0:
-			m_crtc->address_w(data);
+			m_crtc->write_address(data);
 			break;
 
 		case 1:
-			m_crtc->register_w(data);
+			m_crtc->write_register(data);
 			break;
 
 		case 2:

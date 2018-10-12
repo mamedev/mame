@@ -29,7 +29,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/hd44780.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -161,6 +161,11 @@ public:
 	{
 	}
 
+	void replicator(machine_config &config);
+
+	void init_replicator();
+
+private:
 	virtual void machine_start() override;
 
 	uint8_t m_port_a;
@@ -183,10 +188,8 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_DRIVER_INIT(replicator);
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
-	void replicator(machine_config &config);
 	void replicator_data_map(address_map &map);
 	void replicator_io_map(address_map &map);
 	void replicator_prg_map(address_map &map);
@@ -532,17 +535,20 @@ WRITE8_MEMBER(replicator_state::port_w)
 * Address maps                                       *
 \****************************************************/
 
-ADDRESS_MAP_START(replicator_state::replicator_prg_map)
-	AM_RANGE(0x0000, 0x1FFFF) AM_ROM
-ADDRESS_MAP_END
+void replicator_state::replicator_prg_map(address_map &map)
+{
+	map(0x0000, 0x1FFFF).rom();
+}
 
-ADDRESS_MAP_START(replicator_state::replicator_data_map)
-	AM_RANGE(0x0200, 0x21FF) AM_RAM  /* ATMEGA1280 Internal SRAM */
-ADDRESS_MAP_END
+void replicator_state::replicator_data_map(address_map &map)
+{
+	map(0x0200, 0x21FF).ram();  /* ATMEGA1280 Internal SRAM */
+}
 
-ADDRESS_MAP_START(replicator_state::replicator_io_map)
-	AM_RANGE(AVR8_IO_PORTA, AVR8_IO_PORTL) AM_READWRITE( port_r, port_w )
-ADDRESS_MAP_END
+void replicator_state::replicator_io_map(address_map &map)
+{
+	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(FUNC(replicator_state::port_r), FUNC(replicator_state::port_w));
+}
 
 /****************************************************\
 * Input ports                                        *
@@ -561,7 +567,7 @@ INPUT_PORTS_END
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(replicator_state, replicator)
+void replicator_state::init_replicator()
 {
 }
 
@@ -599,16 +605,16 @@ static const gfx_layout hd44780_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( replicator )
+static GFXDECODE_START( gfx_replicator )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(replicator_state::replicator)
 
-	MCFG_CPU_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(replicator_prg_map)
-	MCFG_CPU_DATA_MAP(replicator_data_map)
-	MCFG_CPU_IO_MAP(replicator_io_map)
+	MCFG_DEVICE_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(replicator_prg_map)
+	MCFG_DEVICE_DATA_MAP(replicator_data_map)
+	MCFG_DEVICE_IO_MAP(replicator_io_map)
 
 	MCFG_CPU_AVR8_EEPROM("eeprom")
 	MCFG_CPU_AVR8_LFUSE(0xFF)
@@ -629,18 +635,17 @@ MACHINE_CONFIG_START(replicator_state::replicator)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(replicator_state, replicator)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", replicator)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_replicator)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(4, 20)
 
 	/* sound hardware */
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.5)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( replica1 )
@@ -651,7 +656,7 @@ ROM_START( replica1 )
 	- Initial firmware release
 	*/
 	ROM_SYSTEM_BIOS( 0, "v51", "V 5.1" )
-	ROMX_LOAD("mighty-mb40-v5.1.bin", 0x0000, 0x10b90, CRC(20d65cd1) SHA1(da18c3eb5a29a6bc1eecd92eaae6063fe29d0305), ROM_BIOS(1))
+	ROMX_LOAD("mighty-mb40-v5.1.bin", 0x0000, 0x10b90, CRC(20d65cd1) SHA1(da18c3eb5a29a6bc1eecd92eaae6063fe29d0305), ROM_BIOS(0))
 
 	/* Version 5.2 release:
 	- Nozzle Tolerance added to EEPROM
@@ -659,14 +664,14 @@ ROM_START( replica1 )
 	- X,Y calibration tool added
 	*/
 	ROM_SYSTEM_BIOS( 1, "v52", "V 5.2" )
-	ROMX_LOAD("mighty-mb40-v5.2.bin", 0x0000, 0x126c4, CRC(555e47cf) SHA1(9d24a3dbeddce16669bb4d29c3366220ddf15d2a), ROM_BIOS(2))
+	ROMX_LOAD("mighty-mb40-v5.2.bin", 0x0000, 0x126c4, CRC(555e47cf) SHA1(9d24a3dbeddce16669bb4d29c3366220ddf15d2a), ROM_BIOS(1))
 
 	/* Version 5.5 release:
 	- Acceleration added to motor motion
 	- Digipot updates
 	*/
 	ROM_SYSTEM_BIOS( 2, "v55", "V 5.5" )
-	ROMX_LOAD("mighty-mb40-v5.5.bin", 0x0000, 0x1a420, CRC(9327d7e4) SHA1(d734ba2bda12f50ec3ac0035ab11591909d9edde), ROM_BIOS(3))
+	ROMX_LOAD("mighty-mb40-v5.5.bin", 0x0000, 0x1a420, CRC(9327d7e4) SHA1(d734ba2bda12f50ec3ac0035ab11591909d9edde), ROM_BIOS(2))
 
 	/* Version 6.2.0 release:
 	- Bug fix release to firmware 6.0
@@ -674,7 +679,7 @@ ROM_START( replica1 )
 	- Left extruder prints with makerware.
 	*/
 	ROM_SYSTEM_BIOS( 3, "v620", "V 6.2.0" )
-	ROMX_LOAD("mighty_one_v6.2.0.bin", 0x0000, 0x1cf54, CRC(00df6f48) SHA1(db05afc2e1ebc104fb04753634a911187e396556), ROM_BIOS(4))
+	ROMX_LOAD("mighty_one_v6.2.0.bin", 0x0000, 0x1cf54, CRC(00df6f48) SHA1(db05afc2e1ebc104fb04753634a911187e396556), ROM_BIOS(3))
 
 	/* Version 7.0.0 release:
 	- Major upgrade to Stepper Motor Smoothness (via Sailfish team)
@@ -682,7 +687,7 @@ ROM_START( replica1 )
 	- Heaters default to leaving 'preheat' on more of the time
 	*/
 	ROM_SYSTEM_BIOS( 4, "v700", "V 7.0.0" )
-	ROMX_LOAD("mighty_one_v7.0.0.bin", 0x0000, 0x1cb52, CRC(aa2a5fcf) SHA1(934e642b0b2d007689249680bad03c9255ae016a), ROM_BIOS(5))
+	ROMX_LOAD("mighty_one_v7.0.0.bin", 0x0000, 0x1cb52, CRC(aa2a5fcf) SHA1(934e642b0b2d007689249680bad03c9255ae016a), ROM_BIOS(4))
 
 	/* Version 7.2.0 release:
 	- Removes support for S3G files
@@ -690,7 +695,7 @@ ROM_START( replica1 )
 	- Minor bug fixes
 	*/
 	ROM_SYSTEM_BIOS( 5, "v720", "V 7.2.0" )
-	ROMX_LOAD("mighty_one_v7.2.0.bin", 0x0000, 0x1cb80, CRC(5e546706) SHA1(ed4aaf7522d5a5beea7eb69bf2c85d7a89f8f188), ROM_BIOS(6))
+	ROMX_LOAD("mighty_one_v7.2.0.bin", 0x0000, 0x1cb80, CRC(5e546706) SHA1(ed4aaf7522d5a5beea7eb69bf2c85d7a89f8f188), ROM_BIOS(5))
 
 	/* Version 7.3.0 release:
 	- Pause at Z Height
@@ -698,23 +703,23 @@ ROM_START( replica1 )
 	- Minor bug fixes
 	*/
 	ROM_SYSTEM_BIOS( 6, "v730", "V 7.3.0" )
-	ROMX_LOAD("mighty_one_v7.3.0.bin", 0x0000, 0x1d738, CRC(71811ff5) SHA1(6728ea600ab3ff4b589adca90b0d700d9b70bd18), ROM_BIOS(7))
+	ROMX_LOAD("mighty_one_v7.3.0.bin", 0x0000, 0x1d738, CRC(71811ff5) SHA1(6728ea600ab3ff4b589adca90b0d700d9b70bd18), ROM_BIOS(6))
 
 	/* Version 7.4.0 (bugfix) release:
 	- Fixes issues with Z Pause and elapsed print time
 	*/
 	ROM_SYSTEM_BIOS( 7, "v740", "V 7.4.0" )
-	ROMX_LOAD("mighty_one_v7.4.0.bin", 0x0000, 0x1b9e2, CRC(97b05a27) SHA1(76ca2c9c1db2e006e501c3177a8a1aa693dda0f9), ROM_BIOS(8))
+	ROMX_LOAD("mighty_one_v7.4.0.bin", 0x0000, 0x1b9e2, CRC(97b05a27) SHA1(76ca2c9c1db2e006e501c3177a8a1aa693dda0f9), ROM_BIOS(7))
 
 	/* Version 7.5.0 (bugfix) release:
 	- Fixes issue with Heat Hold
 	*/
 	ROM_SYSTEM_BIOS( 8, "v750", "V 7.5.0" )
-	ROMX_LOAD("mighty_one_v7.5.0.bin", 0x0000, 0x1b9c4, CRC(169d6709) SHA1(62b5aacd1bc46969042aea7a50531ec467a4ff1f), ROM_BIOS(9))
+	ROMX_LOAD("mighty_one_v7.5.0.bin", 0x0000, 0x1b9c4, CRC(169d6709) SHA1(62b5aacd1bc46969042aea7a50531ec467a4ff1f), ROM_BIOS(8))
 
 	/* Sailfish firmware image - Metam??quina experimental build v7.5.0 */
 	ROM_SYSTEM_BIOS( 9, "v750mm", "V 7.5.0 - Metam??quina" )
-	ROMX_LOAD("mighty_one_v7.5.0.mm.bin", 0x0000, 0x1ef9a, CRC(0d36d9e7) SHA1(a53899775b4c4eea87b6903758ebb75f06710a69), ROM_BIOS(10))
+	ROMX_LOAD("mighty_one_v7.5.0.mm.bin", 0x0000, 0x1ef9a, CRC(0d36d9e7) SHA1(a53899775b4c4eea87b6903758ebb75f06710a69), ROM_BIOS(9))
 
 
 	/*Arduino MEGA bootloader */
@@ -724,5 +729,5 @@ ROM_START( replica1 )
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
-/*   YEAR  NAME        PARENT    COMPAT    MACHINE        INPUT       STATE                INIT           COMPANY     FULLNAME */
-COMP(2012, replica1,   0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)
+/*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT             COMPANY     FULLNAME */
+COMP(2012, replica1, 0,      0,      replicator, replicator, replicator_state, init_replicator, "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)

@@ -19,11 +19,11 @@
 #define MCFG_ES8712_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, ES8712, _clock)
 #define MCFG_ES8712_RESET_HANDLER(_devcb) \
-	devcb = &downcast<es8712_device &>(*device).set_reset_handler(DEVCB_##_devcb);
+	downcast<es8712_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 #define MCFG_ES8712_MSM_WRITE_CALLBACK(_devcb) \
-	devcb = &downcast<es8712_device &>(*device).set_msm_write_callback(DEVCB_##_devcb);
+	downcast<es8712_device &>(*device).set_msm_write_callback(DEVCB_##_devcb);
 #define MCFG_ES8712_MSM_TAG(_msmtag) \
-	downcast<es8712_device &>(*device).set_msm_tag(("^" _msmtag));
+	downcast<es8712_device &>(*device).set_msm_tag(_msmtag);
 
 
 //**************************************************************************
@@ -47,7 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(msm_w);
 	DECLARE_WRITE_LINE_MEMBER(msm_int);
-	
+
 	void play();
 
 protected:
@@ -63,7 +63,7 @@ private:
 
 	required_device<hct157_device> m_adpcm_select;
 	optional_device<msm5205_device> m_msm;
-	
+
 	// device callbacks
 	devcb_write_line m_reset_handler;
 	devcb_write8 m_msm_write_cb;

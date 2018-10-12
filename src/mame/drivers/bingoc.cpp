@@ -32,10 +32,12 @@ SOUND : YM2151 uPD7759C
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/315_5338a.h"
 #include "machine/gen_latch.h"
 #include "machine/i8251.h"
 #include "sound/ym2151.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -108,7 +110,7 @@ READ8_MEMBER(bingoc_state::sound_test_r)
 WRITE16_MEMBER(bingoc_state::main_sound_latch_w)
 {
 	m_soundlatch->write(space,0,data&0xff);
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 #endif
 
@@ -124,47 +126,42 @@ WRITE8_MEMBER(bingoc_state::sound_play_w)
 //  printf("%02x\n",data);
 }
 
-ADDRESS_MAP_START(bingoc_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE8("uart1", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("uart1", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x100008, 0x100009) AM_DEVREADWRITE8("uart2", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x10000a, 0x10000b) AM_DEVREADWRITE8("uart2", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x100010, 0x100011) AM_DEVREADWRITE8("uart3", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x100012, 0x100013) AM_DEVREADWRITE8("uart3", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("uart4", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x10001a, 0x10001b) AM_DEVREADWRITE8("uart4", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x100020, 0x100021) AM_DEVREADWRITE8("uart5", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x100022, 0x100023) AM_DEVREADWRITE8("uart5", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x100028, 0x100029) AM_DEVREADWRITE8("uart6", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x10002a, 0x10002b) AM_DEVREADWRITE8("uart6", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x100030, 0x100031) AM_DEVREADWRITE8("uart7", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x100032, 0x100033) AM_DEVREADWRITE8("uart7", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x100038, 0x100039) AM_DEVREADWRITE8("uart8", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x10003a, 0x10003b) AM_DEVREADWRITE8("uart8", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x180000, 0x18007f) AM_READ(unknown_r) //lamps?
-#if !SOUND_TEST
-	AM_RANGE(0x180010, 0x180011) AM_WRITE(main_sound_latch_w) //WRONG there...
+void bingoc_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100003).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100008, 0x10000b).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100010, 0x100013).rw("uart3", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100018, 0x10001b).rw("uart4", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100020, 0x100023).rw("uart5", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100028, 0x10002b).rw("uart6", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100030, 0x100033).rw("uart7", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100038, 0x10003b).rw("uart8", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x180000, 0x18001f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0x00ff); //lamps?
+#if 0 // !SOUND_TEST
+	map(0x180010, 0x180011).w(FUNC(bingoc_state::main_sound_latch_w)); //WRONG there...
 #endif
-	AM_RANGE(0xff8000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xff8000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(bingoc_state::sound_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void bingoc_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(bingoc_state::sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_WRITE(sound_play_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("upd", upd7759_device, port_w)
+void bingoc_state::sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).w(FUNC(bingoc_state::sound_play_w));
+	map(0x80, 0x80).w(m_upd7759, FUNC(upd7759_device::port_w));
 #if !SOUND_TEST
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 #else
-	AM_RANGE(0xc0, 0xc0) AM_READ(sound_test_r)
+	map(0xc0, 0xc0).r(FUNC(bingoc_state::sound_test_r));
 #endif
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( bingoc )
@@ -173,15 +170,15 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bingoc_state::bingoc)
 
-	MCFG_CPU_ADD("maincpu", M68000,8000000)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingoc_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,8000000)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bingoc_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80,4000000)        /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io)
+	MCFG_DEVICE_ADD("soundcpu", Z80,4000000)        /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io)
 #if SOUND_TEST
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingoc_state,  nmi_line_pulse)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bingoc_state,  nmi_line_pulse)
 #endif
 
 	MCFG_DEVICE_ADD("uart1", I8251, 4000000) // unknown
@@ -192,6 +189,8 @@ MACHINE_CONFIG_START(bingoc_state::bingoc)
 	MCFG_DEVICE_ADD("uart6", I8251, 4000000) // unknown
 	MCFG_DEVICE_ADD("uart7", I8251, 4000000) // unknown
 	MCFG_DEVICE_ADD("uart8", I8251, 4000000) // unknown
+
+	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 0) // ?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -205,15 +204,16 @@ MACHINE_CONFIG_START(bingoc_state::bingoc)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") //might just be mono...
+	SPEAKER(config, "lspeaker").front_left(); //might just be mono...
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 7159160/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 7159160/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -235,4 +235,4 @@ ROM_START( bingoc )
 	ROM_COPY( "upd",       0x20000, 0x00000, 0x20000 )
 ROM_END
 
-GAME( 1989, bingoc,  0,    bingoc, bingoc, bingoc_state,  0, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", MACHINE_NOT_WORKING )
+GAME( 1989, bingoc, 0, bingoc, bingoc, bingoc_state, empty_init, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", MACHINE_NOT_WORKING )

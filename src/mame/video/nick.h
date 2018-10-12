@@ -33,7 +33,7 @@
 
 
 #define MCFG_NICK_VIRQ_CALLBACK(_write) \
-	devcb = &downcast<nick_device &>(*device).set_virq_wr_callback(DEVCB_##_write);
+	downcast<nick_device &>(*device).set_virq_wr_callback(DEVCB_##_write);
 
 
 /* there are 64us per line, although in reality
@@ -75,7 +75,7 @@ public:
 	// construction/destruction
 	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> devcb_base &set_virq_wr_callback(_Object object) { return m_write_virq.set_callback(object); }
+	template <class Object> devcb_base &set_virq_wr_callback(Object &&cb) { return m_write_virq.set_callback(std::forward<Object>(cb)); }
 
 	virtual void vram_map(address_map &map);
 	virtual void vio_map(address_map &map);

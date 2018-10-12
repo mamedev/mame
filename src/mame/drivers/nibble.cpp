@@ -51,6 +51,7 @@
 //#include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -66,6 +67,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void nibble(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE16_MEMBER(nibble_videoram_w);
@@ -79,7 +83,6 @@ public:
 	INTERRUPT_GEN_MEMBER(nibble_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void nibble(machine_config &config);
 	void nibble_cru_map(address_map &map);
 	void nibble_map(address_map &map);
 };
@@ -152,17 +155,19 @@ void nibble_state::machine_reset()
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(nibble_state::nibble_map)
+void nibble_state::nibble_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(nibble_videoram_w) AM_SHARE("videoram")   // placeholder
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc3ff).w(FUNC(nibble_state::nibble_videoram_w)).share("videoram");   // placeholder
 //  AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("crtc", mc6845_device, address_w)
 //  AM_RANGE(0xff02, 0xff03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(nibble_state::nibble_cru_map)
-ADDRESS_MAP_END
+void nibble_state::nibble_cru_map(address_map &map)
+{
+}
 
 
 /*************************
@@ -295,7 +300,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( nibble )
+static GFXDECODE_START( gfx_nibble )
 	GFXDECODE_ENTRY( "gfx", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -306,8 +311,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(nibble_state::nibble)
 
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, MASTER_CLOCK/4, nibble_map, nibble_cru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)
+	TMS9900(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nibble_state::nibble_map);
+	m_maincpu->set_addrmap(AS_IO, &nibble_state::nibble_cru_map);
+	m_maincpu->set_vblank_int("screen", FUNC(nibble_state::nibble_interrupt));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -318,7 +325,7 @@ MACHINE_CONFIG_START(nibble_state::nibble)
 	MCFG_SCREEN_UPDATE_DRIVER(nibble_state, screen_update_nibble)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nibble)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nibble)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(nibble_state, nibble)
@@ -336,7 +343,7 @@ MACHINE_CONFIG_END
 
 ROM_START( l9nibble )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "09.U123", 0x00000, 0x10000, CRC(dfef685d) SHA1(0aeb4257e408e8549df629a0cdb5f2b6790e32de) ) // tms9900 code?
+	ROM_LOAD( "09.u123", 0x00000, 0x10000, CRC(dfef685d) SHA1(0aeb4257e408e8549df629a0cdb5f2b6790e32de) ) // tms9900 code?
 
 	ROM_REGION( 0x80000, "gfx", 0 )
 	ROM_LOAD( "01.u139", 0x00000, 0x10000, CRC(aba06e58) SHA1(5841beec122613eed2ba9f48cb1d51bfa0ff450c) )
@@ -362,5 +369,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT   STATE         INIT  ROT   COMPANY   FULLNAME    FLAGS
-GAME( 19??, l9nibble, 0,      nibble,  nibble, nibble_state, 0,    ROT0, "Nibble", "Lucky 9",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY   FULLNAME    FLAGS
+GAME( 19??, l9nibble, 0,      nibble,  nibble, nibble_state, empty_init, ROT0, "Nibble", "Lucky 9",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -31,14 +31,16 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void evmbug(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(rs232_r);
 	DECLARE_WRITE8_MEMBER(rs232_w);
 	void kbd_put(u8 data);
 
-	void evmbug(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	uint8_t m_term_out;
@@ -48,18 +50,20 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-ADDRESS_MAP_START(evmbug_state::mem_map)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0xec00, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void evmbug_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+	map(0xec00, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(evmbug_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void evmbug_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0x0003) AM_DEVREAD("uart1", tms9902_device, cruread)
 	//AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("uart1", tms9902_device, cruwrite)
-	AM_RANGE(0x0000, 0x0003) AM_READ(rs232_r)
-	AM_RANGE(0x0000, 0x001f) AM_WRITE(rs232_w)
-ADDRESS_MAP_END
+	map(0x0000, 0x0003).r(FUNC(evmbug_state::rs232_r));
+	map(0x0000, 0x001f).w(FUNC(evmbug_state::rs232_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( evmbug )
@@ -114,10 +118,12 @@ MACHINE_CONFIG_START(evmbug_state::evmbug)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	// We have no lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map )
+	TMS9995(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &evmbug_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &evmbug_state::io_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(evmbug_state, kbd_put))
 
 	//MCFG_DEVICE_ADD("uart1", TMS9902, XTAL(12'000'000) / 4)
@@ -131,5 +137,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY                FULLNAME    FLAGS
-COMP( 19??, evmbug, 0,      0,       evmbug,    evmbug, evmbug_state,  0,    "Texas Instruments",   "TMAM6095", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY              FULLNAME    FLAGS
+COMP( 19??, evmbug, 0,      0,      evmbug,  evmbug, evmbug_state, empty_init, "Texas Instruments", "TMAM6095", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

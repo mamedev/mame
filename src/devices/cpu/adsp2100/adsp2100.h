@@ -181,16 +181,16 @@ enum
 //**************************************************************************
 
 #define MCFG_ADSP21XX_SPORT_RX_CB(_devcb) \
-	devcb = &downcast<adsp21xx_device &>(*device).set_sport_rx_callback(DEVCB_##_devcb);
+	downcast<adsp21xx_device &>(*device).set_sport_rx_callback(DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_SPORT_TX_CB(_devcb) \
-	devcb = &downcast<adsp21xx_device &>(*device).set_sport_tx_callback(DEVCB_##_devcb);
+	downcast<adsp21xx_device &>(*device).set_sport_tx_callback(DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_TIMER_FIRED_CB(_devcb) \
-	devcb = &downcast<adsp21xx_device &>(*device).set_timer_fired_callback(DEVCB_##_devcb);
+	downcast<adsp21xx_device &>(*device).set_timer_fired_callback(DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_DMOVLAY_CB(_devcb) \
-	devcb = &downcast<adsp21xx_device &>(*device).set_dmovlay_callback(DEVCB_##_devcb);
+	downcast<adsp21xx_device &>(*device).set_dmovlay_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -243,7 +243,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// helpers
 	void create_tables();
@@ -450,7 +450,7 @@ protected:
 	address_space *     m_program;
 	address_space *     m_data;
 	address_space *     m_io;
-	direct_read_data<-2> *m_direct;
+	memory_access_cache<2, -2, ENDIANNESS_LITTLE> *m_cache;
 
 	// tables
 	uint8_t               m_condition_table[0x1000];

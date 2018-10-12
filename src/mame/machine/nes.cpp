@@ -104,7 +104,7 @@ void nes_state::machine_start()
 
 	// register saves
 	save_item(NAME(m_last_frame_flip));
-	save_pointer(NAME(m_ciram.get()), 0x800);
+	save_pointer(NAME(m_ciram), 0x800);
 }
 
 
@@ -182,10 +182,10 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 }
 
 
-DRIVER_INIT_MEMBER(nes_state,famicom)
+void nes_state::init_famicom()
 {
 	// setup alt input handlers for additional FC input devices
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_handler(0x4016, 0x4016, read8_delegate(FUNC(nes_state::fc_in0_r), this));
 	space.install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(nes_state::fc_in0_w), this));
 	space.install_read_handler(0x4017, 0x4017, read8_delegate(FUNC(nes_state::fc_in1_r), this));
@@ -194,14 +194,11 @@ DRIVER_INIT_MEMBER(nes_state,famicom)
 NESCTRL_BRIGHTPIXEL_CB(nes_state::bright_pixel)
 {
 	// get the pixel at the gun position
-	uint32_t pix = m_ppu->get_pixel(x, y);
-
-	// get the color base from the ppu
-	uint32_t color_base = m_ppu->get_colorbase();
+	rgb_t pix = m_ppu->get_pixel(x, y);
 
 	// check if the cursor is over a bright pixel
-	if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
-		(pix == color_base + 0x33) || (pix == color_base + 0x34))
+	// FIXME: still a gross hack
+	if (pix.r() == 0xff && pix.b() == 0xff && pix.g() > 0x90)
 		return true;
 	else
 		return false;

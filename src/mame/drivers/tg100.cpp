@@ -43,40 +43,46 @@ public:
 		m_ymw258(*this, "ymw258")
 	{ }
 
+	void tg100(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<multipcm_device> m_ymw258;
-	void tg100(machine_config &config);
 	void tg100_io_map(address_map &map);
 	void tg100_map(address_map &map);
 	void ymw258_map(address_map &map);
 };
 
 /* all memory accesses are decoded by the gate array... */
-ADDRESS_MAP_START(tg100_state::tg100_map)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM /* gate array stuff */
-	AM_RANGE(0x00080000, 0x0009ffff) AM_ROM AM_REGION("prgrom", 0x00000)
-ADDRESS_MAP_END
+void tg100_state::tg100_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).ram(); /* gate array stuff */
+	map(0x00080000, 0x0009ffff).rom().region("prgrom", 0x00000);
+}
 
-ADDRESS_MAP_START(tg100_state::tg100_io_map)
+void tg100_state::tg100_io_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( tg100 )
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(tg100_state::ymw258_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-ADDRESS_MAP_END
+void tg100_state::ymw258_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+}
 
 MACHINE_CONFIG_START(tg100_state::tg100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  H83002, XTAL(20'000'000)) /* TODO: correct CPU type (H8/520) */
-	MCFG_CPU_PROGRAM_MAP( tg100_map )
-	MCFG_CPU_IO_MAP( tg100_io_map )
+	MCFG_DEVICE_ADD("maincpu",  H83002, XTAL(20'000'000)) /* TODO: correct CPU type (H8/520) */
+	MCFG_DEVICE_PROGRAM_MAP( tg100_map )
+	MCFG_DEVICE_IO_MAP( tg100_io_map )
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymw258", MULTIPCM, 9400000)
+	MCFG_DEVICE_ADD("ymw258", MULTIPCM, 9400000)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymw258_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -93,5 +99,5 @@ ROM_START( tg100 )
 
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY   FULLNAME       FLAGS
-CONS( 1991, tg100,    0,      0,      tg100,    tg100,    tg100_state,    0,    "Yamaha", "TG100",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME      FLAGS
+CONS( 1991, tg100, 0,      0,      tg100,   tg100, tg100_state, empty_init, "Yamaha", "TG100",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

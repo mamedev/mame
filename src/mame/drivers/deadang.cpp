@@ -2,8 +2,9 @@
 // copyright-holders:Bryan McPhail, David Haywood
 /***************************************************************************
 
-    Dead Angle                          (c) 1988 Seibu Kaihatsu
-    Gang Hunter                         (c) 1988 Seibu Kaihatsu
+    Pop'N Run                       (c) 1987 Seibu Kaihatsu & Yukai Tsukai
+    Dead Angle                      (c) 1988 Seibu Kaihatsu
+    Gang Hunter                     (c) 1988 Seibu Kaihatsu
 
 ***************************************************************************/
 
@@ -13,6 +14,8 @@
 
     - ghunter trackball input is broken
     - coin lockouts
+    - popnrun: inputs, can't coin it up, needs gfxs dumped and sorted out
+      (SIP modules like airraid);
 
 
 Lead Angle
@@ -64,59 +67,101 @@ READ16_MEMBER(deadang_state::ghunter_trackball_high_r)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(deadang_state::main_map)
-	AM_RANGE(0x00000, 0x037ff) AM_RAM
-	AM_RANGE(0x03800, 0x03fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x05000, 0x05fff) AM_WRITEONLY
-	AM_RANGE(0x06000, 0x0600f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
-	AM_RANGE(0x06010, 0x07fff) AM_WRITEONLY
-	AM_RANGE(0x08000, 0x087ff) AM_WRITE(text_w) AM_SHARE("videoram")
-	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY
-	AM_RANGE(0x0a000, 0x0a001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x0a002, 0x0a003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c000, 0x0cfff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0d000, 0x0dfff) AM_WRITEONLY
-	AM_RANGE(0x0e000, 0x0e0ff) AM_WRITEONLY AM_SHARE("scroll_ram")
-	AM_RANGE(0x0e100, 0x0ffff) AM_WRITEONLY
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void deadang_state::main_map(address_map &map)
+{
+	map(0x00000, 0x037ff).ram();
+	map(0x03800, 0x03fff).ram().share("spriteram");
+	map(0x04000, 0x04fff).ram().share("share1");
+	map(0x05000, 0x05fff).writeonly();
+	map(0x06000, 0x0600f).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
+	map(0x06010, 0x07fff).writeonly();
+	map(0x08000, 0x087ff).w(FUNC(deadang_state::text_w)).share("videoram");
+	map(0x08800, 0x0bfff).writeonly();
+	map(0x0a000, 0x0a001).portr("P1_P2");
+	map(0x0a002, 0x0a003).portr("DSW");
+	map(0x0c000, 0x0cfff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0d000, 0x0dfff).writeonly();
+	map(0x0e000, 0x0e0ff).ram().share("scroll_ram");
+	map(0x0e100, 0x0ffff).writeonly();
+	map(0xc0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(deadang_state::sub_map)
-	AM_RANGE(0x00000, 0x037ff) AM_RAM
-	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(foreground_w) AM_SHARE("video_data")
-	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x08000, 0x08001) AM_WRITE(bank_w)
-	AM_RANGE(0x0c000, 0x0c001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void popnrun_state::popnrun_main_map(address_map &map)
+{
+	main_map(map);
+	map(0x00000, 0x03bff).ram();
+	map(0x03c00, 0x03dff).ram().share("spriteram");
+	map(0x03e00, 0x03fff).ram();
+	map(0x08000, 0x08fff).ram().w(FUNC(popnrun_state::popnrun_text_w)).share("videoram");
+	map(0x0e000, 0x0e0ff).ram().share("scroll_ram");
+}
 
-ADDRESS_MAP_START(deadang_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
-	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm1", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x6008, 0x6009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-ADDRESS_MAP_END
+void deadang_state::sub_map(address_map &map)
+{
+	map(0x00000, 0x037ff).ram();
+	map(0x03800, 0x03fff).ram().w(FUNC(deadang_state::foreground_w)).share("video_data");
+	map(0x04000, 0x04fff).ram().share("share1");
+	map(0x08000, 0x08001).w(FUNC(deadang_state::bank_w));
+	map(0x0c000, 0x0c001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xe0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(deadang_state::sound_decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-ADDRESS_MAP_END
+void popnrun_state::popnrun_sub_map(address_map &map)
+{
+	map(0x00000, 0x003ff).ram().w(FUNC(deadang_state::foreground_w)).share("video_data");
+	map(0x00400, 0x03fff).ram();
+	map(0x04000, 0x04fff).ram().share("share1");
+	map(0xe0000, 0xfffff).rom();
+}
+
+void deadang_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::data_r));
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).w(m_seibu_sound, FUNC(seibu_sound_device::pending_w));
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4005, 0x4006).w(m_adpcm1, FUNC(seibu_adpcm_device::adr_w));
+	map(0x4007, 0x4007).w(m_seibu_sound, FUNC(seibu_sound_device::bank_w));
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401a, 0x401a).w(m_adpcm1, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x6005, 0x6006).w(m_adpcm2, FUNC(seibu_adpcm_device::adr_w));
+	map(0x6008, 0x6009).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x601a, 0x601a).w(m_adpcm2, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
+
+// Air Raid sound config with extra ROM bank
+void popnrun_state::popnrun_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::data_r));
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).w(m_seibu_sound, FUNC(seibu_sound_device::pending_w));
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4007, 0x4007).w(m_seibu_sound, FUNC(seibu_sound_device::bank_w));
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
+
+void deadang_state::sound_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::opcode_r));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
+
 
 /* Input Ports */
 
@@ -229,11 +274,45 @@ static const gfx_layout spritelayout =
 	1024
 };
 
+static const gfx_layout popnrun_charlayout =
+{
+	8,8,        /* 8*8 characters */
+	RGN_FRAC(1,1),
+	2,          /* 2 bits per pixel */
+	{ 4, 0 },
+	{ STEP4(8,1), STEP4(0,1) },
+	{ STEP8(0,16) },
+	128
+};
+
+#ifdef UNUSED_DEFINITION
+// TODO: this is wrong
+static const gfx_layout popnrun_spritelayout =
+{
+	16,16,  /* 16*16 tiles */
+	RGN_FRAC(1,1),
+	2,      /* 4 bits per pixel */
+	{ 0,4 },
+	{ STEP4(0,1), STEP4(16,1), STEP4(512,1), STEP4(512+16,1) },
+	{ STEP16(0,32) },
+	1024
+};
+#endif
+
 /* Graphics Decode Information */
 
-static GFXDECODE_START( deadang )
+static GFXDECODE_START( gfx_deadang )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,    512, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout,  768, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0x000000, spritelayout, 1024, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0x000000, spritelayout,  256, 16 )
+	GFXDECODE_ENTRY( "gfx5", 0x000000, spritelayout,    0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_popnrun )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, popnrun_charlayout,   0x20, 4 )
+	// TODO: probably runs on ROM based palette or just uses the first three entries?
+	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout,    0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x000000, spritelayout, 1024, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0x000000, spritelayout,  256, 16 )
 	GFXDECODE_ENTRY( "gfx5", 0x000000, spritelayout,    0, 16 )
@@ -268,24 +347,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
 MACHINE_CONFIG_START(deadang_state::deadang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,XTAL(16'000'000)/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", V30,XTAL(16'000'000)/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer1", deadang_state, main_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", V30,XTAL(16'000'000)/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", V30,XTAL(16'000'000)/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", deadang_state, sub_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60)) // the game stops working with higher interleave rates..
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -296,34 +376,155 @@ MACHINE_CONFIG_START(deadang_state::deadang)
 	MCFG_SCREEN_UPDATE_DRIVER(deadang_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deadang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deadang)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ym1", ym2203_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ym1", ym2203_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ym1", ym2203_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ym1", ym2203_device, write))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(14'318'181)/4)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(14'318'181)/4)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000)
+	MCFG_DEVICE_ADD("adpcm1", SEIBU_ADPCM, 8000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000)
+	MCFG_DEVICE_ADD("adpcm2", SEIBU_ADPCM, 8000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(popnrun_state::popnrun)
+	deadang(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(popnrun_main_map)
+
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(popnrun_sub_map)
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(popnrun_sound_map)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(popnrun_state, popnrun_screen_update)
+
+	MCFG_DEVICE_REMOVE("watchdog")
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_popnrun)
+
+	MCFG_DEVICE_REMOVE("ym1")
+	MCFG_DEVICE_REMOVE("ym2")
+	MCFG_DEVICE_REMOVE("adpcm1")
+	MCFG_DEVICE_REMOVE("adpcm2")
+
+	MCFG_DEVICE_MODIFY("seibu_sound")
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
+
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+MACHINE_CONFIG_END
+
+
 /* ROMs */
+ROM_START( popnrun )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "popnrun-27512-1-6e.bin", 0xe0001, 0x010000, CRC(cf800494) SHA1(eaed51212c91ebb16e326f8133b60a0ecf0055e5) )
+	ROM_LOAD16_BYTE( "popnrun-27512-2-6h.bin", 0xe0000, 0x010000, CRC(bad47dc4) SHA1(279236cfe5102b4724f9fb4405f514dba011ae3d) )
+
+	ROM_REGION( 0x100000, "sub", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "popnrun-27256-3-17e.bin", 0xf0001, 0x008000, CRC(93f811aa) SHA1(75998375081d3cc5faa7533d39dd2d29a4ef3e7d) )
+	ROM_LOAD16_BYTE( "popnrun-27256-4-17h.bin", 0xf0000, 0x008000, CRC(8fe0c064) SHA1(2a854238b8335a85cbe75c901480b51d479273a0) )
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "popnrun-2764-5-22c.bin", 0x000000, 0x002000, CRC(768a2ec7) SHA1(abc02ec6c6a495e612e8708377d9e7ca98981de4) )
+	ROM_LOAD( "popnrun-27512-6-20c.bin", 0x010000, 0x010000, CRC(47d168ce) SHA1(36c16a400408834fcf0561c3f097e84a287560bd) )
+
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "popnrun-2764-7-1a.bin", 0x000000, 0x002000, CRC(5e508b8e) SHA1(3e49e8d25a3db83178965382295e7c437441b5fe) )
+
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF ) /* Sprites */
+	ROM_LOAD( "gfx2.bin",  0x0000, 0x80000, NO_DUMP )
+	// debugging fill, remove me
+	ROM_FILL(              0x0000, 0x80000, 0x33 )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00 ) /* pf1 layer */
+	ROM_LOAD( "gfx3.bin",  0x0000, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 ) // pf2 layer
+	ROM_LOAD( "gfx4.bin",  0x0000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "gfx5", ROMREGION_ERASE00) // pf3 layer
+	ROM_LOAD( "gfx5.bin",  0x0000, 0x40000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x10000, "gfx6", ROMREGION_ERASE00 )   /* background map data */
+	ROM_LOAD( "gfx6.bin",  0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x10000, "gfx7", ROMREGION_ERASE00 )   /* background map data */
+	ROM_LOAD( "gfx7.bin",  0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "adpcm1", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x10000, "adpcm2", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0100, "prom", ROMREGION_ERASE00 )
+	ROM_LOAD( "popnrun-63s281-9b.bin", 0x000000, 0x000100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
+ROM_END
+
+ROM_START( popnruna )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "1.e5.27512",   0xe0001, 0x010000, CRC(fe45b6c4) SHA1(efa0d4ce6c5963f25ca1195cd2d5745e730b3b95) )
+	ROM_LOAD16_BYTE( "2.h5.27512",   0xe0000, 0x010000, CRC(1e325398) SHA1(ca481c1447de4bffdea695deb9bb46c269272c68) )
+
+	ROM_REGION( 0x100000, "sub", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "popnrun-27256-3-17e.bin", 0xf0001, 0x008000, CRC(93f811aa) SHA1(75998375081d3cc5faa7533d39dd2d29a4ef3e7d) )
+	ROM_LOAD16_BYTE( "popnrun-27256-4-17h.bin", 0xf0000, 0x008000, CRC(8fe0c064) SHA1(2a854238b8335a85cbe75c901480b51d479273a0) )
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "popnrun-2764-5-22c.bin", 0x000000, 0x002000, CRC(768a2ec7) SHA1(abc02ec6c6a495e612e8708377d9e7ca98981de4) )
+	ROM_LOAD( "popnrun-27512-6-20c.bin", 0x010000, 0x010000, CRC(47d168ce) SHA1(36c16a400408834fcf0561c3f097e84a287560bd) )
+
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "popnrun-2764-7-1a.bin", 0x000000, 0x002000, CRC(5e508b8e) SHA1(3e49e8d25a3db83178965382295e7c437441b5fe) )
+
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF ) /* Sprites */
+	ROM_LOAD( "gfx2.bin",  0x0000, 0x80000, NO_DUMP )
+	// debugging fill, remove me
+	ROM_FILL(              0x0000, 0x80000, 0x33 )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00 ) /* pf1 layer */
+	ROM_LOAD( "gfx3.bin",  0x0000, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 ) // pf2 layer
+	ROM_LOAD( "gfx4.bin",  0x0000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "gfx5", ROMREGION_ERASE00) // pf3 layer
+	ROM_LOAD( "gfx5.bin",  0x0000, 0x40000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x10000, "gfx6", ROMREGION_ERASE00 )   /* background map data */
+	ROM_LOAD( "gfx6.bin",  0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x10000, "gfx7", ROMREGION_ERASE00 )   /* background map data */
+	ROM_LOAD( "gfx7.bin",  0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x0100, "prom", ROMREGION_ERASE00 )
+	ROM_LOAD( "popnrun-63s281-9b.bin", 0x000000, 0x000100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
+ROM_END
 
 ROM_START( deadang )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
@@ -515,13 +716,19 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(deadang_state,deadang)
+void deadang_state::init_deadang()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 }
 
-DRIVER_INIT_MEMBER(deadang_state,ghunter)
+void popnrun_state::init_popnrun()
+{
+//  m_adpcm1->decrypt();
+//  m_adpcm2->decrypt();
+}
+
+void deadang_state::init_ghunter()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
@@ -531,8 +738,10 @@ DRIVER_INIT_MEMBER(deadang_state,ghunter)
 }
 
 /* Game Drivers */
+GAME( 1987, popnrun,  0,       popnrun, deadang, popnrun_state, init_popnrun, ROT0, "Seibu Kaihatsu / Yukai Tsukai",         "Pop'n Run - The Videogame (set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, popnruna, popnrun, popnrun, deadang, popnrun_state, init_popnrun, ROT0, "Seibu Kaihatsu / Yukai Tsukai",         "Pop'n Run - The Videogame (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, deadang,  0,       deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu",                        "Dead Angle",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leadang,  deadang, deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu",                        "Lead Angle (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ghunter,  deadang, deadang, ghunter, deadang_state, ghunter, ROT0, "Seibu Kaihatsu",                        "Gang Hunter / Dead Angle",         MACHINE_SUPPORTS_SAVE ) // Title is 'Gang Hunter' or 'Dead Angle' depending on control method dipswitch
-GAME( 1988, ghunters, deadang, deadang, ghunter, deadang_state, ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter / Dead Angle (Spain)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, deadang,  0,       deadang, deadang, deadang_state, init_deadang, ROT0, "Seibu Kaihatsu",                        "Dead Angle",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leadang,  deadang, deadang, deadang, deadang_state, init_deadang, ROT0, "Seibu Kaihatsu",                        "Lead Angle (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ghunter,  deadang, deadang, ghunter, deadang_state, init_ghunter, ROT0, "Seibu Kaihatsu",                        "Gang Hunter / Dead Angle",          MACHINE_SUPPORTS_SAVE ) // Title is 'Gang Hunter' or 'Dead Angle' depending on control method dipswitch
+GAME( 1988, ghunters, deadang, deadang, ghunter, deadang_state, init_ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter / Dead Angle (Spain)",  MACHINE_SUPPORTS_SAVE )

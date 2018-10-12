@@ -12,7 +12,6 @@
 #include "includes/atarisy2.h"
 
 
-
 /*************************************
  *
  *  Tilemap callbacks
@@ -31,12 +30,11 @@ TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
 {
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
-	int code = m_playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
+	int code = (m_playfield_tile_bank[(data >> 10) & 1] << 10) | (data & 0x3ff);
 	int color = (data >> 11) & 7;
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 	tileinfo.category = (~data >> 14) & 3;
 }
-
 
 
 /*************************************
@@ -81,21 +79,13 @@ const atari_motion_objects_config atarisy2_state::s_mob_config =
 
 VIDEO_START_MEMBER(atarisy2_state,atarisy2)
 {
-	/* initialize banked memory */
-	m_alpha_tilemap->basemem().set(&m_vram[0x0000], 0x2000, 16, ENDIANNESS_NATIVE, 2);
-	m_playfield_tilemap->basemem().set(&m_vram[0x2000], 0x2000, 16, ENDIANNESS_NATIVE, 2);
-	m_mob->set_spriteram(&m_vram[0x0c00], 0x0400);
-
 	/* reset the statics */
 	m_yscroll_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atarisy2_state::reset_yscroll_callback),this));
-	m_videobank = 0;
+	m_vrambank->set_bank(0);
 
 	/* save states */
 	save_item(NAME(m_playfield_tile_bank));
-	save_item(NAME(m_videobank));
-	save_item(NAME(m_vram));
 }
-
 
 
 /*************************************
@@ -118,9 +108,9 @@ WRITE16_MEMBER( atarisy2_state::xscroll_w )
 	m_playfield_tilemap->set_scrollx(0, newscroll >> 6);
 
 	/* update the playfield banking */
-	if (m_playfield_tile_bank[0] != (newscroll & 0x0f) * 0x400)
+	if (m_playfield_tile_bank[0] != (newscroll & 0x0f))
 	{
-		m_playfield_tile_bank[0] = (newscroll & 0x0f) * 0x400;
+		m_playfield_tile_bank[0] = (newscroll & 0x0f);
 		m_playfield_tilemap->mark_all_dirty();
 	}
 
@@ -152,16 +142,15 @@ WRITE16_MEMBER( atarisy2_state::yscroll_w )
 		m_yscroll_reset_timer->adjust(m_screen->time_until_pos(0), newscroll >> 6);
 
 	/* update the playfield banking */
-	if (m_playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
+	if (m_playfield_tile_bank[1] != (newscroll & 0x0f))
 	{
-		m_playfield_tile_bank[1] = (newscroll & 0x0f) * 0x400;
+		m_playfield_tile_bank[1] = (newscroll & 0x0f);
 		m_playfield_tilemap->mark_all_dirty();
 	}
 
 	/* update the data */
 	*m_yscroll = newscroll;
 }
-
 
 
 /*************************************
@@ -194,7 +183,6 @@ PALETTE_DECODER_MEMBER( atarisy2_state, RRRRGGGGBBBBIIII )
 }
 
 
-
 /*************************************
  *
  *  Video RAM bank read/write handlers
@@ -207,7 +195,7 @@ READ16_MEMBER( atarisy2_state::slapstic_r )
 	m_slapstic->slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	m_videobank = m_slapstic->slapstic_tweak(space, 0x1234) * 0x1000;
+	m_vrambank->set_bank(m_slapstic->slapstic_tweak(space, 0x1234));
 	return result;
 }
 
@@ -217,9 +205,8 @@ WRITE16_MEMBER( atarisy2_state::slapstic_w )
 	m_slapstic->slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	m_videobank = m_slapstic->slapstic_tweak(space, 0x1234) * 0x1000;
+	m_vrambank->set_bank(m_slapstic->slapstic_tweak(space, 0x1234));
 }
-
 
 
 /*************************************
@@ -228,41 +215,13 @@ WRITE16_MEMBER( atarisy2_state::slapstic_w )
  *
  *************************************/
 
-READ16_MEMBER( atarisy2_state::videoram_r )
+WRITE16_MEMBER( atarisy2_state::spriteram_w )
 {
-	int offs = offset | m_videobank;
-	return m_vram[offs];
+	/* force an update if the link of object 0 is about to change */
+	if (offset == 0x0003)
+		m_screen->update_partial(m_screen->vpos());
+	COMBINE_DATA(&m_mob->spriteram()[offset]);
 }
-
-
-WRITE16_MEMBER( atarisy2_state::videoram_w )
-{
-	int offs = offset | m_videobank;
-
-	/* alpharam? */
-	if (offs < 0x0c00)
-		m_alpha_tilemap->write16(space, offs, data, mem_mask);
-
-	/* spriteram? */
-	else if (offs < 0x1000)
-	{
-		/* force an update if the link of object 0 is about to change */
-		if (offs == 0x0c03)
-			m_screen->update_partial(m_screen->vpos());
-		COMBINE_DATA(&m_mob->spriteram()[offs - 0x0c00]);
-	}
-
-	/* playfieldram? */
-	else if (offs >= 0x2000)
-		m_playfield_tilemap->write16(space, offs - 0x2000, data, mem_mask);
-
-	/* generic case */
-	else
-	{
-		COMBINE_DATA(&m_vram[offs]);
-	}
-}
-
 
 
 /*************************************
@@ -289,12 +248,12 @@ uint32_t atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_in
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
+		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
 			uint8_t *pri = &priority_bitmap.pix8(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
 					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;

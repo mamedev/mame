@@ -96,34 +96,25 @@ class didact_state : public driver_device
 	public:
 	didact_state(const machine_config &mconfig, device_type type, const char * tag)
 		: driver_device(mconfig, type, tag)
-		,m_io_line0(*this, "LINE0")
-		,m_io_line1(*this, "LINE1")
-		,m_io_line2(*this, "LINE2")
-		,m_io_line3(*this, "LINE3")
-		,m_io_line4(*this, "LINE4")
-		,m_line0(0)
-		,m_line1(0)
-		,m_line2(0)
-		,m_line3(0)
-		,m_reset(0)
-		,m_shift(0)
-		,m_led(0)
-		,m_rs232(*this, "rs232")
-		{ }
-	required_ioport m_io_line0;
-	required_ioport m_io_line1;
-	required_ioport m_io_line2;
-	required_ioport m_io_line3;
-	required_ioport m_io_line4;
-	uint8_t m_line0;
-	uint8_t m_line1;
-	uint8_t m_line2;
-	uint8_t m_line3;
+		, m_io_lines(*this, "LINE%u", 0U)
+		, m_lines{ 0, 0, 0, 0 }
+		, m_led(0)
+		, m_rs232(*this, "rs232")
+		, m_leds(*this, "led%u", 0U)
+	{ }
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
+
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
+
+	required_ioport_array<5> m_io_lines;
+	uint8_t m_lines[4];
 	uint8_t m_reset;
 	uint8_t m_shift;
 	uint8_t m_led;
 	optional_device<rs232_port_device> m_rs232;
-	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
+	output_finder<2> m_leds;
 };
 
 
@@ -166,18 +157,20 @@ class didact_state : public driver_device
 /* Mikrodator 6802 driver class */
 class md6802_state : public didact_state
 {
-	public:
+public:
 	md6802_state(const machine_config &mconfig, device_type type, const char * tag)
 		: didact_state(mconfig, type, tag)
-		,m_maincpu(*this, "maincpu")
-		,m_tb16_74145(*this, "tb16_74145")
-		,m_segments(0)
-		,m_pia1(*this, PIA1_TAG)
-		,m_pia2(*this, PIA2_TAG)
-		{ }
-	required_device<m6802_cpu_device> m_maincpu;
-	required_device<ttl74145_device> m_tb16_74145;
-	uint8_t m_segments;
+		, m_maincpu(*this, "maincpu")
+		, m_tb16_74145(*this, "tb16_74145")
+		, m_pia1(*this, PIA1_TAG)
+		, m_pia2(*this, PIA2_TAG)
+		, m_7segs(*this, "digit%u", 0U)
+		, m_segments(0)
+	{ }
+
+	void md6802(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER( pia2_kbA_r );
 	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
 	DECLARE_READ8_MEMBER( pia2_kbB_r );
@@ -186,11 +179,16 @@ class md6802_state : public didact_state
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	void md6802(machine_config &config);
+
 	void md6802_map(address_map &map);
-protected:
+
+private:
+	required_device<m6802_cpu_device> m_maincpu;
+	required_device<ttl74145_device> m_tb16_74145;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
+	output_finder<6> m_7segs;
+	uint8_t m_segments;
 };
 
 /* Keyboard */
@@ -203,16 +201,13 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 	ls145 = m_tb16_74145->read() & 0x0f;
 
 	// read out the artwork, line04 is handled by the timer
-	m_line0 = m_io_line0->read();
-	m_line1 = m_io_line1->read();
-	m_line2 = m_io_line2->read();
-	m_line3 = m_io_line3->read();
+	for (unsigned i = 0U; 4U > i; ++i)
+	{
+		m_lines[i] = m_io_lines[i]->read();
 
-	// Mask out those rows that has a button pressed
-	pa &= ~(((~m_line0 & ls145 ) != 0) ? 1 : 0);
-	pa &= ~(((~m_line1 & ls145 ) != 0) ? 2 : 0);
-	pa &= ~(((~m_line2 & ls145 ) != 0) ? 4 : 0);
-	pa &= ~(((~m_line3 & ls145 ) != 0) ? 8 : 0);
+		// Mask out those rows that has a button pressed
+		pa &= ~(((~m_lines[i] & ls145) != 0) ? (1 << i) : 0);
+	}
 
 	if (m_shift)
 	{
@@ -229,19 +224,15 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 /* Pull the cathodes low enabling the correct digit and lit the segments held by port B */
 WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 {
-	uint8_t digit_nbr;
-
 //  LOG("--->%s(%02x)\n", FUNCNAME, data);
 
-	digit_nbr = (data >> 4) & 0x07;
-	m_tb16_74145->write( digit_nbr );
+	uint8_t const digit_nbr((data >> 4) & 0x07);
+	m_tb16_74145->write(digit_nbr);
 	if (digit_nbr < 6)
-	{
-		output().set_digit_value( digit_nbr, m_segments);
-	}
+		m_7segs[digit_nbr] = m_segments;
 }
 
-/* PIA 2 Port B is all outputs to drive the display so it is very unlikelly that this function is called */
+/* PIA 2 Port B is all outputs to drive the display so it is very unlikely that this function is called */
 READ8_MEMBER( md6802_state::pia2_kbB_r )
 {
 	LOG("Warning, trying to read from Port B designated to drive the display, please check why\n");
@@ -261,7 +252,7 @@ WRITE8_MEMBER( md6802_state::pia2_kbB_w )
 WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
 {
 	LOG("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state);
-	output().set_led_value(m_led, !state);
+	m_leds[m_led] = state ? 0 :1;
 
 	// Serial Out - needs debug/verification
 	m_rs232->write_txd(state);
@@ -272,9 +263,13 @@ WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
 void md6802_state::machine_start()
 {
 	LOG("--->%s()\n", FUNCNAME);
+
+	didact_state::machine_start();
+	m_7segs.resolve();
+
+	save_item(NAME(m_reset));
 	save_item(NAME(m_shift));
 	save_item(NAME(m_led));
-	save_item(NAME(m_reset));
 }
 
 void md6802_state::machine_reset()
@@ -285,12 +280,13 @@ void md6802_state::machine_reset()
 }
 
 // This address map is traced from schema
-ADDRESS_MAP_START(md6802_state::md6802_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE(PIA1_TAG, pia6821_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE(PIA2_TAG, pia6821_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE(0xe000, 0xe7ff) AM_ROM AM_MIRROR(0x1800) AM_REGION("maincpu", 0xe000)
-ADDRESS_MAP_END
+void md6802_state::md6802_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().mirror(0x1800);
+	map(0xa000, 0xa003).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).mirror(0x1ffc);
+	map(0xc000, 0xc003).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).mirror(0x1ffc);
+	map(0xe000, 0xe7ff).rom().mirror(0x1800).region("maincpu", 0xe000);
+}
 
 /*
  *  ___________________________________________________________________________________________________________           _____________________________________________________
@@ -340,32 +336,25 @@ class mp68a_state : public didact_state
 	public:
 	mp68a_state(const machine_config &mconfig, device_type type, const char * tag)
 		: didact_state(mconfig, type, tag)
-		,m_maincpu(*this, "maincpu")
-		,m_digit0(*this, "digit0")
-		,m_digit1(*this, "digit1")
-		,m_digit2(*this, "digit2")
-		,m_digit3(*this, "digit3")
-		,m_digit4(*this, "digit4")
-		,m_digit5(*this, "digit5")
-		,m_pia1(*this, PIA1_TAG)
-		,m_pia2(*this, PIA2_TAG)
-		{ }
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		, m_7segs(*this, "digit%u", 0U)
+		, m_pia1(*this, PIA1_TAG)
+		, m_pia2(*this, PIA2_TAG)
+	{ }
 
 	required_device<m6800_cpu_device> m_maincpu;
 
 	// The display segment driver device (there is actually just one, needs rewrite to be correct)
-	required_device<dm9368_device> m_digit0;
-	required_device<dm9368_device> m_digit1;
-	required_device<dm9368_device> m_digit2;
-	required_device<dm9368_device> m_digit3;
-	required_device<dm9368_device> m_digit4;
-	required_device<dm9368_device> m_digit5;
+	required_device_array<dm9368_device, 6> m_digits;
+	output_finder<6> m_7segs;
 
 	DECLARE_READ8_MEMBER( pia2_kbA_r );
 	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
 	DECLARE_READ8_MEMBER( pia2_kbB_r );
 	DECLARE_WRITE8_MEMBER( pia2_kbB_w );
 	DECLARE_READ_LINE_MEMBER( pia2_cb1_r );
+	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -385,24 +374,26 @@ READ8_MEMBER( mp68a_state::pia2_kbA_r )
 
 WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 {
-	uint8_t digit_nbr;
-
 	/* Display memory is at $702 to $708 in AAAADD format (A=address digit, D=Data digit)
 	   but we are using data read from the port. */
-	digit_nbr = (data >> 4) & 0x07;
+	uint8_t const digit_nbr = (data >> 4) & 0x07;
 
 	/* There is actually only one 9368 and a 74145 to drive the cathode of the right digit low */
-	/* This can be emulated by prentending there are one 9368 per digit, at least for now      */
+	/* This can be emulated by pretending there are one 9368 per digit, at least for now      */
 	switch (digit_nbr)
 	{
-	case 0: m_digit0->a_w(data & 0x0f); break;
-	case 1: m_digit1->a_w(data & 0x0f); break;
-	case 2: m_digit2->a_w(data & 0x0f); break;
-	case 3: m_digit3->a_w(data & 0x0f); break;
-	case 4: m_digit4->a_w(data & 0x0f); break;
-	case 5: m_digit5->a_w(data & 0x0f); break;
-	case 7: break; // used as an 'unselect' by the ROM between digit accesses.
-	default: logerror("Invalid digit index %d\n", digit_nbr);
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+		m_digits[digit_nbr]->a_w(data & 0x0f);
+		break;
+	case 7: // used as an 'unselect' by the ROM between digit accesses.
+		break;
+	default:
+		logerror("Invalid digit index %d\n", digit_nbr);
 	}
 }
 
@@ -410,16 +401,16 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 {
 	uint8_t a012, line, pb;
 
-	LOG("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_line0, m_line1, m_line2, m_line3, m_shift);
+	LOG("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_lines[0], m_lines[1], m_lines[2], m_lines[3], m_shift);
 
 	a012 = 0;
-	if ((line = (m_line0 | m_line1)) != 0)
+	if ((line = (m_lines[0] | m_lines[1])) != 0)
 	{
 		a012 = 8;
 		while (a012 > 0 && !(line & (1 << --a012)));
 		a012 += 8;
 	}
-	if ( a012 == 0 && (line = ((m_line2) | m_line3)) != 0)
+	if ( a012 == 0 && (line = ((m_lines[2]) | m_lines[3])) != 0)
 	{
 		a012 = 8;
 		while (a012 > 0 && !(line & (1 << --a012)));
@@ -431,7 +422,7 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 	{
 		pb |= 0x80;   // Set shift bit (PB7)
 		m_shift = 0;  // Reset flip flop
-		output().set_led_value(m_led, m_shift);
+		m_leds[m_led] = m_shift ? 1 : 0;
 		LOG("SHIFT is released\n");
 	}
 
@@ -447,17 +438,15 @@ WRITE8_MEMBER( mp68a_state::pia2_kbB_w )
 
 READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
 {
-	m_line0 = m_io_line0->read();
-	m_line1 = m_io_line1->read();
-	m_line2 = m_io_line2->read();
-	m_line3 = m_io_line3->read();
+	for (unsigned i = 0U; 4U > i; ++i)
+		m_lines[i] = m_io_lines[i]->read();
 
 #if VERBOSE
-	if ((m_line0 | m_line1 | m_line2 | m_line3) != 0)
-		LOG("%s()-->%02x %02x %02x %02x\n", FUNCNAME, m_line0, m_line1, m_line2, m_line3);
+	if (m_lines[0] | m_lines[1] | m_lines[2] | m_lines[3])
+		LOG("%s()-->%02x %02x %02x %02x\n", FUNCNAME, m_lines[0], m_lines[1], m_lines[2], m_lines[3]);
 #endif
 
-	return (m_line0 | m_line1 | m_line2 | m_line3) != 0 ? 0 : 1;
+	return (m_lines[0] | m_lines[1] | m_lines[2] | m_lines[3]) ? 0 : 1;
 }
 
 void mp68a_state::machine_reset()
@@ -470,6 +459,9 @@ void mp68a_state::machine_start()
 {
 	LOG("--->%s()\n", FUNCNAME);
 
+	didact_state::machine_start();
+	m_7segs.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_shift));
 	save_item(NAME(m_led));
@@ -477,13 +469,14 @@ void mp68a_state::machine_start()
 }
 
 // This address map is traced from pcb
-ADDRESS_MAP_START(mp68a_state::mp68a_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0xf000)
-	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE(PIA1_TAG, pia6820_device, read, write) AM_MIRROR(0xf0fc)
-	AM_RANGE(0x0600, 0x0603) AM_DEVREADWRITE(PIA2_TAG, pia6820_device, read, write) AM_MIRROR(0xf0fc)
-	AM_RANGE(0x0700, 0x07ff) AM_RAM AM_MIRROR(0xf000)
-	AM_RANGE(0x0800, 0x0bff) AM_ROM AM_MIRROR(0xf400) AM_REGION("maincpu", 0x0800)
-ADDRESS_MAP_END
+void mp68a_state::mp68a_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().mirror(0xf000);
+	map(0x0500, 0x0503).rw(m_pia1, FUNC(pia6820_device::read), FUNC(pia6820_device::write)).mirror(0xf0fc);
+	map(0x0600, 0x0603).rw(m_pia2, FUNC(pia6820_device::read), FUNC(pia6820_device::write)).mirror(0xf0fc);
+	map(0x0700, 0x07ff).ram().mirror(0xf000);
+	map(0x0800, 0x0bff).rom().mirror(0xf400).region("maincpu", 0x0800);
+}
 
 static INPUT_PORTS_START( md6802 )
 	PORT_START("LINE0") /* KEY ROW 0 */
@@ -561,24 +554,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 	//  LOG("--->%s()\n", FUNCNAME);
 
 	// Poll the artwork Reset key
-	if ( (m_io_line4->read() & 0x04) )
+	if (m_io_lines[4]->read() & 0x04)
 	{
 		LOG("RESET is pressed, resetting the CPU\n");
 		m_shift = 0;
-		output().set_led_value(m_led, m_shift); // For mp68a only
+		m_leds[m_led] = m_shift ? 1 : 0; // For mp68a only
 		if (m_reset == 0)
 		{
 			machine_reset();
 		}
 		m_reset = 1; // Inhibit multiple resets
 	}
-
-		// Poll the artwork SHIFT/* key
-	else if ( (m_io_line4->read() & 0x08) )
+	else if (m_io_lines[4]->read() & 0x08)
 	{
+		// Poll the artwork SHIFT/* key
 		LOG("%s", !m_shift ? "SHIFT is set\n" : "");
 		m_shift = 1;
-		output().set_led_value(m_led, m_shift); // For mp68a only
+		m_leds[m_led] = m_shift ? 1 : 0; // For mp68a only
 	}
 	else
 	{
@@ -590,17 +582,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 }
 
 MACHINE_CONFIG_START(md6802_state::md6802)
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(md6802_map)
-	MCFG_DEFAULT_LAYOUT(layout_md6802)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(md6802_map)
+	config.set_default_layout(layout_md6802);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("tb16_74145", TTL74145, 0)
+	TTL74145(config, m_tb16_74145, 0);
 	/* PIA #1 0xA000-0xA003 - used differently by laborations and loaded software */
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
+	PIA6821(config, m_pia1, 0);
 
 	/* PIA #2 Keyboard & Display 0xC000-0xC003 */
-	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0)
+	PIA6821(config, m_pia2, 0);
 	/* --PIA init----------------------- */
 	/* 0xE007 0xC002 (DDR B)     = 0xFF - Port B all outputs and set to 0 (zero) */
 	/* 0xE00B 0xC000 (DDR A)     = 0x70 - Port A three outputs and set to 0 (zero) */
@@ -612,29 +604,30 @@ MACHINE_CONFIG_START(md6802_state::md6802)
 	/* 0xE068 0xC000 (Port A)    = 0x60 */
 	/* 0xE08A 0xC002 (Port B)    = 0xEE - updating display */
 	/* 0xE090 0xC000 (Port A)    = 0x00 - looping in 0x10,0x20,0x30,0x40,0x50 */
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(md6802_state, pia2_kbA_w))
-	MCFG_PIA_READPA_HANDLER(READ8(md6802_state, pia2_kbA_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(md6802_state, pia2_kbB_w))
-	MCFG_PIA_READPB_HANDLER(READ8(md6802_state, pia2_kbB_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(md6802_state, pia2_ca2_w))
+	m_pia2->writepa_handler().set(FUNC(md6802_state::pia2_kbA_w));
+	m_pia2->readpa_handler().set(FUNC(md6802_state::pia2_kbA_r));
+	m_pia2->writepb_handler().set(FUNC(md6802_state::pia2_kbB_w));
+	m_pia2->readpb_handler().set(FUNC(md6802_state::pia2_kbB_r));
+	m_pia2->ca2_handler().set(FUNC(md6802_state::pia2_ca2_w));
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", md6802_state, scan_artwork, attotime::from_hz(10))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mp68a_state::mp68a)
 	// Clock source is based on a N9602N Dual Retriggerable Resettable Monostable Multivibrator oscillator at aprox 505KHz.
 	// Trimpot seems broken/stuck at 5K Ohm thu. ROM code 1Ms delay loops suggest 1MHz+
-	MCFG_CPU_ADD("maincpu", M6800, 505000)
-	MCFG_CPU_PROGRAM_MAP(mp68a_map)
-	MCFG_DEFAULT_LAYOUT(layout_mp68a)
+	MCFG_DEVICE_ADD("maincpu", M6800, 505000)
+	MCFG_DEVICE_PROGRAM_MAP(mp68a_map)
+	config.set_default_layout(layout_mp68a);
 
 	/* Devices */
 	/* PIA #1 0x500-0x503 - used differently by laborations and loaded software */
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6820, 0)
+	PIA6820(config, m_pia1, 0);
 
 	/* PIA #2 Keyboard & Display 0x600-0x603 */
-	MCFG_DEVICE_ADD(PIA2_TAG, PIA6820, 0)
+	PIA6820(config, m_pia2, 0);
 	/* --PIA inits----------------------- */
 	/* 0x0BAF 0x601 (Control A) = 0x30 - CA2 is low and enable DDRA */
 	/* 0x0BB1 0x603 (Control B) = 0x30 - CB2 is low and enable DDRB */
@@ -646,13 +639,13 @@ MACHINE_CONFIG_START(mp68a_state::mp68a)
 	/* --execution-wait for key loop-- */
 	/* 0x086B Update display sequnc, see below                            */
 	/* 0x0826 CB1 read          = 0x603 (Control B)  - is a key pressed? */
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mp68a_state, pia2_kbA_w))
-	MCFG_PIA_READPA_HANDLER(READ8(mp68a_state, pia2_kbA_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mp68a_state, pia2_kbB_w))
-	MCFG_PIA_READPB_HANDLER(READ8(mp68a_state, pia2_kbB_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(mp68a_state, pia2_cb1_r))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE)) /* Not used by ROM. Combined trace to CPU IRQ with IRQB */
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE)) /* Not used by ROM. Combined trace to CPU IRQ with IRQA */
+	m_pia2->writepa_handler().set(FUNC(mp68a_state::pia2_kbA_w));
+	m_pia2->readpa_handler().set(FUNC(mp68a_state::pia2_kbA_r));
+	m_pia2->writepb_handler().set(FUNC(mp68a_state::pia2_kbB_w));
+	m_pia2->readpb_handler().set(FUNC(mp68a_state::pia2_kbB_r));
+	m_pia2->readcb1_handler().set(FUNC(mp68a_state::pia2_cb1_r));
+	m_pia2->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE); /* Not used by ROM. Combined trace to CPU IRQ with IRQB */
+	m_pia2->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE); /* Not used by ROM. Combined trace to CPU IRQ with IRQA */
 
 	/* Display - sequence outputting all '0':s at start */
 	/* 0x086B 0x600 (Port A)    = 0x00 */
@@ -668,17 +661,17 @@ MACHINE_CONFIG_START(mp68a_state::mp68a)
 	/* 0x086B 0x600 (Port A)    = 0x50 */
 	/* 0x086B 0x600 (Port A)    = 0x70 */
 	MCFG_DEVICE_ADD("digit0", DM9368, 0)
-	MCFG_OUTPUT_INDEX(0)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<0>))
 	MCFG_DEVICE_ADD("digit1", DM9368, 0)
-	MCFG_OUTPUT_INDEX(1)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<1>))
 	MCFG_DEVICE_ADD("digit2", DM9368, 0)
-	MCFG_OUTPUT_INDEX(2)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<2>))
 	MCFG_DEVICE_ADD("digit3", DM9368, 0)
-	MCFG_OUTPUT_INDEX(3)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<3>))
 	MCFG_DEVICE_ADD("digit4", DM9368, 0)
-	MCFG_OUTPUT_INDEX(4)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<4>))
 	MCFG_DEVICE_ADD("digit5", DM9368, 0)
-	MCFG_OUTPUT_INDEX(5)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<5>))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", mp68a_state, scan_artwork, attotime::from_hz(10))
 MACHINE_CONFIG_END
@@ -686,15 +679,15 @@ MACHINE_CONFIG_END
 // TODO split ROM image into proper ROM set
 ROM_START( md6802 ) // ROM image from http://elektronikforumet.com/forum/viewtopic.php?f=2&t=79576&start=135#p1203640
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "DIDACT.bin", 0xe000, 0x0800, CRC(50430b1d) SHA1(8e2172a9ae95b04f20aa14177df2463a286c8465) )
+	ROM_LOAD( "didact.bin", 0xe000, 0x0800, CRC(50430b1d) SHA1(8e2172a9ae95b04f20aa14177df2463a286c8465) )
 ROM_END
 
 ROM_START( mp68a ) // ROM image from http://elektronikforumet.com/forum/viewtopic.php?f=2&t=79576&start=135#p1203640
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "didactA.bin", 0x0800, 0x0200, CRC(aa05e1ce) SHA1(9ce8223efd274045b43ceca3529e037e16e99fdf) )
-	ROM_LOAD( "didactB.bin", 0x0a00, 0x0200, CRC(592898dc) SHA1(2962f4817712cae97f3ab37b088fc73e66535ff8) )
+	ROM_LOAD( "didacta.bin", 0x0800, 0x0200, CRC(aa05e1ce) SHA1(9ce8223efd274045b43ceca3529e037e16e99fdf) )
+	ROM_LOAD( "didactb.bin", 0x0a00, 0x0200, CRC(592898dc) SHA1(2962f4817712cae97f3ab37b088fc73e66535ff8) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY             FULLNAME            FLAGS
-COMP( 1979, mp68a,      0,          0,      mp68a,      mp68a,  mp68a_state,  0,          "Didact AB",        "mp68a",            MACHINE_NO_SOUND_HW )
-COMP( 1983, md6802,     0,          0,      md6802,     md6802, md6802_state, 0,          "Didact AB",        "Mikrodator 6802",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1979, mp68a,  0,      0,      mp68a,   mp68a,  mp68a_state,  empty_init, "Didact AB", "mp68a",           MACHINE_NO_SOUND_HW )
+COMP( 1983, md6802, 0,      0,      md6802,  md6802, md6802_state, empty_init, "Didact AB", "Mikrodator 6802", MACHINE_NO_SOUND_HW )

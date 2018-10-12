@@ -54,7 +54,7 @@ public:
 	void monty(machine_config &config);
 	void mmonty(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(ioDisplayWrite_w);
 	DECLARE_WRITE8_MEMBER(ioCommandWrite0_w);
@@ -69,7 +69,6 @@ protected:
 	void monty_io(address_map &map);
 	void monty_mem(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<sed1520_device> m_sed0;     // TODO: This isn't actually a SED1520, it's a SED1503F
@@ -84,36 +83,39 @@ private:
 };
 
 
-ADDRESS_MAP_START(monty_state::monty_mem)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+void monty_state::monty_mem(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
 	//AM_RANGE(0x4000, 0x4000) // The main rom checks to see if another program is here on startup
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(monty_state::mmonty_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+void monty_state::mmonty_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
 	//AM_RANGE(0xc000, 0xc000) // The main rom checks to see if another program is here on startup
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+	map(0x8000, 0xffff).rom();
+	map(0x7800, 0x7fff).ram();
+}
 
 
-ADDRESS_MAP_START(monty_state::monty_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ioCommandWrite0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(sound_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ioCommandWrite1_w)
-	AM_RANGE(0x80, 0xff) AM_WRITE(ioDisplayWrite_w)
+void monty_state::monty_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(monty_state::ioCommandWrite0_w));
+	map(0x01, 0x01).w(FUNC(monty_state::sound_w));
+	map(0x02, 0x02).w(FUNC(monty_state::ioCommandWrite1_w));
+	map(0x80, 0xff).w(FUNC(monty_state::ioDisplayWrite_w));
 
 	// 7 reads from a bit shifted IO port
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("X1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("X2")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("X3")
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("X4")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("X5")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("X6")
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("X7")
-ADDRESS_MAP_END
+	map(0x01, 0x01).portr("X1");
+	map(0x02, 0x02).portr("X2");
+	map(0x04, 0x04).portr("X3");
+	map(0x08, 0x08).portr("X4");
+	map(0x10, 0x10).portr("X5");
+	map(0x20, 0x20).portr("X6");
+	map(0x40, 0x40).portr("X7");
+}
 
 
 // Input ports
@@ -225,7 +227,7 @@ WRITE_LINE_MEMBER( monty_state::halt_changed )
 WRITE_LINE_MEMBER( monty_state::key_pressed )
 {
 	if (!state && m_halt)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -264,10 +266,10 @@ SED1520_UPDATE_CB(monty_state::screen_update)
 // TODO: Additional machine definition - Master Monty has a different memory layout
 MACHINE_CONFIG_START(monty_state::monty)
 	// Basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 3580000)       // Ceramic resonator labeled 3.58MT
-	MCFG_CPU_PROGRAM_MAP(monty_mem)
-	MCFG_CPU_IO_MAP(monty_io)
-	MCFG_Z80_SET_HALT_CALLBACK(WRITELINE(monty_state, halt_changed))
+	MCFG_DEVICE_ADD("maincpu", Z80, 3580000)       // Ceramic resonator labeled 3.58MT
+	MCFG_DEVICE_PROGRAM_MAP(monty_mem)
+	MCFG_DEVICE_IO_MAP(monty_io)
+	MCFG_Z80_SET_HALT_CALLBACK(WRITELINE(*this, monty_state, halt_changed))
 
 	// Video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -278,8 +280,8 @@ MACHINE_CONFIG_START(monty_state::monty)
 	MCFG_SCREEN_UPDATE_DRIVER(monty_state, lcd_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// LCD controller interfaces
@@ -288,8 +290,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(monty_state::mmonty)
 	monty(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mmonty_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(mmonty_mem)
 MACHINE_CONFIG_END
 
 
@@ -310,6 +312,6 @@ ROM_END
 
 
 // Drivers
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY   FULLNAME                 FLAGS
-COMP( 1980, monty,   0,      0,       monty,     monty,  monty_state,  0,    "Ritam",  "Monty Plays Scrabble",  MACHINE_NOT_WORKING )
-COMP( 1982, mmonty,  0,      0,       mmonty,    monty,  monty_state,  0,    "Ritam",  "Master Monty",          MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME                FLAGS
+COMP( 1980, monty,  0,      0,      monty,   monty, monty_state, empty_init, "Ritam", "Monty Plays Scrabble", MACHINE_NOT_WORKING )
+COMP( 1982, mmonty, 0,      0,      mmonty,  monty, monty_state, empty_init, "Ritam", "Master Monty",         MACHINE_NOT_WORKING )

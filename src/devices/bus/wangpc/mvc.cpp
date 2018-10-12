@@ -148,7 +148,7 @@ MACHINE_CONFIG_START(wangpc_mvc_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(10)
 	MCFG_MC6845_UPDATE_ROW_CB(wangpc_mvc_device, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(wangpc_mvc_device, vsync_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, wangpc_mvc_device, vsync_w))
 MACHINE_CONFIG_END
 
 

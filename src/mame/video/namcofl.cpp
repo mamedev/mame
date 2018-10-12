@@ -5,9 +5,6 @@
 #include "emu.h"
 #include "includes/namcofl.h"
 
-#include "machine/namcoic.h"
-
-
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
@@ -54,6 +51,12 @@ void namcofl_state::TilemapCB(uint16_t code, int *tile, int *mask)
 	*mask = code;
 }
 
+void namcofl_state::RozCB(uint16_t code, int *tile, int *mask, int which)
+{
+	*tile = code;
+	*mask = code;
+}
+
 
 uint32_t namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -63,10 +66,13 @@ uint32_t namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind1
 
 	for( pri=0; pri<16; pri++ )
 	{
-		c169_roz_draw(screen, bitmap, cliprect, pri);
-		if((pri&1)==0)
-			c123_tilemap_draw( screen, bitmap, cliprect, pri>>1 );
-		c355_obj_draw(screen, bitmap, cliprect, pri );
+		m_c169roz->draw(screen, bitmap, cliprect, pri);
+		if ((pri & 1) == 0)
+		{
+			m_c123tmap->draw(screen, bitmap, cliprect, pri >> 1);
+		}
+
+		m_c355spr->draw(screen, bitmap, cliprect, pri );
 	}
 
 	return 0;
@@ -90,7 +96,5 @@ int namcofl_state::FLobjcode2tile(int code)
 
 VIDEO_START_MEMBER(namcofl_state,namcofl)
 {
-	c123_tilemap_init(NAMCOFL_TILEGFX, memregion(NAMCOFL_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namcofl_state::TilemapCB, this));
-	c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
-	c169_roz_init(NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION);
 }
+

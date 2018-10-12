@@ -2,6 +2,8 @@
 // copyright-holders:Curt Coder
 // thanks-to:Kenneth Lin (original driver author)
 
+#include "emupal.h"
+
 #define MASTER_CLOCK         XTAL(18'432'000)
 #define SOUND_CLOCK          XTAL(3'579'545)
 
@@ -19,6 +21,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void jackal(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoctrl;
 	uint8_t *  m_scrollram;
@@ -53,12 +58,11 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jackal);
 	uint32_t screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jackal_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void jackal_mark_tile_dirty( int offset );
 	void draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int bank );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void jackal(machine_config &config);
 	void master_map(address_map &map);
 	void slave_map(address_map &map);
 };

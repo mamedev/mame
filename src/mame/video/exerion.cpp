@@ -117,10 +117,10 @@ void exerion_state::video_start()
 	m_background_gfx[2] = std::make_unique<uint16_t[]>(256 * 256);
 	m_background_gfx[3] = std::make_unique<uint16_t[]>(256 * 256);
 
-	save_pointer(NAME(m_background_gfx[0].get()), 256 * 256);
-	save_pointer(NAME(m_background_gfx[1].get()), 256 * 256);
-	save_pointer(NAME(m_background_gfx[2].get()), 256 * 256);
-	save_pointer(NAME(m_background_gfx[3].get()), 256 * 256);
+	save_pointer(NAME(m_background_gfx[0]), 256 * 256);
+	save_pointer(NAME(m_background_gfx[1]), 256 * 256);
+	save_pointer(NAME(m_background_gfx[2]), 256 * 256);
+	save_pointer(NAME(m_background_gfx[3]), 256 * 256);
 
 	/*---------------------------------
 	 * Decode the background graphics

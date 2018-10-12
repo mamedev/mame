@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -56,6 +58,6 @@ DECLARE_DEVICE_TYPE(DECOCOMN, decocomn_device)
 	MCFG_DEVICE_ADD(_tag, DECOCOMN, 0)
 
 #define MCFG_DECOCOMN_PALETTE(_palette_tag) \
-	downcast<decocomn_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<decocomn_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_DECOCOMN_H

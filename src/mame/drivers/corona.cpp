@@ -305,6 +305,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -324,21 +325,15 @@
 class corona_state : public driver_device
 {
 public:
-	corona_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	corona_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	uint8_t m_blitter_x_reg;
-	uint8_t m_blitter_y_reg;
-	uint8_t m_blitter_aux_reg;
-	uint8_t m_blitter_unk_reg;
-	std::unique_ptr<uint8_t[]> m_videobuf;
-	uint8_t m_lamp;
-	uint8_t m_lamp_old;
-	int m_input_selector;
 	DECLARE_WRITE8_MEMBER(blitter_y_w);
 	DECLARE_WRITE8_MEMBER(blitter_unk_w);
 	DECLARE_WRITE8_MEMBER(blitter_x_w);
@@ -356,10 +351,6 @@ public:
 	DECLARE_PALETTE_INIT(corona);
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<screen_device> m_screen;
-	required_device<generic_latch_8_device> m_soundlatch;
 	void winner81(machine_config &config);
 	void winner82(machine_config &config);
 	void rcirulet(machine_config &config);
@@ -381,6 +372,23 @@ public:
 	void winner82_map(address_map &map);
 	void winner82_sound_cpu_io_map(address_map &map);
 	void winner82_sound_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+
+	uint8_t m_blitter_x_reg;
+	uint8_t m_blitter_y_reg;
+	uint8_t m_blitter_aux_reg;
+	uint8_t m_blitter_unk_reg;
+	std::unique_ptr<uint8_t[]> m_videobuf;
+	uint8_t m_lamp;
+	uint8_t m_lamp_old;
+	int m_input_selector;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<256> m_lamps;
 };
 
 
@@ -536,8 +544,8 @@ WRITE8_MEMBER(corona_state::ball_w)
 {
 	m_lamp = data;
 
-	output().set_lamp_value(data, 1);
-	output().set_lamp_value(m_lamp_old, 0);
+	m_lamps[data] = 1;
+	m_lamps[m_lamp_old] = 0;
 	m_lamp_old = m_lamp;
 }
 
@@ -627,44 +635,48 @@ WRITE8_MEMBER(corona_state::wc_meters_w)
 
 */
 
-ADDRESS_MAP_START(corona_state::winner81_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xb800, 0xb8ff) AM_RAM // copied from 8000 (0x10 bytes, repeated)
-ADDRESS_MAP_END
+void corona_state::winner81_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x8fff).ram().share("nvram");
+	map(0xb800, 0xb8ff).ram(); // copied from 8000 (0x10 bytes, repeated)
+}
 
-ADDRESS_MAP_START(corona_state::winner81_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x70, 0x70) AM_WRITE(blitter_x_w)
-	AM_RANGE(0x71, 0x71) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0x72, 0x72) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0x74, 0x74) AM_WRITE(blitter_y_w)
-	AM_RANGE(0x75, 0x75) AM_READ(blitter_status_r)
-	AM_RANGE(0x76, 0x76) AM_WRITE(blitter_aux_w)
+void corona_state::winner81_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x70, 0x70).w(FUNC(corona_state::blitter_x_w));
+	map(0x71, 0x71).w(FUNC(corona_state::blitter_unk_w));
+	map(0x72, 0x72).w(FUNC(corona_state::blitter_trig_wdht_w));
+	map(0x74, 0x74).w(FUNC(corona_state::blitter_y_w));
+	map(0x75, 0x75).r(FUNC(corona_state::blitter_status_r));
+	map(0x76, 0x76).w(FUNC(corona_state::blitter_aux_w));
 
-	AM_RANGE(0xd8, 0xd8) AM_WRITENOP            /* dunno, but is writing 0's very often */
-	AM_RANGE(0xdf, 0xdf) AM_WRITE(sound_latch_w)
+	map(0xd8, 0xd8).nopw();            /* dunno, but is writing 0's very often */
+	map(0xdf, 0xdf).w(FUNC(corona_state::sound_latch_w));
 
-	AM_RANGE(0xe8, 0xe8) AM_READ_PORT("IN0")    /* credits for players A, B, C, D */
-	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("IN3")
-	AM_RANGE(0xea, 0xea) AM_READ_PORT("IN1")    /* left & right for all players */
-	AM_RANGE(0xeb, 0xeb) AM_READ_PORT("IN2")    /* bet for all players */
-	AM_RANGE(0xec, 0xec) AM_READ_PORT("IN4")
-	AM_RANGE(0xed, 0xed) AM_READ_PORT("DSW1")   /* DIP switches bank 1 */
-	AM_RANGE(0xee, 0xee) AM_READ_PORT("DSW2")
-	AM_RANGE(0xef, 0xef) AM_WRITE(wc_meters_w)  /* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
-ADDRESS_MAP_END
+	map(0xe8, 0xe8).portr("IN0");    /* credits for players A, B, C, D */
+	map(0xe9, 0xe9).portr("IN3");
+	map(0xea, 0xea).portr("IN1");    /* left & right for all players */
+	map(0xeb, 0xeb).portr("IN2");    /* bet for all players */
+	map(0xec, 0xec).portr("IN4");
+	map(0xed, 0xed).portr("DSW1");   /* DIP switches bank 1 */
+	map(0xee, 0xee).portr("DSW2");
+	map(0xef, 0xef).w(FUNC(corona_state::wc_meters_w));  /* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
+}
 
-ADDRESS_MAP_START(corona_state::winner81_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-ADDRESS_MAP_END
+void corona_state::winner81_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x8000, 0x83ff).ram();
+}
 
-ADDRESS_MAP_START(corona_state::winner81_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void corona_state::winner81_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 /*  Winners Circle 1982
 
@@ -684,42 +696,46 @@ ADDRESS_MAP_END
          FE ---> Sound Latch (writes 01, 02 and 03 during attract)...
 */
 
-ADDRESS_MAP_START(corona_state::winner82_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0x80ff) AM_RAM
-ADDRESS_MAP_END
+void corona_state::winner82_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).ram().share("nvram");
+	map(0x8000, 0x80ff).ram();
+}
 
-ADDRESS_MAP_START(corona_state::winner82_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
+void corona_state::winner82_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(FUNC(corona_state::blitter_status_r));
 
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW1")   /* coinage DIP SW */
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN0")    /* controls for players A & B */
-	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN1")    /* credits for players A, B, C, D */
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN3")    /* single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters */
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(wc_meters_w)
-	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN2")    /* controls for players C & D */
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
-	AM_RANGE(0xff, 0xff) AM_READ_PORT("DSW2")   /* no idea */
-ADDRESS_MAP_END
+	map(0xf8, 0xf8).portr("DSW1");   /* coinage DIP SW */
+	map(0xf9, 0xf9).portr("IN0");    /* controls for players A & B */
+	map(0xfa, 0xfa).portr("IN1");    /* credits for players A, B, C, D */
+	map(0xfb, 0xfb).portr("IN3");    /* single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters */
+	map(0xfc, 0xfc).w(FUNC(corona_state::wc_meters_w));
+	map(0xfd, 0xfd).portr("IN2");    /* controls for players C & D */
+	map(0xfe, 0xfe).w(FUNC(corona_state::sound_latch_w));
+	map(0xff, 0xff).portr("DSW2");   /* no idea */
+}
 
-ADDRESS_MAP_START(corona_state::winner82_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void corona_state::winner82_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+}
 
-ADDRESS_MAP_START(corona_state::winner82_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x03) AM_WRITENOP    /* socket for another ay, inited but never played */
-ADDRESS_MAP_END
+void corona_state::winner82_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x03).nopw();    /* socket for another ay, inited but never played */
+}
 
 /* Ruleta RE-800
 
@@ -748,38 +764,42 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(corona_state::re800_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram") //801a comm?
-ADDRESS_MAP_END
+void corona_state::re800_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x87ff).ram().share("nvram"); //801a comm?
+}
 
-ADDRESS_MAP_START(corona_state::re800_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN1")
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(mux_port_w)
-	AM_RANGE(0xfd, 0xfd) AM_READ(mux_port_r)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(ball_w)
-ADDRESS_MAP_END
+void corona_state::re800_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(FUNC(corona_state::blitter_status_r));
+	map(0xf8, 0xf8).portr("IN1");
+	map(0xf9, 0xf9).portr("DSW1");
+	map(0xfc, 0xfc).w(FUNC(corona_state::mux_port_w));
+	map(0xfd, 0xfd).r(FUNC(corona_state::mux_port_r));
+	map(0xfe, 0xfe).w(FUNC(corona_state::sound_latch_w));
+	map(0xff, 0xff).w(FUNC(corona_state::ball_w));
+}
 
-ADDRESS_MAP_START(corona_state::re800_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-ADDRESS_MAP_END
+void corona_state::re800_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x8000, 0x83ff).ram();
+}
 
-ADDRESS_MAP_START(corona_state::re800_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void corona_state::re800_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 
 /* Lucky Roulette
@@ -808,38 +828,42 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(corona_state::luckyrlt_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void corona_state::luckyrlt_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(corona_state::luckyrlt_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
+void corona_state::luckyrlt_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(FUNC(corona_state::blitter_status_r));
 
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
-	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(mux_port_w)
-	AM_RANGE(0xfd, 0xfd) AM_READ(mux_port_r)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
-ADDRESS_MAP_END
+	map(0xf8, 0xf8).portr("DSW2");
+	map(0xf9, 0xf9).w(FUNC(corona_state::ball_w));
+	map(0xfa, 0xfa).portr("DSW1");
+	map(0xfc, 0xfc).w(FUNC(corona_state::mux_port_w));
+	map(0xfd, 0xfd).r(FUNC(corona_state::mux_port_r));
+	map(0xfe, 0xfe).w(FUNC(corona_state::sound_latch_w));
+}
 
-ADDRESS_MAP_START(corona_state::luckyrlt_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void corona_state::luckyrlt_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+}
 
-ADDRESS_MAP_START(corona_state::luckyrlt_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void corona_state::luckyrlt_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 
 /*********************************
@@ -1366,17 +1390,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(corona_state::winner81)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner81_map)
-	MCFG_CPU_IO_MAP(winner81_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", corona_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner81_map)
+	MCFG_DEVICE_IO_MAP(winner81_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, WC81_MAIN_XTAL/10)    /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner81_sound_map)
-	MCFG_CPU_IO_MAP(winner81_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
+	MCFG_DEVICE_ADD("soundcpu", Z80, WC81_MAIN_XTAL/10)    /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner81_sound_map)
+	MCFG_DEVICE_IO_MAP(winner81_sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1386,31 +1409,31 @@ MACHINE_CONFIG_START(corona_state::winner81)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)    /* measured */
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK1)    /* measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::winner82)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner82_map)
-	MCFG_CPU_IO_MAP(winner82_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", corona_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner82_map)
+	MCFG_DEVICE_IO_MAP(winner82_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, WC82_MAIN_XTAL/8) /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
-	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, WC82_MAIN_XTAL/8) /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
+	MCFG_DEVICE_IO_MAP(winner82_sound_cpu_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1420,32 +1443,32 @@ MACHINE_CONFIG_START(corona_state::winner82)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK2)    /* measured */
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLK2)    /* measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::re800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(re800_map)
-	MCFG_CPU_IO_MAP(re800_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", corona_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(re800_map)
+	MCFG_DEVICE_IO_MAP(re800_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(re800_sound_map)
-	MCFG_CPU_IO_MAP(re800_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
+	MCFG_DEVICE_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(re800_sound_map)
+	MCFG_DEVICE_IO_MAP(re800_sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1455,31 +1478,31 @@ MACHINE_CONFIG_START(corona_state::re800)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::rcirulet)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(re800_map)
-	MCFG_CPU_IO_MAP(re800_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", corona_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(re800_map)
+	MCFG_DEVICE_IO_MAP(re800_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
-	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
+	MCFG_DEVICE_IO_MAP(winner82_sound_cpu_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1489,32 +1512,32 @@ MACHINE_CONFIG_START(corona_state::rcirulet)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::luckyrlt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)
-	MCFG_CPU_IO_MAP(luckyrlt_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", corona_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(luckyrlt_map)
+	MCFG_DEVICE_IO_MAP(luckyrlt_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(luckyrlt_sound_map)
-	MCFG_CPU_IO_MAP(luckyrlt_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
+	MCFG_DEVICE_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(luckyrlt_sound_map)
+	MCFG_DEVICE_IO_MAP(luckyrlt_sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1524,15 +1547,16 @@ MACHINE_CONFIG_START(corona_state::luckyrlt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_luckyrlt)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1735,13 +1759,13 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                     LAYOUT
-GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
-GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
-GAME(  1982, winner82,  0,        winner82, winner82, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
-GAME(  198?, legrandc,  winner82, winner82, winner82, corona_state, 0,        ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
-GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
-GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                        layout_re800 )
-GAMEL( 1991, re800v3,   0,        re800,    re800v3,  corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS, layout_re800 )
-GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                        layout_re800 )
-GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, corona_state, 0,        ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                        layout_luckyrlt )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT        ROT     COMPANY                     FULLNAME                                   FLAGS                     LAYOUT
+GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
+GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
+GAME(  1982, winner82,  0,        winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
+GAME(  198?, legrandc,  winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
+GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
+GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                        layout_re800 )
+GAMEL( 1991, re800v3,   0,        re800,    re800v3,  corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS, layout_re800 )
+GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                        layout_re800 )
+GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                        layout_luckyrlt )

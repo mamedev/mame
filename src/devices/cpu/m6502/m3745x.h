@@ -62,44 +62,44 @@ public:
 
 	const address_space_config m_program_config;
 
-	template<class _read, class _write> void set_p3_callbacks(_read rd, _write wr)
+	template <class Read, class Write> void set_p3_callbacks(Read &&rd, Write &&wr)
 	{
-		read_p3.set_callback(rd);
-		write_p3.set_callback(wr);
+		read_p3.set_callback(std::forward<Read>(rd));
+		write_p3.set_callback(std::forward<Write>(wr));
 	}
 
-	template<class _read, class _write> void set_p4_callbacks(_read rd, _write wr)
+	template <class Read, class Write> void set_p4_callbacks(Read &&rd, Write &&wr)
 	{
-		read_p4.set_callback(rd);
-		write_p4.set_callback(wr);
+		read_p4.set_callback(std::forward<Read>(rd));
+		write_p4.set_callback(std::forward<Write>(wr));
 	}
 
-	template<class _read, class _write> void set_p5_callbacks(_read rd, _write wr)
+	template <class Read, class Write> void set_p5_callbacks(Read &&rd, Write &&wr)
 	{
-		read_p5.set_callback(rd);
-		write_p5.set_callback(wr);
+		read_p5.set_callback(std::forward<Read>(rd));
+		write_p5.set_callback(std::forward<Write>(wr));
 	}
 
-	template<class _read, class _write> void set_p6_callbacks(_read rd, _write wr)
+	template <class Read, class Write> void set_p6_callbacks(Read &&rd, Write &&wr)
 	{
-		read_p6.set_callback(rd);
-		write_p6.set_callback(wr);
+		read_p6.set_callback(std::forward<Read>(rd));
+		write_p6.set_callback(std::forward<Write>(wr));
 	}
 
-	template<class _read, class _read2, class _read3, class _read4> void set_ad14_callbacks(_read rd, _read2 rd2, _read3 rd3, _read4 rd4)
+	template <class Read, class Read2, class Read3, class Read4> void set_ad14_callbacks(Read &&rd, Read2 &&rd2, Read3 &&rd3, Read4 &&rd4)
 	{
-		read_ad_0.set_callback(rd);
-		read_ad_1.set_callback(rd2);
-		read_ad_2.set_callback(rd3);
-		read_ad_3.set_callback(rd4);
+		read_ad_0.set_callback(std::forward<Read>(rd));
+		read_ad_1.set_callback(std::forward<Read2>(rd2));
+		read_ad_2.set_callback(std::forward<Read3>(rd3));
+		read_ad_3.set_callback(std::forward<Read4>(rd4));
 	}
 
-	template<class _read, class _read2, class _read3, class _read4> void set_ad58_callbacks(_read rd, _read2 rd2, _read3 rd3, _read4 rd4)
+	template <class Read, class Read2, class Read3, class Read4> void set_ad58_callbacks(Read &&rd, Read2 &&rd2, Read3 &&rd3, Read4 &&rd4)
 	{
-		read_ad_4.set_callback(rd);
-		read_ad_5.set_callback(rd2);
-		read_ad_6.set_callback(rd3);
-		read_ad_7.set_callback(rd4);
+		read_ad_4.set_callback(std::forward<Read>(rd));
+		read_ad_5.set_callback(std::forward<Read2>(rd2));
+		read_ad_6.set_callback(std::forward<Read3>(rd3));
+		read_ad_7.set_callback(std::forward<Read4>(rd4));
 	}
 
 	devcb_read8  read_p3, read_p4, read_p5, read_p6;

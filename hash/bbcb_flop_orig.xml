@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro Model B Original Disks -->
+<!-- Acorn BBC Micro Model B Original Disks -->
 
 <!-- Loading Instructions:
 
@@ -12,7 +12,7 @@
 
 <!-- All images in this list were created from original discs, most contain copy protection. -->
 
-<softwarelist name="bbcb_flop_orig" description="BBC Micro Model B Original disks">
+<softwarelist name="bbcb_flop_orig" description="Acorn BBC Micro Model B Original disks">
 
 	<!-- Games -->
 

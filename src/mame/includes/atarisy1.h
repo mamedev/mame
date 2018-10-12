@@ -5,9 +5,15 @@
     Atari System 1 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ATARISY1_H
+#define MAME_INCLUDES_ATARISY1_H
+
+#pragma once
 
 #include "machine/74259.h"
+#include "machine/adc0808.h"
 #include "machine/atarigen.h"
+#include "machine/input_merger.h"
 #include "machine/timer.h"
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
@@ -17,19 +23,21 @@ class atarisy1_state : public atarigen_state
 {
 public:
 	atarisy1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_audiocpu(*this, "audiocpu"),
-			m_soundcomm(*this, "soundcomm"),
-			m_bankselect(*this, "bankselect"),
-			m_mob(*this, "mob"),
-			m_joystick_timer(*this, "joystick_timer"),
-			m_playfield_tilemap(*this, "playfield"),
-			m_alpha_tilemap(*this, "alpha"),
-			m_yscroll_reset_timer(*this, "yreset_timer"),
-			m_scanline_timer(*this, "scan_timer"),
-			m_int3off_timer(*this, "int3off_timer"),
-			m_tms(*this, "tms"),
-			m_outlatch(*this, "outlatch") { }
+		: atarigen_state(mconfig, type, tag)
+		, m_audiocpu(*this, "audiocpu")
+		, m_soundcomm(*this, "soundcomm")
+		, m_bankselect(*this, "bankselect")
+		, m_mob(*this, "mob")
+		, m_adc(*this, "adc")
+		, m_ajsint(*this, "ajsint")
+		, m_playfield_tilemap(*this, "playfield")
+		, m_alpha_tilemap(*this, "alpha")
+		, m_yscroll_reset_timer(*this, "yreset_timer")
+		, m_scanline_timer(*this, "scan_timer")
+		, m_int3off_timer(*this, "int3off_timer")
+		, m_tms(*this, "tms")
+		, m_outlatch(*this, "outlatch")
+	{ }
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<atari_sound_comm_device> m_soundcomm;
@@ -40,10 +48,9 @@ public:
 	uint8_t           m_joystick_type;
 	uint8_t           m_trackball_type;
 
-	required_device<timer_device> m_joystick_timer;
+	optional_device<adc0808_device> m_adc;
+	optional_device<input_merger_device> m_ajsint;
 	uint8_t           m_joystick_int;
-	uint8_t           m_joystick_int_enable;
-	uint8_t           m_joystick_value;
 
 	/* playfield parameters */
 	required_device<tilemap_device> m_playfield_tilemap;
@@ -69,30 +76,29 @@ public:
 
 	uint8_t           m_cur[2][2];
 	virtual void update_interrupts() override;
-	DECLARE_READ16_MEMBER(joystick_r);
-	DECLARE_WRITE16_MEMBER(joystick_w);
+	template<int Input> DECLARE_READ8_MEMBER(digital_joystick_r);
+	DECLARE_READ8_MEMBER(adc_r);
+	DECLARE_WRITE8_MEMBER(adc_w);
 	DECLARE_READ16_MEMBER(trakball_r);
 	DECLARE_READ8_MEMBER(switch_6502_r);
-	DECLARE_WRITE_LINE_MEMBER(led_1_w);
-	DECLARE_WRITE_LINE_MEMBER(led_2_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE8_MEMBER(via_pa_w);
 	DECLARE_READ8_MEMBER(via_pa_r);
 	DECLARE_WRITE8_MEMBER(via_pb_w);
 	DECLARE_READ8_MEMBER(via_pb_r);
-	DECLARE_DRIVER_INIT(roadblst);
-	DECLARE_DRIVER_INIT(peterpak);
-	DECLARE_DRIVER_INIT(marble);
-	DECLARE_DRIVER_INIT(roadrunn);
-	DECLARE_DRIVER_INIT(indytemp);
+	void init_roadblst();
+	void init_peterpak();
+	void init_marble();
+	void init_roadrunn();
+	void init_indytemp();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(atarisy1);
 	DECLARE_MACHINE_RESET(atarisy1);
 	DECLARE_VIDEO_START(atarisy1);
 	uint32_t screen_update_atarisy1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(delayed_joystick_int);
+	DECLARE_WRITE_LINE_MEMBER(joystick_int);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_reset_yscroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3off_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3_callback);
@@ -107,6 +113,7 @@ public:
 	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
 
 	static const atari_motion_objects_config s_mob_config;
+	void add_adc(machine_config &config);
 	void atarisy1(machine_config &config);
 	void indytemp(machine_config &config);
 	void roadb110(machine_config &config);
@@ -117,3 +124,5 @@ public:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ATARISY1_H

@@ -54,8 +54,10 @@ enum
 nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_IDE, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
-	m_cru_register(0), m_rtc(nullptr),
-	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false),
+	m_cru_register(0),
+	m_rtc(*this, "ide_rtc"),
+	m_ata(*this, "ata"),
+	m_clk_irq(false), m_sram_enable(false),
 	m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
 	m_input_latch(0), m_output_latch(0), m_ram(*this, RAMREGION)
 {
@@ -307,7 +309,6 @@ WRITE_LINE_MEMBER(nouspikel_ide_interface_device::clock_interrupt_callback)
 
 void nouspikel_ide_interface_device::device_start()
 {
-	m_rtc = subdevice<rtc65271_device>("ide_rtc");
 	m_sram_enable_dip = false; // TODO: what is this?
 
 	save_item(NAME(m_ata_irq));
@@ -366,16 +367,18 @@ INPUT_PORTS_START( tn_ide )
 		PORT_DIPSETTING( 0x1f00, "1F00" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(nouspikel_ide_interface_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
-	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
-	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
+void nouspikel_ide_interface_device::device_add_mconfig(machine_config &config)
+{
+	RTC65271(config, m_rtc, 0);
+	m_rtc->interrupt_cb().set(FUNC(nouspikel_ide_interface_device::clock_interrupt_callback));
 
-	MCFG_RAM_ADD(RAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	m_ata->irq_handler().set(FUNC(nouspikel_ide_interface_device::ide_interrupt_callback));
+
+	RAM(config, m_ram);
+	m_ram->set_default_size("512K");
+	m_ram->set_default_value(0);
+}
 
 ioport_constructor nouspikel_ide_interface_device::device_input_ports() const
 {

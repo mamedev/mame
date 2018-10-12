@@ -58,6 +58,6 @@ private:
 
 
 // device type definition
-extern const device_type PC_KBD_MICROSOFT_NATURAL;
+DECLARE_DEVICE_TYPE(PC_KBD_MICROSOFT_NATURAL, pc_kbd_microsoft_natural_device)
 
 #endif // MAME_BUS_PC_KB_MSNAT_H

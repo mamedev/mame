@@ -24,51 +24,24 @@ class segahang_state : public sega_16bit_common_base
 public:
 	// construction/destruction
 	segahang_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_subcpu(*this, "subcpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_mcu(*this, "mcu"),
-			m_i8255_1(*this, "i8255_1"),
-			m_i8255_2(*this, "i8255_2"),
-			m_sprites(*this, "sprites"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_segaic16road(*this, "segaic16road"),
-			m_soundlatch(*this, "soundlatch"),
-			m_workram(*this, "workram"),
-			m_sharrier_video(false),
-			m_adc_select(0),
-			m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3"}),
-			m_decrypted_opcodes(*this, "decrypted_opcodes")
+		: sega_16bit_common_base(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_mcu(*this, "mcu")
+		, m_i8255_1(*this, "i8255_1")
+		, m_i8255_2(*this, "i8255_2")
+		, m_sprites(*this, "sprites")
+		, m_segaic16vid(*this, "segaic16vid")
+		, m_segaic16road(*this, "segaic16road")
+		, m_soundlatch(*this, "soundlatch")
+		, m_workram(*this, "workram")
+		, m_sharrier_video(false)
+		, m_adc_select(0)
+		, m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3"})
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
-
-	// PPI read/write callbacks
-	DECLARE_WRITE8_MEMBER( video_lamps_w );
-	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
-	DECLARE_WRITE8_MEMBER( sub_control_adc_w );
-	DECLARE_READ8_MEMBER( adc_status_r );
-
-	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( hangon_io_r );
-	DECLARE_WRITE16_MEMBER( hangon_io_w );
-	DECLARE_READ16_MEMBER( sharrier_io_r );
-	DECLARE_WRITE16_MEMBER( sharrier_io_w );
-
-	// Z80 sound CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
-
-	// I8751-related VBLANK interrupt handlers
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
-
-	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(sharrier);
-	DECLARE_DRIVER_INIT(enduror);
-	DECLARE_DRIVER_INIT(endurobl);
-	DECLARE_DRIVER_INIT(endurob2);
-
-	// video updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void sound_board_2203(machine_config &config);
 	void sound_board_2203x2(machine_config &config);
@@ -88,6 +61,36 @@ public:
 	void endurobl(machine_config &config);
 	void enduror1(machine_config &config);
 	void hangon(machine_config &config);
+
+	// game-specific driver init
+	void init_generic();
+	void init_sharrier();
+	void init_enduror();
+	void init_endurobl();
+	void init_endurob2();
+
+private:
+	// PPI read/write callbacks
+	DECLARE_WRITE8_MEMBER( video_lamps_w );
+	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
+	DECLARE_WRITE8_MEMBER( sub_control_adc_w );
+	DECLARE_READ8_MEMBER( adc_status_r );
+
+	// main CPU read/write handlers
+	DECLARE_READ16_MEMBER( hangon_io_r );
+	DECLARE_WRITE16_MEMBER( hangon_io_w );
+	DECLARE_READ16_MEMBER( sharrier_io_r );
+	DECLARE_WRITE16_MEMBER( sharrier_io_w );
+
+	// Z80 sound CPU read/write handlers
+	DECLARE_READ8_MEMBER( sound_data_r );
+
+	// I8751-related VBLANK interrupt handlers
+	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+
+	// video updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void decrypted_opcodes_map(address_map &map);
 	void fd1094_decrypted_opcodes_map(address_map &map);
 	void hangon_map(address_map &map);
@@ -99,7 +102,7 @@ public:
 	void sound_portmap_2203(address_map &map);
 	void sound_portmap_2203x2(address_map &map);
 	void sub_map(address_map &map);
-protected:
+
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
 
@@ -112,6 +115,7 @@ protected:
 
 	// driver overrides
 	virtual void video_start() override;
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -142,4 +146,5 @@ protected:
 	optional_ioport_array<4> m_adc_ports;
 	bool                    m_shadow;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
+	output_finder<2> m_lamps;
 };

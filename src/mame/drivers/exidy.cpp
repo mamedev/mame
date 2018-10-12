@@ -200,104 +200,112 @@ WRITE8_MEMBER(exidy_state::fax_bank_select_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(exidy_state::exidy_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite1_xpos")
-	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite1_ypos")
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite2_xpos")
-	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite2_ypos")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_READ_PORT("DSW")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("spriteno")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_READ_PORT("IN0")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("sprite_enable")
-	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ(exidy_interrupt_r)
-	AM_RANGE(0x5210, 0x5212) AM_WRITEONLY AM_SHARE("color_latch")
-	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+void exidy_state::exidy_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x4000, 0x43ff).mirror(0x0400).ram().share("videoram");
+	map(0x5000, 0x5000).mirror(0x003f).writeonly().share("sprite1_xpos");
+	map(0x5040, 0x5040).mirror(0x003f).writeonly().share("sprite1_ypos");
+	map(0x5080, 0x5080).mirror(0x003f).writeonly().share("sprite2_xpos");
+	map(0x50c0, 0x50c0).mirror(0x003f).writeonly().share("sprite2_ypos");
+	map(0x5100, 0x5100).mirror(0x00fc).portr("DSW");
+	map(0x5100, 0x5100).mirror(0x00fc).writeonly().share("spriteno");
+	map(0x5101, 0x5101).mirror(0x00fc).portr("IN0");
+	map(0x5101, 0x5101).mirror(0x00fc).writeonly().share("sprite_enable");
+	map(0x5103, 0x5103).mirror(0x00fc).r(FUNC(exidy_state::exidy_interrupt_r));
+	map(0x5210, 0x5212).writeonly().share("color_latch");
+	map(0x5213, 0x5213).portr("IN2");
+}
 
 
-ADDRESS_MAP_START(exidy_state::sidetrac_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-ADDRESS_MAP_END
+void exidy_state::sidetrac_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0800, 0x3fff).rom();
+	map(0x4800, 0x4fff).rom().share("characterram");
+	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(exidy_state::spectar_audio_2_w));
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-ADDRESS_MAP_START(exidy_state::targ_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(targ_audio_2_w)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-ADDRESS_MAP_END
+void exidy_state::targ_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0800, 0x3fff).rom();
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(exidy_state::targ_audio_2_w));
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-ADDRESS_MAP_START(exidy_state::spectar_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-ADDRESS_MAP_END
+void exidy_state::spectar_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0800, 0x3fff).rom();
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(exidy_state::spectar_audio_2_w));
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-ADDRESS_MAP_START(exidy_state::rallys_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5000, 0x5000) AM_WRITEONLY AM_SHARE("sprite1_xpos")
-	AM_RANGE(0x5001, 0x5001) AM_WRITEONLY AM_SHARE("sprite1_ypos")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_READ_PORT("DSW")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("spriteno")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_READ_PORT("IN0")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("sprite_enable")
-	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ(exidy_interrupt_r)
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0x5210, 0x5212) AM_WRITEONLY AM_SHARE("color_latch")
-	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
-	AM_RANGE(0x5300, 0x5300) AM_WRITEONLY AM_SHARE("sprite2_xpos")
-	AM_RANGE(0x5301, 0x5301) AM_WRITEONLY AM_SHARE("sprite2_ypos")
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-ADDRESS_MAP_END
+void exidy_state::rallys_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x3fff).rom();
+	map(0x4000, 0x43ff).mirror(0x0400).ram().share("videoram");
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5000, 0x5000).writeonly().share("sprite1_xpos");
+	map(0x5001, 0x5001).writeonly().share("sprite1_ypos");
+	map(0x5100, 0x5100).mirror(0x00fc).portr("DSW");
+	map(0x5100, 0x5100).mirror(0x00fc).writeonly().share("spriteno");
+	map(0x5101, 0x5101).mirror(0x00fc).portr("IN0");
+	map(0x5101, 0x5101).mirror(0x00fc).writeonly().share("sprite_enable");
+	map(0x5103, 0x5103).mirror(0x00fc).r(FUNC(exidy_state::exidy_interrupt_r));
+	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(exidy_state::spectar_audio_2_w));
+	map(0x5210, 0x5212).writeonly().share("color_latch");
+	map(0x5213, 0x5213).portr("IN2");
+	map(0x5300, 0x5300).writeonly().share("sprite2_xpos");
+	map(0x5301, 0x5301).writeonly().share("sprite2_ypos");
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-ADDRESS_MAP_START(exidy_state::venture_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void exidy_state::venture_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5200, 0x520f).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(exidy_state::pepper2_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x4800, 0x4fff) AM_NOP
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void exidy_state::pepper2_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x4800, 0x4fff).noprw();
+	map(0x5200, 0x520f).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x6fff).ram().share("characterram");
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(exidy_state::fax_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM
-	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(fax_bank_select_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x5213, 0x5217) AM_WRITENOP        /* empty control lines on color/sound board */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void exidy_state::fax_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0400, 0x07ff).ram();
+	map(0x1a00, 0x1a00).portr("IN4");
+	map(0x1c00, 0x1c00).portr("IN3");
+	map(0x2000, 0x2000).w(FUNC(exidy_state::fax_bank_select_w));
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x5200, 0x520f).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x5213, 0x5217).nopw();        /* empty control lines on color/sound board */
+	map(0x6000, 0x6fff).ram().share("characterram");
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -376,7 +384,7 @@ static INPUT_PORTS_START( targ )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("INTSOURCE")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -396,7 +404,7 @@ static INPUT_PORTS_START( spectar )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( German ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Spanish ) )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spectarrf ) // default to Spanish since it's a Spanish bootleg
@@ -446,7 +454,7 @@ static INPUT_PORTS_START( rallys )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_MODIFY("INTSOURCE")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
@@ -515,7 +523,7 @@ static INPUT_PORTS_START( mtrap )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
 
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -577,7 +585,7 @@ static INPUT_PORTS_START( venture )
     PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -613,7 +621,7 @@ static INPUT_PORTS_START( teetert )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, nullptr)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -693,7 +701,7 @@ static INPUT_PORTS_START( pepper2 )
     PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -745,7 +753,7 @@ static INPUT_PORTS_START( fax )
     PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -790,7 +798,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( exidy )
+static GFXDECODE_START( gfx_exidy )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 2 )
 GFXDECODE_END
 
@@ -816,11 +824,11 @@ MACHINE_START_MEMBER(exidy_state,teetert)
 MACHINE_CONFIG_START(exidy_state::base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exidy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exidy)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -836,8 +844,8 @@ MACHINE_CONFIG_START(exidy_state::sidetrac)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sidetrac_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sidetrac_map)
 
 	/* audio hardware */
 	spectar_audio(config);
@@ -848,8 +856,8 @@ MACHINE_CONFIG_START(exidy_state::targ)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(targ_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(targ_map)
 
 	/* audio hardware */
 	targ_audio(config);
@@ -860,8 +868,8 @@ MACHINE_CONFIG_START(exidy_state::spectar)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spectar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spectar_map)
 
 	/* audio hardware */
 	spectar_audio(config);
@@ -872,8 +880,8 @@ MACHINE_CONFIG_START(exidy_state::rallys)
 	spectar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rallys_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rallys_map)
 MACHINE_CONFIG_END
 
 
@@ -881,13 +889,23 @@ MACHINE_CONFIG_START(exidy_state::venture)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(venture_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(venture_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* audio hardware */
-	venture_audio(config);
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
+	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
+	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
+	pia.cb2_handler().set("soundbd", FUNC(venture_sound_device::ca_w));
+
+	MCFG_DEVICE_ADD("soundbd", EXIDY_VENTURE, 0)
+	MCFG_EXIDY_VENTURE_WRITEPA_HANDLER(WRITE8("pia", pia6821_device, portb_w))
+	MCFG_EXIDY_VENTURE_WRITEPB_HANDLER(WRITE8("pia", pia6821_device, porta_w))
+	MCFG_EXIDY_VENTURE_CA2_HANDLER(WRITELINE("pia", pia6821_device, cb1_w))
+	MCFG_EXIDY_VENTURE_CB2_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))
 MACHINE_CONFIG_END
 
 
@@ -895,8 +913,8 @@ MACHINE_CONFIG_START(exidy_state::teetert)
 	venture(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
 
 	MCFG_MACHINE_START_OVERRIDE(exidy_state, teetert )
 
@@ -904,14 +922,26 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(exidy_state::mtrap)
-	venture(config);
+	base(config);
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(venture_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	/* audio hardware */
-	mtrap_cvsd_audio(config);
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
+	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
+	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
+	pia.cb2_handler().set("soundbd", FUNC(venture_sound_device::ca_w));
+
+	MCFG_DEVICE_ADD("soundbd", EXIDY_MTRAP, 0)
+	MCFG_EXIDY_VENTURE_WRITEPA_HANDLER(WRITE8("pia", pia6821_device, portb_w))
+	MCFG_EXIDY_VENTURE_WRITEPB_HANDLER(WRITE8("pia", pia6821_device, porta_w))
+	MCFG_EXIDY_VENTURE_CA2_HANDLER(WRITELINE("pia", pia6821_device, cb1_w))
+	MCFG_EXIDY_VENTURE_CB2_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))
 MACHINE_CONFIG_END
 
 
@@ -919,8 +949,8 @@ MACHINE_CONFIG_START(exidy_state::pepper2)
 	venture(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pepper2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pepper2_map)
 MACHINE_CONFIG_END
 
 
@@ -928,8 +958,8 @@ MACHINE_CONFIG_START(exidy_state::fax)
 	pepper2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fax_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fax_map)
 MACHINE_CONFIG_END
 
 
@@ -1149,12 +1179,12 @@ ROM_START( mtrap )
 	ROM_LOAD( "mtl7a.bin",   0xe000, 0x1000, CRC(caafbb6d) SHA1(96823ac4e49f192121c53f70382a20f7c52e290b) )
 	ROM_LOAD( "mtl6a.bin",   0xf000, 0x1000, CRC(d85e52ca) SHA1(51296247e365a468fe9458b722bbdbbeeed59fa0) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "mta5a.bin",   0x6800, 0x0800, CRC(dbe4ec02) SHA1(34e965428dbb4b9c558927bb80d19cb550b53228) )
 	ROM_LOAD( "mta6a.bin",   0x7000, 0x0800, CRC(c00f0c05) SHA1(398b0bc2a7e54b1e2326ed067bf6bb15cc52ed39) )
 	ROM_LOAD( "mta7a.bin",   0x7800, 0x0800, CRC(f3f16ca7) SHA1(3928c5da246c43036a7b4cbb140a1734d5f1fb03) )
 
-	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
+	ROM_REGION( 0x4000, "soundbd:cvsdcpu", 0 ) /* 16k for digital sound processor */
 	ROM_LOAD( "mta2a.bin",   0x0000, 0x1000, CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
 	ROM_LOAD( "mta3a.bin",   0x1000, 0x1000, CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
 	ROM_LOAD( "mta4a.bin",   0x2000, 0x1000, CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
@@ -1179,12 +1209,12 @@ ROM_START( mtrap2 )
 	ROM_LOAD( "mtl-2.7a",    0xe000, 0x1000, CRC(3d235f95) SHA1(57031d9784c55853dcf6e396ee685d8dd0d3ef87) )
 	ROM_LOAD( "mtl-2.6a",    0xf000, 0x1000, CRC(7ed7632a) SHA1(6800d3c1b901808373d3edd2a3fcf699f93d7daf) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "mta5a.bin",   0x6800, 0x0800, CRC(dbe4ec02) SHA1(34e965428dbb4b9c558927bb80d19cb550b53228) )
 	ROM_LOAD( "mta6a.bin",   0x7000, 0x0800, CRC(c00f0c05) SHA1(398b0bc2a7e54b1e2326ed067bf6bb15cc52ed39) )
 	ROM_LOAD( "mta7a.bin",   0x7800, 0x0800, CRC(f3f16ca7) SHA1(3928c5da246c43036a7b4cbb140a1734d5f1fb03) )
 
-	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
+	ROM_REGION( 0x4000, "soundbd:cvsdcpu", 0 ) /* 16k for digital sound processor */
 	ROM_LOAD( "mta2a.bin",   0x0000, 0x1000, CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
 	ROM_LOAD( "mta3a.bin",   0x1000, 0x1000, CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
 	ROM_LOAD( "mta4a.bin",   0x2000, 0x1000, CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
@@ -1209,12 +1239,12 @@ ROM_START( mtrap3 )
 	ROM_LOAD( "mtl-3.7a",    0xe000, 0x1000, CRC(ea8ec479) SHA1(785557a242d9343c83cdc403b1f726cbea9d230f) )
 	ROM_LOAD( "mtl-3.6a",    0xf000, 0x1000, CRC(d72ba72d) SHA1(4c5b311bc7ecfc6133bc09e586635844e2f1d6a9) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "mta5a.bin",   0x6800, 0x0800, CRC(dbe4ec02) SHA1(34e965428dbb4b9c558927bb80d19cb550b53228) )
 	ROM_LOAD( "mta6a.bin",   0x7000, 0x0800, CRC(c00f0c05) SHA1(398b0bc2a7e54b1e2326ed067bf6bb15cc52ed39) )
 	ROM_LOAD( "mta7a.bin",   0x7800, 0x0800, CRC(f3f16ca7) SHA1(3928c5da246c43036a7b4cbb140a1734d5f1fb03) )
 
-	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
+	ROM_REGION( 0x4000, "soundbd:cvsdcpu", 0 ) /* 16k for digital sound processor */
 	ROM_LOAD( "mta2a.bin",   0x0000, 0x1000, CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
 	ROM_LOAD( "mta3a.bin",   0x1000, 0x1000, CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
 	ROM_LOAD( "mta4a.bin",   0x2000, 0x1000, CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
@@ -1239,12 +1269,12 @@ ROM_START( mtrap4 )
 	ROM_LOAD( "mta47a.bin",   0xe000, 0x1000, CRC(cdf8c6a8) SHA1(932ae9c0ea5700bd79862efa94742136d8e15641) )
 	ROM_LOAD( "mta46a.bin",   0xf000, 0x1000, CRC(77d3f2e6) SHA1(2c21dd7ee326ccb41d3c64eec90a19198382edea) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "mta5a.bin",    0x6800, 0x0800, CRC(dbe4ec02) SHA1(34e965428dbb4b9c558927bb80d19cb550b53228) )
 	ROM_LOAD( "mta6a.bin",    0x7000, 0x0800, CRC(c00f0c05) SHA1(398b0bc2a7e54b1e2326ed067bf6bb15cc52ed39) )
 	ROM_LOAD( "mta7a.bin",    0x7800, 0x0800, CRC(f3f16ca7) SHA1(3928c5da246c43036a7b4cbb140a1734d5f1fb03) )
 
-	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
+	ROM_REGION( 0x4000, "soundbd:cvsdcpu", 0 ) /* 16k for digital sound processor */
 	ROM_LOAD( "mta2a.bin",    0x0000,0x1000,CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
 	ROM_LOAD( "mta3a.bin",    0x1000,0x1000,CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
 	ROM_LOAD( "mta4a.bin",    0x2000,0x1000,CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
@@ -1268,10 +1298,10 @@ ROM_START( mtrapb )
 	ROM_LOAD( "cpu.j2",  0xe000, 0x1000, CRC(1eb0c4c9) SHA1(b7049b86385798f1098945d07fe41b71ddbbc980) )
 	ROM_LOAD( "cpu.h2",  0xf000, 0x1000, CRC(16ea9a51) SHA1(59714f50c82b54f490c69fb5b91ac0aa16cb9abb) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "2564.j10",     0x6000, 0x2000, CRC(d4160aa8) SHA1(d3bae8fa54e71c397ec60f998a012e088588a2e4) )
 
-	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
+	ROM_REGION( 0x4000, "soundbd:cvsdcpu", 0 ) /* 16k for digital sound processor */
 	ROM_LOAD( "mta2a.bin",    0x0000,0x1000,CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
 	ROM_LOAD( "mta3a.bin",    0x1000,0x1000,CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
 	ROM_LOAD( "mta4a.bin",    0x2000,0x1000,CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
@@ -1302,10 +1332,10 @@ ROM_START( mtrapb2 )
 	ROM_LOAD( "ms7.2h",    0xe000, 0x1000, CRC(cdf8c6a8) SHA1(932ae9c0ea5700bd79862efa94742136d8e15641) )
 	ROM_LOAD( "ms6.2f",    0xf000, 0x1000, CRC(77d3f2e6) SHA1(2c21dd7ee326ccb41d3c64eec90a19198382edea) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "ms1a.10j",  0x6000, 0x2000, CRC(d4160aa8) SHA1(d3bae8fa54e71c397ec60f998a012e088588a2e4) )
 
-	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
+	ROM_REGION( 0x4000, "soundbd:cvsdcpu", 0 ) /* 16k for digital sound processor */
 	ROM_LOAD( "ms2a.8d",   0x0000,0x1000,CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
 	ROM_LOAD( "ms3a.8e",   0x1000,0x1000,CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
 	ROM_LOAD( "ms4a.8f",   0x2000,0x1000,CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
@@ -1331,7 +1361,7 @@ ROM_START( venture )
 	ROM_LOAD( "7a-cpu",  0xe000, 0x1000, CRC(48d66220) SHA1(97b1605170c67b3a945b4d5f088df79328e163ce) )
 	ROM_LOAD( "6a-cpu",  0xf000, 0x1000, CRC(7b78cf49) SHA1(1d484172465d3db6c4fc3733aa2b409e3a2e228f) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "3a-ac",   0x5800, 0x0800, CRC(4ea1c3d9) SHA1(d0c99c9d5b887d717c68e8745906ae4e65aec6ad) )
 	ROM_LOAD( "4a-ac",   0x6000, 0x0800, CRC(5154c39e) SHA1(e6f011630eb1aa4116a0e5824ad6b65c1be2455f) )
 	ROM_LOAD( "5a-ac",   0x6800, 0x0800, CRC(1e1e3916) SHA1(867e586583e07cd01e0e852f6ea52a040995725d) )
@@ -1340,6 +1370,11 @@ ROM_START( venture )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "11d-cpu", 0x0000, 0x0800, CRC(b4bb2503) SHA1(67303603b7c5e6301e976ef19f81c7519648b179) )
+
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 
@@ -1354,7 +1389,7 @@ ROM_START( venture2 )
 	ROM_LOAD( "vent_a7.cpu",  0xe000, 0x1000, CRC(1aab27c2) SHA1(66c7274dbb8bda3c78cc61d96a6cb1a9b29939b5) )
 	ROM_LOAD( "vent_a6.cpu",  0xf000, 0x1000, CRC(767bdd71) SHA1(334a903e05fc86186f90aa2d9ce3b0d367d7e516) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "3a-ac",        0x5800, 0x0800, CRC(4ea1c3d9) SHA1(d0c99c9d5b887d717c68e8745906ae4e65aec6ad) )
 	ROM_LOAD( "4a-ac",        0x6000, 0x0800, CRC(5154c39e) SHA1(e6f011630eb1aa4116a0e5824ad6b65c1be2455f) )
 	ROM_LOAD( "5a-ac",        0x6800, 0x0800, CRC(1e1e3916) SHA1(867e586583e07cd01e0e852f6ea52a040995725d) )
@@ -1363,6 +1398,11 @@ ROM_START( venture2 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "11d-cpu",      0x0000, 0x0800, CRC(b4bb2503) SHA1(67303603b7c5e6301e976ef19f81c7519648b179) )
+
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 
@@ -1377,7 +1417,7 @@ ROM_START( venture4 )
 	ROM_LOAD( "vel7a-4",  0xe000, 0x1000, CRC(0a091701) SHA1(ffdea1d60371779d0c28fb3c6111639cace79dad) )
 	ROM_LOAD( "vel6a-4",  0xf000, 0x1000, CRC(7b165f67) SHA1(4109797bcfd33c870234930790e3cecaaf90b706) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "vea3a-2",  0x5800, 0x0800, CRC(83b8836f) SHA1(ec0e2de62caea61ceff56e924449213997bff8cd) )
 	ROM_LOAD( "4a-ac",    0x6000, 0x0800, CRC(5154c39e) SHA1(e6f011630eb1aa4116a0e5824ad6b65c1be2455f) )
 	ROM_LOAD( "5a-ac",    0x6800, 0x0800, CRC(1e1e3916) SHA1(867e586583e07cd01e0e852f6ea52a040995725d) )
@@ -1386,6 +1426,11 @@ ROM_START( venture4 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "vel11d-2", 0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) )
+
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 
@@ -1399,7 +1444,7 @@ ROM_START( pepper2 )
 	ROM_LOAD( "main_7a",  0xe000, 0x1000, CRC(b1c6f07c) SHA1(53d07211d014336bb43671c51f4190c6515e9cde) )
 	ROM_LOAD( "main_6a",  0xf000, 0x1000, CRC(515b1046) SHA1(bdcccd4e415c00ee8e5ec185597df75ecafe7d3d) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "audio_5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) )
 	ROM_LOAD( "audio_6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
 	ROM_LOAD( "audio_7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
@@ -1419,7 +1464,7 @@ ROM_START( pepper27 )
 	ROM_LOAD( "p2l7ar7.bin",  0xe000, 0x1000, CRC(ac1282ef) SHA1(34023d8a01c1f26ec8268d7387660d6f7e875014) )
 	ROM_LOAD( "p2l6ar7.bin",  0xf000, 0x1000, CRC(db8dd4fc) SHA1(9ae00f8d1a19280670dc65a20cf9cc4e7f1cc973) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "audio_5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) )
 	ROM_LOAD( "audio_6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
 	ROM_LOAD( "audio_7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
@@ -1437,7 +1482,7 @@ ROM_START( hardhat )
 	ROM_LOAD( "hhl-2.7a",  0xe000, 0x1000, CRC(6f7ce1c2) SHA1(356dcea22e50c95a8552566a0fb5f9b4e3e5de2a) )
 	ROM_LOAD( "hhl-2.6a",  0xf000, 0x1000, CRC(2a20cf10) SHA1(31eb4556647e78e3d9be1c30d970eac8aaa5cf18) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "hha-1.5a",  0x6800, 0x0800, CRC(16a5a183) SHA1(cf3fed55db9c61fd33c222275d472fa109bed081) )
 	ROM_LOAD( "hha-1.6a",  0x7000, 0x0800, CRC(bde64021) SHA1(a403590d5a27b859eaa299e47df4ebd6ce4a5772) )
 	ROM_LOAD( "hha-1.7a",  0x7800, 0x0800, CRC(505ee5d3) SHA1(efa228465688f2bb30f00dc1511cc5f3a287356c) )
@@ -1458,7 +1503,7 @@ ROM_START( teetert )
 	ROM_LOAD( "7a-cpu",  0xe000, 0x1000, CRC(84491333) SHA1(db9f8e4c49057a4574a3784d71e627da7f7a4b44) )
 	ROM_LOAD( "6a-cpu",  0xf000, 0x1000, CRC(3600d465) SHA1(84d633e042f73bfd6bf4a4d0ffee1cd2027c65d2) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "3a-ac",   0x5800, 0x0800, CRC(83b8836f) SHA1(ec0e2de62caea61ceff56e924449213997bff8cd) )
 	ROM_LOAD( "4a-ac",   0x6000, 0x0800, CRC(5154c39e) SHA1(e6f011630eb1aa4116a0e5824ad6b65c1be2455f) )
 	ROM_LOAD( "5a-ac",   0x6800, 0x0800, CRC(1e1e3916) SHA1(867e586583e07cd01e0e852f6ea52a040995725d) )
@@ -1512,7 +1557,7 @@ ROM_START( fax )
 //  ROM_LOAD( "fxd-7a.64",   0x3c000, 0x2000, NO_DUMP )
 //  ROM_LOAD( "fxd-8a.64",   0x3e000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "fxa2-5a.16",   0x6800, 0x0800, CRC(7c525aec) SHA1(f3afd3bfc0ba4265106e6ca217d113d23ad66016) )
 	ROM_LOAD( "fxa2-6a.16",   0x7000, 0x0800, CRC(2b3bfc44) SHA1(7e3b9133916c8121b2145942155601b3ade420da) )
 	ROM_LOAD( "fxa2-7a.16",   0x7800, 0x0800, CRC(578c62b7) SHA1(1bcb987e8730c001b7339c3dfab2467bf76421c7) )
@@ -1565,7 +1610,7 @@ ROM_START( fax2 )
 	ROM_LOAD( "fxdb1-7a.bin", 0x3c000, 0x2000, CRC(0f97b874) SHA1(5790d3ed9eed2ce05947bc28cc252f720a7f3aeb) )
 	ROM_LOAD( "fxdb1-8a.bin", 0x3e000, 0x2000, CRC(1d055bea) SHA1(96531db0a3a36319bc0a28096e601302eb2eb115) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "fxa2-5a.16",    0x6800, 0x0800, CRC(7c525aec) SHA1(f3afd3bfc0ba4265106e6ca217d113d23ad66016) )
 	ROM_LOAD( "fxa2-6a.16",    0x7000, 0x0800, CRC(2b3bfc44) SHA1(7e3b9133916c8121b2145942155601b3ade420da) )
 	ROM_LOAD( "fxa2-7a.16",    0x7800, 0x0800, CRC(578c62b7) SHA1(1bcb987e8730c001b7339c3dfab2467bf76421c7) )
@@ -1589,7 +1634,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(exidy_state,sidetrac)
+void exidy_state::init_sidetrac()
 {
 	exidy_video_config(0x00, 0x00, false);
 
@@ -1600,7 +1645,7 @@ DRIVER_INIT_MEMBER(exidy_state,sidetrac)
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,targ)
+void exidy_state::init_targ()
 {
 	exidy_video_config(0x00, 0x00, false);
 
@@ -1611,7 +1656,7 @@ DRIVER_INIT_MEMBER(exidy_state,targ)
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,spectar)
+void exidy_state::init_spectar()
 {
 	exidy_video_config(0x00, 0x00, false);
 
@@ -1621,7 +1666,7 @@ DRIVER_INIT_MEMBER(exidy_state,spectar)
 	m_color_latch[0] = 0x09;
 }
 
-DRIVER_INIT_MEMBER(exidy_state,rallys)
+void exidy_state::init_rallys()
 {
 	exidy_video_config(0x00, 0x00, false);
 
@@ -1631,7 +1676,7 @@ DRIVER_INIT_MEMBER(exidy_state,rallys)
 	m_color_latch[0] = 0x09;
 }
 
-DRIVER_INIT_MEMBER(exidy_state,phantoma)
+void exidy_state::init_phantoma()
 {
 	exidy_video_config(0x00, 0x00, false);
 
@@ -1646,31 +1691,31 @@ DRIVER_INIT_MEMBER(exidy_state,phantoma)
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,mtrap)
+void exidy_state::init_mtrap()
 {
 	exidy_video_config(0x14, 0x00, false);
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,venture)
+void exidy_state::init_venture()
 {
 	exidy_video_config(0x04, 0x04, false);
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,teetert)
+void exidy_state::init_teetert()
 {
 	exidy_video_config(0x0c, 0x0c, false);
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,pepper2)
+void exidy_state::init_pepper2()
 {
 	exidy_video_config(0x14, 0x04, true);
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,fax)
+void exidy_state::init_fax()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1687,37 +1732,37 @@ DRIVER_INIT_MEMBER(exidy_state,fax)
  *
  *************************************/
 
-GAME( 1979, sidetrac, 0,       sidetrac, sidetrac, exidy_state, sidetrac, ROT0, "Exidy",   "Side Trak", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "Side Track" on title screen, but cabinet/flyers/documentation clearly indicates otherwise, "Side Trak" it is
+GAME( 1979, sidetrac,  0,       sidetrac, sidetrac,  exidy_state, init_sidetrac, ROT0, "Exidy",   "Side Trak", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "Side Track" on title screen, but cabinet/flyers/documentation clearly indicates otherwise, "Side Trak" it is
 
-GAME( 1980, targ,     0,       targ,     targ,     exidy_state, targ,     ROT0, "Exidy",   "Targ", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, targc,    targ,    targ,     targ,     exidy_state, targ,     ROT0, "Exidy",   "Targ (cocktail?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, targ,      0,       targ,     targ,      exidy_state, init_targ,     ROT0, "Exidy",   "Targ", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, targc,     targ,    targ,     targ,      exidy_state, init_targ,     ROT0, "Exidy",   "Targ (cocktail?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, spectar,  0,       spectar,  spectar,  exidy_state, spectar,  ROT0, "Exidy",   "Spectar (revision 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spectar1, spectar, spectar,  spectar,  exidy_state, spectar,  ROT0, "Exidy",   "Spectar (revision 1?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, spectarrf,spectar, spectar,  spectarrf,exidy_state, spectar,  ROT0, "bootleg (Recreativos Franco)", "Spectar (revision 2, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallys,   spectar, rallys,   rallys,   exidy_state, rallys,   ROT0, "bootleg (Novar)", "Rallys (bootleg of Spectar, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallysa,  spectar, rallys,   rallys,   exidy_state, rallys,   ROT0, "bootleg (Musik Box Brescia)", "Rallys (bootleg of Spectar, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panzer,   spectar, rallys,   rallys,   exidy_state, rallys,   ROT0, "bootleg (Proel)", "Panzer (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phantoma, spectar, rallys,   phantoma, exidy_state, phantoma, ROT0, "bootleg (Jeutel)", "Phantomas (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phantom,  spectar, rallys,   phantoma, exidy_state, phantoma, ROT0, "bootleg (Proel)", "Phantom (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spectar,   0,       spectar,  spectar,   exidy_state, init_spectar,  ROT0, "Exidy",   "Spectar (revision 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spectar1,  spectar, spectar,  spectar,   exidy_state, init_spectar,  ROT0, "Exidy",   "Spectar (revision 1?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spectarrf, spectar, spectar,  spectarrf, exidy_state, init_spectar,  ROT0, "bootleg (Recreativos Franco)", "Spectar (revision 2, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallys,    spectar, rallys,   rallys,    exidy_state, init_rallys,   ROT0, "bootleg (Novar)", "Rallys (bootleg of Spectar, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallysa,   spectar, rallys,   rallys,    exidy_state, init_rallys,   ROT0, "bootleg (Musik Box Brescia)", "Rallys (bootleg of Spectar, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panzer,    spectar, rallys,   rallys,    exidy_state, init_rallys,   ROT0, "bootleg (Proel)", "Panzer (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phantoma,  spectar, rallys,   phantoma,  exidy_state, init_phantoma, ROT0, "bootleg (Jeutel)", "Phantomas (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phantom,   spectar, rallys,   phantoma,  exidy_state, init_phantoma, ROT0, "bootleg (Proel)", "Phantom (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, mtrap,    0,       mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "Exidy",   "Mouse Trap (version 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrap2,   mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "Exidy",   "Mouse Trap (version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "Exidy",   "Mouse Trap (version 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrap4,   mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "Exidy",   "Mouse Trap (version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrapb,   mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "bootleg", "Mouse Trap (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrapb2,  mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "bootleg", "Mouse Trap (version 4, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap,     0,       mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "Exidy",   "Mouse Trap (version 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap2,    mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "Exidy",   "Mouse Trap (version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap3,    mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "Exidy",   "Mouse Trap (version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap4,    mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "Exidy",   "Mouse Trap (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrapb,    mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "bootleg", "Mouse Trap (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrapb2,   mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "bootleg", "Mouse Trap (version 4, bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, venture,  0,       venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, venture2, venture, venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, venture4, venture, venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture,   0,       venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture2,  venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture4,  venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, teetert,  0,       teetert,  teetert,  exidy_state, teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, teetert,   0,       teetert,  teetert,   exidy_state, init_teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, pepper2,  0,       pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Pepper II (version 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pepper27, pepper2, pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Pepper II (version 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pepper2,   0,       pepper2,  pepper2,   exidy_state, init_pepper2,  ROT0, "Exidy",   "Pepper II (version 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pepper27,  pepper2, pepper2,  pepper2,   exidy_state, init_pepper2,  ROT0, "Exidy",   "Pepper II (version 7)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, hardhat,  0,       pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Hard Hat", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hardhat,   0,       pepper2,  pepper2,   exidy_state, init_pepper2,  ROT0, "Exidy",   "Hard Hat", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, fax,      0,       fax,      fax,      exidy_state, fax,      ROT0, "Exidy",   "FAX", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, fax2,     fax,     fax,      fax,      exidy_state, fax,      ROT0, "Exidy",   "FAX 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, fax,       0,       fax,      fax,       exidy_state, init_fax,      ROT0, "Exidy",   "FAX", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, fax2,      fax,     fax,      fax,       exidy_state, init_fax,      ROT0, "Exidy",   "FAX 2", MACHINE_SUPPORTS_SAVE )

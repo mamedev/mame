@@ -26,24 +26,25 @@
 
 #include "emu.h"
 #include "video/gamate.h"
-#include "rendlay.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device, "gamate_vid", "Gamate Video Hardware")
 
-ADDRESS_MAP_START(gamate_video_device::regs_map)
-	AM_RANGE(0x01,0x01) AM_WRITE(lcdcon_w)
-	AM_RANGE(0x02,0x02) AM_WRITE(xscroll_w)
-	AM_RANGE(0x03,0x03) AM_WRITE(yscroll_w)
-	AM_RANGE(0x04,0x04) AM_WRITE(xpos_w)
-	AM_RANGE(0x05,0x05) AM_WRITE(ypos_w)
-	AM_RANGE(0x06,0x06) AM_READ(vram_r)
-	AM_RANGE(0x07,0x07) AM_WRITE(vram_w)
-ADDRESS_MAP_END
+void gamate_video_device::regs_map(address_map &map)
+{
+	map(0x01, 0x01).w(FUNC(gamate_video_device::lcdcon_w));
+	map(0x02, 0x02).w(FUNC(gamate_video_device::xscroll_w));
+	map(0x03, 0x03).w(FUNC(gamate_video_device::yscroll_w));
+	map(0x04, 0x04).w(FUNC(gamate_video_device::xpos_w));
+	map(0x05, 0x05).w(FUNC(gamate_video_device::ypos_w));
+	map(0x06, 0x06).r(FUNC(gamate_video_device::vram_r));
+	map(0x07, 0x07).w(FUNC(gamate_video_device::vram_w));
+}
 
-ADDRESS_MAP_START(gamate_video_device::vram_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("vram") // 2x 8KB SRAMs
-ADDRESS_MAP_END
+void gamate_video_device::vram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("vram"); // 2x 8KB SRAMs
+}
 
 gamate_video_device::gamate_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GAMATE_VIDEO, tag, owner, clock),
@@ -260,13 +261,13 @@ int gamate_video_device::get_pixel_from_vram(int x, int y)
 
 uint32_t gamate_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		//printf("updating scanline %d\n", y);
 		int real_x, real_y;
 		get_real_x_and_y(real_x, real_y, y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int pix = get_pixel_from_vram(x + real_x, real_y);
 
@@ -313,8 +314,6 @@ MACHINE_CONFIG_START(gamate_video_device::device_add_mconfig)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE) // close approximate until we use timers to emulate exact video update
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gamate_video_device,gamate)

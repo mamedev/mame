@@ -13,29 +13,29 @@
 
 
 #define MCFG_Z8_PORT_P0_READ_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_input_cb(0, DEVCB_##_devcb);
+	downcast<z8_device &>(*device).set_input_cb(0, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P1_READ_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_input_cb(1, DEVCB_##_devcb);
+	downcast<z8_device &>(*device).set_input_cb(1, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P2_READ_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_input_cb(2, DEVCB_##_devcb);
+	downcast<z8_device &>(*device).set_input_cb(2, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P3_READ_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_input_cb(3, DEVCB_##_devcb);
+	downcast<z8_device &>(*device).set_input_cb(3, DEVCB_##_devcb);
 
 
 #define MCFG_Z8_PORT_P0_WRITE_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_output_cb(0, DEVCB_##_devcb);
+	downcast<z8_device &>(*device).set_output_cb(0, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P1_WRITE_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_output_cb(1, DEVCB_##_devcb);
+	downcast<z8_device &>(*device).set_output_cb(1, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P2_WRITE_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_output_cb(2, DEVCB_##_devcb);
+	downcast<z8_device &>(*device).set_output_cb(2, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P3_WRITE_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_output_cb(3, DEVCB_##_devcb);
+	downcast<z8_device &>(*device).set_output_cb(3, DEVCB_##_devcb);
 
 
 class z8_device : public cpu_device
@@ -65,7 +65,7 @@ protected:
 	};
 
 	// construction/destruction
-	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_constructor map);
+	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, bool preprogrammed);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -75,6 +75,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 6; }
 	virtual uint32_t execute_max_cycles() const override { return 27; }
 	virtual uint32_t execute_input_lines() const override { return 4; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return true; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
 	virtual void execute_run() override;
@@ -89,17 +90,17 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	void program_2kb(address_map &map);
-	void program_4kb(address_map &map);
+	void program_map(address_map &map);
+	void preprogrammed_map(address_map &map);
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
 
 	// callbacks
@@ -162,8 +163,8 @@ private:
 	inline void load_to_memory_autoinc(address_space &space);
 	inline void pop(uint8_t dst);
 	inline void push(uint8_t src);
-	inline void add_carry(uint8_t dst, int8_t src);
-	inline void add(uint8_t dst, int8_t src);
+	inline void add_carry(uint8_t dst, uint8_t src);
+	inline void add(uint8_t dst, uint8_t src);
 	inline void compare(uint8_t dst, uint8_t src);
 	inline void decimal_adjust(uint8_t dst);
 	inline void decrement(uint8_t dst);
@@ -178,7 +179,7 @@ private:
 	inline void _xor(uint8_t dst, uint8_t src);
 	inline void call(uint16_t dst);
 	inline void jump(uint16_t dst);
-	inline int check_condition_code(int cc);
+	inline bool check_condition_code(int cc);
 	inline void test_complement_under_mask(uint8_t dst, uint8_t src);
 	inline void test_under_mask(uint8_t dst, uint8_t src);
 	inline void rotate_left(uint8_t dst);
@@ -352,6 +353,16 @@ public:
 };
 
 
+class z8671_device : public z8_device
+{
+public:
+	z8671_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	const tiny_rom_entry *device_rom_region() const override;
+};
+
+
 class z8681_device : public z8_device
 {
 public:
@@ -367,6 +378,9 @@ DECLARE_DEVICE_TYPE(UB8830D, ub8830d_device)
 
 // Zilog Z8611
 DECLARE_DEVICE_TYPE(Z8611, z8611_device)
+
+// Zilog Z8671 BASIC/DEBUG interpreter
+DECLARE_DEVICE_TYPE(Z8671, z8671_device)
 
 // Zilog Z8681 ROMless
 DECLARE_DEVICE_TYPE(Z8681, z8681_device)

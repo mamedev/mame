@@ -379,40 +379,43 @@ WRITE8_MEMBER(taitoair_state::coin_control_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(taitoair_state::airsys_map)
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("m68000_mainram")
-	AM_RANGE(0x140000, 0x140001) AM_WRITE(system_control_w) /* Pause the TMS32025 */
-	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(airsys_gradram_w) AM_SHARE("gradram") /* "gradiation ram (0/1)" */
-	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE(airsys_paletteram16_w) AM_SHARE("paletteram")
-	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)    /* tilemaps, sprites */
-	AM_RANGE(0x906000, 0x906007) AM_WRITE(dma_regs_w) // DMA?
-	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_SHARE("line_ram")    /* "line ram" */
-	AM_RANGE(0x910000, 0x91ffff) AM_RAM AM_SHARE("dsp_ram") /* "dsp common ram" (TMS320C25) */
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("tc0430grw") /* TC0430GRW roz transform coefficients */
-	AM_RANGE(0xa00000, 0xa00007) AM_READ(stick_input_r)
-	AM_RANGE(0xa00100, 0xa00107) AM_READ(stick2_input_r)
-	AM_RANGE(0xa00200, 0xa0020f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff) /* other I/O */
-	AM_RANGE(0xa80000, 0xa80001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0xa80002, 0xa80003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM                     /* "power common ram" (mecha drive) */
-ADDRESS_MAP_END
+void taitoair_state::airsys_map(address_map &map)
+{
+	map(0x000000, 0x0bffff).rom();
+	map(0x0c0000, 0x0cffff).ram().share("m68000_mainram");
+	map(0x140000, 0x140001).w(FUNC(taitoair_state::system_control_w)); /* Pause the TMS32025 */
+	map(0x180000, 0x187fff).ram().w(FUNC(taitoair_state::airsys_gradram_w)).share("gradram"); /* "gradiation ram (0/1)" */
+	map(0x188000, 0x189fff).mirror(0x2000).ram().w(FUNC(taitoair_state::airsys_paletteram16_w)).share("paletteram");
+	map(0x800000, 0x820fff).rw(m_tc0080vco, FUNC(tc0080vco_device::word_r), FUNC(tc0080vco_device::word_w));    /* tilemaps, sprites */
+	map(0x906000, 0x906007).w(FUNC(taitoair_state::dma_regs_w)); // DMA?
+	map(0x908000, 0x90ffff).ram().share("line_ram");    /* "line ram" */
+	map(0x910000, 0x91ffff).ram().share("dsp_ram"); /* "dsp common ram" (TMS320C25) */
+	map(0x980000, 0x98000f).ram().share("tc0430grw"); /* TC0430GRW roz transform coefficients */
+	map(0xa00000, 0xa00007).r(FUNC(taitoair_state::stick_input_r));
+	map(0xa00100, 0xa00107).r(FUNC(taitoair_state::stick2_input_r));
+	map(0xa00200, 0xa0020f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff); /* other I/O */
+	map(0xa80000, 0xa80001).nopr();
+	map(0xa80001, 0xa80001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0xa80003, 0xa80003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0xb00000, 0xb007ff).ram();                     /* "power common ram" (mecha drive) */
+}
 
 /************************** Z80 ****************************/
 
-ADDRESS_MAP_START(taitoair_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITENOP        /* pan control */
-	AM_RANGE(0xea00, 0xea00) AM_READNOP
-	AM_RANGE(0xee00, 0xee00) AM_WRITENOP        /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP        /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
-ADDRESS_MAP_END
+void taitoair_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("z80bank");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
+	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
+	map(0xe400, 0xe403).nopw();        /* pan control */
+	map(0xea00, 0xea00).nopr();
+	map(0xee00, 0xee00).nopw();        /* ? */
+	map(0xf000, 0xf000).nopw();        /* ? */
+	map(0xf200, 0xf200).w(FUNC(taitoair_state::sound_bankswitch_w));
+}
 
 /********************************** TMS32025 ********************************/
 
@@ -512,33 +515,35 @@ READ16_MEMBER(taitoair_state::dsp_muldiv_2_r)
 }
 
 
-ADDRESS_MAP_START(taitoair_state::DSP_map_program)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void taitoair_state::DSP_map_program(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
 
-ADDRESS_MAP_START(taitoair_state::DSP_map_data)
-	AM_RANGE(0x2003, 0x2003) AM_READNOP //bit 0 DMA status flag or vblank
-	AM_RANGE(0x3000, 0x3002) AM_WRITE(dsp_flags_w)
-	AM_RANGE(0x3404, 0x3404) AM_WRITE(dsp_muldiv_a_1_w)
-	AM_RANGE(0x3405, 0x3405) AM_WRITE(dsp_muldiv_b_1_w)
-	AM_RANGE(0x3406, 0x3406) AM_WRITE(dsp_muldiv_c_1_w)
-	AM_RANGE(0x3407, 0x3407) AM_READ(dsp_muldiv_1_r)
+void taitoair_state::DSP_map_data(address_map &map)
+{
+	map(0x2003, 0x2003).nopr(); //bit 0 DMA status flag or vblank
+	map(0x3000, 0x3002).w(FUNC(taitoair_state::dsp_flags_w));
+	map(0x3404, 0x3404).w(FUNC(taitoair_state::dsp_muldiv_a_1_w));
+	map(0x3405, 0x3405).w(FUNC(taitoair_state::dsp_muldiv_b_1_w));
+	map(0x3406, 0x3406).w(FUNC(taitoair_state::dsp_muldiv_c_1_w));
+	map(0x3407, 0x3407).r(FUNC(taitoair_state::dsp_muldiv_1_r));
 
-	AM_RANGE(0x3408, 0x3408) AM_WRITE(dsp_muldiv_a_2_w)
-	AM_RANGE(0x3409, 0x3409) AM_WRITE(dsp_muldiv_b_2_w)
-	AM_RANGE(0x340a, 0x340a) AM_WRITE(dsp_muldiv_c_2_w)
-	AM_RANGE(0x340b, 0x340b) AM_READ(dsp_muldiv_2_r)
+	map(0x3408, 0x3408).w(FUNC(taitoair_state::dsp_muldiv_a_2_w));
+	map(0x3409, 0x3409).w(FUNC(taitoair_state::dsp_muldiv_b_2_w));
+	map(0x340a, 0x340a).w(FUNC(taitoair_state::dsp_muldiv_c_2_w));
+	map(0x340b, 0x340b).r(FUNC(taitoair_state::dsp_muldiv_2_r));
 
-	AM_RANGE(0x3418, 0x3418) AM_WRITE(dsp_test_x_w)
-	AM_RANGE(0x3419, 0x3419) AM_WRITE(dsp_test_y_w)
-	AM_RANGE(0x341a, 0x341a) AM_WRITE(dsp_test_z_w)
-	AM_RANGE(0x341b, 0x341b) AM_READWRITE(dsp_test_point_r, dsp_test_start_w)
-	AM_RANGE(0x341c, 0x341c) AM_READ(dsp_test_and_clip_r)
-	AM_RANGE(0x341d, 0x341d) AM_READ(dsp_test_or_clip_r)
+	map(0x3418, 0x3418).w(FUNC(taitoair_state::dsp_test_x_w));
+	map(0x3419, 0x3419).w(FUNC(taitoair_state::dsp_test_y_w));
+	map(0x341a, 0x341a).w(FUNC(taitoair_state::dsp_test_z_w));
+	map(0x341b, 0x341b).rw(FUNC(taitoair_state::dsp_test_point_r), FUNC(taitoair_state::dsp_test_start_w));
+	map(0x341c, 0x341c).r(FUNC(taitoair_state::dsp_test_and_clip_r));
+	map(0x341d, 0x341d).r(FUNC(taitoair_state::dsp_test_or_clip_r));
 
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(lineram_r, lineram_w)
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram_r, dspram_w)
-ADDRESS_MAP_END
+	map(0x4000, 0x7fff).rw(FUNC(taitoair_state::lineram_r), FUNC(taitoair_state::lineram_w));
+	map(0x8000, 0xffff).rw(FUNC(taitoair_state::dspram_r), FUNC(taitoair_state::dspram_w));
+}
 
 
 /************************************************************
@@ -576,12 +581,12 @@ static INPUT_PORTS_START( topland )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Door Switch")   /* "door" (!) */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_down_r )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_up_r )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_left_r )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_right_r )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_down_r )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_up_r )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_down_r )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_up_r )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_left_r )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_right_r )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_down_r )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_up_r )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // DMA status flag
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -661,7 +666,7 @@ static const gfx_layout tilelayout =
 	16*16
 };
 
-static GFXDECODE_START( airsys )
+static GFXDECODE_START( gfx_airsys )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 32*16 )
 GFXDECODE_END
 
@@ -700,30 +705,30 @@ void taitoair_state::machine_reset()
 MACHINE_CONFIG_START(taitoair_state::airsys)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) // MC68000P12
-	MCFG_CPU_PROGRAM_MAP(airsys_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoair_state,  irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) // MC68000P12
+	MCFG_DEVICE_PROGRAM_MAP(airsys_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoair_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)   // Z8400AB1
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)   // Z8400AB1
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("dsp", TMS32025, XTAL(36'000'000)) // Unverified
-	MCFG_CPU_PROGRAM_MAP(DSP_map_program)
-	MCFG_CPU_DATA_MAP(DSP_map_data)
-	MCFG_TMS32025_HOLD_IN_CB(READ16(taitoair_state, dsp_HOLD_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(taitoair_state, dsp_HOLDA_signal_w))
+	tms32025_device& dsp(TMS32025(config, m_dsp, XTAL(36'000'000))); // Unverified
+	dsp.set_addrmap(AS_PROGRAM, &taitoair_state::DSP_map_program);
+	dsp.set_addrmap(AS_DATA, &taitoair_state::DSP_map_data);
+	dsp.hold_in_cb().set(FUNC(taitoair_state::dsp_HOLD_signal_r));
+	dsp.hold_ack_out_cb().set(FUNC(taitoair_state::dsp_HOLDA_signal_w));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoair_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitoair_state::coin_control_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
-	MCFG_TAITOIO_YOKE_ADD("yokectrl")
+	TAITOIO_YOKE(config, m_yoke, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -736,7 +741,7 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoair_state, screen_update_taitoair)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", airsys)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_airsys)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)
 
@@ -748,9 +753,9 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000) / 2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
@@ -995,8 +1000,8 @@ ROM_START( ainfernoj )
 ROM_END
 
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT  MONITOR  COMPANY                      FULLNAME               FLAGS
-GAME( 1988, topland,   0,        airsys,   topland,  taitoair_state, 0,    ROT0,    "Taito Corporation Japan",   "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, toplandj,  topland,  airsys,   topland,  taitoair_state, 0,    ROT0,    "Taito Corporation",         "Top Landing (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, ainferno,  0,        airsys,   ainferno, taitoair_state, 0,    ROT0,    "Taito America Corporation", "Air Inferno (US)",    MACHINE_NOT_WORKING )
-GAME( 1990, ainfernoj, ainferno, airsys,   ainferno, taitoair_state, 0,    ROT0,    "Taito Corporation Japan",   "Air Inferno (Japan)", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY                      FULLNAME               FLAGS
+GAME( 1988, topland,   0,        airsys,   topland,  taitoair_state, empty_init, ROT0,    "Taito Corporation Japan",   "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, toplandj,  topland,  airsys,   topland,  taitoair_state, empty_init, ROT0,    "Taito Corporation",         "Top Landing (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, ainferno,  0,        airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito America Corporation", "Air Inferno (US)",    MACHINE_NOT_WORKING )
+GAME( 1990, ainfernoj, ainferno, airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito Corporation Japan",   "Air Inferno (Japan)", MACHINE_NOT_WORKING )

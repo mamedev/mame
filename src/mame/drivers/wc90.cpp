@@ -9,7 +9,7 @@ Ernesto Corvi
 
 TODO:
 - Dip switches mapping is not complete. ( Anyone has the manual handy? )
-- Hook up trackball controls in wc90t.
+- Hook up trackball controls in twcup90t.
 
 CPU #1 : Handles background & foreground tiles, controllers, dipswitches.
 CPU #2 : Handles sprites and palette
@@ -46,8 +46,8 @@ CPU #3
 
 
 To enter into input test mode:
--keep pressed one of the start buttons during P.O.S.T.(in wc90 & wc90a).
--keep pressed both start buttons during P.O.S.T. until the cross hatch test fade out(in wc90t).
+-keep pressed one of the start buttons during P.O.S.T.(all sets but twcup90t).
+-keep pressed both start buttons during P.O.S.T. until the cross hatch test fade out(in twcup90t).
 Press one of the start buttons to exit.
 
 
@@ -65,67 +65,68 @@ Press one of the start buttons to exit.
 
 WRITE8_MEMBER(wc90_state::bankswitch_w)
 {
-	membank("mainbank")->set_entry(data >> 3);
+	m_mainbank->set_entry(data >> 3);
 }
 
 WRITE8_MEMBER(wc90_state::bankswitch1_w)
 {
-	membank("subbank")->set_entry(data >> 3);
+	m_subbank->set_entry(data >> 3);
 }
 
+void wc90_state::wc90_map_1(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();     /* Main RAM */
+	map(0xa000, 0xafff).ram().w(FUNC(wc90_state::fgvideoram_w)).share(m_fgvideoram); /* fg video ram */
+	map(0xb000, 0xbfff).ram();
+	map(0xc000, 0xcfff).ram().w(FUNC(wc90_state::bgvideoram_w)).share(m_bgvideoram);
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().w(FUNC(wc90_state::txvideoram_w)).share(m_txvideoram); /* tx video ram */
+	map(0xf000, 0xf7ff).bankr(m_mainbank);
+	map(0xf800, 0xfbff).ram().share("share1");
+	map(0xfc00, 0xfc00).portr("P1");
+	map(0xfc02, 0xfc02).portr("P2");
+	map(0xfc05, 0xfc05).portr("SYSTEM");
+	map(0xfc06, 0xfc06).portr("DSW1");
+	map(0xfc07, 0xfc07).portr("DSW2");
+	map(0xfc02, 0xfc02).writeonly().share(m_scroll0ylo);
+	map(0xfc03, 0xfc03).writeonly().share(m_scroll0yhi);
+	map(0xfc06, 0xfc06).writeonly().share(m_scroll0xlo);
+	map(0xfc07, 0xfc07).writeonly().share(m_scroll0xhi);
+	map(0xfc22, 0xfc22).writeonly().share(m_scroll1ylo);
+	map(0xfc23, 0xfc23).writeonly().share(m_scroll1yhi);
+	map(0xfc26, 0xfc26).writeonly().share(m_scroll1xlo);
+	map(0xfc27, 0xfc27).writeonly().share(m_scroll1xhi);
+	map(0xfc42, 0xfc42).writeonly().share(m_scroll2ylo);
+	map(0xfc43, 0xfc43).writeonly().share(m_scroll2yhi);
+	map(0xfc46, 0xfc46).writeonly().share(m_scroll2xlo);
+	map(0xfc47, 0xfc47).writeonly().share(m_scroll2xhi);
+	map(0xfcc0, 0xfcc0).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xfcd0, 0xfcd0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xfce0, 0xfce0).w(FUNC(wc90_state::bankswitch_w));
+}
 
+void wc90_state::wc90_map_2(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().share(m_spriteram);
+	map(0xd800, 0xdfff).ram();
+	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf7ff).bankr(m_subbank);
+	map(0xf800, 0xfbff).ram().share("share1");
+	map(0xfc00, 0xfc00).w(FUNC(wc90_state::bankswitch1_w));
+	map(0xfc01, 0xfc01).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
-ADDRESS_MAP_START(wc90_state::wc90_map_1)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM     /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram") /* fg video ram */
-	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram") /* tx video ram */
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("mainbank")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1")
-	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("P2")
-	AM_RANGE(0xfc05, 0xfc05) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfc06, 0xfc06) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc07, 0xfc07) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITEONLY AM_SHARE("scroll0ylo")
-	AM_RANGE(0xfc03, 0xfc03) AM_WRITEONLY AM_SHARE("scroll0yhi")
-	AM_RANGE(0xfc06, 0xfc06) AM_WRITEONLY AM_SHARE("scroll0xlo")
-	AM_RANGE(0xfc07, 0xfc07) AM_WRITEONLY AM_SHARE("scroll0xhi")
-	AM_RANGE(0xfc22, 0xfc22) AM_WRITEONLY AM_SHARE("scroll1ylo")
-	AM_RANGE(0xfc23, 0xfc23) AM_WRITEONLY AM_SHARE("scroll1yhi")
-	AM_RANGE(0xfc26, 0xfc26) AM_WRITEONLY AM_SHARE("scroll1xlo")
-	AM_RANGE(0xfc27, 0xfc27) AM_WRITEONLY AM_SHARE("scroll1xhi")
-	AM_RANGE(0xfc42, 0xfc42) AM_WRITEONLY AM_SHARE("scroll2ylo")
-	AM_RANGE(0xfc43, 0xfc43) AM_WRITEONLY AM_SHARE("scroll2yhi")
-	AM_RANGE(0xfc46, 0xfc46) AM_WRITEONLY AM_SHARE("scroll2xlo")
-	AM_RANGE(0xfc47, 0xfc47) AM_WRITEONLY AM_SHARE("scroll2xhi")
-	AM_RANGE(0xfcc0, 0xfcc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xfcd0, 0xfcd0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(bankswitch_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(wc90_state::wc90_map_2)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(wc90_state::sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_NOP // IRQ acknowledge? (data read and immediately written back)
-	AM_RANGE(0xfc10, 0xfc10) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void wc90_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf803).rw("ymsnd", FUNC(ym2608_device::read), FUNC(ym2608_device::write));
+	map(0xfc00, 0xfc00).noprw(); // IRQ acknowledge? (data read and immediately written back)
+	map(0xfc10, 0xfc10).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( wc90 )
@@ -328,7 +329,7 @@ static const gfx_layout spritelayout8 =
 };
 
 
-static GFXDECODE_START( wc90 )
+static GFXDECODE_START( gfx_wc90 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,       1*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,       2*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,       3*16*16, 16*16 )
@@ -338,27 +339,27 @@ GFXDECODE_END
 
 void wc90_state::machine_start()
 {
-	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
-	membank("subbank")->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
+	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
+	m_subbank->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
 }
 
 
 MACHINE_CONFIG_START(wc90_state::wc90)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(wc90_map_1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(8'000'000))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(wc90_map_1)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(8'000'000))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(wc90_map_2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(8'000'000))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(wc90_map_2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(8'000'000)/2)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	/* NMIs are triggered by the main CPU */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -367,22 +368,22 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wc90_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90)
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_wc90)
+	MCFG_PALETTE_ADD(m_palette, 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
+	MCFG_DEVICE_ADD(m_sprgen, TECMO_SPRITE, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -434,7 +435,6 @@ ROM_START( twcup90 )
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
 ROM_END
 
-
 ROM_START( twcup90a )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "wc90-1.bin",   0x00000, 0x08000, CRC(d1804e1a) SHA1(eec7374f4d23c89843f38fffff436635adb43b63) )  /* c000-ffff is not used */
@@ -471,6 +471,39 @@ ROM_END
 ROM_START( twcup90b )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ic87-1b.bin",  0x00000, 0x08000, CRC(d024a971) SHA1(856c6ab7abc1cd6db42703f70930b84e3da69db0) )  /* c000-ffff is not used */
+	ROM_LOAD( "ic95_02.bin",  0x10000, 0x10000, CRC(847d439c) SHA1(eade31050da9e84feb4406e327d050a7496871b7) )  /* banked at f000-f7ff */
+
+	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
+	ROM_LOAD( "ic67_04.bin",  0x00000, 0x10000, CRC(dc6eaf00) SHA1(d53924070a59eee35dc0e6465702e4f04e61a073) )  /* c000-ffff is not used */
+	ROM_LOAD( "ic56_03.bin",  0x10000, 0x10000, CRC(1ac02b3b) SHA1(4f8dc049d404072150342f3c2df04789a73ce244) )  /* banked at f000-f7ff */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ic54_05.bin",  0x00000, 0x10000, CRC(27c348b3) SHA1(cf19ff4ae4f323ae3e5a905249b7af8ae342202a) )
+
+	ROM_REGION( 0x010000, "gfx1", 0 )
+	ROM_LOAD( "ic85_07v.bin", 0x00000, 0x10000, CRC(c5219426) SHA1(95e21fcd7de7d418ec287ae7087f6244c6bce5a8) )  /* characters */
+
+	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_LOAD( "ic86_08v.bin", 0x00000, 0x20000, CRC(8fa1a1ff) SHA1(ce624617ac8c8b54e41294cf5dca7a09c91f53ba) )  /* tiles #1 */
+	ROM_LOAD( "ic90_09v.bin", 0x20000, 0x20000, CRC(99f8841c) SHA1(1969b4d78ca00924a7550826e1c4f4fa0588ef02) )  /* tiles #2 */
+
+	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_LOAD( "ic87_10v.bin", 0x00000, 0x20000, CRC(8232093d) SHA1(59bf9c9a858b47326cf0c64b1ee6ac727a15a20b) )  /* tiles #3 */
+	ROM_LOAD( "ic91_11v.bin", 0x20000, 0x20000, CRC(188d3789) SHA1(35654a99a20735bae09b32f74255f8132dee9af2) )  /* tiles #4 */
+
+	ROM_REGION( 0x080000, "gfx4", 0 )
+	ROM_LOAD( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )  /* sprites  */
+	ROM_LOAD( "ic54_13v.bin", 0x20000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )  /* sprites  */
+	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )  /* sprites  */
+	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )  /* sprites  */
+
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* 64k for ADPCM samples */
+	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
+ROM_END
+
+ROM_START( twcup90c ) // 2 PCB set: 6303 A and 6303 B. ic87_01 is very similar to the one in the twcup90a set.
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ic87_01.bin",  0x00000, 0x08000, CRC(f588bb33) SHA1(46e90f145befd50be5ce0ffc05b00a034318a330) )  /* sldh, c000-ffff is not used */
 	ROM_LOAD( "ic95_02.bin",  0x10000, 0x10000, CRC(847d439c) SHA1(eade31050da9e84feb4406e327d050a7496871b7) )  /* banked at f000-f7ff */
 
 	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
@@ -565,9 +598,10 @@ ROM_START( pac90 )
 ROM_END
 
 
-GAME( 1989, twcup90,  0,       wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (World)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90a, twcup90, wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90b, twcup90, wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90t, twcup90, wc90t, wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90,  0,       wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (World set 1)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90a, twcup90, wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b, twcup90, wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90c, twcup90, wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 3)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90t, twcup90, wc90t, wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, pac90, puckman, pac90, pac90, wc90_state, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.
+GAME( 199?, pac90, puckman, pac90, pac90, wc90_state, empty_init, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.

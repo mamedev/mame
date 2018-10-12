@@ -13,6 +13,7 @@
 #include "video/tlc34076.h"
 #include "sound/bsmt2000.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 class btoads_state : public driver_device
@@ -117,6 +118,6 @@ protected:
 	uint16_t m_sprite_dest_offs;
 	uint16_t m_misc_control;
 	int m_xcount;
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34020_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };

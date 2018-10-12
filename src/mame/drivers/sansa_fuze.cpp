@@ -21,19 +21,22 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	void sansa_fuze(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void sansa_fuze_map(address_map &map);
 };
 
 
 
-ADDRESS_MAP_START(sansa_fuze_state::sansa_fuze_map)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
+void sansa_fuze_state::sansa_fuze_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom();
 
-	AM_RANGE(0x80000000, 0x8001ffff) AM_ROM  AM_REGION("maincpu", 0x00000)
-	AM_RANGE(0x81000000, 0x81ffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x80000000, 0x8001ffff).rom().region("maincpu", 0x00000);
+	map(0x81000000, 0x81ffffff).ram();
+}
 
 
 static INPUT_PORTS_START( sansa_fuze )
@@ -43,8 +46,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(sansa_fuze_state::sansa_fuze)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 50000000) // arm based, speed unknown
-	MCFG_CPU_PROGRAM_MAP(sansa_fuze_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 50000000) // arm based, speed unknown
+	MCFG_DEVICE_PROGRAM_MAP(sansa_fuze_map)
 
 MACHINE_CONFIG_END
 
@@ -70,5 +73,5 @@ ROM_START( sanfuze2 )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY    FULLNAME        FLAGS
-CONS( 200?, sanfuze2, 0,      0,      sansa_fuze, sansa_fuze, sansa_fuze_state, 0,    "Sandisk", "Sansa Fuze 2", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY    FULLNAME        FLAGS
+CONS( 200?, sanfuze2, 0,      0,      sansa_fuze, sansa_fuze, sansa_fuze_state, empty_init, "Sandisk", "Sansa Fuze 2", MACHINE_IS_SKELETON )

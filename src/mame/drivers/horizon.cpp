@@ -59,13 +59,15 @@ public:
 		, m_usart_r(*this, I8251_R_TAG)
 		{ }
 
-	DECLARE_READ8_MEMBER(ff_r);
-
 	void horizon(machine_config &config);
 	void horizon2mhz(machine_config &config);
+
+private:
+	DECLARE_READ8_MEMBER(ff_r);
+
 	void horizon_io(address_map &map);
 	void horizon_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart_l;
@@ -82,26 +84,28 @@ private:
 //  ADDRESS_MAP( horizon_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(horizon_state::horizon_mem)
-	AM_RANGE(0x0000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe9ff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0xea01, 0xea01)
-	AM_RANGE(0xea11, 0xea11)
-	AM_RANGE(0xea21, 0xea21)
-	AM_RANGE(0xea31, 0xea31)
-	AM_RANGE(0xeb10, 0xeb17) AM_READ(ff_r)
-	AM_RANGE(0xeb20, 0xeb20)
-	AM_RANGE(0xeb35, 0xeb35)
-	AM_RANGE(0xeb40, 0xeb40)
-ADDRESS_MAP_END
+void horizon_state::horizon_mem(address_map &map)
+{
+	map(0x0000, 0xe7ff).ram();
+	map(0xe800, 0xe9ff).rom().region("roms", 0);
+	map(0xea01, 0xea01);
+	map(0xea11, 0xea11);
+	map(0xea21, 0xea21);
+	map(0xea31, 0xea31);
+	map(0xeb10, 0xeb17).r(FUNC(horizon_state::ff_r));
+	map(0xeb20, 0xeb20);
+	map(0xeb35, 0xeb35);
+	map(0xeb40, 0xeb40);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( horizon_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(horizon_state::horizon_io)
-ADDRESS_MAP_END
+void horizon_state::horizon_io(address_map &map)
+{
+}
 
 
 
@@ -153,16 +157,17 @@ DEVICE_INPUT_DEFAULTS_END
 #include "bus/s100/seals8k.h"
 //#include "bus/s100/wunderbus.h"
 
-static SLOT_INTERFACE_START( horizon_s100_cards )
-	SLOT_INTERFACE("mdsa", S100_MDS_A)
-	SLOT_INTERFACE("mdsad", S100_MDS_AD)
-	//SLOT_INTERFACE("hram", S100_HRAM)
-	//SLOT_INTERFACE("ram32a", S100_RAM32A)
-	//SLOT_INTERFACE("ram16a", S100_RAM16A)
-	//SLOT_INTERFACE("fpb", S100_FPB)
-	SLOT_INTERFACE("8ksc", S100_8K_SC)
-	SLOT_INTERFACE("8kscbb", S100_8K_SC_BB)
-SLOT_INTERFACE_END
+static void horizon_s100_cards(device_slot_interface &device)
+{
+	device.option_add("mdsa", S100_MDS_A);
+	device.option_add("mdsad", S100_MDS_AD);
+	//device.option_add("hram", S100_HRAM);
+	//device.option_add("ram32a", S100_RAM32A);
+	//device.option_add("ram16a", S100_RAM16A);
+	//device.option_add("fpb", S100_FPB);
+	device.option_add("8ksc", S100_8K_SC);
+	device.option_add("8kscbb", S100_8K_SC_BB);
+}
 
 
 
@@ -176,29 +181,29 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(horizon_state::horizon)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(horizon_mem)
-	MCFG_CPU_IO_MAP(horizon_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(horizon_mem)
+	MCFG_DEVICE_IO_MAP(horizon_io)
 
 	// devices
-	MCFG_DEVICE_ADD(I8251_L_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	I8251(config, m_usart_l, 0);
+	m_usart_l->txd_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_usart_l->dtr_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_usart_l->rts_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_L_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_L_TAG, i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_L_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_L_TAG, i8251_device, write_dsr))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD(I8251_R_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	I8251(config, m_usart_r, 0);
+	m_usart_r->txd_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_usart_r->dtr_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_usart_r->rts_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_R_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_R_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_R_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_R_TAG, i8251_device, write_dsr))
 
 	// S-100
 	MCFG_DEVICE_ADD("s100", S100_BUS, XTAL(8'000'000) / 4)
@@ -222,8 +227,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(horizon_state::horizon2mhz)
 	horizon(config);
-	MCFG_CPU_MODIFY("z80")
-	MCFG_CPU_CLOCK(XTAL(4'000'000) / 2)
+	MCFG_DEVICE_MODIFY("z80")
+	MCFG_DEVICE_CLOCK(XTAL(4'000'000) / 2)
 
 	MCFG_DEVICE_MODIFY("s100")
 	MCFG_DEVICE_CLOCK(XTAL(4'000'000) / 2)
@@ -262,9 +267,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY                 FULLNAME                          FLAGS
-COMP( 1976, nshrz,     0,     0, horizon,     horizon, horizon_state, 0, "North Star Computers", "Horizon (North Star Computers, 4MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1976, nshrz2mhz, nshrz, 0, horizon2mhz, horizon, horizon_state, 0, "North Star Computers", "Horizon (North Star Computers, 2MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT    CLASS          INIT        COMPANY                 FULLNAME                                FLAGS
+COMP( 1976, nshrz,     0,      0,      horizon,     horizon, horizon_state, empty_init, "North Star Computers", "Horizon (North Star Computers, 4MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, nshrz2mhz, nshrz,  0,      horizon2mhz, horizon, horizon_state, empty_init, "North Star Computers", "Horizon (North Star Computers, 2MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 
 // This really should be in its own driver
-COMP( 1979, vector1,  0,      0, horizon,     horizon, horizon_state, 0, "Vector Graphic",       "Vector 1+ (DD drive)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1979, vector1,   0,      0,      horizon,     horizon, horizon_state, empty_init, "Vector Graphic",       "Vector 1+ (DD drive)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

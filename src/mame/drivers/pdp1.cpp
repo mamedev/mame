@@ -71,9 +71,10 @@ To load and play a game:
  */
 
 
-ADDRESS_MAP_START(pdp1_state::pdp1_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
+void pdp1_state::pdp1_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+}
 
 static INPUT_PORTS_START( pdp1 )
 	PORT_START("SPACEWAR")      /* 0: spacewar controllers */
@@ -299,7 +300,7 @@ static const uint8_t pdp1_palette[] =
 
 static const uint8_t total_colors_needed = pen_crt_num_levels + sizeof(pdp1_colors) / 3;
 
-static GFXDECODE_START( pdp1 )
+static GFXDECODE_START( gfx_pdp1 )
 	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, pen_crt_num_levels + sizeof(pdp1_colors) / 3, 3 )
 GFXDECODE_END
 
@@ -1921,10 +1922,10 @@ MACHINE_CONFIG_START(pdp1_state::pdp1)
 
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
-	MCFG_CPU_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
+	MCFG_DEVICE_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
 	MCFG_PDP1_RESET_PARAM(pdp1_reset_param)
-	MCFG_CPU_PROGRAM_MAP(pdp1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)   /* dummy interrupt: handles input */
+	MCFG_DEVICE_PROGRAM_MAP(pdp1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)   /* dummy interrupt: handles input */
 
 	/* video hardware (includes the control panel and typewriter output) */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1933,7 +1934,7 @@ MACHINE_CONFIG_START(pdp1_state::pdp1)
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pdp1_state, screen_update_pdp1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pdp1_state, screen_vblank_pdp1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pdp1_state, screen_vblank_pdp1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crt", CRT, 0)
@@ -1946,7 +1947,7 @@ MACHINE_CONFIG_START(pdp1_state::pdp1)
 	MCFG_DEVICE_ADD("typewriter", PDP1_PRINTER, 0)
 	MCFG_DEVICE_ADD("drum", PDP1_CYLINDER, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pdp1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pdp1)
 	MCFG_PALETTE_ADD("palette", total_colors_needed + sizeof(pdp1_palette))
 	MCFG_PALETTE_INDIRECT_ENTRIES(total_colors_needed)
 	MCFG_PALETTE_INIT_OWNER(pdp1_state, pdp1)
@@ -1966,5 +1967,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS        INIT  COMPANY                           FULLNAME  FLAGS
-COMP( 1961, pdp1,     0,        0,      pdp1,     pdp1, pdp1_state,  0,    "Digital Equipment Corporation",  "PDP-1",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT CLASS       INIT        COMPANY                           FULLNAME  FLAGS
+COMP( 1961, pdp1, 0,      0,      pdp1,    pdp1, pdp1_state, empty_init, "Digital Equipment Corporation",  "PDP-1",  MACHINE_NO_SOUND_HW )

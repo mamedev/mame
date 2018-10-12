@@ -15,7 +15,7 @@ The LCD is likely to be a SSD1828 LCD.
 #include "sound/spkrdev.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -64,6 +64,9 @@ public:
 		, m_inputs(*this, "INPUTS")
 	{ }
 
+	void pokemini(machine_config &config);
+
+private:
 	uint8_t m_pm_reg[0x100];
 	PRC m_prc;
 	TIMERS m_timers;
@@ -78,9 +81,8 @@ public:
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
-	void pokemini(machine_config &config);
 	void pokemini_mem_map(address_map &map);
-protected:
+
 	enum
 	{
 		TIMER_SECONDS,
@@ -125,12 +127,13 @@ READ8_MEMBER( pokemini_state::rom_r )
 	return m_cart->read_rom(space, offset & 0x1fffff);
 }
 
-ADDRESS_MAP_START(pokemini_state::pokemini_mem_map)
-	AM_RANGE( 0x000000, 0x000fff )  AM_ROM                            /* bios */
-	AM_RANGE( 0x001000, 0x001fff )  AM_RAM AM_SHARE("p_ram")          /* VRAM/RAM */
-	AM_RANGE( 0x002000, 0x0020ff )  AM_READWRITE(hwreg_r, hwreg_w)    /* hardware registers */
-	AM_RANGE( 0x002100, 0x1fffff )  AM_READ(rom_r)                    /* cartridge area */
-ADDRESS_MAP_END
+void pokemini_state::pokemini_mem_map(address_map &map)
+{
+	map(0x000000, 0x000fff).rom();                            /* bios */
+	map(0x001000, 0x001fff).ram().share("p_ram");          /* VRAM/RAM */
+	map(0x002000, 0x0020ff).rw(FUNC(pokemini_state::hwreg_r), FUNC(pokemini_state::hwreg_w));    /* hardware registers */
+	map(0x002100, 0x1fffff).r(FUNC(pokemini_state::rom_r));                    /* cartridge area */
+}
 
 
 static INPUT_PORTS_START( pokemini )
@@ -1759,13 +1762,12 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 MACHINE_CONFIG_START(pokemini_state::pokemini)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MINX, 4000000)
-	MCFG_CPU_PROGRAM_MAP(pokemini_mem_map)
+	MCFG_DEVICE_ADD("maincpu", MINX, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(pokemini_mem_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(0x2000)
+	I2CMEM(config, "i2cmem", 0).set_data_size(0x2000);
 
 	/* This still needs to be improved to actually match the hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -1775,14 +1777,12 @@ MACHINE_CONFIG_START(pokemini_state::pokemini)
 	MCFG_SCREEN_REFRESH_RATE( 72 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(3, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1801,4 +1801,4 @@ ROM_START( pokemini )
 ROM_END
 
 
-CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, 0, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )
+CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, empty_init, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )

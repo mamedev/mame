@@ -17,6 +17,7 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/serflash.h"
+#include "emupal.h"
 #include "screen.h"
 
 //#include "machine/i2cmem.h"
@@ -33,6 +34,11 @@ public:
 		m_serflash(*this, "flash")
 	{ }
 
+	void nexus3d(machine_config &config);
+
+	void init_nexus3d();
+
+private:
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<cpu_device> m_maincpu;
 	required_device<serflash_device> m_serflash;
@@ -43,11 +49,9 @@ public:
 //  DECLARE_WRITE32_MEMBER(nexus3d_unk2_w);
 //  DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
 
-	DECLARE_DRIVER_INIT(nexus3d);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void nexus3d(machine_config &config);
 	void nexus3d_map(address_map &map);
 };
 
@@ -78,15 +82,16 @@ READ32_MEMBER(nexus3d_state::nexus3d_unk_r)
 //
 //}
 
-ADDRESS_MAP_START(nexus3d_state::nexus3d_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
+void nexus3d_state::nexus3d_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram().share("mainram");
 
-	AM_RANGE(0x00400000, 0x01ffffff) AM_RAM // ?? uploads various data, + pointers to data in the 0x01ffxxxx range, might be video system related
+	map(0x00400000, 0x01ffffff).ram(); // ?? uploads various data, + pointers to data in the 0x01ffxxxx range, might be video system related
 
 	// flash
-	AM_RANGE(0x9C000000, 0x9C000003) AM_DEVREAD8( "flash", serflash_device, n3d_flash_r, 0xffffffff)
-	AM_RANGE(0x9C000010, 0x9C000013) AM_DEVWRITE8("flash", serflash_device, n3d_flash_cmd_w, 0xffffffff)
-	AM_RANGE(0x9C000018, 0x9C00001b) AM_DEVWRITE8("flash", serflash_device, n3d_flash_addr_w, 0xffffffff)
+	map(0x9C000000, 0x9C000003).r(m_serflash, FUNC(serflash_device::n3d_flash_r));
+	map(0x9C000010, 0x9C000013).w(m_serflash, FUNC(serflash_device::n3d_flash_cmd_w));
+	map(0x9C000018, 0x9C00001b).w(m_serflash, FUNC(serflash_device::n3d_flash_addr_w));
 
 	// lots of accesses in this range
 	// 0xc00018xx seems CRTC related
@@ -94,10 +99,10 @@ ADDRESS_MAP_START(nexus3d_state::nexus3d_map)
 //  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE(nexus3d_unk2_r, nexus3d_unk2_w ) // often, status for something.
 //  AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE(nexus3d_unk3_r, nexus3d_unk3_w ) // often
 
-	AM_RANGE(0xE0000014, 0xE0000017) AM_READ(nexus3d_unk_r ) // sits waiting for this
+	map(0xE0000014, 0xE0000017).r(FUNC(nexus3d_state::nexus3d_unk_r)); // sits waiting for this
 
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( nexus3d )
 
@@ -120,8 +125,8 @@ void nexus3d_state::machine_reset()
 MACHINE_CONFIG_START(nexus3d_state::nexus3d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM920T, 200000000)
-	MCFG_CPU_PROGRAM_MAP(nexus3d_map)
+	MCFG_DEVICE_ADD("maincpu", ARM920T, 200000000)
+	MCFG_DEVICE_PROGRAM_MAP(nexus3d_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -169,11 +174,11 @@ ROM_START( acheartf )
 //  ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) // missing from this set, but should be the same
 ROM_END
 
-DRIVER_INIT_MEMBER(nexus3d_state,nexus3d)
+void nexus3d_state::init_nexus3d()
 {
 	// the first part of the flash ROM automatically gets copied to RAM
-	memcpy( m_mainram, memregion("flash")->base(), 4 * 1024);
+	memcpy(m_mainram, memregion("flash")->base(), 4 * 1024);
 }
 
-GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart",      MACHINE_IS_SKELETON )
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart Full", MACHINE_IS_SKELETON )
+GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_nexus3d, ROT0, "Examu", "Arcana Heart",      MACHINE_IS_SKELETON )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_nexus3d, ROT0, "Examu", "Arcana Heart Full", MACHINE_IS_SKELETON )

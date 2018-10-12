@@ -120,10 +120,10 @@ CUSTOM_INPUT_MEMBER( sms_sports_pad_device::rldu_pins_r )
 
 static INPUT_PORTS_START( sms_sports_pad )
 	PORT_START("SPORTS_IN")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_device, rldu_pins_r, nullptr) // R,L,D,U
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_device, rldu_pins_r, nullptr) // R,L,D,U
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL (Button 1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, sms_sports_pad_device, th_pin_r) // TH
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, sms_sports_pad_device, th_pin_r) // TH
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) // TR (Button 2)
 
 	PORT_START("SPORTS_OUT")

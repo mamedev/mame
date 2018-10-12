@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<mamelayout version="2">
+	<element name="background">
+	</element>
+
+	<element name="led_red" defstate="0">
+		<disk state="0">
+			<color red="0.2" green="0.05" blue="0.05" />
+		</disk>
+		<disk state="1">
+			<color red="0.8" green="0.05" blue="0.05" />
+		</disk>
+	</element>
+
+	<element name="text_comm_err">
+		<text string="COMM_ERR"><color red="1.00" green="1.00" blue="1.00" /></text>
+	</element>
+
+	<view name="Default">
+		<screen tag="ioboard:screen">
+			<bounds left="0" top="0" right="1" bottom="1" />
+		</screen>
+		<screen tag="screen">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+
+	<view name="Diagnostic">
+		<backdrop element="background">
+			<bounds x="0" y="0" width="496" height="419" />
+		</backdrop>
+		<screen tag="screen">
+			<bounds left="0" top="0" right="496" bottom="384" />
+		</screen>
+		<screen tag="ioboard:screen">
+			<bounds left="8" top="392" right="129" bottom="411" />
+		</screen>
+		<cpanel name="led_comm_err" element="led_red">
+			<bounds x="141" y="399" width="5" height="5" />
+		</cpanel>
+		<cpanel element="text_comm_err">
+			<bounds x="145" y="398" width="40" height="7" />
+		</cpanel>
+	</view>
+</mamelayout>

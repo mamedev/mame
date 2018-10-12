@@ -29,6 +29,7 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -52,6 +53,11 @@ public:
 		m_vram(*this, "vram")
 		{ }
 
+	void kongambl(machine_config &config);
+
+	void init_kingtut();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
 	required_device<k055673_device> m_k055673;
@@ -69,7 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
 	DECLARE_READ32_MEMBER(test_r);
 	// DECLARE_READ32_MEMBER(rng_r);
-	DECLARE_DRIVER_INIT(kingtut);
+
 	DECLARE_VIDEO_START(kongambl);
 	uint8_t m_irq_mask;
 
@@ -80,7 +86,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
-	void kongambl(machine_config &config);
+
 	void kongamaud_map(address_map &map);
 	void kongambl_map(address_map &map);
 };
@@ -208,71 +214,73 @@ WRITE8_MEMBER(kongambl_state::kongambl_ff_w)
 //  printf("%02x\n",data);
 }
 
-ADDRESS_MAP_START(kongambl_state::kongambl_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM // main program
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM // work RAM
+void kongambl_state::kongambl_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom(); // main program
+	map(0x100000, 0x11ffff).ram(); // work RAM
 
-	AM_RANGE(0x200000, 0x207fff) AM_RAM // backup RAM 24F
+	map(0x200000, 0x207fff).ram(); // backup RAM 24F
 
-	AM_RANGE(0x300000, 0x307fff) AM_RAM // backup RAM 24H
+	map(0x300000, 0x307fff).ram(); // backup RAM 24H
 
 	// override konami chips with custom areas until that code is removed
-	AM_RANGE(0x400000, 0x401fff) AM_ROM AM_REGION("gfx1",0)
-	AM_RANGE(0x420000, 0x43ffff) AM_RAM AM_SHARE("vram")
+	map(0x400000, 0x401fff).rom().region("gfx1", 0);
+	map(0x420000, 0x43ffff).ram().share("vram");
 	//AM_RANGE(0x480000, 0x48003f) AM_RAM // vregs
 
 	//0x400000 0x400001 "13M" even addresses
 	//0x400002,0x400003 "13J" odd addresses
 //  AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
 //  AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
-	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device, long_w)
+	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::long_w));
 
 
 
-	AM_RANGE(0x440000, 0x443fff) AM_RAM // OBJ RAM
+	map(0x440000, 0x443fff).ram(); // OBJ RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
+	map(0x460000, 0x47ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 
-	AM_RANGE(0x4b0000, 0x4b001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00ff00)
+	map(0x4b0000, 0x4b001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask32(0xff00ff00);
 
-	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVWRITE16("k055673", k055673_device, k053246_word_w, 0xffffffff)
+	map(0x4c0000, 0x4c0007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
 	//AM_RANGE(0x4c4000, 0x4c4003) AM_WRITENOP
 	//AM_RANGE(0x4c4004, 0x4c4007) AM_WRITENOP
 	//AM_RANGE(0x4c801c, 0x4c801f) AM_WRITENOP
 	//AM_RANGE(0x4cc01c, 0x4cc01f) AM_WRITENOP
 
-	AM_RANGE(0x4cc000, 0x4cc00f) AM_DEVREAD16("k055673", k055673_device, k055673_rom_word_r, 0xffffffff)
+	map(0x4cc000, 0x4cc00f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 
-	AM_RANGE(0x4d0000, 0x4d0003) AM_WRITE8(kongambl_ff_w,0xff000000)
+	map(0x4d0000, 0x4d0000).w(FUNC(kongambl_state::kongambl_ff_w));
 
-	AM_RANGE(0x500000, 0x5007ff) AM_RAM
-	AM_RANGE(0x500380, 0x500383) AM_READ(test_r)
+	map(0x500000, 0x5007ff).ram();
+	map(0x500380, 0x500383).r(FUNC(kongambl_state::test_r));
 //  AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
 //  AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
 //  AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
-	AM_RANGE(0x580000, 0x580007) AM_READ(test_r)
+	map(0x580000, 0x580007).r(FUNC(kongambl_state::test_r));
 
-	AM_RANGE(0x600000, 0x60000f) AM_READ(test_r)
+	map(0x600000, 0x60000f).r(FUNC(kongambl_state::test_r));
 
-	AM_RANGE(0x700000, 0x700003) AM_READ(eeprom_r)
-	AM_RANGE(0x700004, 0x700007) AM_READ_PORT("IN1")
-	AM_RANGE(0x700008, 0x70000b) AM_READ_PORT("IN3")
-	AM_RANGE(0x780000, 0x780003) AM_WRITE8(eeprom_w,0xffffffff)
+	map(0x700000, 0x700003).r(FUNC(kongambl_state::eeprom_r));
+	map(0x700004, 0x700007).portr("IN1");
+	map(0x700008, 0x70000b).portr("IN3");
+	map(0x780000, 0x780003).w(FUNC(kongambl_state::eeprom_w));
 	//AM_RANGE(0x780004, 0x780007) AM_WRITENOP
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(kongambl_state::kongamaud_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM // main program (mirrored?)
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM // work RAM
-	AM_RANGE(0x180000, 0x180001) AM_WRITENOP
-	AM_RANGE(0x190000, 0x190001) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITENOP
-	AM_RANGE(0x1b0000, 0x1b0001) AM_READNOP
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READNOP
-	AM_RANGE(0x200000, 0x2000ff) AM_RAM // unknown (YMZ280b?  Shared with 68020?)
-	AM_RANGE(0x280000, 0x2800ff) AM_RAM
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM
-ADDRESS_MAP_END
+void kongambl_state::kongamaud_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom(); // main program (mirrored?)
+	map(0x100000, 0x10ffff).ram(); // work RAM
+	map(0x180000, 0x180001).nopw();
+	map(0x190000, 0x190001).nopw();
+	map(0x1a0000, 0x1a0001).nopw();
+	map(0x1b0000, 0x1b0001).nopr();
+	map(0x1c0000, 0x1c0001).nopr();
+	map(0x200000, 0x2000ff).ram(); // unknown (YMZ280b?  Shared with 68020?)
+	map(0x280000, 0x2800ff).ram();
+	map(0x300000, 0x3007ff).ram();
+}
 
 
 
@@ -287,7 +295,7 @@ static INPUT_PORTS_START( kongambl )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -603,7 +611,7 @@ static const gfx_layout charlayout8_tasman =
 	8*64
 };
 
-static GFXDECODE_START( tasman )
+static GFXDECODE_START( gfx_tasman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/(1 << 8) )
 GFXDECODE_END
 
@@ -638,21 +646,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 }
 
 MACHINE_CONFIG_START(kongambl_state::kongambl)
-	MCFG_CPU_ADD("maincpu", M68EC020, 25000000)
-	MCFG_CPU_PROGRAM_MAP(kongambl_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(kongambl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kongambl_state, kongambl_vblank, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sndcpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(kongamaud_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
+	MCFG_DEVICE_ADD("sndcpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(kongamaud_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
 
-	MCFG_DEVICE_ADD("k053252", K053252, 25000000)
-	MCFG_K053252_OFFSETS(0, 16) // TBD
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(kongambl_state, vblank_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(kongambl_state, hblank_irq_ack_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	K053252(config, m_k053252, 25000000);
+	m_k053252->set_offsets(0, 16); // TBD
+	m_k053252->int1_ack().set(FUNC(kongambl_state::vblank_irq_ack_w));
+	m_k053252->int2_ack().set(FUNC(kongambl_state::hblank_irq_ack_w));
+	m_k053252->set_screen("screen");
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223) // fake, they'll be changed by CCU anyway, TBD
@@ -672,15 +680,16 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_K055673_PALETTE("palette")
 
 #if CUSTOM_DRAW
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tasman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tasman)
 #endif
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(kongambl_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 
@@ -810,7 +819,7 @@ ROM_START( vikingt )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(kongambl_state,kingtut)
+void kongambl_state::init_kingtut()
 {
 	//uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
 
@@ -820,8 +829,8 @@ DRIVER_INIT_MEMBER(kongambl_state,kingtut)
 	//rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,  kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state, init_kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

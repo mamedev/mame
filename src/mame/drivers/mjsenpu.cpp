@@ -47,6 +47,7 @@
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -64,6 +65,11 @@ public:
 	{
 	}
 
+	void mjsenpu(machine_config &config);
+
+	void init_mjsenpu();
+
+private:
 	/* devices */
 	required_device<e132xt_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -93,14 +99,12 @@ public:
 	DECLARE_READ32_MEMBER(vram_r);
 	DECLARE_WRITE32_MEMBER(vram_w);
 
-	DECLARE_DRIVER_INIT(mjsenpu);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<palette_device> m_palette;
-	void mjsenpu(machine_config &config);
 	void mjsenpu_32bit_map(address_map &map);
 	void mjsenpu_io(address_map &map);
 };
@@ -214,35 +218,37 @@ READ32_MEMBER(mjsenpu_state::muxed_inputs_r)
 	return 0x00000000;// 0xffffffff;
 }
 
-ADDRESS_MAP_START(mjsenpu_state::mjsenpu_32bit_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("user2",0) // main game rom
+void mjsenpu_state::mjsenpu_32bit_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("mainram");
+	map(0x40000000, 0x401fffff).rom().region("user2", 0); // main game rom
 
-	AM_RANGE(0x80000000, 0x8001ffff) AM_READWRITE(vram_r,vram_w)
+	map(0x80000000, 0x8001ffff).rw(FUNC(mjsenpu_state::vram_r), FUNC(mjsenpu_state::vram_w));
 
-	AM_RANGE(0xffc00000, 0xffc000ff) AM_READWRITE8(palette_low_r, palette_low_w, 0xffffffff)
-	AM_RANGE(0xffd00000, 0xffd000ff) AM_READWRITE8(palette_high_r, palette_high_w, 0xffffffff)
+	map(0xffc00000, 0xffc000ff).rw(FUNC(mjsenpu_state::palette_low_r), FUNC(mjsenpu_state::palette_low_w));
+	map(0xffd00000, 0xffd000ff).rw(FUNC(mjsenpu_state::palette_high_r), FUNC(mjsenpu_state::palette_high_w));
 
-	AM_RANGE(0xffe00000, 0xffe007ff) AM_RAM AM_SHARE("nvram")
+	map(0xffe00000, 0xffe007ff).ram().share("nvram");
 
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0) // boot rom
-ADDRESS_MAP_END
+	map(0xfff80000, 0xffffffff).rom().region("user1", 0); // boot rom
+}
 
 
-ADDRESS_MAP_START(mjsenpu_state::mjsenpu_io)
-	AM_RANGE(0x4000, 0x4003)  AM_READ(muxed_inputs_r)
-	AM_RANGE(0x4010, 0x4013)  AM_READ_PORT("IN1")
+void mjsenpu_state::mjsenpu_io(address_map &map)
+{
+	map(0x4000, 0x4003).r(FUNC(mjsenpu_state::muxed_inputs_r));
+	map(0x4010, 0x4013).portr("IN1");
 
-	AM_RANGE(0x4020, 0x4023)  AM_WRITE8( control_w, 0x000000ff)
+	map(0x4023, 0x4023).w(FUNC(mjsenpu_state::control_w));
 
-	AM_RANGE(0x4030, 0x4033)  AM_READ_PORT("DSW1")
-	AM_RANGE(0x4040, 0x4043)  AM_READ_PORT("DSW2")
-	AM_RANGE(0x4050, 0x4053)  AM_READ_PORT("DSW3")
+	map(0x4030, 0x4033).portr("DSW1");
+	map(0x4040, 0x4043).portr("DSW2");
+	map(0x4050, 0x4053).portr("DSW3");
 
-	AM_RANGE(0x4060, 0x4063)  AM_WRITE8( mux_w, 0x000000ff)
+	map(0x4063, 0x4063).w(FUNC(mjsenpu_state::mux_w));
 
-	AM_RANGE(0x4070, 0x4073)  AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x000000ff)
-ADDRESS_MAP_END
+	map(0x4073, 0x4073).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 static INPUT_PORTS_START( mjsenpu )
 
@@ -301,7 +307,7 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_START("IN1")
 	PORT_BIT(                 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(                 0x00000002, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // might be coin out
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // might be coin out
 	PORT_BIT(                 0x00000008, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE(   0x00000010, IP_ACTIVE_LOW )
 	PORT_BIT(                 0x00000020, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // clears stats in bookkeeping
@@ -460,12 +466,12 @@ following clocks are on the PCB
 MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 27000000*2) /* ?? Mhz */
-	MCFG_CPU_PROGRAM_MAP(mjsenpu_32bit_map)
-	MCFG_CPU_IO_MAP(mjsenpu_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mjsenpu_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XT, 27000000*2) /* ?? Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(mjsenpu_32bit_map)
+	MCFG_DEVICE_IO_MAP(mjsenpu_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mjsenpu_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// more likely coins out?
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
@@ -481,22 +487,22 @@ MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) /* 1 Mhz? */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
 ROM_START( mjsenpu )
 	ROM_REGION32_BE( 0x80000, "user1", 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "U1", 0x000000, 0x080000, CRC(ebfb1079) SHA1(9d676c635d5ee464df5730518399e141ebc515ed) )
+	ROM_LOAD( "u1", 0x000000, 0x080000, CRC(ebfb1079) SHA1(9d676c635d5ee464df5730518399e141ebc515ed) )
 
 	ROM_REGION32_BE( 0x200000, "user2", 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD16_WORD_SWAP( "U13", 0x000000, 0x200000, CRC(a803c5a5) SHA1(61c7386a1bb6224b788de01293697d0e896839a8) )
+	ROM_LOAD16_WORD_SWAP( "u13", 0x000000, 0x200000, CRC(a803c5a5) SHA1(61c7386a1bb6224b788de01293697d0e896839a8) )
 
 	ROM_REGION( 0x080000, "oki", 0 )
-	ROM_LOAD( "SU2", 0x000000, 0x080000, CRC(848045d5) SHA1(4d32e1a5bd0937069dd8d50dfd8b63d4a45e40e6) )
+	ROM_LOAD( "su2", 0x000000, 0x080000, CRC(848045d5) SHA1(4d32e1a5bd0937069dd8d50dfd8b63d4a45e40e6) )
 ROM_END
 
 
@@ -520,7 +526,7 @@ READ32_MEMBER(mjsenpu_state::mjsenpu_speedup_r)
 
 
 
-DRIVER_INIT_MEMBER(mjsenpu_state,mjsenpu)
+void mjsenpu_state::init_mjsenpu()
 {
 /*
 0000ADAE: LDHU.D L42, L38, $0
@@ -537,4 +543,4 @@ DRIVER_INIT_MEMBER(mjsenpu_state,mjsenpu)
 }
 
 
-GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", 0 )
+GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, init_mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", 0 )

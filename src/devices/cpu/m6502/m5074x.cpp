@@ -109,6 +109,13 @@ void m5074x_device::device_start()
 }
 
 
+device_memory_interface::space_config_vector m5074x_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -482,12 +489,13 @@ WRITE8_MEMBER(m5074x_device::tmrirq_w)
 }
 
 /* M50740 - baseline for this familiy */
-ADDRESS_MAP_START(m50740_device::m50740_map)
-	AM_RANGE(0x0000, 0x005f) AM_RAM
-	AM_RANGE(0x00e0, 0x00e9) AM_READWRITE(ports_r, ports_w)
-	AM_RANGE(0x00f9, 0x00ff) AM_READWRITE(tmrirq_r, tmrirq_w)
-	AM_RANGE(0x1400, 0x1fff) AM_ROM AM_REGION(M5074X_INTERNAL_ROM_REGION, 0)
-ADDRESS_MAP_END
+void m50740_device::m50740_map(address_map &map)
+{
+	map(0x0000, 0x005f).ram();
+	map(0x00e0, 0x00e9).rw(FUNC(m50740_device::ports_r), FUNC(m50740_device::ports_w));
+	map(0x00f9, 0x00ff).rw(FUNC(m50740_device::tmrirq_r), FUNC(m50740_device::tmrirq_w));
+	map(0x1400, 0x1fff).rom().region(M5074X_INTERNAL_ROM_REGION, 0);
+}
 
 m50740_device::m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m50740_device(mconfig, M50740, tag, owner, clock)
@@ -500,15 +508,16 @@ m50740_device::m50740_device(const machine_config &mconfig, device_type type, co
 }
 
 /* M50741 - 50740 with a larger internal ROM */
-ADDRESS_MAP_START(m50741_device::m50741_map)
-	AM_RANGE(0x0000, 0x005f) AM_RAM
-	AM_RANGE(0x00e0, 0x00e9) AM_READWRITE(ports_r, ports_w)
-	AM_RANGE(0x00f9, 0x00ff) AM_READWRITE(tmrirq_r, tmrirq_w)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("internal", 0)
-ADDRESS_MAP_END
+void m50741_device::m50741_map(address_map &map)
+{
+	map(0x0000, 0x005f).ram();
+	map(0x00e0, 0x00e9).rw(FUNC(m50741_device::ports_r), FUNC(m50741_device::ports_w));
+	map(0x00f9, 0x00ff).rw(FUNC(m50741_device::tmrirq_r), FUNC(m50741_device::tmrirq_w));
+	map(0x1000, 0x1fff).rom().region("internal", 0);
+}
 
 m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m50741_device(mconfig, M50740, tag, owner, clock)
+	m50741_device(mconfig, M50741, tag, owner, clock)
 {
 }
 

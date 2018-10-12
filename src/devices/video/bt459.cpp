@@ -22,18 +22,19 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(BT459, bt459_device, "bt459", "Brooktree 150MHz Monolithic CMOS 256x24 Color Palette RAMDAC")
+DEFINE_DEVICE_TYPE(BT459, bt459_device, "bt459", "Brooktree Bt459 256 Color RAMDAC")
 
-ADDRESS_MAP_START(bt459_device::map)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(address_lo_r, address_lo_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(address_hi_r, address_hi_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(register_r, register_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void bt459_device::map(address_map &map)
+{
+	map(0x00, 0x00).rw(FUNC(bt459_device::address_lo_r), FUNC(bt459_device::address_lo_w));
+	map(0x01, 0x01).rw(FUNC(bt459_device::address_hi_r), FUNC(bt459_device::address_hi_w));
+	map(0x02, 0x02).rw(FUNC(bt459_device::register_r), FUNC(bt459_device::register_w));
+	map(0x03, 0x03).rw(FUNC(bt459_device::palette_r), FUNC(bt459_device::palette_w));
+}
 
 bt459_device::bt459_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BT459, tag, owner, clock),
-	device_palette_interface(mconfig, *this)
+	: device_t(mconfig, BT459, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
 {
 }
 
@@ -70,11 +71,13 @@ void bt459_device::device_start()
 	save_item(NAME(m_palette_ram));
 
 	save_item(NAME(m_blink_start));
+	save_item(NAME(m_contrast));
 }
 
 void bt459_device::device_reset()
 {
 	m_blink_start = -1;
+	m_contrast = 0xff;
 }
 
 /*
@@ -122,7 +125,7 @@ u8 bt459_device::get_component(rgb_t *arr, int index)
 	return 0;
 }
 
-void bt459_device::set_component(rgb_t *arr, int index, u8 data)
+void bt459_device::set_component(rgb_t *const arr, const int index, const u8 data)
 {
 	switch (m_address_rgb)
 	{
@@ -254,7 +257,9 @@ READ8_MEMBER(bt459_device::register_r)
 	}
 
 	// increment address register and return result
-	m_address = (m_address + 1) & ADDRESS_MASK;
+	if (!machine().side_effects_disabled())
+		m_address = (m_address + 1) & ADDRESS_MASK;
+
 	return result;
 }
 
@@ -543,8 +548,8 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			{
 				u8 data = *pixel_data++;
 
-				bitmap.pix(y, x + 1) = get_rgb(data & 0x7, pixel_mask); data >>= 4;
-				bitmap.pix(y, x + 0) = get_rgb(data & 0x7, pixel_mask);
+				bitmap.pix(y, x + 1) = get_rgb(data & 0xf, pixel_mask); data >>= 4;
+				bitmap.pix(y, x + 0) = get_rgb(data & 0xf, pixel_mask);
 			}
 		break;
 
@@ -628,11 +633,17 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 							// check for dual-cursor mode and combine with cross-hair data
 							if (ch_cursor_enable)
 								if (((x >= 31 - ch_thickness) && (x <= 31 + ch_thickness)) || ((y >= 31 - ch_thickness) && (y <= 31 + ch_thickness)))
-									data = (m_cursor_command & CR43) ? data | ch_cursor_enable : data ^ ch_cursor_enable;
+									data = (m_cursor_command & CR43) ? (data | ch_cursor_enable) : (data ^ ch_cursor_enable);
 
 							// write cursor data to screen (normal or X Window mode)
 							if (data && !((m_command_2 & CR21) && data == 1))
-								bitmap.pix(ypos, xpos) = m_cursor_color[data - 1];
+							{
+								rgb_t rgb = m_cursor_color[data - 1];
+								if (m_contrast != 0xff)
+									rgb.scale8(m_contrast + 1);
+
+								bitmap.pix(ypos, xpos) = rgb;
+							}
 						}
 					}
 				}
@@ -643,7 +654,9 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		if (ch_cursor_enable)
 		{
 			// get the cross hair cursor color
-			const rgb_t ch_color = m_cursor_color[ch_cursor_enable - 1];
+			rgb_t ch_color = m_cursor_color[ch_cursor_enable - 1];
+			if (m_contrast != 0xff)
+				ch_color.scale8(m_contrast + 1);
 
 			/*
 			 * The window (x) value to be written is calculated as follows:

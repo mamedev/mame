@@ -40,6 +40,7 @@ Dumped: 06/04/2009 f205v
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,6 +55,9 @@ public:
 		m_palette(*this, "palette"),
 		m_video(*this, "video") { }
 
+	void murogmbl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -64,7 +68,6 @@ public:
 	DECLARE_PALETTE_INIT(murogmbl);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void murogmbl(machine_config &config);
 	void murogmbl_map(address_map &map);
 };
 
@@ -78,6 +81,9 @@ public:
 		m_palette(*this, "palette"),
 		m_video(*this, "video") { }
 
+	void slotunbl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -88,7 +94,6 @@ public:
 	DECLARE_PALETTE_INIT(slotunbl);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void slotunbl(machine_config &config);
 	void slotunbl_map(address_map &map);
 };
 
@@ -144,29 +149,31 @@ PALETTE_INIT_MEMBER(slotunbl_state, slotunbl)
 	}
 }
 
-ADDRESS_MAP_START(murogmbl_state::murogmbl_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM
-	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_SHARE("video")
-	AM_RANGE(0x5c00, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
-	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("DSW")
-	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN1")
-	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write) /* read is always discarded */
-ADDRESS_MAP_END
+void murogmbl_state::murogmbl_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x4800, 0x4bff).ram();
+	map(0x5800, 0x5bff).ram().share("video");
+	map(0x5c00, 0x5fff).ram();
+	map(0x6000, 0x6000).portr("IN0");
+	map(0x6800, 0x6800).portr("DSW");
+	map(0x7000, 0x7000).portr("IN1");
+	map(0x7800, 0x7800).nopr().w("dac", FUNC(dac_byte_interface::data_w)); /* read is always discarded */
+}
 
-ADDRESS_MAP_START(slotunbl_state::slotunbl_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("video")
+void slotunbl_state::slotunbl_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x4800, 0x4fff).ram();
+	map(0x5000, 0x53ff).ram().share("video");
 //  AM_RANGE(0x5400, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
-	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("DSW")
-	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN1")
-	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write) /* read is always discarded */
-ADDRESS_MAP_END
+	map(0x6000, 0x6000).portr("IN0");
+	map(0x6800, 0x6800).portr("DSW");
+	map(0x7000, 0x7000).portr("IN1");
+	map(0x7800, 0x7800).nopr().w("dac", FUNC(dac_byte_interface::data_w)); /* read is always discarded */
+}
 
 void murogmbl_state::video_start()
 {
@@ -325,21 +332,20 @@ static const gfx_layout layout8x8x2 =
 	8*8
 };
 
-static GFXDECODE_START( murogmbl )
+static GFXDECODE_START( gfx_murogmbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x2,  0x0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( slotunbl )
+static GFXDECODE_START( gfx_slotunbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x2,  0x0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(murogmbl_state::murogmbl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
-	MCFG_CPU_PROGRAM_MAP(murogmbl_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 1000000) /* Z80? */
+	MCFG_DEVICE_PROGRAM_MAP(murogmbl_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", murogmbl)
-
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_murogmbl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -353,18 +359,18 @@ MACHINE_CONFIG_START(murogmbl_state::murogmbl)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(murogmbl_state, murogmbl)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slotunbl_state::slotunbl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
-	MCFG_CPU_PROGRAM_MAP(slotunbl_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 1000000) /* Z80? */
+	MCFG_DEVICE_PROGRAM_MAP(slotunbl_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slotunbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slotunbl)
 
 
 	/* video hardware */
@@ -379,10 +385,10 @@ MACHINE_CONFIG_START(slotunbl_state::slotunbl)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(slotunbl_state, slotunbl)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START(murogmbl)
@@ -411,6 +417,6 @@ ROM_START(slotunbl)
 	ROM_LOAD( "74s288.a8",  0x0000, 0x0020, NO_DUMP )
 ROM_END
 
-GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, murogmbl_state, 0, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, murogmbl_state, empty_init, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, slotunbl,  0,   slotunbl, slotunbl, slotunbl_state, 0, ROT0, "bootleg?", "Slot (unknown bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slotunbl,  0,   slotunbl, slotunbl, slotunbl_state, empty_init, ROT0, "bootleg?", "Slot (unknown bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

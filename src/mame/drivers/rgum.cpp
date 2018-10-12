@@ -19,6 +19,7 @@ The ppi at 3000-3003 seems to be a dual port communication thing with the z80.
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -34,16 +35,19 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void rgum(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(rgum_heartbeat_r);
+
+private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	uint8_t m_hbeat;
-	DECLARE_CUSTOM_INPUT_MEMBER(rgum_heartbeat_r);
 	virtual void video_start() override;
 	uint32_t screen_update_royalgum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void rgum(machine_config &config);
 	void rgum_map(address_map &map);
 };
 
@@ -74,25 +78,26 @@ uint32_t rgum_state::screen_update_royalgum(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-ADDRESS_MAP_START(rgum_state::rgum_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM //not all of it?
+void rgum_state::rgum_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); //not all of it?
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x2002, 0x2002) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_w)
+	map(0x2000, 0x2000).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x2002, 0x2002).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 
-	AM_RANGE(0x2801, 0x2801) AM_READNOP //read but value discarded?
-	AM_RANGE(0x2803, 0x2803) AM_READNOP
+	map(0x2801, 0x2801).nopr(); //read but value discarded?
+	map(0x2803, 0x2803).nopr();
 
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	map(0x3000, 0x3003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("cram")
+	map(0x4000, 0x47ff).ram().share("vram");
+	map(0x5000, 0x57ff).ram().share("cram");
 
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x8000, 0xffff).rom();
+}
 
 
 CUSTOM_INPUT_MEMBER(rgum_state::rgum_heartbeat_r)
@@ -120,7 +125,7 @@ static INPUT_PORTS_START( rgum )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rgum_state,rgum_heartbeat_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rgum_state,rgum_heartbeat_r, nullptr)
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -235,16 +240,15 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( rgum )
+static GFXDECODE_START( gfx_rgum )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(rgum_state::rgum)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(rgum_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rgum_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rgum_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -258,18 +262,19 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 24000000/16)   /* unknown clock & type, hand tuned to get ~50 fps (?) */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rgum)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rgum)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
+	MCFG_DEVICE_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -296,4 +301,4 @@ ROM_START( rgum )
 ROM_END
 
 
-GAME( 199?, rgum, 0, rgum, rgum, rgum_state, 0, ROT0, "<unknown>",         "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, rgum, 0, rgum, rgum, rgum_state, empty_init, ROT0, "<unknown>", "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

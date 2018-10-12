@@ -8,6 +8,7 @@
 
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 
 class kickgoal_state : public driver_device
 {
@@ -26,13 +27,18 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void kickgoal(machine_config &config);
+	void actionhw(machine_config &config);
+
+	void init_kickgoal();
+
+private:
 	DECLARE_READ16_MEMBER(kickgoal_eeprom_r);
 	DECLARE_WRITE16_MEMBER(kickgoal_eeprom_w);
 	DECLARE_WRITE16_MEMBER(kickgoal_fgram_w);
 	DECLARE_WRITE16_MEMBER(kickgoal_bgram_w);
 	DECLARE_WRITE16_MEMBER(kickgoal_bg2ram_w);
 	DECLARE_WRITE16_MEMBER(actionhw_snd_w);
-	DECLARE_DRIVER_INIT(kickgoal);
 
 	TILE_GET_INFO_MEMBER(get_kickgoal_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_kickgoal_bg_tile_info);
@@ -48,15 +54,12 @@ public:
 
 	uint32_t screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void kickgoal(machine_config &config);
-	void actionhw(machine_config &config);
 	void kickgoal_program_map(address_map &map);
 	void oki_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	/* video-related */
 	tilemap_t     *m_fgtm;
 	tilemap_t     *m_bgtm;

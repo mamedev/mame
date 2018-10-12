@@ -14,8 +14,8 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_BUNSETSU, msx_slot_bunsetsu_device)
 
 #define MCFG_MSX_SLOT_BUNSETSU_ADD(_tag, _startpage, _numpages, _region, _offset, _bunsetsu_region_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_BUNSETSU, _startpage, _numpages) \
-	downcast<msx_slot_rom_device &>(*device).set_rom_start("^" _region, _offset); \
-	downcast<msx_slot_bunsetsu_device &>(*device).set_bunsetsu_region_tag("^" _bunsetsu_region_tag);
+	downcast<msx_slot_rom_device &>(*device).set_rom_start(_region, _offset); \
+	downcast<msx_slot_bunsetsu_device &>(*device).set_bunsetsu_region_tag(_bunsetsu_region_tag);
 
 class msx_slot_bunsetsu_device : public msx_slot_rom_device
 {

@@ -23,7 +23,6 @@ Notes:
 
 #include "emu.h"
 #include "includes/nbmj9195.h"
-#include "includes/nb1413m3.h"      // needed for mahjong input controller
 
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
@@ -212,18 +211,11 @@ WRITE8_MEMBER(nbmj9195_state::soundcpu_porte_w)
 
 
 
-/* CTC of main cpu, ch0 trigger is vblank */
-INTERRUPT_GEN_MEMBER(nbmj9195_state::ctc0_trg1)
-{
-	m_maincpu->trg1(1);
-	m_maincpu->trg1(0);
-}
-
 void nbmj9195_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(nbmj9195_state,nbmj9195)
+void nbmj9195_state::init_nbmj9195()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -232,432 +224,444 @@ DRIVER_INIT_MEMBER(nbmj9195_state,nbmj9195)
 }
 
 
-ADDRESS_MAP_START(nbmj9195_state::sailorws_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mjuraden_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::koinomp_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::ngpgal_map)
-	AM_RANGE(0x0000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mscoutm_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe5ff) AM_RAM
-	AM_RANGE(0xe600, 0xebff) AM_RAM_WRITE(nb22090_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xec00, 0xf1ff) AM_RAM
-	AM_RANGE(0xf200, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mjegolf_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe5ff) AM_RAM_WRITE(nb22090_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe600, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xf1ff) AM_RAM
-	AM_RANGE(0xf200, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mjuraden_io_map)
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xb2, 0xb2) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb4, 0xb4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb6, 0xb6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::koinomp_io_map)
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xc4, 0xc4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xc6, 0xc6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-	AM_RANGE(0xcf, 0xcf) AM_MIRROR(0xff00) AM_WRITENOP
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::patimono_io_map)
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mmehyou_io_map)
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::gal10ren_io_map)
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc8, 0xc8) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::renaiclb_io_map)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0x28, 0x28) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0x2c, 0x2c) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mjlaman_io_map)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x22, 0x22) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0x26, 0x26) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mkeibaou_io_map)
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xdc, 0xdc) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xde, 0xde) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::pachiten_io_map)
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xe6, 0xe6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::sailorws_io_map)
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf2, 0xf2) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::sailorwr_io_map)
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xfa, 0xfa) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::psailor1_io_map)
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf2, 0xf2) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::psailor2_io_map)
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::otatidai_io_map)
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb8, 0xb8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::yosimoto_io_map)
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0x90, 0x90) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x94, 0x94) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0x98, 0x98) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::yosimotm_io_map)
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0xff00) AM_NOP
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_NOP
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::jituroku_io_map)
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::ngpgal_io_map)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mjgottsu_io_map)
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::cmehyou_io_map)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-	AM_RANGE(0xb4, 0xb4) AM_MIRROR(0xff00) AM_WRITENOP
-
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mjkoiura_io_map)
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mkoiuraa_io_map)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mscoutm_io_map)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
-	AM_RANGE(0x82, 0x82) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0x84, 0x84) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-
-	AM_RANGE(0xa0, 0xa6) AM_MIRROR(0xff00) AM_WRITENOP            // nb22090 param ?
-
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-
-	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-
-	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::imekura_io_map)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
-	AM_RANGE(0x82, 0x82) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0x84, 0x84) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-
-	AM_RANGE(0xb0, 0xb6) AM_MIRROR(0xff00) AM_WRITENOP            // nb22090 param ?
-
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-
-	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::mjegolf_io_map)
-	AM_RANGE(0x80, 0x86) AM_MIRROR(0xff00) AM_WRITENOP            // nb22090 param ?
-
-	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
-	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
-
-	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
-	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-ADDRESS_MAP_END
-
-
-
-ADDRESS_MAP_START(nbmj9195_state::sailorws_sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::sailorws_sound_io_map)
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym3812_device, write)
-ADDRESS_MAP_END
-
-
-
-
-/*
-TODO: it probably doesn't belong in here. Both CPUs are certainly tmpz84c011 tho ...
-*/
-
-ADDRESS_MAP_START(nbmj9195_state::shabdama_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-//  AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
-//  AM_RANGE(0xd800, 0xdfff) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nbmj9195_state::shabdama_io_map)
-//  ADDRESS_MAP_UNMAP_HIGH
-//  AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-//  AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-//  AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
-ADDRESS_MAP_END
+void nbmj9195_state::sailorws_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf1ff).ram().w(FUNC(nbmj9195_state::palette_w)).share("paletteram");
+	map(0xf800, 0xffff).ram().share("nvram");
+}
+
+void nbmj9195_state::mjuraden_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf200, 0xf3ff).ram().w(FUNC(nbmj9195_state::palette_w)).share("paletteram");
+	map(0xf800, 0xffff).ram();
+}
+
+void nbmj9195_state::koinomp_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe1ff).ram().w(FUNC(nbmj9195_state::palette_w)).share("paletteram");
+	map(0xe800, 0xefff).ram().share("nvram");
+}
+
+void nbmj9195_state::ngpgal_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom();
+	map(0xd000, 0xd1ff).ram().w(FUNC(nbmj9195_state::palette_w)).share("paletteram");
+	map(0xd800, 0xdfff).ram();
+}
+
+void nbmj9195_state::mscoutm_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe5ff).ram();
+	map(0xe600, 0xebff).ram().w(FUNC(nbmj9195_state::nb22090_palette_w)).share("paletteram");
+	map(0xec00, 0xf1ff).ram();
+	map(0xf200, 0xffff).ram();
+}
+
+void nbmj9195_state::mjegolf_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe5ff).ram().w(FUNC(nbmj9195_state::nb22090_palette_w)).share("paletteram");
+	map(0xe600, 0xebff).ram();
+	map(0xec00, 0xf1ff).ram();
+	map(0xf200, 0xffff).ram();
+}
+
+void nbmj9195_state::mjuraden_io_map(address_map &map)
+{
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xb0, 0xb0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xb2, 0xb2).mirror(0xff00).nopw();
+	map(0xb4, 0xb4).mirror(0xff00).nopw();
+	map(0xb6, 0xb6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::koinomp_io_map(address_map &map)
+{
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xc0, 0xc0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xc2, 0xc2).mirror(0xff00).nopw();
+	map(0xc4, 0xc4).mirror(0xff00).nopw();
+	map(0xc6, 0xc6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+	map(0xcf, 0xcf).mirror(0xff00).nopw();
+}
+
+void nbmj9195_state::patimono_io_map(address_map &map)
+{
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa4, 0xa4).mirror(0xff00).nopw();
+	map(0xa8, 0xa8).mirror(0xff00).nopw();
+	map(0xb0, 0xb8).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+}
+
+void nbmj9195_state::mmehyou_io_map(address_map &map)
+{
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa4, 0xa4).mirror(0xff00).nopw();
+	map(0xa8, 0xa8).mirror(0xff00).nopw();
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::gal10ren_io_map(address_map &map)
+{
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xc0, 0xc0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xc8, 0xc8).mirror(0xff00).nopw();
+	map(0xd0, 0xd0).mirror(0xff00).nopw();
+	map(0xd8, 0xd8).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::renaiclb_io_map(address_map &map)
+{
+	map(0x20, 0x20).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x24, 0x24).mirror(0xff00).nopw();
+	map(0x28, 0x28).mirror(0xff00).nopw();
+	map(0x2c, 0x2c).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xe0, 0xe1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xe0, 0xef).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xf0, 0xff).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+}
+
+void nbmj9195_state::mjlaman_io_map(address_map &map)
+{
+	map(0x20, 0x20).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x22, 0x22).mirror(0xff00).nopw();
+	map(0x24, 0x24).mirror(0xff00).nopw();
+	map(0x26, 0x26).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xe0, 0xe1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xe0, 0xef).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xf0, 0xff).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+}
+
+void nbmj9195_state::mkeibaou_io_map(address_map &map)
+{
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xd8, 0xd8).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xda, 0xda).mirror(0xff00).nopw();
+	map(0xdc, 0xdc).mirror(0xff00).nopw();
+	map(0xde, 0xde).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::pachiten_io_map(address_map &map)
+{
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xe0, 0xe0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xe2, 0xe2).mirror(0xff00).nopw();
+	map(0xe4, 0xe4).mirror(0xff00).nopw();
+	map(0xe6, 0xe6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::sailorws_io_map(address_map &map)
+{
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xf0, 0xf0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xf2, 0xf2).mirror(0xff00).nopw();
+	map(0xf4, 0xf4).mirror(0xff00).nopw();
+	map(0xf6, 0xf6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::sailorwr_io_map(address_map &map)
+{
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xf8, 0xf8).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xfa, 0xfa).mirror(0xff00).nopw();
+	map(0xfc, 0xfc).mirror(0xff00).nopw();
+	map(0xfe, 0xfe).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::psailor1_io_map(address_map &map)
+{
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xf0, 0xf0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xf2, 0xf2).mirror(0xff00).nopw();
+	map(0xf4, 0xf4).mirror(0xff00).nopw();
+	map(0xf6, 0xf6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::psailor2_io_map(address_map &map)
+{
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xe0, 0xe0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xe2, 0xe2).mirror(0xff00).nopw();
+	map(0xe4, 0xe4).mirror(0xff00).nopw();
+	map(0xf6, 0xf6).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::otatidai_io_map(address_map &map)
+{
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa8, 0xa8).mirror(0xff00).nopw();
+	map(0xb0, 0xb0).mirror(0xff00).nopw();
+	map(0xb8, 0xb8).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::yosimoto_io_map(address_map &map)
+{
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0x90, 0x90).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x94, 0x94).mirror(0xff00).nopw();
+	map(0x98, 0x98).mirror(0xff00).nopw();
+	map(0x9c, 0x9c).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+}
+
+void nbmj9195_state::yosimotm_io_map(address_map &map)
+{
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xf0, 0xf0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+	map(0xfc, 0xfc).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xf4, 0xf4).mirror(0xff00).noprw();
+	map(0xf8, 0xf8).mirror(0xff00).noprw();
+}
+
+void nbmj9195_state::jituroku_io_map(address_map &map)
+{
+	map(0x60, 0x61).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x60, 0x6f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x70, 0x7f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xe0, 0xe0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xe8, 0xe8).mirror(0xff00).nopw();
+	map(0xf0, 0xf0).mirror(0xff00).nopw();
+	map(0xf8, 0xf8).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::ngpgal_io_map(address_map &map)
+{
+	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa4, 0xa4).mirror(0xff00).nopw();
+	map(0xa8, 0xa8).mirror(0xff00).nopw();
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+}
+
+void nbmj9195_state::mjgottsu_io_map(address_map &map)
+{
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa4, 0xa4).mirror(0xff00).nopw();
+	map(0xa8, 0xa8).mirror(0xff00).nopw();
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::cmehyou_io_map(address_map &map)
+{
+	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa8, 0xa8).mirror(0xff00).nopw();
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+	map(0xb4, 0xb4).mirror(0xff00).nopw();
+
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+}
+
+void nbmj9195_state::mjkoiura_io_map(address_map &map)
+{
+	map(0x80, 0x81).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0x80, 0x8f).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0x90, 0x9f).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa4, 0xa4).mirror(0xff00).nopw();
+	map(0xa8, 0xa8).mirror(0xff00).nopw();
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+}
+
+void nbmj9195_state::mkoiuraa_io_map(address_map &map)
+{
+	map(0xa0, 0xa0).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa4, 0xa4).mirror(0xff00).nopw();
+	map(0xa8, 0xa8).mirror(0xff00).nopw();
+	map(0xb0, 0xb0).mirror(0xff00).w(FUNC(nbmj9195_state::inputportsel_w));
+
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+}
+
+void nbmj9195_state::mscoutm_io_map(address_map &map)
+{
+	map(0x80, 0x80).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_1_r));
+	map(0x82, 0x82).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_0_r));
+	map(0x84, 0x84).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+
+	map(0xa0, 0xa6).mirror(0xff00).nopw();            // nb22090 param ?
+
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+	map(0xe0, 0xe1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xe0, 0xef).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+
+	map(0xf0, 0xff).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+}
+
+void nbmj9195_state::imekura_io_map(address_map &map)
+{
+	map(0x80, 0x80).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_1_r));
+	map(0x82, 0x82).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_0_r));
+	map(0x84, 0x84).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+
+	map(0xb0, 0xb6).mirror(0xff00).nopw();            // nb22090 param ?
+
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xe0, 0xe1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xe0, 0xef).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+	map(0xf0, 0xff).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+}
+
+void nbmj9195_state::mjegolf_io_map(address_map &map)
+{
+	map(0x80, 0x86).mirror(0xff00).nopw();            // nb22090 param ?
+
+	map(0xa0, 0xa1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_0_r));
+	map(0xa0, 0xaf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_0_w));
+	map(0xb0, 0xbf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_0_w));
+
+	map(0xc0, 0xc1).mirror(0xff00).r(FUNC(nbmj9195_state::blitter_1_r));
+	map(0xc0, 0xcf).mirror(0xff00).w(FUNC(nbmj9195_state::blitter_1_w));
+
+	map(0xd0, 0xdf).mirror(0xff00).w(FUNC(nbmj9195_state::clut_1_w));
+
+	map(0xe0, 0xe0).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_1_r));
+	map(0xe2, 0xe2).mirror(0xff00).r(FUNC(nbmj9195_state::mscoutm_dipsw_0_r));
+	map(0xe4, 0xe4).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+}
+
+
+
+void nbmj9195_state::sailorws_sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("soundbank");
+}
+
+void nbmj9195_state::sailorws_sound_io_map(address_map &map)
+{
+	map(0x80, 0x81).mirror(0xff00).w("ymsnd", FUNC(ym3812_device::write));
+}
 
 /********************************************************************************
 These Nichibutsu Mahjong games use two different but very similar control ports:
@@ -2488,72 +2492,71 @@ static const z80_daisy_config daisy_chain_sound[] =
 };
 
 #define MSCOUTM_TMZ84C011_MAIN_PORTS \
-	MCFG_TMPZ84C011_PORTA_READ_CB(IOPORT("SYSTEM")) \
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, mscoutm_inputportsel_w)) \
-	MCFG_TMPZ84C011_PORTB_READ_CB(READ8(nbmj9195_state, mscoutm_cpu_portb_r)) \
-	MCFG_TMPZ84C011_PORTC_READ_CB(READ8(nbmj9195_state, mscoutm_cpu_portc_r)) \
-	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(nbmj9195_state, clutsel_w)) \
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, gfxflag2_w))
+	m_maincpu->in_pa_callback().set_ioport("SYSTEM"); \
+	m_maincpu->out_pa_callback().set(FUNC(nbmj9195_state::mscoutm_inputportsel_w)); \
+	m_maincpu->in_pb_callback().set(FUNC(nbmj9195_state::mscoutm_cpu_portb_r)); \
+	m_maincpu->in_pc_callback().set(FUNC(nbmj9195_state::mscoutm_cpu_portc_r)); \
+	m_maincpu->out_pd_callback().set(FUNC(nbmj9195_state::clutsel_w)); \
+	m_maincpu->out_pe_callback().set(FUNC(nbmj9195_state::gfxflag2_w));
 
 #define OTHERS_TMZ84C011_MAIN_PORTS \
-	MCFG_TMPZ84C011_PORTA_READ_CB(READ8(nbmj9195_state, others_cpu_porta_r)) \
-	MCFG_TMPZ84C011_PORTB_READ_CB(READ8(nbmj9195_state, others_cpu_portb_r)) \
-	MCFG_TMPZ84C011_PORTC_READ_CB(READ8(nbmj9195_state, others_cpu_portc_r)) \
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(nbmj9195_state, dipswbitsel_w)) \
-	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(nbmj9195_state, clutsel_w)) \
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, outcoin_flag_w))
+	m_maincpu->in_pa_callback().set(FUNC(nbmj9195_state::others_cpu_porta_r)); \
+	m_maincpu->in_pb_callback().set(FUNC(nbmj9195_state::others_cpu_portb_r)); \
+	m_maincpu->in_pc_callback().set(FUNC(nbmj9195_state::others_cpu_portc_r)); \
+	m_maincpu->out_pc_callback().set(FUNC(nbmj9195_state::dipswbitsel_w)); \
+	m_maincpu->out_pd_callback().set(FUNC(nbmj9195_state::clutsel_w)); \
+	m_maincpu->out_pe_callback().set(FUNC(nbmj9195_state::outcoin_flag_w));
 
 MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMPZ84C011, 12000000/2) /* TMPZ84C011, 6.00 MHz */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_main)
-	MCFG_CPU_PROGRAM_MAP(sailorws_map)
-	MCFG_CPU_IO_MAP(sailorws_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj9195_state, ctc0_trg1) /* vblank is connect to ctc trigger */
+	TMPZ84C011(config, m_maincpu, 12000000/2); /* TMPZ84C011, 6.00 MHz */
+	m_maincpu->set_daisy_config(daisy_chain_main);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::sailorws_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::sailorws_io_map);
 
-	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000) /* TMPZ84C011, 8.00 MHz */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
-	MCFG_CPU_PROGRAM_MAP(sailorws_sound_map)
-	MCFG_CPU_IO_MAP(sailorws_sound_io_map)
-	MCFG_TMPZ84C011_ZC0_CB(DEVWRITELINE("audiocpu", tmpz84c011_device, trg3))
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, soundbank_w)) \
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(DEVWRITE8("dac1", dac_byte_interface, write)) \
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(DEVWRITE8("dac2", dac_byte_interface, write)) \
-	MCFG_TMPZ84C011_PORTD_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read)) \
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porte_w))
+	tmpz84c011_device& audiocpu(TMPZ84C011(config, "audiocpu", 8000000)); /* TMPZ84C011, 8.00 MHz */
+	audiocpu.set_daisy_config(daisy_chain_sound);
+	audiocpu.set_addrmap(AS_PROGRAM, &nbmj9195_state::sailorws_sound_map);
+	audiocpu.set_addrmap(AS_IO, &nbmj9195_state::sailorws_sound_io_map);
+	audiocpu.zc0_callback().set("audiocpu", FUNC(tmpz84c011_device::trg3));
+	audiocpu.out_pa_callback().set(FUNC(nbmj9195_state::soundbank_w));
+	audiocpu.out_pb_callback().set("dac1", FUNC(dac_byte_interface::data_w));
+	audiocpu.out_pc_callback().set("dac2", FUNC(dac_byte_interface::data_w));
+	audiocpu.in_pd_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	audiocpu.out_pe_callback().set(FUNC(nbmj9195_state::soundcpu_porte_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(1024, 512)     /* no way this is correct */
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nbmj9195_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(1024, 512);     /* no way this is correct */
+	m_screen->set_visarea(0, 640-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(nbmj9195_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c011_device::trg1)).invert();
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD(m_palette, 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1)
 	NBMJDRV1_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
 	OTHERS_TMZ84C011_MAIN_PORTS
 MACHINE_CONFIG_END
 
@@ -2562,7 +2565,6 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV2)
 	NBMJDRV1_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
 	OTHERS_TMZ84C011_MAIN_PORTS
 
 	/* video hardware */
@@ -2574,7 +2576,6 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV3)
 	NBMJDRV1_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
 	MSCOUTM_TMZ84C011_MAIN_PORTS
 
 	/* video hardware */
@@ -2591,9 +2592,8 @@ MACHINE_CONFIG_START(nbmj9195_state::mjuraden)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjuraden_map)
-	MCFG_CPU_IO_MAP(mjuraden_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::mjuraden_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::mjuraden_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2601,9 +2601,8 @@ MACHINE_CONFIG_START(nbmj9195_state::koinomp)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(koinomp_map)
-	MCFG_CPU_IO_MAP(koinomp_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::koinomp_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::koinomp_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2611,19 +2610,14 @@ MACHINE_CONFIG_START(nbmj9195_state::patimono)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(patimono_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::patimono_io_map);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(nbmj9195_state::janbari)
-	NBMJDRV1(config);
+	patimono(config);
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(patimono_io_map)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -2631,23 +2625,17 @@ MACHINE_CONFIG_START(nbmj9195_state::mmehyou)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(koinomp_map)
-	MCFG_CPU_IO_MAP(mmehyou_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::koinomp_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::mmehyou_io_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(nbmj9195_state::ultramhm)
-	NBMJDRV1(config);
+	koinomp(config);
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(koinomp_map)
-	MCFG_CPU_IO_MAP(koinomp_io_map)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -2655,8 +2643,7 @@ MACHINE_CONFIG_START(nbmj9195_state::gal10ren)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(gal10ren_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::gal10ren_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2664,8 +2651,7 @@ MACHINE_CONFIG_START(nbmj9195_state::renaiclb)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(renaiclb_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::renaiclb_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2673,8 +2659,7 @@ MACHINE_CONFIG_START(nbmj9195_state::mjlaman)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mjlaman_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::mjlaman_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2682,8 +2667,7 @@ MACHINE_CONFIG_START(nbmj9195_state::mkeibaou)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mkeibaou_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::mkeibaou_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2691,10 +2675,9 @@ MACHINE_CONFIG_START(nbmj9195_state::pachiten)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(pachiten_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::pachiten_io_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -2709,10 +2692,9 @@ MACHINE_CONFIG_START(nbmj9195_state::sailorwr)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(sailorwr_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::sailorwr_io_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -2720,8 +2702,7 @@ MACHINE_CONFIG_START(nbmj9195_state::psailor1)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(psailor1_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::psailor1_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2729,8 +2710,7 @@ MACHINE_CONFIG_START(nbmj9195_state::psailor2)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(psailor2_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::psailor2_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2738,8 +2718,7 @@ MACHINE_CONFIG_START(nbmj9195_state::otatidai)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(otatidai_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::otatidai_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2747,8 +2726,7 @@ MACHINE_CONFIG_START(nbmj9195_state::yosimoto)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(yosimoto_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::yosimoto_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2756,10 +2734,9 @@ MACHINE_CONFIG_START(nbmj9195_state::yosimotm)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(yosimotm_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::yosimotm_io_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -2767,8 +2744,7 @@ MACHINE_CONFIG_START(nbmj9195_state::jituroku)
 	NBMJDRV1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(jituroku_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::jituroku_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2776,9 +2752,8 @@ MACHINE_CONFIG_START(nbmj9195_state::ngpgal)
 	NBMJDRV2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ngpgal_map)
-	MCFG_CPU_IO_MAP(ngpgal_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::ngpgal_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::ngpgal_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2786,9 +2761,8 @@ MACHINE_CONFIG_START(nbmj9195_state::mjgottsu)
 	NBMJDRV2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ngpgal_map)
-	MCFG_CPU_IO_MAP(mjgottsu_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::ngpgal_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::mjgottsu_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2796,9 +2770,9 @@ MACHINE_CONFIG_START(nbmj9195_state::bakuhatu)
 	NBMJDRV2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ngpgal_map)
-	MCFG_CPU_IO_MAP(mjgottsu_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::ngpgal_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::mjgottsu_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2806,9 +2780,8 @@ MACHINE_CONFIG_START(nbmj9195_state::cmehyou)
 	NBMJDRV2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ngpgal_map)
-	MCFG_CPU_IO_MAP(cmehyou_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::ngpgal_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::cmehyou_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2816,9 +2789,8 @@ MACHINE_CONFIG_START(nbmj9195_state::mjkoiura)
 	NBMJDRV2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjuraden_map)
-	MCFG_CPU_IO_MAP(mjkoiura_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::mjuraden_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::mjkoiura_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2826,9 +2798,8 @@ MACHINE_CONFIG_START(nbmj9195_state::mkoiuraa)
 	NBMJDRV2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjuraden_map)
-	MCFG_CPU_IO_MAP(mkoiuraa_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::mjuraden_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::mkoiuraa_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2836,9 +2807,8 @@ MACHINE_CONFIG_START(nbmj9195_state::mscoutm)
 	NBMJDRV3(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mscoutm_map)
-	MCFG_CPU_IO_MAP(mscoutm_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::mscoutm_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::mscoutm_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2846,9 +2816,8 @@ MACHINE_CONFIG_START(nbmj9195_state::imekura)
 	NBMJDRV3(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjegolf_map)
-	MCFG_CPU_IO_MAP(imekura_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::mjegolf_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::imekura_io_map);
 MACHINE_CONFIG_END
 
 
@@ -2856,20 +2825,10 @@ MACHINE_CONFIG_START(nbmj9195_state::mjegolf)
 	NBMJDRV3(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjegolf_map)
-	MCFG_CPU_IO_MAP(mjegolf_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::mjegolf_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::mjegolf_io_map);
 MACHINE_CONFIG_END
 
-
-MACHINE_CONFIG_START(nbmj9195_state::shabdama)
-	NBMJDRV1(config);
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(shabdama_map)
-	MCFG_CPU_IO_MAP(shabdama_io_map)
-MACHINE_CONFIG_END
 
 
 ROM_START( mjuraden )
@@ -3443,60 +3402,37 @@ ROM_START( jituroku )
 	ROM_LOAD( "9.10h", 0x300000, 0x80000, CRC(6bea11d7) SHA1(c9ea69ed38a86c138f702f84c26897225cdaff31) )
 ROM_END
 
-ROM_START( shabdama )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "1.bin",        0x000000, 0x010000, CRC(e49e3d73) SHA1(6d17d60e1b6f8aee96f7a09f45113030064d3bdb) )
-
-	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "3.bin",        0x000000, 0x010000, CRC(e8233c6e) SHA1(fbfdb03dc9f4e3e80e161b8522b676485ffb1c95) )
-	ROM_LOAD( "2.bin",        0x010000, 0x010000, CRC(3e0b5344) SHA1(eeae36fc4fca091065c1d51f05c2d11f44fe6d13) )
-
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
-	ROM_LOAD( "10.bin",       0x060000, 0x010000, CRC(5da10b82) SHA1(72974d083110fc6c583bfa1c22ce3abe02ba86f6) )
-	ROM_LOAD( "9.bin",        0x050000, 0x010000, CRC(1afdc5bf) SHA1(b07b32656ffc96b7f7d4bd242b2a6e0e105ab67a) )
-	ROM_LOAD( "8.bin",        0x040000, 0x010000, CRC(3e75423e) SHA1(62e24849ddeb004ed8570d2884afa4ab257cdf07) )
-	ROM_LOAD( "7.bin",        0x030000, 0x010000, CRC(7f08e3a6) SHA1(127018442183332175c9e1f558274cd2cb5f0147) )
-	ROM_LOAD( "6.bin",        0x020000, 0x010000, CRC(0fece809) SHA1(1fe8436af8ead02a3b517b6306f9824cd64b2d26) )
-	ROM_LOAD( "5.bin",        0x010000, 0x010000, CRC(0706386a) SHA1(29eee363775869dcc9c46285632e8bf745c9110b) )
-	ROM_LOAD( "4.bin",        0x000000, 0x010000, CRC(199e2127) SHA1(2514d51cb06438b312d1f328c72baa739280416a) )
-
-	DISK_REGION( "laserdisc" )
-		DISK_IMAGE_READONLY( "shabdama", 0, NO_DUMP )
-ROM_END
-
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR, COMPANY, FULLNAME, FLAGS
-GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Yubis", "Mahjong Uranai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, koinomp,  0,        koinomp,  koinomp,  nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Koi no Magic Potion (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, patimono, 0,        patimono, patimono, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Pachinko Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, janbari,  0,        janbari,  janbari,  nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Yubis / AV Japan", "Mahjong Janjan Baribari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mjanbari, janbari,  janbari,  pachiten, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Yubis / AV Japan", "Medal Mahjong Janjan Baribari [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mmehyou,  0,        mmehyou,  mmehyou,  nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Kawakusu", "Medal Mahjong Circuit no Mehyou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ultramhm, 0,        ultramhm, ultramhm, nbmj9195_state, nbmj9195, ROT0,    "Apple", "Ultra Maru-hi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gal10ren, 0,        gal10ren, gal10ren, nbmj9195_state, nbmj9195, ROT0,    "Fujic", "Mahjong Gal 10-renpatsu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, renaiclb, 0,        renaiclb, renaiclb, nbmj9195_state, nbmj9195, ROT0,    "Fujic", "Mahjong Ren-ai Club (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman,  nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / AV Japan", "Mahjong La Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mkeibaou, 0,        mkeibaou, patimono, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Keibaou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, pachiten, 0,        pachiten, pachiten, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / AV Japan / Miki Syouji", "Medal Mahjong Pachi-Slot Tengoku [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Sailor Wars (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Sailor Wars (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sailorwr, sailorws, sailorwr, sailorwr, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Sailor Wars-R [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wcatcher, 0,        otatidai, wcatcher, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Wakuwaku Catcher (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195_state, nbmj9195, ROT0,    "Windom", "Jitsuroku Maru-chi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, yosimotm, yosimoto, yosimotm, yosimotm, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, psailor1, 0,        psailor1, psailor1, nbmj9195_state, nbmj9195, ROT0,    "Sphinx", "Bishoujo Janshi Pretty Sailor 18-kin (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, psailor2, 0,        psailor2, psailor2, nbmj9195_state, nbmj9195, ROT0,    "Sphinx", "Bishoujo Janshi Pretty Sailor 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195_state, nbmj9195, ROT0,    "Sphinx", "Disco Mahjong Otachidai no Okite (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu / Yubis", "Mahjong Uranai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, koinomp,  0,        koinomp,  koinomp,  nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Koi no Magic Potion (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, patimono, 0,        patimono, patimono, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Pachinko Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, janbari,  0,        janbari,  janbari,  nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu / Yubis / AV Japan", "Mahjong Janjan Baribari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mjanbari, janbari,  janbari,  pachiten, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu / Yubis / AV Japan", "Medal Mahjong Janjan Baribari [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mmehyou,  0,        mmehyou,  mmehyou,  nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu / Kawakusu", "Medal Mahjong Circuit no Mehyou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ultramhm, 0,        ultramhm, ultramhm, nbmj9195_state, init_nbmj9195, ROT0,    "Apple", "Ultra Maru-hi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gal10ren, 0,        gal10ren, gal10ren, nbmj9195_state, init_nbmj9195, ROT0,    "Fujic", "Mahjong Gal 10-renpatsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, renaiclb, 0,        renaiclb, renaiclb, nbmj9195_state, init_nbmj9195, ROT0,    "Fujic", "Mahjong Ren-ai Club (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman,  nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu / AV Japan", "Mahjong La Man (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mkeibaou, 0,        mkeibaou, patimono, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Keibaou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pachiten, 0,        pachiten, pachiten, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu / AV Japan / Miki Syouji", "Medal Mahjong Pachi-Slot Tengoku [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Sailor Wars (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Sailor Wars (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sailorwr, sailorws, sailorwr, sailorwr, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Sailor Wars-R [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wcatcher, 0,        otatidai, wcatcher, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Wakuwaku Catcher (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195_state, init_nbmj9195, ROT0,    "Windom", "Jitsuroku Maru-chi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, yosimotm, yosimoto, yosimotm, yosimotm, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, psailor1, 0,        psailor1, psailor1, nbmj9195_state, init_nbmj9195, ROT0,    "Sphinx", "Bishoujo Janshi Pretty Sailor 18-kin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, psailor2, 0,        psailor2, psailor2, nbmj9195_state, init_nbmj9195, ROT0,    "Sphinx", "Bishoujo Janshi Pretty Sailor 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195_state, init_nbmj9195, ROT0,    "Sphinx", "Disco Mahjong Otachidai no Okite (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ngpgal,   0,        ngpgal,   ngpgal,   nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Nekketsu Grand-Prix Gal (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjgottsu, 0,        mjgottsu, mjgottsu, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Gottsu ee-kanji (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bakuhatu, mjgottsu, bakuhatu, bakuhatu, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Bakuhatsu Junjouden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, cmehyou,  0,        cmehyou,  cmehyou,  nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu / Kawakusu", "Mahjong Circuit no Mehyou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mjkoiura, 0,        mjkoiura, mjkoiura, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Koi Uranai (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkoiuraa, mjkoiura, mkoiuraa, mjkoiura, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "Mahjong Koi Uranai (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ngpgal,   0,        ngpgal,   ngpgal,   nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Nekketsu Grand-Prix Gal (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjgottsu, 0,        mjgottsu, mjgottsu, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Gottsu ee-kanji (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bakuhatu, mjgottsu, bakuhatu, bakuhatu, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Bakuhatsu Junjouden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, cmehyou,  0,        cmehyou,  cmehyou,  nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu / Kawakusu", "Mahjong Circuit no Mehyou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mjkoiura, 0,        mjkoiura, mjkoiura, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Koi Uranai (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkoiuraa, mjkoiura, mkoiuraa, mjkoiura, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Koi Uranai (Japan set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm,  nbmj9195_state, nbmj9195, ROT0,    "Sphinx / AV Japan", "Mahjong Scout Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, imekura,  0,        imekura,  imekura,  nbmj9195_state, nbmj9195, ROT0,    "Sphinx / AV Japan", "Imekura Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf,  nbmj9195_state, nbmj9195, ROT0,    "Fujic / AV Japan", "Mahjong Erotica Golf (Japan)", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1991, shabdama, 0,        shabdama, mjuraden, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "LD Mahjong #4 Shabon-Dama", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm,  nbmj9195_state, init_nbmj9195, ROT0,    "Sphinx / AV Japan", "Mahjong Scout Man (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, imekura,  0,        imekura,  imekura,  nbmj9195_state, init_nbmj9195, ROT0,    "Sphinx / AV Japan", "Imekura Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf,  nbmj9195_state, init_nbmj9195, ROT0,    "Fujic / AV Japan", "Mahjong Erotica Golf (Japan)", MACHINE_SUPPORTS_SAVE )

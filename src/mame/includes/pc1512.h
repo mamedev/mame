@@ -38,7 +38,6 @@
 #define INS8250_TAG     "ic106"
 #define AMS40041_TAG    "ic126"
 #define CENTRONICS_TAG  "centronics"
-#define SPEAKER_TAG     "speaker"
 #define ISA_BUS_TAG     "isa"
 #define RS232_TAG       "rs232"
 #define SCREEN_TAG      "screen"
@@ -57,7 +56,7 @@ public:
 		m_uart(*this, INS8250_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_cent_data_out(*this, "cent_data_out"),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_kb(*this, PC1512_KEYBOARD_TAG),
 		m_ram(*this, RAM_TAG),
 		m_floppy0(*this, PC_FDC_XT_TAG ":0:525dd" ),

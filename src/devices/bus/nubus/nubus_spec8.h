@@ -47,7 +47,6 @@ private:
 	uint32_t m_mode, m_vbl_disable;
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 	emu_timer *m_timer;
-	const std::string m_assembled_tag;
 
 	//uint32_t m_7xxxxx_regs[0x100000/4];
 	//int m_width, m_height, m_patofsx, m_patofsy;

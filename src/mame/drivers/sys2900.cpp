@@ -47,55 +47,60 @@ Status:
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 //#include "bus/s100/s100.h"
+#include "emupal.h"
 #include "screen.h"
 
 
 class sys2900_state : public driver_device
 {
 public:
+	sys2900_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
+
+	void sys2900(machine_config &config);
+
+	void init_sys2900();
+
+private:
 	enum
 	{
 		TIMER_BOOT
 	};
-
-	sys2900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu") { }
-
-	DECLARE_DRIVER_INIT(sys2900);
 	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sys2900(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
-ADDRESS_MAP_START(sys2900_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
-	AM_RANGE( 0x0800, 0xefff ) AM_RAM
-	AM_RANGE( 0xf000, 0xf7ff ) AM_ROM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void sys2900_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0xefff).ram();
+	map(0xf000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sys2900_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("sio1", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("pio",  z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("sio2", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("ctc",  z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) // unknown device, disk related?
-	AM_RANGE(0xa0, 0xaf) // unknown device
-	AM_RANGE(0xc0, 0xc3) // unknown device
-ADDRESS_MAP_END
+void sys2900_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x20, 0x23).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x24, 0x27).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x28, 0x2b).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x2c, 0x2f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83); // unknown device, disk related?
+	map(0xa0, 0xaf); // unknown device
+	map(0xc0, 0xc3); // unknown device
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sys2900 )
@@ -121,7 +126,7 @@ void sys2900_state::machine_reset()
 	timer_set(attotime::from_usec(5), TIMER_BOOT);
 }
 
-DRIVER_INIT_MEMBER(sys2900_state,sys2900)
+void sys2900_state::init_sys2900()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf000);
@@ -138,9 +143,9 @@ uint32_t sys2900_state::screen_update_sys2900(screen_device &screen, bitmap_ind1
 
 MACHINE_CONFIG_START(sys2900_state::sys2900)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -153,10 +158,10 @@ MACHINE_CONFIG_START(sys2900_state::sys2900)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 0)
-	MCFG_DEVICE_ADD("pio", Z80PIO, 0)
-	MCFG_DEVICE_ADD("sio1", Z80SIO, 0)
-	MCFG_DEVICE_ADD("sio2", Z80SIO, 0)
+	Z80CTC(config, "ctc", 0);
+	Z80PIO(config, "pio", 0);
+	Z80SIO(config, "sio1", 0);
+	Z80SIO(config, "sio2", 0);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -167,5 +172,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT     COMPANY          FULLNAME       FLAGS
-COMP( 1981, sys2900, 0,      0,       sys2900,   sys2900, sys2900_state, sys2900, "Systems Group", "System 2900", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY          FULLNAME       FLAGS
+COMP( 1981, sys2900, 0,      0,      sys2900, sys2900, sys2900_state, init_sys2900, "Systems Group", "System 2900", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

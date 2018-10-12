@@ -225,7 +225,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
 	m_control_regs[BDMA_CONTROL_REG] |= ((param >> 14) & 0xff) << 8;
 
 	if (m_control_regs[BDMA_CONTROL_REG] & 8)
-		m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	else
 		m_cpu->pulse_input_line(ADSP2181_BDMA, m_cpu->minimum_quantum_time());
 
@@ -272,24 +272,27 @@ WRITE16_MEMBER( acclaim_rax_device::host_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(acclaim_rax_device::adsp_program_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pram")
-ADDRESS_MAP_END
+void acclaim_rax_device::adsp_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram().share("adsp_pram");
+}
 
-ADDRESS_MAP_START(acclaim_rax_device::adsp_data_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("databank")
-	AM_RANGE(0x2000, 0x3fdf) AM_RAM // Internal RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
-ADDRESS_MAP_END
+void acclaim_rax_device::adsp_data_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankrw("databank");
+	map(0x2000, 0x3fdf).ram(); // Internal RAM
+	map(0x3fe0, 0x3fff).rw(FUNC(acclaim_rax_device::adsp_control_r), FUNC(acclaim_rax_device::adsp_control_w));
+}
 
-ADDRESS_MAP_START(acclaim_rax_device::adsp_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(ram_bank_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(rom_bank_w)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(host_r, host_w)
-ADDRESS_MAP_END
+void acclaim_rax_device::adsp_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0000).w(FUNC(acclaim_rax_device::ram_bank_w));
+	map(0x0001, 0x0001).w(FUNC(acclaim_rax_device::rom_bank_w));
+	map(0x0003, 0x0003).rw(FUNC(acclaim_rax_device::host_r), FUNC(acclaim_rax_device::host_w));
+}
 
 
 void acclaim_rax_device::device_start()
@@ -488,12 +491,12 @@ acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
-	MCFG_CPU_ADD("adsp", ADSP2181, XTAL(16'670'000))
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(acclaim_rax_device, adsp_sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(acclaim_rax_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
-	MCFG_CPU_IO_MAP(adsp_io_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2181, XTAL(16'670'000))
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, acclaim_rax_device, adsp_sound_tx_callback))      /* callback for serial transmit */
+	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(*this, acclaim_rax_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_IO_MAP(adsp_io_map)
 
 	MCFG_TIMER_DEVICE_ADD("adsp_reg_timer0", DEVICE_SELF, acclaim_rax_device, adsp_irq0)
 	MCFG_TIMER_DEVICE_ADD("adsp_dma_timer", DEVICE_SELF, acclaim_rax_device, dma_timer_callback)
@@ -501,12 +504,13 @@ MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
 	MCFG_GENERIC_LATCH_16_ADD("data_in")
 	MCFG_GENERIC_LATCH_16_ADD("data_out")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dacl", DMADAC, 0)
+	MCFG_DEVICE_ADD("dacl", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dacr", DMADAC, 0)
+	MCFG_DEVICE_ADD("dacr", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 

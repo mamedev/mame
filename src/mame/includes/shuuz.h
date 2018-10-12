@@ -12,6 +12,7 @@
 
 #include "machine/atarigen.h"
 #include "video/atarimo.h"
+#include "video/atarivad.h"
 
 class shuuz_state : public atarigen_state
 {
@@ -23,7 +24,7 @@ public:
 
 	void shuuz(machine_config &config);
 
-protected:
+private:
 	virtual void update_interrupts() override;
 
 	DECLARE_WRITE16_MEMBER(latch_w);
@@ -38,7 +39,6 @@ protected:
 
 	void main_map(address_map &map);
 
-private:
 	required_device<atari_vad_device> m_vad;
 
 	int m_cur[2];

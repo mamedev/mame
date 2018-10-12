@@ -21,6 +21,7 @@ If write to the 6845 is enabled, MAME freezes after 1 or 2 seconds.
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
@@ -36,37 +37,39 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void sys9002(machine_config &config);
+
+private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void sys9002(machine_config &config);
 	void sys9002_io(address_map &map);
 	void sys9002_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<palette_device> m_palette;
 };
 
 
-ADDRESS_MAP_START(sys9002_state::sys9002_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM // 4 * 4K ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM // 4 * 2k RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("videoram") // 2k RAM
-	AM_RANGE(0xc000, 0xc07f) AM_RAM // ??
-ADDRESS_MAP_END
+void sys9002_state::sys9002_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom(); // 4 * 4K ROM
+	map(0x8000, 0x9fff).ram(); // 4 * 2k RAM
+	map(0xa000, 0xa7ff).ram().share("videoram"); // 2k RAM
+	map(0xc000, 0xc07f).ram(); // ??
+}
 
-ADDRESS_MAP_START(sys9002_state::sys9002_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void sys9002_state::sys9002_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	//AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)  // left commented out as mame freezes after about 2 seconds
 	//AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w) // 7 bits even parity, x64
-	AM_RANGE(0x11, 0x11) AM_READNOP  // continuous read
-	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w) // enabled for transmit only, 8 bits odd parity, x64
-ADDRESS_MAP_END
+	map(0x08, 0x09).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x11, 0x11).nopr();  // continuous read
+	map(0x1c, 0x1d).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sys9002 )
@@ -120,9 +123,9 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sys9002_state::sys9002)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL(2'000'000)) // XTAL not visible on images
-	MCFG_CPU_PROGRAM_MAP(sys9002_mem)
-	MCFG_CPU_IO_MAP(sys9002_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(2'000'000)) // XTAL not visible on images
+	MCFG_DEVICE_PROGRAM_MAP(sys9002_mem)
+	MCFG_DEVICE_IO_MAP(sys9002_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -131,7 +134,7 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", mx2178)
+	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mx2178)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
@@ -140,33 +143,33 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(sys9002_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 614400)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 614400));
+	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
+	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	i8251_device &uart1(I8251(config, "uart1", 0)); // 7 bits even parity, x64
+	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
+	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", uart1)
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", uart1)
 
-	MCFG_DEVICE_ADD("uart2", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	i8251_device &uart2(I8251(config, "uart2", 0)); // enabled for transmit only, 8 bits odd parity, x64
+	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
+	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart2", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart2", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart2", i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", uart2)
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart2", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart2", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart2", i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", uart2)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -180,5 +183,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                FULLNAME                FLAGS
-COMP( 198?, sys9002, 0,      0,       sys9002,   sys9002, sys9002_state, 0,    "Mannesmann Kienzle",  "System 9002 Terminal", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME                FLAGS
+COMP( 198?, sys9002, 0,      0,      sys9002, sys9002, sys9002_state, empty_init, "Mannesmann Kienzle", "System 9002 Terminal", MACHINE_IS_SKELETON )

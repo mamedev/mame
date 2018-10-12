@@ -17,7 +17,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SCORE7, score7_cpu_device, "score7", "S+core 7")
+DEFINE_DEVICE_TYPE(SCORE7, score7_cpu_device, "score7", "Sunplus S+core 7")
 
 
 //**************************************************************************
@@ -73,10 +73,10 @@ void score7_cpu_device::device_start()
 {
 	// find address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// register state for debugger
 	state_add(SCORE_PC  , "PC"  , m_pc).callimport().callexport().formatstr("%08X");
@@ -172,7 +172,7 @@ void score7_cpu_device::execute_run()
 	do
 	{
 		m_ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		check_irq();
 
@@ -283,7 +283,7 @@ int32_t score7_cpu_device::sign_extend(uint32_t data, uint8_t len)
 
 uint32_t score7_cpu_device::fetch()
 {
-	return m_direct->read_dword(m_pc & ~3);
+	return m_cache->read_dword(m_pc & ~3);
 }
 
 uint8_t score7_cpu_device::read_byte(offs_t offset)
@@ -325,7 +325,7 @@ void score7_cpu_device::check_irq()
 			if (m_pending_interrupt[i])
 			{
 				m_pending_interrupt[i] = false;
-				debugger_interrupt_hook(this, i);
+				standard_irq_callback(i);
 				gen_exception(EXCEPTION_INTERRUPT, i);
 				return;
 			}
@@ -335,7 +335,7 @@ void score7_cpu_device::check_irq()
 
 void score7_cpu_device::gen_exception(int cause, uint32_t param)
 {
-	debugger_exception_hook(this, cause);
+	debugger_exception_hook(cause);
 
 	REG_ECR = (REG_ECR & ~0x0000001f) | (cause & 0x1f);              // set exception cause
 	REG_PSR = (REG_PSR & ~0x0000000f) | ((REG_PSR << 2) & 0x0c);     // push status bits
@@ -1350,7 +1350,7 @@ void score7_cpu_device::unemulated_op(const char * op)
 	fatalerror("%s: unemulated %s (PC=0x%08x)\n", tag(), op, m_ppc);
 }
 
-util::disasm_interface *score7_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> score7_cpu_device::create_disassembler()
 {
-	return new score7_disassembler;
+	return std::make_unique<score7_disassembler>();
 }

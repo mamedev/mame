@@ -217,6 +217,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "mgames.lh"
@@ -225,16 +226,18 @@
 class mgames_state : public driver_device
 {
 public:
-	mgames_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mgames_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_video(*this, "video"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_lamps(*this, "lamp%u", 1U)
+	{ }
 
-	uint8_t m_output[8];
-	required_shared_ptr<uint8_t> m_video;
-	int m_mixdata;
+	void mgames(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mixport_r);
 	DECLARE_WRITE8_MEMBER(outport0_w);
 	DECLARE_WRITE8_MEMBER(outport1_w);
@@ -244,14 +247,20 @@ public:
 	DECLARE_WRITE8_MEMBER(outport5_w);
 	DECLARE_WRITE8_MEMBER(outport6_w);
 	DECLARE_WRITE8_MEMBER(outport7_w);
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mgames);
 	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
+
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
+	uint8_t m_output[8];
+	required_shared_ptr<uint8_t> m_video;
+	int m_mixdata;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void mgames(machine_config &config);
-	void main_map(address_map &map);
+	output_finder<9> m_lamps;
 };
 
 
@@ -349,8 +358,8 @@ READ8_MEMBER(mgames_state::mixport_r)
 
 WRITE8_MEMBER(mgames_state::outport0_w)
 {
-	output().set_lamp_value(1, (data & 1));           /* Lamp 1 - BET */
-	output().set_lamp_value(5, (data >> 1) & 1);      /* Lamp 5 - HOLD 1 */
+	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - BET */
+	m_lamps[4] = BIT(data, 1);      /* Lamp 5 - HOLD 1 */
 
 	m_output[0] = data;
 	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -370,8 +379,8 @@ WRITE8_MEMBER(mgames_state::outport0_w)
 
 WRITE8_MEMBER(mgames_state::outport1_w)
 {
-	output().set_lamp_value(2, (data & 1));           /* Lamp 2 - DEAL */
-	output().set_lamp_value(6, (data >> 1) & 1);      /* Lamp 6 - HOLD 2 */
+	m_lamps[1] = BIT(data, 0);      /* Lamp 2 - DEAL */
+	m_lamps[5] = BIT(data, 1);      /* Lamp 6 - HOLD 2 */
 
 	m_output[1] = data;
 	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -391,8 +400,8 @@ WRITE8_MEMBER(mgames_state::outport1_w)
 
 WRITE8_MEMBER(mgames_state::outport2_w)
 {
-	output().set_lamp_value(3, (data & 1));           /* Lamp 3 - CANCEL */
-	output().set_lamp_value(7, (data >> 1) & 1);      /* Lamp 7 - HOLD 3 */
+	m_lamps[2] = BIT(data, 0);      /* Lamp 3 - CANCEL */
+	m_lamps[6] = BIT(data, 1);      /* Lamp 7 - HOLD 3 */
 
 	m_output[2] = data;
 	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -412,8 +421,8 @@ WRITE8_MEMBER(mgames_state::outport2_w)
 
 WRITE8_MEMBER(mgames_state::outport3_w)
 {
-	output().set_lamp_value(4, (data & 1));           /* Lamp 4 - STAND */
-	output().set_lamp_value(8, (data >> 1) & 1);      /* Lamp 8 - HOLD 4 */
+	m_lamps[3] = BIT(data, 0);      /* Lamp 4 - STAND */
+	m_lamps[7] = BIT(data, 1);      /* Lamp 8 - HOLD 4 */
 
 	m_output[3] = data;
 	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -433,7 +442,7 @@ WRITE8_MEMBER(mgames_state::outport3_w)
 
 WRITE8_MEMBER(mgames_state::outport4_w)
 {
-	output().set_lamp_value(9, (data >> 1) & 1);      /* Lamp 9 - HOLD 5 */
+	m_lamps[8] = BIT(data, 1);      /* Lamp 9 - HOLD 5 */
 
 	m_output[4] = data;
 	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -524,24 +533,25 @@ WRITE8_MEMBER(mgames_state::outport7_w)
 
 */
 
-ADDRESS_MAP_START(mgames_state::main_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
+void mgames_state::main_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
 //  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
-	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_SHARE("nvram")   /* NVRAM = 2x SCM5101E */
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("video")   /* 4x MM2114N-3 */
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("SW1")
-	AM_RANGE(0x8001, 0x8001) AM_READ(mixport_r) /* DIP switch bank 2 + a sort of watchdog */
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN1")
-	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN2")
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(outport0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(outport1_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(outport2_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(outport3_w)
-	AM_RANGE(0x8004, 0x8004) AM_WRITE(outport4_w)
-	AM_RANGE(0x8005, 0x8005) AM_WRITE(outport5_w)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(outport6_w)
-	AM_RANGE(0x8007, 0x8007) AM_WRITE(outport7_w)
-ADDRESS_MAP_END
+	map(0x3800, 0x38ff).ram().share("nvram");   /* NVRAM = 2x SCM5101E */
+	map(0x4000, 0x47ff).ram().share("video");   /* 4x MM2114N-3 */
+	map(0x8000, 0x8000).portr("SW1");
+	map(0x8001, 0x8001).r(FUNC(mgames_state::mixport_r)); /* DIP switch bank 2 + a sort of watchdog */
+	map(0x8002, 0x8002).portr("IN1");
+	map(0x8003, 0x8003).portr("IN2");
+	map(0x8000, 0x8000).w(FUNC(mgames_state::outport0_w));
+	map(0x8001, 0x8001).w(FUNC(mgames_state::outport1_w));
+	map(0x8002, 0x8002).w(FUNC(mgames_state::outport2_w));
+	map(0x8003, 0x8003).w(FUNC(mgames_state::outport3_w));
+	map(0x8004, 0x8004).w(FUNC(mgames_state::outport4_w));
+	map(0x8005, 0x8005).w(FUNC(mgames_state::outport5_w));
+	map(0x8006, 0x8006).w(FUNC(mgames_state::outport6_w));
+	map(0x8007, 0x8007).w(FUNC(mgames_state::outport7_w));
+}
 
 
 static INPUT_PORTS_START( mgames )
@@ -629,18 +639,18 @@ static const gfx_layout tiles16x16_layout =
 	16*16
 };
 
-static GFXDECODE_START( mgames )
+static GFXDECODE_START( gfx_mgames )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(mgames_state::mgames)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mgames_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mgames_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -651,7 +661,7 @@ MACHINE_CONFIG_START(mgames_state::mgames)
 	MCFG_SCREEN_UPDATE_DRIVER(mgames_state, screen_update_mgames)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgames)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgames)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mgames_state, mgames)
 
@@ -682,5 +692,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT   STATE         INIT   ROT    COMPANY  FULLNAME      FLAGS...                                 LAYOUT  */
-GAMEL( 1981, mgames,   0,      mgames,   mgames, mgames_state, 0,     ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )
+/*     YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROT   COMPANY  FULLNAME       FLAGS...                                 LAYOUT  */
+GAMEL( 1981, mgames, 0,      mgames,  mgames, mgames_state, empty_init, ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )

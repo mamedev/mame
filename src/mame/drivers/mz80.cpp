@@ -31,6 +31,7 @@ MZ80B
 #include "emu.h"
 #include "includes/mz80.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -245,27 +246,29 @@ static INPUT_PORTS_START( mz80a )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(mz80_state::mz80k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0xcfff) AM_RAM AM_SHARE("p_ram") // 48 KB of RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("videoram") // Video RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) /* PPIA 8255 */
-	AM_RANGE(0xe004, 0xe007) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)  /* PIT 8253  */
-	AM_RANGE(0xe008, 0xe00b) AM_READWRITE( mz80k_strobe_r, mz80k_strobe_w)
-	AM_RANGE(0xf000, 0xf3ff) AM_ROM
-ADDRESS_MAP_END
+void mz80_state::mz80k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0xcfff).ram().share("p_ram"); // 48 KB of RAM
+	map(0xd000, 0xd7ff).ram().share("videoram"); // Video RAM
+	map(0xe000, 0xe003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)); /* PPIA 8255 */
+	map(0xe004, 0xe007).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));  /* PIT 8253  */
+	map(0xe008, 0xe00b).rw(FUNC(mz80_state::mz80k_strobe_r), FUNC(mz80_state::mz80k_strobe_w));
+	map(0xf000, 0xf3ff).rom();
+}
 
-ADDRESS_MAP_START(mz80_state::mz80k_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void mz80_state::mz80k_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+}
 
-static GFXDECODE_START( mz80k )
+static GFXDECODE_START( gfx_mz80k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mz80k_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( mz80kj )
+static GFXDECODE_START( gfx_mz80kj )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mz80kj_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -278,9 +281,9 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	/* basic machine hardware */
 
 	/* main CPU */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 4)        /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(mz80k_mem)
-	MCFG_CPU_IO_MAP(mz80k_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 4)        /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mz80k_mem)
+	MCFG_DEVICE_IO_MAP(mz80k_io)
 
 
 	/* video hardware */
@@ -291,30 +294,28 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80k)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz80k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz80k)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz80_state, mz80k_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mz80_state, mz80k_8255_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(mz80_state, mz80k_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz80_state, mz80k_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(mz80_state::mz80k_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(mz80_state::mz80k_8255_portb_r));
+	m_ppi->in_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_w));
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz80_state, pit_out0_changed))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz80_state, pit_out0_changed))
 	MCFG_PIT8253_CLK1(XTAL(8'000'000)/256)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk2))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
 	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mz80_state, pit_out2_changed))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mz80_state, pit_out2_changed))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tempo", mz80_state, ne555_tempo_callback, attotime::from_hz(34))
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -326,7 +327,7 @@ MACHINE_CONFIG_START(mz80_state::mz80kj)
 	mz80k(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80kj)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mz80kj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mz80kj)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mz80_state::mz80a)
@@ -339,11 +340,11 @@ MACHINE_CONFIG_END
 ROM_START( mz80k )
 	ROM_REGION( 0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "sp1002", "sp1002" )
-	ROMX_LOAD( "sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c), ROM_BIOS(1) )
+	ROMX_LOAD( "sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tc", "tc" )
-	ROMX_LOAD( "80ktc.rom",     0x0000, 0x1000, CRC(19ed6546) SHA1(2bbeff916c2fa8991e718070ca4195beb45e0848), ROM_BIOS(2) )
+	ROMX_LOAD( "80ktc.rom",     0x0000, 0x1000, CRC(19ed6546) SHA1(2bbeff916c2fa8991e718070ca4195beb45e0848), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v44", "v44" )
-	ROMX_LOAD( "80kv44.rom",    0x0000, 0x1000, CRC(d66af028) SHA1(718904c011dfcfcfabbb7dbdaaa35b9f3ac41baf), ROM_BIOS(3) )
+	ROMX_LOAD( "80kv44.rom",    0x0000, 0x1000, CRC(d66af028) SHA1(718904c011dfcfcfabbb7dbdaaa35b9f3ac41baf), ROM_BIOS(2) )
 	ROM_LOAD( "mz80kfdif.rom",  0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
@@ -373,7 +374,7 @@ ROM_START( mz80a )
 	ROM_LOAD( "mz80acg.rom", 0x0000, 0x0800, CRC(a87c2e2b) SHA1(e8aefbdb48a63e5f96692af868c353ca7e1bfcd2) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY    FULLNAME             FLAGS
-COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K (Japanese)", 0 )
-COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K",            0 )
-COMP( 1982, mz80a,    0,        0,      mz80a,   mz80a, mz80_state,  mz80k, "Sharp",   "MZ-80A",            0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1979, mz80kj, 0,      0,      mz80kj,  mz80k, mz80_state, init_mz80k, "Sharp", "MZ-80K (Japanese)", 0 )
+COMP( 1979, mz80k,  mz80kj, 0,      mz80k,   mz80k, mz80_state, init_mz80k, "Sharp", "MZ-80K",            0 )
+COMP( 1982, mz80a,  0,      0,      mz80a,   mz80a, mz80_state, init_mz80k, "Sharp", "MZ-80A",            0 )

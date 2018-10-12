@@ -1,193 +1,82 @@
-// license:LGPL-2.1+
-// copyright-holders:Angelo Salese
+// license:BSD-3-Clause
+// copyright-holders:AJR
 /***************************************************************************
 
     Harriet (c) 1990 Quantel
 
-    TODO:
-    - PCB pics would be very useful
-    - "Failed to read NVR" message.
-    - hook-up keyboard/terminal, shouldn't be too hard by studying the code.
-
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/terminal.h"
-#include "speaker.h"
-
-
-#define TERMINAL_TAG "terminal"
+#include "machine/hd63450.h"
+//#include "machine/imsc012.h"
+#include "machine/mc68681.h"
+#include "machine/mc68901.h"
+#include "machine/nvram.h"
+#include "machine/timekpr.h"
+//#include "machine/wd33c93.h"
 
 class harriet_state : public driver_device
 {
 public:
 	harriet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_READ8_MEMBER(unk2_r);
-	DECLARE_READ8_MEMBER(unk3_r);
-	DECLARE_READ8_MEMBER(keyboard_status_r);
-	void kbd_put(u8 data);
-
 	void harriet(machine_config &config);
+private:
+	DECLARE_READ8_MEMBER(zpram_r);
+	DECLARE_WRITE8_MEMBER(zpram_w);
+	DECLARE_READ8_MEMBER(unk_status_r);
+
 	void harriet_map(address_map &map);
-protected:
-	// driver_device overrides
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void video_start() override;
-
-	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-
-	uint8_t m_teletype_data;
-	uint8_t m_teletype_status;
+	std::unique_ptr<u8[]> m_zpram_data;
 };
 
-void harriet_state::video_start()
+READ8_MEMBER(harriet_state::zpram_r)
 {
+	return m_zpram_data[offset];
 }
 
-uint32_t harriet_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+WRITE8_MEMBER(harriet_state::zpram_w)
 {
-	return 0;
+	m_zpram_data[offset] = data;
 }
 
-/* tested at POST (PC=0x612), halts the CPU if cmp.b $f1000f.l, d0 for 0x4000 DBRAs */
-READ8_MEMBER(harriet_state::unk_r)
+READ8_MEMBER(harriet_state::unk_status_r)
 {
-	return machine().rand();
+	return 0x81;
 }
 
-WRITE8_MEMBER(harriet_state::unk_w)
+void harriet_state::harriet_map(address_map &map)
 {
-/*  if(offset)
-        printf("%02x\n",data);
-    else if(data != 0xcf)
-        printf("$f1001d Control (offset 0) write %02x\n",data);*/
+	map(0x000000, 0x007fff).rom().region("monitor", 0);
+	map(0x040000, 0x040fff).rw(FUNC(harriet_state::zpram_r), FUNC(harriet_state::zpram_w)).umask16(0xff00);
+	map(0x040000, 0x040fff).rw("timekpr", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
+	map(0x7f0000, 0x7fffff).ram();
+	map(0xf10000, 0xf1001f).rw("duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xf20000, 0xf2002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xf30000, 0xf30fff).rw("dmac", FUNC(hd63450_device::read), FUNC(hd63450_device::write));
+	map(0xf4003f, 0xf4003f).r(FUNC(harriet_state::unk_status_r));
+	//map(0xf60000, 0xf6000f).rw("c012", FUNC(imsc012_device::read), FUNC(imsc012_device::write));
 }
-
-/* PC=0x676/0x694 */
-READ8_MEMBER(harriet_state::unk2_r)
-{
-	return machine().rand();
-}
-
-
-WRITE8_MEMBER(harriet_state::serial_w)
-{
-	m_terminal->write(space, 0, data);
-}
-
-/* tested before putting data to serial port at PC=0x4c78 */
-READ8_MEMBER(harriet_state::unk3_r)
-{
-	return 0xff;//machine().rand();
-}
-
-/* 0x314c bit 7: keyboard status */
-READ8_MEMBER(harriet_state::keyboard_status_r)
-{
-	uint8_t res;
-
-	res = m_teletype_status | m_teletype_data;
-	m_teletype_status &= ~0x80;
-
-	return res;
-}
-
-ADDRESS_MAP_START(harriet_state::harriet_map)
-	AM_RANGE(0x000000, 0x007fff) AM_ROM
-	AM_RANGE(0x040000, 0x040fff) AM_RAM // NVRAM
-	AM_RANGE(0x7f0000, 0x7fffff) AM_RAM // todo: boundaries, 0x7fe000 - 0x7fffff tested on boot
-	AM_RANGE(0xf1000e, 0xf1000f) AM_READ8(unk_r,0x00ff)
-	AM_RANGE(0xf1001c, 0xf1001f) AM_WRITE8(unk_w,0x00ff)
-	AM_RANGE(0xf20022, 0xf20023) AM_READ8(unk2_r,0x00ff)
-	AM_RANGE(0xf20024, 0xf20025) AM_READ8(unk2_r,0x00ff)
-	AM_RANGE(0xf2002c, 0xf2002d) AM_READ8(unk3_r,0x00ff)
-	AM_RANGE(0xf2002e, 0xf2002f) AM_WRITE8(serial_w,0x00ff)
-//  AM_RANGE(0xf4001e, 0xf4001f) AM_READ8(keyboard_status_r,0x00ff)
-//  AM_RANGE(0xf4002e, 0xf4002f) AM_READ8(keyboard_status_r,0x00ff)
-	AM_RANGE(0xf4003e, 0xf4003f) AM_READ8(keyboard_status_r,0x00ff)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( harriet )
-	/* dummy active high structure */
-	PORT_START("SYSA")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	/* dummy active low structure */
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
-
-void harriet_state::kbd_put(u8 data)
-{
-	m_teletype_data = data;
-	m_teletype_status |= 0x80;
-}
 
 void harriet_state::machine_start()
 {
+	m_zpram_data = std::make_unique<u8[]>(0x800);
+	subdevice<nvram_device>("zpram")->set_base(m_zpram_data.get(), 0x800);
+	save_pointer(NAME(m_zpram_data), 0x800);
 }
 
 void harriet_state::machine_reset()
@@ -195,35 +84,40 @@ void harriet_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(harriet_state::harriet)
+void harriet_state::harriet(machine_config &config)
+{
+	M68010(config, m_maincpu, 40_MHz_XTAL / 4); // MC68010FN10
+	m_maincpu->set_addrmap(AS_PROGRAM, &harriet_state::harriet_map);
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68010,XTAL(8'000'000)) // TODO: clock
-	MCFG_CPU_PROGRAM_MAP(harriet_map)
+	MC68681(config, "duart", 3.6864_MHz_XTAL);
 
-	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(harriet_state, kbd_put))
+	mc68901_device &mfp(MC68901(config, "mfp", 40_MHz_XTAL / 16));
+	mfp.set_timer_clock(2.4576_MHz_XTAL);
+	mfp.set_rx_clock(9600);
+	mfp.set_tx_clock(9600);
+	mfp.out_so_cb().set("rs232", FUNC(rs232_port_device::write_txd));
+	//mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::rc_w));
+	//mfp.out_tdo_cb().set("mfp", FUNC(mc68901_device::tc_w));
 
-	MCFG_PALETTE_ADD("palette", 8)
+	HD63450(config, "dmac", 40_MHz_XTAL / 4, "maincpu"); // MC68450R10 (or HD68450Y-10)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	M48T02(config, "timekpr", 0);
+	NVRAM(config, "zpram", nvram_device::DEFAULT_ALL_0); // MK48Z02
 
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("mfp", FUNC(mc68901_device::write_rx));
+	rs232.rxd_handler().append("mfp", FUNC(mc68901_device::tbi_w));
 
-/***************************************************************************
+	//WD33C93(config, "wdca", 40_MHz_XTAL / 4);
+	//WD33C93(config, "wdcb", 40_MHz_XTAL / 4);
+	//IMSC012(config, "c012", 40_MHz_XTAL / 8); // INMOS IMSC012-P20S link adaptor
+}
 
-  Game driver(s)
-
-***************************************************************************/
 
 ROM_START( harriet )
-	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "harriet 36-74c.tfb v5.01 lobyte 533f.bin", 0x0001, 0x4000, CRC(f07fff76) SHA1(8288f7eaa8f4155e0e4746635f63ca2cc3da25d1) )
-	ROM_LOAD16_BYTE( "harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28) )
+	ROM_REGION16_BE(0x8000, "monitor", 0)
+	ROM_LOAD16_BYTE("harriet 36-74c.tfb v5.01 lobyte 533f.bin", 0x0001, 0x4000, CRC(f07fff76) SHA1(8288f7eaa8f4155e0e4746635f63ca2cc3da25d1))
+	ROM_LOAD16_BYTE("harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28))
 ROM_END
 
-COMP( 1990, harriet,  0,  0, harriet,  harriet, harriet_state,  0,    "Quantel",      "Harriet", MACHINE_IS_SKELETON )
+COMP( 1990, harriet, 0, 0, harriet, harriet, harriet_state, empty_init, "Quantel", "Harriet", MACHINE_IS_SKELETON )

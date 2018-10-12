@@ -10,6 +10,7 @@
 
 #include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
+#include "emupal.h"
 #include "screen.h"
 
 class galspnbl_state : public driver_device
@@ -31,6 +32,9 @@ public:
 		m_soundlatch(*this, "soundlatch")
 		{ }
 
+	void galspnbl(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_colorram;
@@ -57,7 +61,6 @@ public:
 
 	void mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 
-	void galspnbl(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 };

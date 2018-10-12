@@ -121,19 +121,19 @@ enum
 	psxcpu_device::getcpu( *this, cputag )->subdevice<psxdma_device>("dma")->install_write_handler( channel, handler );
 
 #define MCFG_PSX_GPU_READ_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_gpu_read_handler(DEVCB_##_devcb);
+	downcast<psxcpu_device &>(*device).set_gpu_read_handler(DEVCB_##_devcb);
 #define MCFG_PSX_GPU_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_gpu_write_handler(DEVCB_##_devcb);
+	downcast<psxcpu_device &>(*device).set_gpu_write_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_SPU_READ_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_spu_read_handler(DEVCB_##_devcb);
+	downcast<psxcpu_device &>(*device).set_spu_read_handler(DEVCB_##_devcb);
 #define MCFG_PSX_SPU_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_spu_write_handler(DEVCB_##_devcb);
+	downcast<psxcpu_device &>(*device).set_spu_write_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_CD_READ_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_cd_read_handler(DEVCB_##_devcb);
+	downcast<psxcpu_device &>(*device).set_cd_read_handler(DEVCB_##_devcb);
 #define MCFG_PSX_CD_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_cd_write_handler(DEVCB_##_devcb);
+	downcast<psxcpu_device &>(*device).set_cd_write_handler(DEVCB_##_devcb);
 #define MCFG_PSX_DISABLE_ROM_BERR \
 	downcast<psxcpu_device *>(device)->set_disable_rom_berr(true);
 
@@ -220,7 +220,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// CPU registers
 	uint32_t m_pc;
@@ -235,7 +235,7 @@ protected:
 	// address spaces
 	const address_space_config m_program_config;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	// other internal states
 	int m_icount;

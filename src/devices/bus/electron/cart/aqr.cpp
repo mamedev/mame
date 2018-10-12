@@ -56,7 +56,7 @@ uint8_t electron_aqr_device::read(address_space &space, offs_t offset, int infc,
 	{
 		if (offset >= 0x0000 && offset < 0x4000)
 		{
-			data = m_ram[(offset & 0x3fff) + (m_page_register * 0x4000)];
+			data = m_ram[(offset & 0x3fff) | (m_page_register << 14)];
 		}
 	}
 
@@ -89,7 +89,7 @@ void electron_aqr_device::write(address_space &space, offs_t offset, uint8_t dat
 	{
 		if (offset >= 0x0000 && offset < 0x4000 && !m_lock_register)
 		{
-			m_ram[(offset & 0x3fff) + (m_page_register * 0x4000)] = data;
+			m_ram[(offset & 0x3fff) | (m_page_register << 14)] = data;
 		}
 	}
 }

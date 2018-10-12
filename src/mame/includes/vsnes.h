@@ -13,11 +13,35 @@ public:
 		, m_ppu2(*this, "ppu2")
 		, m_work_ram(*this, "work_ram")
 		, m_work_ram_1(*this, "work_ram_1")
-		, m_palette(*this, "palette")
 		, m_gfx1_rom(*this, "gfx1")
 	{
 	}
 
+	void vsdual(machine_config &config);
+	void vsgshoe(machine_config &config);
+	void vsnes(machine_config &config);
+	void vsdual_pi(machine_config &config);
+	void topgun(machine_config &config);
+	void mightybj(machine_config &config);
+	void vsnes_bootleg(machine_config &config);
+	void jajamaru(machine_config &config);
+
+	void init_vskonami();
+	void init_vsvram();
+	void init_bnglngby();
+	void init_drmario();
+	void init_MMC3();
+	void init_vsfdf();
+	void init_tkoboxng();
+	void init_vsgun();
+	void init_supxevs();
+	void init_vsgshoe();
+	void init_vsnormal();
+	void init_platoon();
+	void init_rbibb();
+	void init_vsdual();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<ppu2c0x_device> m_ppu1;
@@ -25,7 +49,6 @@ public:
 
 	required_shared_ptr<uint8_t> m_work_ram;
 	optional_shared_ptr<uint8_t> m_work_ram_1;
-	required_device<palette_device> m_palette;
 
 	optional_memory_region m_gfx1_rom;
 
@@ -65,55 +88,25 @@ public:
 	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking_sub);
 	void v_set_mirroring(int ppu, int mirroring);
 
-	DECLARE_DRIVER_INIT(vskonami);
-	DECLARE_DRIVER_INIT(vsvram);
-	DECLARE_DRIVER_INIT(bnglngby);
-	DECLARE_DRIVER_INIT(drmario);
-	DECLARE_DRIVER_INIT(MMC3);
-	DECLARE_DRIVER_INIT(vsfdf);
-	DECLARE_DRIVER_INIT(tkoboxng);
-	DECLARE_DRIVER_INIT(vsgun);
-	DECLARE_DRIVER_INIT(supxevs);
-	DECLARE_DRIVER_INIT(vsgshoe);
-	DECLARE_DRIVER_INIT(vsnormal);
-	DECLARE_DRIVER_INIT(platoon);
-	DECLARE_DRIVER_INIT(rbibb);
-	DECLARE_DRIVER_INIT(vsdual);
 	DECLARE_MACHINE_START(vsnes);
 	DECLARE_MACHINE_RESET(vsnes);
-	DECLARE_VIDEO_START(vsnes);
-	DECLARE_PALETTE_INIT(vsnes);
 	DECLARE_MACHINE_START(vsdual);
 	DECLARE_MACHINE_RESET(vsdual);
-	DECLARE_VIDEO_START(vsdual);
-	DECLARE_PALETTE_INIT(vsdual);
-	uint32_t screen_update_vsnes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_vsnes_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );
 	void mapper4_set_prg(  );
 	void mapper4_set_chr(  );
 	void mapper4_irq( int scanline, int vblank, int blanked );
-	void ppu_irq_1(int *ppu_regs);
-	void ppu_irq_2(int *ppu_regs);
 
 	DECLARE_READ8_MEMBER( vsnes_bootleg_z80_latch_r );
 	DECLARE_WRITE8_MEMBER(bootleg_sound_write);
 	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_data_r);
 	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_address_r);
 
-	void vsdual(machine_config &config);
-	void vsgshoe(machine_config &config);
-	void vsnes(machine_config &config);
-	void vsdual_pi(machine_config &config);
-	void topgun(machine_config &config);
-	void mightybj(machine_config &config);
-	void vsnes_bootleg(machine_config &config);
-	void jajamaru(machine_config &config);
 	void vsnes_bootleg_z80_map(address_map &map);
 	void vsnes_cpu1_bootleg_map(address_map &map);
 	void vsnes_cpu1_map(address_map &map);
 	void vsnes_cpu2_map(address_map &map);
-private:
+
 	int m_coin;
 	int m_do_vrom_bank;
 	int m_input_latch[4];

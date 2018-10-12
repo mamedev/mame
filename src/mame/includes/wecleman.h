@@ -8,16 +8,12 @@
 #include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k051316.h"
+#include "emupal.h"
 #include "screen.h"
 
 class wecleman_state : public driver_device
 {
 public:
-	enum
-	{
-		WECLEMAN_ID = 0,
-		HOTCHASE_ID
-	};
 	wecleman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videostatus(*this, "videostatus")
@@ -37,7 +33,23 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
+		, m_led(*this, "led%u", 0U)
 	{ }
+
+	void hotchase(machine_config &config);
+	void wecleman(machine_config &config);
+
+	void init_wecleman();
+	void init_hotchase();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(hotchase_sound_status_r);
+
+private:
+	enum
+	{
+		WECLEMAN_ID = 0,
+		HOTCHASE_ID
+	};
 
 	optional_shared_ptr<uint16_t> m_videostatus;
 	optional_shared_ptr<uint16_t> m_protection_ram;
@@ -75,6 +87,7 @@ public:
 	int m_sound_hw_type;
 	bool m_hotchase_sound_hs;
 	pen_t m_black_pen;
+
 	DECLARE_READ16_MEMBER(wecleman_protection_r);
 	DECLARE_WRITE16_MEMBER(wecleman_protection_w);
 	DECLARE_WRITE16_MEMBER(irqctrl_w);
@@ -93,15 +106,19 @@ public:
 	DECLARE_WRITE8_MEMBER(wecleman_volume_callback);
 	template<int Chip> DECLARE_READ8_MEMBER(hotchase_k007232_r);
 	template<int Chip> DECLARE_WRITE8_MEMBER(hotchase_k007232_w);
-	DECLARE_DRIVER_INIT(wecleman);
-	DECLARE_DRIVER_INIT(hotchase);
+
 	TILE_GET_INFO_MEMBER(wecleman_get_txt_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_fg_tile_info);
+
+	DECLARE_MACHINE_START(wecleman);
 	DECLARE_MACHINE_RESET(wecleman);
 	DECLARE_VIDEO_START(wecleman);
+
+	DECLARE_MACHINE_START(hotchase);
 	DECLARE_MACHINE_RESET(hotchase);
 	DECLARE_VIDEO_START(hotchase);
+
 	uint32_t screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hotchase_sound_timer);
@@ -117,7 +134,7 @@ public:
 	void hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K051316_CB_MEMBER(hotchase_zoom_callback_1);
 	K051316_CB_MEMBER(hotchase_zoom_callback_2);
-	DECLARE_CUSTOM_INPUT_MEMBER(hotchase_sound_status_r);
+
 	DECLARE_WRITE8_MEMBER(hotchase_sound_hs_w);
 
 	required_device<cpu_device> m_maincpu;
@@ -129,15 +146,15 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	void hotchase(machine_config &config);
-	void wecleman(machine_config &config);
+	output_finder<1> m_led;
+
 	void hotchase_map(address_map &map);
 	void hotchase_sound_map(address_map &map);
 	void hotchase_sub_map(address_map &map);
 	void wecleman_map(address_map &map);
 	void wecleman_sound_map(address_map &map);
 	void wecleman_sub_map(address_map &map);
-private:
+
 	struct sprite_t
 	{
 		sprite_t() { }

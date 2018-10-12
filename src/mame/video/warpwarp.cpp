@@ -40,6 +40,37 @@ PALETTE_INIT_MEMBER(warpwarp_state,navarone)
 	palette.set_pen_color(3, geebee_palette[0]);
 }
 
+MACHINE_RESET_MEMBER(warpwarp_state,kaitei)
+{
+	// Some PCB videos/images shows a b&w arrangement, others a full colorized one.
+	// This is due of the monitor type used, cfr. http://news.livedoor.com/article/detail/5604337/
+
+	// We change color palette at reset time, according to the configuration switch.
+	if(m_in_config->read() & 1) // color
+	{
+		m_palette->set_pen_color(0, rgb_t(0x00,0x00,0x00));
+		m_palette->set_pen_color(1, rgb_t(0x00,0xff,0xff));
+		m_palette->set_pen_color(2, rgb_t(0x00,0xff,0xff));
+		m_palette->set_pen_color(3, rgb_t(0x00,0x00,0x00));
+		m_palette->set_pen_color(4, rgb_t(0x00,0x00,0x00));
+		m_palette->set_pen_color(5, rgb_t(0x00,0xff,0x00));
+		m_palette->set_pen_color(6, rgb_t(0x00,0xff,0x00));
+		m_palette->set_pen_color(7, rgb_t(0x00,0x00,0x00));
+		m_palette->set_pen_color(8, rgb_t(0xff,0x00,0x00)); // ball pen
+	}
+	else // b & w
+	{
+		m_palette->set_pen_color(0, geebee_palette[0]);
+		m_palette->set_pen_color(1, geebee_palette[1]);
+		m_palette->set_pen_color(2, geebee_palette[1]);
+		m_palette->set_pen_color(3, geebee_palette[0]);
+		m_palette->set_pen_color(4, geebee_palette[0]);
+		m_palette->set_pen_color(5, geebee_palette[1]);
+		m_palette->set_pen_color(6, geebee_palette[1]);
+		m_palette->set_pen_color(7, geebee_palette[0]);
+		m_palette->set_pen_color(8, geebee_palette[1]); // ball pen
+	}
+}
 
 /***************************************************************************
 

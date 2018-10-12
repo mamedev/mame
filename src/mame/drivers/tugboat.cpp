@@ -29,6 +29,7 @@ always false - counter was reloaded and incremented before interrupt occurs
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -36,11 +37,6 @@ always false - counter was reloaded and incremented before interrupt occurs
 class tugboat_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
-
 	tugboat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -48,6 +44,14 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ram(*this, "ram") { }
+
+	void tugboat(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -75,12 +79,10 @@ public:
 	DECLARE_PALETTE_INIT(tugboat);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
-		int addr,int gfx0,int gfx1,int transparency);
+	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int addr, int gfx0, int gfx1, int transparency);
 
-		void tugboat(machine_config &config);
-		void main_map(address_map &map);
-protected:
+	void main_map(address_map &map);
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -233,19 +235,20 @@ void tugboat_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(tugboat_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(hd46505_0_w)  /* scrolling is performed changing the start_addr register (0C/0D) */
-	AM_RANGE(0x10c0, 0x10c1) AM_WRITE(hd46505_1_w)
-	AM_RANGE(0x11e4, 0x11e7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x11e8, 0x11eb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+void tugboat_state::main_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x01ff).ram().share("ram");
+	map(0x1060, 0x1061).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x10a0, 0x10a1).w(FUNC(tugboat_state::hd46505_0_w));  /* scrolling is performed changing the start_addr register (0C/0D) */
+	map(0x10c0, 0x10c1).w(FUNC(tugboat_state::hd46505_1_w));
+	map(0x11e4, 0x11e7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x11e8, 0x11eb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	//AM_RANGE(0x1700, 0x1fff) AM_RAM
-	AM_RANGE(0x18e0, 0x18ef) AM_WRITE(score_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM /* tilemap RAM */
-	AM_RANGE(0x4000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+	map(0x18e0, 0x18ef).w(FUNC(tugboat_state::score_w));
+	map(0x2000, 0x2fff).ram(); /* tilemap RAM */
+	map(0x4000, 0x7fff).rom();
+}
 
 
 static INPUT_PORTS_START( tugboat )
@@ -352,7 +355,7 @@ static const gfx_layout tilelayout =
 	8*8
 };
 
-static GFXDECODE_START( tugboat )
+static GFXDECODE_START( gfx_tugboat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x80, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x80, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout, 0x00, 16 )
@@ -361,16 +364,15 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(tugboat_state::tugboat)
-	MCFG_CPU_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tugboat_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tugboat_state,input_r))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set(FUNC(tugboat_state::input_r));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tugboat_state, ctrl_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("DSW");
+	pia1.writepb_handler().set(FUNC(tugboat_state::ctrl_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -378,15 +380,16 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tugboat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tugboat)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tugboat_state, tugboat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL(10'000'000)/8)
+	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
@@ -474,6 +477,6 @@ ROM_START( berenstn )
 ROM_END
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat,  tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, noahsark, 0, tugboat, noahsark, tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, berenstn, 0, tugboat, noahsark, tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tugboat,  0, tugboat, tugboat,  tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, noahsark, 0, tugboat, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0, tugboat, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

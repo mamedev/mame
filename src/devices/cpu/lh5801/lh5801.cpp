@@ -64,7 +64,7 @@ enum
 #define H 0x10
 
 
-DEFINE_DEVICE_TYPE(LH5801, lh5801_cpu_device, "lh5801", "LH5801")
+DEFINE_DEVICE_TYPE(LH5801, lh5801_cpu_device, "lh5801", "Sharp LH5801")
 
 
 lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -92,7 +92,7 @@ void lh5801_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	m_in_func.resolve_safe(0);
 
@@ -149,7 +149,7 @@ void lh5801_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_p.w.l).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_t).noshow().formatstr("%8s");
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void lh5801_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -225,7 +225,7 @@ void lh5801_cpu_device::execute_run()
 		{
 			m_oldpc = P;
 
-			debugger_instruction_hook(this, P);
+			debugger_instruction_hook(P);
 			lh5801_instruction();
 		}
 
@@ -257,7 +257,7 @@ void lh5801_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-util::disasm_interface *lh5801_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> lh5801_cpu_device::create_disassembler()
 {
-	return new lh5801_disassembler;
+	return std::make_unique<lh5801_disassembler>();
 }

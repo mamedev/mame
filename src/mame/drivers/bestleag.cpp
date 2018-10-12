@@ -23,6 +23,7 @@ Dip Locations added according to Service Mode
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -250,25 +251,26 @@ WRITE16_MEMBER(bestleag_state::oki_bank_w)
 
 /* Memory Map */
 
-ADDRESS_MAP_START(bestleag_state::bestleag_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0d2000, 0x0d3fff) AM_NOP // left over from the original game (only read / written in memory test)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(txram_w) AM_SHARE("txram")
-	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_SHARE("vregs")
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
-	AM_RANGE(0x300016, 0x300017) AM_READ_PORT("DSWA")
-	AM_RANGE(0x300018, 0x300019) AM_READ_PORT("DSWB")
-	AM_RANGE(0x30001c, 0x30001d) AM_WRITE(oki_bank_w)
-	AM_RANGE(0x30001e, 0x30001f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void bestleag_state::bestleag_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x0d2000, 0x0d3fff).noprw(); // left over from the original game (only read / written in memory test)
+	map(0x0e0000, 0x0e3fff).ram().w(FUNC(bestleag_state::bgram_w)).share("bgram");
+	map(0x0e8000, 0x0ebfff).ram().w(FUNC(bestleag_state::fgram_w)).share("fgram");
+	map(0x0f0000, 0x0f3fff).ram().w(FUNC(bestleag_state::txram_w)).share("txram");
+	map(0x0f8000, 0x0f800b).ram().share("vregs");
+	map(0x100000, 0x100fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x200000, 0x200fff).ram().share("spriteram");
+	map(0x300010, 0x300011).portr("SYSTEM");
+	map(0x300012, 0x300013).portr("P1");
+	map(0x300014, 0x300015).portr("P2");
+	map(0x300016, 0x300017).portr("DSWA");
+	map(0x300018, 0x300019).portr("DSWB");
+	map(0x30001c, 0x30001d).w(FUNC(bestleag_state::oki_bank_w));
+	map(0x30001f, 0x30001f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x304000, 0x304001).nopw();
+	map(0xfe0000, 0xffffff).ram();
+}
 
 #define BESTLEAG_PLAYER_INPUT( player ) \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) PORT_8WAY \
@@ -372,16 +374,16 @@ static const gfx_layout bestleag_char16layout =
 	16*16
 };
 
-static GFXDECODE_START( bestleag )
+static GFXDECODE_START( gfx_bestleag )
 	GFXDECODE_ENTRY( "gfx1", 0, bestleag_charlayout,     0x200, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, bestleag_char16layout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, bestleag_char16layout,   0x300, 16 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(bestleag_state::bestleag)
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(bestleag_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bestleag_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(bestleag_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bestleag_state,  irq6_line_hold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -391,13 +393,14 @@ MACHINE_CONFIG_START(bestleag_state::bestleag)
 	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleag)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bestleag)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bestleag)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) /* Hand-tuned */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* Hand-tuned */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -478,5 +481,5 @@ ROM_END
 
 /* GAME drivers */
 
-GAME( 1993, bestleag, bigstrik, bestleag, bestleag, bestleag_state, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, Italian Serie A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, bestleaw, bigstrik, bestleaw, bestleag, bestleag_state, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, World Cup)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bestleag, bigstrik, bestleag, bestleag, bestleag_state, empty_init, ROT0, "bootleg", "Best League (bootleg of Big Striker, Italian Serie A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bestleaw, bigstrik, bestleaw, bestleag, bestleag_state, empty_init, ROT0, "bootleg", "Best League (bootleg of Big Striker, World Cup)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -4,17 +4,23 @@
         Twincobr/Flying Shark/Wardner  game hardware from 1986-1987
         -----------------------------------------------------------
 ****************************************************************************/
+#ifndef MAME_INCLUDES_TWINCOBR_H
+#define MAME_INCLUDES_TWINCOBR_H
 
+#pragma once
+
+#include "machine/74259.h"
 #include "video/mc6845.h"
 #include "video/bufsprite.h"
 #include "video/toaplan_scu.h"
+#include "emupal.h"
 #include "screen.h"
 
 class twincobr_state : public driver_device
 {
 public:
-	twincobr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	twincobr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_sharedram(*this, "sharedram"),
 		m_spriteram8(*this, "spriteram8"),
 		m_spriteram16(*this, "spriteram16"),
@@ -23,9 +29,19 @@ public:
 		m_spritegen(*this, "scu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_mainlatch(*this, "mainlatch"),
+		m_coinlatch(*this, "coinlatch")
 	{ }
 
+	void twincobr(machine_config &config);
+	void twincobrw(machine_config &config);
+	void fsharkbt(machine_config &config);
+	void fshark(machine_config &config);
+
+	void init_twincobr();
+
+protected:
 	optional_shared_ptr<uint8_t> m_sharedram;
 	optional_device<buffered_spriteram8_device> m_spriteram8;
 	optional_device<buffered_spriteram16_device> m_spriteram16;
@@ -101,15 +117,14 @@ public:
 	DECLARE_WRITE8_MEMBER(wardner_videoram_w);
 	DECLARE_READ8_MEMBER(wardner_sprite_r);
 	DECLARE_WRITE8_MEMBER(wardner_sprite_w);
-	DECLARE_DRIVER_INIT(twincobr);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	DECLARE_MACHINE_RESET(twincobr);
 	DECLARE_VIDEO_START(toaplan0);
 	uint32_t screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(twincobr_interrupt);
-	INTERRUPT_GEN_MEMBER(wardner_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(twincobr_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(wardner_vblank_irq);
 	void twincobr_restore_dsp();
 	void twincobr_create_tilemaps();
 	DECLARE_WRITE_LINE_MEMBER(display_on_w);
@@ -124,9 +139,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void twincobr(machine_config &config);
-	void fsharkbt(machine_config &config);
-	void fshark(machine_config &config);
+	required_device<ls259_device> m_mainlatch;
+	required_device<ls259_device> m_coinlatch;
+
 	void DSP_io_map(address_map &map);
 	void DSP_program_map(address_map &map);
 	void fsharkbt_i8741_io_map(address_map &map);
@@ -134,3 +149,5 @@ public:
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TWINCOBR_H

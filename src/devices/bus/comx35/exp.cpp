@@ -73,9 +73,7 @@ uint8_t comx_expansion_slot_device::mrd_r(address_space &space, offs_t offset, i
 	uint8_t data = 0;
 
 	if (m_card != nullptr)
-	{
 		data = m_card->comx_mrd_r(space, offset, extrom);
-	}
 
 	return data;
 }
@@ -88,9 +86,7 @@ uint8_t comx_expansion_slot_device::mrd_r(address_space &space, offs_t offset, i
 void comx_expansion_slot_device::mwr_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
-	{
 		m_card->comx_mwr_w(space, offset, data);
-	}
 }
 
 
@@ -103,9 +99,7 @@ uint8_t comx_expansion_slot_device::io_r(address_space &space, offs_t offset)
 	uint8_t data = 0;
 
 	if (m_card != nullptr)
-	{
 		data = m_card->comx_io_r(space, offset);
-	}
 
 	return data;
 }
@@ -118,9 +112,7 @@ uint8_t comx_expansion_slot_device::io_r(address_space &space, offs_t offset)
 void comx_expansion_slot_device::io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
-	{
 		m_card->comx_io_w(space, offset, data);
-	}
 }
 
 
@@ -128,12 +120,10 @@ void comx_expansion_slot_device::io_w(address_space &space, offs_t offset, uint8
 //  ds_w - device select write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( comx_expansion_slot_device::ds_w )
+WRITE_LINE_MEMBER(comx_expansion_slot_device::ds_w)
 {
 	if (m_card != nullptr)
-	{
 		m_card->comx_ds_w(state);
-	}
 }
 
 
@@ -141,24 +131,47 @@ WRITE_LINE_MEMBER( comx_expansion_slot_device::ds_w )
 //  q_w - Q write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( comx_expansion_slot_device::q_w )
+WRITE_LINE_MEMBER(comx_expansion_slot_device::q_w)
 {
 	if (m_card != nullptr)
-	{
 		m_card->comx_q_w(state);
-	}
 }
 
-READ_LINE_MEMBER( comx_expansion_slot_device::ef4_r )
+
+//-------------------------------------------------
+//  ef4_r - EF4 poll
+//-------------------------------------------------
+
+READ_LINE_MEMBER(comx_expansion_slot_device::ef4_r)
 {
 	int state = CLEAR_LINE;
 
 	if (m_card != nullptr)
-	{
 		state = m_card->comx_ef4_r();
-	}
 
 	return state;
+}
+
+
+//-------------------------------------------------
+//  sc_w - state code/N0-N2 write
+//-------------------------------------------------
+
+WRITE8_MEMBER(comx_expansion_slot_device::sc_w)
+{
+	if (m_card != nullptr)
+		m_card->comx_sc_w(offset, data);
+}
+
+
+//-------------------------------------------------
+//  tpb_w - TPB write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(comx_expansion_slot_device::tpb_w)
+{
+	if (m_card != nullptr)
+		m_card->comx_tpb_w(state);
 }
 
 
@@ -176,13 +189,14 @@ READ_LINE_MEMBER( comx_expansion_slot_device::ef4_r )
 #include "ram.h"
 #include "thermal.h"
 
-SLOT_INTERFACE_START( comx_expansion_cards )
-	SLOT_INTERFACE("eb", COMX_EB)
-	SLOT_INTERFACE("fd", COMX_FD)
-	SLOT_INTERFACE("clm", COMX_CLM)
-	SLOT_INTERFACE("ram", COMX_RAM)
-	SLOT_INTERFACE("joy", COMX_JOY)
-	SLOT_INTERFACE("prn", COMX_PRN)
-	SLOT_INTERFACE("thm", COMX_THM)
-	SLOT_INTERFACE("epr", COMX_EPR)
-SLOT_INTERFACE_END
+void comx_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("eb", COMX_EB);
+	device.option_add("fd", COMX_FD);
+	device.option_add("clm", COMX_CLM);
+	device.option_add("ram", COMX_RAM);
+	device.option_add("joy", COMX_JOY);
+	device.option_add("prn", COMX_PRN);
+	device.option_add("thm", COMX_THM);
+	device.option_add("epr", COMX_EPR);
+}

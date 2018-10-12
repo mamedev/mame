@@ -118,43 +118,47 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /****************************************************************************/
 
-ADDRESS_MAP_START(himesiki_state::himesiki_prm0)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa100, 0xa7ff) AM_RAM AM_SHARE("sprram_p103a") // not on Android
-	AM_RANGE(0xa800, 0xafff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE(himesiki_bg_ram_w) AM_SHARE("bg_ram")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void himesiki_state::himesiki_prm0(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xa0ff).ram().share("spriteram");
+	map(0xa100, 0xa7ff).ram().share("sprram_p103a"); // not on Android
+	map(0xa800, 0xafff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xb000, 0xbfff).ram().w(FUNC(himesiki_state::himesiki_bg_ram_w)).share("bg_ram");
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(himesiki_state::himesiki_iom0)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) // inputs
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) // dips + rombank
-	AM_RANGE(0x08, 0x08) AM_WRITE(himesiki_scrolly_w)
-	AM_RANGE(0x09, 0x0a) AM_WRITE(himesiki_scrollx_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(himesiki_sound_w)
-ADDRESS_MAP_END
+void himesiki_state::himesiki_iom0(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)); // inputs
+	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // dips + rombank
+	map(0x08, 0x08).w(FUNC(himesiki_state::himesiki_scrolly_w));
+	map(0x09, 0x0a).w(FUNC(himesiki_state::himesiki_scrollx_w));
+	map(0x0b, 0x0b).w(FUNC(himesiki_state::himesiki_sound_w));
+}
 
 
 
 
-ADDRESS_MAP_START(himesiki_state::himesiki_prm1)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void himesiki_state::himesiki_prm1(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(himesiki_state::himesiki_iom1)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void himesiki_state::himesiki_iom1(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 /****************************************************************************/
 
@@ -393,7 +397,7 @@ static const gfx_layout layout_spr =
 	16*16*4
 };
 
-static GFXDECODE_START( himesiki )
+static GFXDECODE_START( gfx_himesiki )
 	GFXDECODE_ENTRY( "bgtiles",   0, layout_bg, 0x000, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_spr, 0x200, 16 )
 	GFXDECODE_ENTRY( "spr_p103a", 0, layout_p103a, 0x200, 16 )
@@ -425,24 +429,24 @@ void himesiki_state::machine_reset()
 MACHINE_CONFIG_START(himesiki_state::himesiki)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CLK2) /* it's a 6.000 MHz rated part, but near the 8 Mhz XTAL?? - Android skips lots of frames at 6, crashes at 4 */
-	MCFG_CPU_PROGRAM_MAP(himesiki_prm0)
-	MCFG_CPU_IO_MAP(himesiki_iom0)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", himesiki_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, CLK2) /* it's a 6.000 MHz rated part, but near the 8 Mhz XTAL?? - Android skips lots of frames at 6, crashes at 4 */
+	MCFG_DEVICE_PROGRAM_MAP(himesiki_prm0)
+	MCFG_DEVICE_IO_MAP(himesiki_iom0)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", himesiki_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, CLK2/2) /* 4.000 MHz (4Mhz rated part, near the 8 Mhz XTAL) */
-	MCFG_CPU_PROGRAM_MAP(himesiki_prm1)
-	MCFG_CPU_IO_MAP(himesiki_iom1)
+	MCFG_DEVICE_ADD("sub", Z80, CLK2/2) /* 4.000 MHz (4Mhz rated part, near the 8 Mhz XTAL) */
+	MCFG_DEVICE_PROGRAM_MAP(himesiki_prm1)
+	MCFG_DEVICE_IO_MAP(himesiki_iom1)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("1P"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("2P"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("OTHERS"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("1P");
+	ppi0.in_pb_callback().set_ioport("2P");
+	ppi0.in_pc_callback().set_ioport("OTHERS");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(himesiki_state, himesiki_rombank_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW1");
+	ppi1.in_pb_callback().set_ioport("DSW2");
+	ppi1.out_pc_callback().set(FUNC(himesiki_state::himesiki_rombank_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -453,17 +457,17 @@ MACHINE_CONFIG_START(himesiki_state::himesiki)
 	MCFG_SCREEN_UPDATE_DRIVER(himesiki_state, screen_update_himesiki)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", himesiki)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_himesiki)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym2203", YM2203, CLK2/4) // ??
+	MCFG_DEVICE_ADD("ym2203", YM2203, CLK2/4) // ??
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
@@ -511,27 +515,27 @@ ROM_END
 
 ROM_START( androidpo )
 	ROM_REGION( 0x08000, "maincpu", 0 )
-	ROM_LOAD( "MITSUBISHI__AD1__M5L27256K.toppcb.k1", 0x00000, 0x08000, CRC(25ab85eb) SHA1(e1fab149c83ff880b119258206d5818f3db641c5) )
+	ROM_LOAD( "mitsubishi__ad1__m5l27256k.toppcb.k1", 0x00000, 0x08000, CRC(25ab85eb) SHA1(e1fab149c83ff880b119258206d5818f3db641c5) )
 
 	ROM_REGION( 0x10000, "banks", 0 )
-	ROM_LOAD( "MITSUBISHI__AD-3__M5L27256K.toppcb.g1", 0x00000, 0x04000, CRC(6cf5f48a) SHA1(b9b4e5e7bace0e8d98fbc9f4ad91bc56ef42099e) )
+	ROM_LOAD( "mitsubishi__ad-3__m5l27256k.toppcb.g1", 0x00000, 0x04000, CRC(6cf5f48a) SHA1(b9b4e5e7bace0e8d98fbc9f4ad91bc56ef42099e) )
 	ROM_CONTINUE(                                       0x08000, 0x04000)
-	ROM_LOAD( "MITSUBISHI__AD2__M5L27256K.toppcb.j1", 0x04000, 0x04000, CRC(e41426be) SHA1(e7e06ef3ff5160bb7d870e148ba2799da52cf24c) )
+	ROM_LOAD( "mitsubishi__ad2__m5l27256k.toppcb.j1", 0x04000, 0x04000, CRC(e41426be) SHA1(e7e06ef3ff5160bb7d870e148ba2799da52cf24c) )
 	ROM_CONTINUE(                                       0x0c000, 0x04000)
 
 	ROM_REGION( 0x18000, "sub", 0 )
-	ROM_LOAD( "MITSUBISHI__AD-4__M5L27256K.toppcb.n6", 0x00000, 0x08000, CRC(13c38fe4) SHA1(34a35fa057159a5c83892a88b8c908faa39d5cb3) )
+	ROM_LOAD( "mitsubishi__ad-4__m5l27256k.toppcb.n6", 0x00000, 0x08000, CRC(13c38fe4) SHA1(34a35fa057159a5c83892a88b8c908faa39d5cb3) )
 
 	ROM_REGION( 0x10000, "bgtiles", 0 )
-	ROM_LOAD( "MITSUBISHI__AD-5__M5L27512K.toppcb.f5", 0x00000, 0x10000, CRC(4c72a930) SHA1(f1542844391b55fe43293eef7ce48c09b7aca75a) )
+	ROM_LOAD( "mitsubishi__ad-5__m5l27512k.toppcb.f5", 0x00000, 0x10000, CRC(4c72a930) SHA1(f1542844391b55fe43293eef7ce48c09b7aca75a) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "MITSUBISHI__AD-6__M5L27512K.botpcb.def9", 0x00000, 0x10000, CRC(5e42984e) SHA1(2a928960c740dfb94589e011cce093bed2fd7685) )
-	ROM_LOAD16_BYTE( "MITSUBISHI__AD-7__M5L27512K.botpcb.bc9", 0x00001, 0x10000, CRC(611ff400) SHA1(1a9aed33d0e3f063811f92b9fee3ecbff0e965bf) )
+	ROM_LOAD16_BYTE( "mitsubishi__ad-6__m5l27512k.botpcb.def9", 0x00000, 0x10000, CRC(5e42984e) SHA1(2a928960c740dfb94589e011cce093bed2fd7685) )
+	ROM_LOAD16_BYTE( "mitsubishi__ad-7__m5l27512k.botpcb.bc9", 0x00001, 0x10000, CRC(611ff400) SHA1(1a9aed33d0e3f063811f92b9fee3ecbff0e965bf) )
 
 	ROM_REGION( 0x2000, "plds", 0 )
-	ROM_LOAD( "RICOH_7A2_19__EPL10P8BP_JAPAN_I.f1.jed", 0x0000, 0x0473, CRC(c5e51ea2) SHA1(3e35a30935f562227f0afa32a6be6eb33f9a8372) )
-	ROM_LOAD( "RICOH_7A2_19__EPL10P8BP_JAPAN_M.j3.jed", 0x1000, 0x0473, CRC(807d1553) SHA1(257be9eacd57d2e2dbaab3be5725d8d06d6a9a0b) )
+	ROM_LOAD( "ricoh_7a2_19__epl10p8bp_japan_i.f1.jed", 0x0000, 0x0473, CRC(c5e51ea2) SHA1(3e35a30935f562227f0afa32a6be6eb33f9a8372) )
+	ROM_LOAD( "ricoh_7a2_19__epl10p8bp_japan_m.j3.jed", 0x1000, 0x0473, CRC(807d1553) SHA1(257be9eacd57d2e2dbaab3be5725d8d06d6a9a0b) )
 
 	ROM_REGION( 0x20000, "spr_p103a", ROMREGION_ERASEFF )
 	// there's no P103A PCB for this on Android
@@ -539,21 +543,21 @@ ROM_END
 
 ROM_START( androidp )
 	ROM_REGION( 0x08000, "maincpu", 0 )
-	ROM_LOAD( "ANDR1.BIN", 0x00000, 0x08000, CRC(fff04130) SHA1(9bdafa8b311cc5d0851b04df3c6dd16eb087a5dd) )
+	ROM_LOAD( "andr1.bin", 0x00000, 0x08000, CRC(fff04130) SHA1(9bdafa8b311cc5d0851b04df3c6dd16eb087a5dd) )
 
 	ROM_REGION( 0x10000, "banks", 0 )
-	ROM_LOAD( "ANDR3.BIN", 0x00000, 0x04000, CRC(112d5123) SHA1(653109eae7b58d9dcb8892ea9aca17427f14c145) )
+	ROM_LOAD( "andr3.bin", 0x00000, 0x04000, CRC(112d5123) SHA1(653109eae7b58d9dcb8892ea9aca17427f14c145) )
 	ROM_CONTINUE(                                       0x08000, 0x04000)
 
 	ROM_REGION( 0x18000, "sub", 0 )
-	ROM_LOAD( "ANDR4.BIN", 0x00000, 0x08000, CRC(65f5e98b) SHA1(69f979d653695413a1c503c402d4bf5ffcfb6e5d) )
+	ROM_LOAD( "andr4.bin", 0x00000, 0x08000, CRC(65f5e98b) SHA1(69f979d653695413a1c503c402d4bf5ffcfb6e5d) )
 
 	ROM_REGION( 0x10000, "bgtiles", 0 )
-	ROM_LOAD( "ANDR5.BIN", 0x00000, 0x10000, CRC(0a0b44c0) SHA1(8d359b802c7dee5faea9464f06b672fd401799cf) )
+	ROM_LOAD( "andr5.bin", 0x00000, 0x10000, CRC(0a0b44c0) SHA1(8d359b802c7dee5faea9464f06b672fd401799cf) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "ANDR6.BIN", 0x00000, 0x10000, CRC(122b7dd1) SHA1(5dffd2b97c8222afc98552513b84a91d6127f41b) )
-	ROM_LOAD16_BYTE( "ANDR7.BIN", 0x00001, 0x10000, CRC(fc0f9234) SHA1(496a918cc1f4d0e7191a49cc43c51fbd71e0bdf5) )
+	ROM_LOAD16_BYTE( "andr6.bin", 0x00000, 0x10000, CRC(122b7dd1) SHA1(5dffd2b97c8222afc98552513b84a91d6127f41b) )
+	ROM_LOAD16_BYTE( "andr7.bin", 0x00001, 0x10000, CRC(fc0f9234) SHA1(496a918cc1f4d0e7191a49cc43c51fbd71e0bdf5) )
 
 	ROM_REGION( 0x20000, "spr_p103a", ROMREGION_ERASEFF )
 	// there's no P103A PCB for this on Android
@@ -563,8 +567,8 @@ ROM_START( androidp )
 ROM_END
 
 
-GAME( 1989, himesiki, 0,         himesiki, himesiki,  himesiki_state, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, himesiki,  0,        himesiki, himesiki,  himesiki_state, empty_init, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // the game changed significantly between these 2 versions, it is possible the later build was actually released
-GAME( 1987, androidp,  0,          himesiki, androidp,  himesiki_state, 0, ROT90, "Nasco", "Android (prototype, later build)", MACHINE_SUPPORTS_SAVE ) // shows 1987 copyright after staff list during ending
-GAME( 198?, androidpo, androidp,   himesiki, androidpo, himesiki_state, 0, ROT90, "Nasco", "Android (prototype, early build)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, androidp,  0,        himesiki, androidp,  himesiki_state, empty_init, ROT90, "Nasco", "Android (prototype, later build)", MACHINE_SUPPORTS_SAVE ) // shows 1987 copyright after staff list during ending
+GAME( 198?, androidpo, androidp, himesiki, androidpo, himesiki_state, empty_init, ROT90, "Nasco", "Android (prototype, early build)", MACHINE_SUPPORTS_SAVE )

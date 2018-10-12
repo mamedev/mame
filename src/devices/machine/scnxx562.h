@@ -41,7 +41,8 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
+#include "diserial.h"
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
@@ -77,44 +78,44 @@
 
 // Port A callbacks
 #define MCFG_DUSCC_OUT_TXDA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_txda_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_txda_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_DTRA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_dtra_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_dtra_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_RTSA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_rtsa_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_rtsa_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_SYNCA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_synca_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_synca_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_TRXCA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_trxca_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_trxca_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_RTXCA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_rtxca_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_rtxca_callback(DEVCB_##_devcb);
 
 // Port B callbacks
 #define MCFG_DUSCC_OUT_TXDB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_txdb_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_txdb_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_DTRB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_dtrb_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_dtrb_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_RTSB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_rtsb_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_rtsb_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_SYNCB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_syncb_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_syncb_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_TRXCB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_trxcb_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_trxcb_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_RTXCB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_rtxcb_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_rtxcb_callback(DEVCB_##_devcb);
 
 #define MCFG_DUSCC_OUT_INT_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
+	downcast<duscc_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -16,7 +16,7 @@
 DECLARE_DEVICE_TYPE(PSX_DMA, psxdma_device)
 
 #define MCFG_PSX_DMA_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<psxdma_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<psxdma_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 class psxdma_device : public device_t
 {

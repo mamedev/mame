@@ -46,8 +46,8 @@ typedef uint32_t DWORD;
 #include "v25priv.h"
 #include "necdasm.h"
 
-DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "V25")
-DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "V35")
+DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "NEC V25")
+DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "NEC V35")
 
 
 v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
@@ -137,7 +137,7 @@ void v25_common_device::do_prefetch(int previous_ICount)
 uint8_t v25_common_device::fetch()
 {
 	prefetch();
-	return m_direct->read_byte((Sreg(PS)<<4)+m_ip++, m_fetch_xor);
+	return m_dr8((Sreg(PS)<<4)+m_ip++);
 }
 
 uint16_t v25_common_device::fetchword()
@@ -161,7 +161,7 @@ uint8_t v25_common_device::fetchop()
 	uint8_t ret;
 
 	prefetch();
-	ret = m_direct->read_byte(( Sreg(PS)<<4)+m_ip++, m_fetch_xor);
+	ret = m_dr8((Sreg(PS)<<4)+m_ip++);
 
 	if (m_MF == 0)
 		if (m_v25v35_decryptiontable)
@@ -419,9 +419,9 @@ void v25_common_device::execute_set_input(int irqline, int state)
 	}
 }
 
-util::disasm_interface *v25_common_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> v25_common_device::create_disassembler()
 {
-	return new nec_disassembler(m_v25v35_decryptiontable);
+	return std::make_unique<nec_disassembler>(m_v25v35_decryptiontable);
 }
 
 void v25_common_device::device_start()
@@ -511,7 +511,13 @@ void v25_common_device::device_start()
 	save_item(NAME(m_prefetch_reset));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if(m_program->data_width() == 8) {
+		auto cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
+		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+	} else {
+		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+	}
 	m_io = &space(AS_IO);
 
 	m_pt_in.resolve_safe(0xff);
@@ -546,7 +552,7 @@ void v25_common_device::device_start()
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -755,7 +761,7 @@ void v25_common_device::execute_run()
 	if (m_halted)
 	{
 		m_icount = 0;
-		debugger_instruction_hook(this, (Sreg(PS)<<4) + m_ip);
+		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
 		return;
 	}
 
@@ -773,7 +779,7 @@ void v25_common_device::execute_run()
 		if (m_no_interrupt)
 			m_no_interrupt--;
 
-		debugger_instruction_hook(this, (Sreg(PS)<<4) + m_ip);
+		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
 		prev_ICount = m_icount;
 		(this->*s_nec_instruction[fetchop()])();
 		do_prefetch(prev_ICount);

@@ -47,14 +47,10 @@ mach32_device::mach32_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-MACHINE_CONFIG_START(mach32_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("8514a", ATIMACH32_8514A, 0)
-	MCFG_EEPROM_SERIAL_93C56_ADD("ati_eeprom")
-MACHINE_CONFIG_END
-
-void mach32_8514a_device::device_config_complete()
+void mach32_device::device_add_mconfig(machine_config &config)
 {
-	m_vga = dynamic_cast<mach32_device*>(owner());
+	ATIMACH32_8514A(config, "8514a", 0).set_vga(DEVICE_SELF);
+	EEPROM_93C56_16BIT(config, "ati_eeprom");
 }
 
 void mach32_8514a_device::device_start()
@@ -337,14 +333,10 @@ mach64_device::mach64_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-MACHINE_CONFIG_START(mach64_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("8514a", ATIMACH64_8514A, 0)
-	MCFG_EEPROM_SERIAL_93C56_ADD("ati_eeprom")
-MACHINE_CONFIG_END
-
-void mach64_8514a_device::device_config_complete()
+void mach64_device::device_add_mconfig(machine_config &config)
 {
-	m_vga = dynamic_cast<mach64_device*>(owner());
+	ATIMACH64_8514A(config, "8514a", 0).set_vga(DEVICE_SELF);
+	EEPROM_93C56_16BIT(config, "ati_eeprom");
 }
 
 void mach64_8514a_device::device_start()

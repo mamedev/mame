@@ -209,7 +209,7 @@ VIDEO_START_MEMBER(ssv_state,eaglshot)
 	m_gfxdecode->gfx(0)->set_source((uint8_t *)m_eaglshot_gfxram.get());
 	m_gfxdecode->gfx(1)->set_source((uint8_t *)m_eaglshot_gfxram.get());
 
-	save_pointer(NAME(m_eaglshot_gfxram.get()), 16 * 0x40000 / 2);
+	save_pointer(NAME(m_eaglshot_gfxram), 16 * 0x40000 / 2);
 }
 
 TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)

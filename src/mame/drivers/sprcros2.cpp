@@ -56,6 +56,7 @@ SC-61.5A
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -65,17 +66,20 @@ class sprcros2_state : public driver_device
 {
 public:
 	sprcros2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_master_cpu(*this, "master_cpu"),
-			m_slave_cpu(*this, "slave_cpu"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_fgvram(*this, "fgvram"),
-			m_fgattr(*this, "fgattr"),
-			m_bgvram(*this, "bgvram"),
-			m_bgattr(*this, "bgattr"),
-			m_sprram(*this, "sprram")
+		: driver_device(mconfig, type, tag)
+		, m_master_cpu(*this, "master_cpu")
+		, m_slave_cpu(*this, "slave_cpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_fgvram(*this, "fgvram")
+		, m_fgattr(*this, "fgattr")
+		, m_bgvram(*this, "bgvram")
+		, m_bgattr(*this, "bgattr")
+		, m_sprram(*this, "sprram")
 	{ }
 
+	void sprcros2(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_master_cpu;
 	required_device<cpu_device> m_slave_cpu;
@@ -104,19 +108,17 @@ public:
 	bool m_slave_nmi_enable;
 	bool m_screen_enable;
 	uint8_t m_bg_scrollx, m_bg_scrolly;
-	void sprcros2(machine_config &config);
 	void master_io(address_map &map);
 	void master_map(address_map &map);
 	void slave_io(address_map &map);
 	void slave_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -243,41 +245,45 @@ WRITE8_MEMBER(sprcros2_state::bg_scrolly_w)
 	m_bg_scrolly = data;
 }
 
-ADDRESS_MAP_START(sprcros2_state::master_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_REGION("master", 0)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("master_rombank")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("fgvram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("fgattr")
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_SHARE("sprram")
-	AM_RANGE(0xe840, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("shared_ram")
-ADDRESS_MAP_END
+void sprcros2_state::master_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().region("master", 0);
+	map(0xc000, 0xdfff).bankr("master_rombank");
+	map(0xe000, 0xe3ff).ram().share("fgvram");
+	map(0xe400, 0xe7ff).ram().share("fgattr");
+	map(0xe800, 0xe83f).ram().share("sprram");
+	map(0xe840, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("shared_ram");
+}
 
-ADDRESS_MAP_START(sprcros2_state::master_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("EXTRA") AM_DEVWRITE("sn3", sn76489_device, write)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07, 0x07) AM_WRITE(master_output_w)
-ADDRESS_MAP_END
+void sprcros2_state::master_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).portr("EXTRA").w("sn3", FUNC(sn76489_device::command_w));
+	map(0x04, 0x04).portr("DSW1");
+	map(0x05, 0x05).portr("DSW2");
+	map(0x07, 0x07).w(FUNC(sprcros2_state::master_output_w));
+}
 
-ADDRESS_MAP_START(sprcros2_state::slave_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_REGION("slave", 0)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("slave_rombank")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("bgvram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("bgattr")
-	AM_RANGE(0xe800, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("shared_ram")
-ADDRESS_MAP_END
+void sprcros2_state::slave_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().region("slave", 0);
+	map(0xc000, 0xdfff).bankr("slave_rombank");
+	map(0xe000, 0xe3ff).ram().share("bgvram");
+	map(0xe400, 0xe7ff).ram().share("bgattr");
+	map(0xe800, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("shared_ram");
+}
 
-ADDRESS_MAP_START(sprcros2_state::slave_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(bg_scrollx_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(bg_scrolly_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(slave_output_w)
-ADDRESS_MAP_END
+void sprcros2_state::slave_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(sprcros2_state::bg_scrollx_w));
+	map(0x01, 0x01).w(FUNC(sprcros2_state::bg_scrolly_w));
+	map(0x03, 0x03).w(FUNC(sprcros2_state::slave_output_w));
+}
 
 static INPUT_PORTS_START( sprcros2 )
 	PORT_START("P1")
@@ -354,7 +360,7 @@ static const gfx_layout fg_layout =
 	8*8*2
 };
 
-static GFXDECODE_START( sprcros2 )
+static GFXDECODE_START( gfx_sprcros2 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0,   16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 256, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, fg_layout,     512, 64 )
@@ -429,13 +435,13 @@ PALETTE_INIT_MEMBER(sprcros2_state, sprcros2)
 INTERRUPT_GEN_MEMBER(sprcros2_state::master_vblank_irq)
 {
 	if(m_master_nmi_enable == true)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(sprcros2_state::slave_vblank_irq)
 {
 	if(m_slave_nmi_enable == true)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::master_scanline)
@@ -450,16 +456,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::master_scanline)
 MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master_cpu",Z80,MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_IO_MAP(master_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sprcros2_state,  master_vblank_irq)
+	MCFG_DEVICE_ADD("master_cpu",Z80,MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_IO_MAP(master_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprcros2_state,  master_vblank_irq)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sprcros2_state, master_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave_cpu",Z80,MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_IO_MAP(slave_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sprcros2_state,  slave_vblank_irq)
+	MCFG_DEVICE_ADD("slave_cpu",Z80,MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_IO_MAP(slave_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprcros2_state,  slave_vblank_irq)
 
 	MCFG_QUANTUM_PERFECT_CPU("master_cpu")
 
@@ -469,21 +475,21 @@ MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 343, 8, 256-8, 262, 16, 240) // TODO: Wrong screen parameters
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprcros2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprcros2)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(sprcros2_state, sprcros2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn1", SN76489, 10000000/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sn1", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 10000000/4)
+	MCFG_DEVICE_ADD("sn2", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76489, 10000000/4)
+	MCFG_DEVICE_ADD("sn3", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -572,5 +578,5 @@ ROM_START( sprcros2a )
 	ROM_LOAD( "sc-60.4k",    0x0320, 0x0100, CRC(d7a4e57d) SHA1(6db02ec6aa55b05422cb505e63c71e36b4b11b4a) ) //fg clut
 ROM_END
 
-GAME( 1986, sprcros2,  0,        sprcros2, sprcros2, sprcros2_state, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sprcros2a, sprcros2, sprcros2, sprcros2, sprcros2_state, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sprcros2,  0,        sprcros2, sprcros2, sprcros2_state, empty_init, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sprcros2a, sprcros2, sprcros2, sprcros2, sprcros2_state, empty_init, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )

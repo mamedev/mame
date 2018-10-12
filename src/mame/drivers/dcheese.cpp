@@ -154,9 +154,9 @@ WRITE8_MEMBER(dcheese_state::sound_control_w)
 WRITE8_MEMBER(dcheese_state::bsmt_data_w)
 {
 	/* writes come in pairs; even bytes latch, odd bytes write */
-	if (offset % 2 == 0)
+	if ((offset & 1) == 0)
 	{
-		m_bsmt->write_reg(offset / 2);
+		m_bsmt->write_reg(offset >> 1);
 		m_sound_msb_latch = data;
 	}
 	else
@@ -171,19 +171,20 @@ WRITE8_MEMBER(dcheese_state::bsmt_data_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(dcheese_state::main_cpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("200000") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("220000") AM_WRITE(madmax_blitter_color_w)
-	AM_RANGE(0x240000, 0x240001) AM_READ_PORT("240000") AM_WRITE(eeprom_control_w)
-	AM_RANGE(0x260000, 0x26001f) AM_WRITE(madmax_blitter_xparam_w)
-	AM_RANGE(0x280000, 0x28001f) AM_WRITE(madmax_blitter_yparam_w)
-	AM_RANGE(0x2a0000, 0x2a003f) AM_READWRITE(madmax_blitter_vidparam_r, madmax_blitter_vidparam_w)
-	AM_RANGE(0x2e0000, 0x2e0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(madmax_blitter_unknown_w)
-ADDRESS_MAP_END
+void dcheese_state::main_cpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x200000, 0x200001).portr("200000").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x220000, 0x220001).portr("220000").w(FUNC(dcheese_state::blitter_color_w));
+	map(0x240000, 0x240001).portr("240000").w(FUNC(dcheese_state::eeprom_control_w));
+	map(0x260000, 0x26001f).w(FUNC(dcheese_state::blitter_xparam_w));
+	map(0x280000, 0x28001f).w(FUNC(dcheese_state::blitter_yparam_w));
+	map(0x2a0000, 0x2a003f).rw(FUNC(dcheese_state::blitter_vidparam_r), FUNC(dcheese_state::blitter_vidparam_w));
+	map(0x2e0001, 0x2e0001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x300000, 0x300001).w(FUNC(dcheese_state::blitter_unknown_w));
+}
 
 
 
@@ -193,14 +194,15 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(dcheese_state::sound_cpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sound_status_r, sound_control_w)
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0700) AM_WRITE(bsmt_data_w)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dcheese_state::sound_cpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0000).mirror(0x07ff).rw(FUNC(dcheese_state::sound_status_r), FUNC(dcheese_state::sound_control_w));
+	map(0x0800, 0x0800).mirror(0x07ff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1000, 0x10ff).mirror(0x0700).w(FUNC(dcheese_state::bsmt_data_w));
+	map(0x1800, 0x1fff).ram();
+	map(0x2000, 0xffff).rom();
+}
 
 
 
@@ -218,7 +220,7 @@ static INPUT_PORTS_START( dcheese )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE )      /* says tilt */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT )         /* says test */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )      /* bump left */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 )      /* bump right */
@@ -232,9 +234,9 @@ static INPUT_PORTS_START( dcheese )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* sound->main buffer status (0=empty) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -248,7 +250,7 @@ static INPUT_PORTS_START( dcheese )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 )  // opto 1
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON6 )  // opto 2
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("2a000e")
@@ -271,7 +273,7 @@ static INPUT_PORTS_START( lottof2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x1f00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )      /* button */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 )      /* ticket */
@@ -282,9 +284,9 @@ static INPUT_PORTS_START( lottof2 )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* sound->main buffer status (0=empty) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -298,7 +300,7 @@ static INPUT_PORTS_START( lottof2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("2a000e")
@@ -320,7 +322,7 @@ static INPUT_PORTS_START( fredmem )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x1f00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -330,9 +332,9 @@ static INPUT_PORTS_START( fredmem )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* sound->main buffer status (0=empty) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -349,7 +351,7 @@ static INPUT_PORTS_START( fredmem )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("2a000e")
@@ -373,20 +375,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(dcheese_state::dcheese)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MAIN_OSC)
-	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcheese_state,  dcheese_vblank)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(dcheese_state,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_OSC)
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dcheese_state,  dcheese_vblank)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dcheese_state,irq_callback)
 
-	MCFG_CPU_ADD("audiocpu", M6809, SOUND_OSC/16)
-	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dcheese_state, irq1_line_hold,  480)   /* accurate for fredmem */
+	MCFG_DEVICE_ADD("audiocpu", M6809, SOUND_OSC/16)
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(dcheese_state, irq1_line_hold,  480)   /* accurate for fredmem */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -396,16 +398,17 @@ MACHINE_CONFIG_START(dcheese_state::dcheese)
 	MCFG_SCREEN_UPDATE_DRIVER(dcheese_state, screen_update_dcheese)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 65534)
+	MCFG_PALETTE_ADD("palette", 65536)
 	MCFG_PALETTE_INIT_OWNER(dcheese_state, dcheese)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_BSMT2000_ADD("bsmt", SOUND_OSC)
+	MCFG_DEVICE_ADD("bsmt", BSMT2000, SOUND_OSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.2)
 MACHINE_CONFIG_END
@@ -444,7 +447,7 @@ ROM_START( dcheese )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "dchez.102", 0x8000, 0x8000, CRC(5d110061) SHA1(10d852a408a75979b8e8843afc7b39737ca2c6c8) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "gfx", 0 )
 	ROM_LOAD( "dchez.123", 0x00000, 0x40000, CRC(2293dd9a) SHA1(3f0550c2a6f59a233c5b1010cecdb19404170dc0) )
 	ROM_LOAD( "dchez.127", 0x40000, 0x40000, CRC(372f9d67) SHA1(74f73f0344bfb890b5e457fcde3d82c9106e7edd) )
 	ROM_LOAD( "dchez.125", 0x80000, 0x40000, CRC(ddf28bab) SHA1(0f3bc86d0db7afebf8c6094b8337e5f343a82f29) )
@@ -475,7 +478,7 @@ ROM_START( dcheese )
 	ROM_RELOAD(            0x3c0000, 0x20000 )
 	ROM_RELOAD(            0x3e0000, 0x20000 )
 
-	ROM_REGION16_LE( 0x20000, "user1", 0 )
+	ROM_REGION16_LE( 0x20000, "palrom", 0 )
 	ROM_LOAD16_BYTE( "dchez.144", 0x00000, 0x10000, CRC(52c96252) SHA1(46de465c25e4602aa360336315b3c8e1a9a0b5f3) )
 	ROM_LOAD16_BYTE( "dchez.145", 0x00001, 0x10000, CRC(a11b92d0) SHA1(265f93cb3657910aabca21ed8afbb55bdc86a964) )
 ROM_END
@@ -489,7 +492,7 @@ ROM_START( lottof2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "u102.r10", 0x8000, 0x8000, CRC(fcb34c81) SHA1(f80cef85d0f4218c88c01b238f10eff2c6241d33) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "gfx", 0 )
 	ROM_LOAD( "u123.r10", 0x00000, 0x40000, CRC(dbcdb5aa) SHA1(7473c5e0fc1a40a39e148277b4094fe1338d988c) )
 	ROM_LOAD( "u127.r10", 0x40000, 0x40000, CRC(029ffed9) SHA1(63ba56277745ebea7c2c2b3738790cd2f4ddbe00) )
 	ROM_LOAD( "u125.r10", 0x80000, 0x40000, CRC(c70cf1c6) SHA1(eb5f0c5f7485d92ce569ad915b9f5c3c48338172) )
@@ -525,7 +528,7 @@ ROM_START( lottof2 )
 	ROM_RELOAD(            0x3c0000, 0x20000 )
 	ROM_RELOAD(            0x3e0000, 0x20000 )
 
-	ROM_REGION16_LE( 0x20000, "user1", 0 )
+	ROM_REGION16_LE( 0x20000, "palrom", 0 )
 	ROM_LOAD16_BYTE( "u144.r10", 0x00000, 0x10000, CRC(3b9d5d9e) SHA1(b3fbfeb41c62c689a825dfe9487917a927a71f58) )
 	ROM_LOAD16_BYTE( "u145.r10", 0x00001, 0x10000, CRC(e5a022a4) SHA1(567a37d24b36ca01a2ac3c40a0392cf97b1eb948) )
 ROM_END
@@ -539,7 +542,7 @@ ROM_START( fredmem )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "art-rom.123", 0x000000, 0x80000, CRC(48133505) SHA1(60f69b053e67256928db57e0a5335bbd5a72ddfc) ) /* Graphics / Art at U123 */
 	ROM_LOAD( "art-rom.125", 0x080000, 0x80000, CRC(8181e154) SHA1(4d16b84ad52d8e3d3bcad3fdf5f8da23df198d46) ) /* Graphics / Art at U125 */
 	ROM_LOAD( "art-rom.127", 0x100000, 0x80000, CRC(93095f3b) SHA1(de746829e04bf153024e94e6ef0ceffb1eae2b14) ) /* Graphics / Art at U127 */
@@ -555,7 +558,7 @@ ROM_START( fredmem )
 	ROM_LOAD( "arom3", 0x300000, 0x80000, CRC(411900b0) SHA1(ddc5b387c89baab0fd5c654f3768c6e27972c06a) )
 	ROM_RELOAD(        0x380000, 0x80000 )
 
-	ROM_REGION16_LE( 0x20000, "user1", 0 )
+	ROM_REGION16_LE( 0x20000, "palrom", 0 )
 	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(793c4bda) SHA1(5a8a2981b48922f4d9e617a9bf9ef6a47ab702b7) ) /* Palette - 0 at U144 */
 	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(fe2c3521) SHA1(896e53427c7831620ca565be9c0b76aabc36b9f4) ) /* Palette - 1 at U145 */
 
@@ -572,7 +575,7 @@ ROM_START( fredmemus )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "art-rom.123", 0x000000, 0x80000, CRC(48133505) SHA1(60f69b053e67256928db57e0a5335bbd5a72ddfc) ) /* Graphics / Art at U123 */
 	ROM_LOAD( "art-rom.125", 0x080000, 0x80000, CRC(8181e154) SHA1(4d16b84ad52d8e3d3bcad3fdf5f8da23df198d46) ) /* Graphics / Art at U125 */
 	ROM_LOAD( "art-rom.127", 0x100000, 0x80000, CRC(93095f3b) SHA1(de746829e04bf153024e94e6ef0ceffb1eae2b14) ) /* Graphics / Art at U127 */
@@ -588,7 +591,7 @@ ROM_START( fredmemus )
 	ROM_LOAD( "arom3", 0x300000, 0x80000, CRC(411900b0) SHA1(ddc5b387c89baab0fd5c654f3768c6e27972c06a) )
 	ROM_RELOAD(        0x380000, 0x80000 )
 
-	ROM_REGION16_LE( 0x20000, "user1", 0 )
+	ROM_REGION16_LE( 0x20000, "palrom", 0 )
 	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(793c4bda) SHA1(5a8a2981b48922f4d9e617a9bf9ef6a47ab702b7) ) /* Palette - 0 at U144 */
 	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(fe2c3521) SHA1(896e53427c7831620ca565be9c0b76aabc36b9f4) ) /* Palette - 1 at U145 */
 
@@ -604,7 +607,7 @@ ROM_START( fredmemuk )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "art-rom.123", 0x000000, 0x80000, CRC(48133505) SHA1(60f69b053e67256928db57e0a5335bbd5a72ddfc) ) /* Graphics / Art at U123 */
 	ROM_LOAD( "art-rom.125", 0x080000, 0x80000, CRC(8181e154) SHA1(4d16b84ad52d8e3d3bcad3fdf5f8da23df198d46) ) /* Graphics / Art at U125 */
 	ROM_LOAD( "art-rom.127", 0x100000, 0x80000, CRC(93095f3b) SHA1(de746829e04bf153024e94e6ef0ceffb1eae2b14) ) /* Graphics / Art at U127 */
@@ -620,7 +623,7 @@ ROM_START( fredmemuk )
 	ROM_LOAD( "arom3", 0x300000, 0x80000, CRC(411900b0) SHA1(ddc5b387c89baab0fd5c654f3768c6e27972c06a) )
 	ROM_RELOAD(        0x380000, 0x80000 )
 
-	ROM_REGION16_LE( 0x20000, "user1", 0 )
+	ROM_REGION16_LE( 0x20000, "palrom", 0 )
 	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(793c4bda) SHA1(5a8a2981b48922f4d9e617a9bf9ef6a47ab702b7) ) /* Palette - 0 at U144 */
 	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(fe2c3521) SHA1(896e53427c7831620ca565be9c0b76aabc36b9f4) ) /* Palette - 1 at U145 */
 
@@ -637,7 +640,7 @@ ROM_START( fredmemj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "art-rom.123", 0x000000, 0x80000, CRC(48133505) SHA1(60f69b053e67256928db57e0a5335bbd5a72ddfc) ) /* Graphics / Art at U123 */
 	ROM_LOAD( "art-rom_japan.125", 0x080000, 0x80000, CRC(7bfd9b92) SHA1(306f276cf4574587fb4421c2b214522ee2b53774) ) /* Graphics / Art at U125 */
 	ROM_LOAD( "art-rom.127", 0x100000, 0x80000, CRC(93095f3b) SHA1(de746829e04bf153024e94e6ef0ceffb1eae2b14) ) /* Graphics / Art at U127 */
@@ -653,7 +656,7 @@ ROM_START( fredmemj )
 	ROM_LOAD( "arom3", 0x300000, 0x80000, CRC(411900b0) SHA1(ddc5b387c89baab0fd5c654f3768c6e27972c06a) )
 	ROM_RELOAD(        0x380000, 0x80000 )
 
-	ROM_REGION16_LE( 0x20000, "user1", 0 )
+	ROM_REGION16_LE( 0x20000, "palrom", 0 )
 	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(793c4bda) SHA1(5a8a2981b48922f4d9e617a9bf9ef6a47ab702b7) ) /* Palette - 0 at U144 */
 	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(fe2c3521) SHA1(896e53427c7831620ca565be9c0b76aabc36b9f4) ) /* Palette - 1 at U145 */
 
@@ -669,7 +672,7 @@ ROM_START( fredmemc )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "art-rom.123", 0x000000, 0x80000, CRC(48133505) SHA1(60f69b053e67256928db57e0a5335bbd5a72ddfc) ) /* Graphics / Art at U123 */
 	ROM_LOAD( "art-rom.125.mandarin", 0x080000, 0x80000, CRC(780c06fa) SHA1(34aa420fb8a628b8cb92b0975e602d8c676c608a) ) /* Graphics / Art at U125 */
 	ROM_LOAD( "art-rom.127", 0x100000, 0x80000, CRC(93095f3b) SHA1(de746829e04bf153024e94e6ef0ceffb1eae2b14) ) /* Graphics / Art at U127 */
@@ -685,7 +688,7 @@ ROM_START( fredmemc )
 	ROM_LOAD( "arom3", 0x300000, 0x80000, CRC(411900b0) SHA1(ddc5b387c89baab0fd5c654f3768c6e27972c06a) )
 	ROM_RELOAD(        0x380000, 0x80000 )
 
-	ROM_REGION16_LE( 0x20000, "user1", 0 )
+	ROM_REGION16_LE( 0x20000, "palrom", 0 )
 	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(793c4bda) SHA1(5a8a2981b48922f4d9e617a9bf9ef6a47ab702b7) ) /* Palette - 0 at U144 */
 	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(fe2c3521) SHA1(896e53427c7831620ca565be9c0b76aabc36b9f4) ) /* Palette - 1 at U145 */
 
@@ -701,7 +704,7 @@ ROM_START( fredmesp )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "art-rom.123", 0x000000, 0x80000, CRC(48133505) SHA1(60f69b053e67256928db57e0a5335bbd5a72ddfc) ) /* Graphics / Art at U123 */
 	ROM_LOAD( "art-rom.125.spanish", 0x080000, 0x80000, CRC(3ee88ec8) SHA1(24f3d548fe47b92d68904e1cd6233f75b109772c) ) /* Graphics / Art at U125 */
 	ROM_LOAD( "art-rom.127", 0x100000, 0x80000, CRC(93095f3b) SHA1(de746829e04bf153024e94e6ef0ceffb1eae2b14) ) /* Graphics / Art at U127 */
@@ -717,7 +720,7 @@ ROM_START( fredmesp )
 	ROM_LOAD( "arom3", 0x300000, 0x80000, CRC(411900b0) SHA1(ddc5b387c89baab0fd5c654f3768c6e27972c06a) )
 	ROM_RELOAD(        0x380000, 0x80000 )
 
-	ROM_REGION16_LE( 0x20000, "user1", 0 )
+	ROM_REGION16_LE( 0x20000, "palrom", 0 )
 	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(793c4bda) SHA1(5a8a2981b48922f4d9e617a9bf9ef6a47ab702b7) ) /* Palette - 0 at U144 */
 	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(fe2c3521) SHA1(896e53427c7831620ca565be9c0b76aabc36b9f4) ) /* Palette - 1 at U145 */
 
@@ -735,7 +738,7 @@ ROM_START( cecmatch )
 	ROM_LOAD( "prog.102", 0x00000, 0x8000, CRC(d452ccf4) SHA1(7de9a4f39bf0ba448fe4ebeb459e98a1910a66be) ) /* Sound Program 6809 code at U102 */
 	ROM_RELOAD(0x8000,0x8000)
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "art-rom.123", 0x000000, 0x40000, CRC(1bab1a52) SHA1(f713ba1bc755c41d38d9846444d753c9c7fb1f9d) ) /* Graphics / Art at U123 */
 	ROM_LOAD( "art-rom.127", 0x040000, 0x40000, CRC(dc9be2ca) SHA1(d5059a49a3aad309e242c9c4791d10aa5ecd5d1a) ) /* Graphics / Art at U127 */
 	ROM_LOAD( "art-rom.125", 0x080000, 0x40000, CRC(7abe18d9) SHA1(c5a582ded7c1b0a02847b342111c64ac0ccb70c2) ) /* Graphics / Art at U125 */
@@ -758,7 +761,7 @@ ROM_START( cecmatch )
 	ROM_RELOAD(        0x380000, 0x40000 )
 	ROM_RELOAD(        0x3c0000, 0x40000 )
 
-	ROM_REGION16_LE( 0x20000, "user1", 0 )
+	ROM_REGION16_LE( 0x20000, "palrom", 0 )
 	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(69b3cc85) SHA1(05f7204ac961274b5d2f42cc6c0d06e5fa146aef)) /* Palette - 0 at U144 */
 	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(e64a8511) SHA1(0e3a1fe936c841b8acfb150bf63e564b1dec2363) ) /* Palette - 1 at U145 */
 ROM_END
@@ -771,12 +774,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1993, dcheese,   0,       dcheese, dcheese, dcheese_state, 0, ROT90, "HAR",                "Double Cheese",                                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1993, lottof2,   0,       dcheese, lottof2, dcheese_state, 0, ROT0,  "HAR",                "Lotto Fun 2",                                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cecmatch,  0,       fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "ChuckECheese's Match Game",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmem,   0,       fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (World?, Ticket version, 3/17/95)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemus, fredmem, fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemuk, fredmem, fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemj,  fredmem, fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Japan, High Score version, 3/20/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemc,  fredmem, fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmesp,  fredmem, fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dcheese,   0,       dcheese, dcheese, dcheese_state, empty_init, ROT90, "HAR",                "Double Cheese",                                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1993, lottof2,   0,       dcheese, lottof2, dcheese_state, empty_init, ROT0,  "HAR",                "Lotto Fun 2",                                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cecmatch,  0,       fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "ChuckECheese's Match Game",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmem,   0,       fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (World?, Ticket version, 3/17/95)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemus, fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemuk, fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemj,  fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Japan, High Score version, 3/20/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemc,  fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmesp,  fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)",                   MACHINE_SUPPORTS_SAVE )

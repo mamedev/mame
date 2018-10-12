@@ -159,15 +159,16 @@ ROM board internal layouts:
 
 DEFINE_DEVICE_TYPE(AW_ROM_BOARD, aw_rom_board, "aw_rom_board", "Sammy Atomiswave ROM Board")
 
-ADDRESS_MAP_START(aw_rom_board::submap)
-	AM_RANGE(0x00, 0x01) AM_WRITE(epr_offsetl_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(epr_offseth_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(mpr_record_index_w)
-	AM_RANGE(0x08, 0x09) AM_WRITE(mpr_first_file_index_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(mpr_file_offsetl_w)
-	AM_RANGE(0x0c, 0x0d) AM_WRITE(mpr_file_offseth_w)
-	AM_RANGE(0x40, 0x41) AM_READWRITE(pio_r, pio_w)
-ADDRESS_MAP_END
+void aw_rom_board::submap(address_map &map)
+{
+	map(0x00, 0x01).w(FUNC(aw_rom_board::epr_offsetl_w));
+	map(0x02, 0x03).w(FUNC(aw_rom_board::epr_offseth_w));
+	map(0x06, 0x07).w(FUNC(aw_rom_board::mpr_record_index_w));
+	map(0x08, 0x09).w(FUNC(aw_rom_board::mpr_first_file_index_w));
+	map(0x0a, 0x0b).w(FUNC(aw_rom_board::mpr_file_offsetl_w));
+	map(0x0c, 0x0d).w(FUNC(aw_rom_board::mpr_file_offseth_w));
+	map(0x40, 0x41).rw(FUNC(aw_rom_board::pio_r), FUNC(aw_rom_board::pio_w));
+}
 
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_g1_device(mconfig, AW_ROM_BOARD, tag, owner, clock)

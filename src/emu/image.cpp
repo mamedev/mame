@@ -63,6 +63,7 @@ image_manager::image_manager(running_machine &machine)
 			{
 				// retrieve image error message
 				std::string image_err = std::string(image.error());
+				std::string startup_image_name = startup_image;
 
 				// unload the bad image
 				image.unload();
@@ -72,9 +73,10 @@ image_manager::image_manager(running_machine &machine)
 				if (machine.options().write_config())
 					write_config(machine.options(), nullptr, &machine.system());
 
-				fatalerror_exitcode(machine, EMU_ERR_DEVICE, "Device %s load (%s) failed: %s",
+				fatalerror_exitcode(machine, EMU_ERR_DEVICE, "Device %s load (-%s %s) failed: %s",
 					image.device().name(),
-					startup_image.c_str(),
+					image.instance_name().c_str(),
+					startup_image_name.c_str(),
 					image_err.c_str());
 			}
 		}

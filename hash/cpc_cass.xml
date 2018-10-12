@@ -31385,12 +31385,12 @@ Please stick to using the floppy versions for the time being...
 		<info name="alt_title" value="Sly Spy - Secret Agent (Box)" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="69156">
-				<rom name=" secret agent - sly spy (uk) (face a) (1990) (spain retail version) [original] [tape].cdt" size="69156" crc="da89e44e" sha1="ceab83c5a78664cf53abe0dd173f7724cb60bee9" offset="0" />
+				<rom name="secret agent - sly spy (uk) (face a) (1990) (spain retail version) [original] [tape].cdt" size="69156" crc="da89e44e" sha1="ceab83c5a78664cf53abe0dd173f7724cb60bee9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
 			<dataarea name="cass" size="188825">
-				<rom name=" secret agent - sly spy (uk) (face b) (1990) (spain retail version) [original] [tape].cdt" size="188825" crc="4d27019e" sha1="f2d8ab11bc5b645bb987e1425299c518dd16ac71" offset="0" />
+				<rom name="secret agent - sly spy (uk) (face b) (1990) (spain retail version) [original] [tape].cdt" size="188825" crc="4d27019e" sha1="f2d8ab11bc5b645bb987e1425299c518dd16ac71" offset="0" />
 			</dataarea>
 		</part>
 	</software>

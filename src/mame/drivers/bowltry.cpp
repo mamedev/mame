@@ -77,16 +77,17 @@ WRITE16_MEMBER(bowltry_state::hack_w)
 }
 #endif
 
-ADDRESS_MAP_START(bowltry_state::bowltry_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE( 0x080000, 0x083fff ) AM_RAM
-	AM_RANGE( 0x600000, 0x60ffff ) AM_RAM
+void bowltry_state::bowltry_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x080000, 0x083fff).ram();
+	map(0x600000, 0x60ffff).ram();
 #if HACK_ENABLED
-	AM_RANGE( 0x60e090, 0x60e093 ) AM_READWRITE(hack_r,hack_w)
+	map(0x60e090, 0x60e093).rw(FUNC(bowltry_state::hack_r), FUNC(bowltry_state::hack_w));
 #endif
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( bowltry )
 INPUT_PORTS_END
@@ -99,9 +100,9 @@ uint32_t bowltry_state::screen_update_bowltry(screen_device &screen, bitmap_rgb3
 
 
 MACHINE_CONFIG_START(bowltry_state::bowltry)
-	MCFG_CPU_ADD("maincpu", H83008, 16000000 )
-	MCFG_CPU_PROGRAM_MAP( bowltry_map )
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", bowltry_state,  irq0_line_hold) // uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)
+	MCFG_DEVICE_ADD("maincpu", H83008, 16000000 )
+	MCFG_DEVICE_PROGRAM_MAP( bowltry_map )
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bowltry_state,  irq0_line_hold) // uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -130,4 +131,4 @@ ROM_START( bowltry )
 ROM_END
 
 
-GAME( 200?, bowltry,    0,          bowltry,  bowltry, bowltry_state,  0, ROT0, "Atlus",        "Bowling Try",MACHINE_IS_SKELETON )
+GAME( 200?, bowltry, 0, bowltry, bowltry, bowltry_state, empty_init, ROT0, "Atlus", "Bowling Try", MACHINE_IS_SKELETON )

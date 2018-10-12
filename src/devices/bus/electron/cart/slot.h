@@ -110,10 +110,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<electron_cartslot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<electron_cartslot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(_devcb) \
-	devcb = &downcast<electron_cartslot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
+	downcast<electron_cartslot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -212,7 +212,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(ELECTRON_CARTSLOT, electron_cartslot_device)
 
-SLOT_INTERFACE_EXTERN(electron_cart);
+void electron_cart(device_slot_interface &device);
 
 
 #endif // MAME_BUS_ELECTRON_CARTSLOT_H

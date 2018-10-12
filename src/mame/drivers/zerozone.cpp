@@ -35,6 +35,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -49,27 +50,29 @@ WRITE16_MEMBER( zerozone_state::sound_w )
 }
 
 
-ADDRESS_MAP_START(zerozone_state::main_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSWB")
-	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSWA")
-	AM_RANGE(0x084000, 0x084001) AM_WRITE(sound_w)
-	AM_RANGE(0x088000, 0x0881ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x098000, 0x098001) AM_RAM     /* Watchdog? */
-	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(tilemap_w) AM_SHARE("videoram")
-	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITE(tilebank_w)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM     /* Never read from */
-ADDRESS_MAP_END
+void zerozone_state::main_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x080000, 0x080001).portr("SYSTEM");
+	map(0x080002, 0x080003).portr("INPUTS");
+	map(0x080008, 0x080009).portr("DSWB");
+	map(0x08000a, 0x08000b).portr("DSWA");
+	map(0x084000, 0x084001).w(FUNC(zerozone_state::sound_w));
+	map(0x088000, 0x0881ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x098000, 0x098001).ram();     /* Watchdog? */
+	map(0x09ce00, 0x09ffff).ram().w(FUNC(zerozone_state::tilemap_w)).share("videoram");
+	map(0x0b4000, 0x0b4001).w(FUNC(zerozone_state::tilebank_w));
+	map(0x0c0000, 0x0cffff).ram();
+	map(0x0f8000, 0x0f87ff).ram();     /* Never read from */
+}
 
-ADDRESS_MAP_START(zerozone_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void zerozone_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( zerozone )
@@ -153,7 +156,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( zerozone )
+static GFXDECODE_START( gfx_zerozone )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 256 )         /* sprites & playfield */
 GFXDECODE_END
 
@@ -171,12 +174,12 @@ void zerozone_state::machine_reset()
 MACHINE_CONFIG_START(zerozone_state::zerozone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zerozone_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", zerozone_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 1000000)  /* 1 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 1000000)  /* 1 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -189,17 +192,17 @@ MACHINE_CONFIG_START(zerozone_state::zerozone)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 47*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zerozone)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zerozone)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -245,5 +248,5 @@ ROM_START( lvgirl94 )
 ROM_END
 
 
-GAME( 1993, zerozone, 0, zerozone, zerozone, zerozone_state, 0, ROT0, "Comad", "Zero Zone", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lvgirl94, 0, zerozone, zerozone, zerozone_state, 0, ROT0, "Comad", "Las Vegas Girl (Girl '94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, zerozone, 0, zerozone, zerozone, zerozone_state, empty_init, ROT0, "Comad", "Zero Zone", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lvgirl94, 0, zerozone, zerozone, zerozone_state, empty_init, ROT0, "Comad", "Las Vegas Girl (Girl '94)", MACHINE_SUPPORTS_SAVE )

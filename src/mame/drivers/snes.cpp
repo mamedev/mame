@@ -51,6 +51,10 @@ public:
 			, m_cartslot(*this, "snsslot")
 	{ }
 
+	void snespal(machine_config &config);
+	void snes(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( snes20_hi_r );
 	DECLARE_WRITE8_MEMBER( snes20_hi_w );
 	DECLARE_READ8_MEMBER( snes20_lo_r );
@@ -106,8 +110,7 @@ public:
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
 	optional_device<sns_cart_slot_device> m_cartslot;
-	void snespal(machine_config &config);
-	void snes(machine_config &config);
+
 	void snes_map(address_map &map);
 	void spc_map(address_map &map);
 };
@@ -1012,17 +1015,19 @@ WRITE8_MEMBER( snes_console_state::pfest94_lo_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(snes_console_state::snes_map)
+void snes_console_state::snes_map(address_map &map)
+{
 //  AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes20_lo_r, snes20_lo_w)
-	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                                     /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	map(0x7e0000, 0x7fffff).ram();                                     /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
 //  AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes20_hi_r, snes20_hi_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(snes_console_state::spc_map)
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", snes_sound_device, spc_ram_r, spc_ram_w) /* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", snes_sound_device, spc_io_r, spc_io_w)   /* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
-ADDRESS_MAP_END
+void snes_console_state::spc_map(address_map &map)
+{
+	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
+	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
+	map(0x0100, 0xffff).rw(FUNC(snes_console_state::spc_ram_100_r), FUNC(snes_console_state::spc_ram_100_w));
+}
 
 
 /*************************************
@@ -1332,12 +1337,12 @@ void snes_console_state::machine_reset()
 MACHINE_CONFIG_START(snes_console_state::snes)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68 MHz, also 3.58 MHz */
-	MCFG_CPU_PROGRAM_MAP(snes_map)
+	MCFG_DEVICE_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68 MHz, also 3.58 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(snes_map)
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_CPU_PROGRAM_MAP(spc_map)
+	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
+	MCFG_DEVICE_PROGRAM_MAP(spc_map)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(48000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1347,9 +1352,9 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
-	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SNES_PPU(config, m_ppu, 0);
+	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
+	m_ppu->set_screen("screen");
 
 	MCFG_SNES_CONTROL_PORT_ADD("ctrl1", snes_control_port_devices, "joypad")
 	MCFG_SNESCTRL_ONSCREEN_CB(snes_console_state, onscreen_cb)
@@ -1358,8 +1363,9 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_SNESCTRL_GUNLATCH_CB(snes_console_state, gun_latch_cb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("spc700", SNES, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
@@ -1371,8 +1377,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snes_console_state::snespal)
 	snes(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_CLOCK( MCLK_PAL )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_CLOCK( MCLK_PAL )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_PAL, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL)
@@ -1401,6 +1407,6 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT STATE                INIT  COMPANY     FULLNAME                                      FLAGS */
-CONS( 1989, snes,      0,      0,     snes,      snes, snes_console_state,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1991, snespal,   snes,   0,     snespal,   snes, snes_console_state,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS               INIT        COMPANY     FULLNAME                                      FLAGS */
+CONS( 1989, snes,    0,      0,      snes,    snes,  snes_console_state, empty_init, "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, snespal, snes,   0,      snespal, snes,  snes_console_state, empty_init, "Nintendo", "Super Nintendo Entertainment System (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

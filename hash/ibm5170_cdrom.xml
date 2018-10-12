@@ -2127,6 +2127,21 @@
 		</part>
 	</software>
 
+	<!-- Windows 98 -->
+	<!-- Intel Celeron 266 MHz class minimum / DirectX 7.0 -->
+	<!-- Korean game, published in Japan by Media Kite -->
+	<!-- ID code: MKW-239 -->
+	<software name="jaxis" supported="no">
+		<description>Jaxis (Japan)</description>
+		<year>2002</year>
+		<publisher>Jamie System Development</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jaxis" sha1="749981bb810b64df141c752daf5b47a64ec0acc9" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
 	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
 	<software name="kingsq6e">
@@ -2254,6 +2269,19 @@
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="curse of monkey island, the (1997)(lucasarts)(disc 2 of 2)[lucasarts classic]" sha1="424d5197c9ed6f6fcf5803612d670aea9bbe05a0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1, Windows 95, Macintosh -->
+	<!-- http://redump.org/disc/50161/ -->
+	<software name="fredfisk" supported="no">
+		<description>Freddi Fisk och fallet med de försvunna sjögräsfröna (Sweden)</description>
+		<year>1997</year>
+		<publisher>Levande Böcker</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="freddi fisk och fallet med de forsvunna sjograsfrona (sweden)" sha1="10c19256b8aca3d1b868a97a08670ba72bb9e257" />
 			</diskarea>
 		</part>
 	</software>
@@ -2712,6 +2740,20 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="GX4" sha1="a600a961b5127d3a5ee368c20d9f54e6ede23b81" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- TODO: playback doesn't work properly, needs mouse left button user pressed? Eventually hangs anyway. -->
+	<software name="whoshoti" supported="no">
+		<description>Who Shot Johnny Rock (Italy)</description>
+		<year>1993</year>
+		<publisher>American Laser Games</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="who shot johnny rock [DOS IT]" sha1="eb68c0469a43bd16d412180dc0022cb260a31773" />
 			</diskarea>
 		</part>
 	</software>

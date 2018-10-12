@@ -2,37 +2,15 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-        Schachcomputer SC1
+Schachcomputer SC1
 
-        12/05/2009 Skeleton driver.
+2009-05-12 Skeleton driver.
 
 ToDo:
 - speaker
 - LEDs
 - 7seg sometimes flashes
 
-Port 80-83 could be a device
-
-This happens at the start:
-'maincpu' (04EF): unmapped i/o memory write to 0081 = 0F & FF
-'maincpu' (04F3): unmapped i/o memory write to 0083 = CF & FF
-'maincpu' (04F7): unmapped i/o memory write to 0083 = BB & FF
-'maincpu' (04FB): unmapped i/o memory write to 0082 = 01 & FF
-'maincpu' (0523): unmapped i/o memory write to 00FC = 02 & FF  **
-'maincpu' (0523): unmapped i/o memory write to 00FC = 04 & FF  **
-
-** These two happen for a while (making a tone from a speaker?)
-
-Then:
-'maincpu' (0523): unmapped i/o memory write to 00FC = 00 & FF
-'maincpu' (0075): unmapped i/o memory write to 0080 = 02 & FF
-'maincpu' (0523): unmapped i/o memory write to 00FC = 20 & FF
-
-Then this happens continuously:
-Port 80 out - 00, 02, FF
-Port FC out - 00, 01, 02, 04, 08, 10, 20, 40, 80 (selecting rows?)
-Port 80 in - upper byte = 20 thru 26
-Port 82 in - upper byte = 0 thru 7
 
 ****************************************************************************/
 
@@ -52,19 +30,24 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
+	void sc1(machine_config &config);
 
+private:
 	DECLARE_WRITE8_MEMBER( matrix_w );
 	DECLARE_WRITE8_MEMBER( pio_port_a_w );
 	DECLARE_READ8_MEMBER( pio_port_b_r );
 
-	uint8_t m_matrix;
-	void sc1(machine_config &config);
 	void sc1_io(address_map &map);
 	void sc1_mem(address_map &map);
+
+	uint8_t m_matrix;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	output_finder<4> m_digits;
 };
 
 /***************************************************************************
@@ -75,16 +58,16 @@ public:
 
 WRITE8_MEMBER( sc1_state::pio_port_a_w )
 {
-	uint8_t digit = bitswap<8>( data,3,4,6,0,1,2,7,5 );
+	uint8_t digit = bitswap<8>( data,3,4,6,0,1,2,7,5 ) & 0x7f;
 
 	if (m_matrix & 0x04)
-		output().set_digit_value(3, digit & 0x7f);
+		m_digits[3] = digit;
 	if (m_matrix & 0x08)
-		output().set_digit_value(2, digit & 0x7f);
+		m_digits[2] = digit;
 	if (m_matrix & 0x10)
-		output().set_digit_value(1, digit & 0x7f);
+		m_digits[1] = digit;
 	if (m_matrix & 0x20)
-		output().set_digit_value(0, digit & 0x7f);
+		m_digits[0] = digit;
 }
 
 
@@ -124,18 +107,20 @@ READ8_MEMBER( sc1_state::pio_port_b_r )
 }
 
 
-ADDRESS_MAP_START(sc1_state::sc1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
-	AM_RANGE( 0x4000, 0x43ff ) AM_RAM
-ADDRESS_MAP_END
+void sc1_state::sc1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x43ff).ram();
+}
 
-ADDRESS_MAP_START(sc1_state::sc1_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(matrix_w)
-ADDRESS_MAP_END
+void sc1_state::sc1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw("z80pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xfc, 0xfc).w(FUNC(sc1_state::matrix_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sc1 )
@@ -175,21 +160,21 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(sc1_state::sc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(sc1_mem)
-	MCFG_CPU_IO_MAP(sc1_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sc1_mem)
+	MCFG_DEVICE_IO_MAP(sc1_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc1)
+	config.set_default_layout(layout_sc1);
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(sc1_state, pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(sc1_state, pio_port_b_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(4'000'000)));
+	pio.out_pa_callback().set(FUNC(sc1_state::pio_port_a_w));
+	pio.in_pb_callback().set(FUNC(sc1_state::pio_port_b_r));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -201,5 +186,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  STATE       INIT  COMPANY                       FULLNAME              FLAGS
-COMP( 1989, sc1,  0,      0,       sc1,     sc1,   sc1_state,  0,    "VEB Mikroelektronik Erfurt", "Schachcomputer SC1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                       FULLNAME              FLAGS
+COMP( 1989, sc1,  0,      0,      sc1,     sc1,   sc1_state, empty_init, "VEB Mikroelektronik Erfurt", "Schachcomputer SC1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

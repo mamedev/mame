@@ -64,10 +64,10 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(timeplt_state::interrupt)
+WRITE_LINE_MEMBER(timeplt_state::vblank_irq)
 {
-	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -129,32 +129,38 @@ CUSTOM_INPUT_MEMBER(timeplt_state::chkun_hopper_status_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(timeplt_state::timeplt_main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa800, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ(scanline_r) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sound_data_w)
-	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_READ_PORT("DSW1") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")
-	;map(0xc300, 0xc30f).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_d0(space, offset >> 1, data, mem_mask); });
-	AM_RANGE(0xc320, 0xc320) AM_MIRROR(0x0c9f) AM_READ_PORT("IN1")
-	AM_RANGE(0xc340, 0xc340) AM_MIRROR(0x0c9f) AM_READ_PORT("IN2")
-	AM_RANGE(0xc360, 0xc360) AM_MIRROR(0x0c9f) AM_READ_PORT("DSW0")
-ADDRESS_MAP_END
+void timeplt_state::timeplt_main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x5fff).rom();
+	map(0xa000, 0xa3ff).ram().w(FUNC(timeplt_state::colorram_w)).share("colorram");
+	map(0xa400, 0xa7ff).ram().w(FUNC(timeplt_state::videoram_w)).share("videoram");
+	map(0xa800, 0xafff).ram();
+	map(0xb000, 0xb0ff).mirror(0x0b00).ram().share("spriteram");
+	map(0xb400, 0xb4ff).mirror(0x0b00).ram().share("spriteram2");
+	map(0xc000, 0xc000).mirror(0x0cff).r(FUNC(timeplt_state::scanline_r)).w("timeplt_audio", FUNC(timeplt_audio_device::sound_data_w));
+	map(0xc200, 0xc200).mirror(0x0cff).portr("DSW1").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc300, 0xc300).mirror(0x0c9f).portr("IN0");
+	map(0xc300, 0xc30f).lw8("mainlatch_w",
+							[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								m_mainlatch->write_d0(space, offset >> 1, data, mem_mask);
+							});
+	map(0xc320, 0xc320).mirror(0x0c9f).portr("IN1");
+	map(0xc340, 0xc340).mirror(0x0c9f).portr("IN2");
+	map(0xc360, 0xc360).mirror(0x0c9f).portr("DSW0");
+}
 
-ADDRESS_MAP_START(timeplt_state::psurge_main_map)
-	AM_IMPORT_FROM(timeplt_main_map)
-	AM_RANGE(0x6004, 0x6004) AM_READ(psurge_protection_r)
-ADDRESS_MAP_END
+void timeplt_state::psurge_main_map(address_map &map)
+{
+	timeplt_main_map(map);
+	map(0x6004, 0x6004).r(FUNC(timeplt_state::psurge_protection_r));
+}
 
-ADDRESS_MAP_START(timeplt_state::chkun_main_map)
-	AM_IMPORT_FROM(timeplt_main_map)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-ADDRESS_MAP_END
+void timeplt_state::chkun_main_map(address_map &map)
+{
+	timeplt_main_map(map);
+	map(0x6000, 0x67ff).ram();
+}
 
 
 
@@ -269,7 +275,7 @@ static INPUT_PORTS_START( chkun )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Bet 3B")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bet 1B")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Bet 2B")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -318,7 +324,7 @@ static INPUT_PORTS_START( bikkuric )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -383,7 +389,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( timeplt )
+static GFXDECODE_START( gfx_timeplt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   32*4, 64 )
 GFXDECODE_END
@@ -399,7 +405,7 @@ static const gfx_layout chkun_spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( chkun )
+static GFXDECODE_START( gfx_chkun )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, chkun_spritelayout,   32*4, 64 )
 GFXDECODE_END
@@ -422,21 +428,20 @@ void timeplt_state::machine_reset()
 MACHINE_CONFIG_START(timeplt_state::timeplt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* not confirmed, but common for Konami games of the era */
-	MCFG_CPU_PROGRAM_MAP(timeplt_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", timeplt_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* not confirmed, but common for Konami games of the era */
+	MCFG_DEVICE_PROGRAM_MAP(timeplt_main_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(timeplt_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(timeplt_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(timeplt_state, video_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(timeplt_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(timeplt_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // PAY OUT - not used
+	LS259(config, m_mainlatch); // B3
+	m_mainlatch->q_out_cb<0>().set(FUNC(timeplt_state::nmi_enable_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(timeplt_state::flipscreen_w));
+	m_mainlatch->q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w));
+	m_mainlatch->q_out_cb<3>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(timeplt_state::video_enable_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(timeplt_state::coin_counter_1_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(timeplt_state::coin_counter_2_w));
+	m_mainlatch->q_out_cb<7>().set_nop(); // PAY OUT - not used
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -446,15 +451,15 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(timeplt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, timeplt_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", timeplt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_timeplt)
 	MCFG_PALETTE_ADD("palette", 32*4+64*4)
 	MCFG_PALETTE_INIT_OWNER(timeplt_state, timeplt)
 
 	/* sound hardware */
 
-	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);
+	MCFG_DEVICE_ADD("timeplt_audio", TIMEPLT_AUDIO)
 MACHINE_CONFIG_END
 
 
@@ -462,15 +467,16 @@ MACHINE_CONFIG_START(timeplt_state::psurge)
 	timeplt(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(psurge_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", timeplt_state,  nmi_line_pulse)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(psurge_main_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+
+	m_mainlatch->q_out_cb<0>().set_nop();
+	m_mainlatch->q_out_cb<4>().set_nop();
+	m_mainlatch->q_out_cb<5>().set_nop();
+	m_mainlatch->q_out_cb<6>().set_nop();
 
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,psurge)
 MACHINE_CONFIG_END
@@ -478,11 +484,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(timeplt_state::bikkuric)
 	timeplt(config);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_chkun)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(chkun_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(chkun_main_map)
 
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,chkun)
 MACHINE_CONFIG_END
@@ -490,11 +496,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(timeplt_state::chkun)
 	bikkuric(config);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_chkun)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("timeplt_audio:ay2")
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("^", timeplt_state, chkun_sound_w))
+	MCFG_DEVICE_MODIFY("timeplt_audio:ay2")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, timeplt_state, chkun_sound_w))
 
 	MCFG_TC8830F_ADD("tc8830f", XTAL(512'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "timeplt_audio:mono", 0.10)
@@ -687,12 +693,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, timeplt,  0,       timeplt,  timeplt,  timeplt_state, 0, ROT90,  "Konami", "Time Pilot", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, timepltc, timeplt, timeplt,  timeplt,  timeplt_state, 0, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, timeplta, timeplt, timeplt,  timeplt,  timeplt_state, 0, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, spaceplt, timeplt, timeplt,  timeplt,  timeplt_state, 0, ROT90,  "bootleg", "Space Pilot", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, timeplt,  0,       timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "Konami", "Time Pilot", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, timepltc, timeplt, timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, timeplta, timeplt, timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, spaceplt, timeplt, timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "bootleg", "Space Pilot", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, psurge,   0,       psurge,   psurge,   timeplt_state, 0, ROT270, "Vision Electronics", "Power Surge", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, psurge,   0,       psurge,   psurge,   timeplt_state, empty_init, ROT270, "Vision Electronics", "Power Surge", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, chkun,    0,       chkun,    chkun,    timeplt_state, 0, ROT90,  "Peni", "Chance Kun (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, bikkuric, 0,       bikkuric, bikkuric, timeplt_state, 0, ROT90,  "Peni", "Bikkuri Card (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chkun,    0,       chkun,    chkun,    timeplt_state, empty_init, ROT90,  "Peni", "Chance Kun (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, bikkuric, 0,       bikkuric, bikkuric, timeplt_state, empty_init, ROT90,  "Peni", "Bikkuri Card (Japan)", MACHINE_SUPPORTS_SAVE )

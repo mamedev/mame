@@ -93,8 +93,8 @@ ROM_START( mouse )
 	ROM_LOAD( "341-0269.2b",  0x000000, 0x000800, CRC(94067f16) SHA1(3a2baa6648efe4456d3ec3721216e57c64f7acfc) )
 
 	ROM_REGION(0xc00, "pal", 0)
-	ROM_LOAD( "mmi_pal16r4a(jedec).2a", 0x000000, 0x000b04, CRC(1d620ee5) SHA1(5aa9a515c919ff7a18878649cac5d44f0c2abf28) )
-	ROM_LOAD( "mmi_pal16r4a(binary).2a", 0x000000, 0x000100, CRC(1da5c745) SHA1(ba267b69a2fda2a2348b140979ece562411bb37b) )
+	ROM_LOAD( "mmi_pal16r4a,jedec.2a", 0x000000, 0x000b04, CRC(1d620ee5) SHA1(5aa9a515c919ff7a18878649cac5d44f0c2abf28) )
+	ROM_LOAD( "mmi_pal16r4a,binary.2a", 0x000000, 0x000100, CRC(1da5c745) SHA1(ba267b69a2fda2a2348b140979ece562411bb37b) )
 ROM_END
 
 static INPUT_PORTS_START( mouse )
@@ -127,20 +127,21 @@ ioport_constructor a2bus_mouse_device::device_input_ports() const
     machine configurations
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(a2bus_mouse_device::device_add_mconfig)
-	MCFG_CPU_ADD(MOUSE_MCU_TAG, M68705P3, 2043600)
-	MCFG_M68705_PORTA_R_CB(READ8(a2bus_mouse_device, mcu_port_a_r))
-	MCFG_M68705_PORTB_R_CB(READ8(a2bus_mouse_device, mcu_port_b_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(a2bus_mouse_device, mcu_port_a_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(a2bus_mouse_device, mcu_port_b_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(a2bus_mouse_device, mcu_port_c_w))
+void a2bus_mouse_device::device_add_mconfig(machine_config &config)
+{
+	M68705P3(config, m_mcu, 2043600);
+	m_mcu->porta_r_cb().set(FUNC(a2bus_mouse_device::mcu_port_a_r));
+	m_mcu->portb_r_cb().set(FUNC(a2bus_mouse_device::mcu_port_b_r));
+	m_mcu->porta_w_cb().set(FUNC(a2bus_mouse_device::mcu_port_a_w));
+	m_mcu->portb_w_cb().set(FUNC(a2bus_mouse_device::mcu_port_b_w));
+	m_mcu->portc_w_cb().set(FUNC(a2bus_mouse_device::mcu_port_c_w));
 
-	MCFG_DEVICE_ADD(MOUSE_PIA_TAG, PIA6821, 1021800)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(a2bus_mouse_device, pia_out_a))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a2bus_mouse_device, pia_out_b))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(a2bus_mouse_device, pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(a2bus_mouse_device, pia_irqb_w))
-MACHINE_CONFIG_END
+	PIA6821(config, m_pia, 1021800);
+	m_pia->writepa_handler().set(FUNC(a2bus_mouse_device::pia_out_a));
+	m_pia->writepb_handler().set(FUNC(a2bus_mouse_device::pia_out_b));
+	m_pia->irqa_handler().set(FUNC(a2bus_mouse_device::pia_irqa_w));
+	m_pia->irqb_handler().set(FUNC(a2bus_mouse_device::pia_irqb_w));
+}
 
 /*-------------------------------------------------
     rom_region - device-specific ROM region
@@ -293,7 +294,7 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_port_b_w)
 
 WRITE8_MEMBER(a2bus_mouse_device::mcu_port_c_w)
 {
-	m_pia->portb_w(data << 4);
+	m_pia->write_portb(data << 4);
 }
 
 template <unsigned AXIS, u8 DIR, u8 CLK> void a2bus_mouse_device::update_axis()

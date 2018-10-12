@@ -45,8 +45,8 @@
  *---------------------------
  * See fccpu30.cpp
  *
- * Misc links about Force Computes and this board:
- *------------------------------------------------
+ * Misc links about Force Computers and this board:
+ *-------------------------------------------------
  * http://bitsavers.org/pdf/forceComputers/
  *
  * Description, from datasheets etc
@@ -129,26 +129,30 @@
 class miniforce_state : public driver_device
 {
 public:
-miniforce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device (mconfig, type, tag)
+	miniforce_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 	{
 	}
-	virtual void machine_start () override;
-	virtual void machine_reset () override;
+
 	void miniforce(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void miniforce_mem(address_map &map);
 };
 
 #if 0
-ADDRESS_MAP_START(miniforce_state::miniforce_mem)
-	ADDRESS_MAP_UNMAP_HIGH
+void miniforce_state::miniforce_mem(address_map &map)
+{
+	map.unmap_value_high();
 /* The ROMs contains an OS9 bootloader. It is position independent but reset vector suggests that it sits flat on adress 0 (zero) */
 //  AM_RANGE (0x000000, 0x003fff) AM_ROM AM_REGION("roms", 0x000000) /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
 //  AM_RANGE (0x004000, 0x01ffff) AM_ROM AM_REGION("roms", 0x004000)/* System EPROM Area 112Kb for System ROM - not verified    */
 //  AM_RANGE (0x020000, 0x03ffff) AM_RAM /* Not verified */
 //  AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 //  AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
-ADDRESS_MAP_END
+}
 #endif
 
 /* Start it up */
@@ -167,18 +171,19 @@ void miniforce_state::machine_reset()
 static INPUT_PORTS_START (miniforce)
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(miniforce_vme_cards)
-	SLOT_INTERFACE("fccpu21", VME_FCCPU21)
-	SLOT_INTERFACE("fcisio", VME_FCISIO1)
-	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
-	SLOT_INTERFACE("hcpu30", VME_HCPU30)
-SLOT_INTERFACE_END
+static void miniforce_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21", VME_FCCPU21);
+	device.option_add("fcisio", VME_FCISIO1);
+	device.option_add("fcscsi", VME_FCSCSI1);
+	device.option_add("hcpu30", VME_HCPU30);
+}
 
 /*
  * Machine configuration
  */
 MACHINE_CONFIG_START(miniforce_state::miniforce)
-//  MCFG_CPU_PROGRAM_MAP (miniforce_mem)
+//  MCFG_DEVICE_PROGRAM_MAP (miniforce_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, miniforce_vme_cards, "fccpu21")
 	MCFG_VME_SLOT_ADD ("vme", 2, miniforce_vme_cards, nullptr)
@@ -195,5 +200,5 @@ ROM_START(miniforce)
 ROM_END
 
 /* Drivers TODO: setup distinct miniforce machine configurations */
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY             FULLNAME      FLAGS */
-COMP (1987, miniforce,  0,      0,      miniforce,  miniforce,  miniforce_state,  0,    "Force Computers",  "miniFORCE",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY            FULLNAME     FLAGS */
+COMP( 1987, miniforce, 0,      0,      miniforce, miniforce, miniforce_state, empty_init, "Force Computers", "miniFORCE", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

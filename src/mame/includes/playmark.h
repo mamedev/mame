@@ -4,6 +4,7 @@
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "emupal.h"
 
 class playmark_state : public driver_device
 {
@@ -26,6 +27,17 @@ public:
 		m_ticket(*this, "ticket"),
 		m_token(*this, "token") { }
 
+	void wbeachvl(machine_config &config);
+	void hrdtimes(machine_config &config);
+	void luckboomh(machine_config &config);
+	void bigtwin(machine_config &config);
+	void hotmind(machine_config &config);
+	void bigtwinb(machine_config &config);
+	void excelsr(machine_config &config);
+
+	void init_pic_decode();
+
+protected:
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_bgvideoram;
 	required_shared_ptr<uint16_t> m_videoram1;
@@ -85,7 +97,6 @@ public:
 	DECLARE_WRITE16_MEMBER(excelsr_scroll_w);
 	DECLARE_WRITE16_MEMBER(hrdtimes_scroll_w);
 	DECLARE_WRITE8_MEMBER(playmark_oki_banking_w);
-	DECLARE_DRIVER_INIT(pic_decode);
 	TILE_GET_INFO_MEMBER(bigtwin_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bigtwin_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(wbeachvl_get_tx_tile_info);
@@ -121,13 +132,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<ticket_dispenser_device> m_ticket;
 	optional_device<ticket_dispenser_device> m_token;
-	void wbeachvl(machine_config &config);
-	void hrdtimes(machine_config &config);
-	void luckboomh(machine_config &config);
-	void bigtwin(machine_config &config);
-	void hotmind(machine_config &config);
-	void bigtwinb(machine_config &config);
-	void excelsr(machine_config &config);
+
 	void bigtwin_main_map(address_map &map);
 	void bigtwinb_main_map(address_map &map);
 	void excelsr_main_map(address_map &map);

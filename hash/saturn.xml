@@ -16017,9 +16017,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Daisenriyaku Strong Style (J) (T-21202G)... -->
+	<!-- Identifying Daisenryaku Strong Style (J) (T-21202G)... -->
 	<software name="daisenss" supported="no">
-		<description>Daisenriyaku Strong Style (Jpn)</description>
+		<description>Daisenryaku Strong Style (Jpn)</description>
 		<year>1997</year>
 		<publisher>OZ Club</publisher>
 		<info name="serial" value="T-21202G"/>
@@ -16028,7 +16028,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="daisenriyaku strong style (j) (t-21202g)" sha1="de79b5a982ffa3b7f0dee250b32e6e9a11bd2ed8" />
+				<disk name="daisenryaku strong style (j) (t-21202g)" sha1="de79b5a982ffa3b7f0dee250b32e6e9a11bd2ed8" />
 			</diskarea>
 		</part>
 	</software>

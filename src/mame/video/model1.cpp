@@ -471,7 +471,7 @@ void model1_state::unsort_quads() const
 
 void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	view_t *view = m_view;
+	view_t *view = m_view.get();
 	int count = m_quadpt - m_quaddb;
 
 	/* clip to the cliprect */
@@ -598,7 +598,7 @@ void model1_state::fclip_push_quad_next(int level, quad_t& q, point_t *p1, point
 
 void model1_state::fclip_push_quad(int level, quad_t& q)
 {
-	view_t *view = m_view;
+	view_t *view = m_view.get();
 
 	if (level == 4)
 	{
@@ -1562,9 +1562,9 @@ void model1_state::tgp_scan()
 	m_render_done = 0;
 }
 
-VIDEO_START_MEMBER(model1_state, model1)
+void model1_state::video_start()
 {
-	m_view = auto_alloc_clear(machine(), <model1_state::view_t>());
+	m_view = std::make_unique<model1_state::view_t>();
 
 	m_poly_ram = make_unique_clear<uint32_t[]>(0x400000);
 	m_tgp_ram = make_unique_clear<uint16_t[]>(0x100000-0x40000);
@@ -1585,14 +1585,14 @@ VIDEO_START_MEMBER(model1_state, model1)
 	m_clipfn[3].m_isclipped = &model1_state::fclip_isc_right;
 	m_clipfn[3].m_clip = &model1_state::fclip_clip_right;
 
-	save_pointer(NAME(m_tgp_ram.get()), 0x100000-0x40000);
-	save_pointer(NAME(m_poly_ram.get()), 0x40000);
+	save_pointer(NAME(m_tgp_ram), 0x100000-0x40000);
+	save_pointer(NAME(m_poly_ram), 0x40000);
 	save_item(NAME(m_listctl));
 }
 
 uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	model1_state::view_t *view = m_view;
+	model1_state::view_t *view = m_view.get();
 #if 0
 	{
 		bool mod = false;

@@ -160,7 +160,7 @@ void device_palette_interface::interface_post_stop()
 void device_palette_interface::set_indirect_color(int index, rgb_t rgb)
 {
 	// make sure we are in range
-	assert(index < m_indirect_pens.size());
+	assert(index < m_indirect_colors.size());
 
 	// alpha doesn't matter
 	rgb.set_a(255);

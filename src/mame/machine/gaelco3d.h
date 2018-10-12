@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #define MCFG_GAELCO_SERIAL_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<gaelco_serial_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<gaelco_serial_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 
@@ -110,6 +110,6 @@ private:
 	void sync_link();
 };
 
-extern const device_type GAELCO_SERIAL;
+DECLARE_DEVICE_TYPE(GAELCO_SERIAL, gaelco_serial_device)
 
 #endif // MAME_MACHINE_GAELCO3D_H

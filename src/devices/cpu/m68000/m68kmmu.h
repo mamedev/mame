@@ -489,6 +489,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 				m_mmu_tmp_buserror_address = addr_in;
 				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 			}
 		}
 		else if (m_mmu_tmp_sr & M68K_MMU_SR_SUPERVISOR_ONLY)
@@ -498,6 +499,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 				m_mmu_tmp_buserror_address = addr_in;
 				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 			}
 		}
 		else if ((m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT) && !m_mmu_tmp_rw)
@@ -507,6 +509,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 				m_mmu_tmp_buserror_address = addr_in;
 				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 			}
 		}
 
@@ -568,6 +571,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					m_mmu_tmp_buserror_address = addr_in;
 					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 				}
 			}
 
@@ -593,6 +597,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					m_mmu_tmp_buserror_address = addr_in;
 					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 				}
 			}
 
@@ -663,6 +668,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					m_mmu_tmp_buserror_address = addr_in;
 					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 				}
 
 				return addr_in;
@@ -677,6 +683,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					m_mmu_tmp_buserror_address = addr_in;
 					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 				}
 
 				return addr_in;
@@ -695,6 +702,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					m_mmu_tmp_buserror_address = addr_in;
 					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 				}
 			}
 
@@ -739,6 +747,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 				m_mmu_tmp_buserror_address = addr_in;
 				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 			}
 
 			return addr_in;
@@ -755,6 +764,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 						m_mmu_tmp_buserror_address = addr_in;
 						m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 						m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+						m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 					}
 				}
 
@@ -1016,7 +1026,18 @@ void m68881_mmu_ops()
 
 												if (m_mmu_tc & 0x80000000)
 												{
-													m_pmmu_enabled = 1;
+													int bits = 0;
+													for(int shift = 20; shift >= 0; shift -= 4) {
+														bits += (m_mmu_tc >> shift) & 0x0f;
+													}
+
+													if (bits != 32 || !((m_mmu_tc >> 23) & 1)) {
+														logerror("MMU: TC invalid!\n");
+														m_mmu_tc &= ~0x80000000;
+														m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
+													} else {
+														m_pmmu_enabled = 1;
+													}
 //                                                  printf("PMMU enabled\n");
 												}
 												else
@@ -1036,6 +1057,12 @@ void m68881_mmu_ops()
 												m_mmu_srp_limit = (temp64>>32) & 0xffffffff;
 												m_mmu_srp_aptr = temp64 & 0xffffffff;
 //                                              printf("PMMU: SRP limit = %08x aptr = %08x\n", m_mmu_srp_limit, m_mmu_srp_aptr);
+												// SRP type 0 is not allowed
+												if ((m_mmu_srp_limit & 3) == 0) {
+													m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
+													return;
+												}
+
 												if (!(modes & 0x100))
 												{
 													pmmu_atc_flush();
@@ -1047,6 +1074,13 @@ void m68881_mmu_ops()
 												m_mmu_crp_limit = (temp64>>32) & 0xffffffff;
 												m_mmu_crp_aptr = temp64 & 0xffffffff;
 //                                              printf("PMMU: CRP limit = %08x aptr = %08x\n", m_mmu_crp_limit, m_mmu_crp_aptr);
+												// CRP type 0 is not allowed
+												if ((m_mmu_crp_limit & 3) == 0) {
+													m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
+													return;
+												}
+
+
 												if (!(modes & 0x100))
 												{
 													pmmu_atc_flush();

@@ -164,6 +164,7 @@ Quick Jack administration/service mode:
 #include "sound/ay8910.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -176,14 +177,26 @@ public:
 		m_microtouch(*this, "microtouch"),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
+		m_acrtc(*this, "acrtc"),
 		m_palette(*this, "palette"),
+		m_nvram(*this, "nvram"),
 		m_in0(*this, "IN0")
 	{ }
 
+	void skattv(machine_config &config);
+	void quickjac(machine_config &config);
+	void fashiong(machine_config &config);
+	void fstation(machine_config &config);
+	void funland(machine_config &config);
+	void skattva(machine_config &config);
+
+private:
 	required_device<microtouch_device> m_microtouch;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
+	required_device<hd63484_device> m_acrtc;
 	required_device<palette_device> m_palette;
+	required_device<nvram_device> m_nvram;
 	required_ioport m_in0;
 
 	/* misc */
@@ -199,12 +212,7 @@ public:
 	IRQ_CALLBACK_MEMBER(duart_iack_handler);
 	//INTERRUPT_GEN_MEMBER(adp_int);
 	void skattva_nvram_init(nvram_device &nvram, void *base, size_t size);
-	void skattv(machine_config &config);
-	void quickjac(machine_config &config);
-	void fashiong(machine_config &config);
-	void fstation(machine_config &config);
-	void funland(machine_config &config);
-	void skattva(machine_config &config);
+
 	void adp_hd63484_map(address_map &map);
 	void fashiong_hd63484_map(address_map &map);
 	void fstation_hd63484_map(address_map &map);
@@ -304,61 +312,66 @@ WRITE16_MEMBER(adp_state::input_w)
 	m_mux_data &= 0x0f;
 }
 
-ADDRESS_MAP_START(adp_state::skattv_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("acrtc", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("acrtc", hd63484_device, data16_r, data16_w)
-	AM_RANGE(0x800100, 0x800101) AM_READWRITE(input_r, input_w)
-	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void adp_state::skattv_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x800080, 0x800081).rw(m_acrtc, FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x800082, 0x800083).rw(m_acrtc, FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800100, 0x800101).rw(FUNC(adp_state::input_r), FUNC(adp_state::input_w));
+	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
+	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xffc000, 0xffffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(adp_state::skattva_mem)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("acrtc", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("acrtc", hd63484_device, data16_r, data16_w)
-	AM_RANGE(0x800100, 0x800101) AM_READ_PORT("IN0")
-	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void adp_state::skattva_mem(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
+	map(0x800080, 0x800081).rw(m_acrtc, FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x800082, 0x800083).rw(m_acrtc, FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800100, 0x800101).portr("IN0");
+	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
+	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xffc000, 0xffffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(adp_state::quickjac_mem)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("acrtc", hd63484_device, status16_r, address16_w) // bad
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("acrtc", hd63484_device, data16_r, data16_w) // bad
-	AM_RANGE(0x800100, 0x800101) AM_READ_PORT("IN0")
-	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void adp_state::quickjac_mem(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
+	map(0x800080, 0x800081).rw(m_acrtc, FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w)); // bad
+	map(0x800082, 0x800083).rw(m_acrtc, FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w)); // bad
+	map(0x800100, 0x800101).portr("IN0");
+	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
+	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xff0000, 0xffffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(adp_state::funland_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("acrtc", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("acrtc", hd63484_device, data16_r, data16_w)
-	AM_RANGE(0x800088, 0x800089) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x80008a, 0x80008b) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x80008c, 0x80008d) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
-	AM_RANGE(0x800100, 0x800101) AM_READ_PORT("IN0")
-	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xfc0000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void adp_state::funland_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
+	map(0x800080, 0x800081).rw(m_acrtc, FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x800082, 0x800083).rw(m_acrtc, FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800089, 0x800089).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x80008b, 0x80008b).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x80008d, 0x80008d).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x800100, 0x800101).portr("IN0");
+	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
+	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xfc0000, 0xffffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(adp_state::fstation_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("acrtc", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("acrtc", hd63484_device, data16_r, data16_w)
-	AM_RANGE(0x800100, 0x800101) AM_READWRITE(input_r, input_w)
-	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xfc0000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void adp_state::fstation_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x800080, 0x800081).rw(m_acrtc, FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x800082, 0x800083).rw(m_acrtc, FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800100, 0x800101).rw(FUNC(adp_state::input_r), FUNC(adp_state::input_w));
+	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
+	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xfc0000, 0xffffff).ram().share("nvram");
+}
 
 
 static INPUT_PORTS_START( quickjac )
@@ -525,41 +538,44 @@ INTERRUPT_GEN_MEMBER(adp_state::adp_int)
 }
 */
 
-ADDRESS_MAP_START(adp_state::adp_hd63484_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x60000) AM_RAM
-	AM_RANGE(0x80000, 0x9ffff) AM_MIRROR(0x60000) AM_ROM AM_REGION("gfx1", 0)
-ADDRESS_MAP_END
+void adp_state::adp_hd63484_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).mirror(0x60000).ram();
+	map(0x80000, 0x9ffff).mirror(0x60000).rom().region("gfx1", 0);
+}
 
-ADDRESS_MAP_START(adp_state::fashiong_hd63484_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x60000) AM_RAM
-	AM_RANGE(0x80000, 0xfffff) AM_ROM AM_REGION("gfx1", 0)
-ADDRESS_MAP_END
+void adp_state::fashiong_hd63484_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).mirror(0x60000).ram();
+	map(0x80000, 0xfffff).rom().region("gfx1", 0);
+}
 
-ADDRESS_MAP_START(adp_state::fstation_hd63484_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0x80000, 0xfffff) AM_RAM
-ADDRESS_MAP_END
+void adp_state::fstation_hd63484_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom().region("gfx1", 0);
+	map(0x80000, 0xfffff).ram();
+}
 
 MACHINE_CONFIG_START(adp_state::quickjac)
 
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(quickjac_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(adp_state, duart_iack_handler)
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(quickjac_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(adp_state, duart_iack_handler)
 
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
 	MCFG_DEVICE_ADD( "duart", MC68681, XTAL(8'664'000) / 2 )
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart", mc68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart", mc68681_device, rx_a_w) )
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	//MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(adp_state, rtc_irq))
+	//MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, adp_state, rtc_irq))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -573,43 +589,43 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 
 	MCFG_PALETTE_INIT_OWNER(adp_state,adp)
 
-	MCFG_HD63484_ADD("acrtc", 0, adp_hd63484_map)
+	HD63484(config, m_acrtc, 0).set_addrmap(0, &adp_state::adp_hd63484_map);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 3686400/2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, 3686400/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("PA"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(adp_state::skattv)
+void adp_state::skattv(machine_config &config)
+{
 	quickjac(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(skattv_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::skattv_mem);
+}
 
-MACHINE_CONFIG_START(adp_state::skattva)
+void adp_state::skattva(machine_config &config)
+{
 	quickjac(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(skattva_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::skattva_mem);
+	m_nvram->set_custom_handler(FUNC(adp_state::skattva_nvram_init));
+}
 
-	MCFG_NVRAM_REPLACE_CUSTOM_DRIVER("nvram", adp_state, skattva_nvram_init)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(adp_state::fashiong)
+void adp_state::fashiong(machine_config &config)
+{
 	skattv(config);
-	MCFG_DEVICE_MODIFY("acrtc")
-	MCFG_HD63484_ADDRESS_MAP(fashiong_hd63484_map)
-MACHINE_CONFIG_END
+	m_acrtc->set_addrmap(0, &adp_state::fashiong_hd63484_map);
+}
 
-ADDRESS_MAP_START(adp_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void adp_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 MACHINE_CONFIG_START(adp_state::funland)
 	quickjac(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(funland_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(funland_mem)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
@@ -621,8 +637,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(adp_state::fstation)
 	funland(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fstation_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fstation_mem)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(640, 480)
@@ -714,10 +730,10 @@ ROM_START( fstation )
 ROM_END
 
 
-GAME( 1993, quickjac,  0,        quickjac,    quickjac, adp_state, 0, ROT0,  "ADP",     "Quick Jack",                        MACHINE_NOT_WORKING )
-GAME( 1994, skattv,    0,        skattv,      skattv,   adp_state, 0, ROT0,  "ADP",     "Skat TV",                           MACHINE_NOT_WORKING )
-GAME( 1995, skattva,   skattv,   skattva,     skattva,  adp_state, 0, ROT0,  "ADP",     "Skat TV (version TS3)",             MACHINE_NOT_WORKING )
-GAME( 1997, fashiong,  0,        fashiong,    skattv,   adp_state, 0, ROT0,  "ADP",     "Fashion Gambler (set 1)",           MACHINE_NOT_WORKING )
-GAME( 1997, fashiong2, fashiong, fashiong,    skattv,   adp_state, 0, ROT0,  "ADP",     "Fashion Gambler (set 2)",           MACHINE_NOT_WORKING )
-GAME( 1999, funlddlx,  0,        funland,     skattv,   adp_state, 0, ROT0,  "Stella",  "Funny Land de Luxe",                MACHINE_NOT_WORKING )
-GAME( 2000, fstation,  0,        fstation,    fstation, adp_state, 0, ROT0,  "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING )
+GAME( 1993, quickjac,  0,        quickjac, quickjac, adp_state, empty_init, ROT0, "ADP",     "Quick Jack",                        MACHINE_NOT_WORKING )
+GAME( 1994, skattv,    0,        skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat TV",                           MACHINE_NOT_WORKING )
+GAME( 1995, skattva,   skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (version TS3)",             MACHINE_NOT_WORKING )
+GAME( 1997, fashiong,  0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 1)",           MACHINE_NOT_WORKING )
+GAME( 1997, fashiong2, fashiong, fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 2)",           MACHINE_NOT_WORKING )
+GAME( 1999, funlddlx,  0,        funland,  skattv,   adp_state, empty_init, ROT0, "Stella",  "Funny Land de Luxe",                MACHINE_NOT_WORKING )
+GAME( 2000, fstation,  0,        fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING )

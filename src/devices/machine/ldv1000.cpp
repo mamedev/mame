@@ -21,7 +21,7 @@
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 
 
@@ -60,21 +60,23 @@ DEFINE_DEVICE_TYPE(PIONEER_LDV1000, pioneer_ldv1000_device, "ldv1000", "Pioneer 
 //  LD-V1000 ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-ADDRESS_MAP_START(pioneer_ldv1000_device::ldv1000_map)
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ldvppi0", i8255_device, read, write)
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ldvppi1", i8255_device, read, write)
-ADDRESS_MAP_END
+void pioneer_ldv1000_device::ldv1000_map(address_map &map)
+{
+	map(0x0000, 0x1fff).mirror(0x6000).rom();
+	map(0x8000, 0x87ff).mirror(0x3800).ram();
+	map(0xc000, 0xc003).mirror(0x1ff0).rw("ldvppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).mirror(0x1ff0).rw("ldvppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
-ADDRESS_MAP_START(pioneer_ldv1000_device::ldv1000_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0x38) AM_READWRITE(z80_decoder_display_port_r, z80_decoder_display_port_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(z80_controller_r)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(z80_controller_w)
-	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ldvctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void pioneer_ldv1000_device::ldv1000_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).mirror(0x38).rw(FUNC(pioneer_ldv1000_device::z80_decoder_display_port_r), FUNC(pioneer_ldv1000_device::z80_decoder_display_port_w));
+	map(0x40, 0x40).mirror(0x3f).r(FUNC(pioneer_ldv1000_device::z80_controller_r));
+	map(0x80, 0x80).mirror(0x3f).w(FUNC(pioneer_ldv1000_device::z80_controller_w));
+	map(0xc0, 0xc3).mirror(0x3c).rw(m_z80_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 static const z80_daisy_config daisy_chain[] =
@@ -271,24 +273,24 @@ const tiny_rom_entry *pioneer_ldv1000_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pioneer_ldv1000_device::device_add_mconfig)
-	MCFG_CPU_ADD("ldv1000", Z80, XTAL(5'000'000)/2)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
-	MCFG_CPU_IO_MAP(ldv1000_portmap)
+	Z80(config, m_z80_cpu, XTAL(5'000'000)/2);
+	m_z80_cpu->set_daisy_config(daisy_chain);
+	m_z80_cpu->set_addrmap(AS_PROGRAM, &pioneer_ldv1000_device::ldv1000_map);
+	m_z80_cpu->set_addrmap(AS_IO, &pioneer_ldv1000_device::ldv1000_portmap);
 
-	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL(5'000'000)/2)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(pioneer_ldv1000_device, ctc_interrupt))
+	Z80CTC(config, m_z80_ctc, XTAL(5'000'000)/2);
+	m_z80_ctc->intr_callback().set(FUNC(pioneer_ldv1000_device::ctc_interrupt));
 
-	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pioneer_ldv1000_device, ppi0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pioneer_ldv1000_device, ppi0_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(pioneer_ldv1000_device, ppi0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi0_portc_w))
+	i8255_device &ldvppi0(I8255(config, "ldvppi0"));
+	ldvppi0.out_pa_callback().set(FUNC(pioneer_ldv1000_device::ppi0_porta_w));
+	ldvppi0.in_pb_callback().set(FUNC(pioneer_ldv1000_device::ppi0_portb_r));
+	ldvppi0.in_pc_callback().set(FUNC(pioneer_ldv1000_device::ppi0_portc_r));
+	ldvppi0.out_pc_callback().set(FUNC(pioneer_ldv1000_device::ppi0_portc_w));
 
-	MCFG_DEVICE_ADD("ldvppi1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pioneer_ldv1000_device, ppi1_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pioneer_ldv1000_device, ppi1_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi1_portc_w))
+	i8255_device &ldvppi1(I8255(config, "ldvppi1"));
+	ldvppi1.in_pa_callback().set(FUNC(pioneer_ldv1000_device::ppi1_porta_r));
+	ldvppi1.out_pb_callback().set(FUNC(pioneer_ldv1000_device::ppi1_portb_w));
+	ldvppi1.out_pc_callback().set(FUNC(pioneer_ldv1000_device::ppi1_portc_w));
 MACHINE_CONFIG_END
 
 

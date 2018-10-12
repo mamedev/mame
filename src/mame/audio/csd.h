@@ -26,7 +26,10 @@ class midway_cheap_squeak_deluxe_device : public device_t, public device_mixer_i
 {
 public:
 	// construction/destruction
-	midway_cheap_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_cheap_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 16'000'000);
+
+	// helpers
+	void suspend_cpu();
 
 	// read/write
 	DECLARE_READ8_MEMBER(stat_r);

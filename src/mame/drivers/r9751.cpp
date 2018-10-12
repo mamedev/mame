@@ -61,7 +61,6 @@
 
 #include <queue>
 
-#define TERMINAL_TAG "terminal"
 
 /* Log defines */
 #define TRACE_FDC 0
@@ -92,11 +91,16 @@ public:
 		m_pdc(*this, "pdc"),
 		m_smioc(*this, "smioc"),
 		m_wd33c93(*this, "wd33c93"),
-		m_terminal(*this, TERMINAL_TAG),
+		m_terminal(*this, "terminal"),
 		m_main_ram(*this, "main_ram")
 	{
 	}
 
+	void r9751(machine_config &config);
+
+	void init_r9751();
+
+private:
 	void kbd_put(u8 data);
 
 	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
@@ -111,11 +115,8 @@ public:
 	DECLARE_READ8_MEMBER(pdc_dma_r);
 	DECLARE_WRITE8_MEMBER(pdc_dma_w);
 
-	DECLARE_DRIVER_INIT(r9751);
-
-	void r9751(machine_config &config);
 	void r9751_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
 	required_device<smioc_device> m_smioc;
@@ -227,7 +228,7 @@ WRITE8_MEMBER(r9751_state::pdc_dma_w)
 	if(TRACE_DMA) logerror("DMA WRITE: %08X DATA: %08X\n", address,data);
 }
 
-DRIVER_INIT_MEMBER(r9751_state,r9751)
+void r9751_state::init_r9751()
 {
 	reg_ff050004 = 0;
 	reg_fff80040 = 0;
@@ -619,16 +620,17 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(r9751_state::r9751_mem)
+void r9751_state::r9751_mem(address_map &map)
+{
 	//ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000,0x00ffffff) AM_RAM AM_SHARE("main_ram") // 16MB
-	AM_RANGE(0x08000000,0x0800ffff) AM_ROM AM_REGION("prom", 0)
-	AM_RANGE(0x5FF00000,0x5FFFFFFF) AM_READWRITE(r9751_mmio_5ff_r, r9751_mmio_5ff_w)
-	AM_RANGE(0xFF010000,0xFF01FFFF) AM_READWRITE(r9751_mmio_ff01_r, r9751_mmio_ff01_w)
-	AM_RANGE(0xFF050000,0xFF06FFFF) AM_READWRITE(r9751_mmio_ff05_r, r9751_mmio_ff05_w)
-	AM_RANGE(0xFFF80000,0xFFF8FFFF) AM_READWRITE(r9751_mmio_fff8_r, r9751_mmio_fff8_w)
+	map(0x00000000, 0x00ffffff).ram().share("main_ram"); // 16MB
+	map(0x08000000, 0x0800ffff).rom().region("prom", 0);
+	map(0x5FF00000, 0x5FFFFFFF).rw(FUNC(r9751_state::r9751_mmio_5ff_r), FUNC(r9751_state::r9751_mmio_5ff_w));
+	map(0xFF010000, 0xFF01FFFF).rw(FUNC(r9751_state::r9751_mmio_ff01_r), FUNC(r9751_state::r9751_mmio_ff01_w));
+	map(0xFF050000, 0xFF06FFFF).rw(FUNC(r9751_state::r9751_mmio_ff05_r), FUNC(r9751_state::r9751_mmio_ff05_w));
+	map(0xFFF80000, 0xFFF8FFFF).rw(FUNC(r9751_state::r9751_mmio_fff8_r), FUNC(r9751_state::r9751_mmio_fff8_w));
 	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown area
-ADDRESS_MAP_END
+}
 
 /******************************************************************************
  Input Ports
@@ -642,24 +644,24 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(r9751_state::r9751)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68030, 20000000)
-	MCFG_CPU_PROGRAM_MAP(r9751_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, 20000000)
+	MCFG_DEVICE_PROGRAM_MAP(r9751_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(r9751_state, kbd_put))
 
 	/* i/o hardware */
 	MCFG_DEVICE_ADD("smioc", SMIOC, 0)
 
 	/* disk hardware */
-	MCFG_DEVICE_ADD("pdc", PDC, 0)
-	MCFG_PDC_R_CB(READ8(r9751_state, pdc_dma_r))
-	MCFG_PDC_W_CB(WRITE8(r9751_state, pdc_dma_w))
+	PDC(config, m_pdc, 0);
+	m_pdc->m68k_r_callback().set(FUNC(r9751_state::pdc_dma_r));
+	m_pdc->m68k_w_callback().set(FUNC(r9751_state::pdc_dma_w));
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
+	WD33C93(config, m_wd33c93);
+	m_wd33c93->set_scsi_port("scsi");
 
 	/* software list */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","r9751")
@@ -674,10 +676,10 @@ MACHINE_CONFIG_END
 ROM_START(r9751)
 	ROM_REGION32_BE(0x00010000, "prom", 0)
 	ROM_SYSTEM_BIOS(0, "prom34",  "PROM Version 3.4")
-	ROMX_LOAD( "p-n_98d4643__abaco_v3.4__(49fe7a)__j221.27512.bin", 0x0000, 0x10000, CRC(9fb19a85) SHA1(c861e15a2fc9a4ef689c2034c53fbb36f17f7da6), ROM_GROUPWORD | ROM_BIOS(1) ) // Label: "P/N 98D4643 // ABACO V3.4 // (49FE7A) // J221" 27512 @Unknown
+	ROMX_LOAD( "p-n_98d4643__abaco_v3.4__=49fe7a=__j221.27512.bin", 0x0000, 0x10000, CRC(9fb19a85) SHA1(c861e15a2fc9a4ef689c2034c53fbb36f17f7da6), ROM_GROUPWORD | ROM_BIOS(0) ) // Label: "P/N 98D4643 // ABACO V3.4 // (49FE7A) // J221" 27512 @Unknown
 
 	ROM_SYSTEM_BIOS(1, "prom42", "PROM Version 4.2")
-	ROMX_LOAD( "98d5731__zebra_v4.2__4cd79d.u5", 0x0000, 0x10000, CRC(e640f8df) SHA1(a9e4fa271d7f2f3a134e2120932ec088d5b8b007), ROM_GROUPWORD | ROM_BIOS(2) ) // Label: 98D5731 // ZEBRA V4.2 // 4CD79D 27512 @Unknown
+	ROMX_LOAD( "98d5731__zebra_v4.2__4cd79d.u5", 0x0000, 0x10000, CRC(e640f8df) SHA1(a9e4fa271d7f2f3a134e2120932ec088d5b8b007), ROM_GROUPWORD | ROM_BIOS(1) ) // Label: 98D5731 // ZEBRA V4.2 // 4CD79D 27512 @Unknown
 ROM_END
 
 
@@ -686,5 +688,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT      COMPAT  MACHINE  INPUT  STATE        INIT      COMPANY                 FULLNAME              FLAGS
-COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,    "ROLM Systems, Inc.",   "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY               FULLNAME              FLAGS
+COMP( 1988, r9751, 0,      0,      r9751,   r9751, r9751_state, init_r9751, "ROLM Systems, Inc.", "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

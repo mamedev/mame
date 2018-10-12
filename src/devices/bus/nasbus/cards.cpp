@@ -13,7 +13,8 @@
 #include "floppy.h"
 
 
-SLOT_INTERFACE_START( nasbus_slot_cards )
-	SLOT_INTERFACE("avc", NASCOM_AVC)
-	SLOT_INTERFACE("floppy", NASCOM_FDC)
-SLOT_INTERFACE_END
+void nasbus_slot_cards(device_slot_interface &device)
+{
+	device.option_add("avc", NASCOM_AVC);
+	device.option_add("floppy", NASCOM_FDC);
+}

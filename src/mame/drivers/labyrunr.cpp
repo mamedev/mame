@@ -21,16 +21,16 @@
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_vblank_interrupt)
+WRITE_LINE_MEMBER(labyrunr_state::vblank_irq)
 {
-	if (m_k007121->ctrlram_r(7) & 0x02)
-		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+	if (state && (m_k007121->ctrlram_r(7) & 0x02))
+		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_timer_interrupt)
 {
 	if (m_k007121->ctrlram_r(7) & 0x01)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -46,27 +46,28 @@ WRITE8_MEMBER(labyrunr_state::labyrunr_bankswitch_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 }
 
-ADDRESS_MAP_START(labyrunr_state::labyrunr_map)
-	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("k007121", k007121_device, ctrl_w)
-	AM_RANGE(0x0020, 0x005f) AM_RAM AM_SHARE("scrollram")
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("ym1", ym2203_device, read_port_r, write_port_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("ym1", ym2203_device, status_port_r, control_port_w)
-	AM_RANGE(0x0900, 0x0900) AM_DEVREADWRITE("ym2", ym2203_device, read_port_r, write_port_w)
-	AM_RANGE(0x0901, 0x0901) AM_DEVREADWRITE("ym2", ym2203_device, status_port_r, control_port_w)
-	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("P2")
-	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("P1")
-	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(labyrunr_bankswitch_w)
-	AM_RANGE(0x0d00, 0x0d1f) AM_DEVREADWRITE("k051733", k051733_device, read, write)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(labyrunr_vram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(labyrunr_vram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void labyrunr_state::labyrunr_map(address_map &map)
+{
+	map(0x0000, 0x0007).w(m_k007121, FUNC(k007121_device::ctrl_w));
+	map(0x0020, 0x005f).ram().share("scrollram");
+	map(0x0800, 0x0800).rw("ym1", FUNC(ym2203_device::read_port_r), FUNC(ym2203_device::write_port_w));
+	map(0x0801, 0x0801).rw("ym1", FUNC(ym2203_device::status_port_r), FUNC(ym2203_device::control_port_w));
+	map(0x0900, 0x0900).rw("ym2", FUNC(ym2203_device::read_port_r), FUNC(ym2203_device::write_port_w));
+	map(0x0901, 0x0901).rw("ym2", FUNC(ym2203_device::status_port_r), FUNC(ym2203_device::control_port_w));
+	map(0x0a00, 0x0a00).portr("P2");
+	map(0x0a01, 0x0a01).portr("P1");
+	map(0x0b00, 0x0b00).portr("SYSTEM");
+	map(0x0c00, 0x0c00).w(FUNC(labyrunr_state::labyrunr_bankswitch_w));
+	map(0x0d00, 0x0d1f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));
+	map(0x0e00, 0x0e00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1000, 0x10ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0x1800, 0x1fff).ram();
+	map(0x2000, 0x2fff).ram().share("spriteram");
+	map(0x3000, 0x37ff).ram().w(FUNC(labyrunr_state::labyrunr_vram1_w)).share("videoram1");
+	map(0x3800, 0x3fff).ram().w(FUNC(labyrunr_state::labyrunr_vram2_w)).share("videoram2");
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
 
 /***************************************************************************
@@ -146,7 +147,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( labyrunr )
+static GFXDECODE_START( gfx_labyrunr )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 8*16 )
 GFXDECODE_END
 
@@ -166,12 +167,11 @@ void labyrunr_state::machine_start()
 MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */
-	MCFG_CPU_PROGRAM_MAP(labyrunr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", labyrunr_state,  labyrunr_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
+	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */
+	MCFG_DEVICE_PROGRAM_MAP(labyrunr_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -181,8 +181,9 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(labyrunr_state, screen_update_labyrunr)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, labyrunr_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", labyrunr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_labyrunr)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -193,9 +194,9 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
@@ -203,7 +204,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 3000000)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
@@ -267,6 +268,6 @@ ROM_START( labyrunrk )
 ROM_END
 
 
-GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Trick Trap (World?)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, labyrunrk,tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tricktrp,  0,        labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Trick Trap (World?)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunr,  tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunrk, tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )

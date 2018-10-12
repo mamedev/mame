@@ -651,7 +651,9 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	m_absmask64[0] = m_absmask64[1] = 0x7fffffffffffffffU;
 
 	// get pointers to C functions we need to call
-	m_near.debug_cpu_instruction_hook = (x86code *)debugger_instruction_hook;
+	using debugger_hook_func = void (*)(device_debug *, offs_t);
+	static const debugger_hook_func debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); }; // TODO: kill trampoline if possible
+	m_near.debug_cpu_instruction_hook = (x86code *)debugger_inst_hook;
 	if (LOG_HASHJMPS)
 	{
 		m_near.debug_log_hashjmp = (x86code *)debug_log_hashjmp;
@@ -2797,17 +2799,17 @@ void drcbe_x64::op_debug(x86code *&dst, const instruction &inst)
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
 
 		// test and branch
-		emit_mov_r64_imm(dst, REG_RAX, (uintptr_t)&m_device.machine().debug_flags);          // mov   rax,&debug_flags
+		emit_mov_r64_imm(dst, REG_RAX, (uintptr_t)&m_device.machine().debug_flags);     // mov   rax,&debug_flags
 		emit_test_m32_imm(dst, MBD(REG_RAX, 0), DEBUG_FLAG_CALL_HOOK);                  // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
 		emit_link skip = { nullptr };
 		emit_jcc_short_link(dst, x64emit::COND_Z, skip);                                // jz    skip
 
 		// push the parameter
-		emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)&m_device);                             // mov   param1,device
+		emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)m_device.debug());                 // mov   param1,device.debug
 		emit_mov_r32_p32(dst, REG_PARAM2, pcp);                                         // mov   param2,pcp
 		emit_smart_call_m64(dst, &m_near.debug_cpu_instruction_hook);                   // call  debug_cpu_instruction_hook
 
-		resolve_link(dst, skip);                                                    // skip:
+		resolve_link(dst, skip);                                                        // skip:
 	}
 }
 

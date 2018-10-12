@@ -7,7 +7,7 @@
 
 #define MCFG_NAOMI_M4_BOARD_ADD(_tag, _key_tag, _eeprom_tag, _irq_cb) \
 	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M4_BOARD, _eeprom_tag, _irq_cb) \
-	downcast<naomi_m4_board &>(*device).set_tags("^" _key_tag);
+	downcast<naomi_m4_board &>(*device).set_tags(_key_tag);
 
 class naomi_m4_board : public naomi_board
 {

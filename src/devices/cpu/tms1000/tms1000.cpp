@@ -24,35 +24,39 @@
 // - 30-term microinstructions PLA(mpla) at the top half, to the right of the midline, supporting 16 microinstructions
 // - 20-term output PLA(opla) at the top-left
 // - the ALU is between the opla and mpla
-DEFINE_DEVICE_TYPE(TMS1000,  tms1000_cpu_device,  "tms1000",  "TMS1000") // 28-pin DIP, 11 R pins
-DEFINE_DEVICE_TYPE(TMS1070,  tms1070_cpu_device,  "tms1070",  "TMS1070") // high voltage version
-DEFINE_DEVICE_TYPE(TMS1040,  tms1040_cpu_device,  "tms1040",  "TMS1040") // same as TMS1070 with just a different pinout?
-DEFINE_DEVICE_TYPE(TMS1200,  tms1200_cpu_device,  "tms1200",  "TMS1200") // 40-pin DIP, 13 R pins
-DEFINE_DEVICE_TYPE(TMS1700,  tms1700_cpu_device,  "tms1700",  "TMS1700") // 28-pin DIP, RAM/ROM size halved, 9 R pins
-DEFINE_DEVICE_TYPE(TMS1730,  tms1730_cpu_device,  "tms1730",  "TMS1730") // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins (output PLA is still 8-bit, O1,O3,O5 unused)
+DEFINE_DEVICE_TYPE(TMS1000,  tms1000_cpu_device,  "tms1000",  "Texas Instruments TMS1000") // 28-pin DIP, 11 R pins
+DEFINE_DEVICE_TYPE(TMS1070,  tms1070_cpu_device,  "tms1070",  "Texas Instruments TMS1070") // high voltage version
+DEFINE_DEVICE_TYPE(TMS1040,  tms1040_cpu_device,  "tms1040",  "Texas Instruments TMS1040") // same as TMS1070 with just a different pinout?
+DEFINE_DEVICE_TYPE(TMS1200,  tms1200_cpu_device,  "tms1200",  "Texas Instruments TMS1200") // 40-pin DIP, 13 R pins
+DEFINE_DEVICE_TYPE(TMS1700,  tms1700_cpu_device,  "tms1700",  "Texas Instruments TMS1700") // 28-pin DIP, RAM/ROM size halved, 9 R pins
+DEFINE_DEVICE_TYPE(TMS1730,  tms1730_cpu_device,  "tms1730",  "Texas Instruments TMS1730") // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins (output PLA is still 8-bit, O1,O3,O5 unused)
 
 // 2nd source Motorola chips
-DEFINE_DEVICE_TYPE(MC141000, mc141000_cpu_device, "mc141000", "MC141000") // CMOS, pin-compatible with TMS1000(reverse polarity)
-DEFINE_DEVICE_TYPE(MC141200, mc141200_cpu_device, "mc141200", "MC141200") // CMOS, 40-pin DIP, 16 R pins
+DEFINE_DEVICE_TYPE(MC141000, mc141000_cpu_device, "mc141000", "Motorola MC141000") // CMOS, pin-compatible with TMS1000(reverse polarity)
+DEFINE_DEVICE_TYPE(MC141200, mc141200_cpu_device, "mc141200", "Motorola MC141200") // CMOS, 40-pin DIP, 16 R pins
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms1000_cpu_device::program_10bit_8)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void tms1000_cpu_device::program_10bit_8(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(tms1000_cpu_device::data_64x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void tms1000_cpu_device::data_64x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(tms1000_cpu_device::program_9bit_8)
-	AM_RANGE(0x000, 0x1ff) AM_MIRROR(0x200) AM_ROM
-ADDRESS_MAP_END
+void tms1000_cpu_device::program_9bit_8(address_map &map)
+{
+	map(0x000, 0x1ff).mirror(0x200).rom();
+}
 
-ADDRESS_MAP_START(tms1000_cpu_device::data_32x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(0x08, 0x0f) AM_MIRROR(0x30) AM_NOP // override
-ADDRESS_MAP_END
+void tms1000_cpu_device::data_32x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+	map(0x08, 0x0f).mirror(0x30).noprw(); // override
+}
 
 
 // device definitions
@@ -114,9 +118,9 @@ MACHINE_CONFIG_END
 
 
 // disasm
-util::disasm_interface *tms1000_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms1000_cpu_device::create_disassembler()
 {
-	return new tms1000_disassembler;
+	return std::make_unique<tms1000_disassembler>();
 }
 
 

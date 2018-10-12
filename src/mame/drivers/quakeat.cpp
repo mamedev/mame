@@ -63,6 +63,7 @@ TODO:
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -73,10 +74,12 @@ public:
 		: pcat_base_state(mconfig, type, tag)
 		{ }
 
+	void quake(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void quake(machine_config &config);
 	void quake_io(address_map &map);
 	void quake_map(address_map &map);
 };
@@ -91,21 +94,23 @@ uint32_t quakeat_state::screen_update_quake(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-ADDRESS_MAP_START(quakeat_state::quake_map)
-	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM AM_REGION("pc_bios", 0) /* BIOS */
-ADDRESS_MAP_END
+void quakeat_state::quake_map(address_map &map)
+{
+	map(0x00000000, 0x0000ffff).rom().region("pc_bios", 0); /* BIOS */
+}
 
-ADDRESS_MAP_START(quakeat_state::quake_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP
+void quakeat_state::quake_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x00e8, 0x00eb).noprw();
 //  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x0300, 0x03af) AM_NOP
-	AM_RANGE(0x03b0, 0x03df) AM_NOP
+	map(0x0300, 0x03af).noprw();
+	map(0x03b0, 0x03df).noprw();
 //  AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
 //  AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
 //  AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
 //  AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
-ADDRESS_MAP_END
+}
 
 /*************************************************************/
 
@@ -121,10 +126,10 @@ void quakeat_state::machine_start()
 
 MACHINE_CONFIG_START(quakeat_state::quake)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM2, 233000000) /* Pentium II, 233MHz */
-	MCFG_CPU_PROGRAM_MAP(quake_map)
-	MCFG_CPU_IO_MAP(quake_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM2, 233000000) /* Pentium II, 233MHz */
+	MCFG_DEVICE_PROGRAM_MAP(quake_map)
+	MCFG_DEVICE_IO_MAP(quake_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
@@ -151,4 +156,4 @@ ROM_START(quake)
 ROM_END
 
 
-GAME( 1998, quake,  0,   quake, quake, quakeat_state, 0, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )
+GAME( 1998, quake,  0,   quake, quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )

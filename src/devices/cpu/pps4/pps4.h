@@ -29,13 +29,13 @@ enum
 //**************************************************************************
 
 #define MCFG_PPS4_DISCRETE_INPUT_A_CB(_devcb) \
-	devcb = &downcast<pps4_device &>(*device).set_dia_cb(DEVCB_##_devcb);
+	downcast<pps4_device &>(*device).set_dia_cb(DEVCB_##_devcb);
 
 #define MCFG_PPS4_DISCRETE_INPUT_B_CB(_devcb) \
-	devcb = &downcast<pps4_device &>(*device).set_dib_cb(DEVCB_##_devcb);
+	downcast<pps4_device &>(*device).set_dib_cb(DEVCB_##_devcb);
 
 #define MCFG_PPS4_DISCRETE_OUTPUT_CB(_devcb) \
-	devcb = &downcast<pps4_device &>(*device).set_do_cb(DEVCB_##_devcb);
+	downcast<pps4_device &>(*device).set_do_cb(DEVCB_##_devcb);
 
 //**************************************************************************
 //  DEVICE TYPE DEFINITIONS
@@ -72,7 +72,6 @@ protected:
 	virtual u32 execute_min_cycles() const override { return 1; }
 	virtual u32 execute_max_cycles() const override { return 3; }
 	virtual u32 execute_input_lines() const override { return 0; }
-	virtual u32 execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -82,7 +81,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -93,7 +92,7 @@ protected:
 	devcb_write8 m_do_cb;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
 	int     m_icount;

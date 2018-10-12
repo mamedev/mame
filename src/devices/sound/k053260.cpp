@@ -105,6 +105,16 @@ void k053260_device::device_start()
 
 
 //-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void k053260_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / CLOCKS_PER_SAMPLE);
+}
+
+
+//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 

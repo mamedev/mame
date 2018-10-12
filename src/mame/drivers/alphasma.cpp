@@ -17,7 +17,7 @@
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "video/hd44780.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 
 class alphasmart_state : public driver_device
@@ -36,6 +36,11 @@ public:
 	{
 	}
 
+	void alphasmart(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc0;
 	required_device<hd44780_device> m_lcdc1;
@@ -50,7 +55,6 @@ public:
 	DECLARE_PALETTE_INIT(alphasmart);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 	DECLARE_READ8_MEMBER(kb_r);
 	DECLARE_WRITE8_MEMBER(kb_matrixl_w);
 	DECLARE_WRITE8_MEMBER(kb_matrixh_w);
@@ -60,10 +64,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port_d_w);
 	void update_lcdc(address_space &space, bool lcdc0, bool lcdc1);
 
-	void alphasmart(machine_config &config);
 	void alphasmart_io(address_map &map);
 	void alphasmart_mem(address_map &map);
-protected:
+
 	uint8_t           m_matrix[2];
 	uint8_t           m_port_a;
 	uint8_t           m_port_d;
@@ -79,15 +82,17 @@ public:
 	{
 	}
 
+	void asma2k(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_intram;
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
 
-	void asma2k(machine_config &config);
 	void asma2k_mem(address_map &map);
-private:
+
 	uint8_t m_lcd_ctrl;
 };
 
@@ -168,20 +173,22 @@ WRITE8_MEMBER(alphasmart_state::port_d_w)
 }
 
 
-ADDRESS_MAP_START(alphasmart_state::alphasmart_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("rambank")
-	AM_RANGE( 0x0000, 0x003f ) AM_NOP   // internal registers
-	AM_RANGE( 0x0040, 0x00ff ) AM_RAM   // internal RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM   AM_REGION("maincpu", 0)
-	AM_RANGE( 0x8000, 0x8000 ) AM_READWRITE(kb_r, kb_matrixh_w)
-	AM_RANGE( 0xc000, 0xc000 ) AM_WRITE(kb_matrixl_w)
-ADDRESS_MAP_END
+void alphasmart_state::alphasmart_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankrw("rambank");
+	map(0x0000, 0x003f).noprw();   // internal registers
+	map(0x0040, 0x00ff).ram();   // internal RAM
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
+	map(0x8000, 0x8000).rw(FUNC(alphasmart_state::kb_r), FUNC(alphasmart_state::kb_matrixh_w));
+	map(0xc000, 0xc000).w(FUNC(alphasmart_state::kb_matrixl_w));
+}
 
-ADDRESS_MAP_START(alphasmart_state::alphasmart_io)
-	AM_RANGE( MC68HC11_IO_PORTA, MC68HC11_IO_PORTA ) AM_READWRITE(port_a_r, port_a_w)
-	AM_RANGE( MC68HC11_IO_PORTD, MC68HC11_IO_PORTD ) AM_READWRITE(port_d_r, port_d_w)
-ADDRESS_MAP_END
+void alphasmart_state::alphasmart_io(address_map &map)
+{
+	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(FUNC(alphasmart_state::port_a_r), FUNC(alphasmart_state::port_a_w));
+	map(MC68HC11_IO_PORTD, MC68HC11_IO_PORTD).rw(FUNC(alphasmart_state::port_d_r), FUNC(alphasmart_state::port_d_w));
+}
 
 READ8_MEMBER(asma2k_state::io_r)
 {
@@ -228,14 +235,15 @@ WRITE8_MEMBER(asma2k_state::port_a_w)
 }
 
 
-ADDRESS_MAP_START(asma2k_state::asma2k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("rambank")
-	AM_RANGE( 0x0000, 0x003f ) AM_NOP   // internal registers
-	AM_RANGE( 0x0040, 0x00ff ) AM_RAM AM_SHARE("internal_ram")   // internal RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM   AM_REGION("maincpu", 0)
-	AM_RANGE( 0x9000, 0x9000 ) AM_WRITE(kb_matrixl_w)
-ADDRESS_MAP_END
+void asma2k_state::asma2k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankrw("rambank");
+	map(0x0000, 0x003f).noprw();   // internal registers
+	map(0x0040, 0x00ff).ram().share("internal_ram");   // internal RAM
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
+	map(0x9000, 0x9000).w(FUNC(asma2k_state::kb_matrixl_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( alphasmart )
@@ -425,9 +433,9 @@ void alphasmart_state::machine_reset()
 
 MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL(8'000'000)/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
-	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
-	MCFG_CPU_IO_MAP(alphasmart_io)
+	MCFG_DEVICE_ADD("maincpu", MC68HC11, XTAL(8'000'000)/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
+	MCFG_DEVICE_PROGRAM_MAP(alphasmart_mem)
+	MCFG_DEVICE_IO_MAP(alphasmart_io)
 	MCFG_MC68HC11_CONFIG(0, 192, 0x00)
 
 	MCFG_KS0066_F05_ADD("ks0066_0")
@@ -435,8 +443,7 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	MCFG_KS0066_F05_ADD("ks0066_1")
 	MCFG_HD44780_LCD_SIZE(2, 40)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -449,15 +456,14 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(alphasmart_state, alphasmart)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(asma2k_state::asma2k)
 	alphasmart(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(asma2k_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(asma2k_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -474,15 +480,15 @@ ROM_START( asma2k )
 	    which is integrated onto one plcc44 chip called a zpsd211r.
 	*/
 	ROM_SYSTEM_BIOS( 0, "v314", "v3.14" )
-	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(1) )
+	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v308", "v3.08" )
-	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(2) )
+	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(1) )
 
 	ROM_REGION( 0x8000, "spellcheck", 0 )
 	ROM_LOAD( "spellcheck.bin",  0x0000, 0x8000, NO_DUMP )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       STATE             INIT  COMPANY                           FULLNAME           FLAGS
-COMP( 1995, asmapro, 0,      0,      alphasmart, alphasmart, alphasmart_state, 0,    "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, asma2k,  0,      0,      asma2k,     alphasmart, asma2k_state,     0,    "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                           FULLNAME           FLAGS
+COMP( 1995, asmapro, 0,      0,      alphasmart, alphasmart, alphasmart_state, empty_init, "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, asma2k,  0,      0,      asma2k,     alphasmart, asma2k_state,     empty_init, "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

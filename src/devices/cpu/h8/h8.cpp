@@ -19,7 +19,7 @@
 h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	program_config("program", ENDIANNESS_BIG, 16, mode_a16 ? 16 : 24, 0, map_delegate),
-	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), direct(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
+	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), cache(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
 	TMP1(0), TMP2(0), TMPR(0), inst_state(0), inst_substate(0), icount(0), bcount(0), irq_vector(0), taken_irq_vector(0), irq_level(0), taken_irq_level(0), irq_required(false), irq_nmi(false)
 {
 	supports_advanced = false;
@@ -32,7 +32,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 void h8_device::device_start()
 {
 	program = &space(AS_PROGRAM);
-	direct  = program->direct<0>();
+	cache   = program->cache<1, 0, ENDIANNESS_BIG>();
 	io      = &space(AS_IO);
 
 	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();
@@ -100,7 +100,7 @@ void h8_device::device_start()
 	save_item(NAME(taken_irq_level));
 	save_item(NAME(irq_nmi));
 
-	m_icountptr = &icount;
+	set_icountptr(icount);
 
 	PC = 0;
 	PPC = 0;
@@ -177,6 +177,11 @@ uint32_t h8_device::execute_input_lines() const
 	return 0;
 }
 
+bool h8_device::execute_input_edge_triggered(int inputnum) const
+{
+	return inputnum == INPUT_LINE_NMI;
+}
+
 void h8_device::recompute_bcount(uint64_t event_time)
 {
 	if(!event_time || event_time >= total_cycles() + icount) {
@@ -208,7 +213,7 @@ void h8_device::execute_run()
 			if(inst_state < 0x10000) {
 				PPC = NPC;
 				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-					debugger_instruction_hook(this, NPC);
+					debugger_instruction_hook(NPC);
 			}
 			do_exec_full();
 		}
@@ -328,7 +333,7 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 uint16_t h8_device::read16i(uint32_t adr)
 {
 	icount--;
-	return direct->read_word(adr & ~1);
+	return cache->read_word(adr & ~1);
 }
 
 uint16_t h8_device::fetch()
@@ -1343,9 +1348,9 @@ void h8_device::set_nz32(uint32_t v)
 		CCR |= F_N;
 }
 
-util::disasm_interface *h8_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> h8_device::create_disassembler()
 {
-	return new h8_disassembler;
+	return std::make_unique<h8_disassembler>();
 }
 
 #include "cpu/h8/h8.hxx"

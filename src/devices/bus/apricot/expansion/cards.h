@@ -11,6 +11,6 @@
 
 #pragma once
 
-SLOT_INTERFACE_EXTERN( apricot_expansion_cards );
+void apricot_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_APRICOT_EXPANSION_CARDS_H

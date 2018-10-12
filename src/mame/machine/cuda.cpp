@@ -67,17 +67,18 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-ADDRESS_MAP_START(cuda_device::cuda_map)
-	AM_RANGE(0x0000, 0x0002) AM_READWRITE(ports_r, ports_w)
-	AM_RANGE(0x0004, 0x0006) AM_READWRITE(ddr_r, ddr_w)
-	AM_RANGE(0x0007, 0x0007) AM_READWRITE(pll_r, pll_w)
-	AM_RANGE(0x0008, 0x0008) AM_READWRITE(timer_ctrl_r, timer_ctrl_w)
-	AM_RANGE(0x0009, 0x0009) AM_READWRITE(timer_counter_r, timer_counter_w)
-	AM_RANGE(0x0012, 0x0012) AM_READWRITE(onesec_r, onesec_w)
-	AM_RANGE(0x0090, 0x00ff) AM_RAM                         // work RAM and stack
-	AM_RANGE(0x0100, 0x01ff) AM_READWRITE(pram_r, pram_w)
-	AM_RANGE(0x0f00, 0x1fff) AM_ROM AM_REGION(CUDA_CPU_TAG, 0)
-ADDRESS_MAP_END
+void cuda_device::cuda_map(address_map &map)
+{
+	map(0x0000, 0x0002).rw(FUNC(cuda_device::ports_r), FUNC(cuda_device::ports_w));
+	map(0x0004, 0x0006).rw(FUNC(cuda_device::ddr_r), FUNC(cuda_device::ddr_w));
+	map(0x0007, 0x0007).rw(FUNC(cuda_device::pll_r), FUNC(cuda_device::pll_w));
+	map(0x0008, 0x0008).rw(FUNC(cuda_device::timer_ctrl_r), FUNC(cuda_device::timer_ctrl_w));
+	map(0x0009, 0x0009).rw(FUNC(cuda_device::timer_counter_r), FUNC(cuda_device::timer_counter_w));
+	map(0x0012, 0x0012).rw(FUNC(cuda_device::onesec_r), FUNC(cuda_device::onesec_w));
+	map(0x0090, 0x00ff).ram();                         // work RAM and stack
+	map(0x0100, 0x01ff).rw(FUNC(cuda_device::pram_r), FUNC(cuda_device::pram_w));
+	map(0x0f00, 0x1fff).rom().region(CUDA_CPU_TAG, 0);
+}
 
 
 //-------------------------------------------------
@@ -85,8 +86,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(cuda_device::device_add_mconfig)
-	MCFG_CPU_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL(32'768)*192)   // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
-	MCFG_CPU_PROGRAM_MAP(cuda_map)
+	MCFG_DEVICE_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL(32'768)*192)   // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
+	MCFG_DEVICE_PROGRAM_MAP(cuda_map)
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *cuda_device::device_rom_region() const

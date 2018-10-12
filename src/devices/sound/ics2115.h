@@ -14,7 +14,7 @@
 	MCFG_DEVICE_ADD(_tag, ICS2115, _clock)
 
 #define MCFG_ICS2115_IRQ_CB(_devcb) \
-	devcb = &downcast<ics2115_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<ics2115_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

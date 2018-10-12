@@ -184,7 +184,7 @@ void namco_50xx_device::irq_set()
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	machine().scheduler().timer_set(attotime::from_usec(21), timer_expired_delegate(FUNC(namco_50xx_device::irq_clear),this), 0);
+	m_irq_cleared_timer->adjust(attotime::from_usec(21), 0);
 }
 
 WRITE8_MEMBER( namco_50xx_device::write )
@@ -241,6 +241,8 @@ namco_50xx_device::namco_50xx_device(const machine_config &mconfig, const char *
 
 void namco_50xx_device::device_start()
 {
+	m_irq_cleared_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_50xx_device::irq_clear), this));
+
 	save_item(NAME(m_latched_cmd));
 	save_item(NAME(m_latched_rw));
 	save_item(NAME(m_portO));
@@ -251,11 +253,11 @@ void namco_50xx_device::device_start()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(namco_50xx_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", MB8842, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-	MCFG_MB88XX_READ_K_CB(READ8(namco_50xx_device, K_r))
-	MCFG_MB88XX_WRITE_O_CB(WRITE8(namco_50xx_device, O_w))
-	MCFG_MB88XX_READ_R0_CB(READ8(namco_50xx_device, R0_r))
-	MCFG_MB88XX_READ_R2_CB(READ8(namco_50xx_device, R2_r))
+	MCFG_DEVICE_ADD("mcu", MB8842, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
+	MCFG_MB88XX_READ_K_CB(READ8(*this, namco_50xx_device, K_r))
+	MCFG_MB88XX_WRITE_O_CB(WRITE8(*this, namco_50xx_device, O_w))
+	MCFG_MB88XX_READ_R0_CB(READ8(*this, namco_50xx_device, R0_r))
+	MCFG_MB88XX_READ_R2_CB(READ8(*this, namco_50xx_device, R2_r))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

@@ -7,11 +7,10 @@
     driver by Angelo Salese & David Haywood
 
     TODO:
-    - Don't know where the ES8712 samples come from;
+    - What does the ES8712 control? There's definitely no ADPCM chip or sample ROM here;
     - Main CPU banking is wrong;
     - Some inputs not understood;
     - A bunch of missing port outputs (including payout);
-    - NVRAM;
     - screen disable? Start-up fading looks horrible;
     - Game looks IGS-esque, is there any correlation?
 
@@ -27,8 +26,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "sound/es8712.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -44,6 +45,9 @@ public:
 		m_hi_vram(*this, "hi_vram"),
 		m_cram(*this, "cram") { }
 
+	void d9final(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -65,7 +69,6 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void d9final(machine_config &config);
 	void d9final_io(address_map &map);
 	void d9final_map(address_map &map);
 };
@@ -126,31 +129,33 @@ READ8_MEMBER(d9final_state::prot_latch_r)
 }
 
 
-ADDRESS_MAP_START(d9final_state::d9final_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_SHARE("lo_vram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_SHARE("hi_vram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_SHARE("cram")
-	AM_RANGE(0xf000, 0xf007) AM_READ(prot_latch_r) //AM_DEVREADWRITE("essnd", es8712_device, read, write)
-	AM_RANGE(0xf800, 0xf80f) AM_DEVREADWRITE("rtc", rtc62421_device, read, write)
-ADDRESS_MAP_END
+void d9final_state::d9final_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).ram().share("nvram");
+	map(0xc800, 0xcbff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xcc00, 0xcfff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xd000, 0xd7ff).ram().w(FUNC(d9final_state::sc0_lovram)).share("lo_vram");
+	map(0xd800, 0xdfff).ram().w(FUNC(d9final_state::sc0_hivram)).share("hi_vram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(d9final_state::sc0_cram)).share("cram");
+	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
+	map(0xf800, 0xf80f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
+}
 
-ADDRESS_MAP_START(d9final_state::d9final_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void d9final_state::d9final_io(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable? screen enable?
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWB")
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWC")
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x60, 0x60) AM_READ_PORT("DSWD")
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN1") AM_WRITE(bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+	map(0x00, 0x00).portr("DSWA");
+	map(0x20, 0x20).portr("DSWB");
+	map(0x40, 0x40).portr("DSWC");
+	map(0x40, 0x41).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x60, 0x60).portr("DSWD");
+	map(0x80, 0x80).portr("IN0");
+	map(0xa0, 0xa0).portr("IN1").w(FUNC(d9final_state::bank_w));
+	map(0xe0, 0xe0).portr("IN2");
+}
 
 static INPUT_PORTS_START( d9final )
 	PORT_START("IN0")
@@ -286,7 +291,7 @@ static const gfx_layout tiles16x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( d9final )
+static GFXDECODE_START( gfx_d9final )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x8_layout, 0, 16*4 )
 GFXDECODE_END
 
@@ -298,11 +303,12 @@ void d9final_state::machine_start()
 
 MACHINE_CONFIG_START(d9final_state::d9final)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(d9final_map)
-	MCFG_CPU_IO_MAP(d9final_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(d9final_map)
+	MCFG_DEVICE_IO_MAP(d9final_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Sharp LH5116D-10 + battery
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -313,13 +319,13 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", d9final)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_d9final)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	//MCFG_DEVICE_ADD("essnd", ES8712, 24000000/3) // clock unknown
@@ -343,4 +349,4 @@ ROM_END
 
 
 
-GAME( 1992, d9final, 0, d9final, d9final, d9final_state, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, d9final, 0, d9final, d9final, d9final_state, empty_init, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )

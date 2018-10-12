@@ -44,44 +44,48 @@
 //#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(poly88_state::poly88_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
-	AM_RANGE(0x0400, 0x0bff) AM_ROM // ROM Expansion
-	AM_RANGE(0x0c00, 0x0dff) AM_RAM AM_MIRROR(0x200) // System RAM (mirrored)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM // System Expansion area
-	AM_RANGE(0x2000, 0x3fff) AM_RAM // Minimal user RAM area
-	AM_RANGE(0x4000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("video_ram") // Video RAM
-ADDRESS_MAP_END
+void poly88_state::poly88_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom(); // Monitor ROM
+	map(0x0400, 0x0bff).rom(); // ROM Expansion
+	map(0x0c00, 0x0dff).ram().mirror(0x200); // System RAM (mirrored)
+	map(0x1000, 0x1fff).rom(); // System Expansion area
+	map(0x2000, 0x3fff).ram(); // Minimal user RAM area
+	map(0x4000, 0xf7ff).ram();
+	map(0xf800, 0xfbff).ram().share("video_ram"); // Video RAM
+}
 
-ADDRESS_MAP_START(poly88_state::poly88_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(poly88_baud_rate_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(poly88_intr_w)
-	AM_RANGE(0xf8, 0xf8) AM_READ(poly88_keyboard_r)
-ADDRESS_MAP_END
+void poly88_state::poly88_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x04, 0x04).w(FUNC(poly88_state::poly88_baud_rate_w));
+	map(0x08, 0x08).w(FUNC(poly88_state::poly88_intr_w));
+	map(0xf8, 0xf8).r(FUNC(poly88_state::poly88_keyboard_r));
+}
 
-ADDRESS_MAP_START(poly88_state::poly8813_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
-	AM_RANGE(0x0400, 0x0bff) AM_ROM // Disk System ROM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM // System RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_SHARE("video_ram") // Video RAM
-	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
-ADDRESS_MAP_END
+void poly88_state::poly8813_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom(); // Monitor ROM
+	map(0x0400, 0x0bff).rom(); // Disk System ROM
+	map(0x0c00, 0x0fff).ram(); // System RAM
+	map(0x1800, 0x1bff).ram().share("video_ram"); // Video RAM
+	map(0x2000, 0xffff).ram(); // RAM
+}
 
-ADDRESS_MAP_START(poly88_state::poly8813_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void poly88_state::poly8813_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( poly88 )
@@ -187,17 +191,17 @@ static const gfx_layout poly88_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( poly88 )
+static GFXDECODE_START( gfx_poly88 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, poly88_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(poly88_state::poly88)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(16'588'800) / 9) // uses 8224 clock generator
-	MCFG_CPU_PROGRAM_MAP(poly88_mem)
-	MCFG_CPU_IO_MAP(poly88_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", poly88_state,  poly88_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(poly88_state,poly88_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(16'588'800) / 9) // uses 8224 clock generator
+	MCFG_DEVICE_PROGRAM_MAP(poly88_mem)
+	MCFG_DEVICE_IO_MAP(poly88_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poly88_state,  poly88_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(poly88_state,poly88_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -208,14 +212,13 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	MCFG_SCREEN_UPDATE_DRIVER(poly88_state, screen_update_poly88)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", poly88)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poly88)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -223,9 +226,9 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, XTAL(16'588'800) / 9)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(poly88_state,write_cas_tx))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(poly88_state,poly88_usart_rxready))
+	I8251(config, m_uart, XTAL(16'588'800) / 9);
+	m_uart->txd_handler().set(FUNC(poly88_state::write_cas_tx));
+	m_uart->rxrdy_handler().set(FUNC(poly88_state::poly88_usart_rxready));
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 2)
@@ -233,9 +236,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(poly88_state::poly8813)
 	poly88(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(poly8813_mem)
-	MCFG_CPU_IO_MAP(poly8813_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(poly8813_mem)
+	MCFG_DEVICE_IO_MAP(poly8813_io)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -260,6 +263,6 @@ ROM_START( poly8813 )
 ROM_END
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT    COMPANY                  FULLNAME     FLAGS
-COMP( 1976, poly88,  0,     0,       poly88,    poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-88",   0 )
-COMP( 1977, poly8813,poly88,0,       poly8813,  poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-8813", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT         COMPANY                FULLNAME     FLAGS
+COMP( 1976, poly88,   0,      0,      poly88,   poly88, poly88_state, init_poly88, "PolyMorphic Systems", "Poly-88",   0 )
+COMP( 1977, poly8813, poly88, 0,      poly8813, poly88, poly88_state, init_poly88, "PolyMorphic Systems", "Poly-8813", MACHINE_NOT_WORKING )

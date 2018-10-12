@@ -335,12 +335,13 @@ ioport_constructor t5182_device::device_input_ports() const
 	//  90XX reset
 	//  A0XX
 	// rest unused
-ADDRESS_MAP_START(t5182_device::t5182_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("cpu", 0) // internal ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_MIRROR(0x1800) // internal RAM
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_MIRROR(0x3F00) AM_SHARE("sharedram") // 2016 with four 74ls245s, one each for main and t5182 address and data. pins 23, 22, 20, 19, 18 are all tied low so only 256 bytes are usable
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(":t5182_z80", 0) // external ROM
-ADDRESS_MAP_END
+void t5182_device::t5182_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("cpu", 0); // internal ROM
+	map(0x2000, 0x27ff).ram().mirror(0x1800); // internal RAM
+	map(0x4000, 0x40ff).ram().mirror(0x3F00).share("sharedram"); // 2016 with four 74ls245s, one each for main and t5182 address and data. pins 23, 22, 20, 19, 18 are all tied low so only 256 bytes are usable
+	map(0x8000, 0xffff).rom().region(":t5182_z80", 0); // external ROM
+}
 
 
 	// 00  W YM2151 address
@@ -353,16 +354,17 @@ ADDRESS_MAP_END
 	// 30 R  coin inputs (bits 0 and 1, active high)
 	// 40  W external ROM banking? (the only 0 bit enables a ROM)
 	// 50  W test mode status flags (bit 0 = ROM test fail, bit 1 = RAM test fail, bit 2 = YM2151 IRQ not received)
-ADDRESS_MAP_START(t5182_device::t5182_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(":ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_WRITE(sharedram_semaphore_snd_acquire_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(sharedram_semaphore_snd_release_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(ym2151_irq_ack_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(cpu_irq_ack_w)
-	AM_RANGE(0x20, 0x20) AM_READ(sharedram_semaphore_main_r)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("T5182_COIN")
-ADDRESS_MAP_END
+void t5182_device::t5182_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw(":ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x10, 0x10).w(FUNC(t5182_device::sharedram_semaphore_snd_acquire_w));
+	map(0x11, 0x11).w(FUNC(t5182_device::sharedram_semaphore_snd_release_w));
+	map(0x12, 0x12).w(FUNC(t5182_device::ym2151_irq_ack_w));
+	map(0x13, 0x13).w(FUNC(t5182_device::cpu_irq_ack_w));
+	map(0x20, 0x20).r(FUNC(t5182_device::sharedram_semaphore_main_r));
+	map(0x30, 0x30).portr("T5182_COIN");
+}
 
 
 //-------------------------------------------------
@@ -370,8 +372,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(t5182_device::device_add_mconfig)
-	MCFG_CPU_ADD("t5182_z80", Z80, T5182_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(t5182_map)
-	MCFG_CPU_IO_MAP(t5182_io)
+	MCFG_DEVICE_ADD("t5182_z80", Z80, T5182_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(t5182_map)
+	MCFG_DEVICE_IO_MAP(t5182_io)
 
 MACHINE_CONFIG_END

@@ -129,22 +129,23 @@ WRITE8_MEMBER(sns_rom_sgb_device::gb_ie_w)
 
 
 
-ADDRESS_MAP_START(sns_rom_sgb_device::supergb_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("sgb_ppu", sgb_ppu_device, vram_r, vram_w)  /* 8k VRAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )   /* 8k switched RAM bank (cartridge) */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM                              /* 8k low RAM */
-	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)
-	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("sgb_ppu", sgb_ppu_device, oam_r, oam_w)    /* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)      /* I/O */
-	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("sgb_apu", gameboy_sound_device, sound_r, sound_w)      /* sound registers */
-	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
-	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("sgb_apu", gameboy_sound_device, wave_r, wave_w)        /* Wave RAM */
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("sgb_ppu", sgb_ppu_device, video_r, video_w) /* also disable bios?? */        /* Video controller & BIOS flip-flop */
-	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* High RAM */
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)        /* Interrupt enable register */
-ADDRESS_MAP_END
+void sns_rom_sgb_device::supergb_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rw(FUNC(sns_rom_sgb_device::gb_cart_r), FUNC(sns_rom_sgb_device::gb_bank_w));
+	map(0x8000, 0x9fff).rw("sgb_ppu", FUNC(sgb_ppu_device::vram_r), FUNC(sgb_ppu_device::vram_w));  /* 8k VRAM */
+	map(0xa000, 0xbfff).rw(FUNC(sns_rom_sgb_device::gb_ram_r), FUNC(sns_rom_sgb_device::gb_ram_w));   /* 8k switched RAM bank (cartridge) */
+	map(0xc000, 0xdfff).ram();                              /* 8k low RAM */
+	map(0xe000, 0xfdff).rw(FUNC(sns_rom_sgb_device::gb_echo_r), FUNC(sns_rom_sgb_device::gb_echo_w));
+	map(0xfe00, 0xfeff).rw("sgb_ppu", FUNC(sgb_ppu_device::oam_r), FUNC(sgb_ppu_device::oam_w));    /* OAM RAM */
+	map(0xff00, 0xff0f).rw(FUNC(sns_rom_sgb_device::gb_io_r), FUNC(sns_rom_sgb_device::gb_io_w));      /* I/O */
+	map(0xff10, 0xff26).rw("sgb_apu", FUNC(gameboy_sound_device::sound_r), FUNC(gameboy_sound_device::sound_w));      /* sound registers */
+	map(0xff27, 0xff2f).noprw();                     /* unused */
+	map(0xff30, 0xff3f).rw("sgb_apu", FUNC(gameboy_sound_device::wave_r), FUNC(gameboy_sound_device::wave_w));        /* Wave RAM */
+	map(0xff40, 0xff7f).rw("sgb_ppu", FUNC(sgb_ppu_device::video_r), FUNC(sgb_ppu_device::video_w)); /* also disable bios?? */        /* Video controller & BIOS flip-flop */
+	map(0xff80, 0xfffe).ram();                     /* High RAM */
+	map(0xffff, 0xffff).rw(FUNC(sns_rom_sgb_device::gb_ie_r), FUNC(sns_rom_sgb_device::gb_ie_w));        /* Interrupt enable register */
+}
 
 
 
@@ -153,21 +154,22 @@ WRITE8_MEMBER( sns_rom_sgb_device::gb_timer_callback )
 }
 
 
-static SLOT_INTERFACE_START(supergb_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  GB_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_mbc1",  GB_ROM_MBC1)
-SLOT_INTERFACE_END
+static void supergb_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  GB_STD_ROM);
+	device.option_add_internal("rom_mbc1",  GB_ROM_MBC1);
+}
 
 
 MACHINE_CONFIG_START(sns_rom_sgb1_device::device_add_mconfig)
-	MCFG_CPU_ADD("sgb_cpu", LR35902, 4295454)   /* 4.295454 MHz */
-	MCFG_CPU_PROGRAM_MAP(supergb_map)
-	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
+	MCFG_DEVICE_ADD("sgb_cpu", LR35902, 4295454)   /* 4.295454 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(supergb_map)
+	MCFG_LR35902_TIMER_CB(WRITE8(*this, sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
+	MCFG_DEVICE_ADD("sgb_ppu", SGB_PPU, "sgb_cpu")
 
-	MCFG_SOUND_ADD("sgb_apu", DMG_APU, 4295454)
+	MCFG_DEVICE_ADD("sgb_apu", DMG_APU, 4295454)
 
 	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, nullptr)
 MACHINE_CONFIG_END
@@ -186,14 +188,14 @@ const tiny_rom_entry *sns_rom_sgb1_device::device_rom_region() const
 
 
 MACHINE_CONFIG_START(sns_rom_sgb2_device::device_add_mconfig)
-	MCFG_CPU_ADD("sgb_cpu", LR35902, XTAL(4'194'304))   /* 4.194MHz derived from clock on sgb2 pcb */
-	MCFG_CPU_PROGRAM_MAP(supergb_map)
-	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
+	MCFG_DEVICE_ADD("sgb_cpu", LR35902, XTAL(4'194'304))   /* 4.194MHz derived from clock on sgb2 pcb */
+	MCFG_DEVICE_PROGRAM_MAP(supergb_map)
+	MCFG_LR35902_TIMER_CB(WRITE8(*this, sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
+	MCFG_DEVICE_ADD("sgb_ppu", SGB_PPU, "sgb_cpu")
 
-	MCFG_SOUND_ADD("sgb_apu", DMG_APU, XTAL(4'194'304))
+	MCFG_DEVICE_ADD("sgb_apu", DMG_APU, XTAL(4'194'304))
 
 	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, nullptr)
 MACHINE_CONFIG_END

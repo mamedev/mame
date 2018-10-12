@@ -208,7 +208,7 @@ WRITE16_MEMBER(rltennis_state::blitter_w)
 
 				int address=yy*512+xx;
 
-				int pix = m_gfx[ address & 0x0ffffff ];
+				int pix = m_gfx[ address & m_gfx.mask() ];
 				int screen_x=(x&0xff)+((m_blitter[BLT_FLAGS] & BLTFLAG_DST_LR )?256:0);
 
 				if((pix || force_blit)&& screen_x >0 && y >0 && screen_x < 512 && y < 256 )

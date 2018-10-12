@@ -11,19 +11,15 @@
 #include "sound/st0016.h"
 #include "screen.h"
 
-typedef device_delegate<uint8_t (void)> st0016_dma_offs_delegate;
-#define ST0016_DMA_OFFS_CB(name)  uint8_t name(void)
-
-#define MCFG_ST0016_DMA_OFFS_CB(_class, _method) \
-	downcast<st0016_cpu_device &>(*device).set_dma_offs_callback(st0016_dma_offs_delegate(&_class::_method, #_class "::" #_method, this));
-
 
 class st0016_cpu_device : public z80_device, public device_gfx_interface
 {
 public:
+	typedef device_delegate<uint8_t ()> dma_offs_delegate;
+
 	st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
-	template <typename Object> void set_dma_offs_callback(Object &&callback) { m_dma_offs_cb = std::forward<Object>(callback); }
+	template <typename... T> void set_dma_offs_callback(T &&... args) { m_dma_offs_cb = dma_offs_delegate(std::forward<T>(args)...); }
 
 	DECLARE_WRITE8_MEMBER(st0016_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(st0016_palette_bank_w);
@@ -100,7 +96,7 @@ protected:
 
 private:
 	uint8_t m_dma_offset;
-	st0016_dma_offs_delegate m_dma_offs_cb;
+	dma_offs_delegate m_dma_offs_cb;
 	uint32_t m_game_flag;
 
 	DECLARE_READ8_MEMBER(soundram_read);

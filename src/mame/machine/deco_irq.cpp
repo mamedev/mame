@@ -108,14 +108,14 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 	}
 
 	// lightgun?
-	if (m_lightgun_latch >= visible.min_y && m_lightgun_latch <= visible.max_y && y == m_lightgun_latch)
+	if (m_lightgun_latch >= visible.top() && m_lightgun_latch <= visible.bottom() && y == m_lightgun_latch)
 	{
 		m_lightgun_irq = true;
 		m_lightgun_irq_cb(ASSERT_LINE);
 	}
 
 	// vblank-in?
-	if (y == (visible.max_y + 1))
+	if (y == (visible.bottom() + 1))
 	{
 		m_vblank_irq = true;
 		m_vblank_irq_cb(ASSERT_LINE);
@@ -130,12 +130,13 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 //  INTERFACE
 //**************************************************************************
 
-ADDRESS_MAP_START(deco_irq_device::map)
-	AM_RANGE(0x0, 0x0) AM_WRITE(control_w)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(scanline_r, scanline_w)
-	AM_RANGE(0x2, 0x2) AM_READWRITE(raster_irq_ack_r, vblank_irq_ack_w)
-	AM_RANGE(0x3, 0x3) AM_READ(status_r)
-ADDRESS_MAP_END
+void deco_irq_device::map(address_map &map)
+{
+	map(0x0, 0x0).w(FUNC(deco_irq_device::control_w));
+	map(0x1, 0x1).rw(FUNC(deco_irq_device::scanline_r), FUNC(deco_irq_device::scanline_w));
+	map(0x2, 0x2).rw(FUNC(deco_irq_device::raster_irq_ack_r), FUNC(deco_irq_device::vblank_irq_ack_w));
+	map(0x3, 0x3).r(FUNC(deco_irq_device::status_r));
+}
 
 WRITE8_MEMBER( deco_irq_device::control_w )
 {

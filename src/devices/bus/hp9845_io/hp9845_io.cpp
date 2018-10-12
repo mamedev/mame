@@ -126,7 +126,8 @@ void hp9845_io_card_device::flg_w(int state)
 #include "98035.h"
 #include "98034.h"
 
-SLOT_INTERFACE_START(hp9845_io_slot_devices)
-SLOT_INTERFACE("98034_hpib" , HP98034_IO_CARD)
-SLOT_INTERFACE("98035_rtc" , HP98035_IO_CARD)
-SLOT_INTERFACE_END
+void hp9845_io_slot_devices(device_slot_interface &device)
+{
+	device.option_add("98034_hpib" , HP98034_IO_CARD);
+	device.option_add("98035_rtc" , HP98035_IO_CARD);
+}

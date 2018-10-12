@@ -39,7 +39,7 @@ private:
 	// internal state
 	required_device<z80_device> m_cpu;
 	required_device<upd765a_device> m_fdc;
-	required_device<i8255_device> m_pio;
+	required_device<i8255_device> m_ppi;
 
 	floppy_image_device *m_fd0;
 	floppy_image_device *m_fd1;

@@ -52,6 +52,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -79,25 +80,27 @@ public:
 };
 
 
-ADDRESS_MAP_START(carrera_state::carrera_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe801, 0xe801) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("tileram")
-ADDRESS_MAP_END
+void carrera_state::carrera_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0xe000, 0xe7ff).ram();
+	map(0xe800, 0xe800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe801, 0xe801).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xf000, 0xffff).ram().share("tileram");
+}
 
-ADDRESS_MAP_START(carrera_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN3")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN5")
-	AM_RANGE(0x06, 0x06) AM_WRITENOP // ?
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void carrera_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).portr("IN3");
+	map(0x04, 0x04).portr("IN4");
+	map(0x05, 0x05).portr("IN5");
+	map(0x06, 0x06).nopw(); // ?
+	map(0x08, 0x09).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 static INPUT_PORTS_START( carrera )
 	PORT_START("IN0")   /* Port 0 */
@@ -257,7 +260,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( carrera )
+static GFXDECODE_START( gfx_carrera )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -313,10 +316,9 @@ PALETTE_INIT_MEMBER(carrera_state, carrera)
 
 MACHINE_CONFIG_START(carrera_state::carrera)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
-	MCFG_CPU_PROGRAM_MAP(carrera_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", carrera_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK / 6)
+	MCFG_DEVICE_PROGRAM_MAP(carrera_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -330,18 +332,19 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carrera)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carrera)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(carrera_state, carrera)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)
 	/* these are set as input, but I have no idea which input port it uses is for the AY */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(carrera_state, unknown_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(carrera_state, unknown_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, carrera_state, unknown_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, carrera_state, unknown_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -362,4 +365,4 @@ ROM_START( carrera )
 ROM_END
 
 
-GAME( 19??, carrera, 0, carrera, carrera, carrera_state, 0, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )
+GAME( 19??, carrera, 0, carrera, carrera, carrera_state, empty_init, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )

@@ -1351,6 +1351,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/poly_dsk.h,FORMATS["POLY_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["POLY_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/poly_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/poly_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/ppg_dsk.h,FORMATS["PPG_DSK"] = true
 --------------------------------------------------
 

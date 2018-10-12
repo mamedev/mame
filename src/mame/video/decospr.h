@@ -99,6 +99,6 @@ DECLARE_DEVICE_TYPE(DECO_SPRITE, decospr_device)
 	downcast<decospr_device &>(*device).set_offsets(_xoffs, _yoffs);
 
 #define MCFG_DECO_SPRITE_GFXDECODE(_gfxtag) \
-	downcast<decospr_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<decospr_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_DECOSPR_H

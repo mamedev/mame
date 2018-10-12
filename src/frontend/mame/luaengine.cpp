@@ -24,6 +24,7 @@
 #include "natkeyboard.h"
 #include "uiinput.h"
 #include "pluginopts.h"
+#include "softlist.h"
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
@@ -202,6 +203,11 @@ namespace sol
 						typestr = "unmap";
 						break;
 					case AMH_DEVICE_DELEGATE:
+					case AMH_DEVICE_DELEGATE_M:
+					case AMH_DEVICE_DELEGATE_S:
+					case AMH_DEVICE_DELEGATE_SM:
+					case AMH_DEVICE_DELEGATE_MO:
+					case AMH_DEVICE_DELEGATE_SMO:
 						typestr = "delegate";
 						break;
 					case AMH_PORT:
@@ -799,10 +805,15 @@ void lua_engine::initialize()
 	emu["wait"] = lua_CFunction([](lua_State *L) {
 			lua_engine *engine = mame_machine_manager::instance()->lua();
 			luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
-			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), 0, L);
+			int ret = lua_pushthread(L);
+			if(ret == 1)
+				return luaL_error(L, "cannot wait from outside coroutine");
+			int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref, nullptr);
 			return lua_yield(L, 0);
 		});
 	emu["lang_translate"] = &lang_translate;
+	emu["pid"] = &osd_getpid;
 
 /*
  * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
@@ -1231,16 +1242,13 @@ void lua_engine::initialize()
 			"visible_cpu", sol::property([](debugger_manager &debug) { debug.cpu().get_visible_cpu(); },
 				[](debugger_manager &debug, device_t &dev) { debug.cpu().set_visible_cpu(&dev); }),
 			"execution_state", sol::property([](debugger_manager &debug) {
-					int execstate = debug.cpu().execution_state();
-					if(execstate == 0)
-						return "stop";
-					return "run";
+					return debug.cpu().is_stopped() ? "stop" : "run";
 				},
 				[](debugger_manager &debug, const std::string &state) {
-					int execstate = 1;
 					if(state == "stop")
-						execstate = 0;
-					debug.cpu().set_execution_state(execstate);
+						debug.cpu().set_execution_stopped();
+					else
+						debug.cpu().set_execution_running();
 				}));
 
 	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
@@ -1285,42 +1293,40 @@ void lua_engine::initialize()
 					return table;
 				},
 			"wpset", [](device_debug &dev, addr_space &sp, const std::string &type, offs_t addr, offs_t len, const char *cond, const char *act) {
-					int wptype = WATCHPOINT_READ;
+					read_or_write wptype = read_or_write::READ;
 					if(type == "w")
-						wptype = WATCHPOINT_WRITE;
+						wptype = read_or_write::WRITE;
 					else if((type == "rw") || (type == "wr"))
-						wptype = WATCHPOINT_READ | WATCHPOINT_WRITE;
+						wptype = read_or_write::READWRITE;
 					return dev.watchpoint_set(sp.space, wptype, addr, len, cond, act);
 				},
 			"wpclr", &device_debug::watchpoint_clear,
 			"wplist", [this](device_debug &dev, addr_space &sp) {
 					sol::table table = sol().create_table();
-					device_debug::watchpoint *list = dev.watchpoint_first(sp.space.spacenum());
-					while(list)
+					for(auto &wpp : dev.watchpoint_vector(sp.space.spacenum()))
 					{
 						sol::table wp = sol().create_table();
-						wp["enabled"] = list->enabled();
-						wp["address"] = list->address();
-						wp["length"] = list->length();
-						switch(list->type())
+						wp["enabled"] = wpp->enabled();
+						wp["address"] = wpp->address();
+						wp["length"] = wpp->length();
+						switch(wpp->type())
 						{
-							case WATCHPOINT_READ:
+							case read_or_write::READ:
 								wp["type"] = "r";
 								break;
-							case WATCHPOINT_WRITE:
+							case read_or_write::WRITE:
 								wp["type"] = "w";
 								break;
-							case WATCHPOINT_READ | WATCHPOINT_WRITE:
+							case read_or_write::READWRITE:
 								wp["type"] = "rw";
 								break;
 							default: // huh?
 								wp["type"] = "";
 								break;
 						}
-						wp["condition"] = list->condition();
-						wp["action"] = list->action();
-						table[list->index()] = wp;
-						list = list->next();
+						wp["condition"] = wpp->condition();
+						wp["action"] = wpp->action();
+						table[wpp->index()] = wp;
 					}
 					return table;
 				});
@@ -1440,8 +1446,9 @@ void lua_engine::initialize()
 			"write_direct_u32", &addr_space::direct_mem_write<uint32_t>,
 			"write_direct_i64", &addr_space::direct_mem_write<int64_t>,
 			"write_direct_u64", &addr_space::direct_mem_write<uint64_t>,
-			"name", sol::property(&addr_space::name),
+			"name", sol::property([](addr_space &sp) { return sp.space.name(); }),
 			"shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }),
+			"index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }),
 			"map", sol::property([this](addr_space &sp) {
 					address_space &space = sp.space;
 					sol::table map = sol().create_table();
@@ -1781,7 +1788,7 @@ void lua_engine::initialize()
 			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
 			"width", [](screen_device &sdev) { return sdev.visible_area().width(); },
 			"orientation", [](screen_device &sdev) {
-					uint32_t flags = sdev.machine().system().flags & machine_flags::MASK_ORIENTATION;
+					uint32_t flags = sdev.orientation();
 					int rotation_angle = 0;
 					switch (flags)
 					{
@@ -1980,6 +1987,7 @@ void lua_engine::initialize()
 			"manufacturer", &device_image_interface::manufacturer,
 			"year", &device_image_interface::year,
 			"software_list_name", &device_image_interface::software_list_name,
+			"software_parent", sol::property([](device_image_interface &di) { const software_info *si = di.software_entry(); return si ? si->parentname() : ""; }),
 			"image_type_name", &device_image_interface::image_type_name,
 			"load", &device_image_interface::load,
 			"unload", &device_image_interface::unload,
@@ -2024,13 +2032,16 @@ void lua_engine::close()
 
 void lua_engine::resume(void *ptr, int nparam)
 {
-	lua_State *L = static_cast<lua_State *>(ptr);
+	lua_rawgeti(m_lua_state, LUA_REGISTRYINDEX, nparam);
+	lua_State *L = lua_tothread(m_lua_state, -1);
+	lua_pop(m_lua_state, 1);
 	int stat = lua_resume(L, nullptr, 0);
 	if((stat != LUA_OK) && (stat != LUA_YIELD))
 	{
 		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
+	luaL_unref(m_lua_state, LUA_REGISTRYINDEX, nparam);
 }
 
 void lua_engine::run(sol::load_result res)

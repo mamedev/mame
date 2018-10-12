@@ -87,6 +87,7 @@ L10, L15, L18 and G18 all read the same
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 class warpspeed_state : public driver_device
@@ -99,6 +100,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_workram(*this, "workram") { }
 
+	void warpspeed(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -120,7 +124,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_circles(bitmap_ind16 &bitmap);
-	void warpspeed(machine_config &config);
 	void warpspeed_io_map(address_map &map);
 	void warpspeed_map(address_map &map);
 };
@@ -233,20 +236,22 @@ uint32_t warpspeed_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-ADDRESS_MAP_START(warpspeed_state::warpspeed_map)
-	AM_RANGE(0x0000, 0x0dff) AM_ROM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(vidram_w ) AM_SHARE("videoram")
-	AM_RANGE(0x1c00, 0x1cff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+void warpspeed_state::warpspeed_map(address_map &map)
+{
+	map(0x0000, 0x0dff).rom();
+	map(0x1800, 0x1bff).ram().w(FUNC(warpspeed_state::vidram_w)).share("videoram");
+	map(0x1c00, 0x1cff).ram().share("workram");
+}
 
-ADDRESS_MAP_START(warpspeed_state::warpspeed_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN2")
-	AM_RANGE(0x00, 0x27) AM_WRITE(hardware_w )
-ADDRESS_MAP_END
+void warpspeed_state::warpspeed_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("DSW");
+	map(0x03, 0x03).portr("IN2");
+	map(0x00, 0x27).w(FUNC(warpspeed_state::hardware_w));
+}
 
 static INPUT_PORTS_START( warpspeed )
 	PORT_START("IN0")
@@ -300,7 +305,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( warpspeed )
+static GFXDECODE_START( gfx_warpspeed )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 1  )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 1  )
 GFXDECODE_END
@@ -321,10 +326,10 @@ PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
 MACHINE_CONFIG_START(warpspeed_state::warpspeed)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(warpspeed_map)
-	MCFG_CPU_IO_MAP(warpspeed_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpspeed_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(warpspeed_map)
+	MCFG_DEVICE_IO_MAP(warpspeed_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", warpspeed_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -335,7 +340,7 @@ MACHINE_CONFIG_START(warpspeed_state::warpspeed)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_UPDATE_DRIVER(warpspeed_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warpspeed)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warpspeed)
 	MCFG_PALETTE_ADD("palette", 2+8)
 	MCFG_PALETTE_INIT_OWNER(warpspeed_state, warpspeed)
 MACHINE_CONFIG_END
@@ -376,4 +381,4 @@ ROM_START( warpsped )
 ROM_END
 
 
-GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, 0, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.
+GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, empty_init, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.

@@ -9,7 +9,7 @@
 
 #define MCFG_AW_ROM_BOARD_ADD(_tag, _keyregion, _irq_cb)  \
 	MCFG_NAOMI_G1_ADD(_tag, AW_ROM_BOARD, _irq_cb)        \
-	aw_rom_board::static_set_keyregion(*device, "^" _keyregion);
+	aw_rom_board::static_set_keyregion(*device, _keyregion);
 
 class aw_rom_board : public naomi_g1_device
 {
@@ -18,7 +18,7 @@ public:
 
 	static void static_set_keyregion(device_t &device, const char *keyregion);
 
-	void submap(address_map &map);
+	virtual void submap(address_map &map) override;
 
 	DECLARE_WRITE16_MEMBER(epr_offsetl_w);          // 5f7000
 	DECLARE_WRITE16_MEMBER(epr_offseth_w);          // 5f7004

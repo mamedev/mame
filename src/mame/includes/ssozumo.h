@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 
+#include "emupal.h"
+
 class ssozumo_state : public driver_device
 {
 public:
@@ -17,6 +19,11 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_colorram2(*this, "colorram2") { }
 
+	void ssozumo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
@@ -26,8 +33,6 @@ public:
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -36,14 +41,12 @@ public:
 	DECLARE_PALETTE_INIT(ssozumo);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ssozumo(machine_config &config);
 	void ssozumo_map(address_map &map);
 	void ssozumo_sound_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;

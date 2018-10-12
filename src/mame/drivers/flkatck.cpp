@@ -92,29 +92,32 @@ WRITE8_MEMBER(flkatck_state::multiply_w)
 }
 
 
-ADDRESS_MAP_START(flkatck_state::flkatck_map)
-	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE(flkatck_k007121_regs_w)                                   /* 007121 registers */
-	AM_RANGE(0x0008, 0x03ff) AM_RAM                                                                 /* RAM */
-	AM_RANGE(0x0400, 0x041f) AM_READWRITE(flkatck_ls138_r, flkatck_ls138_w)                         /* inputs, DIPS, bankswitch, counters, sound command */
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") /* palette */
-	AM_RANGE(0x1000, 0x1fff) AM_RAM                                                                 /* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_SHARE("k007121_ram")                    /* Video RAM (007121) */
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")                                                            /* banked ROM */
-	AM_RANGE(0x6000, 0xffff) AM_ROM                                                                 /* ROM */
-ADDRESS_MAP_END
+void flkatck_state::flkatck_map(address_map &map)
+{
+	map(0x0000, 0x0007).ram().w(FUNC(flkatck_state::flkatck_k007121_regs_w));                                   /* 007121 registers */
+	map(0x0008, 0x03ff).ram();                                                                 /* RAM */
+	map(0x0400, 0x041f).rw(FUNC(flkatck_state::flkatck_ls138_r), FUNC(flkatck_state::flkatck_ls138_w));                         /* inputs, DIPS, bankswitch, counters, sound command */
+	map(0x0800, 0x0bff).ram().w("palette", FUNC(palette_device::write8)).share("palette"); /* palette */
+	map(0x1000, 0x1fff).ram().share("spriteram");                                            /* RAM */
+	map(0x2000, 0x2fff).ram().w(FUNC(flkatck_state::vram_w)).share("vram");                    /* Video RAM (007121) */
+	map(0x3000, 0x3fff).ram();
+	map(0x4000, 0x5fff).bankr("bank1");                                                            /* banked ROM */
+	map(0x6000, 0xffff).rom();                                                                 /* ROM */
+}
 
-ADDRESS_MAP_START(flkatck_state::flkatck_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                             /* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                                             /* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)                                // 007452: Protection (see wecleman, but unused here?)
-	AM_RANGE(0x9001, 0x9001) AM_READNOP                                         // 007452: ?
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)                               // 007452: Protection (see wecleman, but unused here?)
-	AM_RANGE(0x9004, 0x9004) AM_READNOP                                         // 007452: ?
-	AM_RANGE(0x9006, 0x9006) AM_WRITENOP                                        // 007452: ?
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) /* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)           /* YM2151 */
-ADDRESS_MAP_END
+void flkatck_state::flkatck_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                                             /* ROM */
+	map(0x8000, 0x87ff).ram();                                             /* RAM */
+	map(0x9000, 0x9000).r(FUNC(flkatck_state::multiply_r));                                // 007452: Protection (see wecleman, but unused here?)
+	map(0x9001, 0x9001).nopr();                                         // 007452: ?
+	map(0x9000, 0x9001).w(FUNC(flkatck_state::multiply_w));                               // 007452: Protection (see wecleman, but unused here?)
+	map(0x9004, 0x9004).nopr();                                         // 007452: ?
+	map(0x9006, 0x9006).nopw();                                        // 007452: ?
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write)); /* 007232 registers */
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));           /* YM2151 */
+}
 
 
 static INPUT_PORTS_START( flkatck )
@@ -177,7 +180,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( flkatck )
+static GFXDECODE_START( gfx_flkatck )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 32 )
 GFXDECODE_END
 
@@ -211,16 +214,16 @@ void flkatck_state::machine_reset()
 MACHINE_CONFIG_START(flkatck_state::flkatck)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
-	MCFG_CPU_PROGRAM_MAP(flkatck_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flkatck_state,  flkatck_interrupt)
+	MCFG_DEVICE_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(flkatck_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flkatck_state,  flkatck_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3579545)   /* NEC D780C-1, 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(flkatck_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,3579545)   /* NEC D780C-1, 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(flkatck_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -231,7 +234,7 @@ MACHINE_CONFIG_START(flkatck_state::flkatck)
 	MCFG_SCREEN_UPDATE_DRIVER(flkatck_state, screen_update_flkatck)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flkatck)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flkatck)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -240,16 +243,17 @@ MACHINE_CONFIG_START(flkatck_state::flkatck)
 	MCFG_K007121_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(flkatck_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, flkatck_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
@@ -311,6 +315,6 @@ ROM_START( flkatcka )
 	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
 ROM_END
 
-GAME( 1987, mx5000,  0,      flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatck, mx5000, flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatcka,mx5000, flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mx5000,  0,      flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatck, mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatcka,mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )

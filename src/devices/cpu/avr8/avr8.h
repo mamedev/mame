@@ -64,7 +64,7 @@
 //**************************************************************************
 
 #define MCFG_CPU_AVR8_EEPROM(_tag) \
-	downcast<avr8_device &>(*device).set_eeprom_tag("^" _tag);
+	downcast<avr8_device &>(*device).set_eeprom_tag(_tag);
 
 
 //**************************************************************************
@@ -93,8 +93,8 @@ public:
 	uint64_t get_elapsed_cycles() const { return m_elapsed_cycles; }
 
 	// register handling
-	DECLARE_WRITE8_MEMBER( regs_w );
-	DECLARE_READ8_MEMBER( regs_r );
+	DECLARE_WRITE8_MEMBER(regs_w);
+	DECLARE_READ8_MEMBER(regs_r);
 	uint32_t m_shifted_pc;
 
 protected:
@@ -123,7 +123,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;

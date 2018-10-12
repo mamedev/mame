@@ -479,7 +479,7 @@ inline uint8_t z80_device::rop()
 {
 	unsigned pc = PCD;
 	PC++;
-	uint8_t res = m_decrypted_opcodes_direct->read_byte(pc);
+	uint8_t res = m_opcodes_cache->read_byte(pc);
 	m_icount -= 2;
 	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f), 0x00, 0xff);
 	m_icount += 2;
@@ -496,14 +496,14 @@ inline uint8_t z80_device::arg()
 {
 	unsigned pc = PCD;
 	PC++;
-	return m_direct->read_byte(pc);
+	return m_cache->read_byte(pc);
 }
 
 inline uint16_t z80_device::arg16()
 {
 	unsigned pc = PCD;
 	PC += 2;
-	return m_direct->read_byte(pc) | (m_direct->read_byte((pc+1)&0xffff) << 8);
+	return m_cache->read_byte(pc) | (m_cache->read_byte((pc+1)&0xffff) << 8);
 }
 
 /***************************************************************
@@ -1955,7 +1955,7 @@ OP(xycb,ff) { A = set(7, rm(m_ea)); wm(m_ea, A); } /* SET  7,A=(XY+o)  */
 
 OP(illegal,1) {
 	logerror("Z80 ill. opcode $%02x $%02x ($%04x)\n",
-			m_decrypted_opcodes_direct->read_byte((PCD-1)&0xffff), m_decrypted_opcodes_direct->read_byte(PCD), PCD-1);
+			m_opcodes_cache->read_byte((PCD-1)&0xffff), m_opcodes_cache->read_byte(PCD), PCD-1);
 }
 
 /**********************************************************
@@ -2543,7 +2543,7 @@ OP(fd,ff) { illegal_1(); op_ff();                            } /* DB   FD       
 OP(illegal,2)
 {
 	logerror("Z80 ill. opcode $ed $%02x\n",
-			m_decrypted_opcodes_direct->read_byte((PCD-1)&0xffff));
+			m_opcodes_cache->read_byte((PCD-1)&0xffff));
 }
 
 /**********************************************************
@@ -3406,9 +3406,9 @@ void z80_device::device_start()
 	m_ea = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_decrypted_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_direct = m_program->direct<0>();
-	m_decrypted_opcodes_direct = m_decrypted_opcodes->direct<0>();
+	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
+	m_opcodes_cache = m_opcodes->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
@@ -3446,7 +3446,7 @@ void z80_device::device_start()
 	state_add(Z80_HALT,        "HALT",      m_halt).mask(0x1);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	/* setup cycle tables */
 	m_cc_op = cc_op;
@@ -3517,7 +3517,7 @@ void z80_device::execute_run()
 		m_after_ldair = false;
 
 		PRVPC = PCD;
-		debugger_instruction_hook(this, PCD);
+		debugger_instruction_hook(PCD);
 		m_r++;
 		EXEC(op,rop());
 	} while (m_icount > 0);
@@ -3546,7 +3546,7 @@ void nsc800_device::execute_run()
 		m_after_ldair = false;
 
 		PRVPC = PCD;
-		debugger_instruction_hook(this, PCD);
+		debugger_instruction_hook(PCD);
 		m_r++;
 		EXEC(op,rop());
 	} while (m_icount > 0);
@@ -3672,9 +3672,9 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *z80_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
 {
-	return new z80_disassembler;
+	return std::make_unique<z80_disassembler>();
 }
 
 
@@ -3702,7 +3702,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	cpu_device(mconfig, type, tag, owner, clock),
 	z80_daisy_chain_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
-	m_decrypted_opcodes_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
+	m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_irqack_cb(*this),
 	m_refresh_cb(*this),
@@ -3715,7 +3715,7 @@ device_memory_interface::space_config_vector z80_device::memory_space_config() c
 	if(has_configured_map(AS_OPCODES))
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &m_program_config),
-			std::make_pair(AS_OPCODES, &m_decrypted_opcodes_config),
+			std::make_pair(AS_OPCODES, &m_opcodes_config),
 			std::make_pair(AS_IO,      &m_io_config)
 		};
 	else
@@ -3725,11 +3725,11 @@ device_memory_interface::space_config_vector z80_device::memory_space_config() c
 		};
 }
 
-DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Z80")
+DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Zilog Z80")
 
 nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80_device(mconfig, NSC800, tag, owner, clock)
 {
 }
 
-DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "NSC800")
+DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "National Semiconductor NSC800")

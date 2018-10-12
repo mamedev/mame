@@ -29,16 +29,8 @@
  *
  *************************************/
 
-void cybstorm_state::update_interrupts()
-{
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void cybstorm_state::machine_start()
 {
-	atarigen_state::machine_start();
 	save_item(NAME(m_latch_data));
 	save_item(NAME(m_alpha_tile_bank));
 }
@@ -88,32 +80,34 @@ WRITE32_MEMBER(cybstorm_state::latch_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(cybstorm_state::main_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE16("vad", atari_vad_device, control_read, control_write, 0xffffffff)
-	AM_RANGE(0x3f0000, 0x3fffff) AM_DEVICE16("vadbank", address_map_bank_device, amap16, 0xffffffff)
-	AM_RANGE(0x9f0000, 0x9f0003) AM_READ_PORT("9F0000")
-	AM_RANGE(0x9f0010, 0x9f0013) AM_READ(special_port1_r)
-	AM_RANGE(0x9f0030, 0x9f0033) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff0000)
-	AM_RANGE(0x9f0040, 0x9f0043) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff0000)
-	AM_RANGE(0x9f0050, 0x9f0053) AM_WRITE(latch_w)
-	AM_RANGE(0xfb0000, 0xfb0003) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
-	AM_RANGE(0xfc0000, 0xfc0003) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write32)
-	AM_RANGE(0xfd0000, 0xfd0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xff00ff00)
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void cybstorm_state::main_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x20ffff).ram().w("palette", FUNC(palette_device::write32)).share("palette");
+	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
+	map(0x3f0000, 0x3fffff).m(m_vadbank, FUNC(address_map_bank_device::amap16));
+	map(0x9f0000, 0x9f0003).portr("9F0000");
+	map(0x9f0010, 0x9f0013).r(FUNC(cybstorm_state::special_port1_r));
+	map(0x9f0031, 0x9f0031).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
+	map(0x9f0041, 0x9f0041).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
+	map(0x9f0050, 0x9f0053).w(FUNC(cybstorm_state::latch_w));
+	map(0xfb0000, 0xfb0003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
+	map(0xfc0000, 0xfc0003).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
+	map(0xfd0000, 0xfd0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
+	map(0xfe0000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(cybstorm_state::vadbank_map)
-	AM_RANGE(0x000000, 0x001fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
-	AM_RANGE(0x002000, 0x003fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
-	AM_RANGE(0x004000, 0x005fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
-	AM_RANGE(0x006000, 0x007fff) AM_RAM AM_SHARE("vad:mob")
-	AM_RANGE(0x008000, 0x008eff) AM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
-	AM_RANGE(0x008f00, 0x008f7f) AM_RAM AM_SHARE("vad:eof")
-	AM_RANGE(0x008f80, 0x008fff) AM_RAM AM_SHARE("vad:mob:slip")
-	AM_RANGE(0x009000, 0x00ffff) AM_RAM
-ADDRESS_MAP_END
+void cybstorm_state::vadbank_map(address_map &map)
+{
+	map(0x000000, 0x001fff).ram().w(m_vad, FUNC(atari_vad_device::playfield2_latched_msb_w)).share("vad:playfield2");
+	map(0x002000, 0x003fff).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_lsb_w)).share("vad:playfield");
+	map(0x004000, 0x005fff).ram().w(m_vad, FUNC(atari_vad_device::playfield_upper_w)).share("vad:playfield_ext");
+	map(0x006000, 0x007fff).ram().share("vad:mob");
+	map(0x008000, 0x008eff).w(m_vad, FUNC(atari_vad_device::alpha_w)).share("vad:alpha");
+	map(0x008f00, 0x008f7f).ram().share("vad:eof");
+	map(0x008f80, 0x008fff).ram().share("vad:mob:slip");
+	map(0x009000, 0x00ffff).ram();
+}
 
 
 
@@ -160,7 +154,7 @@ static INPUT_PORTS_START( cybstorm )
 	PORT_START("9F0010")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_HBLANK("screen")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa")
@@ -213,7 +207,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( cybstorm )
+static GFXDECODE_START( gfx_cybstorm )
 	GFXDECODE_ENTRY( "gfx2", 0, pflayout,     0, 16 )       /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx3", 0, molayout,  4096, 64 )       /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, anlayout, 16384, 64 )       /* characters 8x8 */
@@ -230,29 +224,23 @@ GFXDECODE_END
 MACHINE_CONFIG_START(cybstorm_state::round2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cybstorm_state, video_int_gen)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(cybstorm_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))
 	MCFG_ATARI_VAD_PLAYFIELD(cybstorm_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(cybstorm_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_ALPHA(cybstorm_state, "gfxdecode", get_alpha_tile_info)
 	MCFG_ATARI_VAD_MOB(cybstorm_state::s_mob_config, "gfxdecode")
 
-	MCFG_DEVICE_ADD("vadbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vadbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x90000)
+	ADDRESS_MAP_BANK(config, "vadbank").set_map(&cybstorm_state::vadbank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x90000);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cybstorm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cybstorm)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -271,9 +259,10 @@ MACHINE_CONFIG_START(cybstorm_state::cybstorm)
 	round2(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_IIIS_ADD("jsa", WRITELINE(cybstorm_state, sound_int_write_line))
+	MCFG_ATARI_JSA_IIIS_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("9F0010", 22)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -352,9 +341,8 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
+void cybstorm_state::init_cybstorm()
 {
-
 }
 
 
@@ -365,4 +353,4 @@ DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
  *
  *************************************/
 
-GAME( 1993, cybstorm, 0, cybstorm, cybstorm, cybstorm_state, cybstorm, ROT0, "Atari Games", "Cyberstorm (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybstorm, 0, cybstorm, cybstorm, cybstorm_state, init_cybstorm, ROT0, "Atari Games", "Cyberstorm (prototype)", MACHINE_SUPPORTS_SAVE )

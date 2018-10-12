@@ -47,53 +47,56 @@ public:
 
 	void mice2(machine_config &config);
 	void mice(machine_config &config);
+
+private:
 	void mice2_io(address_map &map);
 	void mice2_mem(address_map &map);
 	void mice_io(address_map &map);
 	void mice_mem(address_map &map);
-private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
-ADDRESS_MAP_START(mice_state::mice_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("mcp", 0)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM //(U13)
-	AM_RANGE(0x6000, 0x60ff) AM_DEVREADWRITE("rpt", i8155_device, memory_r, memory_w)
-ADDRESS_MAP_END
+void mice_state::mice_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().region("mcp", 0);
+	map(0x4400, 0x47ff).ram(); //(U13)
+	map(0x6000, 0x60ff).rw("rpt", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+}
 
-ADDRESS_MAP_START(mice_state::mice_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("rpt", i8155_device, io_r, io_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+void mice_state::mice_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x50, 0x51).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x60, 0x67).rw("rpt", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x70, 0x73).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(mice_state::mice2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("cep", 0)
-	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE("rpt", i8155_device, memory_r, memory_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("rtt8155", i8155_device, memory_r, memory_w)
-ADDRESS_MAP_END
+void mice_state::mice2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom().region("cep", 0);
+	map(0x9000, 0x90ff).rw("rpt", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0xb000, 0xb7ff).ram();
+	map(0xe800, 0xe8ff).rw("rtt8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+}
 
-ADDRESS_MAP_START(mice_state::mice2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x90, 0x97) AM_DEVREADWRITE("rpt", i8155_device, io_r, io_w)
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("rttppi1", i8255_device, read, write)
-	AM_RANGE(0xc8, 0xcb) AM_DEVREADWRITE("rttppi2", i8255_device, read, write)
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("rttppi3", i8255_device, read, write)
-	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("rttppi4", i8255_device, read, write)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("rttppi5", i8255_device, read, write)
-	AM_RANGE(0xe8, 0xed) AM_DEVREADWRITE("rtt8155", i8155_device, io_r, io_w)
-ADDRESS_MAP_END
+void mice_state::mice2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x90, 0x97).rw("rpt", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xa0, 0xa3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc0, 0xc3).rw("rttppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc8, 0xcb).rw("rttppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xd0, 0xd3).rw("rttppi3", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xd8, 0xdb).rw("rttppi4", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe0, 0xe3).rw("rttppi5", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe8, 0xed).rw("rtt8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mice )
@@ -159,39 +162,39 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(mice_state::mice)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(mice_mem)
-	MCFG_CPU_IO_MAP(mice_io)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mice_mem)
+	MCFG_DEVICE_IO_MAP(mice_io)
 
-	MCFG_DEVICE_ADD("uart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST65_LINE))
-	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
+	i8251_device &uart(I8251(config, "uart", 6.144_MHz_XTAL / 2));
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	uart.txrdy_handler().set_inputline("maincpu", I8085_RST65_LINE);
+	uart.rxrdy_handler().set_inputline("maincpu", I8085_RST75_LINE);
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", mice_terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", mice_terminal)
 
-	MCFG_DEVICE_ADD("rpt", I8155, 6.144_MHz_XTAL / 2)
-	MCFG_I8155_IN_PORTC_CB(IOPORT("BAUD"))
-	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	i8155_device &rpt(I8155(config, "rpt", 6.144_MHz_XTAL / 2));
+	rpt.in_pc_callback().set_ioport("BAUD");
+	rpt.out_to_callback().set("uart", FUNC(i8251_device::write_txc));
+	rpt.out_to_callback().append("uart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	I8255(config, "ppi", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mice_state::mice2)
 	mice(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mice2_mem)
-	MCFG_CPU_IO_MAP(mice2_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mice2_mem)
+	MCFG_DEVICE_IO_MAP(mice2_io)
 
 	MCFG_DEVICE_MODIFY("rs232")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", mice2_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", mice2_terminal)
 
 	MCFG_DEVICE_ADD("rttppi1", I8255, 0)
 	MCFG_DEVICE_ADD("rttppi2", I8255, 0)
@@ -238,9 +241,9 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT     COMPAT   MACHINE   INPUT   CLASS       INIT  COMPANY                   FULLNAME                   FLAGS
-COMP( 1981, mice_6502,  0,         0,       mice,     mice,   mice_state, 0,    "Microtek International", "MICE 6502 (Rev-A)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1984, mice2_z80,  0,         0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II Z80 (Rev-F)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, mice2_6502, mice2_z80, 0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II 6502 (Rev-F)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, mice2_8085, mice2_z80, 0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II 8085 (Rev-M)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, mice2_6809, mice2_z80, 0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II 6809(E) (Rev-L)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME        PARENT     COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY                   FULLNAME                   FLAGS
+COMP( 1981, mice_6502,  0,         0,      mice,    mice,   mice_state, empty_init, "Microtek International", "MICE 6502 (Rev-A)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1984, mice2_z80,  0,         0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II Z80 (Rev-F)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, mice2_6502, mice2_z80, 0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II 6502 (Rev-F)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, mice2_8085, mice2_z80, 0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II 8085 (Rev-M)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, mice2_6809, mice2_z80, 0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II 6809(E) (Rev-L)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

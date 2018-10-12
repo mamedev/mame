@@ -23,12 +23,13 @@
 // device type definition
 DEFINE_DEVICE_TYPE(MB90082, mb90082_device, "mb90082", "Fujitsu MB90082 OSD")
 
-ADDRESS_MAP_START(mb90082_device::mb90082_vram)
-	AM_RANGE(0x0000, 0x023f) AM_RAM // main screen vram
-	AM_RANGE(0x0400, 0x063f) AM_RAM // main screen attr
+void mb90082_device::mb90082_vram(address_map &map)
+{
+	map(0x0000, 0x023f).ram(); // main screen vram
+	map(0x0400, 0x063f).ram(); // main screen attr
 //  AM_RANGE(0x0800, 0x0a3f) AM_RAM // sub screen vram
 //  AM_RANGE(0x0c00, 0x0e3f) AM_RAM // sub screen attr
-ADDRESS_MAP_END
+}
 
 /* charset is undumped, but apparently a normal ASCII one is enough for the time being (for example "fnt0808.x1" in Sharp X1) */
 ROM_START( mb90082 )

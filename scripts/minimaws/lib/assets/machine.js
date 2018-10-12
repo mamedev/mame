@@ -47,6 +47,11 @@ function update_cmd_preview()
 	if (sysbios && (!elide_defaults || (sysbios.selectedOptions[0].getAttribute('data-isdefault') != 'yes')))
 		add_option('bios', sysbios.value);
 
+	// add RAM option if applicable
+	var ramopt = document.getElementById('select-ram-option');
+	if (ramopt && (!elide_defaults || (ramopt.selectedOptions[0].getAttribute('data-isdefault') != 'yes')))
+		add_option('ramsize', ramopt.value);
+
 	var slotslist = document.getElementById('list-slot-options');
 	if (slotslist)
 	{
@@ -71,7 +76,7 @@ function update_cmd_preview()
 
 	// replace the preview with appropriate element
 	var target = document.getElementById('para-cmd-preview');
-	var replacement = document.createElement(inifmt ? 'pre' : 'p');
+	var replacement = document.createElement(inifmt ? 'pre' : 'tt');
 	replacement.setAttribute('id', 'para-cmd-preview');
 	replacement.textContent = result;
 	target.parentNode.replaceChild(replacement, target);
@@ -93,6 +98,28 @@ function set_default_system_bios()
 			sysbios.onchange = make_slot_bios_change_handler(dflt);
 			sysbios.parentNode.appendChild(document.createTextNode(' '));
 			sysbios.parentNode.appendChild(dflt);
+			break;
+		}
+	}
+	update_cmd_preview();
+}
+
+
+function set_default_ram_option()
+{
+	// search for an explicit default option
+	var ramopt = document.getElementById('select-ram-option');
+	var len = ramopt.options.length;
+	for (var i = 0; i < len; i++)
+	{
+		if (ramopt.options[i].getAttribute('data-isdefault') == 'yes')
+		{
+			// select it and add a button for restoring it
+			ramopt.selectedIndex = i;
+			var dflt = make_restore_default_button('default', 'btn-def-ram-option', ramopt, i);
+			ramopt.onchange = make_slot_bios_change_handler(dflt);
+			ramopt.parentNode.appendChild(document.createTextNode(' '));
+			ramopt.parentNode.appendChild(dflt);
 			break;
 		}
 	}

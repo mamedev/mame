@@ -71,6 +71,7 @@ public:
 
 	// construction/destruction
 	sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~sh2_device() override;
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
 	template <typename Object> void set_dma_kludge_callback(Object &&cb) { m_dma_kludge_cb = std::forward<Object>(cb); }
@@ -81,7 +82,7 @@ public:
 	DECLARE_READ32_MEMBER( sh7604_r );
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 
-	void sh2_set_frt_input(int state);
+	virtual void set_frt_input(int state) override;
 	void sh2_notify_dma_data_available();
 	void func_fastirq();
 
@@ -98,7 +99,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 4; }
 	virtual uint32_t execute_input_lines() const override { return 16; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -110,7 +112,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space *m_decrypted_program;
 
@@ -157,12 +159,12 @@ private:
 
 	uint32_t m_debugger_temp;
 
-	inline uint8_t RB(offs_t A) override;
-	inline uint16_t RW(offs_t A) override;
-	inline uint32_t RL(offs_t A) override;
-	inline void WB(offs_t A, uint8_t V) override;
-	inline void WW(offs_t A, uint16_t V) override;
-	inline void WL(offs_t A, uint32_t V) override;
+	virtual uint8_t RB(offs_t A) override;
+	virtual uint16_t RW(offs_t A) override;
+	virtual uint32_t RL(offs_t A) override;
+	virtual void WB(offs_t A, uint8_t V) override;
+	virtual void WW(offs_t A, uint16_t V) override;
+	virtual void WL(offs_t A, uint32_t V) override;
 
 	virtual void LDCMSR(const uint16_t opcode) override;
 	virtual void LDCSR(const uint16_t opcode) override;
@@ -184,9 +186,9 @@ private:
 	virtual void init_drc_frontend() override;
 	virtual const opcode_desc* get_desclist(offs_t pc) override;
 
-	virtual void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception) override;
+	virtual void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception) override;
 	virtual void static_generate_entry_point() override;
-	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
+	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle *&handleptr) override;
 
 };
 

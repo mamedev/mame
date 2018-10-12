@@ -47,49 +47,56 @@ public:
 		, m_p_ram(*this, "ram")
 		, m_keyboard(*this, "X%u", 0)
 		, m_clock(*this, "uart_clock")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void selz80(machine_config &config);
+	void dagz80(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 	DECLARE_MACHINE_RESET(dagz80);
 	DECLARE_MACHINE_RESET(selz80);
 
-	void selz80(machine_config &config);
-	void dagz80(machine_config &config);
 	void dagz80_mem(address_map &map);
 	void selz80_io(address_map &map);
 	void selz80_mem(address_map &map);
-private:
+
 	uint8_t m_digit;
 	void setup_baud();
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_p_ram;
 	required_ioport_array<4> m_keyboard;
 	required_device<clock_device> m_clock;
+	output_finder<8> m_digits;
+	virtual void machine_start() override;
 };
 
-ADDRESS_MAP_START(selz80_state::dagz80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void selz80_state::dagz80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).ram().share("ram");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(selz80_state::selz80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x27ff) AM_RAM // all 3 RAM sockets filled
+void selz80_state::selz80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x27ff).ram(); // all 3 RAM sockets filled
 	// AM_RANGE(0x3000, 0x37ff) AM_ROM  // empty socket for ROM
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xa000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(selz80_state::selz80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("i8279", i8279_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void selz80_state::selz80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( selz80 )
@@ -190,7 +197,8 @@ WRITE8_MEMBER( selz80_state::scanlines_w )
 
 WRITE8_MEMBER( selz80_state::digit_w )
 {
-	output().set_digit_value(m_digit, bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4));
+	if (m_digit < 8)
+		m_digits[m_digit] = bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4);
 }
 
 READ8_MEMBER( selz80_state::kbd_r )
@@ -203,43 +211,48 @@ READ8_MEMBER( selz80_state::kbd_r )
 	return data;
 }
 
+void selz80_state::machine_start()
+{
+	m_digits.resolve();
+}
+
 MACHINE_CONFIG_START(selz80_state::selz80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
-	MCFG_CPU_PROGRAM_MAP(selz80_mem)
-	MCFG_CPU_IO_MAP(selz80_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
+	MCFG_DEVICE_PROGRAM_MAP(selz80_mem)
+	MCFG_DEVICE_IO_MAP(selz80_io)
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_selz80)
+	config.set_default_layout(layout_selz80);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	CLOCK(config, m_clock, 153600);
+	m_clock->signal_handler().set("uart", FUNC(i8251_device::write_txc));
+	m_clock->signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	i8251_device &uart(I8251(config, "uart", 0));
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 
-	MCFG_DEVICE_ADD("i8279", I8279, 5000000 / 2) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(selz80_state, scanlines_w))         // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(selz80_state, digit_w))           // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(selz80_state, kbd_r))                 // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	i8279_device &kbdc(I8279(config, "i8279", 5000000 / 2)); // based on divider
+	kbdc.out_sl_callback().set(FUNC(selz80_state::scanlines_w));    // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(selz80_state::digit_w));      // display A&B
+	kbdc.in_rl_callback().set(FUNC(selz80_state::kbd_r));           // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                       // Shift key
+	kbdc.in_ctrl_callback().set_constant(1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(selz80_state::dagz80)
 	selz80(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dagz80_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dagz80_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, dagz80 )
 MACHINE_CONFIG_END
 
@@ -248,9 +261,9 @@ MACHINE_CONFIG_END
 ROM_START( selz80 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v3.3", "V3.3")
-	ROMX_LOAD( "z80-trainer.rom", 0x0000, 0x1000, CRC(eed1755f) SHA1(72e6ebfccb0e50034660bc36db1a741932311ce1), ROM_BIOS(1)) // (c)TEL86/V3.3
+	ROMX_LOAD( "z80-trainer.rom", 0x0000, 0x1000, CRC(eed1755f) SHA1(72e6ebfccb0e50034660bc36db1a741932311ce1), ROM_BIOS(0)) // (c)TEL86/V3.3
 	ROM_SYSTEM_BIOS(1, "v3.2", "V3.2")
-	ROMX_LOAD( "moniz80_3.2_04.12.1985.bin", 0x0000, 0x1000, CRC(3a3cf574) SHA1(ba6cd2276ce66f3a4545baf4d396f6c06d51dc38), ROM_BIOS(2)) // (c)SEL85/V3.2
+	ROMX_LOAD( "moniz80_3.2_04.12.1985.bin", 0x0000, 0x1000, CRC(3a3cf574) SHA1(ba6cd2276ce66f3a4545baf4d396f6c06d51dc38), ROM_BIOS(1)) // (c)SEL85/V3.2
 	ROM_LOAD( "term80-a000.bin", 0xa000, 0x2000, CRC(0a58c0a7) SHA1(d1b4b3b2ad0d084175b1ff6966653d8b20025252))
 	ROM_LOAD( "term80-e000.bin", 0xe000, 0x2000, CRC(158e08e6) SHA1(f1add43bcf8744a01238fb893ee284872d434db5))
 ROM_END
@@ -263,6 +276,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY  FULLNAME           FLAGS
-COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, 0,    "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
-COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, selz80_state, 0,    "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME           FLAGS
+COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, empty_init, "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
+COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, selz80_state, empty_init, "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)

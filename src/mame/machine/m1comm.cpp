@@ -52,61 +52,81 @@ Notes:
 */
 
 #include "emu.h"
-#include "emuopts.h"
 #include "machine/m1comm.h"
+#include "emuopts.h"
 
-#define Z80_TAG     "m1commcpu"
-
-#define VERBOSE 0
-#include "logmacro.h"
+#define Z80_TAG     "commcpu"
 
 /*************************************
  *  M1COMM Memory Map
  *************************************/
-ADDRESS_MAP_START(m1comm_device::m1comm_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(share_r, share_w)
-ADDRESS_MAP_END
+void m1comm_device::m1comm_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xc000, 0xffff).mask(0x0fff).rw(FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+}
 
 /*************************************
  *  M1COMM I/O Map
  *************************************/
-ADDRESS_MAP_START(m1comm_device::m1comm_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(dlc_reg_r, dlc_reg_w)
-	AM_RANGE(0x20, 0x2f) AM_READWRITE(dma_reg_r, dma_reg_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(syn_r, syn_w)
-	AM_RANGE(0x60, 0x60) AM_READWRITE(zfg_r, zfg_w)
-	AM_RANGE(0xff, 0xff) AM_RAM
-ADDRESS_MAP_END
-
+void m1comm_device::m1comm_io(address_map &map)
+{
+	map.global_mask(0x7f);
+	map(0x00, 0x1f).rw(m_dlc, FUNC(mb89374_device::read), FUNC(mb89374_device::write));
+	map(0x20, 0x2f).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x40, 0x5f).mask(0x01).rw(FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
+	map(0x60, 0x7f).mask(0x01).rw(FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
+}
 
 ROM_START( m1comm )
 	ROM_REGION( 0x20000, Z80_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a) )
+	ROM_DEFAULT_BIOS("epr15112")
+
+	// found on Virtua Racing and WingWar
+	ROM_SYSTEM_BIOS( 0, "epr15112", "EPR-15112" )
+	ROMX_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a), ROM_BIOS(0) )
+
+	// found on Virtua Formula
+	ROM_SYSTEM_BIOS( 1, "epr15624", "EPR-15624" )
+	ROMX_LOAD( "epr-15624.17", 0x0000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a), ROM_BIOS(1) )
 ROM_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model 1 Communication Board")
+DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model-1 Communication Board")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(m1comm_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 8000000) /* 32 MHz / 4 */
-	MCFG_CPU_PROGRAM_MAP(m1comm_mem)
-	MCFG_CPU_IO_MAP(m1comm_io)
-MACHINE_CONFIG_END
+void m1comm_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_cpu, 8000000); // 32 MHz / 4
+	m_cpu->set_memory_map(&m1comm_device::m1comm_mem);
+	m_cpu->set_io_map(&m1comm_device::m1comm_io);
+
+	AM9517A(config, m_dma, 8000000); // 32 MHz / 4
+	m_dma->out_hreq_callback().set(FUNC(m1comm_device::dma_hreq_w));
+	m_dma->in_memr_callback().set(FUNC(m1comm_device::dma_mem_r));
+	m_dma->out_memw_callback().set(FUNC(m1comm_device::dma_mem_w));
+	m_dma->out_dack_callback<2>().set(m_dlc, FUNC(mb89374_device::pi3_w));
+	m_dma->out_dack_callback<3>().set(m_dlc, FUNC(mb89374_device::pi2_w));
+	m_dma->out_eop_callback().set(m_dlc, FUNC(mb89374_device::ci_w));
+	m_dma->in_ior_callback<2>().set(m_dlc, FUNC(mb89374_device::dma_r));
+	m_dma->out_iow_callback<3>().set(m_dlc, FUNC(mb89374_device::dma_w));
+
+	MB89374(config, m_dlc, 8000000); // 32 MHz / 4
+	m_dlc->out_po_callback<2>().set(m_dma, FUNC(am9517a_device::dreq3_w));
+	m_dlc->out_po_callback<3>().set(m_dma, FUNC(am9517a_device::dreq2_w));
+	m_dlc->out_irq_callback().set(FUNC(m1comm_device::dlc_int7_w));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
-
 const tiny_rom_entry *m1comm_device::device_rom_region() const
 {
 	return ROM_NAME( m1comm );
@@ -122,10 +142,11 @@ const tiny_rom_entry *m1comm_device::device_rom_region() const
 
 m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M1COMM, tag, owner, clock),
-	m_commcpu(*this, Z80_TAG),
-	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
-	m_line_tx(OPEN_FLAG_READ)
+	m_cpu(*this, Z80_TAG),
+	m_dma(*this, "commdma"),
+	m_dlc(*this, "commdlc")
 {
+#ifdef M1COMM_SIMULATION
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
 	strcat(m_localhost, "socket.");
@@ -139,6 +160,9 @@ m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, dev
 	strcat(m_remotehost, mconfig.options().comm_remotehost());
 	strcat(m_remotehost, ":");
 	strcat(m_remotehost, mconfig.options().comm_remoteport());
+
+	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
+#endif
 }
 
 //-------------------------------------------------
@@ -159,81 +183,53 @@ void m1comm_device::device_reset()
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
-
-	m_commcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-READ8_MEMBER(m1comm_device::dlc_reg_r)
+void m1comm_device::device_reset_after_children()
 {
-	// dirty hack to keep Z80 in RESET state
-	if (!m_cn)
-	{
-		device_reset();
-		return 0xff;
-	}
-	// dirty hack to keep Z80 in RESET state
-
-	uint8_t result = m_dlc_reg[offset];
-	LOG("m1comm-dlc_reg_r: read register %02x for value %02x\n", offset, result);
-	return result;
+	m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dma->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dlc->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(m1comm_device::dlc_reg_w)
+WRITE_LINE_MEMBER(m1comm_device::dma_hreq_w)
 {
-	m_dlc_reg[offset] = data;
-	LOG("m1comm-dlc_reg_w: write register %02x for value %02x\n", offset, data);
+	m_cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_dma->hack_w(state);
 }
 
-READ8_MEMBER(m1comm_device::dma_reg_r)
+READ8_MEMBER(m1comm_device::dma_mem_r)
 {
-	uint8_t result = m_dma_reg[offset];
-	LOG("m1comm-dma_reg_r: read register %02x for value %02x\n", offset, result);
-	return result;
+	return m_cpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(m1comm_device::dma_reg_w)
+WRITE8_MEMBER(m1comm_device::dma_mem_w)
 {
-	LOG("m1comm-dma_reg_w: %02x %02x\n", offset, data);
-	m_dma_reg[offset] = data;
+	m_cpu->space(AS_PROGRAM).write_byte(offset, data);
+}
+
+WRITE_LINE_MEMBER(m1comm_device::dlc_int7_w)
+{
+	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
 READ8_MEMBER(m1comm_device::syn_r)
 {
-	uint8_t result = m_syn | 0xfc;
-	LOG("m1comm-syn_r: read register %02x for value %02x\n", offset, result);
-	return result;
+	return m_syn | 0xfc;
 }
 
 WRITE8_MEMBER(m1comm_device::syn_w)
 {
 	m_syn = data & 0x03;
-
-	switch (data & 0x02)
-	{
-	case 0x00:
-		LOG("m1comm-syn_w: VINT disabled\n");
-		break;
-
-	case 0x02:
-		LOG("m1comm-syn_w: VINT enabled\n");
-		break;
-
-	default:
-		LOG("m1comm-syn_w: %02x\n", data);
-		break;
-	}
 }
 
 READ8_MEMBER(m1comm_device::zfg_r)
 {
-	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
-	LOG("m1comm-zfg_r: read register %02x for value %02x\n", offset, result);
-	return result;
+	return m_zfg | (~m_fg << 7) | 0x7e;
 }
 
 WRITE8_MEMBER(m1comm_device::zfg_w)
 {
-	LOG("m1comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
@@ -258,9 +254,16 @@ WRITE8_MEMBER(m1comm_device::cn_w)
 
 #ifndef M1COMM_SIMULATION
 	if (!m_cn)
+	{
 		device_reset();
+		device_reset_after_children();
+	}
 	else
-		m_commcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	{
+		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dma->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dlc->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
 #else
 	if (!m_cn)
 	{
@@ -300,8 +303,7 @@ void m1comm_device::check_vint_irq()
 #ifndef M1COMM_SIMULATION
 	if (m_syn & 0x02)
 	{
-		m_commcpu->set_input_line_and_vector(0, HOLD_LINE, 0xef);
-		LOG("m1comm-INT5\n");
+		m_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xef);
 	}
 #else
 	comm_tick();
@@ -317,7 +319,6 @@ void m1comm_device::comm_tick()
 		int frameOffset = 0x0000;
 		int frameSize = 0x01c4;
 		int dataSize = frameSize + 1;
-		int togo = 0;
 		int recv = 0;
 		int idx = 0;
 
@@ -325,120 +326,77 @@ void m1comm_device::comm_tick()
 		bool isSlave = (m_shared[1] == 0x02);
 		bool isRelay = (m_shared[1] == 0x00);
 
-		// if link not yet established...
-		if (m_linkalive == 0x00)
+		if (m_linkalive == 0x02)
 		{
-			// waiting...
+			// link failed...
+			m_shared[0] = 0xff;
+			return;
+		}
+		else if (m_linkalive == 0x00)
+		{
+			// link not yet established...
 			m_shared[0] = 0x05;
 
 			// check rx socket
-			if (!m_line_rx.is_open())
+			if (!m_line_rx)
 			{
 				osd_printf_verbose("M1COMM: listen on %s\n", m_localhost);
-				m_line_rx.open(m_localhost);
+				uint64_t filesize; // unused
+				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 			}
 
 			// check tx socket
-			if (!m_line_tx.is_open())
+			if (!m_line_tx)
 			{
 				osd_printf_verbose("M1COMM: connect to %s\n", m_remotehost);
-				m_line_tx.open(m_remotehost);
+				uint64_t filesize; // unused
+				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 			}
 
 			// if both sockets are there check ring
-			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
+			if (m_line_rx && m_line_tx)
 			{
-				// try to read one messages
-				recv = m_line_rx.read(m_buffer, dataSize);
-				while (recv != 0)
+				// try to read one message
+				recv = read_frame(dataSize);
+				while (recv > 0)
 				{
-					// check if complete message
-					if (recv == dataSize)
-					{
-						// check if message id
-						idx = m_buffer[0];
+					// check message id
+					idx = m_buffer0[0];
 
-						// 0xFF - link id
-						if (idx == 0xff)
+					// 0xFF - link id
+					if (idx == 0xff)
+					{
+						if (isMaster)
 						{
-							if (isMaster)
-							{
-								// master gets first id and starts next state
-								m_linkid = 0x01;
-								m_linkcount = m_buffer[1];
-								m_linktimer = 0x01;
-							}
-							else if (isSlave || isRelay)
-							{
-								// slave gets own id
-								if (isSlave)
-								{
-									m_buffer[1]++;
-									m_linkid = m_buffer[1];
-								}
-
-								// slave and relay forward message
-								m_line_tx.write(m_buffer, dataSize);
-							}
+							// master gets first id and starts next state
+							m_linkid = 0x01;
+							m_linkcount = m_buffer0[1];
+							m_linktimer = 0x00;
 						}
-
-						// 0xFE - link size
-						else if (idx == 0xfe)
+						else
 						{
-							if (isSlave || isRelay)
+							// slave get own id, relay does nothing
+							if (isSlave)
 							{
-								m_linkcount = m_buffer[1];
-
-								// slave and relay forward message
-								m_line_tx.write(m_buffer, dataSize);
+								m_buffer0[1]++;
+								m_linkid = m_buffer0[1];
 							}
 
-							// consider it done
-							osd_printf_verbose("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
-							m_linkalive = 0x01;
-							m_zfg = 0x01;
-
-							// write to shared mem
-							m_shared[0] = 0x01;
-							m_shared[2] = m_linkid;
-							m_shared[3] = m_linkcount;
+							// forward message to other nodes
+							send_frame(dataSize);
 						}
 					}
-					else
+
+					// 0xFE - link size
+					else if (idx == 0xfe)
 					{
-						// got only part of a message - read the rest (and drop it)
-						// TODO: combine parts and push to "ring buffer"
-						togo = dataSize - recv;
-						while (togo > 0){
-							recv = m_line_rx.read(m_buffer, togo);
-							togo -= recv;
+						if (isSlave || isRelay)
+						{
+							m_linkcount = m_buffer0[1];
+
+							// forward message to other nodes
+							send_frame(dataSize);
 						}
-						osd_printf_verbose("M1COMM: dropped a message...\n");
-					}
-
-					if (m_linkalive == 0x00)
-						recv = m_line_rx.read(m_buffer, dataSize);
-					else
-						recv = 0;
-				}
-
-				// if we are master and link is not yet established
-				if (isMaster && (m_linkalive == 0x00))
-				{
-					// send first packet
-					if (m_linktimer == 0x00)
-					{
-						m_buffer[0] = 0xff;
-						m_buffer[1] = 0x01;
-						m_line_tx.write(m_buffer, dataSize);
-					}
-
-					// send second packet
-					else if (m_linktimer == 0x01)
-					{
-						m_buffer[0] = 0xfe;
-						m_buffer[1] = m_linkcount;
-						m_line_tx.write(m_buffer, dataSize);
 
 						// consider it done
 						osd_printf_verbose("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
@@ -451,103 +409,232 @@ void m1comm_device::comm_tick()
 						m_shared[3] = m_linkcount;
 					}
 
-					else if (m_linktimer > 0x02)
+
+					if (m_linkalive == 0x00)
+						recv = read_frame(dataSize);
+					else
+						recv = 0;
+				}
+
+				// if we are master and link is not yet established
+				if (isMaster && (m_linkalive == 0x00))
+				{
+					// send first packet
+					if (m_linktimer == 0x01)
+					{
+						m_buffer0[0] = 0xff;
+						m_buffer0[1] = 0x01;
+						send_frame(dataSize);
+					}
+
+					// send second packet
+					else if (m_linktimer == 0x00)
+					{
+						m_buffer0[0] = 0xfe;
+						m_buffer0[1] = m_linkcount;
+						send_frame(dataSize);
+
+						// consider it done
+						osd_printf_verbose("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						m_linkalive = 0x01;
+						m_zfg = 0x01;
+
+						// write to shared mem
+						m_shared[0] = 0x01;
+						m_shared[2] = m_linkid;
+						m_shared[3] = m_linkcount;
+					}
+
+					else if (m_linktimer > 0x01)
 					{
 						// decrease delay timer
 						m_linktimer--;
-						if (m_linktimer == 0x02)
-							m_linktimer = 0x00;
 					}
 				}
 			}
 		}
 
-		// update "ring buffer" if link established
 		if (m_linkalive == 0x01)
 		{
-			int togo = 0;
-			// try to read one messages
-			int recv = m_line_rx.read(m_buffer, dataSize);
-			while (recv != 0)
+			// link established
+			do
 			{
-				// check if complete message
-				if (recv == dataSize)
+				// try to read a message
+				recv = read_frame(dataSize);
+				while (recv > 0)
 				{
 					// check if valid id
-					int idx = m_buffer[0];
-					if (idx > 0 && idx <= m_linkcount) {
-						// if not our own message
+					idx = m_buffer0[0];
+					if (idx > 0 && idx <= m_linkcount)
+					{
+						// if not own message
 						if (idx != m_linkid)
 						{
 							// save message to "ring buffer"
 							frameOffset = frameStart + (idx * frameSize);
 							for (int j = 0x00 ; j < frameSize ; j++)
 							{
-								m_shared[frameOffset + j] = m_buffer[1 + j];
+								m_shared[frameOffset + j] = m_buffer0[1 + j];
 							}
 
 							// forward message to other nodes
-							m_line_tx.write(m_buffer, dataSize);
+							send_frame(dataSize);
 						}
-					} else {
-						if (!isMaster && idx == 0xf0){
-							// 0xF0 - master addional bytes
-							for (int j = 0x06 ; j < 0x10 ; j++)
+					}
+					else
+					{
+						if (idx == 0xfc)
+						{
+							// 0xFC - VSYNC
+							m_linktimer = 0x00;
+							if (!isMaster)
+								// forward message to other nodes
+								send_frame(dataSize);
+						}
+						if (idx == 0xfd)
+						{
+							// 0xFD - master addional bytes
+							if (!isMaster)
 							{
-								m_shared[j] = m_buffer[1 + j];
-							}
+								// save message to "ring buffer"
+								frameOffset = 0x06;
+								for (int j = 0x00 ; j < 0x0a ; j++)
+								{
+									m_shared[frameOffset + j] = m_buffer0[1 + j];
+								}
 
-							// forward message to other nodes
-							m_line_tx.write(m_buffer, dataSize);
+								// forward message to other nodes
+								send_frame(dataSize);
+							}
 						}
 					}
+
+					// try to read another message
+					recv = read_frame(dataSize);
 				}
-				else
-				{
-					// got only part of a message - read the rest (and drop it)
-					// TODO: combine parts and push to "ring buffer"
-					togo = dataSize - recv;
-					while (togo > 0){
-						recv = m_line_rx.read(m_buffer, togo);
-						togo -= recv;
-					}
-					osd_printf_verbose("M1COMM: dropped a message...\n");
-				}
-				recv = m_line_rx.read(m_buffer, dataSize);
 			}
+			while (m_linktimer == 0x01);
+
+			// enable wait for vsync
+			m_linktimer = m_framesync;
 
 			// update "ring buffer" if link established
 			// live relay does not send data
-			if (m_linkid != 0x00 && m_shared[5] != 0x00)
+			if (m_linkid != 0x00)
 			{
-				m_buffer[0] = m_linkid;
-				frameOffset = frameStart + (m_linkid * frameSize);
-				for (int j = 0x00 ; j < frameSize ; j++)
+				// check ready-to-send flag
+				if (m_shared[4] != 0x00)
 				{
-					// push message to "ring buffer"
-					m_shared[frameOffset + j] = m_shared[frameStart + j];
-					m_buffer[1 + j] = m_shared[frameStart + j];
-				}
-				// push message to other nodes
-				m_line_tx.write(m_buffer, dataSize);
+					send_data(m_linkid, frameStart, frameSize, dataSize);
 
-				// master sends some additional status bytes
-				if (isMaster){
-					m_buffer[0] = 0xf0;
+					// save message to "ring buffer"
+					frameOffset = frameStart + (m_linkid * frameSize);
 					for (int j = 0x00 ; j < frameSize ; j++)
 					{
-						m_buffer[1 + j] = 0x00;
+						m_shared[frameOffset + j] = m_buffer0[1 + j];
 					}
-					for (int j = 0x06 ; j < 0x10 ; j++)
-					{
-						m_buffer[1 + j] = m_shared[j];
-					}
-					// push message to other nodes
-					m_line_tx.write(m_buffer, dataSize);
+				}
+
+				if (isMaster)
+				{
+					// master sends additional status bytes
+					send_data(0xfd, 0x06, 0x0a, dataSize);
+
+					// send vsync
+					m_buffer0[0] = 0xfc;
+					m_buffer0[1] = 0x01;
+					send_frame(dataSize);
 				}
 			}
+
 			// clear 05
 			m_shared[5] = 0x00;
+		}
+	}
+}
+
+int m1comm_device::read_frame(int dataSize)
+{
+	if (!m_line_rx)
+		return 0;
+
+	// try to read a message
+	std::uint32_t recv = 0;
+	osd_file::error filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
+	if (recv > 0)
+	{
+		// check if message complete
+		if (recv != dataSize)
+		{
+			// only part of a message - read on
+			std::uint32_t togo = dataSize - recv;
+			int offset = recv;
+			while (togo > 0)
+			{
+				filerr = m_line_rx->read(m_buffer1, 0, togo, recv);
+				if (recv > 0)
+				{
+					for (int i = 0 ; i < recv ; i++)
+					{
+						m_buffer0[offset + i] = m_buffer1[i];
+					}
+					togo -= recv;
+					offset += recv;
+				}
+				else if (filerr == osd_file::error::NONE && recv == 0)
+				{
+					togo = 0;
+				}
+			}
+		}
+	}
+	else if (filerr == osd_file::error::NONE && recv == 0)
+	{
+		if (m_linkalive == 0x01)
+		{
+			osd_printf_verbose("M1COMM: rx connection lost\n");
+			m_linkalive = 0x02;
+			m_linktimer = 0x00;
+
+			m_shared[0] = 0xff;
+
+			m_line_rx.reset();
+			m_line_tx.reset();
+		}
+	}
+	return recv;
+}
+
+void m1comm_device::send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize)
+{
+	m_buffer0[0] = frameType;
+	for (int i = 0x00 ; i < frameSize ; i++)
+	{
+		m_buffer0[1 + i] = m_shared[frameStart + i];
+	}
+	send_frame(dataSize);
+}
+
+void m1comm_device::send_frame(int dataSize){
+	if (!m_line_tx)
+		return;
+
+	osd_file::error filerr;
+	std::uint32_t written;
+
+	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
+	if (filerr != osd_file::error::NONE)
+	{
+		if (m_linkalive == 0x01)
+		{
+			osd_printf_verbose("M1COMM: tx connection lost\n");
+			m_linkalive = 0x02;
+			m_linktimer = 0x00;
+
+			m_shared[0] = 0xff;
+
+			m_line_rx.reset();
+			m_line_tx.reset();
 		}
 	}
 }

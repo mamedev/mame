@@ -12,16 +12,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_IREMGA20_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, IREMGA20, _clock)
-#define MCFG_IREMGA20_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, IREMGA20, _clock)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -29,7 +19,8 @@
 // ======================> iremga20_device
 
 class iremga20_device : public device_t,
-						public device_sound_interface
+						public device_sound_interface,
+						public device_rom_interface
 {
 public:
 	iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -41,30 +32,27 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
 
 private:
 	struct channel_def
 	{
 		uint32_t rate;
-		uint32_t size;
-		uint32_t start;
 		uint32_t pos;
-		uint32_t frac;
+		uint32_t counter;
 		uint32_t end;
 		uint32_t volume;
-		uint32_t pan;
-		uint32_t effect;
 		uint32_t play;
 	};
 
-	void iremga20_reset();
-
-	required_region_ptr<uint8_t> m_rom;
 	sound_stream *m_stream;
-	uint16_t m_regs[0x40];
+	uint8_t m_regs[0x20];
 	channel_def m_channel[4];
 };
 

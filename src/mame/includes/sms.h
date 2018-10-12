@@ -58,17 +58,113 @@ public:
 		m_led_pwr(*this, "led_pwr"),
 		m_region_maincpu(*this, "maincpu"),
 		m_mainram(nullptr),
-		m_is_gamegear(0),
-		m_is_smsj(0),
-		m_is_mark_iii(0),
-		m_is_sdisp(0),
-		m_ioctrl_region_is_japan(0),
-		m_has_bios_0400(0),
-		m_has_bios_2000(0),
-		m_has_bios_full(0),
-		m_has_jpn_sms_cart_slot(0),
-		m_store_cart_selection_data(0)
+		m_left_lcd(*this, "left_lcd"),
+		m_right_lcd(*this, "right_lcd"),
+		m_is_gamegear(false),
+		m_is_smsj(false),
+		m_is_mark_iii(false),
+		m_is_sdisp(false),
+		m_ioctrl_region_is_japan(false),
+		m_has_bios_0400(false),
+		m_has_bios_2000(false),
+		m_has_bios_full(false),
+		m_has_jpn_sms_cart_slot(false),
+		m_has_pwr_led(false),
+		m_store_cart_selection_data(false)
 	{ }
+
+	void sms_base(machine_config &config);
+	void sms_ntsc_base(machine_config &config);
+	void sms_pal_base(machine_config &config);
+	void sms_paln_base(machine_config &config);
+	void sms_br_base(machine_config &config);
+	void sms3_br(machine_config &config);
+	void sg1000m3(machine_config &config);
+	void smsj(machine_config &config);
+	void sms1_paln(machine_config &config);
+	void sms1_ntsc(machine_config &config);
+	void gamegear(machine_config &config);
+	void gamegeaj(machine_config &config);
+	void sms3_paln(machine_config &config);
+	void sms1_pal(machine_config &config);
+	void sms2_pal(machine_config &config);
+	void sms2_kr(machine_config &config);
+	void sms1_br(machine_config &config);
+	void sms2_ntsc(machine_config &config);
+	void sms1_kr(machine_config &config);
+
+	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
+
+	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+protected:
+	void store_post_load();
+	void store_select_cart(uint8_t data);
+
+	DECLARE_READ8_MEMBER(read_0000);
+	DECLARE_READ8_MEMBER(read_4000);
+	DECLARE_READ8_MEMBER(read_8000);
+	DECLARE_READ8_MEMBER(read_ram);
+	DECLARE_WRITE8_MEMBER(write_ram);
+	DECLARE_WRITE8_MEMBER(write_cart);
+
+	DECLARE_READ8_MEMBER(sms_mapper_r);
+	DECLARE_WRITE8_MEMBER(sms_mapper_w);
+	DECLARE_WRITE8_MEMBER(sms_mem_control_w);
+	DECLARE_WRITE8_MEMBER(sms_io_control_w);
+	DECLARE_READ8_MEMBER(sms_count_r);
+	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
+	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
+	DECLARE_READ8_MEMBER(gg_input_port_00_r);
+	DECLARE_READ8_MEMBER(sg1000m3_peripheral_r);
+	DECLARE_WRITE8_MEMBER(sg1000m3_peripheral_w);
+	DECLARE_READ8_MEMBER(gg_sio_r);
+	DECLARE_WRITE8_MEMBER(gg_sio_w);
+	DECLARE_WRITE8_MEMBER(gg_psg_stereo_w);
+	DECLARE_WRITE8_MEMBER(gg_psg_w);
+	DECLARE_WRITE8_MEMBER(sms_psg_w);
+	DECLARE_READ8_MEMBER(smsj_audio_control_r);
+	DECLARE_WRITE8_MEMBER(smsj_audio_control_w);
+	DECLARE_WRITE8_MEMBER(smsj_ym2413_register_port_w);
+	DECLARE_WRITE8_MEMBER(smsj_ym2413_data_port_w);
+	DECLARE_READ8_MEMBER(sms_sscope_r);
+	DECLARE_WRITE8_MEMBER(sms_sscope_w);
+
+	DECLARE_WRITE_LINE_MEMBER(sms_csync_callback);
+	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
+	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
+	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
+	DECLARE_READ32_MEMBER(sms_pixel_color);
+
+	DECLARE_VIDEO_START(gamegear);
+	DECLARE_VIDEO_RESET(gamegear);
+	DECLARE_VIDEO_START(sms1);
+	DECLARE_VIDEO_RESET(sms1);
+
+	uint32_t screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sms1_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sms1_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sms1);
+
+	void gg_io(address_map &map);
+	void sg1000m3_io(address_map &map);
+	void sms1_mem(address_map &map);
+	void sms_io(address_map &map);
+	void sms_mem(address_map &map);
+	void smsj_io(address_map &map);
+	void smskr_io(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint8_t read_bus(address_space &space, unsigned int bank, uint16_t base_addr, uint16_t offset);
+	void setup_bios();
+	void setup_media_slots();
+	void setup_enabled_slots();
+	void lphaser_hcount_latch();
+	void sms_get_inputs();
+	void smsj_set_audio_control(uint8_t data);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -98,8 +194,8 @@ public:
 	uint8_t *m_BIOS;
 
 	// for 3D glass binocular hack
-	device_t *m_left_lcd;
-	device_t *m_right_lcd;
+	optional_device<screen_device> m_left_lcd;
+	optional_device<screen_device> m_right_lcd;
 	bitmap_rgb32 m_prevleft_bitmap;
 	bitmap_rgb32 m_prevright_bitmap;
 
@@ -114,15 +210,16 @@ public:
 	std::unique_ptr<int[]> m_line_buffer;
 
 	// model identifiers
-	uint8_t m_is_gamegear;
-	uint8_t m_is_smsj;
-	uint8_t m_is_mark_iii;
-	uint8_t m_is_sdisp;
-	uint8_t m_ioctrl_region_is_japan;
-	uint8_t m_has_bios_0400;
-	uint8_t m_has_bios_2000;
-	uint8_t m_has_bios_full;
-	uint8_t m_has_jpn_sms_cart_slot;
+	bool m_is_gamegear;
+	bool m_is_smsj;
+	bool m_is_mark_iii;
+	bool m_is_sdisp;
+	bool m_ioctrl_region_is_japan;
+	bool m_has_bios_0400;
+	bool m_has_bios_2000;
+	bool m_has_bios_full;
+	bool m_has_jpn_sms_cart_slot;
+	bool m_has_pwr_led;
 
 	// [0] for 0x400-0x3fff, [1] for 0x4000-0x7fff, [2] for 0x8000-0xffff, [3] for 0x0000-0x0400
 	uint8_t m_bios_page[4];
@@ -168,100 +265,6 @@ public:
 	sega8_card_slot_device *m_cards[16];
 	uint8_t m_store_control;
 	uint8_t m_store_cart_selection_data;
-	void store_post_load();
-	void store_select_cart(uint8_t data);
-
-	DECLARE_READ8_MEMBER(read_0000);
-	DECLARE_READ8_MEMBER(read_4000);
-	DECLARE_READ8_MEMBER(read_8000);
-	DECLARE_READ8_MEMBER(read_ram);
-	DECLARE_WRITE8_MEMBER(write_ram);
-	DECLARE_WRITE8_MEMBER(write_cart);
-
-	DECLARE_READ8_MEMBER(sms_mapper_r);
-	DECLARE_WRITE8_MEMBER(sms_mapper_w);
-	DECLARE_WRITE8_MEMBER(sms_mem_control_w);
-	DECLARE_WRITE8_MEMBER(sms_io_control_w);
-	DECLARE_READ8_MEMBER(sms_count_r);
-	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
-	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
-	DECLARE_READ8_MEMBER(gg_input_port_00_r);
-	DECLARE_READ8_MEMBER(sg1000m3_peripheral_r);
-	DECLARE_WRITE8_MEMBER(sg1000m3_peripheral_w);
-	DECLARE_READ8_MEMBER(gg_sio_r);
-	DECLARE_WRITE8_MEMBER(gg_sio_w);
-	DECLARE_WRITE8_MEMBER(gg_psg_stereo_w);
-	DECLARE_WRITE8_MEMBER(gg_psg_w);
-	DECLARE_WRITE8_MEMBER(sms_psg_w);
-	DECLARE_READ8_MEMBER(smsj_audio_control_r);
-	DECLARE_WRITE8_MEMBER(smsj_audio_control_w);
-	DECLARE_WRITE8_MEMBER(smsj_ym2413_register_port_w);
-	DECLARE_WRITE8_MEMBER(smsj_ym2413_data_port_w);
-	DECLARE_READ8_MEMBER(sms_sscope_r);
-	DECLARE_WRITE8_MEMBER(sms_sscope_w);
-
-	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
-	DECLARE_WRITE_LINE_MEMBER(sms_csync_callback);
-	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
-	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
-	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
-	DECLARE_READ32_MEMBER(sms_pixel_color);
-
-	DECLARE_DRIVER_INIT(sg1000m3);
-	DECLARE_DRIVER_INIT(gamegear);
-	DECLARE_DRIVER_INIT(gamegeaj);
-	DECLARE_DRIVER_INIT(sms1krfm);
-	DECLARE_DRIVER_INIT(sms1kr);
-	DECLARE_DRIVER_INIT(smskr);
-	DECLARE_DRIVER_INIT(smsj);
-	DECLARE_DRIVER_INIT(sms1);
-	DECLARE_DRIVER_INIT(sms);
-	DECLARE_MACHINE_START(sms);
-	DECLARE_MACHINE_RESET(sms);
-	DECLARE_VIDEO_START(gamegear);
-	DECLARE_VIDEO_RESET(gamegear);
-	DECLARE_VIDEO_START(sms1);
-	DECLARE_VIDEO_RESET(sms1);
-
-	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sms1);
-
-	void sms_base(machine_config &config);
-	void sms_ntsc_base(machine_config &config);
-	void sms_pal_base(machine_config &config);
-	void sms_paln_base(machine_config &config);
-	void sms_br_base(machine_config &config);
-	void sms3_br(machine_config &config);
-	void sg1000m3(machine_config &config);
-	void smsj(machine_config &config);
-	void sms1_paln(machine_config &config);
-	void sms1_ntsc(machine_config &config);
-	void gamegear(machine_config &config);
-	void sms3_paln(machine_config &config);
-	void sms1_pal(machine_config &config);
-	void sms2_pal(machine_config &config);
-	void sms2_kr(machine_config &config);
-	void sms1_br(machine_config &config);
-	void sms2_ntsc(machine_config &config);
-	void sms1_kr(machine_config &config);
-	void gg_io(address_map &map);
-	void sg1000m3_io(address_map &map);
-	void sms1_mem(address_map &map);
-	void sms_io(address_map &map);
-	void sms_mem(address_map &map);
-	void smsj_io(address_map &map);
-	void smskr_io(address_map &map);
-protected:
-	uint8_t read_bus(address_space &space, unsigned int bank, uint16_t base_addr, uint16_t offset);
-	void setup_bios();
-	void setup_media_slots();
-	void setup_enabled_slots();
-	void lphaser_hcount_latch();
-	void sms_get_inputs();
-	void smsj_set_audio_control(uint8_t data);
 };
 
 class smssdisp_state : public sms_state
@@ -277,7 +280,7 @@ public:
 	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
 	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);
 	DECLARE_WRITE8_MEMBER(sms_store_control_w);
-	DECLARE_DRIVER_INIT(smssdisp);
+	void init_smssdisp();
 
 	DECLARE_READ8_MEMBER(store_cart_peek);
 

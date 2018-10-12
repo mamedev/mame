@@ -11,6 +11,7 @@
 
 #include "video/crt.h"
 #include "cpu/pdp1/tx0.h"
+#include "emupal.h"
 
 enum state_t
 {
@@ -142,11 +143,22 @@ public:
 		m_twr(*this, "TWR.%u", 0)
 	{ }
 
+	void tx0_64kw(machine_config &config);
+	void tx0_8kw(machine_config &config);
+
+	void init_tx0();
+
+	required_device<tx0_device> m_maincpu;
 	tx0_tape_reader_t m_tape_reader;
 	tape_puncher_t m_tape_puncher;
 	tx0_typewriter_t m_typewriter;
 	emu_timer *m_dis_timer;
 	magtape_t m_magtape;
+
+	void schedule_select();
+	void schedule_unselect();
+
+protected:
 	int m_old_typewriter_keys[4];
 	int m_old_control_keys;
 	int m_old_tsr_keys;
@@ -156,7 +168,6 @@ public:
 	bitmap_ind16 m_typewriter_bitmap;
 	int m_pos;
 	int m_case_shift;
-	DECLARE_DRIVER_INIT(tx0);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -169,7 +180,6 @@ public:
 	TIMER_CALLBACK_MEMBER(prt_callback);
 	TIMER_CALLBACK_MEMBER(dis_callback);
 	void tx0_machine_stop();
-	required_device<tx0_device> m_maincpu;
 	inline void tx0_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void tx0_plot(int x, int y);
 	void tx0_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
@@ -187,8 +197,7 @@ public:
 	void tape_write(uint8_t data);
 	void begin_tape_read(int binary);
 	void typewriter_out(uint8_t data);
-	void schedule_select();
-	void schedule_unselect();
+
 	void tx0_keyboard();
 	DECLARE_WRITE_LINE_MEMBER(tx0_io_cpy);
 	DECLARE_WRITE_LINE_MEMBER(tx0_io_r1l);
@@ -201,11 +210,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tx0_io_reset_callback);
 	void magtape_callback();
 
-	void tx0_64kw(machine_config &config);
-	void tx0_8kw(machine_config &config);
 	void tx0_64kw_map(address_map &map);
 	void tx0_8kw_map(address_map &map);
-private:
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<crt_device> m_crt;

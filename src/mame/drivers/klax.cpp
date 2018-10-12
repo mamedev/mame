@@ -79,39 +79,41 @@ void klax_state::machine_reset()
  *
  *************************************/
 
-ADDRESS_MAP_START(klax_state::klax_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1") AM_WRITE(klax_latch_w)
-	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("P2")
-	AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x2e0000, 0x2e0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(interrupt_ack_w)
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0xff00) AM_SHARE("palette")
-	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0x3f0f80, 0x3f0fff) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0x3f1000, 0x3f1fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16_ext) AM_SHARE("playfield_ext")
-	AM_RANGE(0x3f2000, 0x3f27ff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
-ADDRESS_MAP_END
+void klax_state::klax_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_state::klax_latch_w));
+	map(0x260002, 0x260003).portr("P2");
+	map(0x270001, 0x270001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x360000, 0x360001).w(FUNC(klax_state::interrupt_ack_w));
+	map(0x3e0000, 0x3e07ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
+	map(0x3f0000, 0x3f0f7f).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0x3f0f80, 0x3f0fff).ram().share("mob:slip");
+	map(0x3f1000, 0x3f1fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16_ext)).share("playfield_ext");
+	map(0x3f2000, 0x3f27ff).ram().share("mob");
+	map(0x3f2800, 0x3f3fff).ram();
+}
 
-ADDRESS_MAP_START(klax_state::klax2bl_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1") AM_WRITE(klax_latch_w)
-	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("P2")
+void klax_state::klax2bl_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_state::klax_latch_w));
+	map(0x260002, 0x260003).portr("P2");
 //  AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // no OKI here
-	AM_RANGE(0x2e0000, 0x2e0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(interrupt_ack_w)
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0xff00) AM_SHARE("palette")
-	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0x3f0f80, 0x3f0fff) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0x3f1000, 0x3f1fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16_ext) AM_SHARE("playfield_ext")
-	AM_RANGE(0x3f2000, 0x3f27ff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
-ADDRESS_MAP_END
+	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x360000, 0x360001).w(FUNC(klax_state::interrupt_ack_w));
+	map(0x3e0000, 0x3e07ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
+	map(0x3f0000, 0x3f0f7f).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0x3f0f80, 0x3f0fff).ram().share("mob:slip");
+	map(0x3f1000, 0x3f1fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16_ext)).share("playfield_ext");
+	map(0x3f2000, 0x3f27ff).ram().share("mob");
+	map(0x3f2800, 0x3f3fff).ram();
+}
 
 /*************************************
  *
@@ -163,7 +165,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( klax )
+static GFXDECODE_START( gfx_klax )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
@@ -179,7 +181,7 @@ static const gfx_layout bootleg_layout =
 	8*8
 };
 
-static GFXDECODE_START( klax2bl )
+static GFXDECODE_START( gfx_klax2bl )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_layout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
@@ -194,17 +196,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(klax_state::klax)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(klax_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", klax_state, video_int_gen)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(klax_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", klax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_klax)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -220,34 +220,36 @@ MACHINE_CONFIG_START(klax_state::klax)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(klax_state, screen_update_klax)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, klax_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/4, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, ATARI_CLOCK_14MHz/4/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(klax_state::bootleg_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void klax_state::bootleg_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 MACHINE_CONFIG_START(klax_state::klax2bl)
 	klax(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(klax2bl_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(klax2bl_map)
 
 	MCFG_DEVICE_REMOVE("oki") // no 6295 here
 
-	MCFG_CPU_ADD("audiocpu", Z80, 6000000) /* ? */
-	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 6000000) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", klax2bl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_klax2bl)
 
 	// guess, probably something like this
-	MCFG_SOUND_ADD("msm", MSM5205, 375000)    /* ? */
-//  MCFG_MSM5205_VCLK_CB(WRITELINE(klax_state, m5205_int1)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 375000)    /* ? */
+//  MCFG_MSM5205_VCLK_CB(WRITELINE(*this, klax_state, m5205_int1)) /* interrupt function */
 //  MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -438,10 +440,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, klax,  0,    klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (set 1)", 0 )
-GAME( 1989, klax2, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (set 2)", 0 )
-GAME( 1989, klax3, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (set 3)", 0 )
-GAME( 1989, klaxj, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (Japan)", 0 )
-GAME( 1989, klaxd, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (Germany)", 0 )
+GAME( 1989, klax,    0,    klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (set 1)", 0 )
+GAME( 1989, klax2,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (set 2)", 0 )
+GAME( 1989, klax3,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (set 3)", 0 )
+GAME( 1989, klaxj,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Japan)", 0 )
+GAME( 1989, klaxd,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Germany)", 0 )
 
-GAME( 1989, klax2bl, klax, klax2bl, klax, klax_state, 0, ROT0, "bootleg", "Klax (set 2, bootleg)", MACHINE_NOT_WORKING )
+GAME( 1989, klax2bl, klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (set 2, bootleg)", MACHINE_NOT_WORKING )

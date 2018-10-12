@@ -525,47 +525,50 @@ INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
  *
  *************************************/
 
-ADDRESS_MAP_START(m10_state::m10_main)
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
-	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_SHARE("rom")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_SHARE("colorram") /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(m10_chargen_w) AM_SHARE("chargen") /* background ????? */
-	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
-	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m10_ctrl_w)   /* line at bottom of screen?, sound, flip screen */
-	AM_RANGE(0xa500, 0xa500) AM_WRITE(m10_a500_w)   /* ??? */
-	AM_RANGE(0xa700, 0xa700) AM_READ(m10_a700_r)
-	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
-ADDRESS_MAP_END
+void m10_state::m10_main(address_map &map)
+{
+	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
+	map(0x1000, 0x2fff).rom().share("rom");
+	map(0x4000, 0x43ff).ram().share("videoram");
+	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x5000, 0x53ff).ram().w(FUNC(m10_state::m10_chargen_w)).share("chargen"); /* background ????? */
+	map(0xa200, 0xa200).portr("DSW");
+	map(0xa300, 0xa300).portr("INPUTS");
+	map(0xa400, 0xa400).w(FUNC(m10_state::m10_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
+	map(0xa500, 0xa500).w(FUNC(m10_state::m10_a500_w));   /* ??? */
+	map(0xa700, 0xa700).r(FUNC(m10_state::m10_a700_r));
+	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
+}
 
-ADDRESS_MAP_START(m10_state::m11_main)
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
-	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_SHARE("rom")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_SHARE("colorram") /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("chargen") /* background ????? */
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(m11_a100_w) /* sound writes ???? */
-	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
-	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m11_ctrl_w)   /* line at bottom of screen?, sound, flip screen */
-	AM_RANGE(0xa700, 0xa700) AM_READ(m11_a700_r)
-	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
-ADDRESS_MAP_END
+void m10_state::m11_main(address_map &map)
+{
+	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
+	map(0x1000, 0x2fff).rom().share("rom");
+	map(0x4000, 0x43ff).ram().share("videoram");
+	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x5000, 0x53ff).ram().share("chargen"); /* background ????? */
+	map(0xa100, 0xa100).w(FUNC(m10_state::m11_a100_w)); /* sound writes ???? */
+	map(0xa200, 0xa200).portr("DSW");
+	map(0xa300, 0xa300).portr("INPUTS");
+	map(0xa400, 0xa400).w(FUNC(m10_state::m11_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
+	map(0xa700, 0xa700).r(FUNC(m10_state::m11_a700_r));
+	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
+}
 
-ADDRESS_MAP_START(m10_state::m15_main)
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
-	AM_RANGE(0x1000, 0x33ff) AM_ROM AM_SHARE("rom")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_SHARE("colorram") /* foreground colour  */
-	AM_RANGE(0x5000, 0x57ff) AM_RAM_WRITE(m15_chargen_w) AM_SHARE("chargen") /* background ????? */
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2")
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(m15_a100_w) /* sound writes ???? */
-	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
-	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("P1")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m15_ctrl_w)   /* sound, flip screen */
-	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
-ADDRESS_MAP_END
+void m10_state::m15_main(address_map &map)
+{
+	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
+	map(0x1000, 0x33ff).rom().share("rom");
+	map(0x4000, 0x43ff).ram().share("videoram");
+	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x5000, 0x57ff).ram().w(FUNC(m10_state::m15_chargen_w)).share("chargen"); /* background ????? */
+	map(0xa000, 0xa000).portr("P2");
+	map(0xa100, 0xa100).w(FUNC(m10_state::m15_a100_w)); /* sound writes ???? */
+	map(0xa200, 0xa200).portr("DSW");
+	map(0xa300, 0xa300).portr("P1");
+	map(0xa400, 0xa400).w(FUNC(m10_state::m15_ctrl_w));   /* sound, flip screen */
+	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
+}
 
 /*************************************
  *
@@ -777,7 +780,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( m10 )
+static GFXDECODE_START( gfx_m10 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -812,13 +815,13 @@ static const char *const m10_sample_names[] =
 MACHINE_CONFIG_START(m10_state::m10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(m10_main)
+	MCFG_DEVICE_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(m10_main)
 
 	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
 	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", m10_state,  m10_interrupt)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m10_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -826,7 +829,7 @@ MACHINE_CONFIG_START(m10_state::m10)
 	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m10)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m10)
 	MCFG_PALETTE_ADD("palette", 2*8)
 
 	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
@@ -834,28 +837,29 @@ MACHINE_CONFIG_START(m10_state::m10)
 
 	/* 74LS123 */
 
-	MCFG_DEVICE_ADD("ic8j1", TTL74123, 0) /* completely illegible */
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_DIODE)    /* the hook up type */
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(1))               /* resistor connected to RCext */
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(1))               /* capacitor connected to Cext and RCext */
-	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
-	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(m10_state, ic8j1_output_changed))
-	MCFG_DEVICE_ADD("ic8j2", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_DIODE)    /* the hook up type */
+	TTL74123(config, m_ic8j1, 0); /* completely illegible */
+	m_ic8j1->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  /* the hook up type */
+	m_ic8j1->set_resistor_value(RES_K(1));                      /* resistor connected to RCext */
+	m_ic8j1->set_capacitor_value(CAP_U(1));                     /* capacitor connected to Cext and RCext */
+	m_ic8j1->set_a_pin_value(1);                                /* A pin - driven by the CRTC */
+	m_ic8j1->set_b_pin_value(1);                                /* B pin - pulled high */
+	m_ic8j1->set_clear_pin_value(1);                            /* Clear pin - pulled high */
+	m_ic8j1->out_cb().set(FUNC(m10_state::ic8j1_output_changed));
+
+	TTL74123(config, m_ic8j2, 0);
+	m_ic8j2->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  /* the hook up type */
 	/* 10k + 20k variable resistor */
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(2.2))               /* capacitor connected to Cext and RCext */
-	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
-	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(m10_state, ic8j2_output_changed))
+	m_ic8j2->set_resistor_value(RES_K(22));                     /* resistor connected to RCext */
+	m_ic8j2->set_capacitor_value(CAP_U(2.2));                   /* capacitor connected to Cext and RCext */
+	m_ic8j2->set_a_pin_value(1);                                /* A pin - driven by the CRTC */
+	m_ic8j2->set_b_pin_value(1);                                /* B pin - pulled high */
+	m_ic8j2->set_clear_pin_value(1);                            /* Clear pin - pulled high */
+	m_ic8j2->out_cb().set(FUNC(m10_state::ic8j2_output_changed));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(m10_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -866,9 +870,9 @@ MACHINE_CONFIG_START(m10_state::m11)
 	m10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(m11_main)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", m10_state,  m11_interrupt)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(m11_main)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m11_interrupt)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -876,13 +880,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(m10_state::m15)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(m15_main)
+	MCFG_DEVICE_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(m15_main)
 
 	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
 	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m10_state,  m15_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m15_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -890,16 +894,16 @@ MACHINE_CONFIG_START(m10_state::m15)
 	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m15)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 2*8)
 
 	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
 	MCFG_VIDEO_START_OVERRIDE(m10_state, m15 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(m10_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -909,8 +913,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m10_state::headoni)
 	m15(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(11730000/16)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(11730000/16)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -923,19 +927,15 @@ MACHINE_CONFIG_END
  * Hacks to work around missing roms to get at least some
  * video output
  */
-DRIVER_INIT_MEMBER(m10_state,andromed)
+void m10_state::init_andromed()
 {
-	int i;
-
-	for (i = 0x1c00; i < 0x2000; i++)
+	for (int i = 0x1c00; i < 0x2000; i++)
 		m_rom[i] = 0x60;
 }
 
-DRIVER_INIT_MEMBER(m10_state,ipminva1)
+void m10_state::init_ipminva1()
 {
-	int i;
-
-	for (i = 0x1400; i < 0x17ff; i++)
+	for (int i = 0x1400; i < 0x17ff; i++)
 		m_rom[i] = 0x60;
 }
 
@@ -1047,10 +1047,10 @@ ROM_START( greenber )
 	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) ) // ok ?
 ROM_END
 
-GAME( 1979, andromed,  0,        m11,     skychut,  m10_state, andromed, ROT270, "IPM",  "Andromeda (Japan?)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, 0,        ROT270, "IPM",  "IPM Invader",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, ipminva1, ROT270, "IPM",  "IPM Invader (Incomplete Dump)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, skychut,   0,        m11,     skychut,  m10_state, 0,        ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacbeam,  0,        m15,     spacbeam, m10_state, 0,        ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
-GAME( 1979, headoni,   0,        headoni, headoni,  m10_state, 0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, greenber,  0,        m15,     spacbeam, m10_state, 0,        ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, andromed,  0,        m11,     skychut,  m10_state, init_andromed, ROT270, "IPM",  "Andromeda (Japan?)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, init_ipminva1, ROT270, "IPM",  "IPM Invader (Incomplete Dump)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, skychut,   0,        m11,     skychut,  m10_state, empty_init,    ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15,     spacbeam, m10_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
+GAME( 1979, headoni,   0,        headoni, headoni,  m10_state, empty_init,    ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, greenber,  0,        m15,     spacbeam, m10_state, empty_init,    ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

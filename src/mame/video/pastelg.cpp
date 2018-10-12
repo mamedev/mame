@@ -298,7 +298,7 @@ void pastelg_state::video_start()
 	save_item(NAME(m_blitter_direction_x));
 	save_item(NAME(m_blitter_direction_y));
 	save_item(NAME(m_palbank));
-	save_pointer(NAME(m_videoram.get()), width*height);
+	save_pointer(NAME(m_videoram), width*height);
 	save_item(NAME(m_flipscreen_old));
 }
 

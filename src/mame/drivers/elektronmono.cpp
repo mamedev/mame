@@ -125,13 +125,12 @@ public:
 
 	void elektron(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void elektron_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -143,22 +142,24 @@ void elekmono_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(elekmono_state::elektron_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x00100000, 0x001fffff) AM_RAM // patch memory
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM // main RAM
+void elekmono_state::elektron_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom().region("maincpu", 0);
+	map(0x00100000, 0x001fffff).ram(); // patch memory
+	map(0x00200000, 0x002fffff).ram(); // main RAM
 	// 00300000 = Coldfire SIM
 	// 00400000 = DSP1 Hi08 host registers (ICR, CVR, ISR, IVR, unused, RXH/TXH, RXM/TXM, RXL/TXL)
 	// 00500000 = DSP2 Hi08 host registers (same as DSP1)
-	AM_RANGE(0x01000000, 0x01001fff) AM_RAM
-	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+	map(0x01000000, 0x01001fff).ram();
+	map(0x10000000, 0x107fffff).rom().region("maincpu", 0);
+}
 
 MACHINE_CONFIG_START(elekmono_state::elektron)
-	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL(25'447'000))
-	MCFG_CPU_PROGRAM_MAP(elektron_map)
+	MCFG_DEVICE_ADD("maincpu", MCF5206E, XTAL(25'447'000))
+	MCFG_DEVICE_PROGRAM_MAP(elektron_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( elektron )
@@ -174,5 +175,5 @@ ROM_START( machdrum )
 	ROM_LOAD( "elektron_sps1-1uw_os1.63.bin", 0x000000, 0x800000, CRC(3d552c99) SHA1(a872a2f3527063673d6ea6d3080c4c62ef0cadc1) )
 ROM_END
 
-CONS( 2004, monomach, 0, 0, elektron, elektron, elekmono_state, 0, "Elektron", "Monomachine SFX6 MK2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 2007, machdrum, 0, 0, elektron, elektron, elekmono_state, 0, "Elektron", "Machinedrum SPS-1 MK2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 2004, monomach, 0, 0, elektron, elektron, elekmono_state, empty_init, "Elektron", "Monomachine SFX6 MK2",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 2007, machdrum, 0, 0, elektron, elektron, elekmono_state, empty_init, "Elektron", "Machinedrum SPS-1 MK2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

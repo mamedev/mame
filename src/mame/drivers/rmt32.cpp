@@ -165,6 +165,7 @@ Notes: (All IC's listed for completeness)
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "video/sed1200.h"
+#include "emupal.h"
 #include "screen.h"
 
 static INPUT_PORTS_START( mt32 )
@@ -191,12 +192,15 @@ INPUT_PORTS_END
 class mt32_state : public driver_device
 {
 public:
+	mt32_state(const machine_config &mconfig, device_type type, const char *tag);
+
+	void mt32(machine_config &config);
+
+private:
 	required_device<i8x9x_device> cpu;
 	required_device<ram_device> ram;
 	optional_device<sed1200d0a_device> lcd;
 	required_device<timer_device> midi_timer;
-
-	mt32_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -216,10 +220,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
-	void mt32(machine_config &config);
 	void mt32_io(address_map &map);
 	void mt32_map(address_map &map);
-private:
+
 	uint8_t lcd_data_buffer[256];
 	int lcd_data_buffer_pos;
 	uint8_t midi;
@@ -332,31 +335,32 @@ PALETTE_INIT_MEMBER(mt32_state, mt32)
 	palette.set_pen_color(1, rgb_t(0, 255, 0));
 }
 
-ADDRESS_MAP_START(mt32_state::mt32_map)
-	AM_RANGE(0x0100, 0x0100) AM_WRITE(bank_w)
-	AM_RANGE(0x0200, 0x0200) AM_WRITE(so_w)
-	AM_RANGE(0x021a, 0x021a) AM_READ_PORT("SC0")
-	AM_RANGE(0x021c, 0x021c) AM_READ_PORT("SC1")
-	AM_RANGE(0x0300, 0x0300) AM_WRITE(lcd_data_w)
-	AM_RANGE(0x0380, 0x0380) AM_READWRITE(lcd_ctrl_r, lcd_ctrl_w)
-	AM_RANGE(0x1000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x1000)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("fixed")
-ADDRESS_MAP_END
+void mt32_state::mt32_map(address_map &map)
+{
+	map(0x0100, 0x0100).w(FUNC(mt32_state::bank_w));
+	map(0x0200, 0x0200).w(FUNC(mt32_state::so_w));
+	map(0x021a, 0x021a).portr("SC0");
+	map(0x021c, 0x021c).portr("SC1");
+	map(0x0300, 0x0300).w(FUNC(mt32_state::lcd_data_w));
+	map(0x0380, 0x0380).rw(FUNC(mt32_state::lcd_ctrl_r), FUNC(mt32_state::lcd_ctrl_w));
+	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
+	map(0x8000, 0xbfff).bankrw("bank");
+	map(0xc000, 0xffff).bankrw("fixed");
+}
 
-ADDRESS_MAP_START(mt32_state::mt32_io)
-	AM_RANGE(i8x9x_device::A7,     i8x9x_device::A7)     AM_READ_PORT("A7")
-	AM_RANGE(i8x9x_device::SERIAL, i8x9x_device::SERIAL) AM_WRITE(midi_w)
-	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)
-ADDRESS_MAP_END
+void mt32_state::mt32_io(address_map &map)
+{
+	map(i8x9x_device::A7, i8x9x_device::A7).portr("A7");
+	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(FUNC(mt32_state::midi_w));
+	map(i8x9x_device::P0, i8x9x_device::P0).r(FUNC(mt32_state::port0_r));
+}
 
 MACHINE_CONFIG_START(mt32_state::mt32)
-	MCFG_CPU_ADD( "maincpu", P8098, XTAL(12'000'000) )
-	MCFG_CPU_PROGRAM_MAP( mt32_map )
-	MCFG_CPU_IO_MAP( mt32_io )
+	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(12'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( mt32_map )
+	MCFG_DEVICE_IO_MAP( mt32_io )
 
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
+	RAM( config, "ram" ).set_default_size( "32K" );
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -381,28 +385,28 @@ ROM_START( mt32 )
 	ROM_DEFAULT_BIOS( "107" )
 
 	ROM_SYSTEM_BIOS( 0, "104", "Firmware 1.0.4" )
-	ROMX_LOAD(       "mt32_1.0.4.ic27.bin",          0,   0x8000, CRC(a93b65f2) SHA1(9cd4858014c4e8a9dff96053f784bfaac1092a2e), ROM_BIOS(1)|ROM_SKIP(1) )
-	ROMX_LOAD(       "mt32_1.0.4.ic26.bin",          1,   0x8000, CRC(b5ee2192) SHA1(fe8db469b5bfeb37edb269fd47e3ce6d91014652), ROM_BIOS(1)|ROM_SKIP(1) )
+	ROMX_LOAD(       "mt32_1.0.4.ic27.bin",          0,   0x8000, CRC(a93b65f2) SHA1(9cd4858014c4e8a9dff96053f784bfaac1092a2e), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROMX_LOAD(       "mt32_1.0.4.ic26.bin",          1,   0x8000, CRC(b5ee2192) SHA1(fe8db469b5bfeb37edb269fd47e3ce6d91014652), ROM_BIOS(0) | ROM_SKIP(1) )
 
 	ROM_SYSTEM_BIOS( 1, "105", "Firmware 1.0.5" )
-	ROMX_LOAD(       "mt32_1.0.5.ic27.bin",          0,   0x8000, CRC(3281216c) SHA1(57a09d80d2f7ca5b9734edbe9645e6e700f83701), ROM_BIOS(2)|ROM_SKIP(1) )
-	ROMX_LOAD(       "mt32_1.0.5.ic26.bin",          1,   0x8000, CRC(e06d8020) SHA1(52e3c6666db9ef962591a8ee99be0cde17f3a6b6), ROM_BIOS(2)|ROM_SKIP(1) )
+	ROMX_LOAD(       "mt32_1.0.5.ic27.bin",          0,   0x8000, CRC(3281216c) SHA1(57a09d80d2f7ca5b9734edbe9645e6e700f83701), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD(       "mt32_1.0.5.ic26.bin",          1,   0x8000, CRC(e06d8020) SHA1(52e3c6666db9ef962591a8ee99be0cde17f3a6b6), ROM_BIOS(1) | ROM_SKIP(1) )
 
 	ROM_SYSTEM_BIOS( 2, "106", "Firmware 1.0.6" )
-	ROMX_LOAD(       "mt32_1.0.6.ic27.bin",          0,   0x8000, CRC(29369ae1) SHA1(cc83bf23cee533097fb4c7e2c116e43b50ebacc8), ROM_BIOS(3)|ROM_SKIP(1) )
-	ROMX_LOAD(       "mt32_1.0.6.ic26.bin",          1,   0x8000, CRC(4d495d98) SHA1(bf4f15666bc46679579498386704893b630c1171), ROM_BIOS(3)|ROM_SKIP(1) )
+	ROMX_LOAD(       "mt32_1.0.6.ic27.bin",          0,   0x8000, CRC(29369ae1) SHA1(cc83bf23cee533097fb4c7e2c116e43b50ebacc8), ROM_BIOS(2) | ROM_SKIP(1) )
+	ROMX_LOAD(       "mt32_1.0.6.ic26.bin",          1,   0x8000, CRC(4d495d98) SHA1(bf4f15666bc46679579498386704893b630c1171), ROM_BIOS(2) | ROM_SKIP(1) )
 
 	ROM_SYSTEM_BIOS( 3, "107", "Firmware 1.0.7" )
-	ROMX_LOAD(       "mt32_1.0.7.ic27.bin",          0,   0x8000, CRC(67fd8968) SHA1(13f06b38f0d9e0fc050b6503ab777bb938603260), ROM_BIOS(4)|ROM_SKIP(1) )
-	ROMX_LOAD(       "mt32_1.0.7.ic26.bin",          1,   0x8000, CRC(60f45882) SHA1(c55e165487d71fa88bd8c5e9c083bc456c1a89aa), ROM_BIOS(4)|ROM_SKIP(1) )
+	ROMX_LOAD(       "mt32_1.0.7.ic27.bin",          0,   0x8000, CRC(67fd8968) SHA1(13f06b38f0d9e0fc050b6503ab777bb938603260), ROM_BIOS(3) | ROM_SKIP(1) )
+	ROMX_LOAD(       "mt32_1.0.7.ic26.bin",          1,   0x8000, CRC(60f45882) SHA1(c55e165487d71fa88bd8c5e9c083bc456c1a89aa), ROM_BIOS(3) | ROM_SKIP(1) )
 
 	ROM_SYSTEM_BIOS( 4, "br", "Blue Ridge enhanced firmware" )
-	ROMX_LOAD(       "blue_ridge__mt32b.bin",        1,   0x8000, CRC(5816476f) SHA1(e0934320d7cbb5edfaa29e0d01ae835ef620085b), ROM_BIOS(5)|ROM_SKIP(1) )
-	ROMX_LOAD(       "blue_ridge__mt32a.bin",        0,   0x8000, CRC(d75fc3d9) SHA1(11a6ae5d8b6ee328b371af7f1e40b82125aa6b4d), ROM_BIOS(5)|ROM_SKIP(1) )
+	ROMX_LOAD(       "blue_ridge__mt32b.bin",        1,   0x8000, CRC(5816476f) SHA1(e0934320d7cbb5edfaa29e0d01ae835ef620085b), ROM_BIOS(4) | ROM_SKIP(1) )
+	ROMX_LOAD(       "blue_ridge__mt32a.bin",        0,   0x8000, CRC(d75fc3d9) SHA1(11a6ae5d8b6ee328b371af7f1e40b82125aa6b4d), ROM_BIOS(4) | ROM_SKIP(1) )
 
 	ROM_SYSTEM_BIOS( 5, "m9", "M9 enhanced firmware" )
-	ROMX_LOAD(       "a__m-9.27c256.ic27.bin",       0,   0x8000, CRC(c078ab00) SHA1(381e4208c0211a9a24a3a1b06a36760a1940ea6b), ROM_BIOS(6)|ROM_SKIP(1) )
-	ROMX_LOAD(       "b__m-9.27c256.ic26.bin",       1,   0x8000, CRC(e9c439c4) SHA1(36fece02eddd84230a7cf32f931c94dd14adbf2c), ROM_BIOS(6)|ROM_SKIP(1) )
+	ROMX_LOAD(       "a__m-9.27c256.ic27.bin",       0,   0x8000, CRC(c078ab00) SHA1(381e4208c0211a9a24a3a1b06a36760a1940ea6b), ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD(       "b__m-9.27c256.ic26.bin",       1,   0x8000, CRC(e9c439c4) SHA1(36fece02eddd84230a7cf32f931c94dd14adbf2c), ROM_BIOS(5) | ROM_SKIP(1) )
 
 // We need a bios-like selection for these too
 	ROM_REGION( 0x80000, "la32", 0 )
@@ -421,10 +425,10 @@ ROM_START( cm32l )
 	ROM_DEFAULT_BIOS( "102" )
 
 	ROM_SYSTEM_BIOS( 0, "100", "Firmware 1.00" )
-	ROMX_LOAD(       "lapc-i.v1.0.0.ic3.bin",        0,  0x10000, CRC(ee62022f) SHA1(73683d585cd6948cc19547942ca0e14a0319456d), ROM_BIOS(1) )
+	ROMX_LOAD(       "lapc-i.v1.0.0.ic3.bin",        0,  0x10000, CRC(ee62022f) SHA1(73683d585cd6948cc19547942ca0e14a0319456d), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "102", "Firmware 1.02" )
-	ROMX_LOAD(       "cm32l_control.rom",            0,  0x10000, CRC(b998047e) SHA1(a439fbb390da38cada95a7cbb1d6ca199cd66ef8), ROM_BIOS(2) )
+	ROMX_LOAD(       "cm32l_control.rom",            0,  0x10000, CRC(b998047e) SHA1(a439fbb390da38cada95a7cbb1d6ca199cd66ef8), ROM_BIOS(1) )
 
 	ROM_REGION( 0x100000, "la32", 0 )
 // We need a bios-like selection for these too
@@ -437,5 +441,5 @@ ROM_START( cm32l )
 	ROM_LOAD(        "r15179917.ic19.bin",           0,   0x8000, CRC(236c87a6) SHA1(e1c03905c46e962d1deb15eeed92eb61b42bba4a) )
 ROM_END
 
-CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, 0, "Roland", "MT32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, 0, "Roland", "CM32L", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "CM32L", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

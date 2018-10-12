@@ -42,17 +42,19 @@ const tiny_rom_entry *vic1515_device::device_rom_region() const
 //  ADDRESS_MAP( vic1515_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(vic1515_device::vic1515_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("rom", 0)
-ADDRESS_MAP_END
+void vic1515_device::vic1515_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("rom", 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vic1515_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(vic1515_device::vic1515_io)
-ADDRESS_MAP_END
+void vic1515_device::vic1515_io(address_map &map)
+{
+}
 
 
 //-------------------------------------------------
@@ -60,9 +62,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vic1515_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8039, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(vic1515_mem)
-	MCFG_CPU_IO_MAP(vic1515_io)
+	MCFG_DEVICE_ADD("maincpu", I8039, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vic1515_mem)
+	MCFG_DEVICE_IO_MAP(vic1515_io)
 MACHINE_CONFIG_END
 
 

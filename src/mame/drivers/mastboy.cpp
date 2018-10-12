@@ -3,6 +3,8 @@
 /*
     Master Boy - Gaelco (c)1991
 
+    this is the 2nd release of Master Boy, the original 1987 game is on different hardware, see mastboyo.cpp for that one
+
     MAME Driver by David Haywood
 
     Special Thanks to Charles MacDonald
@@ -441,45 +443,59 @@
 #include "sound/saa1099.h"
 #include "sound/msm5205.h"
 #include "machine/74259.h"
+#include "machine/bankdev.h"
 #include "machine/eeprompar.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
 
 class mastboy_state : public driver_device
 {
 public:
 	mastboy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_msm(*this, "msm"),
-		m_outlatch(*this, "outlatch"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_earom(*this, "earom") ,
-		m_workram(*this, "workram"),
-		m_tileram(*this, "tileram"),
-		m_colram(*this, "colram") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_msm(*this, "msm")
+		, m_outlatch(*this, "outlatch")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_earom(*this, "earom")
+		, m_bank_c000(*this, "bank_c000")
+		, m_workram(*this, "workram")
+		, m_tileram(*this, "tileram")
+		, m_colram(*this, "colram")
+		, m_vram(*this, "vram")
+	{ }
 
+	void mastboy(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<ls259_device> m_outlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<eeprom_parallel_28xx_device> m_earom;
+	required_device<address_map_bank_device> m_bank_c000;
 
 	required_shared_ptr<uint8_t> m_workram;
 	required_shared_ptr<uint8_t> m_tileram;
 	required_shared_ptr<uint8_t> m_colram;
+	required_shared_ptr<uint8_t> m_vram;
 
-	uint8_t* m_vram;
-	uint8_t m_bank;
 	int m_irq0_ack;
 	int m_m5205_next;
 	int m_m5205_part;
 
-	DECLARE_READ8_MEMBER(banked_ram_r);
-	DECLARE_WRITE8_MEMBER(banked_ram_w);
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(msm5205_data_w);
 	DECLARE_WRITE_LINE_MEMBER(irq0_ack_w);
@@ -487,14 +503,10 @@ public:
 	DECLARE_READ8_MEMBER(nmi_read);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
-	void mastboy(machine_config &config);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void bank_c000_map(address_map &map);
 	void mastboy_io_map(address_map &map);
 	void mastboy_map(address_map &map);
 };
@@ -504,9 +516,6 @@ public:
 
 void mastboy_state::video_start()
 {
-	m_gfxdecode->gfx(0)->set_source(m_vram);
-
-	save_pointer(NAME(m_vram), 0x10000);
 }
 
 uint32_t mastboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -555,74 +564,25 @@ uint32_t mastboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Access to Banked RAM */
 
-READ8_MEMBER(mastboy_state::banked_ram_r)
+READ8_MEMBER(mastboy_state::vram_r)
 {
-	if ((m_bank&0x80) == 0x00)
-	{
-		int bank;
-		bank = m_bank & 0x07;
-		//if (m_bank&0xf8) printf("invalid bank bits in vram/vrom read\n");
-
-		if (bank>0x3) // ROM access
-		{
-			uint8_t *src    = memregion( "gfx1" )->base();
-			bank &=0x3;
-			return src[offset+(bank*0x4000)];
-		}
-		else
-		{
-			bank &=0x3;
-			/* we have to invert the data for the GFX decode */
-			return m_vram[offset+(bank*0x4000)]^0xff;
-		}
-	}
-	else
-	{
-		uint8_t *src;
-		int bank;
-		bank = m_bank & 0x7f;
-		src = memregion       ( "user1" )->base() + bank * 0x4000;
-		return src[offset];
-	}
+	/* we have to invert the data for the GFX decode */
+	return m_vram[offset]^0xff;
 }
 
-WRITE8_MEMBER(mastboy_state::banked_ram_w)
+WRITE8_MEMBER(mastboy_state::vram_w)
 {
-	if ((m_bank&0x80) == 0x00)
-	{
-		int bank;
-		bank = m_bank & 0x07;
-		//if (data&0xf8) printf("invalid bank bits in vram/vrom write\n");
+	/* we have to invert the data for the GFX decode */
+	m_vram[offset] = data^0xff;
 
-		if (bank>0x3) // ROM access
-		{
-			logerror("Attempting to WRITE to VROM\n");
-		}
-		else
-		{
-			/* write to the RAM based tile data */
-			int offs;
-			bank &=0x3;
-
-			offs = offset+(bank*0x4000);
-
-			/* we have to invert the data for the GFX decode */
-			m_vram[offs] = data^0xff;
-
-			/* Decode the new tile */
-			m_gfxdecode->gfx(0)->mark_dirty(offs/32);
-		}
-	}
-	else
-	{
-		logerror("attempt to write %02x to banked area with BANKED ROM selected\n",data);
-	}
+	/* Decode the new tile */
+	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 }
 
 WRITE8_MEMBER(mastboy_state::bank_w)
 {
 	// controls access to banked ram / rom
-	m_bank = data;
+	m_bank_c000->set_bank(data);
 }
 
 /* MSM5205 Related */
@@ -635,12 +595,12 @@ WRITE8_MEMBER(mastboy_state::msm5205_data_w)
 
 WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 {
-	m_msm->data_w(m_m5205_next);
+	m_msm->write_data(m_m5205_next);
 	m_m5205_next >>= 4;
 
 	m_m5205_part ^= 1;
 	if(!m_m5205_part)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -652,40 +612,47 @@ WRITE_LINE_MEMBER(mastboy_state::irq0_ack_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mastboy_state::interrupt)
+WRITE_LINE_MEMBER(mastboy_state::vblank_irq)
 {
-	if (m_outlatch->q0_r() == 1)
-	{
-		device.execute().set_input_line(0, ASSERT_LINE);
-	}
+	if (state && m_outlatch->q0_r() == 1)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(mastboy_state::mastboy_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM // Internal ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROM // External ROM
+void mastboy_state::mastboy_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom(); // Internal ROM
+	map(0x4000, 0x7fff).rom(); // External ROM
 
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("workram")// work ram
-	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_SHARE("tileram")// tilemap ram
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_SHARE("colram") AM_MIRROR(0x0e00)  // colour ram
+	map(0x8000, 0x8fff).ram().share("workram");// work ram
+	map(0x9000, 0x9fff).ram().share("tileram");// tilemap ram
+	map(0xa000, 0xa1ff).ram().share("colram").mirror(0x0e00);  // colour ram
 
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(banked_ram_r,banked_ram_w) // mastboy bank area read / write
+	map(0xc000, 0xffff).m("bank_c000", FUNC(address_map_bank_device::amap8));
 
-	AM_RANGE(0xff000, 0xff7ff) AM_DEVREADWRITE("earom", eeprom_parallel_28xx_device, read, write)
+	map(0xff000, 0xff7ff).rw(m_earom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 
-	AM_RANGE(0xff800, 0xff807) AM_READ_PORT("P1")
-	AM_RANGE(0xff808, 0xff80f) AM_READ_PORT("P2")
-	AM_RANGE(0xff810, 0xff817) AM_READ_PORT("DSW1")
-	AM_RANGE(0xff818, 0xff81f) AM_READ_PORT("DSW2")
+	map(0xff800, 0xff807).portr("P1");
+	map(0xff808, 0xff80f).portr("P2");
+	map(0xff810, 0xff817).portr("DSW1");
+	map(0xff818, 0xff81f).portr("DSW2");
 
-	AM_RANGE(0xff820, 0xff827) AM_WRITE(bank_w)
-	AM_RANGE(0xff828, 0xff829) AM_DEVWRITE("saa", saa1099_device, write)
-	AM_RANGE(0xff830, 0xff830) AM_WRITE(msm5205_data_w)
-	AM_RANGE(0xff838, 0xff83f) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+	map(0xff820, 0xff827).w(FUNC(mastboy_state::bank_w));
+	map(0xff828, 0xff829).w("saa", FUNC(saa1099_device::write));
+	map(0xff830, 0xff830).w(FUNC(mastboy_state::msm5205_data_w));
+	map(0xff838, 0xff83f).w(m_outlatch, FUNC(ls259_device::write_d0));
 
-	AM_RANGE(0xffc00, 0xfffff) AM_RAM // Internal RAM
-ADDRESS_MAP_END
+	map(0xffc00, 0xfffff).ram(); // Internal RAM
+}
+
+// TODO : banked map is mirrored?
+void mastboy_state::bank_c000_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).mirror(0x1e0000).rw(FUNC(mastboy_state::vram_r), FUNC(mastboy_state::vram_w)).share("vram");
+	map(0x010000, 0x01ffff).mirror(0x1e0000).rom().region("vrom", 0);
+	map(0x200000, 0x3fffff).rom().region("bankedrom", 0);
+}
 
 /* Ports */
 
@@ -700,10 +667,11 @@ READ8_MEMBER(mastboy_state::nmi_read)
 	return 0x00;
 }
 
-ADDRESS_MAP_START(mastboy_state::mastboy_io_map)
-	AM_RANGE(0x38, 0x38) AM_READ(port_38_read)
-	AM_RANGE(0x39, 0x39) AM_READ(nmi_read)
-ADDRESS_MAP_END
+void mastboy_state::mastboy_io_map(address_map &map)
+{
+	map(0x38, 0x38).r(FUNC(mastboy_state::port_38_read));
+	map(0x39, 0x39).r(FUNC(mastboy_state::nmi_read));
+}
 
 /* Input Ports */
 
@@ -815,18 +783,15 @@ static const gfx_layout tiles8x8_layout_2 =
 };
 
 
-static GFXDECODE_START( mastboy )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2",  0, tiles8x8_layout_2, 0, 16 )
+static GFXDECODE_START( gfx_mastboy )
+	GFXDECODE_RAM(   "vram", 0, tiles8x8_layout,   0, 16 )
+	GFXDECODE_ENTRY( "vrom", 0, tiles8x8_layout_2, 0, 16 )
 GFXDECODE_END
 
 /* Machine Functions / Driver */
 
 void mastboy_state::machine_start()
 {
-	m_vram = memregion( "gfx1" )->base(); // makes decoding the RAM based tiles easier this way
-
-	save_item(NAME(m_bank));
 	save_item(NAME(m_irq0_ack));
 	save_item(NAME(m_m5205_next));
 	save_item(NAME(m_m5205_part));
@@ -835,28 +800,29 @@ void mastboy_state::machine_start()
 void mastboy_state::machine_reset()
 {
 	/* clear some ram */
-	memset( m_workram,   0x00, 0x01000);
-	memset( m_tileram,   0x00, 0x01000);
-	memset( m_colram,    0x00, 0x00200);
-	memset( m_vram, 0x00, 0x10000);
+	std::fill(&m_workram[0], &m_workram[m_workram.bytes()], 0);
+	std::fill(&m_tileram[0], &m_tileram[m_tileram.bytes()], 0);
+	std::fill(&m_colram[0],  &m_colram[m_colram.bytes()],   0);
+	std::fill(&m_vram[0],    &m_vram[m_vram.bytes()],       0);
 }
 
 
 
 MACHINE_CONFIG_START(mastboy_state::mastboy)
-	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
-	MCFG_CPU_PROGRAM_MAP(mastboy_map)
-	MCFG_CPU_IO_MAP(mastboy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mastboy_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
+	MCFG_DEVICE_PROGRAM_MAP(mastboy_map)
+	MCFG_DEVICE_IO_MAP(mastboy_io_map)
 
-	MCFG_EEPROM_2816_ADD("earom")
+	EEPROM_2816(config, "earom");
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC17
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mastboy_state, irq0_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("msm", msm5205_device, s2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("msm", msm5205_device, s1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("earom", eeprom_parallel_28xx_device, oe_w))
+	LS259(config, m_outlatch); // IC17
+	m_outlatch->q_out_cb<0>().set(FUNC(mastboy_state::irq0_ack_w));
+	m_outlatch->q_out_cb<1>().set("msm", FUNC(msm5205_device::s2_w));
+	m_outlatch->q_out_cb<2>().set("msm", FUNC(msm5205_device::s1_w));
+	m_outlatch->q_out_cb<3>().set("msm", FUNC(msm5205_device::reset_w));
+	m_outlatch->q_out_cb<4>().set("earom", FUNC(eeprom_parallel_28xx_device::oe_w));
+
+	ADDRESS_MAP_BANK(config, "bank_c000").set_map(&mastboy_state::bank_c000_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x4000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -866,18 +832,18 @@ MACHINE_CONFIG_START(mastboy_state::mastboy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mastboy_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboy)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", 6000000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(mastboy_state, adpcm_int))  /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mastboy_state, adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -887,18 +853,15 @@ MACHINE_CONFIG_END
 ROM_START( mastboy )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
-	ROM_LOAD( "03.bin",       0x04000, 0x4000, CRC(5020a37f) SHA1(8bc75623232f3ab457b47d5af6cd1c3fb24c0d0e) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "3.ic77",       0x04000, 0x4000, CRC(64a712ba) SHA1(a8318fa6f5b3fe1aaff4cef07aced927e3503542) ) // data (1ST AND 2ND HALF IDENTICAL)
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 ) // only the last 16kb matters
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 ) /* RAM accessed by the video chip */
-	/* 0x00000 - 0x0ffff = banked ram */
-
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT ) /* ROM accessed by the video chip */
+	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) /* ROM accessed by the video chip */
 	ROM_LOAD( "04.bin", 0x00000, 0x10000, CRC(565932f4) SHA1(4b184aa445b5671072031ad4a2ccb13868d6d3a4) )
 
-	ROM_REGION( 0x200000, "user1", 0 ) /* banked data - 8 banks, 6 'question' slots */
+	ROM_REGION( 0x200000, "bankedrom", 0 ) /* banked data - 8 banks, 6 'question' slots */
 	ROM_LOAD( "01.bin", 0x000000,   0x040000, CRC(36755831) SHA1(706fba5fc765502774643bfef8a3c9d2c01eb01b) ) // 99% gfx
 	ROM_LOAD( "02.bin", 0x040000,   0x020000, CRC(69cf6b7c) SHA1(a7bdc62051d09636dcd54db102706a9b42465e63) ) // data
 	ROM_RELOAD(         0x060000,   0x020000) // 128kb roms are mirrored
@@ -923,22 +886,56 @@ ROM_START( mastboy )
 	/*                  0x1c0000 tt 0x1fffff EMPTY */
 ROM_END
 
-/* Is this actually official, or a hack? */
-ROM_START( mastboyi )
+// this set has a number of strings used in the boot-up display intentionally terminated at the first character so they don't display
+ROM_START( mastboya )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
+	ROM_LOAD( "03.bin",       0x04000, 0x4000, CRC(5020a37f) SHA1(8bc75623232f3ab457b47d5af6cd1c3fb24c0d0e) ) // data (1ST AND 2ND HALF IDENTICAL)
+	ROM_CONTINUE(             0x04000, 0x4000 )
+	ROM_CONTINUE(             0x04000, 0x4000 )
+	ROM_CONTINUE(             0x04000, 0x4000 ) // only the last 16kb matters
+
+	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) /* ROM accessed by the video chip */
+	ROM_LOAD( "04.bin", 0x00000, 0x10000, CRC(565932f4) SHA1(4b184aa445b5671072031ad4a2ccb13868d6d3a4) )
+
+	ROM_REGION( 0x200000, "bankedrom", 0 ) /* banked data - 8 banks, 6 'question' slots */
+	ROM_LOAD( "01.bin", 0x000000,   0x040000, CRC(36755831) SHA1(706fba5fc765502774643bfef8a3c9d2c01eb01b) ) // 99% gfx
+	ROM_LOAD( "02.bin", 0x040000,   0x020000, CRC(69cf6b7c) SHA1(a7bdc62051d09636dcd54db102706a9b42465e63) ) // data
+	ROM_RELOAD(         0x060000,   0x020000) // 128kb roms are mirrored
+/*  Ciencias - General
+    Espectaculos - Cine
+    Sociales - Geografia Esp.
+    Sociales - Historia  */
+	ROM_LOAD( "05.bin", 0x080000,   0x020000, CRC(394cb674) SHA1(1390c666772f1e1e2da8866b960a3d24dc660e68) ) // questions
+	ROM_RELOAD(         0x0a0000,   0x020000) // 128kb roms are mirrored
+/*  Sociales - Geografia Mun.
+    Varios - Cultura General */
+	ROM_LOAD( "06.bin", 0x0c0000,   0x020000, CRC(aace7120) SHA1(5655b56a7c241bc7908081088042601174c0a0b2) ) // questions
+	ROM_RELOAD(         0x0e0000,   0x020000) // 128kb roms are mirrored
+/*  Deportes - General */
+	ROM_LOAD( "07.bin", 0x100000,   0x020000, CRC(6618b002) SHA1(79942350da335a3362b6fc43527b6568ce134ceb) ) // questions
+	ROM_RELOAD(         0x120000,   0x020000) // 128kb roms are mirrored
+/*  Ciencias - General
+    Varios - Cultura General */
+	ROM_LOAD( "08.bin", 0x140000,   0x020000, CRC(6a4870dd) SHA1(f8ca94a5bc4ba3f512767901e4ae3579c2c6355a) ) // questions
+	ROM_RELOAD(         0x160000,   0x020000) // 128kb roms are mirrored
+	/*                  0x180000 to 0x1bffff EMPTY */
+	/*                  0x1c0000 tt 0x1fffff EMPTY */
+ROM_END
+
+/* Is this actually official, or a hack? - I think the internal ROM should be different on the Italian sets as it indexes the wrong strings on the startup screens, showing MARK instead of PLAY MARK etc. so marked as BAD_DUMP on these sets */
+ROM_START( mastboyi )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
 	ROM_LOAD( "3-mem-a.ic77", 0x04000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 ) // only the last 16kb matters
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 ) /* RAM accessed by the video chip */
-	/* 0x00000 - 0x0ffff = banked ram */
-
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT ) /* ROM accessed by the video chip */
+	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) /* ROM accessed by the video chip */
 	ROM_LOAD( "4.ic91", 0x00000, 0x10000, CRC(858d7b27) SHA1(b0ddf49df5665003f3616d67f7fc27408433483b) )
 
-	ROM_REGION( 0x200000, "user1", 0 ) /* question data - 6 sockets */
+	ROM_REGION( 0x200000, "bankedrom", 0 ) /* question data - 6 sockets */
 	ROM_LOAD( "1-mem-c.ic75", 0x000000, 0x040000, CRC(7c7b1cc5) SHA1(73ad7bdb61d1f99ce09ef3a5a3ae0f1e72364eee) ) // 99% gfx
 	ROM_LOAD( "2-mem-b.ic76", 0x040000, 0x020000, CRC(87015c18) SHA1(a16bf2707ce847da0923662796195b75719a6d77) ) // data
 	ROM_RELOAD(               0x060000, 0x020000) // 128kb roms are mirrored
@@ -964,19 +961,16 @@ ROM_END
 // only one of the question roms differs (minor wording / spelling changes in most cases)
 ROM_START( mastboyia )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
 	ROM_LOAD( "3-mem-a.ic77", 0x04000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 ) // only the last 16kb matters
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 ) /* RAM accessed by the video chip */
-	/* 0x00000 - 0x0ffff = banked ram */
+	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) /* ROM accessed by the video chip */
+	ROM_LOAD( "4.ic91", 0x00000, 0x10000, BAD_DUMP CRC(858d7b27) SHA1(b0ddf49df5665003f3616d67f7fc27408433483b) ) // RAMM err.
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT ) /* ROM accessed by the video chip */
-	ROM_LOAD( "4.ic91", 0x00000, 0x10000, CRC(858d7b27) SHA1(b0ddf49df5665003f3616d67f7fc27408433483b) )
-
-	ROM_REGION( 0x200000, "user1", 0 ) /* question data - 6 sockets */
+	ROM_REGION( 0x200000, "bankedrom", 0 ) /* question data - 6 sockets */
 	ROM_LOAD( "1-mem-c.ic75", 0x000000, 0x040000, CRC(7c7b1cc5) SHA1(73ad7bdb61d1f99ce09ef3a5a3ae0f1e72364eee) ) // 99% gfx
 	ROM_LOAD( "2-mem-b.ic76", 0x040000, 0x020000, CRC(87015c18) SHA1(a16bf2707ce847da0923662796195b75719a6d77) ) // data
 	ROM_RELOAD(               0x060000, 0x020000) // 128kb roms are mirrored
@@ -999,6 +993,8 @@ ROM_START( mastboyia )
 	/*                  0x1c0000 to 0x1fffff EMPTY */
 ROM_END
 
-GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboyia,mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboy,   0,       mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboya,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A, hack?)", MACHINE_SUPPORTS_SAVE )
+// are the Italian sets legitimate, or also hacked, the startup display is incorrect displaying 'MARK' instead of 'PLAYMARK' Maybe the internal ROM should differ instead?
+GAME( 1991, mastboyi,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyia, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )

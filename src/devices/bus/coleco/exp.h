@@ -120,7 +120,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(COLECOVISION_CARTRIDGE_SLOT, colecovision_cartridge_slot_device)
 
-SLOT_INTERFACE_EXTERN( colecovision_cartridges );
+void colecovision_cartridges(device_slot_interface &device);
 
 
 #endif // MAME_BUS_COLECO_EXP_H

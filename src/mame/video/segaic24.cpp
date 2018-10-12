@@ -80,7 +80,7 @@ void segas24_tile_device::device_start()
 	tile_ram = std::make_unique<uint16_t[]>(0x10000/2);
 	m_xhout_write_cb.resolve_safe();
 	m_xvout_write_cb.resolve_safe();
-	
+
 	tile_layer[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(segas24_tile_device::tile_info_0s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 	tile_layer[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(segas24_tile_device::tile_info_0w),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 	tile_layer[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(segas24_tile_device::tile_info_1s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
@@ -96,8 +96,8 @@ void segas24_tile_device::device_start()
 
 	set_gfx(char_gfx_index, std::make_unique<gfx_element>(&palette(), char_layout, (uint8_t *)char_ram.get(), NATIVE_ENDIAN_VALUE_LE_BE(8,0), palette().entries() / 16, 0));
 
-	save_pointer(NAME(tile_ram.get()), 0x10000/2);
-	save_pointer(NAME(char_ram.get()), 0x80000/2);
+	save_pointer(NAME(tile_ram), 0x10000/2);
+	save_pointer(NAME(char_ram), 0x80000/2);
 }
 
 void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm, const uint16_t *mask,
@@ -572,7 +572,7 @@ void segas24_sprite_device::device_start()
 {
 	sprite_ram = std::make_unique<uint16_t[]>(0x40000/2);
 
-	save_pointer(NAME(sprite_ram.get()), 0x40000/2);
+	save_pointer(NAME(sprite_ram), 0x40000/2);
 }
 
 /* System24 sprites

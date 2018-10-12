@@ -96,12 +96,13 @@ WRITE_LINE_MEMBER( c64_magic_formel_cartridge_device::pia_cb2_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_magic_formel_cartridge_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(c64_magic_formel_cartridge_device, pia_cb2_w))
-MACHINE_CONFIG_END
+void c64_magic_formel_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_pa_w));
+	m_pia->writepb_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_pb_w));
+	m_pia->cb2_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_cb2_w));
+}
 
 
 //-------------------------------------------------

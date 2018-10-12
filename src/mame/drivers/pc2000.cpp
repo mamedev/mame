@@ -24,7 +24,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -202,24 +202,26 @@ WRITE8_MEMBER( pc2000_state::beep_w )
 	m_beep_state = data;
 }
 
-ADDRESS_MAP_START(pc2000_state::pc2000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank0")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x59 0x45, if it succeeds a jump at 0x8004 occurs
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-ADDRESS_MAP_END
+void pc2000_state::pc2000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).bankr("bank0");
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr("bank2");    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x59 0x45, if it succeeds a jump at 0x8004 occurs
+	map(0xc000, 0xdfff).ram();
+}
 
-ADDRESS_MAP_START(pc2000_state::pc2000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(rombank0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(rombank1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(rombank2_w)
-	AM_RANGE(0x0a, 0x0b) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_READWRITE(key_matrix_r, key_matrix_w)
-	AM_RANGE(0x12, 0x12) AM_READWRITE(beep_r, beep_w)
-ADDRESS_MAP_END
+void pc2000_state::pc2000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(pc2000_state::rombank0_w));
+	map(0x01, 0x01).w(FUNC(pc2000_state::rombank1_w));
+	map(0x03, 0x03).w(FUNC(pc2000_state::rombank2_w));
+	map(0x0a, 0x0b).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
+	map(0x10, 0x11).rw(FUNC(pc2000_state::key_matrix_r), FUNC(pc2000_state::key_matrix_w));
+	map(0x12, 0x12).rw(FUNC(pc2000_state::beep_r), FUNC(pc2000_state::beep_w));
+}
 
 
 void gl3000s_state::machine_start()
@@ -330,15 +332,16 @@ SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 }
 
 
-ADDRESS_MAP_START(gl3000s_state::gl3000s_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE(rombank1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(rombank2_w)
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("sed1520_r", sed1520_device, read, write)
-	AM_RANGE(0x0a, 0x0b) AM_DEVREADWRITE("sed1520_l", sed1520_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_READWRITE(key_matrix_r, key_matrix_w)
-ADDRESS_MAP_END
+void gl3000s_state::gl3000s_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x01, 0x01).w(FUNC(gl3000s_state::rombank1_w));
+	map(0x03, 0x03).w(FUNC(gl3000s_state::rombank2_w));
+	map(0x08, 0x09).rw(m_lcdc_r, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
+	map(0x0a, 0x0b).rw(m_lcdc_l, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
+	map(0x10, 0x11).rw(FUNC(gl3000s_state::key_matrix_r), FUNC(gl3000s_state::key_matrix_w));
+}
 
 READ8_MEMBER( pc1000_state::kb_r )
 {
@@ -395,19 +398,21 @@ HD44780_PIXEL_UPDATE(pc1000_state::pc1000_pixel_update)
 		}
 }
 
-ADDRESS_MAP_START(pc1000_state::pc1000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("bios", 0x00000)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_DEVREAD("cartslot", generic_slot_device, read_rom)    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x33, if it succeeds a jump at 0x8010 occurs
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void pc1000_state::pc1000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().region("bios", 0x00000);
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0xbfff).r(m_cart, FUNC(generic_slot_device::read_rom));    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x33, if it succeeds a jump at 0x8010 occurs
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(pc1000_state::pc1000_io)
-	AM_RANGE(0x0000, 0x01ff) AM_READ(kb_r)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0xfe) AM_READWRITE(lcdc_control_r, lcdc_control_w)
-	AM_RANGE(0x4100, 0x4100) AM_MIRROR(0xfe) AM_READWRITE(lcdc_data_r, lcdc_data_w)
-ADDRESS_MAP_END
+void pc1000_state::pc1000_io(address_map &map)
+{
+	map(0x0000, 0x01ff).r(FUNC(pc1000_state::kb_r));
+	map(0x4000, 0x4000).mirror(0xfe).rw(FUNC(pc1000_state::lcdc_control_r), FUNC(pc1000_state::lcdc_control_w));
+	map(0x4100, 0x4100).mirror(0xfe).rw(FUNC(pc1000_state::lcdc_data_r), FUNC(pc1000_state::lcdc_data_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pc2000 )
@@ -856,7 +861,7 @@ static const gfx_layout hd44780_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( pc2000 )
+static GFXDECODE_START( gfx_pc2000 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -875,10 +880,10 @@ DEVICE_IMAGE_LOAD_MEMBER( pc2000_state, pc2000_cart )
 
 MACHINE_CONFIG_START(pc2000_state::pc2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) /* probably not accurate */
-	MCFG_CPU_PROGRAM_MAP(pc2000_mem)
-	MCFG_CPU_IO_MAP(pc2000_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pc2000_state, irq0_line_hold, 50)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) /* probably not accurate */
+	MCFG_DEVICE_PROGRAM_MAP(pc2000_mem)
+	MCFG_DEVICE_IO_MAP(pc2000_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(pc2000_state, irq0_line_hold, 50)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -891,15 +896,14 @@ MACHINE_CONFIG_START(pc2000_state::pc2000)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc2000_state, pc2000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc2000)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc2000)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
@@ -933,8 +937,8 @@ HD44780_PIXEL_UPDATE(gl4004_state::gl4000_pixel_update)
 
 MACHINE_CONFIG_START(gl3000s_state::gl3000s)
 	pc2000(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(gl3000s_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(gl3000s_io)
 
 	MCFG_DEVICE_REMOVE("hd44780")
 	MCFG_SED1520_ADD("sed1520_l", UPDATE(gl3000s_state, screen_update_left))    // left panel is 59 pixels (0-58)
@@ -945,7 +949,7 @@ MACHINE_CONFIG_START(gl3000s_state::gl3000s)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 24-1)
 	MCFG_SCREEN_UPDATE_DRIVER( gl3000s_state, screen_update )
 
-	MCFG_DEFAULT_LAYOUT(layout_gl3000s)
+	config.set_default_layout(layout_gl3000s);
 
 	MCFG_DEVICE_REMOVE("gfxdecode")
 
@@ -970,10 +974,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pc1000_state::misterx)
 	pc2000(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pc1000_mem)
-	MCFG_CPU_IO_MAP(pc1000_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pc1000_state, irq0_line_hold,  10)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pc1000_mem)
+	MCFG_DEVICE_IO_MAP(pc1000_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(pc1000_state, irq0_line_hold,  10)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1085,21 +1089,21 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY                    FULLNAME                                  FLAGS
-COMP( 1988, pc1000,   0,      0,      pc1000,   pc1000,  pc1000_state,  0,    "Video Technology",        "PreComputer 1000",                       MACHINE_NOT_WORKING )
-COMP( 1988, misterx,  0,      0,      misterx,  pc1000,  pc1000_state,  0,    "Video Technology / Yeno", "MisterX",                                MACHINE_NOT_WORKING )
-COMP( 1988, ordisava, 0,      0,      pc1000,   pc1000,  pc1000_state,  0,    "Video Technology",        "Ordisavant (France)",                    MACHINE_NOT_WORKING )
-COMP( 1993, pc2000,   0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "PreComputer 2000",                       MACHINE_NOT_WORKING )
-COMP( 1993, gl2000,   0,      0,      gl2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader 2000",                     MACHINE_NOT_WORKING )
-COMP( 1994, gl2000c,  gl2000, 0,      gl2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader 2000 Compact",             MACHINE_NOT_WORKING )
-COMP( 1995, gl2000p,  gl2000, 0,      gl2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader 2000 Plus",                MACHINE_NOT_WORKING )
-COMP( 1996, gl3000s,  0,      0,      gl3000s,  gl3000s, gl3000s_state, 0,    "Video Technology",        "Genius Leader 3000S (Germany)",          MACHINE_NOT_WORKING )
-COMP( 1994, gl4000,   0,      0,      gl4000,   pc2000,  gl4004_state,  0,    "Video Technology",        "Genius Leader 4000 Quadro (Germany)",    MACHINE_NOT_WORKING )
-COMP( 1996, gl4004,   0,      0,      gl4000,   pc2000,  gl4004_state,  0,    "Video Technology",        "Genius Leader 4004 Quadro L (Germany)",  MACHINE_NOT_WORKING )
-COMP( 1997, gl5000,   0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader 5000 (Germany)",           MACHINE_IS_SKELETON )
-COMP( 1997, gl5005x,  0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader 5005X (Germany)",          MACHINE_IS_SKELETON )
-COMP( 1997, glpn,     0,      0,      gl4000,   pc2000,  gl4004_state,  0,    "Video Technology",        "Genius Leader Power Notebook (Germany)", MACHINE_IS_SKELETON )
-COMP( 1998, gmtt ,    0,      0,      gl4000,   pc2000,  gl4004_state,  0,    "Video Technology",        "Genius Master Table Top (Germany)",      MACHINE_IS_SKELETON )
-COMP( 2001, gbs5505x, 0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius BrainStation 5505X (Germany)",    MACHINE_IS_SKELETON )
-COMP( 1993, gln,      0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader Notebook",                 MACHINE_IS_SKELETON )
-COMP( 1999, lexipcm,  0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Lexibook",                "LexiPC Mega 2000 (Germany)",             MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS         INIT        COMPANY                    FULLNAME                                  FLAGS
+COMP( 1988, pc1000,   0,      0,      pc1000,   pc1000,  pc1000_state, empty_init, "Video Technology",        "PreComputer 1000",                       MACHINE_NOT_WORKING )
+COMP( 1988, misterx,  0,      0,      misterx,  pc1000,  pc1000_state, empty_init, "Video Technology / Yeno", "MisterX",                                MACHINE_NOT_WORKING )
+COMP( 1988, ordisava, 0,      0,      pc1000,   pc1000,  pc1000_state, empty_init, "Video Technology",        "Ordisavant (France)",                    MACHINE_NOT_WORKING )
+COMP( 1993, pc2000,   0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000",                       MACHINE_NOT_WORKING )
+COMP( 1993, gl2000,   0,      0,      gl2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000",                     MACHINE_NOT_WORKING )
+COMP( 1994, gl2000c,  gl2000, 0,      gl2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000 Compact",             MACHINE_NOT_WORKING )
+COMP( 1995, gl2000p,  gl2000, 0,      gl2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000 Plus",                MACHINE_NOT_WORKING )
+COMP( 1996, gl3000s,  0,      0,      gl3000s,  gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader 3000S (Germany)",          MACHINE_NOT_WORKING )
+COMP( 1994, gl4000,   0,      0,      gl4000,   pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4000 Quadro (Germany)",    MACHINE_NOT_WORKING )
+COMP( 1996, gl4004,   0,      0,      gl4000,   pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4004 Quadro L (Germany)",  MACHINE_NOT_WORKING )
+COMP( 1997, gl5000,   0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5000 (Germany)",           MACHINE_IS_SKELETON )
+COMP( 1997, gl5005x,  0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5005X (Germany)",          MACHINE_IS_SKELETON )
+COMP( 1997, glpn,     0,      0,      gl4000,   pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader Power Notebook (Germany)", MACHINE_IS_SKELETON )
+COMP( 1998, gmtt ,    0,      0,      gl4000,   pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Master Table Top (Germany)",      MACHINE_IS_SKELETON )
+COMP( 2001, gbs5505x, 0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius BrainStation 5505X (Germany)",    MACHINE_IS_SKELETON )
+COMP( 1993, gln,      0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader Notebook",                 MACHINE_IS_SKELETON )
+COMP( 1999, lexipcm,  0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Lexibook",                "LexiPC Mega 2000 (Germany)",             MACHINE_IS_SKELETON )

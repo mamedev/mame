@@ -76,21 +76,24 @@
 DEFINE_DEVICE_TYPE(NICK, nick_device, "nick", "NICK")
 
 
-ADDRESS_MAP_START(nick_device::vram_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void nick_device::vram_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(nick_device::vram_r), FUNC(nick_device::vram_w));
+}
 
-ADDRESS_MAP_START(nick_device::vio_map)
-	AM_RANGE(0x00, 0x00) AM_WRITE(fixbias_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(border_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(lpl_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(lph_w)
-ADDRESS_MAP_END
+void nick_device::vio_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(nick_device::fixbias_w));
+	map(0x01, 0x01).w(FUNC(nick_device::border_w));
+	map(0x02, 0x02).w(FUNC(nick_device::lpl_w));
+	map(0x03, 0x03).w(FUNC(nick_device::lph_w));
+}
 
 
-ADDRESS_MAP_START(nick_device::nick_map)
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void nick_device::nick_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
 

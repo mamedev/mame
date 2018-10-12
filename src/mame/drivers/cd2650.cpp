@@ -57,6 +57,7 @@ TODO
 #include "machine/keyboard.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -117,20 +118,23 @@ READ8_MEMBER(cd2650_state::keyin_r)
 	return ret;
 }
 
-ADDRESS_MAP_START(cd2650_state::cd2650_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x1000, 0x7fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void cd2650_state::cd2650_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom().region("roms", 0);
+	map(0x1000, 0x7fff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(cd2650_state::cd2650_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void cd2650_state::cd2650_io(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x80, 0x84) disk i/o
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(cd2650_state::cd2650_data)
-	AM_RANGE(S2650_DATA_PORT,S2650_DATA_PORT) AM_READ(keyin_r) AM_DEVWRITE("outlatch", f9334_device, write_nibble_d3)
-ADDRESS_MAP_END
+void cd2650_state::cd2650_data(address_map &map)
+{
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( cd2650 )
@@ -203,7 +207,7 @@ static const gfx_layout cd2650_charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( cd2650 )
+static GFXDECODE_START( gfx_cd2650 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cd2650_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -284,16 +288,16 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 
 MACHINE_CONFIG_START(cd2650_state::cd2650)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'192'640) / 12) // 1.182720MHz according to RE schematic
-	MCFG_CPU_PROGRAM_MAP(cd2650_mem)
-	MCFG_CPU_IO_MAP(cd2650_io)
-	MCFG_CPU_DATA_MAP(cd2650_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(cd2650_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cd2650_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'192'640) / 12) // 1.182720MHz according to RE schematic
+	MCFG_DEVICE_PROGRAM_MAP(cd2650_mem)
+	MCFG_DEVICE_IO_MAP(cd2650_io)
+	MCFG_DEVICE_DATA_MAP(cd2650_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, cd2650_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cd2650_state, cass_w))
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // IC26
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cd2650_state, tape_deck_on_w)) // TD ON
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state)) // OUT6
+	f9334_device &outlatch(F9334(config, "outlatch")); // IC26
+	outlatch.q_out_cb<0>().set(FUNC(cd2650_state::tape_deck_on_w)); // TD ON
+	outlatch.q_out_cb<7>().set("beeper", FUNC(beep_device::set_state)); // OUT6
 	// Q1-Q7 = OUT 0-6, not defined in RE
 	// The connection of OUT6 to a 700-1200 Hz noise generator is suggested
 	// in Central Data 2650 Newsletter, Volume 1, Issue 3 for use with the
@@ -305,18 +309,16 @@ MACHINE_CONFIG_START(cd2650_state::cd2650)
 	MCFG_SCREEN_UPDATE_DRIVER(cd2650_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cd2650)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cd2650)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", cd2650_state, cd2650, "pgm", 1)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
@@ -347,5 +349,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY         FULLNAME   FLAGS
-COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, cd2650_state,  0,    "Central Data", "2650 Computer System", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME                FLAGS
+COMP( 1977, cd2650, 0,      0,      cd2650,  cd2650, cd2650_state, empty_init, "Central Data", "2650 Computer System", 0 )

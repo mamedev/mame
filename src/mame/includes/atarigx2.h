@@ -11,6 +11,7 @@
 #pragma once
 
 #include "audio/atarijsa.h"
+#include "machine/adc0808.h"
 #include "machine/atarigen.h"
 #include "machine/atarixga.h"
 #include "video/atarirle.h"
@@ -27,11 +28,12 @@ public:
 		, m_playfield_tilemap(*this, "playfield")
 		, m_alpha_tilemap(*this, "alpha")
 		, m_rle(*this, "rle")
+		, m_adc(*this, "adc")
 	{ }
 
-	DECLARE_DRIVER_INIT(spclords);
-	DECLARE_DRIVER_INIT(rrreveng);
-	DECLARE_DRIVER_INIT(motofren);
+	void init_spclords();
+	void init_rrreveng();
+	void init_motofren();
 	void atarigx2_0x200(machine_config &config);
 	void atarigx2_0x400(machine_config &config);
 
@@ -42,7 +44,7 @@ protected:
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ32_MEMBER(special_port2_r);
 	DECLARE_READ32_MEMBER(special_port3_r);
-	DECLARE_READ32_MEMBER(a2d_data_r);
+	DECLARE_READ8_MEMBER(a2d_data_r);
 	DECLARE_WRITE32_MEMBER(latch_w);
 	DECLARE_WRITE32_MEMBER(mo_command_w);
 	DECLARE_WRITE32_MEMBER(atarigx2_protection_w);
@@ -68,6 +70,8 @@ private:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_rle_objects_device> m_rle;
+
+	required_device<adc0808_device> m_adc;
 
 	uint16_t          m_current_control;
 	uint8_t           m_playfield_tile_bank;

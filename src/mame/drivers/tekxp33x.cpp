@@ -38,6 +38,7 @@
 #include "emu.h"
 #include "cpu/mips/r3000.h"
 #include "cpu/tms34010/tms34010.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -49,24 +50,28 @@ public:
 	tekxp330_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	void tekxp330(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void tekxp330(machine_config &config);
 	void cpu_map(address_map &map);
 	void tms_map(address_map &map);
 };
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(tekxp330_state::cpu_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void tekxp330_state::cpu_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram();
+	map(0x1fc00000, 0x1fdfffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(tekxp330_state::tms_map)
-ADDRESS_MAP_END
+void tekxp330_state::tms_map(address_map &map)
+{
+}
 
 /* Input Ports */
 
@@ -94,12 +99,12 @@ void tekxp330_state::machine_start()
 
 MACHINE_CONFIG_START(tekxp330_state::tekxp330)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3052, XTAL(20'000'000)) /* IDT 79R3052E, clock unknown */
+	MCFG_DEVICE_ADD("maincpu", R3052, XTAL(20'000'000)) /* IDT 79R3052E, clock unknown */
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
-	MCFG_CPU_ADD("tms", TMS34010, XTAL(40'000'000)) /* clock unknown */
-	MCFG_CPU_PROGRAM_MAP(tms_map)
+	MCFG_DEVICE_ADD("tms", TMS34010, XTAL(40'000'000)) /* clock unknown */
+	MCFG_DEVICE_PROGRAM_MAP(tms_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -122,5 +127,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1992, tekxp330, 0,      0,      tekxp330, tekxp330, tekxp330_state, 0,    "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1992, tekxp330, 0,      0,      tekxp330, tekxp330, tekxp330_state, empty_init, "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )

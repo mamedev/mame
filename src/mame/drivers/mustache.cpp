@@ -45,30 +45,32 @@ YM2151:
 #define YM_CLOCK    (XTAL1/4)
 
 
-ADDRESS_MAP_START(mustache_state::memmap)
-	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
-	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
-	AM_RANGE(0xd002, 0xd002) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
-	AM_RANGE(0xd003, 0xd003) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("t5182", t5182_device, sharedram_r, sharedram_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("P1")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("P2")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("START")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("DSWA")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
-	AM_RANGE(0xd806, 0xd806) AM_WRITE(scroll_w)
-	AM_RANGE(0xd807, 0xd807) AM_WRITE(video_control_w)
-	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mustache_state::memmap(address_map &map)
+{
+	map(0x0000, 0x7fff).r("sei80bu", FUNC(sei80bu_device::data_r));
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram().w(FUNC(mustache_state::videoram_w)).share("videoram");
+	map(0xd000, 0xd000).w("t5182", FUNC(t5182_device::sound_irq_w));
+	map(0xd001, 0xd001).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
+	map(0xd002, 0xd002).w("t5182", FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
+	map(0xd003, 0xd003).w("t5182", FUNC(t5182_device::sharedram_semaphore_main_release_w));
+	map(0xd400, 0xd4ff).rw("t5182", FUNC(t5182_device::sharedram_r), FUNC(t5182_device::sharedram_w));
+	map(0xd800, 0xd800).portr("P1");
+	map(0xd801, 0xd801).portr("P2");
+	map(0xd802, 0xd802).portr("START");
+	map(0xd803, 0xd803).portr("DSWA");
+	map(0xd804, 0xd804).portr("DSWB");
+	map(0xd806, 0xd806).w(FUNC(mustache_state::scroll_w));
+	map(0xd807, 0xd807).w(FUNC(mustache_state::video_control_w));
+	map(0xe800, 0xefff).writeonly().share("spriteram");
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(mustache_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
-ADDRESS_MAP_END
+void mustache_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).r("sei80bu", FUNC(sei80bu_device::opcode_r));
+	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
+}
 
 /******************************************************************************/
 
@@ -159,7 +161,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( mustache )
+static GFXDECODE_START( gfx_mustache )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 8 )
 GFXDECODE_END
@@ -180,9 +182,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::scanline)
 MACHINE_CONFIG_START(mustache_state::mustache)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
@@ -199,14 +201,14 @@ MACHINE_CONFIG_START(mustache_state::mustache)
 	MCFG_SCREEN_UPDATE_DRIVER(mustache_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mustache)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mustache)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", YM_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, YM_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -265,10 +267,8 @@ ROM_START( mustachei )
 	ROM_LOAD( "a.b6",0x0300, 0x1000, CRC(5f83fa35) SHA1(cb13e63577762d818e5dcbb52b8a53f66e284e8f) ) /* 63S281N near SEI0070BU */
 ROM_END
 
-DRIVER_INIT_MEMBER(mustache_state,mustache)
+void mustache_state::init_mustache()
 {
-	int i;
-
 	int G1 = memregion("gfx1")->bytes()/3;
 	int G2 = memregion("gfx2")->bytes()/2;
 	uint8_t *gfx1 = memregion("gfx1")->base();
@@ -276,13 +276,11 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	std::vector<uint8_t> buf(G2*2);
 
 	/* BG data lines */
-	for (i=0;i<G1; i++)
+	for (int i = 0; i < G1; i++)
 	{
-		uint16_t w;
-
 		buf[i] = bitswap<8>(gfx1[i], 0,5,2,6,4,1,7,3);
 
-		w = (gfx1[i+G1] << 8) | gfx1[i+G1*2];
+		uint16_t w = (gfx1[i+G1] << 8) | gfx1[i+G1*2];
 		w = bitswap<16>(w, 14,1,13,5,9,2,10,6, 3,8,4,15,0,11,12,7);
 
 		buf[i+G1]   = w >> 8;
@@ -290,15 +288,13 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	}
 
 	/* BG address lines */
-	for (i = 0; i < 3*G1; i++)
+	for (int i = 0; i < 3*G1; i++)
 		gfx1[i] = buf[bitswap<16>(i,15,14,13,2,1,0,12,11,10,9,8,7,6,5,4,3)];
 
 	/* SPR data lines */
-	for (i=0;i<G2; i++)
+	for (int i = 0; i < G2; i++)
 	{
-		uint16_t w;
-
-		w = (gfx2[i] << 8) | gfx2[i+G2];
+		uint16_t w = (gfx2[i] << 8) | gfx2[i+G2];
 		w = bitswap<16>(w, 5,7,11,4,15,10,3,14, 9,2,13,8,1,12,0,6 );
 
 		buf[i]    = w >> 8;
@@ -306,10 +302,10 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	}
 
 	/* SPR address lines */
-	for (i = 0; i < 2*G2; i++)
+	for (int i = 0; i < 2*G2; i++)
 		gfx2[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
 }
 
 
-GAME( 1987, mustache,  0,        mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (March license)",  "Mustache Boy (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mustachei, mustache, mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (IG SPA license)", "Mustache Boy (Italy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mustache,  0,        mustache, mustache, mustache_state, init_mustache, ROT90, "Seibu Kaihatsu (March license)",  "Mustache Boy (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mustachei, mustache, mustache, mustache, mustache_state, init_mustache, ROT90, "Seibu Kaihatsu (IG SPA license)", "Mustache Boy (Italy)", MACHINE_SUPPORTS_SAVE )

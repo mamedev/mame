@@ -26,10 +26,10 @@
 	downcast<i8089_device &>(*device).set_data_width(_data_width);
 
 #define MCFG_I8089_SINTR1(_sintr1) \
-	devcb = &downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
+	downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
 
 #define MCFG_I8089_SINTR2(_sintr2) \
-	devcb = &downcast<i8089_device *>(device)->set_sintr2_callback(DEVCB_##_sintr2);
+	downcast<i8089_device *>(device)->set_sintr2_callback(DEVCB_##_sintr2);
 
 
 //**************************************************************************
@@ -82,7 +82,7 @@ protected:
 	address_space_config m_io_config;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;

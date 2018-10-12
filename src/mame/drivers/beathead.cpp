@@ -101,7 +101,7 @@
 
 #include "emu.h"
 #include "includes/beathead.h"
-#include "machine/nvram.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
 
@@ -137,9 +137,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
 	update_interrupts();
 
 	/* set the timer for the next one */
-	timer.adjust(m_screen->time_until_pos(scanline) - m_hblank_offset, scanline);
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline) - m_hblank_offset, scanline);
 }
-
 
 void beathead_state::machine_reset()
 {
@@ -152,8 +151,8 @@ void beathead_state::machine_reset()
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
 	m_hblank_offset = m_screen->scan_period() * (455 - 336 - 25) / 455;
-	timer_device *scanline_timer = machine().device<timer_device>("scan_timer");
-	scanline_timer->adjust(m_screen->time_until_pos(0) - m_hblank_offset);
+
+	m_scan_timer->adjust(m_screen->time_until_pos(0) - m_hblank_offset);
 
 	/* reset IRQs */
 	m_irq_line_state = CLEAR_LINE;
@@ -219,30 +218,6 @@ READ32_MEMBER( beathead_state::interrupt_control_r )
 
 /*************************************
  *
- *  EEPROM handling
- *
- *************************************/
-
-WRITE32_MEMBER( beathead_state::eeprom_data_w )
-{
-	if (m_eeprom_enabled)
-	{
-		mem_mask &= 0x000000ff;
-		COMBINE_DATA(m_nvram + offset);
-		m_eeprom_enabled = 0;
-	}
-}
-
-
-WRITE32_MEMBER( beathead_state::eeprom_enable_w )
-{
-	m_eeprom_enabled = 1;
-}
-
-
-
-/*************************************
- *
  *  Sound communication
  *
  *************************************/
@@ -274,33 +249,34 @@ WRITE32_MEMBER( beathead_state::coin_count_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(beathead_state::main_map)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("ram_base")
-	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rom_base")
-	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_SHARE("nvram")
-	AM_RANGE(0x41000000, 0x41000003) AM_DEVREADWRITE8("jsa", atari_jsa_iii_device, main_response_r, main_command_w, 0x000000ff)
-	AM_RANGE(0x41000100, 0x41000103) AM_READ(interrupt_control_r)
-	AM_RANGE(0x41000100, 0x4100011f) AM_WRITE(interrupt_control_w)
-	AM_RANGE(0x41000200, 0x41000203) AM_READ_PORT("IN1")
-	AM_RANGE(0x41000204, 0x41000207) AM_READ_PORT("IN0")
-	AM_RANGE(0x41000208, 0x4100020f) AM_WRITE(sound_reset_w)
-	AM_RANGE(0x41000220, 0x41000227) AM_WRITE(coin_count_w)
-	AM_RANGE(0x41000300, 0x41000303) AM_READ_PORT("IN2")
-	AM_RANGE(0x41000304, 0x41000307) AM_READ_PORT("IN3")
-	AM_RANGE(0x41000400, 0x41000403) AM_WRITEONLY AM_SHARE("palette_select")
-	AM_RANGE(0x41000500, 0x41000503) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0x41000600, 0x41000603) AM_WRITE(finescroll_w)
-	AM_RANGE(0x41000700, 0x41000703) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
-	AM_RANGE(0x42000000, 0x4201ffff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
-	AM_RANGE(0x43000000, 0x43000007) AM_READWRITE(hsync_ram_r, hsync_ram_w)
-	AM_RANGE(0x8df80000, 0x8df80003) AM_READNOP /* noisy x4 during scanline int */
-	AM_RANGE(0x8f380000, 0x8f3fffff) AM_WRITE(vram_latch_w)
-	AM_RANGE(0x8f900000, 0x8f97ffff) AM_WRITE(vram_transparent_w)
-	AM_RANGE(0x8f980000, 0x8f9fffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8fb80000, 0x8fbfffff) AM_WRITE(vram_bulk_w)
-	AM_RANGE(0x8fff8000, 0x8fff8003) AM_WRITEONLY AM_SHARE("vram_bulk_latch")
-	AM_RANGE(0x9e280000, 0x9e2fffff) AM_WRITE(vram_copy_w)
-ADDRESS_MAP_END
+void beathead_state::main_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).ram().share("ram_base");
+	map(0x01800000, 0x01bfffff).rom().region("user1", 0).share("rom_base");
+	map(0x40000000, 0x400007ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0x000000ff);
+	map(0x41000000, 0x41000000).rw(m_jsa, FUNC(atari_jsa_iii_device::main_response_r), FUNC(atari_jsa_iii_device::main_command_w));
+	map(0x41000100, 0x41000103).r(FUNC(beathead_state::interrupt_control_r));
+	map(0x41000100, 0x4100011f).w(FUNC(beathead_state::interrupt_control_w));
+	map(0x41000200, 0x41000203).portr("IN1");
+	map(0x41000204, 0x41000207).portr("IN0");
+	map(0x41000208, 0x4100020f).w(FUNC(beathead_state::sound_reset_w));
+	map(0x41000220, 0x41000227).w(FUNC(beathead_state::coin_count_w));
+	map(0x41000300, 0x41000303).portr("IN2");
+	map(0x41000304, 0x41000307).portr("IN3");
+	map(0x41000400, 0x41000403).writeonly().share("palette_select");
+	map(0x41000500, 0x41000500).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
+	map(0x41000600, 0x41000603).w(FUNC(beathead_state::finescroll_w));
+	map(0x41000700, 0x41000703).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
+	map(0x42000000, 0x4201ffff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0x43000000, 0x43000007).rw(FUNC(beathead_state::hsync_ram_r), FUNC(beathead_state::hsync_ram_w));
+	map(0x8df80000, 0x8df80003).nopr(); /* noisy x4 during scanline int */
+	map(0x8f380000, 0x8f3fffff).w(FUNC(beathead_state::vram_latch_w));
+	map(0x8f900000, 0x8f97ffff).w(FUNC(beathead_state::vram_transparent_w));
+	map(0x8f980000, 0x8f9fffff).ram().share("videoram");
+	map(0x8fb80000, 0x8fbfffff).w(FUNC(beathead_state::vram_bulk_w));
+	map(0x8fff8000, 0x8fff8003).writeonly().share("vram_bulk_latch");
+	map(0x9e280000, 0x9e2fffff).w(FUNC(beathead_state::vram_copy_w));
+}
 
 
 
@@ -363,14 +339,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(beathead_state::beathead)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", beathead_state, scanline_callback)
+	MCFG_TIMER_DRIVER_ADD(m_scan_timer, beathead_state, scanline_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -386,9 +362,9 @@ MACHINE_CONFIG_START(beathead_state::beathead)
 	MCFG_PALETTE_MEMBITS(16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(beathead_state, sound_int_write_line))
+	MCFG_ATARI_JSA_III_ADD("jsa", NOOP)
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -430,4 +406,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1993, beathead, 0, beathead, beathead, beathead_state, 0, ROT0, "Atari Games", "BeatHead (prototype)", 0 )
+GAME( 1993, beathead, 0, beathead, beathead, beathead_state, empty_init, ROT0, "Atari Games", "BeatHead (prototype)", 0 )

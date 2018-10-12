@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "includes/channelf.h"
+
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -119,17 +120,19 @@ WRITE8_MEMBER( channelf_state::port_5_w )
 	m_row_reg = (data | 0xc0) ^ 0xff;
 }
 
-ADDRESS_MAP_START(channelf_state::channelf_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0xffff) AM_DEVREAD("cartslot", channelf_cart_slot_device, read_rom)
-ADDRESS_MAP_END
+void channelf_state::channelf_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0xffff).r(m_cart, FUNC(channelf_cart_slot_device::read_rom));
+}
 
-ADDRESS_MAP_START(channelf_state::channelf_io)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(port_0_r, port_0_w) /* Front panel switches */
-	AM_RANGE(0x01, 0x01) AM_READWRITE(port_1_r, port_1_w) /* Right controller     */
-	AM_RANGE(0x04, 0x04) AM_READWRITE(port_4_r, port_4_w) /* Left controller      */
-	AM_RANGE(0x05, 0x05) AM_READWRITE(port_5_r, port_5_w)
-ADDRESS_MAP_END
+void channelf_state::channelf_io(address_map &map)
+{
+	map(0x00, 0x00).rw(FUNC(channelf_state::port_0_r), FUNC(channelf_state::port_0_w)); /* Front panel switches */
+	map(0x01, 0x01).rw(FUNC(channelf_state::port_1_r), FUNC(channelf_state::port_1_w)); /* Right controller     */
+	map(0x04, 0x04).rw(FUNC(channelf_state::port_4_r), FUNC(channelf_state::port_4_w)); /* Left controller      */
+	map(0x05, 0x05).rw(FUNC(channelf_state::port_5_r), FUNC(channelf_state::port_5_w));
+}
 
 
 
@@ -189,14 +192,15 @@ void channelf_state::machine_start()
 	}
 }
 
-static SLOT_INTERFACE_START(cf_cart)
-	SLOT_INTERFACE_INTERNAL("std",      CHANF_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("maze",     CHANF_ROM_MAZE)
-	SLOT_INTERFACE_INTERNAL("hangman",  CHANF_ROM_HANGMAN)
-	SLOT_INTERFACE_INTERNAL("chess",    CHANF_ROM_CHESS)
-	SLOT_INTERFACE_INTERNAL("multi_old",CHANF_ROM_MULTI_OLD)
-	SLOT_INTERFACE_INTERNAL("multi",    CHANF_ROM_MULTI_FINAL)
-SLOT_INTERFACE_END
+static void cf_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",      CHANF_ROM_STD);
+	device.option_add_internal("maze",     CHANF_ROM_MAZE);
+	device.option_add_internal("hangman",  CHANF_ROM_HANGMAN);
+	device.option_add_internal("chess",    CHANF_ROM_CHESS);
+	device.option_add_internal("multi_old",CHANF_ROM_MULTI_OLD);
+	device.option_add_internal("multi",    CHANF_ROM_MULTI_FINAL);
+}
 
 
 MACHINE_CONFIG_START(channelf_state::channelf_cart)
@@ -209,9 +213,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(channelf_state::channelf)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
-	MCFG_CPU_PROGRAM_MAP(channelf_map)
-	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_DEVICE_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
+	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
+	MCFG_DEVICE_IO_MAP(channelf_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -227,8 +231,8 @@ MACHINE_CONFIG_START(channelf_state::channelf)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	channelf_cart(config);
@@ -236,9 +240,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(channelf_state::sabavdpl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
-	MCFG_CPU_PROGRAM_MAP(channelf_map)
-	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_DEVICE_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
+	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
+	MCFG_DEVICE_IO_MAP(channelf_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
@@ -254,8 +258,8 @@ MACHINE_CONFIG_START(channelf_state::sabavdpl)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	channelf_cart(config);
@@ -264,9 +268,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(channelf_state::channlf2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
-	MCFG_CPU_PROGRAM_MAP(channelf_map)
-	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_DEVICE_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
+	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
+	MCFG_DEVICE_IO_MAP(channelf_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -282,8 +286,8 @@ MACHINE_CONFIG_START(channelf_state::channlf2)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	channelf_cart(config);
@@ -292,9 +296,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(channelf_state::sabavpl2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
-	MCFG_CPU_PROGRAM_MAP(channelf_map)
-	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_DEVICE_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
+	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
+	MCFG_DEVICE_IO_MAP(channelf_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
@@ -310,8 +314,8 @@ MACHINE_CONFIG_START(channelf_state::sabavpl2)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	channelf_cart(config);
@@ -320,9 +324,9 @@ MACHINE_CONFIG_END
 ROM_START( channelf )
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "sl90025", "Luxor Video Entertainment System" )
-	ROMX_LOAD("sl90025.rom",  0x0000, 0x0400, CRC(015c1e38) SHA1(759e2ed31fbde4a2d8daf8b9f3e0dffebc90dae2), ROM_BIOS(1))
+	ROMX_LOAD("sl90025.rom",  0x0000, 0x0400, CRC(015c1e38) SHA1(759e2ed31fbde4a2d8daf8b9f3e0dffebc90dae2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "sl31253", "Channel F" )
-	ROMX_LOAD("sl31253.rom",  0x0000, 0x0400, CRC(04694ed9) SHA1(81193965a374d77b99b4743d317824b53c3e3c78), ROM_BIOS(2))
+	ROMX_LOAD("sl31253.rom",  0x0000, 0x0400, CRC(04694ed9) SHA1(81193965a374d77b99b4743d317824b53c3e3c78), ROM_BIOS(1))
 	ROM_LOAD("sl31254.rom",   0x0400, 0x0400, CRC(9c047ba3) SHA1(8f70d1b74483ba3a37e86cf16c849d601a8c3d2c))
 	ROM_REGION(0x2000, "vram", ROMREGION_ERASE00)
 ROM_END
@@ -342,12 +346,12 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE            INIT   COMPANY         FULLNAME                                FLAGS */
-CONS( 1976, channelf,  0,        0,      channelf,  channelf, channelf_state,  0,     "Fairchild",    "Channel F",                            0 )
-CONS( 1977, sabavdpl,  channelf, 0,      sabavdpl,  channelf, channelf_state,  0,     "SABA",         "SABA Videoplay",                       0 )
-CONS( 197?, luxorves,  channelf, 0,      sabavdpl,  channelf, channelf_state,  0,     "Luxor",        "Luxor Video Entertainment System",     0 )
-CONS( 1978, channlf2,  0, channelf,      channlf2,  channelf, channelf_state,  0,     "Fairchild",    "Channel F II",                         0 )
-CONS( 1978, sabavpl2,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "SABA",         "SABA Videoplay 2",                     0 )
-CONS( 197?, luxorvec,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "Luxor",        "Luxor Video Entertainment Computer",   0 )
-CONS( 197?, itttelma,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "ITT",          "ITT Tele-Match Processor",             0 )
-CONS( 1978, ingtelma,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "Ingelen",      "Ingelen Tele-Match Processor",         0 )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS           INIT        COMPANY         FULLNAME                                FLAGS */
+CONS( 1976, channelf, 0,        0,        channelf, channelf, channelf_state, empty_init, "Fairchild",    "Channel F",                            0 )
+CONS( 1977, sabavdpl, channelf, 0,        sabavdpl, channelf, channelf_state, empty_init, "SABA",         "SABA Videoplay",                       0 )
+CONS( 197?, luxorves, channelf, 0,        sabavdpl, channelf, channelf_state, empty_init, "Luxor",        "Luxor Video Entertainment System",     0 )
+CONS( 1978, channlf2, 0,        channelf, channlf2, channelf, channelf_state, empty_init, "Fairchild",    "Channel F II",                         0 )
+CONS( 1978, sabavpl2, channlf2, 0,        sabavpl2, channelf, channelf_state, empty_init, "SABA",         "SABA Videoplay 2",                     0 )
+CONS( 197?, luxorvec, channlf2, 0,        sabavpl2, channelf, channelf_state, empty_init, "Luxor",        "Luxor Video Entertainment Computer",   0 )
+CONS( 197?, itttelma, channlf2, 0,        sabavpl2, channelf, channelf_state, empty_init, "ITT",          "ITT Tele-Match Processor",             0 )
+CONS( 1978, ingtelma, channlf2, 0,        sabavpl2, channelf, channelf_state, empty_init, "Ingelen",      "Ingelen Tele-Match Processor",         0 )

@@ -1,12 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-
 #ifndef MAME_INCLUDES_PGM2_H
 #define MAME_INCLUDES_PGM2_H
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/ymz770.h"
@@ -17,6 +15,7 @@
 #include "machine/timer.h"
 #include "machine/atmel_arm_aic.h"
 #include "machine/pgm2_memcard.h"
+#include "emupal.h"
 
 struct kov3_module_key
 {
@@ -29,8 +28,8 @@ struct kov3_module_key
 class pgm2_state : public driver_device
 {
 public:
-	pgm2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pgm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_lineram(*this, "lineram"),
@@ -88,15 +87,15 @@ public:
 	DECLARE_WRITE32_MEMBER(encryption_do_w);
 	DECLARE_WRITE32_MEMBER(sprite_encryption_w);
 
-	DECLARE_DRIVER_INIT(kov2nl);
-	DECLARE_DRIVER_INIT(orleg2);
-	DECLARE_DRIVER_INIT(ddpdojt);
-	DECLARE_DRIVER_INIT(kov3);
-	DECLARE_DRIVER_INIT(kov3_104);
-	DECLARE_DRIVER_INIT(kov3_102);
-	DECLARE_DRIVER_INIT(kov3_101);
-	DECLARE_DRIVER_INIT(kov3_100);
-	DECLARE_DRIVER_INIT(kof98umh);
+	void init_kov2nl();
+	void init_orleg2();
+	void init_ddpdojt();
+	void init_kov3();
+	void init_kov3_104();
+	void init_kov3_102();
+	void init_kov3_101();
+	void init_kov3_100();
+	void init_kof98umh();
 
 	uint32_t screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);

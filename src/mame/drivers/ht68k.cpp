@@ -52,6 +52,9 @@ public:
 	{
 	}
 
+	void ht68k(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<wd1770_device> m_fdc;
@@ -65,20 +68,20 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output);
 	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
-	void ht68k(machine_config &config);
 	void ht68k_mem(address_map &map);
 };
 
 
-ADDRESS_MAP_START(ht68k_state::ht68k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("p_ram") // 512 KB RAM / ROM at boot
+void ht68k_state::ht68k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0007ffff).ram().share("p_ram"); // 512 KB RAM / ROM at boot
 	//AM_RANGE(0x00080000, 0x000fffff) // Expansion
 	//AM_RANGE(0x00d80000, 0x00d8ffff) // Printer
-	AM_RANGE(0x00e00000, 0x00e00007) AM_MIRROR(0xfff8) AM_DEVREADWRITE8("wd1770", wd1770_device, read, write, 0x00ff) // FDC WD1770
-	AM_RANGE(0x00e80000, 0x00e800ff) AM_MIRROR(0xff00) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
-	AM_RANGE(0x00f00000, 0x00f07fff) AM_ROM AM_MIRROR(0xf8000) AM_REGION("user1",0)
-ADDRESS_MAP_END
+	map(0x00e00000, 0x00e00007).mirror(0xfff8).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write)).umask16(0x00ff); // FDC WD1770
+	map(0x00e80000, 0x00e800ff).mirror(0xff00).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x00f00000, 0x00f07fff).rom().mirror(0xf8000).region("user1", 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ht68k )
@@ -120,28 +123,29 @@ WRITE8_MEMBER(ht68k_state::duart_output)
 	if (m_floppy) {m_floppy->ss_w(BIT(data,3) ? 0 : 1);}
 }
 
-static SLOT_INTERFACE_START( ht68k_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ht68k_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 
 MACHINE_CONFIG_START(ht68k_state::ht68k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(ht68k_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(ht68k_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "duart68681", MC68681, XTAL(8'000'000) / 2 )
+	MCFG_DEVICE_ADD("duart68681", MC68681, 8_MHz_XTAL / 2)
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(ht68k_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(ht68k_state, duart_txb))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(ht68k_state, duart_output))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, ht68k_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, ht68k_state, duart_txb))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, ht68k_state, duart_output))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681", mc68681_device, rx_a_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart68681", mc68681_device, rx_a_w))
 
-	MCFG_WD1770_ADD("wd1770", XTAL(8'000'000) )
+	WD1770(config, m_fdc, 8_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -160,5 +164,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY                 FULLNAME           FLAGS
-COMP( 1987, ht68k,  0,       0,      ht68k,     ht68k, ht68k_state, 0,    "Hawthorne Technology", "TinyGiant HT68k", MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                 FULLNAME           FLAGS
+COMP( 1987, ht68k, 0,      0,      ht68k,   ht68k, ht68k_state, empty_init, "Hawthorne Technology", "TinyGiant HT68k", MACHINE_NO_SOUND)

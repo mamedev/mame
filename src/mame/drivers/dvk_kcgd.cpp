@@ -22,6 +22,7 @@
 #include "machine/clock.h"
 #include "machine/ms7004.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -67,6 +68,9 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
+	void kcgd(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -94,13 +98,12 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_index_w);
 	DECLARE_WRITE8_MEMBER(palette_data_w);
 
-	emu_timer *m_vsync_on_timer;
-	emu_timer *m_vsync_off_timer;
+	//emu_timer *m_vsync_on_timer;
+	//emu_timer *m_vsync_off_timer;
 	emu_timer *m_500hz_timer;
 
-	void kcgd(machine_config &config);
 	void kcgd_mem(address_map &map);
-private:
+
 	void draw_scanline(uint16_t *p, uint16_t offset);
 	rectangle m_tmpclip;
 	bitmap_ind16 m_tmpbmp;
@@ -113,25 +116,25 @@ private:
 	} m_video;
 	std::unique_ptr<uint32_t[]> m_videoram;
 
-protected:
 	required_device<cpu_device> m_maincpu;
 //  required_device<ms7004_device> m_ms7004;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
 
-ADDRESS_MAP_START(kcgd_state::kcgd_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0000000, 0077777) AM_READWRITE(vram_mmap_r, vram_mmap_w)
-	AM_RANGE (0100000, 0157777) AM_ROM
-	AM_RANGE (0160000, 0160001) AM_MIRROR(03774) AM_READWRITE(vram_addr_r, vram_addr_w)
-	AM_RANGE (0160002, 0160003) AM_MIRROR(03774) AM_READWRITE(vram_data_r, vram_data_w)
-	AM_RANGE (0167770, 0167771) AM_READWRITE(status_r, status_w)
-	AM_RANGE (0167772, 0167773) AM_READWRITE8(palette_index_r, palette_index_w, 0x00ff) // reads always return 0
-	AM_RANGE (0167772, 0167773) AM_READWRITE8(palette_data_r, palette_data_w, 0xff00)
-//  AM_RANGE (0176560, 0176567) AM_RAM  // USART2 -- host
-//  AM_RANGE (0177560, 0177567) AM_RAM  // USART3 -- keyboard
-ADDRESS_MAP_END
+void kcgd_state::kcgd_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0000000, 0077777).rw(FUNC(kcgd_state::vram_mmap_r), FUNC(kcgd_state::vram_mmap_w));
+	map(0100000, 0157777).rom();
+	map(0160000, 0160001).mirror(03774).rw(FUNC(kcgd_state::vram_addr_r), FUNC(kcgd_state::vram_addr_w));
+	map(0160002, 0160003).mirror(03774).rw(FUNC(kcgd_state::vram_data_r), FUNC(kcgd_state::vram_data_w));
+	map(0167770, 0167771).rw(FUNC(kcgd_state::status_r), FUNC(kcgd_state::status_w));
+	map(0167772, 0167772).rw(FUNC(kcgd_state::palette_index_r), FUNC(kcgd_state::palette_index_w)); // reads always return 0
+	map(0167773, 0167773).rw(FUNC(kcgd_state::palette_data_r), FUNC(kcgd_state::palette_data_w));
+//  map(0176560, 0176567).ram();  // USART2 -- host
+//  map(0177560, 0177567).ram();  // USART3 -- keyboard
+}
 
 void kcgd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -159,8 +162,6 @@ void kcgd_state::machine_reset()
 
 void kcgd_state::video_start()
 {
-//  screen_device *screen = machine().device<screen_device>("screen");
-
 	// 64 kwords, word size is 17 bits
 	m_videoram = std::make_unique<uint32_t[]>(65536);
 
@@ -168,10 +169,10 @@ void kcgd_state::video_start()
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);
 /*
     m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC_ON);
-    m_vsync_on_timer->adjust(screen->time_until_pos(0, 0), 0, screen->frame_period());
+    m_vsync_on_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->frame_period());
 
     m_vsync_off_timer = timer_alloc(TIMER_ID_VSYNC_OFF);
-    m_vsync_off_timer->adjust(screen->time_until_pos(16, 0), 0, screen->frame_period());
+    m_vsync_off_timer->adjust(m_screen->time_until_pos(16, 0), 0, m_screen->frame_period());
 */
 	m_500hz_timer = timer_alloc(TIMER_ID_500HZ);
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
@@ -341,13 +342,13 @@ static const gfx_layout kcgd_charlayout =
 	8*10                    /* every char takes 10 bytes */
 };
 
-static GFXDECODE_START( kcgd )
+static GFXDECODE_START( gfx_kcgd )
 	GFXDECODE_ENTRY("maincpu", 0112236, kcgd_charlayout, 0, 1)
 GFXDECODE_END
 
 MACHINE_CONFIG_START(kcgd_state::kcgd)
-	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL(30'800'000)/4)
-	MCFG_CPU_PROGRAM_MAP(kcgd_mem)
+	MCFG_DEVICE_ADD("maincpu", K1801VM2, XTAL(30'800'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(kcgd_mem)
 	MCFG_T11_INITIAL_MODE(0100000)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", kcgd_state, scanline_callback, attotime::from_hz(50*28*11)) // XXX verify
@@ -363,13 +364,13 @@ MACHINE_CONFIG_START(kcgd_state::kcgd)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(kcgd_state, kcgd)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kcgd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kcgd)
 #if 0
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(DEVWRITELINE("i8251kbd", i8251_device, write_rxd))
+	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(kcgd_state, write_keyboard_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, kcgd_state, write_keyboard_clock))
 #endif
 MACHINE_CONFIG_END
 
@@ -377,12 +378,12 @@ ROM_START( dvk_kcgd )
 	ROM_REGION16_BE(0x100000,"maincpu", ROMREGION_ERASE00)
 	ROM_DEFAULT_BIOS("181")
 	ROM_SYSTEM_BIOS(0, "181", "mask 181")
-	ROMX_LOAD("kr1801re2-181.bin", 0100000, 020000, CRC(acac124f) SHA1(412c3eb71bece6f791fc5a9d707cf4692fd0b45b), ROM_BIOS(1))
+	ROMX_LOAD("kr1801re2-181.bin", 0100000, 020000, CRC(acac124f) SHA1(412c3eb71bece6f791fc5a9d707cf4692fd0b45b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "182", "mask 182")
-	ROMX_LOAD("kr1801re2-182.bin", 0100000, 020000, CRC(3ca2921a) SHA1(389b30c40ed7e41dae71d58c7bff630359a48153), ROM_BIOS(2))
+	ROMX_LOAD("kr1801re2-182.bin", 0100000, 020000, CRC(3ca2921a) SHA1(389b30c40ed7e41dae71d58c7bff630359a48153), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE        INIT   COMPANY     FULLNAME       FLAGS */
-COMP( 1987, dvk_kcgd, 0,      0,       kcgd,      0,       kcgd_state,  0,     "USSR",     "DVK KCGD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME    FLAGS */
+COMP( 1987, dvk_kcgd, 0,      0,      kcgd,    0,     kcgd_state, empty_init, "USSR",  "DVK KCGD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

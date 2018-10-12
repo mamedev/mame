@@ -10,6 +10,9 @@
   - 1996 Sharp Microcomputer Databook
   - KB1013VK1-2/KB1013VK4-2 manual
 
+  Default external frequency of these is 32.768kHz, forwarding a clockrate in the
+  MAME machine config is optional. Newer revisions can have an internal oscillator.
+
   TODO:
   - source organiziation between files is a mess
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
@@ -130,7 +133,7 @@ void sm510_base_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_c).formatstr("%1s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// init peripherals
 	init_divider();
@@ -300,7 +303,7 @@ void sm510_base_device::execute_run()
 		m_prev_pc = m_pc;
 
 		// fetch next opcode
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		m_op = m_program->read_byte(m_pc);
 		increment_pc();
 		get_opcode_param();

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "cpu/i86/i186.h"
+#include "machine/gen_latch.h"
 #include "machine/pit8253.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
@@ -55,31 +56,20 @@ protected:
 		TYPE_WSF
 	};
 
-	required_device<dac_byte_interface> m_dac1;
-	required_device<dac_byte_interface> m_dac2;
-	required_device<dac_byte_interface> m_dac3;
-	required_device<dac_byte_interface> m_dac4;
-	optional_device<dac_byte_interface> m_dac5;
-	optional_device<dac_byte_interface> m_dac6;
-	optional_device<dac_byte_interface> m_dac7;
-	optional_device<dac_byte_interface> m_dac8;
+	required_device<generic_latch_16_device> m_soundlatch;
+	optional_device_array<dac_byte_interface, 8> m_dac;
 	optional_device<dac_word_interface> m_dac9;
-	required_device<dac_byte_interface> m_dac1vol;
-	required_device<dac_byte_interface> m_dac2vol;
-	required_device<dac_byte_interface> m_dac3vol;
-	required_device<dac_byte_interface> m_dac4vol;
-	optional_device<dac_byte_interface> m_dac5vol;
-	optional_device<dac_byte_interface> m_dac6vol;
-	optional_device<dac_byte_interface> m_dac7vol;
-	optional_device<dac_byte_interface> m_dac8vol;
+	optional_device_array<dac_byte_interface, 8> m_dacvol;
+
+	void ataxx_80186_map_io(address_map &map);
+	void leland_80186_map_io(address_map &map);
+	void leland_80186_map_program(address_map &map);
 
 private:
-	void command_lo_sync(void *ptr, int param);
 	void delayed_response_r(void *ptr, int param);
 	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1<<which)) : (m_clock_active & ~(1<<which)); }
 
 	// internal state
-	i80186_cpu_device *m_audiocpu;
 	uint16_t m_peripheral;
 	uint8_t m_last_control;
 	uint8_t m_clock_active;
@@ -91,10 +81,10 @@ private:
 	uint8_t m_ext_active;
 	uint8_t* m_ext_base;
 
-	required_device<pit8254_device> m_pit0;
-	optional_device<pit8254_device> m_pit1;
-	optional_device<pit8254_device> m_pit2;
+	optional_device_array<pit8254_device, 3> m_pit;
 	optional_device<ym2151_device> m_ymsnd;
+	optional_device<i80186_cpu_device> m_audiocpu;
+	required_device<cpu_device> m_master;
 };
 
 
@@ -106,6 +96,8 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
+private:
+	void redline_80186_map_io(address_map &map);
 };
 
 

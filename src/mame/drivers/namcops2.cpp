@@ -873,6 +873,7 @@ Notes:
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -884,12 +885,13 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void system246(machine_config &config);
 	void system256(machine_config &config);
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void ps2_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -908,19 +910,20 @@ uint32_t namcops2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(namcops2_state::ps2_map)
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM in consumer PS2s, do these have more?
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void namcops2_state::ps2_map(address_map &map)
+{
+	map(0x00000000, 0x01ffffff).ram(); // 32 MB RAM in consumer PS2s, do these have more?
+	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
+}
 
 static INPUT_PORTS_START( system246 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(namcops2_state::system246)
-	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // actually R5900 @ 294 MHz
+	MCFG_DEVICE_ADD("maincpu", R5000LE, 294000000) // actually R5900 @ 294 MHz
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_CPU_PROGRAM_MAP(ps2_map)
+	MCFG_DEVICE_PROGRAM_MAP(ps2_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1590,59 +1593,59 @@ ROM_START( sbxc )
 ROM_END
 
 // System 246
-GAME(2001, sys246,          0, system246, system246, namcops2_state, 0, ROT0, "Namco", "System 246 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
-GAME(2001, vnight,     sys246, system246, system246, namcops2_state, 0, ROT0, "Sega / Namco", "Vampire Night (VPN3 Ver. B)", MACHINE_IS_SKELETON)
-GAME(2001, bldyr3b,    sys246, system246, system246, namcops2_state, 0, ROT0, "bootleg", "Bloody Roar 3 (bootleg)", MACHINE_IS_SKELETON)
-GAME(2001, rrvac,      sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2001, rrvac2,      rrvac, system246, system246, namcops2_state, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV2 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2001, rrvac1,      rrvac, system246, system246, namcops2_state, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2001, wanganmd,   sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Wangan Midnight (WMN1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, dragchrn,   sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, netchu02,   sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, scptour,    sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Smash Court Pro Tournament (SCP1)", MACHINE_IS_SKELETON)
-GAME(2002, soulclb2,   sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Soul Calibur II (SC23 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, soulcl2a, soulclb2, system246, system246, namcops2_state, 0, ROT0, "Namco", "Soul Calibur II (SC22 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, soulcl2b, soulclb2, system246, system246, namcops2_state, 0, ROT0, "Namco", "Soul Calibur II (SC21 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, soulcl2w, soulclb2, system246, system246, namcops2_state, 0, ROT0, "Namco", "Soul Calibur II (SC23 world version)", MACHINE_IS_SKELETON)
-GAME(2002, tekken4,    sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Tekken 4 (TEF3 Ver. C)", MACHINE_IS_SKELETON)
-GAME(2002, tekken4a,  tekken4, system246, system246, namcops2_state, 0, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, tekken4b,  tekken4, system246, system246, namcops2_state, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, tekken4c,  tekken4, system246, system246, namcops2_state, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. C)", MACHINE_IS_SKELETON)
-GAME(2002, wanganmr,   sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Wangan Midnight R (WMR1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2003, prdgp03,    sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Pride GP 2003 (PR21 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2003, timecrs3,   sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Time Crisis 3 (TST1)", MACHINE_IS_SKELETON)
-GAME(2003, timecrs3e,timecrs3, system246, system246, namcops2_state, 0, ROT0, "Namco", "Time Crisis 3 (TST2 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2003, zgundm,     sys246, system246, system246, namcops2_state, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans (ZGA1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2004, fghtjam,    sys246, system246, system246, namcops2_state, 0, ROT0, "Capcom / Namco", "Capcom Fighting Jam (JAM1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2004, sukuinuf,   sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2004, zgundmdx,   sys246, system246, system246, namcops2_state, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2004, zoidsinf,   sys246, system246, system246, namcops2_state, 0, ROT0, "Tomy / Taito", "Zoids Infinity", MACHINE_IS_SKELETON)
-GAME(2005, cobrata,    sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Cobra: The Arcade (CBR1 Ver. B)", MACHINE_IS_SKELETON)
-GAME(2005, gundzaft,   sys246, system246, system246, namcops2_state, 0, ROT0, "Capcom / Banpresto", "Gundam Seed: Federation vs. Z.A.F.T. (SED1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2005, soulclb3,   sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A key, NA-B disc)", MACHINE_IS_SKELETON)
-GAME(2005, soulclb3a,soulclb3, system246, system246, namcops2_state, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A key, NA-B disc)", MACHINE_IS_SKELETON)
-GAME(2005, soulclb3b,soulclb3, system246, system246, namcops2_state, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A key, NA-A disc)", MACHINE_IS_SKELETON)
-GAME(2005, taiko7,     sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Taiko No Tatsujin 7 (TK71-NA-A)", MACHINE_IS_SKELETON)
-GAME(2006, taiko8,     sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Taiko No Tatsujin 8 (TK8100-1-NA-A)", MACHINE_IS_SKELETON)
-GAME(2006, qgundam,    sys246, system246, system246, namcops2_state, 0, ROT0, "Namco", "Quiz Mobile Suit Gundam: Monsenshi (QG1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2008, fateulc,    sys246, system246, system246, namcops2_state, 0, ROT0, "Capcom / Namco", "Fate: Unlimited Codes (FUD1 ver. A)", MACHINE_IS_SKELETON)
-GAME(2008, fateulcb,  fateulc, system246, system246, namcops2_state, 0, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", MACHINE_IS_SKELETON)
-GAME(2008, sbxc,       sys246, system246, system246, namcops2_state, 0, ROT0, "Capcom / Arc System Works", "Sengoku Basara X Cross", MACHINE_IS_SKELETON)
+GAME(2001, sys246,          0, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "System 246 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2001, vnight,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Sega / Namco", "Vampire Night (VPN3 Ver. B)", MACHINE_IS_SKELETON)
+GAME(2001, bldyr3b,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "bootleg", "Bloody Roar 3 (bootleg)", MACHINE_IS_SKELETON)
+GAME(2001, rrvac,      sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2001, rrvac2,      rrvac, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2001, rrvac1,      rrvac, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2001, wanganmd,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Wangan Midnight (WMN1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, dragchrn,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, netchu02,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, scptour,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Smash Court Pro Tournament (SCP1)", MACHINE_IS_SKELETON)
+GAME(2002, soulclb2,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur II (SC23 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, soulcl2a, soulclb2, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur II (SC22 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, soulcl2b, soulclb2, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur II (SC21 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, soulcl2w, soulclb2, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur II (SC23 world version)", MACHINE_IS_SKELETON)
+GAME(2002, tekken4,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 4 (TEF3 Ver. C)", MACHINE_IS_SKELETON)
+GAME(2002, tekken4a,  tekken4, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, tekken4b,  tekken4, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, tekken4c,  tekken4, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 4 (TEF1 Ver. C)", MACHINE_IS_SKELETON)
+GAME(2002, wanganmr,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Wangan Midnight R (WMR1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2003, prdgp03,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Pride GP 2003 (PR21 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2003, timecrs3,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Time Crisis 3 (TST1)", MACHINE_IS_SKELETON)
+GAME(2003, timecrs3e,timecrs3, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Time Crisis 3 (TST2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2003, zgundm,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans (ZGA1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2004, fghtjam,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Namco", "Capcom Fighting Jam (JAM1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2004, sukuinuf,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2004, zgundmdx,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2004, zoidsinf,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Tomy / Taito", "Zoids Infinity", MACHINE_IS_SKELETON)
+GAME(2005, cobrata,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Cobra: The Arcade (CBR1 Ver. B)", MACHINE_IS_SKELETON)
+GAME(2005, gundzaft,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Banpresto", "Gundam Seed: Federation vs. Z.A.F.T. (SED1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2005, soulclb3,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A key, NA-B disc)", MACHINE_IS_SKELETON)
+GAME(2005, soulclb3a,soulclb3, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A key, NA-B disc)", MACHINE_IS_SKELETON)
+GAME(2005, soulclb3b,soulclb3, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A key, NA-A disc)", MACHINE_IS_SKELETON)
+GAME(2005, taiko7,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko No Tatsujin 7 (TK71-NA-A)", MACHINE_IS_SKELETON)
+GAME(2006, taiko8,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko No Tatsujin 8 (TK8100-1-NA-A)", MACHINE_IS_SKELETON)
+GAME(2006, qgundam,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Quiz Mobile Suit Gundam: Monsenshi (QG1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2008, fateulc,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Namco", "Fate: Unlimited Codes (FUD1 ver. A)", MACHINE_IS_SKELETON)
+GAME(2008, fateulcb,  fateulc, system246, system246, namcops2_state, empty_init, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", MACHINE_IS_SKELETON)
+GAME(2008, sbxc,       sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Arc System Works", "Sengoku Basara X Cross", MACHINE_IS_SKELETON)
 
 // System 256
-GAME(2004, sys256,          0, system256, system246, namcops2_state, 0, ROT0, "Namco", "System 256 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
-GAME(2005, tekken51,   sys256, system256, system246, namcops2_state, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", MACHINE_IS_SKELETON)
-GAME(2005, tekken51b,tekken51, system256, system246, namcops2_state, 0, ROT0, "Namco", "Tekken 5.1 (TE53 Ver. B)", MACHINE_IS_SKELETON)
-GAME(2005, tekken5d,   sys256, system256, system246, namcops2_state, 0, ROT0, "Namco", "Tekken 5 Dark Resurrection (TED1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2005, superdbz,   sys256, system256, system246, namcops2_state, 0, ROT0, "Banpresto / Spike", "Super Dragon Ball Z (DB1 Ver. B)", MACHINE_IS_SKELETON)
-GAME(2006, kinniku,    sys256, system256, system246, namcops2_state, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2006, taiko9,     sys256, system256, system246, namcops2_state, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", MACHINE_IS_SKELETON)
-GAME(2006, yuyuhaku,   sys256, system256, system246, namcops2_state, 0, ROT0, "Banpresto", "The Battle of Yu Yu Hakusho: Shitou! Ankoku Bujutsukai!", MACHINE_IS_SKELETON)
-GAME(2006, zoidiexp,   sys246, system246, system246, namcops2_state, 0, ROT0, "Tomy / Taito", "Zoids Infinity EX Plus (ver. 2.10)", MACHINE_IS_SKELETON)
-GAME(2007, kinniku2,   sys256, system256, system246, namcops2_state, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix 2 (KN2 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2007, taiko10,    sys256, system256, system246, namcops2_state, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", MACHINE_IS_SKELETON)
-GAME(2008, gdvsgd,     sys256, system256, system246, namcops2_state, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam (GVS1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2009, gdvsgdnx,   sys256, system256, system246, namcops2_state, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam Next", MACHINE_IS_SKELETON)
+GAME(2004, sys256,          0, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "System 256 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2005, tekken51,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", MACHINE_IS_SKELETON)
+GAME(2005, tekken51b,tekken51, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 5.1 (TE53 Ver. B)", MACHINE_IS_SKELETON)
+GAME(2005, tekken5d,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 5 Dark Resurrection (TED1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2005, superdbz,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Banpresto / Spike", "Super Dragon Ball Z (DB1 Ver. B)", MACHINE_IS_SKELETON)
+GAME(2006, kinniku,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2006, taiko9,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", MACHINE_IS_SKELETON)
+GAME(2006, yuyuhaku,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Banpresto", "The Battle of Yu Yu Hakusho: Shitou! Ankoku Bujutsukai!", MACHINE_IS_SKELETON)
+GAME(2006, zoidiexp,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Tomy / Taito", "Zoids Infinity EX Plus (ver. 2.10)", MACHINE_IS_SKELETON)
+GAME(2007, kinniku2,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Kinnikuman Muscle Grand Prix 2 (KN2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2007, taiko10,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", MACHINE_IS_SKELETON)
+GAME(2008, gdvsgd,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Capcom / Bandai", "Gundam vs. Gundam (GVS1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2009, gdvsgdnx,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Capcom / Bandai", "Gundam vs. Gundam Next", MACHINE_IS_SKELETON)
 
 // System Super 256
-GAME(2006, timecrs4,   sys256, system256, system246, namcops2_state, 0, ROT0, "Namco", "Time Crisis 4", MACHINE_IS_SKELETON)
+GAME(2006, timecrs4,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Time Crisis 4", MACHINE_IS_SKELETON)

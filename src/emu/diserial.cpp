@@ -8,9 +8,10 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "diserial.h"
 
-device_serial_interface::device_serial_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "serial"),
+device_serial_interface::device_serial_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "serial"),
 	m_start_bit_hack_for_external_clocks(false),
 	m_df_start_bit_count(0),
 	m_df_word_length(0),
@@ -156,6 +157,8 @@ WRITE_LINE_MEMBER(device_serial_interface::clock_w)
 
 void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_count, parity_t parity, stop_bits_t stop_bits)
 {
+	//device().logerror("Start bits: %d; Data bits: %d; Parity: %s; Stop bits: %s\n", start_bit_count, data_bit_count, parity_tostring(parity), stop_bits_tostring(stop_bits));
+
 	m_df_word_length = data_bit_count;
 
 	switch (stop_bits)

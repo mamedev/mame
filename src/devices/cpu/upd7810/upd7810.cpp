@@ -377,20 +377,22 @@ STOP            01001000  10111011          12  stop
 #include "upd7810_dasm.h"
 
 
-DEFINE_DEVICE_TYPE(UPD7810,  upd7810_device,  "upd7810",  "uPD7810")
-DEFINE_DEVICE_TYPE(UPD7807,  upd7807_device,  "upd7807",  "uPD7807")
-DEFINE_DEVICE_TYPE(UPD7801,  upd7801_device,  "upd7801",  "uPD7801")
-DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "uPD78C05")
-DEFINE_DEVICE_TYPE(UPD78C06, upd78c06_device, "upd78c06", "uPD78C06")
+DEFINE_DEVICE_TYPE(UPD7810,  upd7810_device,  "upd7810",  "NEC uPD7810")
+DEFINE_DEVICE_TYPE(UPD7807,  upd7807_device,  "upd7807",  "NEC uPD7807")
+DEFINE_DEVICE_TYPE(UPD7801,  upd7801_device,  "upd7801",  "NEC uPD7801")
+DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "NEC uPD78C05")
+DEFINE_DEVICE_TYPE(UPD78C06, upd78c06_device, "upd78c06", "NEC uPD78C06")
 
 
-ADDRESS_MAP_START(upd7810_device::upd_internal_128_ram_map)
-	AM_RANGE(0xff80, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void upd7810_device::upd_internal_128_ram_map(address_map &map)
+{
+	map(0xff80, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(upd7810_device::upd_internal_256_ram_map)
-	AM_RANGE(0xff00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void upd7810_device::upd_internal_256_ram_map(address_map &map)
+{
+	map(0xff00, 0xffff).ram();
+}
 
 upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -520,24 +522,24 @@ device_memory_interface::space_config_vector upd7810_device::memory_space_config
 	};
 }
 
-util::disasm_interface *upd7810_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd7810_device::create_disassembler()
 {
-	return new upd7810_disassembler;
+	return std::make_unique<upd7810_disassembler>();
 }
 
-util::disasm_interface *upd7807_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd7807_device::create_disassembler()
 {
-	return new upd7807_disassembler;
+	return std::make_unique<upd7807_disassembler>();
 }
 
-util::disasm_interface *upd7801_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd7801_device::create_disassembler()
 {
-	return new upd7801_disassembler;
+	return std::make_unique<upd7801_disassembler>();
 }
 
-util::disasm_interface *upd78c05_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd78c05_device::create_disassembler()
 {
-	return new upd78c05_disassembler;
+	return std::make_unique<upd78c05_disassembler>();
 }
 
 WRITE8_MEMBER(upd7810_device::pa_w)
@@ -1569,7 +1571,7 @@ void upd78c05_device::handle_timers(int cycles)
 void upd7810_device::base_device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	m_to_func.resolve_safe();
 	m_co0_func.resolve_safe();
@@ -1669,7 +1671,7 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void upd7810_device::device_start()
@@ -1900,7 +1902,7 @@ void upd7810_device::execute_run()
 	{
 		int cc;
 
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		PPC = PC;
 		RDOP(OP);

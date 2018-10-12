@@ -37,34 +37,30 @@
 
 DEFINE_DEVICE_TYPE(K054321, k054321_device, "k054321", "K054321 Maincpu-Soundcpu interface")
 
-ADDRESS_MAP_START(k054321_device::main_map)
-	AM_RANGE(0x0, 0x0) AM_WRITE(active_w)
-	AM_RANGE(0x2, 0x2) AM_WRITE(volume_reset_w)
-	AM_RANGE(0x3, 0x3) AM_WRITE(volume_up_w)
-	AM_RANGE(0x4, 0x4) AM_WRITE(dummy_w)
-	AM_RANGE(0x6, 0x6) AM_WRITE(main1_w)
-	AM_RANGE(0x7, 0x7) AM_WRITE(main2_w)
-	AM_RANGE(0x8, 0x8) AM_READ(busy_r)
-	AM_RANGE(0xa, 0xa) AM_READ(sound1_r)
-ADDRESS_MAP_END
+void k054321_device::main_map(address_map &map)
+{
+	map(0x0, 0x0).w(FUNC(k054321_device::active_w));
+	map(0x2, 0x2).w(FUNC(k054321_device::volume_reset_w));
+	map(0x3, 0x3).w(FUNC(k054321_device::volume_up_w));
+	map(0x4, 0x4).w(FUNC(k054321_device::dummy_w));
+	map(0x6, 0x6).w(FUNC(k054321_device::main1_w));
+	map(0x7, 0x7).w(FUNC(k054321_device::main2_w));
+	map(0x8, 0x8).r(FUNC(k054321_device::busy_r));
+	map(0xa, 0xa).r(FUNC(k054321_device::sound1_r));
+}
 
-ADDRESS_MAP_START(k054321_device::sound_map)
-	AM_RANGE(0x0, 0x0) AM_WRITE(sound1_w)
-	AM_RANGE(0x2, 0x2) AM_READ(main1_r)
-	AM_RANGE(0x3, 0x3) AM_READ(main2_r)
-ADDRESS_MAP_END
+void k054321_device::sound_map(address_map &map)
+{
+	map(0x0, 0x0).w(FUNC(k054321_device::sound1_w));
+	map(0x2, 0x2).r(FUNC(k054321_device::main1_r));
+	map(0x3, 0x3).r(FUNC(k054321_device::main2_r));
+}
 
 k054321_device::k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K054321, tag, owner, clock),
 	  m_left(*this, finder_base::DUMMY_TAG),
 	  m_right(*this, finder_base::DUMMY_TAG)
 {
-}
-
-void k054321_device::set_gain_devices(const char *_left, const char *_right)
-{
-	m_left.set_tag(_left);
-	m_right.set_tag(_right);
 }
 
 void k054321_device::device_start()

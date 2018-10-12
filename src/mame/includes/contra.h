@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "video/k007121.h"
+#include "emupal.h"
 #include "screen.h"
 
 class contra_state : public driver_device
@@ -19,6 +20,7 @@ public:
 		m_tx_cram(*this, "tx_cram"),
 		m_tx_vram(*this, "tx_vram"),
 		m_spriteram(*this, "spriteram"),
+		m_spriteram_2(*this, "spriteram_2"),
 		m_bg_cram(*this, "bg_cram"),
 		m_bg_vram(*this, "bg_vram"),
 		m_audiocpu(*this, "audiocpu"),
@@ -37,6 +39,7 @@ public:
 	required_shared_ptr<uint8_t> m_tx_cram;
 	required_shared_ptr<uint8_t> m_tx_vram;
 	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram_2;
 	required_shared_ptr<uint8_t> m_bg_cram;
 	required_shared_ptr<uint8_t> m_bg_vram;
 
@@ -54,6 +57,7 @@ public:
 	required_device<k007121_device> m_k007121_2;
 	DECLARE_WRITE8_MEMBER(contra_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(contra_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(sirq_clear_w);
 	DECLARE_WRITE8_MEMBER(contra_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(contra_fg_vram_w);
 	DECLARE_WRITE8_MEMBER(contra_fg_cram_w);
@@ -67,6 +71,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(contra);
 	uint32_t screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

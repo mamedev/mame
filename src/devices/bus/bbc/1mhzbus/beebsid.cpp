@@ -13,13 +13,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define MOS8580_TAG     "mos8580"
-
-
-//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -30,13 +23,16 @@ DEFINE_DEVICE_TYPE(BBC_BEEBSID, bbc_beebsid_device, "beebsid", "BeebSID")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_beebsid_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD(MOS8580_TAG, MOS8580, XTAL(16'000'000) / 16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+void bbc_beebsid_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "speaker").front_center();
+	MOS8580(config, m_sid, 16_MHz_XTAL / 16);
+	m_sid->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_BBC_PASSTHRU_1MHZBUS_SLOT_ADD()
-MACHINE_CONFIG_END
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, bbc_1mhzbus_devices, nullptr);
+	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
+	m_1mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
+}
 
 
 //**************************************************************************
@@ -50,7 +46,8 @@ MACHINE_CONFIG_END
 bbc_beebsid_device::bbc_beebsid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BBC_BEEBSID, tag, owner, clock),
 	device_bbc_1mhzbus_interface(mconfig, *this),
-	m_sid(*this, MOS8580_TAG)
+	m_1mhzbus(*this, "1mhzbus"),
+	m_sid(*this, "mos8580")
 {
 }
 
@@ -61,18 +58,47 @@ bbc_beebsid_device::bbc_beebsid_device(const machine_config &mconfig, const char
 
 void bbc_beebsid_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<bbc_1mhzbus_slot_device *>(owner());
-
-	space.install_readwrite_handler(0xfc20, 0xfc3f, read8_delegate(FUNC(mos8580_device::read), (mos8580_device*)m_sid), write8_delegate(FUNC(mos8580_device::write), (mos8580_device*)m_sid));
 }
 
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
+//**************************************************************************
+//  IMPLEMENTATION
+//**************************************************************************
 
-void bbc_beebsid_device::device_reset()
+READ8_MEMBER(bbc_beebsid_device::fred_r)
 {
-	m_sid->reset();
+	uint8_t data = 0xff;
+
+	if (offset >= 0x20 && offset < 0x40)
+	{
+		data = m_sid->read(space, offset);
+	}
+
+	data &= m_1mhzbus->fred_r(space, offset);
+
+	return data;
+}
+
+WRITE8_MEMBER(bbc_beebsid_device::fred_w)
+{
+	if (offset >= 0x20 && offset < 0x40)
+	{
+		m_sid->write(space, offset, data);
+	}
+
+	m_1mhzbus->fred_w(space, offset, data);
+}
+
+READ8_MEMBER(bbc_beebsid_device::jim_r)
+{
+	uint8_t data = 0xff;
+
+	data &= m_1mhzbus->jim_r(space, offset);
+
+	return data;
+}
+
+WRITE8_MEMBER(bbc_beebsid_device::jim_w)
+{
+	m_1mhzbus->jim_w(space, offset, data);
 }

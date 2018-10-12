@@ -90,49 +90,16 @@ class merit_state : public driver_device
 {
 public:
 	merit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_ram_attr(*this, "raattr"),
-		m_ram_video(*this, "ravideo"),
-		m_backup_ram(*this, "backup_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen") { }
+		: driver_device(mconfig, type, tag)
+		, m_ram_attr(*this, "raattr")
+		, m_ram_video(*this, "ravideo")
+		, m_backup_ram(*this, "backup_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_ppi(*this, "ppi8255_%u", 0U)
+		, m_screen(*this, "screen")
+		, m_leds(*this, "led%u", 0U)
+	{ }
 
-	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
-	pen_t m_pens[NUM_PENS];
-	required_shared_ptr<uint8_t> m_ram_attr;
-	required_shared_ptr<uint8_t> m_ram_video;
-	std::unique_ptr<uint8_t[]> m_ram_palette;
-	uint8_t m_lscnblk;
-	int m_extra_video_bank_bit;
-	int m_question_address;
-	int m_decryption_key;
-	optional_shared_ptr<uint8_t> m_backup_ram;
-	DECLARE_READ8_MEMBER(questions_r);
-	DECLARE_WRITE8_MEMBER(low_offset_w);
-	DECLARE_WRITE8_MEMBER(med_offset_w);
-	DECLARE_WRITE8_MEMBER(high_offset_w);
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(casino5_bank_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE8_MEMBER(led1_w);
-	DECLARE_WRITE8_MEMBER(led2_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(misc_couple_w);
-	DECLARE_DRIVER_INIT(couple);
-	DECLARE_DRIVER_INIT(key_5);
-	DECLARE_DRIVER_INIT(key_4);
-	DECLARE_DRIVER_INIT(key_7);
-	DECLARE_DRIVER_INIT(key_0);
-	DECLARE_DRIVER_INIT(key_2);
-	DECLARE_DRIVER_INIT(dtrvwz5);
-	virtual void machine_start() override;
-	DECLARE_MACHINE_START(casino5);
-	MC6845_BEGIN_UPDATE(crtc_begin_update);
-	MC6845_UPDATE_ROW(crtc_update_row);
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
 	void misdraw(machine_config &config);
 	void couple(machine_config &config);
 	void phrcraze(machine_config &config);
@@ -144,6 +111,35 @@ public:
 	void trvwhziv(machine_config &config);
 	void bigappg(machine_config &config);
 	void pitboss(machine_config &config);
+
+	void init_couple();
+	void init_key_5();
+	void init_key_4();
+	void init_key_7();
+	void init_key_0();
+	void init_key_2();
+	void init_dtrvwz5();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
+
+private:
+	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
+	DECLARE_READ8_MEMBER(questions_r);
+	DECLARE_WRITE8_MEMBER(low_offset_w);
+	DECLARE_WRITE8_MEMBER(med_offset_w);
+	DECLARE_WRITE8_MEMBER(high_offset_w);
+	DECLARE_READ8_MEMBER(palette_r);
+	DECLARE_WRITE8_MEMBER(palette_w);
+	DECLARE_WRITE8_MEMBER(casino5_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	DECLARE_WRITE8_MEMBER(led1_w);
+	DECLARE_WRITE8_MEMBER(led2_w);
+	DECLARE_WRITE8_MEMBER(misc_w);
+	DECLARE_WRITE8_MEMBER(misc_couple_w);
+
+	DECLARE_MACHINE_START(casino5);
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	void bigappg_map(address_map &map);
 	void casino5_map(address_map &map);
 	void couple_map(address_map &map);
@@ -158,15 +154,32 @@ public:
 	void trvwhiz_io_map(address_map &map);
 	void trvwhiz_map(address_map &map);
 	void trvwhziv_map(address_map &map);
+
+	virtual void machine_start() override;
+
+	pen_t m_pens[NUM_PENS];
+	required_shared_ptr<uint8_t> m_ram_attr;
+	required_shared_ptr<uint8_t> m_ram_video;
+	std::unique_ptr<uint8_t[]> m_ram_palette;
+	uint8_t m_lscnblk;
+	int m_extra_video_bank_bit;
+	int m_question_address;
+	int m_decryption_key;
+	optional_shared_ptr<uint8_t> m_backup_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device_array<i8255_device, 2> m_ppi;
+	required_device<screen_device> m_screen;
+	output_finder<10> m_leds;
 };
 
 
 void merit_state::machine_start()
 {
+	m_leds.resolve();
 	m_question_address = 0;
 	m_ram_palette = std::make_unique<uint8_t[]>(RAM_PALETTE_SIZE);
 
-	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
+	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
 	save_item(NAME(m_lscnblk));
 	save_item(NAME(m_extra_video_bank_bit));
 	save_item(NAME(m_question_address));
@@ -339,24 +352,24 @@ WRITE_LINE_MEMBER(merit_state::hsync_changed)
 WRITE8_MEMBER(merit_state::led1_w)
 {
 	/* 5 button lamps player 1 */
-	output().set_led_value(0,~data & 0x01);
-	output().set_led_value(1,~data & 0x02);
-	output().set_led_value(2,~data & 0x04);
-	output().set_led_value(3,~data & 0x08);
-	output().set_led_value(4,~data & 0x10);
+	m_leds[0] = BIT(~data, 0);
+	m_leds[1] = BIT(~data, 1);
+	m_leds[2] = BIT(~data, 2);
+	m_leds[3] = BIT(~data, 3);
+	m_leds[4] = BIT(~data, 4);
 }
 
 WRITE8_MEMBER(merit_state::led2_w)
 {
 	/* 5 button lamps player 2 */
-	output().set_led_value(5,~data & 0x01);
-	output().set_led_value(6,~data & 0x02);
-	output().set_led_value(7,~data & 0x04);
-	output().set_led_value(8,~data & 0x08);
-	output().set_led_value(9,~data & 0x10);
+	m_leds[5] = BIT(~data, 0);
+	m_leds[6] = BIT(~data, 1);
+	m_leds[7] = BIT(~data, 2);
+	m_leds[8] = BIT(~data, 3);
+	m_leds[9] = BIT(~data, 4);
 
 	/* coin counter */
-	machine().bookkeeping().coin_counter_w(0,0x80-(data & 0x80));
+	machine().bookkeeping().coin_counter_w(0, BIT(~data, 7));
 }
 
 WRITE8_MEMBER(merit_state::misc_w)
@@ -403,182 +416,196 @@ CUSTOM_INPUT_MEMBER(merit_state::rndbit_r)
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(merit_state::pitboss_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void merit_state::pitboss_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram();
+	map(0xa000, 0xa003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc000, 0xc003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
 
-ADDRESS_MAP_START(merit_state::casino5_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(casino5_bank_w)
-	AM_RANGE(0x7001, 0x7fff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void merit_state::casino5_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x5fff).bankr("bank2");
+	map(0x6000, 0x6fff).ram().share("nvram");
+	map(0x7000, 0x7000).w(FUNC(merit_state::casino5_bank_w));
+	map(0x7001, 0x7fff).ram();
+	map(0xa000, 0xa003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc000, 0xc003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
 
-ADDRESS_MAP_START(merit_state::bigappg_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void merit_state::bigappg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xbfff).ram().share("nvram");
+	map(0xc004, 0xc007).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
 
-ADDRESS_MAP_START(merit_state::misdraw_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("cpunvram") // overlays other NVRAM? or is it banked?
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) // swapped compared to other set?
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void merit_state::misdraw_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xbfff).ram().share("nvram");
+	map(0xb000, 0xb7ff).ram().share("cpunvram"); // overlays other NVRAM? or is it banked?
+	map(0xc004, 0xc007).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write)); // swapped compared to other set?
+	map(0xc008, 0xc00b).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
 
-ADDRESS_MAP_START(merit_state::dodge_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void merit_state::dodge_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xbfff).ram().share("nvram");
+	map(0xc004, 0xc007).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
 
 /* Address decoding is done by prom u13 on crt200a hardware. It decodes
  * the following addr lines: 2,3,9,13,14,15 ==> E20C
  * ==> mirror 1DF3 & ~effective_addr_lines
  * */
 
-ADDRESS_MAP_START(merit_state::trvwhiz_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4c00, 0x4cff) AM_READWRITE(questions_r, high_offset_w)
-	AM_RANGE(0x5400, 0x54ff) AM_WRITE(low_offset_w)
-	AM_RANGE(0x5800, 0x58ff) AM_WRITE(med_offset_w)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void merit_state::trvwhiz_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4c00, 0x4cff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
+	map(0x5400, 0x54ff).w(FUNC(merit_state::low_offset_w));
+	map(0x5800, 0x58ff).w(FUNC(merit_state::med_offset_w));
+	map(0x6000, 0x67ff).ram();
+	map(0xa000, 0xa003).mirror(0x1df0).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc000, 0xc003).mirror(0x1df0).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
 
-ADDRESS_MAP_START(merit_state::trvwhiz_io_map)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("aysnd", ay8912_device, address_w)
-	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("aysnd", ay8912_device, data_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(merit_state::phrcraze_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xc00c, 0xc00f) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
-	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
-	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(merit_state::phrcraze_io_map)
-	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, address_w)
-	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, data_w)
-ADDRESS_MAP_END
+void merit_state::trvwhiz_io_map(address_map &map)
+{
+	map(0x8000, 0x8000).w("aysnd", FUNC(ay8912_device::address_w));
+	map(0x8100, 0x8100).w("aysnd", FUNC(ay8912_device::data_w));
+}
 
 
-ADDRESS_MAP_START(merit_state::tictac_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
-	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
-	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void merit_state::phrcraze_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xbfff).ram();
+	map(0xc008, 0xc00b).mirror(0x1df0).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc00c, 0xc00f).mirror(0x1df0).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
+	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
+	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
+	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
 
-ADDRESS_MAP_START(merit_state::tictac_io_map)
-	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, address_w)
-	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, data_w)
-ADDRESS_MAP_END
+void merit_state::phrcraze_io_map(address_map &map)
+{
+	map(0xc004, 0xc004).mirror(0x1cf3).w("aysnd", FUNC(ay8912_device::address_w));
+	map(0xc104, 0xc104).mirror(0x1cf3).w("aysnd", FUNC(ay8912_device::data_w));
+}
 
 
-ADDRESS_MAP_START(merit_state::trvwhziv_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
-	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
-	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void merit_state::tictac_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xc004, 0xc007).mirror(0x1df0).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).mirror(0x1df0).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
+	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
+	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
+	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
 
-ADDRESS_MAP_START(merit_state::dtrvwz5_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xb000, 0xb0ff) AM_ROM /* protection? code jumps here */
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
-	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
-	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void merit_state::tictac_io_map(address_map &map)
+{
+	map(0xc00c, 0xc00c).mirror(0x1cf3).w("aysnd", FUNC(ay8912_device::address_w));
+	map(0xc10c, 0xc10c).mirror(0x1cf3).w("aysnd", FUNC(ay8912_device::data_w));
+}
 
-ADDRESS_MAP_START(merit_state::couple_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("backup_ram")
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+
+void merit_state::trvwhziv_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xbfff).ram();
+	map(0xc004, 0xc007).mirror(0x1df0).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).mirror(0x1df0).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
+	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
+	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
+	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
+
+void merit_state::dtrvwz5_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram().share("nvram");
+	map(0xb000, 0xb0ff).rom(); /* protection? code jumps here */
+	map(0xc004, 0xc007).mirror(0x1df0).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).mirror(0x1df0).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
+	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
+	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
+	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
+
+void merit_state::couple_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram().share("backup_ram");
+	map(0xc004, 0xc007).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+}
 
 
 static INPUT_PORTS_START( meritpoker )
@@ -611,7 +638,7 @@ static INPUT_PORTS_START( meritpoker )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, nullptr)
 
 	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
@@ -819,7 +846,7 @@ static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs - Where a
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_CODE(KEYCODE_G) PORT_NAME("P2 Button 5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_COCKTAIL PORT_CODE(KEYCODE_W) PORT_NAME("P2 Play")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, nullptr)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW:1")
@@ -882,7 +909,7 @@ static INPUT_PORTS_START( mroundup ) // todo: Find were Player 2 "Play" is mappe
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_CODE(KEYCODE_G) PORT_NAME("P2 Button 5")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // pulling this LOW causes "unathorized conversion" msg.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, nullptr)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Enable Draw Poker" )     PORT_DIPLOCATION("SW1:1")
@@ -1027,7 +1054,7 @@ static INPUT_PORTS_START( casino5 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, nullptr)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Enable Draw Poker" )     PORT_DIPLOCATION("SW1:1")
@@ -1383,19 +1410,19 @@ MACHINE_START_MEMBER(merit_state,casino5)
 }
 
 MACHINE_CONFIG_START(merit_state::pitboss)
-	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(pitboss_map)
-	MCFG_CPU_IO_MAP(trvwhiz_io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(pitboss_map)
+	MCFG_DEVICE_IO_MAP(trvwhiz_io_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(merit_state, led1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(merit_state, misc_w))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("DSW");
+	m_ppi[1]->out_pb_callback().set(FUNC(merit_state::led1_w));
+	m_ppi[1]->out_pc_callback().set(FUNC(merit_state::misc_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1407,24 +1434,24 @@ MACHINE_CONFIG_START(merit_state::pitboss)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(merit_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(merit_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(merit_state, hsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, merit_state, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, CRTC_CLOCK)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(merit_state, led2_w))
+	MCFG_DEVICE_ADD("aysnd", AY8912, CRTC_CLOCK)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, merit_state, led2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::casino5)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(casino5_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(casino5_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(merit_state,casino5)
 MACHINE_CONFIG_END
@@ -1432,84 +1459,80 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(merit_state::bigappg)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bigappg_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bigappg_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::misdraw)
 	bigappg(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(misdraw_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(misdraw_map)
 
-	MCFG_NVRAM_ADD_0FILL("cpunvram")
+	NVRAM(config, "cpunvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::dodge)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dodge_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dodge_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", merit_state, dodge_nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(merit_state::dodge_nvram_init));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::tictac)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tictac_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tictac_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::trvwhiz)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trvwhiz_map)
-	MCFG_CPU_IO_MAP(trvwhiz_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trvwhiz_map)
+	MCFG_DEVICE_IO_MAP(trvwhiz_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::dtrvwz5)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dtrvwz5_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dtrvwz5_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::phrcraze)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(phrcraze_map)
-	MCFG_CPU_IO_MAP(phrcraze_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(phrcraze_map)
+	MCFG_DEVICE_IO_MAP(phrcraze_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::trvwhziv)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trvwhziv_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trvwhziv_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::couple)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(couple_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(couple_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(merit_state, led1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(merit_state, misc_couple_w))
+	m_ppi[1]->out_pc_callback().set(FUNC(merit_state::misc_couple_w));
 MACHINE_CONFIG_END
 
 
@@ -2406,40 +2429,39 @@ ROM_START( couplei )
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )  /*video timing?*/
 ROM_END
 
-DRIVER_INIT_MEMBER(merit_state,key_0)
+void merit_state::init_key_0()
 {
 	m_decryption_key = 0;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_2)
+void merit_state::init_key_2()
 {
 	m_decryption_key = 2;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_4)
+void merit_state::init_key_4()
 {
 	m_decryption_key = 4;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_5)
+void merit_state::init_key_5()
 {
 	m_decryption_key = 5;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_7)
+void merit_state::init_key_7()
 {
 	m_decryption_key = 7;
 }
 
-DRIVER_INIT_MEMBER(merit_state,couple)
+void merit_state::init_couple()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	#if 0 //quick rom compare test
 	{
-		int i,r;
-		r = 0;
-		for(i=0;i<0x2000;i++)
+		int r = 0;
+		for (int i = 0; i < 0x2000; i++)
 		{
 			if(ROM[0x14000+i] == ROM[0x16000+i])
 				r++;
@@ -2456,12 +2478,11 @@ DRIVER_INIT_MEMBER(merit_state,couple)
 	membank("bank1")->set_base(ROM + 0x10000 + (0x2000 * 2));
 }
 
-DRIVER_INIT_MEMBER(merit_state,dtrvwz5)
+void merit_state::init_dtrvwz5()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
 	/* fill b000 - b0ff with ret 0xc9 */
-	for ( i = 0xb000; i < 0xb100; i++ )
+	for (int i = 0xb000; i < 0xb100; i++)
 		ROM[i] = 0xc9;
 
 	ROM[0xb000] = 0xc9; /* ret */
@@ -2486,63 +2507,63 @@ DRIVER_INIT_MEMBER(merit_state,dtrvwz5)
 
 /* Gambling type games */
 
-GAME( 1983, pitboss,    0,       pitboss,  pitbossa, merit_state,  0,   ROT0,  "Merit", "The Pit Boss (2214-07, U5-0A)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* "7" hand written over a 5 */
-GAME( 1983, pitboss04,  pitboss, casino5,  pitboss,  merit_state,  0,   ROT0,  "Merit", "The Pit Boss (2214-04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitboss03,  pitboss, pitboss,  pitbossa, merit_state,  0,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitboss03a, pitboss, pitboss,  pitbossa1,merit_state,  0,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossm4,  pitboss, pitboss,  pitbossb, merit_state,  0,   ROT0,  "Merit", "The Pit Boss (M4A1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossps,  pitboss, pitboss,  pitbossa, merit_state,  0,   ROT0,  "Merit", "The Pit Boss (PSB1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, mdchoice,   pitboss, pitboss,  mdchoice, merit_state,  0,   ROT0,  "Merit", "Dealer's Choice (E4A1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Copyright year based on other Pit Boss sets */
-GAME( 1983, mpchoice,   pitboss, pitboss,  mpchoice, merit_state,  0,   ROT0,  "Merit", "Player's Choice (M4C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss,    0,        pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (2214-07, U5-0A)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* "7" hand written over a 5 */
+GAME( 1983, pitboss04,  pitboss,  casino5, pitboss,   merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (2214-04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss03,  pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss03a, pitboss,  pitboss, pitbossa1, merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossm4,  pitboss,  pitboss, pitbossb,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (M4A1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossps,  pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (PSB1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, mdchoice,   pitboss,  pitboss, mdchoice,  merit_state, empty_init, ROT0,  "Merit", "Dealer's Choice (E4A1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Copyright year based on other Pit Boss sets */
+GAME( 1983, mpchoice,   pitboss,  pitboss, mpchoice,  merit_state, empty_init, ROT0,  "Merit", "Player's Choice (M4C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1989, casino5,  0,       casino5,  casino5,   merit_state, 0,   ROT0,  "Merit", "Casino Five (3315-02, U5-2B)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1984, casino5a, casino5, casino5,  casino5,   merit_state, 0,   ROT0,  "Merit", "Casino Five (3315-02, U5-0)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, casino5,    0,        casino5, casino5,   merit_state, empty_init, ROT0,  "Merit", "Casino Five (3315-02, U5-2B)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, casino5a,   casino5,  casino5, casino5,   merit_state, empty_init, ROT0,  "Merit", "Casino Five (3315-02, U5-0)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, mroundup, 0,         pitboss, mroundup, merit_state, 0,   ROT0,  "Merit", "The Round Up",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1984, mroundup,   0,        pitboss, mroundup,  merit_state, empty_init, ROT0,  "Merit", "The Round Up",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1984, chkndraw,  0,        pitboss, chkndraw, merit_state, 0,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-1)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, chkndrawa, chkndraw, pitboss, chkndraw, merit_state, 0,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-0)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, chkndraw,   0,        pitboss, chkndraw,  merit_state, empty_init, ROT0,  "Merit", "Chicken Draw (2131-04, U5-1)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, chkndrawa,  chkndraw, pitboss, chkndraw,  merit_state, empty_init, ROT0,  "Merit", "Chicken Draw (2131-04, U5-0)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1987, riviera,  0,       dodge,    riviera,   merit_state, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivieraa, riviera, dodge,    riviera,   merit_state, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivierab, riviera, dodge,    rivierab,  merit_state, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, riviera,    0,        dodge,   riviera,   merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivieraa,   riviera,  dodge,   riviera,   merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivierab,   riviera,  dodge,   rivierab,  merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1986, bigappg,  0,       bigappg,  bigappg,   merit_state, 0,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, misdraw,  0,       misdraw,  bigappg,   merit_state, 0,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, iowapp,   0,       dodge,    iowapp,    merit_state, 0,   ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) /* Copyright year based on rom label */
+GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state, empty_init, ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, misdraw,    0,        misdraw, bigappg,   merit_state, empty_init, ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, iowapp,     0,        dodge,   iowapp,    merit_state, empty_init, ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) /* Copyright year based on rom label */
 
-GAME( 1986, dodgectya,dodgecty,dodge,    dodge,     merit_state, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1986, dodgectyb,dodgecty,dodge,    dodge,     merit_state, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1986, dodgectyc,dodgecty,dodge,    dodge,     merit_state, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1986, dodgectya,  dodgecty, dodge,   dodge,     merit_state, empty_init, ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1986, dodgectyb,  dodgecty, dodge,   dodge,     merit_state, empty_init, ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1986, dodgectyc,  dodgecty, dodge,   dodge,     merit_state, empty_init, ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 /* Trivia and Word games */
 
-GAME( 1985, trvwzh,   0,       trvwhiz,  trivia,   merit_state, key_0,  ROT0,  "Merit", "Trivia ? Whiz (6221-00)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwzha,  trvwzh,  trvwhiz,  trivia,   merit_state, key_0,  ROT0,  "Merit", "Trivia ? Whiz (6221-00, with Sex trivia)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwzhb,  trvwzh,  trvwhiz,  trivia,   merit_state, key_0,  ROT0,  "Merit", "Trivia ? Whiz (6221-00, Alt Gen trivia)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwzv,   trvwzh,  trvwhiz,  trivia,   merit_state, key_0,  ROT90, "Merit", "Trivia ? Whiz (6221-02, Vertical)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwzh,     0,       trvwhiz,  trivia,   merit_state, init_key_0,  ROT0,  "Merit", "Trivia ? Whiz (6221-00)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwzha,    trvwzh,  trvwhiz,  trivia,   merit_state, init_key_0,  ROT0,  "Merit", "Trivia ? Whiz (6221-00, with Sex trivia)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwzhb,    trvwzh,  trvwhiz,  trivia,   merit_state, init_key_0,  ROT0,  "Merit", "Trivia ? Whiz (6221-00, Alt Gen trivia)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwzv,     trvwzh,  trvwhiz,  trivia,   merit_state, init_key_0,  ROT90, "Merit", "Trivia ? Whiz (6221-02, Vertical)",                       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz2,   0,       trvwhiz,  trivia,   merit_state, key_2,  ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz2a,  trvwz2,  trvwhiz,  trivia,   merit_state, key_2,  ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2 Alt Sex trivia)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz2,   0,       trvwhiz,  trivia,   merit_state, init_key_2,  ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz2a,  trvwz2,  trvwhiz,  trivia,   merit_state, init_key_2,  ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2 Alt Sex trivia)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz3h,  0,       trvwhiz,  trivia,   merit_state, key_0,  ROT0,  "Merit", "Trivia ? Whiz (6221-05, Edition 3)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz3ha, trvwz3h, trvwhiz,  trivia,   merit_state, key_0,  ROT0,  "Merit", "Trivia ? Whiz (6221-05, Edition 3 Sex trivia III)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz3v,  trvwz3h, trvwhiz,  trivia,   merit_state, key_0,  ROT90, "Merit", "Trivia ? Whiz (6221-04, Edition 3 Vertical)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3h,  0,       trvwhiz,  trivia,   merit_state, init_key_0,  ROT0,  "Merit", "Trivia ? Whiz (6221-05, Edition 3)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3ha, trvwz3h, trvwhiz,  trivia,   merit_state, init_key_0,  ROT0,  "Merit", "Trivia ? Whiz (6221-05, Edition 3 Sex trivia III)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3v,  trvwz3h, trvwhiz,  trivia,   merit_state, init_key_0,  ROT90, "Merit", "Trivia ? Whiz (6221-04, Edition 3 Vertical)",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz4,   0,       trvwhziv, trvwhziv, merit_state, key_5,  ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B Edition 4)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz4a,  trvwz4,  trvwhziv, trvwhziv, merit_state, key_5,  ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B Edition 4 Alt Sex trivia)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4,   0,       trvwhziv, trvwhziv, merit_state, init_key_5,  ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B Edition 4)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4a,  trvwz4,  trvwhziv, trvwhziv, merit_state, init_key_5,  ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B Edition 4 Alt Sex trivia)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, tictac,   0,       tictac,   tictac,   merit_state, key_4,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C Horizontal)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tictacv,  tictac,  tictac,   tictac,   merit_state, key_4,  ROT90, "Merit", "Tic Tac Trivia (6221-22, U5-0 Vertical)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tictac,   0,       tictac,   tictac,   merit_state, init_key_4,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C Horizontal)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tictacv,  tictac,  tictac,   tictac,   merit_state, init_key_4,  ROT90, "Merit", "Tic Tac Trivia (6221-22, U5-0 Vertical)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, phrcraze, 0,       phrcraze, phrcraze, merit_state, key_7,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-0A)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, phrcrazea,phrcraze,phrcraze, phrcraza, merit_state, key_7,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-0)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1986, phrcrazeb,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3A Expanded Questions)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, phrcrazec,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3 Expanded Questions)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1986, phrcrazev,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT90, "Merit", "Phraze Craze (6221-45, U5-2 Vertical)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcraze, 0,       phrcraze, phrcraze, merit_state, init_key_7,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-0A)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcrazea,phrcraze,phrcraze, phrcraza, merit_state, init_key_7,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-0)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcrazeb,phrcraze,phrcraze, phrcrazs, merit_state, init_key_7,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3A Expanded Questions)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcrazec,phrcraze,phrcraze, phrcrazs, merit_state, init_key_7,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3 Expanded Questions)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcrazev,phrcraze,phrcraze, phrcrazs, merit_state, init_key_7,  ROT90, "Merit", "Phraze Craze (6221-45, U5-2 Vertical)",                   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, dtrvwz5,  0,       dtrvwz5,  dtrvwh5,  merit_state, dtrvwz5,ROT0,  "Merit", "Deluxe Trivia ? Whiz (6221-70, U5-0A Edition 5)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dtrvwz5,  0,       dtrvwz5,  dtrvwh5,  merit_state, init_dtrvwz5,ROT0,  "Merit", "Deluxe Trivia ? Whiz (6221-70, U5-0A Edition 5)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, couple,   0,       couple,   couple,   merit_state, couple, ROT0,  "Merit", "The Couples (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, couplep,  couple,  couple,   couplep,  merit_state, couple, ROT0,  "Merit", "The Couples (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, couplei,  couple,  couple,   couple,   merit_state, couple, ROT0,  "Merit", "The Couples (set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, couple,   0,       couple,   couple,   merit_state, init_couple, ROT0,  "Merit", "The Couples (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, couplep,  couple,  couple,   couplep,  merit_state, init_couple, ROT0,  "Merit", "The Couples (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, couplei,  couple,  couple,   couple,   merit_state, init_couple, ROT0,  "Merit", "The Couples (set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )

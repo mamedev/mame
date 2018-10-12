@@ -41,29 +41,33 @@ MACHINE_CONFIG_START(ps2_state::at_softlists)
 	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(ps2_state::ps2_16_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void ps2_state::ps2_16_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x09ffff).bankrw("bank10");
+	map(0x0e0000, 0x0fffff).rom().region("bios", 0);
+	map(0xfe0000, 0xffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(ps2_state::ps2_32_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void ps2_state::ps2_32_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0009ffff).bankrw("bank10");
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(ps2_state::ps2_16_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
-ADDRESS_MAP_END
+void ps2_state::ps2_16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+}
 
-ADDRESS_MAP_START(ps2_state::ps2_32_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
-ADDRESS_MAP_END
+void ps2_state::ps2_32_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+}
 
 void ps2_state::machine_start()
 {
@@ -83,55 +87,52 @@ void ps2_state::machine_start()
 
 MACHINE_CONFIG_START(ps2_state::ps2m30286)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, 10000000)
-	MCFG_CPU_PROGRAM_MAP(ps2_16_map)
-	MCFG_CPU_IO_MAP(ps2_16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+	MCFG_DEVICE_ADD("maincpu", I80286, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(ps2_16_map)
+	MCFG_DEVICE_IO_MAP(ps2_16_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_80286_SHUTDOWN(WRITELINE("mb", at_mb_device, shutdown))
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	at_softlists(config);
 
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "vga", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, "fdc", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, "ide", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa4", pc_isa16_cards, "comat", false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "vga", true)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdc", false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ps2_state::ps2386)
-	MCFG_CPU_ADD("maincpu", I386, 12000000)
-	MCFG_CPU_PROGRAM_MAP(ps2_32_map)
-	MCFG_CPU_IO_MAP(ps2_32_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I386, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(ps2_32_map)
+	MCFG_DEVICE_IO_MAP(ps2_32_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	at_softlists(config);
 
 	// on board devices
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdcsmc", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "ide", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board4", pc_isa16_cards, "lpt", true)
+	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", true)
+	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", true)
+	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "lpt", true)
 	// ISA cards
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa4", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_et4k", false)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M,16M,32M,64M,128M,256M")
+	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M,16M,32M,64M,128M,256M");
 MACHINE_CONFIG_END
 
 ROM_START( i8530286 )
@@ -260,11 +261,11 @@ ROM_START( i8580111 )
 	ROM_LOAD16_BYTE( "15f6639.bin", 0x00001, 0x10000, CRC(82cf0f7d) SHA1(13bb39225757b89749af70e881af0228673dbe0c))
 ROM_END
 
-COMP ( 1990, i8530h31, ibm5170, 0,       ps2m30286, 0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8530-H31 (Model 30/286)", MACHINE_NOT_WORKING )
-COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, 0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 Model 30-286", MACHINE_NOT_WORKING )
-COMP ( 198?, i8535043, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8535-043 (Model 35)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8550021, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8550-021 (Model 50)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8550061, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8550-061 (Model 50Z)", MACHINE_NOT_WORKING )
-COMP ( 1989, i8555081, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8550-081 (Model 55SX)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8580071, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8580-071 (Model 80)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8580111, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8580-111 (Model 80)", MACHINE_NOT_WORKING )
+COMP( 1990, i8530h31, ibm5170, 0, ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8530-H31 (Model 30/286)", MACHINE_NOT_WORKING )
+COMP( 1988, i8530286, ibm5170, 0, ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 Model 30-286", MACHINE_NOT_WORKING )
+COMP( 198?, i8535043, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8535-043 (Model 35)", MACHINE_NOT_WORKING )
+COMP( 198?, i8550021, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-021 (Model 50)", MACHINE_NOT_WORKING )
+COMP( 198?, i8550061, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-061 (Model 50Z)", MACHINE_NOT_WORKING )
+COMP( 1989, i8555081, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-081 (Model 55SX)", MACHINE_NOT_WORKING )
+COMP( 198?, i8580071, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8580-071 (Model 80)", MACHINE_NOT_WORKING )
+COMP( 198?, i8580111, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8580-111 (Model 80)", MACHINE_NOT_WORKING )

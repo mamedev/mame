@@ -106,7 +106,8 @@ device_psi_keyboard_interface::~device_psi_keyboard_interface()
 //  SLOT INTERFACE
 //**************************************************************************
 
-SLOT_INTERFACE_START( psi_keyboard_devices )
-	SLOT_INTERFACE("ergoline", ERGOLINE_KEYBOARD)
-	SLOT_INTERFACE("hle", PSI_HLE_KEYBOARD)
-SLOT_INTERFACE_END
+void psi_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("ergoline", ERGOLINE_KEYBOARD);
+	device.option_add("hle", PSI_HLE_KEYBOARD);
+}

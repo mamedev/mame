@@ -20,13 +20,13 @@
 #define ESRIP_DRAW(name) int name(int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)
 
 #define MCFG_ESRIP_FDT_R_CALLBACK(_read) \
-	devcb = &downcast<esrip_device &>(*device).set_fdt_r_callback(DEVCB_##_read);
+	downcast<esrip_device &>(*device).set_fdt_r_callback(DEVCB_##_read);
 
 #define MCFG_ESRIP_FDT_W_CALLBACK(_write) \
-	devcb = &downcast<esrip_device &>(*device).set_fdt_w_callback(DEVCB_##_write);
+	downcast<esrip_device &>(*device).set_fdt_w_callback(DEVCB_##_write);
 
 #define MCFG_ESRIP_STATUS_IN_CALLBACK(_read) \
-	devcb = &downcast<esrip_device &>(*device).set_status_in_callback(DEVCB_##_read);
+	downcast<esrip_device &>(*device).set_status_in_callback(DEVCB_##_read);
 
 #define MCFG_ESRIP_DRAW_CALLBACK_OWNER(_class, _method) \
 	downcast<esrip_device &>(*device).set_draw_callback(esrip_device::draw_delegate(&_class::_method, #_class "::" #_method, this));
@@ -34,6 +34,8 @@
 #define MCFG_ESRIP_LBRM_PROM(_tag) \
 	downcast<esrip_device &>(*device).lbrm_prom(_tag);
 
+#define MCFG_ESRIP_SCREEN(screen_tag) \
+	downcast<esrip_device &>(*device).set_screen_tag(screen_tag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -54,6 +56,7 @@ public:
 	esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
 	template <class Object> devcb_base &set_fdt_r_callback(Object &&cb) { return m_fdt_r.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_fdt_w_callback(Object &&cb) { return m_fdt_w.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_status_in_callback(Object &&cb) { return m_status_in.set_callback(std::forward<Object>(cb)); }
@@ -136,7 +139,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -193,7 +196,7 @@ protected:
 	uint8_t   *m_lbrm;
 
 	address_space *m_program;
-	direct_read_data<-3> *m_direct;
+	memory_access_cache<3, -3, ENDIANNESS_BIG> *m_cache;
 
 	int     m_icount;
 
@@ -201,6 +204,7 @@ protected:
 	devcb_write16 m_fdt_w;
 	devcb_read8 m_status_in;
 	draw_delegate m_draw;
+	required_device<screen_device> m_screen;
 	const char *m_lbrm_prom;
 
 	typedef void (esrip_device::*ophandler)(uint16_t inst);

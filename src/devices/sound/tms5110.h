@@ -14,19 +14,19 @@
 /* usually 800000 for 10000 Hz sample rate.  */
 
 #define MCFG_TMS5110_M0_CB(_devcb) \
-	devcb = &downcast<tms5110_device &>(*device).set_m0_callback(DEVCB_##_devcb);
+	downcast<tms5110_device &>(*device).set_m0_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS5110_M1_CB(_devcb) \
-	devcb = &downcast<tms5110_device &>(*device).set_m1_callback(DEVCB_##_devcb);
+	downcast<tms5110_device &>(*device).set_m1_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS5110_ADDR_CB(_devcb) \
-	devcb = &downcast<tms5110_device &>(*device).set_addr_callback(DEVCB_##_devcb);
+	downcast<tms5110_device &>(*device).set_addr_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS5110_DATA_CB(_devcb) \
-	devcb = &downcast<tms5110_device &>(*device).set_data_callback(DEVCB_##_devcb);
+	downcast<tms5110_device &>(*device).set_data_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS5110_ROMCLK_CB(_devcb) \
-	devcb = &downcast<tms5110_device &>(*device).set_romclk_callback(DEVCB_##_devcb);
+	downcast<tms5110_device &>(*device).set_romclk_callback(DEVCB_##_devcb);
 
 
 class tms5110_device : public device_t, public device_sound_interface
@@ -338,7 +338,7 @@ private:
 DECLARE_DEVICE_TYPE(TMSPROM, tmsprom_device)
 
 #define MCFG_TMSPROM_REGION(_region) \
-	downcast<tmsprom_device &>(*device).set_region("^" _region);
+	downcast<tmsprom_device &>(*device).set_region(_region);
 
 #define MCFG_TMSPROM_ROM_SIZE(_size) \
 	downcast<tmsprom_device &>(*device).set_rom_size(_size);
@@ -365,9 +365,9 @@ DECLARE_DEVICE_TYPE(TMSPROM, tmsprom_device)
 	downcast<tmsprom_device &>(*device).set_stop_bit(_bit);
 
 #define MCFG_TMSPROM_PDC_CB(_devcb) \
-	devcb = &downcast<tmsprom_device &>(*device).set_pdc_callback(DEVCB_##_devcb);
+	downcast<tmsprom_device &>(*device).set_pdc_callback(DEVCB_##_devcb);
 
 #define MCFG_TMSPROM_CTL_CB(_devcb) \
-	devcb = &downcast<tmsprom_device &>(*device).set_ctl_callback(DEVCB_##_devcb);
+	downcast<tmsprom_device &>(*device).set_ctl_callback(DEVCB_##_devcb);
 
 #endif // MAME_SOUND_TMS5110_H

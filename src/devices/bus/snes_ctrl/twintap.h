@@ -48,6 +48,6 @@ private:
 
 
 // device type definition
-extern const device_type SNES_TWINTAP;
+DECLARE_DEVICE_TYPE(SNES_TWINTAP, snes_twintap_device)
 
 #endif // MAME_BUS_SNES_CTRL_TWINTAP_H

@@ -12,7 +12,7 @@
 #include "m6510.h"
 #include "m6510d.h"
 
-DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "M6510")
+DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "MOS Technology M6510")
 
 m6510_device::m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6510_device(mconfig, M6510, tag, owner, clock)
@@ -34,9 +34,9 @@ void m6510_device::set_pulls(uint8_t _pullup, uint8_t _floating)
 	floating = _floating;
 }
 
-util::disasm_interface *m6510_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6510_device::create_disassembler()
 {
-	return new m6510_disassembler;
+	return std::make_unique<m6510_disassembler>();
 }
 
 void m6510_device::device_start()
@@ -44,7 +44,7 @@ void m6510_device::device_start()
 	read_port.resolve_safe(0);
 	write_port.resolve_safe();
 
-	if(direct_disabled)
+	if(cache_disabled)
 		mintf = std::make_unique<mi_6510_nd>(this);
 	else
 		mintf = std::make_unique<mi_6510_normal>(this);
@@ -118,7 +118,7 @@ uint8_t m6510_device::mi_6510_normal::read(uint16_t adr)
 
 uint8_t m6510_device::mi_6510_normal::read_sync(uint16_t adr)
 {
-	uint8_t res = sdirect->read_byte(adr);
+	uint8_t res = scache->read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -128,7 +128,7 @@ uint8_t m6510_device::mi_6510_normal::read_sync(uint16_t adr)
 
 uint8_t m6510_device::mi_6510_normal::read_arg(uint16_t adr)
 {
-	uint8_t res = direct->read_byte(adr);
+	uint8_t res = cache->read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)

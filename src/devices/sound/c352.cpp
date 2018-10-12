@@ -42,7 +42,6 @@ c352_device::c352_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-
 //-------------------------------------------------
 //  rom_bank_updated - the rom bank has changed
 //-------------------------------------------------
@@ -298,7 +297,7 @@ void c352_device::device_start()
 	}
 	for(int i=0;i<128;i++)
 		m_mulawtab[i+128] = (~m_mulawtab[i])&0xffe0;
-	
+
 	// register save state info
 	for (i = 0; i < 32; i++)
 	{

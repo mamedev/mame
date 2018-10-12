@@ -27,17 +27,13 @@
 #include "machine/eepromser.h"
 #include "machine/sgi.h"
 #include "machine/wd33c93.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class indigo_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RTC
-	};
-
 	indigo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -46,6 +42,15 @@ public:
 		, m_eeprom(*this, "eeprom")
 	{
 	}
+
+	void indigo4k(machine_config &config);
+	void indigo3k(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_RTC
+	};
 
 	DECLARE_READ32_MEMBER(hpc_r);
 	DECLARE_WRITE32_MEMBER(hpc_w);
@@ -59,12 +64,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static void cdrom_config(device_t *device);
-	void indigo4k(machine_config &config);
-	void indigo3k(machine_config &config);
 	void indigo3k_map(address_map &map);
 	void indigo4k_map(address_map &map);
 	void indigo_map(address_map &map);
-private:
+
 	struct hpc_t
 	{
 		uint8_t m_misc_status;
@@ -94,7 +97,6 @@ private:
 
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -466,28 +468,31 @@ WRITE32_MEMBER(indigo_state::int_w)
 	osd_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
 }
 
-ADDRESS_MAP_START(indigo_state::indigo_map)
-	AM_RANGE( 0x00000000, 0x001fffff ) AM_RAM AM_SHARE("share10")
-	AM_RANGE( 0x08000000, 0x08ffffff ) AM_RAM AM_SHARE("share5")
-	AM_RANGE( 0x09000000, 0x097fffff ) AM_RAM AM_SHARE("share6")
-	AM_RANGE( 0x0a000000, 0x0a7fffff ) AM_RAM AM_SHARE("share7")
-	AM_RANGE( 0x0c000000, 0x0c7fffff ) AM_RAM AM_SHARE("share8")
-	AM_RANGE( 0x10000000, 0x107fffff ) AM_RAM AM_SHARE("share9")
-	AM_RANGE( 0x18000000, 0x187fffff ) AM_RAM AM_SHARE("share1")
-	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE(hpc_r, hpc_w )
-	AM_RANGE( 0x1fbd9000, 0x1fbd903f ) AM_READWRITE(int_r, int_w )
-ADDRESS_MAP_END
+void indigo_state::indigo_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("share10");
+	map(0x08000000, 0x08ffffff).ram().share("share5");
+	map(0x09000000, 0x097fffff).ram().share("share6");
+	map(0x0a000000, 0x0a7fffff).ram().share("share7");
+	map(0x0c000000, 0x0c7fffff).ram().share("share8");
+	map(0x10000000, 0x107fffff).ram().share("share9");
+	map(0x18000000, 0x187fffff).ram().share("share1");
+	map(0x1fb80000, 0x1fb8ffff).rw(FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
+	map(0x1fbd9000, 0x1fbd903f).rw(FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
+}
 
-ADDRESS_MAP_START(indigo_state::indigo3k_map)
-	AM_IMPORT_FROM( indigo_map )
-	AM_RANGE( 0x1fc00000, 0x1fc3ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
-ADDRESS_MAP_END
+void indigo_state::indigo3k_map(address_map &map)
+{
+	indigo_map(map);
+	map(0x1fc00000, 0x1fc3ffff).rom().share("share2").region("user1", 0);
+}
 
-ADDRESS_MAP_START(indigo_state::indigo4k_map)
-	AM_IMPORT_FROM( indigo_map )
-	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
-	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
-ADDRESS_MAP_END
+void indigo_state::indigo4k_map(address_map &map)
+{
+	indigo_map(map);
+	map(0x1fa00000, 0x1fa1ffff).rw("sgi_mc", FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
+	map(0x1fc00000, 0x1fc7ffff).rom().share("share2").region("user1", 0);
+}
 
 WRITE_LINE_MEMBER(indigo_state::scsi_irq)
 {
@@ -577,13 +582,13 @@ INPUT_PORTS_END
 void indigo_state::cdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^mono", 1.0)
 }
 
 MACHINE_CONFIG_START(indigo_state::indigo3k)
-	MCFG_CPU_ADD("maincpu", R3041, 33000000)
+	MCFG_DEVICE_ADD("maincpu", R3041, 33000000)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP(indigo3k_map)
+	MCFG_DEVICE_PROGRAM_MAP(indigo3k_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -596,44 +601,44 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("scc", SCC8530, 7000000)
+	SCC8530(config, m_scc, 7000000);
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_6)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
-	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_WD33C93_IRQ_CB(WRITELINE(indigo_state, scsi_irq))      /* command completion IRQ */
+	WD33C93(config, m_wd33c93);
+	m_wd33c93->set_scsi_port("scsi");
+	m_wd33c93->irq_cb().set(FUNC(indigo_state::scsi_irq));      /* command completion IRQ */
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	EEPROM_93C56_16BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(indigo_state::indigo4k)
 	indigo3k(config);
-	MCFG_CPU_REPLACE("maincpu", R4600BE, 150000000) // Should be R4400
+	MCFG_DEVICE_REPLACE("maincpu", R4600BE, 150000000) // Should be R4400
 	MCFG_MIPS3_ICACHE_SIZE(32768)
 	MCFG_MIPS3_DCACHE_SIZE(32768)
-	MCFG_CPU_PROGRAM_MAP(indigo4k_map)
+	MCFG_DEVICE_PROGRAM_MAP(indigo4k_map)
 
 	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
 MACHINE_CONFIG_END
 
 ROM_START( indigo3k )
-	ROM_REGION( 0x40000, "user1", 0 )
+	ROM_REGION32_BE( 0x40000, "user1", 0 )
 	ROM_SYSTEM_BIOS( 0, "401-rev-c", "SGI Version 4.0.1 Rev C LG1/GR2, Jul 9, 1992" ) // dumped over serial connection from boot monitor and swapped
-	ROMX_LOAD( "ip12prom.070-8088-xxx.u56", 0x000000, 0x040000, CRC(25ca912f) SHA1(94b3753d659bfe50b914445cef41290122f43880), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
+	ROMX_LOAD( "ip12prom.070-8088-xxx.u56", 0x000000, 0x040000, CRC(25ca912f) SHA1(94b3753d659bfe50b914445cef41290122f43880), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "401-rev-d", "SGI Version 4.0.1 Rev D LG1/GR2, Mar 24, 1992" ) // dumped with EPROM programmer
-	ROMX_LOAD( "ip12prom.070-8088-002.u56", 0x000000, 0x040000, CRC(ea4329ef) SHA1(b7d67d0e30ae8836892f7170dd4757732a0a3fd6), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
+	ROMX_LOAD( "ip12prom.070-8088-002.u56", 0x000000, 0x040000, CRC(ea4329ef) SHA1(b7d67d0e30ae8836892f7170dd4757732a0a3fd6), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
 ROM_END
 
 ROM_START( indigo4k )
-	ROM_REGION( 0x80000, "user1", 0 )
-	ROM_LOAD( "ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c) )
+	ROM_REGION32_BE( 0x80000, "user1", 0 )
+	ROMX_LOAD( "ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c), ROM_GROUPDWORD | ROM_REVERSE )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT   COMPANY                 FULLNAME                                          FLAGS
-COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY                 FULLNAME                                          FLAGS
+COMP( 1991, indigo3k, 0,      0,      indigo3k, indigo, indigo_state, empty_init, "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1993, indigo4k, 0,      0,      indigo4k, indigo, indigo_state, empty_init, "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

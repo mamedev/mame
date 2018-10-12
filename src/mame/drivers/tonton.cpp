@@ -41,6 +41,9 @@ public:
 		m_hopper(*this, "hopper")
 	{ }
 
+	void tonton(machine_config &config);
+
+private:
 	required_device<v9938_device> m_v9938;
 	DECLARE_WRITE8_MEMBER(tonton_outport_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
@@ -50,7 +53,6 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
-	void tonton(machine_config &config);
 	void tonton_io(address_map &map);
 	void tonton_map(address_map &map);
 };
@@ -88,24 +90,26 @@ WRITE8_MEMBER(tonton_state::hopper_w)
 *                  Memory Map                    *
 *************************************************/
 
-ADDRESS_MAP_START(tonton_state::tonton_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void tonton_state::tonton_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe3ff).ram().share("nvram");
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(tonton_state::tonton_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x00, 0x00) AM_WRITE(tonton_outport_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x01, 0x01) AM_WRITE(hopper_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void tonton_state::tonton_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x00, 0x00).w(FUNC(tonton_state::tonton_outport_w));
+	map(0x01, 0x01).portr("IN1");
+	map(0x01, 0x01).w(FUNC(tonton_state::hopper_w));
+	map(0x02, 0x02).portr("DSW1");
+	map(0x03, 0x03).portr("DSW2");
+	map(0x88, 0x8b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 /*************************************************
@@ -130,7 +134,7 @@ static INPUT_PORTS_START( tonton )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Unknown A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)    // hopper feedback
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)    // hopper feedback
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("DSW1")
@@ -221,23 +225,25 @@ WRITE8_MEMBER(tonton_state::ay_bout_w)
 MACHINE_CONFIG_START(tonton_state::tonton)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */
-	MCFG_CPU_PROGRAM_MAP(tonton_map)
-	MCFG_CPU_IO_MAP(tonton_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */
+	MCFG_DEVICE_PROGRAM_MAP(tonton_map)
+	MCFG_DEVICE_IO_MAP(tonton_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
+	v9938_device &v9938(V9938(config, "v9938", MAIN_CLOCK));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(0x20000);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, YM2149_CLOCK)   /* Guess. According to other MSX2 based gambling games */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", YM2149, YM2149_CLOCK)   /* Guess. According to other MSX2 based gambling games */
 	/*
 	  AY8910: Port A out: FF
 	  AY8910: Port B out: FF
@@ -246,8 +252,8 @@ MACHINE_CONFIG_START(tonton_state::tonton)
 	  AY8910: Port A out: 00
 	  AY8910: Port B out: 00
 	*/
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tonton_state, ay_aout_w))    /* Write all bits twice, and then reset them at boot */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tonton_state, ay_bout_w))     /* Write all bits twice, and then reset them at boot */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tonton_state, ay_aout_w))    /* Write all bits twice, and then reset them at boot */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tonton_state, ay_bout_w))     /* Write all bits twice, and then reset them at boot */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -264,5 +270,5 @@ ROM_START( tonton )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT  ROT    COMPANY                   FULLNAME                                 FLAGS
-GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY                   FULLNAME                                 FLAGS
+GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )

@@ -121,59 +121,37 @@ enum
 
 /*****************************************************************
     Debugging
-    Set to 0 (disable) or 1 (enable)
+    Add the desired LOG aspect to the VERBOSE line
 ******************************************************************/
 
-// Log addresses of executed opcodes
-#define TRACE_EXEC 0
+#define LOG_OP         (1U<<1)   // Current instruction
+#define LOG_EXEC       (1U<<2)   // Address of current instruction
+#define LOG_CONFIG     (1U<<3)   // Configuration
+#define LOG_CYCLES     (1U<<4)   // Cycles
+#define LOG_WARN       (1U<<5)   // Illegal operation or other condition
+#define LOG_MEM        (1U<<6)   // Memory access
+#define LOG_CONTEXT    (1U<<7)   // Context switch
+#define LOG_INT        (1U<<8)   // Interrupts
+#define LOG_READY      (1U<<9)   // READY line input
+#define LOG_CLOCK      (1U<<10)  // Clock pulses
+#define LOG_ADDRESSBUS (1U<<11)  // Address bus operation
+#define LOG_STATUS     (1U<<12)  // Status register
+#define LOG_CRU        (1U<<13)  // CRU operations
+#define LOG_DEC        (1U<<14)  // Decrementer
+#define LOG_WAIT       (1U<<15)  // Wait states
+#define LOG_HOLD       (1U<<16)  // Hold states
+#define LOG_IDLE       (1U<<17)  // Idle states
+#define LOG_EMU        (1U<<18)  // Emulation details
+#define LOG_MICRO      (1U<<19)  // Microinstruction processing
+#define LOG_INTD       (1U<<20)  // Interrupts (detailed phases)
+#define LOG_DETAIL     (1U<<31)  // Increased detail
 
-// Log cycles
-#define TRACE_CYCLES 0
+// Minimum log should be config and warnings
+#define VERBOSE ( LOG_CONFIG | LOG_WARN )
 
-// Log configuration
-#define TRACE_CONFIG 1
+#include "logmacro.h"
 
-// Log emulation details
-#define TRACE_EMU 0
-
-// Log wait/hold states
-#define TRACE_WAITHOLD 0
-
-// Log microinstruction processing
-#define TRACE_MICRO 0
-
-// Log interrupts
-#define TRACE_INT 0
-
-// Log interrupts (detailed phases)
-#define TRACE_INTD 0
-
-// Log clock pulses
-#define TRACE_CLOCK 0
-
-// Log READY line input
-#define TRACE_READY 0
-
-// Log memory access
-#define TRACE_MEM 0
-
-// Log address bus operation
-#define TRACE_ADDRESSBUS 0
-
-// Log CRU operations
-#define TRACE_CRU 0
-
-// Log status register
-#define TRACE_STATUS 0
-
-// Log operation
-#define TRACE_OP 0
-
-// Log decrementer operation
-#define TRACE_DEC 0
-
-// Log with max detail
-#define TRACE_DETAIL 0
+constexpr int tms9995_device::AS_SETOFFSET;
 
 /****************************************************************************
     Constructor
@@ -191,8 +169,10 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		PC(0),
 		PC_debug(0),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
+		m_setoffset_config("setoffset", ENDIANNESS_BIG, 8, 16),
 		m_io_config("cru", ENDIANNESS_BIG, 8, 16),
 		m_prgspace(nullptr),
+		m_sospace(nullptr),
 		m_cru(nullptr),
 		m_external_operation(*this),
 		m_iaq_line(*this),
@@ -217,7 +197,8 @@ void tms9995_device::device_start()
 {
 	// TODO: Restore save state suport
 
-	m_prgspace = &space(AS_PROGRAM);                        // dimemory.h
+	m_prgspace = &space(AS_PROGRAM);
+	m_sospace = has_space(AS_SETOFFSET) ? &space(AS_SETOFFSET) : nullptr;
 	m_cru = &space(AS_IO);
 
 	// Resolve our external connections
@@ -228,7 +209,7 @@ void tms9995_device::device_start()
 	m_dbin_line.resolve();
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// Clear the interrupt flags
 	m_int_pending = 0;
@@ -237,7 +218,6 @@ void tms9995_device::device_start()
 	m_mid_active = false;
 	m_nmi_active = false;
 	m_int_overflow = false;
-	m_int_decrementer = false;
 
 	m_idle_state = false;
 
@@ -257,7 +237,7 @@ void tms9995_device::device_start()
 	// Set up the lookup table for command decoding
 	build_command_lookup_table();
 
-	if (TRACE_CONFIG) logerror("%s: Variant = %s, Overflow int = %s\n", tag(), m_mp9537? "MP9537 (no on-chip RAM)" : "with on-chip RAM", m_check_overflow? "check" : "no check");
+	LOGMASKED(LOG_CONFIG, "Variant = %s, Overflow int = %s\n", m_mp9537? "MP9537 (no on-chip RAM)" : "standard (with on-chip RAM)", m_check_overflow? "check" : "no check");
 
 	// Register persistable state variables
 	// save_item(NAME(m_state_any)); // only for debugger output
@@ -284,7 +264,6 @@ void tms9995_device::device_start()
 	save_item(NAME(m_nmi_active));
 	save_item(NAME(m_int1_active));
 	save_item(NAME(m_int4_active));
-	save_item(NAME(m_int_decrementer));
 	save_item(NAME(m_int_overflow));
 	save_item(NAME(m_reset));
 	save_item(NAME(m_from_reset));
@@ -326,7 +305,7 @@ void tms9995_device::device_start()
 	// save_item(NAME(m_first_cycle)); // only for log output
 }
 
-const char* tms9995_device::s_statename[20] =
+char const *const tms9995_device::s_statename[20] =
 {
 	"PC",  "WP",  "ST",  "IR",
 	"R0",  "R1",  "R2",  "R3",
@@ -405,7 +384,7 @@ void tms9995_device::state_export(const device_state_entry &entry)
 */
 void tms9995_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	static const char *statestr = "LAECOPX-----IIII";
+	static char const statestr[] = "LAECOPX-----IIII";
 	char flags[17];
 	memset(flags, 0x00, ARRAY_LENGTH(flags));
 	uint16_t val = 0x8000;
@@ -466,10 +445,17 @@ void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 
 device_memory_interface::space_config_vector tms9995_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
-	};
+	if (has_configured_map(AS_SETOFFSET))
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM,   &m_program_config),
+			std::make_pair(AS_SETOFFSET, &m_setoffset_config),
+			std::make_pair(AS_IO,        &m_io_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM,   &m_program_config),
+			std::make_pair(AS_IO,        &m_io_config)
+		};
 }
 
 /**************************************************************************
@@ -1172,7 +1158,7 @@ void tms9995_device::build_command_lookup_table()
 	{
 		inst = &s_command[i];
 		table = m_command_lookup_table.get();
-		if (TRACE_EMU) logerror("=== opcode=%04x, len=%d\n", inst->opcode, format_mask_len[inst->format]);
+		LOGMASKED(LOG_EMU, "=== opcode=%04x, len=%d\n", inst->opcode, format_mask_len[inst->format]);
 		bitcount = 4;
 		opcode = inst->opcode;
 		cmdindex = (opcode>>12) & 0x000f;
@@ -1182,7 +1168,7 @@ void tms9995_device::build_command_lookup_table()
 			// Descend
 			if (table[cmdindex].next_digit == nullptr)
 			{
-				if (TRACE_EMU) logerror("create new table at bitcount=%d for index=%d\n", bitcount, cmdindex);
+				LOGMASKED(LOG_EMU, "create new table at bitcount=%d for index=%d\n", bitcount, cmdindex);
 				table[cmdindex].next_digit = std::make_unique<lookup_entry[]>(16);
 				for (int j=0; j < 16; j++)
 				{
@@ -1192,7 +1178,7 @@ void tms9995_device::build_command_lookup_table()
 			}
 			else
 			{
-				if (TRACE_EMU) logerror("found a table at bitcount=%d\n", bitcount);
+				LOGMASKED(LOG_EMU, "found a table at bitcount=%d\n", bitcount);
 			}
 
 			table = table[cmdindex].next_digit.get();
@@ -1200,17 +1186,17 @@ void tms9995_device::build_command_lookup_table()
 			bitcount = bitcount+4;
 			opcode <<= 4;
 			cmdindex = (opcode>>12) & 0x000f;
-			if (TRACE_EMU) logerror("next index=%x\n", cmdindex);
+			LOGMASKED(LOG_EMU, "next index=%x\n", cmdindex);
 		}
 
-		if (TRACE_EMU) logerror("bitcount=%d\n", bitcount);
+		LOGMASKED(LOG_EMU, "bitcount=%d\n", bitcount);
 		// We are at the target level
 		// Need to fill in the same entry for all values in the bitcount
 		// (if a command needs 10 bits we have to copy it four
 		// times for all combinations with 12 bits)
 		for (int j=0; j < (1<<(bitcount-format_mask_len[inst->format])); j++)
 		{
-			if (TRACE_EMU) logerror("opcode=%04x at position %d\n", inst->opcode, cmdindex+j);
+			LOGMASKED(LOG_EMU, "opcode=%04x at position %d\n", inst->opcode, cmdindex+j);
 			table[cmdindex+j].index = i;
 		}
 
@@ -1234,14 +1220,14 @@ void tms9995_device::execute_run()
 {
 	if (m_reset) service_interrupt();
 
-	if (TRACE_EMU) logerror("calling execute_run for %d cycles\n", m_icount);
+	LOGMASKED(LOG_EMU, "calling execute_run for %d cycles\n", m_icount);
 	do
 	{
 		// Normal operation
 		if (m_check_ready && m_ready == false)
 		{
 			// We are in a wait state
-			if (TRACE_WAITHOLD) logerror("wait state\n");
+			LOGMASKED(LOG_WAIT, "wait state\n");
 			// The clock output should be used to change the state of an outer
 			// device which operates the READY line
 			pulse_clock(1);
@@ -1251,7 +1237,7 @@ void tms9995_device::execute_run()
 			if (m_check_hold && m_hold_requested)
 			{
 				set_hold_state(true);
-				if (TRACE_WAITHOLD) logerror("HOLD state\n");
+				LOGMASKED(LOG_HOLD, "HOLD state\n");
 				pulse_clock(1);
 			}
 			else
@@ -1260,7 +1246,7 @@ void tms9995_device::execute_run()
 
 				m_check_ready = false;
 
-				if (TRACE_MICRO) logerror("main loop, operation %s, MPC = %d\n", opname[m_command], MPC);
+				LOGMASKED(LOG_MICRO, "main loop, operation %s, MPC = %d\n", opname[m_command], MPC);
 				uint8_t* program = (uint8_t*)s_command[m_index].prog;
 				(this->*s_microoperation[program[MPC]])();
 
@@ -1276,7 +1262,7 @@ void tms9995_device::execute_run()
 		}
 	} while (m_icount>0 && !m_reset);
 
-	if (TRACE_EMU) logerror("cycles expired; will return soon.\n");
+	LOGMASKED(LOG_EMU, "cycles expired; will return soon.\n");
 }
 
 /**************************************************************************/
@@ -1303,28 +1289,42 @@ void tms9995_device::execute_set_input(int irqline, int state)
 		if (irqline == INPUT_LINE_NMI)
 		{
 			m_nmi_active = (state==ASSERT_LINE);
-			if (TRACE_INT) logerror("NMI interrupt line state=%d\n", state);
+			LOGMASKED(LOG_INT, "NMI interrupt line state=%d\n", state);
 		}
 		else
 		{
 			if (irqline == INT_9995_INT1)
 			{
-				m_int1_active = m_flag[2] = (state==ASSERT_LINE);
-				if (TRACE_INT) logerror("Line INT1 state=%d\n", state);
+				// *active means that the signal is still present on the input.
+				// The latch can only be reset when this signal is clear.
+				m_int1_active = (state==ASSERT_LINE);
+				LOGMASKED(LOG_INT, "Line INT1 state=%d\n", state);
+				// Latch the INT
+				if (state==ASSERT_LINE)
+				{
+					LOGMASKED(LOG_INT, "Latch INT1\n");
+					m_flag[2] = true;
+				}
 			}
 			else
 			{
 				if (irqline == INT_9995_INT4)
 				{
-					if (TRACE_INT) logerror("Line INT4/EC state=%d\n", state);
+					LOGMASKED(LOG_INT, "Line INT4/EC state=%d\n", state);
 					if (m_flag[0]==false)
 					{
-						if (TRACE_INT) logerror("set as interrupt\n");
-						m_int4_active = m_flag[4] = (state==ASSERT_LINE);
+						m_int4_active = (state==ASSERT_LINE);
+						LOGMASKED(LOG_INT, "set as interrupt\n");
+						// Latch the INT
+						if (state==ASSERT_LINE)
+						{
+							LOGMASKED(LOG_INT, "Latch INT4\n");
+							m_flag[4] = true;
+						}
 					}
 					else
 					{
-						if (TRACE_INT) logerror("set as event count\n");
+						LOGMASKED(LOG_INT, "set as event count\n");
 						trigger_decrementer();
 					}
 				}
@@ -1363,11 +1363,12 @@ void tms9995_device::pulse_clock(int count)
 		m_ready = m_ready_bufd && !m_request_auto_wait_state;                // get the latched READY state
 		if (!m_clock_out_line.isnull()) m_clock_out_line(CLEAR_LINE);
 		m_icount--;                         // This is the only location where we count down the cycles.
-		if (TRACE_CLOCK)
-		{
-			if (m_check_ready) logerror("pulse_clock, READY=%d, auto_wait=%d\n", m_ready_bufd? 1:0, m_auto_wait? 1:0);
-			else logerror("pulse_clock\n");
-		}
+
+		if (m_check_ready)
+			LOGMASKED(LOG_CLOCK, "pulse_clock, READY=%d, auto_wait=%d\n", m_ready_bufd? 1:0, m_auto_wait? 1:0);
+		else
+			LOGMASKED(LOG_CLOCK, "pulse_clock\n");
+
 		m_request_auto_wait_state = false;
 		if (m_flag[0] == false && m_flag[1] == true)
 		{
@@ -1385,7 +1386,7 @@ void tms9995_device::pulse_clock(int count)
 WRITE_LINE_MEMBER( tms9995_device::hold_line )
 {
 	m_hold_requested = (state==ASSERT_LINE);
-	if (TRACE_WAITHOLD) logerror("set HOLD = %d\n", state);
+	LOGMASKED(LOG_HOLD, "set HOLD = %d\n", state);
 	if (!m_hold_requested)
 	{
 		if (!m_holda_line.isnull()) m_holda_line(CLEAR_LINE);
@@ -1398,11 +1399,19 @@ WRITE_LINE_MEMBER( tms9995_device::hold_line )
 */
 WRITE_LINE_MEMBER( tms9995_device::ready_line )
 {
-	if (m_reset && (m_ready_bufd != state)) logerror("Ignoring READY=%d change due to pending RESET\n", state);
-	else
+	bool newready = (state==ASSERT_LINE);
+
+	if (newready != m_ready_bufd)
 	{
-		m_ready_bufd = (state==ASSERT_LINE);
-		if (TRACE_READY) logerror("set READY = %d\n", m_ready_bufd? 1 : 0);
+		if (m_reset)
+		{
+			LOGMASKED(LOG_WARN, "Ignoring READY=%d change due to pending RESET\n", state);
+		}
+		else
+		{
+			m_ready_bufd = newready;
+			LOGMASKED(LOG_READY, "set READY = %d\n", m_ready_bufd? 1 : 0);
+		}
 	}
 }
 
@@ -1444,7 +1453,7 @@ void tms9995_device::decode(uint16_t inst)
 	while (!complete)
 	{
 		ix = (opcode >> 12) & 0x000f;
-		if (TRACE_EMU) logerror("Check next hex digit of instruction %x\n", ix);
+		LOGMASKED(LOG_EMU, "Check next hex digit of instruction %x\n", ix);
 		if (table[ix].next_digit != nullptr)
 		{
 			table = table[ix].next_digit.get();
@@ -1457,7 +1466,7 @@ void tms9995_device::decode(uint16_t inst)
 	if (program_index == NOPRG)
 	{
 		// not found
-		logerror("Undefined opcode %04x at logical address %04x, will trigger MID\n", inst, PC);
+		LOGMASKED(LOG_WARN, "Undefined opcode %04x at logical address %04x, will trigger MID\n", inst, PC);
 		m_pre_IR = 0;
 		m_pre_command = MID;
 	}
@@ -1469,7 +1478,7 @@ void tms9995_device::decode(uint16_t inst)
 		m_pre_command = decoded.id;
 		m_pre_index = program_index;
 		m_pre_byteop = ((decoded.format == 1) && ((inst & 0x1000)!=0));
-		if (TRACE_EMU) logerror("Command decoded as id %d, %s, base opcode %04x\n", decoded.id, opname[decoded.id], decoded.opcode);
+		LOGMASKED(LOG_EMU, "Command decoded as id %d, %s, base opcode %04x\n", decoded.id, opname[decoded.id], decoded.opcode);
 		m_pass = 1;
 	}
 }
@@ -1489,7 +1498,7 @@ void tms9995_device::int_prefetch_and_decode()
 		// Check interrupt lines
 		if (m_nmi_active)
 		{
-			if (TRACE_INT) logerror("Checking interrupts ... NMI active\n");
+			LOGMASKED(LOG_INT, "Checking interrupts ... NMI active\n");
 			m_int_pending |= PENDING_NMI;
 			m_idle_state = false;
 			PC = (PC + 2) & 0xfffe;     // we have not prefetched the next instruction
@@ -1501,10 +1510,10 @@ void tms9995_device::int_prefetch_and_decode()
 			// If the current command is XOP or BLWP, ignore the interrupt
 			if (m_command != XOP && m_command != BLWP)
 			{
-				if (m_int1_active && intmask >= 1) m_int_pending |= PENDING_LEVEL1;
+				if (m_flag[2] && intmask >= 1) m_int_pending |= PENDING_LEVEL1;
 				if (m_int_overflow && intmask >= 2) m_int_pending |= PENDING_OVERFLOW;
-				if (m_int_decrementer && intmask >= 3) m_int_pending |= PENDING_DECR;
-				if (m_int4_active && intmask >= 4) m_int_pending |= PENDING_LEVEL4;
+				if (m_flag[3] && intmask >= 3) m_int_pending |= PENDING_DECR;
+				if (m_flag[4] && intmask >= 4) m_int_pending |= PENDING_LEVEL4;
 			}
 
 			if (m_int_pending!=0)
@@ -1512,19 +1521,18 @@ void tms9995_device::int_prefetch_and_decode()
 				if (m_idle_state)
 				{
 					m_idle_state = false;
-					if (TRACE_INT) logerror("Interrupt occurred, terminate IDLE state\n");
+					LOGMASKED(LOG_INT, "Interrupt occurred, terminate IDLE state\n");
 				}
 				PC = PC + 2;        // PC must be advanced (see flow chart), but no prefetch
-				if (TRACE_INT) logerror("Interrupts pending; no prefetch; advance PC to %04x\n", PC);
+				LOGMASKED(LOG_INT, "Interrupts pending; no prefetch; advance PC to %04x\n", PC);
 				return;
 			}
 			else
 			{
-				if (TRACE_INT) logerror("Checking interrupts ... none pending\n");
 				// No pending interrupts
 				if (m_idle_state)
 				{
-					if (TRACE_WAITHOLD) logerror("IDLE state\n");
+					LOGMASKED(LOG_IDLE, "IDLE state\n");
 					// We are IDLE, stay in the loop and do not advance the PC
 					m_pass = 2;
 					pulse_clock(1);
@@ -1554,7 +1562,7 @@ void tms9995_device::prefetch_and_decode()
 		m_value_copy = m_current_value;
 		if (!m_iaq_line.isnull()) m_iaq_line(ASSERT_LINE);
 		m_address = PC;
-		if (TRACE_OP) logerror("**** Prefetching new instruction at %04x ****\n", PC);
+		LOGMASKED(LOG_DETAIL, "**** Prefetching new instruction at %04x ****\n", PC);
 	}
 
 	word_read(); // changes m_mem_phase
@@ -1567,7 +1575,7 @@ void tms9995_device::prefetch_and_decode()
 		m_current_value = m_value_copy; // restore m_current_value
 		PC = (PC + 2) & 0xfffe;     // advance PC
 		if (!m_iaq_line.isnull()) m_iaq_line(CLEAR_LINE);
-		if (TRACE_OP) logerror("++++ Prefetch done ++++\n");
+		LOGMASKED(LOG_DETAIL, "++++ Prefetch done ++++\n");
 	}
 }
 
@@ -1598,15 +1606,16 @@ void tms9995_device::next_command()
 		// This is a preset for opcodes which do not need an opcode address derivation
 		m_address = WP + ((IR & 0x000f)<<1);
 		MPC = -1;
-		if (TRACE_OP) logerror("===== Next operation %04x (%s) at %04x =====\n", IR, opname[m_command], PC-2);
+		LOGMASKED(LOG_OP, "===== %04x: Op=%04x (%s)\n", PC-2, IR, opname[m_command]);
 
-		if (TRACE_EXEC)
-		{
-			if (m_log_interrupt) logerror("i%04x\n", PC-2);
-			else logerror("%04x\n", PC-2);
-		}
+		// Mark logged address as interrupt service
+		if (m_log_interrupt)
+			LOGMASKED(LOG_EXEC, "i%04x\n", PC-2);
+		else
+			LOGMASKED(LOG_EXEC, "%04x\n", PC-2);
+
 		PC_debug = PC - 2;
-		debugger_instruction_hook(this, PC_debug);
+		debugger_instruction_hook(PC_debug);
 		m_first_cycle = m_icount;
 	}
 }
@@ -1617,7 +1626,7 @@ void tms9995_device::next_command()
 void tms9995_device::command_completed()
 {
 	// Pseudo state at the end of the current instruction cycle sequence
-	if (TRACE_CYCLES)
+	if (LOG_CYCLES & VERBOSE)
 	{
 		logerror("+++++ Instruction %04x (%s) completed", IR, opname[m_command]);
 		int cycles =  m_first_cycle - m_icount;
@@ -1679,7 +1688,7 @@ void tms9995_device::service_interrupt()
 			vectorpos = 0x0008;
 			m_intmask = 0x0001;
 			PC = (PC + 2) & 0xfffe;
-			if (TRACE_INT) logerror("***** MID pending\n");
+			LOGMASKED(LOG_INT, "***** MID pending\n");
 			m_mid_active = false;
 		}
 		else
@@ -1689,7 +1698,7 @@ void tms9995_device::service_interrupt()
 				vectorpos = 0xfffc;
 				m_int_pending &= ~PENDING_NMI;
 				m_intmask = 0;
-				if (TRACE_INT) logerror("***** NMI pending\n");
+				LOGMASKED(LOG_INT, "***** NMI pending\n");
 			}
 			else
 			{
@@ -1697,9 +1706,9 @@ void tms9995_device::service_interrupt()
 				{
 					vectorpos = 0x0004;
 					m_int_pending &= ~PENDING_LEVEL1;
-					m_flag[2] = false;
+					if (!m_int1_active) m_flag[2] = false;
 					m_intmask = 0;
-					if (TRACE_INT) logerror("***** INT1 pending\n");
+					LOGMASKED(LOG_INT, "***** INT1 pending\n");
 				}
 				else
 				{
@@ -1708,7 +1717,7 @@ void tms9995_device::service_interrupt()
 						vectorpos = 0x0008;
 						m_int_pending &= ~PENDING_OVERFLOW;
 						m_intmask = 0x0001;
-						if (TRACE_INT) logerror("***** OVERFL pending\n");
+						LOGMASKED(LOG_INT, "***** OVERFL pending\n");
 					}
 					else
 					{
@@ -1718,16 +1727,15 @@ void tms9995_device::service_interrupt()
 							m_intmask = 0x0002;
 							m_int_pending &= ~PENDING_DECR;
 							m_flag[3] = false;
-							m_int_decrementer = false;
-							if (TRACE_DEC) logerror("***** DECR pending\n");
+							LOGMASKED(LOG_DEC, "***** DECR pending\n");
 						}
 						else
 						{
 							vectorpos = 0x0010;
 							m_intmask = 0x0003;
 							m_int_pending &= ~PENDING_LEVEL4;
-							m_flag[4] = false;
-							if (TRACE_INT) logerror("***** INT4 pending\n");
+							if (!m_int4_active) m_flag[4] = false;
+							LOGMASKED(LOG_INT, "***** INT4 pending\n");
 						}
 					}
 				}
@@ -1735,7 +1743,7 @@ void tms9995_device::service_interrupt()
 		}
 	}
 
-	if (TRACE_INT) logerror("********* triggered an interrupt with vector %04x/%04x\n", vectorpos, vectorpos+2);
+	LOGMASKED(LOG_INT, "********* triggered an interrupt with vector %04x/%04x\n", vectorpos, vectorpos+2);
 
 	// just for debugging purposes
 	if (!m_reset) m_log_interrupt = true;
@@ -1787,12 +1795,13 @@ void tms9995_device::mem_read()
 
 	if ((m_address & 0xfffe)==0xfffa && !m_mp9537)
 	{
-		if (TRACE_DEC) logerror("read decrementer\n");
+		LOGMASKED(LOG_DEC, "read dec=%04x\n", m_decrementer_value);
 		// Decrementer mapped into the address space
 		m_current_value = m_decrementer_value;
 		if (m_byteop)
 		{
-			if ((m_address & 1)!=1) m_current_value <<= 8;
+			// When reading FFFB, return the lower byte
+			if ((m_address & 1)==1) m_current_value <<= 8;
 			m_current_value &= 0xff00;
 		}
 		pulse_clock(1);
@@ -1806,7 +1815,7 @@ void tms9995_device::mem_read()
 		// byte operations (e.g. when retrieving the index register)
 		if (m_word_access || !m_byteop) m_address &= 0xfffe;
 
-		if (TRACE_MEM) logerror("read onchip memory (single pass, address %04x)\n", m_address);
+		LOGMASKED(LOG_MEM, "read onchip memory (single pass, address %04x)\n", m_address);
 
 		// Ignore the READY state
 		m_check_ready = false;
@@ -1841,8 +1850,9 @@ void tms9995_device::mem_read()
 			else m_pass = 2;
 
 			m_check_hold = false;
-			if (TRACE_ADDRESSBUS) logerror("set address bus %04x\n", m_address & ~1);
-			m_prgspace->set_address(address);
+			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & ~1);
+			if (m_sospace)
+				m_sospace->read_byte(address);
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1850,13 +1860,14 @@ void tms9995_device::mem_read()
 			// Sample the value on the data bus (high byte)
 			if (m_word_access || !m_byteop) address &= 0xfffe;
 			value = m_prgspace->read_byte(address);
-			if (TRACE_MEM) logerror("memory read byte %04x -> %02x\n", m_address & ~1, value);
+			LOGMASKED(LOG_MEM, "memory read byte %04x -> %02x\n", m_address & ~1, value);
 			m_current_value = (value << 8) & 0xff00;
 			break;
 		case 3:
 			// Set address + 1 (unless byte command)
-			if (TRACE_ADDRESSBUS) logerror("set address bus %04x\n", m_address | 1);
-			m_prgspace->set_address(m_address | 1);
+			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
+			if (m_sospace)
+				m_sospace->read_byte(m_address | 1);
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1864,7 +1875,7 @@ void tms9995_device::mem_read()
 			// Read low byte
 			value = m_prgspace->read_byte(m_address | 1);
 			m_current_value |= value;
-			if (TRACE_MEM) logerror("memory read byte %04x -> %02x, complete word = %04x\n", m_address | 1, value, m_current_value);
+			LOGMASKED(LOG_MEM, "memory read byte %04x -> %02x, complete word = %04x\n", m_address | 1, value, m_current_value);
 			m_check_hold = true;
 			break;
 		}
@@ -1932,7 +1943,7 @@ void tms9995_device::mem_write()
 		{
 			m_starting_count_storage_register = m_decrementer_value = m_current_value;
 		}
-		if (TRACE_DEC) logerror("Setting decrementer to %04x, PC=%04x\n", m_current_value, PC);
+		LOGMASKED(LOG_DEC, "Setting dec=%04x [PC=%04x]\n", m_current_value, PC);
 		pulse_clock(1);
 		return;
 	}
@@ -1944,7 +1955,7 @@ void tms9995_device::mem_write()
 		// byte operations (e.g. when retrieving the index register)
 		if (m_word_access || !m_byteop) m_address &= 0xfffe;
 
-		if (TRACE_MEM) logerror("write to onchip memory (single pass, address %04x, value=%04x)\n", m_address, m_current_value);
+		LOGMASKED(LOG_MEM, "write to onchip memory (single pass, address %04x, value=%04x)\n", m_address, m_current_value);
 		m_check_ready = false;
 		m_onchip_memory[m_address & 0x00ff] = (m_current_value >> 8) & 0xff;
 		if (m_word_access || !m_byteop)
@@ -1973,9 +1984,10 @@ void tms9995_device::mem_write()
 			else m_pass = 2;
 
 			m_check_hold = false;
-			if (TRACE_ADDRESSBUS) logerror("set address bus %04x\n", address);
-			m_prgspace->set_address(address);
-			if (TRACE_MEM) logerror("memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
+			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", address);
+			if (m_sospace)
+				m_sospace->read_byte(address);
+			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
 			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
@@ -1986,9 +1998,10 @@ void tms9995_device::mem_write()
 			break;
 		case 3:
 			// Set address + 1 (unless byte command)
-			if (TRACE_ADDRESSBUS) logerror("set address bus %04x\n", m_address | 1);
-			m_prgspace->set_address(m_address | 1);
-			if (TRACE_MEM) logerror("memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
+			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
+			if (m_sospace)
+				m_sospace->read_byte(m_address | 1);
+			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
 			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
@@ -2029,7 +2042,7 @@ void tms9995_device::return_with_address()
 	m_index = m_caller_index;
 	MPC = m_caller_MPC; // will be increased on return
 	m_address = m_current_value + m_address_add;
-	if (TRACE_DETAIL) logerror("+++ return from operand address derivation +++\n");
+	LOGMASKED(LOG_DETAIL, "+++ return from operand address derivation +++\n");
 	// no clock pulse
 }
 
@@ -2043,7 +2056,7 @@ void tms9995_device::return_with_address_copy()
 	m_index = m_caller_index;
 	MPC = m_caller_MPC; // will be increased on return
 	m_address = m_address_saved;
-	if (TRACE_DETAIL) logerror("+++ return from operand address derivation (auto inc) +++\n");
+	LOGMASKED(LOG_DETAIL, "+++ return from operand address derivation (auto inc) +++\n");
 	// no clock pulse
 }
 
@@ -2084,7 +2097,7 @@ void tms9995_device::return_with_address_copy()
 
 void tms9995_device::cru_output_operation()
 {
-	if (TRACE_CRU) logerror("CRU output operation, address %04x, value %d\n", m_cru_address, m_cru_value & 0x01);
+	LOGMASKED(LOG_CRU, "CRU output operation, address %04x, value %d\n", m_cru_address, m_cru_value & 0x01);
 
 	if (m_cru_address == 0x1fda)
 	{
@@ -2099,7 +2112,7 @@ void tms9995_device::cru_output_operation()
 		{
 			m_check_ready = false;
 			// FLAG2, FLAG3, and FLAG4 are read-only
-			if (TRACE_CRU) logerror("set CRU address %04x to %d\n", m_cru_address, m_cru_value&1);
+			LOGMASKED(LOG_CRU, "set CRU address %04x to %d\n", m_cru_address, m_cru_value&1);
 			if ((m_cru_address != 0x1ee4) && (m_cru_address != 0x1ee6) && (m_cru_address != 0x1ee8))
 				m_flag[(m_cru_address>>1)&0x000f] = (m_cru_value & 0x01);
 		}
@@ -2156,7 +2169,7 @@ void tms9995_device::cru_input_operation()
 		// ........ ........ X....... ........
 		//
 		crubyte = m_cru->read_byte((m_cru_address >> 4)& CRUREADMASK);
-		if (TRACE_DETAIL) logerror("Need to get next 8 bits (addresses %04x-%04x): %02x\n", (m_cru_address&0xfff0)+14, m_cru_address&0xfff0, crubyte);
+		LOGMASKED(LOG_DETAIL, "Need to get next 8 bits (addresses %04x-%04x): %02x\n", (m_cru_address&0xfff0)+14, m_cru_address&0xfff0, crubyte);
 		m_cru_read = crubyte << 15;
 		m_cru_bits_left = 8;
 
@@ -2168,7 +2181,7 @@ void tms9995_device::cru_input_operation()
 			m_cru_first_read = false;
 			m_pass = m_count;
 		}
-		if (TRACE_DETAIL) logerror("adjusted value for shift: %06x\n", m_cru_read);
+		LOGMASKED(LOG_DETAIL, "adjusted value for shift: %06x\n", m_cru_read);
 	}
 
 	crubit = (m_cru_read & 0x8000);
@@ -2194,7 +2207,7 @@ void tms9995_device::cru_input_operation()
 		}
 	}
 
-	if (TRACE_CRU) logerror("CRU input operation, address %04x, value %d\n", m_cru_address, (crubit & 0x8000)>>15);
+	LOGMASKED(LOG_CRU, "CRU input operation, address %04x, value %d\n", m_cru_address, (crubit & 0x8000)>>15);
 
 	m_cru_value |= crubit;
 
@@ -2222,15 +2235,14 @@ void tms9995_device::trigger_decrementer()
 	if (m_starting_count_storage_register>0) // null will turn off the decrementer
 	{
 		m_decrementer_value--;
+		LOGMASKED(LOG_DEC, "dec=%04x\n", m_decrementer_value);
 		if (m_decrementer_value==0)
 		{
-			if (TRACE_DEC) logerror("decrementer reached 0\n");
 			m_decrementer_value = m_starting_count_storage_register;
 			if (m_flag[1]==true)
 			{
-				if (TRACE_DEC) logerror("decrementer flags interrupt\n");
+				LOGMASKED(LOG_DEC, "decrementer flags interrupt\n");
 				m_flag[3] = true;
-				m_int_decrementer = true;
 			}
 		}
 	}
@@ -2277,12 +2289,12 @@ void tms9995_device::operand_address_subprogram()
 	{
 		if (m_regnumber != 0)
 		{
-			if (TRACE_DETAIL) logerror("indexed addressing\n");
+			LOGMASKED(LOG_DETAIL, "indexed addressing\n");
 			MPC = 16; // indexed
 		}
 		else
 		{
-			if (TRACE_DETAIL) logerror("symbolic addressing\n");
+			LOGMASKED(LOG_DETAIL, "symbolic addressing\n");
 			m_address = PC;
 			PC = (PC + 2) & 0xfffe;
 		}
@@ -2292,7 +2304,7 @@ void tms9995_device::operand_address_subprogram()
 	m_mem_phase = 1;
 	m_address_add = 0;
 	MPC--;      // will be increased in the mail loop
-	if (TRACE_DETAIL) logerror("*** Operand address derivation; address=%04x; index=%d\n", m_address, MPC+1);
+	LOGMASKED(LOG_DETAIL, "*** Operand address derivation; address=%04x; index=%d\n", m_address, MPC+1);
 }
 
 /*
@@ -2434,7 +2446,7 @@ void tms9995_device::alu_add_s_sxc()
 	{
 		set_status_parity((uint8_t)(dest_new>>8));
 	}
-	if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
+	LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
 	// No clock pulse (will be done by prefetch)
 }
 
@@ -2481,7 +2493,7 @@ void tms9995_device::alu_blwp()
 	case 4:
 		PC = m_current_value & 0xfffe;
 		n = 0;
-		if (TRACE_OP) logerror("Context switch complete; WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
+		LOGMASKED(LOG_CONTEXT, "Context switch (blwp): WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 		break;
 	}
 	m_inst_state++;
@@ -2502,7 +2514,7 @@ void tms9995_device::alu_c()
 		set_status_parity((uint8_t)(m_source_value>>8));
 	}
 	compare_and_set_lae(m_source_value, m_current_value);
-	if (TRACE_STATUS) logerror("ST = %04x (val1=%04x, val2=%04x)\n", ST, m_source_value, m_current_value);
+	LOGMASKED(LOG_STATUS, "ST = %04x (val1=%04x, val2=%04x)\n", ST, m_source_value, m_current_value);
 }
 
 /*
@@ -2513,12 +2525,12 @@ void tms9995_device::alu_ci()
 	// We have the register value in m_source_value, the register address in m_address_saved
 	// and the immediate value in m_current_value
 	compare_and_set_lae(m_source_value, m_current_value);
-	if (TRACE_STATUS) logerror("ST = %04x (val1=%04x, val2=%04x)\n", ST, m_source_value, m_current_value);
+	LOGMASKED(LOG_STATUS, "ST = %04x (val1=%04x, val2=%04x)\n", ST, m_source_value, m_current_value);
 }
 
 void tms9995_device::alu_clr_seto()
 {
-	if (TRACE_OP) logerror("clr/seto: Setting values for address %04x\n", m_address);
+	LOGMASKED(LOG_DETAIL, "clr/seto: Setting values for address %04x\n", m_address);
 	switch (m_command)
 	{
 	case CLR:
@@ -2727,14 +2739,14 @@ void tms9995_device::alu_external()
 
 	if (m_command == IDLE)
 	{
-		if (TRACE_OP) logerror("Entering IDLE state\n");
+		LOGMASKED(LOG_OP, "Entering IDLE state\n");
 		m_idle_state = true;
 	}
 
 	if (m_command == RSET)
 	{
 		ST &= 0xfff0;
-		if (TRACE_OP) logerror("RSET, new ST = %04x\n", ST);
+		LOGMASKED(LOG_OP, "RSET, new ST = %04x\n", ST);
 	}
 
 	if (!m_external_operation.isnull())
@@ -2776,7 +2788,7 @@ void tms9995_device::alu_f3()
 				compare_and_set_lae(m_current_value, 0);
 			}
 		}
-		if (TRACE_STATUS) logerror("ST = %04x\n", ST);
+		LOGMASKED(LOG_STATUS, "ST = %04x\n", ST);
 		break;
 	}
 	m_inst_state++;
@@ -2812,7 +2824,7 @@ void tms9995_device::alu_imm_arithm()
 	m_current_value = (uint16_t)(dest_new & 0xffff);
 	compare_and_set_lae(m_current_value, 0);
 	m_address = m_address_saved;
-	if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
+	LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
 }
 
 /*
@@ -2868,11 +2880,11 @@ void tms9995_device::alu_jump()
 
 	if (!cond)
 	{
-		if (TRACE_OP) logerror("Jump condition false\n");
+		LOGMASKED(LOG_DETAIL, "Jump condition false\n");
 	}
 	else
 	{
-		if (TRACE_OP) logerror("Jump condition true\n");
+		LOGMASKED(LOG_DETAIL, "Jump condition true\n");
 		PC = (PC + (displacement<<1)) & 0xfffe;
 	}
 }
@@ -2892,7 +2904,7 @@ void tms9995_device::alu_ldcr()
 	case 1:
 		// We have read the byte or word into m_current_value.
 		compare_and_set_lae(m_current_value, 0);
-		if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
+		LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
 
 		// Parity is computed from the complete byte, even when less than
 		// 8 bits are transferred (see [1]).
@@ -2924,7 +2936,7 @@ void tms9995_device::alu_li()
 	// The immediate value is still in m_current_value
 	m_address = m_address_saved;
 	compare_and_set_lae(m_current_value, 0);
-	if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
+	LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
 }
 
 void tms9995_device::alu_limi_lwpi()
@@ -2933,13 +2945,13 @@ void tms9995_device::alu_limi_lwpi()
 	if (m_command == LIMI)
 	{
 		ST = (ST & 0xfff0) | (m_current_value & 0x000f);
-		if (TRACE_OP) logerror("LIMI sets ST = %04x\n", ST);
+		LOGMASKED(LOG_DETAIL, "LIMI sets ST = %04x\n", ST);
 		pulse_clock(1);     // needs one more than LWPI
 	}
 	else
 	{
 		WP = m_current_value & 0xfffe;
-		if (TRACE_OP) logerror("LWPI sets new WP = %04x\n", WP);
+		LOGMASKED(LOG_DETAIL, "LWPI sets new WP = %04x\n", WP);
 	}
 }
 
@@ -2952,13 +2964,13 @@ void tms9995_device::alu_lst_lwp()
 	if (m_command==LST)
 	{
 		ST = m_current_value;
-		if (TRACE_OP) logerror("new ST = %04x\n", ST);
+		LOGMASKED(LOG_DETAIL, "new ST = %04x\n", ST);
 		pulse_clock(1);
 	}
 	else
 	{
 		WP = m_current_value & 0xfffe;
-		if (TRACE_OP) logerror("new WP = %04x\n", WP);
+		LOGMASKED(LOG_DETAIL, "new WP = %04x\n", WP);
 	}
 }
 
@@ -2976,7 +2988,7 @@ void tms9995_device::alu_mov()
 		set_status_parity((uint8_t)(m_current_value>>8));
 	}
 	compare_and_set_lae(m_current_value, 0);
-	if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
+	LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
 	// No clock pulse, as next instruction is prefetch
 }
 
@@ -3069,7 +3081,7 @@ void tms9995_device::alu_rtwp()
 		// Just for debugging purposes
 		m_log_interrupt = false;
 
-		if (TRACE_OP) logerror("RTWP restored old context (WP=%04x, PC=%04x, ST=%04x)\n", WP, PC, ST);
+		LOGMASKED(LOG_CONTEXT, "Context switch (rtwp): WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 		break;
 	}
 	m_inst_state++;
@@ -3122,7 +3134,7 @@ void tms9995_device::alu_shift()
 		}
 		else
 		{
-			if (TRACE_DETAIL) logerror("Shift operation gets count from R0\n");
+			LOGMASKED(LOG_DETAIL, "Shift operation gets count from R0\n");
 		}
 		pulse_clock(1);
 		pulse_clock(1);
@@ -3167,7 +3179,7 @@ void tms9995_device::alu_shift()
 		set_status_bit(ST_OV, overflow);
 		compare_and_set_lae(m_current_value, 0);
 		m_address = m_address_saved;        // Register address
-		if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
+		LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
 		break;
 	}
 	m_inst_state++;
@@ -3263,7 +3275,7 @@ void tms9995_device::alu_single_arithm()
 	m_current_value = dest_new & 0xffff;
 	compare_and_set_lae(m_current_value, 0);
 
-	if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
+	LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
 	// No clock pulse, as next instruction is prefetch
 }
 
@@ -3301,7 +3313,7 @@ void tms9995_device::alu_stcr()
 			m_current_value <<= 8;
 		}
 		else n += 8;
-		if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
+		LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
 		break;
 	}
 	m_inst_state++;
@@ -3341,7 +3353,7 @@ void tms9995_device::alu_tb()
 		break;
 	case 2:
 		set_status_bit(ST_EQ, m_cru_value!=0);
-		if (TRACE_STATUS) logerror("ST = %04x\n", ST);
+		LOGMASKED(LOG_STATUS, "ST = %04x\n", ST);
 		break;
 	}
 	m_inst_state++;
@@ -3406,6 +3418,7 @@ void tms9995_device::alu_xop()
 	case 6:
 		PC = m_current_value & 0xfffe;
 		set_status_bit(ST_X, true);
+		LOGMASKED(LOG_CONTEXT, "Context switch (xop): WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 		break;
 	}
 	m_inst_state++;
@@ -3424,7 +3437,7 @@ void tms9995_device::alu_int()
 	case 0:
 		PC = (PC - 2) & 0xfffe;
 		m_address_saved = m_address;
-		if (TRACE_INTD) logerror("interrupt service (0): Prepare to read vector\n");
+		LOGMASKED(LOG_INTD, "interrupt service (0): Prepare to read vector\n");
 		break;
 	case 1:
 		pulse = 2;                  // two cycles (with the one at the end)
@@ -3432,30 +3445,30 @@ void tms9995_device::alu_int()
 		WP = m_current_value & 0xfffe;       // new WP
 		m_current_value = ST;
 		m_address = (WP + 30)&0xfffe;
-		if (TRACE_INTD) logerror("interrupt service (1): Read new WP = %04x, save ST to %04x\n", WP, m_address);
+		LOGMASKED(LOG_INTD, "interrupt service (1): Read new WP = %04x, save ST to %04x\n", WP, m_address);
 		break;
 	case 2:
 		m_address = (WP + 28)&0xfffe;
 		m_current_value = PC;
-		if (TRACE_INTD) logerror("interrupt service (2): Save PC to %04x\n", m_address);
+		LOGMASKED(LOG_INTD, "interrupt service (2): Save PC to %04x\n", m_address);
 		break;
 	case 3:
 		m_address = (WP + 26)&0xfffe;
 		m_current_value = m_source_value;   // old WP
-		if (TRACE_INTD) logerror("interrupt service (3): Save WP to %04x\n", m_address);
+		LOGMASKED(LOG_INTD, "interrupt service (3): Save WP to %04x\n", m_address);
 		break;
 	case 4:
 		m_address = (m_address_saved + 2) & 0xfffe;
-		if (TRACE_INTD) logerror("interrupt service (4): Read PC from %04x\n", m_address);
+		LOGMASKED(LOG_INTD, "interrupt service (4): Read PC from %04x\n", m_address);
 		break;
 	case 5:
 		PC = m_current_value & 0xfffe;
 		ST = (ST & 0xfe00) | m_intmask;
-		if (TRACE_INTD) logerror("interrupt service (5): Context switch complete; WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
+		LOGMASKED(LOG_CONTEXT, "Context switch (int): WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 
 		if (((m_int_pending & PENDING_MID)!=0) && m_nmi_active)
 		{
-			if (TRACE_INTD) logerror("interrupt service (6): NMI active after context switch\n");
+			LOGMASKED(LOG_INTD, "interrupt service (6): NMI active after context switch\n");
 			m_int_pending &= ~PENDING_MID;
 			m_address = 0xfffc;
 			m_intmask = 0;
@@ -3465,7 +3478,7 @@ void tms9995_device::alu_int()
 		{
 			if (m_from_reset)
 			{
-				if (TRACE_INTD) logerror("interrupt service (6): RESET completed\n");
+				LOGMASKED(LOG_INTD, "interrupt service (6): RESET completed\n");
 				// We came from the RESET interrupt
 				m_from_reset = false;
 				ST &= 0x01ff;
@@ -3501,11 +3514,11 @@ uint32_t tms9995_device::execute_input_lines() const
 	return 2;
 }
 
-util::disasm_interface *tms9995_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms9995_device::create_disassembler()
 {
-	return new tms9900_disassembler(TMS9995_ID);
+	return std::make_unique<tms9900_disassembler>(TMS9995_ID);
 }
 
 
-DEFINE_DEVICE_TYPE(TMS9995, tms9995_device, "tms9995", "TMS9995")
-DEFINE_DEVICE_TYPE(TMS9995_MP9537, tms9995_mp9537_device, "tms9995_mp9537", "TMS9995-MP9537")
+DEFINE_DEVICE_TYPE(TMS9995, tms9995_device, "tms9995", "Texas Instruments TMS9995")
+DEFINE_DEVICE_TYPE(TMS9995_MP9537, tms9995_mp9537_device, "tms9995_mp9537", "Texas Instruments TMS9995-MP9537")

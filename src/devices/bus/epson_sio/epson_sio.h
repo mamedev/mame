@@ -22,10 +22,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(epson_sio_devices, _def_slot, false)
 
 #define MCFG_EPSON_SIO_RX(_rx) \
-	devcb = &downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB_##_rx);
+	downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB_##_rx);
 
 #define MCFG_EPSON_SIO_PIN(_pin) \
-	devcb = &downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB_##_pin);
+	downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB_##_pin);
 
 
 //**************************************************************************
@@ -44,8 +44,8 @@ public:
 	virtual ~epson_sio_device();
 
 	// callbacks
-	template<class _rx> devcb_base &set_rx_callback(_rx rx) { return m_write_rx.set_callback(rx); }
-	template<class _pin> devcb_base &set_pin_callback(_pin pin) { return m_write_pin.set_callback(pin); }
+	template <class Object> devcb_base &set_rx_callback(Object &&rx) { return m_write_rx.set_callback(std::forward<Object>(rx)); }
+	template <class Object> devcb_base &set_pin_callback(Object &&pin) { return m_write_pin.set_callback(std::forward<Object>(pin)); }
 
 	// called from owner
 	DECLARE_WRITE_LINE_MEMBER( tx_w );
@@ -90,7 +90,7 @@ DECLARE_DEVICE_TYPE(EPSON_SIO, epson_sio_device)
 
 
 // supported devices
-SLOT_INTERFACE_EXTERN( epson_sio_devices );
+void epson_sio_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_EPSON_SIO_EPSON_SIO_H

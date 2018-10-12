@@ -38,7 +38,7 @@ void jaleco_blend_device::device_start()
 {
 	m_table = make_unique_clear<uint8_t[]>(0xc00);
 
-	save_pointer(NAME(m_table.get()), 0xc00);
+	save_pointer(NAME(m_table), 0xc00);
 }
 
 //-------------------------------------------------

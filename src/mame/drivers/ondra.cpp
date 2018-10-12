@@ -16,25 +16,28 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
 
 /* Address maps */
-ADDRESS_MAP_START(ondra_state::ondra_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0xdfff) AM_RAMBANK("bank2")
-	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank3")
-ADDRESS_MAP_END
+void ondra_state::ondra_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0xdfff).bankrw("bank2");
+	map(0xe000, 0xffff).bankrw("bank3");
+}
 
-ADDRESS_MAP_START(ondra_state::ondra_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x0b)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x03, 0x03) AM_WRITE(ondra_port_03_w)
+void ondra_state::ondra_io(address_map &map)
+{
+	map.global_mask(0x0b);
+	map.unmap_value_high();
+	map(0x03, 0x03).w(FUNC(ondra_state::ondra_port_03_w));
 	//AM_RANGE(0x09, 0x09) AM_WRITE(ondra_port_09_w)
 	//AM_RANGE(0x0a, 0x0a) AM_WRITE(ondra_port_0a_w)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ondra )
@@ -112,19 +115,18 @@ static INPUT_PORTS_START( ondra )
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(ondra_state::ondra_interrupt)
+WRITE_LINE_MEMBER(ondra_state::vblank_irq)
 {
-	device.execute().set_input_line(0, HOLD_LINE);
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 /* Machine driver */
 MACHINE_CONFIG_START(ondra_state::ondra)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)
-	MCFG_CPU_PROGRAM_MAP(ondra_mem)
-	MCFG_CPU_IO_MAP(ondra_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ondra_state,  ondra_interrupt)
-
+	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(ondra_mem)
+	MCFG_DEVICE_IO_MAP(ondra_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -134,14 +136,14 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ondra_state, screen_update_ondra)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ondra_state, vblank_irq))
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -150,9 +152,7 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ondra")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -183,6 +183,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE        INIT  COMPANY   FULLNAME       FLAGS
-COMP( 1989, ondrat, 0,      0,      ondra,      ondra, ondra_state, 0,    "Tesla",  "Ondra",       0 )
-COMP( 1989, ondrav, ondrat, 0,      ondra,      ondra, ondra_state, 0,    "ViLi",   "Ondra ViLi",  0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME      FLAGS
+COMP( 1989, ondrat, 0,      0,      ondra,   ondra, ondra_state, empty_init, "Tesla", "Ondra",      0 )
+COMP( 1989, ondrav, ondrat, 0,      ondra,   ondra, ondra_state, empty_init, "ViLi",  "Ondra ViLi", 0 )

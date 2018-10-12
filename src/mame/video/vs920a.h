@@ -44,6 +44,6 @@ DECLARE_DEVICE_TYPE(VS920A, vs920a_text_tilemap_device)
 	downcast<vs920a_text_tilemap_device &>(*device).set_gfx_region(_region);
 
 #define MCFG_VS920A_GFXDECODE(_gfxtag) \
-	downcast<vs920a_text_tilemap_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<vs920a_text_tilemap_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_VS920A_H

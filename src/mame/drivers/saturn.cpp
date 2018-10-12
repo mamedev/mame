@@ -432,7 +432,6 @@ test1f diagnostic hacks:
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
 #include "machine/saturn_cdb.h"
-#include "sound/scsp.h"
 #include "video/stvvdp1.h"
 #include "video/stvvdp2.h"
 
@@ -460,8 +459,19 @@ public:
 		, m_ctrl2(*this, "ctrl2")
 	{ }
 
+	void saturn(machine_config &config);
+	void saturnjp(machine_config &config);
+	void saturneu(machine_config &config);
+	void saturnus(machine_config &config);
+
+	void init_saturnus();
+	void init_saturneu();
+	void init_saturnjp();
+
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
+
+private:
 
 	DECLARE_MACHINE_START(saturn);
 	DECLARE_MACHINE_RESET(saturn);
@@ -473,9 +483,6 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
 
 	void saturn_init_driver(int rgn);
-	DECLARE_DRIVER_INIT(saturnus);
-	DECLARE_DRIVER_INIT(saturneu);
-	DECLARE_DRIVER_INIT(saturnjp);
 	DECLARE_READ8_MEMBER(saturn_pdr1_direct_r);
 	DECLARE_READ8_MEMBER(saturn_pdr2_direct_r);
 	DECLARE_WRITE8_MEMBER(saturn_pdr1_direct_w);
@@ -494,12 +501,9 @@ public:
 	required_device<saturn_control_port_device> m_ctrl1;
 	required_device<saturn_control_port_device> m_ctrl2;
 
-	void saturn(machine_config &config);
-	void saturnjp(machine_config &config);
-	void saturneu(machine_config &config);
-	void saturnus(machine_config &config);
 	void saturn_mem(address_map &map);
 	void sound_mem(address_map &map);
+	void scsp_mem(address_map &map);
 };
 
 
@@ -518,40 +522,47 @@ READ32_MEMBER( sat_console_state::abus_dummy_r )
 	return -1;
 }
 
-ADDRESS_MAP_START(sat_console_state::saturn_mem)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_MIRROR(0x20000000) AM_REGION("bios", 0) AM_WRITENOP // bios
-	AM_RANGE(0x00100000, 0x0010007f) AM_DEVREADWRITE8("smpc", smpc_hle_device, read, write, 0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
-	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(saturn_minit_w)
-	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(saturn_sinit_w)
+void sat_console_state::saturn_mem(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom().mirror(0x20000000).region("bios", 0).nopw(); // bios
+	map(0x00100000, 0x0010007f).rw(m_smpc_hle, FUNC(smpc_hle_device::read), FUNC(smpc_hle_device::write));
+	map(0x00180000, 0x0018ffff).rw(FUNC(sat_console_state::saturn_backupram_r), FUNC(sat_console_state::saturn_backupram_w)).share("share1");
+	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
+	map(0x01000000, 0x017fffff).w(FUNC(sat_console_state::saturn_minit_w));
+	map(0x01800000, 0x01ffffff).w(FUNC(sat_console_state::saturn_sinit_w));
 //  AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_MIRROR(0x20000000) // Cartridge area
 //  AM_RANGE(0x02400000, 0x027fffff) AM_RAM // External Data RAM area
 //  AM_RANGE(0x04000000, 0x047fffff) AM_RAM // External Battery RAM area
-	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
-	AM_RANGE(0x05000000, 0x057fffff) AM_READ(abus_dummy_r)
-	AM_RANGE(0x05800000, 0x0589ffff) AM_DEVREADWRITE("stvcd", stvcd_device, stvcd_r, stvcd_w)
+	map(0x04ffffff, 0x04ffffff).r(FUNC(sat_console_state::saturn_cart_type_r));
+	map(0x05000000, 0x057fffff).r(FUNC(sat_console_state::abus_dummy_r));
+	map(0x05800000, 0x0589ffff).rw(m_stvcd, FUNC(stvcd_device::stvcd_r), FUNC(stvcd_device::stvcd_w));
 	/* Sound */
-	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
-	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_device, read, write, 0xffffffff)
+	map(0x05a00000, 0x05a7ffff).rw(FUNC(sat_console_state::saturn_soundram_r), FUNC(sat_console_state::saturn_soundram_w));
+	map(0x05b00000, 0x05b00fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 	/* VDP1 */
-	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
-	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
-	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
-	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
-	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
-	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_DEVICE("scu", sega_scu_device, regs_map ) //AM_READWRITE(saturn_scu_r, saturn_scu_w)
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
-	AM_RANGE(0x45000000, 0x46ffffff) AM_WRITENOP
-	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP // cache address array
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array, Dragon Ball Z sprites relies on this
-ADDRESS_MAP_END
+	map(0x05c00000, 0x05c7ffff).rw(FUNC(sat_console_state::saturn_vdp1_vram_r), FUNC(sat_console_state::saturn_vdp1_vram_w));
+	map(0x05c80000, 0x05cbffff).rw(FUNC(sat_console_state::saturn_vdp1_framebuffer0_r), FUNC(sat_console_state::saturn_vdp1_framebuffer0_w));
+	map(0x05d00000, 0x05d0001f).rw(FUNC(sat_console_state::saturn_vdp1_regs_r), FUNC(sat_console_state::saturn_vdp1_regs_w));
+	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(sat_console_state::saturn_vdp2_vram_r), FUNC(sat_console_state::saturn_vdp2_vram_w));
+	map(0x05f00000, 0x05f7ffff).rw(FUNC(sat_console_state::saturn_vdp2_cram_r), FUNC(sat_console_state::saturn_vdp2_cram_w));
+	map(0x05f80000, 0x05fbffff).rw(FUNC(sat_console_state::saturn_vdp2_regs_r), FUNC(sat_console_state::saturn_vdp2_regs_w));
+	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //AM_READWRITE(saturn_scu_r, saturn_scu_w)
+	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
+	map(0x45000000, 0x46ffffff).nopw();
+	map(0x60000000, 0x600003ff).nopw(); // cache address array
+	map(0xc0000000, 0xc0000fff).ram(); // cache data array, Dragon Ball Z sprites relies on this
+}
 
-ADDRESS_MAP_START(sat_console_state::sound_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("sound_ram")
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_device, read, write)
-ADDRESS_MAP_END
+void sat_console_state::sound_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sound_ram");
+	map(0x100000, 0x100fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
+}
+
+void sat_console_state::scsp_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sound_ram");
+}
 
 
 INPUT_CHANGED_MEMBER(sat_console_state::tray_open)
@@ -595,8 +606,6 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
 {
-	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
-
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
 
@@ -651,7 +660,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	}
 
 	// save states
-//  save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+//  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));
@@ -784,18 +793,18 @@ uint8_t sat_console_state::smpc_direct_mode(uint16_t in_value,bool which)
 MACHINE_CONFIG_START(sat_console_state::saturn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_CPU_PROGRAM_MAP(saturn_mem)
+	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_DEVICE_PROGRAM_MAP(saturn_mem)
 	MCFG_SH2_IS_SLAVE(0)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sat_console_state, saturn_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_CPU_PROGRAM_MAP(saturn_mem)
+	MCFG_DEVICE_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_DEVICE_PROGRAM_MAP(saturn_mem)
 	MCFG_SH2_IS_SLAVE(1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", sat_console_state, saturn_slave_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_mem)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
 
 	MCFG_SEGA_SCU_ADD("scu")
 	downcast<sega_scu_device &>(*device).set_hostcpu("maincpu");
@@ -806,23 +815,23 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
 	MCFG_SMPC_HLE_SCREEN("screen")
 	MCFG_SMPC_HLE_CONTROL_PORTS("ctrl1", "ctrl2")
-	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(sat_console_state, saturn_pdr1_direct_r))
-	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(sat_console_state, saturn_pdr2_direct_r))
-	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(sat_console_state, saturn_pdr1_direct_w))
-	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(sat_console_state, saturn_pdr2_direct_w))
-	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(saturn_state, master_sh2_reset_w))
-	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(saturn_state, master_sh2_nmi_w))
-	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(saturn_state, slave_sh2_reset_w))
-	MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(saturn_state, sound_68k_reset_w))
-	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(saturn_state, system_reset_w))
-	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(saturn_state, system_halt_w))
-	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(saturn_state, dot_select_w))
-	MCFG_SMPC_HLE_IRQ_HANDLER_CB(DEVWRITELINE("scu", sega_scu_device, smpc_irq_w))
+	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(*this, sat_console_state, saturn_pdr1_direct_r))
+	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(*this, sat_console_state, saturn_pdr2_direct_r))
+	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(*this, sat_console_state, saturn_pdr1_direct_w))
+	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(*this, sat_console_state, saturn_pdr2_direct_w))
+	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(*this, saturn_state, master_sh2_reset_w))
+	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(*this, saturn_state, master_sh2_nmi_w))
+	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(*this, saturn_state, slave_sh2_reset_w))
+	MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(*this, saturn_state, sound_68k_reset_w))
+	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(*this, saturn_state, system_reset_w))
+	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(*this, saturn_state, system_halt_w))
+	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(*this, saturn_state, dot_select_w))
+	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE("scu", sega_scu_device, smpc_irq_w))
 
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(sat_console_state::nvram_init));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -830,16 +839,18 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_SCREEN_UPDATE_DRIVER(sat_console_state, screen_update_stv_vdp2)
 	MCFG_PALETTE_ADD("palette", 2048+(2048*2))//standard palette + extra memory for rgb brightness.
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stv)
 
 	MCFG_VIDEO_START_OVERRIDE(sat_console_state,stv_vdp2)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(saturn_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(DEVWRITELINE("scu", sega_scu_device, sound_req_w))
-	MCFG_SCSP_EXTS_CB(DEVREAD16("stvcd", stvcd_device, channel_volume_r))
+	MCFG_DEVICE_ADD(m_scsp, SCSP)
+	MCFG_DEVICE_ADDRESS_MAP(0, scsp_mem)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
+	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
+	MCFG_SCSP_EXTS_CB(READ16("stvcd", stvcd_device, channel_volume_r))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -851,15 +862,16 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl2", saturn_controls, "joypad")
 MACHINE_CONFIG_END
 
-static SLOT_INTERFACE_START(saturn_cart)
-	SLOT_INTERFACE_INTERNAL("rom",    SATURN_ROM)
-	SLOT_INTERFACE_INTERNAL("ram8",   SATURN_DRAM_8MB)
-	SLOT_INTERFACE_INTERNAL("ram32",  SATURN_DRAM_32MB)
-	SLOT_INTERFACE_INTERNAL("bram4",  SATURN_BRAM_4MB)
-	SLOT_INTERFACE_INTERNAL("bram8",  SATURN_BRAM_8MB)
-	SLOT_INTERFACE_INTERNAL("bram16", SATURN_BRAM_16MB)
-	SLOT_INTERFACE_INTERNAL("bram32", SATURN_BRAM_32MB)
-SLOT_INTERFACE_END
+static void saturn_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",    SATURN_ROM);
+	device.option_add_internal("ram8",   SATURN_DRAM_8MB);
+	device.option_add_internal("ram32",  SATURN_DRAM_32MB);
+	device.option_add_internal("bram4",  SATURN_BRAM_4MB);
+	device.option_add_internal("bram8",  SATURN_BRAM_8MB);
+	device.option_add_internal("bram16", SATURN_BRAM_16MB);
+	device.option_add_internal("bram32", SATURN_BRAM_32MB);
+}
 
 
 MACHINE_CONFIG_START(sat_console_state::saturnus)
@@ -931,17 +943,17 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturnus)
+void sat_console_state::init_saturnus()
 {
 	saturn_init_driver(4);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturneu)
+void sat_console_state::init_saturneu()
 {
 	saturn_init_driver(12);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturnjp)
+void sat_console_state::init_saturnjp()
 {
 	saturn_init_driver(1);
 }
@@ -951,11 +963,11 @@ DRIVER_INIT_MEMBER(sat_console_state,saturnjp)
 ROM_START(saturnjp)
 	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "101", "Japan v1.01 (941228)")
-	ROMX_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720), ROM_BIOS(1))
+	ROMX_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "1003", "Japan v1.003 (941012)")
-	ROMX_LOAD("sega1003.bin", 0x00000000, 0x00080000, CRC(b3c63c25) SHA1(7b23b53d62de0f29a23e423d0fe751dfb469c2fa), ROM_BIOS(2))
+	ROMX_LOAD("sega1003.bin", 0x00000000, 0x00080000, CRC(b3c63c25) SHA1(7b23b53d62de0f29a23e423d0fe751dfb469c2fa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "100", "Japan v1.00 (940921)")
-	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(3))
+	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(2))
 ROM_END
 
 /* Overseas Saturn */
@@ -963,18 +975,18 @@ ROM_START(saturn)
 	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "101a", "Overseas v1.01a (941115)")
 	/* Confirmed by ElBarto */
-	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
+	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
-	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
+	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(1))
 ROM_END
 
 ROM_START(saturneu)
 	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "101a", "Overseas v1.01a (941115)")
 	/* Confirmed by ElBarto */
-	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
+	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
-	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
+	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(1))
 ROM_END
 
 ROM_START(vsaturn)
@@ -985,14 +997,14 @@ ROM_END
 ROM_START(hisaturn)
 	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "102", "v1.02 (950519)")
-	ROMX_LOAD( "mpr-18100.bin", 0x000000, 0x080000, CRC(3408dbf4) SHA1(8a22710e09ce75f39625894366cafe503ed1942d), ROM_BIOS(1))
+	ROMX_LOAD("mpr-18100.bin", 0x000000, 0x080000, CRC(3408dbf4) SHA1(8a22710e09ce75f39625894366cafe503ed1942d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "101", "v1.01 (950130)")
-	ROMX_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796), ROM_BIOS(2))
+	ROMX_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796), ROM_BIOS(1))
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT   STATE              INIT        COMPANY     FULLNAME            FLAGS */
-CONS( 1994, saturn,     0,      0,      saturnus, saturn, sat_console_state, saturnus,   "Sega",     "Saturn (USA)",     MACHINE_NOT_WORKING )
-CONS( 1994, saturnjp,   saturn, 0,      saturnjp, saturn, sat_console_state, saturnjp,   "Sega",     "Saturn (Japan)",   MACHINE_NOT_WORKING )
-CONS( 1994, saturneu,   saturn, 0,      saturneu, saturn, sat_console_state, saturneu,   "Sega",     "Saturn (PAL)",     MACHINE_NOT_WORKING )
-CONS( 1995, vsaturn,    saturn, 0,      saturnjp, saturn, sat_console_state, saturnjp,   "JVC",      "V-Saturn",         MACHINE_NOT_WORKING )
-CONS( 1995, hisaturn,   saturn, 0,      saturnjp, saturn, sat_console_state, saturnjp,   "Hitachi",  "HiSaturn",         MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS              INIT           COMPANY    FULLNAME            FLAGS */
+CONS( 1994, saturn,   0,      0,      saturnus, saturn, sat_console_state, init_saturnus, "Sega",    "Saturn (USA)",     MACHINE_NOT_WORKING )
+CONS( 1994, saturnjp, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturnjp, "Sega",    "Saturn (Japan)",   MACHINE_NOT_WORKING )
+CONS( 1994, saturneu, saturn, 0,      saturneu, saturn, sat_console_state, init_saturneu, "Sega",    "Saturn (PAL)",     MACHINE_NOT_WORKING )
+CONS( 1995, vsaturn,  saturn, 0,      saturnjp, saturn, sat_console_state, init_saturnjp, "JVC",     "V-Saturn",         MACHINE_NOT_WORKING )
+CONS( 1995, hisaturn, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturnjp, "Hitachi", "HiSaturn",         MACHINE_NOT_WORKING )

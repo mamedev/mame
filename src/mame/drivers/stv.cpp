@@ -410,7 +410,7 @@ void stv_state::install_stvbios_speedups( void )
 	m_slave->sh2drc_add_pcflush(0x6013aee);
 }
 
-DRIVER_INIT_MEMBER(stv_state,stv)
+void stv_state::init_stv()
 {
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	m_minit_boost = 400;
@@ -443,9 +443,9 @@ DRIVER_INIT_MEMBER(stv_state,stv)
 	m_vdp2.pal = 0;
 }
 
-DRIVER_INIT_MEMBER(stv_state,critcrsh)
+void stv_state::init_critcrsh()
 {
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
 }
@@ -474,13 +474,13 @@ READ32_MEMBER(stv_state::magzun_rx_hack_r)
 	return m_workram_h[0x0ff3b4/4];
 }
 
-DRIVER_INIT_MEMBER(stv_state,magzun)
+void stv_state::init_magzun()
 {
 	m_maincpu->sh2drc_add_pcflush(0x604bf20);
 	m_maincpu->sh2drc_add_pcflush(0x604bfbe);
 	m_maincpu->sh2drc_add_pcflush(0x604c006);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::magzun_ioga_r32),this), write32_delegate(FUNC(stv_state::magzun_ioga_w32),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::magzun_ioga_r32),this), write32_delegate(FUNC(stv_state::magzun_ioga_w32),this));
@@ -499,25 +499,25 @@ DRIVER_INIT_MEMBER(stv_state,magzun)
 }
 
 
-DRIVER_INIT_MEMBER(stv_state,stvmp)
+void stv_state::init_stvmp()
 {
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stvmp_ioga_r32),this), write32_delegate(FUNC(stv_state::stvmp_ioga_w32),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stvmp_ioga_r32),this), write32_delegate(FUNC(stv_state::stvmp_ioga_w32),this));
 }
 
 
-DRIVER_INIT_MEMBER(stv_state,shienryu)
+void stv_state::init_shienryu()
 {
 	// master
 	m_maincpu->sh2drc_add_pcflush(0x60041c6);
 	// slave
 	m_slave->sh2drc_add_pcflush(0x600440e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,prikura)
+void stv_state::init_prikura()
 {
 /*
  06018640: MOV.B   @R14,R0  // 60b9228
@@ -532,13 +532,13 @@ DRIVER_INIT_MEMBER(stv_state,prikura)
 	// slave
 	m_slave->sh2drc_add_pcflush(0x6018c6e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost = m_sinit_boost = 0;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,hanagumi)
+void stv_state::init_hanagumi()
 {
 /*
     06013E1E: NOP
@@ -559,7 +559,7 @@ DRIVER_INIT_MEMBER(stv_state,hanagumi)
 */
 	m_maincpu->sh2drc_add_pcflush(0x6010160);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
 
@@ -581,13 +581,13 @@ CPU0: Aids Screen
 
 */
 
-DRIVER_INIT_MEMBER(stv_state,puyosun)
+void stv_state::init_puyosun()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6021cf0);
 
 	m_slave->sh2drc_add_pcflush(0x60236fe);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost = m_sinit_boost = 0;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
@@ -603,37 +603,37 @@ CPU0 Data East Logo:
 
 */
 
-DRIVER_INIT_MEMBER(stv_state,mausuke)
+void stv_state::init_mausuke()
 {
 	m_maincpu->sh2drc_add_pcflush(0x60461A0);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost = m_sinit_boost = 0;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,cottonbm)
+void stv_state::init_cottonbm()
 {
 //  m_maincpu->sh2drc_add_pcflush(0x6030ee2);
 //  m_slave->sh2drc_add_pcflush(0x6032b52);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(10);
 }
 
-DRIVER_INIT_MEMBER(stv_state,cotton2)
+void stv_state::init_cotton2()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6031c7a);
 	m_slave->sh2drc_add_pcflush(0x60338ea);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,dnmtdeka)
+void stv_state::init_dnmtdeka()
 {
 	// install all 3 speedups on both master and slave
 	m_maincpu->sh2drc_add_pcflush(0x6027c90);
@@ -644,10 +644,10 @@ DRIVER_INIT_MEMBER(stv_state,dnmtdeka)
 	m_slave->sh2drc_add_pcflush(0xd04);
 	m_slave->sh2drc_add_pcflush(0x60051f2);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,diehard)
+void stv_state::init_diehard()
 {
 	// install all 3 speedups on both master and slave
 	m_maincpu->sh2drc_add_pcflush(0x6027c98);
@@ -658,21 +658,21 @@ DRIVER_INIT_MEMBER(stv_state,diehard)
 	m_slave->sh2drc_add_pcflush(0xd04);
 	m_slave->sh2drc_add_pcflush(0x60051f2);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,fhboxers)
+void stv_state::init_fhboxers()
 {
 	m_maincpu->sh2drc_add_pcflush(0x60041c2);
 	m_maincpu->sh2drc_add_pcflush(0x600bb0a);
 	m_maincpu->sh2drc_add_pcflush(0x600b31e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 //  m_instadma_hack = 1;
 }
 
-DRIVER_INIT_MEMBER(stv_state,groovef)
+void stv_state::init_groovef()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6005e7c);
 	m_maincpu->sh2drc_add_pcflush(0x6005e86);
@@ -680,81 +680,81 @@ DRIVER_INIT_MEMBER(stv_state,groovef)
 
 	m_slave->sh2drc_add_pcflush(0x60060c2);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost = m_sinit_boost = 0;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,danchih)
+void stv_state::init_danchih()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6028b28);
 	m_maincpu->sh2drc_add_pcflush(0x6028c8e);
 	m_slave->sh2drc_add_pcflush(0x602ae26);
 
-	DRIVER_INIT_CALL(stvmp);
+	init_stvmp();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
-DRIVER_INIT_MEMBER(stv_state,danchiq)
+void stv_state::init_danchiq()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6028b28);
 	m_maincpu->sh2drc_add_pcflush(0x6028c8e);
 	m_slave->sh2drc_add_pcflush(0x602ae26);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
-DRIVER_INIT_MEMBER(stv_state,astrass)
+void stv_state::init_astrass()
 {
 	m_maincpu->sh2drc_add_pcflush(0x60011ba);
 	m_maincpu->sh2drc_add_pcflush(0x605b9da);
 
 	install_common_protection();
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,thunt)
+void stv_state::init_thunt()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602A024);
 	m_maincpu->sh2drc_add_pcflush(0x6013EEA);
 	m_slave->sh2drc_add_pcflush(0x602AAF8);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(1);
 }
 
-DRIVER_INIT_MEMBER(stv_state,sandor)
+void stv_state::init_sandor()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602a0f8);
 	m_maincpu->sh2drc_add_pcflush(0x6013fbe);
 	m_slave->sh2drc_add_pcflush(0x602abcc);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(1);
 }
 
-DRIVER_INIT_MEMBER(stv_state,grdforce)
+void stv_state::init_grdforce()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6041e32);
 	m_slave->sh2drc_add_pcflush(0x6043aa2);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,batmanfr)
+void stv_state::init_batmanfr()
 {
 	m_maincpu->sh2drc_add_pcflush(0x60121c0);
 	m_slave->sh2drc_add_pcflush(0x60125bc);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32_delegate(FUNC(stv_state::batmanfr_sound_comms_w),this));
 	m_slave->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32_delegate(FUNC(stv_state::batmanfr_sound_comms_w),this));
@@ -763,249 +763,312 @@ DRIVER_INIT_MEMBER(stv_state,batmanfr)
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,colmns97)
+void stv_state::init_colmns97()
 {
 	m_slave->sh2drc_add_pcflush(0x60298a2);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost = m_sinit_boost = 0;
 }
 
-DRIVER_INIT_MEMBER(stv_state,winterht)
+void stv_state::init_winterht()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6098aea);
 	m_slave->sh2drc_add_pcflush(0x609ae4e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(2);
 }
 
-DRIVER_INIT_MEMBER(stv_state,seabass)
+void stv_state::init_seabass()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602cbfa);
 	m_slave->sh2drc_add_pcflush(0x60321ee);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
-DRIVER_INIT_MEMBER(stv_state,vfremix)
+void stv_state::init_vfremix()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602c30c);
 	m_slave->sh2drc_add_pcflush(0x604c332);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(20);
 }
 
-DRIVER_INIT_MEMBER(stv_state,sss)
+void stv_state::init_sss()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6026398);
 	m_slave->sh2drc_add_pcflush(0x6028cd6);
 
 	install_common_protection();
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,othellos)
+void stv_state::init_othellos()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602bcbe);
 	m_slave->sh2drc_add_pcflush(0x602d92e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,sasissu)
+void stv_state::init_sasissu()
 {
 	m_slave->sh2drc_add_pcflush(0x60710be);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(2);
 }
 
-DRIVER_INIT_MEMBER(stv_state,gaxeduel)
+void stv_state::init_gaxeduel()
 {
 //  m_maincpu->sh2drc_add_pcflush(0x6012ee4);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,suikoenb)
+void stv_state::init_suikoenb()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6013f7a);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
 
-DRIVER_INIT_MEMBER(stv_state,sokyugrt)
+void stv_state::init_sokyugrt()
 {
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,znpwfv)
+void stv_state::init_znpwfv()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6012ec2);
 	m_slave->sh2drc_add_pcflush(0x60175a6);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_nsec(500);
 }
 
-DRIVER_INIT_MEMBER(stv_state,twcup98)
+void stv_state::init_twcup98()
 {
 	m_maincpu->sh2drc_add_pcflush(0x605edde);
 	m_slave->sh2drc_add_pcflush(0x6062bca);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	install_common_protection();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
-DRIVER_INIT_MEMBER(stv_state,smleague)
+void stv_state::init_smleague()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6063bf4);
 	m_slave->sh2drc_add_pcflush(0x6062bca);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	/* tight sync to avoid dead locks */
 	m_minit_boost = m_sinit_boost = 5000;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5000);
 }
 
-DRIVER_INIT_MEMBER(stv_state,finlarch)
+void stv_state::init_finlarch()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6064d60);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	/* tight sync to avoid dead locks */
 	m_minit_boost = m_sinit_boost = 5000;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5000);
 }
 
-DRIVER_INIT_MEMBER(stv_state,maruchan)
+void stv_state::init_maruchan()
 {
 	m_maincpu->sh2drc_add_pcflush(0x601ba46);
 	m_slave->sh2drc_add_pcflush(0x601ba46);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,pblbeach)
+void stv_state::init_pblbeach()
 {
 	m_maincpu->sh2drc_add_pcflush(0x605eb78);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,shanhigw)
+void stv_state::init_shanhigw()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6020c5c);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,elandore)
+void stv_state::init_elandore()
 {
 	m_maincpu->sh2drc_add_pcflush(0x604eac0);
 	m_slave->sh2drc_add_pcflush(0x605340a);
 
 	install_common_protection();
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(0);
 }
 
-DRIVER_INIT_MEMBER(stv_state,rsgun)
+void stv_state::init_rsgun()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6034d04);
 	m_slave->sh2drc_add_pcflush(0x6036152);
 
 	install_common_protection();
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(20);
 }
 
-DRIVER_INIT_MEMBER(stv_state,ffreveng)
+void stv_state::init_ffreveng()
 {
 	install_common_protection();
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,decathlt)
+
+READ32_MEMBER(stv_state::decathlt_prot_r)
 {
-	m_5838crypt->install_decathlt_protection();
-	DRIVER_INIT_CALL(stv);
+	// needs to be a way to indicate if device is enabled and fall through to cartridge data if not?
+	if (m_newprotection_element)
+	{
+		m_newprotection_element = false;
+		m_5838crypt->debug_helper(m_protbankval);
+	}
+
+	uint32 ret = 0;
+	if (mem_mask & 0xffff0000) ret |= (m_5838crypt->data_r(space, offset, mem_mask)<<16);
+	if (mem_mask & 0x0000ffff) ret |= m_5838crypt->data_r(space, offset, mem_mask);
+	return ret;
 }
 
-DRIVER_INIT_MEMBER(stv_state,nameclv3)
+WRITE32_MEMBER(stv_state::decathlt_prot_srcaddr_w)
+{
+	int offs = offset * 4;
+
+	m_protbankval = (offs & 0x1800000)>>23;
+	m_protbank->set_entry(m_protbankval); // if the protection device is accessed at this address data is fetched from 0x02000000
+	m_newprotection_element = true;
+
+	if ((offs & 0x7fffff) == 0x7FFFF0)
+	{
+		m_5838crypt->srcaddr_w(space, offset, data, mem_mask);
+	}
+	else if ((offs & 0x7fffff) == 0x7FFFF4)
+	{
+		m_5838crypt->data_w(space, offset, data, mem_mask);
+	}
+}
+
+void stv_state::init_decathlt()
+{
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2000000, 0x37fffff, write32_delegate(FUNC(stv_state::decathlt_prot_srcaddr_w), this)); // set compressed data source address, write data
+
+	// really needs installing over the whole range, with fallbacks to read rom if device is disabled or isn't accessed on given address
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27ffff8, 0x27ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); // read decompressed data
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fffff8, 0x2fffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x37ffff8, 0x37ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
+
+	m_protbank->configure_entry(0, memregion("cart")->base() + 0x0000000);
+	m_protbank->configure_entry(1, memregion("cart")->base() + 0x0800000);
+	m_protbank->configure_entry(2, memregion("cart")->base() + 0x1000000);
+	//m_protbank->configure_entry(3, memregion("cart")->base() + 0x1800000);
+
+	m_protbank->set_entry(0);
+
+	m_newprotection_element = false;
+
+	init_stv();
+}
+
+void stv_state::init_decathlt_nokey()
+{
+	init_decathlt();
+	m_5838crypt->set_hack_mode(sega_315_5838_comp_device::HACK_MODE_NO_KEY);
+}
+
+void stv_state::init_nameclv3()
 {
 	m_maincpu->sh2drc_add_pcflush(0x601eb4c);
 	m_slave->sh2drc_add_pcflush(0x602b80e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state, hopper)
+void stv_state::init_hopper()
 {
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
 }
 
-ADDRESS_MAP_START(stv_state::stv_mem)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_MIRROR(0x20000000) AM_REGION("bios", 0) // bios
-	AM_RANGE(0x00100000, 0x0010007f) AM_DEVREADWRITE8("smpc", smpc_hle_device, read, write, 0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
+void stv_state::stv_mem(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom().mirror(0x20000000).region("bios", 0); // bios
+	map(0x00100000, 0x0010007f).rw(m_smpc_hle, FUNC(smpc_hle_device::read), FUNC(smpc_hle_device::write));
+	map(0x00180000, 0x0018ffff).rw(FUNC(stv_state::saturn_backupram_r), FUNC(stv_state::saturn_backupram_w)).share("share1");
+	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
 //  AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_ioga_r32, stv_io_w32) AM_SHARE("ioga") AM_MIRROR(0x20) /* installed with per-game specific */
-	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
-	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
-	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_MIRROR(0x20000000) AM_REGION("abus", 0) // cartridge
+	map(0x01000000, 0x017fffff).w(FUNC(stv_state::minit_w));
+	map(0x01800000, 0x01ffffff).w(FUNC(stv_state::sinit_w));
+	map(0x02000000, 0x04ffffff).rom().mirror(0x20000000).region("abus", 0); // cartridge
 	/* Sound */
-	AM_RANGE(0x05a00000, 0x05afffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
-	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_device, read, write, 0xffffffff)
+	map(0x05a00000, 0x05afffff).rw(FUNC(stv_state::saturn_soundram_r), FUNC(stv_state::saturn_soundram_w));
+	map(0x05b00000, 0x05b00fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
 	/* VDP1 */
-	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
-	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
-	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
-	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
-	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
-	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_DEVICE("scu", sega_scu_device, regs_map ) //AM_READWRITE(saturn_scu_r, saturn_scu_w)
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
-	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
-	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM
-ADDRESS_MAP_END
+	map(0x05c00000, 0x05c7ffff).rw(FUNC(stv_state::saturn_vdp1_vram_r), FUNC(stv_state::saturn_vdp1_vram_w));
+	map(0x05c80000, 0x05cbffff).rw(FUNC(stv_state::saturn_vdp1_framebuffer0_r), FUNC(stv_state::saturn_vdp1_framebuffer0_w));
+	map(0x05d00000, 0x05d0001f).rw(FUNC(stv_state::saturn_vdp1_regs_r), FUNC(stv_state::saturn_vdp1_regs_w));
+	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(stv_state::saturn_vdp2_vram_r), FUNC(stv_state::saturn_vdp2_vram_w));
+	map(0x05f00000, 0x05f7ffff).rw(FUNC(stv_state::saturn_vdp2_cram_r), FUNC(stv_state::saturn_vdp2_cram_w));
+	map(0x05f80000, 0x05fbffff).rw(FUNC(stv_state::saturn_vdp2_regs_r), FUNC(stv_state::saturn_vdp2_regs_w));
+	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //AM_READWRITE(saturn_scu_r, saturn_scu_w)
+	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
+	map(0x60000000, 0x600003ff).nopw();
+	map(0xc0000000, 0xc00007ff).ram(); // cache RAM
+}
 
-ADDRESS_MAP_START(stv_state::stvcd_mem)
-	AM_IMPORT_FROM(stv_mem)
-	AM_RANGE(0x05800000, 0x0589ffff) AM_DEVREADWRITE("stvcd", stvcd_device, stvcd_r, stvcd_w)
-ADDRESS_MAP_END
+void stv_state::stvcd_mem(address_map &map)
+{
+	stv_mem(map);
+	map(0x05800000, 0x0589ffff).rw("stvcd", FUNC(stvcd_device::stvcd_r), FUNC(stvcd_device::stvcd_w));
+}
 
-ADDRESS_MAP_START(stv_state::sound_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("sound_ram")
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_device, read, write)
-ADDRESS_MAP_END
+void stv_state::sound_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sound_ram");
+	map(0x100000, 0x100fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
+}
+
+void stv_state::scsp_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sound_ram");
+}
 
 
 
@@ -1062,18 +1125,18 @@ WRITE8_MEMBER( stv_state::pdr2_output_w )
 MACHINE_CONFIG_START(stv_state::stv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_CPU_PROGRAM_MAP(stv_mem)
+	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_DEVICE_PROGRAM_MAP(stv_mem)
 	MCFG_SH2_IS_SLAVE(0)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", stv_state, saturn_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_CPU_PROGRAM_MAP(stv_mem)
+	MCFG_DEVICE_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_DEVICE_PROGRAM_MAP(stv_mem)
 	MCFG_SH2_IS_SLAVE(1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", stv_state, saturn_slave_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_mem)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
 
 	MCFG_SEGA_SCU_ADD("scu")
 	downcast<sega_scu_device &>(*device).set_hostcpu("maincpu");
@@ -1081,23 +1144,23 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
 	MCFG_SMPC_HLE_SCREEN("screen")
 	downcast<smpc_hle_device &>(*device).set_region_code(0);
-	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(stv_state, pdr1_input_r))
-	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(stv_state, pdr2_input_r))
-	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(stv_state, pdr1_output_w))
-	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(stv_state, pdr2_output_w))
-	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(saturn_state, master_sh2_reset_w))
-	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(saturn_state, master_sh2_nmi_w))
-	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(saturn_state, slave_sh2_reset_w))
-//  MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(saturn_state, sound_68k_reset_w)) // ST-V games controls reset line via PDR2
-	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(saturn_state, system_reset_w))
-	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(saturn_state, system_halt_w))
-	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(saturn_state, dot_select_w))
-	MCFG_SMPC_HLE_IRQ_HANDLER_CB(DEVWRITELINE("scu", sega_scu_device, smpc_irq_w))
+	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(*this, stv_state, pdr1_input_r))
+	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(*this, stv_state, pdr2_input_r))
+	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(*this, stv_state, pdr1_output_w))
+	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(*this, stv_state, pdr2_output_w))
+	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(*this, saturn_state, master_sh2_reset_w))
+	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(*this, saturn_state, master_sh2_nmi_w))
+	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(*this, saturn_state, slave_sh2_reset_w))
+//  MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(*this, saturn_state, sound_68k_reset_w)) // ST-V games controls reset line via PDR2
+	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(*this, saturn_state, system_reset_w))
+	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(*this, saturn_state, system_halt_w))
+	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(*this, saturn_state, dot_select_w))
+	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE("scu", sega_scu_device, smpc_irq_w))
 
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually AK93C45F */
+	EEPROM_93C46_16BIT(config, "eeprom"); /* Actually AK93C45F */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1106,15 +1169,17 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_SCREEN_UPDATE_DRIVER(stv_state, screen_update_stv_vdp2)
 	MCFG_PALETTE_ADD("palette", 2048+(2048*2))//standard palette + extra memory for rgb brightness.
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stv)
 
 	MCFG_VIDEO_START_OVERRIDE(stv_state,stv_vdp2)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(saturn_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(DEVWRITELINE("scu", sega_scu_device, sound_req_w))
+	MCFG_DEVICE_ADD("scsp", SCSP)
+	MCFG_DEVICE_ADDRESS_MAP(0, scsp_mem)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
+	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1129,34 +1194,30 @@ MACHINE_CONFIG_START(stv_state::stvcd)
 	stv(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(stvcd_mem)
+	MCFG_DEVICE_PROGRAM_MAP(stvcd_mem)
 	MCFG_DEVICE_MODIFY("slave")
-	MCFG_CPU_PROGRAM_MAP(stvcd_mem)
+	MCFG_DEVICE_PROGRAM_MAP(stvcd_mem)
 
 	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
 	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	//MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_MODIFY("scsp")
-	MCFG_SCSP_EXTS_CB(DEVREAD16("stvcd", stvcd_device, channel_volume_r))
+	MCFG_SCSP_EXTS_CB(READ16("stvcd", stvcd_device, channel_volume_r))
 MACHINE_CONFIG_END
 
 
-uint16_t stv_state::crypt_read_callback_ch1(uint32_t addr)
+void stv_state::sega5838_map(address_map &map)
 {
-	return m_maincpu->space().read_word(0x02000000 + 0x1000000 + (addr * 2));
-}
-
-uint16_t stv_state::crypt_read_callback_ch2(uint32_t addr)
-{
-	return m_maincpu->space().read_word(0x02000000 + 0x0000000 + (addr * 2));
+	map(0x000000, 0x7fffff).bankr("protbank");
 }
 
 MACHINE_CONFIG_START(stv_state::stv_5838)
 	stv(config);
+
 	MCFG_DEVICE_ADD("315_5838", SEGA315_5838_COMP, 0)
-	MCFG_SET_5838_READ_CALLBACK_CH1(stv_state, crypt_read_callback_ch1)
-	MCFG_SET_5838_READ_CALLBACK_CH2(stv_state, crypt_read_callback_ch2)
+	MCFG_DEVICE_ADDRESS_MAP(0, sega5838_map)
+
 MACHINE_CONFIG_END
 
 
@@ -1278,12 +1339,10 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 }
 
 
-MACHINE_START_MEMBER(stv_state,stv)
+MACHINE_START_MEMBER(stv_state, stv)
 {
-	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
-
 	// save states
-//  save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+//  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_prev_gamebank_select));
 	save_item(NAME(m_port_sel));
@@ -1732,7 +1791,7 @@ static INPUT_PORTS_START( patocar )
 
 	PORT_MODIFY("PORTA")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )   // hopper ?
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_MODIFY("PORTB")
@@ -1783,7 +1842,7 @@ static INPUT_PORTS_START( micrombc )
 INPUT_PORTS_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 /* BIOS rev info found at 0x800 (byte swapped):
 
@@ -1839,9 +1898,9 @@ ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SH
 	ROM_LOAD16_WORD_SWAP_BIOS( 8,  "epr-17953a.ic8",  0x000000, 0x080000, CRC(a4c47570) SHA1(9efc73717ec8a13417e65c54344ded9fc25bf5ef) ) \
 	ROM_SYSTEM_BIOS( 9,  "tw2",   "EPR-17742A (Taiwan 95/02/20)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 9,  "epr-17742a.ic8",  0x000000, 0x080000, CRC(02daf123) SHA1(23185beb1ce9c09b8719e57d1adb7b28c8141fd5) ) \
-	ROM_SYSTEM_BIOS( 10,  "debug","Debug (95/01/13)" ) \
+	ROM_SYSTEM_BIOS( 10,  "debug","Development (1.10, 95/01/13)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 10,  "stv110.bin",     0x000000, 0x080000, CRC(3dfeda92) SHA1(8eb33192a57df5f3a1dfb57263054867c6b2db6d) ) \
-	ROM_SYSTEM_BIOS( 11, "dev",   "Development (bios 1.061)" ) \
+	ROM_SYSTEM_BIOS( 11, "dev",   "Development (1.061, 94/11/25)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 11, "stv1061.bin",     0x000000, 0x080000, CRC(728dbca3) SHA1(0ed2030177f0aa8285645c395ae9ad9f568ab1d6) ) \
 	\
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
@@ -1899,12 +1958,10 @@ by introdon in ST-V ("SG0000000"),and according to the manual it's even wrong! (
 by Sega titles,and this is a Sunsoft game)It's likely to be a left-over...
 */
 
-DRIVER_INIT_MEMBER(stv_state,sanjeon)
+void stv_state::init_sanjeon()
 {
 	uint8_t *src = memregion("cart")->base();
-	int x;
-
-	for (x=0;x<0x3000000;x++)
+	for (int x = 0; x < 0x3000000; x++)
 	{
 		src[x] = src[x]^0xff;
 
@@ -1913,11 +1970,9 @@ DRIVER_INIT_MEMBER(stv_state,sanjeon)
 		src[x] = bitswap<8>(src[x],7,6,5,4,  2,3,1,0);
 		src[x] = bitswap<8>(src[x],7,0,5,4,  3,2,1,6);
 		src[x] = bitswap<8>(src[x],3,6,5,4,  7,2,1,0);
-
 	}
 
-
-	DRIVER_INIT_CALL(sasissu);
+	init_sasissu();
 }
 
 
@@ -2709,6 +2764,7 @@ ROM_END
 
 ROM_START( znpwfvt )
 	STV_BIOS
+	ROM_DEFAULT_BIOS( "tw" ) // only runs with Taiwanese BIOS ROMs
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr20408.13",    0x0000001, 0x0100000, CRC(1d62fcf6) SHA1(3651261aa755da27b11462f2705311b7c639a687) ) // good
@@ -3078,11 +3134,11 @@ ROM_START( pclub2pf ) // set to 1p
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 
-	ROM_LOAD16_WORD_SWAP( "pclb2puf.IC22",    0x0200000, 0x0200000, CRC(a14282f2) SHA1(b96e70693d8e71b090e20efdd3aa6228e7289fa4) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclb2puf.IC24",    0x0400000, 0x0200000, CRC(4fb4dc74) SHA1(1f174512c9cd5420d7f935cbc6b5875836f6e825) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclb2puf.IC26",    0x0600000, 0x0200000, CRC(d20bbfb5) SHA1(5f2768e0e306bd0e3ed9b4e1d234aac8fd7155e6) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclb2puf.IC28",    0x0800000, 0x0200000, CRC(da658ae9) SHA1(24293c2b23b3009956fc05df5177a27415754301) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclb2puf.IC30",    0x0a00000, 0x0200000, CRC(cafc0e6b) SHA1(fa2ac54260336d5dd1ced7ccaf87115511ece1f8) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclb2puf.ic22",    0x0200000, 0x0200000, CRC(a14282f2) SHA1(b96e70693d8e71b090e20efdd3aa6228e7289fa4) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclb2puf.ic24",    0x0400000, 0x0200000, CRC(4fb4dc74) SHA1(1f174512c9cd5420d7f935cbc6b5875836f6e825) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclb2puf.ic26",    0x0600000, 0x0200000, CRC(d20bbfb5) SHA1(5f2768e0e306bd0e3ed9b4e1d234aac8fd7155e6) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclb2puf.ic28",    0x0800000, 0x0200000, CRC(da658ae9) SHA1(24293c2b23b3009956fc05df5177a27415754301) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclb2puf.ic30",    0x0a00000, 0x0200000, CRC(cafc0e6b) SHA1(fa2ac54260336d5dd1ced7ccaf87115511ece1f8) ) // OK
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclub2pf.nv", 0x0000, 0x0080, CRC(447bb3bd) SHA1(9fefec09849bfa0c14b49e73ff13e2a538dff511) )
@@ -3114,7 +3170,7 @@ ROM_START( prc297wia ) // set to 1p
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 
-	ROM_LOAD16_WORD_SWAP( "pclb297w_ic22_ALT",    0x0200000, 0x0200000, CRC(1feb3bfe) SHA1(cb79908a13e32c3c00e5892d988088a902d6f874) ) // OK - IC7
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic22_alt",    0x0200000, 0x0200000, CRC(1feb3bfe) SHA1(cb79908a13e32c3c00e5892d988088a902d6f874) ) // OK - IC7
 	ROM_LOAD16_WORD_SWAP( "prc297wi_ic24",    0x0400000, 0x0200000, CRC(4bd706d1) SHA1(e3c52c63bb93d9fa836c300865423a226bf74586) ) // OK - IC2
 	ROM_LOAD16_WORD_SWAP( "prc297wi_ic26",    0x0600000, 0x0200000, CRC(417e182a) SHA1(4df04a390523e52e48efcc48891bc54452f351c9) ) // OK - IC2
 	ROM_LOAD16_WORD_SWAP( "prc297wi_ic28",    0x0800000, 0x0200000, CRC(73da594e) SHA1(936b0af4a32d5b93847bbf2ecfc8d334290059c0) ) // OK - IC3
@@ -3170,11 +3226,11 @@ ROM_START( pclub26w ) // set to 1p
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 
-	ROM_LOAD16_WORD_SWAP( "pclbvol6w_IC22",    0x0200000, 0x0200000, CRC(72aa320c) SHA1(09bc30e8cb00a5a4014c44e468cc64f6c3425d92) )
-	ROM_LOAD16_WORD_SWAP( "pclbvol6w_IC24",    0x0400000, 0x0200000, CRC(d98371e2) SHA1(813ac5f3c5b57d07cc319c73560bc0719ddcfe6b) )
-	ROM_LOAD16_WORD_SWAP( "pclbvol6w_IC26",    0x0600000, 0x0200000, CRC(e6bbe3a5) SHA1(b2f642b8ca0779ad66cfbbadece40f4e3dc41fd1) )
-	ROM_LOAD16_WORD_SWAP( "pclbvol6w_IC28",    0x0800000, 0x0200000, CRC(3c330c9b) SHA1(92f8e8d4f43db7c4ce431d17501492a7f8d8a867) )
-	ROM_LOAD16_WORD_SWAP( "pclbvol6w_IC30",    0x0a00000, 0x0200000, CRC(67646090) SHA1(ed6402a22acafa0203c587b871edc547f0ec5277) )
+	ROM_LOAD16_WORD_SWAP( "pclbvol6w_ic22",    0x0200000, 0x0200000, CRC(72aa320c) SHA1(09bc30e8cb00a5a4014c44e468cc64f6c3425d92) )
+	ROM_LOAD16_WORD_SWAP( "pclbvol6w_ic24",    0x0400000, 0x0200000, CRC(d98371e2) SHA1(813ac5f3c5b57d07cc319c73560bc0719ddcfe6b) )
+	ROM_LOAD16_WORD_SWAP( "pclbvol6w_ic26",    0x0600000, 0x0200000, CRC(e6bbe3a5) SHA1(b2f642b8ca0779ad66cfbbadece40f4e3dc41fd1) )
+	ROM_LOAD16_WORD_SWAP( "pclbvol6w_ic28",    0x0800000, 0x0200000, CRC(3c330c9b) SHA1(92f8e8d4f43db7c4ce431d17501492a7f8d8a867) )
+	ROM_LOAD16_WORD_SWAP( "pclbvol6w_ic30",    0x0a00000, 0x0200000, CRC(67646090) SHA1(ed6402a22acafa0203c587b871edc547f0ec5277) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclub26w.nv", 0x0000, 0x0080, CRC(448f770d) SHA1(5f966c511c4c8e9d5b2d257c41c2c88a453b4944) )
@@ -3200,11 +3256,11 @@ ROM_START( pclub27s ) // set to 1p
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 
-	ROM_LOAD16_WORD_SWAP( "pclub2v7.IC22",    0x0200000, 0x0200000, CRC(44c8ab27) SHA1(65e2705b2918da32ea40375707df4e148b311159) )
-	ROM_LOAD16_WORD_SWAP( "pclub2v7.IC24",    0x0400000, 0x0200000, CRC(24818437) SHA1(5293d45b53680301abaf0b32a62596aaaa2552d6) )
-	ROM_LOAD16_WORD_SWAP( "pclub2v7.IC26",    0x0600000, 0x0200000, CRC(076c1d44) SHA1(d597ed4524bb03eb0ef8ada08d49f3dc0fc8136d) )
-	ROM_LOAD16_WORD_SWAP( "pclub2v7.IC28",    0x0800000, 0x0200000, CRC(ff9643ca) SHA1(3309f970f87324b06cc48add386019f769abcd89) )
-	ROM_LOAD16_WORD_SWAP( "pclub2v7.IC30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) )
+	ROM_LOAD16_WORD_SWAP( "pclub2v7.ic22",    0x0200000, 0x0200000, CRC(44c8ab27) SHA1(65e2705b2918da32ea40375707df4e148b311159) )
+	ROM_LOAD16_WORD_SWAP( "pclub2v7.ic24",    0x0400000, 0x0200000, CRC(24818437) SHA1(5293d45b53680301abaf0b32a62596aaaa2552d6) )
+	ROM_LOAD16_WORD_SWAP( "pclub2v7.ic26",    0x0600000, 0x0200000, CRC(076c1d44) SHA1(d597ed4524bb03eb0ef8ada08d49f3dc0fc8136d) )
+	ROM_LOAD16_WORD_SWAP( "pclub2v7.ic28",    0x0800000, 0x0200000, CRC(ff9643ca) SHA1(3309f970f87324b06cc48add386019f769abcd89) )
+	ROM_LOAD16_WORD_SWAP( "pclub2v7.ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclub27s.nv", 0x0000, 0x0080, CRC(e58c7167) SHA1(d88b1648c5d86a90615a8c6a1bf87bc9e75dc320) )
@@ -3272,11 +3328,11 @@ ROM_START( pclub2pe ) // set to 1p
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 
-	ROM_LOAD16_WORD_SWAP( "pclb2psi_IC22",    0x0200000, 0x0200000, CRC(caadc660) SHA1(f2e84bee96266bb03d8f9009249c17c27935f82e) )
-	ROM_LOAD16_WORD_SWAP( "pclb2psi_IC24",    0x0400000, 0x0200000, CRC(ece82698) SHA1(b17b1ea8adc13c3722067c9854d1b7fdf3917090) )
-	ROM_LOAD16_WORD_SWAP( "pclb2psi_IC26",    0x0600000, 0x0200000, CRC(c8a1e335) SHA1(a95ddfc41fdd9f720c11208f45ef5db4bee6cb97) )
-	ROM_LOAD16_WORD_SWAP( "pclb2psi_IC28",    0x0800000, 0x0200000, CRC(52f09627) SHA1(e2ffc321bb0f2a650d0c0b39c3ec68226e1ca7f4) )
-	ROM_LOAD16_WORD_SWAP( "pclb2psi_IC30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) )
+	ROM_LOAD16_WORD_SWAP( "pclb2psi_ic22",    0x0200000, 0x0200000, CRC(caadc660) SHA1(f2e84bee96266bb03d8f9009249c17c27935f82e) )
+	ROM_LOAD16_WORD_SWAP( "pclb2psi_ic24",    0x0400000, 0x0200000, CRC(ece82698) SHA1(b17b1ea8adc13c3722067c9854d1b7fdf3917090) )
+	ROM_LOAD16_WORD_SWAP( "pclb2psi_ic26",    0x0600000, 0x0200000, CRC(c8a1e335) SHA1(a95ddfc41fdd9f720c11208f45ef5db4bee6cb97) )
+	ROM_LOAD16_WORD_SWAP( "pclb2psi_ic28",    0x0800000, 0x0200000, CRC(52f09627) SHA1(e2ffc321bb0f2a650d0c0b39c3ec68226e1ca7f4) )
+	ROM_LOAD16_WORD_SWAP( "pclb2psi_ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclub2pe.nv", 0x0000, 0x0080, CRC(447bb3bd) SHA1(9fefec09849bfa0c14b49e73ff13e2a538dff511))
@@ -3287,11 +3343,11 @@ ROM_START( pclub2wb ) // set to 1p
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 
-	ROM_LOAD16_WORD_SWAP( "pclb2wb_IC22",    0x0200000, 0x0200000, CRC(12245be7) SHA1(4d6c2c9ca7fe73a9ec490157cdb01a6228dee7f8) )
-	ROM_LOAD16_WORD_SWAP( "pclb2wb_IC24",    0x0400000, 0x0200000, CRC(e5d6e11e) SHA1(4af3c646747f76d99482c985f960df2519a85c23) )
-	ROM_LOAD16_WORD_SWAP( "pclb2wb_IC26",    0x0600000, 0x0200000, CRC(7ee066f0) SHA1(a7c725ce8e621ed299474dd215174699e097db3f) )
-	ROM_LOAD16_WORD_SWAP( "pclb2wb_IC28",    0x0800000, 0x0200000, CRC(9ed59513) SHA1(c8f5ed13be2a91f83c35a7929aaa5751d7843e6e) )
-	ROM_LOAD16_WORD_SWAP( "pclb2wb_IC30",    0x0a00000, 0x0200000, CRC(00a0c702) SHA1(f2c4a7a51559f0ade96b8e6337cd1a1d61472de7) )
+	ROM_LOAD16_WORD_SWAP( "pclb2wb_ic22",    0x0200000, 0x0200000, CRC(12245be7) SHA1(4d6c2c9ca7fe73a9ec490157cdb01a6228dee7f8) )
+	ROM_LOAD16_WORD_SWAP( "pclb2wb_ic24",    0x0400000, 0x0200000, CRC(e5d6e11e) SHA1(4af3c646747f76d99482c985f960df2519a85c23) )
+	ROM_LOAD16_WORD_SWAP( "pclb2wb_ic26",    0x0600000, 0x0200000, CRC(7ee066f0) SHA1(a7c725ce8e621ed299474dd215174699e097db3f) )
+	ROM_LOAD16_WORD_SWAP( "pclb2wb_ic28",    0x0800000, 0x0200000, CRC(9ed59513) SHA1(c8f5ed13be2a91f83c35a7929aaa5751d7843e6e) )
+	ROM_LOAD16_WORD_SWAP( "pclb2wb_ic30",    0x0a00000, 0x0200000, CRC(00a0c702) SHA1(f2c4a7a51559f0ade96b8e6337cd1a1d61472de7) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclub2wb.nv", 0x0000, 0x0080, CRC(0d442eec) SHA1(54dd544e1496e3999d8111eb06abf805b610d77d) )
@@ -3304,11 +3360,11 @@ ROM_START( pclubyo2 ) // set to 1p
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 
-	ROM_LOAD16_WORD_SWAP( "pclbyov2.IC22",    0x0200000, 0x0200000, CRC(719a4d27) SHA1(328dfb8debea02e8660e636e953982d381529945) )
-	ROM_LOAD16_WORD_SWAP( "pclbyov2.IC24",    0x0400000, 0x0200000, CRC(790dc7b5) SHA1(829ead39930779617a9bef41d8615362ca86c4c7) )
-	ROM_LOAD16_WORD_SWAP( "pclbyov2.IC26",    0x0600000, 0x0200000, CRC(12ae1606) SHA1(9534fb2dbf6fd2c258ba2716783cc5bab8bd8dc0) )
-	ROM_LOAD16_WORD_SWAP( "pclbyov2.IC28",    0x0800000, 0x0200000, CRC(ff9643ca) SHA1(3309f970f87324b06cc48add386019f769abcd89) )
-	ROM_LOAD16_WORD_SWAP( "pclbyov2.IC30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) )
+	ROM_LOAD16_WORD_SWAP( "pclbyov2.ic22",    0x0200000, 0x0200000, CRC(719a4d27) SHA1(328dfb8debea02e8660e636e953982d381529945) )
+	ROM_LOAD16_WORD_SWAP( "pclbyov2.ic24",    0x0400000, 0x0200000, CRC(790dc7b5) SHA1(829ead39930779617a9bef41d8615362ca86c4c7) )
+	ROM_LOAD16_WORD_SWAP( "pclbyov2.ic26",    0x0600000, 0x0200000, CRC(12ae1606) SHA1(9534fb2dbf6fd2c258ba2716783cc5bab8bd8dc0) )
+	ROM_LOAD16_WORD_SWAP( "pclbyov2.ic28",    0x0800000, 0x0200000, CRC(ff9643ca) SHA1(3309f970f87324b06cc48add386019f769abcd89) )
+	ROM_LOAD16_WORD_SWAP( "pclbyov2.ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclubyo2.nv", 0x0000, 0x0080, CRC(2b26a8f7) SHA1(32f34096cac05a37c492ee389ed8e4c02694c268) )
@@ -3463,12 +3519,12 @@ ROM_START( pclove )
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	// note, 'IC2' in service mode (the test of IC24/IC26) fails once you map the protection device because it occupies the same memory address as the rom at IC26
 	// this sometimes causes it to fail on real hardware too(!)
-	ROM_LOAD16_WORD_SWAP( "pclbLove.ic22",    0x0200000, 0x0200000, CRC(8cd25a0f) SHA1(c938d5f4f800db019abc2e17cce1e780e93f3d02) ) // OK (tested as IC7)
-	ROM_LOAD16_WORD_SWAP( "pclbLove.ic24",    0x0400000, 0x0200000, CRC(85583e2c) SHA1(7f407d1bce40317fc10433dafcd82ee41be05839) ) // OK (tested as IC2)
-	ROM_LOAD16_WORD_SWAP( "pclbLove.ic26",    0x0600000, 0x0200000, CRC(7efcabcc) SHA1(b99a67ab2053c3be5ce37530b65f9693c2a4eef8) ) // OK (tested as IC2)
-	ROM_LOAD16_WORD_SWAP( "pclbLove.ic28",    0x0800000, 0x0200000, CRC(a1336da7) SHA1(ba26810067a13968a54a8867025b8d8e96384ae7) ) // OK (tested as IC3)
-	ROM_LOAD16_WORD_SWAP( "pclbLove.ic30",    0x0a00000, 0x0200000, CRC(ec5b5e28) SHA1(89bcddb52c176c86ad4bdb9f4f052be5b75bcd1b) ) // OK (tested as IC3)
-	ROM_LOAD16_WORD_SWAP( "pclbLove.ic32",    0x0c00000, 0x0200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // FF fill? (not tested either)
+	ROM_LOAD16_WORD_SWAP( "pclblove.ic22",    0x0200000, 0x0200000, CRC(8cd25a0f) SHA1(c938d5f4f800db019abc2e17cce1e780e93f3d02) ) // OK (tested as IC7)
+	ROM_LOAD16_WORD_SWAP( "pclblove.ic24",    0x0400000, 0x0200000, CRC(85583e2c) SHA1(7f407d1bce40317fc10433dafcd82ee41be05839) ) // OK (tested as IC2)
+	ROM_LOAD16_WORD_SWAP( "pclblove.ic26",    0x0600000, 0x0200000, CRC(7efcabcc) SHA1(b99a67ab2053c3be5ce37530b65f9693c2a4eef8) ) // OK (tested as IC2)
+	ROM_LOAD16_WORD_SWAP( "pclblove.ic28",    0x0800000, 0x0200000, CRC(a1336da7) SHA1(ba26810067a13968a54a8867025b8d8e96384ae7) ) // OK (tested as IC3)
+	ROM_LOAD16_WORD_SWAP( "pclblove.ic30",    0x0a00000, 0x0200000, CRC(ec5b5e28) SHA1(89bcddb52c176c86ad4bdb9f4f052be5b75bcd1b) ) // OK (tested as IC3)
+	ROM_LOAD16_WORD_SWAP( "pclblove.ic32",    0x0c00000, 0x0200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // FF fill? (not tested either)
 
 	// protection device used to decrypt some startup code
 
@@ -3606,127 +3662,127 @@ ROM_START( sackids )
 ROM_END
 
 
-GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   stv,        ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
+GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
 
-//GAME YEAR, NAME,     PARENT,  MACH,     INP,      STATE,       INIT,       MONITOR
+//GAME YEAR, NAME,     PARENT,  MACH,     INP,      STATE,       INIT,            MONITOR
 /* Playable */
-GAME( 1998, astrass,   stvbios, stv_5881, stv6b,    stv_state,   astrass,    ROT0,   "Sunsoft",                      "Astra SuperStars (J 980514 V1.002)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, bakubaku,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Baku Baku Animal (J 950407 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, batmanfr,  stvbios, batmanfr, batmanfr, stv_state,   batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, colmns97,  stvbios, stv,      stv,      stv_state,   colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, cotton2,   stvbios, stv,      stv,      stv_state,   cotton2,    ROT0,   "Success",                      "Cotton 2 (JUET 970902 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, cottonbm,  stvbios, stv,      stv,      stv_state,   cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, critcrsh,  stvbios, stv,      critcrsh, stv_state,   critcrsh,   ROT0,   "Sega",                         "Critter Crusher (EA 951204 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tatacot,   critcrsh,stv,      critcrsh, stv_state,   critcrsh,   ROT0,   "Sega",                         "Tatacot (JA 951128 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, danchih,   stvbios, stv,      stvmp,    stv_state,   danchih,    ROT0,   "Altron (Tecmo license)",       "Danchi de Hanafuda (J 990607 V1.400)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, danchiq,   stvbios, stv,      stv,      stv_state,   danchiq,    ROT0,   "Altron",                       "Danchi de Quiz: Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, diehard,   stvbios, stv,      stv,      stv_state,   diehard,    ROT0,   "Sega",                         "Die Hard Arcade (UET 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
-GAME( 1996, dnmtdeka,  diehard, stv,      stv,      stv_state,   dnmtdeka,   ROT0,   "Sega",                         "Dynamite Deka (J 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
-GAME( 1995, ejihon,    stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusyo (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, elandore,  stvbios, stv_5881, stv6b,    stv_state,   elandore,   ROT0,   "Sai-Mate",                     "Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ffrevng10, ffreveng,stv_5881, stv6b,    stv_state,   ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990714 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ffreveng,  stvbios, stv_5881, stv6b,    stv_state,   ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990930 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, fhboxers,  stvbios, stv,      stv,      stv_state,   fhboxers,   ROT0,   "Sega",                         "Funky Head Boxers (JUETBKAL 951218 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, findlove,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Daiki / FCF",                  "Zenkoku Seifuku Bishoujo Grand Prix Find Love (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, gaxeduel,  stvbios, stv,      stv6b,    stv_state,   gaxeduel,   ROT0,   "Sega",                         "Golden Axe - The Duel (JUETL 950117 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1998, grdforce,  stvbios, stv,      stv,      stv_state,   grdforce,   ROT0,   "Success",                      "Guardian Force (JUET 980318 V0.105)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, groovef,   stvbios, stv,      stv6b,    stv_state,   groovef,    ROT0,   "Atlus",                        "Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, hanagumi,  stvbios, stv,      stv,      stv_state,   hanagumi,   ROT0,   "Sega",                         "Sakura Taisen - Hanagumi Taisen Columns (J 971007 V1.010)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, introdon,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sunsoft / Success",            "Karaoke Quiz Intro Don Don! (J 960213 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, kiwames,   stvbios, stv,      stvmp,    stv_state,   stvmp,      ROT0,   "Athena",                       "Pro Mahjong Kiwame S (J 951020 V1.208)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, maruchan,  stvbios, stv,      stv,      stv_state,   maruchan,   ROT0,   "Sega / Toyosuisan",            "Maru-Chan de Goo! (J 971216 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, mausuke,   stvbios, stv,      stv,      stv_state,   mausuke,    ROT0,   "Data East",                    "Mausuke no Ojama the World (J 960314 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, micrombc,  stvbios, hopper,   micrombc, stv_state,   hopper,     ROT0,   "Sega",                         "Microman Battle Charge (J 990326 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, myfairld,  stvbios, stv,      myfairld, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, othellos,  stvbios, stv,      stv,      stv_state,   othellos,   ROT0,   "Success",                      "Othello Shiyouyo (J 980423 V1.002)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, patocar,   stvbios, hopper,   patocar,  stv_state,   hopper,     ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, pblbeach,  stvbios, stv,      stv,      stv_state,   pblbeach,   ROT0,   "T&E Soft",                     "Pebble Beach - The Great Shot (JUE 950913 V0.990)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, prikura,   stvbios, stv,      stv,      stv_state,   prikura,    ROT0,   "Atlus",                        "Princess Clara Daisakusen (J 960910 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, puyosun,   stvbios, stv,      stv,      stv_state,   puyosun,    ROT0,   "Compile",                      "Puyo Puyo Sun (J 961115 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, rsgun,     stvbios, stv_5881, stv,      stv_state,   rsgun,      ROT0,   "Treasure",                     "Radiant Silvergun (JUET 980523 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sasissu,   stvbios, stv,      stv,      stv_state,   sasissu,    ROT0,   "Sega",                         "Taisen Tanto-R Sashissu!! (J 980216 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sanjeon,   sasissu, stv,      stv,      stv_state,   sanjeon,    ROT0,   "Sega / Deniam",                "DaeJeon! SanJeon SuJeon (AJTUE 990412 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, seabass,   stvbios, stv,      stv,      stv_state,   seabass,    ROT0,   "A wave inc. (Able license)",   "Sea Bass Fishing (JUET 971110 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, shanhigw,  stvbios, stv,      stv,      stv_state,   shanhigw,   ROT0,   "Sunsoft / Activision",         "Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, shienryu,  stvbios, stv,      stv,      stv_state,   shienryu,   ROT270, "Warashi",                      "Shienryu (JUET 961226 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sss,       stvbios, stv_5881, stv,      stv_state,   sss,        ROT0,   "Capcom / Cave / Victor",       "Steep Slope Sliders (JUET 981110 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, sandor,    stvbios, stv,      stv,      stv_state,   sandor,     ROT0,   "Sega",                         "Puzzle & Action: Sando-R (J 951114 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, thunt,     sandor,  stv,      stv,      stv_state,   thunt,      ROT0,   "Sega",                         "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, thuntk,    sandor,  stv,      stv,      stv_state,   sandor,     ROT0,   "Sega / Deniam",                "Puzzle & Action: BoMulEul Chajara (JUET 970125 V2.00K)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, smleague,  stvbios, stv,      stv,      stv_state,   smleague,   ROT0,   "Sega",                         "Super Major League (U 960108 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, finlarch,  smleague,stv,      stv,      stv_state,   finlarch,   ROT0,   "Sega",                         "Final Arch (J 950714 V1.001)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, sokyugrt,  stvbios, stv,      stv,      stv_state,   sokyugrt,   ROT0,   "Raizing / Eighting",           "Soukyugurentai / Terra Diver (JUET 960821 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, suikoenb,  stvbios, stv,      stv6b,    stv_state,   suikoenb,   ROT0,   "Data East",                    "Suiko Enbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, techbowl,  stvbios, hopper,   patocar,  stv_state,   hopper,     ROT0,   "Sega",                         "Technical Bowling (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, vfkids,    stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Virtua Fighter Kids (JUET 960319 V0.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, vmahjong,  stvbios, stv,      vmahjong, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, winterht,  stvbios, stv,      stv,      stv_state,   winterht,   ROT0,   "Sega",                         "Winter Heat (JUET 971012 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, znpwfv,    stvbios, stv,      stv,      stv_state,   znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, znpwfvt,   znpwfv,  stv,      stv,      stv_state,   znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (T 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, astrass,   stvbios, stv_5881, stv6b,    stv_state,   init_astrass,    ROT0,   "Sunsoft",                      "Astra SuperStars (J 980514 V1.002)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, bakubaku,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Baku Baku Animal (J 950407 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, batmanfr,  stvbios, batmanfr, batmanfr, stv_state,   init_batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, colmns97,  stvbios, stv,      stv,      stv_state,   init_colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, cotton2,   stvbios, stv,      stv,      stv_state,   init_cotton2,    ROT0,   "Success",                      "Cotton 2 (JUET 970902 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, cottonbm,  stvbios, stv,      stv,      stv_state,   init_cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, critcrsh,  stvbios, stv,      critcrsh, stv_state,   init_critcrsh,   ROT0,   "Sega",                         "Critter Crusher (EA 951204 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tatacot,   critcrsh,stv,      critcrsh, stv_state,   init_critcrsh,   ROT0,   "Sega",                         "Tatacot (JA 951128 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, danchih,   stvbios, stv,      stvmp,    stv_state,   init_danchih,    ROT0,   "Altron (Tecmo license)",       "Danchi de Hanafuda (J 990607 V1.400)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, danchiq,   stvbios, stv,      stv,      stv_state,   init_danchiq,    ROT0,   "Altron",                       "Danchi de Quiz: Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, diehard,   stvbios, stv,      stv,      stv_state,   init_diehard,    ROT0,   "Sega",                         "Die Hard Arcade (UET 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
+GAME( 1996, dnmtdeka,  diehard, stv,      stv,      stv_state,   init_dnmtdeka,   ROT0,   "Sega",                         "Dynamite Deka (J 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
+GAME( 1995, ejihon,    stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusyo (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, elandore,  stvbios, stv_5881, stv6b,    stv_state,   init_elandore,   ROT0,   "Sai-Mate",                     "Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ffrevng10, ffreveng,stv_5881, stv6b,    stv_state,   init_ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990714 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ffreveng,  stvbios, stv_5881, stv6b,    stv_state,   init_ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990930 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, fhboxers,  stvbios, stv,      stv,      stv_state,   init_fhboxers,   ROT0,   "Sega",                         "Funky Head Boxers (JUETBKAL 951218 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, findlove,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Daiki / FCF",                  "Zenkoku Seifuku Bishoujo Grand Prix Find Love (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, gaxeduel,  stvbios, stv,      stv6b,    stv_state,   init_gaxeduel,   ROT0,   "Sega",                         "Golden Axe - The Duel (JUETL 950117 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1998, grdforce,  stvbios, stv,      stv,      stv_state,   init_grdforce,   ROT0,   "Success",                      "Guardian Force (JUET 980318 V0.105)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, groovef,   stvbios, stv,      stv6b,    stv_state,   init_groovef,    ROT0,   "Atlus",                        "Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, hanagumi,  stvbios, stv,      stv,      stv_state,   init_hanagumi,   ROT0,   "Sega",                         "Sakura Taisen - Hanagumi Taisen Columns (J 971007 V1.010)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, introdon,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sunsoft / Success",            "Karaoke Quiz Intro Don Don! (J 960213 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, kiwames,   stvbios, stv,      stvmp,    stv_state,   init_stvmp,      ROT0,   "Athena",                       "Pro Mahjong Kiwame S (J 951020 V1.208)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, maruchan,  stvbios, stv,      stv,      stv_state,   init_maruchan,   ROT0,   "Sega / Toyosuisan",            "Maru-Chan de Goo! (J 971216 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, mausuke,   stvbios, stv,      stv,      stv_state,   init_mausuke,    ROT0,   "Data East",                    "Mausuke no Ojama the World (J 960314 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, micrombc,  stvbios, hopper,   micrombc, stv_state,   init_hopper,     ROT0,   "Sega",                         "Microman Battle Charge (J 990326 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, myfairld,  stvbios, stv,      myfairld, stv_state,   init_stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, othellos,  stvbios, stv,      stv,      stv_state,   init_othellos,   ROT0,   "Success",                      "Othello Shiyouyo (J 980423 V1.002)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, patocar,   stvbios, hopper,   patocar,  stv_state,   init_hopper,     ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, pblbeach,  stvbios, stv,      stv,      stv_state,   init_pblbeach,   ROT0,   "T&E Soft",                     "Pebble Beach - The Great Shot (JUE 950913 V0.990)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, prikura,   stvbios, stv,      stv,      stv_state,   init_prikura,    ROT0,   "Atlus",                        "Princess Clara Daisakusen (J 960910 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, puyosun,   stvbios, stv,      stv,      stv_state,   init_puyosun,    ROT0,   "Compile",                      "Puyo Puyo Sun (J 961115 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, rsgun,     stvbios, stv_5881, stv,      stv_state,   init_rsgun,      ROT0,   "Treasure",                     "Radiant Silvergun (JUET 980523 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sasissu,   stvbios, stv,      stv,      stv_state,   init_sasissu,    ROT0,   "Sega",                         "Taisen Tanto-R Sashissu!! (J 980216 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sanjeon,   sasissu, stv,      stv,      stv_state,   init_sanjeon,    ROT0,   "Sega / Deniam",                "DaeJeon! SanJeon SuJeon (AJTUE 990412 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, seabass,   stvbios, stv,      stv,      stv_state,   init_seabass,    ROT0,   "A wave inc. (Able license)",   "Sea Bass Fishing (JUET 971110 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, shanhigw,  stvbios, stv,      stv,      stv_state,   init_shanhigw,   ROT0,   "Sunsoft / Activision",         "Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, shienryu,  stvbios, stv,      stv,      stv_state,   init_shienryu,   ROT270, "Warashi",                      "Shienryu (JUET 961226 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sss,       stvbios, stv_5881, stv,      stv_state,   init_sss,        ROT0,   "Capcom / Cave / Victor Interactive Software",       "Steep Slope Sliders (JUET 981110 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Also credited as Pack In Soft in ending screen
+GAME( 1995, sandor,    stvbios, stv,      stv,      stv_state,   init_sandor,     ROT0,   "Sega",                         "Puzzle & Action: Sando-R (J 951114 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, thunt,     sandor,  stv,      stv,      stv_state,   init_thunt,      ROT0,   "Sega",                         "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, thuntk,    sandor,  stv,      stv,      stv_state,   init_sandor,     ROT0,   "Sega / Deniam",                "Puzzle & Action: BoMulEul Chajara (JUET 970125 V2.00K)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, smleague,  stvbios, stv,      stv,      stv_state,   init_smleague,   ROT0,   "Sega",                         "Super Major League (U 960108 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, finlarch,  smleague,stv,      stv,      stv_state,   init_finlarch,   ROT0,   "Sega",                         "Final Arch (J 950714 V1.001)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sokyugrt,  stvbios, stv,      stv,      stv_state,   init_sokyugrt,   ROT0,   "Raizing / Eighting",           "Soukyugurentai / Terra Diver (JUET 960821 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, suikoenb,  stvbios, stv,      stv6b,    stv_state,   init_suikoenb,   ROT0,   "Data East",                    "Suiko Enbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, techbowl,  stvbios, hopper,   patocar,  stv_state,   init_hopper,     ROT0,   "Sega",                         "Technical Bowling (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, vfkids,    stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Virtua Fighter Kids (JUET 960319 V0.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, vmahjong,  stvbios, stv,      vmahjong, stv_state,   init_stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, winterht,  stvbios, stv,      stv,      stv_state,   init_winterht,   ROT0,   "Sega",                         "Winter Heat (JUET 971012 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, znpwfv,    stvbios, stv,      stv,      stv_state,   init_znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, znpwfvt,   znpwfv,  stv,      stv,      stv_state,   init_znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (T 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* Unemulated printer / camera devices */
 // USA sets
-GAME( 1997, pclub2,    stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 (U 970921 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1999, pclub2v3,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 3 (U 990310 V1.000)", MACHINE_NOT_WORKING ) // Hello Kitty themed
-GAME( 1999, pclubpok,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2,    stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 (U 970921 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclub2v3,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 3 (U 990310 V1.000)", MACHINE_NOT_WORKING ) // Hello Kitty themed
+GAME( 1999, pclubpok,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
 // Japan sets
-GAME( 1999, pclub2fc,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1998, pclub2pf,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (J V1.100)", MACHINE_NOT_WORKING ) // version info is blank
-GAME( 1997, pclub2pe,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Pepsiman (J 970618 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1997, pclub2wb,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclub2fc,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1998, pclub2pf,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (J V1.100)", MACHINE_NOT_WORKING ) // version info is blank
+GAME( 1997, pclub2pe,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Pepsiman (J 970618 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2wb,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
 
-GAME( 1997, pclb2elk,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1997, pckobe99,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Kobe Luminaire '99 (Print Club Custom 3) (J 991203 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclb2elk,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pckobe99,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Kobe Luminaire '99 (Print Club Custom 3) (J 991203 V1.000)", MACHINE_NOT_WORKING )
 
-GAME( 1997, pclub26w,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 961210 V1.000)", MACHINE_NOT_WORKING ) // internal string is 'PURIKURA2 97FUYU' (but in reality it seems to be an end of 96 Winter version)
-GAME( 1997, pclub26wa, pclub26w,stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 970121 V1.200)", MACHINE_NOT_WORKING ) // ^
-GAME( 1997, pclub27s,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 7 Spring (J 970313 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1997, prc28su,   stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 8 Summer (J 970616 V1.100)", MACHINE_NOT_WORKING ) // internal string 97SUMMER
-GAME( 1997, prc29au,   stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 9 Autumn (J V1.100)", MACHINE_NOT_WORKING ) // internal string 97AUTUMN, no date code! (all 0)
-GAME( 1997, prc297wi,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 1)", MACHINE_NOT_WORKING ) // internal string is '97WINTER'
-GAME( 1997, prc297wia, prc297wi,stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 2)", MACHINE_NOT_WORKING ) // different program revision, same date code, clearly didn't get updated properly
-GAME( 1998, prc298sp,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
-GAME( 1998, prc298su,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
-GAME( 1998, prc298au,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
-GAME( 2000, prc2ksu,   stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
-
-
-GAME( 1999, pclubor,   stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1999, pclubol,   stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Olive (J 980717 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1997, pclub2kc,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Kome Kome Club (J 970203 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1997, pclubyo2,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub26w,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 961210 V1.000)", MACHINE_NOT_WORKING ) // internal string is 'PURIKURA2 97FUYU' (but in reality it seems to be an end of 96 Winter version)
+GAME( 1997, pclub26wa, pclub26w,stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 970121 V1.200)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pclub27s,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 7 Spring (J 970313 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1997, prc28su,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 8 Summer (J 970616 V1.100)", MACHINE_NOT_WORKING ) // internal string 97SUMMER
+GAME( 1997, prc29au,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 9 Autumn (J V1.100)", MACHINE_NOT_WORKING ) // internal string 97AUTUMN, no date code! (all 0)
+GAME( 1997, prc297wi,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 1)", MACHINE_NOT_WORKING ) // internal string is '97WINTER'
+GAME( 1997, prc297wia, prc297wi,stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 2)", MACHINE_NOT_WORKING ) // different program revision, same date code, clearly didn't get updated properly
+GAME( 1998, prc298sp,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
+GAME( 1998, prc298su,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
+GAME( 1998, prc298au,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
+GAME( 2000, prc2ksu,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
 
 
-GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
-GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
-GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1999, pclubor,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclubol,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Olive (J 980717 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2kc,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Kome Kome Club (J 970203 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclubyo2,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
 
-GAME( 1998, stress,    stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
-GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
+GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
+
+GAME( 1998, stress,    stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
+GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,         ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
 
 
 
 
 
 /* Doing something.. but not enough yet */
-GAME( 1995, vfremix,   stvbios, stv,      stv,      stv_state,   vfremix,    ROT0,   "Sega",                         "Virtua Fighter Remix (JUETBKAL 950428 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, decathlt,  stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960709 V1.001)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, decathlto, decathlt,stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960424 V1.000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998, twcup98,   stvbios, stv_5881, stv,      stv_state,   twcup98,    ROT0,   "Tecmo",                        "Tecmo World Cup '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // some situations with the GK result in the game stalling, maybe CPU core bug??
-GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   twcup98,    ROT0,   "Tecmo",                        "Tecmo World Soccer '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^^ (check)
+GAME( 1995, vfremix,   stvbios, stv,      stv,      stv_state,   init_vfremix,    ROT0,   "Sega",                         "Virtua Fighter Remix (JUETBKAL 950428 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, decathlt,  stvbios, stv_5838, stv,      stv_state,   init_decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960709 V1.001)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, decathlto, decathlt,stv_5838, stv,      stv_state,   init_decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960424 V1.000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, twcup98,   stvbios, stv_5881, stv,      stv_state,   init_twcup98,    ROT0,   "Tecmo",                        "Tecmo World Cup '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // some situations with the GK result in the game stalling, maybe CPU core bug??
+GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   init_twcup98,    ROT0,   "Tecmo",                        "Tecmo World Soccer '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^^ (check)
 
 /* Gives I/O errors */
-GAME( 1996, magzun,    stvbios, stv,      stv,      stv_state,   magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
-GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, sackids,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,    "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, magzun,    stvbios, stv,      stv,      stv_state,   init_magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
+GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,    "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* CD games */
-GAME( 1995, sfish2,    0,       stvcd,    stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-GAME( 1995, sfish2j,   sfish2,  stvcd,    stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1995, sfish2,    0,       stvcd,    stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1995, sfish2j,   sfish2,  stvcd,    stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
 /*
 This is the known list of undumped ST-V games:

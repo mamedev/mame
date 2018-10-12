@@ -15,17 +15,18 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(I82439TX, i82439tx_device, "i82439tx", "Intel 82439TX")
+DEFINE_DEVICE_TYPE(I82439TX_LEGACY, i82439tx_device, "i82439tx_legacy", "Intel 82439TX")
 
 
-i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: northbridge_device(mconfig, I82439TX, tag, owner, clock),
+i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	northbridge_device(mconfig, I82439TX_LEGACY, tag, owner, clock),
 	pci_device_interface(mconfig, *this),
 	m_cpu_tag(nullptr),
 	m_region_tag(nullptr),
 	m_space(nullptr),
 	m_rom(nullptr)
 {
+	m_smram.smiact_n = 1;
 }
 
 void i82439tx_device::i82439tx_configure_memory(uint8_t val, offs_t begin, offs_t end)
@@ -218,13 +219,43 @@ void i82439tx_device::pci_write(pci_bus_device *pcibus, int function, int offset
 			logerror("i82439tx_pci_write(): Unemulated PCI write 0x%02X = 0x%04X\n", offset, data);
 			break;
 
+		case 0x70:
+			if (ACCESSING_BITS_8_15)
+			{
+				// ESMRAMC: EXTENDED SYSTEM MANAGEMENT RAM CONTROL REGISTER
+				data = (data & ~(1 << 14)) | ((m_regs[(offset - 0x50) / 4] & ~data) & (1 << 14)); // e_smerr cleared only by writing 1
+				m_smram.tseg_en = (data >> 8) & 1;
+				m_smram.tseg_sz = (data >> 9) & 3;
+				m_smram.e_smerr = (data >> 14) & 1;
+				m_smram.h_smrame = (data >> 15) & 1;
+				m_smram.tseg_size = 128 * (1 << m_smram.tseg_sz) * 1024;
+#ifdef VERBOSE
+				logerror("i82439tx_pci_write(): ESMRAMC h_smrame %d e_smerr %d tseg_sz %d tseg_en %d\n", m_smram.h_smrame, m_smram.e_smerr, m_smram.tseg_sz, m_smram.tseg_en);
+#endif
+			}
+			if (ACCESSING_BITS_16_23)
+			{
+				// SMRAMC: SYSTEM MANAGEMENT RAM CONTROL REGISTER
+				data = data | (m_regs[(offset - 0x50) / 4] & (1 << 20)); // d_lck can only be set to 1
+				m_smram.c_base_seg = (data >> 16) & 7;
+				m_smram.g_smrame = (data >> 19) & 1;
+				m_smram.d_lck = (data >> 20) & 1;
+				m_smram.d_cls = (data >> 21) & 1;
+				m_smram.d_open = (data >> 22) & 1;
+#ifdef VERBOSE
+				logerror("i82439tx_pci_write(): SMRAMC d_open %d d_cls %d d_lck %d g_smrame %d c_base_seg %d\n", m_smram.d_open, m_smram.d_cls, m_smram.d_lck, m_smram.g_smrame, m_smram.c_base_seg);
+#endif
+			}
+			update_smram_mappings();
+			COMBINE_DATA(&m_regs[(offset - 0x50) / 4]);
+			break;
+
 		case 0x50:
 		case 0x54:
 		case 0x60:
 		case 0x64:
 		case 0x68:
 		case 0x6C:
-		case 0x70:
 		case 0x74:
 		case 0x78:
 		case 0x7C:
@@ -269,6 +300,140 @@ void i82439tx_device::pci_write(pci_bus_device *pcibus, int function, int offset
 	}
 }
 
+/*
+A is the compatible smram area, the memory area from 0xa0000 to 0xbffff
+S is the extended smram area, the memory area from 0x100a0000 to 0x100fffff
+T is the TSEG (T segment) smram area, the memory area from 0x10000000+dram_size-tseg_size to 0x10000000+dram_size-1
+  where dram_size is the size of the dram memory on the motherboard and tseg_size is the size of TSEG
+A and S are mutually exclusive and are stored in the last 384 kilobytes of the first megabyte of dram memory
+T is stored in the last tseg_size bytes of the dram memory on the motherboard
+
+g       s h
+s       m s t
+m       i m s
+r     o a r e
+a l c p c a g
+m c l e t m e
+e k s n # e n           Code                Data
+-------------  -------------------- --------------------
+0 x x x x x x   A-PCI  S-PCI  T-PCI  A-PCI  S-PCI  T-PCI
+1 0 1 1 x x x         Invalid              Invalid
+
+1 0 0 0 0 0 0   A-DRAM S-PCI  T-PCI  A-DRAM S-PCI  T-PCI
+1 0 0 0 0 0 1   A-DRAM S-PCI  T-DRAM A-DRAM S-PCI  T-DRAM
+1 0 0 0 0 1 0   A-PCI  S-DRAM T-PCI  A-PCI  S-DRAM T-PCI
+1 0 0 0 0 1 1   A-PCI  S-DRAM T-DRAM A-PCI  S-DRAM T-DRAM
+
+1 0 0 1 0 0 0   A-DRAM S-PCI  T-PCI  A-DRAM S-PCI  T-PCI
+1 0 0 1 0 0 1   A-DRAM S-PCI  T-DRAM A-DRAM S-PCI  T-DRAM
+1 0 0 1 0 1 0   A-PCI  S-DRAM T-PCI  A-PCI  S-DRAM T-PCI
+1 0 0 1 0 1 1   A-PCI  S-DRAM T-DRAM A-PCI  S-DRAM T-DRAM
+
+1 1 0 0 0 0 0   A-DRAM S-PCI  T-PCI  A-DRAM S-PCI  T-PCI
+1 1 0 0 0 0 1   A-DRAM S-PCI  T-DRAM A-DRAM S-PCI  T-DRAM
+1 1 0 0 0 1 0   A-PCI  S-DRAM T-PCI  A-PCI  S-DRAM T-PCI
+1 1 0 0 0 1 1   A-PCI  S-DRAM T-DRAM A-PCI  S-DRAM T-DRAM
+
+1 0 1 0 0 0 0   A-DRAM S-PCI  T-PCI  A-PCI  S-PCI  T-PCI
+1 0 1 0 0 0 1   A-DRAM S-PCI  T-DRAM A-PCI  S-PCI  T-PCI
+1 0 1 0 0 1 0   A-dram S-DRAM T-PCI  A-PCI  S-PCI  T-PCI
+1 0 1 0 0 1 1   A-PCI  S-DRAM T-DRAM A-PCI  S-PCI  T-PCI
+
+1 1 1 0 0 0 0   A-DRAM S-PCI  T-PCI  A-PCI  S-PCI  T-PCI
+1 1 1 0 0 0 1   A-DRAM S-PCI  T-DRAM A-PCI  S-PCI  T-PCI
+1 1 1 0 0 1 0   A-PCI  S-DRAM T-PCI  A-PCI  S-PCI  T-PCI
+1 1 1 0 0 1 1   A-PCI  S-DRAM T-DRAM A-PCI  S-PCI  T-PCI
+
+1 0 0 1 1 0 0   A-DRAM S-PCI  T-PCI  A-DRAM S-PCI  T-PCI
+1 0 0 1 1 0 1   A-DRAM S-PCI  T-DRAM A-DRAM S-PCI  T-DRAM
+1 0 0 1 1 1 0   A-PCI  S-DRAM T-PCI  A-PCI  S-DRAM T-PCI
+1 0 0 1 1 1 1   A-PCI  S-DRAM T-DRAM A-PCI  S-DRAM T-DRAM
+
+1 0 0 0 1 x x   A-PCI  S-PCI  T-PCI  A-PCI  S-PCI  T-PCI
+1 0 1 0 1 x x   A-PCI  S-PCI  T-PCI  A-PCI  S-PCI  T-PCI
+1 1 0 0 1 x x   A-PCI  S-PCI  T-PCI  A-PCI  S-PCI  T-PCI
+1 1 1 0 1 x x   A-PCI  S-PCI  T-PCI  A-PCI  S-PCI  T-PCI
+*/
+
+void i82439tx_device::update_smram_mappings()
+{
+	int old = m_smram.mapping;
+	if (m_smram.g_smrame == 0)
+		m_smram.mapping = 0; // pci active in all ranges
+	else if (m_smram.smiact_n == 1)
+	{
+		if (m_smram.d_open == 1)
+		{
+			// TSEG_EN decides if tseg is present or not
+			// H_SMRAME decides between smram compatible and extended
+			m_smram.mapping = (1 - m_smram.h_smrame) | (m_smram.h_smrame << 1) | (m_smram.tseg_en << 2);
+		}
+		else
+			m_smram.mapping = 0; // pci active in all ranges
+	}
+	else // SMIACT# is 0
+	{
+		// TSEG_EN decides if tseg is present or not
+		// H_SMRAME decides between smram compatible and extended
+		m_smram.mapping = (1 - m_smram.h_smrame) | (m_smram.h_smrame << 1) | (m_smram.tseg_en << 2);
+	}
+	if (m_smram.mapping != old)
+	{
+		int change = old ^ m_smram.mapping;
+
+		if (change & 1)
+		{
+			// unmap current 0xa0000 to 0xbffff
+			m_space->unmap_readwrite(0xa0000, 0xbffff);
+			// map new
+			if (m_smram.mapping & 1)
+			{
+				m_space->install_ram(0xa0000, 0xbffff, m_ram->pointer() + 0xa0000);
+			}
+			else
+				m_pci_bus->remap(AS_PROGRAM, 0xa0000, 0xbffff); // remap all pci and isa devices
+		}
+		if (change & 2)
+		{
+			// unmap current 0x100a0000 to 0x100fffff
+			m_space->unmap_readwrite(0x100a0000, 0x100fffff);
+			// map new
+			if (m_smram.mapping & 2)
+			{
+				m_space->install_ram(0x100a0000, 0x100fffff, m_ram->pointer() + 0xa0000); // TODO: exclude areas used by shadow ram
+			}
+			else
+				m_pci_bus->remap(AS_PROGRAM, 0x100a0000, 0x100fffff); // remap all pci and isa devices
+		}
+		if (change & 4)
+		{
+			offs_t s = 0x10000000 + m_ram->size() - (offs_t)m_smram.tseg_size;
+			offs_t e = 0x10000000 + m_ram->size() - 1;
+
+			// unmap current 0x10000000+dram_size-tseg_size to 0x10000000+dram_size-1
+			m_space->unmap_readwrite(s, e);
+			// map new
+			if (m_smram.mapping & 4)
+			{
+				m_space->install_ram(s, e, m_ram->pointer() + m_ram->size() - (offs_t)m_smram.tseg_size);
+			}
+			else
+				m_pci_bus->remap(AS_PROGRAM, s, e); // remap all pci and isa devices
+		}
+	}
+}
+
+WRITE_LINE_MEMBER(i82439tx_device::smi_act_w)
+{
+	// state is 0 when smm is not active
+	// but smiact_n reflects the state of the SMIACT# pin
+	if (state == 0)
+		m_smram.smiact_n = 1;
+	else
+		m_smram.smiact_n = 0;
+	update_smram_mappings();
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -288,6 +453,7 @@ void i82439tx_device::device_start()
 	// setup save states
 	save_item(NAME(m_regs));
 	save_item(NAME(m_bios_ram));
+	// TODO: savestate m_smram
 }
 
 //-------------------------------------------------
@@ -306,6 +472,7 @@ void i82439tx_device::device_reset()
 	m_regs[0x05] = 0x00000002;
 	m_regs[0x06] = 0x00000000;
 	m_regs[0x07] = 0x00000000;
+	m_regs[0x20] = 0x00000000;
 
 	memset(m_bios_ram, 0, sizeof(m_bios_ram));
 

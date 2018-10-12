@@ -12,7 +12,7 @@
 #include "m65ce02.h"
 #include "m65ce02d.h"
 
-DEFINE_DEVICE_TYPE(M65CE02, m65ce02_device, "m65ce02", "M65CE02")
+DEFINE_DEVICE_TYPE(M65CE02, m65ce02_device, "m65ce02", "MOS Technology M65CE02")
 
 m65ce02_device::m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m65ce02_device(mconfig, M65CE02, tag, owner, clock)
@@ -24,9 +24,9 @@ m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-util::disasm_interface *m65ce02_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m65ce02_device::create_disassembler()
 {
-	return new m65ce02_disassembler;
+	return std::make_unique<m65ce02_disassembler>();
 }
 
 void m65ce02_device::init()
@@ -44,7 +44,7 @@ void m65ce02_device::init()
 
 void m65ce02_device::device_start()
 {
-	if(direct_disabled)
+	if(cache_disabled)
 		mintf = std::make_unique<mi_default_nd>();
 	else
 		mintf = std::make_unique<mi_default_normal>();

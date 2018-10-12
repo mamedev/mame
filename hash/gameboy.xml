@@ -700,15 +700,19 @@
 		</part>
 	</software>
 
+	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=0046 -->
 	<software name="amaztatr">
 		<description>A-mazing Tater (USA)</description>
 		<year>1992</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-P3-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="amazing tater (usa).bin" size="65536" crc="d229ac62" sha1="1e475cbd5fb7099df91155a103698e4e66da7a86" offset="0" />
+				<rom name="dmg-p3e-0.u1" size="65536" crc="d229ac62" sha1="1e475cbd5fb7099df91155a103698e4e66da7a86" offset="0" /> <!-- real label: DMG-P3E-0 -->
 			</dataarea>
 		</part>
 	</software>
@@ -16925,7 +16929,7 @@
 
 	<software name="pokeyells" cloneof="pokeyell">
 		<!-- Notes: SGB enhanced -->
-		<description>Pokémon - Edicion Amarilla (Spa)</description>
+		<description>Pokémon - Edición Amarilla (Spa)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSS-ESP"/>
@@ -24922,40 +24926,51 @@
 		</part>
 	</software>
 
-<!-- Sachen carts -->
+<!-- Sachen multi-carts -->
 
+	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1604 -->
 	<software name="4in1_001">
 		<description>4 in 1 (Euro, 4B-001)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-001"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="SA-1005A" /> <!-- Also found with SA-111 PCB -->
+			<!-- SA-111 version only have one epoxy blob combining ROM and Sachen MMC1. -->
+			<!-- SA-1005A version has an epoxy blob Sachen MMC1 and a DIP mask ROM. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4b-001.bin" size="262144" crc="82f06e93" sha1="7506c75fdfa29935afb1e85f5b6013516b2e9f92" offset="0" />
+				<rom name="vol.7.u1" size="262144" crc="82f06e93" sha1="7506c75fdfa29935afb1e85f5b6013516b2e9f92" offset="0" /> <!-- real label: VOL.7 -->
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1558 -->
 	<software name="4in1_002">
 		<description>4 in 1 (Euro, 4B-002)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-002"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="1231" /> <!-- Also found with TG-001 PCB -->
+			<!-- 1231 version has an MX27C512PC-70 PROM and an epoxy blob Sachen MMC1. -->
+			<!-- TG-001 version has an epoxy blob ROM and an epoxy blob Sachen MMC1. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="65536">
-				<rom name="4b-002.bin" size="65536" crc="5e438db8" sha1="d9cb1721854709be7667f5dbce0adf2488c0919b" offset="0" />
+				<rom name="mx27c512pc-70.u1" size="65536" crc="5e438db8" sha1="d9cb1721854709be7667f5dbce0adf2488c0919b" offset="0" /> <!-- raal label: MX27C512PC-70 -->
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1617 -->
 	<software name="4in1_003">
-		<description>4 in 1 (Euro, 4B-003)</description>
+		<description>4 in 1 (Twn, 4B-003)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-003"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="No:7203" />
+			<!-- No:7203 version has an epoxy blob Sachen MMC1 and a DIP mask ROM. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="65536">
 				<rom name="4b-003.bin" size="65536" crc="c294aa21" sha1="b5a3ee09692476d801d873a703d508d17ee24fbd" offset="0" />
@@ -24963,38 +24978,52 @@
 		</part>
 	</software>
 
+	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1606 -->
 	<software name="4in1_004">
 		<description>4 in 1 (Euro, 4B-004)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-004"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="SA-1005" /> <!-- Also found with TG-002 PCB -->
+			<!-- SA-1005 version has an epoxy blob Sachen MMC1 and a DIP mask ROM. -->
+			<!-- TG-002 version has an epoxy blob ROM and an epoxy blob Sachen MMC1. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4b-004.bin" size="262144" crc="c69a19f6" sha1="ca7990dc03a3b3ada1dce37afc4490deaf872402" offset="0" />
+				<!-- alternative label: VOL9 -->
+				<rom name="vol.9.u1" size="262144" crc="c69a19f6" sha1="ca7990dc03a3b3ada1dce37afc4490deaf872402" offset="0" /> <!-- real label: VOL.9 -->
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1579 -->
 	<software name="4in1_005">
 		<description>4 in 1 (Euro, 4B-005)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-005"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="SA-1005" /> <!-- Also found with 1231, SA-111 and TG-002 PCBs -->
+			<!-- SA-111 version only have one epoxy blob combining ROM and Sachen MMC1. -->
+			<!-- SA-1005 version has an epoxy blob Sachen MMC1 and a DIP mask ROM. -->
+			<!-- 1231 version has an epoxy blob Sachen MMC1 and a DIP mask ROM. -->
+			<!-- TG-002 version has an epoxy blob ROM and an epoxy blob Sachen MMC1. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4b-005.bin" size="262144" crc="f4310eb3" sha1="2107979104cff88bcd635215a936bbc44354ea7c" offset="0" />
+				<rom name="vol.8.u1" size="262144" crc="f4310eb3" sha1="2107979104cff88bcd635215a936bbc44354ea7c" offset="0" /> <!-- real label: VOL.8 -->
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1607 -->
 	<software name="4in1_006">
 		<description>4 in 1 (Euro, 4B-006)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-006"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="TG-002" />
+			<!-- TG-002 version has an epoxy blob ROM and an epoxy blob Sachen MMC1. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
 				<rom name="4b-006.bin" size="262144" crc="95398da5" sha1="2e856de768c7cb442a206de8c94a23548027bb60" offset="0" />
@@ -25002,12 +25031,16 @@
 		</part>
 	</software>
 
+	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1593 -->
 	<software name="4in1_007">
 		<description>4 in 1 (Euro, 4B-007)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-007"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="SA-1005" /> <!-- Also found with SA-111 PCB -->
+			<!-- SA-111 version only have one epoxy blob combining ROM and Sachen MMC1. -->
+			<!-- SA-1005 version has an epoxy blob Sachen MMC1 and a QFN ROM with DIP adapter. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
 				<rom name="4b-007.bin" size="262144" crc="62d9350e" sha1="0eef7f3934508ab79e1cad4ddf3bfdb3216b6b4f" offset="0" />
@@ -25015,12 +25048,17 @@
 		</part>
 	</software>
 
+	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1605 -->
 	<software name="4in1_008">
 		<description>4 in 1 (Euro, 4B-008)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-008"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="SA-1005" /> <!-- Also found with TG-002 and NO.72-ROM PCBs -->
+			<!-- NO.72-ROM version only have one epoxy blob combining ROM and Sachen MMC1. -->
+			<!-- TG-002 version has an epoxy blob ROM and an epoxy blob Sachen MMC1. -->
+			<!-- SA-1005 version has an epoxy blob Sachen MMC1 and a QFN ROM with DIP adapter. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
 				<rom name="4b-008.bin" size="262144" crc="740e9bc8" sha1="d7c11d56a42ed7c4ef2fe3c752931a63160d7429" offset="0" />
@@ -25028,12 +25066,15 @@
 		</part>
 	</software>
 
+	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1608 -->
 	<software name="4in1_009">
 		<description>4 in 1 (Euro, 4B-009)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-009"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="TG-002" />
+			<!-- TG-002 version has an epoxy blob ROM and an epoxy blob Sachen MMC1. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
 				<rom name="4b-009.bin" size="262144" crc="114e1f1e" sha1="39743e21935a9115fcb4ee86d67d51bdb4b5f6d6" offset="0" />
@@ -25354,7 +25395,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 			<dataarea name="rom" size="1048576">
 				<rom name="game boy camera (usa, europe).bin" size="1048576" crc="4640909f" sha1="461c3c37ed270681e3e94053efb21504b600aef5" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="131072">
+			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -25371,7 +25412,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 			<dataarea name="rom" size="1048576">
 				<rom name="pocket camera (japan) (rev a).bin" size="1048576" crc="73e8ef96" sha1="912205ea22e1dd735ed4f41d247039eebf39dddc" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="131072">
+			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -25385,7 +25426,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 			<dataarea name="rom" size="1048576">
 				<rom name="game boy camera gold (usa).bin" size="1048576" crc="a1a3f786" sha1="53a0dd6de3ebd0d3495f8bdc377ab08e5074c0ef" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="131072">
+			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>

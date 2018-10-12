@@ -11,7 +11,9 @@
 
 #pragma once
 
-extern device_type S100_8K_SC;
-extern device_type S100_8K_SC_BB;
+#include "bus/s100/s100.h"
+
+DECLARE_DEVICE_TYPE(S100_8K_SC, device_s100_card_interface)
+DECLARE_DEVICE_TYPE(S100_8K_SC_BB, device_s100_card_interface)
 
 #endif // MAME_BUS_S100_8K_SC_H

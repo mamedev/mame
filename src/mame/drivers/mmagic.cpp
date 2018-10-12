@@ -50,6 +50,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
 
@@ -83,6 +84,9 @@ public:
 		m_audio(0x00)
 	{}
 
+	void mmagic(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(ball_x_w);
 	DECLARE_WRITE8_MEMBER(ball_y_w);
@@ -91,13 +95,11 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mmagic(machine_config &config);
 	void mmagic_io(address_map &map);
 	void mmagic_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -117,24 +119,26 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(mmagic_state::mmagic_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x2000, 0x21ff) AM_RAM
-	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(ball_x_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(ball_y_w)
-	AM_RANGE(0x8004, 0x8004) AM_READ(vblank_r)
-ADDRESS_MAP_END
+void mmagic_state::mmagic_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x17ff).rom();
+	map(0x2000, 0x21ff).ram();
+	map(0x3000, 0x31ff).ram().share("vram");
+	map(0x8002, 0x8002).w(FUNC(mmagic_state::ball_x_w));
+	map(0x8003, 0x8003).w(FUNC(mmagic_state::ball_y_w));
+	map(0x8004, 0x8004).r(FUNC(mmagic_state::vblank_r));
+}
 
-ADDRESS_MAP_START(mmagic_state::mmagic_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_WRITE(color_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(audio_w)
-	AM_RANGE(0x85, 0x85) AM_READ_PORT("paddle")
-	AM_RANGE(0x86, 0x86) AM_READ_PORT("buttons")
-	AM_RANGE(0x87, 0x87) AM_READ_PORT("dipswitch")
-ADDRESS_MAP_END
+void mmagic_state::mmagic_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x80).w(FUNC(mmagic_state::color_w));
+	map(0x81, 0x81).w(FUNC(mmagic_state::audio_w));
+	map(0x85, 0x85).portr("paddle");
+	map(0x86, 0x86).portr("buttons");
+	map(0x87, 0x87).portr("dipswitch");
+}
 
 
 //**************************************************************************
@@ -304,9 +308,9 @@ void mmagic_state::machine_start()
 
 MACHINE_CONFIG_START(mmagic_state::mmagic)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // NEC D8085A
-	MCFG_CPU_PROGRAM_MAP(mmagic_mem)
-	MCFG_CPU_IO_MAP(mmagic_io)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // NEC D8085A
+	MCFG_DEVICE_PROGRAM_MAP(mmagic_mem)
+	MCFG_DEVICE_IO_MAP(mmagic_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -316,8 +320,8 @@ MACHINE_CONFIG_START(mmagic_state::mmagic)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(mmagic_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -352,5 +356,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE INPUT   CLASS         INIT  ROT     COMPANY     FULLNAME        FLAGS
-GAME( 1979, mmagic, 0,      mmagic, mmagic, mmagic_state, 0,    ROT270, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME    PARENT  MACHINE INPUT   CLASS         INIT        ROT     COMPANY     FULLNAME        FLAGS
+GAME( 1979, mmagic, 0,      mmagic, mmagic, mmagic_state, empty_init, ROT270, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

@@ -48,6 +48,6 @@ private:
 
 
 // device type definition
-extern const device_type WANGPC_EMB;
+DECLARE_DEVICE_TYPE(WANGPC_EMB, wangpc_emb_device)
 
 #endif // MAME_BUS_WANGPC_EMB_H

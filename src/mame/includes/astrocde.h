@@ -5,12 +5,18 @@
     Bally Astrocade-based hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_ASTROCDE_H
+#define MAME_INCLUDES_ASTROCDE_H
 
+#pragma once
+
+#include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/astrocde.h"
 #include "sound/samples.h"
 #include "sound/votrax.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define ASTROCADE_CLOCK     (XTAL(14'318'181)/2)
@@ -30,11 +36,9 @@ public:
 		TIMER_SCANLINE
 	};
 
-	astrocde_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	astrocde_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_samples(*this, "samples"),
 		m_votrax(*this, "votrax"),
 		m_astrocade_sound1(*this, "astrocade1"),
 		m_videoram(*this, "videoram"),
@@ -43,48 +47,20 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_bank4000(*this, "bank4000"),
 		m_bank8000(*this, "bank8000"),
-		m_p1handle(*this, "P1HANDLE"),
-		m_p2handle(*this, "P2HANDLE"),
-		m_p3handle(*this, "P3HANDLE"),
-		m_p4handle(*this, "P4HANDLE"),
-		m_keypad0(*this, "KEYPAD0"),
-		m_keypad1(*this, "KEYPAD1"),
-		m_keypad2(*this, "KEYPAD2"),
-		m_keypad3(*this, "KEYPAD3"),
-		m_p1_knob(*this, "P1_KNOB"),
-		m_p2_knob(*this, "P2_KNOB"),
-		m_p3_knob(*this, "P3_KNOB"),
-		m_p4_knob(*this, "P4_KNOB"),
-		m_trackball(*this, { { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" } }),
-		m_joystick(*this, { { "MOVEX", "MOVEY" } }),
+		m_handle(*this, "P%uHANDLE", 1U),
 		m_interrupt_scanline(0xff)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
-	optional_device<samples_device> m_samples;
 	optional_device<votrax_sc01_device> m_votrax;
-	optional_device<astrocade_device> m_astrocade_sound1;
+	optional_device<astrocade_io_device> m_astrocade_sound1;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_protected_ram;
 	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<address_map_bank_device> m_bank4000;
 	optional_memory_bank m_bank8000;
-	optional_ioport m_p1handle;
-	optional_ioport m_p2handle;
-	optional_ioport m_p3handle;
-	optional_ioport m_p4handle;
-	optional_ioport m_keypad0;
-	optional_ioport m_keypad1;
-	optional_ioport m_keypad2;
-	optional_ioport m_keypad3;
-	optional_ioport m_p1_knob;
-	optional_ioport m_p2_knob;
-	optional_ioport m_p3_knob;
-	optional_ioport m_p4_knob;
-	optional_ioport_array<4> m_trackball;
-	optional_ioport_array<2> m_joystick;
+	optional_ioport_array<4> m_handle;
 
 	uint8_t m_video_config;
 	uint8_t m_sparkle[4];
@@ -92,8 +68,6 @@ public:
 	char *m_totalword_ptr;
 	char m_oldword[256];
 	int m_plural;
-	uint8_t m_port_1_last;
-	uint8_t m_port_2_last;
 	uint8_t m_ram_write_enable;
 	uint8_t m_input_select;
 	std::unique_ptr<uint8_t[]> m_sparklestar;
@@ -136,47 +110,33 @@ public:
 	DECLARE_WRITE8_MEMBER(protected_ram_enable_w);
 	DECLARE_READ8_MEMBER(protected_ram_r);
 	DECLARE_WRITE8_MEMBER(protected_ram_w);
-	DECLARE_WRITE8_MEMBER(seawolf2_lamps_w);
-	DECLARE_WRITE8_MEMBER(seawolf2_sound_1_w);
-	DECLARE_WRITE8_MEMBER(seawolf2_sound_2_w);
-	DECLARE_WRITE8_MEMBER(ebases_trackball_select_w);
-	DECLARE_WRITE8_MEMBER(ebases_coin_w);
-	DECLARE_READ8_MEMBER(spacezap_io_r);
-	DECLARE_READ8_MEMBER(wow_io_r);
-	DECLARE_READ8_MEMBER(gorf_io_1_r);
-	DECLARE_READ8_MEMBER(gorf_io_2_r);
-	DECLARE_READ8_MEMBER(robby_io_r);
-	DECLARE_READ8_MEMBER(profpac_io_1_r);
-	DECLARE_READ8_MEMBER(profpac_io_2_r);
+	DECLARE_READ8_MEMBER(input_mux_r);
+	template<int Coin> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template<int Bit> DECLARE_WRITE_LINE_MEMBER(sparkle_w);
+	DECLARE_WRITE_LINE_MEMBER(gorf_sound_switch_w);
 	DECLARE_WRITE8_MEMBER(profpac_banksw_w);
 	DECLARE_WRITE8_MEMBER(demndrgn_banksw_w);
-	DECLARE_READ8_MEMBER(demndrgn_io_r);
-	DECLARE_WRITE8_MEMBER(demndrgn_sound_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_lamp_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_counter_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_lights_w);
-	DECLARE_READ8_MEMBER(astrocade_data_chip_register_r);
-	DECLARE_WRITE8_MEMBER(astrocade_data_chip_register_w);
+	DECLARE_READ8_MEMBER(video_register_r);
+	DECLARE_WRITE8_MEMBER(video_register_w);
 	DECLARE_WRITE8_MEMBER(astrocade_funcgen_w);
+	DECLARE_WRITE8_MEMBER(expand_register_w);
 	DECLARE_WRITE8_MEMBER(astrocade_pattern_board_w);
 	DECLARE_WRITE8_MEMBER(profpac_page_select_w);
 	DECLARE_READ8_MEMBER(profpac_intercept_r);
 	DECLARE_WRITE8_MEMBER(profpac_screenram_ctrl_w);
 	DECLARE_READ8_MEMBER(profpac_videoram_r);
 	DECLARE_WRITE8_MEMBER(profpac_videoram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(ebases_trackball_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(demndragn_joystick_r);
 	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
-	DECLARE_DRIVER_INIT(profpac);
-	DECLARE_DRIVER_INIT(spacezap);
-	DECLARE_DRIVER_INIT(robby);
-	DECLARE_DRIVER_INIT(wow);
-	DECLARE_DRIVER_INIT(tenpindx);
-	DECLARE_DRIVER_INIT(seawolf2);
-	DECLARE_DRIVER_INIT(demndrgn);
-	DECLARE_DRIVER_INIT(ebases);
-	DECLARE_DRIVER_INIT(gorf);
-	DECLARE_DRIVER_INIT(astrocde);
+	void init_profpac();
+	void init_spacezap();
+	void init_robby();
+	void init_wow();
+	void init_tenpindx();
+	void init_seawolf2();
+	void init_demndrgn();
+	void init_ebases();
+	void init_gorf();
+	void init_astrocde();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(astrocde);
 	DECLARE_VIDEO_START(profpac);
@@ -193,7 +153,7 @@ public:
 	void init_sparklestar();
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( votrax_speech_r );
+	DECLARE_WRITE8_MEMBER(votrax_speech_w);
 	CUSTOM_INPUT_MEMBER( votrax_speech_status_r );
 
 	void astrocade_base(machine_config &config);
@@ -202,20 +162,14 @@ public:
 	void astrocade_stereo_sound(machine_config &config);
 	void spacezap(machine_config &config);
 	void gorf(machine_config &config);
-	void seawolf2(machine_config &config);
 	void profpac(machine_config &config);
 	void robby(machine_config &config);
-	void ebases(machine_config &config);
 	void wow(machine_config &config);
-	void tenpindx(machine_config &config);
-	void demndrgn(machine_config &config);
 	void bank4000_map(address_map &map);
 	void demndrgn_map(address_map &map);
-	void ebases_map(address_map &map);
 	void port_map(address_map &map);
 	void port_map_16col_pattern(address_map &map);
 	void port_map_16col_pattern_nosound(address_map &map);
-	void port_map_16col_pattern_tenpindx(address_map &map);
 	void port_map_mono_pattern(address_map &map);
 	void port_map_stereo_pattern(address_map &map);
 	void profpac_bank4000_map(address_map &map);
@@ -223,9 +177,95 @@ public:
 	void robby_map(address_map &map);
 	void seawolf2_map(address_map &map);
 	void spacezap_map(address_map &map);
-	void tenpin_sub_io_map(address_map &map);
-	void tenpin_sub_map(address_map &map);
 	void wow_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+class seawolf2_state : public astrocde_state
+{
+public:
+	seawolf2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_samples(*this, "samples")
+	{ }
+
+	void seawolf2(machine_config &config);
+private:
+	DECLARE_WRITE8_MEMBER(sound_1_w);
+	DECLARE_WRITE8_MEMBER(sound_2_w);
+
+	void port_map_discrete(address_map &map);
+
+	virtual void machine_start() override;
+
+	required_device<samples_device> m_samples;
+	uint8_t m_port_1_last;
+	uint8_t m_port_2_last;
+};
+
+class ebases_state : public astrocde_state
+{
+public:
+	ebases_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_trackball(*this, {"TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1"})
+	{ }
+
+	void ebases(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(trackball_r);
+private:
+	DECLARE_WRITE8_MEMBER(trackball_select_w);
+	DECLARE_WRITE8_MEMBER(coin_w);
+
+	void ebases_map(address_map &map);
+	void port_map_ebases(address_map &map);
+
+	required_ioport_array<4> m_trackball;
+};
+
+class demndrgn_state : public astrocde_state
+{
+public:
+	demndrgn_state(const machine_config &mconfig, device_type type, const char *tag)
+		: astrocde_state(mconfig, type, tag)
+		, m_joystick(*this, {"MOVEX", "MOVEY"})
+	{ }
+
+	void demndrgn(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(joystick_r);
+private:
+	DECLARE_WRITE_LINE_MEMBER(input_select_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
+
+	void port_map_16col_pattern_demndrgn(address_map &map);
+
+	required_ioport_array<2> m_joystick;
+};
+
+class tenpindx_state : public astrocde_state
+{
+public:
+	tenpindx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_subcpu(*this, "sub"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
+
+	void tenpindx(machine_config &config);
+private:
+	DECLARE_WRITE8_MEMBER(lamp_w);
+	DECLARE_WRITE8_MEMBER(counter_w);
+	DECLARE_WRITE8_MEMBER(lights_w);
+
+	virtual void machine_start() override;
+
+	void port_map_16col_pattern_tenpindx(address_map &map);
+	void sub_io_map(address_map &map);
+	void sub_map(address_map &map);
+
+	required_device<z80_device> m_subcpu;
+	output_finder<19> m_lamps;
+};
+
+#endif // MAME_INCLUDES_ASTROCDE_H

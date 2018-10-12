@@ -61,7 +61,7 @@ enum
 
 
 #define MCFG_LH5801_IN(_devcb) \
-	devcb = &downcast<lh5801_cpu_device &>(*device).set_in_func(DEVCB_##_devcb);
+	downcast<lh5801_cpu_device &>(*device).set_in_func(DEVCB_##_devcb);
 
 
 class lh5801_cpu_device :  public cpu_device
@@ -82,7 +82,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 2; }
 	virtual uint32_t execute_max_cycles() const override { return 19; }
 	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == LH5801_LINE_MI || inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -93,7 +93,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -103,7 +103,7 @@ private:
 
 	address_space *m_program;         //ME0
 	address_space *m_io;              //ME1
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	PAIR m_s;
 	PAIR m_p;

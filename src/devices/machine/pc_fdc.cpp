@@ -16,28 +16,39 @@
 #include "emu.h"
 #include "machine/pc_fdc.h"
 
+//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
+
+//#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+
 DEFINE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device, "pc_fdc_xt", "PC FDC (XT)")
 DEFINE_DEVICE_TYPE(PC_FDC_AT, pc_fdc_at_device, "pc_fdc_at", "PC FDC (AT)")
 
-ADDRESS_MAP_START(pc_fdc_family_device::map)
-ADDRESS_MAP_END
+void pc_fdc_family_device::map(address_map &map)
+{
+}
 
 // The schematics show address decoding is minimal
-ADDRESS_MAP_START(pc_fdc_xt_device::map)
-	AM_RANGE(0x0, 0x0) AM_DEVREAD("upd765", upd765a_device, msr_r) AM_WRITE(dor_w)
-	AM_RANGE(0x1, 0x1) AM_DEVREAD("upd765", upd765a_device, fifo_r) AM_WRITE(dor_fifo_w)
-	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
-	AM_RANGE(0x3, 0x3) AM_WRITE(dor_w)
-	AM_RANGE(0x4, 0x5) AM_DEVICE("upd765", upd765a_device, map)
-ADDRESS_MAP_END
+void pc_fdc_xt_device::map(address_map &map)
+{
+	map(0x0, 0x0).r(fdc, FUNC(upd765a_device::msr_r)).w(FUNC(pc_fdc_xt_device::dor_w));
+	map(0x1, 0x1).r(fdc, FUNC(upd765a_device::fifo_r)).w(FUNC(pc_fdc_xt_device::dor_fifo_w));
+	map(0x2, 0x2).w(FUNC(pc_fdc_xt_device::dor_w));
+	map(0x3, 0x3).w(FUNC(pc_fdc_xt_device::dor_w));
+	map(0x4, 0x5).m(fdc, FUNC(upd765a_device::map));
+}
 
 
 // Decoding is through a PAL, so presumably complete
-ADDRESS_MAP_START(pc_fdc_at_device::map)
-	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
-	AM_RANGE(0x4, 0x5) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
-ADDRESS_MAP_END
+void pc_fdc_at_device::map(address_map &map)
+{
+	map(0x2, 0x2).rw(FUNC(pc_fdc_at_device::dor_r), FUNC(pc_fdc_at_device::dor_w));
+	map(0x4, 0x5).m(fdc, FUNC(upd765a_device::map));
+	map(0x7, 0x7).rw(FUNC(pc_fdc_at_device::dir_r), FUNC(pc_fdc_at_device::ccr_w));
+}
 
 pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	pc_fdc_interface(mconfig, type, tag, owner, clock), fdc(*this, "upd765"),
@@ -61,11 +72,12 @@ void pc_fdc_family_device::dma_w(uint8_t data)
 	fdc->dma_w(data);
 }
 
-MACHINE_CONFIG_START(pc_fdc_family_device::device_add_mconfig)
-	MCFG_UPD765A_ADD("upd765", false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc_fdc_family_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc_fdc_family_device, drq_w))
-MACHINE_CONFIG_END
+void pc_fdc_family_device::device_add_mconfig(machine_config &config)
+{
+	UPD765A(config, fdc, false, false);
+	fdc->intrq_wr_callback().set(FUNC(pc_fdc_family_device::irq_w));
+	fdc->drq_wr_callback().set(FUNC(pc_fdc_family_device::drq_w));
+}
 
 void pc_fdc_family_device::device_start()
 {
@@ -98,7 +110,7 @@ void pc_fdc_family_device::device_reset()
 
 WRITE8_MEMBER( pc_fdc_family_device::dor_w )
 {
-	logerror("%s: dor = %02x\n", tag(), data);
+	LOG("dor = %02x\n", data);
 	uint8_t pdor = dor;
 	dor = data;
 
@@ -131,7 +143,7 @@ READ8_MEMBER( pc_fdc_family_device::dir_r )
 WRITE8_MEMBER( pc_fdc_family_device::ccr_w )
 {
 	static const int rates[4] = { 500000, 300000, 250000, 1000000 };
-	logerror("%s: ccr = %02x\n", tag(), data);
+	LOG("ccr = %02x\n", data);
 	fdc->set_rate(rates[data & 3]);
 }
 
@@ -165,7 +177,7 @@ void pc_fdc_family_device::check_irq()
 	bool pirq = irq;
 	irq = fdc_irq && (dor & 4) && (dor & 8);
 	if(irq != pirq && !intrq_cb.isnull()) {
-		logerror("%s: pc_irq = %d\n", tag(), irq);
+		LOG("pc_irq = %d\n", irq);
 		intrq_cb(irq);
 	}
 }

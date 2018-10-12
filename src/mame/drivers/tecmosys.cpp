@@ -4,9 +4,13 @@
  Driver by Farfetch'd, David Haywood & Tomasz Slanina
  Protection simulation by nuapete
 
- ToDo:
+ TODO:
   - Dump / Decap MCUs to allow for proper protection emulation.
   - tkdenshoa pcb shows some garbage sprites at the top during y-scroll
+  - Flip screen is wrong
+  - Line scroll is unimplemented(but it seems like unused)
+  - Unknowns of sprite/tilemap registers
+  - Verify priority/mixing from real PCB
 
 
 T.Slanina 20040530 :
@@ -250,12 +254,11 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 
 	switch( offset )
 	{
-		case 0:
-			if ( m_screen->vpos() >= 240) return 0;
-			else return 1;
+	case 0:
+		return (m_screen->vpos() >= 240) ? 0 : 1;
 
-		default:
-			return 0;
+	default:
+		return 0;
 	}
 }
 
@@ -274,81 +277,100 @@ WRITE16_MEMBER(tecmosys_state::eeprom_w)
 	}
 }
 
-ADDRESS_MAP_START(tecmosys_state::main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM // work ram
-	AM_RANGE(0x210000, 0x210001) AM_READNOP // single byte overflow on stack defined as 0x210000
-	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(bg0_tilemap_w) AM_SHARE("bg0tilemap_ram") // bg0 ram
-	AM_RANGE(0x301000, 0x3013ff) AM_RAM_WRITE(bg0_tilemap_lineram_w) AM_SHARE("bg0_lineram")// bg0 linescroll? (guess)
+template<int Layer>
+WRITE16_MEMBER(tecmosys_state::vram_w)
+{
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset/2);
+}
 
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(bg1_tilemap_w) AM_SHARE("bg1tilemap_ram") // bg1 ram
-	AM_RANGE(0x401000, 0x4013ff) AM_RAM_WRITE(bg1_tilemap_lineram_w) AM_SHARE("bg1_lineram")// bg1 linescroll? (guess)
+template<int Layer>
+WRITE16_MEMBER(tecmosys_state::lineram_w)
+{
+	COMBINE_DATA(&m_lineram[Layer][offset]);
+	if (data!=0x0000) popmessage("non 0 write to bg%01x lineram %04x %04x",Layer,offset,data);
+}
 
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(bg2_tilemap_w) AM_SHARE("bg2tilemap_ram") // bg2 ram
-	AM_RANGE(0x501000, 0x5013ff) AM_RAM_WRITE(bg2_tilemap_lineram_w) AM_SHARE("bg2_lineram") // bg2 linescroll? (guess)
+void tecmosys_state::main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x20ffff).ram(); // work ram
+	map(0x210000, 0x210001).nopr(); // single byte overflow on stack defined as 0x210000
+	map(0x300000, 0x300fff).ram().w(FUNC(tecmosys_state::vram_w<1>)).share("vram_1"); // bg0 ram
+	map(0x301000, 0x3013ff).ram().w(FUNC(tecmosys_state::lineram_w<0>)).share("bg0_lineram");// bg0 linescroll? (guess)
 
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(fg_tilemap_w) AM_SHARE("fgtilemap_ram") // fix ram
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram") // obj ram
-	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // AM_WRITEONLY // obj pal
+	map(0x400000, 0x400fff).ram().w(FUNC(tecmosys_state::vram_w<2>)).share("vram_2"); // bg1 ram
+	map(0x401000, 0x4013ff).ram().w(FUNC(tecmosys_state::lineram_w<1>)).share("bg1_lineram");// bg1 linescroll? (guess)
 
-	//AM_RANGE(0x980000, 0x9807ff) AM_WRITEONLY // bg pal
-	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // fix pal
+	map(0x500000, 0x500fff).ram().w(FUNC(tecmosys_state::vram_w<3>)).share("vram_3"); // bg2 ram
+	map(0x501000, 0x5013ff).ram().w(FUNC(tecmosys_state::lineram_w<2>)).share("bg2_lineram"); // bg2 linescroll? (guess)
+
+	map(0x700000, 0x703fff).ram().w(FUNC(tecmosys_state::vram_w<0>)).share("vram_0"); // fix ram
+	map(0x800000, 0x80ffff).ram().share("spriteram"); // obj ram
+	map(0x880000, 0x88000b).r(FUNC(tecmosys_state::unk880000_r));
+	map(0x880000, 0x88002f).w(FUNC(tecmosys_state::unk880000_w)).share("880000regs");  // 10 byte dta@88000c, 880022=watchdog?
+	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // AM_WRITEONLY // obj pal
+
+	//map(0x980000, 0x9807ff).writeonly(); // bg pal
+	//map(0x980800, 0x980fff).w(FUNC(tecmosys_state::paletteram_xGGGGGRRRRRBBBBB_word_w)).share("paletteram"); // fix pal
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
-	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("tmap_palette")
+	map(0x980000, 0x980fff).ram().w(FUNC(tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w)).share("tmap_palette");
 
-	AM_RANGE(0x880000, 0x88002f) AM_WRITE(unk880000_w ) AM_SHARE("880000regs")  // 10 byte dta@88000c, 880022=watchdog?
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w  )
-	AM_RANGE(0xa80000, 0xa80005) AM_WRITEONLY AM_SHARE("a80000regs")    // a80000-3 scroll? a80004 inverted ? 3 : 0
-	AM_RANGE(0xb00000, 0xb00005) AM_WRITEONLY AM_SHARE("b00000regs")    // b00000-3 scrool?, b00004 inverted ? 3 : 0
-	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(prot_status_r, prot_status_w)
-	AM_RANGE(0xc00000, 0xc00005) AM_WRITEONLY AM_SHARE("c00000regs")    // c00000-3 scroll? c00004 inverted ? 13 : 10
-	AM_RANGE(0xc80000, 0xc80005) AM_WRITEONLY AM_SHARE("c80000regs")    // c80000-3 scrool? c80004 inverted ? 3 : 0
-	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
-	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
-	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(prot_data_w)
-	AM_RANGE(0xf00000, 0xf00001) AM_READ8(sound_command_pending_r, 0x00ff)
-	AM_RANGE(0xf80000, 0xf80001) AM_READ(prot_data_r)
-ADDRESS_MAP_END
+	map(0xa00000, 0xa00001).w(FUNC(tecmosys_state::eeprom_w));
+	map(0xa80000, 0xa80005).writeonly().share("scroll_2");    // a80000-3 scroll? a80004 inverted ? 3 : 0
+	map(0xb00000, 0xb00005).writeonly().share("scroll_3");    // b00000-3 scrool?, b00004 inverted ? 3 : 0
+	map(0xb80000, 0xb80001).rw(FUNC(tecmosys_state::prot_status_r), FUNC(tecmosys_state::prot_status_w));
+	map(0xc00000, 0xc00005).writeonly().share("scroll_0");    // c00000-3 scroll? c00004 inverted ? 13 : 10
+	map(0xc80000, 0xc80005).writeonly().share("scroll_1");    // c80000-3 scrool? c80004 inverted ? 3 : 0
+	map(0xd00000, 0xd00001).portr("P1");
+	map(0xd00002, 0xd00003).portr("P2");
+	map(0xd80000, 0xd80001).r(FUNC(tecmosys_state::eeprom_r));
+	map(0xe00001, 0xe00001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xe80000, 0xe80001).w(FUNC(tecmosys_state::prot_data_w));
+	map(0xf00001, 0xf00001).r(FUNC(tecmosys_state::sound_command_pending_r));
+	map(0xf80000, 0xf80001).r(FUNC(tecmosys_state::prot_data_r));
+}
 
 
 WRITE8_MEMBER(tecmosys_state::z80_bank_w)
 {
-	membank("bank1")->set_entry(data);
+	m_audiobank->set_entry(data);
 }
 
 WRITE8_MEMBER(tecmosys_state::oki_bank_w)
 {
-	uint8_t upperbank = (data & 0x30) >> 4;
-	uint8_t lowerbank = (data & 0x03) >> 0;
-	uint8_t* region = memregion("oki")->base();
-
-	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
-	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
+	m_okibank[0]->set_entry((data & 0x03) >> 0);
+	m_okibank[1]->set_entry((data & 0x30) >> 4);
 }
 
-ADDRESS_MAP_START(tecmosys_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM
-ADDRESS_MAP_END
 
-ADDRESS_MAP_START(tecmosys_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_WRITE(oki_bank_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(z80_bank_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x50, 0x50) AM_WRITE(sound_nmi_disable_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-ADDRESS_MAP_END
+void tecmosys_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0xe000, 0xf7ff).ram();
+}
+
+void tecmosys_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).bankr("okibank1");
+	map(0x20000, 0x3ffff).bankr("okibank2");
+}
+
+void tecmosys_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ymf", FUNC(ymf262_device::read), FUNC(ymf262_device::write));
+	map(0x10, 0x10).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x20, 0x20).w(FUNC(tecmosys_state::oki_bank_w));
+	map(0x30, 0x30).w(FUNC(tecmosys_state::z80_bank_w));
+	map(0x40, 0x40).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x50, 0x50).w(FUNC(tecmosys_state::sound_nmi_disable_w));
+	map(0x60, 0x61).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+}
 
 
-
-static INPUT_PORTS_START( deroon )
+static INPUT_PORTS_START( tecmosys )
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )      PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )    PORT_8WAY PORT_PLAYER(1)
@@ -395,9 +417,9 @@ static const gfx_layout gfxlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,1,2,3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4},
-	{ 0*4*8, 1*4*8, 2*4*8, 3*4*8, 4*4*8, 5*4*8, 6*4*8, 7*4*8},
+	{ STEP8(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
 	8*8*4
 };
 
@@ -406,51 +428,47 @@ static const gfx_layout gfxlayout2 =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-		8*8*4*1+0*4, 8*8*4*1+1*4, 8*8*4*1+2*4, 8*8*4*1+3*4, 8*8*4*1+4*4, 8*8*4*1+5*4,8*8*4*1+6*4, 8*8*4*1+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*8*4*2+0*32, 8*8*4*2+1*32, 8*8*4*2+2*32, 8*8*4*2+3*32, 8*8*4*2+4*32, 8*8*4*2+5*32, 8*8*4*2+6*32, 8*8*4*2+7*32 },
-	128*8
+	{ STEP8(0,1) },
+	{ STEP8(0,4), STEP8(8*8*4,4) },
+	{ STEP8(0,4*8), STEP8(8*8*4*2,4*8) },
+	16*16*4
 };
 
-static GFXDECODE_START( tecmosys )
-	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout,   0x4400, 0x40 )
-	GFXDECODE_ENTRY( "gfx3", 0, gfxlayout2,  0x4000, 0x40 )
-	GFXDECODE_ENTRY( "gfx4", 0, gfxlayout2,  0x4000, 0x40 )
-	GFXDECODE_ENTRY( "gfx5", 0, gfxlayout2,  0x4000, 0x40 )
-
+static GFXDECODE_START( gfx_tecmosys )
+	GFXDECODE_ENTRY( "layer0", 0, gfxlayout,   0x4400, 0x40 )
+	GFXDECODE_ENTRY( "layer1", 0, gfxlayout2,  0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer2", 0, gfxlayout2,  0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer3", 0, gfxlayout2,  0x4000, 0x40 )
 GFXDECODE_END
 
 
 void tecmosys_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 16, memregion("audiocpu")->base(), 0x4000);
+	m_audiobank->configure_entries(0, 16, memregion("audiocpu")->base(), 0x4000);
+	for (int bank = 0; bank < 2; bank++)
+		m_okibank[bank]->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
 
 	save_item(NAME(m_device_read_ptr));
 	save_item(NAME(m_device_status));
 	save_item(NAME(m_device_value));
 }
 
-MACHINE_CONFIG_START(tecmosys_state::deroon)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
+MACHINE_CONFIG_START(tecmosys_state::tecmosys)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 400) // guess
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 400); // guess
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2 )
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2 )
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmosys)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tecmosys)
+	EEPROM_93C46_16BIT(config, "eeprom", eeprom_serial_streaming::ENABLE);
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
-
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(57.4458)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3000))
@@ -461,28 +479,29 @@ MACHINE_CONFIG_START(tecmosys_state::deroon)
 	MCFG_PALETTE_ADD("palette", 0x4000+0x800)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymf", YMF262, XTAL(14'318'181))
+	MCFG_DEVICE_ADD("ymf", YMF262, XTAL(14'318'181))
 	MCFG_YMF262_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -500,7 +519,7 @@ ROM_START( deroon )
 	ROM_LOAD( "deroon_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
 	ROM_LOAD( "deroon_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
 
-	ROM_REGION( 0x2000000, "gfx1", ROMREGION_ERASE00 ) // Sprites (non-tile based)
+	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE00 ) // Sprites (non-tile based)
 	/* all these roms need verifying, they could be half size */
 
 	ROM_LOAD16_BYTE( "t101.uah1", 0x0000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
@@ -510,23 +529,23 @@ ROM_START( deroon )
 	/*                            0x1000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
 	ROM_LOAD16_BYTE( "t104.ucl1", 0x1000001, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) // 8x8 4bpp tiles
+	ROM_REGION( 0x100000, "layer0", 0 ) // 8x8 4bpp tiles
 	ROM_LOAD( "t301.ubd1", 0x000000, 0x100000, CRC(8b026177) SHA1(3887856bdaec4d9d3669fe3bc958ef186fbe9adb) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "layer1", ROMREGION_ERASE00) // 16x16 4bpp tiles
 	/* not used? */
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASE00 ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "layer2", ROMREGION_ERASE00 ) // 16x16 4bpp tiles
 	ROM_LOAD( "t201.ubb1", 0x000000, 0x100000, CRC(d5a087ac) SHA1(5098160ce7719d93e3edae05f6edd317d4c61f0d) )
 
-	ROM_REGION( 0x100000, "gfx5", ROMREGION_ERASE00 ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "layer3", ROMREGION_ERASE00 ) // 16x16 4bpp tiles
 	ROM_LOAD( "t202.ubc1", 0x000000, 0x100000, CRC(f051dae1) SHA1(f5677c07fe644b3838657370f0309fb09244c619) )
 
 	ROM_REGION( 0x200000, "ymz", 0 ) // YMZ280B Samples
 	ROM_LOAD( "t401.uya1", 0x000000, 0x200000, CRC(92111992) SHA1(ae27e11ae76dec0b9892ad32e1a8bf6ab11f2e6c) )
 
-	ROM_REGION( 0x100000, "oki", 0 ) // M6295 Samples
-	ROM_LOAD( "t501.uad1", 0x080000, 0x080000, CRC(2fbcfe27) SHA1(f25c830322423f0959a36955edb563a6150f2142) )
+	ROM_REGION( 0x80000, "oki", 0 ) // M6295 Samples
+	ROM_LOAD( "t501.uad1", 0x000000, 0x080000, CRC(2fbcfe27) SHA1(f25c830322423f0959a36955edb563a6150f2142) )
 ROM_END
 
 ROM_START( tkdensho )
@@ -542,7 +561,7 @@ ROM_START( tkdensho )
 	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
 	ROM_LOAD( "tkdensho_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
 
-	ROM_REGION( 0x4000000, "gfx1", ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
+	ROM_REGION( 0x4000000, "sprites", ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
 	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
 	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
 	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
@@ -553,24 +572,24 @@ ROM_START( tkdensho )
 	ROM_LOAD16_BYTE( "ae105.fl1",     0x2800001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
 	ROM_LOAD16_BYTE( "ae106.gl1",     0x3000001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // 8x8 4bpp tiles
+	ROM_REGION( 0x080000, "layer0", 0 ) // 8x8 4bpp tiles
 	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "layer1", 0 ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae200w74.ba1",  0x000000, 0x0100000, CRC(c1645041) SHA1(323670a6aa2a4524eb968cc0b4d688098ffeeb12) )
 
-	ROM_REGION( 0x100000, "gfx4", 0 ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "layer2", 0 ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae201w75.bb1",  0x000000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
 
-	ROM_REGION( 0x100000, "gfx5", 0 ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "layer3", 0 ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae202w76.bc1",  0x000000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
 
 	ROM_REGION( 0x400000, "ymz", 0 ) // YMZ280B Samples
 	ROM_LOAD( "ae400t23.ya1", 0x000000, 0x200000, CRC(c6ffb043) SHA1(e0c6c5f6b840f63c9a685a2c3be66efa4935cbeb) )
 	ROM_LOAD( "ae401t24.yb1", 0x200000, 0x200000, CRC(d83f1a73) SHA1(412b7ac9ff09a984c28b7d195330d78c4aac3dc5) )
 
-	ROM_REGION( 0x100000, "oki", 0 ) // M6295 Samples
-	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
+	ROM_REGION( 0x80000, "oki", 0 ) // M6295 Samples
+	ROM_LOAD( "ae500w07.ad1", 0x000000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
 ROM_START( tkdenshoa )
@@ -586,7 +605,7 @@ ROM_START( tkdenshoa )
 	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
 	ROM_LOAD( "tkdensho_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
 
-	ROM_REGION( 0x4000000, "gfx1", ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
+	ROM_REGION( 0x4000000, "sprites", ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
 	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
 	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
 	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
@@ -597,66 +616,64 @@ ROM_START( tkdenshoa )
 	ROM_LOAD16_BYTE( "ae105.fl1",     0x2800001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
 	ROM_LOAD16_BYTE( "ae106.gl1",     0x3000001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // 8x8 4bpp tiles
+	ROM_REGION( 0x080000, "layer0", 0 ) // 8x8 4bpp tiles
 	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "layer1", 0 ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae200w74.ba1",  0x000000, 0x0100000, CRC(c1645041) SHA1(323670a6aa2a4524eb968cc0b4d688098ffeeb12) )
 
-	ROM_REGION( 0x100000, "gfx4", 0 ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "layer2", 0 ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae201w75.bb1",  0x000000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
 
-	ROM_REGION( 0x100000, "gfx5", 0 ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "layer3", 0 ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae202w76.bc1",  0x000000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
 
 	ROM_REGION( 0x400000, "ymz", 0 ) // YMZ280B Samples
 	ROM_LOAD( "ae400t23.ya1", 0x000000, 0x200000, CRC(c6ffb043) SHA1(e0c6c5f6b840f63c9a685a2c3be66efa4935cbeb) )
 	ROM_LOAD( "ae401t24.yb1", 0x200000, 0x200000, CRC(d83f1a73) SHA1(412b7ac9ff09a984c28b7d195330d78c4aac3dc5) )
 
-	ROM_REGION( 0x100000, "oki", 0 ) // M6295 Samples
-	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
+	ROM_REGION( 0x80000, "oki", 0 ) // M6295 Samples
+	ROM_LOAD( "ae500w07.ad1", 0x000000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
 void tecmosys_state::descramble()
 {
-	uint8_t *gfxsrc  = memregion( "gfx1" )->base();
-	size_t srcsize = memregion( "gfx1" )->bytes();
 	int i;
 
-	for (i=0; i < srcsize; i+=4)
+	for (i=0; i < m_sprite_region.length(); i+=4)
 	{
 		uint8_t tmp[4];
 
-		tmp[2] = ((gfxsrc[i+0]&0xf0)>>0) | ((gfxsrc[i+1]&0xf0)>>4); //  0, 1, 2, 3   8, 9,10,11
-		tmp[3] = ((gfxsrc[i+0]&0x0f)<<4) | ((gfxsrc[i+1]&0x0f)<<0); //  4, 5, 6, 7, 12,13,14,15
-		tmp[0] = ((gfxsrc[i+2]&0xf0)>>0) | ((gfxsrc[i+3]&0xf0)>>4); // 16,17,18,19, 24,25,26,27
-		tmp[1] = ((gfxsrc[i+2]&0x0f)<<4) | ((gfxsrc[i+3]&0x0f)>>0); // 20,21,22,23, 28,29,30,31
+		tmp[2] = ((m_sprite_region[i+0]&0xf0)>>0) | ((m_sprite_region[i+1]&0xf0)>>4); //  0, 1, 2, 3   8, 9,10,11
+		tmp[3] = ((m_sprite_region[i+0]&0x0f)<<4) | ((m_sprite_region[i+1]&0x0f)<<0); //  4, 5, 6, 7, 12,13,14,15
+		tmp[0] = ((m_sprite_region[i+2]&0xf0)>>0) | ((m_sprite_region[i+3]&0xf0)>>4); // 16,17,18,19, 24,25,26,27
+		tmp[1] = ((m_sprite_region[i+2]&0x0f)<<4) | ((m_sprite_region[i+3]&0x0f)>>0); // 20,21,22,23, 28,29,30,31
 
-		gfxsrc[i+0] = tmp[0];
-		gfxsrc[i+1] = tmp[1];
-		gfxsrc[i+2] = tmp[2];
-		gfxsrc[i+3] = tmp[3];
+		m_sprite_region[i+0] = tmp[0];
+		m_sprite_region[i+1] = tmp[1];
+		m_sprite_region[i+2] = tmp[2];
+		m_sprite_region[i+3] = tmp[3];
 	}
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,deroon)
+void tecmosys_state::init_deroon()
 {
 	descramble();
 	prot_init(0); // machine/tecmosys.c
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,tkdensho)
+void tecmosys_state::init_tkdensho()
 {
 	descramble();
 	prot_init(1);
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,tkdensha)
+void tecmosys_state::init_tkdensha()
 {
 	descramble();
 	prot_init(2);
 }
 
-GAME( 1995, deroon,           0, deroon, deroon, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tkdensho,         0, deroon, deroon, tecmosys_state, tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tecmosys_state, tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, deroon,           0, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tkdensho,         0, tecmosys, tecmosys, tecmosys_state, init_tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tkdenshoa, tkdensho, tecmosys, tecmosys, tecmosys_state, init_tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

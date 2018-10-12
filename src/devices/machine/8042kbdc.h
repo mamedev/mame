@@ -17,28 +17,6 @@
 #include "machine/pckeybrd.h"
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_KBDC8042_KEYBOARD_TYPE(_kbdt) \
-	downcast<kbdc8042_device &>(*device).set_keyboard_type(kbdc8042_device::_kbdt);
-
-#define MCFG_KBDC8042_SYSTEM_RESET_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_system_reset_callback(DEVCB_##_devcb);
-
-#define MCFG_KBDC8042_GATE_A20_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_gate_a20_callback(DEVCB_##_devcb);
-
-#define MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_input_buffer_full_callback(DEVCB_##_devcb);
-
-#define MCFG_KBDC8042_OUTPUT_BUFFER_EMPTY_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_output_buffer_empty_callback(DEVCB_##_devcb);
-
-#define MCFG_KBDC8042_SPEAKER_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_speaker_callback(DEVCB_##_devcb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -55,14 +33,14 @@ public:
 	};
 
 	// construction/destruction
-	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_keyboard_type(kbdc8042_type_t keybtype) { m_keybtype = keybtype; }
-	template <class Object> devcb_base &set_system_reset_callback(Object &&cb) { return m_system_reset_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_gate_a20_callback(Object &&cb) { return m_gate_a20_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_input_buffer_full_callback(Object &&cb) { return m_input_buffer_full_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_buffer_empty_callback(Object &&cb) { return m_output_buffer_empty_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_speaker_callback(Object &&cb) { return m_speaker_cb.set_callback(std::forward<Object>(cb)); }
+	auto system_reset_callback() { return m_system_reset_cb.bind(); }
+	auto gate_a20_callback() { return m_gate_a20_cb.bind(); }
+	auto input_buffer_full_callback() { return m_input_buffer_full_cb.bind(); }
+	auto output_buffer_empty_callback() { return m_output_buffer_empty_cb.bind(); }
+	auto speaker_callback() { return m_speaker_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -70,8 +48,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_out2 );
 
 	void at_8042_set_outport(uint8_t data, int initial);
-	void at_8042_receive(uint8_t data);
+	void at_8042_receive(uint8_t data, bool mouse = false);
 	void at_8042_check_keyboard();
+	void at_8042_check_mouse();
 	void at_8042_clear_keyboard_received();
 
 protected:
@@ -79,9 +58,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	uint8_t m_inport, m_outport, m_data, m_command;
+	uint8_t m_inport;
+	uint8_t m_outport;
+	uint8_t m_data;
+	uint8_t m_command;
 
 	struct {
 		int received;
@@ -90,6 +73,10 @@ private:
 	struct {
 		int received;
 		int on;
+		uint8_t sample_rate;
+		bool receiving_sample_rate;
+		uint8_t transmit_buf[8];
+		uint8_t to_transmit;
 	} m_mouse;
 
 	int m_last_write_to_control;
@@ -108,6 +95,9 @@ private:
 	int m_poll_delay;
 
 	required_device<at_keyboard_device> m_keyboard_dev;
+	required_ioport m_mousex_port;
+	required_ioport m_mousey_port;
+	required_ioport m_mousebtn_port;
 
 	kbdc8042_type_t     m_keybtype;
 
@@ -117,6 +107,10 @@ private:
 	devcb_write_line    m_output_buffer_empty_cb;
 
 	devcb_write8        m_speaker_cb;
+
+	uint16_t            m_mouse_x;
+	uint16_t            m_mouse_y;
+	uint8_t             m_mouse_btn;
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 };

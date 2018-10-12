@@ -101,51 +101,54 @@ void abcbus_slot_device::device_start()
 //  SLOT_INTERFACE( abc80_cards )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( abc80_cards )
-	SLOT_INTERFACE("fd2", ABC_FD2)
-	SLOT_INTERFACE("memcard", ABC_MEMORY_CARD)
-	SLOT_INTERFACE("abcexp", ABC_EXPANSION_UNIT)
-	SLOT_INTERFACE("16k", ABC80_16KB_RAM_CARD)
-	SLOT_INTERFACE("slow", LUXOR_55_10828)
-	SLOT_INTERFACE("abc830", ABC830)
-	SLOT_INTERFACE("db411223", DATABOARD_4112_23)
-	SLOT_INTERFACE("unidisk", UNIDISK)
-	SLOT_INTERFACE("cadabc", ABC_CADMOUSE)
-SLOT_INTERFACE_END
+void abc80_cards(device_slot_interface &device)
+{
+	device.option_add("fd2", ABC_FD2);
+	device.option_add("memcard", ABC_MEMORY_CARD);
+	device.option_add("abcexp", ABC_EXPANSION_UNIT);
+	device.option_add("16k", ABC80_16KB_RAM_CARD);
+	device.option_add("slow", LUXOR_55_10828);
+	device.option_add("abc830", ABC830);
+	device.option_add("db411223", DATABOARD_4112_23);
+	device.option_add("unidisk", UNIDISK);
+	device.option_add("cadabc", ABC_CADMOUSE);
+}
 
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( abcbus_cards )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( abcbus_cards )
-	SLOT_INTERFACE("abc830", ABC830)
-	SLOT_INTERFACE("abc832", ABC832)
-	SLOT_INTERFACE("abc834", ABC834)
-	SLOT_INTERFACE("abc838", ABC838)
-	SLOT_INTERFACE("abc850", ABC850)
-	SLOT_INTERFACE_INTERNAL("abc850fdd", ABC850_FLOPPY)
-	SLOT_INTERFACE("abc852", ABC852)
-	SLOT_INTERFACE("abc856", ABC856)
-	SLOT_INTERFACE("abc890", ABC890)
-	SLOT_INTERFACE("abc894", ABC894)
-	SLOT_INTERFACE("db411223", DATABOARD_4112_23)
-	SLOT_INTERFACE("hdc", ABC_HDC)
-	SLOT_INTERFACE("sio", ABC_SIO)
-	SLOT_INTERFACE("slow", LUXOR_55_10828)
-	SLOT_INTERFACE("uni800", ABC_UNI800)
-	SLOT_INTERFACE("unidisk", UNIDISK)
-	SLOT_INTERFACE("slutprov", ABC_SLUTPROV)
-	SLOT_INTERFACE("xebec", LUXOR_55_21056)
-SLOT_INTERFACE_END
+void abcbus_cards(device_slot_interface &device)
+{
+	device.option_add("abc830", ABC830);
+	device.option_add("abc832", ABC832);
+	device.option_add("abc834", ABC834);
+	device.option_add("abc838", ABC838);
+	device.option_add("abc850", ABC850);
+	device.option_add_internal("abc850fdd", ABC850_FLOPPY);
+	device.option_add("abc852", ABC852);
+	device.option_add("abc856", ABC856);
+	device.option_add("abc890", ABC890);
+	device.option_add("abc894", ABC894);
+	device.option_add("db411223", DATABOARD_4112_23);
+	device.option_add("hdc", ABC_HDC);
+	device.option_add("sio", ABC_SIO);
+	device.option_add("slow", LUXOR_55_10828);
+	device.option_add("uni800", ABC_UNI800);
+	device.option_add("unidisk", UNIDISK);
+	device.option_add("slutprov", ABC_SLUTPROV);
+	device.option_add("xebec", LUXOR_55_21056);
+}
 
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( abc1600bus_cards )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( abc1600bus_cards )
-	SLOT_INTERFACE("4105", LUXOR_4105) // SASI interface
-//  SLOT_INTERFACE("4077", LUXOR_4077) // Winchester controller
-//  SLOT_INTERFACE("4004", LUXOR_4004) // ICOM I/O (Z80, Z80PIO, Z80SIO/2, Z80CTC, 2 Z80DMAs, 2 PROMs, 64KB RAM)
-SLOT_INTERFACE_END
+void abc1600bus_cards(device_slot_interface &device)
+{
+	device.option_add("4105", LUXOR_4105); // SASI interface
+//  device.option_add("4077", LUXOR_4077); // Winchester controller
+//  device.option_add("4004", LUXOR_4004); // ICOM I/O (Z80, Z80PIO, Z80SIO/2, Z80CTC, 2 Z80DMAs, 2 PROMs, 64KB RAM)
+}

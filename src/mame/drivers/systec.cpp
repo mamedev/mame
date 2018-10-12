@@ -49,24 +49,28 @@ public:
 	{ }
 
 	void systec(machine_config &config);
+
+private:
 	void systec_io(address_map &map);
 	void systec_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(systec_state::systec_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void systec_state::systec_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(systec_state::systec_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x68, 0x6b) // fdc?
-	AM_RANGE(0x6c, 0x6c) // motor control?
-	AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
-ADDRESS_MAP_END
+void systec_state::systec_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x68, 0x6b); // fdc?
+	map(0x6c, 0x6c); // motor control?
+	map(0xc4, 0xc7).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( systec )
@@ -82,24 +86,24 @@ void systec_state::machine_reset()
 
 MACHINE_CONFIG_START(systec_state::systec)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(systec_mem)
-	MCFG_CPU_IO_MAP(systec_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(systec_mem)
+	MCFG_DEVICE_IO_MAP(systec_io)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
+	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
-	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'000'000)));
+	//sio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // no evidence of a daisy chain because IM2 is not set
+	sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
 MACHINE_CONFIG_END
 
 
@@ -112,5 +116,5 @@ ROM_END
 
 /* Driver */
 
-//   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   STATE         INIT  COMPANY   FULLNAME      FLAGS
-COMP(19??, systec, 0,      0,       systec,  systec, systec_state, 0,    "Systec", "Systec Z80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY   FULLNAME      FLAGS
+COMP(19??, systec, 0,      0,      systec,  systec, systec_state, empty_init, "Systec", "Systec Z80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

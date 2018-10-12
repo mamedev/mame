@@ -25,10 +25,15 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_region_gfx1(*this, "gfx1") {}
 
+	void galaxy(machine_config &config);
+	void galaxyp(machine_config &config);
+
+	void init_galaxy();
+	void init_galaxyp();
+
+private:
 	DECLARE_READ8_MEMBER(galaxy_keyboard_r);
 	DECLARE_WRITE8_MEMBER(galaxy_latch_w);
-	DECLARE_DRIVER_INIT(galaxy);
-	DECLARE_DRIVER_INIT(galaxyp);
 	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(galaxy);
 	DECLARE_MACHINE_RESET(galaxyp);
@@ -39,13 +44,10 @@ public:
 	void galaxy_set_timer();
 	void galaxy_setup_snapshot (const uint8_t * data, uint32_t size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( galaxy );
-	void galaxy(machine_config &config);
-	void galaxyp(machine_config &config);
 	void galaxy_mem(address_map &map);
 	void galaxyp_io(address_map &map);
 	void galaxyp_mem(address_map &map);
 
-protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cassette;

@@ -479,7 +479,7 @@ protected:
 	virtual void device_start() override;
 };
 
-extern const device_type OHCI_USB_CONNECTOR;
+DECLARE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector)
 
 #define MCFG_USB_PORT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, OHCI_USB_CONNECTOR, 0)                   \

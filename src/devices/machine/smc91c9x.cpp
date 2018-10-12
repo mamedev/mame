@@ -126,10 +126,6 @@ void smc91c9x_device::device_start()
 
 	m_irq_handler.resolve_safe();
 
-	// Set completion queues to max size to save properly
-	m_comp_rx.resize(ETHER_BUFFERS);
-	m_comp_tx.resize(ETHER_BUFFERS);
-
 	/* register ide states */
 	save_item(NAME(m_reg));
 	save_item(NAME(m_regmask));
@@ -139,8 +135,44 @@ void smc91c9x_device::device_start()
 	save_item(NAME(m_recd));
 	save_item(NAME(m_alloc_rx));
 	save_item(NAME(m_alloc_tx));
-	save_item(NAME(m_comp_rx));
-	save_item(NAME(m_comp_tx));
+	// Save vector data for proper save state restoration
+	save_item(NAME(m_comp_rx_data));
+	save_item(NAME(m_comp_tx_data));
+	save_item(NAME(m_trans_tx_data));
+	// Save vector sizes for proper save state restoration
+	save_item(NAME(m_comp_tx_size));
+	save_item(NAME(m_comp_rx_size));
+	save_item(NAME(m_trans_tx_size));
+}
+
+// Save state presave to save vector sizes
+void smc91c9x_device::device_pre_save()
+{
+	m_comp_tx_size = m_comp_tx.size();
+	m_comp_rx_size = m_comp_rx.size();
+	m_trans_tx_size = m_trans_tx.size();
+	memcpy(m_comp_rx_data, m_comp_rx.data(), m_comp_rx_size * sizeof(u32));
+	memcpy(m_comp_tx_data, m_comp_tx.data(), m_comp_tx_size * sizeof(u32));
+	memcpy(m_trans_tx_data, m_trans_tx.data(), m_trans_tx_size * sizeof(u32));
+
+	//osd_printf_info("Save: comp_tx: %d comp_rx: %d trans_tx: %d\n", m_comp_tx_size, m_comp_rx_size, m_trans_tx_size);
+	//if (m_comp_tx_size)
+	//  osd_printf_info("comp_tx packet: %d\n", m_comp_tx.front());
+}
+
+// Save state preload to restore vector sizes
+void smc91c9x_device::device_post_load()
+{
+	m_comp_tx.resize(m_comp_tx_size);
+	m_comp_rx.resize(m_comp_rx_size);
+	m_trans_tx.resize(m_trans_tx_size);
+	memcpy(m_comp_rx.data(), m_comp_rx_data, m_comp_rx_size * sizeof(u32));
+	memcpy(m_comp_tx.data(), m_comp_tx_data, m_comp_tx_size * sizeof(u32));
+	memcpy(m_trans_tx.data(), m_trans_tx_data, m_trans_tx_size * sizeof(u32));
+
+	//osd_printf_info("Restore: comp_tx: %d comp_rx: %d trans_tx: %d\n", m_comp_tx_size, m_comp_rx_size, m_trans_tx_size);
+	//if (m_comp_tx_size)
+	//  osd_printf_info("comp_tx size: %lu comp_tx packet: %d array_data: %d\n", m_comp_tx.size(), m_comp_tx.front(), m_comp_tx_data[0]);
 }
 
 //-------------------------------------------------
@@ -190,6 +222,7 @@ void smc91c9x_device::device_reset()
 	m_reg[EREG_MT4_5]        = 0x0000;   m_regmask[EREG_MT4_5]        = 0xffff;
 	m_reg[EREG_MT6_7]        = 0x0000;   m_regmask[EREG_MT6_7]        = 0xffff;
 	m_reg[EREG_MGMT]         = 0x3030;   m_regmask[EREG_MGMT]         = 0x0f0f;
+	// TODO: Revision should be set based on chip type
 	m_reg[EREG_REVISION]     = 0x3345;   m_regmask[EREG_REVISION]     = 0x0000;
 	m_reg[EREG_ERCV]         = 0x331f;   m_regmask[EREG_ERCV]         = 0x009f;
 
@@ -228,13 +261,11 @@ void smc91c9x_device::mmu_reset()
 	m_alloc_rx = 0;
 	m_alloc_tx = 0;
 
-	// Reset completion FIFOs
-	m_comp_tx.clear();
-	m_comp_rx.clear();
-
 	// Flush fifos.
 	clear_tx_fifo();
 	clear_rx_fifo();
+
+	update_ethernet_irq();
 }
 
 DEFINE_DEVICE_TYPE(SMC91C94, smc91c94_device, "smc91c94", "SMC91C94 Ethernet Controller")
@@ -273,16 +304,28 @@ bool smc91c9x_device::alloc_req(const int tx, int &packet_num)
 void smc91c9x_device::alloc_release(const int packet_num)
 {
 	int clear_mask = ~(1 << packet_num);
+	if (!((m_alloc_tx | m_alloc_rx) & (1 << packet_num))) {
+		logerror("alloc_release: Trying to release a non-allocated packet. packet_num: %02x alloc_tx: %04x alloc_rx: %04x\n",
+			packet_num, m_alloc_tx, m_alloc_rx);
+	}
 	m_alloc_tx &= clear_mask;
 	m_alloc_rx &= clear_mask;
 }
 
 void smc91c9x_device::clear_tx_fifo()
 {
+	// Clear transmit timer
+	m_tx_timer->reset();
+	// Reset transmit queue
+	m_trans_tx.clear();
+	// Reset completion FIFOs
+	m_comp_tx.clear();
 }
 
 void smc91c9x_device::clear_rx_fifo()
 {
+	// Clear recieve FIFO
+	m_comp_rx.clear();
 }
 
 int smc91c9x_device::is_broadcast(const uint8_t *mac_address)
@@ -453,18 +496,11 @@ void smc91c9x_device::recv_cb(uint8_t *data, int length)
 void smc91c9x_device::update_ethernet_irq()
 {
 	// Check tx completion fifo empty
-	if (m_comp_tx.empty()) {
-		m_reg[EREG_INTERRUPT] |= EINT_TX_EMPTY;
-	}
-	else {
-		m_reg[EREG_INTERRUPT] &= ~EINT_TX_EMPTY;
-	}
-	//if (m_comp_tx.empty()) {
-	//  m_reg[EREG_INTERRUPT] &= ~EINT_TX;
-	//}
-	//else {
-	//  m_reg[EREG_INTERRUPT] |= EINT_TX;
-	//}
+	if (m_comp_tx.empty())
+		m_reg[EREG_INTERRUPT] &= ~EINT_TX;
+	else
+		m_reg[EREG_INTERRUPT] |= EINT_TX;
+
 	// Check rx completion fifo empty
 	if (m_comp_rx.empty())
 		m_reg[EREG_INTERRUPT] &= ~EINT_RCV;
@@ -479,7 +515,7 @@ void smc91c9x_device::update_ethernet_irq()
 	uint8_t new_state = mask & state;
 	if (m_irq_state ^ new_state)
 	{
-		logerror("update_ethernet_irq: old: %02x new: %02x\n", m_irq_state, new_state);
+		LOG("update_ethernet_irq: old: %02x new: %02x\n", m_irq_state, new_state);
 		m_irq_state = new_state;
 		m_irq_handler(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
@@ -503,8 +539,12 @@ void smc91c9x_device::update_stats()
 
 TIMER_CALLBACK_MEMBER(smc91c9x_device::send_frame)
 {
-	const int packet_num = m_comp_tx.front();
+	// Get the packet number from the transmit fifo
+	const int packet_num = m_trans_tx.front();
 	uint8_t *const tx_buffer = &m_buffer[packet_num * ETHER_BUFFER_SIZE];
+
+	// Pop the transmit fifo
+	m_trans_tx.erase(m_trans_tx.begin());
 
 	/* update the EPH register */
 	m_reg[EREG_EPH_STATUS] = 0x0001;
@@ -512,11 +552,10 @@ TIMER_CALLBACK_MEMBER(smc91c9x_device::send_frame)
 	if (is_broadcast(&tx_buffer[4]))
 		m_reg[EREG_EPH_STATUS] |= 0x0040;
 
-	// Set Tx Empty interrupt
-	// TODO: If more than 1 packet is enqueued should wait for all to finish
-	//m_reg[EREG_INTERRUPT] |= EINT_TX_EMPTY;
-	m_reg[EREG_INTERRUPT] |= EINT_TX;
-	//m_comp_tx.erase(m_comp_tx.begin());
+	// Check tx completion fifo empty
+	if (m_trans_tx.empty())
+		m_reg[EREG_INTERRUPT] |= EINT_TX_EMPTY;
+
 	m_sent++;
 
 	update_stats();
@@ -566,14 +605,13 @@ TIMER_CALLBACK_MEMBER(smc91c9x_device::send_frame)
 				m_reg[EREG_TCR] &= ~0x1;
 			}
 
-			// signal a no transmit
-			m_reg[EREG_INTERRUPT] &= ~EINT_TX;
 			// Set a ethernet phy status interrupt
 			m_reg[EREG_INTERRUPT] |= EINT_EPH;
 
+			// TODO: Is it necessary to clear FIFOs on error?
 			// Flush fifos.
-			clear_tx_fifo();
-			clear_rx_fifo();
+			//clear_tx_fifo();
+			//clear_rx_fifo();
 		}
 		else
 		{
@@ -596,7 +634,16 @@ TIMER_CALLBACK_MEMBER(smc91c9x_device::send_frame)
 	tx_buffer[0] = m_reg[EREG_EPH_STATUS];
 	tx_buffer[1] = m_reg[EREG_EPH_STATUS] >> 8;
 
+	// Push the packet number onto the tx completion fifo
+	m_comp_tx.push_back(packet_num);
+
 	update_ethernet_irq();
+
+	// If there is more packets to transmit then set the tx timer
+	if ((m_reg[EREG_TCR] & 0x1) && !m_trans_tx.empty()) {
+		// Shortest packet (64 bytes @ 10Mbps = 50us)
+		m_tx_timer->adjust(attotime::from_usec(50));
+	}
 }
 
 /*-------------------------------------------------
@@ -612,10 +659,11 @@ void smc91c9x_device::process_command(uint16_t data)
 			break;
 
 		case ECMD_ALLOCATE:
-			LOG("   ALLOCATE MEMORY FOR TX (%d)\n", (data & 7));
+			LOG("   ALLOCATE MEMORY FOR TX (%d)", (data & 7));
 			{
 				int packet_num;
 				if (alloc_req(1, packet_num)) {
+					LOG(" packet_num = %02x\n", (packet_num));
 					// Set ARR register
 					m_reg[EREG_PNR_ARR] &= ~0xff00;
 					m_reg[EREG_PNR_ARR] |= packet_num << 8;
@@ -643,8 +691,10 @@ void smc91c9x_device::process_command(uint16_t data)
 
 		case ECMD_REMOVE_TOPFRAME_TX:
 			LOG("   REMOVE FRAME FROM TX FIFO\n");
-			m_comp_tx.erase(m_comp_tx.begin());
-			// TODO: Should we clear TX_INT?
+			if (m_comp_tx.empty())
+				logerror("process_command: Trying to remove entry from empty tx completion fifo\n");
+			else
+				m_comp_tx.erase(m_comp_tx.begin());
 			break;
 
 		case ECMD_REMOVE_RELEASE_TOPFRAME_RX:
@@ -654,8 +704,11 @@ void smc91c9x_device::process_command(uint16_t data)
 			// Fall through
 		case ECMD_REMOVE_TOPFRAME_RX:
 			LOG("   REMOVE FRAME FROM RX FIFO\n");
-			// remove entry from rx queue
-			m_comp_rx.erase(m_comp_rx.begin());
+			// remove entry from rx completion queue
+			if (m_comp_rx.empty())
+				logerror("process_command: Trying to remove entry from empty rx completion fifo\n");
+			else
+				m_comp_rx.erase(m_comp_rx.begin());
 
 			update_ethernet_irq();
 			m_recd++;
@@ -671,20 +724,21 @@ void smc91c9x_device::process_command(uint16_t data)
 			break;
 
 		case ECMD_ENQUEUE_PACKET:
-			LOG("   ENQUEUE TX PACKET\n");
+			LOG("   ENQUEUE TX PACKET ");
 
 			if (m_reg[EREG_TCR] & 0x0001) // TX EN ?
 			{
 				const int packet_number = m_reg[EREG_PNR_ARR] & 0xff;
-				// Push packet number tx completion fifo
-				m_comp_tx.push_back(packet_number);
+				LOG("(PACKET_NUM=%d)\n", packet_number);
+				// Push packet number to tx transmit fifo
+				m_trans_tx.push_back(packet_number);
 				// Calculate transmit time
-				uint8_t *const tx_buffer = &m_buffer[packet_number * ETHER_BUFFER_SIZE];
-				int buffer_len = ((tx_buffer[3] << 8) | tx_buffer[2]) & 0x7ff;
-				buffer_len -= 6;
-				// ~16 Mbps
-				int usec = ((buffer_len * 8) >> 4) + 1;
-				m_tx_timer->adjust(attotime::from_usec(usec));
+				//uint8_t *const tx_buffer = &m_buffer[packet_number * ETHER_BUFFER_SIZE];
+				//int buffer_len = ((tx_buffer[3] << 8) | tx_buffer[2]) & 0x7ff;
+				//buffer_len -= 6;
+				//int usec = ((buffer_len * 8) / 10) + 1;
+				// Shortest packet (64 bytes @ 10Mbps = 50us)
+				m_tx_timer->adjust(attotime::from_usec(50));
 			}
 			break;
 
@@ -692,12 +746,13 @@ void smc91c9x_device::process_command(uint16_t data)
 			LOG("   RESET TX FIFOS\n");
 			// Flush fifos.
 			clear_tx_fifo();
-			clear_rx_fifo();
 
 			break;
 	}
 	// Set Busy (clear on next read)
 	m_reg[EREG_MMU_COMMAND] |= 0x0001;
+	//LOG("process_command: TxQ: %d TxComp: %d RxComp: %d TxAlloc: %04x RxAlloc: %04x\n",
+	//  m_trans_tx.size(), m_comp_tx.size(), m_comp_rx.size(), m_alloc_tx, m_alloc_rx);
 }
 
 
@@ -895,8 +950,17 @@ WRITE16_MEMBER( smc91c9x_device::write )
 		case EREG_INTERRUPT:
 			// Pop tx fifo packet from completion fifo if clear tx int is set
 			if (m_reg[EREG_INTERRUPT] & data & EINT_TX) {
-				m_comp_tx.erase(m_comp_tx.begin());
-				m_reg[EREG_INTERRUPT] &= ~EINT_TX;
+				if (m_comp_tx.empty()) {
+					logerror("write: Trying to remove an entry from empty tx completion fifo\n");
+				}
+				else {
+					LOG("Removing tx completion packet_num = %d\n", m_comp_tx.front());
+					m_comp_tx.erase(m_comp_tx.begin());
+				}
+			}
+			// Clear TX_EMPTY interrupt if clear tx empty bit is set
+			if (m_reg[EREG_INTERRUPT] & data & EINT_TX_EMPTY) {
+				m_reg[EREG_INTERRUPT] &= ~EINT_TX_EMPTY;
 			}
 			m_reg[EREG_INTERRUPT] &= ~(data & 0x56);
 			update_ethernet_irq();

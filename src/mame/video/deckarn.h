@@ -31,7 +31,7 @@ private:
 DECLARE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device)
 
 #define MCFG_DECO_KARNOVSPRITES_GFXDECODE(_gfxtag) \
-	downcast<deco_karnovsprites_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<deco_karnovsprites_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #define MCFG_DECO_KARNOVSPRITES_GFX_REGION(_region) \
 	downcast<deco_karnovsprites_device &>(*device).set_gfx_region(_region);

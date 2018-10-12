@@ -32,7 +32,7 @@ public:
 
 	void submar(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(submar_sensor0_r);
@@ -146,22 +146,24 @@ WRITE8_MEMBER(submar_state::submar_irq_clear_w)
 }
 
 
-ADDRESS_MAP_START(submar_state::submar_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x207f) AM_RAM
-ADDRESS_MAP_END
+void submar_state::submar_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x207f).ram();
+}
 
-ADDRESS_MAP_START(submar_state::submar_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(submar_sensor0_r, submar_motor_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(submar_sensor1_r, submar_lamp_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(submar_solenoid_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(submar_sound_w)
-	AM_RANGE(0x04, 0x05) AM_WRITE(submar_led_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(submar_irq_clear_w)
-ADDRESS_MAP_END
+void submar_state::submar_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(FUNC(submar_state::submar_sensor0_r), FUNC(submar_state::submar_motor_w));
+	map(0x01, 0x01).rw(FUNC(submar_state::submar_sensor1_r), FUNC(submar_state::submar_lamp_w));
+	map(0x02, 0x02).w(FUNC(submar_state::submar_solenoid_w));
+	map(0x03, 0x03).portr("DSW").w(FUNC(submar_state::submar_sound_w));
+	map(0x04, 0x05).w(FUNC(submar_state::submar_led_w));
+	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x07, 0x07).w(FUNC(submar_state::submar_irq_clear_w));
+}
 
 
 
@@ -223,12 +225,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(submar_state::submar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(19'968'000)/8)
-	MCFG_CPU_PERIODIC_INT_DRIVER(submar_state, irq0_line_assert, 124.675) // 555 IC
-	MCFG_CPU_PROGRAM_MAP(submar_map)
-	MCFG_CPU_IO_MAP(submar_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(19'968'000)/8)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(submar_state, irq0_line_assert, 124.675) // 555 IC
+	MCFG_DEVICE_PROGRAM_MAP(submar_map)
+	MCFG_DEVICE_IO_MAP(submar_portmap)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* no video! */
 
@@ -251,4 +253,4 @@ ROM_START( submar )
 ROM_END
 
 
-GAMEL( 1979, submar, 0, submar, submar, submar_state, 0, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_submar )
+GAMEL( 1979, submar, 0, submar, submar, submar_state, empty_init, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_submar )

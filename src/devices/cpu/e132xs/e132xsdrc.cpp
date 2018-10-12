@@ -6,14 +6,11 @@
 #include "e132xsfe.h"
 #include "32xsdefs.h"
 
-using namespace uml;
-
-#define DRC_PC mem(m_core->global_regs)
-#define DRC_SR mem(&m_core->global_regs[1])
+#define DRC_PC uml::mem(m_core->global_regs)
+#define DRC_SR uml::mem(&m_core->global_regs[1])
 
 void hyperstone_device::execute_run_drc()
 {
-	drcuml_state *drcuml = m_drcuml.get();
 	int execute_result;
 
 	/* reset the cache if dirty */
@@ -28,7 +25,7 @@ void hyperstone_device::execute_run_drc()
 	do
 	{
 		/* run as much as we can */
-		execute_result = drcuml->execute(*m_entry);
+		execute_result = m_drcuml->execute(*m_entry);
 
 		/* if we need to recompile, do it */
 		if (execute_result == EXECUTE_MISSING_CODE)
@@ -194,7 +191,7 @@ void hyperstone_device::code_flush_cache()
 }
 
 /* Return the entry point for a determinated trap */
-void hyperstone_device::generate_get_trap_addr(drcuml_block *block, uml::code_label &label, uint32_t trapno)
+void hyperstone_device::generate_get_trap_addr(drcuml_block &block, uml::code_label &label, uint32_t trapno)
 {
 	int no_subtract;
 	UML_MOV(block, I0, trapno);
@@ -214,11 +211,9 @@ void hyperstone_device::generate_get_trap_addr(drcuml_block *block, uml::code_la
 
 void hyperstone_device::code_compile_block(offs_t pc)
 {
-	drcuml_state *drcuml = m_drcuml.get();
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
 	bool override = false;
-	drcuml_block *block;
 
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
@@ -231,7 +226,7 @@ void hyperstone_device::code_compile_block(offs_t pc)
 		try
 		{
 			/* start the block */
-			block = drcuml->begin_block(8192);
+			drcuml_block &block(m_drcuml->begin_block(8192));
 
 			/* loop until we get through all instruction sequences */
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
@@ -240,8 +235,8 @@ void hyperstone_device::code_compile_block(offs_t pc)
 				uint32_t nextpc;
 
 				/* add a code log entry */
-				if (drcuml->logging())
-					block->append_comment("-------------------------");
+				if (m_drcuml->logging())
+					block.append_comment("-------------------------");
 
 				/* determine the last instruction in this sequence */
 				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
@@ -250,7 +245,7 @@ void hyperstone_device::code_compile_block(offs_t pc)
 				assert(seqlast != nullptr);
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
-				if (override || !drcuml->hash_exists(0, seqhead->pc))
+				if (override || !m_drcuml->hash_exists(0, seqhead->pc))
 					UML_HASH(block, 0, seqhead->pc);
 
 				/* if we already have a hash, and this is the first sequence, assume that we */
@@ -271,7 +266,7 @@ void hyperstone_device::code_compile_block(offs_t pc)
 
 				/* validate this code block if we're not pointing into ROM */
 				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
-					generate_checksum_block(block, &compiler, seqhead, seqlast);
+					generate_checksum_block(block, compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
 				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
@@ -283,7 +278,7 @@ void hyperstone_device::code_compile_block(offs_t pc)
 				/* iterate over instructions in the sequence and compile them */
 				for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
 				{
-					generate_sequence_instruction(block, &compiler, curdesc);
+					generate_sequence_instruction(block, compiler, curdesc);
 					generate_update_cycles(block);
 				}
 
@@ -300,7 +295,7 @@ void hyperstone_device::code_compile_block(offs_t pc)
 			}
 
 			/* end the sequence */
-			block->end();
+			block.end();
 			g_profiler.stop();
 			succeeded = true;
 		}
@@ -331,10 +326,10 @@ static inline uint32_t epc(const opcode_desc *desc)
     already allocated
 -------------------------------------------------*/
 
-static inline void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
+static inline void alloc_handle(drcuml_state &drcuml, uml::code_handle *&handleptr, const char *name)
 {
-	if (*handleptr == nullptr)
-		*handleptr = drcuml->handle_alloc(name);
+	if (!handleptr)
+		handleptr = drcuml.handle_alloc(name);
 }
 
 
@@ -346,12 +341,11 @@ static inline void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, c
 
 void hyperstone_device::static_generate_exception(uint32_t exception, const char *name)
 {
-	code_handle *&exception_handle = m_exception[exception];
-	drcuml_state *drcuml = m_drcuml.get();
-	drcuml_block *block = drcuml->begin_block(1024);
+	uml::code_handle *&exception_handle = m_exception[exception];
+	drcuml_block &block(m_drcuml->begin_block(1024));
 
 	/* add a global entry for this */
-	alloc_handle(drcuml, &exception_handle, name);
+	alloc_handle(*m_drcuml, exception_handle, name);
 	UML_HANDLE(block, *exception_handle);
 
 	uml::code_label label = 1;
@@ -384,20 +378,17 @@ void hyperstone_device::static_generate_exception(uint32_t exception, const char
 
 	UML_HASHJMP(block, 0, I0, *m_nocode);// hashjmp <mode>,i0,nocode
 
-	block->end();
+	block.end();
 }
 
 
 
 void hyperstone_device::static_generate_interrupt_checks()
 {
-	drcuml_state *drcuml = m_drcuml.get();
-	drcuml_block *block;
-
 	/* begin generating */
-	block = drcuml->begin_block(512);
+	drcuml_block &block(m_drcuml->begin_block(512));
 
-	alloc_handle(drcuml, &m_interrupt_checks, "int_checks");
+	alloc_handle(*m_drcuml, m_interrupt_checks, "int_checks");
 	UML_HANDLE(block, *m_interrupt_checks);
 
 	uml::code_label labelnum = 1;
@@ -429,7 +420,7 @@ void hyperstone_device::static_generate_interrupt_checks()
 	UML_LABEL(block, done_int);
 	UML_RET(block);
 
-	block->end();
+	block.end();
 }
 
 /*-------------------------------------------------
@@ -439,16 +430,13 @@ void hyperstone_device::static_generate_interrupt_checks()
 
 void hyperstone_device::static_generate_entry_point()
 {
-	drcuml_state *drcuml = m_drcuml.get();
-	drcuml_block *block;
-
 	/* begin generating */
-	block = drcuml->begin_block(20);
+	drcuml_block &block(m_drcuml->begin_block(20));
 
 	/* forward references */
-	alloc_handle(drcuml, &m_nocode, "nocode");
+	alloc_handle(*m_drcuml, m_nocode, "nocode");
 
-	alloc_handle(drcuml, &m_entry, "entry");
+	alloc_handle(*m_drcuml, m_entry, "entry");
 	UML_HANDLE(block, *m_entry);
 
 	/* load fast integer registers */
@@ -456,7 +444,7 @@ void hyperstone_device::static_generate_entry_point()
 
 	/* generate a hash jump via the current mode and PC */
 	UML_HASHJMP(block, 0, mem(&m_core->global_regs[0]), *m_nocode);
-	block->end();
+	block.end();
 }
 
 
@@ -467,14 +455,11 @@ void hyperstone_device::static_generate_entry_point()
 
 void hyperstone_device::static_generate_nocode_handler()
 {
-	drcuml_state *drcuml = m_drcuml.get();
-	drcuml_block *block;
-
 	/* begin generating */
-	block = drcuml->begin_block(10);
+	drcuml_block &block(m_drcuml->begin_block(10));
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(drcuml, &m_nocode, "nocode");
+	alloc_handle(*m_drcuml, m_nocode, "nocode");
 	UML_HANDLE(block, *m_nocode);
 	UML_GETEXP(block, I0);
 
@@ -482,7 +467,7 @@ void hyperstone_device::static_generate_nocode_handler()
 	//save_fast_iregs(block);
 	UML_EXIT(block, EXECUTE_MISSING_CODE);
 
-	block->end();
+	block.end();
 }
 
 
@@ -493,38 +478,33 @@ void hyperstone_device::static_generate_nocode_handler()
 
 void hyperstone_device::static_generate_out_of_cycles()
 {
-	drcuml_state *drcuml = m_drcuml.get();
-	drcuml_block *block;
-
 	/* begin generating */
-	block = drcuml->begin_block(10);
+	drcuml_block &block(m_drcuml->begin_block(10));
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(drcuml, &m_out_of_cycles, "out_of_cycles");
+	alloc_handle(*m_drcuml, m_out_of_cycles, "out_of_cycles");
 	UML_HANDLE(block, *m_out_of_cycles);
 	//save_fast_iregs(block);
 	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
 
-	block->end();
+	block.end();
 }
 
 /*------------------------------------------------------------------
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-void hyperstone_device::static_generate_memory_accessor(int size, int iswrite, bool isio, const char *name, code_handle *&handleptr)
+void hyperstone_device::static_generate_memory_accessor(int size, int iswrite, bool isio, const char *name, uml::code_handle *&handleptr)
 {
 	/* on entry, address is in I0; data for writes is in I1 */
 	/* on exit, read result is in I1 */
 	/* routine trashes I0-I1 */
-	drcuml_state *drcuml = m_drcuml.get();
-	drcuml_block *block;
 
 	/* begin generating */
-	block = drcuml->begin_block(1024);
+	drcuml_block &block(m_drcuml->begin_block(1024));
 
 	/* add a global entry for this */
-	alloc_handle(drcuml, &handleptr, name);
+	alloc_handle(*m_drcuml, handleptr, name);
 	UML_HANDLE(block, *handleptr);
 
 	// write:
@@ -553,7 +533,7 @@ void hyperstone_device::static_generate_memory_accessor(int size, int iswrite, b
 	}
 	UML_RET(block);
 
-	block->end();
+	block.end();
 }
 
 
@@ -562,7 +542,7 @@ void hyperstone_device::static_generate_memory_accessor(int size, int iswrite, b
     CODE GENERATION
 ***************************************************************************/
 
-void hyperstone_device::generate_interrupt_checks_no_timer(drcuml_block *block, uml::code_label &labelnum)
+void hyperstone_device::generate_interrupt_checks_no_timer(drcuml_block &block, uml::code_label &labelnum)
 {
 	int skip_io3 = labelnum++;
 	UML_TEST(block, I0, 0x40);
@@ -645,7 +625,7 @@ void hyperstone_device::generate_interrupt_checks_no_timer(drcuml_block *block, 
 	UML_LABEL(block, skip_io2);
 }
 
-void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block, uml::code_label &labelnum)
+void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block &block, uml::code_label &labelnum)
 {
 	int skip_io3 = labelnum++;
 	UML_TEST(block, I0, 0x40);
@@ -766,7 +746,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
     an exception if out
 -------------------------------------------------*/
 
-void hyperstone_device::generate_update_cycles(drcuml_block *block, bool check_interrupts)
+void hyperstone_device::generate_update_cycles(drcuml_block &block, bool check_interrupts)
 {
 	if (check_interrupts)
 	{
@@ -792,12 +772,12 @@ void hyperstone_device::generate_update_cycles(drcuml_block *block, bool check_i
     validate a sequence of opcodes
 -------------------------------------------------*/
 
-void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
+void hyperstone_device::generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
 {
 	const opcode_desc *curdesc;
 	if (m_drcuml->logging())
 	{
-		block->append_comment("[Validation for %08X]", seqhead->pc);
+		block.append_comment("[Validation for %08X]", seqhead->pc);
 	}
 	/* loose verify or single instruction: just compare and fail */
 	if (!(m_drcoptions & E132XS_STRICT_VERIFY) || seqhead->next() == nullptr)
@@ -806,10 +786,10 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
 		{
 			uint32_t sum = seqhead->opptr.w[0];
 			uint32_t addr = seqhead->physpc;
-			void *base = m_direct->read_ptr(addr, m_core->opcodexor);
+			const void *base = m_prptr(addr);
 			if (base == nullptr)
 			{
-				printf("m_direct->read_ptr returned nullptr for address %08x\n", addr);
+				printf("cache read_ptr returned nullptr for address %08x\n", addr);
 				return;
 			}
 			UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x1);
@@ -817,7 +797,7 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
 			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
 				addr = seqhead->delay.first()->physpc;
-				base = m_direct->read_ptr(addr, m_core->opcodexor);
+				base = m_prptr(addr);
 				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x1);
 				UML_ADD(block, I0, I0, I1);
@@ -832,10 +812,10 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
 	else /* full verification; sum up everything */
 	{
 		uint32_t addr = seqhead->physpc;
-		void *base = m_direct->read_ptr(addr, m_core->opcodexor);
+		const void *base = m_prptr(addr);
 		if (base == nullptr)
 		{
-			printf("m_direct->read_ptr returned nullptr for address %08x\n", addr);
+			printf("cache read_ptr returned nullptr for address %08x\n", addr);
 			return;
 		}
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x1);
@@ -844,7 +824,7 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				addr = curdesc->physpc;
-				base = m_direct->read_ptr(addr, m_core->opcodexor);
+				base = m_prptr(addr);
 				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x1);
 				UML_ADD(block, I0, I0, I1);
@@ -853,7 +833,7 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
 				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
 					addr = curdesc->delay.first()->physpc;
-					base = m_direct->read_ptr(addr, m_core->opcodexor);
+					base = m_prptr(addr);
 					assert(base != nullptr);
 					UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x1);
 					UML_ADD(block, I0, I0, I1);
@@ -872,11 +852,11 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
     including disassembly of a MIPS instruction
 -------------------------------------------------*/
 
-void hyperstone_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op)
+void hyperstone_device::log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op)
 {
 	if (m_drcuml->logging())
 	{
-		block->append_comment("%08X: %08x", pc, op);
+		block.append_comment("%08X: %08x", pc, op);
 	}
 }
 
@@ -885,7 +865,7 @@ void hyperstone_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc,
     generate_branch
 ------------------------------------------------------------------*/
 
-void hyperstone_device::generate_branch(drcuml_block *block, uml::parameter targetpc, bool update_cycles)
+void hyperstone_device::generate_branch(drcuml_block &block, uml::parameter targetpc, bool update_cycles)
 {
 	if (update_cycles)
 		generate_update_cycles(block);
@@ -907,7 +887,7 @@ void hyperstone_device::generate_branch(drcuml_block *block, uml::parameter targ
     for a single instruction in a sequence
 -------------------------------------------------*/
 
-void hyperstone_device::generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	offs_t expc;
 
@@ -946,7 +926,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block *block, compi
 
 #include "e132xsdrc_ops.hxx"
 
-bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+bool hyperstone_device::generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = (uint32_t)desc->opptr.w[0];
 
@@ -1213,7 +1193,7 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 		case 0xff: generate_trap_op(block, compiler, desc); break;
 	}
 
-	int no_delay_taken = compiler->m_labelnum++;
+	int no_delay_taken = compiler.m_labelnum++;
 	UML_TEST(block, mem(&m_core->delay_slot_taken), ~0);
 	UML_JMPc(block, uml::COND_Z, no_delay_taken);
 	UML_MOV(block, mem(&m_core->delay_slot_taken), 0);
@@ -1224,7 +1204,7 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 	int done;
 	UML_AND(block, I0, DRC_SR, (T_MASK | P_MASK));
 	UML_CMP(block, I0, (T_MASK | P_MASK));
-	UML_JMPc(block, uml::COND_NE, done = compiler->m_labelnum++);
+	UML_JMPc(block, uml::COND_NE, done = compiler.m_labelnum++);
 	UML_TEST(block, mem(&m_core->delay_slot), 1);
 	UML_EXHc(block, uml::COND_E, *m_exception[EXCEPTION_TRACE], 0);
 

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_NEMESIS_H
+#define MAME_INCLUDES_NEMESIS_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "sound/flt_rc.h"
@@ -7,14 +11,15 @@
 #include "sound/k005289.h"
 #include "sound/vlm5030.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
 class nemesis_state : public driver_device
 {
 public:
-	nemesis_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nemesis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_charram(*this, "charram"),
 		m_xscroll1(*this, "xscroll1"),
 		m_xscroll2(*this, "xscroll2"),
@@ -38,8 +43,21 @@ public:
 		m_vlm(*this, "vlm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	void nyanpani(machine_config &config);
+	void konamigt(machine_config &config);
+	void rf2_gx400(machine_config &config);
+	void gx400(machine_config &config);
+	void bubsys(machine_config &config);
+	void hcrash(machine_config &config);
+	void salamand(machine_config &config);
+	void citybomb(machine_config &config);
+	void nemesis(machine_config &config);
+	void blkpnthr(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_charram;
 	required_shared_ptr<uint16_t> m_xscroll1;
@@ -120,24 +138,15 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(nemesis_interrupt);
-	INTERRUPT_GEN_MEMBER(blkpnthr_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(nemesis_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(blkpnthr_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
 	void create_palette_lookups();
 	void nemesis_postload();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE8_MEMBER(volume_callback);
-	void nyanpani(machine_config &config);
-	void konamigt(machine_config &config);
-	void rf2_gx400(machine_config &config);
-	void gx400(machine_config &config);
-	void bubsys(machine_config &config);
-	void hcrash(machine_config &config);
-	void salamand(machine_config &config);
-	void citybomb(machine_config &config);
-	void nemesis(machine_config &config);
-	void blkpnthr(machine_config &config);
+
 	void blkpnthr_map(address_map &map);
 	void blkpnthr_sound_map(address_map &map);
 	void city_sound_map(address_map &map);
@@ -155,3 +164,5 @@ public:
 	void salamand_vlm_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NEMESIS_H

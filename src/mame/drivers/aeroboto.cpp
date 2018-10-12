@@ -47,12 +47,17 @@ READ8_MEMBER(aeroboto_state::aeroboto_201_r)
 }
 
 
-INTERRUPT_GEN_MEMBER(aeroboto_state::aeroboto_interrupt)
+WRITE_LINE_MEMBER(aeroboto_state::vblank_irq)
 {
-	if (!m_disable_irq)
-		device.execute().set_input_line(0, ASSERT_LINE);
-	else
-		m_disable_irq--;
+	if (state)
+	{
+		if (!m_disable_irq)
+			m_maincpu->set_input_line(0, ASSERT_LINE);
+		else
+			m_disable_irq--;
+
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 READ8_MEMBER(aeroboto_state::aeroboto_irq_ack_r)
@@ -74,37 +79,39 @@ WRITE8_MEMBER(aeroboto_state::aeroboto_1a2_w)
 		m_disable_irq = 1;
 }
 
-ADDRESS_MAP_START(aeroboto_state::main_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("mainram") // main  RAM
-	AM_RANGE(0x01a2, 0x01a2) AM_WRITE(aeroboto_1a2_w)           // affects IRQ line (more protection?)
-	AM_RANGE(0x0800, 0x08ff) AM_RAM                             // tile color buffer; copied to 0x2000
-	AM_RANGE(0x0900, 0x09ff) AM_WRITEONLY                       // a backup of default tile colors
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(aeroboto_videoram_w) AM_SHARE("videoram")     // tile RAM
-	AM_RANGE(0x1800, 0x183f) AM_RAM AM_SHARE("hscroll") // horizontal scroll regs
-	AM_RANGE(0x1840, 0x27ff) AM_WRITENOP                    // cleared during custom LSI test
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(aeroboto_tilecolor_w) AM_SHARE("tilecolor")   // tile color RAM
-	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_SHARE("spriteram")   // sprite RAM
-	AM_RANGE(0x2900, 0x2fff) AM_WRITENOP                    // cleared along with sprite RAM
-	AM_RANGE(0x2973, 0x2973) AM_READ(aeroboto_2973_r)           // protection read
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(aeroboto_in0_r, aeroboto_3000_w)
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0x3003, 0x3003) AM_WRITEONLY AM_SHARE("vscroll")
-	AM_RANGE(0x3004, 0x3004) AM_READ(aeroboto_201_r) AM_WRITEONLY AM_SHARE("starx")
-	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_SHARE("stary") // usable but probably wrong
-	AM_RANGE(0x3006, 0x3006) AM_WRITEONLY AM_SHARE("bgcolor")
-	AM_RANGE(0x3800, 0x3800) AM_READ(aeroboto_irq_ack_r)        // watchdog or IRQ ack
-	AM_RANGE(0x4000, 0xffff) AM_ROM                             // main ROM
-ADDRESS_MAP_END
+void aeroboto_state::main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("mainram"); // main  RAM
+	map(0x01a2, 0x01a2).w(FUNC(aeroboto_state::aeroboto_1a2_w));           // affects IRQ line (more protection?)
+	map(0x0800, 0x08ff).ram();                             // tile color buffer; copied to 0x2000
+	map(0x0900, 0x09ff).writeonly();                       // a backup of default tile colors
+	map(0x1000, 0x17ff).ram().w(FUNC(aeroboto_state::aeroboto_videoram_w)).share("videoram");     // tile RAM
+	map(0x1800, 0x183f).ram().share("hscroll"); // horizontal scroll regs
+	map(0x1840, 0x27ff).nopw();                    // cleared during custom LSI test
+	map(0x2000, 0x20ff).ram().w(FUNC(aeroboto_state::aeroboto_tilecolor_w)).share("tilecolor");   // tile color RAM
+	map(0x2800, 0x28ff).ram().share("spriteram");   // sprite RAM
+	map(0x2900, 0x2fff).nopw();                    // cleared along with sprite RAM
+	map(0x2973, 0x2973).r(FUNC(aeroboto_state::aeroboto_2973_r));           // protection read
+	map(0x3000, 0x3000).rw(FUNC(aeroboto_state::aeroboto_in0_r), FUNC(aeroboto_state::aeroboto_3000_w));
+	map(0x3001, 0x3001).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x3002, 0x3002).portr("DSW2").w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x3003, 0x3003).writeonly().share("vscroll");
+	map(0x3004, 0x3004).r(FUNC(aeroboto_state::aeroboto_201_r)).writeonly().share("starx");
+	map(0x3005, 0x3005).writeonly().share("stary"); // usable but probably wrong
+	map(0x3006, 0x3006).writeonly().share("bgcolor");
+	map(0x3800, 0x3800).r(FUNC(aeroboto_state::aeroboto_irq_ack_r));        // watchdog or IRQ ack
+	map(0x4000, 0xffff).rom();                             // main ROM
+}
 
-ADDRESS_MAP_START(aeroboto_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x9002, 0x9002) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xa002, 0xa002) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void aeroboto_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x9000, 0x9001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x9002, 0x9002).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xa000, 0xa001).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xa002, 0xa002).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xf000, 0xffff).rom();
+}
 
 
 
@@ -209,7 +216,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( aeroboto )
+static GFXDECODE_START( gfx_aeroboto )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0,  64 )     /* chars */
 //  GFXDECODE_ENTRY( "gfx2", 0, starlayout,     0, 128 )     /* sky */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0,   8 )
@@ -240,14 +247,11 @@ void aeroboto_state::machine_reset()
 MACHINE_CONFIG_START(aeroboto_state::formatz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(10'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aeroboto_state,  aeroboto_interrupt)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(10'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(10'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aeroboto_state,  irq0_line_hold)
-
+	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(10'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -257,23 +261,24 @@ MACHINE_CONFIG_START(aeroboto_state::formatz)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aeroboto_state, screen_update_aeroboto)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, aeroboto_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aeroboto)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aeroboto)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(10'000'000)/8) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch2", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'000'000)/8) /* verified on pcb */
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch2", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(10'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(10'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -339,5 +344,5 @@ ROM_END
 
 
 
-GAME( 1984, formatz,  0,       formatz, formatz, aeroboto_state, 0, ROT0, "Jaleco",                    "Formation Z", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, aeroboto, formatz, formatz, formatz, aeroboto_state, 0, ROT0, "Jaleco (Williams license)", "Aeroboto",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, formatz,  0,       formatz, formatz, aeroboto_state, empty_init, ROT0, "Jaleco",                    "Formation Z", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, aeroboto, formatz, formatz, formatz, aeroboto_state, empty_init, ROT0, "Jaleco (Williams license)", "Aeroboto",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

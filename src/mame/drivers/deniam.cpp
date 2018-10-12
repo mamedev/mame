@@ -73,55 +73,59 @@ WRITE16_MEMBER(deniam_state::deniam_irq_ack_w)
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(deniam_state::deniam16b_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
-	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
-	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
-	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
-	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP
-	AM_RANGE(0xc44006, 0xc44007) AM_READNOP /* unused? */
-	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void deniam_state::deniam16b_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40ffff).ram().w(FUNC(deniam_state::deniam_videoram_w)).share("videoram");
+	map(0x410000, 0x410fff).ram().w(FUNC(deniam_state::deniam_textram_w)).share("textram");
+	map(0x440000, 0x4407ff).writeonly().share("spriteram");
+	map(0x840000, 0x840fff).w(FUNC(deniam_state::deniam_palette_w)).share("paletteram");
+	map(0xc40000, 0xc40000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xc40002, 0xc40003).rw(FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
+	map(0xc40004, 0xc40005).w(FUNC(deniam_state::deniam_irq_ack_w));
+	map(0xc44000, 0xc44001).portr("SYSTEM");
+	map(0xc44002, 0xc44003).portr("P1");
+	map(0xc44004, 0xc44005).portr("P2").nopw();
+	map(0xc44006, 0xc44007).nopr(); /* unused? */
+	map(0xc4400a, 0xc4400b).portr("DSW");
+	map(0xff0000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(deniam_state::sound_map)
-	AM_RANGE(0x0000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void deniam_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(deniam_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x07, 0x07) AM_WRITE(deniam16b_oki_rom_bank_w)
-ADDRESS_MAP_END
+void deniam_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x02, 0x03).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x05, 0x05).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x07, 0x07).w(FUNC(deniam_state::deniam16b_oki_rom_bank_w));
+}
 
 /* identical to 16b, but handles sound directly */
-ADDRESS_MAP_START(deniam_state::deniam16c_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
-	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
-	AM_RANGE(0xc40006, 0xc40007) AM_WRITE(deniam16c_oki_rom_bank_w)
-	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
-	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2")
-	AM_RANGE(0xc44006, 0xc44007) AM_READNOP /* read unused? extra input port/dipswitches? */
-	AM_RANGE(0xc40008, 0xc4000b) AM_DEVWRITE8("ymsnd", ym3812_device, write, 0xff00)
-	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW") /* probably YM3812 input port */
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void deniam_state::deniam16c_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40ffff).ram().w(FUNC(deniam_state::deniam_videoram_w)).share("videoram");
+	map(0x410000, 0x410fff).ram().w(FUNC(deniam_state::deniam_textram_w)).share("textram");
+	map(0x440000, 0x4407ff).writeonly().share("spriteram");
+	map(0x840000, 0x840fff).w(FUNC(deniam_state::deniam_palette_w)).share("paletteram");
+	map(0xc40001, 0xc40001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc40002, 0xc40003).rw(FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
+	map(0xc40004, 0xc40005).w(FUNC(deniam_state::deniam_irq_ack_w));
+	map(0xc40006, 0xc40007).w(FUNC(deniam_state::deniam16c_oki_rom_bank_w));
+	map(0xc44000, 0xc44001).portr("SYSTEM");
+	map(0xc44002, 0xc44003).portr("P1");
+	map(0xc44004, 0xc44005).portr("P2");
+	map(0xc44006, 0xc44007).nopr(); /* read unused? extra input port/dipswitches? */
+	map(0xc40008, 0xc4000b).w("ymsnd", FUNC(ym3812_device::write)).umask16(0xff00);
+	map(0xc4400a, 0xc4400b).portr("DSW"); /* probably YM3812 input port */
+	map(0xff0000, 0xffffff).ram();
+}
 
 
 
@@ -211,7 +215,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( deniam )
+static GFXDECODE_START( gfx_deniam )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )    /* colors 0-1023 */
 												/* sprites use colors 1024-2047 */
 GFXDECODE_END
@@ -249,13 +253,13 @@ void deniam_state::machine_reset()
 MACHINE_CONFIG_START(deniam_state::deniam16b)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
-	MCFG_CPU_PROGRAM_MAP(deniam16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(deniam16b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(25'000'000)/4)  /* 6.25Mhz verified */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(25'000'000)/4)  /* 6.25Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 
 	/* video hardware */
@@ -268,30 +272,30 @@ MACHINE_CONFIG_START(deniam_state::deniam16b)
 	MCFG_SCREEN_UPDATE_DRIVER(deniam_state, screen_update_deniam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deniam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deniam)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(25'000'000)/24, PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(25'000'000)/24, okim6295_device::PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(deniam_state::deniam16c)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
-	MCFG_CPU_PROGRAM_MAP(deniam16c_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(deniam16c_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
 
 	/* video hardware */
@@ -304,17 +308,17 @@ MACHINE_CONFIG_START(deniam_state::deniam16c)
 	MCFG_SCREEN_UPDATE_DRIVER(deniam_state, screen_update_deniam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deniam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deniam)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(25'000'000)/24, PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(25'000'000)/24, okim6295_device::PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -412,7 +416,7 @@ ROM_END
 
 
 
-GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, karianx,  0,        deniam16b, karianx,  deniam_state, karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, karianx,  0,        deniam16b, karianx,  deniam_state, init_karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)",     MACHINE_SUPPORTS_SAVE )

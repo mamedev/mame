@@ -204,8 +204,8 @@ inline void jaguar_state::get_crosshair_xy(int player, int &x, int &y)
 	const rectangle &visarea = m_screen->visible_area();
 
 	/* only 2 lightguns are connected */
-	x = visarea.min_x + (((ioport(player ? "FAKE2_X" : "FAKE1_X")->read() & 0xff) * visarea.width()) >> 8);
-	y = visarea.min_y + (((ioport(player ? "FAKE2_Y" : "FAKE1_Y")->read() & 0xff) * visarea.height()) >> 8);
+	x = visarea.left() + (((ioport(player ? "FAKE2_X" : "FAKE1_X")->read() & 0xff) * visarea.width()) >> 8);
+	y = visarea.top() + (((ioport(player ? "FAKE2_Y" : "FAKE1_Y")->read() & 0xff) * visarea.height()) >> 8);
 }
 
 
@@ -534,7 +534,7 @@ READ32_MEMBER( jaguar_state::blitter_r )
 			return m_blitter_status & 3;
 
 		default:
-			logerror("%08X:Blitter read register @ F022%02X\n", space.device().safe_pcbase(), offset * 4);
+			logerror("%s:Blitter read register @ F022%02X\n", machine().describe_context(), offset * 4);
 			return 0;
 	}
 }
@@ -553,7 +553,7 @@ WRITE32_MEMBER( jaguar_state::blitter_w )
 	}
 
 	if (LOG_BLITTER_WRITE)
-	logerror("%08X:Blitter write register @ F022%02X = %08X\n", space.device().safe_pcbase(), offset * 4, data);
+	logerror("%s:Blitter write register @ F022%02X = %08X\n", machine().describe_context(), offset * 4, data);
 }
 
 
@@ -567,7 +567,7 @@ WRITE32_MEMBER( jaguar_state::blitter_w )
 READ16_MEMBER( jaguar_state::tom_regs_r )
 {
 	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC)
-		logerror("%08X:TOM read register @ F00%03X\n", space.device().safe_pcbase(), offset * 2);
+		logerror("%s:TOM read register @ F00%03X\n", machine().describe_context(), offset * 2);
 
 	switch (offset)
 	{
@@ -666,7 +666,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 	}
 
 	if (offset != INT2 && offset != VI && offset != INT1)
-		logerror("%08X:TOM write register @ F00%03X = %04X\n", space.device().safe_pcbase(), offset * 2, data);
+		logerror("%s:TOM write register @ F00%03X = %04X\n", machine().describe_context(), offset * 2, data);
 }
 
 
@@ -752,7 +752,7 @@ void jaguar_state::scanline_update(int param)
 	if ((m_gpu_regs[VMODE] & 1) && vc >= (m_gpu_regs[VDB] & 0x7ff))
 	{
 		uint32_t *dest = &m_screen_bitmap.pix32(vc >> 1);
-		int maxx = visarea.max_x;
+		int maxx = visarea.right();
 		int hde = effective_hvalue(m_gpu_regs[HDE]) >> 1;
 		uint16_t x,scanline[760];
 		uint8_t y,pixel_width = ((m_gpu_regs[VMODE]>>10)&3)+1;
@@ -761,7 +761,7 @@ void jaguar_state::scanline_update(int param)
 		if (ENABLE_BORDERS && vc % 2 == 0)
 		{
 			rgb_t border = rgb_t(m_gpu_regs[BORD1] & 0xff, m_gpu_regs[BORD1] >> 8, m_gpu_regs[BORD2] & 0xff);
-			for (x = visarea.min_x; x <= visarea.max_x; x++)
+			for (x = visarea.left(); x <= visarea.right(); x++)
 				dest[x] = border;
 		}
 

@@ -106,7 +106,7 @@ VIDEO_START_MEMBER(midtunit_state,midtunit)
 	/* register for state saving */
 	save_item(NAME(midtunit_control));
 	save_item(NAME(gfxbank_offset));
-	save_pointer(NAME(local_videoram.get()), 0x100000/sizeof(local_videoram[0]));
+	save_pointer(NAME(local_videoram), 0x100000/sizeof(local_videoram[0]));
 	save_item(NAME(videobank_select));
 	save_item(NAME(dma_register));
 }

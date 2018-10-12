@@ -323,8 +323,8 @@ void firetrk_state::check_collision(int which)
 {
 	int y, x;
 
-	for (y = playfield_window.min_y; y <= playfield_window.max_y; y++)
-		for (x = playfield_window.min_x; x <= playfield_window.max_x; x++)
+	for (y = playfield_window.top(); y <= playfield_window.bottom(); y++)
+		for (x = playfield_window.left(); x <= playfield_window.right(); x++)
 		{
 			pen_t a = m_helper1.pix16(y, x);
 			pen_t b = m_helper2.pix16(y, x);
@@ -353,7 +353,7 @@ uint32_t firetrk_state::screen_update_firetrk(screen_device &screen, bitmap_ind1
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
-	if (cliprect.max_y == screen.visible_area().max_y)
+	if (cliprect.bottom() == screen.visible_area().bottom())
 	{
 		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 
@@ -386,7 +386,7 @@ uint32_t firetrk_state::screen_update_superbug(screen_device &screen, bitmap_ind
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
-	if (cliprect.max_y == screen.visible_area().max_y)
+	if (cliprect.bottom() == screen.visible_area().bottom())
 	{
 		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 
@@ -416,7 +416,7 @@ uint32_t firetrk_state::screen_update_montecar(screen_device &screen, bitmap_ind
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x00, 24, 0x20, 0x08);
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x20, 16, 0x20, 0x08);
 
-	if (cliprect.max_y == screen.visible_area().max_y)
+	if (cliprect.bottom() == screen.visible_area().bottom())
 	{
 		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 

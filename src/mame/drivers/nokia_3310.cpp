@@ -19,6 +19,7 @@
 #include "video/pcd8544.h"
 
 #include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -29,19 +30,23 @@
 class noki3310_state : public driver_device
 {
 public:
-	noki3310_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	noki3310_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pcd8544(*this, "pcd8544"),
 		m_keypad(*this, "COL.%u", 0),
 		m_pwr(*this, "PWR")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<pcd8544_device> m_pcd8544;
-	required_ioport_array<5> m_keypad;
-	required_ioport m_pwr;
+	void noki3330(machine_config &config);
+	void noki3410(machine_config &config);
+	void noki7110(machine_config &config);
+	void noki6210(machine_config &config);
+	void noki3310(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -63,15 +68,9 @@ public:
 	DECLARE_WRITE16_MEMBER(ram_w)       { COMBINE_DATA(&m_ram[offset]); }
 	DECLARE_READ16_MEMBER(dsp_ram_r);
 	DECLARE_WRITE16_MEMBER(dsp_ram_w);
-	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
 
-	void noki3330(machine_config &config);
-	void noki3410(machine_config &config);
-	void noki7110(machine_config &config);
-	void noki6210(machine_config &config);
-	void noki3310(machine_config &config);
 	void noki3310_map(address_map &map);
-private:
+
 	void assert_fiq(int num);
 	void assert_irq(int num);
 	void ack_fiq(uint16_t mask);
@@ -79,8 +78,14 @@ private:
 	void nokia_ccont_w(uint8_t data);
 	uint8_t nokia_ccont_r();
 
+	required_device<cpu_device> m_maincpu;
+	required_device<pcd8544_device> m_pcd8544;
+	required_ioport_array<5> m_keypad;
+	required_ioport m_pwr;
+
 	std::unique_ptr<uint16_t[]>   m_ram;
 	std::unique_ptr<uint16_t[]>   m_dsp_ram;
+
 	uint8_t       m_power_on;
 	uint16_t      m_fiq_status;
 	uint16_t      m_irq_status;
@@ -631,19 +636,20 @@ WRITE8_MEMBER(noki3310_state::mad2_mcuif_w)
 }
 
 
-ADDRESS_MAP_START(noki3310_state::noki3310_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)
-	AM_RANGE(0x00000000, 0x0000ffff) AM_MIRROR(0x80000) AM_READWRITE16(ram_r, ram_w, 0xffffffff)                // boot ROM / RAM
-	AM_RANGE(0x00010000, 0x00010fff) AM_MIRROR(0x8f000) AM_READWRITE16(dsp_ram_r, dsp_ram_w, 0xffffffff)        // DSP shared memory
-	AM_RANGE(0x00020000, 0x000200ff) AM_MIRROR(0x8ff00) AM_READWRITE8(mad2_io_r, mad2_io_w, 0xffffffff)         // IO (Primary I/O range, configures peripherals)
-	AM_RANGE(0x00030000, 0x00030003) AM_MIRROR(0x8fffc) AM_READWRITE8(mad2_dspif_r, mad2_dspif_w, 0xffffffff)   // DSPIF (API control register)
-	AM_RANGE(0x00040000, 0x00040003) AM_MIRROR(0x8fffc) AM_READWRITE8(mad2_mcuif_r, mad2_mcuif_w, 0xffffffff)   // MCUIF (Secondary I/O range, configures memory ranges)
-	AM_RANGE(0x00100000, 0x0017ffff) AM_READWRITE16(ram_r, ram_w, 0xffffffff)                                   // RAMSelX
-	AM_RANGE(0x00200000, 0x005fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)     // ROM1SelX
-	AM_RANGE(0x00600000, 0x009fffff) AM_UNMAP                                                                   // ROM2SelX
-	AM_RANGE(0x00a00000, 0x00dfffff) AM_UNMAP                                                                   // EEPROMSelX
-	AM_RANGE(0x00e00000, 0x00ffffff) AM_UNMAP                                                                   // Reserved
-ADDRESS_MAP_END
+void noki3310_state::noki3310_map(address_map &map)
+{
+	map.global_mask(0x00ffffff);
+	map(0x00000000, 0x0000ffff).mirror(0x80000).rw(FUNC(noki3310_state::ram_r), FUNC(noki3310_state::ram_w));                // boot ROM / RAM
+	map(0x00010000, 0x00010fff).mirror(0x8f000).rw(FUNC(noki3310_state::dsp_ram_r), FUNC(noki3310_state::dsp_ram_w));        // DSP shared memory
+	map(0x00020000, 0x000200ff).mirror(0x8ff00).rw(FUNC(noki3310_state::mad2_io_r), FUNC(noki3310_state::mad2_io_w));         // IO (Primary I/O range, configures peripherals)
+	map(0x00030000, 0x00030003).mirror(0x8fffc).rw(FUNC(noki3310_state::mad2_dspif_r), FUNC(noki3310_state::mad2_dspif_w));   // DSPIF (API control register)
+	map(0x00040000, 0x00040003).mirror(0x8fffc).rw(FUNC(noki3310_state::mad2_mcuif_r), FUNC(noki3310_state::mad2_mcuif_w));   // MCUIF (Secondary I/O range, configures memory ranges)
+	map(0x00100000, 0x0017ffff).rw(FUNC(noki3310_state::ram_r), FUNC(noki3310_state::ram_w));                                   // RAMSelX
+	map(0x00200000, 0x005fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));     // ROM1SelX
+	map(0x00600000, 0x009fffff).unmaprw();                                                                   // ROM2SelX
+	map(0x00a00000, 0x00dfffff).unmaprw();                                                                   // EEPROMSelX
+	map(0x00e00000, 0x00ffffff).unmaprw();                                                                   // Reserved
+}
 
 
 INPUT_CHANGED_MEMBER( noki3310_state::key_irq )
@@ -697,8 +703,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(noki3310_state::noki3310)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7_BE, 26000000 / 2)  // MAD2WD1 13 MHz, clock internally supplied to ARM core can be divided by 2, in sleep mode a 32768 Hz clock is used
-	MCFG_CPU_PROGRAM_MAP(noki3310_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7_BE, 26000000 / 2)  // MAD2WD1 13 MHz, clock internally supplied to ARM core can be divided by 2, in sleep mode a 32768 Hz clock is used
+	MCFG_DEVICE_PROGRAM_MAP(noki3310_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::white())
@@ -714,15 +720,14 @@ MACHINE_CONFIG_START(noki3310_state::noki3310)
 	MCFG_PCD8544_ADD("pcd8544")
 	MCFG_PCD8544_SCREEN_UPDATE_CALLBACK(noki3310_state, pcd8544_screen_update)
 
-	MCFG_INTEL_TE28F160_ADD("flash")
+	INTEL_TE28F160(config, "flash");
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(noki3310_state::noki3330)
 	noki3310(config);
 
-	MCFG_DEVICE_REMOVE("flash")
-	MCFG_INTEL_TE28F320_ADD("flash")
+	INTEL_TE28F320(config.replace(), "flash");
 
 MACHINE_CONFIG_END
 
@@ -766,10 +771,10 @@ ROM_START( noki3210 )
 
 	ROM_REGION16_BE(0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "600", "v6.00")  // A 03-10-2000
-	ROMX_LOAD("3210F600A.fls", 0x000000, 0x200000, CRC(6a978478) SHA1(6bdec2ec76aca15bc12b621be4402e455562454b), ROM_BIOS(1))
+	ROMX_LOAD("3210f600a.fls", 0x000000, 0x200000, CRC(6a978478) SHA1(6bdec2ec76aca15bc12b621be4402e455562454b), ROM_BIOS(0))
 
 	ROM_REGION16_BE(0x04000, "eeprom", 0 )
-	ROM_LOAD("3210 virgin eeprom 24C128.bin", 0x00000, 0x04000, CRC(af8d8f65) SHA1(33a24c04d81a2bd8abce4a6fd873029f0c633ecb))
+	ROM_LOAD("3210 virgin eeprom,24c128.bin", 0x00000, 0x04000, CRC(af8d8f65) SHA1(33a24c04d81a2bd8abce4a6fd873029f0c633ecb))
 ROM_END
 
 ROM_START( noki3310 )
@@ -779,15 +784,15 @@ ROM_START( noki3310 )
 	ROM_SYSTEM_BIOS(0, "607", "v6.07")  // C 17-06-2003
 	ROM_SYSTEM_BIOS(1, "579", "v5.79")  // N 11-11-2002
 	ROM_SYSTEM_BIOS(2, "513", "v5.13")  // C 11-01-2002
-	ROMX_LOAD("3310_607_PPM_C.fls", 0x000000, 0x200000, CRC(5743f6ba) SHA1(0e80b5f1698909c9850be770c1289566582aa77a), ROM_BIOS(1))
-	ROMX_LOAD("3310 NR1 v5.79.fls", 0x000000, 0x200000, CRC(26b4f0df) SHA1(649de05ed88205a080693b918cd1295ac691dff1), ROM_BIOS(2))
-	ROMX_LOAD("3310 v. 5.13 C.fls", 0x000000, 0x1d0000, CRC(0f66d256) SHA1(04d8dabe2c454d6a1161f352d85c69c409895000), ROM_BIOS(3))
-	ROM_LOAD("3310 virgin eeprom 003D0000.fls", 0x1d0000, 0x030000, CRC(8393b1f7) SHA1(ab6c05bfa54ecd7c2acbd172009ffe6c7f130cb8))
+	ROMX_LOAD("3310_607_ppm_c.fls", 0x000000, 0x200000, CRC(5743f6ba) SHA1(0e80b5f1698909c9850be770c1289566582aa77a), ROM_BIOS(0))
+	ROMX_LOAD("3310 nr1 v5.79.fls", 0x000000, 0x200000, CRC(26b4f0df) SHA1(649de05ed88205a080693b918cd1295ac691dff1), ROM_BIOS(1))
+	ROMX_LOAD("3310 v. 5.13 c.fls", 0x000000, 0x1d0000, CRC(0f66d256) SHA1(04d8dabe2c454d6a1161f352d85c69c409895000), ROM_BIOS(2))
+	ROM_LOAD("3310 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(8393b1f7) SHA1(ab6c05bfa54ecd7c2acbd172009ffe6c7f130cb8))
 
 	// these 2 are apparently the 6.39 update firmware data
 	ROM_REGION(0x0200000, "misc", 0 )
-	ROM_LOAD( "NHM5NY06.390",   0x000000, 0x0131161, CRC(5dfb1af7) SHA1(3a8ad82dc239b0cd18be60f537c4d0e07881155d) )
-	ROM_LOAD( "NHM5NY06.39I",   0x000000, 0x0090288, CRC(ec214ee4) SHA1(f5b3b9ceaa7280d5246dd70d5696f8f6983122fc) )
+	ROM_LOAD( "nhm5ny06.390",   0x000000, 0x0131161, CRC(5dfb1af7) SHA1(3a8ad82dc239b0cd18be60f537c4d0e07881155d) )
+	ROM_LOAD( "nhm5ny06.39i",   0x000000, 0x0090288, CRC(ec214ee4) SHA1(f5b3b9ceaa7280d5246dd70d5696f8f6983122fc) )
 ROM_END
 
 ROM_START( noki3330 )
@@ -795,8 +800,8 @@ ROM_START( noki3330 )
 
 	ROM_REGION16_BE(0x0400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "450", "v4.50")  // C 12-10-2001
-	ROMX_LOAD("3330F450C.fls", 0x000000, 0x350000, CRC(259313e7) SHA1(88bcc39d9358fd8a8562fe3a0280f0ce82f5897f), ROM_BIOS(1))
-	ROM_LOAD("3330 virgin eeprom 005F0000.fls", 0x3f0000, 0x010000, CRC(23459c10) SHA1(68481effb39d90a1639e8f261009c66e97d3e668))
+	ROMX_LOAD("3330f450c.fls", 0x000000, 0x350000, CRC(259313e7) SHA1(88bcc39d9358fd8a8562fe3a0280f0ce82f5897f), ROM_BIOS(0))
+	ROM_LOAD("3330 virgin eeprom 005f0000.fls", 0x3f0000, 0x010000, CRC(23459c10) SHA1(68481effb39d90a1639e8f261009c66e97d3e668))
 ROM_END
 
 ROM_START( noki3410 )
@@ -804,7 +809,7 @@ ROM_START( noki3410 )
 
 	ROM_REGION16_BE(0x0400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "506", "v5.06")  // C 29-11-2002
-	ROMX_LOAD("3410_5-06c.fls", 0x000000, 0x370000, CRC(1483e094) SHA1(ef26026297c779de7b01923a364ded822e720c38), ROM_BIOS(1))
+	ROMX_LOAD("3410_5-06c.fls", 0x000000, 0x370000, CRC(1483e094) SHA1(ef26026297c779de7b01923a364ded822e720c38), ROM_BIOS(0))
 ROM_END
 
 ROM_START( noki5210 )
@@ -814,9 +819,9 @@ ROM_START( noki5210 )
 	ROM_SYSTEM_BIOS(0, "540", "v5.40")  // C 11-10-2003
 	ROM_SYSTEM_BIOS(1, "525", "v5.25")  // C 26-02-2003
 	ROM_SYSTEM_BIOS(2, "520", "v5.20")  // C 12-08-2002
-	ROMX_LOAD("5210_5.40_PPM_C.FLS", 0x000000, 0x380000, CRC(e37d5beb) SHA1(726f000780dd67750b7d2859687f846ce17a1bf7), ROM_BIOS(1))
-	ROMX_LOAD("5210_5.25_PPM_C.FLS", 0x000000, 0x380000, CRC(13bba458) SHA1(3b5244244743fba48f9061e158f95fc46b86446e), ROM_BIOS(2))
-	ROMX_LOAD("5210_520_C.fls", 0x000000, 0x380000, CRC(38648cd3) SHA1(9210e15e6bd780f86c467bec33ef54d6393abe5a), ROM_BIOS(3))
+	ROMX_LOAD("5210_5.40_ppm_c.fls", 0x000000, 0x380000, CRC(e37d5beb) SHA1(726f000780dd67750b7d2859687f846ce17a1bf7), ROM_BIOS(0))
+	ROMX_LOAD("5210_5.25_ppm_c.fls", 0x000000, 0x380000, CRC(13bba458) SHA1(3b5244244743fba48f9061e158f95fc46b86446e), ROM_BIOS(1))
+	ROMX_LOAD("5210_520_c.fls", 0x000000, 0x380000, CRC(38648cd3) SHA1(9210e15e6bd780f86c467bec33ef54d6393abe5a), ROM_BIOS(2))
 ROM_END
 
 ROM_START( noki6210 )
@@ -824,8 +829,8 @@ ROM_START( noki6210 )
 
 	ROM_REGION16_BE(0x0400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "556", "v5.56")  // C 25-01-2002
-	ROMX_LOAD("6210_556C.fls", 0x000000, 0x3a0000, CRC(203fb962) SHA1(3d9ea319503e78ec69b60d72cda23e461e118ea9), ROM_BIOS(1))
-	ROM_LOAD("6210 virgin eeprom 005FA000.fls", 0x3fa000, 0x006000, CRC(3c6d3437) SHA1(b3a527ede1be87bd715fb3741a81eef5bd422efa))
+	ROMX_LOAD("6210_556c.fls", 0x000000, 0x3a0000, CRC(203fb962) SHA1(3d9ea319503e78ec69b60d72cda23e461e118ea9), ROM_BIOS(0))
+	ROM_LOAD("6210 virgin eeprom 005fa000.fls", 0x3fa000, 0x006000, CRC(3c6d3437) SHA1(b3a527ede1be87bd715fb3741a81eef5bd422efa))
 ROM_END
 
 ROM_START( noki6250 )
@@ -833,8 +838,8 @@ ROM_START( noki6250 )
 
 	ROM_REGION16_BE(0x0400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "503", "v5.03")  // C 06-12-2001
-	ROMX_LOAD("6250-503mcuPPMC.fls", 0x000000, 0x3a0000, CRC(8dffb91b) SHA1(95607ce39c383bda75f1e6aeae67a214b787b0a1), ROM_BIOS(1))
-	ROM_LOAD("6250 virgin eeprom 005FA000.fls", 0x3fa000, 0x006000, CRC(6087ce70) SHA1(57c29c8387caf864603d94a22bfb63ace427b7f9))
+	ROMX_LOAD("6250-503mcuppmc.fls", 0x000000, 0x3a0000, CRC(8dffb91b) SHA1(95607ce39c383bda75f1e6aeae67a214b787b0a1), ROM_BIOS(0))
+	ROM_LOAD("6250 virgin eeprom 005fa000.fls", 0x3fa000, 0x006000, CRC(6087ce70) SHA1(57c29c8387caf864603d94a22bfb63ace427b7f9))
 ROM_END
 
 ROM_START( noki7110 )
@@ -842,8 +847,8 @@ ROM_START( noki7110 )
 
 	ROM_REGION16_BE(0x0400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "501", "v5.01")  // C 08-12-2000
-	ROMX_LOAD("7110F501_ppmC.fls", 0x000000, 0x390000, CRC(919ac753) SHA1(53af8324919f455ba8199d2c05f7a921cfb811d5), ROM_BIOS(1))
-	ROM_LOAD("7110 virgin eeprom 005FA000.fls", 0x3fa000, 0x006000, CRC(78e7d8c1) SHA1(8b4dd782fc9d1306268ba63124ee463ac646912b))
+	ROMX_LOAD("7110f501_ppmc.fls", 0x000000, 0x390000, CRC(919ac753) SHA1(53af8324919f455ba8199d2c05f7a921cfb811d5), ROM_BIOS(0))
+	ROM_LOAD("7110 virgin eeprom 005fa000.fls", 0x3fa000, 0x006000, CRC(78e7d8c1) SHA1(8b4dd782fc9d1306268ba63124ee463ac646912b))
 ROM_END
 
 ROM_START( noki8210 )
@@ -851,8 +856,8 @@ ROM_START( noki8210 )
 
 	ROM_REGION16_BE(0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "531", "v5.31")  // C 08-03-2002
-	ROMX_LOAD("8210_5.31PPM_C.FLS", 0x000000, 0x1d0000, CRC(927022b1) SHA1(c1a0fe95cedb89a92b19654208cc4855e1a4988e), ROM_BIOS(1))
-	ROM_LOAD("8210 virgin eeprom 003D0000.fls", 0x1d0000, 0x030000, CRC(37fddeea) SHA1(1c01ad3948ff9919890498a84f31052369d93e1d))
+	ROMX_LOAD("8210_5.31ppm_c.fls", 0x000000, 0x1d0000, CRC(927022b1) SHA1(c1a0fe95cedb89a92b19654208cc4855e1a4988e), ROM_BIOS(0))
+	ROM_LOAD("8210 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(37fddeea) SHA1(1c01ad3948ff9919890498a84f31052369d93e1d))
 ROM_END
 
 ROM_START( noki8250 )
@@ -860,8 +865,8 @@ ROM_START( noki8250 )
 
 	ROM_REGION16_BE(0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "502", "v5.02")  // K 28-01-2002
-	ROMX_LOAD("8250-502mcuPPMK.fls", 0x000000, 0x1d0000, CRC(2c58e48b) SHA1(f26c98ffcfffbbd5714889e10cfa41c5f6dd2529), ROM_BIOS(1))
-	ROM_LOAD("8250 virgin eeprom 003D0000.fls", 0x1d0000, 0x030000, CRC(7ca585e0) SHA1(a974fb5fddcd0438ac4aaf32b431f1453e8d923c))
+	ROMX_LOAD("8250-502mcuppmk.fls", 0x000000, 0x1d0000, CRC(2c58e48b) SHA1(f26c98ffcfffbbd5714889e10cfa41c5f6dd2529), ROM_BIOS(0))
+	ROM_LOAD("8250 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(7ca585e0) SHA1(a974fb5fddcd0438ac4aaf32b431f1453e8d923c))
 ROM_END
 
 ROM_START( noki8850 )
@@ -869,8 +874,8 @@ ROM_START( noki8850 )
 
 	ROM_REGION16_BE(0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "531", "v5.31")  // C 08-03-2002
-	ROMX_LOAD("8850v531.fls", 0x000000, 0x1d0000, CRC(8864fcb3) SHA1(9f966787403b68a09530680ad911302403eb1521), ROM_BIOS(1))
-	ROM_LOAD("8850 virgin eeprom 003D0000.fls", 0x1d0000, 0x030000, CRC(4823f27e) SHA1(b09455302d98fbedf35072c9ecfd7721a04924b0))
+	ROMX_LOAD("8850v531.fls", 0x000000, 0x1d0000, CRC(8864fcb3) SHA1(9f966787403b68a09530680ad911302403eb1521), ROM_BIOS(0))
+	ROM_LOAD("8850 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(4823f27e) SHA1(b09455302d98fbedf35072c9ecfd7721a04924b0))
 ROM_END
 
 ROM_START( noki8890 )
@@ -878,21 +883,21 @@ ROM_START( noki8890 )
 
 	ROM_REGION16_BE(0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "1220", "v12.20")    // C 19-03-2001
-	ROMX_LOAD("8890_12.20_ppmC.FLS", 0x000000, 0x1d0000, CRC(77206f78) SHA1(a214a0d69760ecd8eeca0b9d82f95c94bdfe70ed), ROM_BIOS(1))
-	ROM_LOAD("8890 virgin eeprom 003D0000.fls", 0x1d0000, 0x030000, CRC(1d8ef3b5) SHA1(cc0924cfd4c0ce796fca157c640fc3183c2b5f2c))
+	ROMX_LOAD("8890_12.20_ppmc.fls", 0x000000, 0x1d0000, CRC(77206f78) SHA1(a214a0d69760ecd8eeca0b9d82f95c94bdfe70ed), ROM_BIOS(0))
+	ROM_LOAD("8890 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(1d8ef3b5) SHA1(cc0924cfd4c0ce796fca157c640fc3183c2b5f2c))
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     CLASS            INIT  COMPANY  FULLNAME      FLAGS
-SYST( 1999, noki3210, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 3210", MACHINE_IS_SKELETON )
-SYST( 1999, noki7110, 0,      0,      noki7110,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 7110", MACHINE_IS_SKELETON )
-SYST( 1999, noki8210, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 8210", MACHINE_IS_SKELETON )
-SYST( 1999, noki8850, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 8850", MACHINE_IS_SKELETON )
-SYST( 2000, noki3310, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 3310", MACHINE_IS_SKELETON )
-SYST( 2000, noki6210, 0,      0,      noki6210,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 6210", MACHINE_IS_SKELETON )
-SYST( 2000, noki6250, 0,      0,      noki6210,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 6250", MACHINE_IS_SKELETON )
-SYST( 2000, noki8250, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 8250", MACHINE_IS_SKELETON )
-SYST( 2000, noki8890, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 8890", MACHINE_IS_SKELETON )
-SYST( 2001, noki3330, 0,      0,      noki3330,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 3330", MACHINE_IS_SKELETON )
-SYST( 2002, noki3410, 0,      0,      noki3410,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 3410", MACHINE_IS_SKELETON )
-SYST( 2002, noki5210, 0,      0,      noki3330,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 5210", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME      FLAGS
+SYST( 1999, noki3210, 0,      0,      noki3310, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 3210", MACHINE_IS_SKELETON )
+SYST( 1999, noki7110, 0,      0,      noki7110, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 7110", MACHINE_IS_SKELETON )
+SYST( 1999, noki8210, 0,      0,      noki3310, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 8210", MACHINE_IS_SKELETON )
+SYST( 1999, noki8850, 0,      0,      noki3310, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 8850", MACHINE_IS_SKELETON )
+SYST( 2000, noki3310, 0,      0,      noki3310, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 3310", MACHINE_IS_SKELETON )
+SYST( 2000, noki6210, 0,      0,      noki6210, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 6210", MACHINE_IS_SKELETON )
+SYST( 2000, noki6250, 0,      0,      noki6210, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 6250", MACHINE_IS_SKELETON )
+SYST( 2000, noki8250, 0,      0,      noki3310, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 8250", MACHINE_IS_SKELETON )
+SYST( 2000, noki8890, 0,      0,      noki3310, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 8890", MACHINE_IS_SKELETON )
+SYST( 2001, noki3330, 0,      0,      noki3330, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 3330", MACHINE_IS_SKELETON )
+SYST( 2002, noki3410, 0,      0,      noki3410, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 3410", MACHINE_IS_SKELETON )
+SYST( 2002, noki5210, 0,      0,      noki3330, noki3310, noki3310_state, empty_init, "Nokia", "Nokia 5210", MACHINE_IS_SKELETON )

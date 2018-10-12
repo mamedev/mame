@@ -47,9 +47,10 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ms7004_device::ms7004_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void ms7004_device::ms7004_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
 
 //-------------------------------------------------
@@ -57,17 +58,21 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(ms7004_device::device_add_mconfig)
-	MCFG_CPU_ADD(MS7004_CPU_TAG, I8035, XTAL(4'608'000))
-	MCFG_CPU_PROGRAM_MAP(ms7004_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ms7004_device, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ms7004_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ms7004_device, t1_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
+	MCFG_DEVICE_ADD(MS7004_CPU_TAG, I8035, XTAL(4'608'000))
+	MCFG_DEVICE_PROGRAM_MAP(ms7004_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ms7004_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ms7004_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ms7004_device, t1_r))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(ms7004_device, i8243_port_w))
+	I8243(config, m_i8243);
+	m_i8243->p4_out_cb().set(FUNC(ms7004_device::i8243_port_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(ms7004_device::i8243_port_w<1>));
+	m_i8243->p6_out_cb().set(FUNC(ms7004_device::i8243_port_w<2>));
+	m_i8243->p7_out_cb().set(FUNC(ms7004_device::i8243_port_w<3>));
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MS7004_SPK_TAG, BEEP, 3250)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(MS7004_SPK_TAG, BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -429,7 +434,7 @@ WRITE8_MEMBER( ms7004_device::p2_w )
 	DBG_LOG(2,0,( "p2_w %02x = col %d\n", data, data&15));
 
 	m_p2 = data;
-	m_i8243->p2_w(space, offset, data);
+	m_i8243->p2_w(data);
 }
 
 
@@ -437,23 +442,24 @@ WRITE8_MEMBER( ms7004_device::p2_w )
 //  prog_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ms7004_device::i8243_port_w )
+template<int P>
+void ms7004_device::i8243_port_w(uint8_t data)
 {
 	int sense = 0;
 
-	DBG_LOG(2,0,( "8243 port %d data %02xH\n", offset + 4, data));
+	DBG_LOG(2,0,( "8243 port %d data %02xH\n", P + 4, data));
 
 	if (data) {
 		switch(data) {
-			case 0x01: sense = m_kbd[(offset << 2) + 0]->read(); break;
-			case 0x02: sense = m_kbd[(offset << 2) + 1]->read(); break;
-			case 0x04: sense = m_kbd[(offset << 2) + 2]->read(); break;
-			case 0x08: sense = m_kbd[(offset << 2) + 3]->read(); break;
+			case 0x01: sense = m_kbd[(P << 2) + 0]->read(); break;
+			case 0x02: sense = m_kbd[(P << 2) + 1]->read(); break;
+			case 0x04: sense = m_kbd[(P << 2) + 2]->read(); break;
+			case 0x08: sense = m_kbd[(P << 2) + 3]->read(); break;
 		}
 		m_keylatch = BIT(sense, (m_p1 & 7));
 		if (m_keylatch)
 		DBG_LOG(1,0,( "row %d col %02x t1 %d\n",
-			(m_p1 & 7), (offset << 4 | data), m_keylatch));
+			(m_p1 & 7), (P << 4 | data), m_keylatch));
 	}
 }
 

@@ -13,12 +13,14 @@
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "machine/bankdev.h"
+#include "machine/74145.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mz_state : public driver_device
@@ -37,8 +39,17 @@ public:
 		, m_screen(*this, "screen")
 		, m_banke(*this, "banke")
 		, m_bankf(*this, "bankf")
+		, m_ls145(*this, "ls145")
+		, m_cursor_timer(*this, "cursor")
 	{ }
 
+	void mz800(machine_config &config);
+	void mz700(machine_config &config);
+
+	void init_mz800();
+	void init_mz700();
+
+private:
 	DECLARE_READ8_MEMBER(mz700_e008_r);
 	DECLARE_WRITE8_MEMBER(mz700_e008_w);
 	DECLARE_READ8_MEMBER(mz800_bank_0_r);
@@ -61,8 +72,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mz800_ramaddr_w);
 	DECLARE_WRITE8_MEMBER(mz800_palette_w);
 	DECLARE_WRITE8_MEMBER(mz800_cgram_w);
-	DECLARE_DRIVER_INIT(mz800);
-	DECLARE_DRIVER_INIT(mz700);
 	DECLARE_MACHINE_RESET(mz700);
 	DECLARE_MACHINE_RESET(mz800);
 	virtual void machine_start() override;
@@ -82,18 +91,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
-	void mz800(machine_config &config);
-	void mz700(machine_config &config);
 	void mz700_banke(address_map &map);
 	void mz700_io(address_map &map);
 	void mz700_mem(address_map &map);
 	void mz800_bankf(address_map &map);
 	void mz800_io(address_map &map);
 	void mz800_mem(address_map &map);
-private:
+
 	int m_mz700;                /* 1 if running on an mz700 */
 
-	int m_cursor_timer;
+	int m_cursor_bit;
 	int m_other_timer;
 
 	int m_intmsk;   /* PPI8255 pin PC2 */
@@ -134,6 +141,9 @@ private:
 	required_device<screen_device> m_screen;
 	optional_device<address_map_bank_device> m_banke;
 	optional_device<address_map_bank_device> m_bankf;
+
+	required_device<ttl74145_device> m_ls145;
+	required_device<timer_device> m_cursor_timer;
 };
 
 #endif // MAME_INCLUDES_MZ700_H

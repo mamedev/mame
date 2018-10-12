@@ -11,6 +11,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -24,6 +25,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
+	void if800(machine_config &config);
+
+private:
 	required_device<upd7220_device> m_hgdc;
 
 	required_shared_ptr<uint16_t> m_video_ram;
@@ -32,7 +36,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	void if800(machine_config &config);
 	void if800_io(address_map &map);
 	void if800_map(address_map &map);
 	void upd7220_map(address_map &map);
@@ -55,17 +58,19 @@ UPD7220_DISPLAY_PIXELS_MEMBER( if800_state::hgdc_display_pixels )
 	}
 }
 
-ADDRESS_MAP_START(if800_state::if800_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x0ffff) AM_RAM
-	AM_RANGE(0xfe000,0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+void if800_state::if800_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x0ffff).ram();
+	map(0xfe000, 0xfffff).rom().region("ipl", 0);
+}
 
-ADDRESS_MAP_START(if800_state::if800_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void if800_state::if800_io(address_map &map)
+{
+	map.unmap_value_high();
 //  AM_RANGE(0x0640, 0x065f) dma?
-	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write,0x00ff)
-ADDRESS_MAP_END
+	map(0x0660, 0x0663).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( if800 )
@@ -80,15 +85,16 @@ void if800_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(if800_state::upd7220_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void if800_state::upd7220_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram().share("video_ram");
+}
 
 MACHINE_CONFIG_START(if800_state::if800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000)
-	MCFG_CPU_PROGRAM_MAP(if800_map)
-	MCFG_CPU_IO_MAP(if800_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(if800_map)
+	MCFG_DEVICE_IO_MAP(if800_io)
 
 
 //  MCFG_PIC8259_ADD( "pic8259", if800_pic8259_config )
@@ -118,5 +124,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY           FULLNAME          FLAGS
-COMP( 1985, if800,  0,      0,       if800,     if800, if800_state, 0,     "Oki Electric",   "if800 model 60", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY         FULLNAME          FLAGS
+COMP( 1985, if800, 0,      0,      if800,   if800, if800_state, empty_init, "Oki Electric", "if800 model 60", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

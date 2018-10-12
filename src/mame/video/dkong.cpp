@@ -522,7 +522,7 @@ WRITE8_MEMBER(dkong_state::radarscp_grid_color_w)
 
 WRITE8_MEMBER(dkong_state::dkong_flipscreen_w)
 {
-	m_flip = ~data & 0x01;
+	m_flip = data & 0x01;
 }
 
 WRITE8_MEMBER(dkong_state::dkong_spritebank_w)
@@ -1008,6 +1008,7 @@ uint32_t dkong_state::screen_update_pestplce(screen_device &screen, bitmap_ind16
 {
 	int offs;
 
+	machine().tilemap().set_flip_all(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* Draw the sprites. */
@@ -1015,7 +1016,14 @@ uint32_t dkong_state::screen_update_pestplce(screen_device &screen, bitmap_ind16
 	{
 		if (m_sprite_ram[offs])
 		{
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			if (m_flip)
+				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+					m_sprite_ram[offs + 2],
+					(m_sprite_ram[offs + 1] & 0x0f) + 16 * m_palette_bank,
+					~m_sprite_ram[offs + 1] & 0x80,~m_sprite_ram[offs + 1] & 0x40,
+					240 - m_sprite_ram[offs + 3] + 8,m_sprite_ram[offs] - 8, 0);
+			else
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					m_sprite_ram[offs + 2],
 					(m_sprite_ram[offs + 1] & 0x0f) + 16 * m_palette_bank,
 					m_sprite_ram[offs + 1] & 0x80,m_sprite_ram[offs + 1] & 0x40,
@@ -1027,6 +1035,7 @@ uint32_t dkong_state::screen_update_pestplce(screen_device &screen, bitmap_ind16
 
 uint32_t dkong_state::screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	machine().tilemap().set_flip_all(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* it uses sprite_ram[offs + 2] & 0x10 for sprite bank */

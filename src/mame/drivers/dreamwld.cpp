@@ -21,7 +21,7 @@ Note: this hardware is a copy of Psikyo's 68020 based hardware,
       by the looks of it, there are various subtle changes to how
       things work, for example the tilemap sizes and missing
       transparent pen modification.  This makes it rather hard to
-      merge with psikyo.c and it should probably be left separate.
+      merge with psikyo.cpp and it should probably be left separate.
 
 
 Stephh's notes (based on the game M68EC020 code and some tests) :
@@ -98,31 +98,46 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
 
 class dreamwld_state : public driver_device
 {
 public:
 	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_bg2_videoram(*this, "bg2_videoram"),
-		m_vregs(*this, "vregs"),
-		m_workram(*this, "workram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram")
+		, m_vram(*this, "vram_%u", 0)
+		, m_vregs(*this, "vregs")
+		, m_workram(*this, "workram")
+		, m_prot(*this, "prot")
+		, m_spritelut(*this, "spritelut")
+		, m_okibank(*this, "oki%ubank", 1)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+	{
+		std::fill(std::begin(m_old_linescroll), std::end(m_old_linescroll), 0);
+	}
 
+	void baryon(machine_config &config);
+	void dreamwld(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_spriteram;
-	required_shared_ptr<uint32_t> m_bg_videoram;
-	required_shared_ptr<uint32_t> m_bg2_videoram;
+	required_shared_ptr_array<uint32_t, 2> m_vram;
 	required_shared_ptr<uint32_t> m_vregs;
 	required_shared_ptr<uint32_t> m_workram;
+
+	optional_memory_region m_prot;
+	required_memory_region m_spritelut;
+	optional_memory_bank_array<2> m_okibank;
 
 	std::unique_ptr<uint16_t[]> m_lineram16;
 
@@ -130,23 +145,19 @@ public:
 	DECLARE_WRITE16_MEMBER(lineram16_w) { COMBINE_DATA(&m_lineram16[offset]); }
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_bg2_tilemap;
+	tilemap_t  *m_tilemap[2][2];
 	int      m_tilebank[2];
 	int      m_tilebankold[2];
+	int      m_old_linescroll[2];
 
-	std::unique_ptr<uint32_t[]> m_spritebuf1;
-	std::unique_ptr<uint32_t[]> m_spritebuf2;
+	std::unique_ptr<uint32_t[]> m_spritebuf[2];
 
 	/* misc */
 	int      m_protindex;
-	DECLARE_WRITE32_MEMBER(dreamwld_bg_videoram_w);
-	DECLARE_WRITE32_MEMBER(dreamwld_bg2_videoram_w);
-	DECLARE_READ32_MEMBER(dreamwld_protdata_r);
-	DECLARE_WRITE32_MEMBER(dreamwld_6295_0_bank_w);
-	DECLARE_WRITE32_MEMBER(dreamwld_6295_1_bank_w);
-	TILE_GET_INFO_MEMBER(get_dreamwld_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_dreamwld_bg2_tile_info);
+	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
+	DECLARE_READ32_MEMBER(protdata_r);
+	template<int Chip> DECLARE_WRITE32_MEMBER(okibank_w);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -156,8 +167,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void baryon(machine_config &config);
-	void dreamwld(machine_config &config);
 	void baryon_map(address_map &map);
 	void dreamwld_map(address_map &map);
 	void oki1_map(address_map &map);
@@ -169,9 +178,9 @@ public:
 void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint32_t *source = m_spritebuf1.get();
-	uint32_t *finish = m_spritebuf1.get() + 0x1000 / 4;
-	uint16_t *redirect = (uint16_t *)memregion("spritelut")->base();
+	uint32_t *source = m_spritebuf[0].get();
+	uint32_t *finish = m_spritebuf[0].get() + 0x1000 / 4;
+	uint16_t *redirect = (uint16_t *)m_spritelut->base();
 	int xoffset = 4;
 
 	while (source < finish)
@@ -233,57 +242,53 @@ void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-
-WRITE32_MEMBER(dreamwld_state::dreamwld_bg_videoram_w)
+template<int Layer>
+WRITE32_MEMBER(dreamwld_state::vram_w)
 {
-	COMBINE_DATA(&m_bg_videoram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset * 2);
-	m_bg_tilemap->mark_tile_dirty(offset * 2 + 1);
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	for (int size = 0; size < 2; size++)
+	{
+		m_tilemap[Layer][size]->mark_tile_dirty(offset * 2);
+		m_tilemap[Layer][size]->mark_tile_dirty(offset * 2 + 1);
+	}
 }
 
-TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg_tile_info)
+template<int Layer>
+TILE_GET_INFO_MEMBER(dreamwld_state::get_tile_info)
 {
 	int tileno, colour;
-	tileno = (tile_index & 1) ? (m_bg_videoram[tile_index >> 1] & 0xffff) : ((m_bg_videoram[tile_index >> 1] >> 16) & 0xffff);
+	tileno = (tile_index & 1) ? (m_vram[Layer][tile_index >> 1] & 0xffff) : ((m_vram[Layer][tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
-	SET_TILE_INFO_MEMBER(1, tileno + m_tilebank[0] * 0x2000, 0x80 + colour, 0);
+	SET_TILE_INFO_MEMBER(1, tileno + m_tilebank[Layer] * 0x2000, (Layer * 0x40) + colour, 0);
 }
 
-
-WRITE32_MEMBER(dreamwld_state::dreamwld_bg2_videoram_w)
-{
-	COMBINE_DATA(&m_bg2_videoram[offset]);
-	m_bg2_tilemap->mark_tile_dirty(offset * 2);
-	m_bg2_tilemap->mark_tile_dirty(offset * 2 + 1);
-}
-
-TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg2_tile_info)
-{
-	uint16_t tileno, colour;
-	tileno = (tile_index & 1) ? (m_bg2_videoram[tile_index >> 1] & 0xffff) : ((m_bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
-	colour = tileno >> 13;
-	tileno &= 0x1fff;
-	SET_TILE_INFO_MEMBER(1, tileno + m_tilebank[1] * 0x2000, 0xc0 + colour, 0);
-}
 
 void dreamwld_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
-	m_bg2_tilemap->set_transparent_pen(0);
+	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
+	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
+	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS, 16, 16, 128,32);
+	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS, 16, 16, 128,32);
+	m_tilemap[1][0]->set_transparent_pen(0);
+	m_tilemap[1][1]->set_transparent_pen(0);
 
-	m_bg_tilemap->set_scroll_rows(64*16); // line scrolling
-	m_bg_tilemap->set_scroll_cols(1);
+	for (int layer = 0; layer < 2; layer++)
+	{
+		for (int size = 0; size < 2; size++)
+		{
+			m_tilemap[layer][size]->set_scroll_rows(1);
+			m_tilemap[layer][size]->set_scroll_cols(1);
+		}
+	}
 
-	m_bg2_tilemap->set_scroll_rows(64*16);    // line scrolling
-	m_bg2_tilemap->set_scroll_cols(1);
-
-	m_spritebuf1 = std::make_unique<uint32_t[]>(0x2000 / 4);
-	m_spritebuf2 = std::make_unique<uint32_t[]>(0x2000 / 4);
-
+	m_spritebuf[0] = std::make_unique<uint32_t[]>(0x2000 / 4);
+	m_spritebuf[1] = std::make_unique<uint32_t[]>(0x2000 / 4);
 	m_lineram16 = make_unique_clear<uint16_t[]>(0x400 / 2);
-	save_pointer(NAME(m_lineram16.get()), 0x400/2);
+
+	save_pointer(NAME(m_spritebuf[0]), 0x2000 / 4, 0);
+	save_pointer(NAME(m_spritebuf[1]), 0x2000 / 4, 1);
+	save_pointer(NAME(m_lineram16), 0x400/2);
 
 }
 
@@ -292,120 +297,79 @@ WRITE_LINE_MEMBER(dreamwld_state::screen_vblank_dreamwld)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_spritebuf2.get(), m_spritebuf1.get(), 0x2000);
-		memcpy(m_spritebuf1.get(), m_spriteram, 0x2000);
+		memcpy(m_spritebuf[1].get(), m_spritebuf[0].get(), 0x2000);
+		memcpy(m_spritebuf[0].get(), m_spriteram, 0x2000);
 	}
 }
 
 
 uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  int tm0size, tm1size;
+	tilemap_t *tmptilemap[2];
 
-	tilemap_t *tmptilemap0, *tmptilemap1;
+	uint32_t scrolly[2]{ m_vregs[(0x000 / 4)]+32, m_vregs[(0x008 / 4)]+32 };
 
-	tmptilemap0 = m_bg_tilemap;
-	tmptilemap1 = m_bg2_tilemap;
+	uint32_t scrollx[2]{ m_vregs[(0x004 / 4)] + 0, m_vregs[(0x00c / 4)] + 2 };
 
-	int layer0_scrolly = m_vregs[(0x000 / 4)]+32;
-	int layer1_scrolly = m_vregs[(0x008 / 4)]+32;
+	uint32_t layer_ctrl[2]{ m_vregs[0x010 / 4], m_vregs[0x014 / 4] };
 
-	int layer0_scrollx = m_vregs[(0x004 / 4)] + 0;
-	int layer1_scrollx = m_vregs[(0x00c / 4)] + 2;
-
-	uint32_t layer0_ctrl = m_vregs[0x010 / 4];
-	uint32_t layer1_ctrl = m_vregs[0x014 / 4];
-
-	m_tilebank[0] = (layer0_ctrl >> 6) & 1;
-	m_tilebank[1] = (layer1_ctrl >> 6) & 1;
-
-	if (m_tilebank[0] != m_tilebankold[0])
+	for (int layer = 0; layer < 2; layer++)
 	{
-		m_tilebankold[0] = m_tilebank[0];
-		m_bg_tilemap->mark_all_dirty();
-	}
+		m_tilebank[layer] = (layer_ctrl[layer] >> 6) & 1;
 
-	if (m_tilebank[1] != m_tilebankold[1])
-	{
-		m_tilebankold[1] = m_tilebank[1];
-		m_bg2_tilemap->mark_all_dirty();
-	}
-
-
-
-	tmptilemap0->set_scrolly(0, layer0_scrolly);
-	tmptilemap1->set_scrolly(0, layer1_scrolly);
-
-	// not on this hw?
-#if 0
-	switch ((layer0_ctrl & 0x00c0) >> 6)
-	{
-	case 0: tm0size = 1;    break;
-	case 1: tm0size = 2;    break;
-	case 2: tm0size = 3;    break;
-	default:    tm0size = 0;    break;
-	}
-
-	switch ((layer1_ctrl & 0x00c0) >> 6)
-	{
-	case 0: tm1size = 1;    break;
-	case 1: tm1size = 2;    break;
-	case 2: tm1size = 3;    break;
-	default:    tm1size = 0;    break;
-	}
-#endif
-	//popmessage("sizes %d %d\n", tm0size, tm1size);
-
-	for (int i = 0; i < 256; i++)   /* 256 screen lines */
-	{
-		int x0 = 0, x1 = 0;
-
-		uint16_t* linebase;
-
-
-
-		/* layer 0 */
-		linebase = &m_lineram16[0x000];
-
-		if (layer0_ctrl & 0x0300)
+		if (m_tilebank[layer] != m_tilebankold[layer])
 		{
-			if (layer0_ctrl & 0x0200)
-				/* per-tile rowscroll */
-				x0 = linebase[((i+32)&0xff)/16];
-			else
-				/* per-line rowscroll */
-				x0 = linebase[(i+32)&0xff];
+			m_tilebankold[layer] = m_tilebank[layer];
+			for (int size = 0; size < 2; size++)
+				m_tilemap[layer][size]->mark_all_dirty();
 		}
 
-		tmptilemap0->set_scrollx(
-		(i + layer0_scrolly) & 0x3ff,
-		layer0_scrollx + x0 );
+		// Test mode only, Other size is enable?
+		int size = (layer_ctrl[layer] & 0x0400) >> 10;
+		tmptilemap[layer] = m_tilemap[layer][size];
+		int row_mask = 0x3ff >> size;
 
+		tmptilemap[layer]->set_scrolly(0, scrolly[layer]);
 
-		/* layer 1 */
-		linebase = &m_lineram16[0x200/2];
-
-		if (layer1_ctrl & 0x0300)
+		if (layer_ctrl[layer] & 0x0300)
 		{
-			if (layer1_ctrl & 0x0200)
-				/* per-tile rowscroll */
-				x1 = linebase[((i+32)&0xff)/16];
-			else
+			int tile_rowscroll = (layer_ctrl[layer] & 0x0200) >> 7;
+			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					m_tilemap[layer][i]->set_scroll_rows(((64*16) >> i));
+				}
+				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
+			}
+			uint16_t* linebase = &m_lineram16[(layer * 0x200) / 2];
+			for (int i = 0; i < 256; i++)   /* 256 screen lines */
+			{
 				/* per-line rowscroll */
-				x1 = linebase[(i+32)&0xff];
+				int x0 = linebase[((i+32)&0xff) >> tile_rowscroll];
+
+				tmptilemap[layer]->set_scrollx(
+						(i + scrolly[layer]) & row_mask,
+						scrollx[layer] + x0 );
+			}
 		}
+		else
+		{
+			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					m_tilemap[layer][i]->set_scroll_rows(1);
+				}
+				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
+			}
 
-
-		tmptilemap1->set_scrollx(
-		(i + layer1_scrolly) & 0x3ff,
-		layer1_scrollx + x1 );
-
+			tmptilemap[layer]->set_scrollx(0, scrollx[layer]);
+		}
 	}
 
-
-
-	tmptilemap0->draw(screen, bitmap, cliprect, 0, 0);
-	tmptilemap1->draw(screen, bitmap, cliprect, 0, 0);
+	tmptilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	tmptilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
 
@@ -414,13 +378,12 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 
 
 
-READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
+READ32_MEMBER(dreamwld_state::protdata_r)
 {
 	//static int count = 0;
 
-	uint8_t *protdata = memregion("user1")->base();
-	size_t protsize = memregion("user1")->bytes();
-	uint8_t dat = protdata[(m_protindex++) % protsize];
+	size_t protsize = m_prot->bytes();
+	uint8_t dat = m_prot->base()[(m_protindex++) % protsize];
 
 	//printf("protection read %04x %02x\n", count, dat);
 	//count++;
@@ -431,60 +394,57 @@ READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 	return dat << 24;
 }
 
-ADDRESS_MAP_START(dreamwld_state::oki1_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki1bank")
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(dreamwld_state::oki2_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki2bank")
-ADDRESS_MAP_END
-
-WRITE32_MEMBER(dreamwld_state::dreamwld_6295_0_bank_w)
+void dreamwld_state::oki1_map(address_map &map)
 {
-	if (ACCESSING_BITS_0_7)
-		membank("oki1bank")->set_entry(data&3);
-	else
-		logerror("OKI0: unk bank write %x mem_mask %8x\n", data, mem_mask);
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("oki1bank");
 }
 
-WRITE32_MEMBER(dreamwld_state::dreamwld_6295_1_bank_w)
+void dreamwld_state::oki2_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("oki2bank");
+}
+
+template<int Chip>
+WRITE32_MEMBER(dreamwld_state::okibank_w)
 {
 	if (ACCESSING_BITS_0_7)
-		membank("oki2bank")->set_entry(data&3);
+		m_okibank[Chip]->set_entry(data&3);
 	else
-		logerror("OKI1: unk bank write %x mem_mask %8x\n", data, mem_mask);
+		logerror("OKI%x: unk bank write %x mem_mask %8x\n", Chip, data, mem_mask);
 }
 
 
-ADDRESS_MAP_START(dreamwld_state::baryon_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM  AM_WRITENOP
+void dreamwld_state::baryon_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom().nopw();
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_SHARE("bg_videoram")
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_SHARE("bg2_videoram")
-	AM_RANGE(0x804000, 0x8043ff) AM_READWRITE16(lineram16_r, lineram16_w, 0xffffffff)  // linescroll
-	AM_RANGE(0x804400, 0x805fff) AM_RAM AM_SHARE("vregs")
+	map(0x400000, 0x401fff).ram().share("spriteram");
+	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x800000, 0x801fff).ram().w(FUNC(dreamwld_state::vram_w<0>)).share("vram_0");
+	map(0x802000, 0x803fff).ram().w(FUNC(dreamwld_state::vram_w<1>)).share("vram_1");
+	map(0x804000, 0x8043ff).rw(FUNC(dreamwld_state::lineram16_r), FUNC(dreamwld_state::lineram16_w));  // linescroll
+	map(0x804400, 0x805fff).ram().share("vregs");
 
-	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
+	map(0xc00000, 0xc00003).portr("INPUTS");
+	map(0xc00004, 0xc00007).portr("c00004");
 
-	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE(dreamwld_6295_0_bank_w) // sfx
-	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0xff000000) // sfx
+	map(0xc0000c, 0xc0000f).w(FUNC(dreamwld_state::okibank_w<0>)); // sfx
+	map(0xc00018, 0xc00018).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // sfx
 
-	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
+	map(0xc00030, 0xc00033).r(FUNC(dreamwld_state::protdata_r)); // it reads protection data (irq code) from here and puts it at ffd000
 
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_SHARE("workram") // work ram
-ADDRESS_MAP_END
+	map(0xfe0000, 0xffffff).ram().share("workram"); // work ram
+}
 
-ADDRESS_MAP_START(dreamwld_state::dreamwld_map)
-	AM_IMPORT_FROM( baryon_map )
+void dreamwld_state::dreamwld_map(address_map &map)
+{
+	baryon_map(map);
 
-	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE(dreamwld_6295_1_bank_w) // sfx
-	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0xff000000) // sfx
-ADDRESS_MAP_END
+	map(0xc0002c, 0xc0002f).w(FUNC(dreamwld_state::okibank_w<1>)); // sfx
+	map(0xc00028, 0xc00028).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // sfx
+}
 
 
 static INPUT_PORTS_START( dreamwld )
@@ -510,8 +470,8 @@ static INPUT_PORTS_START( dreamwld )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
 
 	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
@@ -580,8 +540,8 @@ static INPUT_PORTS_START( rolcrush )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
 
 	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) /* As listed in service mode, but tested */
@@ -642,8 +602,8 @@ static INPUT_PORTS_START( cutefght )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
 
 	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) /* As listed in service mode, but tested */
@@ -707,8 +667,8 @@ static INPUT_PORTS_START( gaialast )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
 
 	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003,  0x0001, DEF_STR( Lives )  )  PORT_DIPLOCATION("SW2:1,2")
@@ -757,32 +717,30 @@ static const gfx_layout layout_16x16x4 =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{0,1,2,3},
-	{2*4,3*4,0*4,1*4,6*4,7*4,4*4,5*4,
-		10*4,11*4,8*4,9*4,14*4,15*4,12*4,13*4},
-	{0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,
-		8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64},
+	{STEP4(0,1)},
+	{STEP16(0,4)},
+	{STEP16(0,4*16)},
 	16*16*4
 };
 
-static GFXDECODE_START( dreamwld )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x000, 0x100 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x000, 0x100 ) // [1] Layer 0 + 1
+static GFXDECODE_START( gfx_dreamwld )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x000, 0x40 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x800, 0x48 ) // [1] Layer 0 + 1
 GFXDECODE_END
 
 
 void dreamwld_state::machine_start()
 {
-	if (subdevice("oki1"))
+	if (m_okibank[0].found())
 	{
-		membank("oki1bank")->configure_entries(0, 4, memregion("oki1")->base()+0x30000, 0x10000);
-		membank("oki1bank")->set_entry(0);
+		m_okibank[0]->configure_entries(0, 4, memregion("oki1")->base()+0x30000, 0x10000);
+		m_okibank[0]->set_entry(0);
 	}
 
-	if (subdevice("oki2"))
+	if (m_okibank[1].found())
 	{
-		membank("oki2bank")->configure_entries(0, 4, memregion("oki2")->base()+0x30000, 0x10000);
-		membank("oki2bank")->set_entry(0);
+		m_okibank[1]->configure_entries(0, 4, memregion("oki2")->base()+0x30000, 0x10000);
+		m_okibank[1]->set_entry(0);
 	}
 
 	save_item(NAME(m_protindex));
@@ -801,9 +759,12 @@ void dreamwld_state::machine_reset()
 MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz verified */
-	MCFG_CPU_PROGRAM_MAP(baryon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(baryon_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
+
+	MCFG_DEVICE_ADD("mcu", AT89C52, XTAL(32'000'000)/2) /* AT89C52 or 87(C)52, unknown clock (value from docs) */
+	MCFG_DEVICE_DISABLE()   /* Internal ROM aren't dumped */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -812,36 +773,32 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 	MCFG_SCREEN_SIZE(512,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 308-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dreamwld_state, screen_vblank_dreamwld))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dreamwld_state, screen_vblank_dreamwld))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreamwld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreamwld)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/32, PIN7_LOW) /* 1MHz verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_LOW) /* 1MHz verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
-
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dreamwld_state::dreamwld)
 	baryon(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dreamwld_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dreamwld_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'000'000)/32, PIN7_LOW) /* 1MHz verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_LOW) /* 1MHz verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
-
 MACHINE_CONFIG_END
 
 
@@ -888,21 +845,21 @@ ROM_START( baryon ) // this set had original SemiCom labels
 	ROM_LOAD32_BYTE( "2_semicom", 0x000002, 0x040000, CRC(42b14a6c) SHA1(37e772a673732ef16767c14ad77a4faaa06d675a) )
 	ROM_LOAD32_BYTE( "3_semicom", 0x000003, 0x040000, CRC(0ae6d86e) SHA1(410ad161688ec8516fe5ac7160a4a228dbb01936) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+	ROM_REGION( 0x02000, "mcu", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x02000 , NO_DUMP ) /* can't be dumped. */
 
-	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data - from baryona set, assumed to be the same */
+	ROM_REGION( 0x6bd, "prot", 0 ) /* Protection data - from baryona set, assumed to be the same */
 	ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
 	ROM_LOAD( "1_semicom", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) ) //  eprom type 27C040
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "10_semicom", 0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) ) //  eprom type 27C160
-	ROM_LOAD16_WORD_SWAP( "11_semicom", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) ) //  eprom type 27C160
+	ROM_LOAD( "10_semicom", 0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) ) //  eprom type 27C160
+	ROM_LOAD( "11_semicom", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) ) //  eprom type 27C160
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "8_semicom",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) ) //  eprom type 27C160
+	ROM_LOAD( "8_semicom",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) ) //  eprom type 27C160
 
 	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
 	ROM_LOAD16_BYTE( "6_semicom", 0x000000, 0x020000, CRC(fdbb08b0) SHA1(4b3ac56c4c8370b1434fb6a481fce0d9c52313e0) ) //  eprom type 27C010
@@ -919,21 +876,21 @@ ROM_START( baryona ) // replacment labels? no SemiCom logo
 	ROM_LOAD32_BYTE( "3.bin", 0x000002, 0x040000, CRC(046d4231) SHA1(05056efe5fec7f43c400f05278de516b01be0fdf) )
 	ROM_LOAD32_BYTE( "5.bin", 0x000003, 0x040000, CRC(63d5e7cb) SHA1(269bf5ffe10f2464f823c4d377921e19cfb8bc46) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+	ROM_REGION( 0x02000, "mcu", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x02000 , NO_DUMP ) /* can't be dumped. */
 
-	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data  */
+	ROM_REGION( 0x6bd, "prot", 0 ) /* Protection data  */
 	ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
 	ROM_LOAD( "1.bin", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "9.bin",  0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) )
-	ROM_LOAD16_WORD_SWAP( "11.bin", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) )
+	ROM_LOAD( "9.bin",  0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) )
+	ROM_LOAD( "11.bin", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "2.bin",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) )
+	ROM_LOAD( "2.bin",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) )
 
 	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
 	ROM_LOAD16_BYTE( "8.bin", 0x000000, 0x020000, CRC(fdbb08b0) SHA1(4b3ac56c4c8370b1434fb6a481fce0d9c52313e0) )
@@ -989,10 +946,10 @@ ROM_START( cutefght )
 	ROM_LOAD32_BYTE( "3_semicom", 0x000002, 0x080000, CRC(e7e7a866) SHA1(a31751f4164a427de59f0c76c9a8cb34370d8183) )
 	ROM_LOAD32_BYTE( "4_semicom", 0x000003, 0x080000, CRC(476a3bf5) SHA1(5be1c70bbf4fcfc534b7f20bfceaa8da2e961330) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+	ROM_REGION( 0x02000, "mcu", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x02000 , NO_DUMP ) /* can't be dumped. */
 
-	ROM_REGION( 0x1000, "user1", ROMREGION_ERASEFF ) /* Protection data  */
+	ROM_REGION( 0x1000, "prot", ROMREGION_ERASEFF ) /* Protection data  */
 	ROM_LOAD( "protdata.bin", 0x000, 0x701 , CRC(764c3c0e) SHA1(ae044d016850b730b2d97ccb7845b6b438c1e074) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip */
@@ -1002,13 +959,13 @@ ROM_START( cutefght )
 	ROM_LOAD( "1_semicom", 0x000000, 0x80000, CRC(fa3b6890) SHA1(7534931c96d6fa05fee840a7ea07b87e2e2acc50) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "10_semicom",  0x000000, 0x200000, CRC(62bf1e6e) SHA1(fb4b0db313e26687f0ebc6a8505a02e5348776da) )
-	ROM_LOAD16_WORD_SWAP( "11_semicom",  0x200000, 0x200000, CRC(796f23a7) SHA1(adaa4c8525de428599f4489ecc8e966fed0d514d) )
-	ROM_LOAD16_WORD_SWAP( "13_semicom",  0x400000, 0x200000, CRC(24222b3c) SHA1(08163863890c01728db89b8f4447841ecb4f4f62) )
-	ROM_LOAD16_WORD_SWAP( "14_semicom",  0x600000, 0x200000, CRC(385b69d7) SHA1(8e7cae5589e354bea0b77b061af1d0c81d796f7c) )
+	ROM_LOAD( "10_semicom",  0x000000, 0x200000, CRC(62bf1e6e) SHA1(fb4b0db313e26687f0ebc6a8505a02e5348776da) )
+	ROM_LOAD( "11_semicom",  0x200000, 0x200000, CRC(796f23a7) SHA1(adaa4c8525de428599f4489ecc8e966fed0d514d) )
+	ROM_LOAD( "13_semicom",  0x400000, 0x200000, CRC(24222b3c) SHA1(08163863890c01728db89b8f4447841ecb4f4f62) )
+	ROM_LOAD( "14_semicom",  0x600000, 0x200000, CRC(385b69d7) SHA1(8e7cae5589e354bea0b77b061af1d0c81d796f7c) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "12_semicom",0x000000, 0x200000, CRC(45d29c22) SHA1(df719a061dcd14fb4388fb45dfee2054e56a1299) )
+	ROM_LOAD( "12_semicom",0x000000, 0x200000, CRC(45d29c22) SHA1(df719a061dcd14fb4388fb45dfee2054e56a1299) )
 
 	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
 	ROM_LOAD16_BYTE( "7_semicom", 0x000000, 0x020000, CRC(39454102) SHA1(347e9242fd7e2092cfaacdce92691cf6024471ac) )
@@ -1068,10 +1025,10 @@ ROM_START( rolcrush )
 	ROM_LOAD32_BYTE( "mx27c2000_2.bin", 0x000002, 0x040000, CRC(5eb24adb) SHA1(0329a02e18490bfe72ff34a64722d7316814720b) )
 	ROM_LOAD32_BYTE( "mx27c2000_1.bin", 0x000003, 0x040000, CRC(a37e15b2) SHA1(f0fc945a894d6ed58daf05390a17051d0f3cda20) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+	ROM_REGION( 0x02000, "mcu", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x02000 , NO_DUMP ) /* can't be dumped. */
 
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) /* Protection data  */
+	ROM_REGION( 0x10000, "prot", ROMREGION_ERASE00 ) /* Protection data  */
 	ROM_LOAD( "protdata.bin", 0x000, 0x745, CRC(06b8a880) SHA1(b7d4bf26d34cb544825270c2c474bbd4c81a6c9e) ) /* extracted */
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip*/
@@ -1081,10 +1038,10 @@ ROM_START( rolcrush )
 	/* not populared */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "m27c160.8.bin", 0x000000, 0x200000, CRC(a509bc36) SHA1(aaa008e07e4b24ff9dbcee5925d6516d1662931c) )
+	ROM_LOAD( "m27c160.8.bin", 0x000000, 0x200000, CRC(a509bc36) SHA1(aaa008e07e4b24ff9dbcee5925d6516d1662931c) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "m27c160.10.bin",0x000000, 0x200000, CRC(739b0cb0) SHA1(a7cc48502d84218586afa7276fa7ba759242f05e) )
+	ROM_LOAD( "m27c160.10.bin",0x000000, 0x200000, CRC(739b0cb0) SHA1(a7cc48502d84218586afa7276fa7ba759242f05e) )
 
 	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
 	ROM_LOAD16_BYTE( "tms27c010_7.bin", 0x000000, 0x020000, CRC(4cb84384) SHA1(8dd02e2d9829c15cb19654779d2217a7d53d5971) )
@@ -1102,10 +1059,10 @@ ROM_START( rolcrusha )
 	ROM_LOAD32_BYTE( "2", 0x000002, 0x040000, CRC(7b291ba9) SHA1(9629c71b00317c68394b836395c3a81bdd32273a) )
 	ROM_LOAD32_BYTE( "1", 0x000003, 0x040000, CRC(ef23ccf3) SHA1(14dcf8bfca991f6aa9b20236c879ae715a009ca2) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+	ROM_REGION( 0x02000, "mcu", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x02000 , NO_DUMP ) /* can't be dumped. */
 
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) /* Protection data  */
+	ROM_REGION( 0x10000, "prot", ROMREGION_ERASE00 ) /* Protection data  */
 	ROM_LOAD( "protdata.bin", 0x000, 0x745, CRC(06b8a880) SHA1(b7d4bf26d34cb544825270c2c474bbd4c81a6c9e) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip*/
@@ -1115,10 +1072,10 @@ ROM_START( rolcrusha )
 	/* not populared */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "8", 0x000000, 0x200000, CRC(01446191) SHA1(b106ed6c085fad617552972db78866a3346e4553) )
+	ROM_LOAD( "8", 0x000000, 0x200000, CRC(01446191) SHA1(b106ed6c085fad617552972db78866a3346e4553) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "10",0x000000, 0x200000, CRC(8cb75392) SHA1(8b274cd13876e65fffc157d8459331032c3c16db) )
+	ROM_LOAD( "10",0x000000, 0x200000, CRC(8cb75392) SHA1(8b274cd13876e65fffc157d8459331032c3c16db) )
 
 	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
 	ROM_LOAD16_BYTE( "7", 0x000000, 0x020000, CRC(23d641e4) SHA1(1df8afb5c0118e8588d301db64f6adeb9ae40a79) )
@@ -1177,10 +1134,10 @@ ROM_START( dreamwld )
 	ROM_LOAD32_BYTE( "1.bin", 0x000002, 0x040000, CRC(35c94ee5) SHA1(3440a65a807622b619c97bc2a88fd7d875c26f66) )
 	ROM_LOAD32_BYTE( "2.bin", 0x000003, 0x040000, CRC(5409e7fc) SHA1(2f94a6a8e4c94b36b43f0b94d58525f594339a9d) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+	ROM_REGION( 0x02000, "mcu", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x02000 , NO_DUMP ) /* can't be dumped. */
 
-	ROM_REGION( 0x6c9, "user1", 0 ) /* Protection data  */
+	ROM_REGION( 0x6c9, "prot", 0 ) /* Protection data  */
 	/* The MCU supplies this data.
 	  The 68k reads it through a port, taking the size and destination write address from the level 1
 	  and level 2 irq positions in the 68k vector table (there is code to check that they haven't been
@@ -1195,10 +1152,10 @@ ROM_START( dreamwld )
 	ROM_LOAD( "6.bin", 0x000000, 0x80000, CRC(c8b91f30) SHA1(706004ca56d0a74bc7a3dfd73a21cdc09eb90f05) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "9.bin", 0x000000, 0x200000, CRC(fa84e3af) SHA1(5978737d348fd382f4ec004d29870656c864d137) )
+	ROM_LOAD( "9.bin", 0x000000, 0x200000, CRC(fa84e3af) SHA1(5978737d348fd382f4ec004d29870656c864d137) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "10.bin",0x000000, 0x200000, CRC(3553e4f5) SHA1(c335494f4a12a01a88e7cd578cae922954303cfd) )
+	ROM_LOAD( "10.bin",0x000000, 0x200000, CRC(3553e4f5) SHA1(c335494f4a12a01a88e7cd578cae922954303cfd) )
 
 	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
 	ROM_LOAD16_BYTE( "8.bin", 0x000000, 0x020000, CRC(8d570df6) SHA1(e53e4b099c64eca11d027e0083caa101fcd99959) )
@@ -1264,10 +1221,10 @@ ROM_START( gaialast )
 	ROM_LOAD32_BYTE( "2", 0x000002, 0x040000, CRC(549e594a) SHA1(728c6b51cc478ad7251bcbe6d7f4f4e6a2ee4a4e) )
 	ROM_LOAD32_BYTE( "3", 0x000003, 0x040000, CRC(a8e845d8) SHA1(f8c7e702bd747a22e76c861effec4cd3cd2f3fc9) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+	ROM_REGION( 0x02000, "mcu", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x02000 , NO_DUMP ) /* can't be dumped. */
 
-	ROM_REGION( 0x6c9, "user1", ROMREGION_ERASEFF ) /* Protection data  */
+	ROM_REGION( 0x6c9, "prot", ROMREGION_ERASEFF ) /* Protection data  */
 	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 , CRC(d3403b7b) SHA1(712a7f27fc41b632d584237f7641e8ae20035111) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
@@ -1277,12 +1234,12 @@ ROM_START( gaialast )
 	/* not populared */
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "10", 0x000000, 0x200000, CRC(5822ef93) SHA1(8ce22c30f8027f35c5f72eb6ce57a74540dd55da) )
-	ROM_LOAD16_WORD_SWAP( "11", 0x200000, 0x200000, CRC(f4f5770d) SHA1(ac850483cae321d286a09fe93ce7e49725722de0) )
-	ROM_LOAD16_WORD_SWAP( "12", 0x400000, 0x200000, CRC(a1f04571) SHA1(c29b3b3c209b63ad44ebfa5afb4b1832965e0936) )
+	ROM_LOAD( "10", 0x000000, 0x200000, CRC(5822ef93) SHA1(8ce22c30f8027f35c5f72eb6ce57a74540dd55da) )
+	ROM_LOAD( "11", 0x200000, 0x200000, CRC(f4f5770d) SHA1(ac850483cae321d286a09fe93ce7e49725722de0) )
+	ROM_LOAD( "12", 0x400000, 0x200000, CRC(a1f04571) SHA1(c29b3b3c209b63ad44ebfa5afb4b1832965e0936) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "8",0x000000, 0x200000, CRC(32d16985) SHA1(2b7a20eea09e7d2debd42469e9f6ae49310f5747) )
+	ROM_LOAD( "8",0x000000, 0x200000, CRC(32d16985) SHA1(2b7a20eea09e7d2debd42469e9f6ae49310f5747) )
 
 	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
 	ROM_LOAD16_BYTE( "6", 0x000000, 0x020000, CRC(5c82feed) SHA1(1857afecf1081adf015ade1efb5930e3a7deef78) )
@@ -1292,10 +1249,10 @@ ROM_START( gaialast )
 	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
-GAME( 1997, baryon,   0,        baryon,   baryon,   dreamwld_state, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 1)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1997, baryona,  baryon,   baryon,   baryon,   dreamwld_state, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 2)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1998, cutefght, 0,        dreamwld, cutefght, dreamwld_state, 0, ROT0,   "SemiCom",                        "Cute Fighter",                                               MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rolcrush, 0,        baryon,   rolcrush, dreamwld_state, 0, ROT0,   "SemiCom / Exit (Trust license)", "Rolling Crush (version 1.07.E - 1999/02/11, Trust license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rolcrusha,rolcrush, baryon,   rolcrush, dreamwld_state, 0, ROT0,   "SemiCom / Exit",                 "Rolling Crush (version 1.03.E - 1999/01/29)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1999, gaialast, 0,        baryon,   gaialast, dreamwld_state, 0, ROT0,   "SemiCom / XESS",                 "Gaia - The Last Choice of Earth",                            MACHINE_SUPPORTS_SAVE )
-GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, dreamwld_state, 0, ROT0,   "SemiCom",                        "Dream World",                                                MACHINE_SUPPORTS_SAVE )
+GAME( 1997, baryon,   0,        baryon,   baryon,   dreamwld_state, empty_init, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 1)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1997, baryona,  baryon,   baryon,   baryon,   dreamwld_state, empty_init, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 2)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1998, cutefght, 0,        dreamwld, cutefght, dreamwld_state, empty_init, ROT0,   "SemiCom",                        "Cute Fighter",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rolcrush, 0,        baryon,   rolcrush, dreamwld_state, empty_init, ROT0,   "SemiCom / Exit (Trust license)", "Rolling Crush (version 1.07.E - 1999/02/11, Trust license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rolcrusha,rolcrush, baryon,   rolcrush, dreamwld_state, empty_init, ROT0,   "SemiCom / Exit",                 "Rolling Crush (version 1.03.E - 1999/01/29)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1999, gaialast, 0,        baryon,   gaialast, dreamwld_state, empty_init, ROT0,   "SemiCom / XESS",                 "Gaia - The Last Choice of Earth",                            MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, dreamwld_state, empty_init, ROT0,   "SemiCom",                        "Dream World",                                                MACHINE_SUPPORTS_SAVE )

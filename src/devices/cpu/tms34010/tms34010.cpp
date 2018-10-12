@@ -39,7 +39,7 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3), m_pc(0), m_ppc(0), m_st(0), m_pixel_write(nullptr), m_pixel_read(nullptr), m_raster_op(nullptr), m_pixel_op(nullptr), m_pixel_op_timing(0), m_convsp(0), m_convdp(0), m_convmp(0), m_gfxcycles(0), m_pixelshift(0), m_is_34020(0), m_reset_deferred(false)
-	, m_halt_on_reset(false), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_direct(nullptr)
+	, m_halt_on_reset(false), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_cache(nullptr)
 	, m_pixclock(0)
 	, m_pixperclock(0), m_scantimer(nullptr), m_icount(0)
 	, m_output_int_cb(*this)
@@ -182,32 +182,32 @@ inline uint32_t tms340x0_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
-	return m_direct->read_word(pc);
+	return m_cache->read_word(pc);
 }
 
 inline int16_t tms340x0_device::PARAM_WORD()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
-	return m_direct->read_word(pc);
+	return m_cache->read_word(pc);
 }
 
 inline int32_t tms340x0_device::PARAM_LONG()
 {
 	uint32_t pc = m_pc;
 	m_pc += 4 << 3;
-	return (uint16_t)m_direct->read_word(pc) | (m_direct->read_word(pc + 16) << 16);
+	return (uint16_t)m_cache->read_word(pc) | (m_cache->read_word(pc + 16) << 16);
 }
 
 inline int16_t tms340x0_device::PARAM_WORD_NO_INC()
 {
-	return m_direct->read_word(m_pc);
+	return m_cache->read_word(m_pc);
 }
 
 inline int32_t tms340x0_device::PARAM_LONG_NO_INC()
 {
 	uint32_t pc = m_pc;
-	return (uint16_t)m_direct->read_word(pc) | (m_direct->read_word(pc + 16) << 16);
+	return (uint16_t)m_cache->read_word(pc) | (m_cache->read_word(pc + 16) << 16);
 }
 
 /* read memory byte */
@@ -588,7 +588,7 @@ void tms340x0_device::device_start()
 	m_external_host_access = false;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<03>();
+	m_cache = m_program->cache<1, 3, ENDIANNESS_LITTLE>();
 
 	/* set up the state table */
 	{
@@ -627,7 +627,7 @@ void tms340x0_device::device_start()
 	save_pointer(NAME(&m_regs[0].reg), ARRAY_LENGTH(m_regs));
 	machine().save().register_postload(save_prepost_delegate(FUNC(tms340x0_device::tms34010_state_postload), this));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void tms340x0_device::device_reset()
@@ -751,7 +751,7 @@ void tms340x0_device::execute_run()
 		{
 			uint16_t op;
 			m_ppc = m_pc;
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 			op = ROPCODE();
 			(this->*s_opcode_table[op >> 4])(op);
 		} while (m_icount > 0);
@@ -1626,12 +1626,12 @@ void tms340x0_device::state_string_export(const device_state_entry &entry, std::
 	}
 }
 
-util::disasm_interface *tms34010_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms34010_device::create_disassembler()
 {
-	return new tms34010_disassembler(false);
+	return std::make_unique<tms34010_disassembler>(false);
 }
 
-util::disasm_interface *tms34020_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms34020_device::create_disassembler()
 {
-	return new tms34010_disassembler(true);
+	return std::make_unique<tms34010_disassembler>(true);
 }

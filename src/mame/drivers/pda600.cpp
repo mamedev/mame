@@ -59,7 +59,7 @@
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
 #include "machine/hd64610.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -67,10 +67,14 @@ class pda600_state : public driver_device
 {
 public:
 	pda600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
-		{}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
+	void pda600(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void video_start() override;
@@ -78,28 +82,29 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t *     m_video_ram;
-	void pda600(machine_config &config);
 	void pda600_io(address_map &map);
 	void pda600_mem(address_map &map);
 };
 
 
-ADDRESS_MAP_START(pda600_state::pda600_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+void pda600_state::pda600_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x1ffff).rom();
 	//AM_RANGE(0x20000, 0x9ffff) AM_RAM // PCMCIA Card
-	AM_RANGE(0xa0000, 0xa7fff) AM_RAM   AM_REGION("videoram", 0)
-	AM_RANGE(0xe0000, 0xfffff) AM_RAM   AM_REGION("mainram", 0)     AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0xa0000, 0xa7fff).ram().region("videoram", 0);
+	map(0xe0000, 0xfffff).ram().region("mainram", 0).share("nvram");
+}
 
-ADDRESS_MAP_START(pda600_state::pda600_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
+void pda600_state::pda600_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x3f).noprw(); /* Z180 internal registers */
 	//AM_RANGE(0x40, 0x7f) AM_NOP   /* Z180 internal registers */
-	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE("rtc", hd64610_device, read, write)
+	map(0x80, 0x8f).rw("rtc", FUNC(hd64610_device::read), FUNC(hd64610_device::write));
 	//AM_RANGE(0xC0, 0xC1) AM_NOP   /* LCD */
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pda600 )
@@ -190,7 +195,7 @@ static const gfx_layout pda600_charlayout_19a =
 	8*19
 };
 
-static GFXDECODE_START( pda600 )
+static GFXDECODE_START( gfx_pda600 )
 	GFXDECODE_ENTRY( "maincpu", 0x45cd, pda600_charlayout_19, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x4892, pda600_charlayout_19a, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x4d73, pda600_charlayout_8, 0, 1 )
@@ -199,30 +204,30 @@ static GFXDECODE_START( pda600 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(pda600_state::pda600)
+void pda600_state::pda600(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z180, XTAL(14'318'181))
-	MCFG_CPU_PROGRAM_MAP(pda600_mem)
-	MCFG_CPU_IO_MAP(pda600_io)
+	Z180(config, m_maincpu, XTAL(14'318'181));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pda600_state::pda600_mem);
+	m_maincpu->set_addrmap(AS_IO, &pda600_state::pda600_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(240, 320)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 320-1)
-	MCFG_SCREEN_UPDATE_DRIVER( pda600_state, screen_update )
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(240, 320);
+	screen.set_visarea(0, 240-1, 0, 320-1);
+	screen.set_screen_update(FUNC(pda600_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pda600)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pda600);
+	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
-	MCFG_DEVICE_ADD("rtc", HD64610, XTAL(32'768))
-MACHINE_CONFIG_END
+	HD64610(config, "rtc", XTAL(32'768));
+}
 
 /* ROM definition */
 ROM_START( pda600 )
@@ -238,5 +243,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY        FULLNAME          FLAGS */
-COMP( 1993, pda600,  0,      0,      pda600,    pda600,  pda600_state,  0,    "Amstrad plc", "PenPad PDA 600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME          FLAGS */
+COMP( 1993, pda600, 0,      0,      pda600,  pda600, pda600_state, empty_init, "Amstrad plc", "PenPad PDA 600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

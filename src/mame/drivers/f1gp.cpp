@@ -53,75 +53,80 @@ READ8_MEMBER(f1gp_state::command_pending_r)
 }
 
 
-ADDRESS_MAP_START(f1gp_state::f1gp_cpu1_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")
-	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)                            /* mirror */
-	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)                            /* mirror */
-	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)                            /* mirror */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_SHARE("spr1cgram")               // SPR-1 CG RAM
-	AM_RANGE(0xe04000, 0xe07fff) AM_RAM AM_SHARE("spr2cgram")               // SPR-2 CG RAM
-	AM_RANGE(0xf00000, 0xf003ff) AM_RAM AM_SHARE("spr1vram")                                // SPR-1 VRAM
-	AM_RANGE(0xf10000, 0xf103ff) AM_RAM AM_SHARE("spr2vram")                                // SPR-2 VRAM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                         // WORK RAM-1
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")       // DUAL RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")         // CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // PALETTE
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(f1gp_gfxctrl_w)
-//  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff002, 0xfff005) AM_WRITE(f1gp_fgscroll_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_READ8(command_pending_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xfff020, 0xfff023) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
-	AM_RANGE(0xfff040, 0xfff05f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
-ADDRESS_MAP_END
+void f1gp_state::f1gp_cpu1_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x2fffff).rom().region("user1", 0);
+	map(0xa00000, 0xbfffff).rom().region("user2", 0);
+	map(0xc00000, 0xc3ffff).rw(FUNC(f1gp_state::f1gp_zoomdata_r), FUNC(f1gp_state::f1gp_zoomdata_w));
+	map(0xd00000, 0xd01fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w)).share("rozvideoram");
+	map(0xd02000, 0xd03fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));                            /* mirror */
+	map(0xd04000, 0xd05fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));                            /* mirror */
+	map(0xd06000, 0xd07fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));                            /* mirror */
+	map(0xe00000, 0xe03fff).ram().share("spr1cgram");               // SPR-1 CG RAM
+	map(0xe04000, 0xe07fff).ram().share("spr2cgram");               // SPR-2 CG RAM
+	map(0xf00000, 0xf003ff).ram().share("spr1vram");                                // SPR-1 VRAM
+	map(0xf10000, 0xf103ff).ram().share("spr2vram");                                // SPR-2 VRAM
+	map(0xff8000, 0xffbfff).ram();                                                         // WORK RAM-1
+	map(0xffc000, 0xffcfff).ram().share("sharedram");       // DUAL RAM
+	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");         // CHARACTER
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // PALETTE
+	map(0xfff000, 0xfff001).portr("INPUTS");
+	map(0xfff000, 0xfff001).w(FUNC(f1gp_state::f1gp_gfxctrl_w));
+	map(0xfff002, 0xfff003).portr("WHEEL");
+	map(0xfff004, 0xfff005).portr("DSW1");
+	map(0xfff002, 0xfff005).w(FUNC(f1gp_state::f1gp_fgscroll_w));
+	map(0xfff006, 0xfff007).portr("DSW2");
+	map(0xfff009, 0xfff009).r(FUNC(f1gp_state::command_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff020, 0xfff023).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
+	map(0xfff040, 0xfff05f).w(m_k053936, FUNC(k053936_device::ctrl_w));
+	map(0xfff050, 0xfff051).portr("DSW3");
+}
 
-ADDRESS_MAP_START(f1gp_state::f1gp2_cpu1_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_SHARE("sprcgram")                                    // SPR-1 CG RAM + SPR-2 CG RAM
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")   // BACK VRAM
-	AM_RANGE(0xe00000, 0xe00fff) AM_RAM AM_SHARE("spritelist")                          // not checked + SPR-1 VRAM + SPR-2 VRAM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                             // WORK RAM-1
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")           // DUAL RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")             // CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")            // PALETTE
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(f1gp2_gfxctrl_w)
-//  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_READ8(command_pending_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW3")
-	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(f1gp_fgscroll_w)
-ADDRESS_MAP_END
+void f1gp_state::f1gp2_cpu1_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x2fffff).rom().region("user1", 0);
+	map(0xa00000, 0xa07fff).ram().share("sprcgram");                                    // SPR-1 CG RAM + SPR-2 CG RAM
+	map(0xd00000, 0xd01fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w)).share("rozvideoram");   // BACK VRAM
+	map(0xe00000, 0xe00fff).ram().share("spritelist");                          // not checked + SPR-1 VRAM + SPR-2 VRAM
+	map(0xff8000, 0xffbfff).ram();                                                             // WORK RAM-1
+	map(0xffc000, 0xffcfff).ram().share("sharedram");           // DUAL RAM
+	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");             // CHARACTER
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");            // PALETTE
+	map(0xfff000, 0xfff001).portr("INPUTS").w(FUNC(f1gp_state::f1gp2_gfxctrl_w));
+	map(0xfff002, 0xfff003).portr("WHEEL");
+	map(0xfff004, 0xfff005).portr("DSW1");
+	map(0xfff006, 0xfff007).portr("DSW2");
+	map(0xfff009, 0xfff009).r(FUNC(f1gp_state::command_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff00a, 0xfff00b).portr("DSW3");
+	map(0xfff020, 0xfff03f).w(m_k053936, FUNC(k053936_device::ctrl_w));
+	map(0xfff044, 0xfff047).w(FUNC(f1gp_state::f1gp_fgscroll_w));
+}
 
-ADDRESS_MAP_START(f1gp_state::f1gp_cpu2_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM  AM_SHARE("sharedram")
-	AM_RANGE(0xfff030, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void f1gp_state::f1gp_cpu2_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0xff8000, 0xffbfff).ram();
+	map(0xffc000, 0xffcfff).ram().share("sharedram");
+	map(0xfff030, 0xfff033).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(f1gp_state::sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void f1gp_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(f1gp_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp2
-	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-ADDRESS_MAP_END
+void f1gp_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(f1gp_state::f1gp_sh_bankswitch_w)); // f1gp
+	map(0x0c, 0x0c).w(FUNC(f1gp_state::f1gp_sh_bankswitch_w)); // f1gp2
+	map(0x14, 0x14).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+}
 
 WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
 {
@@ -148,53 +153,60 @@ WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
 	*/
 }
 
-ADDRESS_MAP_START(f1gp_state::f1gpb_cpu1_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")
-	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)   /* mirror */
-	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)   /* mirror */
-	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)   /* mirror */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM //unused
-	AM_RANGE(0xe04000, 0xe07fff) AM_RAM //unused
-	AM_RANGE(0xf00000, 0xf003ff) AM_RAM //unused
-	AM_RANGE(0xf10000, 0xf103ff) AM_RAM //unused
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_READNOP //?
-	AM_RANGE(0xfff006, 0xfff007) AM_WRITENOP
-	AM_RANGE(0xfff00a, 0xfff00b) AM_RAM AM_SHARE("fgregs")
-	AM_RANGE(0xfff00e, 0xfff00f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(f1gpb_misc_w)
-	AM_RANGE(0xfff010, 0xfff011) AM_WRITENOP
-	AM_RANGE(0xfff020, 0xfff023) AM_WRITENOP // GGA access
-	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
-	AM_RANGE(0xfff800, 0xfff809) AM_RAM AM_SHARE("rozregs")
-ADDRESS_MAP_END
+void f1gp_state::f1gpb_cpu1_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x2fffff).rom().region("user1", 0);
+	map(0xa00000, 0xbfffff).rom().region("user2", 0);
+	map(0x800000, 0x801fff).ram().share("spriteram");
+	map(0xc00000, 0xc3ffff).rw(FUNC(f1gp_state::f1gp_zoomdata_r), FUNC(f1gp_state::f1gp_zoomdata_w));
+	map(0xd00000, 0xd01fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w)).share("rozvideoram");
+	map(0xd02000, 0xd03fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));   /* mirror */
+	map(0xd04000, 0xd05fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));   /* mirror */
+	map(0xd06000, 0xd07fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));   /* mirror */
+	map(0xe00000, 0xe03fff).ram(); //unused
+	map(0xe04000, 0xe07fff).ram(); //unused
+	map(0xf00000, 0xf003ff).ram(); //unused
+	map(0xf10000, 0xf103ff).ram(); //unused
+	map(0xff8000, 0xffbfff).ram();
+	map(0xffc000, 0xffcfff).ram().share("sharedram");
+	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfff000, 0xfff001).portr("INPUTS");
+	map(0xfff002, 0xfff003).portr("WHEEL");
+	map(0xfff004, 0xfff005).portr("DSW1");
+	map(0xfff006, 0xfff007).portr("DSW2");
+	map(0xfff008, 0xfff009).nopr(); //?
+	map(0xfff006, 0xfff007).nopw();
+	map(0xfff00a, 0xfff00b).ram().share("fgregs");
+	map(0xfff00f, 0xfff00f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xfff00c, 0xfff00d).w(FUNC(f1gp_state::f1gpb_misc_w));
+	map(0xfff010, 0xfff011).nopw();
+	map(0xfff020, 0xfff023).nopw(); // GGA access
+	map(0xfff050, 0xfff051).portr("DSW3");
+	map(0xfff800, 0xfff809).ram().share("rozregs");
+}
 
-ADDRESS_MAP_START(f1gp_state::f1gpb_cpu2_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xfff030, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void f1gp_state::f1gpb_cpu2_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0xff8000, 0xffbfff).ram();
+	map(0xffc000, 0xffcfff).ram().share("sharedram");
+	map(0xfff030, 0xfff033).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+}
 
 static INPUT_PORTS_START( f1gp )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Brake Button")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Accelerator Button")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -206,8 +218,14 @@ static INPUT_PORTS_START( f1gp )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("WHEEL")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5)
+
 	PORT_START("DSW1")
-	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW1:1" )        /* Listed as "Unused" */
+	// listed as "unused" in manual, actually enables free play
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Free_Play ) )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coin_A ) )       PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000) PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(      0x0a00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 2C_1C ) )
@@ -244,9 +262,9 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPSETTING(      0x0000, "Multi Player Game Only" )        PORT_CONDITION("DSW1",0x0004,EQUALS,0x0000)
 	PORT_DIPSETTING(      0x0008, "Multi Player Off" )          PORT_CONDITION("DSW1",0x0004,NOTEQUALS,0x0000)
 	PORT_DIPSETTING(      0x0000, "Multi Player Off" )          PORT_CONDITION("DSW1",0x0004,NOTEQUALS,0x0000)
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )        /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )        /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )        /* Listed as "Unused", reverses joystick left/right directions? */
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )        /* Listed as "Unused", two buttons to accelerate? */
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )        /* Listed as "Unused", reverses button activeness? */
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("DSW2")
@@ -261,7 +279,12 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW3:5" )        /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW3:6" )        /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW3:7" )        /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW3:8" )        /* Listed as "Unused" */
+	// listed as "Unused" in manual, it selects between joystick or steering wheel
+	PORT_DIPNAME( 0x8000, 0x8000, "Input Method" )      PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(      0x8000, "Joystick" )
+	// TODO: doesn't work in-game, reads from $fff002 ingame too but doesn't have an effect,
+	//       maybe outputs threshold to $fff000 or it's not supposed to be enabled like the manual claims.
+	PORT_DIPSETTING(      0x0000, "Steering Wheel" )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x001f, 0x0010, DEF_STR( Region ) )           /* Jumpers?? */
@@ -272,6 +295,12 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Taiwan ) )
 	/* all other values are invalid */
+
+	PORT_START("JOY_TYPE")
+	PORT_CONFNAME( 0x01, 0x01, "Joystick Type" )
+	PORT_CONFSETTING(    0x01, "2-Way" )
+	// in "free run" course select lets you go up/down
+	PORT_CONFSETTING(    0x00, "4-Way" )
 INPUT_PORTS_END
 
 
@@ -280,7 +309,7 @@ static INPUT_PORTS_START( f1gp2 )
 	PORT_INCLUDE( f1gp )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Turbo Button")
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Region ) )
@@ -343,14 +372,14 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( f1gp )
+static GFXDECODE_START( gfx_f1gp )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout2,  0x300, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( f1gp2 )
+static GFXDECODE_START( gfx_f1gp2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0x100, 16 )
@@ -387,30 +416,30 @@ MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 MACHINE_CONFIG_START(f1gp_state::f1gp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(f1gp_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(f1gp_cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(f1gp_cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(f1gp_cpu2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gp)
 	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
+	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1000000) // guessed
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 1000000)); // guessed
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -420,7 +449,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f1gp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -445,13 +474,14 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_K053936_OFFSETS(-58, -2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -463,13 +493,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(f1gp_state::f1gpb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(f1gpb_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(f1gpb_cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000,10000000)    /* 10 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(f1gpb_cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000,10000000)    /* 10 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(f1gpb_cpu2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
 	/* NO sound CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
@@ -477,13 +507,13 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gpb)
 	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
+	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1000000) // guessed
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 1000000)); // guessed
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -493,7 +523,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gpb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f1gp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -502,9 +532,10 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gpb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -514,11 +545,11 @@ MACHINE_CONFIG_START(f1gp_state::f1gp2)
 	f1gp(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(f1gp2_cpu1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1gp2_cpu1_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gp2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gp2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp2)
@@ -684,7 +715,7 @@ ROM_START( f1gp2 )
 ROM_END
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, 0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
-GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

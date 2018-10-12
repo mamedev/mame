@@ -98,19 +98,20 @@ WRITE8_MEMBER( taito_en_device::en_volume_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(taito_en_device::en_sound_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("osram")
-	AM_RANGE(0x140000, 0x140fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0xff00)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_device, read, write)
-	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x00ff)
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x300000, 0x30003f) AM_WRITE(en_es5505_bank_w)
-	AM_RANGE(0x340000, 0x340003) AM_WRITE8(en_volume_w, 0xff00)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_ROMBANK("cpubank1")
-	AM_RANGE(0xc20000, 0xc3ffff) AM_ROMBANK("cpubank2")
-	AM_RANGE(0xc40000, 0xc7ffff) AM_ROMBANK("cpubank3")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")  // mirror
-ADDRESS_MAP_END
+void taito_en_device::en_sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).ram().mirror(0x30000).share("osram");
+	map(0x140000, 0x140fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask16(0xff00);
+	map(0x200000, 0x20001f).rw("ensoniq", FUNC(es5505_device::read), FUNC(es5505_device::write));
+	map(0x260000, 0x2601ff).rw("esp", FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
+	map(0x280000, 0x28001f).rw("duart68681", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x300000, 0x30003f).w(FUNC(taito_en_device::en_es5505_bank_w));
+	map(0x340000, 0x340003).w(FUNC(taito_en_device::en_volume_w)).umask16(0xff00);
+	map(0xc00000, 0xc1ffff).bankr("cpubank1");
+	map(0xc20000, 0xc3ffff).bankr("cpubank2");
+	map(0xc40000, 0xc7ffff).bankr("cpubank3");
+	map(0xff0000, 0xffffff).ram().share("osram");  // mirror
+}
 
 
 /*************************************
@@ -198,39 +199,40 @@ WRITE8_MEMBER(taito_en_device::duart_output)
 MACHINE_CONFIG_START(taito_en_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(30'476'100) / 2)
-	MCFG_CPU_PROGRAM_MAP(en_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(en_sound_map)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000)) // from Gun Buster schematics
+	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000)) // from Gun Buster schematics
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, XTAL(16'000'000) / 4)
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(taito_en_device, duart_irq_handler))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(taito_en_device, duart_output))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, taito_en_device, duart_irq_handler))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, taito_en_device, duart_output))
 
-	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
-	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(taito_en_device, mb87078_gain_changed))
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(taito_en_device::mb87078_gain_changed));
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0) // host accesses this from the other side
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_ADD("ensoniq", ES5505, XTAL(30'476'100) / 2)
 	MCFG_ES5505_REGION0("ensoniq.0")
 	MCFG_ES5505_REGION1("ensoniq.0")
 	MCFG_ES5505_CHANNELS(4)
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END

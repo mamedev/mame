@@ -102,6 +102,7 @@ private:
 	static const int m_scancode_set_2_3[];
 	static const extended_keyboard_code m_mf2_code[0x10][2];
 
+	output_finder<3> m_leds;
 	int m_scan_code_set;
 	int m_input_state;
 };
@@ -114,16 +115,16 @@ DECLARE_DEVICE_TYPE(AT_KEYB, at_keyboard_device)
 
 #define MCFG_PC_KEYB_ADD(_tag, _cb) \
 	MCFG_DEVICE_ADD(_tag, PC_KEYB, 0) \
-	devcb = &downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
+	downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
 
 #define MCFG_AT_KEYB_ADD(_tag, _def_set, _cb) \
 	MCFG_DEVICE_ADD(_tag, AT_KEYB, 0) \
 	downcast<at_keyboard_device &>(*device).set_type(pc_keyboard_device::KEYBOARD_TYPE::AT, _def_set); \
-	devcb = &downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
+	downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
 
 #define MCFG_AT_MF2_KEYB_ADD(_tag, _def_set, _cb) \
 	MCFG_DEVICE_ADD(_tag, AT_KEYB, 0) \
 	downcast<at_keyboard_device &>(*device).set_type(pc_keyboard_device::KEYBOARD_TYPE_MF2, _def_set); \
-	devcb = &downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
+	downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
 
 #endif // MAME_MACHINE_PCKEYBRD_H

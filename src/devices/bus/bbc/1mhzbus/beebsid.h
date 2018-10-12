@@ -30,12 +30,17 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual DECLARE_READ8_MEMBER(fred_r) override;
+	virtual DECLARE_WRITE8_MEMBER(fred_w) override;
+	virtual DECLARE_READ8_MEMBER(jim_r) override;
+	virtual DECLARE_WRITE8_MEMBER(jim_w) override;
+
 private:
+	required_device<bbc_1mhzbus_slot_device> m_1mhzbus;
 	required_device<mos8580_device> m_sid;
 };
 

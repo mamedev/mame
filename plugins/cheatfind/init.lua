@@ -80,7 +80,7 @@ function cheatfind.startplugin()
 			elseif data.shift < 0 then
 				local s = -data.shift
 				local read = (s == 1) and space.read_u16 or (s == 2) and space.read_u32 or (s == 3) and space.read_u64 or space.read_u8
-				local pack = (s == 1) and "<H" or (s == 2) and "<L" or (s == 3) and "<J" or "B"
+				local pack = (s == 1) and "<I2" or (s == 2) and "<I4" or (s == 3) and "<I8" or "B"
 				for i = start, start + (size >> s) do
 					if j < 65536 then
 						temp[j] = string.pack(pack, read(space, i))
@@ -98,11 +98,14 @@ function cheatfind.startplugin()
 		return data
 	end
 
-	-- compare two data blocks, format is as lua string.unpack, bne and beq val is table of masks
-	function cheat.comp(newdata, olddata, oper, format, val, bcd)
+	-- compare two data blocks, format is as lua string.unpack, bne and beq val is table of masks, step is address increment value
+	function cheat.comp(newdata, olddata, oper, format, val, bcd, step)
 		local ret = {}
 		local ref = {} -- this is a helper for comparing two match lists
 		local bitmask = nil
+		if not step or step <= 0 then
+			step = 1
+		end
 
 		local cfoper = {
 			lt = function(a, b, val) return (a < b and val == 0) or (val > 0 and (a + val) == b) end,
@@ -167,7 +170,7 @@ function cheatfind.startplugin()
 			val = 0
 		end
 
-		for i = 1, olddata.size do
+		for i = 1, olddata.size, step do
 			local oldstat, old = pcall(string.unpack, format, olddata.block, i)
 			local newstat, new = pcall(string.unpack, format, newdata.block, i)
 			if oldstat and newstat then
@@ -211,8 +214,8 @@ function cheatfind.startplugin()
 	end
 
 	-- compare two blocks and filter by table of previous matches
-	function cheat.compnext(newdata, olddata, oldmatch, oper, format, val, bcd)
-		local matches, refs = cheat.comp(newdata, olddata, oper, format, check_val(oper, val, oldmatch), bcd)
+	function cheat.compnext(newdata, olddata, oldmatch, oper, format, val, bcd, step)
+		local matches, refs = cheat.comp(newdata, olddata, oper, format, check_val(oper, val, oldmatch), bcd, step)
 		local nonmatch = {}
 		local oldrefs = {}
 		for num, match in pairs(oldmatch) do
@@ -237,15 +240,15 @@ function cheatfind.startplugin()
 
 
 	-- compare a data block to the current state
-	function cheat.compcur(olddata, oper, format, val, bcd)
+	function cheat.compcur(olddata, oper, format, val, bcd, step)
 		local newdata = cheat.save(olddata.space, olddata.start, olddata.size, olddata.space)
-		return cheat.comp(newdata, olddata, oper, format, val, bcd)
+		return cheat.comp(newdata, olddata, oper, format, val, bcd, step)
 	end
 
 	-- compare a data block to the current state and filter
-	function cheat.compcurnext(olddata, oldmatch, oper, format, val, bcd)
+	function cheat.compcurnext(olddata, oldmatch, oper, format, val, bcd, step)
 		local newdata = cheat.save(olddata.space, olddata.start, olddata.size, olddata.space)
-		return cheat.compnext(newdata, olddata, oldmatch, oper, format, val, bcd)
+		return cheat.compnext(newdata, olddata, oldmatch, oper, format, val, bcd, step)
 	end
 
 
@@ -254,11 +257,13 @@ function cheatfind.startplugin()
 	local devtable = {}
 	local devsel = 1
 	local devcur = 1
-	local formtable = { "B", "b", "<H", ">H", "<h", ">h", "<L", ">L", "<l", ">l", "<J", ">J", "<j", ">j" }
+	local formtable = { " I1", " i1", "<I2", ">I2", "<i2", ">i2", "<I4", ">I4", "<i4", ">i4", "<I8", ">I8", "<i8", ">i8", }-- " <f", " >f", " <d", " >d" }
 	local formname = { "u8", "s8", "little u16", "big u16", "little s16", "big s16",
-			   "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64" }
+			   "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64", }
+			   -- "little float", "big float", "little double", "big double" }
 	local width = 1
 	local bcd = 0
+	local align = 0
 	local optable = { "lt", "gt", "eq", "ne", "beq", "bne", "ltv", "gtv", "eqv", "nev" }
 	local opsel = 1
 	local value = 0
@@ -294,34 +299,34 @@ function cheatfind.startplugin()
 
 		local space_table = cheat.getspaces()
 		for tag, list in pairs(space_table) do
-			if list.program then
+			for name, space in pairs(list) do
 				local ram = {}
-				for num, entry in pairs(list.program.map) do
+				for num, entry in pairs(space.map) do
 					if entry.writetype == "ram" then
 						ram[#ram + 1] = { offset = entry.offset, size = entry.endoff - entry.offset }
-						if list.program.shift > 0 then
-							ram[#ram].size = ram[#ram].size >> list.program.shift
-						elseif list.program.shift < 0 then
-							ram[#ram].size = ram[#ram].size << -list.program.shift
+						if space.shift > 0 then
+							ram[#ram].size = ram[#ram].size >> space.shift
+						elseif space.shift < 0 then
+							ram[#ram].size = ram[#ram].size << -space.shift
 						end
 					end
 				end
 				if next(ram) then
-					if tag == ":maincpu" then
-						table.insert(devtable, 1, { tag = tag, space = list.program, ram = ram })
+					if tag == ":maincpu" and name == "program" then
+						table.insert(devtable, 1, { name = tag .. ", " .. name, tag = tag, sname = name, space = space, ram = ram })
 					else
-						devtable[#devtable + 1] = { tag = tag, space = list.program, ram = ram }
+						devtable[#devtable + 1] = { name = tag .. ", " .. name, tag = tag, sname = name, space = space, ram = ram }
 					end
 				end
 			end
 		end
 		space_table = cheat.getram()
 		for tag, ram in pairs(space_table) do
-			devtable[#devtable + 1] = { tag = tag, space = ram.dev, ram = {{ offset = 0, size = ram.size }} }
+			devtable[#devtable + 1] = { tag = tag, name = "ram", space = ram.dev, ram = {{ offset = 0, size = ram.size }} }
 		end
 		space_table = cheat.getshares()
 		for tag, share in pairs(space_table) do
-			devtable[#devtable + 1] = { tag = tag, space = share, ram = {{ offset = 0, size = share.size }} }
+			devtable[#devtable + 1] = { tag = tag, name = tag, space = share, ram = {{ offset = 0, size = share.size }} }
 		end
 	end
 
@@ -418,7 +423,8 @@ function cheatfind.startplugin()
 						if file then
 							file:write(string.format(cheat_save.json, desc))
 							file:close()
-							if not getmetatable(devtable[devcur].space).__name:match("device_t") then -- no xml or simple for ram_device cheat
+							-- xml or simple are program space only
+							if not getmetatable(devtable[devcur].space).__name:match("device_t") and devtable[devcur].sname == "program" then
 								file = io.open(filename .. ".xml", "w")
 								file:write(string.format(cheat_save.xml, desc))
 								file:close()
@@ -428,7 +434,7 @@ function cheatfind.startplugin()
 								manager:machine():popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), filename))
 							end
 							written = true
-						elseif not getmetatable(devtable[devcur].space).__name:match("device_t") then
+						elseif not getmetatable(devtable[devcur].space).__name:match("device_t") and devtable[devcur].sname == "program" then
 							file = io.open(cheat_save.path .. "/cheat.simple", "a")
 							if file then
 								file:write(string.format(cheat_save.simple, desc))
@@ -452,7 +458,7 @@ function cheatfind.startplugin()
 		end
 
 		menu[#menu + 1] = function()
-			local m = { _("CPU or RAM"), devtable[devsel].tag, 0 }
+			local m = { _("CPU or RAM"), devtable[devsel].name, 0 }
 			menu_lim(devsel, 1, #devtable, m)
 			local function f(event)
 				if (event == "left" or event == "right") and #menu_blocks ~= 0 then
@@ -506,15 +512,23 @@ function cheatfind.startplugin()
 				local function f(event)
 					if event == "select" then
 						local count = 0
+						local step = align == 1 and formtable[width]:sub(3, 3) or "1"
+						if step == "f" then
+							step = 4
+						elseif step == "d" then
+							step = 8
+						else
+							step = tonumber(step)
+						end
 						if #matches == 0 then
 							matches[1] = {}
 							for num = 1, #menu_blocks do
 								if leftop == #menu_blocks[1] + 1 then
 									matches[1][num] = cheat.compcur(menu_blocks[num][rightop], optable[opsel],
-									formtable[width], value, bcd == 1)
+									formtable[width], value, bcd == 1, step)
 								else
 									matches[1][num] = cheat.comp(menu_blocks[num][leftop], menu_blocks[num][rightop],
-									optable[opsel], formtable[width], value, bcd == 1)
+									optable[opsel], formtable[width], value, bcd == 1, step)
 								end
 								count = count + #matches[1][num]
 							end
@@ -524,15 +538,15 @@ function cheatfind.startplugin()
 							for num = 1, #menu_blocks do
 								if leftop == #menu_blocks[1] + 1 then
 									matches[#matches][num] = cheat.compcurnext(menu_blocks[num][rightop], lastmatch[num],
-									optable[opsel], formtable[width], value, bcd == 1)
+									optable[opsel], formtable[width], value, bcd == 1, step)
 								else
 									matches[#matches][num] = cheat.compnext(menu_blocks[num][leftop], menu_blocks[num][rightop],
-									lastmatch[num], optable[opsel], formtable[width], value, bcd == 1)
+									lastmatch[num], optable[opsel], formtable[width], value, bcd == 1, step)
 								end
 								count = count + #matches[#matches][num]
 							end
 						end
-						manager:machine():popmessage(count .. _(" total matches found"))
+						manager:machine():popmessage(string.format(_("%d total matches found"), count))
 						matches[#matches].count = count
 						matchpg = 0
 						devsel = devcur
@@ -619,6 +633,17 @@ function cheatfind.startplugin()
 				end
 				return m, function(event) local r bcd, r = incdec(event, bcd, 0, 1) return r end
 			end
+			menu[#menu + 1] = function()
+				if formtable[width]:sub(3, 3) == "1" then
+					return nil
+				end
+				local m = { "Aligned only", _("Off"), 0 }
+				menu_lim(align, 0, 1, m)
+				if align == 1 then
+					m[2] = _("On")
+				end
+				return m, function(event) local r align, r = incdec(event, align, 0, 1) return r end
+			end
 			if #matches ~= 0 then
 				menu[#menu + 1] = function()
 					local function f(event)
@@ -673,13 +698,15 @@ function cheatfind.startplugin()
 					end
 					return mpairs_it, list, 0
 				end
-				local bitwidth = formtable[width]:sub(2, 2):lower()
-				if bitwidth == "h" then
+				local bitwidth = formtable[width]:sub(3, 3)
+				if bitwidth == "2" then
 					bitwidth = " %04x"
-				elseif bitwidth == "l" then
+				elseif bitwidth == "4" then
 					bitwidth = " %08x"
-				elseif bitwidth == "j" then
+				elseif bitwidth == "8" then
 					bitwidth = " %016x"
+				elseif bitwidth == "f" or bitwidth == "d" then
+					bitwidth = " %010f"
 				else
 					bitwidth = " %02x"
 				end
@@ -687,20 +714,28 @@ function cheatfind.startplugin()
 				local function match_exec(match)
 					local dev = devtable[devcur]
 					local cheat = { desc = string.format(_("Test cheat at addr %08X"), match.addr), script = {} }
-					local wid = formtable[width]:sub(2, 2):lower()
+					local wid = formtable[width]:sub(3, 3)
 					local widchar
 					local form
-					if wid == "h" then
+					if wid == "2" then
 						wid = "u16"
 						form = "%08x %04x"
 						widchar = "w"
-					elseif wid == "l" then
+					elseif wid == "4" then
 						wid = "u32"
 						form = "%08x %08x"
 						widchart = "d"
-					elseif wid == "j" then
+					elseif wid == "8" then
 						wid = "u64"
 						form = "%08x %016x"
+						widchar = "q"
+					elseif wid == "f" then
+						wid = "u32"
+						form = "%08x %f"
+						widchar = "d"
+					elseif wid == "d" then
+						wid = "u64"
+						form = "%08x %f"
 						widchar = "q"
 					else
 						wid = "u8"
@@ -712,8 +747,11 @@ function cheatfind.startplugin()
 					if getmetatable(dev.space).__name:match("device_t") then
 						cheat.ram = { ram = dev.tag }
 						cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
+					elseif getmetatable(dev.space).__name:match("memory_share") then
+						cheat.share = { share = dev.tag }
+						cheat.script.run = "share:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
 					else
-						cheat.space = { cpu = { tag = dev.tag, type = "program" } }
+						cheat.space = { cpu = { tag = dev.tag, type = dev.sname } }
 						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
 					end
 					if match.mode == 1 then
@@ -729,9 +767,13 @@ function cheatfind.startplugin()
 						menu_type = 1
 						local setname = emu.romname()
 						if emu.softname() ~= "" then
-							for name, image in pairs(manager:machine().images) do
-								if image:exists() and image:software_list_name() ~= "" then
-									setname = image:software_list_name() .. "/" .. emu.softname()
+							if emu.softname():find(":") then
+								filename = emu.softname():gsub(":", "/")
+							else
+								for name, image in pairs(manager:machine().images) do
+									if image:exists() and image:software_list_name() ~= "" then
+										setname = image:software_list_name() .. "/" .. emu.softname()
+									end
 								end
 							end
 						end

@@ -126,36 +126,39 @@ READ8_MEMBER(mainsnk_state::sound_ack_r)
 
 
 
-ADDRESS_MAP_START(mainsnk_state::main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
-	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
-	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
-	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3")
-	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc600, 0xc600) AM_WRITE(c600_w)
-	AM_RANGE(0xc700, 0xc700) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0xdc00, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")    // + work RAM
-ADDRESS_MAP_END
+void mainsnk_state::main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc000).portr("IN0");
+	map(0xc100, 0xc100).portr("IN1");
+	map(0xc200, 0xc200).portr("IN2");
+	map(0xc300, 0xc300).portr("IN3");
+	map(0xc400, 0xc400).portr("DSW1");
+	map(0xc500, 0xc500).portr("DSW2");
+	map(0xc600, 0xc600).w(FUNC(mainsnk_state::c600_w));
+	map(0xc700, 0xc700).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xd800, 0xdbff).ram().w(FUNC(mainsnk_state::bgram_w)).share("bgram");
+	map(0xdc00, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().share("spriteram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(mainsnk_state::fgram_w)).share("fgram");    // + work RAM
+}
 
-ADDRESS_MAP_START(mainsnk_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, acknowledge_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITENOP    // ? always FFFF, snkwave leftover?
-	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void mainsnk_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_r));
+	map(0xe000, 0xe001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0xe002, 0xe003).nopw();    // ? always FFFF, snkwave leftover?
+	map(0xe008, 0xe009).w("ay2", FUNC(ay8910_device::address_data_w));
+}
 
-ADDRESS_MAP_START(mainsnk_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_ack_r)
-ADDRESS_MAP_END
+void mainsnk_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(mainsnk_state::sound_ack_r));
+}
 
 
 
@@ -166,7 +169,7 @@ static INPUT_PORTS_START( mainsnk )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
@@ -260,7 +263,7 @@ static INPUT_PORTS_START( canvas )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
@@ -328,9 +331,9 @@ static INPUT_PORTS_START( canvas )
 	PORT_DIPSETTING(    0x10, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x08, "Infinite Lives (Cheat)" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -365,7 +368,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( mainsnk )
+static GFXDECODE_START( gfx_mainsnk )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0x100, 0x080>>4 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0x000, 0x080>>3 )
 GFXDECODE_END
@@ -374,14 +377,14 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 
-	MCFG_CPU_ADD("maincpu", Z80, 3360000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mainsnk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3360000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mainsnk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mainsnk_state, irq0_line_assert,  244)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mainsnk_state, irq0_line_assert,  244)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -391,21 +394,21 @@ MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 	MCFG_SCREEN_UPDATE_DRIVER(mainsnk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mainsnk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mainsnk)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INIT_OWNER(mainsnk_state, mainsnk)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
@@ -476,5 +479,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, mainsnk_state, 0,   ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, canvas,    0,   mainsnk, canvas,  mainsnk_state, 0,   ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT180, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )

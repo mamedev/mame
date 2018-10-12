@@ -10,6 +10,11 @@
 class kaneko_view2_tilemap_device : public device_t
 {
 public:
+	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: kaneko_view2_tilemap_device(mconfig, tag, owner, (uint32_t)0)
+	{
+	}
+
 	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
@@ -92,7 +97,7 @@ private:
 DECLARE_DEVICE_TYPE(KANEKO_TMAP, kaneko_view2_tilemap_device)
 
 #define MCFG_KANEKO_TMAP_GFXDECODE(_gfxtag) \
-	downcast<kaneko_view2_tilemap_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<kaneko_view2_tilemap_device &>(*device).set_gfxdecode_tag(_gfxtag);
 #define MCFG_KANEKO_TMAP_GFX_REGION(_region) \
 	downcast<kaneko_view2_tilemap_device &>(*device).set_gfx_region(_region);
 #define MCFG_KANEKO_TMAP_INVERT_FLIP(_invert) \

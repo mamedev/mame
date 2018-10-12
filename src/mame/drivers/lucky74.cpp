@@ -878,10 +878,10 @@ WRITE8_MEMBER(lucky74_state::lamps_a_w)
     ---- xx--  BIG + SMALL (need to be individualized)
 */
 
-	output().set_lamp_value(8, (data >> 0) & 1);      /* D-UP */
-	output().set_lamp_value(9, (data >> 1) & 1);      /* TAKE SCORE */
-	output().set_lamp_value(10, (data >> 2) & 1);     /* BIG */
-	output().set_lamp_value(11, (data >> 3) & 1);     /* SMALL */
+	m_lamps[8] = BIT(data, 0);      /* D-UP */
+	m_lamps[9] = BIT(data, 1);      /* TAKE SCORE */
+	m_lamps[10] = BIT(data, 2);     /* BIG */
+	m_lamps[11] = BIT(data, 3);     /* SMALL */
 }
 
 WRITE8_MEMBER(lucky74_state::lamps_b_w)
@@ -898,14 +898,14 @@ WRITE8_MEMBER(lucky74_state::lamps_b_w)
     x--- ----  CANCEL (should lit start too?)
 */
 
-	output().set_lamp_value(0, (data >> 0) & 1);                      /* HOLD1 */
-	output().set_lamp_value(1, (data >> 1) & 1);                      /* HOLD2 */
-	output().set_lamp_value(2, (data >> 2) & 1);                      /* HOLD3 */
-	output().set_lamp_value(3, (data >> 3) & 1);                      /* HOLD4 */
-	output().set_lamp_value(4, (data >> 4) & 1);                      /* HOLD5 */
-	output().set_lamp_value(5, (data >> 5) & 1);                      /* BET */
-	output().set_lamp_value(6, ((data >> 6) & 1)|((data >> 7) & 1));  /* START */
-	output().set_lamp_value(7, (data >> 7) & 1);                      /* CANCEL */
+	m_lamps[0] = BIT(data, 0);                 /* HOLD1 */
+	m_lamps[1] = BIT(data, 1);                 /* HOLD2 */
+	m_lamps[2] = BIT(data, 2);                 /* HOLD3 */
+	m_lamps[3] = BIT(data, 3);                 /* HOLD4 */
+	m_lamps[4] = BIT(data, 4);                 /* HOLD5 */
+	m_lamps[5] = BIT(data, 5);                 /* BET */
+	m_lamps[6] = BIT(data, 6) | BIT(data, 7);  /* START */
+	m_lamps[7] = BIT(data, 7);                 /* CANCEL */
 }
 
 
@@ -917,7 +917,7 @@ INTERRUPT_GEN_MEMBER(lucky74_state::nmi_interrupt)
 {
 	if ((m_ym2149_portb & 0x10) == 0)   /* ym2149 portB bit 4 trigger the NMI */
 	{
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -926,31 +926,33 @@ INTERRUPT_GEN_MEMBER(lucky74_state::nmi_interrupt)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(lucky74_state::lucky74_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")   /* NVRAM */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_SHARE("fg_videoram")    /* VRAM1-1 */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(lucky74_fg_colorram_w) AM_SHARE("fg_colorram")    /* VRAM1-2 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lucky74_bg_videoram_w) AM_SHARE("bg_videoram")    /* VRAM2-1 */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lucky74_bg_colorram_w) AM_SHARE("bg_colorram")    /* VRAM2-2 */
-	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)        /* Input Ports 0 & 1 */
-	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)        /* DSW 1, 2 & 3 */
-	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)        /* DSW 4 */
-	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE("sn1", sn76489_device, write)                      /* SN76489 #1 */
-	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)        /* Input Ports 2 & 4 */
-	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE("sn2", sn76489_device, write)                      /* SN76489 #2 */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("aysnd", ay8910_device, address_w)                  /* YM2149 control */
-	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE("sn3", sn76489_device, write)                      /* SN76489 #3 */
-	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)       /* YM2149 (Input Port 1) */
-	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)                       /* USART 8251 port */
-	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)                   /* SM7831 Co-Processor */
-ADDRESS_MAP_END
+void lucky74_state::lucky74_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram().share("nvram");   /* NVRAM */
+	map(0xd000, 0xd7ff).ram().w(FUNC(lucky74_state::lucky74_fg_videoram_w)).share("fg_videoram");       // VRAM1-1
+	map(0xd800, 0xdfff).ram().w(FUNC(lucky74_state::lucky74_fg_colorram_w)).share("fg_colorram");       // VRAM1-2
+	map(0xe000, 0xe7ff).ram().w(FUNC(lucky74_state::lucky74_bg_videoram_w)).share("bg_videoram");       // VRAM2-1
+	map(0xe800, 0xefff).ram().w(FUNC(lucky74_state::lucky74_bg_colorram_w)).share("bg_colorram");       // VRAM2-2
+	map(0xf000, 0xf003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));           // Input Ports 0 & 1
+	map(0xf080, 0xf083).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));           // DSW 1, 2 & 3
+	map(0xf0c0, 0xf0c3).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));           // DSW 4
+	map(0xf100, 0xf100).w("sn1", FUNC(sn76489_device::command_w));                                      // SN76489 #1
+	map(0xf200, 0xf203).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));           // Input Ports 2 & 4
+	map(0xf300, 0xf300).w("sn2", FUNC(sn76489_device::command_w));                                      // SN76489 #2
+	map(0xf400, 0xf400).w("aysnd", FUNC(ay8910_device::address_w));                                     // YM2149 control
+	map(0xf500, 0xf500).w("sn3", FUNC(sn76489_device::command_w));                                      // SN76489 #3
+	map(0xf600, 0xf600).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));          // YM2149 (Input Port 1)
+	map(0xf700, 0xf701).rw(FUNC(lucky74_state::usart_8251_r), FUNC(lucky74_state::usart_8251_w));       // USART 8251 port
+	map(0xf800, 0xf803).rw(FUNC(lucky74_state::copro_sm7831_r), FUNC(lucky74_state::copro_sm7831_w));   // SM7831 Co-Processor
+}
 
-ADDRESS_MAP_START(lucky74_state::lucky74_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x05) AM_READWRITE(custom_09R81P_port_r, custom_09R81P_port_w)           /* custom 09R81P (samples system) */
-	AM_RANGE(0xff, 0xff) AM_RAM // presumably HS satellite control port (check patched in Lucky 74)
-ADDRESS_MAP_END
+void lucky74_state::lucky74_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x05).rw(FUNC(lucky74_state::custom_09R81P_port_r), FUNC(lucky74_state::custom_09R81P_port_w));           /* custom 09R81P (samples system) */
+	map(0xff, 0xff).ram(); // presumably HS satellite control port (check patched in Lucky 74)
+}
 
 /* unknown I/O byte R/W
 
@@ -1388,7 +1390,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( lucky74 )
+static GFXDECODE_START( gfx_lucky74 )
 	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 0, 16 )      /* text, frames & cards */
 	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 256, 16 )    /* title & whores */
 GFXDECODE_END
@@ -1436,7 +1438,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 			/* transferring 1st nibble */
 			m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos];
 			m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
-			m_msm->data_w(m_adpcm_data >> 4);
+			m_msm->write_data(m_adpcm_data >> 4);
 
 			if (m_adpcm_pos == m_adpcm_end)
 			{
@@ -1449,7 +1451,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 		else
 		{
 			/* transferring 2nd nibble */
-			m_msm->data_w(m_adpcm_data & 0x0f);
+			m_msm->write_data(m_adpcm_data & 0x0f);
 			m_adpcm_data = -1;
 		}
 	}
@@ -1464,33 +1466,33 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 MACHINE_CONFIG_START(lucky74_state::lucky74)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)    /* 3 MHz. */
-	MCFG_CPU_PROGRAM_MAP(lucky74_map)
-	MCFG_CPU_IO_MAP(lucky74_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt) /* 60 Hz. measured */
+	MCFG_DEVICE_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)    /* 3 MHz. */
+	MCFG_DEVICE_PROGRAM_MAP(lucky74_map)
+	MCFG_DEVICE_IO_MAP(lucky74_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt) /* 60 Hz. measured */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// Each 82C255 behaves like 2x 8255 (in mode 0). Since MAME doesn't support it yet, I replaced
 	// both 82C255 with 4x 8255...
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
 	// Port C write: 0x00 after reset, 0xff during game, and 0xfd when tap F2 for percentage and run count
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN4"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("IN2");
+	ppi1.in_pc_callback().set_ioport("IN4");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set_ioport("DSW1");
+	ppi2.in_pb_callback().set_ioport("DSW2");
+	ppi2.in_pc_callback().set_ioport("DSW3");
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW4"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lucky74_state, lamps_a_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lucky74_state, lamps_b_w))
+	i8255_device &ppi3(I8255A(config, "ppi8255_3"));
+	ppi3.in_pa_callback().set_ioport("DSW4");
+	ppi3.out_pb_callback().set(FUNC(lucky74_state::lamps_a_w));
+	ppi3.out_pc_callback().set(FUNC(lucky74_state::lamps_b_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1501,31 +1503,31 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	MCFG_SCREEN_UPDATE_DRIVER(lucky74_state, screen_update_lucky74)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lucky74)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lucky74)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(lucky74_state, lucky74)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
+	MCFG_DEVICE_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
+	MCFG_DEVICE_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
+	MCFG_DEVICE_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, C_06B49P_CLKOUT_04) /* 1.5 MHz. */
+	MCFG_DEVICE_ADD("aysnd", AY8910, C_06B49P_CLKOUT_04) /* 1.5 MHz. */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN3"))
 	/* port b read is a sort of status byte */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lucky74_state, ym2149_portb_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lucky74_state, ym2149_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)         /* not routed to audio hardware */
 
-	MCFG_SOUND_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)  /* 375 kHz. */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(lucky74_state, lucky74_adpcm_int))  /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)  /* 375 kHz. */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, lucky74_state, lucky74_adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
@@ -1745,8 +1747,8 @@ ROM_END
 *                Game Drivers                *
 **********************************************/
 
-//     YEAR  NAME      PARENT   MACHINE  INPUT     STATS           INIT  ROT   COMPANY            FULLNAME                    FLAGS                LAYOUT
-GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  lucky74_state,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                   layout_lucky74 )
-GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74a, lucky74_state,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", 0,                   layout_lucky74 )
-GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  lucky74_state,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", MACHINE_NOT_WORKING, layout_lucky74 )
-GAME(  1989, excitbj,  0,       lucky74, excitbj,  lucky74_state,  0,    ROT0, "Sega",           "Exciting Black Jack",       MACHINE_NOT_WORKING )
+//     YEAR  NAME      PARENT   MACHINE  INPUT     STATS          INIT        ROT   COMPANY            FULLNAME                    FLAGS                LAYOUT
+GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                   layout_lucky74 )
+GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74a, lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", 0,                   layout_lucky74 )
+GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", MACHINE_NOT_WORKING, layout_lucky74 )
+GAME(  1989, excitbj,  0,       lucky74, excitbj,  lucky74_state, empty_init, ROT0, "Sega",           "Exciting Black Jack",       MACHINE_NOT_WORKING )

@@ -25,18 +25,19 @@
 
 /***********************************************************************************************/
 
-ADDRESS_MAP_START(zac2650_state::main_map)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tinvader_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1c00, 0x1cff) AM_RAM
-	AM_RANGE(0x1d00, 0x1dff) AM_RAM
-	AM_RANGE(0x1e80, 0x1e80) AM_READ(tinvader_port_0_r) AM_WRITE(tinvader_sound_w)
-	AM_RANGE(0x1e81, 0x1e81) AM_READ_PORT("1E81")
-	AM_RANGE(0x1e82, 0x1e82) AM_READ_PORT("1E82")
-	AM_RANGE(0x1e85, 0x1e85) AM_READ_PORT("1E85")                   /* Dodgem Only */
-	AM_RANGE(0x1e86, 0x1e86) AM_READ_PORT("1E86") AM_WRITENOP       /* Dodgem Only */
-	AM_RANGE(0x1f00, 0x1fff) AM_READWRITE(zac_s2636_r, zac_s2636_w) AM_SHARE("s2636_0_ram")
-ADDRESS_MAP_END
+void zac2650_state::main_map(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+	map(0x1800, 0x1bff).ram().w(FUNC(zac2650_state::tinvader_videoram_w)).share("videoram");
+	map(0x1c00, 0x1cff).ram();
+	map(0x1d00, 0x1dff).ram();
+	map(0x1e80, 0x1e80).r(FUNC(zac2650_state::tinvader_port_0_r)).w(FUNC(zac2650_state::tinvader_sound_w));
+	map(0x1e81, 0x1e81).portr("1E81");
+	map(0x1e82, 0x1e82).portr("1E82");
+	map(0x1e85, 0x1e85).portr("1E85");                   /* Dodgem Only */
+	map(0x1e86, 0x1e86).portr("1E86").nopw();       /* Dodgem Only */
+	map(0x1f00, 0x1fff).rw(FUNC(zac2650_state::zac_s2636_r), FUNC(zac2650_state::zac_s2636_w)).share("s2636_0_ram");
+}
 
 static INPUT_PORTS_START( tinvader )
 	PORT_START("1E80")
@@ -223,7 +224,7 @@ static const gfx_layout s2636_character =
 	8*8
 };
 
-static GFXDECODE_START( tinvader )
+static GFXDECODE_START( gfx_tinvader )
 	GFXDECODE_SCALE( "gfx1", 0, tinvader_character,   0, 2, 3, 3 )
 	GFXDECODE_SCALE( nullptr,   0x1F00, s2636_character, 0, 2, 4, 3 )  /* dynamic */
 	GFXDECODE_SCALE( nullptr,   0x1F00, s2636_character, 0, 2, 8, 6 )  /* dynamic */
@@ -232,28 +233,28 @@ GFXDECODE_END
 MACHINE_CONFIG_START(zac2650_state::tinvader)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 3800000/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT
+	s2650_device &maincpu(S2650(config, m_maincpu, 3800000/4));
+	maincpu.set_addrmap(AS_PROGRAM, &zac2650_state::main_map);
+	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1041))
-	MCFG_SCREEN_SIZE(30*24, 32*24)
-	MCFG_SCREEN_VISIBLE_AREA(0, 719, 0, 767)
-	MCFG_SCREEN_UPDATE_DRIVER(zac2650_state, screen_update_tinvader)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(55);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1041));
+	m_screen->set_size(30*24, 32*24);
+	m_screen->set_visarea(0, 719, 0, 767);
+	m_screen->set_screen_update(FUNC(zac2650_state::screen_update_tinvader));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tinvader)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tinvader)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(zac2650_state, zac2650)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("s2636", S2636, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636, 0);
+	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 WRITE8_MEMBER(zac2650_state::tinvader_sound_w)
@@ -308,6 +309,6 @@ ROM_START( dodgem )
 ROM_END
 
 
-GAMEL(1979?,tinv2650, 0,        tinvader, tinvader, zac2650_state, 0, ROT270, "Zaccaria / Zelco", "The Invaders", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tinv2650 )
-GAME( 1979?,sia2650,  tinv2650, tinvader, sinvader, zac2650_state, 0, ROT270, "bootleg (Sidam)",  "Super Invader Attack (bootleg of The Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1980?
-GAME( 1979, dodgem,   0,        tinvader, dodgem,   zac2650_state, 0, ROT0,   "Zaccaria",         "Dodgem", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1979?, tinv2650, 0,        tinvader, tinvader, zac2650_state, empty_init, ROT270, "Zaccaria / Zelco", "The Invaders", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tinv2650 )
+GAME(  1979?, sia2650,  tinv2650, tinvader, sinvader, zac2650_state, empty_init, ROT270, "bootleg (Sidam)",  "Super Invader Attack (bootleg of The Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1980?
+GAME(  1979,  dodgem,   0,        tinvader, dodgem,   zac2650_state, empty_init, ROT0,   "Zaccaria",         "Dodgem", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

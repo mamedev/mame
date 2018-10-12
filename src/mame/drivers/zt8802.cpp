@@ -22,12 +22,12 @@ class zt8802_state : public driver_device
 public:
 	zt8802_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		//      , m_maincpu(*this, "maincpu")
 	{ }
 
-void zt8802(machine_config &config);
+	void zt8802(machine_config &config);
 private:
-//  required_device<cpu_device> m_maincpu;
+	//  required_device<cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( zt8802 )
@@ -41,4 +41,4 @@ ROM_START( zt8802 )
 	ROM_LOAD( "c103207-218 a.rom", 0x00000, 0x80000, CRC(fc1c6e99) SHA1(cfbb2f0c9927bac5abc85c12d2b82f7da46cab03) )
 ROM_END
 
-COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, 0, "Ziatech", "ZT-8802 SBC", MACHINE_IS_SKELETON )
+COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, empty_init, "Ziatech", "ZT-8802 SBC", MACHINE_IS_SKELETON )

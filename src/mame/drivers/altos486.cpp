@@ -26,7 +26,7 @@ public:
 
 	void altos486(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(read_rmx_ack);
 
 	DECLARE_READ16_MEMBER(mmu_ram_r);
@@ -40,7 +40,6 @@ protected:
 	void altos486_z80_io(address_map &map);
 	void altos486_z80_mem(address_map &map);
 
-private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_ram;
 	required_memory_region m_rom;
@@ -101,113 +100,118 @@ FLOPPY_FORMATS_MEMBER( altos486_state::floppy_formats )
 	FLOPPY_TD0_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( altos486_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void altos486_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
-ADDRESS_MAP_START(altos486_state::altos486_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mmu_ram_r, mmu_ram_w) AM_SHARE("main_ram")
-ADDRESS_MAP_END
+void altos486_state::altos486_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xfffff).rw(FUNC(altos486_state::mmu_ram_r), FUNC(altos486_state::mmu_ram_w)).share("main_ram");
+}
 
-ADDRESS_MAP_START(altos486_state::altos486_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_io_r, mmu_io_w)
-ADDRESS_MAP_END
+void altos486_state::altos486_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(altos486_state::mmu_io_r), FUNC(altos486_state::mmu_io_w));
+}
 
-ADDRESS_MAP_START(altos486_state::altos486_z80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
+void altos486_state::altos486_z80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom().region("iocpu", 0);
+	map(0x2000, 0x27ff).ram();
 	//AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_shared_r, z80_shared_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(altos486_state::altos486_z80_io)
+void altos486_state::altos486_z80_io(address_map &map)
+{
 	//AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio0", z80sio0_device, read, write)
 	//AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio1", z80sio0_device, read, write)
 	//AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio2", z80sio0_device, read, write)
-ADDRESS_MAP_END
+}
 
 MACHINE_CONFIG_START(altos486_state::altos486)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(altos486_mem)
-	MCFG_CPU_IO_MAP(altos486_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb) // yes, really
+	MCFG_DEVICE_ADD(m_maincpu, I80186, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(altos486_mem)
+	MCFG_DEVICE_IO_MAP(altos486_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb) // yes, really
 
-	MCFG_CPU_ADD("iocpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(altos486_z80_mem)
-	MCFG_CPU_IO_MAP(altos486_z80_io)
+	MCFG_DEVICE_ADD("iocpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(altos486_z80_mem)
+	MCFG_DEVICE_IO_MAP(altos486_z80_io)
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(altos486_state, read_rmx_ack))
+	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
+	pic8259.out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	pic8259.in_sp_callback().set_constant(1);
+	pic8259.read_slave_ack_callback().set(FUNC(altos486_state::read_rmx_ack));
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
-	MCFG_UPD765A_ADD("fdc", false, false)
+	UPD765A(config, "fdc", false, false);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos486_floppies, "525qd", altos486_state::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_DEVICE_ADD("sio0", Z80SIO0, 4000000)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(altos486_state, sio_interrupt))
+	z80sio0_device& sio0(Z80SIO0(config, "sio0", 4000000));
+	sio0.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	sio0.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	sio0.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	sio0.out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	sio0.out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	sio0.out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+	//sio0.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	MCFG_DEVICE_ADD("sio1", Z80SIO0, 4000000)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232c", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232c", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232c", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232d", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232d", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232d", rs232_port_device, write_rts))
-	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(altos486_state, sio_interrupt))
+	z80sio0_device& sio1(Z80SIO0(config, "sio1", 4000000));
+	sio1.out_txda_callback().set("rs232c", FUNC(rs232_port_device::write_txd));
+	sio1.out_dtra_callback().set("rs232c", FUNC(rs232_port_device::write_dtr));
+	sio1.out_rtsa_callback().set("rs232c", FUNC(rs232_port_device::write_rts));
+	sio1.out_txdb_callback().set("rs232d", FUNC(rs232_port_device::write_txd));
+	sio1.out_dtrb_callback().set("rs232d", FUNC(rs232_port_device::write_dtr));
+	sio1.out_rtsb_callback().set("rs232d", FUNC(rs232_port_device::write_rts));
+	//sio1.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	MCFG_DEVICE_ADD("sio2", Z80SIO0, 4000000)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_lp", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_lp", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232_lp", rs232_port_device, write_rts))
-	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(altos486_state, sio_interrupt))
+	z80sio0_device& sio2(Z80SIO0(config, "sio2", 4000000));
+	sio2.out_txda_callback().set("rs232_lp", FUNC(rs232_port_device::write_txd));
+	sio2.out_dtra_callback().set("rs232_lp", FUNC(rs232_port_device::write_dtr));
+	sio2.out_rtsa_callback().set("rs232_lp", FUNC(rs232_port_device::write_rts));
+	//sio2.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	MCFG_DEVICE_ADD("i8274", I8274, XTAL(16'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs422_wn", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs422_wn", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs422_wn", rs232_port_device, write_rts))
-	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(altos486_state, sio_interrupt))
+	i8274_device& i8274(I8274(config, "i8274", XTAL(16'000'000)/4));
+	i8274.out_txda_callback().set("rs422_wn", FUNC(rs232_port_device::write_txd));
+	i8274.out_dtra_callback().set("rs422_wn", FUNC(rs232_port_device::write_dtr));
+	i8274.out_rtsa_callback().set("rs422_wn", FUNC(rs232_port_device::write_rts));
+	//i8274.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio0", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio0", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio0", z80dart_device, ctsa_w))
-	//MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", altos486_terminal)
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio0", z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio0", z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio0", z80dart_device, ctsa_w))
+	//MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", altos486_terminal)
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio0", z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio0", z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio0", z80dart_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio0", z80dart_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio0", z80dart_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio0", z80dart_device, ctsb_w))
 
-	MCFG_RS232_PORT_ADD("rs232c", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio1", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio1", z80dart_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232c", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80dart_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD("rs232d", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1", z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio1", z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio1", z80dart_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232d", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80dart_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80dart_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80dart_device, ctsb_w))
 
-	MCFG_RS232_PORT_ADD("rs232_lp", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio2", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio2", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio2", z80dart_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232_lp", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio2", z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio2", z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio2", z80dart_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD("rs422_wn", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8274", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("i8274", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("i8274", z80dart_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs422_wn", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8274", z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("i8274", z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("i8274", z80dart_device, ctsa_w))
 
 	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
@@ -223,14 +227,14 @@ MACHINE_CONFIG_END
 ROM_START( altos486 )
 	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v11", "Altos 486 v1.1")
-	ROMX_LOAD("16577_lo_v1.1.bin",   0x0000, 0x2000, CRC(65a9db18) SHA1(3ac2b87f1fc0b28ed4907c9b4091aaa170609674), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("16576_hi_v1.1.bin",   0x0001, 0x2000, CRC(cea4cd8d) SHA1(f9f49828bd5e3281bd7cc34d4460ca1b677530b0), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("16577_lo_v1.1.bin",   0x0000, 0x2000, CRC(65a9db18) SHA1(3ac2b87f1fc0b28ed4907c9b4091aaa170609674), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("16576_hi_v1.1.bin",   0x0001, 0x2000, CRC(cea4cd8d) SHA1(f9f49828bd5e3281bd7cc34d4460ca1b677530b0), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v12", "Altos 486 v1.2")
-	ROMX_LOAD("16577-003_4D_v1.2.bin",   0x0000, 0x2000, CRC(e2ac806b) SHA1(9b358246e26b3e85a6dff418899a180370884537), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("16576-003_3D_v1.2.bin",   0x0001, 0x2000, CRC(912f4c12) SHA1(df5088e8610513b577926b0c752e3b54bc880167), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("16577-003_4d_v1.2.bin",   0x0000, 0x2000, CRC(e2ac806b) SHA1(9b358246e26b3e85a6dff418899a180370884537), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("16576-003_3d_v1.2.bin",   0x0001, 0x2000, CRC(912f4c12) SHA1(df5088e8610513b577926b0c752e3b54bc880167), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION( 0x1000, "iocpu", 0 )
 	ROM_LOAD("16019_z80.bin", 0x0000, 0x1000, CRC(68b1b2e1) SHA1(5d83609a465029212d5e3f72ac9c520b3dbed838))
 ROM_END
 
-COMP( 1984, altos486, 0, 0, altos486, 0, altos486_state, 0, "Altos Computer Systems", "Altos 486",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, altos486, 0, 0, altos486, 0, altos486_state, empty_init, "Altos Computer Systems", "Altos 486", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

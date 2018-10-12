@@ -27,24 +27,25 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	DECLARE_DRIVER_INIT(canons80);
+	void init_canons80();
 	void canons80(machine_config &config);
 	void canons80_map(address_map &map);
 };
 
 
-ADDRESS_MAP_START(canons80_state::canons80_map)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void canons80_state::canons80_map(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom();
+}
 
 MACHINE_CONFIG_START(canons80_state::canons80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6301, 5000000) /* hd63a01xop 5 MHz guessed: TODO: check on PCB */
-	MCFG_CPU_PROGRAM_MAP(canons80_map)
+	MCFG_DEVICE_ADD("maincpu", HD6301, 5000000) /* hd63a01xop 5 MHz guessed: TODO: check on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(canons80_map)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(canons80_state, canons80)
+void canons80_state::init_canons80()
 {
 }
 
@@ -53,5 +54,5 @@ ROM_START( canons80 )
 	ROM_LOAD( "canon_8735kx_nh4-0029_064.ic6", 0x8000, 0x8000, CRC(b6cd2ff7) SHA1(e47a136300c826e480fac1be7fc090523078a2a6) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE  INPUT  INIT                      COMPANY  FULLNAME                            FLAGS */
-COMP( 1988, canons80,      0,      0, canons80,     0, canons80_state, canons80, "Canon", "Canon S-80 electronic typewriter", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY  FULLNAME                            FLAGS */
+COMP( 1988, canons80, 0,      0,      canons80, 0,     canons80_state, init_canons80, "Canon", "Canon S-80 electronic typewriter", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

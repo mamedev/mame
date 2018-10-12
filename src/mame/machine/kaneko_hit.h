@@ -16,6 +16,11 @@
 class kaneko_hit_device : public device_t
 {
 public:
+	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: kaneko_hit_device(mconfig, tag, owner, (uint32_t)0)
+	{
+	}
+
 	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_type(int hittype) { m_hittype = hittype; }

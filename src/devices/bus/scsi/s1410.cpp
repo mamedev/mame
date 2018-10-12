@@ -133,30 +133,32 @@ const tiny_rom_entry *s1410_device::device_rom_region() const
 //  ADDRESS_MAP( s1410_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(s1410_device::s1410_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(Z8400A_TAG, 0)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void s1410_device::s1410_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region(Z8400A_TAG, 0);
+	map(0x1000, 0x13ff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( s1410_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(s1410_device::s1410_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x66, 0x66) AM_WRITENOP
-	AM_RANGE(0x67, 0x67) AM_WRITENOP
-	AM_RANGE(0x68, 0x68) AM_READNOP
-	AM_RANGE(0x69, 0x69) AM_WRITENOP
-	AM_RANGE(0x6a, 0x6a) AM_WRITENOP
-	AM_RANGE(0x6b, 0x6b) AM_WRITENOP
-	AM_RANGE(0x6c, 0x6c) AM_WRITENOP
-	AM_RANGE(0xa0, 0xa0) AM_NOP
-	AM_RANGE(0xc1, 0xc1) AM_WRITENOP
-	AM_RANGE(0xc2, 0xc2) AM_WRITENOP
-	AM_RANGE(0xc3, 0xc3) AM_WRITENOP
-ADDRESS_MAP_END
+void s1410_device::s1410_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x66, 0x66).nopw();
+	map(0x67, 0x67).nopw();
+	map(0x68, 0x68).nopr();
+	map(0x69, 0x69).nopw();
+	map(0x6a, 0x6a).nopw();
+	map(0x6b, 0x6b).nopw();
+	map(0x6c, 0x6c).nopw();
+	map(0xa0, 0xa0).noprw();
+	map(0xc1, 0xc1).nopw();
+	map(0xc2, 0xc2).nopw();
+	map(0xc3, 0xc3).nopw();
+}
 
 
 //-------------------------------------------------
@@ -164,9 +166,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(s1410_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL(16'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(s1410_mem)
-	MCFG_CPU_IO_MAP(s1410_io)
+	MCFG_DEVICE_ADD(Z8400A_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(s1410_mem)
+	MCFG_DEVICE_IO_MAP(s1410_io)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_HARDDISK_ADD("image")

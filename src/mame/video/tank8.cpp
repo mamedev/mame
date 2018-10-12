@@ -210,7 +210,7 @@ WRITE_LINE_MEMBER(tank8_state::screen_vblank)
 		draw_sprites(m_helper2, visarea);
 		draw_bullets(m_helper3, visarea);
 
-		for (y = visarea.min_y; y <= visarea.max_y; y++)
+		for (y = visarea.top(); y <= visarea.bottom(); y++)
 		{
 			int _state = 0;
 
@@ -221,7 +221,7 @@ WRITE_LINE_MEMBER(tank8_state::screen_vblank)
 			if ((m_screen->frame_number() ^ y) & 1)
 				continue; /* video display is interlaced */
 
-			for (x = visarea.min_x; x <= visarea.max_x; x++)
+			for (x = visarea.left(); x <= visarea.right(); x++)
 			{
 				uint8_t index;
 

@@ -19,11 +19,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void att630(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void att630(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -32,22 +34,23 @@ u32 att630_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	return 0;
 }
 
-ADDRESS_MAP_START(att630_state::mem_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE8("duart1", scn2681_device, read, write, 0x00ff)
-	AM_RANGE(0x200020, 0x20003f) AM_DEVREADWRITE8("duart2", scn2681_device, read, write, 0x00ff)
-	AM_RANGE(0x760000, 0x77ffff) AM_RAM
-	AM_RANGE(0x780000, 0x7bffff) AM_RAM
-	AM_RANGE(0x7c0000, 0x7fffff) AM_RAM
-	AM_RANGE(0xe00000, 0xe03fff) AM_NOP // 0x00ff mask
-ADDRESS_MAP_END
+void att630_state::mem_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x200000, 0x20001f).rw("duart1", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x200020, 0x20003f).rw("duart2", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x760000, 0x77ffff).ram();
+	map(0x780000, 0x7bffff).ram();
+	map(0x7c0000, 0x7fffff).ram();
+	map(0xe00000, 0xe03fff).noprw(); // 0x00ff mask
+}
 
 static INPUT_PORTS_START( att630 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(att630_state::att630)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(40'000'000) / 4) // clock not confirmed
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(40'000'000) / 4) // clock not confirmed
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(87'183'360), 1376, 0, 1024, 1056, 0, 1024)
@@ -75,4 +78,4 @@ ROM_START( att630 )
 	ROM_LOAD16_BYTE( "460622-1.bin", 0x20001, 0x10000, CRC(c108c1e0) SHA1(ef01349e890b8a4117c01e78d1c23fbd113ba58f) )
 ROM_END
 
-COMP( 1987, att630, 0, 0, att630, att630, att630_state, 0, "AT&T", "630 MTG", MACHINE_IS_SKELETON )
+COMP( 1987, att630, 0, 0, att630, att630, att630_state, empty_init, "AT&T", "630 MTG", MACHINE_IS_SKELETON )

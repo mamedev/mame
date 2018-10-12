@@ -22,6 +22,7 @@
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 
 #define AVIGO_NUM_COLOURS 2
 
@@ -103,7 +104,7 @@ public:
 	uint8_t               m_bank1_h;
 	uint8_t               m_ad_control_status;
 	uint16_t              m_ad_value;
-	uint8_t *             m_video_memory;
+	std::unique_ptr<uint8_t[]> m_video_memory;
 	uint8_t               m_screen_column;
 	uint8_t               m_warm_start;
 	DECLARE_PALETTE_INIT(avigo);

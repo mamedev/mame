@@ -15,9 +15,13 @@ void alpha68k_state::alpha68k_flipscreen_w( int flip )
 	m_flipscreen = flip;
 }
 
-void alpha68k_state::alpha68k_V_video_bank_w( int bank )
+WRITE8_MEMBER(alpha68k_state::video_bank_w)
 {
-	m_bank_base = bank & 0xf;
+	if ((m_bank_base ^ data) & 0xf)
+	{
+		m_bank_base = data & 0xf;
+		m_fix_tilemap->mark_all_dirty();
+	}
 }
 
 /******************************************************************************/
@@ -51,13 +55,12 @@ VIDEO_START_MEMBER(alpha68k_state,alpha68k)
 //AT
 void alpha68k_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e )
 {
-	uint16_t *spriteram = m_spriteram;
 	int offs, mx, my, color, tile, fx, fy, i;
 
 	for (offs = s; offs < e; offs += 0x40)
 	{
-		my = spriteram[offs + 3 + (j << 1)];
-		mx = spriteram[offs + 2 + (j << 1)] << 1 | my >> 15;
+		my = m_spriteram[offs + 3 + (j << 1)];
+		mx = m_spriteram[offs + 2 + (j << 1)] << 1 | my >> 15;
 		my = -my & 0x1ff;
 		mx = ((mx + 0x100) & 0x1ff) - 0x100;
 		if (j == 0 && s == 0x7c0)
@@ -71,8 +74,8 @@ void alpha68k_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		for (i = 0; i < 0x40; i += 2)
 		{
-			tile = spriteram[offs + 1 + i + (0x800 * j) + 0x800];
-			color = spriteram[offs + i + (0x800 * j) + 0x800] & 0x7f;
+			tile = m_spriteram[offs + 1 + i + (0x800 * j) + 0x800];
+			color = m_spriteram[offs + i + (0x800 * j) + 0x800] & 0x7f;
 
 			fy = tile & 0x8000;
 			fx = tile & 0x4000;
@@ -103,10 +106,6 @@ void alpha68k_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 uint32_t alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_last_bank != m_bank_base)
-		machine().tilemap().mark_all_dirty();
-
-	m_last_bank = m_bank_base;
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(2047, cliprect);
@@ -140,67 +139,28 @@ uint32_t alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap
 
 */
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_II_video_bank_w)
+/* Graphics flags?  Not related to fix chars anyway */
+WRITE_LINE_MEMBER(alpha68k_state::video_control2_w)
 {
-	switch (offset)
-	{
-		case 0x10: /* Reset */
-			m_bank_base = m_buffer_28 = m_buffer_60 = m_buffer_68 = 0;
-			return;
-		case 0x14:
-			if (m_buffer_60) m_bank_base=1; else m_bank_base=0;
-			m_buffer_28 = 1;
-			return;
-		case 0x18:
-			if (m_buffer_68) {if (m_buffer_60) m_bank_base = 3; else m_bank_base = 2; }
-			if (m_buffer_28) {if (m_buffer_60) m_bank_base = 1; else m_bank_base = 0; }
-			return;
-		case 0x30:
-			m_buffer_28 = m_buffer_68 = 0; m_bank_base = 1;
-			m_buffer_60 = 1;
-			return;
-		case 0x34:
-			if (m_buffer_60) m_bank_base = 3; else m_bank_base = 2;
-			m_buffer_68 = 1;
-			return;
-		case 0x38:
-			if (m_buffer_68) {if (m_buffer_60) m_bank_base = 7; else m_bank_base = 6; }
-			if (m_buffer_28) {if (m_buffer_60) m_bank_base = 5; else m_bank_base = 4; }
-			return;
-		case 0x08: /* Graphics flags?  Not related to fix chars anyway */
-		case 0x0c:
-		case 0x28:
-		case 0x2c:
-			return;
-	}
+	logerror("%s: Q2 changed to %d\n", machine().describe_context(), state);
+}
 
-	logerror("%04x \n",offset);
+WRITE_LINE_MEMBER(alpha68k_state::video_control3_w)
+{
+	logerror("%s: Q3 changed to %d\n", machine().describe_context(), state);
 }
 
 /******************************************************************************/
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_V_video_control_w)
-{
-	switch (offset)
-	{
-		case 0x08: /* Graphics flags?  Not related to fix chars anyway */
-		case 0x0c:
-		case 0x28:
-		case 0x2c:
-			return;
-	}
-}
-
 void alpha68k_state::draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask )
 {
-	uint16_t *spriteram = m_spriteram;
 	int offs, mx, my, color, tile, fx, fy, i;
 
 	for (offs = s; offs < e; offs += 0x40)
 	{
 //AT
-		my = spriteram[offs + 3 + (j << 1)];
-		mx = spriteram[offs + 2 + (j << 1)] << 1 | my >> 15;
+		my = m_spriteram[offs + 3 + (j << 1)];
+		mx = m_spriteram[offs + 2 + (j << 1)] << 1 | my >> 15;
 		my = -my & 0x1ff;
 		mx = ((mx + 0x100) & 0x1ff) - 0x100;
 		if (j == 0 && s == 0x7c0)
@@ -214,8 +174,8 @@ void alpha68k_state::draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &clip
 
 		for (i = 0; i < 0x40; i += 2)
 		{
-			tile = spriteram[offs + 1 + i + (0x800 * j) + 0x800];
-			color = spriteram[offs + i + (0x800 * j) + 0x800] & 0xff;
+			tile = m_spriteram[offs + 1 + i + (0x800 * j) + 0x800];
+			color = m_spriteram[offs + i + (0x800 * j) + 0x800] & 0xff;
 
 			fx = tile & fx_mask;
 			fy = tile & fy_mask;
@@ -246,12 +206,6 @@ void alpha68k_state::draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &clip
 
 uint32_t alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *spriteram = m_spriteram;
-
-	if (m_last_bank != m_bank_base)
-		machine().tilemap().mark_all_dirty();
-
-	m_last_bank = m_bank_base;
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(4095, cliprect);
@@ -262,7 +216,7 @@ uint32_t alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_
 		draw_sprites_V(bitmap, cliprect, 0, 0x07c0, 0x0800, 0, 0x8000, 0x7fff);
 		draw_sprites_V(bitmap, cliprect, 1, 0x0000, 0x0800, 0, 0x8000, 0x7fff);
 		//AT: *KLUDGE* fixes priest priority in level 1(could be a game bug)
-		if (spriteram[0x1bde] == 0x24 && (spriteram[0x1bdf] >> 8) == 0x3b)
+		if (m_spriteram[0x1bde] == 0x24 && (m_spriteram[0x1bdf] >> 8) == 0x3b)
 		{
 			draw_sprites_V(bitmap, cliprect, 2, 0x03c0, 0x0800, 0, 0x8000, 0x7fff);
 			draw_sprites_V(bitmap, cliprect, 2, 0x0000, 0x03c0, 0, 0x8000, 0x7fff);
@@ -286,10 +240,6 @@ uint32_t alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_
 
 uint32_t alpha68k_state::screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_last_bank != m_bank_base)
-		machine().tilemap().mark_all_dirty();
-
-	m_last_bank = m_bank_base;
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(4095, cliprect);
@@ -308,23 +258,21 @@ uint32_t alpha68k_state::screen_update_alpha68k_V_sb(screen_device &screen, bitm
 //AT
 void alpha68k_state::draw_sprites_I( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d, int yshift )
 {
-	uint16_t *spriteram = m_spriteram;
 	int data, offs, mx, my, tile, color, fy, i;
-	uint8_t *color_prom = memregion("user1")->base();
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	for (offs = 0; offs < 0x400; offs += 0x20)
 	{
-		mx = spriteram[offs + c];
+		mx = m_spriteram[offs + c];
 		my = (yshift - (mx >> 8)) & 0xff;
 		mx &= 0xff;
 
 		for (i = 0; i < 0x20; i++)
 		{
-			data = spriteram[offs + d + i];
+			data = m_spriteram[offs + d + i];
 			tile = data & 0x3fff;
 			fy = data & 0x4000;
-			color = color_prom[tile << 1 | data >> 15];
+			color = m_color_proms[tile << 1 | data >> 15];
 
 				gfx->transpen(bitmap,cliprect, tile, color, 0, fy, mx, my, 0);
 
@@ -410,15 +358,13 @@ void alpha68k_state::jongbou_video_banking(int *bank, int data)
 
 void alpha68k_state::kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d )
 {
-	uint16_t *spriteram = m_spriteram;
 	int offs, mx, my, color, tile, i, bank, fy, fx;
 	int data;
-	uint8_t *color_prom = memregion("user1")->base();
 
 //AT
 	for (offs = 0; offs < 0x400; offs += 0x20)
 	{
-		mx = spriteram[offs + c];
+		mx = m_spriteram[offs + c];
 		my = -(mx >> 8) & 0xff;
 		mx &= 0xff;
 
@@ -427,10 +373,10 @@ void alpha68k_state::kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 
 		for (i = 0; i < 0x20; i++)
 		{
-			data = spriteram[offs + d + i];
+			data = m_spriteram[offs + d + i];
 			if (data!=0x20)
 			{
-				color = color_prom[(data >> 1 & 0x1000) | (data & 0xffc) | (data >> 14 & 3)];
+				color = m_color_proms[(data >> 1 & 0x1000) | (data & 0xffc) | (data >> 14 & 3)];
 				if (color != 0xff)
 				{
 					fy = data & 0x1000;
@@ -476,12 +422,11 @@ uint32_t alpha68k_state::screen_update_kyros(screen_device &screen, bitmap_ind16
 void alpha68k_state::sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d )
 {
 //AT
-	uint16_t *spriteram = m_spriteram;
 	int data, offs, mx, my, color, tile, i, bank, fy, fx;
 
 	for (offs = 0; offs < 0x400; offs += 0x20)
 	{
-		mx = spriteram[offs + c];
+		mx = m_spriteram[offs + c];
 		my = -(mx >> 8) & 0xff;
 		mx &= 0xff;
 		if (mx > 0xf8)
@@ -492,7 +437,7 @@ void alpha68k_state::sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 		for (i = 0; i < 0x20; i++)
 		{
-			data = spriteram[offs + d + i];
+			data = m_spriteram[offs + d + i];
 			if (data != 0x40)
 			{
 				fy = data & 0x1000;

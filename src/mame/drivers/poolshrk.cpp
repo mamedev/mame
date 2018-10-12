@@ -17,7 +17,7 @@ Atari Poolshark Driver
 
 
 
-DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
+void poolshrk_state::init_poolshrk()
 {
 	uint8_t* pSprite = memregion("gfx1")->base();
 	uint8_t* pOffset = memregion("proms")->base();
@@ -58,9 +58,9 @@ WRITE8_MEMBER(poolshrk_state::da_latch_w)
 WRITE8_MEMBER(poolshrk_state::led_w)
 {
 	if (offset & 2)
-		output().set_led_value(0, offset & 1);
+		m_leds[0] = BIT(offset, 0);
 	if (offset & 4)
-		output().set_led_value(1, offset & 1);
+		m_leds[1] = BIT(offset, 0);
 }
 
 
@@ -101,23 +101,24 @@ READ8_MEMBER(poolshrk_state::irq_reset_r)
 }
 
 
-ADDRESS_MAP_START(poolshrk_state::poolshrk_cpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x2300) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x2000) AM_WRITEONLY AM_SHARE("playfield_ram")
-	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_SHARE("hpos_ram")
-	AM_RANGE(0x0c00, 0x0c0f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_SHARE("vpos_ram")
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2000) AM_READWRITE(input_r, watchdog_w)
-	AM_RANGE(0x1400, 0x17ff) AM_MIRROR(0x2000) AM_WRITE(scratch_sound_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x2000) AM_WRITE(score_sound_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x2000) AM_WRITE(click_sound_w)
-	AM_RANGE(0x4000, 0x4000) AM_NOP /* diagnostic ROM location */
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(da_latch_w)
-	AM_RANGE(0x6400, 0x67ff) AM_WRITE(bump_sound_w)
-	AM_RANGE(0x6800, 0x6bff) AM_READ(irq_reset_r)
-	AM_RANGE(0x6c00, 0x6fff) AM_WRITE(led_w)
-	AM_RANGE(0x7000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void poolshrk_state::poolshrk_cpu_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x00ff).mirror(0x2300).ram();
+	map(0x0400, 0x07ff).mirror(0x2000).writeonly().share("playfield_ram");
+	map(0x0800, 0x080f).mirror(0x23f0).writeonly().share("hpos_ram");
+	map(0x0c00, 0x0c0f).mirror(0x23f0).writeonly().share("vpos_ram");
+	map(0x1000, 0x13ff).mirror(0x2000).rw(FUNC(poolshrk_state::input_r), FUNC(poolshrk_state::watchdog_w));
+	map(0x1400, 0x17ff).mirror(0x2000).w(FUNC(poolshrk_state::scratch_sound_w));
+	map(0x1800, 0x1bff).mirror(0x2000).w(FUNC(poolshrk_state::score_sound_w));
+	map(0x1c00, 0x1fff).mirror(0x2000).w(FUNC(poolshrk_state::click_sound_w));
+	map(0x4000, 0x4000).noprw(); /* diagnostic ROM location */
+	map(0x6000, 0x63ff).w(FUNC(poolshrk_state::da_latch_w));
+	map(0x6400, 0x67ff).w(FUNC(poolshrk_state::bump_sound_w));
+	map(0x6800, 0x6bff).r(FUNC(poolshrk_state::irq_reset_r));
+	map(0x6c00, 0x6fff).w(FUNC(poolshrk_state::led_w));
+	map(0x7000, 0x7fff).rom();
+}
 
 
 static INPUT_PORTS_START( poolshrk )
@@ -200,7 +201,7 @@ static const gfx_layout poolshrk_tile_layout =
 };
 
 
-static GFXDECODE_START( poolshrk )
+static GFXDECODE_START( gfx_poolshrk )
 	GFXDECODE_ENTRY( "gfx1", 0, poolshrk_sprite_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, poolshrk_tile_layout, 0, 1 )
 GFXDECODE_END
@@ -218,11 +219,11 @@ PALETTE_INIT_MEMBER(poolshrk_state, poolshrk)
 MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 8) /* ? */
-	MCFG_CPU_PROGRAM_MAP(poolshrk_cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 8) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(poolshrk_cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -232,15 +233,14 @@ MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", poolshrk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poolshrk)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(poolshrk_state, poolshrk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(poolshrk)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, poolshrk_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -262,4 +262,4 @@ ROM_START( poolshrk )
 ROM_END
 
 
-GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, poolshrk, 0, "Atari", "Poolshark", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, init_poolshrk, 0, "Atari", "Poolshark", MACHINE_SUPPORTS_SAVE )

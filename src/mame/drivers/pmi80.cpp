@@ -44,19 +44,24 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_ledready(0)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void pmi80(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
-	void pmi80(machine_config &config);
 	void pmi80_io(address_map &map);
 	void pmi80_mem(address_map &map);
-private:
+
 	uint8_t m_keyrow;
 	bool m_ledready;
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
+	output_finder<10> m_digits;
 };
 
 
@@ -78,22 +83,25 @@ WRITE8_MEMBER( pmi80_state::leds_w )
 	if (m_ledready)
 	{
 		m_ledready = false;
-		output().set_digit_value(m_keyrow^0xff, data^0xff);
+		if (m_keyrow > 0xF5)  // to be sure to be sure
+			m_digits[m_keyrow^0xff] = data^0xff;
 	}
 }
 
-ADDRESS_MAP_START(pmi80_state::pmi80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff ) AM_ROM
-	AM_RANGE( 0x0400, 0x1fff ) AM_RAM
-ADDRESS_MAP_END
+void pmi80_state::pmi80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x1fff).ram();
+}
 
-ADDRESS_MAP_START(pmi80_state::pmi80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(leds_w)
-	AM_RANGE(0xfa, 0xfa) AM_READWRITE(keyboard_r,keyboard_w)
-ADDRESS_MAP_END
+void pmi80_state::pmi80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf8, 0xf8).w(FUNC(pmi80_state::leds_w));
+	map(0xfa, 0xfa).rw(FUNC(pmi80_state::keyboard_r), FUNC(pmi80_state::keyboard_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pmi80 )
@@ -154,16 +162,21 @@ void pmi80_state::machine_reset()
 {
 }
 
+void pmi80_state::machine_start()
+{
+	m_digits.resolve();
+}
+
 
 MACHINE_CONFIG_START(pmi80_state::pmi80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(pmi80_mem)
-	MCFG_CPU_IO_MAP(pmi80_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pmi80_mem)
+	MCFG_DEVICE_IO_MAP(pmi80_io)
 
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pmi80)
+	config.set_default_layout(layout_pmi80);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -174,5 +187,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS
-COMP( 1982, pmi80,  0,       0,      pmi80,     pmi80, pmi80_state, 0,    "Tesla",  "PMI-80", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1982, pmi80, 0,      0,      pmi80,   pmi80, pmi80_state, empty_init, "Tesla", "PMI-80", MACHINE_NO_SOUND_HW)

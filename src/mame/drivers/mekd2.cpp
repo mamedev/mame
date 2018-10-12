@@ -102,8 +102,12 @@ public:
 		, m_pia_u(*this, "pia_u")
 		, m_acia(*this, "acia")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void mekd2(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
 	DECLARE_READ8_MEMBER(mekd2_key_r);
 	DECLARE_WRITE_LINE_MEMBER(mekd2_nmi_w);
@@ -114,9 +118,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
 
-	void mekd2(machine_config &config);
 	void mekd2_mem(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_cass_data[4];
 	uint8_t m_segment;
@@ -124,11 +127,13 @@ private:
 	uint8_t m_keydata;
 	bool m_cass_state;
 	bool m_cassold;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_s;
 	required_device<pia6821_device> m_pia_u;
 	required_device<acia6850_device> m_acia;
 	required_device<cassette_image_device> m_cass;
+	output_finder<6> m_digits;
 };
 
 
@@ -139,14 +144,15 @@ private:
 
 ************************************************************/
 
-ADDRESS_MAP_START(mekd2_state::mekd2_mem)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM // user ram
-	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
-	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0x8020, 0x8023) AM_DEVREADWRITE("pia_s", pia6821_device, read, write)
-	AM_RANGE(0xa000, 0xa07f) AM_RAM // system ram
-	AM_RANGE(0xe000, 0xe3ff) AM_ROM AM_MIRROR(0x1c00)   /* JBUG ROM */
-ADDRESS_MAP_END
+void mekd2_state::mekd2_mem(address_map &map)
+{
+	map(0x0000, 0x00ff).ram(); // user ram
+	map(0x8004, 0x8007).rw(m_pia_u, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8008, 0x8009).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x8020, 0x8023).rw(m_pia_s, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xa07f).ram(); // system ram
+	map(0xe000, 0xe3ff).rom().mirror(0x1c00);   /* JBUG ROM */
+}
 
 /***********************************************************
 
@@ -284,7 +290,7 @@ WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 		for (i = 0; i < 6; i++)
 		{
 			if (BIT(data, i))
-				output().set_digit_value(i, ~m_segment & 0x7f);
+				m_digits[i] = ~m_segment & 0x7f;
 		}
 	}
 	m_digit = data;
@@ -358,6 +364,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 	}
 }
 
+void mekd2_state::machine_start()
+{
+	m_digits.resolve();
+}
+
 /***********************************************************
 
     Machine
@@ -366,40 +377,39 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 
 MACHINE_CONFIG_START(mekd2_state::mekd2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
-	MCFG_CPU_PROGRAM_MAP(mekd2_mem)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(mekd2_mem)
 
-	MCFG_DEFAULT_LAYOUT(layout_mekd2)
+	config.set_default_layout(layout_mekd2);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD("cassette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia_s", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(mekd2_state, mekd2_key_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(mekd2_state, mekd2_key40_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mekd2_state, mekd2_segment_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mekd2_state, mekd2_digit_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(mekd2_state, mekd2_nmi_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	PIA6821(config, m_pia_s, 0);
+	m_pia_s->readpa_handler().set(FUNC(mekd2_state::mekd2_key_r));
+	m_pia_s->readcb1_handler().set(FUNC(mekd2_state::mekd2_key40_r));
+	m_pia_s->writepa_handler().set(FUNC(mekd2_state::mekd2_segment_w));
+	m_pia_s->writepb_handler().set(FUNC(mekd2_state::mekd2_digit_w));
+	m_pia_s->ca2_handler().set(FUNC(mekd2_state::mekd2_nmi_w));
+	m_pia_s->irqa_handler().set_inputline("maincpu", INPUT_LINE_NMI);
+	m_pia_s->irqb_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("pia_u", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia_u, 0);
+	m_pia_u->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(mekd2_state, cass_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(mekd2_state::cass_w));
 
 	MCFG_DEVICE_ADD("acia_tx_clock", CLOCK, XTAL_MEKD2 / 256) // 4800Hz
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
 
 	MCFG_DEVICE_ADD("acia_rx_clock", CLOCK, 300) // toggled by cassette circuit
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_c", mekd2_state, mekd2_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_p", mekd2_state, mekd2_p, attotime::from_hz(40000))
@@ -424,5 +434,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY     FULLNAME      FLAGS
-COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, mekd2_state, 0,    "Motorola", "MEK6800D2" , 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, mekd2_state, empty_init, "Motorola", "MEK6800D2" , 0 )

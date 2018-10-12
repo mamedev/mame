@@ -65,6 +65,7 @@ this requires the -joystick_contradictory switch on the commandline.
 #include "sound/ay8910.h"
 #include "machine/i2cmem.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -82,6 +83,11 @@ public:
 		, m_videorambank(0)
 	{ }
 
+	void spider(machine_config &config);
+	void twins(machine_config &config);
+	void twinsa(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint16_t> m_paletteram;
 	required_device<palette_device> m_palette;
@@ -117,9 +123,6 @@ public:
 	uint16_t* m_rom16;
 	uint8_t* m_rom8;
 
-	void spider(machine_config &config);
-	void twins(machine_config &config);
-	void twinsa(machine_config &config);
 	void ramdac_map(address_map &map);
 	void spider_io(address_map &map);
 	void twins_io(address_map &map);
@@ -282,17 +285,19 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 }
 
 
-ADDRESS_MAP_START(twins_state::twins_map)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(spider_blitter_r, spider_blitter_w)
-ADDRESS_MAP_END
+void twins_state::twins_map(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(FUNC(twins_state::spider_blitter_r), FUNC(twins_state::spider_blitter_w));
+}
 
-ADDRESS_MAP_START(twins_state::twins_io)
-	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(twins_pal_w) AM_SHARE("paletteram")
-	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
-ADDRESS_MAP_END
+void twins_state::twins_io(address_map &map)
+{
+	map(0x0000, 0x0003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x0002, 0x0002).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x0004, 0x0005).rw(FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
+	map(0x0006, 0x0007).w(FUNC(twins_state::twins_pal_w)).share("paletteram");
+	map(0x000e, 0x000f).w(FUNC(twins_state::porte_paloff0_w));
+}
 
 void twins_state::video_start()
 {
@@ -389,28 +394,25 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(twins_state::twins)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, 8000000)
-	MCFG_CPU_PROGRAM_MAP(twins_map)
-	MCFG_CPU_IO_MAP(twins_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(twins_map)
+	MCFG_DEVICE_IO_MAP(twins_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_24C02_ADD("i2cmem")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -420,36 +422,35 @@ MACHINE_CONFIG_END
 
 
 
-ADDRESS_MAP_START(twins_state::twinsa_io)
-	AM_RANGE(0x0000, 0x0001) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
-	AM_RANGE(0x0002, 0x0003) AM_DEVWRITE8("ramdac",ramdac_device,mask_w,0x00ff)
-	AM_RANGE(0x0004, 0x0005) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
-	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE8("aysnd", ay8910_device, address_w, 0x00ff)
-	AM_RANGE(0x0010, 0x0011) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x0018, 0x0019) AM_READ(twins_port4_r) AM_WRITE(twins_port4_w)
-ADDRESS_MAP_END
+void twins_state::twinsa_io(address_map &map)
+{
+	map(0x0000, 0x0000).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0002, 0x0002).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x0004, 0x0004).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
+	map(0x0008, 0x0008).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x0010, 0x0010).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x0018, 0x0019).r(FUNC(twins_state::twins_port4_r)).w(FUNC(twins_state::twins_port4_w));
+}
 
 
-ADDRESS_MAP_START(twins_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void twins_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 MACHINE_CONFIG_START(twins_state::twinsa)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(twins_map)
-	MCFG_CPU_IO_MAP(twinsa_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(twins_map)
+	MCFG_DEVICE_IO_MAP(twinsa_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -458,9 +459,9 @@ MACHINE_CONFIG_START(twins_state::twinsa)
 	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(16'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -545,20 +546,21 @@ READ16_MEMBER(twins_state::spider_port_1e_r)
 }
 
 
-ADDRESS_MAP_START(twins_state::spider_io)
-	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
-	AM_RANGE(0x0008, 0x0009) AM_WRITE(spider_pal_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0010, 0x0011) AM_WRITE(spider_paloff0_w)
+void twins_state::spider_io(address_map &map)
+{
+	map(0x0000, 0x0003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x0002, 0x0002).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x0004, 0x0005).rw(FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
+	map(0x0008, 0x0009).w(FUNC(twins_state::spider_pal_w)).share("paletteram");
+	map(0x0010, 0x0011).w(FUNC(twins_state::spider_paloff0_w));
 
-	AM_RANGE(0x0018, 0x0019) AM_READ(spider_port_18_r)
-	AM_RANGE(0x001a, 0x001b) AM_WRITE(spider_port_1a_w)
-	AM_RANGE(0x001c, 0x001d) AM_WRITE(spider_port_1c_w)
-	AM_RANGE(0x001e, 0x001f) AM_READ(spider_port_1e_r)
+	map(0x0018, 0x0019).r(FUNC(twins_state::spider_port_18_r));
+	map(0x001a, 0x001b).w(FUNC(twins_state::spider_port_1a_w));
+	map(0x001c, 0x001d).w(FUNC(twins_state::spider_port_1c_w));
+	map(0x001e, 0x001f).r(FUNC(twins_state::spider_port_1e_r));
 
 
-ADDRESS_MAP_END
+}
 
 
 
@@ -566,28 +568,25 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(twins_state::spider)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, 8000000)
-	MCFG_CPU_PROGRAM_MAP(twins_map)
-	MCFG_CPU_IO_MAP(spider_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(twins_map)
+	MCFG_DEVICE_IO_MAP(spider_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_spider)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 
@@ -631,7 +630,7 @@ ROM_START( spider )
 	ROM_LOAD16_BYTE( "21.bin", 0x000000, 0x080000, CRC(ff224206) SHA1(d8d45850983542e811facc917d016841fc56a97f) )
 ROM_END
 
-GAME( 1994, twins,  0,     twins,  twins, twins_state, 0, ROT0, "Electronic Devices", "Twins (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twinsa, twins, twinsa, twins, twins_state, 0, ROT0, "Electronic Devices", "Twins (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twins,  0,     twins,  twins, twins_state, empty_init, ROT0, "Electronic Devices", "Twins (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twinsa, twins, twinsa, twins, twins_state, empty_init, ROT0, "Electronic Devices", "Twins (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, spider, 0,     spider, twins, twins_state, 0, ROT0, "Buena Vision",       "Spider",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, spider, 0,     spider, twins, twins_state, empty_init, ROT0, "Buena Vision",       "Spider",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -343,5 +343,8 @@ WRITE_LINE_MEMBER(baraduke_state::screen_vblank_baraduke)
 
 			m_copy_sprites = 0;
 		}
+
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_mcu->set_input_line(0, HOLD_LINE);
 	}
 }

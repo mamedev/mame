@@ -57,17 +57,13 @@ Usage of terminal:
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 
 class okean240_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_OKEAN_BOOT
-	};
-
 	okean240_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_term_data(0)
@@ -77,7 +73,20 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_io_modifiers(*this, "MODIFIERS")
 		, m_maincpu(*this, "maincpu")
+		, m_ppikbd(*this, "ppikbd")
 	{ }
+
+	void okean240a(machine_config &config);
+	void okean240t(machine_config &config);
+	void okean240(machine_config &config);
+
+	void init_okean240();
+
+private:
+	enum
+	{
+		TIMER_OKEAN_BOOT
+	};
 
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
 	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
@@ -91,17 +100,13 @@ public:
 	DECLARE_READ8_MEMBER(okean240a_port42_r);
 	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_DRIVER_INIT(okean240);
 	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void okean240a(machine_config &config);
-	void okean240t(machine_config &config);
-	void okean240(machine_config &config);
 	void okean240_io(address_map &map);
 	void okean240_mem(address_map &map);
 	void okean240a_io(address_map &map);
 	void okean240t_io(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -114,6 +119,7 @@ private:
 	optional_ioport m_io_modifiers;
 	ioport_port *m_io_port[11];
 	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppikbd;
 };
 
 // okean240 requires bit 4 to change
@@ -219,37 +225,39 @@ WRITE8_MEMBER(okean240_state::scroll_w)
 	m_scroll = data;
 }
 
-ADDRESS_MAP_START(okean240_state::okean240_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0x0800, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void okean240_state::okean240_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0x3fff).ram();
+	map(0x4000, 0x7fff).ram().share("videoram");
+	map(0x8000, 0xbfff).ram();
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(okean240_state::okean240_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("pic", pic8259_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
-	AM_RANGE(0xa0, 0xa0) AM_READ(term_r)
-	AM_RANGE(0xa1, 0xa1) AM_READ(term_status_r)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppic", i8255_device, read, write)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("ppie", i8255_device, read, write)
-ADDRESS_MAP_END
+void okean240_state::okean240_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x43).rw(m_ppikbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x60, 0x63).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x80, 0x81).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x80, 0x80).r(FUNC(okean240_state::okean240_kbd_status_r));
+	map(0xa0, 0xa0).r(FUNC(okean240_state::term_r));
+	map(0xa1, 0xa1).r(FUNC(okean240_state::term_status_r));
+	map(0xc0, 0xc3).rw("ppic", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe0, 0xe3).rw("ppie", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(okean240_state::okean240a_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("pic", pic8259_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(okean240a_kbd_status_r)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppic", i8255_device, read, write)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("ppie", i8255_device, read, write)
+void okean240_state::okean240a_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x43).rw(m_ppikbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x60, 0x63).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x80, 0x81).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x80, 0x80).r(FUNC(okean240_state::okean240a_kbd_status_r));
+	map(0xa0, 0xa1).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xc0, 0xc3).rw("ppic", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe0, 0xe3).rw("ppie", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	// AM_RANGE(0x00, 0x1f)=ppa00.data
 	// AM_RANGE(0x20, 0x23)=dsk.data
 	// AM_RANGE(0x24, 0x24)=dsk.wait
@@ -260,20 +268,20 @@ ADDRESS_MAP_START(okean240_state::okean240a_io)
 	// AM_RANGE(0xa0, 0xa1)=comport.data
 	// AM_RANGE(0xc0, 0xdf)=ppaC0.data
 	// AM_RANGE(0xe0, 0xff)=ppaE0.data
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(okean240_state::okean240t_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x23) AM_WRITENOP
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("pic", pic8259_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppic", i8255_device, read, write)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("ppie", i8255_device, read, write)
-ADDRESS_MAP_END
+void okean240_state::okean240t_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x20, 0x23).nopw();
+	map(0x40, 0x43).rw(m_ppikbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x60, 0x63).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x80, 0x81).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x80, 0x80).r(FUNC(okean240_state::okean240_kbd_status_r));
+	map(0xa0, 0xa1).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xc0, 0xc3).rw("ppic", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe0, 0xe3).rw("ppie", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( okean240 )
@@ -437,7 +445,7 @@ void okean240_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-DRIVER_INIT_MEMBER(okean240_state,okean240)
+void okean240_state::init_okean240()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
@@ -490,45 +498,45 @@ static const gfx_layout okean240_charlayout =
 	8*7                 /* every char takes 7 bytes */
 };
 
-static GFXDECODE_START( okean240 )
+static GFXDECODE_START( gfx_okean240 )
 	GFXDECODE_ENTRY( "maincpu", 0xec08, okean240_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( okean240a )
+static GFXDECODE_START( gfx_okean240a )
 	GFXDECODE_ENTRY( "maincpu", 0xef63, okean240_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(okean240_state::okean240t)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(12'000'000) / 6)
-	MCFG_CPU_PROGRAM_MAP(okean240_mem)
-	MCFG_CPU_IO_MAP(okean240t_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(12'000'000) / 6)
+	MCFG_DEVICE_PROGRAM_MAP(okean240_mem)
+	MCFG_DEVICE_IO_MAP(okean240t_io)
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	i8251_device &uart(I8251(config, "uart", 0));
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 
-	MCFG_DEVICE_ADD("ppikbd", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(okean240_state, okean240_port40_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(okean240_state, okean240_port41_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(okean240_state, okean240_port42_w))
+	I8255(config, m_ppikbd);
+	m_ppikbd->in_pa_callback().set(FUNC(okean240_state::okean240_port40_r));
+	m_ppikbd->in_pb_callback().set(FUNC(okean240_state::okean240_port41_r));
+	m_ppikbd->out_pc_callback().set(FUNC(okean240_state::okean240_port42_w));
 
-	MCFG_DEVICE_ADD("ppic", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(okean240_state, scroll_w))
+	i8255_device &ppic(I8255(config, "ppic"));
+	ppic.out_pa_callback().set(FUNC(okean240_state::scroll_w));
 
-	MCFG_DEVICE_ADD("ppie", I8255, 0)
+	I8255(config, "ppie");
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK1(3072000) // artificial rate
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<1>(3072000); // artificial rate
+	pit.out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
+	pit.out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 
@@ -546,19 +554,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(okean240_state::okean240a)
 	okean240t(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(okean240a_io)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240a)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(okean240a_io)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240a)
 	MCFG_DEVICE_REMOVE("rs232")
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 
-	MCFG_DEVICE_MODIFY("ppikbd")
-	MCFG_I8255_IN_PORTA_CB(READ8(okean240_state, okean240a_port40_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(okean240_state, okean240a_port41_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(okean240_state, okean240a_port42_r))
+	m_ppikbd->in_pa_callback().set(FUNC(okean240_state::okean240a_port40_r));
+	m_ppikbd->in_pb_callback().set(FUNC(okean240_state::okean240a_port41_r));
+	m_ppikbd->in_pc_callback().set(FUNC(okean240_state::okean240a_port42_r));
 
 	MCFG_DEVICE_MODIFY("pit")
 	MCFG_PIT8253_CLK1(1536000) // artificial rate
@@ -566,9 +573,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(okean240_state::okean240)
 	okean240t(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(okean240_io)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(okean240_io)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240)
 	MCFG_DEVICE_REMOVE("uart")
 	MCFG_DEVICE_REMOVE("rs232")
 	MCFG_DEVICE_MODIFY("pit")
@@ -597,7 +604,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      INIT            COMPANY    FULLNAME     FLAGS
-COMP( 1986, okean240,  0,        0,      okean240,  okean240,  okean240_state, okean240,  "<unknown>", "Okeah-240",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1986, okean240a, okean240, 0,      okean240a, okean240a, okean240_state, okean240,  "<unknown>", "Ocean-240 with FDD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1986, okean240t, okean240, 0,      okean240t, okean240,  okean240_state, okean240,  "<unknown>", "Ocean-240 Test ROM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS           INIT           COMPANY      FULLNAME              FLAGS
+COMP( 1986, okean240,  0,        0,      okean240,  okean240,  okean240_state, init_okean240, "<unknown>", "Okeah-240",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, okean240a, okean240, 0,      okean240a, okean240a, okean240_state, init_okean240, "<unknown>", "Ocean-240 with FDD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, okean240t, okean240, 0,      okean240t, okean240,  okean240_state, init_okean240, "<unknown>", "Ocean-240 Test ROM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

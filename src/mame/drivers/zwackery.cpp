@@ -25,6 +25,7 @@
 #include "machine/6840ptm.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -52,6 +53,9 @@ public:
 		m_fg_tilemap(nullptr)
 	{ }
 
+	void zwackery(machine_config &config);
+
+private:
 	DECLARE_VIDEO_START(zwackery);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	DECLARE_WRITE16_MEMBER(videoram_w);
@@ -71,12 +75,10 @@ public:
 
 	DECLARE_READ8_MEMBER(ptm_r);
 
-	void zwackery(machine_config &config);
 	void zwackery_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<m68000_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
@@ -102,19 +104,20 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(zwackery_state::zwackery_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x037fff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM
-	AM_RANGE(0x084000, 0x084fff) AM_RAM
-	AM_RANGE(0x100000, 0x10000f) AM_READ8(ptm_r, 0xff00) AM_DEVWRITE8("ptm", ptm6840_device, write, 0xff00)
-	AM_RANGE(0x104000, 0x104007) AM_DEVREADWRITE8("pia0", pia6821_device, read, write, 0xff00)
-	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_device, read, write, 0x00ff)
-	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_device, read, write, 0x00ff)
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xc00000, 0xc00fff) AM_READWRITE8(spriteram_r, spriteram_w, 0x00ff)
-ADDRESS_MAP_END
+void zwackery_state::zwackery_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x037fff).rom();
+	map(0x080000, 0x080fff).ram();
+	map(0x084000, 0x084fff).ram();
+	map(0x100000, 0x10000f).r(FUNC(zwackery_state::ptm_r)).umask16(0xff00).w(m_ptm, FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x104000, 0x104007).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00);
+	map(0x108000, 0x108007).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
+	map(0x10c000, 0x10c007).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
+	map(0x800000, 0x800fff).ram().w(FUNC(zwackery_state::videoram_w)).share("videoram");
+	map(0x802000, 0x803fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc00fff).rw(FUNC(zwackery_state::spriteram_r), FUNC(zwackery_state::spriteram_w)).umask16(0x00ff);
+}
 
 
 //**************************************************************************
@@ -137,7 +140,7 @@ static INPUT_PORTS_START( zwackery )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_SPECIAL )    // sound communications
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_CUSTOM )    // sound communications
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Spell Up")
@@ -396,7 +399,7 @@ static const gfx_layout mcr68_sprite_layout =
 	32*32
 };
 
-static GFXDECODE_START( zwackery )
+static GFXDECODE_START( gfx_zwackery )
 	GFXDECODE_ENTRY( "gfx1",    0, zwackery_layout,     0,     16 )
 	GFXDECODE_ENTRY( "sprites", 0, mcr68_sprite_layout, 0x800, 32 )
 	GFXDECODE_ENTRY( "gfx1",    0, zwackery_layout,     0,     16 )  // yes, an extra copy
@@ -483,7 +486,7 @@ void zwackery_state::machine_start()
 	m_spriteram = std::make_unique<uint8_t[]>(0x800);
 
 	// register for save states
-	save_pointer(NAME(m_spriteram.get()), 0x800);
+	save_pointer(NAME(m_spriteram), 0x800);
 }
 
 
@@ -493,29 +496,29 @@ void zwackery_state::machine_start()
 
 MACHINE_CONFIG_START(zwackery_state::zwackery)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL(16'000'000)/2
-	MCFG_CPU_PROGRAM_MAP(zwackery_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL(16'000'000)/2
+	MCFG_DEVICE_PROGRAM_MAP(zwackery_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 7652400 / 10)
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 6))
+	PTM6840(config, m_ptm, 7652400 / 10);
+	m_ptm->irq_callback().set_inputline("maincpu", 6);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zwackery_state, pia0_porta_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(zwackery_state, pia0_irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(zwackery_state, pia0_irq_w))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpb_handler().set_ioport("IN0");
+	m_pia0->writepa_handler().set(FUNC(zwackery_state::pia0_porta_w));
+	m_pia0->irqa_handler().set(FUNC(zwackery_state::pia0_irq_w));
+	m_pia0->irqb_handler().set(FUNC(zwackery_state::pia0_irq_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(zwackery_state, pia1_porta_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zwackery_state, pia1_porta_w))
-	MCFG_PIA_READPB_HANDLER(READ8(zwackery_state, pia1_portb_r))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("csd", midway_cheap_squeak_deluxe_device, sirq_w))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set(FUNC(zwackery_state::pia1_porta_r));
+	m_pia1->writepa_handler().set(FUNC(zwackery_state::pia1_porta_w));
+	m_pia1->readpb_handler().set(FUNC(zwackery_state::pia1_portb_r));
+	m_pia1->ca2_handler().set("csd", FUNC(midway_cheap_squeak_deluxe_device::sirq_w));
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(zwackery_state, pia2_porta_r))
-	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
+	PIA6821(config, m_pia2, 0);
+	m_pia2->readpa_handler().set(FUNC(zwackery_state::pia2_porta_r));
+	m_pia2->readpb_handler().set_ioport("DSW");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -528,15 +531,15 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", zwackery_state, scanline_cb, "screen", 0, 1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zwackery)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zwackery)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRBBBBBGGGGG_inverted)
 
 	MCFG_VIDEO_START_OVERRIDE(zwackery_state, zwackery)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -609,5 +612,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT  ROTATION  COMPANY         FULLNAME    FLAGS
-GAME( 1984, zwackery, 0,      zwackery, zwackery, zwackery_state, 0,    ROT0,     "Bally Midway", "Zwackery", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY         FULLNAME    FLAGS
+GAME( 1984, zwackery, 0,      zwackery, zwackery, zwackery_state, empty_init, ROT0,     "Bally Midway", "Zwackery", MACHINE_SUPPORTS_SAVE )

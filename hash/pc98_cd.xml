@@ -16,7 +16,38 @@
 <!--  OS disks  -->
 
 
-	<software name="win2kpc">
+	<!--
+
+	Current status of Windows OSes:
+
+	Windows 95: works, but the PC-9801-86 driver has some trouble playing sounds
+	Windows 98: installer complains about not having at least a 66 MHz CPU
+	Windows NT 3.51: installs ok, but graphics are broken after the switch to 256-color mode
+	Windows NT 4.0: works
+	Windows 2000: fails to boot after the initial file copy
+
+	-->
+
+	<software name="win2kmsd" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Microsoft Windows 2000 MSDN.ccd" size="772" crc="940f2356" sha1="bebe3fc6c8b1e81e9eb96ada4def4c1e7ffcfae4"/>
+		<rom name="Microsoft Windows 2000 MSDN.cue" size="89" crc="54c2cf62" sha1="43a5b7dc29e40e6df9d55e0e8448e879e98213ec"/>
+		<rom name="Microsoft Windows 2000 MSDN.img" size="617957424" crc="95ef5092" sha1="378e5c014e93fcc18bec670070a5416aeb7db171"/>
+		<rom name="Microsoft Windows 2000 MSDN.sub" size="25222752" crc="3d6220b2" sha1="41ac37381dcbdb770bd59053ab21839ceadacdd9"/>
+		-->
+		<description>Windows 2000 Professional + Server (MSDN)</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 2000 msdn" sha1="4133e2626523c2b43f40c90f5bf2afe8a8e1feaa" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win2kpc" supported="no">
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Professional (PC-9821) - W2PCCP_JA.iso" size="409946112" crc="ffffffff" sha1="f0ad97e933a8fe835fdb7211ef9034862b68d7f9"/>
@@ -34,7 +65,7 @@
 		</part>
 	</software>
 
-	<software name="win2kpf">
+	<software name="win2kpf" supported="no">
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Professional (PC-9821) - W2PFPP_JA.iso" size="409946112" crc="ffffffff" sha1="ef5035b8c6b566552eba9f16e085272632e259b4"/>
@@ -52,7 +83,7 @@
 		</part>
 	</software>
 
-	<software name="win2kps">
+	<software name="win2kps" supported="no">
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Professional (PC-9821) - W2PSEL_JA.iso" size="409946112" crc="ffffffff" sha1="b48ebce2da480ab8a7e7b1e82b33bb01543b2b21"/>
@@ -70,7 +101,7 @@
 		</part>
 	</software>
 
-	<software name="win2kpf4">
+	<software name="win2kpf4" supported="no">
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Professional with SP4 (PC-9821) - ZRMPFPP_JA.iso" size="420202496" crc="ffffffff" sha1="8bf88f199b4919c8d340cd40a80bfb9b6e001f49"/>
@@ -88,7 +119,7 @@
 		</part>
 	</software>
 
-	<software name="win2ksf">
+	<software name="win2ksf" supported="no">
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Server (PC-9821) - W2SFPP_JA.iso" size="479168512" crc="ffffffff" sha1="57ec6c59bf0d5918031e5e4aa115743616fc5200"/>
@@ -106,7 +137,7 @@
 		</part>
 	</software>
 
-	<software name="win2kss">
+	<software name="win2kss" supported="no">
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Server (PC-9821) - W2SSEL_JA.iso" size="479168512" crc="ffffffff" sha1="325e1f718981603fc21b88f34643efb71e0ee7e1"/>
@@ -124,7 +155,7 @@
 		</part>
 	</software>
 
-	<software name="win2ksf4">
+	<software name="win2ksf4" supported="no">
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Server with SP4 (PC-9821) - ZRMSFPP_JA.iso" size="488269824" crc="ffffffff" sha1="f43c06cfa45289228ce47f815aa96efb8b9d1574"/>
@@ -138,6 +169,54 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="windows 2000 server with sp4 (pc-9821) - zrmsfpp_ja" sha1="0d77a7e9fc9bd7fd5ee0d93ff212a2a0f5c5314a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
+	<software name="winn351w" supported="no">
+		<!--
+		Origin: WinWorld
+		<rom name="winn351_wks_jpn.iso" size="544534528" crc="3e416147" sha1="86e724f0ae050bfdbe8a795f97f3afb7db4db57d"/>
+		-->
+		<description>Windows NT 3.51 Workstation</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="winn351_wks_jpn" sha1="592a0e61e1d34e3a53c5cec397b7f0a588b33d3c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
+	<software name="winn351wc" supported="no">
+		<!--
+		Origin: WinWorld
+		<rom name="winn351_wks_jpn-chk.iso" size="544534528" crc="0b9952f3" sha1="606553951efc84c33549e84f0a782075480b4016"/>
+		-->
+		<description>Windows NT 3.51 Workstation (Checked Build)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="winn351_wks_jpn-chk" sha1="8fb3f84765d38dfe12462df9e856cb69261a62da" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
+	<software name="winnt40s">
+		<!--
+		Origin: WinWorld
+		<rom name="jp_winnt_4.0_srv.iso" size="650047488" crc="ffffffff" sha1="a866123e88359a41dee9ffef8688ec3ca9b47abd"/>
+		-->
+		<description>Windows NT 4.0 Server</description>
+		<year>1997</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jp_winnt_4.0_srv" sha1="6b2dc3f8c4cb818cd8ed9699e4c9af79bd85679f" />
 			</diskarea>
 		</part>
 	</software>
@@ -168,7 +247,7 @@
 		</part>
 	</software>
 
-	<software name="win95">
+	<software name="win95" supported="partial">
 		<!--
 		Origin: Unknown
 		<rom name="Microsoft Windows 95 PC-98 (JPN).iso" size="81395712" crc="d402c155" sha1="14d10f62db11397ea46bdf02d1619f1b8e1ff345"/>
@@ -176,7 +255,7 @@
 		CUE file used for conversion:
 		<rom name="Microsoft Windows 95 PC-98 (JPN).cue" size="93" crc="c4113669" sha1="3ee6d0113b8efe9cf0ee19fe6054165233fa9906"/>
 		-->
-		<description>Windows 95</description>
+		<description>Windows 95 (Retail, v4.00.950)</description>
 		<year>1995</year>
 		<publisher>Microsoft</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -186,8 +265,86 @@
 		</part>
 	</software>
 
+	<!-- MAME doesn't support the Epson PC-98 clones yet, so we'll keep these as non-working -->
+
+	<software name="win95edk" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Microsoft Windows 95 Upgrade for Epson PC series (Epson Driver Kit).ccd" size="769" crc="8d81d513" sha1="e0aac2ea660fcf9a0dc9a947518ab281ce76ca40"/>
+		<rom name="Microsoft Windows 95 Upgrade for Epson PC series (Epson Driver Kit).cue" size="129" crc="8dd487f0" sha1="94963a9a674107435b357543538fe48088df82a4"/>
+		<rom name="Microsoft Windows 95 Upgrade for Epson PC series (Epson Driver Kit).img" size="17454192" crc="8dcaa81c" sha1="6d8304d0b57d49bccc41ec68c744610d6e9e7fc6"/>
+		<rom name="Microsoft Windows 95 Upgrade for Epson PC series (Epson Driver Kit).sub" size="712416" crc="527e79e4" sha1="5acfdd86cf05f09b2ff7d73052699a677ddb0203"/>
+		-->
+		<description>Epson PC Series Driver Kit for Windows 95</description>
+		<year>1996</year>
+		<publisher>Epson</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 95 upgrade for epson pc series (epson driver kit)" sha1="52dff684bca22570359fec0d566f287dba6f63f6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win95eps" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Microsoft Windows 95 Upgrade for Epson PC series.ccd" size="772" crc="034f622f" sha1="3322f54544b4fded772657491715bc8e1805482a"/>
+		<rom name="Microsoft Windows 95 Upgrade for Epson PC series.cue" size="110" crc="dd01c798" sha1="8c8e3f13660d29331a2b52477910e4ac52c8a244"/>
+		<rom name="Microsoft Windows 95 Upgrade for Epson PC series.img" size="314300112" crc="6ae6b27d" sha1="0ccdb6bb5fe550b138d33627b020dd08d38c2a8d"/>
+		<rom name="Microsoft Windows 95 Upgrade for Epson PC series.sub" size="12828576" crc="7b4f8922" sha1="1dd2408dc103d83faa7b8f34555d0c0ff4a2905f"/>
+		-->
+		<description>Windows 95 Upgrade for Epson PC Series (OSR1, v4.00.950a)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 95 upgrade for epson pc series" sha1="e6d85d5b3243580c5dec393114d352656faa728e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win95o2" supported="partial">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Microsoft Windows 95 OSR2.ccd" size="769" crc="3972874e" sha1="4996baf6f0e48dc1ae950aac5cc92dfa944f4ae7"/>
+		<rom name="Microsoft Windows 95 OSR2.cue" size="87" crc="4cd9eb70" sha1="7c4042efa31440646fb3e7593f4aa41553dd5086"/>
+		<rom name="Microsoft Windows 95 OSR2.img" size="76390608" crc="e4920918" sha1="f1844dd94cb8e73204c806e6fe7c4f91ec184af9"/>
+		<rom name="Microsoft Windows 95 OSR2.sub" size="3117984" crc="10b20fd0" sha1="717c309e2c81ddb72e598c63c74f20e0d48e5b40"/>
+		-->
+		<description>Windows 95 (OSR2, v4.00.950 B)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 95 osr2" sha1="53ddcf748030d5a3513179c92e2cec1a9c953bc5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win95ndk" supported="partial">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Microsoft Windows 95 (NEC Driver Kit).ccd" size="770" crc="be093f9a" sha1="a47f2ecf7f28fa8b88ecd1c2a66c967e9fb789d7"/>
+		<rom name="Microsoft Windows 95 (NEC Driver Kit).cue" size="99" crc="b560e6ec" sha1="f983b885f5bb0f9d25e42bb66101476f7767fd07"/>
+		<rom name="Microsoft Windows 95 (NEC Driver Kit).img" size="83735904" crc="c5db79e3" sha1="281b041e45f6056c86b00b0b666d99577762a248"/>
+		<rom name="Microsoft Windows 95 (NEC Driver Kit).sub" size="3417792" crc="0010b0cf" sha1="c517e59a258c7d543726c9c28f549850fe9e9105"/>
+		-->
+		<description>NEC Driver Kit for Windows 95</description>
+		<year>1995</year>
+		<publisher>NEC</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 95 (nec driver kit)" sha1="06d296d97ce6e0e07f6ba022262e4069f075662a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Supports IBM PC-AT and PC-98 architectures -->
-	<software name="win98">
+	<software name="win98" supported="no">
 		<!--
 		Origin: Unknown
 		<rom name="Microsoft Windows 98 x86 &amp; PC-98 (JPN).iso" size="508647424" crc="f82c51a9" sha1="3607d2cc8fea57ca915954e9ff2e2cbc82a02fff"/>
@@ -201,6 +358,90 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="microsoft windows 98 x86 &amp; pc-98 (jpn)" sha1="3be220cca006d5d012db9a29599bbad15c2627a4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Supports IBM PC-AT and PC-98 architectures -->
+	<software name="win98upg" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Microsoft Windows 98 Upgrade.ccd" size="771" crc="237c9695" sha1="fef54ecb46d0642d4bbeff2792e72bbc81020d95"/>
+		<rom name="Microsoft Windows 98 Upgrade.cue" size="90" crc="3e004fcc" sha1="b2132cfcc1325c4b242b521c1de7030224fa9084"/>
+		<rom name="Microsoft Windows 98 Upgrade.img" size="583712304" crc="c1ca0e3b" sha1="d7d081e584faa3fa3dcf0dca0c1135e503835136"/>
+		<rom name="Microsoft Windows 98 Upgrade.sub" size="23824992" crc="685ca69d" sha1="a6cfdee7ae883d24d7997effc8597d180108100d"/>
+		-->
+		<description>Windows 98 (Upgrade)</description>
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 98 upgrade" sha1="ca24c9b057081e369b4f91a453ab621333e7191b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Supports IBM PC-AT and PC-98 architectures -->
+	<software name="win98se" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Microsoft Windows 98SE.ccd" size="772" crc="65e992be" sha1="b869a3e83459f562966739caa22b46b5204e20cb"/>
+		<rom name="Microsoft Windows 98SE.cue" size="84" crc="a529c2b7" sha1="050dc1be1c9aeafd7e4d7ce7235285b8296f9eee"/>
+		<rom name="Microsoft Windows 98SE.img" size="546019152" crc="cbaea25b" sha1="6b1689232640632a7cc6e5de4967b922637c055d"/>
+		<rom name="Microsoft Windows 98SE.sub" size="22286496" crc="6dec77e2" sha1="41843630fb1a58131b5ecf6dd187884fb29e6685"/>
+		-->
+		<description>Windows 98 Second Edition</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 98se" sha1="eb0bdd209334b3709fa31043f390838351127bc0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="xa12c8ss">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="PC-9821Xa12C8 System Software (Recovery CD).ccd" size="771" crc="907ff910" sha1="3d0229e25b637eabf5ecf84da16e2e8fb52661a6"/>
+		<rom name="PC-9821Xa12C8 System Software (Recovery CD).cue" size="105" crc="4b453116" sha1="2d837e4bfc12bc3ca1561af5fbd4eae54b51d50e"/>
+		<rom name="PC-9821Xa12C8 System Software (Recovery CD).img" size="198800448" crc="7ef00d68" sha1="4149062ad65d8ed7f250c65ff14fa8619c643ee0"/>
+		<rom name="PC-9821Xa12C8 System Software (Recovery CD).sub" size="8114304" crc="cf5053bd" sha1="4a237393be2ce3c510a0b5f7e63b4dc4f68b976c"/>
+		-->
+		<description>PC-9821Xa12C8 System Software</description>
+		<year>1995</year>
+		<publisher>NEC</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Install Disk #1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="pc-9821xa12c8 system software (system install disk #1).hdm" size="1261568" crc="b728dcae" sha1="d9277990e7739da403e5fb653c6d1966ef0b4044" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Install Disk #2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="pc-9821xa12c8 system software (system install disk #2).hdm" size="1261568" crc="093085db" sha1="c67652c0dc24b6a9ba699ffbbd7c463151f998fc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="PCI Setup Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="pc-9821xa12c8 system software (pci setup disk).hdm" size="1261568" crc="227f2047" sha1="cffce55224793a66bfbf80910c80dece7aec4430" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Demonstration Program" />
+			<dataarea name="flop" size="1261568">
+				<rom name="pc-9821xa12c8 system software (demonstration program).hdm" size="1261568" crc="f98985f7" sha1="39e260b78807cd99b2abd0f02abffb13a30aec0f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="Recovery CD" />
+			<diskarea name="cdrom">
+				<disk name="pc-9821xa12c8 system software (recovery cd)" sha1="edf68ee9835feec9966ddd052e5c2d58bf90350d" />
 			</diskarea>
 		</part>
 	</software>
@@ -310,6 +551,28 @@
 		</part>
 	</software>
 
+	<!-- PC-98x1 / DOS/V hybrid -->
+	<software name="aitd3">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Alone in the Dark 3.ccd" size="12288" crc="ca75d9c3" sha1="438e524b86e5a86364757856dacc4352e67084b7"/>
+		<rom name="Alone in the Dark 3.cue" size="2413" crc="aa012ed7" sha1="f6588836955ce28cf39a30d4e43896a28299a552"/>
+		<rom name="Alone in the Dark 3.img" size="539786352" crc="9bccc714" sha1="87c573215a279febe3cde1406a60f5ef7a7b9911"/>
+		<rom name="Alone in the Dark 3.sub" size="22032096" crc="f75c6388" sha1="db08bfa0c87ed04a5cf41df9a49395e3de81093f"/>
+		-->
+		<description>Alone in the Dark 3</description>
+		<year>1995</year>
+		<publisher>エーエムティーサヴァン (AMT Savan)</publisher>
+		<info name="alt_title" value="アローン イン ザ ダーク3" />
+		<info name="release" value="19951208" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="alone in the dark 3" sha1="4646ea0570fae916819e9674eb3cb8d976cdb1df" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="akikogld">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
@@ -354,6 +617,56 @@
 		</part>
 	</software>
 
+	<!-- probably a bad dump: the image seems to have been created from the game files instead of being an actual dump of
+	 the original disc (it has a Joliet filesystem and the directories have creation dates in 2003) so it probably needs
+	 to be replaced with a proper dump.
+
+	PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml   -->
+	<software name="alice3">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Alice no Yakata III.iso" size="20756480" crc="d594012b" sha1="001f86551065e146be22d0d81d7063e1873360c6"/>
+		<rom name="alice no yakata iii.cue" size="80" crc="9eafa1c4" sha1="5ac36bf88ba7480c480e37942201bd81f2676dbe"/>
+		-->
+		<description>Alice no Yakata III</description>
+		<year>1995</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="アリスの館III" />
+		<info name="release" value="199506xx" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="alice no yakata iii" sha1="aaae43036d123ba7b75d6322f646b1b1ecfe14ec" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Fails with "can't find the CD-ROM drive" error -->
+	<software name="angel" supported="no">
+		<!--
+		 Origin: Neo Kobe Collection
+		 CCD converted to CUE with GNU ccd2cue
+		<rom name="Angel (U-Jin Presents).ccd" size="2812" crc="5269b2c9" sha1="4fff4210e42536faa001b659721aeaaffe1f5d5c"/>
+		<rom name="Angel (U-Jin Presents).cue" size="686" crc="ebfef01e" sha1="900c6ccf3f455edf48ea7e0ee437d39830c3ebed"/>
+		<rom name="Angel (U-Jin Presents).img" size="350154000" crc="89c3466d" sha1="d17fc9ad79e78aaf97ab7bc9452638471f75d692"/>
+		<rom name="Angel (U-Jin Presents).sub" size="14292000" crc="192792f3" sha1="c273e05d203924a777229d9390c75d4b3032e8a8"/>
+		 -->
+		<description>Angel</description>
+		<year>1993</year>
+		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>
+		<info name="alt_title" value="エンジェル" />
+		<info name="release" value="19931001" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="angel (u-jin presents) (cd save disk).hdm" size="1261568" crc="5a6758a1" sha1="aff63d873bd6ba8e39d0bd80a66eb29690edbe18" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="angel (u-jin presents)" sha1="edc70847695dacb84864890a9dfb33395019ba5d"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
 	<software name="anghalo">
 		<!--
@@ -367,9 +680,29 @@
 		<year>1996</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="release" value="199610xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="angel halo" sha1="9d79b87bdfa4a3c3308c15a7e7c2927686f79c68" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="angie">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Daraku no Kuni no Angie.ccd" size="769" crc="0383d773" sha1="8efea92b525333d4b8ab86d61311129f5b983f83"/>
+		<rom name="Daraku no Kuni no Angie.cue" size="85" crc="2b165d28" sha1="666bc4a1947c6b8d24264620612f9f1de7be1f57"/>
+		<rom name="Daraku no Kuni no Angie.img" size="12340944" crc="d6ef722d" sha1="f8f36a2d5cea8fc690c86fe91568ab1af80d2803"/>
+		<rom name="Daraku no Kuni no Angie.sub" size="503712" crc="6b612379" sha1="d578c1bc63806b5b60d19f41f386537a034ffe02"/>
+		-->
+		<description>Daraku no Kuni no Angie - Kyoukai no Mesu Dorei-tachi</description>
+		<year>1996</year>
+		<publisher>PIL</publisher>
+		<info name="alt_title" value="堕落の国のアンジー ～狂界の牝奴隷達～" />
+		<info name="release" value="19960419" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="daraku no kuni no angie" sha1="abda5fc88dbfb9b667a4cd3a0d74dc499b9f55f5" />
 			</diskarea>
 		</part>
 	</software>
@@ -395,6 +728,7 @@
 		<publisher>TGL</publisher>
 		<info name="alt_title" value="あっぱれ伝 伏龍の章" />
 		<info name="release" value="19951208" />
+		<info name="usage" value="Requires serial number (barcode) printed on the back cover"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="appaden" sha1="914ade4e8f211ac685766bd0696076322f9fade6"/>
@@ -426,6 +760,72 @@
 		</part>
 	</software>
 
+	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<software name="bacta12v">
+		<!--
+		 Origin: Neo Kobe Collection
+		<rom name="Bacta 1&amp;2 + Voice.ccd" size="1342" crc="eaecbaee" sha1="08a2203ca5ce3ff931611ec0a6fa03d7e3dbc20f"/>
+		<rom name="Bacta 1&amp;2 + Voice.cue" size="198" crc="9b35ee13" sha1="1386512259df3e4aade1d76ed526bc2648082902"/>
+		<rom name="Bacta 1&amp;2 + Voice.img" size="284514384" crc="ee8f9e72" sha1="2a2a89d6e7d4795d7b315468d2b9b0297694452f"/>
+		<rom name="Bacta 1&amp;2 + Voice.sub" size="11612832" crc="ad18c1ea" sha1="1d98f9eec9dbb2d810bf687df3cf94fb9a30c036"/>
+		 -->
+		<description>Bacta 1 &amp; 2 + Voice</description>
+		<year>1996</year>
+		<publisher>姫屋ソフト (Himeya Soft)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bacta 1 &amp; 2 + voice" sha1="86c2d8dcb4e40b108e7e8fab5c1f9f3609f65ed7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="bfmaria">
+		<!--
+		 Origin: Neo Kobe Collection
+		 CCD converted to CUE with GNU ccd2cue
+		<rom name="Ballade for Maria (Maria ni Sasageru Ballade).ccd" size="4213" crc="cc7ea43f" sha1="59cf832f071870194535682eeed17c6bda8bc2e8"/>
+		<rom name="Ballade for Maria (Maria ni Sasageru Ballade).cue" size="801" crc="1d1d4f7b" sha1="7cff4f6b1ada6ec34572e8d65f0e29ad80016221"/>
+		<rom name="Ballade for Maria (Maria ni Sasageru Ballade).img" size="636477072" crc="df4b1836" sha1="6f4406f54279798299f687179883b944fbd434a6"/>
+		<rom name="Ballade for Maria (Maria ni Sasageru Ballade).sub" size="25978656" crc="edd2ec49" sha1="519c10f83606e462fb92f78bc9afa592f7410244"/>
+		 -->
+		<description>Ballade for Maria</description>
+		<year>1995</year>
+		<publisher>フェアリーテール (Fairytale)</publisher>
+		<info name="alt_title" value="マリアに捧げるバラード" />
+		<info name="release" value="19950623" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ballade for maria (maria ni sasageru ballade) (cd boot disk).hdm" size="1261568" crc="b477937a" sha1="eefcd765ec25bc9c9d923dd79ca136bb020fc8f2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ballade for maria (maria ni sasageru ballade)" sha1="d7c53a611f04a1646ce0733ce6c1fccce6bde899"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="bhludy">
+		<!--
+		 Origin: Neo Kobe Collection
+		 CCD converted to CUE with GNU ccd2cue
+		<rom name="Bounty Hunter Ludy.ccd" size="768" crc="75401494" sha1="4ac577a3ea4a5750948e6d6e04009f452e7db84e"/>
+		<rom name="Bounty Hunter Ludy.cue" size="80" crc="cc44dd10" sha1="26bf267681c74a7fef09a012dc41cb0e670b0453"/>
+		<rom name="Bounty Hunter Ludy.img" size="11061456" crc="785c3a51" sha1="5d2abc3e2162ed107e1f01739b989994e2be2a23"/>
+		<rom name="Bounty Hunter Ludy.sub" size="451488" crc="0c62c662" sha1="a1079ecbed0045b1d0a573f0a61b9ee57191568f"/>
+		-->
+		<description>Bounty Hunter Ludy</description>
+		<year>1996</year>
+		<publisher>ScooP</publisher>
+		<info name="alt_title" value="バウンティハンター ルディ" />
+		<info name="release" value="19961025" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bounty hunter ludy" sha1="a8e3f4b21f23f3dac1f0b54e1620c572ae695236" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="blandia">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
@@ -440,6 +840,32 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="vhmd131" sha1="fd3f2db19e613b384ea362fbba8421aeb6b556b6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="branmark">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Branmarker.ccd" size="770" crc="cda79ddd" sha1="3143b5f4f2347f8c711764d609da593ac052bf07"/>
+		<rom name="Branmarker.cue" size="72" crc="35b13fdc" sha1="66054bfdeb2bc3b5e33e7a5b4a98329b36bda726"/>
+		<rom name="Branmarker.img" size="27553680" crc="15b8b9c0" sha1="add8144444bba66a453fc6951c39d266ae9c1e87"/>
+		<rom name="Branmarker.sub" size="1124640" crc="cad18181" sha1="b1c642c3074d64f2e4e57cd5eaccc66038050f3f"/>
+		-->
+		<description>Branmarker</description>
+		<year>1993</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="ブランマーカー" />
+		<info name="release" value="19931126" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="branmarker (cd boot disk).hdm" size="1261568" crc="96260d7a" sha1="686c6fcb4525544ba37c55270c3535173668e3f7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="branmarker" sha1="6c03823c2bf385630c5064a994fc8718610ced0f" />
 			</diskarea>
 		</part>
 	</software>
@@ -482,7 +908,8 @@
 		</part>
 	</software>
 
-	<software name="brandnew">
+	<!-- Requires disk 2 of the floppy version (included in the box) as copy protection, but fails the check -->
+	<software name="brandnew" supported="no">
 		<!--
 		Origin: redump.org
 		<rom name="Brandish (Japan) (Renewal) (Track 01).bin" size="11936400" crc="07953f04" sha1="e3aba6d10495617412095fb47ae40c59c63b2237"/>
@@ -506,6 +933,11 @@
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュ リニューアル" />
 		<info name="release" value="19950310" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3594434">
+				<rom name="brandish_renewal_disk2.mfm" size="3594434" crc="ff09f243" sha1="9c8e3c99ac406b2501aa83867fa9e78424efb408" offset="0" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="brandish (japan) (renewal)" sha1="d804bc3ddb997443b0ba856bac3eb2d8d333a8a7" />
@@ -549,6 +981,25 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="br3" sha1="13b948978967afcd3393482e2b568f6df96b2830" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="brand3rn">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Brandish 3 Renewal.ccd" size="2824" crc="b1cb2134" sha1="5375c2b834227cad4e02da9c7863ee426e8e0699"/>
+		<rom name="Brandish 3 Renewal.cue" size="682" crc="11ddeaa3" sha1="0fe20e4d00509bd41be668bed65df3fe607c4d47"/>
+		<rom name="Brandish 3 Renewal.img" size="337780128" crc="6766cc71" sha1="c631dd9c085c60a94a6c00b4398ea1eae2fa55ba"/>
+		<rom name="Brandish 3 Renewal.sub" size="13786944" crc="14832959" sha1="6d4a8f487a0d9e752433c2b8376ef7699eda00e3"/>
+		-->
+		<description>Brandish 3 - Spirit of Balcan - Renewal</description>
+		<year>1995</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="ブランディッシュ３ スピリット オブ バルカン リニューアル" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="brandish 3 renewal" sha1="d5ebe552ae1d2ccd0d8587aaf81a8396810d1b63" />
 			</diskarea>
 		</part>
 	</software>
@@ -603,9 +1054,28 @@
 		<year>1994</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="release" value="199408xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="crystal rinal" sha1="96bce4606ee6775e966328143a6051fe312d9a8d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="crw2">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="CRW 2.ccd" size="781" crc="7ebbb2d6" sha1="32ae638016a59d915fcf0a802c8beefcc72c40d9"/>
+		<rom name="CRW 2.cue" size="67" crc="a44b2bd0" sha1="30a1cfb666b1e0e27ead942b8fe09df158d6b57d"/>
+		<rom name="CRW 2.img" size="5708304" crc="19078c0c" sha1="3bcafe0b1d60bd6715e6cef71d548fa1728a2436"/>
+		<rom name="CRW 2.sub" size="232992" crc="21e7898a" sha1="cd173cfd8a32cabd08278505702e06256af29b2f"/>
+		-->
+		<description>CRW 2</description>
+		<year>1995</year>
+		<publisher>ウィズ (Wiz)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="crw 2" sha1="4792f4d632abb3da27d632430dab988a65d4ffbd" />
 			</diskarea>
 		</part>
 	</software>
@@ -647,6 +1117,26 @@
 		</part>
 	</software>
 
+	<!-- PC-98x1 / DOS/V hybrid -->
+	<software name="darkser">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Dark Seraphim.ccd" size="5308" crc="51b672e6" sha1="46b002dc7808f0f91a818029048de84031b56ae0"/>
+		<rom name="Dark Seraphim.cue" size="1387" crc="81da128c" sha1="8ec4a1367929360289f3c4f6e7fb835ec00a5dcb"/>
+		<rom name="Dark Seraphim.img" size="615685392" crc="157c555a" sha1="41c33fc3e15bf3a652306dc0cf2ffe7d6ed9f60d"/>
+		<rom name="Dark Seraphim.sub" size="25130016" crc="830e549f" sha1="ee87bf9202208b8c362ab442e161802723552b24"/>
+		-->
+		<description>Dark Seraphim</description>
+		<year>1995</year>
+		<publisher>呉ソフトウエア工房 (Kure Software Koubou)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dark seraphim" sha1="1c56fe51c36ebe9e97c6e8bfbf0033ccc46db40d" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dawnpat">
 		<!--
 		Origin: P2P
@@ -660,6 +1150,94 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dawn patrol (1997)(kss)" sha1="437aabffa45d26aeedddd8cefa9362ef48d6c08c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="debut">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Tanjou - Debut (CD version).ccd" size="972" crc="b9c249db" sha1="50d96c9509eb76c8de503d152295de03aa29a232"/>
+		<rom name="Tanjou - Debut (CD version).cue" size="149" crc="f277b739" sha1="60e7842f9cd91659e0390640c8cc7efa699be3e7"/>
+		<rom name="Tanjou - Debut (CD version).img" size="55401360" crc="497ba0bf" sha1="c9e91dc28cbb446287406f4b985174104a218881"/>
+		<rom name="Tanjou - Debut (CD version).sub" size="2261280" crc="f6dab8f7" sha1="e5db66cdb03079502251f17b55c3673e8ebb1065"/>
+		 -->
+		<description>Tanjou - Debut</description>
+		<year>1994</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="alt_title" value="誕生 〜Debut〜" />
+		<info name="release" value="19940408" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="tanjou - debut (cd version) (key disk) [original].hdm" size="1261568" crc="216950bb" sha1="d5ab1830b82de1cf53403871c768aa85b923c74d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tanjou - debut (cd version)" sha1="802f4b095a79a456ff94f9aa5a6be6aeda3a3f0c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<software name="defana">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="De.FaNa.ccd" size="3058" crc="4307c4b7" sha1="649455c3a3d1d15b085a807a674ca467313ef240"/>
+		<rom name="De.FaNa.cue" size="543" crc="76eec4ca" sha1="5e87dee0b98dd8b76e6b71de7af2d2f9a8bfc945"/>
+		<rom name="De.FaNa.img" size="462657216" crc="98e1bb0f" sha1="fc6208362b828a436445e864fcfbd49297e93d9c"/>
+		<rom name="De.FaNa.sub" size="18883968" crc="febc7304" sha1="1186a2b181aa3fd341b39b1b9d8481a74e45fbac"/>
+		-->
+		<description>De.FaNa - Full Animation Adventure Series #2</description>
+		<year>1995</year>
+		<publisher>姫屋ソフト (Himeya Soft)</publisher>
+		<info name="release" value="199511xx" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="de.fana" sha1="935c63b0c38c56e7f19957cf6fe7cc2472728964" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<software name="desire">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Desire.ccd" size="1727" crc="4d8d3af5" sha1="5719fdc09d1c88238cd839f78573e28669f3f00e"/>
+		<rom name="Desire.cue" size="265" crc="2f6a7314" sha1="050eeee7841ec85e3f376998f3a615bc3fc81e2f"/>
+		<rom name="Desire.img" size="525627312" crc="eda711e8" sha1="2f6e316e60146a6a5b762d29b0cc4a210987c95c"/>
+		<rom name="Desire.sub" size="21454176" crc="fea510bb" sha1="e5d36eba6a606b50d4459102e33f94dd9cca2111"/>
+		-->
+		<description>Desire - Haitoku no Rasen</description>
+		<year>1994</year>
+		<publisher>シーズウェア (C's Ware)</publisher>
+		<info name="alt_title" value="デザイア 背徳の螺旋" />
+		<info name="release" value="199411xx" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="desire" sha1="a7ba23ec748ba4a58d0baab8172ee8ba17c450c5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Hangs shortly after starting a new game -->
+	<software name="diesirae" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Dies Irae.ccd" size="13658" crc="281e6765" sha1="7ecc5e5d865978aeb448da60ea3b50144ed3f55a"/>
+		<rom name="Dies Irae.cue" size="3823" crc="0560c5d5" sha1="f2718512f47ad11cc8c69f88bae10fdd117e8a16"/>
+		<rom name="Dies Irae.img" size="585499824" crc="8a29ef18" sha1="c3b68a3a408a47d024ae4f63a437d3e5b68c0b02"/>
+		<rom name="Dies Irae.sub" size="23897952" crc="c51cda60" sha1="8c539942f9458f34b5d164add098578a4cb96e53"/>
+		-->
+		<description>Dies Irae</description>
+		<year>1996</year>
+		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<info name="alt_title" value="ディエス イレ" />
+		<info name="release" value="19960215" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dies irae" sha1="ad4d50b2ddfa35a087b4d9b63058a36dac780c53" />
 			</diskarea>
 		</part>
 	</software>
@@ -710,10 +1288,178 @@
 		<description>D.O. Kanshuu Premium Box - Touch My Heart</description>
 		<year>1995</year>
 		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="ディーオー監修プレミアムボックス タッチ マイ ハート" />
 		<info name="release" value="199505xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="d.o. kanshuu premium box - touch my heart" sha1="b3b4fdd6a780911b432d925dbb5eeb5844f0485c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dokidok1">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="D.O. Doki Doki Disk CD Vol. 1.ccd" size="2682" crc="f14c52aa" sha1="ccf3a9dbd76872c0a2959aac183baf894b4b587b"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 1.cue" size="495" crc="0ed4cfbf" sha1="e36ece5bac45f7c6f150b544001dd3db9d064205"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 1.img" size="449279040" crc="0231f485" sha1="3e717dedf1a516a6a8fcba8567e06da11db04f52"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 1.sub" size="18337920" crc="f0a84b2e" sha1="a6ac5eb08ccc245e71867d5ee61841ad0a57c204"/>
+		-->
+		<description>Doki Doki Disk CD-ban Dai-1-kan: Club D.O. Jimukyoku</description>
+		<year>1994</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="d.o. doki doki disk cd vol. 1" sha1="f86a8c6d30d1d94a45930daf78f23d68961162a8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dokidok2">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="D.O. Doki Doki Disk CD Vol. 2.ccd" size="2100" crc="4c9bb563" sha1="4eafbc8ca963cfa605e8c7df540166699a6a83eb"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 2.cue" size="379" crc="e84de088" sha1="5557b2be97d995662d5152869f71d35af8a83461"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 2.img" size="108972864" crc="661ad65a" sha1="ce006c31ca69a601137efbe021b985f14e9c54f6"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 2.sub" size="4447872" crc="e15627a8" sha1="642b6e3f4590b0c06047056189559284523082d6"/>
+		-->
+		<description>Doki Doki Disk CD-ban: Club D.O. Vol. 2</description>
+		<year>1995</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="d.o. doki doki disk cd vol. 2" sha1="8ebcec5d3ac672d237c3101a370a2bd92c6d59b8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dokidok3">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="D.O. Doki Doki Disk CD Vol. 3.ccd" size="772" crc="fc3f116f" sha1="627b973273473842e8a23e92449360137d2ad60a"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 3.cue" size="91" crc="d029c790" sha1="25eae4cfa09e8366546ef738eb386910810e68dc"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 3.img" size="567871584" crc="608f3a81" sha1="f2da2948f916c0beaa6e0e25b4a230757c82b5e0"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 3.sub" size="23178432" crc="84610d44" sha1="f18f3a4a5fab3930c0394abc6595e930e93f3ab1"/>
+		-->
+		<description>Doki Doki Disk CD-ban: Club D.O. Vol. 3</description>
+		<year>1996</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="d.o. doki doki disk cd vol. 3" sha1="b69090b18762165bc2f4a90623900a87abb3b35b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dokido45">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="D.O. Doki Doki Disk CD Vol. 4-5.ccd" size="772" crc="2cca0d32" sha1="19b53282f73138c767b36615be93780ba885289a"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 4-5.cue" size="93" crc="4105ea36" sha1="473b6d1bbb1f11aa822dca2a2579c36bb016ef51"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 4-5.img" size="259101024" crc="d58a5937" sha1="7a0fd618dc2338c6010aa635540efae9315b3887"/>
+		<rom name="D.O. Doki Doki Disk CD Vol. 4-5.sub" size="10575552" crc="5c0d3410" sha1="4af5c75a43d06b00d2866914c2ae599a003c24b4"/>
+		-->
+		<description>Doki Doki Disk CD-ban: Club D.O. Vol. 4-5</description>
+		<year>1997</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="d.o. doki doki disk cd vol. 4-5" sha1="a525c997da4948eba43742f818b45fb195b408b9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<software name="dpszenbu">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="D.P.S. Zenbu.ccd" size="1714" crc="c68dad59" sha1="244862655199e9144499e516f00620a880d25309"/>
+		<rom name="D.P.S. Zenbu.cue" size="271" crc="21113aab" sha1="2319a64d1bce6422acd425974fafc334606a670d"/>
+		<rom name="D.P.S. Zenbu.img" size="264604704" crc="66ece7ad" sha1="b7ec7148b74c55e92d1e5dd89d0fc12bad984ac2"/>
+		<rom name="D.P.S. Zenbu.sub" size="10800192" crc="931ae6d6" sha1="4352aed66a1b669011210b98cde1c7513a44c72a"/>
+		-->
+		<description>D.P.S. Zenbu</description>
+		<year>1995</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="d.p.s. zenbu" sha1="0dfb4343e175a124795974183c17356530231b85" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't run after installation -->
+	<software name="dorbestj" supported="no">
+		<!--
+		 Origin: Neo Kobe Collection
+		 CCD converted to CUE with GNU ccd2cue
+		<rom name="DOR Best Selection Vol. 1 (Joukan) (Disc 1).ccd" size="1730" crc="69b852d3" sha1="12787f85f3ab2f3307c6590115504ff280c0d454"/>
+		<rom name="DOR Best Selection Vol. 1 (Joukan) (Disc 1).cue" size="317" crc="a0ef90de" sha1="3fc7464db686c90e14408c60cb8c58f5725658e8"/>
+		<rom name="DOR Best Selection Vol. 1 (Joukan) (Disc 1).img" size="566820240" crc="ba07c4e2" sha1="56ff70cc80844f130c2c2b2d820a08c46f48012e"/>
+		<rom name="DOR Best Selection Vol. 1 (Joukan) (Disc 1).sub" size="23135520" crc="bf35c2de" sha1="a88d6a4b7b6bcb9662ff80c1e5f1c66f51a6bdd5"/>
+		<rom name="DOR Best Selection Vol. 1 (Joukan) (Disk 2).ccd" size="1925" crc="9131726a" sha1="47c8f5b4202ad301ad38f357c5a2c7f5c84a65f4"/>
+		<rom name="DOR Best Selection Vol. 1 (Joukan) (Disk 2).cue" size="355" crc="7a80ceda" sha1="31a6760c2eaa03b785d55b91e73b988bdf559cff"/>
+		<rom name="DOR Best Selection Vol. 1 (Joukan) (Disk 2).img" size="588999600" crc="a2650e70" sha1="6dae133f2a285bfafb79d2d364ce457e0cdd6a41"/>
+		<rom name="DOR Best Selection Vol. 1 (Joukan) (Disk 2).sub" size="24040800" crc="93169675" sha1="776ac82c0c28d85847d29e0b5e9d2908b881869e"/>
+		 -->
+		<description>DOR Best Selection Joukan</description>
+		<year>1993</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="DOR ベストセレクション 上巻" />
+		<info name="release" value="19930427" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="dor best selection vol. 1 (joukan) (cd boot disk) [original].hdm" size="1261568" crc="42ee3c3c" sha1="d278c712f993ea7944509d9d6b583544c6cd8983" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dor best selection vol. 1 (joukan) (disc 1)" sha1="4333ed2d779890bddeef272b3ca4297b712fdf99"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dor best selection vol. 1 (joukan) (disc 2)" sha1="f9dc66b8a43d487d35e1e46d6a192efc6bcb9ada"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't run after installation -->
+	<software name="dorbestg" supported="no">
+		<!--
+		 Origin: Neo Kobe Collection
+		 CCD converted to CUE with GNU ccd2cue
+		<rom name="DOR Best Selection Vol. 2 (Gekan) (Disc 1).ccd" size="1539" crc="52faeb28" sha1="887073d35f67641b024c472f846c0f0da47833c1"/>
+		<rom name="DOR Best Selection Vol. 2 (Gekan) (Disc 1).cue" size="278" crc="2b9dc9f0" sha1="849852f90e50c48aa4853a5294e6f0b8610405f9"/>
+		<rom name="DOR Best Selection Vol. 2 (Gekan) (Disc 1).img" size="514841040" crc="13752684" sha1="0ea75ca23699ac71d3ed577f266b7d6269577af0"/>
+		<rom name="DOR Best Selection Vol. 2 (Gekan) (Disc 1).sub" size="21013920" crc="9cd0056e" sha1="743bf8530cbd16bf30e86875d408ae1f61d05ccf"/>
+		<rom name="DOR Best Selection Vol. 2 (Gekan) (Disc 2).ccd" size="1162" crc="f6db6770" sha1="db598d883d999e4a4e5ac320d6f4ce014ee4634e"/>
+		<rom name="DOR Best Selection Vol. 2 (Gekan) (Disc 2).cue" size="202" crc="7c9cc77a" sha1="cbdb8c9d2daa78b2797c5aedab35617600550fa0"/>
+		<rom name="DOR Best Selection Vol. 2 (Gekan) (Disc 2).img" size="488726784" crc="17046bc3" sha1="7b2c7ea0e0b50e268be622d9369365c7a5c2b989"/>
+		<rom name="DOR Best Selection Vol. 2 (Gekan) (Disc 2).sub" size="19948032" crc="463b669d" sha1="b8e040192429b987aabb3ae4afeeabc1a360891d"/>
+		 -->
+		<description>DOR Best Selection Gekan</description>
+		<year>1993</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="DOR ベストセレクション 下巻" />
+		<info name="release" value="19930521" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="dor best selection vol. 2 (gekan) (cd boot disk) [original].hdm" size="1261568" crc="bb48197e" sha1="d388abfeca45b7cd18513be71d6b7583d745c9f6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dor best selection vol. 2 (gekan) (disc 1)" sha1="438dd4cc2ff509adec93b1f2e673f999edead366"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dor best selection vol. 2 (gekan) (disc 2)" sha1="fce650e170bd57aa47f49ad5301ecc80467cf07e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -801,7 +1547,8 @@
 	</software>
 
 	<!-- PC-98x1 / DOS/V hybrid -->
-	<software name="duelsucp">
+	<!-- Blank screen when running DS.BAT; also, there's apparently no way to install the game - maybe it's missing a floppy disk? -->
+	<software name="duelsucp" supported="no">
 		<!--
 		Origin: P2P
 		<rom name="DUEL succession Plus kit (1996)(Kure Software Koubou).ccd" size="3636" crc="8317e961" sha1="57b2aa6bf0a6cf0db7c8d4dfab48d9bc84822736"/>
@@ -850,14 +1597,62 @@
 		<year>1995</year>
 		<publisher>シーズウェア (C's Ware)</publisher>
 		<info name="release" value="199508xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="eimmy to yobanaide" sha1="4c321b593322b94cf84a68ad1021d0cf3b24b1c4" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="emit1">
+	<software name="elhazard">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="El-Hazard - The Magnificent World.ccd" size="8649" crc="dfd7fc62" sha1="303d217b45060a322a4d12b996cba8be49cb0891"/>
+		<rom name="El-Hazard - The Magnificent World.cue" size="1708" crc="e03173b3" sha1="5db1a495dd8a6690d618a3a286e689be0c14fe79"/>
+		<rom name="El-Hazard - The Magnificent World.img" size="556048080" crc="8170ea36" sha1="35574d11fdeed2ca97882441cce594693439383e"/>
+		<rom name="El-Hazard - The Magnificent World.sub" size="22695840" crc="51460979" sha1="30ba20e773add8fd366b829a8d72e1f34674d2d3"/>
+		-->
+		<description>El-Hazard - The Magnificent World</description>
+		<year>1996</year>
+		<publisher>パイオニアＬＤＣ (Pioneer LDC)</publisher>
+		<info name="alt_title" value="神秘の世界エルハザード" />
+		<info name="release" value="19960322" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="el-hazard - the magnificent world" sha1="0bd04fd147be6361ff63ae5e8321dd236d3046a9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The floppy format isn't supported; MAME complains about "incorrect layout on track 0 head 0" -->
+	<software name="elmknigt" supported="no">
+		<!--
+		 Origin: Neo Kobe Collection
+		 CCD converted to CUE with GNU ccd2cue
+		<rom name="Elm Knight - A Living Body Armor.ccd" size="4133" crc="d83ed776" sha1="0328c2d9f7df853937a4f1665e35e9f7157a9180"/>
+		<rom name="Elm Knight - A Living Body Armor.cue" size="1040" crc="f518b4d1" sha1="7c5525026a49e6b0bc6689385c728c3f57da3b8e"/>
+		<rom name="Elm Knight - A Living Body Armor.img" size="507295824" crc="bc4cc15c" sha1="d0b1eefc45ca1fdea6369859cededeb7d4710d1b"/>
+		<rom name="Elm Knight - A Living Body Armor.sub" size="20705952" crc="9a6404ac" sha1="1fe24c834080be97dd8254b10f3b6c45356ee617"/>
+		 -->
+		<description>Elm Knight - A Living Body Armor</description>
+		<year>1993</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<info name="alt_title" value="エルムナイト" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1542672">
+				<rom name="elm knight - a living body armor (cd boot disk) [original].nfd" size="1542672" crc="8c78cba1" sha1="ae3dfe73781246a2451fdd6ee04ad48e73c0dd9e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="elm knight - a living body armor" sha1="235c5401c1d12328c1393c86ad993c2c78769dc9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Fails to boot with "メモリー不足でプログラムを実行できません" (insufficient memory to run the program). Works on real hardware. -->
+	<software name="emit1" supported="no">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
 		 <rom name="emit1.img" size="650297424" crc="a7339a4f" sha1="720123b69454e613ec2bdc7260632213d0593f10"/>
@@ -888,7 +1683,8 @@
 		</part>
 	</software>
 
-	<software name="emit2">
+	<!-- Severe graphics glitches -->
+	<software name="emit2" supported="no">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
 		 <rom name="emit2.bin" size="651482832" crc="576a81d1" sha1="6be4198012c474b8776b7b98a29eee1acf0a968c"/
@@ -911,7 +1707,8 @@
 		</part>
 	</software>
 
-	<software name="emit3">
+	<!-- Fails to boot with "メモリー不足でプログラムを実行できません" (insufficient memory to run the program). Works on real hardware. -->
+	<software name="emit3" supported="no">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
 		 <rom name="emit3.bin" size="667852752" crc="dbe68c8e" sha1="3d403aff25e182ee37ce7511dc00cfa8d78cf025"/>
@@ -947,7 +1744,7 @@
 		<year>1994</year>
 		<publisher>シーズウェア (C's Ware)</publisher>
 		<info name="release" value="199408xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="etsuraku no gakuen" sha1="0c8f0badf5a5dbd86ad56c5302d5db519d828fd5" />
 			</diskarea>
@@ -986,6 +1783,7 @@
 		<year>1996</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="フィニッシュホールド２ ＴＡＧ" />
+		<info name="usage" value="Requires serial number printed on registration card"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="finish hold 2 - tag (japan)" sha1="a553455dae0a6efa8b2b424d24c1e611bd03a10e" />
@@ -1011,7 +1809,8 @@
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<software name="funnybee">
+	<!-- Fails to recognize the CD - on a real PC-9821Nw150 it hangs on boot, so... who knows -->
+	<software name="funnybee" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Uchuu Kaitou Funny Bee.ccd" size="2647" crc="864414f0" sha1="7086713452aeb61b31ff7efa5b8cc7b58652e82e"/>
@@ -1023,12 +1822,12 @@
 		<year>1994</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199409xx" />
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="uchuu kaitou funny bee (boot disk).hdm" size="1261568" crc="4bcc3120" sha1="f721efe9534554a1a9e4e2201b8f7c4102987b29" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="uchuu kaitou funny bee" sha1="da9c5874aaeccbf120ab9593a63a7aa1f87b4b27" />
 			</diskarea>
@@ -1048,8 +1847,7 @@
 		<year>1996</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199606xx" />
-		<info name="usage" value="Requires HDD installation"/>
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gakuen king" sha1="c02be1aa661a23f536e8ccb2413e0cc528226757" />
 			</diskarea>
@@ -1079,13 +1877,53 @@
 		<rom name="track12.bin" size="38403456" crc="80f16812" sha1="9efa2a2871895a4a2803867d01ca0cc333584c8d"/>
 		<rom name="track13.bin" size="28487424" crc="cdb49e40" sha1="2a5dbc79d3c869f249a37495d655857f6ccbc5c9"/>
 		-->
-		<description>Galpani</description>
+		<description>GalPani</description>
 		<year>1995</year>
 		<publisher>クレオ・アイ (Creo I)</publisher>
-		<info name="alt_title" value="フィニッシュホールド２ ＴＡＧ" />
+		<info name="alt_title" value="ギャルパニ" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="galpani" sha1="a6ef11bd97ac8917eee3ef7af50b516d7d538e17" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="galpani2">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Gal Pani 2.ccd" size="3241" crc="d9160683" sha1="ab7c34c96931d21b558b520666cf80fe2048879b"/>
+		<rom name="Gal Pani 2.cue" size="796" crc="13b14558" sha1="17495050991a8d8960c81fa00a54693522047886"/>
+		<rom name="Gal Pani 2.img" size="424133808" crc="2428648e" sha1="c70285d8de0d3375f0b0867c468e76605e69cfe3"/>
+		<rom name="Gal Pani 2.sub" size="17311584" crc="a2caa4e9" sha1="c857d5226db9f318987c3288618bc6374dd0b680"/>
+		-->
+		<description>GalPani II</description>
+		<year>1996</year>
+		<publisher>毎日コミュニケーションズ (Mainichi Communications)</publisher>
+		<info name="alt_title" value="ギャルパニII" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gal pani 2" sha1="38be511a795126b1e49a155cf952c587917b6d24" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gamega">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="GA-ME-GA.ccd" size="772" crc="419b1443" sha1="2e0a1a6f42b729af858f30b4d1327b73acdf1896"/>
+		<rom name="GA-ME-GA.cue" size="70" crc="5e5ac528" sha1="9ad3dc04bfed4003ddd691a51748ee4e5160d8ec"/>
+		<rom name="GA-ME-GA.img" size="268233840" crc="b1c5c046" sha1="194e9fd11292e3a344ceba5a6240cc5ff5455c4f"/>
+		<rom name="GA-ME-GA.sub" size="10948320" crc="6b636045" sha1="66d4dbf990f7a603ed39e27b23661780f15038c4"/>
+		-->
+		<description>Game CD GA-ME-GA</description>
+		<year>1994?</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="ゲームCD GA・ME・GA" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ga-me-ga" sha1="55c3b0a0bcbb8eeb261727a04a582a9c4d90e0d7" />
 			</diskarea>
 		</part>
 	</software>
@@ -1146,7 +1984,54 @@
 		</part>
 	</software>
 
+	<software name="gokiigo">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Gokichi-kun Series Igo Kinenban CD.ccd" size="769" crc="50506e84" sha1="b7e510276de694f41f898c319f9916db99402daa"/>
+		<rom name="Gokichi-kun Series Igo Kinenban CD.cue" size="96" crc="59372d8b" sha1="13f7becd9e1aeceb919fb699f3f5cc4e87342490"/>
+		<rom name="Gokichi-kun Series Igo Kinenban CD.img" size="2424912" crc="0b287492" sha1="62b8c1b476b4dc0be1ad61da13983fff04279fff"/>
+		<rom name="Gokichi-kun Series Igo Kinenban CD.sub" size="98976" crc="4228cdca" sha1="84f22053f4067791004906d6d71a7914f5a534cf"/>
+		-->
+		<description>Gokichi-kun Series - Igo Kinenban CD</description>
+		<year>1995</year>
+		<publisher>ジーエーエム　(GAM)</publisher>
+		<info name="alt_title" value="碁キチくんシリーズ 囲碁記念版CD" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gokichi-kun series igo kinenban cd" sha1="4c0f6a573a3b6ee7bd6305e9ba223cd3f731b948" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="guardrec">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Guardian Recall - Shugojuu Shoukan.ccd" size="8646" crc="f9124ddc" sha1="1c8688de117716169952c2bf7d1fbed540abce98"/>
+		<rom name="Guardian Recall - Shugojuu Shoukan.cue" size="1709" crc="d8e581f6" sha1="c091a0d0566c80fa5c9ff7362ae008a166de1aa0"/>
+		<rom name="Guardian Recall - Shugojuu Shoukan.img" size="619831968" crc="a6539aee" sha1="c768df544d5a3a4f4add6a19b3649276db4e8b7b"/>
+		<rom name="Guardian Recall - Shugojuu Shoukan.sub" size="25299264" crc="4a302a90" sha1="37a78c01cea9230b35fe92ec7b344125b8770799"/>
+		-->
+		<description>Guardian Recall - Shugojuu Shoukan</description>
+		<year>1996</year>
+		<publisher>アグミックス (Agumix)</publisher>
+		<info name="alt_title" value="ガーディアンリコール 守護獣召喚" />
+		<info name="release" value="19960730" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="guardian recall - shugojuu shoukan (install disk).hdm" size="1261568" crc="75e7b6c4" sha1="5e763e760e96ffe7fba796ec1e52db04970412ff" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="guardian recall - shugojuu shoukan" sha1="cbff17522ffb196c5ff7fda211c1dbc16ca5bc17"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<!-- Parts of the voiced dialogue get cut off, probably due to the lack of proper pregaps in the audio tracks -->
 	<software name="gunblaze">
 		<!--
 		Origin: Neo Kobe Collection
@@ -1159,7 +2044,7 @@
 		<year>1994</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="release" value="199412xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gunblaze" sha1="2ef094206014ebbe9606e2eca117779e833bd1eb" />
 			</diskarea>
@@ -1185,6 +2070,26 @@
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<software name="hanakiok">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Hana no Kioku.ccd" size="1536" crc="fb0735ea" sha1="8cbab4ded5211a62e586e46c91494819a9e11107"/>
+		<rom name="Hana no Kioku.cue" size="233" crc="d51a36ec" sha1="7104673d7ecf704fb949ccbba5b5ead2f4a0c248"/>
+		<rom name="Hana no Kioku.img" size="463659168" crc="40188f96" sha1="92300b7318a2f08a22cbbd909db9c93acd1490b0"/>
+		<rom name="Hana no Kioku.sub" size="18924864" crc="8b86eb7e" sha1="43c708b29115c38a3d1c71244a696e80b5319ce4"/>
+		-->
+		<description>Hana no Kioku</description>
+		<year>1995</year>
+		<publisher>フォスター (Foster)</publisher>
+		<info name="release" value="19951222" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hana no kioku" sha1="d0ade7a3f7f36fa8a5f8bd6016643823a913b866" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
 	<software name="hanapon">
 		<!--
 		Origin: Neo Kobe Collection
@@ -1197,7 +2102,7 @@
 		<year>1996</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="release" value="199607xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="hanafuda de pon!" sha1="e6c9322b57da82c08ac7a7d91e50771214820806" />
 			</diskarea>
@@ -1217,9 +2122,53 @@
 		<year>1995</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="release" value="199503xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="heart de ron!!" sha1="1c95cf153e055068b71f8fd6fffe760d1ddd2ac0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Seems to hang randomly at certain points -->
+	<!-- PC-98x1 / DOS/V hybrid -->
+	<software name="henring" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Henshin Ring.ccd" size="974" crc="cdfe79bf" sha1="eae4a7b6a176464e88b2474c49ee3a21a6124c3a"/>
+		<rom name="Henshin Ring.cue" size="134" crc="fe7d0f39" sha1="29a57be4c8a41cdca5f243b78433fff2cfd7b4c8"/>
+		<rom name="Henshin Ring.img" size="267551760" crc="438d9628" sha1="56a5ba4df6b87abe3a39a73fba2536e9c680f4aa"/>
+		<rom name="Henshin Ring.sub" size="10920480" crc="3bf2c56d" sha1="b5fcdd0ab32a8186ca115732700fde36086f284f"/>
+		-->
+		<description>Henshin Ring</description>
+		<year>1996</year>
+		<publisher>マイアミソフト (Miamisoft)</publisher>
+		<info name="alt_title" value="変身リング" />
+		<info name="release" value="19960916" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="henshin ring" sha1="a1464fd45cc71aaf9705c6d8ee2859770317ff2d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hiiragik">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Hiiragizaka no Kyuukan.ccd" size="2710" crc="6190a7c7" sha1="86fb8e1ac1f2f0b8ecda38ee7d263d044e8c98ba"/>
+		<rom name="Hiiragizaka no Kyuukan.cue" size="466" crc="db2bf4ea" sha1="c47615183edda9695f115effc5bcf45d5a8af7a5"/>
+		<rom name="Hiiragizaka no Kyuukan.img" size="377512464" crc="1a750708" sha1="d7dbf54fe08f538a9ec63277bc8c500dfbe46163"/>
+		<rom name="Hiiragizaka no Kyuukan.sub" size="15408672" crc="9ba34091" sha1="9c5a8de89ac4b9e3078d8bd1cbc38f9db2c8f7be"/>
+		-->
+		<description>Hiiragizaka no Kyuukan</description>
+		<year>1996</year>
+		<publisher>ユーミソフト (U-me Soft)</publisher>
+		<info name="alt_title" value="柊坂の旧館" />
+		<info name="release" value="19961004" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hiiragizaka no kyuukan" sha1="9ea024158b92b9079b33ac449bd6fb14d0a9de93" />
 			</diskarea>
 		</part>
 	</software>
@@ -1237,9 +2186,31 @@
 		<year>1995</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="release" value="199508xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="hoshi no suna monogatari 3" sha1="6526c4192fcfb73dbf32f4d2a2575ae6a554d376" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Seems to hang randomly at certain points -->
+	<software name="hyouiten" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Hyoui Tengoku.ccd" size="769" crc="4c357f5f" sha1="1e3c94153f7ca8f74b292fe3c053e22d7c01346f"/>
+		<rom name="Hyoui Tengoku.cue" size="75" crc="8765895f" sha1="be3f99ffd0b835f539e7d337ae02a1382ceff206"/>
+		<rom name="Hyoui Tengoku.img" size="74372592" crc="809331b1" sha1="4fe8ee145938b9fd44f42f080fd31ed3d5871fef"/>
+		<rom name="Hyoui Tengoku.sub" size="3035616" crc="d17af4c0" sha1="8e85cfdb6705b2396f6ddc63dbe770516103cfdd"/>
+		-->
+		<description>Hyoui Tengoku</description>
+		<year>1997</year>
+		<publisher>マイアミソフト (Miamisoft)</publisher>
+		<info name="alt_title" value="ひょ～い天国" />
+		<info name="release" value="19970314" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hyoui tengoku" sha1="65efb7e0ede7d81b954c86494c47d3f95186801c" />
 			</diskarea>
 		</part>
 	</software>
@@ -1302,6 +2273,32 @@
 		</part>
 	</software>
 
+	<software name="jinmon">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Jinmon Yuugi.ccd" size="3248" crc="6a88a204" sha1="ef45500d866ac9144ebd35ad4b70d4076c4f9181"/>
+		<rom name="Jinmon Yuugi.cue" size="573" crc="cdfa00b4" sha1="0c49ebac74ef721e1b317e8cbd734eb3e5e0cd54"/>
+		<rom name="Jinmon Yuugi.img" size="547482096" crc="8fb421ee" sha1="cd75c232e7e194d64c0c5d83ede5b2ff84e922bd"/>
+		<rom name="Jinmon Yuugi.sub" size="22346208" crc="6ffdd73c" sha1="90d1cd4ab0cfc2251d8bd54c3e6e20fd0e590caf"/>
+		-->
+		<description>Jinmon Yuugi</description>
+		<year>1995</year>
+		<publisher>フェアリーテール (Fairytale)</publisher>
+		<info name="alt_title" value="尋問遊戯" />
+		<info name="release" value="19950811" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="jinmon yuugi (cd boot disk).hdm" size="1261568" crc="61d5fdb9" sha1="47caf5d5562e67df53e614fd17fd74dfd3ff0f09" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jinmon yuugi" sha1="0993066479bf5de13e6cfc9c87e44356992bf92a"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
 	<software name="kindanke">
 		<!--
@@ -1315,7 +2312,7 @@
 		<year>1993</year>
 		<publisher>シーズウェア (C's Ware)</publisher>
 		<info name="release" value="199407xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kindan no ketsuzoku" sha1="589dfff7b733335530a19f3a88a7cdda91826187" />
 			</diskarea>
@@ -1335,7 +2332,7 @@
 		<year>1996</year>
 		<publisher>フォスター (Foster)</publisher>
 		<info name="release" value="199603xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="koko wa rakuensou" sha1="711d590b172c5c496d1f14f825dbc7b8a10e71fb" />
 			</diskarea>
@@ -1353,7 +2350,7 @@
 		<year>1996</year>
 		<publisher>フォスター (Foster)</publisher>
 		<info name="release" value="199604xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="koko wa rakuensou 2" sha1="d7879482b9f644f09c6324688fe4d3a2898ed137" />
 			</diskarea>
@@ -1379,13 +2376,75 @@
 		</part>
 	</software>
 
+	<software name="kyrandia">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="The Legend of Kyrandia.ccd" size="4894" crc="3a8bbbfb" sha1="132f7535d204a731423b497729d3b7e01f35eefd"/>
+		<rom name="The Legend of Kyrandia.cue" size="917" crc="126b517a" sha1="50280ae669798e6e37f82a9621e8a2b2341832ba"/>
+		<rom name="The Legend of Kyrandia.img" size="561895152" crc="8f8bb29e" sha1="15d73a824957614af96bac3467c37f576a50390f"/>
+		<rom name="The Legend of Kyrandia.sub" size="22934496" crc="0638eedb" sha1="76d14925a9f668100d2e55f610b56cacf6fbb292"/>
+		-->
+		<description>The Legend of Kyrandia</description>
+		<year>1994</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="alt_title" value="レジェンド　オブ　キランディア" />
+		<info name="release" value="19940215" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="the legend of kyrandia (cd install disk).hdm" size="1261568" crc="005afba9" sha1="b60c579d34363f947bfb187401aa53eafe4d299a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="the legend of kyrandia" sha1="c1e8ad3237cc405e134ccebb7466f356d6280871" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	The installation process requires an original, write-protected MS-DOS 5.0A disk. MAME doesn't seem to emulate the write protection,
+	so the installer doesn't work. As a workaround, a premade boot disk is also included.
+	-->
+	<software name="lesserm" supported="partial">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Lesser Mern Special Director's Edition.ccd" size="957" crc="189d87e2" sha1="0d829c0ca27ab24a1404ce8932219a52a2519a0a"/>
+		<rom name="Lesser Mern Special Director's Edition.cue" size="138" crc="815d6da0" sha1="f8cf64b84815ec089c8ab9f3bdcee99c76a3bdab"/>
+		<rom name="Lesser Mern Special Director's Edition.img" size="298544064" crc="6df3f1b5" sha1="54232495cf7288d21d20d62a6cbea74c6e64660a"/>
+		<rom name="Lesser Mern Special Director's Edition.sub" size="12185472" crc="734bf105" sha1="4a0f9eda741adaaff00021574fa096e4f7a7c75b"/>
+		-->
+		<description>Lesser Mern - Special Director's Edition</description>
+		<year>1992</year>
+		<publisher>パンサーソフトウェア (Panther Software)</publisher>
+		<info name="alt_title" value="レッサーメルン Special Director's Edition" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="lesser mern special director's edition (boot disk).hdm" size="1261568" crc="c1fcf6ba" sha1="715daad023ce610432191b7d45fcd35250bd061c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Install Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="lesser mern special director's edition (install disk).hdm" size="1261568" crc="54de4fde" sha1="bf1a9816e8e1f7f1b6dae873ccd91fff9296b1bd" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="lesser mern special director's edition" sha1="238538d0118a18ce8237f681bf0de70b73af887d" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="letspir">
 		<!--
 		Origin: Unknown
 		<rom name="lptv.bin" size="629345808" crc="c255cd67" sha1="88870768ff5291369264043e4179d8add509cfe6"/>
 		<rom name="lptv.cue" size="173" crc="e9325e8e" sha1="df5078e1cc21a684e0e4f34b455e5bb9d11621aa"/>
 		-->
-		<description>Let's! Pirates</description>
+		<description>Let's! Pirates - Trouble Vacances</description>
 		<year>1997</year>
 		<publisher>ジックス (ZyX)</publisher>
 		<info name="alt_title" value="Ｌｅｔ＇ｓ！パイレーツ とらぶるばかんす  ~ Let's! Pirates - Trouble Vacances" />
@@ -1438,16 +2497,36 @@
 		</part>
 	</software>
 
+	<software name="loh3">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="The Legend of Heroes (Eiyuu Densetsu) III - Shiroki Majo Renewal.ccd" size="4058" crc="82c1de5c" sha1="70cd47a46b41410891cfc545473e59fdaf52cbc6"/>
+		<rom name="The Legend of Heroes (Eiyuu Densetsu) III - Shiroki Majo Renewal.cue" size="1072" crc="329c79d3" sha1="b046ff7385d7c196a3b9c26ff1ae2f1e58d8ed13"/>
+		<rom name="The Legend of Heroes (Eiyuu Densetsu) III - Shiroki Majo Renewal.img" size="474097344" crc="aec51d0b" sha1="fb16502c9446d3db4604c12ec7f1f73275f0faa6"/>
+		<rom name="The Legend of Heroes (Eiyuu Densetsu) III - Shiroki Majo Renewal.sub" size="19350912" crc="3c1d9027" sha1="e1d514ac0569343ebcf8c08da742b622b4be9501"/>
+		-->
+		<description>The Legend of Heroes III - Shiroki Majo Renewal</description>
+		<year>1994</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="英雄伝説III 白き魔女 リニューアル" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="the legend of heroes (eiyuu densetsu) iii - shiroki majo renewal" sha1="ff8c8cc2a3792aefb2af300bdc9b3cbd29759521" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="loh4">
 		<!--
 		Origin: redump.org
 		<rom name="Akai Shizuku - The Legend of Heroes IV (Japan).cue" size="112" crc="51672b80" md5="31535feeaec7c80f11da3556e4366922" sha1="c0eaf4181b26932759cc78679c83c6bf52725862"/>
 		<rom name="Akai Shizuku - The Legend of Heroes IV (Japan).bin" size="8772960" crc="5427ac70" md5="6bd6a1dc1a79d58abd14266516218358" sha1="3c603b5cd6000a0f7d365da32ad6d7dfb5bc1965"/>
 		-->
-		<description>Akai Shizuku - The Legend of Heroes IV</description>
-		<year>1996</year>
+		<description>The Legend of Heroes IV - Akai Shizuku</description>
+		<year>1995</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<info name="alt_title" value="英雄伝説４ 朱紅い雫 ~ Eiyuu Densetsu 4 - Akai Shizuku" />
+		<info name="alt_title" value="英雄伝説４ 朱紅い雫" />
 		<info name="release" value="19950210" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1456,7 +2535,29 @@
 		</part>
 	</software>
 
-	<software name="macrslcp">
+	<software name="loveesc">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Love Escalator.ccd" size="769" crc="712f7218" sha1="976ac5dc6b88ba098e3681f923b2806375e6bf10"/>
+		<rom name="Love Escalator.cue" size="76" crc="7c805a73" sha1="89e45fcafe61129bbaedfed1ba404ccee68a2c72"/>
+		<rom name="Love Escalator.img" size="37060464" crc="d174d831" sha1="8d59c23e53025e854819babcf290ae8fef7e4344"/>
+		<rom name="Love Escalator.sub" size="1512672" crc="1db6e3c1" sha1="8b525f8c109fd0cddacbb4fe2caa34d3ac463912"/>
+		-->
+		<description>Love Escalator</description>
+		<year>1998</year>
+		<publisher>海月製作所 (Umitsuki Seisakusho)</publisher>
+		<info name="alt_title" value="ラブ・エスカレーター" />
+		<info name="release" value="19980417" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="love escalator" sha1="6e5316d0877fb67b08306086cc2233886b52fe78" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Mouse doesn't work -->
+	<software name="macrslcp" supported="no">
 		<!--
 		Origin: redump.org
 		<rom name="Chou Jikuu Yousai Macross - SkullLeader Complete Pack (Japan).cue" size="447" crc="c16d423e" md5="be2a0ed6b66d7af5465defeaa5e6fc9f" sha1="1cc4e97dd3496cc91ce1fe9d6d899d7d874cc0c9"/>
@@ -1504,7 +2605,7 @@
 		-->
 		<description>Making Candy - Oki ni Mesumama</description>
 		<year>1996</year>
-		<publisher>きゅろっと (Culotte)</publisher>
+		<publisher>きゅろっと (Curott)</publisher>
 		<info name="alt_title" value="Making Candy ～お気に召すまま～" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1513,7 +2614,54 @@
 		</part>
 	</software>
 
+	<!-- MAME crashes with "Incorrect layout on track 77 head 0" error -->
+	<software name="manpsy" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Manji Psy Yuuki.ccd" size="767" crc="ba1a7018" sha1="1496e88de038c0325642932ac9d5a21e0914a151"/>
+		<rom name="Manji Psy Yuuki.cue" size="77" crc="eb2a5e02" sha1="0a1a810e73682e9048b82b6f457f2bb5afe50056"/>
+		<rom name="Manji Psy Yuuki.img" size="10426416" crc="03089f4f" sha1="05e0f7dc985a44092813dbc918a1a31e28181436"/>
+		<rom name="Manji Psy Yuuki.sub" size="425568" crc="7ed36365" sha1="949c1ae1adbde6f062d8039f4355ab7ca20de407"/>
+		-->
+		<description>Manji PSYyuuki</description>
+		<year>1995</year>
+		<publisher>ピー・エス・ディー (PSD)</publisher>
+		<info name="alt_title" value="卍PSY幽記" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1481696">
+				<rom name="manji psy yuuki (cd key disk) [nfd r1].nfd" size="1481696" crc="2b4cda11" sha1="75b6bb2d2c6978c7c6daf2769284b55d1bbb3e89" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="manji psy yuuki" sha1="8b74e54e132db29ac164e4c5aef657b845fa5a6f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="menzober">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Menzoberranzan - Yami no Monshou.ccd" size="771" crc="2269d0df" sha1="0944b8794ba75494f9be3ab326357144bdfe9e6f"/>
+		<rom name="Menzoberranzan - Yami no Monshou.cue" size="94" crc="a2ff42d3" sha1="13279c463ccac30958c9ea8ea08d5d38fce752d7"/>
+		<rom name="Menzoberranzan - Yami no Monshou.img" size="368866512" crc="95286dba" sha1="2c9c1774baf3c511dea98a90e3475618345e2c93"/>
+		<rom name="Menzoberranzan - Yami no Monshou.sub" size="15055776" crc="b13ffc60" sha1="cc3841df031a4e687c8bf6c0bdb371149fbaeb4d"/>
+		-->
+		<description>Menzoberranzan - Yami no Monshou</description>
+		<year>1995</year>
+		<publisher>ケイエスエス (KSS)</publisher>
+		<info name="alt_title" value="メンゾベランザン 闇の紋章" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="menzoberranzan - yami no monshou" sha1="f2fe8f536daeb91c893caa33dd825f1d2157b1c2" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<!-- Parts of the voiced dialogue get cut off, probably due to the lack of proper pregaps in the audio tracks -->
 	<software name="mjdepon">
 		<!--
 		Origin: Neo Kobe Collection
@@ -1526,7 +2674,7 @@
 		<year>1994</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="release" value="199404xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mahjong de pon!" sha1="58c4ae95a830294baa1a448c328d53c1d0a6002b" />
 			</diskarea>
@@ -1550,19 +2698,51 @@
 		<description>Ms. Detective File #1 - Iwami Ginzan Satsujin Jiken</description>
 		<year>1993</year>
 		<publisher>データウエスト (Data West)</publisher>
+		<info name="alt_title" value="ミス・ディテクティヴ　ファイル#1　石見銀山殺人事件" />
+		<info name="release" value="19930417" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="msd#1(canbe).fdi" size="1265664" crc="a79ac902" sha1="b87b9f194967f5b8920084a284ebc8aea5add970" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cdrom1" interface="fmt_cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="msdet1" sha1="f21afa695d9f0402203cf9d3d5df79d4ac5b7527" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="msquadro">
+	<software name="msdet2">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Ms. Detective #2 - Sugatanaki Iraisha.ccd" size="1206" crc="f516d92c" sha1="54cdebd7e17ee8861affd996bdb8857b2bff3cc7"/>
+		<rom name="Ms. Detective #2 - Sugatanaki Iraisha.cue" size="219" crc="24b51f06" sha1="378c328565d9b98dedc83435031c2834b76f5a0c"/>
+		<rom name="Ms. Detective #2 - Sugatanaki Iraisha.img" size="474174960" crc="a810c9f2" sha1="7bfe20007b1473bb55a849685bd1258939c540f9"/>
+		<rom name="Ms. Detective #2 - Sugatanaki Iraisha.sub" size="19354080" crc="0dfa8820" sha1="20be48fb8f6ecee27d31fb10269e8a175991d003"/>
+		-->
+		<description>Ms. Detective File #2 - Sugata-naki Irainin</description>
+		<year>1993</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="alt_title" value="ミス・ディテクティヴ　ファイル#2　姿なき依頼人" />
+		<info name="release" value="19931029" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ms. detective #2 - sugatanaki iraisha (cd boot disk).hdm" size="1261568" crc="7d8c3c93" sha1="f9f683f9f24b97c974e1b6d3ba92e9c84369c474" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ms. detective #2 - sugatanaki iraisha" sha1="690aae46ced6211deae11aa007f908f80e2455c5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Needs the mouse driver loaded, otherwise displays everything at double size. Doesn't happen on real hardware.
+	Also, CDDA playback is a bit spotty. Sometimes tracks restart when they shouldn't.
+	-->
+	<software name="msquadro" supported="partial">
 		<!--
 		Origin: P2P
 		<rom name="Magical Squadron CD (1996)(KOGADO).cue" size="984" crc="df807cc0" sha1="a652dfe75e37e96527ad45ad4931871dcb9a9309"/>
@@ -1635,7 +2815,26 @@
 		</part>
 	</software>
 
-	<software name="mujintou">
+	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<software name="mugenhoy">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Mugen Houyou.ccd" size="2290" crc="efb9c6dd" sha1="dfd3d76b44371623ae396bab962493ca44e64b8e"/>
+		<rom name="Mugen Houyou.cue" size="388" crc="d0dee7b7" sha1="13234af65455d3dfa24183d4b70fb8520abe8a7b"/>
+		<rom name="Mugen Houyou.img" size="470750448" crc="6858f768" sha1="6e46253314b6f06cd4d744a524a90ca388ad3cb3"/>
+		<rom name="Mugen Houyou.sub" size="19214304" crc="00b20527" sha1="ea060ccabe3e87313c22304f9b5d2380e096cd3e"/>
+		-->
+		<description>Mugen Houyou</description>
+		<year>1995</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mugen houyou" sha1="19d89c9f5c41fc1c77bc3a27220aeb9da39f484a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mujinmem">
 		<!--
 		Origin: P2P
 		<rom name="mmmv.iso" size="23649360" crc="ce63887b" sha1="1739e81de226ae9337d0d9965072f5d5a6cef550"/>
@@ -1647,6 +2846,27 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mmmv" sha1="356f8166c098430a6950ffb799e7162b8b1f1cac" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<software name="mujintou">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Mujintou Monogatari.ccd" size="3456" crc="275a291d" sha1="81c9565f559f59cfe9ff4e666a2a9822915624ea"/>
+		<rom name="Mujintou Monogatari.cue" size="847" crc="3e4f0013" sha1="3767ed59ebeb718d449d4d80beb1e1fb4ff14c44"/>
+		<rom name="Mujintou Monogatari.img" size="696972864" crc="aff89b05" sha1="419d472dbf69d3cd204e0f07ddce900233f4b7f2"/>
+		<rom name="Mujintou Monogatari.sub" size="28447872" crc="68370f53" sha1="31d57842f7a5a0a71e27c36aa272ae0b27be9d91"/>
+		-->
+		<description>Mujintou Monogatari</description>
+		<year>1995</year>
+		<publisher>ケイエスエス (KSS)</publisher>
+		<info name="alt_title" value="無人島物語" />
+		<info name="release" value="199509xx" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mujintou monogatari" sha1="7cfe7c2b9d4bef30c1db4dbeae0a99799a90dea0" />
 			</diskarea>
 		</part>
 	</software>
@@ -1663,6 +2883,75 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="myhomed2" sha1="cf40d4a36b83bb8fa55d0b8108f28bc5c7a062ba" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="necronom">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Necronomicon.ccd" size="4927" crc="8aa9d487" sha1="e5d251f500eb576cbf54c3e2a1ddfae693b26e08"/>
+		<rom name="Necronomicon.cue" size="1286" crc="12a53cf4" sha1="b9d21430c280a32249d0c162fb6c41487ffb37a8"/>
+		<rom name="Necronomicon.img" size="668675952" crc="4c7b6101" sha1="63bcf3e8ffd625457c521f74b2ba24616a8b46a5"/>
+		<rom name="Necronomicon.sub" size="27292896" crc="bd3377b2" sha1="76450dbafcfeda5c9c4182f1f0c286a71cc41630"/>
+		-->
+		<description>Necronomicon</description>
+		<year>1994</year>
+		<publisher>フェアリーテール (Fairytale)</publisher>
+		<info name="alt_title" value="ネクロノミコン" />
+		<info name="release" value="19940805" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="necronomicon (cd boot disk) [original].hdm" size="1261568" crc="6ac8e7fd" sha1="f422b45c5f56f7d3a5f3007b210d46fb33ffaa7b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="necronomicon" sha1="b5936cd6982990fb23e7791d5403c3b8bcbec048" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ohkitsun">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Oh! Kitsune-sama.ccd" size="770" crc="f3b51102" sha1="1fa6b19463015b76b2287d184dd72e5837af0886"/>
+		<rom name="Oh! Kitsune-sama.cue" size="78" crc="bf3fa721" sha1="f31a6cc26516d9157ce7faafff94d48544288d24"/>
+		<rom name="Oh! Kitsune-sama.img" size="35496384" crc="50394013" sha1="eea47925997a5ddbd761644453ddb11e73b5cc00"/>
+		<rom name="Oh! Kitsune-sama.sub" size="1448832" crc="016995b6" sha1="c6173ae840424da0c9c1bd3a27a54e41a8a35c9e"/>
+		-->
+		<description>Oh! Kitsune-sama</description>
+		<year>1996</year>
+		<publisher>きゅろっと (Curott)</publisher>
+		<info name="alt_title" value="Oh! きつねさま" />
+		<info name="release" value="19960920" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="oh! kitsune-sama" sha1="344195412be77a1953d6a2a79db5c8a9e8a56b41" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<software name="onlyyou">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Only You - Seikimatsu no Juliet-tachi.ccd" size="8031" crc="b30e36c6" sha1="11afc416f19145422b5361b8f29806f0812aed11"/>
+		<rom name="Only You - Seikimatsu no Juliet-tachi.cue" size="1556" crc="0b500ebd" sha1="43975c372b452b82b6198acf90d192541cc47dda"/>
+		<rom name="Only You - Seikimatsu no Juliet-tachi.img" size="753279744" crc="776dce9a" sha1="f221fc48088f4b3e41090117199cd30fc4a28c3e"/>
+		<rom name="Only You - Seikimatsu no Juliet-tachi.sub" size="30746112" crc="d09a65c4" sha1="dc1159df41672661d31c067f1e36629174d2d907"/>
+		-->
+		<description>Only You - Seikimatsu no Juliet-tachi</description>
+		<year>1995</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="Only You －世紀末のジュリエット達－" />
+		<info name="release" value="199512xx" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="only you - seikimatsu no juliet-tachi" sha1="332ebd04ae60f9a1350b06ae23afd335eb843851" />
 			</diskarea>
 		</part>
 	</software>
@@ -1685,6 +2974,27 @@
 		</part>
 	</software>
 
+	<!-- PC-98x1 / DOS/V hybrid -->
+	<software name="pgatour3">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="PGA Tour Golf III.ccd" size="772" crc="6c6a8de6" sha1="8a17a5b688355228b68d39cec4668e4b01406b6e"/>
+		<rom name="PGA Tour Golf III.cue" size="79" crc="eb6f4ae8" sha1="2e82e3ccae0c4f157b3e66127ec0b169b1b076a2"/>
+		<rom name="PGA Tour Golf III.img" size="504186480" crc="858e5ecf" sha1="b2b277efff86d7bd6dd4dcd0e8955ab5ec2a7efe"/>
+		<rom name="PGA Tour Golf III.sub" size="20579040" crc="4fa5d349" sha1="05dc1d078ce392c48d8d8f738373642550460129"/>
+		 -->
+		<description>PGA Tour Golf III</description>
+		<year>1995</year>
+		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<info name="alt_title" value="PGAツアーゴルフIII" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pga tour golf iii" sha1="e16544b2b60c1fbc7f4a4c3c8f76111b5ff02b34"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="photogen">
 		<!--
 		Origin: redump.org
@@ -1699,6 +3009,27 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="photo genic (japan)" sha1="407a1029503fc66d6207e436000c47b1626e01a0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pilcasex">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="PILcaSEX.ccd" size="768" crc="a685bc55" sha1="2e9c74a53d0b01a3673322aa56d9d72a7be2f5fe"/>
+		<rom name="PILcaSEX.cue" size="70" crc="95b9d552" sha1="b38501e438107d9f34ed227d61a93a956f903327"/>
+		<rom name="PILcaSEX.img" size="10440528" crc="c4f34aa6" sha1="1521ae3dfbc6253cf658e58545d9ca0395e83b1c"/>
+		<rom name="PILcaSEX.sub" size="426144" crc="7a9a7aab" sha1="bc1c5af8fecb3872206bdf8bd1347a0e7f904244"/>
+		-->
+		<description>PILcaSEX</description>
+		<year>1996</year>
+		<publisher>PIL</publisher>
+		<info name="alt_title" value="ピルケース" />
+		<info name="release" value="19960726" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pilcasex" sha1="9a2e11eb9b919af0111ae50a469a7ed662b276b1" />
 			</diskarea>
 		</part>
 	</software>
@@ -1719,6 +3050,7 @@
 		<publisher>コナミ (Konami)</publisher>
 		<info name="alt_title" value="ポリスノーツ" />
 		<info name="release" value="19940729" />
+		<info name="usage" value="Works best with MS-DOS 5.0 and AVSDRV.SYS v3.10 Rev 1" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="policenauts (japan) (system disk).fdi" size="1265664" crc="ef3e4428" sha1="246b674a48903ff7e3fe90292b1236d75a8d6c23" offset="000000" />
@@ -1813,6 +3145,84 @@
 		</part>
 	</software>
 
+	<software name="psydet1">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Psychic Detective Series Vol. 1 - Invitation.ccd" size="1356" crc="2422b0af" sha1="3b6e7f9a5859c025547827665eb280e20ab9f333"/>
+		<rom name="Psychic Detective Series Vol. 1 - Invitation.cue" size="242" crc="2e738f92" sha1="a96dded98cd0ebe78292d1a22279042fdad01cfe"/>
+		<rom name="Psychic Detective Series Vol. 1 - Invitation.img" size="355210800" crc="6d3ea2b1" sha1="9c6f3d3d76407f598cf5d2dd796333793845b277"/>
+		<rom name="Psychic Detective Series Vol. 1 - Invitation.sub" size="14498400" crc="ac3f524a" sha1="21f4b4b34242c7a586652383fd9de91df3e90aac"/>
+		-->
+		<description>Psychic Detective Series Vol. 1 - Invitation - Kage kara no Shoutaijou</description>
+		<year>1993</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="alt_title" value="サイキックディテクティヴィシリーズ Vol.1 インビテーション 影からの招待状" />
+		<info name="usage" value="Replace DWCD98.SYS with the appropriate CD-ROM driver" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series vol. 1 - invitation (cd boot disk) [original].hdm" size="1261568" crc="03ba40f0" sha1="befb2ce9bd31f2eaeb347717241d7b885da881da" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 1 - invitation" sha1="0c74357b7739003b96d20a2e050e254463d77dfc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet2">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Psychic Detective Series Vol. 2 - Memories.ccd" size="2308" crc="76a329e7" sha1="067879783c9aca0e5e19906ea5e35df042b437bd"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories.cue" size="430" crc="79e6d1e7" sha1="6331fb48377a811b8b3014be8b6490f806389d63"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories.img" size="356429136" crc="5d79cbfa" sha1="178f1a919b97704d719249ee2c4ae073c53b3df1"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories.sub" size="14548128" crc="95ad6cdb" sha1="3639fa9c0b258633d60623f9b5136a94d7234ce9"/>
+		-->
+		<description>Psychic Detective Series Vol. 2 - Memories</description>
+		<year>1994</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="alt_title" value="サイキックディテクティヴィシリーズ Vol.2 メモリーズ" />
+		<info name="release" value="19940422" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series vol. 2 - memories (cd boot disk) [original].hdm" size="1261568" crc="d2c6630e" sha1="b0fa0742748ea5441cc05bf89c642424dd120e88" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 2 - memories" sha1="6e70ada7a531e06daa3c5a8f4ade2a03329c8339" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet3">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Psychic Detective Series Vol. 3 - Aya.ccd" size="1918" crc="93871a15" sha1="d8845fff7b29b253ee11435c4cd55adf7d3c2d34"/>
+		<rom name="Psychic Detective Series Vol. 3 - Aya.cue" size="349" crc="7753915c" sha1="7eba86fc23cc31dfe853a672a4afb599520a3350"/>
+		<rom name="Psychic Detective Series Vol. 3 - Aya.img" size="292243056" crc="1ed94114" sha1="014dc90ad9df00885f3fe29dc94b33a9b8e17724"/>
+		<rom name="Psychic Detective Series Vol. 3 - Aya.sub" size="11928288" crc="865c2857" sha1="37a0dc414ae7cd9e17fcbee1a56df6ab3e962382"/>
+		-->
+		<description>Psychic Detective Series Vol. 3 - Aya</description>
+		<year>1994</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="alt_title" value="サイキックディテクティヴィシリーズ Vol.3 アヤ" />
+		<info name="release" value="19940715" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series vol. 3 - aya (cd boot disk) [original].hdm" size="1261568" crc="89378fcf" sha1="a0d879ce1d1f983aa66eb8c86716d3aa060b91a0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 3 - aya" sha1="5fc758d36d0a6dda4a1b6f9c7d1bc8aaa5024024" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="puyopuy2">
 		<!--
 		Origin: redump.org
@@ -1833,6 +3243,26 @@
 		</part>
 	</software>
 
+	<software name="racespc">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Race into Space - Uchuu e no Chousen.ccd" size="1166" crc="001687c6" sha1="6cab8c1510e1720d49dc09c9550048eca2bec730"/>
+		<rom name="Race into Space - Uchuu e no Chousen.cue" size="174" crc="c93522c9" sha1="9c3d0d6bb68abbb1252fa35754e924cdc8774f32"/>
+		<rom name="Race into Space - Uchuu e no Chousen.img" size="719674368" crc="7425a5b7" sha1="95b215cebe3fa8d16d1a0c33e04263e796e2f740"/>
+		<rom name="Race into Space - Uchuu e no Chousen.sub" size="29374464" crc="8a2f3c29" sha1="54efcc6d8867c02f8b16c82d7e11d737a023beac"/>
+		-->
+		<description>Buzz Aldrin's Race into Space - Uchuu e no Chousen</description>
+		<year>1995</year>
+		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<info name="alt_title" value="Buzz Aldrin's Race into Space 宇宙への挑戦" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="race into space - uchuu e no chousen" sha1="e4d97cf17b4b2f90c31b069397d62d25e37f073a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
 	<software name="raidy">
 		<!--
@@ -1845,7 +3275,7 @@
 		<description>Ikazuchi no Senshi Raidy</description>
 		<year>1994</year>
 		<publisher>ジックス (ZyX)</publisher>
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ikazuchi no senshi raidy" sha1="da27ad369e6a084c2b9b17401c9ccd7b7f5370cf" />
 			</diskarea>
@@ -1874,7 +3304,7 @@
 		<year>1996</year>
 		<publisher>ジックス (ZyX)</publisher>
 		<info name="release" value="199603xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ikazuchi no senshi raidy ii" sha1="798073ac9329aaf2a956ca30490914d46424a28d" />
 			</diskarea>
@@ -1931,8 +3361,7 @@
 		<year>1995</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199512xx" />
-		<info name="usage" value="Requires HDD installation"/>
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rance 4.1" sha1="5eb36774483fe9c3e7ba5745aaa336540b07f402" />
 			</diskarea>
@@ -1952,8 +3381,7 @@
 		<year>1995</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199512xx" />
-		<info name="usage" value="Requires HDD installation"/>
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rance 4.2" sha1="e61f331f1a8f026f1a88325a4497eeb4d4c06446" />
 			</diskarea>
@@ -1991,7 +3419,7 @@
 		<year>1995</year>
 		<publisher>ジックス (ZyX)</publisher>
 		<info name="release" value="199506xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ring out!!" sha1="2b50d05b278824e36a1b2fdf500a5ec4c9daeb3b" />
 			</diskarea>
@@ -2035,18 +3463,57 @@
 		</part>
 	</software>
 
+	<software name="rpgtd982o">
+		<!--
+		Origin: redump.org
+		<rom name="LOGiN CD-ROM &amp; Book Series - RPG Tsukuuru Dante98 II (1996-07-02 version).ccd" size="768" crc="ba29708d" sha1="4894189a1483c4187f7af100111b6bc166432edb"/>
+		<rom name="LOGiN CD-ROM &amp; Book Series - RPG Tsukuuru Dante98 II (1996-07-02 version).cue" size="135" crc="6577b6df" sha1="f00cb5cf5bb7f0fa21050991a7f9e43c9e0b3950"/>
+		<rom name="LOGiN CD-ROM &amp; Book Series - RPG Tsukuuru Dante98 II (1996-07-02 version).img" size="32107152" crc="737be030" sha1="dbeff20ce222959d1773d74f82d522a07a7e5cf7"/>
+		<rom name="LOGiN CD-ROM &amp; Book Series - RPG Tsukuuru Dante98 II (1996-07-02 version).sub" size="1310496" crc="421a4d70" sha1="6f59b95a98c61d5c0b8173b93d47b3fa67636fd2"/>
+		-->
+		<description>LOGiN Disk &amp; Book - RPG Tsukuuru Dante98 II (1996-07-02)</description>
+		<year>1996</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="login cd-rom &amp; book series - rpg tsukuuru dante98 ii (1996-07-02 version)" sha1="5e58e309599c994569c33c01533dd9e51889452b" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="rpgtd982">
 		<!--
 		Origin: redump.org
 		<rom name="RPG Tkool Dante98 II (Japan).cue" size="94" crc="c4bb7dbc" md5="21e91169b17ab3a3fa06c986b936b7b6" sha1="980a4a0a76a5e0e6519b96f3973b5e5ce43a380b"/>
 		<rom name="RPG Tkool Dante98 II (Japan).bin" size="32109504" crc="82d12cd8" md5="536c6452e26431a33cb4bf2fd5a04160" sha1="4f81df2baa23ea9b18e531182c1beb22a7eee608"/>
 		-->
-		<description>LOGiN Disk &amp; Book - RPG Tsukuruu Dante98 II</description>
+		<description>LOGiN Disk &amp; Book - RPG Tsukuuru Dante98 II (1996-08-22)</description>
 		<year>1996</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rpg tkool dante98 ii (japan)" sha1="23d11194a580ff8cb12fb7a9cff9d550362665f1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ruriiro">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Ruriiro no Yuki.ccd" size="769" crc="5bc4b85b" sha1="166fb8cda7a1356654931fb3474cf5d327a21645"/>
+		<rom name="Ruriiro no Yuki.cue" size="77" crc="d45f9b85" sha1="fe6248e91760349ec2b129478a29ca6dd74eb992"/>
+		<rom name="Ruriiro no Yuki.img" size="18975936" crc="2e804ce9" sha1="8028cc5ade04e2c806e1112d300c73f23ff52f88"/>
+		<rom name="Ruriiro no Yuki.sub" size="774528" crc="6a5c0ef7" sha1="34b2f2b3f64a585de0259ba65932a85c50a7856d"/>
+		-->
+		<description>Ruriiro no Yuki</description>
+		<year>1997</year>
+		<publisher>アイル (Ail)</publisher>
+		<info name="alt_title" value="瑠璃色の雪" />
+		<info name="release" value="19970307" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ruriiro no yuki" sha1="63b8c67446f176743d382ec6b1cd2418d3066612" />
 			</diskarea>
 		</part>
 	</software>
@@ -2087,6 +3554,46 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ryouki no ori 2 (1997)(plantech-zerosystem)" sha1="636b1baf224a69a2d249b8500057b2d018395ab9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ryoukiop">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="The Original Pictures of Ryouki no Ori.ccd" size="771" crc="42ca81a9" sha1="9aa63e365f07132776adbbdc408563523f5950c7"/>
+		<rom name="The Original Pictures of Ryouki no Ori.cue" size="100" crc="aef6b3cf" sha1="2aa4fde7d34a66df167a8f6497c0614b23507d07"/>
+		<rom name="The Original Pictures of Ryouki no Ori.img" size="109137504" crc="39902fbe" sha1="4a57c8ec95895ac2264d76167e7f3a0c1b55df40"/>
+		<rom name="The Original Pictures of Ryouki no Ori.sub" size="4454592" crc="47ecc3bd" sha1="e894b2c3d85f2468dc3ad4eadbc3fff3d6a36d07"/>
+		-->
+		<description>The Original Pictures of Ryouki no Ori</description>
+		<year>1996</year>
+		<publisher>日本プランテック (Nihon Plantech)</publisher>
+		<info name="alt_title" value="ザ・オリジナル・ピクチャー・オブ　猟奇の檻" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="the original pictures of ryouki no ori" sha1="21d30c4a31d9c04ad89f613c561453aea8d49e08" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rxanadu">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Revival Xanadu.ccd" size="769" crc="e46b8900" sha1="40849f8aae9cc3f6e82985aa23dba8c57963db0b"/>
+		<rom name="Revival Xanadu.cue" size="76" crc="0a8f07ed" sha1="1126ee8177462f95882741902da708e6abf9e296"/>
+		<rom name="Revival Xanadu.img" size="3920784" crc="ff3b7515" sha1="c157f262a26383a2f0929564a75411d4b9c91202"/>
+		<rom name="Revival Xanadu.sub" size="160032" crc="51c2e0cf" sha1="88879aa1018a6ee76b6e227346ff835a1e5176ed"/>
+		-->
+		<description>Revival Xanadu</description>
+		<year>1996</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="リバイバル ザナドゥ" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="revival xanadu" sha1="d4abe0f3d92d81ae1e104c329098cfb284f7378a" />
 			</diskarea>
 		</part>
 	</software>
@@ -2153,7 +3660,8 @@
 		</part>
 	</software>
 
-	<software name="samykou">
+	<!-- Runs way too fast -->
+	<software name="samykou" supported="no">
 		<!--
 		Origin: P2P
 		<rom name="Image.cdm" size="8745" crc="1f70796c" sha1="0b37322533bb8264b66312949011cc3fa041adfa"/>
@@ -2173,7 +3681,8 @@
 		</part>
 	</software>
 
-	<software name="samyzen">
+	<!-- Runs way too fast -->
+	<software name="samyzen" supported="no">
 		<!--
 		Origin: redump.org
 		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan).cue" size="5830" crc="f767e079" md5="7bf31e023a4b1cab0f535040720248a5" sha1="23afeb3660d51cb920679c5bbbbf1508619fce09"/>
@@ -2233,6 +3742,75 @@
 		</part>
 	</software>
 
+	<software name="sayonara">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Sayonara no Mukougawa.ccd" size="772" crc="f139d90b" sha1="2bef1de331b61bffa97de53e7ac15ec759e3a439"/>
+		<rom name="Sayonara no Mukougawa.cue" size="83" crc="fe05ab2c" sha1="9b02147989e9972fe8903e43dcb550c1dab7314a"/>
+		<rom name="Sayonara no Mukougawa.img" size="300359808" crc="131c32f9" sha1="b179a71fa2fee096dac26f65049b3f1bdbaed7d8"/>
+		<rom name="Sayonara no Mukougawa.sub" size="12259584" crc="859cd9be" sha1="89fbbe7aaffb8043d6d89f8d81a1b85ab560498a"/>
+		-->
+		<description>Sayonara no Mukougawa</description>
+		<year>1997</year>
+		<publisher>フォスター (Foster)</publisher>
+		<info name="alt_title" value="さよならの向こう側" />
+		<info name="release" value="19970808" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sayonara no mukougawa" sha1="12f39c9730f71e27097b402ca3340969faad9797" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sangoku5">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Sangokushi V.ccd" size="5150" crc="79bc2b4a" sha1="98b59df86b8596e662f860239067ee08f182fa83"/>
+		<rom name="Sangokushi V.cue" size="1264" crc="538c0b19" sha1="1e7836b1dbddd819f4bdcbfdafd546e31dfbf693"/>
+		<rom name="Sangokushi V.img" size="666345120" crc="b1f08a4a" sha1="177f712138ee49e554c56136d8f5746b642a2905"/>
+		<rom name="Sangokushi V.sub" size="27197760" crc="e6b978ba" sha1="9c49b9805d0a5202348d6f6a1034d72ca086b261"/>
+		-->
+		<description>Sangokushi V</description>
+		<year>1995</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="三國志V" />
+		<info name="release" value="19951215" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="sangokushi v (cd setup disk).hdm" size="1261568" crc="a4286d4b" sha1="c7e25ec9699ee679dab678ff5d49804ea6c83305" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sangokushi v" sha1="41e4711b4607683dce45cf7f743696c8681c1217" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't recognize the CD-ROM - the same image works on real hardware -->
+	<software name="schwarex" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Schwarzschild EX - Tessa no Seigun.ccd" size="4023" crc="6b9a81a0" sha1="c194537cd16be86b76bed370967a38c122374a3b"/>
+		<rom name="Schwarzschild EX - Tessa no Seigun.cue" size="773" crc="3a32e339" sha1="db52ea9d41eba43cc6b0daa9f202a4c681633187"/>
+		<rom name="Schwarzschild EX - Tessa no Seigun.img" size="448829808" crc="87b2838f" sha1="7219afee2ce909d69a533016d878c71a1bd0dd91"/>
+		<rom name="Schwarzschild EX - Tessa no Seigun.sub" size="18319584" crc="7a5ee540" sha1="39481c4f02697cb6260900fde332e48bc474f1c3"/>
+		-->
+		<description>Schwarzschild EX - Tessa no Seigun</description>
+		<year>1995</year>
+		<publisher>工画堂 (Kogado)</publisher>
+		<info name="alt_title" value="シュヴァルツシルトEX　鉄鎖の星群" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="schwarzschild ex - tessa no seigun" sha1="e855469cd1cea5fd01e09d686f746930dc0e8337" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Needs the mouse driver loaded, otherwise displays everything at double size. Doesn't happen on real hardware. -->
 	<software name="schwargx">
 		<!--
 		Origin: P2P
@@ -2279,7 +3857,7 @@
 		<rom name="Track35.bin" size="9758448" crc="393a430a" sha1="4977a91e035164b2d9f1f789556c07f00f0322f8"/>
 		<rom name="Track36.bin" size="11814096" crc="30450f84" sha1="f0347acbb558b4a040f14467af375a6eb431fba9"/>
 		-->
-		<description>Schwarzschild GX: Sabita Sousei</description>
+		<description>Schwarzschild GX - Sabita Sousei</description>
 		<year>1997</year>
 		<publisher>工画堂 (Kogado)</publisher>
 		<info name="alt_title" value="シュヴァルツシルトGX 錆びた蒼星" />
@@ -2303,7 +3881,7 @@
 		<year>1994</year>
 		<publisher>JHV</publisher>
 		<info name="release" value="199404xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="star cruiser 2" sha1="7a2d5788f08400e37fafbb973c3bf1f9825ffe22" />
 			</diskarea>
@@ -2337,6 +3915,32 @@
 		</part>
 	</software>
 
+	<software name="sensangl">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Sensual Angels.ccd" size="771" crc="3e1468e6" sha1="0f1dd5aee1841f9a6a6e32d2f259f5b879e9be25"/>
+		<rom name="Sensual Angels.cue" size="76" crc="48ce3060" sha1="970998b3793665cd105a839b0c32cd595beb96f5"/>
+		<rom name="Sensual Angels.img" size="609814800" crc="4c8e7047" sha1="8b69973e09fa2f6b899c5f7eb744dcfc1499f956"/>
+		<rom name="Sensual Angels.sub" size="24890400" crc="24daad45" sha1="6025f636de7399505eca2c3047f61d27aabb5235"/>
+		-->
+		<description>Sensual Angels</description>
+		<year>1994</year>
+		<publisher>JHV</publisher>
+		<info name="release" value="199401xx" />
+		<info name="usage" value="Replace DWCD98.SYS with the appropriate CD-ROM driver" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="sensual angels (cd boot disk) [original].hdm" size="1261568" crc="bec41290" sha1="58a8701c158470f66da3e03179fd53a9b70d17cf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sensual angels" sha1="bf31f01ad4d713a0e95fc83f6d06091e3de59842" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sex2">
 		<!--
 		 Origin: P2P
@@ -2355,7 +3959,7 @@
 		</part>
 	</software>
 
-	<software name="shamhat">
+	<software name="shamhat" >
 		<!--
 		Origin unknown
 		<rom name="shamhat the holy circlet (1994)(datewest).bin" size="242197200" crc="91d12ee2" sha1="30a9e0886155de2a5bbac037dffdd6095a245d4e"/>
@@ -2400,11 +4004,11 @@
 		<rom name="vhmd129.bin" size="11402496" crc="9e620c50" sha1="3062ce263881840fd8dd3feadff9b4107df8e536"/>
 		<rom name="vhmd129.cue" size="70" crc="37b31217" sha1="4fcac64bbd02a8be9e1887a439b80e3192aa5ee5"/>
 		-->
-		<description>Super Real Mahjong P4 Final</description>
+		<description>Super Real Mahjong PIV Final</description>
 		<year>1995</year>
 		<publisher>ビング (Ving)</publisher>
 		<info name="serial" value="VHMD-129" />
-		<info name="alt_title" value="スーパーリアル麻雀 Ｐ４ ファイナル" />
+		<info name="alt_title" value="スーパーリアル麻雀 ＰＩＶ ファイナル" />
 		<info name="release" value="19950216" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2445,7 +4049,7 @@
 		<info name="release" value="19971031" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="sweet days cd (1997)(pearl soft)" sha1="895526e3f19b2f383cf2ed4893dc867a0101c0d9" />
+				<disk name="sweet days cd (1997)(pearl soft)" sha1="9abd34bc8ad4896cfb14cd022865d8d0c7326ecb" />
 			</diskarea>
 		</part>
 	</software>
@@ -2463,7 +4067,7 @@
 		<year>1995</year>
 		<publisher>ジックス (ZyX)</publisher>
 		<info name="release" value="199501xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="takamizawa kyosuke - nekketsu!! kyouiku kenshuu" sha1="ce13831f3094f9ab53c392480ece497c9b3c7997" />
 			</diskarea>
@@ -2482,6 +4086,27 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dojin_vol1" sha1="3d36a3eb869dbec523307ae75123fb3f3537663d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tamago">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Tamago Ryouri.ccd" size="769" crc="3c723f75" sha1="f7f821494203f35ec33c7d38b8f4ab910b5a1fa9"/>
+		<rom name="Tamago Ryouri.cue" size="75" crc="8e5e82be" sha1="2099568445f6b37d1d95bfe7348f37ce1bd45320"/>
+		<rom name="Tamago Ryouri.img" size="7088928" crc="0399c2dd" sha1="74868e9381ab309502ae4d390211b98e79d47ac8"/>
+		<rom name="Tamago Ryouri.sub" size="289344" crc="696f8c2e" sha1="bae0a3e7dc6682c46b0d8ce6e6dd35799410f115"/>
+		 -->
+		<description>Tamago Ryouri</description>
+		<year>1995</year>
+		<publisher>ボンびいボンボン (Bonbee Bonbon)</publisher>
+		<info name="alt_title" value="たまご料理" />
+		<info name="release" value="19950914" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tamago ryouri" sha1="afa7209ee58aa80d4304fef99d514bfd8eb8da6f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2510,7 +4135,7 @@
 		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 18).bin" size="32462304" crc="b6f4dd8a" md5="c0cd9374feb7336b7b4898c413566142" sha1="95a8e5ddf059f0ed7e18479e8db5c0263cf9d7ef"/>
 		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 19).bin" size="1467648" crc="6257e903" md5="2105c070b33a3ef9049878f5c7b1c884" sha1="bc7608fb11113cb2afc66272450ee4529b7b933e"/>
 		-->
-		<description>TFX - The Cutting Edge of Aerial Combat (Japan)</description>
+		<description>TFX - The Cutting Edge of Aerial Combat</description>
 		<year>1996</year>
 		<publisher>イマジニア (Imagineer)</publisher>
 		<info name="release" value="19960628" />
@@ -2532,6 +4157,7 @@
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="トキオ２ 開拓移民募集中！" />
 		<info name="release" value="19950914" />
+		<info name="usage" value="Requires the original manual to pass the protection check"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tokyo 2 - kaitaku imin boshuuchuu! (japan)" sha1="009ad8945385a51fd2e0bd1960a872297052396b" />
@@ -2539,7 +4165,8 @@
 		</part>
 	</software>
 
-	<software name="thehorde">
+	<!-- Severe screen positioning issues -->
+	<software name="thehorde" supported="no">
 		<!--
 		Origin: redump.org
 		<rom name="Horde, The (Japan).cue" size="1451" crc="89c39237" md5="43a9b4b3c10af301fe8c6e8e842b930c" sha1="afae4fee774ec36ec6bb01099e7346f0bcbdb0fb"/>
@@ -2597,9 +4224,10 @@
 		<rom name="Image.sub" size="24662880" crc="20f890dc" sha1="4fe043a928835600b7cdddc517aac410323384bd"/>
 		-->
 		<description>Toushin Toshi II</description>
-		<year>1996</year>
+		<year>1995</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="闘神都市 II" />
+		<info name="release" value="19950519" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="toushin2" sha1="780273f0ece50759e03589c3a7202eddfaf9eeb4" />
@@ -2607,7 +4235,51 @@
 		</part>
 	</software>
 
-	<software name="usnf">
+	<software name="toshin2s">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Toushin Toshi II - Soshite, Sorekara....ccd" size="3809" crc="9c8e2336" sha1="02d5cc4f6c53bf8119209973cc8997e0419baa2c"/>
+		<rom name="Toushin Toshi II - Soshite, Sorekara....cue" size="717" crc="87090c4f" sha1="b61ba78cacf53c6918da750e433546eecf983422"/>
+		<rom name="Toushin Toshi II - Soshite, Sorekara....img" size="340814208" crc="b51f44d5" sha1="c5595ca4e7db9b15b4b802b1c8d94decf9f56b35"/>
+		<rom name="Toushin Toshi II - Soshite, Sorekara....sub" size="13910784" crc="b64a2761" sha1="c1c3ad052d27c34c7f2a4fdd731e52d0a33fd27d"/>
+		-->
+		<description>Toushin Toshi II - Soshite, Sorekara...</description>
+		<year>1995</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="闘神都市 II そして、それから・・・" />
+		<info name="release" value="19951208" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="toushin toshi ii - soshite, sorekara..." sha1="10ae6ad7d25f19f4af5dc51953c733496b14b5b2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tunedhrt">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Tuned Heart.ccd" size="769" crc="dbe8ffa6" sha1="cee4b22d9ee44f5a6991066a7b2029e60e2b119d"/>
+		<rom name="Tuned Heart.cue" size="73" crc="b24bd492" sha1="e80940cadc9e028df3a76dc1113404cf644dc3e3"/>
+		<rom name="Tuned Heart.img" size="99155616" crc="99bd1f7a" sha1="751a1d740446cf2d591acca5888eb1ea4b0fb186"/>
+		<rom name="Tuned Heart.sub" size="4047168" crc="51cb456d" sha1="da7807fe854d60225e06d01ae9abe548c4499a77"/>
+		-->
+		<description>Tuned Heart</description>
+		<year>1996</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="チューンドハート" />
+		<info name="release" value="19960223" />
+		<info name="usage" value="Requires serial number printed on registration card"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tuned heart" sha1="8022484f60e7afe9c348b7f1a979766968c9400f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Controls don't seem to work properly -->
+	<software name="usnf" supported="no">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
 		 <rom name="usnf.iso" size="194809856" crc="6178b7e3" sha1="dcb7dc3314d5f58675573da250e95beac47b2c08"/>
@@ -2620,6 +4292,68 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="usnf" sha1="00f67219ad9ac4dada4a5054f1a2ace5235682a8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
+	<!-- Hangs at the text / voice selection screen -->
+	<software name="vastness" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Vastness.ccd" size="1525" crc="41bb06da" sha1="764c09836fc45e09f6efe47ed2b9da4c49a97e7f"/>
+		<rom name="Vastness.cue" size="228" crc="e8656a96" sha1="193c31c0fa10f79dd7c2601bf42bb764edb2d353"/>
+		<rom name="Vastness.img" size="463666224" crc="ff249f28" sha1="21c024c9f4bc2fcfaadf84072e094998facad4a7"/>
+		<rom name="Vastness.sub" size="18925152" crc="1f3a4a5d" sha1="7d26e94d29997ae4c1f204a143194c9a08c74860"/>
+		-->
+		<description>Vastness - Kuukyo no Ikenie-tachi</description>
+		<year>1994</year>
+		<publisher>CD Bros.</publisher>
+		<info name="release" value="19940422" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="vastness" sha1="12d1fbe66e92cd580616814077eebb402d4e0332" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Sounds play but nothing shows up on screen -->
+	<software name="venus" supported="no">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Venus &amp; Mug-R.ccd" size="5912" crc="d82f6079" sha1="24e90e6022b4e260a80fb523cd41d50deb60665c"/>
+		<rom name="Venus &amp; Mug-R.cue" size="1120" crc="aba0013f" sha1="0f8ebccfbbb7ad7e0e3456a8b8687697d6d0e409"/>
+		<rom name="Venus &amp; Mug-R.img" size="415247952" crc="373350ee" sha1="e38a778ce4ddddb80d0a1c197eb0036c84c99ef1"/>
+		<rom name="Venus &amp; Mug-R.sub" size="16948896" crc="72f5e1dd" sha1="0fa67dfcaacb9d27143d75d2f7dba29f73866f07"/>
+		-->
+		<description>Venus &amp; Mug-R</description>
+		<year>1994</year>
+		<publisher>ソフトウェアハウスぱせり (Software House Parsley)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="venus &amp; mug-r" sha1="e5baf67106a20b95a6eb7ee40ba0ed01eb3084cc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="viperctr">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Viper CTR - Asuka.ccd" size="4611" crc="851e7b34" sha1="eec3f6c7d1027e91d0107916ff40e53d28db8644"/>
+		<rom name="Viper CTR - Asuka.cue" size="873" crc="912f99aa" sha1="ffa7cb646a02c2d6cd9d70230ba16dc30271157b"/>
+		<rom name="Viper CTR - Asuka.img" size="505087296" crc="a6d79469" sha1="38d43c398c43dcecfde405a6621347bc880b7266"/>
+		<rom name="Viper CTR - Asuka.sub" size="20615808" crc="1bb77e00" sha1="31552d00dbd981abe72d13ddfa7fe4076adb32ed"/>
+		-->
+		<description>Viper CTR - Asuka</description>
+		<year>1997</year>
+		<publisher>ソニア (Sogna)</publisher>
+		<info name="alt_title" value="ＶＩＰＥＲ－ＣＴＲ ～あすか～" />
+		<info name="release" value="19970124" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="viper ctr - asuka" sha1="e254d1d36a5eb00842457e4101f7dc1d54df9851" />
 			</diskarea>
 		</part>
 	</software>
@@ -2641,6 +4375,31 @@
 		</part>
 	</software>
 
+	<software name="vircall2">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Virtuacall 2.ccd" size="3830" crc="657b3cb9" sha1="149c3c04c27251fbd4ee386dc7be1fa60ac9f0cc"/>
+		<rom name="Virtuacall 2.cue" size="690" crc="de1e55d4" sha1="854b8fd54d5a5314b969701f185feba9308d27eb"/>
+		<rom name="Virtuacall 2.img" size="582943200" crc="e356d715" sha1="1d05f7e8814481b6d8bce9f582ef1d03b11ce618"/>
+		<rom name="Virtuacall 2.sub" size="23793600" crc="fdf1b411" sha1="26232122c3e4fa66e717e78a98b408b15709075e"/>
+		-->
+		<description>Virtuacall 2</description>
+		<year>1996</year>
+		<publisher>フェアリーテール (Fairytale)</publisher>
+		<info name="release" value="19960202" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="virtuacall 2 (cd boot disk) [original].hdm" size="1261568" crc="8212a907" sha1="b9332c1dca6e7d75be4aff6eaff4a03e2d7733b9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="virtuacall 2" sha1="a2f012a08c2ed5bf79701d149289157eff984b34" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="warcraft">
 		<!--
 		Origin: P2P
@@ -2658,6 +4417,27 @@
 		</part>
 	</software>
 
+	<software name="watashi">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Watashi.ccd" size="770" crc="8ea97235" sha1="d3ed300a4c680ef01e204b24eb3f2a9a0bce184e"/>
+		<rom name="Watashi.cue" size="69" crc="f46549be" sha1="f6163394fd4c2b25fa11c8dd697d5009fec63d39"/>
+		<rom name="Watashi.img" size="31173408" crc="dd806876" sha1="a1010e9c579ad089ec68744b026bc900b20b6731"/>
+		<rom name="Watashi.sub" size="1272384" crc="9d55c9fd" sha1="afc2087941a4805afbb289644f17c7ea910cbd6b"/>
+		-->
+		<description>Watashi</description>
+		<year>1997</year>
+		<publisher>パールソフト (Pearl Soft)</publisher>
+		<info name="alt_title" value="私" />
+		<info name="release" value="19970110" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="watashi" sha1="153e530657947b803c33cdeb7d78eb17cdb894be" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
 	<software name="xenon">
 		<!--
@@ -2667,11 +4447,11 @@
 		<rom name="Xenon.img" size="326937408" crc="594213b2" sha1="1307189e44ccca2154486421f82b9b1df393b73a"/>
 		<rom name="Xenon.sub" size="13344384" crc="257b6cd3" sha1="51a3f6a3ff4646cce4f7130a4ae550d95e79330b"/>
 		-->
-		<description>Xenon</description>
+		<description>Xenon - Mugen no Shitai</description>
 		<year>1995</year>
 		<publisher>シーズウェア (C's Ware)</publisher>
 		<info name="release" value="199503xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="xenon" sha1="d6544b946ece77ce93fb6cf1db3ffb231b464ac0" />
 			</diskarea>
@@ -2692,9 +4472,29 @@
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="妖獣戦記2 黎明の戦士" />
 		<info name="release" value="199402xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="yojusen2" sha1="219f6731e9960291832df99d43ee52ab5d62bc52" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="yumecol">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Yumemizaka &amp; Collections.ccd" size="2907" crc="f1e94113" sha1="06b41a33c3ddf07689ca45196a0315594307cbfe"/>
+		<rom name="Yumemizaka &amp; Collections.cue" size="507" crc="8c97e089" sha1="603a88a4061d65a0b70d90ee47cedf8cebf60e07"/>
+		<rom name="Yumemizaka &amp; Collections.img" size="480153744" crc="7a4588f3" sha1="96c553280680937f5baf79e6376515f0423ebdf6"/>
+		<rom name="Yumemizaka &amp; Collections.sub" size="19598112" crc="dc8a00fa" sha1="fb1fabfb897bf037014df4a23e4600509cd36c2c"/>
+		-->
+		<description>Yumemizaka &amp; Collections</description>
+		<year>1996</year>
+		<publisher>ユーミソフト (U-me Soft)</publisher>
+		<info name="alt_title" value="夢見坂＆コレクションズ" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="yumemizaka &amp; collections" sha1="0af61cdfb7c9f3264b40cc30d1a396d9259a6c4a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2734,6 +4534,27 @@
 		</part>
 	</software>
 
+	<software name="yuudisk">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Yuu Disk Special - CD-ROM Bishoujo Collection.ccd" size="5373" crc="de9649c9" sha1="bbe34c70fe69ca4161b80ff96bb22acdd1ef4dab"/>
+		<rom name="Yuu Disk Special - CD-ROM Bishoujo Collection.cue" size="1057" crc="a6480a35" sha1="4cb5d5c76856c84311fd80701e0c20252a0ec747"/>
+		<rom name="Yuu Disk Special - CD-ROM Bishoujo Collection.img" size="449300208" crc="78603df8" sha1="bd6365d50398d49fb57fb6a4ae4719a55ffbfa86"/>
+		<rom name="Yuu Disk Special - CD-ROM Bishoujo Collection.sub" size="18338784" crc="29bf9e2d" sha1="aedf918cbf396dd6caa9f544acf61921c1280184"/>
+		-->
+		<description>Yuu Disk Special - CD-ROM Bishoujo Collection</description>
+		<year>1996</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="遊ディスクスペシャル CD-ROM美少女コレクション" />
+		<info name="release" value="199604xx" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="yuu disk special - cd-rom bishoujo collection" sha1="ca1f0985b942c00359b72f84c1f45b06df6407e1" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="zaimeta">
 		<!--
 		Origin: Unknown
@@ -2765,7 +4586,7 @@
 		<description>Zatsuon Ryouiki</description>
 		<year>1995</year>
 		<publisher>ディー・オー (D.O.)</publisher>
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="zatsuon ryouiki" sha1="f61c4277ef4a2ec49f127d6b798e30d9b7b0b3af" />
 			</diskarea>

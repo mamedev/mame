@@ -4,6 +4,7 @@
 #include "cpu/m6805/m68705.h"
 
 #include "sound/2203intf.h"
+#include "emupal.h"
 
 
 class mexico86_state : public driver_device
@@ -23,6 +24,11 @@ public:
 	{
 	}
 
+	void knightb(machine_config &config);
+	void mexico86(machine_config &config);
+	void kikikai(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<u8> m_protection_ram;
 	required_shared_ptr<u8> m_mainram;
@@ -69,9 +75,6 @@ public:
 	INTERRUPT_GEN_MEMBER(mexico86_m68705_interrupt);
 	void mcu_simulate(  );
 	bool mcu_coin_counter_w(bool condition);
-	void knightb(machine_config &config);
-	void mexico86(machine_config &config);
-	void kikikai(machine_config &config);
 	void mexico86_map(address_map &map);
 	void mexico86_sound_map(address_map &map);
 	void mexico86_sub_cpu_map(address_map &map);

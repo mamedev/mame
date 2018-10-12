@@ -72,37 +72,41 @@ public:
 		: hec2hrp_state(mconfig, type, tag),
 			m_videoram(*this, "videoram") { }
 
+	void hector1(machine_config &config);
+	void interact(machine_config &config);
+
+private:
+
 	required_shared_ptr<uint8_t> m_videoram;
 	DECLARE_MACHINE_START(interact);
 	DECLARE_MACHINE_RESET(interact);
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void hector1(machine_config &config);
-	void interact(machine_config &config);
 	void interact_mem(address_map &map);
 };
 
 
-ADDRESS_MAP_START(interact_state::interact_mem)
-	ADDRESS_MAP_UNMAP_HIGH
+void interact_state::interact_mem(address_map &map)
+{
+	map.unmap_value_high();
 	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROM  /*BANK(2)*/
+	map(0x0000, 0x3fff).rom();  /*BANK(2)*/
 	/*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
 
 	/* Hardware address mapping*/
-/*  AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)// Bank management not udsed in BR machine*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
+/*  AM_RANGE(0x0800,0x0808) AM_WRITE(switch_bank_w)// Bank management not udsed in BR machine*/
+	map(0x1000, 0x1000).w(FUNC(interact_state::color_a_w));  /* Color c0/c1*/
+	map(0x1800, 0x1800).w(FUNC(interact_state::color_b_w));  /* Color c2/c3*/
+	map(0x2000, 0x2003).w(FUNC(interact_state::sn_2000_w));  /* Sound*/
+	map(0x2800, 0x2803).w(FUNC(interact_state::sn_2800_w));  /* Sound*/
+	map(0x3000, 0x3000).rw(FUNC(interact_state::cassette_r), FUNC(interact_state::sn_3000_w));/* Write necessary*/
+	map(0x3800, 0x3807).rw(FUNC(interact_state::keyboard_r), FUNC(interact_state::keyboard_w));  /* Keyboard*/
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
+	map(0x4000, 0x49ff).ram().share("videoram");
 	/* continous RAM*/
-	AM_RANGE(0x4A00,0xffff) AM_RAM
+	map(0x4A00, 0xffff).ram();
 
-ADDRESS_MAP_END
+}
 
 
 MACHINE_RESET_MEMBER(interact_state,interact)
@@ -126,9 +130,9 @@ uint32_t interact_state::screen_update_interact(screen_device &screen, bitmap_in
 MACHINE_CONFIG_START(interact_state::interact)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(interact_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(interact_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 
 	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
 	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
@@ -163,9 +167,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(interact_state::hector1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(1'750'000))
-	MCFG_CPU_PROGRAM_MAP(interact_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(1'750'000))
+	MCFG_DEVICE_PROGRAM_MAP(interact_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 
 	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
 	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
@@ -299,6 +303,6 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME      PARENT     COMPA   MACHINE    INPUT     STATE           INIT  COMPANY       FULLNAME       FLAGS */
-COMP(1979, interact, 0,         0,      interact,  interact, interact_state, 0,    "Interact",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
-COMP(1983, hector1,  interact,  0,      hector1,   interact, interact_state, 0,    "Micronique", "Hector 1",  MACHINE_IMPERFECT_SOUND)
+/*   YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY       FULLNAME       FLAGS */
+COMP(1979, interact, 0,        0,      interact, interact, interact_state, empty_init, "Interact",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
+COMP(1983, hector1,  interact, 0,      hector1,  interact, interact_state, empty_init, "Micronique", "Hector 1",  MACHINE_IMPERFECT_SOUND)

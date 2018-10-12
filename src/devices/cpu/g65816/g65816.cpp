@@ -93,8 +93,8 @@ TODO general:
 #include "g65816.h"
 
 
-DEFINE_DEVICE_TYPE(G65816, g65816_device, "g65c816", "G65C816")
-DEFINE_DEVICE_TYPE(_5A22,  _5a22_device,  "5a22",    "5A22")
+DEFINE_DEVICE_TYPE(G65816, g65816_device, "g65c816", "Western Design Center G65C816")
+DEFINE_DEVICE_TYPE(_5A22,  _5a22_device,  "5a22",    "Ricoh 5A22")
 
 enum
 {
@@ -112,6 +112,9 @@ g65816_device::g65816_device(const machine_config &mconfig, const char *tag, dev
 g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 24, 0, internal)
+	, m_opcode_config("opcodes", ENDIANNESS_LITTLE, 8, 24, 0, internal)
+	, m_vector_config("vectors", ENDIANNESS_LITTLE, 8, 5, 0)
 	, m_cpu_type(cpu_type)
 {
 }
@@ -119,26 +122,34 @@ g65816_device::g65816_device(const machine_config &mconfig, device_type type, co
 
 device_memory_interface::space_config_vector g65816_device::memory_space_config() const
 {
-	return space_config_vector {
+	space_config_vector spaces = {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
+	if (has_configured_map(AS_DATA))
+		spaces.push_back(std::make_pair(AS_DATA, &m_data_config));
+	if (has_configured_map(AS_OPCODES))
+		spaces.push_back(std::make_pair(AS_OPCODES, &m_opcode_config));
+	if (has_configured_map(AS_VECTORS))
+		spaces.push_back(std::make_pair(AS_VECTORS, &m_vector_config));
+	return spaces;
 }
 
 
-ADDRESS_MAP_START(_5a22_device::_5a22_map)
-	AM_RANGE(0x4202, 0x4202) AM_MIRROR(0xbf0000) AM_WRITE(wrmpya_w)
-	AM_RANGE(0x4203, 0x4203) AM_MIRROR(0xbf0000) AM_WRITE(wrmpyb_w)
-	AM_RANGE(0x4204, 0x4204) AM_MIRROR(0xbf0000) AM_WRITE(wrdivl_w)
-	AM_RANGE(0x4205, 0x4205) AM_MIRROR(0xbf0000) AM_WRITE(wrdivh_w)
-	AM_RANGE(0x4206, 0x4206) AM_MIRROR(0xbf0000) AM_WRITE(wrdvdd_w)
+void _5a22_device::_5a22_map(address_map &map)
+{
+	map(0x4202, 0x4202).mirror(0xbf0000).w(FUNC(_5a22_device::wrmpya_w));
+	map(0x4203, 0x4203).mirror(0xbf0000).w(FUNC(_5a22_device::wrmpyb_w));
+	map(0x4204, 0x4204).mirror(0xbf0000).w(FUNC(_5a22_device::wrdivl_w));
+	map(0x4205, 0x4205).mirror(0xbf0000).w(FUNC(_5a22_device::wrdivh_w));
+	map(0x4206, 0x4206).mirror(0xbf0000).w(FUNC(_5a22_device::wrdvdd_w));
 
-	AM_RANGE(0x420d, 0x420d) AM_MIRROR(0xbf0000) AM_WRITE(memsel_w)
+	map(0x420d, 0x420d).mirror(0xbf0000).w(FUNC(_5a22_device::memsel_w));
 
-	AM_RANGE(0x4214, 0x4214) AM_MIRROR(0xbf0000) AM_READ(rddivl_r)
-	AM_RANGE(0x4215, 0x4215) AM_MIRROR(0xbf0000) AM_READ(rddivh_r)
-	AM_RANGE(0x4216, 0x4216) AM_MIRROR(0xbf0000) AM_READ(rdmpyl_r)
-	AM_RANGE(0x4217, 0x4217) AM_MIRROR(0xbf0000) AM_READ(rdmpyh_r)
-ADDRESS_MAP_END
+	map(0x4214, 0x4214).mirror(0xbf0000).r(FUNC(_5a22_device::rddivl_r));
+	map(0x4215, 0x4215).mirror(0xbf0000).r(FUNC(_5a22_device::rddivh_r));
+	map(0x4216, 0x4216).mirror(0xbf0000).r(FUNC(_5a22_device::rdmpyl_r));
+	map(0x4217, 0x4217).mirror(0xbf0000).r(FUNC(_5a22_device::rdmpyh_r));
+}
 
 
 _5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -222,6 +233,13 @@ unsigned g65816_device::g65816i_read_8_immediate(unsigned address)
 	return g65816_read_8_immediate(address);
 }
 
+unsigned g65816_device::g65816i_read_8_opcode(unsigned address)
+{
+	address = ADDRESS_65816(address);
+	CLOCKS -= (bus_5A22_cycle_burst(address));
+	return g65816_read_8_opcode(address);
+}
+
 unsigned g65816_device::g65816i_read_8_direct(unsigned address)
 {
 	if (FLAG_E)
@@ -240,10 +258,11 @@ unsigned g65816_device::g65816i_read_8_direct(unsigned address)
 
 unsigned g65816_device::g65816i_read_8_vector(unsigned address)
 {
-	if (!READ_VECTOR.isnull())
-		return READ_VECTOR(*m_program, address, 0xff);
+	CLOCKS -= (bus_5A22_cycle_burst(address));
+	if (has_space(AS_VECTORS))
+		return space(AS_VECTORS).read_byte(address & 0x001f);
 	else
-		return g65816i_read_8_normal(address);
+		return g65816_read_8_immediate(address);
 }
 
 void g65816_device::g65816i_write_8_normal(unsigned address, unsigned value)
@@ -589,7 +608,7 @@ void g65816_device::g65816i_interrupt_software(unsigned vector)
 		FLAG_D = DFLAG_CLEAR;
 		g65816i_set_flag_i(IFLAG_SET);
 		REGISTER_PB = 0;
-		g65816i_jump_16(g65816i_read_16_normal(vector));
+		g65816i_jump_16(g65816i_read_16_immediate(vector));
 	}
 	else
 	{
@@ -600,7 +619,7 @@ void g65816_device::g65816i_interrupt_software(unsigned vector)
 		FLAG_D = DFLAG_CLEAR;
 		g65816i_set_flag_i(IFLAG_SET);
 		REGISTER_PB = 0;
-		g65816i_jump_16(g65816i_read_16_normal(vector));
+		g65816i_jump_16(g65816i_read_16_immediate(vector));
 	}
 }
 
@@ -613,7 +632,7 @@ void g65816_device::g65816i_interrupt_nmi()
 		g65816i_push_8(g65816i_get_reg_p() & ~FLAGPOS_B);
 		FLAG_D = DFLAG_CLEAR;
 		REGISTER_PB = 0;
-		g65816i_jump_16(g65816i_read_16_normal((FLAG_E) ? VECTOR_NMI_E : VECTOR_NMI_N));
+		g65816i_jump_16(g65816i_read_16_vector((FLAG_E) ? VECTOR_NMI_E : VECTOR_NMI_N));
 	}
 	else
 	{
@@ -623,7 +642,7 @@ void g65816_device::g65816i_interrupt_nmi()
 		g65816i_push_8(g65816i_get_reg_p());
 		FLAG_D = DFLAG_CLEAR;
 		REGISTER_PB = 0;
-		g65816i_jump_16(g65816i_read_16_normal((FLAG_E) ? VECTOR_NMI_E : VECTOR_NMI_N));
+		g65816i_jump_16(g65816i_read_16_vector((FLAG_E) ? VECTOR_NMI_E : VECTOR_NMI_N));
 	}
 }
 
@@ -706,7 +725,10 @@ void g65816_device::device_reset()
 	REGISTER_S = 0x1ff;
 
 	/* Fetch the reset vector */
-	REGISTER_PC = g65816_read_8(VECTOR_RESET) | (g65816_read_8(VECTOR_RESET+1)<<8);
+	if (has_space(AS_VECTORS))
+		REGISTER_PC = space(AS_VECTORS).read_word(VECTOR_RESET & 0x001f);
+	else
+		REGISTER_PC = g65816_read_8_immediate(VECTOR_RESET) | (g65816_read_8_immediate(VECTOR_RESET+1)<<8);
 	g65816i_jumping(REGISTER_PB | REGISTER_PC);
 }
 
@@ -767,9 +789,9 @@ void g65816_device::execute_set_input(int line, int state)
 	(this->*FTABLE_SET_LINE)(line, state);
 }
 
-util::disasm_interface *g65816_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> g65816_device::create_disassembler()
 {
-	return new g65816_disassembler(this);
+	return std::make_unique<g65816_disassembler>(this);
 }
 
 bool g65816_device::get_m_flag() const
@@ -833,7 +855,10 @@ void g65816_device::device_start()
 	m_execute = nullptr;
 	m_debugger_temp = 0;
 
-	m_program = &space(AS_PROGRAM);
+	address_space &program_space = space(AS_PROGRAM);
+	m_data_space = has_space(AS_DATA) ? &space(AS_DATA) : &program_space;
+	m_program_cache = program_space.cache<0, 0, ENDIANNESS_LITTLE>();
+	m_opcode_cache = (has_space(AS_OPCODES) ? space(AS_OPCODES) : program_space).cache<0, 0, ENDIANNESS_LITTLE>();
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
@@ -885,7 +910,7 @@ void g65816_device::device_start()
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
 
-	m_icountptr = &m_ICount;
+	set_icountptr(m_ICount);
 }
 
 void g65816_device::state_import(const device_state_entry &entry)
@@ -985,11 +1010,6 @@ void g65816_device::state_string_export(const device_state_entry &entry, std::st
 				m_flag_c & CFLAG_SET ? 'C':'.');
 			break;
 	}
-}
-
-void g65816_device::set_read_vector_callback(read8_delegate read_vector)
-{
-	READ_VECTOR = read_vector;
 }
 
 

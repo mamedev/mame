@@ -32,61 +32,65 @@ WRITE8_MEMBER(flstory_state::snd_reset_w)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(flstory_state::base_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+void flstory_state::base_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
 
 	// rumba lumber reads area 0xc800-0xcfff
 	// onna34ro checks the whole range during POST but having a mirror or not doesn't make any difference for the check to pass
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x800) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
+	map(0xc000, 0xc7ff).mirror(0x800).ram().w(FUNC(flstory_state::flstory_videoram_w)).share("videoram");
 
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog */
-	AM_RANGE(0xd002, 0xd002) AM_NOP         /* unknown read & coin lock out? */
+	map(0xd001, 0xd001).nopw();    /* watchdog */
+	map(0xd002, 0xd002).noprw();         /* unknown read & coin lock out? */
 
-	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd403, 0xd403) AM_READNOP AM_WRITE(snd_reset_w) // unknown read (set/clr side effect?)
+	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0xd400, 0xd400).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xd403, 0xd403).nopr().w(FUNC(flstory_state::snd_reset_w)); // unknown read (set/clr side effect?)
 
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
+	map(0xd401, 0xd401).r(FUNC(flstory_state::snd_flag_r));
+	map(0xd800, 0xd800).portr("DSW0");
+	map(0xd801, 0xd801).portr("DSW1");
+	map(0xd802, 0xd802).portr("DSW2");
+	map(0xd803, 0xd803).portr("SYSTEM");
+	map(0xd804, 0xd804).portr("P1");
+	map(0xd806, 0xd806).portr("P2");
 
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
+	map(0xdc00, 0xdc9f).ram().share("spriteram");
+	map(0xdca0, 0xdcbf).ram().w(FUNC(flstory_state::flstory_scrlram_w)).share("scrlram");
 
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
+	map(0xdd00, 0xdeff).rw(FUNC(flstory_state::flstory_palette_r), FUNC(flstory_state::flstory_palette_w));
 
 	// victorious nine read 0xf80a during attract, unknown purpose
-	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("workram") /* work RAM */
-ADDRESS_MAP_END
+	map(0xe000, 0xe7ff).mirror(0x1800).ram().share("workram"); /* work RAM */
+}
 
-ADDRESS_MAP_START(flstory_state::flstory_map)
-	AM_IMPORT_FROM(base_map)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+void flstory_state::flstory_map(address_map &map)
+{
+	base_map(map);
+	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 
-	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
+	map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
-	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
-ADDRESS_MAP_END
+	map(0xdcc0, 0xdcff).ram(); /* unknown */
+	map(0xdf03, 0xdf03).w(FUNC(flstory_state::flstory_gfxctrl_w));
+}
 
-ADDRESS_MAP_START(flstory_state::onna34ro_map)
-	AM_IMPORT_FROM(base_map)
+void flstory_state::onna34ro_map(address_map &map)
+{
+	base_map(map);
 //  AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 //  AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
-	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
-ADDRESS_MAP_END
+	map(0xdcc0, 0xdcff).ram(); /* unknown */
+	map(0xdf03, 0xdf03).w(FUNC(flstory_state::flstory_gfxctrl_w));
+}
 
-ADDRESS_MAP_START(flstory_state::onna34ro_mcu_map)
-	AM_IMPORT_FROM(onna34ro_map)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
-ADDRESS_MAP_END
+void flstory_state::onna34ro_mcu_map(address_map &map)
+{
+	onna34ro_map(map);
+	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
+}
 
 CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
 {
@@ -95,27 +99,29 @@ CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
 	return (victnine_mcu_status_r(space, 0) & 3);
 }
 
-ADDRESS_MAP_START(flstory_state::victnine_map)
-	AM_IMPORT_FROM(base_map)
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
+void flstory_state::victnine_map(address_map &map)
+{
+	base_map(map);
+	map(0xd000, 0xd000).rw(FUNC(flstory_state::victnine_mcu_r), FUNC(flstory_state::victnine_mcu_w));
 
-	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("EXTRA_P1")   /* also mcu */
-	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
+	map(0xd805, 0xd805).portr("EXTRA_P1");   /* also mcu */
+	map(0xd807, 0xd807).portr("EXTRA_P2");
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
-	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-ADDRESS_MAP_END
+	map(0xdce0, 0xdce0).rw(FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
+	map(0xdce1, 0xdce1).nopw();    /* unknown */
+}
 
-ADDRESS_MAP_START(flstory_state::rumba_map)
-	AM_IMPORT_FROM(base_map)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+void flstory_state::rumba_map(address_map &map)
+{
+	base_map(map);
+	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 
-	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
-	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
+	map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
+	map(0xd807, 0xd807).portr("EXTRA_P2");
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
+	map(0xdce0, 0xdce0).rw(FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
 //  AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-ADDRESS_MAP_END
+}
 
 
 
@@ -162,20 +168,21 @@ WRITE8_MEMBER(flstory_state::sound_control_3_w)
 }
 
 
-ADDRESS_MAP_START(flstory_state::sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ym2149_device, address_data_w)
-	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_device, write)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
-	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd800, 0xd800) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xda00, 0xda00) AM_READ(snd_flag_r) AM_DEVWRITE("soundnmi", input_merger_device, in_set<1>)
-	AM_RANGE(0xdc00, 0xdc00) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<1>)
-	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write) /* signed 8-bit DAC &  unknown read */
-	AM_RANGE(0xe000, 0xefff) AM_ROM                                         /* space for diagnostics ROM */
-ADDRESS_MAP_END
+void flstory_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xc801).w(m_ay, FUNC(ym2149_device::address_data_w));
+	map(0xca00, 0xca0d).w(m_msm, FUNC(msm5232_device::write));
+	map(0xcc00, 0xcc00).w(FUNC(flstory_state::sound_control_0_w));
+	map(0xce00, 0xce00).w(FUNC(flstory_state::sound_control_1_w));
+	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xd800, 0xd800).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0xda00, 0xda00).r(FUNC(flstory_state::snd_flag_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
+	map(0xdc00, 0xdc00).w(m_soundnmi, FUNC(input_merger_device::in_clear<1>));
+	map(0xde00, 0xde00).nopr().w("dac", FUNC(dac_byte_interface::data_w)); /* signed 8-bit DAC &  unknown read */
+	map(0xe000, 0xefff).rom();                                         /* space for diagnostics ROM */
+}
 
 
 
@@ -499,7 +506,7 @@ static INPUT_PORTS_START( victnine )
 	/* bits 0,1 are MCU related:
 	    - bit 0: mcu is ready to receive data from main cpu
 	    - bit 1: mcu has sent data to the main cpu       */
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, flstory_state,victnine_mcu_status_bit01_r, nullptr)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, flstory_state,victnine_mcu_status_bit01_r, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
@@ -682,7 +689,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( flstory )
+static GFXDECODE_START( gfx_flstory )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -729,13 +736,13 @@ MACHINE_RESET_MEMBER(flstory_state,flstory)
 MACHINE_CONFIG_START(flstory_state::flstory)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'733'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(flstory_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'733'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(flstory_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(18'432'000)/6)    /* verified on pcb */
@@ -755,17 +762,17 @@ MACHINE_CONFIG_START(flstory_state::flstory)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flstory)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flstory)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -773,12 +780,12 @@ MACHINE_CONFIG_START(flstory_state::flstory)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(8'000'000)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(flstory_state, sound_control_3_w))
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(8'000'000)/4) /* verified on pcb */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, flstory_state, sound_control_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, flstory_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_SOUND_ADD("msm", MSM5232, XTAL(8'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4) /* verified on pcb */
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
@@ -792,21 +799,21 @@ MACHINE_CONFIG_START(flstory_state::flstory)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(flstory_state::onna34ro)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'733'000)/2)     /* ??? */
-	MCFG_CPU_PROGRAM_MAP(onna34ro_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'733'000)/2)     /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(onna34ro_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2)     /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2)     /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
@@ -824,17 +831,17 @@ MACHINE_CONFIG_START(flstory_state::onna34ro)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flstory)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flstory)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -842,12 +849,12 @@ MACHINE_CONFIG_START(flstory_state::onna34ro)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(flstory_state, sound_control_3_w))
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(8'000'000)/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, flstory_state, sound_control_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, flstory_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_SOUND_ADD("msm", MSM5232, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
@@ -861,15 +868,15 @@ MACHINE_CONFIG_START(flstory_state::onna34ro)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(flstory_state::onna34ro_mcu)
 	onna34ro(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(onna34ro_mcu_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(onna34ro_mcu_map)
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(18'432'000)/6)    /* ? */
 MACHINE_CONFIG_END
@@ -877,17 +884,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(flstory_state::victnine)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)      /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(victnine_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)      /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(victnine_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2)     /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2)     /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
-//  MCFG_CPU_ADD("mcu", M68705, XTAL(18'432'000)/6)  /* ??? */
-//  MCFG_CPU_PROGRAM_MAP(m68705_map)
+//  MCFG_DEVICE_ADD("mcu", M68705, XTAL(18'432'000)/6)  /* ??? */
+//  MCFG_DEVICE_PROGRAM_MAP(m68705_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -904,17 +911,17 @@ MACHINE_CONFIG_START(flstory_state::victnine)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_victnine)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flstory)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flstory)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,victnine)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -922,12 +929,12 @@ MACHINE_CONFIG_START(flstory_state::victnine)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(flstory_state, sound_control_3_w))
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(8'000'000)/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, flstory_state, sound_control_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, flstory_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("msm", MSM5232, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
@@ -941,22 +948,22 @@ MACHINE_CONFIG_START(flstory_state::victnine)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(flstory_state::rumba)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rumba_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rumba_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(18'432'000)/6) /* ? */
@@ -977,17 +984,17 @@ MACHINE_CONFIG_START(flstory_state::rumba)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_rumba)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flstory)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flstory)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,rumba)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -995,12 +1002,12 @@ MACHINE_CONFIG_START(flstory_state::rumba)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(8'000'000)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(flstory_state, sound_control_3_w))
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(8'000'000)/4) /* verified on pcb */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, flstory_state, sound_control_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, flstory_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("msm", MSM5232, XTAL(8'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4) /* verified on pcb */
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
@@ -1014,9 +1021,9 @@ MACHINE_CONFIG_START(flstory_state::rumba)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1311,9 +1318,9 @@ ROM_START( rumba )
 ROM_END
 
 
-GAME( 1985, flstory,   0,        flstory,      flstory,  flstory_state, 0, ROT180, "Taito", "The FairyLand Story",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, flstoryj,  flstory,  flstory,      flstory,  flstory_state, 0, ROT180, "Taito", "The FairyLand Story (Japan)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, onna34ro,  0,        onna34ro_mcu, onna34ro, flstory_state, 0, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, onna34roa, onna34ro, onna34ro,     onna34ro, flstory_state, 0, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, victnine,  0,        victnine,     victnine, flstory_state, 0, ROT0,   "Taito", "Victorious Nine",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // MCU still simulated
-GAME( 1984, rumba,     0,        rumba,        rumba,    flstory_state, 0, ROT270, "Taito", "Rumba Lumber",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flstory,   0,        flstory,      flstory,  flstory_state, empty_init, ROT180, "Taito", "The FairyLand Story",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flstoryj,  flstory,  flstory,      flstory,  flstory_state, empty_init, ROT180, "Taito", "The FairyLand Story (Japan)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, onna34ro,  0,        onna34ro_mcu, onna34ro, flstory_state, empty_init, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, onna34roa, onna34ro, onna34ro,     onna34ro, flstory_state, empty_init, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, victnine,  0,        victnine,     victnine, flstory_state, empty_init, ROT0,   "Taito", "Victorious Nine",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // MCU still simulated
+GAME( 1984, rumba,     0,        rumba,        rumba,    flstory_state, empty_init, ROT270, "Taito", "Rumba Lumber",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -50,6 +50,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(fdd_select_w);
 	DECLARE_WRITE8_MEMBER(hw_terminal_count_w);
 
+	required_device<z80_device> m_cpu;
+
 private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -60,7 +62,6 @@ private:
 
 	static const device_timer_id TIMER_RESET = 0;
 
-	required_device<cpu_device> m_cpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;

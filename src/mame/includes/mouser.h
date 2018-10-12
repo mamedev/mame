@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class mouser_state : public driver_device
 {
 public:
@@ -20,14 +22,18 @@ public:
 		m_palette(*this, "palette"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
+	void mouser(machine_config &config);
+
+	void init_mouser();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* misc */
-	uint8_t      m_sound_byte;
-	uint8_t      m_nmi_enable;
+	bool         m_nmi_enable;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -37,19 +43,15 @@ public:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(mouser_sound_interrupt_w);
-	DECLARE_READ8_MEMBER(mouser_sound_byte_r);
 	DECLARE_WRITE8_MEMBER(mouser_sound_nmi_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_DRIVER_INIT(mouser);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(mouser);
 	uint32_t screen_update_mouser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mouser_nmi_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(mouser_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(mouser_sound_nmi_assert);
-	void mouser(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void mouser_map(address_map &map);
 	void mouser_sound_io_map(address_map &map);

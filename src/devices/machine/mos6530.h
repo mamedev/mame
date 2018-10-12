@@ -110,15 +110,15 @@ DECLARE_DEVICE_TYPE(MOS6530, mos6530_device)
 
 
 #define MCFG_MOS6530_IN_PA_CB(_devcb) \
-	devcb = &downcast<mos6530_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
+	downcast<mos6530_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_MOS6530_OUT_PA_CB(_devcb) \
-	devcb = &downcast<mos6530_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
+	downcast<mos6530_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_MOS6530_IN_PB_CB(_devcb) \
-	devcb = &downcast<mos6530_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
+	downcast<mos6530_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_MOS6530_OUT_PB_CB(_devcb) \
-	devcb = &downcast<mos6530_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
+	downcast<mos6530_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_MOS6530_H

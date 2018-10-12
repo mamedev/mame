@@ -195,14 +195,10 @@ void wolfpack_state::draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rectangle rect = cliprect;
-
-	if (!(m_pt_pic & 0x20))
-		rect.min_x = 256;
-
-	if (!(m_pt_pic & 0x10))
-		rect.max_x = 255;
-
+	rectangle rect(cliprect);
+	rect.setx(
+			(m_pt_pic & 0x20) ? rect.left() : 256,
+			(m_pt_pic & 0x10) ? rect.right() : 255);
 
 	m_gfxdecode->gfx(2)->transpen(bitmap,rect,
 		m_pt_pic,
@@ -223,19 +219,11 @@ void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 void wolfpack_state::draw_water(palette_device &palette, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rectangle rect = cliprect;
-
-	int x;
-	int y;
-
-	if (rect.max_y > 127)
-		rect.max_y = 127;
-
-	for (y = rect.min_y; y <= rect.max_y; y++)
+	for (int y = cliprect.top(); y <= (std::min)(cliprect.bottom(), 127); y++)
 	{
 		uint16_t* p = &bitmap.pix16(y);
 
-		for (x = rect.min_x; x <= rect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			p[x] = palette.pen_indirect(p[x]) | 0x08;
 	}
 }
@@ -243,9 +231,6 @@ void wolfpack_state::draw_water(palette_device &palette, bitmap_ind16 &bitmap, c
 
 uint32_t wolfpack_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-	int j;
-
 	uint8_t color = 0x48;
 	if (m_ship_size & 0x10) color += 0x13;
 	if (m_ship_size & 0x20) color += 0x22;
@@ -259,8 +244,8 @@ uint32_t wolfpack_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	bitmap.fill(m_video_invert, cliprect);
 
-	for (i = 0; i < 8; i++)
-		for (j = 0; j < 32; j++)
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 32; j++)
 		{
 			int code = m_alpha_num_ram[32 * i + j];
 
@@ -286,19 +271,16 @@ WRITE_LINE_MEMBER(wolfpack_state::screen_vblank)
 	// rising edge
 	if (state)
 	{
-		int x;
-		int y;
-
 		m_helper.fill(0);
 
 		draw_ship(m_helper, m_helper.cliprect());
 
-		for (y = 128; y < 224 - m_torpedo_v; y++)
+		for (int y = 128; y < 224 - m_torpedo_v; y++)
 		{
 			int x1 = 248 - m_torpedo_h - 1;
 			int x2 = 248 - m_torpedo_h + 1;
 
-			for (x = 2 * x1; x < 2 * x2; x++)
+			for (int x = 2 * x1; x < 2 * x2; x++)
 			{
 				if (x < 0 || x >= m_helper.width())
 					continue;

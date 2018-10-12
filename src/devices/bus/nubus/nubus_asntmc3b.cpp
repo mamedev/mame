@@ -43,9 +43,9 @@ DEFINE_DEVICE_TYPE(NUBUS_APPLEENET, nubus_appleenet_device, "nb_aenet", "Apple N
 
 MACHINE_CONFIG_START(nubus_mac8390_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MAC8390_839X, DP8390D, 0)
-	MCFG_DP8390D_IRQ_CB(WRITELINE(nubus_mac8390_device, dp_irq_w))
-	MCFG_DP8390D_MEM_READ_CB(READ8(nubus_mac8390_device, dp_mem_read))
-	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(nubus_mac8390_device, dp_mem_write))
+	MCFG_DP8390D_IRQ_CB(WRITELINE(*this, nubus_mac8390_device, dp_irq_w))
+	MCFG_DP8390D_MEM_READ_CB(READ8(*this, nubus_mac8390_device, dp_mem_read))
+	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(*this, nubus_mac8390_device, dp_mem_write))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

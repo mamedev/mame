@@ -24,17 +24,12 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
+
 
 class intv_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTV_INTERRUPT2_COMPLETE,
-		TIMER_INTV_INTERRUPT_COMPLETE,
-		TIMER_INTV_BTB_FILL
-	};
-
 	intv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -53,6 +48,24 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
+
+	void intvkbd(machine_config &config);
+	void intv2(machine_config &config);
+	void intvoice(machine_config &config);
+	void intvecs(machine_config &config);
+	void intv(machine_config &config);
+
+	void init_intvecs();
+	void init_intvkbd();
+	void init_intv();
+
+private:
+	enum
+	{
+		TIMER_INTV_INTERRUPT2_COMPLETE,
+		TIMER_INTV_INTERRUPT_COMPLETE,
+		TIMER_INTV_BTB_FILL
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8914_device> m_sound;
@@ -102,9 +115,6 @@ public:
 	int m_tape_interrupts_enabled;
 	int m_tape_motor_mode;
 
-	DECLARE_DRIVER_INIT(intvecs);
-	DECLARE_DRIVER_INIT(intvkbd);
-	DECLARE_DRIVER_INIT(intv);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -117,18 +127,13 @@ public:
 	TIMER_CALLBACK_MEMBER(intv_interrupt_complete);
 	TIMER_CALLBACK_MEMBER(intv_btb_fill);
 
-	void intvkbd(machine_config &config);
-	void intv2(machine_config &config);
-	void intvoice(machine_config &config);
-	void intvecs(machine_config &config);
-	void intv(machine_config &config);
 	void intv2_mem(address_map &map);
 	void intv_mem(address_map &map);
 	void intvecs_mem(address_map &map);
 	void intvkbd2_mem(address_map &map);
 	void intvkbd_mem(address_map &map);
 	void intvoice_mem(address_map &map);
-protected:
+
 	int m_is_keybd;
 
 	optional_device<cpu_device> m_keyboard;

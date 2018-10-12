@@ -50,7 +50,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
-		m_v9958(*this, "v9958"),
 		m_nichisnd(*this, "nichisnd"),
 		m_key(*this, "KEY.%u", 0),
 		m_region_maincpu(*this, "maincpu")
@@ -58,7 +57,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
-	required_device<v9958_device> m_v9958;
 	required_device<nichisnd_device> m_nichisnd;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
@@ -74,28 +72,28 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 	#endif
 
-	DECLARE_DRIVER_INIT(csplayh1);
+	void init_csplayh1();
 
-	DECLARE_DRIVER_INIT(aimode);
-	DECLARE_DRIVER_INIT(bikiniko);
-	DECLARE_DRIVER_INIT(csplayh5);
-	DECLARE_DRIVER_INIT(csplayh6);
-	DECLARE_DRIVER_INIT(csplayh7);
-	DECLARE_DRIVER_INIT(fuudol);
-	DECLARE_DRIVER_INIT(junai);
-	DECLARE_DRIVER_INIT(junai2);
-	DECLARE_DRIVER_INIT(konhaji);
-	DECLARE_DRIVER_INIT(mjgalpri);
-	DECLARE_DRIVER_INIT(mjmania);
-	DECLARE_DRIVER_INIT(mogitate);
-	DECLARE_DRIVER_INIT(nichisel);
-	DECLARE_DRIVER_INIT(nuretemi);
-	DECLARE_DRIVER_INIT(pokoachu);
-	DECLARE_DRIVER_INIT(renaimj);
-	DECLARE_DRIVER_INIT(sengomjk);
-	DECLARE_DRIVER_INIT(thenanpa);
-	DECLARE_DRIVER_INIT(torarech);
-	DECLARE_DRIVER_INIT(tsuwaku);
+	void init_aimode();
+	void init_bikiniko();
+	void init_csplayh5();
+	void init_csplayh6();
+	void init_csplayh7();
+	void init_fuudol();
+	void init_junai();
+	void init_junai2();
+	void init_konhaji();
+	void init_mjgalpri();
+	void init_mjmania();
+	void init_mogitate();
+	void init_nichisel();
+	void init_nuretemi();
+	void init_pokoachu();
+	void init_renaimj();
+	void init_sengomjk();
+	void init_thenanpa();
+	void init_torarech();
+	void init_tsuwaku();
 
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
@@ -130,21 +128,23 @@ WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
 	m_mux_data = (~data & 0x1f);
 }
 
-ADDRESS_MAP_START(csplayh5_state::csplayh5_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void csplayh5_state::csplayh5_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_DEVWRITE8("nichisnd", nichisnd_device,sound_host_command_w,0xff00)
-	AM_RANGE(0x200200, 0x200201) AM_READWRITE(csplayh5_mux_r,csplayh5_mux_w)
-	AM_RANGE(0x200400, 0x200401) AM_READ_PORT("SYSTEM")
+	map(0x200000, 0x200001).portr("DSW");
+	map(0x200000, 0x200000).w(m_nichisnd, FUNC(nichisnd_device::sound_host_command_w));
+	map(0x200200, 0x200201).rw(FUNC(csplayh5_state::csplayh5_mux_r), FUNC(csplayh5_state::csplayh5_mux_w));
+	map(0x200400, 0x200401).portr("SYSTEM");
 
-	AM_RANGE(0x200600, 0x200607) AM_DEVREADWRITE8("v9958", v9958_device, read, write, 0x00ff)
+	map(0x200600, 0x200607).rw("v9958", FUNC(v9958_device::read), FUNC(v9958_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("blit_gfx",0) // GFX ROM routes here
+	map(0x800000, 0xbfffff).rom().region("blit_gfx", 0); // GFX ROM routes here
 
-	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x380000) // work RAM
+	map(0xc00000, 0xc7ffff).ram().share("nvram").mirror(0x380000); // work RAM
 
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
+}
 
 #if USE_H8
 READ16_MEMBER(csplayh5_state::test_r)
@@ -152,23 +152,25 @@ READ16_MEMBER(csplayh5_state::test_r)
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(csplayh5_state::csplayh5_sub_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+void csplayh5_state::csplayh5_sub_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
 
-	AM_RANGE(0x02000a, 0x02000b) AM_READ(test_r)
-//  AM_RANGE(0x020008, 0x02000f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0)
+	map(0x02000a, 0x02000b).r(FUNC(csplayh5_state::test_r));
+//  map(0x020008, 0x02000f).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
 
-	AM_RANGE(0x040018, 0x040019) AM_READ(test_r)
-	AM_RANGE(0x040028, 0x04002f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0) // correct?
-	AM_RANGE(0x040036, 0x040037) AM_READ(test_r)
+	map(0x040018, 0x040019).r(FUNC(csplayh5_state::test_r));
+	map(0x040028, 0x04002f).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w)); // correct?
+	map(0x040036, 0x040037).r(FUNC(csplayh5_state::test_r));
 
-	AM_RANGE(0x078000, 0x07ffff) AM_MIRROR(0xf80000) AM_RAM //AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x078000, 0x07ffff).mirror(0xf80000).ram(); //.share("nvram");
+}
 
 
-ADDRESS_MAP_START(csplayh5_state::csplayh5_sub_io_map)
-	AM_RANGE(0x0a, 0x0b) AM_READ(test_r)
-ADDRESS_MAP_END
+void csplayh5_state::csplayh5_sub_io_map(address_map &map)
+{
+	map(0x0a, 0x0b).r(FUNC(csplayh5_state::test_r));
+}
 #endif
 
 
@@ -359,31 +361,33 @@ WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
-	MCFG_CPU_PROGRAM_MAP(csplayh5_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
+	MCFG_DEVICE_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
+	MCFG_DEVICE_PROGRAM_MAP(csplayh5_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(csplayh5_state, tmp68301_parallel_port_w))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, csplayh5_state, tmp68301_parallel_port_w))
 
 #if USE_H8
-	MCFG_CPU_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
-	MCFG_CPU_PROGRAM_MAP(csplayh5_sub_map)
-	MCFG_CPU_IO_MAP(csplayh5_sub_io_map)
+	MCFG_DEVICE_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(csplayh5_sub_map)
+	MCFG_DEVICE_IO_MAP(csplayh5_sub_io_map)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true) // dvd
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(csplayh5_state, ide_irq))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true)); // dvd
+	ide.irq_handler().set(FUNC(csplayh5_state::ide_irq));
 #endif
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(csplayh5_state, csplayh5_vdp0_interrupt))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
+	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272))); // typical 9958 clock, not verified
+	v9958.set_screen_ntsc("screen");
+	v9958.set_vram_size(0x20000);
+	v9958.int_cb().set(FUNC(csplayh5_state::csplayh5_vdp0_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	MCFG_NICHISND_ADD("nichisnd")
@@ -413,28 +417,28 @@ void csplayh5_state::general_init(int patchaddress, int patchvalue)
 
 }
 
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh1)  { general_init(0x6880/2, 0x6020); }
+void csplayh5_state::init_csplayh1()  { general_init(0x6880/2, 0x6020); }
 
-DRIVER_INIT_MEMBER(csplayh5_state,aimode)    { general_init(0x9cda/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,bikiniko)  { general_init(0x585c/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh5)  { general_init(0x4cb4/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh6)  { general_init(0x5976/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh7)  { general_init(0x7a20/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(0x9166/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,junai)     { general_init(0x679c/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,junai2)    { general_init(0x6588/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,konhaji)   { general_init(0x9200/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,mjgalpri)  { general_init(0x5396/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,mjmania)   { general_init(0x6b96/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,mogitate)  { general_init(0x6ab4/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,nichisel)  { general_init(0x9cd6/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,nuretemi)  { general_init(0x8de2/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,pokoachu)  { general_init(0x7b1e/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,renaimj)   { general_init(0x568c/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,sengomjk)  { general_init(0x5226/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,torarech)  { general_init(0x9384/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,tsuwaku)   { general_init(0x856e/2, 0x6018); }
+void csplayh5_state::init_aimode()    { general_init(0x9cda/2, 0x6018); }
+void csplayh5_state::init_bikiniko()  { general_init(0x585c/2, 0x6018); }
+void csplayh5_state::init_csplayh5()  { general_init(0x4cb4/2, 0x6018); }
+void csplayh5_state::init_csplayh6()  { general_init(0x5976/2, 0x6018); }
+void csplayh5_state::init_csplayh7()  { general_init(0x7a20/2, 0x6018); }
+void csplayh5_state::init_fuudol()    { general_init(0x9166/2, 0x6018); }
+void csplayh5_state::init_junai()     { general_init(0x679c/2, 0x6018); }
+void csplayh5_state::init_junai2()    { general_init(0x6588/2, 0x6018); }
+void csplayh5_state::init_konhaji()   { general_init(0x9200/2, 0x6018); }
+void csplayh5_state::init_mjgalpri()  { general_init(0x5396/2, 0x6018); }
+void csplayh5_state::init_mjmania()   { general_init(0x6b96/2, 0x6018); }
+void csplayh5_state::init_mogitate()  { general_init(0x6ab4/2, 0x6018); }
+void csplayh5_state::init_nichisel()  { general_init(0x9cd6/2, 0x6018); }
+void csplayh5_state::init_nuretemi()  { general_init(0x8de2/2, 0x6018); }
+void csplayh5_state::init_pokoachu()  { general_init(0x7b1e/2, 0x6018); }
+void csplayh5_state::init_renaimj()   { general_init(0x568c/2, 0x6018); }
+void csplayh5_state::init_sengomjk()  { general_init(0x5226/2, 0x6018); }
+void csplayh5_state::init_thenanpa()  { general_init(0x69ec/2, 0x6018); }
+void csplayh5_state::init_torarech()  { general_init(0x9384/2, 0x6018); }
+void csplayh5_state::init_tsuwaku()   { general_init(0x856e/2, 0x6018); }
 
 
 /*
@@ -442,7 +446,7 @@ DRIVER_INIT_MEMBER(csplayh5_state,tsuwaku)   { general_init(0x856e/2, 0x6018); }
  */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define DVD_BIOS \
 	ROM_REGION( 0x20000, "subcpu", 0 ) \
@@ -917,35 +921,35 @@ ROM_END
 ***************************************************************************/
 
 // 1995
-GAME( 1995, csplayh1,   0,   csplayh5,  csplayh5, csplayh5_state,  csplayh1,                ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
+		 GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
-GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,                       ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
+		 GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
 
 // 1998
-/* 01 */ GAME( 1998, mjgalpri,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mjgalpri,  ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
-/* 02 */ GAME( 1998, sengomjk,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  sengomjk,  ROT0, "Nichibutsu/Just&Just", "Sengoku Mahjong Kurenai Otome-tai (Japan)", MACHINE_NOT_WORKING )
-/* 03 */ GAME( 1998, junai,     nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai,     ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
-/* 04 */ GAME( 1998, csplayh5,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh5,  ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
-/* 05 */ GAME( 1998, junai2,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  junai2,    ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
-/* 06 */ GAME( 1998, mogitate,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mogitate,  ROT0, "Nichibutsu/Just&Just/NVS/Astro System/AV Japan", "Mahjong Mogitate (Japan)", MACHINE_NOT_WORKING )
+/* 01 */ GAME( 1998, mjgalpri, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjgalpri, ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
+/* 02 */ GAME( 1998, sengomjk, nichidvd, csplayh5, csplayh5, csplayh5_state, init_sengomjk, ROT0, "Nichibutsu/Just&Just", "Sengoku Mahjong Kurenai Otome-tai (Japan)", MACHINE_NOT_WORKING )
+/* 03 */ GAME( 1998, junai,    nichidvd, csplayh5, csplayh5, csplayh5_state, init_junai,    ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
+/* 04 */ GAME( 1998, csplayh5, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh5, ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
+/* 05 */ GAME( 1998, junai2,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_junai2,   ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
+/* 06 */ GAME( 1998, mogitate, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mogitate, ROT0, "Nichibutsu/Just&Just/NVS/Astro System/AV Japan", "Mahjong Mogitate (Japan)", MACHINE_NOT_WORKING )
 
 // 1999
-/* 07 */ GAME( 1999, mjmania,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  mjmania,   ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
-/* 08 */ GAME( 1999, renaimj,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  renaimj,   ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
-/* 09 */ GAME( 1999, bikiniko,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  bikiniko,  ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
-/* 10 */ GAME( 1999, csplayh6,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh6,  ROT0, "Nichibutsu/eic",   "Mahjong Hanafuda Cosplay Tengoku 6 - Junai-hen (Japan)", MACHINE_NOT_WORKING )
-/* 11 */ GAME( 1999, thenanpa,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,  ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
-/* 12 */ GAME( 1999, pokoachu,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  pokoachu,  ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
-/* 13 */ GAME( 1999, csplayh7,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  csplayh7,  ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Ranking (Japan)", MACHINE_NOT_WORKING )
-/* 14 */ GAME( 1999, aimode,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  aimode,    ROT0, "Nichibutsu/eic", "Ai-mode - Pet Shiiku (Japan)", MACHINE_NOT_WORKING )
+/* 07 */ GAME( 1999, mjmania,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjmania,  ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
+/* 08 */ GAME( 1999, renaimj,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_renaimj,  ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
+/* 09 */ GAME( 1999, bikiniko, nichidvd, csplayh5, csplayh5, csplayh5_state, init_bikiniko, ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
+/* 10 */ GAME( 1999, csplayh6, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh6, ROT0, "Nichibutsu/eic",   "Mahjong Hanafuda Cosplay Tengoku 6 - Junai-hen (Japan)", MACHINE_NOT_WORKING )
+/* 11 */ GAME( 1999, thenanpa, nichidvd, csplayh5, csplayh5, csplayh5_state, init_thenanpa, ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
+/* 12 */ GAME( 1999, pokoachu, nichidvd, csplayh5, csplayh5, csplayh5_state, init_pokoachu, ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
+/* 13 */ GAME( 1999, csplayh7, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh7, ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Ranking (Japan)", MACHINE_NOT_WORKING )
+/* 14 */ GAME( 1999, aimode,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_aimode,   ROT0, "Nichibutsu/eic", "Ai-mode - Pet Shiiku (Japan)", MACHINE_NOT_WORKING )
 
 // 2000
-/* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,    ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
-/* 16 */ GAME( 2000, nuretemi,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nuretemi,  ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
-/* 17 */ GAME( 2000, tsuwaku,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  tsuwaku,   ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
-/* 18 */ GAME( 2000, torarech,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
-/* sp */ GAME( 2000, nichisel,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nichisel,  ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
+/* 15 */ GAME( 2000, fuudol,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_fuudol,   ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
+/* 16 */ GAME( 2000, nuretemi, nichidvd, csplayh5, csplayh5, csplayh5_state, init_nuretemi, ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
+/* 17 */ GAME( 2000, tsuwaku,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_tsuwaku,  ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
+/* 18 */ GAME( 2000, torarech, nichidvd, csplayh5, csplayh5, csplayh5_state, init_torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
+/* sp */ GAME( 2000, nichisel, nichidvd, csplayh5, csplayh5, csplayh5_state, init_nichisel, ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001
-/* 19 */ GAME( 2001, konhaji,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  konhaji,   ROT0, "Nichibutsu/Love Factory", "Konnano Hajimete! (Japan)", MACHINE_NOT_WORKING )
+/* 19 */ GAME( 2001, konhaji,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_konhaji,  ROT0, "Nichibutsu/Love Factory", "Konnano Hajimete! (Japan)", MACHINE_NOT_WORKING )
 /* 20 */ // Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic

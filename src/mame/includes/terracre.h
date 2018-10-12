@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano
 
+#include "machine/nb1412m2.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class terracre_state : public driver_device
 {
@@ -17,6 +19,14 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram") { }
 
+	void amazon_base(machine_config &config);
+	void ym2203(machine_config &config);
+	void ym3526(machine_config &config);
+
+protected:
+	void amazon_base_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -26,18 +36,12 @@ public:
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
 
-	// move to 1412m2
-	uint8_t m_mAmazonProtCmd;
-	uint8_t m_mAmazonProtReg[6];
-
 	uint16_t m_xscroll;
 	uint16_t m_yscroll;
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
 	DECLARE_WRITE16_MEMBER(amazon_sound_w);
 	DECLARE_READ8_MEMBER(soundlatch_clear_r);
-	DECLARE_READ16_MEMBER(amazon_protection_r);
-	DECLARE_WRITE16_MEMBER(amazon_protection_w);
 	DECLARE_WRITE16_MEMBER(amazon_background_w);
 	DECLARE_WRITE16_MEMBER(amazon_foreground_w);
 	DECLARE_WRITE16_MEMBER(amazon_flipscreen_w);
@@ -47,17 +51,25 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(terracre);
-	DECLARE_MACHINE_START(amazon);
 	uint32_t screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void amazon_base(machine_config &config);
-	void amazon_1412m2(machine_config &config);
-	void ym2203(machine_config &config);
-	void ym3526(machine_config &config);
-	void amazon_1412m2_map(address_map &map);
-	void amazon_base_map(address_map &map);
+
 	void sound_2203_io_map(address_map &map);
 	void sound_3526_io_map(address_map &map);
 	void sound_map(address_map &map);
 	void terracre_map(address_map &map);
+};
+
+class amazon_state : public terracre_state
+{
+public:
+	amazon_state(const machine_config &mconfig, device_type type, const char *tag)
+		: terracre_state(mconfig, type, tag),
+		m_prot(*this, "prot_chip")
+	{}
+
+	void amazon_1412m2(machine_config &config);
+	void amazon_1412m2_map(address_map &map);
+private:
+	required_device<nb1412m2_device> m_prot;
 };

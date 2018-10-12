@@ -6,6 +6,7 @@
 #include "machine/gen_latch.h"
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
+#include "emupal.h"
 
 class legionna_state : public driver_device, protected seibu_sound_common
 {
@@ -13,6 +14,7 @@ public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram"),
+			m_swappal(*this, "swappal"),
 			m_layer_disable(0),
 			m_back_gfx_bank(0),
 			m_fore_gfx_bank(0),
@@ -29,12 +31,30 @@ public:
 		memset(scrollvals, 0, sizeof(uint16_t)*6);
 	}
 
+	void cupsocs(machine_config &config);
+	void heatbrl(machine_config &config);
+	void cupsoc(machine_config &config);
+	void grainbow(machine_config &config);
+	void legionna(machine_config &config);
+	void godzilla(machine_config &config);
+	void denjinmk(machine_config &config);
+
+	void init_legiongfx();
+	void init_godzilla();
+	void init_cupsoc_debug();
+	void init_cupsoc();
+	void init_cupsocs();
+	void init_olysoc92();
+
+private:
 	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_swappal;
 	std::unique_ptr<uint16_t[]> m_back_data;
 	std::unique_ptr<uint16_t[]> m_fore_data;
 	std::unique_ptr<uint16_t[]> m_mid_data;
 	std::unique_ptr<uint16_t[]> m_textram;
 	std::unique_ptr<uint16_t[]> m_scrollram16;
+	std::unique_ptr<uint16_t[]> m_paletteram;
 	uint16_t m_layer_disable;
 	std::unique_ptr<uint16_t[]> m_layer_config;
 	int m_sprite_xoffs;
@@ -60,16 +80,13 @@ public:
 	DECLARE_WRITE16_MEMBER(legionna_midground_w);
 	DECLARE_WRITE16_MEMBER(legionna_foreground_w);
 	DECLARE_WRITE16_MEMBER(legionna_text_w);
-	DECLARE_READ8_MEMBER(denjinmk_sound_comms_r);
+	u8 denjinmk_sound_comms_r(offs_t offset);
+	DECLARE_WRITE8_MEMBER(godzilla_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(denjinmk_setgfxbank);
 	DECLARE_WRITE16_MEMBER(heatbrl_setgfxbank);
 	DECLARE_WRITE16_MEMBER(grainbow_layer_config_w);
+	DECLARE_WRITE16_MEMBER(palette_swap_w);
 
-	DECLARE_DRIVER_INIT(legiongfx);
-	DECLARE_DRIVER_INIT(cupsoc_debug);
-	DECLARE_DRIVER_INIT(cupsoc);
-	DECLARE_DRIVER_INIT(cupsocs);
-	DECLARE_DRIVER_INIT(olysoc92);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info_denji);
@@ -99,19 +116,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<seibu_crtc_device> m_crtc;
 	optional_device<raiden2cop_device> m_raiden2cop;
-	void cupsocs(machine_config &config);
-	void heatbrl(machine_config &config);
-	void cupsoc(machine_config &config);
-	void grainbow(machine_config &config);
-	void legionna(machine_config &config);
-	void godzilla(machine_config &config);
-	void denjinmk(machine_config &config);
-	void cupsoc_mem(address_map &map);
-	void cupsocs_mem(address_map &map);
+	void cupsoc_map(address_map &map);
+	void cupsocs_map(address_map &map);
 	void denjinmk_map(address_map &map);
 	void godzilla_map(address_map &map);
 	void grainbow_map(address_map &map);
 	void heatbrl_map(address_map &map);
-	void legionna_cop_mem(address_map &map);
+	void legionna_cop_map(address_map &map);
 	void legionna_map(address_map &map);
+	void godzilla_sound_io_map(address_map &map);
 };

@@ -35,13 +35,15 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void unianapc(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void unianapc(machine_config &config);
 	void unianapc_map(address_map &map);
 };
 
@@ -54,8 +56,9 @@ uint32_t unianapc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(unianapc_state::unianapc_map)
-ADDRESS_MAP_END
+void unianapc_state::unianapc_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( unianapc )
 INPUT_PORTS_END
@@ -72,8 +75,8 @@ void unianapc_state::machine_reset()
 MACHINE_CONFIG_START(unianapc_state::unianapc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 1.70 GHz
-	MCFG_CPU_PROGRAM_MAP(unianapc_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 1.70 GHz
+	MCFG_DEVICE_PROGRAM_MAP(unianapc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -98,7 +101,7 @@ ROM_START( dhunting )
 	ROM_LOAD( "videobios", 0x000000, 0x00d000, NO_DUMP )
 
 	ROM_REGION( 0x2000, "gunio", 0 )   // IO card (VGA version)
-	ROM_LOAD( "U2.AT89C52", 0x0000, 0x2000, CRC(afb0e1c7) SHA1(2f621be62f935eafa9ff3c14de2096119132a973) )
+	ROM_LOAD( "u2.at89c52", 0x0000, 0x2000, CRC(afb0e1c7) SHA1(2f621be62f935eafa9ff3c14de2096119132a973) )
 
 	DISK_REGION( "ide:0:hdd:image" ) // DM Storage DM2560V00 IDE flash storage
 	DISK_IMAGE( "dream hunting", 0, SHA1(3515c0617c52c7e8b7e5dba8de22e363cce00e10) )
@@ -115,5 +118,5 @@ ROM_START( hogwild )
 	DISK_IMAGE( "hog wild", 0, SHA1(f05b7f64830d995db2e2a2f7f95ae0100de5dab1) )
 ROM_END
 
-GAME( 2002, dhunting,  0,   unianapc, unianapc, unianapc_state,  0, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_IS_SKELETON ) // Ver 1007?
-GAME( 2003, hogwild,   0,   unianapc, unianapc, unianapc_state,  0, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_IS_SKELETON ) // Ver.00.26.b?
+GAME( 2002, dhunting,  0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_IS_SKELETON ) // Ver 1007?
+GAME( 2003, hogwild,   0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_IS_SKELETON ) // Ver.00.26.b?

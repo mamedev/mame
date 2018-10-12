@@ -6,9 +6,6 @@
 
 #pragma once
 
-#define MCFG_I82586_IRQ_CB(_out_irq) \
-	devcb = &downcast<i82586_base_device &>(*device).set_out_irq_callback(DEVCB_##_out_irq);
-
 class i82586_base_device :
 	public device_t,
 	public device_memory_interface,
@@ -157,10 +154,10 @@ public:
 
 	static const u32 FCS_RESIDUE = 0xdebb20e3; // the residue after computing the fcs over a complete frame (including fcs)
 
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq.set_callback(std::forward<Object>(cb)); }
+	// callback configuration
+	auto out_irq_cb() { return m_out_irq.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(ca);
-	virtual void recv_cb(u8 *buf, int length) override;
 
 protected:
 	i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth);
@@ -172,6 +169,11 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual space_config_vector memory_space_config() const override;
 
+	// device_network_interface overrides
+	virtual void send_complete_cb(int result) override;
+	virtual int recv_start_cb(u8 *buf, int length) override;
+	virtual void recv_complete_cb(int result) override;
+
 	// setup and scb
 	virtual void initialise() = 0;
 	virtual void process_scb();
@@ -179,6 +181,7 @@ protected:
 
 	// command unit
 	virtual void cu_execute();
+	virtual void cu_complete(const u16 status);
 	virtual bool cu_iasetup() = 0;
 	virtual bool cu_configure() = 0;
 	virtual bool cu_mcsetup() = 0;
@@ -188,7 +191,8 @@ protected:
 
 	// receive unit
 	virtual bool address_filter(u8 *mac);
-	virtual void ru_execute(u8 *buf, int length) = 0;
+	virtual u16 ru_execute(u8 *buf, int length) = 0;
+	virtual void ru_complete(const u16 status) = 0;
 
 	// helpers
 	void set_irq(bool irq);
@@ -215,8 +219,8 @@ protected:
 	bool m_fr;          // frame received
 	bool m_cna;         // command unit became inactive
 	bool m_rnr;         // receive unit became not ready
-	bool m_irq_state;
 	bool m_initialised;
+	int m_irq_assert;   // configurable interrupt polarity
 
 	// receive/command unit state
 	cu_state m_cu_state; // command unit state
@@ -281,7 +285,8 @@ protected:
 
 	// receive unit
 	virtual bool address_filter(u8 *mac) override;
-	virtual void ru_execute(u8 *buf, int length) override;
+	virtual u16 ru_execute(u8 *buf, int length) override;
+	virtual void ru_complete(const u16 status) override;
 
 	// helpers
 	virtual u32 address(u32 base, int offset, int address) override { return m_scb_base + m_space->read_word(base + offset); }
@@ -293,6 +298,7 @@ private:
 	virtual void cfg_set(int offset, u8 data) override { m_cfg_bytes[offset] = data; }
 
 	u8 m_cfg_bytes[CFG_SIZE];
+	u16 m_rbd_offset; // next available receive buffer descriptor
 };
 
 class i82596_device : public i82586_base_device
@@ -338,7 +344,8 @@ protected:
 
 	// receive unit
 	virtual bool address_filter(u8 *mac) override;
-	virtual void ru_execute(u8 *buf, int length) override;
+	virtual u16 ru_execute(u8 *buf, int length) override;
+	virtual void ru_complete(const u16 status) override;
 
 	// helpers
 	virtual u32 address(u32 base, int offset, int address) override { return (mode() == MODE_LINEAR) ? m_space->read_dword(base + address) : m_scb_base + m_space->read_word(base + offset); }
@@ -359,6 +366,7 @@ private:
 	u8 m_cfg_bytes[CFG_SIZE];
 	u8 m_sysbus;
 
+	u32 m_rbd_address;  // next available receive buffer descriptor
 	u64 m_mac_multi_ia; // multi-ia address hash table
 };
 

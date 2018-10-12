@@ -72,6 +72,15 @@ class ws_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+		: ws_cart_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ws_cart_slot_device();
 
@@ -127,9 +136,5 @@ DECLARE_DEVICE_TYPE(WS_CART_SLOT, ws_cart_slot_device)
  ***************************************************************************/
 
 #define WSSLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_WSWAN_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, WS_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #endif // MAME_BUS_WSWAN_SLOT_H

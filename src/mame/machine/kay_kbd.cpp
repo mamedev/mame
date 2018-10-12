@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "machine/kay_kbd.h"
 
+#include "cpu/mcs48/mcs48.h"
+#include "speaker.h"
+
 #define LOG_GENERAL (1U << 0)
 #define LOG_TXD     (1U << 1)
 
@@ -107,8 +110,6 @@ xxx0 M000   set keyclick mute to M
 The Kaypro II was sold with a different keyboard using an 8751 (MCS-51)
 MCU, but we don't have a dump for it.
 */
-#include "cpu/mcs48/mcs48.h"
-#include "speaker.h"
 
 
 DEFINE_DEVICE_TYPE(KAYPRO_10_KEYBOARD, kaypro_10_keyboard_device, "kaypro10kbd", "Kaypro 10 Keyboard")
@@ -228,7 +229,7 @@ INPUT_PORTS_START(kaypro_keyboard_typewriter)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)          PORT_CHAR('g')  PORT_CHAR('G')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)          PORT_CHAR('c')  PORT_CHAR('C')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Pad ENTER")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)                                       PORT_NAME("Pad ,")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD)) PORT_NAME("Pad ,")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)  PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) PORT_NAME("Pad -")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // 0xf9
 
@@ -350,16 +351,16 @@ tiny_rom_entry const *kaypro_10_keyboard_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(kaypro_10_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", I8049, 6_MHz_XTAL)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(kaypro_10_keyboard_device, p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(kaypro_10_keyboard_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(kaypro_10_keyboard_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(kaypro_10_keyboard_device, t1_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(kaypro_10_keyboard_device, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(kaypro_10_keyboard_device, bus_w))
+	MCFG_DEVICE_ADD("mcu", I8049, 6_MHz_XTAL)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, kaypro_10_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, kaypro_10_keyboard_device, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, kaypro_10_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, kaypro_10_keyboard_device, t1_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, kaypro_10_keyboard_device, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, kaypro_10_keyboard_device, bus_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("keyboard")
-	MCFG_SOUND_ADD("bell", SPEAKER_SOUND, 0)
+	SPEAKER(config, "keyboard").front_center();
+	MCFG_DEVICE_ADD("bell", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "keyboard", 0.25)
 MACHINE_CONFIG_END
 
@@ -389,7 +390,7 @@ READ8_MEMBER(kaypro_10_keyboard_device::p2_r)
 
 WRITE8_MEMBER(kaypro_10_keyboard_device::p2_w)
 {
-	if ((VERBOSE & LOG_TXD) && (0x0014U >= static_cast<device_state_interface *>(m_mcu)->safe_pc()))
+	if ((VERBOSE & LOG_TXD) && (0x0014U >= m_mcu->pc()))
 	{
 		auto const suppressor(machine().disable_side_effects());
 		address_space &mcu_ram(m_mcu->space(AS_DATA));

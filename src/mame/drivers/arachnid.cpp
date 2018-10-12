@@ -12,6 +12,7 @@
 
     --- Hardware ---
     A 6809 CPU (U3) is clocked by a 556 (U2) circuit with 3 Pin addressing decoding via a 74LS138 (U14)
+    (this information seems incorrect: CPU clock is almost certainly sourced from the VDP's CPUCLK output)
     Program ROM is a 27256 (U15)
     Two 6821 PIAs (U4/U17) are used for I/O
     Video is processed via a TMS9118 (U11) with two TMS4416 (U12/U13) as RAM
@@ -62,7 +63,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
-#include "machine/ram.h"
+#include "machine/nvram.h"
 #include "sound/spkrdev.h"
 #include "video/tms9928a.h"
 #include "speaker.h"
@@ -86,6 +87,9 @@ public:
 			m_speaker(*this, SPEAKER_TAG)
 	{ }
 
+	void arachnid(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u4;
 	required_device<pia6821_device> m_pia_u17;
@@ -109,7 +113,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
 
 	uint8_t read_keyboard(int pa);
-	void arachnid(machine_config &config);
 	void arachnid_map(address_map &map);
 };
 
@@ -121,15 +124,16 @@ public:
     ADDRESS_MAP( arachnid_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(arachnid_state::arachnid_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE(PTM6840_TAG, ptm6840_device, read, write)
-	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE(PIA6821_U4_TAG, pia6821_device, read, write)
-	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE(PIA6821_U17_TAG, pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(TMS9118_TAG, tms9928a_device, vram_write)
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE(TMS9118_TAG, tms9928a_device, register_write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6809_TAG, 0)
-ADDRESS_MAP_END
+void arachnid_state::arachnid_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x2000, 0x2007).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x4004, 0x4007).rw(m_pia_u4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4008, 0x400b).rw(m_pia_u17, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x6000).w(TMS9118_TAG, FUNC(tms9928a_device::vram_w));
+	map(0x6002, 0x6002).w(TMS9118_TAG, FUNC(tms9928a_device::register_w));
+	map(0x8000, 0xffff).rom().region(M6809_TAG, 0);
+}
 
 /***************************************************************************
     INPUT PORTS
@@ -421,41 +425,43 @@ void arachnid_state::machine_start()
 
 MACHINE_CONFIG_START(arachnid_state::arachnid)
 	// basic machine hardware
-	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(arachnid_map)
+	MCFG_DEVICE_ADD(M6809_TAG, MC6809, 10.738635_MHz_XTAL / 3)
+	MCFG_DEVICE_PROGRAM_MAP(arachnid_map)
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02 (or DS1220Y)
 
 	// devices
-	MCFG_DEVICE_ADD(PIA6821_U4_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(arachnid_state, pia_u4_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(arachnid_state, pia_u4_pb_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(arachnid_state, pia_u4_pca_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(arachnid_state, pia_u4_pcb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(arachnid_state, pia_u4_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(arachnid_state, pia_u4_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(arachnid_state, pia_u4_pca_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(arachnid_state, pia_u4_pcb_w))
+	PIA6821(config, m_pia_u4, 0);
+	m_pia_u4->readpa_handler().set(FUNC(arachnid_state::pia_u4_pa_r));
+	m_pia_u4->readpb_handler().set(FUNC(arachnid_state::pia_u4_pb_r));
+	m_pia_u4->readca1_handler().set(FUNC(arachnid_state::pia_u4_pca_r));
+	m_pia_u4->readcb1_handler().set(FUNC(arachnid_state::pia_u4_pcb_r));
+	m_pia_u4->writepa_handler().set(FUNC(arachnid_state::pia_u4_pa_w));
+	m_pia_u4->writepb_handler().set(FUNC(arachnid_state::pia_u4_pb_w));
+	m_pia_u4->ca2_handler().set(FUNC(arachnid_state::pia_u4_pca_w));
+	m_pia_u4->cb2_handler().set(FUNC(arachnid_state::pia_u4_pcb_w));
 
-	MCFG_DEVICE_ADD(PIA6821_U17_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(arachnid_state, pia_u17_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(arachnid_state, pia_u17_pca_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(arachnid_state, pia_u17_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(arachnid_state, pia_u17_pcb_w))
+	PIA6821(config, m_pia_u17, 0);
+	m_pia_u17->readpa_handler().set(FUNC(arachnid_state::pia_u17_pa_r));
+	m_pia_u17->readca1_handler().set(FUNC(arachnid_state::pia_u17_pca_r));
+	m_pia_u17->writepb_handler().set(FUNC(arachnid_state::pia_u17_pb_w));
+	m_pia_u17->cb2_handler().set(FUNC(arachnid_state::pia_u17_pcb_w));
 
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9118_TAG, TMS9118, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6809_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9118_TAG, tms9118_device, screen_update )
+	tms9118_device &vdp(TMS9118(config, TMS9118_TAG, 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, XTAL(8'000'000) / 4)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(arachnid_state, ptm_o1_callback))
+	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 10.738635_MHz_XTAL / 3 / 4));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set(FUNC(arachnid_state::ptm_o1_callback));
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -471,5 +477,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT     MACHINE   INPUT     STATE              INIT         COMPANY             FULLNAME */
-GAME( 1990, arac6000,   0,         arachnid, arachnid, arachnid_state,    0,    ROT0,  "Arachnid",         "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME */
+GAME( 1990, arac6000, 0,      arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

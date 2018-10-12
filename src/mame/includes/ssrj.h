@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
+
+#include "emupal.h"
+
 class ssrj_state : public driver_device
 {
 public:
@@ -14,6 +17,9 @@ public:
 		m_vram4(*this, "vram4"),
 		m_scrollram(*this, "scrollram") { }
 
+	void ssrj(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -47,6 +53,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void ssrj(machine_config &config);
+
 	void ssrj_map(address_map &map);
 };

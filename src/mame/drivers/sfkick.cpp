@@ -167,7 +167,6 @@ class sfkick_state : public driver_device
 public:
 	sfkick_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_v9938(*this, "v9938"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_region_bios(*this, "bios"),
@@ -189,10 +188,11 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	DECLARE_DRIVER_INIT(sfkick);
 	void sfkick(machine_config &config);
 
-protected:
+	void init_sfkick();
+
+private:
 	DECLARE_WRITE8_MEMBER(page0_w);
 	DECLARE_WRITE8_MEMBER(page1_w);
 	DECLARE_WRITE8_MEMBER(page2_w);
@@ -209,13 +209,11 @@ protected:
 	void sfkick_sound_io_map(address_map &map);
 	void sfkick_sound_map(address_map &map);
 
-private:
 	std::unique_ptr<uint8_t[]> m_main_mem;
 	int m_bank_cfg;
 	int m_bank[8];
 	int m_input_mux;
 
-	required_device<v9938_device> m_v9938;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_memory_region m_region_bios;
@@ -465,40 +463,44 @@ WRITE8_MEMBER(sfkick_state::page3_w)
 
 
 
-ADDRESS_MAP_START(sfkick_state::sfkick_map)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROMBANK("bank1")
-	AM_RANGE( 0x2000, 0x3fff) AM_ROMBANK("bank2")
-	AM_RANGE( 0x4000, 0x5fff) AM_ROMBANK("bank3")
-	AM_RANGE( 0x6000, 0x7fff) AM_ROMBANK("bank4")
-	AM_RANGE( 0x8000, 0x9fff) AM_ROMBANK("bank5")
-	AM_RANGE( 0xa000, 0xbfff) AM_ROMBANK("bank6")
-	AM_RANGE( 0xc000, 0xdfff) AM_ROMBANK("bank7")
-	AM_RANGE( 0xe000, 0xffff) AM_ROMBANK("bank8")
-	AM_RANGE( 0x0000, 0x3fff) AM_WRITE(page0_w )
-	AM_RANGE( 0x4000, 0x7fff) AM_WRITE(page1_w )
-	AM_RANGE( 0x8000, 0xbfff) AM_WRITE(page2_w )
-	AM_RANGE( 0xc000, 0xffff) AM_WRITE(page3_w )
-ADDRESS_MAP_END
+void sfkick_state::sfkick_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bank1");
+	map(0x2000, 0x3fff).bankr("bank2");
+	map(0x4000, 0x5fff).bankr("bank3");
+	map(0x6000, 0x7fff).bankr("bank4");
+	map(0x8000, 0x9fff).bankr("bank5");
+	map(0xa000, 0xbfff).bankr("bank6");
+	map(0xc000, 0xdfff).bankr("bank7");
+	map(0xe000, 0xffff).bankr("bank8");
+	map(0x0000, 0x3fff).w(FUNC(sfkick_state::page0_w));
+	map(0x4000, 0x7fff).w(FUNC(sfkick_state::page1_w));
+	map(0x8000, 0xbfff).w(FUNC(sfkick_state::page2_w));
+	map(0xc000, 0xffff).w(FUNC(sfkick_state::page3_w));
+}
 
-ADDRESS_MAP_START(sfkick_state::sfkick_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0xa0, 0xa7) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE( "v9938", v9938_device, read, write)
-	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0xb4, 0xb5) AM_RAM /* loopback ? req by sfkicka (MSX Bios leftover)*/
-ADDRESS_MAP_END
+void sfkick_state::sfkick_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xa0, 0xa7).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x98, 0x9b).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb4, 0xb5).ram(); /* loopback ? req by sfkicka (MSX Bios leftover)*/
+}
 
-ADDRESS_MAP_START(sfkick_state::sfkick_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void sfkick_state::sfkick_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+}
 
-ADDRESS_MAP_START(sfkick_state::sfkick_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-ADDRESS_MAP_END
+void sfkick_state::sfkick_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x04, 0x05).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 WRITE8_MEMBER(sfkick_state::ppi_port_c_w)
 {
@@ -591,31 +593,33 @@ WRITE_LINE_MEMBER(sfkick_state::irqhandler)
 
 MACHINE_CONFIG_START(sfkick_state::sfkick)
 
-	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(sfkick_map)
-	MCFG_CPU_IO_MAP(sfkick_io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(sfkick_map)
+	MCFG_DEVICE_IO_MAP(sfkick_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_CPU_ADD("soundcpu",Z80,MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(sfkick_sound_map)
-	MCFG_CPU_IO_MAP(sfkick_sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu",Z80,MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(sfkick_sound_map)
+	MCFG_DEVICE_IO_MAP(sfkick_sound_io_map)
 
-	MCFG_V9938_ADD("v9938", "screen", 0x80000, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
+	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(0x80000);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(sfkick_state, ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(sfkick_state, ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(sfkick_state, ppi_port_c_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(sfkick_state::ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(sfkick_state::ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(sfkick_state::ppi_port_c_w));
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/6)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sfkick_state, irqhandler))
+	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/6)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, sfkick_state, irqhandler))
 
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
@@ -624,9 +628,9 @@ MACHINE_CONFIG_START(sfkick_state::sfkick)
 
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(sfkick_state,sfkick)
+void sfkick_state::init_sfkick()
 {
-	m_main_mem=std::make_unique<uint8_t[]>(0x4000);
+	m_main_mem = std::make_unique<uint8_t[]>(0x4000);
 }
 
 
@@ -701,6 +705,6 @@ ROM_START( spinkick )
 ROM_END
 
 
-GAME( 1988, sfkick,   0,      sfkick, sfkick, sfkick_state, sfkick, ROT90, "Haesung/HJ Corp", "Super Free Kick (set 1)", 0 )
-GAME( 198?, sfkicka,  sfkick, sfkick, sfkick, sfkick_state, sfkick, ROT90, "Haesung", "Super Free Kick (set 2)", 0 )
-GAME( 1988, spinkick, sfkick, sfkick, sfkick, sfkick_state, sfkick, ROT90, "Haesung/Seojin", "Hec's Spinkick", 0 )
+GAME( 1988, sfkick,   0,      sfkick, sfkick, sfkick_state, init_sfkick, ROT90, "Haesung/HJ Corp", "Super Free Kick (set 1)", 0 )
+GAME( 198?, sfkicka,  sfkick, sfkick, sfkick, sfkick_state, init_sfkick, ROT90, "Haesung", "Super Free Kick (set 2)", 0 )
+GAME( 1988, spinkick, sfkick, sfkick, sfkick, sfkick_state, init_sfkick, ROT90, "Haesung/Seojin", "Hec's Spinkick", 0 )

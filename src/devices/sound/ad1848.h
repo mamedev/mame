@@ -9,10 +9,10 @@
 
 
 #define MCFG_AD1848_IRQ_CALLBACK(cb) \
-	devcb = &downcast<ad1848_device &>(*device).set_irq_callback((DEVCB_##cb));
+	downcast<ad1848_device &>(*device).set_irq_callback((DEVCB_##cb));
 
 #define MCFG_AD1848_DRQ_CALLBACK(cb) \
-	devcb = &downcast<ad1848_device &>(*device).set_drq_callback((DEVCB_##cb));
+	downcast<ad1848_device &>(*device).set_drq_callback((DEVCB_##cb));
 
 class ad1848_device : public device_t
 {

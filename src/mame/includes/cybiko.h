@@ -74,15 +74,20 @@ public:
 	optional_device<at45db041_device> m_flash1;
 	required_device<nvram_device>   m_nvram;
 	optional_ioport_array<15> m_input;
-	DECLARE_DRIVER_INIT(cybikoxt);
-	DECLARE_DRIVER_INIT(cybiko);
+	void init_cybikoxt();
+	void init_cybiko();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybiko );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybikoxt );
-	void cybikoxt(machine_config &config);
-	void cybikov2(machine_config &config);
+
+	void cybikov1_base(machine_config &config);
+	void cybikov1_flash(machine_config &config);
+	void cybikov1_debug_serial(machine_config &config);
 	void cybikov1(machine_config &config);
+	void cybikov2(machine_config &config);
+	void cybikoxt(machine_config &config);
+
 	void cybikov1_io(address_map &map);
 	void cybikov1_mem(address_map &map);
 	void cybikov2_io(address_map &map);

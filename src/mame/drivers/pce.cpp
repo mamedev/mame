@@ -61,7 +61,6 @@ Super System Card:
 
 #include "bus/pce/pce_rom.h"
 #include "cpu/h6280/h6280.h"
-#include "sound/c6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
 #include "video/huc6202.h"
@@ -249,49 +248,45 @@ INPUT_PORTS_END
 
 
 
-ADDRESS_MAP_START(pce_state::pce_mem)
-	AM_RANGE( 0x000000, 0x0FFFFF) AM_DEVREADWRITE("cartslot", pce_cart_slot_device, read_cart, write_cart)
-	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
-	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
-	AM_RANGE( 0x1EE000, 0x1EE7FF) AM_DEVREADWRITE("pce_cd", pce_cd_device, bram_r, bram_w)
-	AM_RANGE( 0x1EE800, 0x1EFFFF) AM_NOP
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_SHARE("user_ram")
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( C6280_TAG, c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE( "maincpu", h6280_device, timer_r, timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( mess_pce_joystick_r, mess_pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE( "maincpu", h6280_device, irq_status_r, irq_status_w )
-	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE( pce_cd_intf_r, pce_cd_intf_w )
-ADDRESS_MAP_END
+void pce_state::pce_mem(address_map &map)
+{
+	map(0x000000, 0x0FFFFF).rw(m_cartslot, FUNC(pce_cart_slot_device::read_cart), FUNC(pce_cart_slot_device::write_cart));
+	map(0x100000, 0x10FFFF).ram().share("cd_ram");
+	map(0x110000, 0x1EDFFF).noprw();
+	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
+	map(0x1EE800, 0x1EFFFF).noprw();
+	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000).share("user_ram");
+	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1FF800, 0x1FFBFF).rw(FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
+}
 
-ADDRESS_MAP_START(pce_state::pce_io)
-	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-ADDRESS_MAP_END
+void pce_state::pce_io(address_map &map)
+{
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+}
 
 
-ADDRESS_MAP_START(pce_state::sgx_mem)
-	AM_RANGE( 0x000000, 0x0FFFFF) AM_DEVREADWRITE("cartslot", pce_cart_slot_device, read_cart, write_cart)
-	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
-	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
-	AM_RANGE( 0x1EE000, 0x1EE7FF) AM_DEVREADWRITE("pce_cd", pce_cd_device, bram_r, bram_w)
-	AM_RANGE( 0x1EE800, 0x1EFFFF) AM_NOP
-	AM_RANGE( 0x1F0000, 0x1F7FFF) AM_RAM AM_SHARE("user_ram")
-	AM_RANGE( 0x1FE000, 0x1FE007) AM_DEVREADWRITE( "huc6270_0", huc6270_device, read, write ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1FE008, 0x1FE00F) AM_DEVREADWRITE( "huc6202", huc6202_device, read, write ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1FE010, 0x1FE017) AM_DEVREADWRITE( "huc6270_1", huc6270_device, read, write ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE(C6280_TAG, c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE("maincpu", h6280_device, timer_r, timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(mess_pce_joystick_r, mess_pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
-	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE(pce_cd_intf_r, pce_cd_intf_w )
-ADDRESS_MAP_END
+void pce_state::sgx_mem(address_map &map)
+{
+	map(0x000000, 0x0FFFFF).rw(m_cartslot, FUNC(pce_cart_slot_device::read_cart), FUNC(pce_cart_slot_device::write_cart));
+	map(0x100000, 0x10FFFF).ram().share("cd_ram");
+	map(0x110000, 0x1EDFFF).noprw();
+	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
+	map(0x1EE800, 0x1EFFFF).noprw();
+	map(0x1F0000, 0x1F7FFF).ram().share("user_ram");
+	map(0x1FE000, 0x1FE007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1FE008, 0x1FE00F).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03E0);
+	map(0x1FE010, 0x1FE017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1FF800, 0x1FFBFF).rw(FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
+}
 
 
-ADDRESS_MAP_START(pce_state::sgx_io)
-	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6202", huc6202_device, io_read, io_write )
-ADDRESS_MAP_END
+void pce_state::sgx_io(address_map &map)
+{
+	map(0x00, 0x03).rw("huc6202", FUNC(huc6202_device::io_read), FUNC(huc6202_device::io_write));
+}
 
 
 uint32_t pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -301,19 +296,25 @@ uint32_t pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
-static SLOT_INTERFACE_START(pce_cart)
-	SLOT_INTERFACE_INTERNAL("rom", PCE_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("cdsys3u", PCE_ROM_CDSYS3)
-	SLOT_INTERFACE_INTERNAL("cdsys3j", PCE_ROM_CDSYS3)
-	SLOT_INTERFACE_INTERNAL("populous", PCE_ROM_POPULOUS)
-	SLOT_INTERFACE_INTERNAL("sf2", PCE_ROM_SF2)
-SLOT_INTERFACE_END
+static void pce_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom", PCE_ROM_STD);
+	device.option_add_internal("cdsys3u", PCE_ROM_CDSYS3);
+	device.option_add_internal("cdsys3j", PCE_ROM_CDSYS3);
+	device.option_add_internal("populous", PCE_ROM_POPULOUS);
+	device.option_add_internal("sf2", PCE_ROM_SF2);
+}
 
 MACHINE_CONFIG_START(pce_state::pce_common)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(pce_mem)
-	MCFG_CPU_IO_MAP(pce_io)
+	H6280(config, m_maincpu, MAIN_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::pce_mem);
+	m_maincpu->set_addrmap(AS_IO, &pce_state::pce_io);
+	m_maincpu->port_in_cb().set(FUNC(pce_state::mess_pce_joystick_r));
+	m_maincpu->port_out_cb().set(FUNC(pce_state::mess_pce_joystick_w));
+	m_maincpu->add_route(0, "lspeaker", 1.00);
+	m_maincpu->add_route(1, "rspeaker", 1.00);
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
@@ -323,23 +324,20 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(DEVREAD16("huc6270", huc6270_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(DEVREAD16("huc6270", huc6270_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, hsync_changed))
+	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
+	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6270", huc6270_device, time_until_next_event))
+	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, vsync_changed))
+	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, hsync_changed))
 
 	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
-	MCFG_C6280_CPU("maincpu")
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_PCE_CD_ADD("pce_cd")
 
@@ -363,9 +361,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pce_state::sgx)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(sgx_mem)
-	MCFG_CPU_IO_MAP(sgx_io)
+	H6280(config, m_maincpu, MAIN_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::sgx_mem);
+	m_maincpu->set_addrmap(AS_IO, &pce_state::sgx_io);
+	m_maincpu->port_in_cb().set(FUNC(pce_state::mess_pce_joystick_r));
+	m_maincpu->port_out_cb().set(FUNC(pce_state::mess_pce_joystick_w));
+	m_maincpu->add_route(0, "lspeaker", 1.00);
+	m_maincpu->add_route(1, "rspeaker", 1.00);
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
@@ -375,13 +378,13 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(DEVREAD16("huc6202", huc6202_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(DEVREAD16("huc6202", huc6202_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(DEVWRITELINE("huc6202", huc6202_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6202", huc6202_device, hsync_changed))
+	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6202", huc6202_device, next_pixel))
+	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6202", huc6202_device, time_until_next_event))
+	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6202", huc6202_device, vsync_changed))
+	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6202", huc6202_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270_0", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
@@ -389,24 +392,21 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 	MCFG_DEVICE_ADD( "huc6202", HUC6202, 0 )
-	MCFG_HUC6202_NEXT_PIXEL_0_CB(DEVREAD16("huc6270_0", huc6270_device, next_pixel))
-	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(DEVREAD16("huc6270_0", huc6270_device, time_until_next_event))
-	MCFG_HUC6202_VSYNC_CHANGED_0_CB(DEVWRITELINE("huc6270_0", huc6270_device, vsync_changed))
-	MCFG_HUC6202_HSYNC_CHANGED_0_CB(DEVWRITELINE("huc6270_0", huc6270_device, hsync_changed))
-	MCFG_HUC6202_READ_0_CB(DEVREAD8("huc6270_0", huc6270_device, read))
-	MCFG_HUC6202_WRITE_0_CB(DEVWRITE8("huc6270_0", huc6270_device, write))
-	MCFG_HUC6202_NEXT_PIXEL_1_CB(DEVREAD16("huc6270_1", huc6270_device, next_pixel))
-	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_1_CB(DEVREAD16("huc6270_1", huc6270_device, time_until_next_event))
-	MCFG_HUC6202_VSYNC_CHANGED_1_CB(DEVWRITELINE("huc6270_1", huc6270_device, vsync_changed))
-	MCFG_HUC6202_HSYNC_CHANGED_1_CB(DEVWRITELINE("huc6270_1", huc6270_device, hsync_changed))
-	MCFG_HUC6202_READ_1_CB(DEVREAD8("huc6270_1", huc6270_device, read))
-	MCFG_HUC6202_WRITE_1_CB(DEVWRITE8("huc6270_1", huc6270_device, write))
+	MCFG_HUC6202_NEXT_PIXEL_0_CB(READ16("huc6270_0", huc6270_device, next_pixel))
+	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(READ16("huc6270_0", huc6270_device, time_until_next_event))
+	MCFG_HUC6202_VSYNC_CHANGED_0_CB(WRITELINE("huc6270_0", huc6270_device, vsync_changed))
+	MCFG_HUC6202_HSYNC_CHANGED_0_CB(WRITELINE("huc6270_0", huc6270_device, hsync_changed))
+	MCFG_HUC6202_READ_0_CB(READ8("huc6270_0", huc6270_device, read))
+	MCFG_HUC6202_WRITE_0_CB(WRITE8("huc6270_0", huc6270_device, write))
+	MCFG_HUC6202_NEXT_PIXEL_1_CB(READ16("huc6270_1", huc6270_device, next_pixel))
+	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_1_CB(READ16("huc6270_1", huc6270_device, time_until_next_event))
+	MCFG_HUC6202_VSYNC_CHANGED_1_CB(WRITELINE("huc6270_1", huc6270_device, vsync_changed))
+	MCFG_HUC6202_HSYNC_CHANGED_1_CB(WRITELINE("huc6270_1", huc6270_device, hsync_changed))
+	MCFG_HUC6202_READ_1_CB(READ8("huc6270_1", huc6270_device, read))
+	MCFG_HUC6202_WRITE_1_CB(WRITE8("huc6270_1", huc6270_device, write))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
-	MCFG_C6280_CPU("maincpu")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sgx")
@@ -430,6 +430,6 @@ ROM_END
 #define rom_tg16 rom_pce
 #define rom_sgx rom_pce
 
-CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "NEC / Hudson Soft", "PC Engine",     MACHINE_IMPERFECT_SOUND )
-CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,       "NEC / Hudson Soft", "TurboGrafx 16", MACHINE_IMPERFECT_SOUND )
-CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,        "NEC / Hudson Soft", "SuperGrafx",    MACHINE_IMPERFECT_SOUND )
+CONS( 1987, pce,  0,   0, pce,  pce, pce_state, init_mess_pce, "NEC / Hudson Soft", "PC Engine",     MACHINE_IMPERFECT_SOUND )
+CONS( 1989, tg16, pce, 0, tg16, pce, pce_state, init_tg16,     "NEC / Hudson Soft", "TurboGrafx 16", MACHINE_IMPERFECT_SOUND )
+CONS( 1989, sgx,  pce, 0, sgx,  pce, pce_state, init_sgx,      "NEC / Hudson Soft", "SuperGrafx",    MACHINE_IMPERFECT_SOUND )

@@ -14,6 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/spkrdev.h"
 #include "video/saa5050.h"
+#include "emupal.h"
 
 
 class p2000t_state : public driver_device

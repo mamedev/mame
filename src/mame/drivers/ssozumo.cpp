@@ -28,23 +28,24 @@ void ssozumo_state::machine_start()
 }
 
 
-ADDRESS_MAP_START(ssozumo_state::ssozumo_map)
-	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x3400, 0x35ff) AM_RAM
-	AM_RANGE(0x3600, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITE(flipscreen_w)
-	AM_RANGE(0x4010, 0x4010) AM_READ_PORT("P2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x4020, 0x4020) AM_READ_PORT("DSW2") AM_WRITE(scroll_w)
-	AM_RANGE(0x4030, 0x4030) AM_READ_PORT("DSW1")
+void ssozumo_state::ssozumo_map(address_map &map)
+{
+	map(0x0000, 0x077f).ram();
+	map(0x0780, 0x07ff).ram().share("spriteram");
+	map(0x2000, 0x23ff).ram().w(FUNC(ssozumo_state::videoram2_w)).share("videoram2");
+	map(0x2400, 0x27ff).ram().w(FUNC(ssozumo_state::colorram2_w)).share("colorram2");
+	map(0x3000, 0x31ff).ram().w(FUNC(ssozumo_state::videoram_w)).share("videoram");
+	map(0x3200, 0x33ff).ram().w(FUNC(ssozumo_state::colorram_w)).share("colorram");
+	map(0x3400, 0x35ff).ram();
+	map(0x3600, 0x37ff).ram();
+	map(0x4000, 0x4000).portr("P1").w(FUNC(ssozumo_state::flipscreen_w));
+	map(0x4010, 0x4010).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x4020, 0x4020).portr("DSW2").w(FUNC(ssozumo_state::scroll_w));
+	map(0x4030, 0x4030).portr("DSW1");
 //  AM_RANGE(0x4030, 0x4030) AM_WRITEONLY
-	AM_RANGE(0x4050, 0x407f) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x4050, 0x407f).ram().w(FUNC(ssozumo_state::paletteram_w)).share("paletteram");
+	map(0x6000, 0xffff).rom();
+}
 
 
 WRITE8_MEMBER(ssozumo_state::sound_nmi_mask_w)
@@ -53,15 +54,16 @@ WRITE8_MEMBER(ssozumo_state::sound_nmi_mask_w)
 }
 
 /* Same as Tag Team */
-ADDRESS_MAP_START(ssozumo_state::ssozumo_sound_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
-	AM_RANGE(0x2007, 0x2007) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ssozumo_state::ssozumo_sound_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2005, 0x2005).w(FUNC(ssozumo_state::sound_nmi_mask_w));
+	map(0x2007, 0x2007).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x4000, 0xffff).rom();
+}
 
 INPUT_CHANGED_MEMBER(ssozumo_state::coin_inserted)
 {
@@ -180,7 +182,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( ssozumo )
+static GFXDECODE_START( gfx_ssozumo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   4*8, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*8, 2 )
@@ -189,19 +191,19 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1200000) /* 1.2 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(ssozumo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssozumo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1200000) /* 1.2 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(ssozumo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ssozumo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 975000)         /* 975 kHz ?? */
-	MCFG_CPU_PROGRAM_MAP(ssozumo_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ssozumo_state, sound_timer_irq, 272/16*57) // guess, assume to be the same as tagteam
+	MCFG_DEVICE_ADD("audiocpu", M6502, 975000)         /* 975 kHz ?? */
+	MCFG_DEVICE_PROGRAM_MAP(ssozumo_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ssozumo_state, sound_timer_irq, 272/16*57) // guess, assume to be the same as tagteam
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -214,25 +216,25 @@ MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 	MCFG_SCREEN_UPDATE_DRIVER(ssozumo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssozumo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssozumo)
 	MCFG_PALETTE_ADD("palette", 64 + 16)
 	MCFG_PALETTE_INIT_OWNER(ssozumo_state, ssozumo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 
-	MCFG_SOUND_ADD("ay1", YM2149, 1500000)
+	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("ay2", YM2149, 1500000)
+	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -294,4 +296,4 @@ ROM_END
 
 
 
-GAME( 1984, ssozumo, 0, ssozumo, ssozumo, ssozumo_state, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ssozumo, 0, ssozumo, ssozumo, ssozumo_state, empty_init, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )

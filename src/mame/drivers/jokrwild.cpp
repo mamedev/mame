@@ -76,6 +76,7 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MASTER_CLOCK    XTAL(8'000'000)   /* guess */
@@ -91,6 +92,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void jokrwild(machine_config &config);
+
+	void init_jokrwild();
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
@@ -99,14 +105,12 @@ public:
 	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(testa_w);
 	DECLARE_WRITE8_MEMBER(testb_w);
-	DECLARE_DRIVER_INIT(jokrwild);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jokrwild);
 	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void jokrwild(machine_config &config);
 	void jokrwild_map(address_map &map);
 };
 
@@ -178,21 +182,22 @@ READ8_MEMBER(jokrwild_state::rng_r)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(jokrwild_state::jokrwild_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM //FIXME: backup RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM //stack RAM
-	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //optical sensor is here
+void jokrwild_state::jokrwild_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().w(FUNC(jokrwild_state::jokrwild_videoram_w)).share("videoram");
+	map(0x0400, 0x07ff).ram(); //FIXME: backup RAM
+	map(0x2000, 0x23ff).ram().w(FUNC(jokrwild_state::jokrwild_colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram(); //stack RAM
+	map(0x4004, 0x4007).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4008, 0x400b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //optical sensor is here
 //  AM_RANGE(0x4010, 0x4010) AM_READNOP /* R ???? */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x6100, 0x6100) AM_READ_PORT("SW1")
-	AM_RANGE(0x6200, 0x6203) AM_READ(rng_r)//another PIA?
-	AM_RANGE(0x6300, 0x6300) AM_READ_PORT("SW2")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x6000, 0x6000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x6001, 0x6001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x6100, 0x6100).portr("SW1");
+	map(0x6200, 0x6203).r(FUNC(jokrwild_state::rng_r));//another PIA?
+	map(0x6300, 0x6300).portr("SW2");
+	map(0x8000, 0xffff).rom();
+}
 
 /* I/O byte R/W
 
@@ -380,7 +385,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( jokrwild )
+static GFXDECODE_START( gfx_jokrwild )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -407,21 +412,20 @@ WRITE8_MEMBER(jokrwild_state::testb_w)
 MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
-	MCFG_CPU_PROGRAM_MAP(jokrwild_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jokrwild_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(jokrwild_map)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(jokrwild_state, testa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(jokrwild_state, testb_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set_ioport("IN0");
+	pia0.readpb_handler().set_ioport("IN1");
+	pia0.writepa_handler().set(FUNC(jokrwild_state::testa_w));
+	pia0.writepb_handler().set(FUNC(jokrwild_state::testb_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN3"))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("IN2");
+	pia1.readpb_handler().set_ioport("IN3");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -432,13 +436,14 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	MCFG_SCREEN_UPDATE_DRIVER(jokrwild_state, screen_update_jokrwild)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jokrwild)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jokrwild)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(jokrwild_state, jokrwild)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 
@@ -476,7 +481,7 @@ ROM_END
 *  Driver Initialization  *
 **************************/
 
-DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
+void jokrwild_state::init_jokrwild()
 /*****************************************************************************
 
   Encryption was made by pages of 256 bytes.
@@ -492,12 +497,10 @@ DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 
 *****************************************************************************/
 {
-	int i, offs;
 	uint8_t *srcp = memregion( "maincpu" )->base();
-
-	for (i = 0x8000; i < 0x10000; i++)
+	for (int i = 0x8000; i < 0x10000; i++)
 	{
-		offs = i & 0xff;
+		int offs = i & 0xff;
 		srcp[i] = srcp[i] ^ 0xcc ^ offs;
 	}
 }
@@ -507,5 +510,5 @@ DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY  FULLNAME                    FLAGS
-GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT   COMPANY  FULLNAME                    FLAGS
+GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, init_jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -10,10 +10,11 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 
 #define MCFG_BFM_DM01_BUSY_CB(_devcb) \
-	devcb = &downcast<bfm_dm01_device &>(*device).set_busy_callback(DEVCB_##_devcb);
+	downcast<bfm_dm01_device &>(*device).set_busy_callback(DEVCB_##_devcb);
 
 class bfm_dm01_device : public device_t
 {

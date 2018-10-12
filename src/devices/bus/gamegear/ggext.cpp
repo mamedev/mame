@@ -117,6 +117,7 @@ uint32_t gg_ext_port_device::pixel_r()
 //  SLOT_INTERFACE( gg_ext_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( gg_ext_port_devices )
-	SLOT_INTERFACE("smsctrladp", SMS_CTRL_ADAPTOR)
-SLOT_INTERFACE_END
+void gg_ext_port_devices(device_slot_interface &device)
+{
+	device.option_add("smsctrladp", SMS_CTRL_ADAPTOR);
+}

@@ -1,17 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-/***************************************************************************
+/*****************************************************************************************
 
 Amust Compak - also known as Amust Executive 816.
 
 2014-03-21 Skeleton driver. [Robbbert]
 
-An unusual-looking CP/M computer.
+An unusual-looking CP/M computer. The screen is a tiny CRT not much bigger
+than a modern smartphone.
+
+Z-80A @ 4MHz; 64KB dynamic RAM (8x 4164); 2KB video ram (6116); 2x 13cm drives;
+80 track DD with data capacity of 790KB; in a lockable Samsonite briefcase.
+
 There are no manuals or schematics known to exist.
 The entire driver is guesswork.
 The board has LH0080 (Z80A), 2x 8251, 2x 8255, 8253, uPD765A and a HD46505SP-2.
-The videoram is a 6116 RAM. There is a piezo beeper. There are 3 crystals,
-X1 = 4.9152 (serial chips?), X2 = 16 (CPU), X3 = 14.31818 MHz (Video?).
+There is a piezo beeper. There are 3 crystals, X1 = 4.9152 (serial chips),
+X2 = 16 (CPU), X3 = 14.31818 MHz (Video).
 There are numerous jumpers, all of which perform unknown functions.
 
 The keyboard is a plug-in unit, same idea as Kaypro and Zorba. It has these
@@ -50,21 +55,6 @@ Two Side
 Skew 1,3,5,2,4
 
 
-Stuff that doesn't make sense:
-------------------------------
-1. To access the screen, it waits for IRQ presumably from sync pulse. It sets INT
-mode 0 which means a page-zero jump, but doesn't write anything to the zero-page ram.
-That's why I added a RETI at 0038 and set the vector to there. A bit later it writes
-a jump at 0000. Then it sets the interrupting device to the fdc (not sure how yet),
-then proceeds to overwrite all of page-zero with the disk contents. This of course
-kills the jump it just wrote, and my RETI. So it runs into the weeds at high speed.
-What should happen is after loading the boot sector succesfully it will jump to 0000,
-otherwise it will write BOOT NG to the screen and you're in the monitor. The bios
-contains no RETI instructions.
-2. At F824 it copies itself to the same address which is presumably shadow ram. But
-it never switches to it. The ram is physically in the machine.
-
-
 Monitor Commands:
 -----------------
 B = Boot from floppy
@@ -73,12 +63,17 @@ B = Boot from floppy
 
 ToDo:
 - Everything
-- Need software
-- Keyboard controller needs to be emulated
+- Floppy issues:
+  - The loop to read a sector has no escape. The interrupt handler (which can't be found)
+    needs to take another path when the sector is complete.
+  - The loop uses "ini" to read a byte, but this doesn't clear DRQ, so memory rapidly fills
+    up with garbage, mostly FF.
+- Keyboard controller needs to be emulated.
 - If booting straight to CP/M, the load message should be in the middle of the screen.
+- Looks like port 5 has a row of function keys or similar. Need to be added.
 
 
-****************************************************************************/
+*******************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -90,6 +85,7 @@ ToDo:
 #include "machine/upd765.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -97,11 +93,6 @@ ToDo:
 class amust_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BEEP_OFF
-	};
-
 	amust_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
@@ -114,8 +105,16 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_DRIVER_INIT(amust);
-	DECLARE_MACHINE_RESET(amust);
+	void amust(machine_config &config);
+
+	void init_amust();
+
+private:
+	enum
+	{
+		TIMER_BEEP_OFF
+	};
+
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port04_w);
 	DECLARE_READ8_MEMBER(port05_r);
@@ -127,19 +126,28 @@ public:
 	DECLARE_READ8_MEMBER(port0a_r);
 	DECLARE_WRITE8_MEMBER(port0a_w);
 	DECLARE_WRITE8_MEMBER(port0d_w);
+	DECLARE_WRITE_LINE_MEMBER(hsync_w);
+	DECLARE_WRITE_LINE_MEMBER(vsync_w);
+	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	void kbd_put(u8 data);
-	INTERRUPT_GEN_MEMBER(irq_vs);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void amust(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+	void machine_reset() override;
+	void do_int();
+
 	u8 m_port04;
 	u8 m_port06;
 	u8 m_port08;
+	u8 m_port09;
 	u8 m_port0a;
 	u8 m_term_data;
+	bool m_drq;
+	//bool m_intrq;
+	bool m_hsync;
+	bool m_vsync;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
@@ -174,51 +182,91 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 //      floppy->ss_w(BIT(data, 4));
 //}
 
-ADDRESS_MAP_START(amust_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-ADDRESS_MAP_END
+void amust_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xf7ff).ram();
+	map(0xf800, 0xffff).bankr("bankr0").bankw("bankw0");
+}
 
-ADDRESS_MAP_START(amust_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0x0d, 0x0d) AM_READNOP AM_WRITE(port0d_w)
-	AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-ADDRESS_MAP_END
+void amust_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x02, 0x03).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x04, 0x07).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0d, 0x0d).nopr().w(FUNC(amust_state::port0d_w));
+	map(0x0e, 0x0e).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x0f, 0x0f).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x14, 0x17).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+}
 
-static SLOT_INTERFACE_START( amust_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void amust_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( amust )
 	PORT_START("P9")
 	// bits 6,7 not used?
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // code @ FB83
+	// bit 5 - fdc intrq
+	PORT_DIPNAME( 0x01, 0x01, "Bit0" ) // code @ FC99
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x02, "Bit1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x04, "Bit2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x08, "Bit3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x10, 0x10, "Boot to Monitor" ) // code @ F895
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0f, 0x01, "Unknown" ) // code @ FC99
-	PORT_DIPSETTING(    0x01, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
 INPUT_PORTS_END
 
-// bodgy
-INTERRUPT_GEN_MEMBER( amust_state::irq_vs )
+void amust_state::do_int()
 {
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xff);
+	bool sync = m_hsync | m_vsync;
+
+	if ((BIT(m_port0a, 3) && sync)             // when writing to the screen, only do it during blanking
+		|| (BIT(m_port0a, 5) && m_drq))        // when reading from floppy, only do it when DRQ is high.
+	{
+		//printf("%X,%X,%X ",m_port0a,sync,m_drq);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0x00);
+	}
+	else
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( amust_state::drq_w )
+{
+	m_drq = state;
+	do_int();
+	m_fdc->tc_w(1);
+}
+
+WRITE_LINE_MEMBER( amust_state::intrq_w )
+{
+	m_port09 = (m_port09 & 0xdf) | (state ? 0x20 : 0);
+}
+
+WRITE_LINE_MEMBER( amust_state::hsync_w )
+{
+	m_hsync = state;
+	do_int();
+}
+
+WRITE_LINE_MEMBER( amust_state::vsync_w )
+{
+	m_vsync = state;
+	do_int();
 }
 
 READ8_MEMBER( amust_state::port04_r )
@@ -264,14 +312,14 @@ d1 -
 d2 -
 d3 -
 d4 - H = go to monitor; L = boot from disk
-d5 - status of disk-related; loops till NZ
+d5 - status of fdc intrq; loops till NZ
 d6 -
 d7 -
 */
 READ8_MEMBER( amust_state::port09_r )
 {
 	logerror("%s\n",machine().describe_context());
-	return ioport("P9")->read();
+	return (ioport("P9")->read() & 0x1f) | m_port09;
 }
 
 READ8_MEMBER( amust_state::port0a_r )
@@ -295,6 +343,14 @@ WRITE8_MEMBER( amust_state::port0a_w )
 		m_beep->set_state(1);
 		timer_set(attotime::from_msec(150), TIMER_BEEP_OFF);
 	}
+	floppy_image_device *floppy = m_floppy0->get_device();
+	m_fdc->set_floppy(floppy);
+	if (floppy)
+	{
+		floppy->mon_w(0);
+
+		//floppy->ss_w(0);   // side 0? hopefully fdc does this
+	}
 }
 
 WRITE8_MEMBER( amust_state::port0d_w )
@@ -317,7 +373,7 @@ static const gfx_layout amust_charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( amust )
+static GFXDECODE_START( gfx_amust )
 	GFXDECODE_ENTRY( "chargen", 0x0000, amust_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -350,21 +406,24 @@ MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 	}
 }
 
-MACHINE_RESET_MEMBER( amust_state, amust )
+void amust_state::machine_reset()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.write_byte(0x38, 0xed);
-	space.write_byte(0x39, 0x4d);
 	m_port04 = 0;
 	m_port06 = 0;
 	m_port08 = 0;
+	m_port09 = 0;
 	m_port0a = 0;
+	m_hsync = false;
+	m_vsync = false;
+	m_drq = false;
+	m_fdc->set_ready_line_connected(1); // always ready for minifloppy; controlled by fdc for 20cm
+	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy; 8MHz for 20cm
 	m_maincpu->set_state_int(Z80_PC, 0xf800);
 }
 
-DRIVER_INIT_MEMBER( amust_state, amust )
+void amust_state::init_amust()
 {
 	u8 *main = memregion("maincpu")->base();
 
@@ -375,11 +434,9 @@ DRIVER_INIT_MEMBER( amust_state, amust )
 
 MACHINE_CONFIG_START(amust_state::amust)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amust_state, irq_vs)
-	MCFG_MACHINE_RESET_OVERRIDE(amust_state, amust)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -389,11 +446,11 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amust)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amust)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 800)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -401,64 +458,68 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(amust_state, crtc_update_row)
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amust_state, hsync_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amust_state, vsync_w))
 
-	MCFG_UPD765A_ADD("fdc", false, true)
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->drq_wr_callback().set(FUNC(amust_state::drq_w));
+	m_fdc->intrq_wr_callback().set(FUNC(amust_state::intrq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	i8251_device &uart1(I8251(config, "uart1", 0));
+	uart1.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart1.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart1.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD("uart2", I8251, 0)
-	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	I8251(config, "uart2", 0);
+	//uart2.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//uart2.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	//uart2.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(amust_state, port04_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amust_state, port04_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(amust_state, port05_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(amust_state, port06_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(amust_state, port06_w))
+	i8255_device &ppi1(I8255A(config, "ppi1"));
+	ppi1.in_pa_callback().set(FUNC(amust_state::port04_r));
+	ppi1.out_pa_callback().set(FUNC(amust_state::port04_w));
+	ppi1.in_pb_callback().set(FUNC(amust_state::port05_r));
+	ppi1.in_pc_callback().set(FUNC(amust_state::port06_r));
+	ppi1.out_pc_callback().set(FUNC(amust_state::port06_w));
 
-	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(amust_state, port08_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amust_state, port08_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(amust_state, port09_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(amust_state, port0a_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(amust_state, port0a_w))
+	i8255_device &ppi2(I8255A(config, "ppi2"));
+	ppi2.in_pa_callback().set(FUNC(amust_state::port08_r));
+	ppi2.out_pa_callback().set(FUNC(amust_state::port08_w));
+	ppi2.in_pb_callback().set(FUNC(amust_state::port09_r));
+	ppi2.in_pc_callback().set(FUNC(amust_state::port0a_r));
+	ppi2.out_pc_callback().set(FUNC(amust_state::port0a_w));
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( amust )
 	ROM_REGION( 0x11000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mon_h.rom", 0x10000, 0x1000, CRC(10dceac6) SHA1(1ef80039063f7a6455563d59f1bcc23e09eca369) )
+	ROM_LOAD( "mon_h.ic25", 0x10000, 0x1000, CRC(10dceac6) SHA1(1ef80039063f7a6455563d59f1bcc23e09eca369) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "cg4.rom", 0x000, 0x800, CRC(52e7b9d8) SHA1(cc6d457634eb688ccef471f72bddf0424e64b045) )
+	ROM_LOAD( "cg4.ic74",   0x000, 0x800, CRC(52e7b9d8) SHA1(cc6d457634eb688ccef471f72bddf0424e64b045) )
 
 	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "kbd_3.rom", 0x000, 0x800, CRC(d9441b35) SHA1(ce250ab1e892a13fd75182703f259855388c6bf4) )
+	ROM_LOAD( "kbd_3.rom",  0x000, 0x800, CRC(d9441b35) SHA1(ce250ab1e892a13fd75182703f259855388c6bf4) )
 
 	ROM_REGION( 0x800, "videoram", ROMREGION_ERASE00 )
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY  FULLNAME               FLAGS
-COMP( 1983, amust,  0,      0,       amust,     amust,   amust_state,   amust,  "Amust",  "Amust Executive 816", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME               FLAGS
+COMP( 1983, amust, 0,      0,      amust,   amust, amust_state, init_amust, "Amust", "Amust Executive 816", MACHINE_NOT_WORKING )

@@ -36,11 +36,11 @@ DEFINE_DEVICE_TYPE(MSHARK, mshark_device, "mshark", "Mator SHARK")
 
 ROM_START( mshark )
 	ROM_REGION( 0x5000, I8085_TAG, 0 )
-	ROM_LOAD( "pch488 3450 v22.1 #1", 0x0000, 0x1000, CRC(03bff9d7) SHA1(ac506df6509e1b2185a69f9f8f44b8b456aa9834) )
-	ROM_LOAD( "pch488 3450 v22.1 #2", 0x1000, 0x1000, CRC(c14fa5fe) SHA1(bcfd1dd65d692c76b90e6134b85f22c39c049430) )
-	ROM_LOAD( "pch488 3450 v22.1 #3", 0x2000, 0x1000, CRC(4dfaa482) SHA1(fe2c44bb650572616c8bdad6358032fe64b1e363) )
-	ROM_LOAD( "pch488 3450 v22.1 #4", 0x3000, 0x1000, CRC(aef665e9) SHA1(80a4c00b717100b4e22fa3704e34060fffce2bc3) )
-	ROM_LOAD( "pch488 3450 v22.1 #5", 0x4000, 0x1000, CRC(f30adf60) SHA1(96c15264d5a9b52e1d238921880c48a797a6da1e) )
+	ROM_LOAD( "pch488 3450 v22.1 @1", 0x0000, 0x1000, CRC(03bff9d7) SHA1(ac506df6509e1b2185a69f9f8f44b8b456aa9834) )
+	ROM_LOAD( "pch488 3450 v22.1 @2", 0x1000, 0x1000, CRC(c14fa5fe) SHA1(bcfd1dd65d692c76b90e6134b85f22c39c049430) )
+	ROM_LOAD( "pch488 3450 v22.1 @3", 0x2000, 0x1000, CRC(4dfaa482) SHA1(fe2c44bb650572616c8bdad6358032fe64b1e363) )
+	ROM_LOAD( "pch488 3450 v22.1 @4", 0x3000, 0x1000, CRC(aef665e9) SHA1(80a4c00b717100b4e22fa3704e34060fffce2bc3) )
+	ROM_LOAD( "pch488 3450 v22.1 @5", 0x4000, 0x1000, CRC(f30adf60) SHA1(96c15264d5a9b52e1d238921880c48a797a6da1e) )
 
 	ROM_REGION( 0x800, "micro", 0 ) // address decoder
 	ROM_LOAD( "micro p3450 v1.3", 0x000, 0x800, CRC(0e69202e) SHA1(3b384951ff54c4b45a3a778a88966d13e2c9d57a) )
@@ -61,17 +61,19 @@ const tiny_rom_entry *mshark_device::device_rom_region() const
 //  ADDRESS_MAP( mshark_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(mshark_device::mshark_mem)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM AM_REGION(I8085_TAG, 0)
-ADDRESS_MAP_END
+void mshark_device::mshark_mem(address_map &map)
+{
+	map(0x0000, 0x4fff).rom().region(I8085_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( mshark_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(mshark_device::mshark_io)
-ADDRESS_MAP_END
+void mshark_device::mshark_io(address_map &map)
+{
+}
 
 
 //-------------------------------------------------
@@ -80,13 +82,13 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(mshark_device::device_add_mconfig)
 	// basic machine hardware
-	MCFG_CPU_ADD(I8085_TAG, I8085A, 1000000)
-	MCFG_CPU_PROGRAM_MAP(mshark_mem)
-	MCFG_CPU_IO_MAP(mshark_io)
+	MCFG_DEVICE_ADD(I8085_TAG, I8085A, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(mshark_mem)
+	MCFG_DEVICE_IO_MAP(mshark_io)
 
 	// devices
 	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
 

@@ -174,22 +174,16 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 ***************************************************************************/
 
 /* Sound comms */
-READ32_MEMBER(fuuki32_state::snd_020_r)
+READ8_MEMBER(fuuki32_state::snd_020_r)
 {
 	machine().scheduler().synchronize();
-	uint32_t retdata = m_shared_ram[offset * 2] << 16 | m_shared_ram[(offset * 2) + 1];
-	return retdata;
+	return m_shared_ram[offset];
 }
 
-WRITE32_MEMBER(fuuki32_state::snd_020_w)
+WRITE8_MEMBER(fuuki32_state::snd_020_w)
 {
 	machine().scheduler().synchronize();
-
-	if (ACCESSING_BITS_16_23)
-		m_shared_ram[offset * 2] = data >> 16;
-
-	if (ACCESSING_BITS_0_7)
-		m_shared_ram[(offset * 2) + 1] = data & 0xff;
+	COMBINE_DATA(&m_shared_ram[offset]);
 }
 
 WRITE32_MEMBER(fuuki32_state::vregs_w)
@@ -206,30 +200,38 @@ WRITE32_MEMBER(fuuki32_state::vregs_w)
 	}
 }
 
-ADDRESS_MAP_START(fuuki32_state::fuuki32_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM                                                                     // ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM                                                                     // Work RAM
-	AM_RANGE(0x410000, 0x41ffff) AM_RAM                                                                     // Work RAM (used by asurabus)
+template<int Layer>
+WRITE32_MEMBER(fuuki32_state::vram_w)
+{
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset);
+}
 
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram.0")  // Tilemap 1
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram.1")  // Tilemap 2
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram.2")  // Tilemap bg
-	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(vram_3_w) AM_SHARE("vram.3")  // Tilemap bg2
-	AM_RANGE(0x508000, 0x517fff) AM_RAM                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_DEVREADWRITE16("fuukivid", fuukivid_device, fuuki_sprram_r, fuuki_sprram_w, 0xffffffff) // Sprites
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette",  palette_device, write32) AM_SHARE("palette") // Palette
+void fuuki32_state::fuuki32_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();                                                                     // ROM
+	map(0x400000, 0x40ffff).ram();                                                                     // Work RAM
+	map(0x410000, 0x41ffff).ram();                                                                     // Work RAM (used by asurabus)
 
-	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("800000") AM_WRITENOP                                         // Coin
-	AM_RANGE(0x810000, 0x810003) AM_READ_PORT("810000") AM_WRITENOP                                         // Player Inputs
-	AM_RANGE(0x880000, 0x880003) AM_READ_PORT("880000")                                                     // Service + DIPS
-	AM_RANGE(0x890000, 0x890003) AM_READ_PORT("890000")                                                     // More DIPS
+	map(0x500000, 0x501fff).ram().w(FUNC(fuuki32_state::vram_w<0>)).share("vram.0");  // Tilemap 1
+	map(0x502000, 0x503fff).ram().w(FUNC(fuuki32_state::vram_w<1>)).share("vram.1");  // Tilemap 2
+	map(0x504000, 0x505fff).ram().w(FUNC(fuuki32_state::vram_w<2>)).share("vram.2");  // Tilemap bg
+	map(0x506000, 0x507fff).ram().w(FUNC(fuuki32_state::vram_w<3>)).share("vram.3");  // Tilemap bg2
+	map(0x508000, 0x517fff).ram();                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
+	map(0x600000, 0x601fff).ram().rw(m_fuukivid, FUNC(fuukivid_device::fuuki_sprram_r), FUNC(fuukivid_device::fuuki_sprram_w)); // Sprites
+	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // Palette
 
-	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")        // Video Registers
-	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM                                                                     // Flipscreen Related
-	AM_RANGE(0x8e0000, 0x8e0003) AM_RAM AM_SHARE("priority")                            // Controls layer order
-	AM_RANGE(0x903fe0, 0x903fff) AM_READWRITE(snd_020_r, snd_020_w)                                         // Shared with Z80
-	AM_RANGE(0xa00000, 0xa00003) AM_WRITEONLY AM_SHARE("tilebank")                      // Tilebank
-ADDRESS_MAP_END
+	map(0x800000, 0x800003).portr("800000").nopw();                                         // Coin
+	map(0x810000, 0x810003).portr("810000").nopw();                                         // Player Inputs
+	map(0x880000, 0x880003).portr("880000");                                                     // Service + DIPS
+	map(0x890000, 0x890003).portr("890000");                                                     // More DIPS
+
+	map(0x8c0000, 0x8c001f).ram().w(FUNC(fuuki32_state::vregs_w)).share("vregs");        // Video Registers
+	map(0x8d0000, 0x8d0003).ram();                                                                     // Flipscreen Related
+	map(0x8e0000, 0x8e0003).ram().share("priority");                            // Controls layer order
+	map(0x903fe0, 0x903fff).rw(FUNC(fuuki32_state::snd_020_r), FUNC(fuuki32_state::snd_020_w)).umask32(0x00ff00ff);                                         // Shared with Z80
+	map(0xa00000, 0xa00003).writeonly().share("tilebank");                      // Tilebank
+}
 
 
 /***************************************************************************
@@ -240,38 +242,24 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(fuuki32_state::sound_bw_w)
 {
-	membank("bank1")->set_entry(data);
+	m_soundbank->set_entry(data);
 }
 
-READ8_MEMBER(fuuki32_state::snd_z80_r)
+void fuuki32_state::fuuki32_sound_map(address_map &map)
 {
-	uint8_t retdata = m_shared_ram[offset];
-	return retdata;
+	map(0x0000, 0x5fff).rom();                             // ROM
+	map(0x6000, 0x6fff).ram();                             // RAM
+	map(0x7ff0, 0x7fff).ram().share("shared_ram");
+	map(0x8000, 0xffff).bankr("soundbank");                // ROM
 }
 
-WRITE8_MEMBER(fuuki32_state::snd_z80_w)
+void fuuki32_state::fuuki32_sound_io_map(address_map &map)
 {
-	m_shared_ram[offset] = data;
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(fuuki32_state::sound_bw_w));
+	map(0x30, 0x30).nopw(); // leftover/unused nmi handler related
+	map(0x40, 0x45).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 }
-
-WRITE8_MEMBER(fuuki32_state::snd_ymf278b_w)
-{
-	machine().device<ymf278b_device>("ymf1")->write(space, offset, data);
-}
-
-ADDRESS_MAP_START(fuuki32_state::fuuki32_sound_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM                             // ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM                             // RAM
-	AM_RANGE(0x7ff0, 0x7fff) AM_READWRITE(snd_z80_r, snd_z80_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")                // ROM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(fuuki32_state::fuuki32_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bw_w)
-	AM_RANGE(0x30, 0x30) AM_WRITENOP // leftover/unused nmi handler related
-	AM_RANGE(0x40, 0x45) AM_DEVREAD("ymf1", ymf278b_device, read) AM_WRITE(snd_ymf278b_w)
-ADDRESS_MAP_END
 
 /***************************************************************************
 
@@ -283,20 +271,20 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( asurabld )
 	PORT_START("800000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
 
 	PORT_START("810000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "INPUTS")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "INPUTS")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "INPUTS")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "INPUTS")
 
 	PORT_START("880000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW1")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW1")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW1")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW1")
 
 	PORT_START("890000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW2")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW2")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW2")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW2")
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -450,7 +438,7 @@ static const gfx_layout layout_8x8x4 =
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
-	{ 2*4,3*4,   0*4,1*4,   6*4,7*4, 4*4,5*4 },
+	{ STEP8(0,4) },
 	{ STEP8(0,8*4) },
 	8*8*4
 };
@@ -462,8 +450,7 @@ static const gfx_layout layout_16x16x4 =
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
-	{   2*4,3*4,   0*4,1*4,   6*4,7*4, 4*4,5*4,
-		10*4,11*4, 8*4,9*4, 14*4,15*4, 12*4,13*4    },
+	{ STEP16(0,4) },
 	{ STEP16(0,16*4) },
 	16*16*4
 };
@@ -472,21 +459,19 @@ static const gfx_layout layout_16x16x4 =
 static const gfx_layout layout_16x16x8 =
 {
 	16,16,
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,1),
 	8,
-	{ STEP4(RGN_FRAC(1,2),1), STEP4(0,1) },
-	{   2*4,3*4,   0*4,1*4,   6*4,7*4, 4*4,5*4,
-		10*4,11*4, 8*4,9*4, 14*4,15*4, 12*4,13*4    },
-	{ STEP16(0,16*4) },
-	16*16*4
+	{ STEP4(0,1), STEP4(16,1) },
+	{ STEP4(0,4), STEP4(16*2,4), STEP4(16*4,4), STEP4(16*6,4) },
+	{ STEP16(0,16*8) },
+	16*16*8
 };
 
-static GFXDECODE_START( fuuki32 )
+static GFXDECODE_START( gfx_fuuki32 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x400*2, 0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x400*0, 0x40 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x400*1, 0x40 ) // [2] Layer 2
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x4,   0x400*3, 0x40 ) // [3] BG Layer
-	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x4,   0x400*3, 0x40 ) // [4] BG Layer 2 (GFX4!)
 GFXDECODE_END
 
 
@@ -525,14 +510,13 @@ void fuuki32_state::machine_start()
 {
 	uint8_t *ROM = memregion("soundcpu")->base();
 
-	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	m_soundbank->configure_entries(0, 0x10, &ROM[0], 0x8000);
 
 	m_level_1_interrupt_timer = timer_alloc(TIMER_LEVEL_1_INTERRUPT);
 	m_vblank_interrupt_timer = timer_alloc(TIMER_VBLANK_INTERRUPT);
 	m_raster_interrupt_timer = timer_alloc(TIMER_RASTER_INTERRUPT);
 
 	save_item(NAME(m_spr_buffered_tilebank));
-	save_item(NAME(m_shared_ram));
 }
 
 
@@ -549,12 +533,12 @@ void fuuki32_state::machine_reset()
 MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
-	MCFG_CPU_PROGRAM_MAP(fuuki32_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(fuuki32_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
-	MCFG_CPU_PROGRAM_MAP(fuuki32_sound_map)
-	MCFG_CPU_IO_MAP(fuuki32_sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(fuuki32_sound_map)
+	MCFG_DEVICE_IO_MAP(fuuki32_sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -562,10 +546,10 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	MCFG_SCREEN_SIZE(64 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 30 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fuuki32_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fuuki32_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fuuki32)
 	MCFG_PALETTE_ADD("palette", 0x4000 / 2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -573,9 +557,10 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	MCFG_FUUKI_VIDEO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymf1", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
+	MCFG_DEVICE_ADD("ymf", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
@@ -583,7 +568,6 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
 	MCFG_SOUND_ROUTE(4, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(5, "rspeaker", 0.40)
-
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -609,31 +593,30 @@ ROM_START( asurabld )
 	ROM_LOAD32_BYTE( "pgm1.u3", 0x000002, 0x80000, CRC(35104452) SHA1(03cfd81429f8a945d5419c9750925bfa997d0607) )
 	ROM_LOAD32_BYTE( "pgm0.u4", 0x000003, 0x80000, CRC(68615497) SHA1(de93751f151f195a863dc6fe83b6e7ed8f99430a) )
 
-	ROM_REGION( 0x090000, "soundcpu", 0 ) /* Z80 */
+	ROM_REGION( 0x80000, "soundcpu", 0 ) /* Z80 */
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(bb1deb89) SHA1(b1c70abddc0b9a88beb69a592376ff69a7e091eb) )
-	ROM_RELOAD(          0x10000, 0x80000) /* for banks */
 
 	ROM_REGION( 0x2000000, "gfx1", 0 )
 	/* 0x0000000 - 0x03fffff empty */ /* spXX.uYY - XX is the bank number! */
-	ROM_LOAD( "sp23.u14", 0x0400000, 0x400000, CRC(7df492eb) SHA1(30b88a3cd025ffc8c28fef06e0784755be37ef8e) )
-	ROM_LOAD( "sp45.u15", 0x0800000, 0x400000, CRC(1890f42a) SHA1(22254fe38fd83f4602a25e1ccba32df16edaf3f9) )
-	ROM_LOAD( "sp67.u16", 0x0c00000, 0x400000, CRC(a48f1ef0) SHA1(bf8787f293793291a503af662d3738c007654726) )
-	ROM_LOAD( "sp89.u17", 0x1000000, 0x400000, CRC(6b024362) SHA1(8be5cc3c7306d28b75acd970bb3be6d3c9825367) )
-	ROM_LOAD( "spab.u18", 0x1400000, 0x400000, CRC(803d2d8c) SHA1(25df30689e576a0620656c721d92bcc3fbd84844) )
-	ROM_LOAD( "spcd.u19", 0x1800000, 0x400000, CRC(42e5c26e) SHA1(b68875d353bdc5d49113bbac02fd83508bce66a5) )
+	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(7df492eb) SHA1(30b88a3cd025ffc8c28fef06e0784755be37ef8e) )
+	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(1890f42a) SHA1(22254fe38fd83f4602a25e1ccba32df16edaf3f9) )
+	ROM_LOAD16_WORD_SWAP( "sp67.u16", 0x0c00000, 0x400000, CRC(a48f1ef0) SHA1(bf8787f293793291a503af662d3738c007654726) )
+	ROM_LOAD16_WORD_SWAP( "sp89.u17", 0x1000000, 0x400000, CRC(6b024362) SHA1(8be5cc3c7306d28b75acd970bb3be6d3c9825367) )
+	ROM_LOAD16_WORD_SWAP( "spab.u18", 0x1400000, 0x400000, CRC(803d2d8c) SHA1(25df30689e576a0620656c721d92bcc3fbd84844) )
+	ROM_LOAD16_WORD_SWAP( "spcd.u19", 0x1800000, 0x400000, CRC(42e5c26e) SHA1(b68875d353bdc5d49113bbac02fd83508bce66a5) )
 
 	ROM_REGION( 0x0800000, "gfx2", 0 )
-	ROM_LOAD( "bg1012.u22", 0x0000000, 0x400000, CRC(d717a0a1) SHA1(007df309dc0650ca07e077b983a2b05730349d0b) )
-	ROM_LOAD( "bg1113.u23", 0x0400000, 0x400000, CRC(94338267) SHA1(7848bc57cb0eac216100a508763451eb57a0a082) )
+	ROM_LOAD32_WORD_SWAP( "bg1012.u22", 0x0000002, 0x400000, CRC(d717a0a1) SHA1(007df309dc0650ca07e077b983a2b05730349d0b) )
+	ROM_LOAD32_WORD_SWAP( "bg1113.u23", 0x0000000, 0x400000, CRC(94338267) SHA1(7848bc57cb0eac216100a508763451eb57a0a082) )
 
 	ROM_REGION( 0x0800000, "gfx3", 0 )
-	ROM_LOAD( "bg2022.u25", 0x0000000, 0x400000, CRC(ee312cd3) SHA1(2ef9d51928d80375daf8e6b204bb66a8b9cbaee7) )
-	ROM_LOAD( "bg2123.u24", 0x0400000, 0x400000, CRC(4acfc469) SHA1(a98d06b967ebb3fa3b4c8aa3d7a05063ec981fb2) )
+	ROM_LOAD32_WORD_SWAP( "bg2022.u25", 0x0000002, 0x400000, CRC(ee312cd3) SHA1(2ef9d51928d80375daf8e6b204bb66a8b9cbaee7) )
+	ROM_LOAD32_WORD_SWAP( "bg2123.u24", 0x0000000, 0x400000, CRC(4acfc469) SHA1(a98d06b967ebb3fa3b4c8aa3d7a05063ec981fb2) )
 
 	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
-	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(e681155e) SHA1(458845b9c86df72685d92d0d4052aacc2fa7d1bd) )
+	ROM_LOAD16_WORD_SWAP( "map.u5", 0x00000, 0x200000, CRC(e681155e) SHA1(458845b9c86df72685d92d0d4052aacc2fa7d1bd) )
 
-	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
+	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
 	ROM_LOAD( "pcm.u6", 0x00000, 0x400000, CRC(ac72225a) SHA1(8d16399ed34ac5bd69dbf43b2de2b0db9ac1c610) )
 ROM_END
 
@@ -652,32 +635,31 @@ ROM_START( asurabus )
 	ROM_LOAD32_BYTE( "pgm1.u3", 0x000002, 0x80000, CRC(0a040f0f) SHA1(d5e86d33efcbbde7ee62cfc8dfe867f250a33415) )
 	ROM_LOAD32_BYTE( "pgm0.u4", 0x000003, 0x80000, CRC(9b71e9d8) SHA1(9b705b5b6fff549f5679890422b481b5cf1d7bd7) )
 
-	ROM_REGION( 0x090000, "soundcpu", 0 ) /* Z80 */
+	ROM_REGION( 0x80000, "soundcpu", 0 ) /* Z80 */
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
-	ROM_RELOAD(          0x10000, 0x80000) /* for banks */
 
 	ROM_REGION( 0x2000000, "gfx1", 0 )
-	ROM_LOAD( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
-	ROM_LOAD( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
-	ROM_LOAD( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
-	ROM_LOAD( "sp67.u16", 0x0c00000, 0x400000, CRC(7c3d83bf) SHA1(7188dd923c6c7eb6aee3323e7ab54aa240c35ea3) )
-	ROM_LOAD( "sp89.u17", 0x1000000, 0x400000, CRC(cb1e14f8) SHA1(941cea1887d7ceb52222adcf1d6913969e6163aa) )
-	ROM_LOAD( "spab.u18", 0x1400000, 0x400000, CRC(e5a4608d) SHA1(b8e39f53e0b7ad1e16ae9c3726597776b404be1c) )
-	ROM_LOAD( "spcd.u19", 0x1800000, 0x400000, CRC(99bfbe32) SHA1(926a8afc4a175874f22f53300e76f59331d3b9ba) )
-	ROM_LOAD( "spef.u20", 0x1c00000, 0x400000, CRC(c9c799cc) SHA1(01373316700d8688deeea2e9e8f831d5f86c7f17) )
+	ROM_LOAD16_WORD_SWAP( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
+	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
+	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
+	ROM_LOAD16_WORD_SWAP( "sp67.u16", 0x0c00000, 0x400000, CRC(7c3d83bf) SHA1(7188dd923c6c7eb6aee3323e7ab54aa240c35ea3) )
+	ROM_LOAD16_WORD_SWAP( "sp89.u17", 0x1000000, 0x400000, CRC(cb1e14f8) SHA1(941cea1887d7ceb52222adcf1d6913969e6163aa) )
+	ROM_LOAD16_WORD_SWAP( "spab.u18", 0x1400000, 0x400000, CRC(e5a4608d) SHA1(b8e39f53e0b7ad1e16ae9c3726597776b404be1c) )
+	ROM_LOAD16_WORD_SWAP( "spcd.u19", 0x1800000, 0x400000, CRC(99bfbe32) SHA1(926a8afc4a175874f22f53300e76f59331d3b9ba) )
+	ROM_LOAD16_WORD_SWAP( "spef.u20", 0x1c00000, 0x400000, CRC(c9c799cc) SHA1(01373316700d8688deeea2e9e8f831d5f86c7f17) )
 
 	ROM_REGION( 0x0800000, "gfx2", 0 )
-	ROM_LOAD( "bg1012.u22", 0x0000000, 0x400000, CRC(e3fb9af0) SHA1(11900cc2873337692f66fb4f1eb9c574e5a967de) )
-	ROM_LOAD( "bg1113.u23", 0x0400000, 0x400000, CRC(5f8657e6) SHA1(7c2854dc5d2d4efe55bda01e329da051350e0031) )
+	ROM_LOAD32_WORD_SWAP( "bg1012.u22", 0x0000002, 0x400000, CRC(e3fb9af0) SHA1(11900cc2873337692f66fb4f1eb9c574e5a967de) )
+	ROM_LOAD32_WORD_SWAP( "bg1113.u23", 0x0000000, 0x400000, CRC(5f8657e6) SHA1(7c2854dc5d2d4efe55bda01e329da051350e0031) )
 
 	ROM_REGION( 0x0800000, "gfx3", 0 )
-	ROM_LOAD( "bg2022.u25", 0x0000000, 0x400000, CRC(f46eda52) SHA1(46530016b32a164bd76c4f53e7b53b2beb28db06) )
-	ROM_LOAD( "bg2123.u24", 0x0400000, 0x400000, CRC(c4ebb86b) SHA1(a7093e6e02b64566d277cbbd5fa90cd430e7c8a0) )
+	ROM_LOAD32_WORD_SWAP( "bg2022.u25", 0x0000002, 0x400000, CRC(f46eda52) SHA1(46530016b32a164bd76c4f53e7b53b2beb28db06) )
+	ROM_LOAD32_WORD_SWAP( "bg2123.u24", 0x0000000, 0x400000, CRC(c4ebb86b) SHA1(a7093e6e02b64566d277cbbd5fa90cd430e7c8a0) )
 
 	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
-	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
+	ROM_LOAD16_WORD_SWAP( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
 
-	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
+	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
 	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
 ROM_END
 
@@ -688,32 +670,31 @@ ROM_START( asurabusa )
 	ROM_LOAD32_BYTE( "8-15.pgm1",  0x000002, 0x80000, CRC(1dd67fe7) SHA1(3fd340ccd4a306783ba0ccd3343ae505c9de3a73) )
 	ROM_LOAD32_BYTE( "0-7.pgm0",   0x000003, 0x80000, CRC(3af08de3) SHA1(1ecc69804693cab6c2c36120acfc6ced094a16e4) )
 
-	ROM_REGION( 0x090000, "soundcpu", 0 ) /* Z80 */
+	ROM_REGION( 0x80000, "soundcpu", 0 ) /* Z80 */
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
-	ROM_RELOAD(          0x10000, 0x80000) /* for banks */
 
 	ROM_REGION( 0x2000000, "gfx1", 0 )
-	ROM_LOAD( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
-	ROM_LOAD( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
-	ROM_LOAD( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
-	ROM_LOAD( "sp67.u16", 0x0c00000, 0x400000, CRC(7c3d83bf) SHA1(7188dd923c6c7eb6aee3323e7ab54aa240c35ea3) )
-	ROM_LOAD( "sp89.u17", 0x1000000, 0x400000, CRC(cb1e14f8) SHA1(941cea1887d7ceb52222adcf1d6913969e6163aa) )
-	ROM_LOAD( "spab.u18", 0x1400000, 0x400000, CRC(e5a4608d) SHA1(b8e39f53e0b7ad1e16ae9c3726597776b404be1c) )
-	ROM_LOAD( "spcd.u19", 0x1800000, 0x400000, CRC(99bfbe32) SHA1(926a8afc4a175874f22f53300e76f59331d3b9ba) )
-	ROM_LOAD( "spef.u20", 0x1c00000, 0x400000, CRC(c9c799cc) SHA1(01373316700d8688deeea2e9e8f831d5f86c7f17) )
+	ROM_LOAD16_WORD_SWAP( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
+	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
+	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
+	ROM_LOAD16_WORD_SWAP( "sp67.u16", 0x0c00000, 0x400000, CRC(7c3d83bf) SHA1(7188dd923c6c7eb6aee3323e7ab54aa240c35ea3) )
+	ROM_LOAD16_WORD_SWAP( "sp89.u17", 0x1000000, 0x400000, CRC(cb1e14f8) SHA1(941cea1887d7ceb52222adcf1d6913969e6163aa) )
+	ROM_LOAD16_WORD_SWAP( "spab.u18", 0x1400000, 0x400000, CRC(e5a4608d) SHA1(b8e39f53e0b7ad1e16ae9c3726597776b404be1c) )
+	ROM_LOAD16_WORD_SWAP( "spcd.u19", 0x1800000, 0x400000, CRC(99bfbe32) SHA1(926a8afc4a175874f22f53300e76f59331d3b9ba) )
+	ROM_LOAD16_WORD_SWAP( "spef.u20", 0x1c00000, 0x400000, CRC(c9c799cc) SHA1(01373316700d8688deeea2e9e8f831d5f86c7f17) )
 
 	ROM_REGION( 0x0800000, "gfx2", 0 )
-	ROM_LOAD( "bg1012.u22", 0x0000000, 0x400000, CRC(e3fb9af0) SHA1(11900cc2873337692f66fb4f1eb9c574e5a967de) )
-	ROM_LOAD( "bg1113.u23", 0x0400000, 0x400000, CRC(5f8657e6) SHA1(7c2854dc5d2d4efe55bda01e329da051350e0031) )
+	ROM_LOAD32_WORD_SWAP( "bg1012.u22", 0x0000002, 0x400000, CRC(e3fb9af0) SHA1(11900cc2873337692f66fb4f1eb9c574e5a967de) )
+	ROM_LOAD32_WORD_SWAP( "bg1113.u23", 0x0000000, 0x400000, CRC(5f8657e6) SHA1(7c2854dc5d2d4efe55bda01e329da051350e0031) )
 
 	ROM_REGION( 0x0800000, "gfx3", 0 )
-	ROM_LOAD( "bg2022.u25", 0x0000000, 0x400000, CRC(f46eda52) SHA1(46530016b32a164bd76c4f53e7b53b2beb28db06) )
-	ROM_LOAD( "bg2123.u24", 0x0400000, 0x400000, CRC(c4ebb86b) SHA1(a7093e6e02b64566d277cbbd5fa90cd430e7c8a0) )
+	ROM_LOAD32_WORD_SWAP( "bg2022.u25", 0x0000002, 0x400000, CRC(f46eda52) SHA1(46530016b32a164bd76c4f53e7b53b2beb28db06) )
+	ROM_LOAD32_WORD_SWAP( "bg2123.u24", 0x0000000, 0x400000, CRC(c4ebb86b) SHA1(a7093e6e02b64566d277cbbd5fa90cd430e7c8a0) )
 
 	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
-	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
+	ROM_LOAD16_WORD_SWAP( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
 
-	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
+	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
 	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
 ROM_END
 
@@ -725,7 +706,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1998, asurabld,   0,        fuuki32, asurabld, fuuki32_state, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, asurabld,  0,        fuuki32, asurabld, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, asurabus,   0,        fuuki32, asurabus, fuuki32_state, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, asurabusa,  asurabus, fuuki32, asurabusa,fuuki32_state, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4
+GAME( 2000, asurabus,  0,        fuuki32, asurabus, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, asurabusa, asurabus, fuuki32, asurabusa,fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4

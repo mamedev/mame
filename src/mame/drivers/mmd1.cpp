@@ -155,9 +155,17 @@ class mmd1_state : public driver_device
 {
 public:
 	mmd1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
+	void mmd1(machine_config &config);
+	void mmd2(machine_config &config);
+
+	void init_mmd2();
+
+private:
 	DECLARE_WRITE8_MEMBER(mmd1_port0_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port1_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port2_w);
@@ -169,18 +177,18 @@ public:
 	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
-	uint8_t m_return_code;
-	uint8_t m_digit;
-	DECLARE_DRIVER_INIT(mmd2);
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
-	required_device<cpu_device> m_maincpu;
-	void mmd1(machine_config &config);
-	void mmd2(machine_config &config);
 	void mmd1_io(address_map &map);
 	void mmd1_mem(address_map &map);
 	void mmd2_io(address_map &map);
 	void mmd2_mem(address_map &map);
+
+	uint8_t m_return_code;
+	uint8_t m_digit;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	output_finder<9> m_digits;
 };
 
 
@@ -249,40 +257,44 @@ READ8_MEMBER( mmd1_state::mmd1_keyboard_r )
 		return m_return_code;
 }
 
-ADDRESS_MAP_START(mmd1_state::mmd1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x00ff ) AM_ROM // Main ROM
-	AM_RANGE( 0x0100, 0x01ff ) AM_ROM // Expansion slot
-	AM_RANGE( 0x0200, 0x02ff ) AM_RAM
-	AM_RANGE( 0x0300, 0x03ff ) AM_RAM
-ADDRESS_MAP_END
+void mmd1_state::mmd1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).rom(); // Main ROM
+	map(0x0100, 0x01ff).rom(); // Expansion slot
+	map(0x0200, 0x02ff).ram();
+	map(0x0300, 0x03ff).ram();
+}
 
-ADDRESS_MAP_START(mmd1_state::mmd1_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE( 0x00, 0x00 ) AM_READWRITE(mmd1_keyboard_r, mmd1_port0_w)
-	AM_RANGE( 0x01, 0x01 ) AM_WRITE(mmd1_port1_w)
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE(mmd1_port2_w)
-ADDRESS_MAP_END
+void mmd1_state::mmd1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x07);
+	map(0x00, 0x00).rw(FUNC(mmd1_state::mmd1_keyboard_r), FUNC(mmd1_state::mmd1_port0_w));
+	map(0x01, 0x01).w(FUNC(mmd1_state::mmd1_port1_w));
+	map(0x02, 0x02).w(FUNC(mmd1_state::mmd1_port2_w));
+}
 
-ADDRESS_MAP_START(mmd1_state::mmd2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0x0400, 0x0fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
-	AM_RANGE(0xd800, 0xe3ff) AM_READ_BANK("bank5") AM_WRITE_BANK("bank6")
-	AM_RANGE(0xe400, 0xe7ff) AM_READ_BANK("bank7") AM_WRITE_BANK("bank8")
-	AM_RANGE(0xfc00, 0xfcff) AM_RAM // Scratchpad
-ADDRESS_MAP_END
+void mmd1_state::mmd2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).bankr("bank1").bankw("bank2");
+	map(0x0400, 0x0fff).bankr("bank3").bankw("bank4");
+	map(0xd800, 0xe3ff).bankr("bank5").bankw("bank6");
+	map(0xe400, 0xe7ff).bankr("bank7").bankw("bank8");
+	map(0xfc00, 0xfcff).ram(); // Scratchpad
+}
 
-ADDRESS_MAP_START(mmd1_state::mmd2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(mmd1_port0_w)
-	AM_RANGE( 0x01, 0x01 ) AM_READWRITE(mmd2_01_r,mmd1_port1_w)
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE(mmd1_port2_w)
-	AM_RANGE( 0x03, 0x03 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
-	AM_RANGE( 0x04, 0x04 ) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
-	AM_RANGE( 0x05, 0x07 ) AM_READ(mmd2_bank_r)
-ADDRESS_MAP_END
+void mmd1_state::mmd2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).w(FUNC(mmd1_state::mmd1_port0_w));
+	map(0x01, 0x01).rw(FUNC(mmd1_state::mmd2_01_r), FUNC(mmd1_state::mmd1_port1_w));
+	map(0x02, 0x02).w(FUNC(mmd1_state::mmd1_port2_w));
+	map(0x03, 0x03).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
+	map(0x04, 0x04).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
+	map(0x05, 0x07).r(FUNC(mmd1_state::mmd2_bank_r));
+}
 
 
 /* Input ports */
@@ -400,7 +412,7 @@ WRITE8_MEMBER( mmd1_state::mmd2_scanlines_w )
 WRITE8_MEMBER( mmd1_state::mmd2_digit_w )
 {
 	if (m_digit < 9)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 }
 
 READ8_MEMBER( mmd1_state::mmd2_kbd_r )
@@ -448,7 +460,7 @@ MACHINE_RESET_MEMBER(mmd1_state,mmd2)
 	membank("bank8")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(mmd1_state,mmd2)
+void mmd1_state::init_mmd2()
 {
 /*
 We preset all banks here, so that bankswitching will incur no speed penalty.
@@ -483,36 +495,36 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 
 MACHINE_CONFIG_START(mmd1_state::mmd1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
-	MCFG_CPU_PROGRAM_MAP(mmd1_mem)
-	MCFG_CPU_IO_MAP(mmd1_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, 6750000 / 9)
+	MCFG_DEVICE_PROGRAM_MAP(mmd1_mem)
+	MCFG_DEVICE_IO_MAP(mmd1_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd1)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mmd1)
+	config.set_default_layout(layout_mmd1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mmd1_state::mmd2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
-	MCFG_CPU_PROGRAM_MAP(mmd2_mem)
-	MCFG_CPU_IO_MAP(mmd2_io)
-	MCFG_I8085A_STATUS(WRITE8(mmd1_state, mmd2_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(mmd1_state, mmd2_inte_callback))
+	MCFG_DEVICE_ADD("maincpu",I8080, 6750000 / 9)
+	MCFG_DEVICE_PROGRAM_MAP(mmd2_mem)
+	MCFG_DEVICE_IO_MAP(mmd2_io)
+	MCFG_I8085A_STATUS(WRITE8(*this, mmd1_state, mmd2_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(*this, mmd1_state, mmd2_inte_callback))
 
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd2)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mmd2)
+	config.set_default_layout(layout_mmd2);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("i8279", I8279, 400000) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(mmd1_state, mmd2_scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(mmd1_state, mmd2_digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(mmd1_state, mmd2_kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	i8279_device &kbdc(I8279(config, "i8279", 400000));             // based on divider
+	kbdc.out_sl_callback().set(FUNC(mmd1_state::mmd2_scanlines_w)); // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(mmd1_state::mmd2_digit_w));   // display A&B
+	kbdc.in_rl_callback().set(FUNC(mmd1_state::mmd2_kbd_r));        // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                       // Shift key
+	kbdc.in_ctrl_callback().set_constant(1);
 
 MACHINE_CONFIG_END
 
@@ -532,6 +544,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY                FULLNAME  FLAGS
-COMP( 1976, mmd1,  0,      0,      mmd1,    mmd1,  mmd1_state, 0,    "E&L Instruments Inc", "MMD-1",  MACHINE_NO_SOUND_HW )
-COMP( 1976, mmd2,  mmd1,   0,      mmd2,    mmd2,  mmd1_state, mmd2, "E&L Instruments Inc", "MMD-2",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                FULLNAME  FLAGS
+COMP( 1976, mmd1,  0,      0,      mmd1,    mmd1,  mmd1_state, empty_init, "E&L Instruments Inc", "MMD-1",  MACHINE_NO_SOUND_HW )
+COMP( 1976, mmd2,  mmd1,   0,      mmd2,    mmd2,  mmd1_state, init_mmd2,  "E&L Instruments Inc", "MMD-2",  MACHINE_NO_SOUND_HW )

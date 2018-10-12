@@ -51,9 +51,19 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
+class hle_hp_itf_device : public hle_device_base
+{
+public:
+	hle_hp_itf_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+
 } } // namespace bus::hp_hil
 
 
 DECLARE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device);
+DECLARE_DEVICE_TYPE_NS(HP_ITF_HLE_KEYBOARD, bus::hp_hil, hle_hp_itf_device);
 
 #endif // MAME_DEVICES_HP_HIL_HLEKBD_H

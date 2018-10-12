@@ -66,12 +66,15 @@ public:
 		: galaxold_state(mconfig, type, tag),
 		m_custom(*this, "cust") { }
 
+	void dambustr(machine_config &config);
+
+	void init_dambustr();
+
+private:
 	required_device<galaxian_sound_device> m_custom;
 
 	int m_noise_data;
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
-	DECLARE_DRIVER_INIT(dambustr);
-	void dambustr(machine_config &config);
 	void dambustr_map(address_map &map);
 };
 
@@ -87,42 +90,43 @@ WRITE8_MEMBER(dambustr_state::dambustr_noise_enable_w)
 }
 
 
-ADDRESS_MAP_START(dambustr_state::dambustr_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void dambustr_state::dambustr_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(dambustr_bg_color_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(dambustr_bg_split_line_w)
+	map(0x8000, 0x8000).w(FUNC(dambustr_state::dambustr_bg_color_w));
+	map(0x8001, 0x8001).w(FUNC(dambustr_state::dambustr_bg_split_line_w));
 
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	map(0xc000, 0xc7ff).ram();
 
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd400, 0xd7ff) AM_READ(galaxold_videoram_r)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd860, 0xd87f) AM_RAM AM_SHARE("bulletsram")
+	map(0xd000, 0xd3ff).ram().w(FUNC(dambustr_state::galaxold_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).r(FUNC(dambustr_state::galaxold_videoram_r));
+	map(0xd800, 0xd83f).ram().w(FUNC(dambustr_state::galaxold_attributesram_w)).share("attributesram");
+	map(0xd840, 0xd85f).ram().share("spriteram");
+	map(0xd860, 0xd87f).ram().share("bulletsram");
 
-	AM_RANGE(0xd880, 0xd8ff) AM_RAM
+	map(0xd880, 0xd8ff).ram();
 
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
-	AM_RANGE(0xe002, 0xe003) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0xe004, 0xe007) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
+	map(0xe000, 0xe000).portr("IN0");
+	map(0xe002, 0xe003).w(FUNC(dambustr_state::galaxold_coin_counter_w));
+	map(0xe004, 0xe007).w(m_custom, FUNC(galaxian_sound_device::lfo_freq_w));
 
-	AM_RANGE(0xe800, 0xefff) AM_READ_PORT("IN1")
-	AM_RANGE(0xe800, 0xe802) AM_DEVWRITE("cust", galaxian_sound_device, background_enable_w)
-	AM_RANGE(0xe803, 0xe803) AM_WRITE(dambustr_noise_enable_w)
-	AM_RANGE(0xe804, 0xe804) AM_DEVWRITE("cust", galaxian_sound_device, fire_enable_w) // probably louder than normal shot
-	AM_RANGE(0xe805, 0xe805) AM_DEVWRITE("cust", galaxian_sound_device, fire_enable_w) // normal shot (like Galaxian)
-	AM_RANGE(0xe806, 0xe807) AM_DEVWRITE("cust", galaxian_sound_device, vol_w)
+	map(0xe800, 0xefff).portr("IN1");
+	map(0xe800, 0xe802).w(m_custom, FUNC(galaxian_sound_device::background_enable_w));
+	map(0xe803, 0xe803).w(FUNC(dambustr_state::dambustr_noise_enable_w));
+	map(0xe804, 0xe804).w(m_custom, FUNC(galaxian_sound_device::fire_enable_w)); // probably louder than normal shot
+	map(0xe805, 0xe805).w(m_custom, FUNC(galaxian_sound_device::fire_enable_w)); // normal shot (like Galaxian)
+	map(0xe806, 0xe807).w(m_custom, FUNC(galaxian_sound_device::vol_w));
 
-	AM_RANGE(0xf000, 0xf7ff) AM_READ_PORT("DSW")
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(galaxold_flip_screen_y_w)
+	map(0xf000, 0xf7ff).portr("DSW");
+	map(0xf001, 0xf001).w(FUNC(dambustr_state::galaxold_nmi_enable_w));
+	map(0xf004, 0xf004).w(FUNC(dambustr_state::galaxold_stars_enable_w));
+	map(0xf006, 0xf006).w(FUNC(dambustr_state::galaxold_flip_screen_x_w));
+	map(0xf007, 0xf007).w(FUNC(dambustr_state::galaxold_flip_screen_y_w));
 
-	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+	map(0xf800, 0xf800).w(m_custom, FUNC(galaxian_sound_device::pitch_w));
+	map(0xf800, 0xffff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
 
 /* verified from Z80 code */
@@ -206,69 +210,69 @@ static const gfx_layout dambustr_spritelayout =
 };
 
 
-static GFXDECODE_START( dambustr )
+static GFXDECODE_START( gfx_dambustr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dambustr_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dambustr_spritelayout, 0, 8 )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(dambustr_state,dambustr)
+void dambustr_state::init_dambustr()
 {
-	int i, j, tmp;
 	int tmpram[16];
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *usr = memregion("user1")->base();
 	uint8_t *gfx = memregion("gfx1")->base();
 
 	// Bit swap addresses
-	for(i=0; i<4096*4; i++) {
+	for (int i = 0; i < 4096*4; i++){
 		rom[i] = usr[bitswap<16>(i,15,14,13,12, 4,10,9,8,7,6,5,3,11,2,1,0)];
-	};
+	}
 
 	// Swap program ROMs
-	for(i=0; i<0x1000; i++) {
-		tmp = rom[0x5000+i];
+	for (int i = 0; i < 0x1000; i++)
+	{
+		uint8_t tmp = rom[0x5000+i];
 		rom[0x5000+i] = rom[0x6000+i];
 		rom[0x6000+i] = rom[0x1000+i];
 		rom[0x1000+i] = tmp;
-	};
+	}
 
 	// Bit swap in $1000-$1fff and $4000-$5fff
-	for(i=0; i<0x1000; i++) {
+	for (int i = 0; i < 0x1000; i++)
+	{
 		rom[0x1000+i] = bitswap<8>(rom[0x1000+i],7,6,5,1,3,2,4,0);
 		rom[0x4000+i] = bitswap<8>(rom[0x4000+i],7,6,5,1,3,2,4,0);
 		rom[0x5000+i] = bitswap<8>(rom[0x5000+i],7,6,5,1,3,2,4,0);
-	};
+	}
 
 	// Swap graphics ROMs
-	for(i=0;i<0x4000;i+=16) {
-		for(j=0; j<16; j++)
+	for (int i = 0; i < 0x4000; i += 16)
+	{
+		for (int j = 0; j < 16; j++)
 			tmpram[j] = gfx[i+j];
-		for(j=0; j<8; j++) {
+		for (int j = 0; j < 8; j++)
+		{
 			gfx[i+j] = tmpram[j*2];
 			gfx[i+j+8] = tmpram[j*2+1];
-		};
-	};
+		}
+	}
 }
 
 
 
 MACHINE_CONFIG_START(dambustr_state::dambustr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(dambustr_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dambustr_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dambustr_state,galaxold)
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(dambustr_state,galaxold_7474_9m_1_callback))
-
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(dambustr_state,galaxold_7474_9m_2_q_callback))
+	TTL7474(config, "7474_9m_1", 0).output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_1_callback));
+	TTL7474(config, "7474_9m_2", 0).comp_output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_2_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", dambustr_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -278,14 +282,14 @@ MACHINE_CONFIG_START(dambustr_state::dambustr)
 	MCFG_SCREEN_UPDATE_DRIVER(dambustr_state, screen_update_dambustr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dambustr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dambustr)
 	MCFG_PALETTE_ADD("palette", 32+2+64+8)      /* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 
 	MCFG_PALETTE_INIT_OWNER(dambustr_state,dambustr)
 	MCFG_VIDEO_START_OVERRIDE(dambustr_state,dambustr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	galaxian_audio(config);
 MACHINE_CONFIG_END
@@ -372,6 +376,6 @@ ROM_START( dambustruk )
 ROM_END
 
 
-GAME( 1981, dambustr,   0,        dambustr, dambustr,   dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
-GAME( 1981, dambustra,  dambustr, dambustr, dambustr,   dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
-GAME( 1981, dambustruk, dambustr, dambustr, dambustruk, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (UK)",        0 )
+GAME( 1981, dambustr,   0,        dambustr, dambustr,   dambustr_state, init_dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
+GAME( 1981, dambustra,  dambustr, dambustr, dambustr,   dambustr_state, init_dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
+GAME( 1981, dambustruk, dambustr, dambustr, dambustruk, dambustr_state, init_dambustr, ROT90, "South West Research", "Dambusters (UK)",        0 )

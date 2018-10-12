@@ -5,31 +5,32 @@
 
 #pragma once
 
+#include "diserial.h"
 
-#define MCFG_RS232_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, RS232_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_RS232_RXD_HANDLER(_devcb) \
-	devcb = &downcast<rs232_port_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
+	downcast<rs232_port_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_DCD_HANDLER(_devcb) \
-	devcb = &downcast<rs232_port_device &>(*device).set_dcd_handler(DEVCB_##_devcb);
+	downcast<rs232_port_device &>(*device).set_dcd_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_DSR_HANDLER(_devcb) \
-	devcb = &downcast<rs232_port_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
+	downcast<rs232_port_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_RI_HANDLER(_devcb) \
-	devcb = &downcast<rs232_port_device &>(*device).set_ri_handler(DEVCB_##_devcb);
+	downcast<rs232_port_device &>(*device).set_ri_handler(DEVCB_##_devcb);
+
+#define MCFG_RS232_SI_HANDLER(_devcb) \
+	downcast<rs232_port_device &>(*device).set_si_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_CTS_HANDLER(_devcb) \
-	devcb = &downcast<rs232_port_device &>(*device).set_cts_handler(DEVCB_##_devcb);
+	downcast<rs232_port_device &>(*device).set_cts_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_RXC_HANDLER(_devcb) \
-	devcb = &downcast<rs232_port_device &>(*device).set_rxc_handler(DEVCB_##_devcb);
+	downcast<rs232_port_device &>(*device).set_rxc_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_TXC_HANDLER(_devcb) \
-	devcb = &downcast<rs232_port_device &>(*device).set_txc_handler(DEVCB_##_devcb);
+	downcast<rs232_port_device &>(*device).set_txc_handler(DEVCB_##_devcb);
 
 #define RS232_BAUD_110 (0x00)
 #define RS232_BAUD_150 (0x01)
@@ -116,12 +117,20 @@
 
 class device_rs232_port_interface;
 
-class rs232_port_device : public device_t,
-	public device_slot_interface
+class rs232_port_device : public device_t, public device_slot_interface
 {
 	friend class device_rs232_port_interface;
 
 public:
+	template <typename T>
+	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: rs232_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~rs232_port_device();
 
@@ -130,19 +139,30 @@ public:
 	template <class Object> devcb_base &set_dcd_handler(Object &&cb) { return m_dcd_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dsr_handler(Object &&cb) { return m_dsr_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_ri_handler(Object &&cb) { return m_ri_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_si_handler(Object &&cb) { return m_si_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_cts_handler(Object &&cb) { return m_cts_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_rxc_handler(Object &&cb) { return m_rxc_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_txc_handler(Object &&cb) { return m_txc_handler.set_callback(std::forward<Object>(cb)); }
+	auto rxd_handler() { return m_rxd_handler.bind(); }
+	auto dcd_handler() { return m_dcd_handler.bind(); }
+	auto dsr_handler() { return m_dsr_handler.bind(); }
+	auto ri_handler() { return m_ri_handler.bind(); }
+	auto si_handler() { return m_si_handler.bind(); }
+	auto cts_handler() { return m_cts_handler.bind(); }
+	auto rxc_handler() { return m_rxc_handler.bind(); }
+	auto txc_handler() { return m_txc_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 	DECLARE_WRITE_LINE_MEMBER( write_dtr );
 	DECLARE_WRITE_LINE_MEMBER( write_rts );
 	DECLARE_WRITE_LINE_MEMBER( write_etc );
+	DECLARE_WRITE_LINE_MEMBER( write_spds );
 
 	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }
 	DECLARE_READ_LINE_MEMBER( dcd_r ) { return m_dcd; }
 	DECLARE_READ_LINE_MEMBER( dsr_r ) { return m_dsr; }
 	DECLARE_READ_LINE_MEMBER( ri_r )  { return m_ri; }
+	DECLARE_READ_LINE_MEMBER( si_r )  { return m_si; }
 	DECLARE_READ_LINE_MEMBER( cts_r ) { return m_cts; }
 	DECLARE_READ_LINE_MEMBER( rxc_r ) { return m_dce_rxc; }
 	DECLARE_READ_LINE_MEMBER( txc_r ) { return m_dce_txc; }
@@ -158,6 +178,7 @@ protected:
 	int m_dcd;
 	int m_dsr;
 	int m_ri;
+	int m_si;
 	int m_cts;
 	int m_dce_rxc;
 	int m_dce_txc;
@@ -166,6 +187,7 @@ protected:
 	devcb_write_line m_dcd_handler;
 	devcb_write_line m_dsr_handler;
 	devcb_write_line m_ri_handler;
+	devcb_write_line m_si_handler;
 	devcb_write_line m_cts_handler;
 	devcb_write_line m_rxc_handler;
 	devcb_write_line m_txc_handler;
@@ -185,11 +207,13 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) { }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) { }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_etc ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_spds ) { }
 
 	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_dcd ) { m_port->m_dcd = state; m_port->m_dcd_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_dsr ) { m_port->m_dsr = state; m_port->m_dsr_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_ri )  { m_port->m_ri = state; m_port->m_ri_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_si )  { m_port->m_si = state; m_port->m_si_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_cts ) { m_port->m_cts = state; m_port->m_cts_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_rxc ) { m_port->m_dce_rxc = state; m_port->m_rxc_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_txc ) { m_port->m_dce_txc = state; m_port->m_txc_handler(state); }
@@ -303,6 +327,6 @@ protected:
 
 DECLARE_DEVICE_TYPE(RS232_PORT, rs232_port_device)
 
-SLOT_INTERFACE_EXTERN( default_rs232_devices );
+void default_rs232_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_RS232_RS232_H

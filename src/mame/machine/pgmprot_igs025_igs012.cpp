@@ -126,17 +126,18 @@ void pgm_012_025_state::drgw2_common_init()
 
 }
 
-ADDRESS_MAP_START(pgm_012_025_state::drgw2_mem)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0xd00000, 0xd00fff) AM_NOP // Written, but never read back? Related to the protection device? - IGS012?
-ADDRESS_MAP_END
+void pgm_012_025_state::drgw2_mem(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x1fffff).bankr("bank1"); /* Game ROM */
+	map(0xd00000, 0xd00fff).noprw(); // Written, but never read back? Related to the protection device? - IGS012?
+}
 
 MACHINE_CONFIG_START(pgm_012_025_state::pgm_012_025_drgw2)
 	pgmbase(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(drgw2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(drgw2_mem)
 
 	MCFG_DEVICE_ADD("igs025", IGS025, 0)
 	//MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_022_025_state, igs025_to_igs012_callback )
@@ -145,7 +146,7 @@ MACHINE_CONFIG_START(pgm_012_025_state::pgm_012_025_drgw2)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2)
+void pgm_012_025_state::init_drgw2()
 {
 	/* incomplete? */
 	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
@@ -161,7 +162,7 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2)
 	mem16[0x1311ce / 2] = 0x4e93;
 }
 
-DRIVER_INIT_MEMBER(pgm_012_025_state,dw2v100x)
+void pgm_012_025_state::init_dw2v100x()
 {
 	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 
@@ -176,7 +177,7 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,dw2v100x)
 	mem16[0x1311ba / 2] = 0x4e93;
 }
 
-DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2c)
+void pgm_012_025_state::init_drgw2c()
 {
 	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 
@@ -191,7 +192,7 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2c)
 	mem16[0x1304f2 / 2] = 0x4e93;
 }
 
-DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2j)
+void pgm_012_025_state::init_drgw2j()
 {
 	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 
@@ -206,7 +207,7 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2j)
 	mem16[0x1303f6 / 2] = 0x4e93;
 }
 
-DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2hk)
+void pgm_012_025_state::init_drgw2hk()
 {
 	drgw2_common_init();
 

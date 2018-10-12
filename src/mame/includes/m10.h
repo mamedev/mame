@@ -8,6 +8,7 @@
 
 #include "sound/samples.h"
 #include "machine/74123.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define IREMM10_MASTER_CLOCK        (12500000)
@@ -35,11 +36,6 @@
 class m10_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
-
 	m10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_memory(*this, "memory"),
@@ -54,6 +50,22 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
+
+	void m15(machine_config &config);
+	void headoni(machine_config &config);
+	void m10(machine_config &config);
+	void m11(machine_config &config);
+
+	void init_andromed();
+	void init_ipminva1();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_memory;
@@ -97,9 +109,6 @@ public:
 	DECLARE_WRITE8_MEMBER(m10_colorram_w);
 	DECLARE_WRITE8_MEMBER(m10_chargen_w);
 	DECLARE_WRITE8_MEMBER(m15_chargen_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(andromed);
-	DECLARE_DRIVER_INIT(ipminva1);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_MACHINE_START(m10);
@@ -115,13 +124,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ic8j2_output_changed);
 	inline void plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col );
 
-	void m15(machine_config &config);
-	void headoni(machine_config &config);
-	void m10(machine_config &config);
-	void m11(machine_config &config);
 	void m10_main(address_map &map);
 	void m11_main(address_map &map);
 	void m15_main(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

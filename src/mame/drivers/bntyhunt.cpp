@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -43,9 +44,10 @@ uint32_t bntyhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(bntyhunt_state::bntyhunt_map)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
-ADDRESS_MAP_END
+void bntyhunt_state::bntyhunt_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom();
+}
 
 static INPUT_PORTS_START( bntyhunt )
 INPUT_PORTS_END
@@ -53,8 +55,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bntyhunt_state::bntyhunt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000) /* Probably a Pentium or higher .. ?? Mhz*/
-	MCFG_CPU_PROGRAM_MAP(bntyhunt_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 200000000) /* Probably a Pentium or higher .. ?? Mhz*/
+	MCFG_DEVICE_PROGRAM_MAP(bntyhunt_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -78,4 +80,4 @@ ROM_START(bntyhunt)
 ROM_END
 
 
-GAME( 200?, bntyhunt,  0,   bntyhunt,  bntyhunt, bntyhunt_state,  0,  ROT0,  "GCTech Co., LTD",    "Bounty Hunter (GCTech Co., LTD)",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 200?, bntyhunt, 0, bntyhunt, bntyhunt, bntyhunt_state, empty_init, ROT0, "GCTech Co., LTD", "Bounty Hunter (GCTech Co., LTD)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

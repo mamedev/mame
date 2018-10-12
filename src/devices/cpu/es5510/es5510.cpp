@@ -553,10 +553,10 @@ void es5510_device::device_start() {
 	gpr = std::make_unique<int32_t[]>(0xc0);     // 24 bits, right justified
 	instr = std::make_unique<uint64_t[]>(160);    // 48 bits, right justified
 	dram = std::make_unique<int16_t[]>(DRAM_SIZE);   // there are up to 20 address bits (at least 16 expected), left justified within the 24 bits of a gpr or dadr; we preallocate all of it.
-	m_icountptr = &icount;
+	set_icountptr(icount);
 	state_add(STATE_GENPC,"GENPC", pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", pc).noshow();
-	
+
 	save_item(NAME(icount));
 	save_item(NAME(halt_asserted));
 	save_item(NAME(pc));
@@ -586,10 +586,10 @@ void es5510_device::device_start() {
 	save_item(NAME(dol));
 	save_item(NAME(dol_count));
 
-	save_pointer(NAME(gpr.get()), 0xc0);
-	save_pointer(NAME(instr.get()), 160);
-	save_pointer(NAME(dram.get()), DRAM_SIZE);
-	
+	save_pointer(NAME(gpr), 0xc0);
+	save_pointer(NAME(instr), 160);
+	save_pointer(NAME(dram), DRAM_SIZE);
+
 	save_item(NAME(dol_latch));
 	save_item(NAME(dil_latch));
 	save_item(NAME(dadr_latch));
@@ -996,9 +996,9 @@ void es5510_device::execute_run() {
 	}
 }
 
-util::disasm_interface *es5510_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> es5510_device::create_disassembler()
 {
-	return new es5510_disassembler;
+	return std::make_unique<es5510_disassembler>();
 }
 
 #if VERBOSE_EXEC

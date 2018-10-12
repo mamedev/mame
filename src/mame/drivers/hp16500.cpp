@@ -59,12 +59,18 @@
 class hp16500_state : public driver_device
 {
 public:
-	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hp16500_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mlc(*this, "mlc")
-		{ }
+	{ }
 
+	void hp16500(machine_config &config);
+	void hp16500a(machine_config &config);
+	void hp1651(machine_config &config);
+	void hp1650(machine_config &config);
+
+private:
 	virtual void video_start() override;
 	uint32_t screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -97,17 +103,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_1650);
 
-	INTERRUPT_GEN_MEMBER(vblank);
-
-	void hp16500(machine_config &config);
-	void hp16500a(machine_config &config);
-	void hp1651(machine_config &config);
-	void hp1650(machine_config &config);
 	void hp16500_map(address_map &map);
 	void hp16500a_map(address_map &map);
 	void hp1650_map(address_map &map);
 	void hp1651_map(address_map &map);
-private:
+
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
 
@@ -221,106 +221,107 @@ WRITE_LINE_MEMBER(hp16500_state::irq_2)
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR);
 }
 
-ADDRESS_MAP_START(hp16500_state::hp1650_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("bios", 0)
+void hp16500_state::hp1650_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("bios", 0);
 
-	AM_RANGE(0x201000, 0x201001) AM_WRITE(maskval_w)
+	map(0x201000, 0x201001).w(FUNC(hp16500_state::maskval_w));
 
-	AM_RANGE(0x204000, 0x204001) AM_WRITE8(pal_ctrl_w, 0x00ff)
-	AM_RANGE(0x205000, 0x205001) AM_WRITE8(pal_r_w, 0x00ff)
-	AM_RANGE(0x2050fe, 0x2050ff) AM_NOP
-	AM_RANGE(0x206000, 0x206001) AM_READNOP AM_WRITE8(pal_g_w, 0x00ff)
-	AM_RANGE(0x207000, 0x207001) AM_WRITE8(pal_b_w, 0x00ff)
+	map(0x204001, 0x204001).w(FUNC(hp16500_state::pal_ctrl_w));
+	map(0x205001, 0x205001).w(FUNC(hp16500_state::pal_r_w));
+	map(0x2050fe, 0x2050ff).noprw();
+	map(0x206000, 0x206001).nopr();
+	map(0x206001, 0x206001).w(FUNC(hp16500_state::pal_g_w));
+	map(0x207001, 0x207001).w(FUNC(hp16500_state::pal_b_w));
 
-	AM_RANGE(0x20a000, 0x20a007) AM_DEVREADWRITE8("epci", mc2661_device, read, write, 0x00ff)
+	map(0x20a000, 0x20a007).rw("epci", FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
+	map(0x20c001, 0x20c001).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x20c003, 0x20c003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x20e000, 0x20e001) AM_READWRITE(vbl_ack16_r, vbl_ack16_w)
+	map(0x20e000, 0x20e001).rw(FUNC(hp16500_state::vbl_ack16_r), FUNC(hp16500_state::vbl_ack16_w));
 
-	AM_RANGE(0x20f000, 0x20f001) AM_NOP
+	map(0x20f000, 0x20f001).noprw();
 
-	AM_RANGE(0x600000, 0x61ffff) AM_WRITE(vram_w)
-	AM_RANGE(0x600000, 0x67ffff) AM_READ8(vram_r, 0x00ff)
+	map(0x600000, 0x61ffff).w(FUNC(hp16500_state::vram_w));
+	map(0x600000, 0x67ffff).r(FUNC(hp16500_state::vram_r)).umask16(0x00ff);
 
-	AM_RANGE(0x900000, 0x9fffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x900000, 0x9fffff).ram();
+}
 
 // like 1650 but moves main RAM to match 16500a
-ADDRESS_MAP_START(hp16500_state::hp1651_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("bios", 0)
+void hp16500_state::hp1651_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("bios", 0);
 
-	AM_RANGE(0x201000, 0x201001) AM_WRITE(maskval_w)
+	map(0x201000, 0x201001).w(FUNC(hp16500_state::maskval_w));
 
-	AM_RANGE(0x204000, 0x204001) AM_WRITE8(pal_ctrl_w, 0x00ff)
-	AM_RANGE(0x205000, 0x205001) AM_WRITE8(pal_r_w, 0x00ff)
-	AM_RANGE(0x2050fe, 0x2050ff) AM_NOP
-	AM_RANGE(0x206000, 0x206001) AM_READNOP AM_WRITE8(pal_g_w, 0x00ff)
-	AM_RANGE(0x207000, 0x207001) AM_WRITE8(pal_b_w, 0x00ff)
+	map(0x204001, 0x204001).w(FUNC(hp16500_state::pal_ctrl_w));
+	map(0x205001, 0x205001).w(FUNC(hp16500_state::pal_r_w));
+	map(0x2050fe, 0x2050ff).noprw();
+	map(0x206000, 0x206001).nopr();
+	map(0x206001, 0x206001).w(FUNC(hp16500_state::pal_g_w));
+	map(0x207001, 0x207001).w(FUNC(hp16500_state::pal_b_w));
 
-	AM_RANGE(0x20a000, 0x20a007) AM_DEVREADWRITE8("epci", mc2661_device, read, write, 0x00ff)
+	map(0x20a000, 0x20a007).rw("epci", FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
+	map(0x20c001, 0x20c001).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x20c003, 0x20c003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x20e000, 0x20e001) AM_READWRITE(vbl_ack16_r, vbl_ack16_w)
+	map(0x20e000, 0x20e001).rw(FUNC(hp16500_state::vbl_ack16_r), FUNC(hp16500_state::vbl_ack16_w));
 
-	AM_RANGE(0x20f000, 0x20f001) AM_NOP
+	map(0x20f000, 0x20f001).noprw();
 
-	AM_RANGE(0x600000, 0x61ffff) AM_WRITE(vram_w)
-	AM_RANGE(0x600000, 0x67ffff) AM_READ8(vram_r, 0x00ff)
+	map(0x600000, 0x61ffff).w(FUNC(hp16500_state::vram_w));
+	map(0x600000, 0x67ffff).r(FUNC(hp16500_state::vram_r)).umask16(0x00ff);
 
-	AM_RANGE(0x980000, 0xa7ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x980000, 0xa7ffff).ram();
+}
 
-ADDRESS_MAP_START(hp16500_state::hp16500a_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("bios", 0)
+void hp16500_state::hp16500a_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("bios", 0);
 
-	AM_RANGE(0x201000, 0x201001) AM_WRITE(maskval_w)
+	map(0x201000, 0x201001).w(FUNC(hp16500_state::maskval_w));
 
-	AM_RANGE(0x204000, 0x204001) AM_WRITE8(pal_ctrl_w, 0x00ff)
-	AM_RANGE(0x205000, 0x205001) AM_WRITE8(pal_r_w, 0x00ff)
-	AM_RANGE(0x206000, 0x206001) AM_WRITE8(pal_g_w, 0x00ff)
-	AM_RANGE(0x207000, 0x207001) AM_WRITE8(pal_b_w, 0x00ff)
+	map(0x204001, 0x204001).w(FUNC(hp16500_state::pal_ctrl_w));
+	map(0x205001, 0x205001).w(FUNC(hp16500_state::pal_r_w));
+	map(0x206001, 0x206001).w(FUNC(hp16500_state::pal_g_w));
+	map(0x207001, 0x207001).w(FUNC(hp16500_state::pal_b_w));
 
-	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
+	map(0x20c001, 0x20c001).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x20c003, 0x20c003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x20e000, 0x20e001) AM_READWRITE(vbl_ack16_r, vbl_ack16_w)
+	map(0x20e000, 0x20e001).rw(FUNC(hp16500_state::vbl_ack16_r), FUNC(hp16500_state::vbl_ack16_w));
 
-	AM_RANGE(0x600000, 0x61ffff) AM_WRITE(vram_w)
-	AM_RANGE(0x600000, 0x67ffff) AM_READ8(vram_r, 0x00ff)
+	map(0x600000, 0x61ffff).w(FUNC(hp16500_state::vram_w));
+	map(0x600000, 0x67ffff).r(FUNC(hp16500_state::vram_r)).umask16(0x00ff);
 
-	AM_RANGE(0x980000, 0xa7ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x980000, 0xa7ffff).ram();
+}
 
 uint32_t hp16500_state::screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-ADDRESS_MAP_START(hp16500_state::hp16500_map)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0x0020f000, 0x0020f003) AM_WRITE(palette_w)
-
-	AM_RANGE(0x00202800, 0x00202803) AM_WRITE(vbl_ack_w)
-	AM_RANGE(0x00203000, 0x00203003) AM_WRITE(vbl_ack_w)
-	AM_RANGE(0x00209800, 0x00209803) AM_READ(vbl_state_r)
-
-	AM_RANGE(0x0020b800, 0x0020b8ff) AM_RAM // system ram test is really strange.
-
-	AM_RANGE(0x0020f800, 0x0020f80f) AM_DEVREADWRITE8("mlc", hp_hil_mlc_device, read, write, 0xffffffff);
-	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE16(vram_w, 0xffffffff)
-	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8  (vram_r, 0x00ff00ff)
-	AM_RANGE(0x00700000, 0x00700003) AM_WRITE8 (mask_w, 0xff000000)
-	AM_RANGE(0x00740000, 0x00740003) AM_WRITE8 (val_w,  0xff000000)
-	AM_RANGE(0x00800000, 0x009fffff) AM_RAM
-ADDRESS_MAP_END
-
-INTERRUPT_GEN_MEMBER(hp16500_state::vblank)
+void hp16500_state::hp16500_map(address_map &map)
 {
-	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+	map(0x00000000, 0x0001ffff).rom().region("bios", 0);
+	map(0x0020f000, 0x0020f003).w(FUNC(hp16500_state::palette_w));
+
+	map(0x00202800, 0x00202803).w(FUNC(hp16500_state::vbl_ack_w));
+	map(0x00203000, 0x00203003).w(FUNC(hp16500_state::vbl_ack_w));
+	map(0x00209800, 0x00209803).r(FUNC(hp16500_state::vbl_state_r));
+
+	map(0x0020b800, 0x0020b8ff).ram(); // system ram test is really strange.
+
+	map(0x0020f800, 0x0020f80f).rw(m_mlc, FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write));
+	map(0x00600000, 0x0061ffff).w(FUNC(hp16500_state::vram_w));
+	map(0x00600000, 0x0067ffff).r(FUNC(hp16500_state::vram_r)).umask32(0x00ff00ff);
+	map(0x00700000, 0x00700000).w(FUNC(hp16500_state::mask_w));
+	map(0x00740000, 0x00740000).w(FUNC(hp16500_state::val_w));
+	map(0x00800000, 0x009fffff).ram();
 }
 
 void hp16500_state::video_start()
@@ -414,8 +415,8 @@ uint32_t hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb3
 
 MACHINE_CONFIG_START(hp16500_state::hp1650)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(hp1650_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp1650_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180 )
@@ -425,17 +426,18 @@ MACHINE_CONFIG_START(hp16500_state::hp1650)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row_1650)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hp16500_state, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
 
 	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp1651)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(hp1651_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp1651_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180 )
@@ -445,17 +447,18 @@ MACHINE_CONFIG_START(hp16500_state::hp1651)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row_1650)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hp16500_state, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
 
 	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp16500a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(hp16500a_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp16500a_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x320, 0, 0x240, 0x19c, 0, 0x170 )
@@ -465,36 +468,36 @@ MACHINE_CONFIG_START(hp16500_state::hp16500a)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hp16500_state, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp16500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC030, 25000000)
-	MCFG_CPU_PROGRAM_MAP(hp16500_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hp16500_state, vblank)
+	M68EC030(config, m_maincpu, 25'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(hp16500_state, screen_update_hp16500)
-	MCFG_SCREEN_SIZE(576,384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 0, 384-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(hp16500_state::screen_update_hp16500));
+	screen.set_size(576,384);
+	screen.set_visarea(0, 576-1, 0, 384-1);
+	screen.set_refresh_hz(60);
+	screen.screen_vblank().set(FUNC(hp16500_state::vsync_changed));
+	// FIXME: Where is the AP line connected to? The MLC documentation recommends connecting it to VBLANK
+	screen.screen_vblank().append(m_mlc, FUNC(hp_hil_mlc_device::ap_w));
 
-	// FIXME: Where is the AP line connected to? The MLC documentation recommends
-	// connecting it to VBLANK
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w))
-
-	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL(15'920'000)/2)
-	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp16500_state, irq_2))
+	HP_HIL_MLC(config, m_mlc, XTAL(15'920'000)/2);
+	m_mlc->int_callback().set(FUNC(hp16500_state::irq_2));
 
 	// TODO: for now hook up the ipc hil keyboard - this might be replaced
 	// later with a 16500b specific keyboard implementation
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil2", hp_hil_devices, "hp_ipc_kbd")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( hp16500 )
@@ -526,7 +529,7 @@ ROM_START( hp16500b )
 	ROM_LOAD32_BYTE( "16500-80017.bin", 0x000003, 0x008000, CRC(e0b1096b) SHA1(426bb9a4756d8087bded4f6b61365d733ffbb09a) )
 ROM_END
 
-COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, 0, "Hewlett Packard", "HP 1650b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, 0, "Hewlett Packard", "HP 1651b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, hp16500_state, 0, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp16500b, 0, 0, hp16500,  hp16500, hp16500_state, 0, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1650b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1651b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1991, hp16500b, 0, 0, hp16500,  hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -6,9 +6,6 @@
 
 #pragma once
 
-#define MCFG_GP9001_VINT_CALLBACK(_devcb) \
-	devcb = &downcast<gp9001vdp_device &>(*device).set_vint_out_cb(DEVCB_##_devcb);
-
 class gp9001vdp_device : public device_t,
 							public device_gfx_interface,
 							public device_video_interface,
@@ -22,14 +19,14 @@ class gp9001vdp_device : public device_t,
 public:
 	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class Object> devcb_base &set_vint_out_cb(Object &&obj) { return m_vint_out_cb.set_callback(std::forward<Object>(obj)); }
+	auto vint_out_cb() { return m_vint_out_cb.bind(); }
 
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t* primap );
-	void gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const uint8_t* priremap, const uint8_t* pri_enable );
-	void gp9001_render_vdp( bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gp9001_screen_eof(void);
-	void create_tilemaps(void);
-	void init_scroll_regs(void);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t* primap);
+	void gp9001_draw_custom_tilemap(bitmap_ind16 &bitmap, int layer, const uint8_t* priremap, const uint8_t* pri_enable);
+	void gp9001_render_vdp(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gp9001_screen_eof();
+	void create_tilemaps();
+	void init_scroll_regs();
 
 	bitmap_ind8 *custom_priority_bitmap;
 
@@ -37,9 +34,7 @@ public:
 
 	// game-specific hack stuff
 	void disable_sprite_buffer() { sp.use_sprite_buffer = 0; }
-	void set_bg_extra_offsets(int xn, int yn, int xf, int yf) { bg.set_extra_offsets(xn, yn, xf, yf); }
-	void set_fg_extra_offsets(int xn, int yn, int xf, int yf) { fg.set_extra_offsets(xn, yn, xf, yf); }
-	void set_top_extra_offsets(int xn, int yn, int xf, int yf) { top.set_extra_offsets(xn, yn, xf, yf); }
+	void set_tm_extra_offsets(int layer, int xn, int yn, int xf, int yf) { tm[layer].set_extra_offsets(xn, yn, xf, yf); }
 	void set_sp_extra_offsets(int xn, int yn, int xf, int yf) { sp.set_extra_offsets(xn, yn, xf, yf); }
 
 	// ROM banking control
@@ -79,15 +74,11 @@ protected:
 
 	address_space_config        m_space_config;
 
-	TILE_GET_INFO_MEMBER(get_top0_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
 private:
 	// internal handlers
-	DECLARE_WRITE16_MEMBER(bg_tmap_w);
-	DECLARE_WRITE16_MEMBER(fg_tmap_w);
-	DECLARE_WRITE16_MEMBER(top_tmap_w);
+	template<int Layer> DECLARE_WRITE16_MEMBER(tmap_w);
 
 	static constexpr unsigned BG_VRAM_SIZE   = 0x1000;   /* Background RAM size */
 	static constexpr unsigned FG_VRAM_SIZE   = 0x1000;   /* Foreground RAM size */
@@ -137,9 +128,9 @@ private:
 		std::unique_ptr<uint16_t[]> vram16_buffer; // vram buffer for this layer
 	};
 
-	int get_tile_number(uint16_t const *vram, int index)
+	int get_tile_number(int layer, int index)
 	{
-		uint16_t const value = vram[(index << 1) | 1];
+		uint16_t const value = m_vram[layer][(index << 1) | 1];
 		if (gfxrom_is_banked)
 			return (gfxrom_bank[(value >> 13) & 7] << 13) | (value & 0x1fff);
 		else
@@ -159,7 +150,7 @@ private:
 	uint16_t gp9001_voffs;
 	uint16_t gp9001_scroll_reg;
 
-	tilemaplayer bg, top, fg;
+	tilemaplayer tm[3];
 	spritelayer sp;
 
 	// technically this is just rom banking, allowing the chip to see more graphic ROM, however it's easier to handle it
@@ -169,9 +160,7 @@ private:
 	bool gfxrom_bank_dirty;       /* dirty flag of object bank (for Batrider) */
 	uint16_t gfxrom_bank[8];       /* Batrider object bank */
 
-	required_shared_ptr<uint16_t> m_vram_bg;
-	required_shared_ptr<uint16_t> m_vram_fg;
-	required_shared_ptr<uint16_t> m_vram_top;
+	required_shared_ptr_array<uint16_t, 3> m_vram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	devcb_write_line m_vint_out_cb;

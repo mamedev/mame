@@ -137,6 +137,7 @@ Dip locations added based on the notes above.
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -151,6 +152,9 @@ public:
 		m_bgram(*this, "bgram"),
 		m_fgram(*this, "fgram") { }
 
+	void ppmast93(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -171,7 +175,6 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ppmast93(machine_config &config);
 	void ppmast93_cpu1_io(address_map &map);
 	void ppmast93_cpu1_map(address_map &map);
 	void ppmast93_cpu2_io(address_map &map);
@@ -204,35 +207,39 @@ WRITE8_MEMBER(ppmast93_state::port4_w)
 	membank("cpubank")->set_entry(data & 0x07);
 }
 
-ADDRESS_MAP_START(ppmast93_state::ppmast93_cpu1_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpubank")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0xd800, 0xdfff) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ppmast93_state::ppmast93_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().nopw();
+	map(0x8000, 0xbfff).bankr("cpubank");
+	map(0xd000, 0xd7ff).ram().w(FUNC(ppmast93_state::bgram_w)).share("bgram");
+	map(0xd800, 0xdfff).nopw();
+	map(0xf000, 0xf7ff).ram().w(FUNC(ppmast93_state::fgram_w)).share("fgram");
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(ppmast93_state::ppmast93_cpu1_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM") AM_WRITE(port4_w)
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW1")
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+void ppmast93_state::ppmast93_cpu1_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).portr("P2");
+	map(0x04, 0x04).portr("SYSTEM").w(FUNC(ppmast93_state::port4_w));
+	map(0x06, 0x06).portr("DSW1");
+	map(0x08, 0x08).portr("DSW2");
+}
 
-ADDRESS_MAP_START(ppmast93_state::ppmast93_cpu2_map)
-	AM_RANGE(0x0000, 0xfbff) AM_ROM AM_REGION("sub", 0x10000)
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xfd00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ppmast93_state::ppmast93_cpu2_map(address_map &map)
+{
+	map(0x0000, 0xfbff).rom().region("sub", 0x10000);
+	map(0xfc00, 0xfc00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xfd00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(ppmast93_state::ppmast93_cpu2_io)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("sub", 0x20000)
-	AM_RANGE(0x0000, 0x0001) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x0002, 0x0002) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void ppmast93_state::ppmast93_cpu2_io(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("sub", 0x20000);
+	map(0x0000, 0x0001).mirror(0xff00).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x0002, 0x0002).mirror(0xff00).w("dac", FUNC(dac_byte_interface::data_w));
+}
 
 static INPUT_PORTS_START( ppmast93 )
 	PORT_START("P1")
@@ -262,7 +269,7 @@ static INPUT_PORTS_START( ppmast93 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) // or it always goes to test mode
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) // or it always goes to test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -328,7 +335,7 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( ppmast93 )
+static GFXDECODE_START( gfx_ppmast93 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -367,15 +374,15 @@ uint32_t ppmast93_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 MACHINE_CONFIG_START(ppmast93_state::ppmast93)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,5000000)         /* 5 MHz */
-	MCFG_CPU_PROGRAM_MAP(ppmast93_cpu1_map)
-	MCFG_CPU_IO_MAP(ppmast93_cpu1_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppmast93_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,5000000)         /* 5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ppmast93_cpu1_map)
+	MCFG_DEVICE_IO_MAP(ppmast93_cpu1_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ppmast93_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,5000000)         /* 5 MHz */
-	MCFG_CPU_PROGRAM_MAP(ppmast93_cpu2_map)
-	MCFG_CPU_IO_MAP(ppmast93_cpu2_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ppmast93_state, irq0_line_hold, 8000)
+	MCFG_DEVICE_ADD("sub", Z80,5000000)         /* 5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ppmast93_cpu2_map)
+	MCFG_DEVICE_IO_MAP(ppmast93_cpu2_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ppmast93_state, irq0_line_hold, 8000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -386,21 +393,21 @@ MACHINE_CONFIG_START(ppmast93_state::ppmast93)
 	MCFG_SCREEN_UPDATE_DRIVER(ppmast93_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppmast93)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppmast93)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 5000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 5000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( ppmast93 )
@@ -420,4 +427,4 @@ ROM_START( ppmast93 )
 	ROM_LOAD( "prom1.ug26", 0x200, 0x100, CRC(d979c64e) SHA1(172c9579013d58e35a5b4f732e360811ac36295e) )
 ROM_END
 
-GAME( 1993, ppmast93, 0, ppmast93, ppmast93, ppmast93_state, 0, ROT0, "Electronic Devices S.R.L.", "Ping Pong Masters '93", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ppmast93, 0, ppmast93, ppmast93, ppmast93_state, empty_init, ROT0, "Electronic Devices S.R.L.", "Ping Pong Masters '93", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

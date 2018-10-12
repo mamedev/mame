@@ -26,7 +26,7 @@ public:
 private:
 	static const char *const regs[8];
 	u16 r16p(offs_t &pc, const data_buffer &opcodes);
-	std::string MakeEA (int lo, offs_t &pc, int width, const data_buffer &opcodes);
+	template <int Width> std::string MakeEA (int lo, offs_t &pc, const data_buffer &opcodes);
 
 };
 

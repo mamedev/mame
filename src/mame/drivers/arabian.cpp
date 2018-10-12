@@ -211,14 +211,15 @@ WRITE8_MEMBER(arabian_state::mcu_port_p_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(arabian_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ_PORT("IN0")
-	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x01ff) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd7ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("custom_cpu_ram")
-	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_SHARE("blitter")
-ADDRESS_MAP_END
+void arabian_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).w(FUNC(arabian_state::arabian_videoram_w));
+	map(0xc000, 0xc000).mirror(0x01ff).portr("IN0");
+	map(0xc200, 0xc200).mirror(0x01ff).portr("DSW1");
+	map(0xd000, 0xd7ff).mirror(0x0800).ram().share("custom_cpu_ram");
+	map(0xe000, 0xe007).mirror(0x0ff8).w(FUNC(arabian_state::arabian_blitter_w)).share("blitter");
+}
 
 
 
@@ -228,10 +229,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(arabian_state::main_io_map)
-	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-ADDRESS_MAP_END
+void arabian_state::main_io_map(address_map &map)
+{
+	map(0xc800, 0xc800).mirror(0x01ff).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xca00, 0xca00).mirror(0x01ff).w("aysnd", FUNC(ay8910_device::data_w));
+}
 
 
 
@@ -356,23 +358,23 @@ void arabian_state::machine_reset()
 MACHINE_CONFIG_START(arabian_state::arabian)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", arabian_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_OSC/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arabian_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("mcu", MB8841, MAIN_OSC/3/2)
-	MCFG_MB88XX_READ_K_CB(READ8(arabian_state, mcu_portk_r))
-	MCFG_MB88XX_WRITE_O_CB(WRITE8(arabian_state, mcu_port_o_w))
-	MCFG_MB88XX_WRITE_P_CB(WRITE8(arabian_state, mcu_port_p_w))
-	MCFG_MB88XX_READ_R0_CB(READ8(arabian_state, mcu_port_r0_r))
-	MCFG_MB88XX_WRITE_R0_CB(WRITE8(arabian_state, mcu_port_r0_w))
-	MCFG_MB88XX_READ_R1_CB(READ8(arabian_state, mcu_port_r1_r))
-	MCFG_MB88XX_WRITE_R1_CB(WRITE8(arabian_state, mcu_port_r1_w))
-	MCFG_MB88XX_READ_R2_CB(READ8(arabian_state, mcu_port_r2_r))
-	MCFG_MB88XX_WRITE_R2_CB(WRITE8(arabian_state, mcu_port_r2_w))
-	MCFG_MB88XX_READ_R3_CB(READ8(arabian_state, mcu_port_r3_r))
-	MCFG_MB88XX_WRITE_R3_CB(WRITE8(arabian_state, mcu_port_r3_w))
+	MCFG_DEVICE_ADD("mcu", MB8841, MAIN_OSC/3/2)
+	MCFG_MB88XX_READ_K_CB(READ8(*this, arabian_state, mcu_portk_r))
+	MCFG_MB88XX_WRITE_O_CB(WRITE8(*this, arabian_state, mcu_port_o_w))
+	MCFG_MB88XX_WRITE_P_CB(WRITE8(*this, arabian_state, mcu_port_p_w))
+	MCFG_MB88XX_READ_R0_CB(READ8(*this, arabian_state, mcu_port_r0_r))
+	MCFG_MB88XX_WRITE_R0_CB(WRITE8(*this, arabian_state, mcu_port_r0_w))
+	MCFG_MB88XX_READ_R1_CB(READ8(*this, arabian_state, mcu_port_r1_r))
+	MCFG_MB88XX_WRITE_R1_CB(WRITE8(*this, arabian_state, mcu_port_r1_w))
+	MCFG_MB88XX_READ_R2_CB(READ8(*this, arabian_state, mcu_port_r2_r))
+	MCFG_MB88XX_WRITE_R2_CB(WRITE8(*this, arabian_state, mcu_port_r2_w))
+	MCFG_MB88XX_READ_R3_CB(READ8(*this, arabian_state, mcu_port_r3_r))
+	MCFG_MB88XX_WRITE_R3_CB(WRITE8(*this, arabian_state, mcu_port_r3_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -390,11 +392,11 @@ MACHINE_CONFIG_START(arabian_state::arabian)
 	MCFG_PALETTE_INIT_OWNER(arabian_state, arabian)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_OSC/4/2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(arabian_state, ay8910_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(arabian_state, ay8910_portb_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_OSC/4/2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, arabian_state, ay8910_porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, arabian_state, ay8910_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -449,5 +451,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, arabian,  0,       arabian, arabian,  arabian_state, 0, ROT270, "Sun Electronics",                 "Arabian",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, arabiana, arabian, arabian, arabiana, arabian_state, 0, ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, arabian,  0,       arabian, arabian,  arabian_state, empty_init, ROT270, "Sun Electronics",                 "Arabian",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, arabiana, arabian, arabian, arabiana, arabian_state, empty_init, ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", MACHINE_SUPPORTS_SAVE )

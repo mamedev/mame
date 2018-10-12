@@ -17,10 +17,8 @@
 /*
     driver init function
 */
-DRIVER_INIT_MEMBER(tx0_state,tx0)
+void tx0_state::init_tx0()
 {
-	uint8_t *dst;
-
 	static const unsigned char fontdata6x8[tx0_fontdata_size] =
 	{   /* ASCII characters */
 		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x00,
@@ -74,20 +72,22 @@ DRIVER_INIT_MEMBER(tx0_state,tx0)
 	};
 
 	/* set up our font */
-	dst = memregion("gfx1")->base();
+	uint8_t *dst = memregion("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, tx0_fontdata_size);
 }
 
 
-ADDRESS_MAP_START(tx0_state::tx0_64kw_map)
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void tx0_state::tx0_64kw_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(tx0_state::tx0_8kw_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void tx0_state::tx0_8kw_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+}
 
 
 static INPUT_PORTS_START( tx0 )
@@ -225,7 +225,7 @@ static const uint8_t tx0_palette[] =
 
 static const uint8_t total_colors_needed = pen_crt_num_levels + sizeof(tx0_colors) / 3;
 
-static GFXDECODE_START( tx0 )
+static GFXDECODE_START( gfx_tx0 )
 	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, pen_crt_num_levels + sizeof(tx0_colors) / 3, 3 )
 GFXDECODE_END
 
@@ -1540,22 +1540,22 @@ INTERRUPT_GEN_MEMBER(tx0_state::tx0_interrupt)
 MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
-	MCFG_CPU_ADD("maincpu", TX0_64KW, 166667)
+	MCFG_DEVICE_ADD("maincpu", TX0_64KW, 166667)
 	MCFG_TX0_CONFIG(
-		WRITELINE( tx0_state, tx0_io_cpy ),
-		WRITELINE( tx0_state, tx0_io_r1l ),
-		WRITELINE( tx0_state, tx0_io_dis ),
-		WRITELINE( tx0_state, tx0_io_r3l ),
-		WRITELINE( tx0_state, tx0_io_prt ),
+		WRITELINE( *this, tx0_state, tx0_io_cpy ),
+		WRITELINE( *this, tx0_state, tx0_io_r1l ),
+		WRITELINE( *this, tx0_state, tx0_io_dis ),
+		WRITELINE( *this, tx0_state, tx0_io_r3l ),
+		WRITELINE( *this, tx0_state, tx0_io_prt ),
 		NOOP,
-		WRITELINE( tx0_state, tx0_io_p6h ),
-		WRITELINE( tx0_state, tx0_io_p7h ),
-		WRITELINE( tx0_state, tx0_sel ),
-		WRITELINE( tx0_state, tx0_io_reset_callback )
+		WRITELINE( *this, tx0_state, tx0_io_p6h ),
+		WRITELINE( *this, tx0_state, tx0_io_p7h ),
+		WRITELINE( *this, tx0_state, tx0_sel ),
+		WRITELINE( *this, tx0_state, tx0_io_reset_callback )
 	)
-	MCFG_CPU_PROGRAM_MAP(tx0_64kw_map)
+	MCFG_DEVICE_PROGRAM_MAP(tx0_64kw_map)
 	/* dummy interrupt: handles input */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tx0_state,  tx0_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tx0_state,  tx0_interrupt)
 
 	/* video hardware (includes the control panel and typewriter output) */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1564,7 +1564,7 @@ MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tx0_state, screen_update_tx0)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx0_state, screen_vblank_tx0))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx0_state, screen_vblank_tx0))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crt", CRT, 0)
@@ -1577,7 +1577,7 @@ MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	MCFG_DEVICE_ADD("typewriter", TX0_PRINTER, 0)
 	MCFG_DEVICE_ADD("magtape", TX0_MAGTAPE, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tx0)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tx0)
 	MCFG_PALETTE_ADD("palette", total_colors_needed + sizeof(tx0_palette))
 	MCFG_PALETTE_INDIRECT_ENTRIES(total_colors_needed)
 	MCFG_PALETTE_INIT_OWNER(tx0_state, tx0)
@@ -1589,8 +1589,8 @@ MACHINE_CONFIG_START(tx0_state::tx0_8kw)
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
 	approximately 6usec) */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tx0_8kw_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tx0_8kw_map)
 	/*MCFG_CPU_PORTS(readport, writeport)*/
 MACHINE_CONFIG_END
 
@@ -1618,6 +1618,6 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  STATE        INIT   COMPANY  FULLNAME                                          FLAGS
-COMP( 1956, tx0_64kw, 0,        0,      tx0_64kw, tx0,   tx0_state,   tx0,   "MIT",   "TX-0 original demonstrator (64 kWords of RAM)" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
-COMP( 1962, tx0_8kw,  tx0_64kw, 0,      tx0_8kw,  tx0,   tx0_state,   tx0,   "MIT",   "TX-0 upgraded system (8 kWords of RAM)" ,        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  STATE      INIT      COMPANY  FULLNAME                                         FLAGS
+COMP( 1956, tx0_64kw, 0,        0,      tx0_64kw, tx0,   tx0_state, init_tx0, "MIT",   "TX-0 original demonstrator (64 kWords of RAM)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+COMP( 1962, tx0_8kw,  tx0_64kw, 0,      tx0_8kw,  tx0,   tx0_state, init_tx0, "MIT",   "TX-0 upgraded system (8 kWords of RAM)",        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)

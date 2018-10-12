@@ -9,18 +9,21 @@
 #ifndef MAME_INCLUDES_GB_H
 #define MAME_INCLUDES_GB_H
 
+#pragma once
+
 #include "sound/gb.h"
 #include "cpu/lr35902/lr35902.h"
 #include "bus/gameboy/gb_slot.h"
 #include "machine/ram.h"
 #include "video/gb_lcd.h"
+#include "emupal.h"
 
 
 class gb_state : public driver_device
 {
 public:
-	gb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_cartslot(*this, "gbslot"),
 		m_maincpu(*this, "maincpu"),
 		m_apu(*this, "apu"),
@@ -29,7 +32,8 @@ public:
 		m_inputs(*this, "INPUTS"),
 		m_bios_hack(*this, "SKIP_CHECK"),
 		m_ram(*this, RAM_TAG),
-		m_ppu(*this, "ppu") { }
+		m_ppu(*this, "ppu")
+	{ }
 
 	uint8_t       m_gb_io[0x10];
 

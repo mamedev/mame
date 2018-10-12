@@ -158,13 +158,14 @@ WRITE16_MEMBER(md_rom_ggenie_device::write)
 }
 
 
-static SLOT_INTERFACE_START(ggenie_sub_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  MD_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_svp",  MD_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_sram",  MD_ROM_SRAM)
-	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)
-	SLOT_INTERFACE_INTERNAL("rom_fram",  MD_ROM_FRAM)
-SLOT_INTERFACE_END
+static void ggenie_sub_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  MD_STD_ROM);
+	device.option_add_internal("rom_svp",  MD_STD_ROM);
+	device.option_add_internal("rom_sram",  MD_ROM_SRAM);
+	device.option_add_internal("rom_sramsafe",  MD_ROM_SRAM);
+	device.option_add_internal("rom_fram",  MD_ROM_FRAM);
+}
 
 
 //-------------------------------------------------

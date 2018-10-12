@@ -144,25 +144,26 @@ READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
 	return m_k056832->bishi_rom_word_r(space, ouroffs, mem_mask);
 }
 
-ADDRESS_MAP_START(bishi_state::main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x407fff) AM_RAM                     // Work RAM
-	AM_RANGE(0x800000, 0x800001) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW")
-	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x800008, 0x800009) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x810000, 0x810003) AM_WRITE(control2_w)       // bank switch for K056832 character ROM test
-	AM_RANGE(0x820000, 0x820001) AM_WRITENOP            // lamps (see lamp test in service menu)
-	AM_RANGE(0x830000, 0x83003f) AM_DEVWRITE("k056832", k056832_device, word_w)
-	AM_RANGE(0x840000, 0x840007) AM_DEVWRITE("k056832", k056832_device, b_word_w)    // VSCCS
-	AM_RANGE(0x850000, 0x85001f) AM_DEVWRITE("k054338", k054338_device, word_w)  // CLTC
-	AM_RANGE(0x870000, 0x8700ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)  // PCU2
-	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
-	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  // Graphic planes
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)    // bug in the ram/rom test?
-	AM_RANGE(0xc00000, 0xc01fff) AM_READ(bishi_K056832_rom_r)
-ADDRESS_MAP_END
+void bishi_state::main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x407fff).ram();                     // Work RAM
+	map(0x800000, 0x800001).rw(FUNC(bishi_state::control_r), FUNC(bishi_state::control_w));
+	map(0x800004, 0x800005).portr("DSW");
+	map(0x800006, 0x800007).portr("SYSTEM");
+	map(0x800008, 0x800009).portr("INPUTS");
+	map(0x810000, 0x810003).w(FUNC(bishi_state::control2_w));       // bank switch for K056832 character ROM test
+	map(0x820000, 0x820001).nopw();            // lamps (see lamp test in service menu)
+	map(0x830000, 0x83003f).w(m_k056832, FUNC(k056832_device::word_w));
+	map(0x840000, 0x840007).w(m_k056832, FUNC(k056832_device::b_word_w));    // VSCCS
+	map(0x850000, 0x85001f).w(m_k054338, FUNC(k054338_device::word_w));  // CLTC
+	map(0x870000, 0x8700ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));  // PCU2
+	map(0x880000, 0x880003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
+	map(0xa00000, 0xa01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  // Graphic planes
+	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xb04000, 0xb047ff).r(FUNC(bishi_state::bishi_mirror_r));    // bug in the ram/rom test?
+	map(0xc00000, 0xc01fff).r(FUNC(bishi_state::bishi_K056832_rom_r));
+}
 
 static INPUT_PORTS_START( bishi )
 	/* Currently, this "IN0" is not read */
@@ -447,8 +448,8 @@ void bishi_state::machine_reset()
 MACHINE_CONFIG_START(bishi_state::bishi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bishi_state, bishi_scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -467,7 +468,7 @@ MACHINE_CONFIG_START(bishi_state::bishi)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(bishi_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k054338", K054338, 0)
@@ -476,9 +477,10 @@ MACHINE_CONFIG_START(bishi_state::bishi)
 	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, SOUND_CLOCK) /* 16.9344MHz */
+	MCFG_DEVICE_ADD("ymz", YMZ280B, SOUND_CLOCK) /* 16.9344MHz */
 	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -489,7 +491,7 @@ MACHINE_CONFIG_START(bishi_state::dobouchn)
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
 	MCFG_DEVICE_MODIFY("k056832")
 //  MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0)
 MACHINE_CONFIG_END
 
 // ROM definitions
@@ -601,8 +603,8 @@ ROM_START( dobouchn )
 	ROM_LOAD( "640-a02-4f.bin", 0x080000, 0x080000, CRC(ab6593f5) SHA1(95907ee4a2cdf3bf27b7c0c1283b2bc36b868d9d) )
 ROM_END
 
-GAME( 1996, bishi,    0,      bishi,    bishi,    bishi_state,   0, ROT0, "Konami", "Bishi Bashi Championship Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishi,   0,      bishi,    bishi2p,  bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishik,  sbishi, bishi,    bishi,    bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAB, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishika, sbishi, bishi,    bishi,    bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, dobouchn, 0,      dobouchn, dobouchn, bishi_state,   0, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bishi,    0,      bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Bishi Bashi Championship Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishi,   0,      bishi,    bishi2p,  bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Championship (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishik,  sbishi, bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAB, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishika, sbishi, bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dobouchn, 0,      dobouchn, dobouchn, bishi_state, empty_init, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

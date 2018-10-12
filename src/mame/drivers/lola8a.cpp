@@ -29,6 +29,7 @@
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,6 +49,9 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
+	void lola8a(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(lola8a_port_a_r);
 	DECLARE_WRITE8_MEMBER(lola8a_port_b_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
@@ -56,10 +60,9 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void lola8a(machine_config &config);
 	void lola8a_io(address_map &map);
 	void lola8a_mem(address_map &map);
-private:
+
 	uint8_t m_portb;
 	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
 	required_device<cpu_device> m_maincpu;
@@ -68,28 +71,30 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 };
 
-ADDRESS_MAP_START(lola8a_state::lola8a_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_RAM // 6264 at G45
-	AM_RANGE( 0x2000, 0x3fff ) AM_RAM // 6264 at F45
+void lola8a_state::lola8a_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).ram(); // 6264 at G45
+	map(0x2000, 0x3fff).ram(); // 6264 at F45
 										// empty place for 6264 at E45
 										// empty place for 6264 at D45
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROM // 2764A at B45
-	AM_RANGE( 0xa000, 0xbfff ) AM_ROM // 2764A at C45
-	AM_RANGE( 0xc000, 0xdfff ) AM_ROM // 2764A at H67
-	AM_RANGE( 0xe000, 0xffff ) AM_RAM AM_SHARE("videoram") // 6264 at G67
-ADDRESS_MAP_END
+	map(0x8000, 0x9fff).rom(); // 2764A at B45
+	map(0xa000, 0xbfff).rom(); // 2764A at C45
+	map(0xc000, 0xdfff).rom(); // 2764A at H67
+	map(0xe000, 0xffff).ram().share("videoram"); // 6264 at G67
+}
 
-ADDRESS_MAP_START(lola8a_state::lola8a_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE(AY8910_TAG, ay8910_device, data_r, data_w)
-	AM_RANGE(0x88, 0x88) AM_READ(keyboard_r)
+void lola8a_state::lola8a_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x80, 0x80).w(AY8910_TAG, FUNC(ay8910_device::address_w));
+	map(0x84, 0x84).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x88, 0x88).r(FUNC(lola8a_state::keyboard_r));
 
-	AM_RANGE(0x90, 0x90) AM_DEVREADWRITE(HD46505SP_TAG, mc6845_device, status_r, address_w)
-	AM_RANGE(0x92, 0x92) AM_DEVREADWRITE(HD46505SP_TAG, mc6845_device, register_r, register_w)
+	map(0x90, 0x90).rw(HD46505SP_TAG, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x92, 0x92).rw(HD46505SP_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( lola8a )
@@ -262,16 +267,16 @@ WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
 
 MACHINE_CONFIG_START(lola8a_state::lola8a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(4'915'200))
-	MCFG_CPU_PROGRAM_MAP(lola8a_mem)
-	MCFG_CPU_IO_MAP(lola8a_io)
-	MCFG_I8085A_SID(READLINE(lola8a_state, cass_r))
-	MCFG_I8085A_SOD(WRITELINE(lola8a_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(4'915'200))
+	MCFG_DEVICE_PROGRAM_MAP(lola8a_mem)
+	MCFG_DEVICE_IO_MAP(lola8a_io)
+	MCFG_I8085A_SID(READLINE(*this, lola8a_state, cass_r))
+	MCFG_I8085A_SOD(WRITELINE(*this, lola8a_state, cass_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL(4'915'200) / 4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(lola8a_state, lola8a_port_a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lola8a_state, lola8a_port_b_w))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(4'915'200) / 4)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, lola8a_state, lola8a_port_a_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lola8a_state, lola8a_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
 
 	/* video hardware */
@@ -286,14 +291,13 @@ MACHINE_CONFIG_START(lola8a_state::lola8a)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(lola8a_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(lola8a_state, crtc_vsync))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, lola8a_state, crtc_vsync))
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -306,5 +310,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT    COMPANY                      FULLNAME       FLAGS
-COMP( 1986, lola8a, 0,      0,      lola8a,   lola8a,  lola8a_state,  0,      "Institut Ivo Lola Ribar",   "Lola 8A",     MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                    FULLNAME   FLAGS
+COMP( 1986, lola8a, 0,      0,      lola8a,  lola8a, lola8a_state, empty_init, "Institut Ivo Lola Ribar", "Lola 8A", MACHINE_NOT_WORKING )

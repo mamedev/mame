@@ -130,7 +130,7 @@
 #define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
 
 
-#define READ_OP(addr)          m_direct->read_word((addr), m_core->opcodexor)
+#define READ_OP(addr)          m_pr16(addr)
 
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0

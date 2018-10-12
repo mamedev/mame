@@ -77,45 +77,63 @@ Z80 CPU - 12MHz/2
 #include "speaker.h"
 
 
-WRITE8_MEMBER(gundealr_state::yamyam_bankswitch_w)
+WRITE8_MEMBER(gundealr_state::bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 0x07);
+	m_mainbank->set_entry(data & 0x07);
 }
 
 
+template<int Xor>
+WRITE8_MEMBER(gundealr_state::fg_scroll_w)
+{
+	m_scroll[offset] = data;
+	m_fg_tilemap->set_scrollx(0, m_scroll[0^Xor] | ((m_scroll[1^Xor] & 0x03) << 8));
+	m_fg_tilemap->set_scrolly(0, m_scroll[2^Xor] | ((m_scroll[3^Xor] & 0x03) << 8));
+}
 
-ADDRESS_MAP_START(gundealr_state::base_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW0")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("IN0")
-	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("IN1")
-	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN2")
-	AM_RANGE(0xc016, 0xc016) AM_WRITE(yamyam_bankswitch_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(gundealr_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gundealr_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(gundealr_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("rambase")
-ADDRESS_MAP_END
+template<int Bit>
+WRITE8_MEMBER(gundealr_state::flipscreen_w)
+{
+	machine().tilemap().set_flip_all(BIT(data, Bit) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+}
 
-ADDRESS_MAP_START(gundealr_state::gundealr_main_map)
-	AM_IMPORT_FROM(base_map)
-	AM_RANGE(0xc014, 0xc014) AM_WRITE(gundealr_flipscreen_w)
-	AM_RANGE(0xc020, 0xc023) AM_WRITE(gundealr_fg_scroll_w)
-ADDRESS_MAP_END
 
-ADDRESS_MAP_START(gundealr_state::yamyam_main_map)
-	AM_IMPORT_FROM(base_map)
-	AM_RANGE(0xc010, 0xc013) AM_WRITE(yamyam_fg_scroll_w)
-	AM_RANGE(0xc014, 0xc014) AM_WRITE(yamyam_flipscreen_w)
-	AM_RANGE(0xc015, 0xc015) AM_WRITENOP // Bit 7 = MCU reset?
-ADDRESS_MAP_END
+void gundealr_state::base_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0xc000, 0xc000).portr("DSW0");
+	map(0xc001, 0xc001).portr("DSW1");
+	map(0xc004, 0xc004).portr("IN0");
+	map(0xc005, 0xc005).portr("IN1");
+	map(0xc006, 0xc006).portr("IN2");
+	map(0xc016, 0xc016).w(FUNC(gundealr_state::bankswitch_w));
+	map(0xc400, 0xc7ff).ram().w(FUNC(gundealr_state::paletteram_w)).share("paletteram");
+	map(0xc800, 0xcfff).ram().w(FUNC(gundealr_state::bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xdfff).ram().w(FUNC(gundealr_state::fg_videoram_w)).share("fg_videoram");
+	map(0xe000, 0xffff).ram().share("rambase");
+}
 
-ADDRESS_MAP_START(gundealr_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-ADDRESS_MAP_END
+void gundealr_state::gundealr_main_map(address_map &map)
+{
+	base_map(map);
+	map(0xc014, 0xc014).w(FUNC(gundealr_state::flipscreen_w<0>));
+	map(0xc020, 0xc023).w(FUNC(gundealr_state::fg_scroll_w<1>));
+}
+
+void gundealr_state::yamyam_main_map(address_map &map)
+{
+	base_map(map);
+	map(0xc010, 0xc013).w(FUNC(gundealr_state::fg_scroll_w<0>));
+	map(0xc014, 0xc014).w(FUNC(gundealr_state::flipscreen_w<7>));
+	map(0xc015, 0xc015).nopw(); // Bit 7 = MCU reset?
+}
+
+void gundealr_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 
@@ -365,33 +383,31 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
+static const gfx_layout layout8x8x4 =
 {
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	8*8*4
 };
 
-static const gfx_layout spritelayout =
+static const gfx_layout layout16x16x4 =
 {
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	128*8
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) },
+	{ STEP16(0,4*8) },
+	16*16*4
 };
 
-static GFXDECODE_START( gundealr )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* colors 0-255 */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 ) /* colors 256-511 */
+static GFXDECODE_START( gfx_gundealr )
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x4,     0, 16 ) /* colors 0-255 */
+	GFXDECODE_ENTRY( "gfx2", 0, layout16x16x4, 256, 16 ) /* colors 256-511 */
 GFXDECODE_END
 
 
@@ -399,9 +415,7 @@ GFXDECODE_END
 
 void gundealr_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 
 	save_item(NAME(m_scroll));
 }
@@ -414,7 +428,7 @@ void gundealr_state::machine_reset()
 	m_scroll[3] = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::gundealr_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::scanline)
 {
 	int scanline = param;
 
@@ -427,11 +441,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::gundealr_scanline)
 MACHINE_CONFIG_START(gundealr_state::gundealr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)   /* 6 MHz verified for Yam! Yam!? */
-	MCFG_CPU_PROGRAM_MAP(gundealr_main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gundealr_state, gundealr_scanline, "screen", 0, 1)
-
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)   /* 6 MHz verified for Yam! Yam!? */
+	MCFG_DEVICE_PROGRAM_MAP(gundealr_main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gundealr_state, scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -439,17 +452,16 @@ MACHINE_CONFIG_START(gundealr_state::gundealr)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gundealr_state, screen_update_gundealr)
+	MCFG_SCREEN_UPDATE_DRIVER(gundealr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gundealr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gundealr)
 	MCFG_PALETTE_ADD("palette", 512)
 
-
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* 1.5Mhz verified for Yam! Yam!? */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* 1.5Mhz verified for Yam! Yam!? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -512,15 +524,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 			break;
 	}
 
-	m_rambase[0x004] = ioport("IN2")->read();
-	m_rambase[0x005] = ioport("IN1")->read();
-	m_rambase[0x006] = ioport("IN0")->read();
+	m_rambase[0x004] = m_port_in[2]->read();
+	m_rambase[0x005] = m_port_in[1]->read();
+	m_rambase[0x006] = m_port_in[0]->read();
 }
 
 MACHINE_CONFIG_START(gundealr_state::yamyam)
 	gundealr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(yamyam_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(yamyam_main_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(6000000/60)) /* 6mhz confirmed */
 MACHINE_CONFIG_END
@@ -538,9 +550,9 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( gundealr )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "1.3j",   0x00000, 0x10000, CRC(5797e830) SHA1(54bd9fbcafdf3fff55d73ecfe26d8e8df0dd55d9) ) /* 27c512; NOTE: the socket is labeled 1, but the rom has a '2' sticker on it! */
-	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
+	/* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "3.6p",         0x00000, 0x10000, CRC(01f99de2) SHA1(2d9e9c50b0669811beb6fa53c0ff1b240fa939c7) )
@@ -554,9 +566,9 @@ ROM_START( gundealr )
 ROM_END
 
 ROM_START( gundealra )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "gundeala.1.3j",   0x00000, 0x10000, CRC(d87e24f1) SHA1(5ac3e20e5848b9cab2a23e083d2566bfd54502d4) )
-	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
+	/* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "gundeala.3.6p",   0x00000, 0x10000, CRC(836cf1a3) SHA1(ca57e7fc3e4497d249af963d1c8610e80ca65aa7) )
@@ -570,9 +582,9 @@ ROM_START( gundealra )
 ROM_END
 
 ROM_START( gundealrt )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "1.3j",         0x00000, 0x10000, CRC(1d951292) SHA1(a8bd34dfaf31c7dc4f9e0ec1fd7d4e10c5b29a85) )
-	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
+	/* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "3.6p",         0x00000, 0x10000, CRC(01f99de2) SHA1(2d9e9c50b0669811beb6fa53c0ff1b240fa939c7) )
@@ -586,9 +598,9 @@ ROM_START( gundealrt )
 ROM_END
 
 ROM_START( gundealrbl ) // gfx customs done out in TTL logic, different proms, patched code rom
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "29.2.am27c512.f10",   0x00000, 0x10000, CRC(7981751e) SHA1(3138581bcff84a11670ba54cbca608d590055b4e) ) // almost == gundealr "1.3j", 5 bytes different: (what does this change?)
-	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
+	/* banked at 0x8000-0xbfff */
 	// address gundealr gundealrbl
 	// 009a    07       00
 	// 6d4a    21       10
@@ -610,9 +622,9 @@ ROM_START( gundealrbl ) // gfx customs done out in TTL logic, different proms, p
 ROM_END
 
 ROM_START( yamyam ) /* DY-90010001 PCB */
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "3.10f",       0x00000, 0x20000, CRC(96ae9088) SHA1(a605882dcdcf1e8cf8b0112f614e696d59acfd97) )
-	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 0x8000-0xbfff */
+	/* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "mcu", 0 ) // unknown 64 pin MCU at J9 with internal ROM code
 	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)
@@ -628,9 +640,9 @@ ROM_START( yamyam ) /* DY-90010001 PCB */
 ROM_END
 
 ROM_START( yamyamk ) /* DY-90010001 PCB */
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "3.10f",       0x00000, 0x20000, CRC(96ae9088) SHA1(a605882dcdcf1e8cf8b0112f614e696d59acfd97) )
-	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 0x8000-0xbfff */
+	/* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "mcu", 0 ) // unknown 64 pin MCU at J9 with internal ROM code
 	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)
@@ -646,9 +658,9 @@ ROM_START( yamyamk ) /* DY-90010001 PCB */
 ROM_END
 
 ROM_START( wiseguy ) /* DY-90010001 PCB */
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "b3.f10",       0x00000, 0x20000, CRC(96ae9088) SHA1(a605882dcdcf1e8cf8b0112f614e696d59acfd97) )
-	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 0x8000-0xbfff */
+	/* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "mcu", 0 ) // unknown 64 pin MCU at J9 with internal ROM code
 	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)
@@ -665,11 +677,11 @@ ROM_END
 
 
 
-GAME( 1990, gundealr,   0,        gundealr, gundealr, gundealr_state, 0, ROT270, "Dooyong", "Gun Dealer",                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealra,  gundealr, gundealr, gundealr, gundealr_state, 0, ROT270, "Dooyong", "Gun Dealer (alt card set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealrt,  gundealr, gundealr, gundealt, gundealr_state, 0, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealrbl, gundealr, gundealrbl, gundealr, gundealr_state, 0, ROT270, "Dooyong", "Gun Dealer (Yam! Yam!? hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealr,   0,        gundealr,   gundealr, gundealr_state, empty_init, ROT270, "Dooyong", "Gun Dealer",                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealra,  gundealr, gundealr,   gundealr, gundealr_state, empty_init, ROT270, "Dooyong", "Gun Dealer (alt card set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealrt,  gundealr, gundealr,   gundealt, gundealr_state, empty_init, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealrbl, gundealr, gundealrbl, gundealr, gundealr_state, empty_init, ROT270, "Dooyong", "Gun Dealer (Yam! Yam!? hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, yamyam,     0,        yamyam,   yamyam,   gundealr_state, 0, ROT0,   "Dooyong", "Yam! Yam!?",                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, yamyamk,    yamyam,   yamyam,   yamyam,   gundealr_state, 0, ROT0,   "Dooyong", "Yam! Yam!? (Korea)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, wiseguy,    yamyam,   yamyam,   yamyam,   gundealr_state, 0, ROT0,   "Dooyong", "Wise Guy",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yamyam,     0,        yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Yam! Yam!?",                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yamyamk,    yamyam,   yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Yam! Yam!? (Korea)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wiseguy,    yamyam,   yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Wise Guy",                  MACHINE_SUPPORTS_SAVE )

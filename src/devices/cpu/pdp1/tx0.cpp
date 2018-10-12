@@ -41,8 +41,8 @@
 #define INCREMENT_PC_8KW    (PC = (PC+1) & ADDRESS_MASK_8KW)
 
 
-DEFINE_DEVICE_TYPE(TX0_8KW,  tx0_8kw_device,  "tx0_8kw_cpu",  "TX-0 8KW")
-DEFINE_DEVICE_TYPE(TX0_64KW, tx0_64kw_device, "tx0_64kw_cpu", "TX-0 64KW")
+DEFINE_DEVICE_TYPE(TX0_8KW,  tx0_8kw_device,  "tx0_8kw_cpu",  "MIT Lincoln Laboratory TX-0 8KW")
+DEFINE_DEVICE_TYPE(TX0_64KW, tx0_64kw_device, "tx0_64kw_cpu", "MIT Lincoln Laboratory TX-0 64KW")
 
 
 tx0_device::tx0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addr_bits, int address_mask, int ir_mask)
@@ -220,7 +220,7 @@ void tx0_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("0%06O").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_ir).noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -255,7 +255,7 @@ void tx0_64kw_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 
 		if (m_ioh && m_ios)
@@ -358,7 +358,7 @@ void tx0_8kw_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 
 		if (m_ioh && m_ios)
@@ -1076,12 +1076,12 @@ void tx0_device::io_complete()
 }
 
 
-util::disasm_interface *tx0_8kw_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tx0_8kw_device::create_disassembler()
 {
-	return new tx0_8kw_disassembler;
+	return std::make_unique<tx0_8kw_disassembler>();
 }
 
-util::disasm_interface *tx0_64kw_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tx0_64kw_device::create_disassembler()
 {
-	return new tx0_64kw_disassembler;
+	return std::make_unique<tx0_64kw_disassembler>();
 }

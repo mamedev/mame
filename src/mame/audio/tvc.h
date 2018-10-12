@@ -12,7 +12,7 @@
 #pragma once
 
 #define MCFG_TVC_SOUND_SNDINT_CALLBACK(_write) \
-	devcb = &downcast<tvc_sound_device &>(*device).set_sndint_wr_callback(DEVCB_##_write);
+	downcast<tvc_sound_device &>(*device).set_sndint_wr_callback(DEVCB_##_write);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

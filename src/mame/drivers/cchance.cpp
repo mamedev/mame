@@ -82,24 +82,25 @@ WRITE8_MEMBER(cchance_state::output_1_w)
 	m_bell_io = (data & 0x80)>>4;
 }
 
-ADDRESS_MAP_START(cchance_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void cchance_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
+	map(0xa000, 0xafff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
+	map(0xb000, 0xbfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
 
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	map(0xc000, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xe300, 0xe303) AM_RAM AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
+	map(0xe000, 0xe2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
+	map(0xe300, 0xe303).ram().mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8));  /* control registers (0x80 mirror used by Arkanoid 2) */
+	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
 
-	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_WRITENOP //???
-	AM_RANGE(0xf001, 0xf001) AM_READ(input_1_r) AM_WRITE(output_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0") AM_WRITE(output_1_w)
-	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xf801, 0xf801) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+	map(0xf000, 0xf000).nopr().nopw(); //???
+	map(0xf001, 0xf001).r(FUNC(cchance_state::input_1_r)).w(FUNC(cchance_state::output_0_w));
+	map(0xf002, 0xf002).portr("IN0").w(FUNC(cchance_state::output_1_w));
+	map(0xf800, 0xf801).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xf801, 0xf801).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 static INPUT_PORTS_START( cchance )
@@ -194,7 +195,7 @@ static const gfx_layout cchance_layout =
 
 
 
-static GFXDECODE_START( cchance )
+static GFXDECODE_START( gfx_cchance )
 	GFXDECODE_ENTRY( "gfx1", 0, cchance_layout,   0x0, 32  )
 GFXDECODE_END
 
@@ -213,11 +214,11 @@ void cchance_state::machine_reset()
 
 MACHINE_CONFIG_START(cchance_state::cchance)
 
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cchance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cchance)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -229,15 +230,15 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cchance_state, screen_update_tnzs)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cchance_state, screen_vblank_tnzs))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cchance_state, screen_vblank_tnzs))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 1500000/2)
+	MCFG_DEVICE_ADD("aysnd", YM2149, 1500000/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -258,4 +259,4 @@ ROM_START( cchance )
 	ROM_LOAD( "prom2", 0x0200, 0x0200, NO_DUMP )
 ROM_END
 
-GAME( 1987?, cchance,  0,    cchance, cchance, cchance_state,  0, ROT0, "<unknown>", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987?, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "<unknown>", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

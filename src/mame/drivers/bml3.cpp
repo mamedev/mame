@@ -25,6 +25,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 #include "bus/bml3/bml3bus.h"
 #include "bus/bml3/bml3mp1802.h"
@@ -401,70 +402,73 @@ WRITE_LINE_MEMBER(bml3_state::bml3bus_firq_w)
 }
 
 
-ADDRESS_MAP_START(bml3_state::bml3_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
-	AM_RANGE(0x4400, 0x9fff) AM_RAM
-	AM_RANGE(0xff40, 0xff46) AM_NOP // lots of unknown reads and writes
-	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xffc4, 0xffc5) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0xffc6, 0xffc7) AM_READWRITE(bml3_6845_r,bml3_6845_w)
+void bml3_state::bml3_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x43ff).rw(FUNC(bml3_state::bml3_vram_r), FUNC(bml3_state::bml3_vram_w));
+	map(0x4400, 0x9fff).ram();
+	map(0xff40, 0xff46).noprw(); // lots of unknown reads and writes
+	map(0xffc0, 0xffc3).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xffc4, 0xffc5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xffc6, 0xffc7).rw(FUNC(bml3_state::bml3_6845_r), FUNC(bml3_state::bml3_6845_w));
 	// KBNMI - Keyboard "Break" key non-maskable interrupt
-	AM_RANGE(0xffc8, 0xffc8) AM_READ(bml3_keyb_nmi_r) // keyboard nmi
+	map(0xffc8, 0xffc8).r(FUNC(bml3_state::bml3_keyb_nmi_r)); // keyboard nmi
 	// DIPSW - DIP switches on system mainboard
-	AM_RANGE(0xffc9, 0xffc9) AM_READ_PORT("DSW")
+	map(0xffc9, 0xffc9).portr("DSW");
 	// TIMER - System timer enable
-	AM_RANGE(0xffca, 0xffca) AM_READ(bml3_firq_status_r) // timer irq
+	map(0xffca, 0xffca).r(FUNC(bml3_state::bml3_firq_status_r)); // timer irq
 	// LPFLG - Light pen interrupt
 //  AM_RANGE(0xffcb, 0xffcb)
 	// MODE_SEL - Graphics mode select
-	AM_RANGE(0xffd0, 0xffd0) AM_WRITE(bml3_hres_reg_w)
+	map(0xffd0, 0xffd0).w(FUNC(bml3_state::bml3_hres_reg_w));
 	// TRACE - Trace counter
 //  AM_RANGE(0xffd1, 0xffd1)
 	// REMOTE - Remote relay control for cassette - bit 7
-	AM_RANGE(0xffd2, 0xffd2) AM_WRITE(relay_w)
+	map(0xffd2, 0xffd2).w(FUNC(bml3_state::relay_w));
 	// MUSIC_SEL - Music select: toggle audio output level when rising
-	AM_RANGE(0xffd3, 0xffd3) AM_READWRITE(bml3_beep_r,bml3_beep_w)
+	map(0xffd3, 0xffd3).rw(FUNC(bml3_state::bml3_beep_r), FUNC(bml3_state::bml3_beep_w));
 	// TIME_MASK - Prohibit timer IRQ
-	AM_RANGE(0xffd4, 0xffd4) AM_WRITE(bml3_firq_mask_w)
+	map(0xffd4, 0xffd4).w(FUNC(bml3_state::bml3_firq_mask_w));
 	// LPENBL - Light pen operation enable
-	AM_RANGE(0xffd5, 0xffd5) AM_NOP
+	map(0xffd5, 0xffd5).noprw();
 	// INTERLACE_SEL - Interlaced video mode (manual has "INTERACE SEL"!)
-	AM_RANGE(0xffd6, 0xffd6) AM_WRITE(bml3_vres_reg_w)
+	map(0xffd6, 0xffd6).w(FUNC(bml3_state::bml3_vres_reg_w));
 //  AM_RANGE(0xffd7, 0xffd7) baud select
 	// C_REG_SEL - Attribute register (character/video mode and colours)
-	AM_RANGE(0xffd8, 0xffd8) AM_READWRITE(bml3_vram_attr_r,bml3_vram_attr_w)
+	map(0xffd8, 0xffd8).rw(FUNC(bml3_state::bml3_vram_attr_r), FUNC(bml3_state::bml3_vram_attr_w));
 	// KB - Keyboard mode register, interrupt control, keyboard LEDs
-	AM_RANGE(0xffe0, 0xffe0) AM_READWRITE(bml3_keyboard_r,bml3_keyboard_w)
+	map(0xffe0, 0xffe0).rw(FUNC(bml3_state::bml3_keyboard_r), FUNC(bml3_state::bml3_keyboard_w));
 //  AM_RANGE(0xffe8, 0xffe8) bank register
 //  AM_RANGE(0xffe9, 0xffe9) IG mode register
 //  AM_RANGE(0xffea, 0xffea) IG enable register
-	AM_RANGE(0xa000, 0xfeff) AM_ROM AM_REGION("maincpu", 0xa000)
-	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xfff0)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(bml3_a000_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(bml3_c000_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(bml3_e000_w)
-	AM_RANGE(0xf000, 0xfeff) AM_WRITE(bml3_f000_w)
-	AM_RANGE(0xfff0, 0xffff) AM_WRITE(bml3_fff0_w)
+	map(0xa000, 0xfeff).rom().region("maincpu", 0xa000);
+	map(0xfff0, 0xffff).rom().region("maincpu", 0xfff0);
+	map(0xa000, 0xbfff).w(FUNC(bml3_state::bml3_a000_w));
+	map(0xc000, 0xdfff).w(FUNC(bml3_state::bml3_c000_w));
+	map(0xe000, 0xefff).w(FUNC(bml3_state::bml3_e000_w));
+	map(0xf000, 0xfeff).w(FUNC(bml3_state::bml3_f000_w));
+	map(0xfff0, 0xffff).w(FUNC(bml3_state::bml3_fff0_w));
 
 #if 0
-	AM_RANGE(0xff00, 0xff00) AM_READWRITE(bml3_ym2203_r,bml3_ym2203_w)
-	AM_RANGE(0xff02, 0xff02) AM_READWRITE(bml3_psg_latch_r,bml3_psg_latch_w) // PSG address/data select
+	map(0xff00, 0xff00).rw(FUNC(bml3_state::bml3_ym2203_r), FUNC(bml3_state::bml3_ym2203_w));
+	map(0xff02, 0xff02).rw(FUNC(bml3_state::bml3_psg_latch_r), FUNC(bml3_state::bml3_psg_latch_w)); // PSG address/data select
 #endif
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(bml3_state::bml3mk2_mem)
-	AM_IMPORT_FROM(bml3_mem)
+void bml3_state::bml3mk2_mem(address_map &map)
+{
+	bml3_mem(map);
 	// TODO: anything to add here?
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(bml3_state::bml3mk5_mem)
-	AM_IMPORT_FROM(bml3_mem)
+void bml3_state::bml3mk5_mem(address_map &map)
+{
+	bml3_mem(map);
 	// TODO: anything to add here?
 
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 
@@ -957,18 +961,19 @@ static const ay8910_interface ay8910_config =
 };
 #endif
 
-static SLOT_INTERFACE_START(bml3_cards)
-	SLOT_INTERFACE("bml3mp1802", BML3BUS_MP1802)  /* MP-1802 Floppy Controller Card */
-	SLOT_INTERFACE("bml3mp1805", BML3BUS_MP1805)  /* MP-1805 Floppy Controller Card */
-	SLOT_INTERFACE("bml3kanji",  BML3BUS_KANJI)
-SLOT_INTERFACE_END
+static void bml3_cards(device_slot_interface &device)
+{
+	device.option_add("bml3mp1802", BML3BUS_MP1802); // MP-1802 Floppy Controller Card
+	device.option_add("bml3mp1805", BML3BUS_MP1805); // MP-1805 Floppy Controller Card
+	device.option_add("bml3kanji",  BML3BUS_KANJI);
+}
 
 
 MACHINE_CONFIG_START(bml3_state::bml3_common)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809, CPU_CLOCK)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
-//  MCFG_CPU_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
+	MCFG_DEVICE_ADD("maincpu",M6809, CPU_CLOCK)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
+//  MCFG_DEVICE_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
 
 //  MCFG_MACHINE_RESET_OVERRIDE(bml3_state,bml3)
 
@@ -994,33 +999,31 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(bml3_state, bml3_piaA_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set(FUNC(bml3_state::bml3_piaA_w));
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bml3_state, bml3_acia_tx_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bml3_state, bml3_acia_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bml3_state, bml3_acia_irq_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(bml3_state::bml3_acia_tx_w));
+	m_acia->rts_handler().set(FUNC(bml3_state::bml3_acia_rts_w));
+	m_acia->irq_handler().set(FUNC(bml3_state::bml3_acia_irq_w));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 9600) // 600 baud x 16(divider) = 9600
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 9'600)); // 600 baud x 16(divider) = 9600
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* slot devices */
 	MCFG_DEVICE_ADD("bml3bus", BML3BUS, 0)
 	MCFG_BML3BUS_CPU("maincpu")
-	MCFG_BML3BUS_OUT_NMI_CB(WRITELINE(bml3_state, bml3bus_nmi_w))
-	MCFG_BML3BUS_OUT_IRQ_CB(WRITELINE(bml3_state, bml3bus_irq_w))
-	MCFG_BML3BUS_OUT_FIRQ_CB(WRITELINE(bml3_state, bml3bus_firq_w))
+	MCFG_BML3BUS_OUT_NMI_CB(WRITELINE(*this, bml3_state, bml3bus_nmi_w))
+	MCFG_BML3BUS_OUT_IRQ_CB(WRITELINE(*this, bml3_state, bml3bus_irq_w))
+	MCFG_BML3BUS_OUT_FIRQ_CB(WRITELINE(*this, bml3_state, bml3bus_firq_w))
 	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
 	   the MP-1805 ROM.
 	   User may want to switch this to MP-1802 (5.25" DS/DD).
@@ -1037,13 +1040,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bml3_state::bml3)
 	bml3_common(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(bml3_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(bml3_mem)
 
 #if 0
 	// TODO: slot device for sound card
 	// audio
-	MCFG_SOUND_ADD("ym2203", YM2203, 2000000) //unknown clock / divider
+	MCFG_DEVICE_ADD("ym2203", YM2203, 2000000) //unknown clock / divider
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
@@ -1054,16 +1057,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bml3_state::bml3mk2)
 	bml3_common(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(bml3mk2_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(bml3mk2_mem)
 
 	// TODO: anything to add here?
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bml3_state::bml3mk5)
 	bml3_common(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(bml3mk5_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(bml3mk5_mem)
 
 	// TODO: anything to add here?
 MACHINE_CONFIG_END
@@ -1117,7 +1120,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY    FULLNAME                               FLAGS */
-COMP( 1980, bml3,   0,      0,       bml3,      bml3,  bml3_state, 0,    "Hitachi", "MB-6890 Basic Master Level 3",        MACHINE_NOT_WORKING)
-COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,  bml3_state, 0,    "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
-COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,  bml3_state, 0,    "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY    FULLNAME                               FLAGS */
+COMP( 1980, bml3,    0,     0,      bml3,    bml3,  bml3_state, empty_init, "Hitachi", "MB-6890 Basic Master Level 3",        MACHINE_NOT_WORKING)
+COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,  bml3_state, empty_init, "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
+COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3,  bml3_state, empty_init, "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)

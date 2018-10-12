@@ -1,5 +1,34 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles,Frank Palazzolo
+/***********************************************************
+
+    Astrocade custom 'IO' chip
+
+************************************************************
+                            _____   _____
+                   Vss   1 |*    \_/     | 40  MXD7
+                   SI0   2 |             | 39  MXD6
+                   SI1   3 |             | 38  MXD5
+                   SI2   4 |             | 37  MXD4
+                   SI3   5 |             | 36  MXD3
+                   SI4   6 |             | 35  MXD2
+                   SI5   7 |             | 34  MXD1
+                   SI6   8 |             | 33  MXD0
+                   SI7   9 |             | 32  SO0
+                  POT0  10 |    CUSTOM   | 31  SO1
+                  POT1  11 |     I/O     | 30  SO2
+                  POT2  12 |             | 29  SO3
+                  POT3  13 |             | 28  SO4
+                DISCHG  14 |             | 27  SO5
+                 MONOS  15 |             | 26  SO6
+                     ϕ  16 |             | 25  SO7
+                /RESET  17 |             | 24  AUDIO
+                  TEST  18 |             | 23  /RD
+                 /IORQ  19 |             | 22  Vgg
+                    /ϕ  20 |_____________| 21  Vdd
+
+***********************************************************/
+
 #ifndef MAME_SOUND_ASTROCDE_H
 #define MAME_SOUND_ASTROCDE_H
 
@@ -10,11 +39,44 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_ASTROCADE_ADD(tag, clock) \
-		MCFG_DEVICE_ADD((tag), ASTROCADE, (clock))
+#define MCFG_ASTROCADE_IO_SI_READ_CB(_devcb) \
+	downcast<astrocade_io_device &>(*device).set_si_callback(DEVCB_##_devcb);
 
-#define MCFG_ASTROCADE_REPLACE(tag, clock) \
-		MCFG_DEVICE_REPLACE((tag), ASTROCADE, (clock))
+#define MCFG_ASTROCADE_IO_SO0_STROBE_CB(_devcb) \
+	downcast<astrocade_io_device &>(*device).set_so_callback<0>(DEVCB_##_devcb);
+
+#define MCFG_ASTROCADE_IO_SO1_STROBE_CB(_devcb) \
+	downcast<astrocade_io_device &>(*device).set_so_callback<1>(DEVCB_##_devcb);
+
+#define MCFG_ASTROCADE_IO_SO2_STROBE_CB(_devcb) \
+	downcast<astrocade_io_device &>(*device).set_so_callback<2>(DEVCB_##_devcb);
+
+#define MCFG_ASTROCADE_IO_SO3_STROBE_CB(_devcb) \
+	downcast<astrocade_io_device &>(*device).set_so_callback<3>(DEVCB_##_devcb);
+
+#define MCFG_ASTROCADE_IO_SO4_STROBE_CB(_devcb) \
+	downcast<astrocade_io_device &>(*device).set_so_callback<4>(DEVCB_##_devcb);
+
+#define MCFG_ASTROCADE_IO_SO5_STROBE_CB(_devcb) \
+	downcast<astrocade_io_device &>(*device).set_so_callback<5>(DEVCB_##_devcb);
+
+#define MCFG_ASTROCADE_IO_SO6_STROBE_CB(_devcb) \
+	downcast<astrocade_io_device &>(*device).set_so_callback<6>(DEVCB_##_devcb);
+
+#define MCFG_ASTROCADE_IO_SO7_STROBE_CB(_devcb) \
+	downcast<astrocade_io_device &>(*device).set_so_callback<7>(DEVCB_##_devcb);
+
+#define MCFG_ASTROCADE_IO_POT0(_tag) \
+	downcast<astrocade_io_device &>(*device).set_pot_tag<0>(_tag);
+
+#define MCFG_ASTROCADE_IO_POT1(_tag) \
+	downcast<astrocade_io_device &>(*device).set_pot_tag<1>(_tag);
+
+#define MCFG_ASTROCADE_IO_POT2(_tag) \
+	downcast<astrocade_io_device &>(*device).set_pot_tag<2>(_tag);
+
+#define MCFG_ASTROCADE_IO_POT3(_tag) \
+	downcast<astrocade_io_device &>(*device).set_pot_tag<3>(_tag);
 
 
 
@@ -22,15 +84,21 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> astrocade_device
+// ======================> astrocade_io_device
 
-class astrocade_device : public device_t, public device_sound_interface
+class astrocade_io_device : public device_t, public device_sound_interface
 {
 public:
-	astrocade_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	astrocade_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// configuration access
+	template<class Object> devcb_base &set_si_callback(Object &&cb) { return m_si_callback.set_callback(std::forward<Object>(cb)); }
+	template<int N, class Object> devcb_base &set_so_callback(Object &&cb) { return m_so_callback[N].set_callback(std::forward<Object>(cb)); }
+	template<int N> void set_pot_tag(const char *tag) { m_pots[N].set_tag(tag); }
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -38,7 +106,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER( astrocade_sound_w );
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8_MEMBER(read);
 
 private:
 	void state_save_register();
@@ -63,8 +132,12 @@ private:
 	uint8_t       m_c_state;        /* current tone generator C state */
 
 	uint8_t       m_bitswap[256];   /* bitswap table */
+
+	devcb_read8   m_si_callback;
+	devcb_write8  m_so_callback[8];
+	optional_ioport_array<4> m_pots;
 };
 
-DECLARE_DEVICE_TYPE(ASTROCADE, astrocade_device)
+DECLARE_DEVICE_TYPE(ASTROCADE_IO, astrocade_io_device)
 
 #endif // MAME_SOUND_ASTROCDE_H

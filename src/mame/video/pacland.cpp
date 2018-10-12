@@ -122,7 +122,7 @@ PALETTE_INIT_MEMBER(pacland_state, pacland)
 		int palentry;
 
 		/* start with no transparency */
-		m_transmask[0][i] = m_transmask[1][i] =  m_transmask[2][i] = 0;
+		m_transmask[0][i] = m_transmask[1][i] = m_transmask[2][i] = 0;
 
 		/* iterate over all palette entries except the last one */
 		for (palentry = 0; palentry < 0x100; palentry++)
@@ -302,8 +302,8 @@ void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			flipy ^= 1;
 		}
 
-		sy -= 16 * sizey;
-		sy = (sy & 0xff) - 32; // fix wraparound
+		sy -= 16 * (sizey + 1); // sprites could not be displayed at the bottom of the screen
+		sy = (sy & 0xff) - 16; // fix wraparound
 
 		for (y = 0;y <= sizey;y++)
 		{
@@ -381,24 +381,28 @@ uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	/* draw sprites with regular transparency */
 	draw_sprites(screen, bitmap, cliprect, flip, 1);
 
-	/* draw high priority fg tiles */
-	draw_fg(screen, bitmap, cliprect, 1);
-
-	/* draw sprite pixels with colortable values >= 0xf0, which have priority over all fg tiles */
+	/* draw sprite pixels in a temporary bitmap with colortable values >= 0xf0 */
 	m_sprite_bitmap.fill(0, cliprect);
 	draw_sprites(screen, m_sprite_bitmap, cliprect, flip, 2);
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *src = &m_sprite_bitmap.pix16(y);
-		uint16_t *dst = &bitmap.pix16(y);
-
+		uint16_t *spr = &m_sprite_bitmap.pix16(y);
+		uint16_t *bmp = &bitmap.pix16(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t pix = src[x];
-			if (pix != 0 && dst[x] < 0x800)
-				dst[x] = pix;
+			/* clear to 0 if "m_sprite_bitmap" and "bitmap" are different,
+			   because not redraw pixels that are not visible in "bitmap"
+			   in this way, keep sprite-sprite priorities intact */
+			if (spr[x] != 0 && spr[x] != bmp[x])
+				spr[x] = 0;
 		}
 	}
+
+	/* draw high priority fg tiles */
+	draw_fg(screen, bitmap, cliprect, 1);
+
+	/* draw sprite pixels with colortable values >= 0xf0, which have priority over everything */
+	copybitmap_trans(bitmap, m_sprite_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }

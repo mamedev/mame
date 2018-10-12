@@ -80,78 +80,79 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_mux2_w )
 }
 
 
-ADDRESS_MAP_START(bfm_sc5_state::sc5_map)
+void bfm_sc5_state::sc5_map(address_map &map)
+{
 	// ROM (max size?)
-	AM_RANGE(0x00000000, 0x002fffff) AM_ROM
+	map(0x00000000, 0x002fffff).rom();
 	// ?
-	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM
+	map(0x01000000, 0x0100ffff).ram();
 
 #if 1
 	// dev1
-	AM_RANGE(0x01010000, 0x010101ff) AM_READWRITE8(sc5_mux1_r, sc5_mux1_w,0xffffffff) // guess
+	map(0x01010000, 0x010101ff).rw(FUNC(bfm_sc5_state::sc5_mux1_r), FUNC(bfm_sc5_state::sc5_mux1_w)); // guess
 #endif
 
 #if 0
 
-	AM_RANGE(0x01010200, 0x01010203) AM_WRITENOP
-	AM_RANGE(0x01010210, 0x01010213) AM_WRITENOP
-	AM_RANGE(0x01010220, 0x01010223) AM_WRITENOP
-	AM_RANGE(0x01010230, 0x01010233) AM_WRITENOP
+	map(0x01010200, 0x01010203).nopw();
+	map(0x01010210, 0x01010213).nopw();
+	map(0x01010220, 0x01010223).nopw();
+	map(0x01010230, 0x01010233).nopw();
 
-	AM_RANGE(0x01010280, 0x01010283) AM_WRITENOP
+	map(0x01010280, 0x01010283).nopw();
 
-	AM_RANGE(0x010102a0, 0x010102a3) AM_WRITENOP
+	map(0x010102a0, 0x010102a3).nopw();
 
-	AM_RANGE(0x010102c0, 0x010102c3) AM_WRITENOP
+	map(0x010102c0, 0x010102c3).nopw();
 
-	AM_RANGE(0x010102f0, 0x010102f3) AM_WRITENOP
+	map(0x010102f0, 0x010102f3).nopw();
 
-	AM_RANGE(0x01010300, 0x01010303) AM_WRITENOP
+	map(0x01010300, 0x01010303).nopw();
 
-	AM_RANGE(0x01010330, 0x01010333) AM_WRITENOP
+	map(0x01010330, 0x01010333).nopw();
 
-	AM_RANGE(0x01010360, 0x01010363) AM_WRITENOP
+	map(0x01010360, 0x01010363).nopw();
 
-	AM_RANGE(0x01010380, 0x01010383) AM_WRITENOP
-	AM_RANGE(0x01010390, 0x01010393) AM_WRITENOP
+	map(0x01010380, 0x01010383).nopw();
+	map(0x01010390, 0x01010393).nopw();
 #endif
 
 #if 1
 	// dev2
-	AM_RANGE(0x01020000, 0x010201ff) AM_WRITE8(sc5_mux2_w,0xffffffff) // guess
+	map(0x01020000, 0x010201ff).w(FUNC(bfm_sc5_state::sc5_mux2_w)); // guess
 #endif
 
 #if 0
 
-	AM_RANGE(0x01020200, 0x01020203) AM_WRITENOP
-	AM_RANGE(0x01020210, 0x01020213) AM_WRITENOP
-	AM_RANGE(0x01020220, 0x01020223) AM_WRITENOP
-	AM_RANGE(0x01020230, 0x01020233) AM_WRITENOP
+	map(0x01020200, 0x01020203).nopw();
+	map(0x01020210, 0x01020213).nopw();
+	map(0x01020220, 0x01020223).nopw();
+	map(0x01020230, 0x01020233).nopw();
 
-	AM_RANGE(0x01020280, 0x01020283) AM_WRITENOP
+	map(0x01020280, 0x01020283).nopw();
 
-	AM_RANGE(0x010202a0, 0x010202a3) AM_WRITENOP
-	AM_RANGE(0x010202b0, 0x010202b3) AM_WRITENOP
-	AM_RANGE(0x010202c0, 0x010202c3) AM_WRITENOP
+	map(0x010202a0, 0x010202a3).nopw();
+	map(0x010202b0, 0x010202b3).nopw();
+	map(0x010202c0, 0x010202c3).nopw();
 #endif
-	AM_RANGE(0x010202F0, 0x010202F3) AM_READWRITE8(sc5_10202F0_r, sc5_10202F0_w, 0xffffffff)
+	map(0x010202F0, 0x010202F3).rw(FUNC(bfm_sc5_state::sc5_10202F0_r), FUNC(bfm_sc5_state::sc5_10202F0_w));
 #if 1
-	AM_RANGE(0x01020330, 0x01020333) AM_WRITENOP
+	map(0x01020330, 0x01020333).nopw();
 
-	AM_RANGE(0x01020350, 0x01020353) AM_WRITENOP
-	AM_RANGE(0x01020360, 0x01020363) AM_WRITENOP
-	AM_RANGE(0x01020370, 0x01020373) AM_WRITENOP
+	map(0x01020350, 0x01020353).nopw();
+	map(0x01020360, 0x01020363).nopw();
+	map(0x01020370, 0x01020373).nopw();
 
-	AM_RANGE(0x01020390, 0x01020393) AM_WRITENOP
+	map(0x01020390, 0x01020393).nopw();
 #endif
-	AM_RANGE(0x02000000, 0x0200001f) AM_WRITE16(sc5_duart_w, 0xffffffff)
+	map(0x02000000, 0x0200001f).w(FUNC(bfm_sc5_state::sc5_duart_w));
 
 	// ram
-	AM_RANGE(0x40000000, 0x4000ffff) AM_RAM
+	map(0x40000000, 0x4000ffff).ram();
 
 	// peripherals
-	AM_RANGE(0xffff0000, 0xffff03ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, dev_r, dev_w) // technically this can be moved with MBAR
-ADDRESS_MAP_END
+	map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+}
 
 INPUT_PORTS_START( bfm_sc5 )
 INPUT_PORTS_END
@@ -210,25 +211,25 @@ WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 }
 
 MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
-	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
-	MCFG_CPU_PROGRAM_MAP(sc5_map)
+	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
+	MCFG_DEVICE_PROGRAM_MAP(sc5_map)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, 16000000/4) // ?? Mhz
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(16000000/2/8, 16000000/2/16, 16000000/2/16, 16000000/2/8)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(bfm_sc5_state, bfm_sc5_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(bfm_sc5_state, bfm_sc5_duart_txa))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(bfm_sc5_state, bfm_sc5_duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(bfm_sc5_state, bfm_sc5_duart_output_w))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, bfm_sc5_state, bfm_sc5_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, bfm_sc5_state, bfm_sc5_duart_txa))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, bfm_sc5_state, bfm_sc5_duart_input_r))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, bfm_sc5_state, bfm_sc5_duart_output_w))
 
 	MCFG_BFMBDA_ADD("vfd0",0)
 
-	MCFG_DEFAULT_LAYOUT(layout_bfm_sc5)
+	config.set_default_layout(layout_bfm_sc5);
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

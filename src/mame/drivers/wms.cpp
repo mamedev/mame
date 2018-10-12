@@ -79,6 +79,7 @@
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -93,25 +94,25 @@ class wms_state : public driver_device
 {
 public:
 	wms_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(wms);
-	DECLARE_READ8_MEMBER(test_r);
-		uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void wms(machine_config &config);
 
-		void wms(machine_config &config);
-		void adsp_data_map(address_map &map);
-		void adsp_program_map(address_map &map);
-		void wms_io(address_map &map);
-		void wms_map(address_map &map);
-protected:
+	void init_wms();
+
+private:
+	DECLARE_READ8_MEMBER(test_r);
+	uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void adsp_data_map(address_map &map);
+	void adsp_program_map(address_map &map);
+	void wms_io(address_map &map);
+	void wms_map(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-
-private:
 };
 
 uint32_t wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -123,26 +124,30 @@ uint32_t wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitma
 *           Memory Map Information           *
 *********************************************/
 
-ADDRESS_MAP_START(wms_state::wms_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x60000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x60000) // TODO: fix me
-ADDRESS_MAP_END
+void wms_state::wms_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+	map(0x60000, 0xfffff).rom().region("maincpu", 0x60000); // TODO: fix me
+}
 
 READ8_MEMBER(wms_state::test_r)
 {
 	return 1;
 }
 
-ADDRESS_MAP_START(wms_state::wms_io)
-	AM_RANGE(0x1207, 0x1207) AM_READ(test_r)
-ADDRESS_MAP_END
+void wms_state::wms_io(address_map &map)
+{
+	map(0x1207, 0x1207).r(FUNC(wms_state::test_r));
+}
 
 
-ADDRESS_MAP_START(wms_state::adsp_program_map)
-ADDRESS_MAP_END
+void wms_state::adsp_program_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(wms_state::adsp_data_map)
-ADDRESS_MAP_END
+void wms_state::adsp_data_map(address_map &map)
+{
+}
 
 
 /*********************************************
@@ -168,21 +173,21 @@ static const gfx_layout gfxlayout =
 	8*8
 };
 
-static GFXDECODE_START( wms )
+static GFXDECODE_START( gfx_wms )
 	GFXDECODE_ENTRY( "maincpu", 0x00000, gfxlayout,   0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(wms_state::wms)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
-	MCFG_CPU_PROGRAM_MAP(wms_map)
-	MCFG_CPU_IO_MAP(wms_io)
+	MCFG_DEVICE_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
+	MCFG_DEVICE_PROGRAM_MAP(wms_map)
+	MCFG_DEVICE_IO_MAP(wms_io)
 
-	MCFG_CPU_ADD("adsp", ADSP2105, MAIN_CLOCK / 2)  // ADSP-2105 could run either at 13.824 or 20 MHz...
+	MCFG_DEVICE_ADD("adsp", ADSP2105, MAIN_CLOCK / 2)  // ADSP-2105 could run either at 13.824 or 20 MHz...
 	MCFG_DEVICE_DISABLE()
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -192,7 +197,7 @@ MACHINE_CONFIG_START(wms_state::wms)
 	MCFG_SCREEN_UPDATE_DRIVER(wms_state, screen_update_wms)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wms)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wms)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
@@ -373,17 +378,17 @@ ROM_END
 
 ROM_START( leprglds )    // Leprechaun's Gold (Spanish) / U5 08/20/101
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD( "leprechaun's_gold.xu03", 0x0000, 0x100000, CRC(a750e5b9) SHA1(891bbfded9ece4d81aa8415cbb5a2728c118300e) )
+	ROM_LOAD( "leprechaun_s_gold.xu03", 0x0000, 0x100000, CRC(a750e5b9) SHA1(891bbfded9ece4d81aa8415cbb5a2728c118300e) )
 
 	ROM_REGION(0x100000, "rom", 0)
-	ROM_LOAD( "leprechaun's_gold.xu02", 0x0000, 0x100000, CRC(884d4871) SHA1(2c7a452dd466532df5fc14b209302a5ad42bb356) )
-	ROM_LOAD( "leprechaun's_gold.xu04", 0x0000, 0x100000, CRC(02642dd2) SHA1(4ac00b9053f9859865910888952e09d2fda5db06) )
-	ROM_LOAD( "leprechaun's_gold.xu05", 0x0000, 0x100000, CRC(eedd0dd2) SHA1(2b1dceb541a660357404f24069392f7892c87cfb) )
+	ROM_LOAD( "leprechaun_s_gold.xu02", 0x0000, 0x100000, CRC(884d4871) SHA1(2c7a452dd466532df5fc14b209302a5ad42bb356) )
+	ROM_LOAD( "leprechaun_s_gold.xu04", 0x0000, 0x100000, CRC(02642dd2) SHA1(4ac00b9053f9859865910888952e09d2fda5db06) )
+	ROM_LOAD( "leprechaun_s_gold.xu05", 0x0000, 0x100000, CRC(eedd0dd2) SHA1(2b1dceb541a660357404f24069392f7892c87cfb) )
 	// sound
-	ROM_LOAD( "leprechaun's_gold.xu30", 0x0000, 0x100000, CRC(6a41056f) SHA1(54168a0115dc8d232100fbbd440063dc75fdbaaf) )
-	ROM_LOAD( "leprechaun's_gold.xu31", 0x0000, 0x100000, CRC(0485e432) SHA1(c57a47fd27a14a2ea01400515f61be58be5fa391) )
-	ROM_LOAD( "leprechaun's_gold.xu17", 0x0000, 0x100000, CRC(10bfcdcf) SHA1(34dc619f33c81014120d9b6a2f8b2373451af2e4) )
-	ROM_LOAD( "leprechaun's_gold.xu18", 0x0000, 0x100000, CRC(a3f82467) SHA1(0971f32bff0d4bda43cd98e975e49710d73f9286) )
+	ROM_LOAD( "leprechaun_s_gold.xu30", 0x0000, 0x100000, CRC(6a41056f) SHA1(54168a0115dc8d232100fbbd440063dc75fdbaaf) )
+	ROM_LOAD( "leprechaun_s_gold.xu31", 0x0000, 0x100000, CRC(0485e432) SHA1(c57a47fd27a14a2ea01400515f61be58be5fa391) )
+	ROM_LOAD( "leprechaun_s_gold.xu17", 0x0000, 0x100000, CRC(10bfcdcf) SHA1(34dc619f33c81014120d9b6a2f8b2373451af2e4) )
+	ROM_LOAD( "leprechaun_s_gold.xu18", 0x0000, 0x100000, CRC(a3f82467) SHA1(0971f32bff0d4bda43cd98e975e49710d73f9286) )
 ROM_END
 
 
@@ -475,15 +480,15 @@ ROM_END
 
 ROM_START( reelemin )    // Reel 'Em In (English) / U4 01/22/97
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD( "reel_'em_in.xu3", 0x0000, 0x100000, CRC(a3840965) SHA1(1e782bb5eaeabce0d1a07eb895d344028364cd4f) )
+	ROM_LOAD( "reel__em_in.xu3", 0x0000, 0x100000, CRC(a3840965) SHA1(1e782bb5eaeabce0d1a07eb895d344028364cd4f) )
 
 	ROM_REGION(0x100000, "rom", 0)
-	ROM_LOAD( "reel_'em_in.xu2", 0x0000, 0x100000, CRC(04658d90) SHA1(1180b2596175394e079c8498bfc5e956426d0e1c) )
+	ROM_LOAD( "reel__em_in.xu2", 0x0000, 0x100000, CRC(04658d90) SHA1(1180b2596175394e079c8498bfc5e956426d0e1c) )
 	// sound
-	ROM_LOAD( "reel_'em_in.xu30", 0x0000, 0x100000, CRC(742590b2) SHA1(65df9d346b1f69f79e6e79c91724813f052c64ee) )
-	ROM_LOAD( "reel_'em_in.xu31", 0x0000, 0x100000, CRC(bf3aabb8) SHA1(251c1bcf28f117152902b37915c41be1e912dda0) )
-	ROM_LOAD( "reel_'em_in.xu17", 0x0000, 0x100000, CRC(f99bf909) SHA1(4dac7aac0cf815d0b67f4c8d55d84f529e45f27d) )
-	ROM_LOAD( "reel_'em_in.xu18", 0x0000, 0x100000, CRC(1e4b64f1) SHA1(f082b2a7b6e029ffded1eec6fbc5f755bdd8d9eb) )
+	ROM_LOAD( "reel__em_in.xu30", 0x0000, 0x100000, CRC(742590b2) SHA1(65df9d346b1f69f79e6e79c91724813f052c64ee) )
+	ROM_LOAD( "reel__em_in.xu31", 0x0000, 0x100000, CRC(bf3aabb8) SHA1(251c1bcf28f117152902b37915c41be1e912dda0) )
+	ROM_LOAD( "reel__em_in.xu17", 0x0000, 0x100000, CRC(f99bf909) SHA1(4dac7aac0cf815d0b67f4c8d55d84f529e45f27d) )
+	ROM_LOAD( "reel__em_in.xu18", 0x0000, 0x100000, CRC(1e4b64f1) SHA1(f082b2a7b6e029ffded1eec6fbc5f755bdd8d9eb) )
 ROM_END
 
 
@@ -617,7 +622,7 @@ ROM_END
 *                Driver Init                 *
 *********************************************/
 
-DRIVER_INIT_MEMBER(wms_state,wms)
+void wms_state::init_wms()
 {
 }
 
@@ -628,34 +633,34 @@ DRIVER_INIT_MEMBER(wms_state,wms)
 
 //    YEAR  NAME        PARENT    MACHINE  INPUT     STATE      INIT  ROT    COMPANY  FULLNAME                          FLAGS
 
-GAME( 200?, wms,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 1)",   MACHINE_IS_SKELETON )
-GAME( 200?, wmsa,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 2)",   MACHINE_IS_SKELETON )
-GAME( 200?, wmsb,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 3)",   MACHINE_IS_SKELETON )
+GAME( 200?, wms,        0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 1)",   MACHINE_IS_SKELETON )
+GAME( 200?, wmsa,       wms,      wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 2)",   MACHINE_IS_SKELETON )
+GAME( 200?, wmsb,       wms,      wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 3)",   MACHINE_IS_SKELETON )
 
-GAME( 2001, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )  // U5 03/09/01
-GAME( 1998, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )  // U5 02/12/98
-GAME( 2000, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )  // U5 09/05/100
-GAME( 1997, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
-GAME( 1997, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
-GAME( 2003, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )  // U5 04/22/103
-GAME( 2001, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )  // U5 06/26/101
-GAME( 1998, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )  // U5 11/25/98
-GAME( 1998, jptparty,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         MACHINE_IS_SKELETON )  // U5 04/01/98
-GAME( 2001, leprgld,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Russian)",     MACHINE_IS_SKELETON )  // U5 08/20/101
-GAME( 2001, leprglds,   leprgld,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )  // U5 08/20/101
-GAME( 2000, lol,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        MACHINE_IS_SKELETON )  // U3 08/30/100
-GAME( 2001, lovewin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Love To Win (Russian)",           MACHINE_IS_SKELETON )  // U5 04/18/101
-GAME( 2001, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (English)",         MACHINE_IS_SKELETON )  // U5 08/02/101
-GAME( 2000, mtburnr,    mtburn,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )  // U5 02/11/100
-GAME( 2000, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )  // U5 07/31/100
-GAME( 2000, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )  // U5 03/17/100
-GAME( 1997, reelemin,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (English)",           MACHINE_IS_SKELETON )  // U4 01/22/97
-GAME( 1997, reeleminr,  reelemin, wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           MACHINE_IS_SKELETON )  // U4 01/22/97
-GAME( 200?, sonoth,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Something For Nothing (Russian)", MACHINE_IS_SKELETON )  // ???
-GAME( 2000, swingin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Swingin In The Green (Russian)",  MACHINE_IS_SKELETON )  // U5 03/17/100
-GAME( 1999, wmstopb,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Top Banana (Russian)",            MACHINE_IS_SKELETON )  // U4 04/30/99
-GAME( 1999, wdun,       0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Who Dunnit (Russian)",            MACHINE_IS_SKELETON )  // U5 09/02/99
-GAME( 2000, winbid,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (English)",           MACHINE_IS_SKELETON )  // U5 10/09/100
-GAME( 1999, winbidr,    winbid,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (Russian)",           MACHINE_IS_SKELETON )  // U5 09/07/99
-GAME( 2000, wldstrek,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Wild Streak (Russian)",           MACHINE_IS_SKELETON )  // U4 04/11/100
-GAME( 2000, yukongld,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Yukon Gold (Russian)",            MACHINE_IS_SKELETON )  // U5 11/06/00
+GAME( 2001, btippers,   0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )  // U5 03/09/01
+GAME( 1998, wmsboom,    0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )  // U5 02/12/98
+GAME( 2000, cashcrop,   0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )  // U5 09/05/100
+GAME( 1997, filthyr,    0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
+GAME( 1997, filthyrr,   filthyr,  wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
+GAME( 2003, hottop,     0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )  // U5 04/22/103
+GAME( 2001, hottopa,    hottop,   wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )  // U5 06/26/101
+GAME( 1998, inwinner,   0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )  // U5 11/25/98
+GAME( 1998, jptparty,   0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         MACHINE_IS_SKELETON )  // U5 04/01/98
+GAME( 2001, leprgld,    0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Leprechaun's Gold (Russian)",     MACHINE_IS_SKELETON )  // U5 08/20/101
+GAME( 2001, leprglds,   leprgld,  wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )  // U5 08/20/101
+GAME( 2000, lol,        0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        MACHINE_IS_SKELETON )  // U3 08/30/100
+GAME( 2001, lovewin,    0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Love To Win (Russian)",           MACHINE_IS_SKELETON )  // U5 04/18/101
+GAME( 2001, mtburn,     0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Money To Burn (English)",         MACHINE_IS_SKELETON )  // U5 08/02/101
+GAME( 2000, mtburnr,    mtburn,   wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )  // U5 02/11/100
+GAME( 2000, otchart,    0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )  // U5 07/31/100
+GAME( 2000, perfect,    0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )  // U5 03/17/100
+GAME( 1997, reelemin,   0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Reel 'Em In (English)",           MACHINE_IS_SKELETON )  // U4 01/22/97
+GAME( 1997, reeleminr,  reelemin, wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           MACHINE_IS_SKELETON )  // U4 01/22/97
+GAME( 200?, sonoth,     0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Something For Nothing (Russian)", MACHINE_IS_SKELETON )  // ???
+GAME( 2000, swingin,    0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Swingin In The Green (Russian)",  MACHINE_IS_SKELETON )  // U5 03/17/100
+GAME( 1999, wmstopb,    0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Top Banana (Russian)",            MACHINE_IS_SKELETON )  // U4 04/30/99
+GAME( 1999, wdun,       0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Who Dunnit (Russian)",            MACHINE_IS_SKELETON )  // U5 09/02/99
+GAME( 2000, winbid,     0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Winning Bid (English)",           MACHINE_IS_SKELETON )  // U5 10/09/100
+GAME( 1999, winbidr,    winbid,   wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Winning Bid (Russian)",           MACHINE_IS_SKELETON )  // U5 09/07/99
+GAME( 2000, wldstrek,   0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Wild Streak (Russian)",           MACHINE_IS_SKELETON )  // U4 04/11/100
+GAME( 2000, yukongld,   0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Yukon Gold (Russian)",            MACHINE_IS_SKELETON )  // U5 11/06/00

@@ -76,21 +76,22 @@ PALETTE_INIT_MEMBER(bsktball_state, bsktball)
  *
  *************************************/
 
-ADDRESS_MAP_START(bsktball_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM /* Zero Page RAM */
-	AM_RANGE(0x0800, 0x0800) AM_READ(bsktball_in0_r)
-	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("IN1")
-	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("DSW")
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP /* Timer Reset */
-	AM_RANGE(0x1010, 0x1010) AM_WRITE(bsktball_bounce_w) /* Crowd Amp / Bounce */
-	AM_RANGE(0x1020, 0x102f) AM_DEVWRITE("outlatch", f9334_device, write_a0)
-	AM_RANGE(0x1030, 0x1030) AM_WRITE(bsktball_note_w) /* Music Ckt Note Dvsr */
-	AM_RANGE(0x1800, 0x1bbf) AM_RAM_WRITE(bsktball_videoram_w) AM_SHARE("videoram") /* DISPLAY */
-	AM_RANGE(0x1bc0, 0x1bff) AM_RAM AM_SHARE("motion")
-	AM_RANGE(0x1c00, 0x1cff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_ROM /* PROGRAM */
-ADDRESS_MAP_END
+void bsktball_state::main_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x01ff).ram(); /* Zero Page RAM */
+	map(0x0800, 0x0800).r(FUNC(bsktball_state::bsktball_in0_r));
+	map(0x0802, 0x0802).portr("IN1");
+	map(0x0803, 0x0803).portr("DSW");
+	map(0x1000, 0x1000).nopw(); /* Timer Reset */
+	map(0x1010, 0x1010).w(FUNC(bsktball_state::bsktball_bounce_w)); /* Crowd Amp / Bounce */
+	map(0x1020, 0x102f).w("outlatch", FUNC(f9334_device::write_a0));
+	map(0x1030, 0x1030).w(FUNC(bsktball_state::bsktball_note_w)); /* Music Ckt Note Dvsr */
+	map(0x1800, 0x1bbf).ram().w(FUNC(bsktball_state::bsktball_videoram_w)).share("videoram"); /* DISPLAY */
+	map(0x1bc0, 0x1bff).ram().share("motion");
+	map(0x1c00, 0x1cff).ram();
+	map(0x2000, 0x3fff).rom(); /* PROGRAM */
+}
 
 
 
@@ -194,7 +195,7 @@ static const gfx_layout motionlayout =
 };
 
 
-static GFXDECODE_START( bsktball )
+static GFXDECODE_START( gfx_bsktball )
 	GFXDECODE_ENTRY( "gfx1", 0x0600, charlayout,   0x00, 0x02 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, motionlayout, 0x08, 0x40 )
 GFXDECODE_END
@@ -241,18 +242,18 @@ void bsktball_state::machine_reset()
 MACHINE_CONFIG_START(bsktball_state::bsktball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,750000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502,750000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bsktball_state, bsktball_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // M6
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // Coin Counter
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(bsktball_state, led1_w)) // LED 1
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(bsktball_state, led2_w)) // LED 2
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(bsktball_state, ld1_w)) // LD 1
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(bsktball_state, ld2_w)) // LD 2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<BSKTBALL_NOISE_EN>)) // Noise Reset
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(bsktball_state, nmion_w)) // NMI On
+	f9334_device &outlatch(F9334(config, "outlatch")); // M6
+	outlatch.q_out_cb<1>().set_nop(); // Coin Counter
+	outlatch.q_out_cb<2>().set_output("led0"); // LED 1
+	outlatch.q_out_cb<3>().set_output("led1"); // LED 2
+	outlatch.q_out_cb<4>().set(FUNC(bsktball_state::ld1_w)); // LD 1
+	outlatch.q_out_cb<5>().set(FUNC(bsktball_state::ld2_w)); // LD 2
+	outlatch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<BSKTBALL_NOISE_EN>)); // Noise Reset
+	outlatch.q_out_cb<7>().set(FUNC(bsktball_state::nmion_w)); // NMI On
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -263,16 +264,15 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	MCFG_SCREEN_UPDATE_DRIVER(bsktball_state, screen_update_bsktball)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bsktball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bsktball)
 	MCFG_PALETTE_ADD("palette", 2*4 + 4*4*4*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(bsktball_state, bsktball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(bsktball)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, bsktball_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -304,4 +304,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, bsktball, 0, bsktball, bsktball, bsktball_state, 0, ROT0, "Atari", "Basketball", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, bsktball, 0, bsktball, bsktball, bsktball_state, empty_init, ROT0, "Atari", "Basketball", MACHINE_SUPPORTS_SAVE )

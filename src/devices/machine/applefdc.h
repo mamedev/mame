@@ -66,13 +66,13 @@ public:
 	virtual void write(uint8_t offset, uint8_t data);
 
 	// read/write handlers overloads
-	uint8_t read(offs_t offset)               { return read((uint8_t) offset); }
-	void write(offs_t offset, uint8_t data)   { write((uint8_t) offset, data); }
-	DECLARE_READ8_MEMBER( read )            { return read((uint8_t) offset); }
-	DECLARE_WRITE8_MEMBER( write )          { write((uint8_t) offset, data); }
+	DECLARE_READ8_MEMBER( bus_r ) { return read(uint8_t(offset)); }
+	DECLARE_WRITE8_MEMBER( bus_w ) { write(uint8_t(offset), data); }
 
 	// accessor
 	uint8_t get_lines();
+
+	virtual void device_reset() override;
 
 protected:
 	enum applefdc_t
@@ -87,7 +87,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// other protecteds
@@ -137,6 +136,12 @@ public:
 class iwm_device : public applefdc_base_device
 {
 public:
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, const applefdc_interface *intrf)
+		: iwm_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_config(intrf);
+	}
+
 	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 

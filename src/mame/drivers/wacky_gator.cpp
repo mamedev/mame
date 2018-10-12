@@ -42,7 +42,7 @@ public:
 		m_samples(*this, "oki"),
 		m_alligator(*this, "alligator%u", 0U),
 		m_digit(*this, "digit%u", 0U),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
@@ -50,7 +50,7 @@ public:
 
 	void wackygtr(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -72,11 +72,10 @@ protected:
 	DECLARE_WRITE8_MEMBER(irq_ack_w)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	DECLARE_WRITE8_MEMBER(firq_ack_w)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 
 	void program_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<pit8253_device> m_pit8253_0;
@@ -85,7 +84,7 @@ private:
 	required_memory_region m_samples;
 	output_finder<5> m_alligator;
 	output_finder<8> m_digit;
-	output_finder<32> m_lamp;
+	output_finder<32> m_lamps;
 
 	int     m_adpcm_sel;
 	uint16_t  m_adpcm_pos;
@@ -185,7 +184,7 @@ void wackygtr_state::machine_start()
 {
 	m_alligator.resolve();
 	m_digit.resolve();
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_adpcm_sel));
 	save_item(NAME(m_adpcm_pos));
@@ -211,18 +210,18 @@ void wackygtr_state::set_digits(int p, uint8_t value)
 void wackygtr_state::set_lamps(int p, uint8_t value)
 {
 	for (int i=0; i<8; i++)
-		m_lamp[p + i] = BIT(value, i);
+		m_lamps[p + i] = BIT(value, i);
 }
 
 static INPUT_PORTS_START( wackygtr )
 	PORT_START("IN0")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_SPECIAL)  PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_rear_sensors_r, nullptr)
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_rear_sensors_r, nullptr)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN1)
 
 	PORT_START("IN1")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_SPECIAL)   PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_front_sensors_r, nullptr)
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM)   PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_front_sensors_r, nullptr)
 	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )
@@ -255,85 +254,86 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 	if (!(m_adpcm_ctrl & 0x80))
 	{
 		uint8_t data = m_samples->base()[m_adpcm_pos & 0xffff];
-		m_msm->data_w((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
+		m_msm->write_data((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
 		m_adpcm_pos += m_adpcm_sel;
 		m_adpcm_sel ^= 1;
 	}
 }
 
-ADDRESS_MAP_START(wackygtr_state::program_map)
-	AM_RANGE(0x0200, 0x0200) AM_READNOP AM_WRITE(irq_ack_w)
-	AM_RANGE(0x0400, 0x0400) AM_READNOP AM_WRITE(firq_ack_w)
-	AM_RANGE(0x0600, 0x0600) AM_WRITE(disp_w<0>)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(disp_w<1>)
-	AM_RANGE(0x0a00, 0x0a00) AM_WRITE(disp_w<2>)
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(disp_w<3>)
-	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(sample_ctrl_w)
+void wackygtr_state::program_map(address_map &map)
+{
+	map(0x0200, 0x0200).nopr().w(FUNC(wackygtr_state::irq_ack_w));
+	map(0x0400, 0x0400).nopr().w(FUNC(wackygtr_state::firq_ack_w));
+	map(0x0600, 0x0600).w(FUNC(wackygtr_state::disp_w<0>));
+	map(0x0800, 0x0800).w(FUNC(wackygtr_state::disp_w<1>));
+	map(0x0a00, 0x0a00).w(FUNC(wackygtr_state::disp_w<2>));
+	map(0x0c00, 0x0c00).w(FUNC(wackygtr_state::disp_w<3>));
+	map(0x0e00, 0x0e00).w(FUNC(wackygtr_state::sample_ctrl_w));
 
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	map(0x1000, 0x1001).w("ymsnd", FUNC(ym2413_device::write));
 
-	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pit8253_0", pit8253_device, read, write)
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pit8253_1", pit8253_device, read, write)
+	map(0x2000, 0x2003).rw(m_pit8253_0, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x3000, 0x3003).rw(m_pit8253_1, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("i8255_1", i8255_device, read, write)
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("i8255_2", i8255_device, read, write)
+	map(0x4000, 0x4003).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("i8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6000, 0x6003).rw("i8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom();
+}
 
 MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(3'579'545))   // HD68B09P
-	MCFG_CPU_PROGRAM_MAP(program_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wackygtr_state, irq0_line_assert, 50)  // FIXME
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(3'579'545))   // HD68B09P
+	MCFG_DEVICE_PROGRAM_MAP(program_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wackygtr_state, irq0_line_assert, 50)  // FIXME
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", wackygtr_state, nmi_timer, attotime::from_hz(100))  // FIXME
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_wackygtr)
+	config.set_default_layout(layout_wackygtr);
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000) )
-	MCFG_MSM5205_VCLK_CB(WRITELINE(wackygtr_state, adpcm_int))   /* IRQ handler */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000) )
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, wackygtr_state, adpcm_int))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545) )
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wackygtr_state, status_lamps_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wackygtr_state, alligators_ctrl1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wackygtr_state, alligators_ctrl2_w))
+	i8255_device &ppi0(I8255(config, "i8255_0"));
+	ppi0.out_pa_callback().set(FUNC(wackygtr_state::status_lamps_w));
+	ppi0.out_pb_callback().set(FUNC(wackygtr_state::alligators_ctrl1_w));
+	ppi0.out_pc_callback().set(FUNC(wackygtr_state::alligators_ctrl2_w));
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wackygtr_state, timing_lamps_w<0>))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wackygtr_state, timing_lamps_w<1>))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wackygtr_state, timing_lamps_w<2>))
+	i8255_device &ppi1(I8255(config, "i8255_1"));
+	ppi1.out_pa_callback().set(FUNC(wackygtr_state::timing_lamps_w<0>));
+	ppi1.out_pb_callback().set(FUNC(wackygtr_state::timing_lamps_w<1>));
+	ppi1.out_pc_callback().set(FUNC(wackygtr_state::timing_lamps_w<2>));
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi2(I8255(config, "i8255_2"));
+	ppi2.in_pa_callback().set_ioport("IN0");
+	ppi2.in_pb_callback().set_ioport("IN1");
+	ppi2.in_pc_callback().set_ioport("IN2");
 
 	MCFG_DEVICE_ADD("pit8253_0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(wackygtr_state, alligator_ck<0>))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<0>))
 	MCFG_PIT8253_CLK1(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(wackygtr_state, alligator_ck<1>))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<1>))
 	MCFG_PIT8253_CLK2(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wackygtr_state, alligator_ck<2>))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<2>))
 
 	MCFG_DEVICE_ADD("pit8253_1", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess
 	MCFG_PIT8253_OUT0_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 	MCFG_PIT8253_CLK1(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(wackygtr_state, alligator_ck<3>))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<3>))
 	MCFG_PIT8253_CLK2(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wackygtr_state, alligator_ck<4>))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<4>))
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
@@ -347,4 +347,4 @@ ROM_START( wackygtr )
 	ROM_LOAD("wp3-vo0.2h", 0x0000, 0x10000, CRC(91c7986f) SHA1(bc9fa0d41c1caa0f909a349f511d022b7e42c6cd))
 ROM_END
 
-GAME(1990, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, 0,  ROT0,   "Data East", "Wacky Gator", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)
+GAME(1990, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, empty_init, ROT0, "Data East", "Wacky Gator", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)

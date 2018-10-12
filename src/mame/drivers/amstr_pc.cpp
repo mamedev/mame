@@ -38,6 +38,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
+#include "machine/ram.h"
 
 class amstrad_pc_state : public driver_device
 {
@@ -45,6 +46,7 @@ public:
 	amstrad_pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
 		m_mb(*this, "mb"),
 		m_keyboard(*this, "pc_keyboard"),
 		m_lpt1(*this, "lpt_1"),
@@ -53,7 +55,14 @@ public:
 	{
 	}
 
+	void pc200(machine_config &config);
+	void pc2086(machine_config &config);
+	void ppc640(machine_config &config);
+	void ppc512(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
 	required_device<pc_lpt_device> m_lpt1;
@@ -86,42 +95,43 @@ public:
 
 	int m_dipstate;
 	static void cfg_com(device_t *device);
-	void pc200(machine_config &config);
-	void pc2086(machine_config &config);
-	void ppc640(machine_config &config);
-	void ppc512(machine_config &config);
+
 	void pc200_io(address_map &map);
 	void pc2086_map(address_map &map);
 	void ppc512_io(address_map &map);
 	void ppc640_map(address_map &map);
 };
 
-ADDRESS_MAP_START(amstrad_pc_state::ppc640_map)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void amstrad_pc_state::ppc640_map(address_map &map)
+{
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(amstrad_pc_state::pc2086_map)
-	AM_RANGE(0xc0000, 0xc9fff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0x10000)
-ADDRESS_MAP_END
+void amstrad_pc_state::pc2086_map(address_map &map)
+{
+	map(0xc0000, 0xc9fff).rom().region("bios", 0);
+	map(0xf0000, 0xfffff).rom().region("bios", 0x10000);
+}
 
-ADDRESS_MAP_START(amstrad_pc_state::pc200_io)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
-	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(pc1640_port60_r, pc1640_port60_w, 0xffff)
-	AM_RANGE(0x0078, 0x0079) AM_READWRITE8(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
-	AM_RANGE(0x007a, 0x007b) AM_READWRITE8(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
-	AM_RANGE(0x0278, 0x027b) AM_READ8(pc200_port278_r, 0xffff)
-	AM_RANGE(0x0278, 0x027b) AM_DEVWRITE8("lpt_2", pc_lpt_device, write, 0x00ff)
-	AM_RANGE(0x0378, 0x037b) AM_READ8(pc200_port378_r, 0xffff)
-	AM_RANGE(0x0378, 0x037b) AM_DEVWRITE8("lpt_1", pc_lpt_device, write, 0x00ff)
-	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void amstrad_pc_state::pc200_io(address_map &map)
+{
+	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x0060, 0x0065).rw(FUNC(amstrad_pc_state::pc1640_port60_r), FUNC(amstrad_pc_state::pc1640_port60_w));
+	map(0x0078, 0x0079).rw(FUNC(amstrad_pc_state::pc1640_mouse_x_r), FUNC(amstrad_pc_state::pc1640_mouse_x_w));
+	map(0x007a, 0x007b).rw(FUNC(amstrad_pc_state::pc1640_mouse_y_r), FUNC(amstrad_pc_state::pc1640_mouse_y_w));
+	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
+	map(0x0278, 0x027b).r(FUNC(amstrad_pc_state::pc200_port278_r));
+	map(0x0278, 0x027b).w(m_lpt2, FUNC(pc_lpt_device::write)).umask16(0x00ff);
+	map(0x0378, 0x037b).r(FUNC(amstrad_pc_state::pc200_port378_r));
+	map(0x0378, 0x037b).w(m_lpt1, FUNC(pc_lpt_device::write)).umask16(0x00ff);
+	map(0x03bc, 0x03bf).rw("lpt_0", FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(amstrad_pc_state::ppc512_io)
-	AM_IMPORT_FROM(pc200_io)
-	AM_RANGE(0x0070, 0x0071) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffff)
-ADDRESS_MAP_END
+void amstrad_pc_state::ppc512_io(address_map &map)
+{
+	pc200_io(map);
+	map(0x0070, 0x0071).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+}
 
 /* pc20 (v2)
    fc078
@@ -483,66 +493,64 @@ void amstrad_pc_state::cfg_com(device_t *device)
 
 MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ppc640_map)
-	MCFG_CPU_IO_MAP(pc200_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ppc640_map)
+	MCFG_DEVICE_IO_MAP(pc200_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "aga", pc_isa8_cards, "aga_pc200", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "fdc", pc_isa8_cards, "fdc_xt", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "com", pc_isa8_cards, "com", true)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("aga", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "aga_pc200", true)
+	MCFG_DEVICE_ADD("fdc", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)
+	MCFG_DEVICE_ADD("com", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("com", cfg_com)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* printer */
-	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("mb:pic8259", pic8259_device, ir7_w))
+	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
+	lpt0.irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir7_w));
 
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("mb:pic8259", pic8259_device, ir7_w))
+	PC_LPT(config, m_lpt1);
+	m_lpt1->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir7_w));
 
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("mb:pic8259", pic8259_device, ir5_w))
+	PC_LPT(config, m_lpt2);
+	m_lpt2->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir5_w));
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
-	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("512K")
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_pc_state::pc2086)
 	pc200(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pc2086_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pc2086_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_pc_state::ppc640)
 	pc200(config);
-	MCFG_CPU_REPLACE("maincpu", V30, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ppc640_map)
-	MCFG_CPU_IO_MAP(ppc512_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_REPLACE("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ppc640_map)
+	MCFG_DEVICE_IO_MAP(ppc512_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_REMOVE("isa1")
 	MCFG_DEVICE_REMOVE("isa2")
 
-	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(amstrad_pc_state::ppc512)
+void amstrad_pc_state::ppc512(machine_config &config)
+{
 	ppc640(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("640K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K").set_extra_options("640K");
+}
 
 /*
 Sinclair PC200 ROMs (from a v1.2 PC200):
@@ -565,14 +573,14 @@ ROM_START( pc200 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
 	// special bios at 0xe0000 !?
 	ROM_SYSTEM_BIOS(0, "v15", "v1.5")
-	ROMX_LOAD("40185-2.ic129", 0xc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932), ROM_SKIP(1) | ROM_BIOS(1)) // v2
-	ROMX_LOAD("40184-2.ic132", 0xc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24), ROM_SKIP(1) | ROM_BIOS(1)) // v2
+	ROMX_LOAD("40185-2.ic129", 0xc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932), ROM_SKIP(1) | ROM_BIOS(0)) // v2
+	ROMX_LOAD("40184-2.ic132", 0xc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24), ROM_SKIP(1) | ROM_BIOS(0)) // v2
 	ROM_SYSTEM_BIOS(1, "v13", "v1.3")
-	ROMX_LOAD("40185v13.ic129", 0xc001, 0x2000, CRC(f082f08e) SHA1(b332db419033588a7380bfecdf46104974347341), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("40184v13.ic132", 0xc000, 0x2000, CRC(5daf6068) SHA1(93a2ccfb0e29c8f2c98f06c64bb0ea0b3acafb13), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("40185v13.ic129", 0xc001, 0x2000, CRC(f082f08e) SHA1(b332db419033588a7380bfecdf46104974347341), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("40184v13.ic132", 0xc000, 0x2000, CRC(5daf6068) SHA1(93a2ccfb0e29c8f2c98f06c64bb0ea0b3acafb13), ROM_SKIP(1) | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v12", "v1.2")
-	ROMX_LOAD("40185.ic129", 0xc001, 0x2000, CRC(c2b4eeac) SHA1(f11015fadf0c16d86ce2c5047be3e6a4782044f7), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD("40184.ic132", 0xc000, 0x2000, CRC(b22704a6) SHA1(dadd573db6cd34f339f2f0ae55b07537924c024a), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("40185.ic129", 0xc001, 0x2000, CRC(c2b4eeac) SHA1(f11015fadf0c16d86ce2c5047be3e6a4782044f7), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("40184.ic132", 0xc000, 0x2000, CRC(b22704a6) SHA1(dadd573db6cd34f339f2f0ae55b07537924c024a), ROM_SKIP(1) | ROM_BIOS(2))
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "40112.ic801", 0x000, 0x800, CRC(842a954c) SHA1(93ca6badf20e0215025fe109959eddead8c52f38) )
@@ -647,10 +655,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR   NAME     PARENT    COMPAT  MACHINE  INPUT  STATE              INIT  COMPANY     FULLNAME */
-COMP(  1987,  ppc512,  ibm5150,  0,      ppc512,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PPC512", MACHINE_NOT_WORKING)
-COMP(  1987,  ppc640,  ibm5150,  0,      ppc640,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING)
-COMP(  1988,  pc20,    ibm5150,  0,      pc200,   pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING)
-COMP(  1988,  pc200,   ibm5150,  0,      pc200,   pc200, amstrad_pc_state,  0,    "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
-COMP(  1988,  pc2086,  ibm5150,  0,      pc2086,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
-COMP(  1990,  pc3086,  ibm5150,  0,      pc2086,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  CLASS             INIT        COMPANY         FULLNAME */
+COMP( 1987, ppc512, ibm5150, 0,      ppc512,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PPC512", MACHINE_NOT_WORKING)
+COMP( 1987, ppc640, ibm5150, 0,      ppc640,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING)
+COMP( 1988, pc20,   ibm5150, 0,      pc200,   pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING)
+COMP( 1988, pc200,  ibm5150, 0,      pc200,   pc200, amstrad_pc_state, empty_init, "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
+COMP( 1988, pc2086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
+COMP( 1990, pc3086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )

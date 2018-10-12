@@ -70,9 +70,9 @@ public:
 	DECLARE_READ8_MEMBER(pce_cd_intf_r);
 	DECLARE_READ8_MEMBER(pce_cd_acard_wram_r);
 	DECLARE_WRITE8_MEMBER(pce_cd_acard_wram_w);
-	DECLARE_DRIVER_INIT(sgx);
-	DECLARE_DRIVER_INIT(tg16);
-	DECLARE_DRIVER_INIT(mess_pce);
+	void init_sgx();
+	void init_tg16();
+	void init_mess_pce();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_MACHINE_START(pce);
 	DECLARE_MACHINE_RESET(mess_pce);

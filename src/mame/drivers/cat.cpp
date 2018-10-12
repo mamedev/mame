@@ -246,8 +246,8 @@ public:
 		TIMER_COUNTER_6MS
 	};
 
-	cat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		//m_nvram(*this, "nvram"), // merge with svram?
 		m_duart(*this, "duartn68681"),
@@ -265,7 +265,7 @@ public:
 		m_y6(*this, "Y6"),
 		m_y7(*this, "Y7"),
 		m_dipsw(*this, "DIPSW1")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	//optional_device<nvram_device> m_nvram;
@@ -290,9 +290,9 @@ public:
 	DECLARE_MACHINE_START(cat);
 	DECLARE_MACHINE_RESET(cat);
 	DECLARE_VIDEO_START(cat);
-	DECLARE_DRIVER_INIT(cat);
+	void init_cat();
 
-	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
@@ -365,16 +365,15 @@ protected:
 
 // TODO: this init doesn't actually work yet! please fix me!
 /*
-DRIVER_INIT_MEMBER( cat_state,cat )
+void cat_state::init_cat()
 {
     uint8_t *svrom = memregion("svrom")->base();
-    int i;
     // fill svrom with the correct 2e80 pattern except where svrom1 sits
     // first half
-    for (i = 0; i < 0x20000; i+=2)
+    for (int i = 0; i < 0x20000; i+=2)
         svrom[i] = 0x2E;
     // second half
-    for (i = 0x20000; i < 0x40000; i+=2)
+    for (int i = 0x20000; i < 0x40000; i+=2)
     {
         svrom[i] = 0x2E;
         svrom[i+1] = 0x80;
@@ -757,32 +756,33 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 */
 
 
-ADDRESS_MAP_START(cat_state::cat_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x180000) // 256 KB ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("svram") AM_MIRROR(0x18C000)// SRAM powered by battery
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("svrom",0x0000) AM_MIRROR(0x180000) // SV ROM
-	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_SHARE("p_cat_vram") AM_MIRROR(0x180000) // 512 KB RAM
-	AM_RANGE(0x600000, 0x67ffff) AM_READWRITE(cat_2e80_r,cat_video_control_w) AM_MIRROR(0x180000) // Gate Array #1: Video Addressing and Timing, dram refresh timing, dram /cs and /wr (ga2 does the actual video invert/display and access to the dram data bus)
-	AM_RANGE(0x800000, 0x800001) AM_READWRITE(cat_floppy_control_r, cat_floppy_control_w) AM_MIRROR(0x18FFE0) // floppy control lines and readback
-	AM_RANGE(0x800002, 0x800003) AM_READWRITE(cat_0080_r, cat_keyboard_w) AM_MIRROR(0x18FFE0) // keyboard col write
-	AM_RANGE(0x800004, 0x800005) AM_READWRITE(cat_0080_r, cat_printer_data_w) AM_MIRROR(0x18FFE0) // Centronics Printer Data
-	AM_RANGE(0x800006, 0x800007) AM_READWRITE(cat_floppy_data_r,cat_floppy_data_w) AM_MIRROR(0x18FFE0) // floppy data read/write
-	AM_RANGE(0x800008, 0x800009) AM_READ(cat_floppy_status_r) AM_MIRROR(0x18FFE0) // floppy status lines
-	AM_RANGE(0x80000a, 0x80000b) AM_READ(cat_keyboard_r) AM_MIRROR(0x18FFE0) // keyboard row read
-	AM_RANGE(0x80000c, 0x80000d) AM_READ(cat_0080_r) AM_MIRROR(0x18FFE0) // Open bus?
-	AM_RANGE(0x80000e, 0x80000f) AM_READWRITE(cat_battery_r,cat_printer_control_w) AM_MIRROR(0x18FFE0) // Centronics Printer Control, keyboard led and country code enable
-	AM_RANGE(0x800010, 0x80001f) AM_READ(cat_0080_r) AM_MIRROR(0x18FFE0) // Open bus?
-	AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8("duartn68681", mc68681_device, read, write, 0xff ) AM_MIRROR(0x18FFE0)
-	AM_RANGE(0x820000, 0x82003f) AM_READWRITE(cat_modem_r,cat_modem_w) AM_MIRROR(0x18FFC0) // AMI S35213 Modem Chip, all access is on bit 7
-	AM_RANGE(0x830000, 0x830001) AM_READ(cat_6ms_counter_r) AM_MIRROR(0x18FFFE) // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
-	AM_RANGE(0x840000, 0x840001) AM_READWRITE(cat_2e80_r,cat_opr_w) AM_MIRROR(0x18FFFE) // GA2 Output port register (video enable, invert, watchdog reset, phone relays)
-	AM_RANGE(0x850000, 0x850001) AM_READ(cat_wdt_r) AM_MIRROR(0x18FFFE) // watchdog and power fail state read
-	AM_RANGE(0x860000, 0x860001) AM_READWRITE(cat_0000_r, cat_tcb_w) AM_MIRROR(0x18FFFE) // Test mode
-	AM_RANGE(0x870000, 0x870001) AM_READ(cat_2e80_r) AM_MIRROR(0x18FFFE) // Open bus?
-	AM_RANGE(0xA00000, 0xA00001) AM_READ(cat_2e80_r) AM_MIRROR(0x1FFFFE) // Open bus/dtack? The 0xA00000-0xA3ffff area is ram used for shadow rom storage on cat developer machines, which is either banked over top of, or jumped to instead of the normal rom
-	AM_RANGE(0xC00000, 0xC00001) AM_READ(cat_2e80_r) AM_MIRROR(0x3FFFFE) // Open bus/vme?
-ADDRESS_MAP_END
+void cat_state::cat_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom().mirror(0x180000); // 256 KB ROM
+	map(0x040000, 0x043fff).ram().share("svram").mirror(0x18C000);// SRAM powered by battery
+	map(0x200000, 0x27ffff).rom().region("svrom", 0x0000).mirror(0x180000); // SV ROM
+	map(0x400000, 0x47ffff).ram().share("p_cat_vram").mirror(0x180000); // 512 KB RAM
+	map(0x600000, 0x67ffff).rw(FUNC(cat_state::cat_2e80_r), FUNC(cat_state::cat_video_control_w)).mirror(0x180000); // Gate Array #1: Video Addressing and Timing, dram refresh timing, dram /cs and /wr (ga2 does the actual video invert/display and access to the dram data bus)
+	map(0x800000, 0x800001).rw(FUNC(cat_state::cat_floppy_control_r), FUNC(cat_state::cat_floppy_control_w)).mirror(0x18FFE0); // floppy control lines and readback
+	map(0x800002, 0x800003).rw(FUNC(cat_state::cat_0080_r), FUNC(cat_state::cat_keyboard_w)).mirror(0x18FFE0); // keyboard col write
+	map(0x800004, 0x800005).rw(FUNC(cat_state::cat_0080_r), FUNC(cat_state::cat_printer_data_w)).mirror(0x18FFE0); // Centronics Printer Data
+	map(0x800006, 0x800007).rw(FUNC(cat_state::cat_floppy_data_r), FUNC(cat_state::cat_floppy_data_w)).mirror(0x18FFE0); // floppy data read/write
+	map(0x800008, 0x800009).r(FUNC(cat_state::cat_floppy_status_r)).mirror(0x18FFE0); // floppy status lines
+	map(0x80000a, 0x80000b).r(FUNC(cat_state::cat_keyboard_r)).mirror(0x18FFE0); // keyboard row read
+	map(0x80000c, 0x80000d).r(FUNC(cat_state::cat_0080_r)).mirror(0x18FFE0); // Open bus?
+	map(0x80000e, 0x80000f).rw(FUNC(cat_state::cat_battery_r), FUNC(cat_state::cat_printer_control_w)).mirror(0x18FFE0); // Centronics Printer Control, keyboard led and country code enable
+	map(0x800010, 0x80001f).r(FUNC(cat_state::cat_0080_r)).mirror(0x18FFE0); // Open bus?
+	map(0x810000, 0x81001f).rw("duartn68681", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff).mirror(0x18FFE0);
+	map(0x820000, 0x82003f).rw(FUNC(cat_state::cat_modem_r), FUNC(cat_state::cat_modem_w)).mirror(0x18FFC0); // AMI S35213 Modem Chip, all access is on bit 7
+	map(0x830000, 0x830001).r(FUNC(cat_state::cat_6ms_counter_r)).mirror(0x18FFFE); // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
+	map(0x840000, 0x840001).rw(FUNC(cat_state::cat_2e80_r), FUNC(cat_state::cat_opr_w)).mirror(0x18FFFE); // GA2 Output port register (video enable, invert, watchdog reset, phone relays)
+	map(0x850000, 0x850001).r(FUNC(cat_state::cat_wdt_r)).mirror(0x18FFFE); // watchdog and power fail state read
+	map(0x860000, 0x860001).rw(FUNC(cat_state::cat_0000_r), FUNC(cat_state::cat_tcb_w)).mirror(0x18FFFE); // Test mode
+	map(0x870000, 0x870001).r(FUNC(cat_state::cat_2e80_r)).mirror(0x18FFFE); // Open bus?
+	map(0xA00000, 0xA00001).r(FUNC(cat_state::cat_2e80_r)).mirror(0x1FFFFE); // Open bus/dtack? The 0xA00000-0xA3ffff area is ram used for shadow rom storage on cat developer machines, which is either banked over top of, or jumped to instead of the normal rom
+	map(0xC00000, 0xC00001).r(FUNC(cat_state::cat_2e80_r)).mirror(0x3FFFFE); // Open bus/vme?
+}
 
 /* Input ports */
 
@@ -931,7 +931,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 	m_video_enable = 1;
 	m_video_invert = 0;
 	m_6ms_timer = timer_alloc(TIMER_COUNTER_6MS);
-	machine().device<nvram_device>("nvram")->set_base(m_svram, 0x4000);
+	subdevice<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 
 MACHINE_RESET_MEMBER(cat_state,cat)
@@ -946,29 +946,29 @@ VIDEO_START_MEMBER(cat_state,cat)
 {
 }
 
-uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t code;
-	int y, x, b;
+	const rgb_t on_color = m_video_invert ? rgb_t::black() : rgb_t::white();
+	const rgb_t off_color = m_video_invert ? rgb_t::white() : rgb_t::black();
 
 	int addr = 0;
 	if (m_video_enable == 1)
 	{
-		for (y = 0; y < 344; y++)
+		for (int y = 0; y < 344; y++)
 		{
 			int horpos = 0;
-			for (x = 0; x < 42; x++)
+			for (int x = 0; x < 42; x++)
 			{
-				code = m_p_cat_videoram[addr++];
-				for (b = 15; b >= 0; b--)
+				uint16_t code = m_p_cat_videoram[addr++];
+				for (int b = 15; b >= 0; b--)
 				{
-					bitmap.pix16(y, horpos++) = ((code >> b) & 0x01) ^ m_video_invert;
+					bitmap.pix32(y, horpos++) = BIT(code, b) ? on_color : off_color;
 				}
 			}
 		}
 	} else {
 		const rectangle black_area(0, 672 - 1, 0, 344 - 1);
-		bitmap.fill(0, black_area);
+		bitmap.fill(rgb_t::black(), black_area);
 	}
 	return 0;
 }
@@ -1057,9 +1057,9 @@ WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the ris
 MACHINE_CONFIG_START(cat_state::cat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(19'968'000)/4)
-	MCFG_CPU_PROGRAM_MAP(cat_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cat_state,cat_int_ack)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(19'968'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(cat_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cat_state,cat_int_ack)
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,cat)
 	MCFG_MACHINE_RESET_OVERRIDE(cat_state,cat)
@@ -1071,28 +1071,24 @@ MACHINE_CONFIG_START(cat_state::cat)
 	MCFG_SCREEN_SIZE(672, 344)
 	MCFG_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_cat)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
 	MCFG_DEVICE_ADD( "duartn68681", MC68681, (XTAL(19'968'000)*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, cat_state, cat_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, cat_state, cat_duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, cat_state, cat_duart_txb))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, cat_state, cat_duart_output))
 
-	MCFG_CENTRONICS_ADD("ctx", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(cat_state, prn_ack_ff))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", mc68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
+	CENTRONICS(config, m_ctx, centronics_devices, "printer");
+	m_ctx->ack_handler().set(FUNC(cat_state::prn_ack_ff));
+	m_ctx->busy_handler().set("duartn68681", FUNC(mc68681_device::ip4_w)).invert();
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START( cat )
@@ -1108,10 +1104,10 @@ ROM_START( cat )
 	 * 4 rows populated on a "released" cat.
 	 */
 	ROM_SYSTEM_BIOS( 0, "r240", "Canon Cat V2.40 US Firmware")
-	ROMX_LOAD( "boultl0.ic2", 0x00001, 0x10000, CRC(77b66208) SHA1(9d718c0a521fefe4f86ef328805b7921bade9d89), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "boulth0.ic4", 0x00000, 0x10000, CRC(f1e1361a) SHA1(0a85385527e2cc55790de9f9919eb44ac32d7f62), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "boultl1.ic3", 0x20001, 0x10000, CRC(c61dafb0) SHA1(93216c26c2d5fc71412acc548c96046a996ea668), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "boulth1.ic5", 0x20000, 0x10000, CRC(bed1f761) SHA1(d177e1d3a39b005dd94a6bda186221d597129af4), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "boultl0.ic2", 0x00001, 0x10000, CRC(77b66208) SHA1(9d718c0a521fefe4f86ef328805b7921bade9d89), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "boulth0.ic4", 0x00000, 0x10000, CRC(f1e1361a) SHA1(0a85385527e2cc55790de9f9919eb44ac32d7f62), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "boultl1.ic3", 0x20001, 0x10000, CRC(c61dafb0) SHA1(93216c26c2d5fc71412acc548c96046a996ea668), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "boulth1.ic5", 0x20000, 0x10000, CRC(bed1f761) SHA1(d177e1d3a39b005dd94a6bda186221d597129af4), ROM_SKIP(1) | ROM_BIOS(0))
 	/* This 2.40 code was compiled by Dwight Elvey based on the v2.40 source
 	 * code disks recovered around 2004. It does NOT exactly match the above
 	 * set exactly but has a few small differences. One of the printer drivers
@@ -1120,20 +1116,20 @@ ROM_START( cat )
 	 * set above.
 	 */
 	ROM_SYSTEM_BIOS( 1, "r240r", "Canon Cat V2.40 US Firmware compiled from recovered source code")
-	ROMX_LOAD( "r240l0.ic2", 0x00001, 0x10000, CRC(1b89bdc4) SHA1(39c639587dc30f9d6636b46d0465f06272838432), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "r240h0.ic4", 0x00000, 0x10000, CRC(94f89b8c) SHA1(6c336bc30636a02c625d31f3057ec86bf4d155fc), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "r240l1.ic3", 0x20001, 0x10000, CRC(1a73be4f) SHA1(e2de2cb485f78963368fb8ceba8fb66ca56dba34), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "r240h1.ic5", 0x20000, 0x10000, CRC(898dd9f6) SHA1(93e791dd4ed7e4afa47a04df6fdde359e41c2075), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r240l0.ic2", 0x00001, 0x10000, CRC(1b89bdc4) SHA1(39c639587dc30f9d6636b46d0465f06272838432), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "r240h0.ic4", 0x00000, 0x10000, CRC(94f89b8c) SHA1(6c336bc30636a02c625d31f3057ec86bf4d155fc), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "r240l1.ic3", 0x20001, 0x10000, CRC(1a73be4f) SHA1(e2de2cb485f78963368fb8ceba8fb66ca56dba34), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "r240h1.ic5", 0x20000, 0x10000, CRC(898dd9f6) SHA1(93e791dd4ed7e4afa47a04df6fdde359e41c2075), ROM_SKIP(1) | ROM_BIOS(1))
 	/* This v1.74 code comes from (probably) the 'main us release' of first-run
 	 * Canon cats, and was dumped from machine serial number R12014979
 	 * Canon cat v1.74 roms are labeled as r74; they only added the major number
 	 * to the rom label after v2.0?
 	 */
 	ROM_SYSTEM_BIOS( 2, "r174", "Canon Cat V1.74 US Firmware")
-	ROMX_LOAD( "r74__0l__c18c.blue.ic2", 0x00001, 0x10000, CRC(b19aa0c8) SHA1(85b3e549cfb91bd3dd32335e02eaaf9350e80900), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "r74__0h__75a6.yellow.ic4", 0x00000, 0x10000, CRC(75281f77) SHA1(ed8b5e37713892ee83413d23c839d09e2fd2c1a9), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "r74__1l__c8a3.green.ic3", 0x20001, 0x10000, CRC(93275558) SHA1(f690077a87076fd51ae385ac5a455804cbc43c8f), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "r74__1h__3c37.white.ic5", 0x20000, 0x10000, CRC(5d7c3962) SHA1(8335993583fdd30b894c01c1a7a6aca61cd81bb4), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD( "r74__0l__c18c.blue.ic2", 0x00001, 0x10000, CRC(b19aa0c8) SHA1(85b3e549cfb91bd3dd32335e02eaaf9350e80900), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r74__0h__75a6.yellow.ic4", 0x00000, 0x10000, CRC(75281f77) SHA1(ed8b5e37713892ee83413d23c839d09e2fd2c1a9), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r74__1l__c8a3.green.ic3", 0x20001, 0x10000, CRC(93275558) SHA1(f690077a87076fd51ae385ac5a455804cbc43c8f), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r74__1h__3c37.white.ic5", 0x20000, 0x10000, CRC(5d7c3962) SHA1(8335993583fdd30b894c01c1a7a6aca61cd81bb4), ROM_SKIP(1) | ROM_BIOS(2))
 	// According to Sandy Bumgarner, there should be a 2.42 version which fixes some bugs in the calc command vs 2.40
 	// According to the Cat Repair Manual page 4-20, there should be a version called B91U0x (maybe 1.91 or 0.91?) with sum16s of 9F1F, FF0A, 79BF and 03FF
 
@@ -1177,5 +1173,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    DEVICE         INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1987, cat,  0,      0,       cat,       cat,     cat_state,     0,       "Canon",  "Cat",         MACHINE_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1987, cat,  0,      0,      cat,     cat,   cat_state, empty_init, "Canon", "Cat",    MACHINE_NOT_WORKING)

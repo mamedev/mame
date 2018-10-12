@@ -124,7 +124,6 @@ protected:
 DECLARE_DEVICE_TYPE(BW2_EXPANSION_SLOT, bw2_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( bw2_expansion_cards );
-
+void bw2_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_BW2_EXP_H

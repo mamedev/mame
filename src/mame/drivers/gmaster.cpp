@@ -12,7 +12,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -28,6 +28,11 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
+	void gmaster(machine_config &config);
+
+	void init_gmaster() { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
+
+private:
 	DECLARE_PALETTE_INIT(gmaster);
 	DECLARE_READ8_MEMBER(gmaster_io_r);
 	DECLARE_WRITE8_MEMBER(gmaster_io_w);
@@ -40,12 +45,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gmaster_portc_w);
 	DECLARE_WRITE8_MEMBER(gmaster_portd_w);
 	DECLARE_WRITE8_MEMBER(gmaster_portf_w);
-	DECLARE_DRIVER_INIT(gmaster) { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
 	uint32_t screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void gmaster(machine_config &config);
 	void gmaster_mem(address_map &map);
-private:
 	virtual void machine_start() override;
 
 	struct
@@ -237,11 +239,12 @@ WRITE8_MEMBER(gmaster_state::gmaster_portf_w)
 }
 
 
-ADDRESS_MAP_START(gmaster_state::gmaster_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
+void gmaster_state::gmaster_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
 	//AM_RANGE(0x8000, 0xfeff)      // mapped by the cartslot
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( gmaster )
@@ -331,32 +334,31 @@ void gmaster_state::machine_start()
 
 
 MACHINE_CONFIG_START(gmaster_state::gmaster)
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(12'000'000)/2/*?*/)  // upd78c11 in the unit
-	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
-	MCFG_UPD7810_PORTA_READ_CB(IOPORT("JOY"))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(gmaster_state, gmaster_portb_r))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(gmaster_state, gmaster_portc_r))
-	MCFG_UPD7810_PORTD_READ_CB(READ8(gmaster_state, gmaster_portd_r))
-	MCFG_UPD7810_PORTF_READ_CB(READ8(gmaster_state, gmaster_portf_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(gmaster_state, gmaster_porta_w))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(gmaster_state, gmaster_portb_w))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(gmaster_state, gmaster_portc_w))
-	MCFG_UPD7810_PORTD_WRITE_CB(WRITE8(gmaster_state, gmaster_portd_w))
-	MCFG_UPD7810_PORTF_WRITE_CB(WRITE8(gmaster_state, gmaster_portf_w))
+	upd7810_device &upd(UPD7810(config, m_maincpu, 12_MHz_XTAL/2/*?*/)); // µPD78C11 in the unit
+	upd.set_addrmap(AS_PROGRAM, &gmaster_state::gmaster_mem);
+	upd.pa_in_cb().set_ioport("JOY");
+	upd.pb_in_cb().set(FUNC(gmaster_state::gmaster_portb_r));
+	upd.pc_in_cb().set(FUNC(gmaster_state::gmaster_portc_r));
+	upd.pd_in_cb().set(FUNC(gmaster_state::gmaster_portd_r));
+	upd.pf_in_cb().set(FUNC(gmaster_state::gmaster_portf_r));
+	upd.pa_out_cb().set(FUNC(gmaster_state::gmaster_porta_w));
+	upd.pb_out_cb().set(FUNC(gmaster_state::gmaster_portb_w));
+	upd.pc_out_cb().set(FUNC(gmaster_state::gmaster_portc_w));
+	upd.pd_out_cb().set(FUNC(gmaster_state::gmaster_portd_w));
+	upd.pf_out_cb().set(FUNC(gmaster_state::gmaster_portf_w));
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64-1-3, 0, 64-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gmaster_state, screen_update_gmaster)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_size(64, 64);
+	screen.set_visarea(0, 64-1-3, 0, 64-1);
+	screen.set_screen_update(FUNC(gmaster_state::screen_update_gmaster));
+	screen.set_palette("palette");
+
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gmaster_palette))
 	MCFG_PALETTE_INIT_OWNER(gmaster_state, gmaster)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 0.50);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "gmaster_cart")
 	MCFG_GENERIC_MANDATORY
@@ -371,5 +373,5 @@ ROM_START(gmaster)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT    MACHINE   INPUT    CLASS          INIT      COMPANY    FULLNAME */
-CONS( 1990, gmaster,  0,      0,        gmaster,  gmaster, gmaster_state, gmaster, "Hartung", "Game Master", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME */
+CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, init_gmaster, "Hartung", "Game Master", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

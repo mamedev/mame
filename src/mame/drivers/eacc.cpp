@@ -59,12 +59,16 @@ class eacc_state : public driver_device
 {
 public:
 	eacc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pia(*this, "pia"),
-	m_p_nvram(*this, "nvram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pia(*this, "pia")
+		, m_p_nvram(*this, "nvram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void eacc(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER( eacc_cb1_r );
 	DECLARE_READ_LINE_MEMBER( eacc_distance_r );
 	DECLARE_READ_LINE_MEMBER( eacc_fuel_sensor_r );
@@ -72,19 +76,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( eacc_cb2_w );
 	DECLARE_WRITE8_MEMBER( eacc_digit_w );
 	DECLARE_WRITE8_MEMBER( eacc_segment_w );
+	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
+	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
+	void eacc_mem(address_map &map);
+	uint8_t m_digit;
 	bool m_cb1;
 	bool m_cb2;
 	bool m_nmi;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_shared_ptr<uint8_t> m_p_nvram;
-	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
-	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
-	void eacc(machine_config &config);
-	void eacc_mem(address_map &map);
-private:
-	uint8_t m_digit;
+	output_finder<7> m_digits;
 };
 
 
@@ -94,14 +98,15 @@ private:
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(eacc_state::eacc_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xc7ff) // A11,A12,A13 not connected
-	AM_RANGE(0x0000, 0x001f) AM_RAM AM_SHARE("nvram") // inside cpu, battery-backed
-	AM_RANGE(0x0020, 0x007f) AM_RAM // inside cpu
-	AM_RANGE(0x4000, 0x47ff) AM_ROM AM_MIRROR(0x8000)
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x7fc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-ADDRESS_MAP_END
+void eacc_state::eacc_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xc7ff); // A11,A12,A13 not connected
+	map(0x0000, 0x001f).ram().share("nvram"); // inside cpu, battery-backed
+	map(0x0020, 0x007f).ram(); // inside cpu
+	map(0x4000, 0x47ff).rom().mirror(0x8000);
+	map(0x8000, 0x8003).mirror(0x7fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+}
 
 
 /******************************************************************************
@@ -220,7 +225,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 		{
 			for (i = 3; i < 7; i++)
 				if (BIT(m_digit, i))
-					output().set_digit_value(i, bitswap<8>(data, 7, 0, 1, 4, 5, 6, 2, 3));
+					m_digits[i] = bitswap<8>(data, 7, 0, 1, 4, 5, 6, 2, 3);
 		}
 	}
 }
@@ -242,23 +247,23 @@ WRITE8_MEMBER( eacc_state::eacc_digit_w )
 
 MACHINE_CONFIG_START(eacc_state::eacc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(3'579'545))  /* Divided by 4 inside the m6802*/
-	MCFG_CPU_PROGRAM_MAP(eacc_mem)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))  /* Divided by 4 inside the m6802*/
+	MCFG_DEVICE_PROGRAM_MAP(eacc_mem)
 
-	MCFG_DEFAULT_LAYOUT(layout_eacc)
+	config.set_default_layout(layout_eacc);
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(eacc_state, eacc_keyboard_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(eacc_state, eacc_distance_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(eacc_state, eacc_cb1_r))
-	MCFG_PIA_READCA2_HANDLER(READLINE(eacc_state, eacc_fuel_sensor_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(eacc_state, eacc_segment_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(eacc_state, eacc_digit_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(eacc_state, eacc_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpb_handler().set(FUNC(eacc_state::eacc_keyboard_r));
+	m_pia->readca1_handler().set(FUNC(eacc_state::eacc_distance_r));
+	m_pia->readcb1_handler().set(FUNC(eacc_state::eacc_cb1_r));
+	m_pia->readca2_handler().set(FUNC(eacc_state::eacc_fuel_sensor_r));
+	m_pia->writepa_handler().set(FUNC(eacc_state::eacc_segment_w));
+	m_pia->writepb_handler().set(FUNC(eacc_state::eacc_digit_w));
+	m_pia->cb2_handler().set(FUNC(eacc_state::eacc_cb2_w));
+	m_pia->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
+	m_pia->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_nmi", eacc_state, eacc_nmi, attotime::from_hz(600))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_cb1", eacc_state, eacc_cb1, attotime::from_hz(30))
 MACHINE_CONFIG_END
@@ -279,5 +284,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY                  FULLNAME           FLAGS
-COMP( 1982, eacc,   0,      0,      eacc,    eacc,  eacc_state, 0,     "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                  FULLNAME           FLAGS
+COMP( 1982, eacc, 0,      0,      eacc,    eacc,  eacc_state, empty_init, "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)

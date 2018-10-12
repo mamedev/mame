@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 ///*************************************************************************
 //  INTERFACE CONFIGURATION MACROS

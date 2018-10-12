@@ -65,7 +65,7 @@ protected:
 
 	address_space_config program_config;
 	address_space *program;
-	direct_read_data<0> *direct;
+	std::function<u8 (offs_t address)> m_pr8;
 
 	int icount, bcount, inst_state, cycles_scaling;
 	uint8_t pending_irq;
@@ -89,7 +89,7 @@ protected:
 	inline void next(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH; }
 	inline void next_noirq(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH_NOIRQ; }
 	void check_irq();
-	inline uint8_t read_pc() { return direct->read_byte(PC++); }
+	inline uint8_t read_pc() { return m_pr8(PC++); }
 
 	void reg_w8(uint8_t adr, uint8_t data);
 	void reg_w16(uint8_t adr, uint16_t data);

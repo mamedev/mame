@@ -28,7 +28,6 @@
 #include "emu.h"
 #include "mmc3.h"
 
-#include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 #include "screen.h"
 
@@ -201,9 +200,8 @@ void nes_txrom_device::hblank_irq(int scanline, int vblank, int blanked)
 
 		if (m_irq_enable && !blanked && (m_irq_count == 0) && (prior_count || m_irq_clear /*|| !m_mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
-			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-						machine().first_screen()->vpos(), machine().first_screen()->hpos()));
-			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			LOG_MMC(("irq fired, scanline: %d\n", scanline));
+			set_irq_line(ASSERT_LINE);
 		}
 	}
 	m_irq_clear = 0;
@@ -302,7 +300,7 @@ WRITE8_MEMBER(nes_txrom_device::txrom_write)
 
 		case 0x6000:
 			m_irq_enable = 0;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 
 		case 0x6001:

@@ -101,14 +101,6 @@ void c64_expansion_slot_device::device_start()
 	m_write_nmi.resolve_safe();
 	m_write_dma.resolve_safe();
 	m_write_reset.resolve_safe();
-
-	// inherit bus clock
-	if (clock() == 0)
-	{
-		c64_expansion_slot_device *root = machine().device<c64_expansion_slot_device>(C64_EXPANSION_SLOT_TAG);
-		assert(root);
-		set_unscaled_clock(root->clock());
-	}
 }
 
 
@@ -295,6 +287,16 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 }
 
 
+void c64_expansion_slot_device::set_passthrough()
+{
+	irq_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::irq_w));
+	nmi_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::nmi_w));
+	reset_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::reset_w));
+	cd_input_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::dma_cd_r));
+	cd_output_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::dma_cd_w));
+	dma_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::dma_w));
+}
+
 //-------------------------------------------------
 //  SLOT_INTERFACE( c64_expansion_cards )
 //-------------------------------------------------
@@ -368,75 +370,76 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 #include "xl80.h"
 #include "zaxxon.h"
 
-SLOT_INTERFACE_START( c64_expansion_cards )
-	SLOT_INTERFACE("16k", C64_16KB)
-	SLOT_INTERFACE("cpm", C64_CPM)
-	SLOT_INTERFACE("dqbb", C64_DQBB)
-	SLOT_INTERFACE("easyflash", C64_EASYFLASH)
-	SLOT_INTERFACE("georam", C64_GEORAM)
-	SLOT_INTERFACE("ide64", C64_IDE64)
-	SLOT_INTERFACE("midimap", C64_MIDI_MAPLIN)
-	SLOT_INTERFACE("midins", C64_MIDI_NAMESOFT)
-	SLOT_INTERFACE("midipp", C64_MIDI_PASSPORT)
-	SLOT_INTERFACE("midisci", C64_MIDI_SCI)
-	SLOT_INTERFACE("midisiel", C64_MIDI_SIEL)
-	SLOT_INTERFACE("music64", C64_MUSIC64)
-	SLOT_INTERFACE("neoram", C64_NEORAM)
-	SLOT_INTERFACE("reu1700", C64_REU1700)
-	SLOT_INTERFACE("reu1750", C64_REU1750)
-	SLOT_INTERFACE("reu1764", C64_REU1764)
-	SLOT_INTERFACE("sfxse", C64_SFX_SOUND_EXPANDER)
-	SLOT_INTERFACE("speakez", C64_SPEAKEASY)
-	SLOT_INTERFACE("supercpu", C64_SUPERCPU)
-	SLOT_INTERFACE("swiftlink", C64_SWIFTLINK)
-	SLOT_INTERFACE("turbo232", C64_TURBO232)
+void c64_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("16k", C64_16KB);
+	device.option_add("cpm", C64_CPM);
+	device.option_add("dqbb", C64_DQBB);
+	device.option_add("easyflash", C64_EASYFLASH);
+	device.option_add("georam", C64_GEORAM);
+	device.option_add("ide64", C64_IDE64);
+	device.option_add("midimap", C64_MIDI_MAPLIN);
+	device.option_add("midins", C64_MIDI_NAMESOFT);
+	device.option_add("midipp", C64_MIDI_PASSPORT);
+	device.option_add("midisci", C64_MIDI_SCI);
+	device.option_add("midisiel", C64_MIDI_SIEL);
+	device.option_add("music64", C64_MUSIC64);
+	device.option_add("neoram", C64_NEORAM);
+	device.option_add("reu1700", C64_REU1700);
+	device.option_add("reu1750", C64_REU1750);
+	device.option_add("reu1764", C64_REU1764);
+	device.option_add("sfxse", C64_SFX_SOUND_EXPANDER);
+	device.option_add("speakez", C64_SPEAKEASY);
+	device.option_add("supercpu", C64_SUPERCPU);
+	device.option_add("swiftlink", C64_SWIFTLINK);
+	device.option_add("turbo232", C64_TURBO232);
 
 	// the following need ROMs from the software list
-	SLOT_INTERFACE_INTERNAL("standard", C64_STD)
-	SLOT_INTERFACE_INTERNAL("comal80", C64_COMAL80)
-	SLOT_INTERFACE_INTERNAL("c128_comal80", C128_COMAL80)
-	SLOT_INTERFACE_INTERNAL("cs64", C64_CURRAH_SPEECH)
-	SLOT_INTERFACE_INTERNAL("dela_ep256", C64_DELA_EP256)
-	SLOT_INTERFACE_INTERNAL("ep64", C64_DELA_EP64)
-	SLOT_INTERFACE_INTERNAL("ep7x8", C64_DELA_EP7X8)
-	SLOT_INTERFACE_INTERNAL("dinamic", C64_DINAMIC)
-	SLOT_INTERFACE_INTERNAL("easycalcres", C64_EASY_CALC_RESULT)
-	SLOT_INTERFACE_INTERNAL("epyxfastload", C64_EPYX_FAST_LOAD)
-	SLOT_INTERFACE_INTERNAL("exos", C64_EXOS)
-	SLOT_INTERFACE_INTERNAL("fcc", C64_FCC)
-	SLOT_INTERFACE_INTERNAL("final", C64_FINAL)
-	SLOT_INTERFACE_INTERNAL("final3", C64_FINAL3)
-	SLOT_INTERFACE_INTERNAL("fun_play", C64_FUN_PLAY)
-	SLOT_INTERFACE_INTERNAL("ieee488", C64_IEEE488)
-	SLOT_INTERFACE_INTERNAL("kingsoft", C64_KINGSOFT)
-	SLOT_INTERFACE_INTERNAL("mach5", C64_MACH5)
-	SLOT_INTERFACE_INTERNAL("magic_desk", C64_MAGIC_DESK)
-	SLOT_INTERFACE_INTERNAL("magic_formel", C64_MAGIC_FORMEL)
-	SLOT_INTERFACE_INTERNAL("magic_voice", C64_MAGIC_VOICE)
-	SLOT_INTERFACE_INTERNAL("mikroasm", C64_MIKRO_ASSEMBLER)
-	SLOT_INTERFACE_INTERNAL("multiscreen", C64_MULTISCREEN)
-	SLOT_INTERFACE_INTERNAL("ocean", C64_OCEAN)
-	SLOT_INTERFACE_INTERNAL("pagefox", C64_PAGEFOX)
-	SLOT_INTERFACE_INTERNAL("partner", C64_PARTNER)
-	SLOT_INTERFACE_INTERNAL("partner128", C128_PARTNER)
-	SLOT_INTERFACE_INTERNAL("prophet64", C64_PROPHET64)
-	SLOT_INTERFACE_INTERNAL("ps64", C64_PS64)
-	SLOT_INTERFACE_INTERNAL("rex", C64_REX)
-	SLOT_INTERFACE_INTERNAL("rex_ep256", C64_REX_EP256)
-	SLOT_INTERFACE_INTERNAL("ross", C64_ROSS)
-	SLOT_INTERFACE_INTERNAL("silverrock", C64_SILVERROCK)
-	SLOT_INTERFACE_INTERNAL("simons_basic", C64_SIMONS_BASIC)
-	SLOT_INTERFACE_INTERNAL("stardos", C64_STARDOS)
-	SLOT_INTERFACE_INTERNAL("struct_basic", C64_STRUCTURED_BASIC)
-	SLOT_INTERFACE_INTERNAL("super_explode", C64_SUPER_EXPLODE)
-	SLOT_INTERFACE_INTERNAL("super_games", C64_SUPER_GAMES)
-	SLOT_INTERFACE_INTERNAL("sw8k", C64_SW8K)
-	SLOT_INTERFACE_INTERNAL("system3", C64_SYSTEM3)
-	SLOT_INTERFACE_INTERNAL("tdos", C64_TDOS)
-	SLOT_INTERFACE_INTERNAL("vizastar", C64_VIZASTAR)
-	SLOT_INTERFACE_INTERNAL("vizawrite", C64_VW64)
-	SLOT_INTERFACE_INTERNAL("warp_speed", C64_WARP_SPEED)
-	SLOT_INTERFACE_INTERNAL("westermann", C64_WESTERMANN)
-	SLOT_INTERFACE_INTERNAL("zaxxon", C64_ZAXXON)
-	SLOT_INTERFACE_INTERNAL("xl80", C64_XL80)
-SLOT_INTERFACE_END
+	device.option_add_internal("standard", C64_STD);
+	device.option_add_internal("comal80", C64_COMAL80);
+	device.option_add_internal("c128_comal80", C128_COMAL80);
+	device.option_add_internal("cs64", C64_CURRAH_SPEECH);
+	device.option_add_internal("dela_ep256", C64_DELA_EP256);
+	device.option_add_internal("ep64", C64_DELA_EP64);
+	device.option_add_internal("ep7x8", C64_DELA_EP7X8);
+	device.option_add_internal("dinamic", C64_DINAMIC);
+	device.option_add_internal("easycalcres", C64_EASY_CALC_RESULT);
+	device.option_add_internal("epyxfastload", C64_EPYX_FAST_LOAD);
+	device.option_add_internal("exos", C64_EXOS);
+	device.option_add_internal("fcc", C64_FCC);
+	device.option_add_internal("final", C64_FINAL);
+	device.option_add_internal("final3", C64_FINAL3);
+	device.option_add_internal("fun_play", C64_FUN_PLAY);
+	device.option_add_internal("ieee488", C64_IEEE488);
+	device.option_add_internal("kingsoft", C64_KINGSOFT);
+	device.option_add_internal("mach5", C64_MACH5);
+	device.option_add_internal("magic_desk", C64_MAGIC_DESK);
+	device.option_add_internal("magic_formel", C64_MAGIC_FORMEL);
+	device.option_add_internal("magic_voice", C64_MAGIC_VOICE);
+	device.option_add_internal("mikroasm", C64_MIKRO_ASSEMBLER);
+	device.option_add_internal("multiscreen", C64_MULTISCREEN);
+	device.option_add_internal("ocean", C64_OCEAN);
+	device.option_add_internal("pagefox", C64_PAGEFOX);
+	device.option_add_internal("partner", C64_PARTNER);
+	device.option_add_internal("partner128", C128_PARTNER);
+	device.option_add_internal("prophet64", C64_PROPHET64);
+	device.option_add_internal("ps64", C64_PS64);
+	device.option_add_internal("rex", C64_REX);
+	device.option_add_internal("rex_ep256", C64_REX_EP256);
+	device.option_add_internal("ross", C64_ROSS);
+	device.option_add_internal("silverrock", C64_SILVERROCK);
+	device.option_add_internal("simons_basic", C64_SIMONS_BASIC);
+	device.option_add_internal("stardos", C64_STARDOS);
+	device.option_add_internal("struct_basic", C64_STRUCTURED_BASIC);
+	device.option_add_internal("super_explode", C64_SUPER_EXPLODE);
+	device.option_add_internal("super_games", C64_SUPER_GAMES);
+	device.option_add_internal("sw8k", C64_SW8K);
+	device.option_add_internal("system3", C64_SYSTEM3);
+	device.option_add_internal("tdos", C64_TDOS);
+	device.option_add_internal("vizastar", C64_VIZASTAR);
+	device.option_add_internal("vizawrite", C64_VW64);
+	device.option_add_internal("warp_speed", C64_WARP_SPEED);
+	device.option_add_internal("westermann", C64_WESTERMANN);
+	device.option_add_internal("zaxxon", C64_ZAXXON);
+	device.option_add_internal("xl80", C64_XL80);
+}

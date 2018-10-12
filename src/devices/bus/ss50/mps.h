@@ -5,10 +5,11 @@
     SWTPC MP-S Serial Interface
 
 **********************************************************************/
-
 #ifndef MAME_DEVICE_BUS_SS50_MPS_H
 #define MAME_DEVICE_BUS_SS50_MPS_H
 
-extern const device_type SS50_MPS;
+#include "interface.h"
+
+DECLARE_DEVICE_TYPE(SS50_MPS, ss50_card_interface)
 
 #endif // MAME_DEVICE_BUS_SS50_MPS_H

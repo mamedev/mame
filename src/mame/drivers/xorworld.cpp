@@ -61,19 +61,20 @@ WRITE16_MEMBER(xorworld_state::irq6_ack_w)
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(xorworld_state::xorworld_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1")
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P2")
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW")
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa0000f) AM_DEVWRITE8("mainlatch", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xffc800, 0xffc87f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xffc880, 0xffc881) AM_WRITE(irq2_ack_w) AM_READNOP
-	AM_RANGE(0xffc882, 0xffc883) AM_WRITE(irq6_ack_w) AM_READNOP
-	AM_RANGE(0xffc884, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void xorworld_state::xorworld_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x200000, 0x200001).portr("P1");
+	map(0x400000, 0x400001).portr("P2");
+	map(0x600000, 0x600001).portr("DSW");
+	map(0x800000, 0x800003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0xa00000, 0xa0000f).w("mainlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0xffc000, 0xffc7ff).ram().w(FUNC(xorworld_state::videoram_w)).share("videoram");
+	map(0xffc800, 0xffc87f).ram().share("spriteram");
+	map(0xffc880, 0xffc881).w(FUNC(xorworld_state::irq2_ack_w)).nopr();
+	map(0xffc882, 0xffc883).w(FUNC(xorworld_state::irq6_ack_w)).nopr();
+	map(0xffc884, 0xffffff).ram();
+}
 
 
 static INPUT_PORTS_START( xorworld )
@@ -90,7 +91,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* used for accessing the NVRAM */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* used for accessing the NVRAM */
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
@@ -145,7 +146,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( xorworld )
+static GFXDECODE_START( gfx_xorworld )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,  0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spritelayout, 0, 64 )
 GFXDECODE_END
@@ -153,22 +154,22 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(xorworld_state::xorworld)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   // 10 MHz
-	MCFG_CPU_PROGRAM_MAP(xorworld_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", xorworld_state, irq6_line_assert) // irq 4 or 6
-	//MCFG_CPU_PERIODIC_INT_DRIVER(xorworld_state, irq2_line_assert, 3*60) //timed irq, unknown timing
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   // 10 MHz
+	MCFG_DEVICE_PROGRAM_MAP(xorworld_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xorworld_state, irq6_line_assert) // irq 4 or 6
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(xorworld_state, irq2_line_assert, 3*60) //timed irq, unknown timing
 	// Simple fix - but this sounds good!! -Valley Bell
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", xorworld_state, irq2_line_assert) // irq 4 or 6
-	MCFG_CPU_PERIODIC_INT_DRIVER(xorworld_state, irq6_line_assert, 3*60) //timed irq, unknown timing
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xorworld_state, irq2_line_assert) // irq 4 or 6
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(xorworld_state, irq6_line_assert, 3*60) //timed irq, unknown timing
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) // CS (active low)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) // SK (active high)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) // EEPROM data (DIN)
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)); // CS (active low)
+	mainlatch.q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)); // SK (active high)
+	mainlatch.q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)); // EEPROM data (DIN)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -179,13 +180,13 @@ MACHINE_CONFIG_START(xorworld_state::xorworld)
 	MCFG_SCREEN_UPDATE_DRIVER(xorworld_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xorworld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xorworld)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(xorworld_state, xorworld)
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", 8000000 /* guess */)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -209,7 +210,7 @@ ROM_END
 
 #define PATCH(data) *rom = data; rom++
 
-DRIVER_INIT_MEMBER(xorworld_state,xorworld)
+void xorworld_state::init_xorworld()
 {
 	/*  patch some strange protection (without this, strange characters appear
 	    after level 5 and some pieces don't rotate properly some times) */
@@ -229,4 +230,4 @@ DRIVER_INIT_MEMBER(xorworld_state,xorworld)
 }
 
 
-GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, xorworld, ROT0, "Gaelco", "Xor World (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, init_xorworld, ROT0, "Gaelco", "Xor World (prototype)", MACHINE_SUPPORTS_SAVE )

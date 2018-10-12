@@ -27,20 +27,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TTL165_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL165, 0)
-
-#define MCFG_TTL165_DATA_CB(_devcb) \
-	devcb = &downcast<ttl165_device &>(*device).set_data_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL165_QH_CB(_devcb) \
-	devcb = &downcast<ttl165_device &>(*device).set_qh_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -48,14 +34,10 @@ class ttl165_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl165_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl165_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// configuration
-	template <class Object> devcb_base &set_data_callback(Object &&cb)
-		{ return m_data_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_qh_callback(Object &&cb)
-		{ return m_qh_cb.set_callback(std::forward<Object>(cb)); }
+	auto data_callback() { return m_data_cb.bind(); }
+	auto qh_callback() { return m_qh_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);

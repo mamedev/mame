@@ -8,6 +8,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 class macrossp_state : public driver_device
@@ -42,6 +43,13 @@ public:
 	{
 	}
 
+	void quizmoon(machine_config &config);
+	void macrossp(machine_config &config);
+
+	void init_quizmoon();
+	void init_macrossp();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr<uint32_t> m_scra_videoram;
@@ -87,8 +95,6 @@ public:
 	DECLARE_WRITE32_MEMBER(macrossp_scrb_videoram_w);
 	DECLARE_WRITE32_MEMBER(macrossp_scrc_videoram_w);
 	DECLARE_WRITE32_MEMBER(macrossp_text_videoram_w);
-	DECLARE_DRIVER_INIT(quizmoon);
-	DECLARE_DRIVER_INIT(macrossp);
 	TILE_GET_INFO_MEMBER(get_macrossp_scra_tile_info);
 	TILE_GET_INFO_MEMBER(get_macrossp_scrb_tile_info);
 	TILE_GET_INFO_MEMBER(get_macrossp_scrc_tile_info);
@@ -101,8 +107,6 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int linem, int pri);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	void quizmoon(machine_config &config);
-	void macrossp(machine_config &config);
 	void macrossp_map(address_map &map);
 	void macrossp_sound_map(address_map &map);
 };

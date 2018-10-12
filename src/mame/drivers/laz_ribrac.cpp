@@ -26,10 +26,12 @@ public:
 	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
+	void laz_ribrac(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void laz_ribrac(machine_config &config);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };
 
@@ -50,14 +52,14 @@ void laz_ribrac_state::machine_reset()
 MACHINE_CONFIG_START(laz_ribrac_state::laz_ribrac)
 
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//  MCFG_CPU_PROGRAM_MAP(laz_ribrac_map)
-//  MCFG_CPU_IO_MAP(laz_ribrac_io)
+//  MCFG_DEVICE_ADD("maincpu", ??, 8000000) // unknown
+//  MCFG_DEVICE_PROGRAM_MAP(laz_ribrac_map)
+//  MCFG_DEVICE_IO_MAP(laz_ribrac_io)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // maybe
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // maybe
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -65,19 +67,19 @@ MACHINE_CONFIG_END
 
 ROM_START( ribrac )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "RIBBITR.U7", 0x00000, 0x10000, CRC(9eb78ca3) SHA1(4fede7bdd30449602a01489dc72dbbd5452d6b5a) )
+	ROM_LOAD( "ribbitr.u7", 0x00000, 0x10000, CRC(9eb78ca3) SHA1(4fede7bdd30449602a01489dc72dbbd5452d6b5a) )
 
 	ROM_REGION( 0xc0000, "oki", 0 )
-	ROM_LOAD( "RIBBITR_SND.U10", 0x00000, 0x10000, NO_DUMP )
-	ROM_LOAD( "RIBBITR_SND.U9", 0x10000, 0x10000, NO_DUMP )
-	ROM_LOAD( "RIBBITR_SND.U8", 0x20000, 0x10000, NO_DUMP )
-	ROM_LOAD( "RIBBITR_SND.U7", 0x30000, 0x10000, NO_DUMP )
+	ROM_LOAD( "ribbitr_snd.u10", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "ribbitr_snd.u9", 0x10000, 0x10000, NO_DUMP )
+	ROM_LOAD( "ribbitr_snd.u8", 0x20000, 0x10000, NO_DUMP )
+	ROM_LOAD( "ribbitr_snd.u7", 0x30000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0xc0000, "oki2", 0 )
-	ROM_LOAD( "RIBBITR_SND.U14", 0x00000, 0x10000, NO_DUMP )
-	ROM_LOAD( "RIBBITR_SND.U13", 0x10000, 0x10000, NO_DUMP )
-	ROM_LOAD( "RIBBITR_SND.U12", 0x20000, 0x10000, NO_DUMP )
-	ROM_LOAD( "RIBBITR_SND.U11", 0x30000, 0x10000, NO_DUMP )
+	ROM_LOAD( "ribbitr_snd.u14", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "ribbitr_snd.u13", 0x10000, 0x10000, NO_DUMP )
+	ROM_LOAD( "ribbitr_snd.u12", 0x20000, 0x10000, NO_DUMP )
+	ROM_LOAD( "ribbitr_snd.u11", 0x30000, 0x10000, NO_DUMP )
 ROM_END
 
-GAME( 1993, ribrac,  0,    laz_ribrac, laz_ribrac, laz_ribrac_state,  0, ROT0, "Lazer-tron", "Ribbit Racing (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, ribrac, 0, laz_ribrac, laz_ribrac, laz_ribrac_state, empty_init, ROT0, "Lazer-tron", "Ribbit Racing (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )

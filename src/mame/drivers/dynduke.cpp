@@ -80,71 +80,77 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(dynduke_state::master_map)
-	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08000, 0x080ff) AM_RAM AM_SHARE("scroll_ram")
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0b004, 0x0b005) AM_WRITENOP
-	AM_RANGE(0x0b006, 0x0b007) AM_WRITE(control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(text_w) AM_SHARE("videoram")
-	AM_RANGE(0x0d000, 0x0d00d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
-	AM_RANGE(0xa0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void dynduke_state::master_map(address_map &map)
+{
+	map(0x00000, 0x06fff).ram();
+	map(0x07000, 0x07fff).ram().share("spriteram");
+	map(0x08000, 0x080ff).ram().share("scroll_ram");
+	map(0x0a000, 0x0afff).ram().share("share1");
+	map(0x0b000, 0x0b001).portr("P1_P2");
+	map(0x0b002, 0x0b003).portr("DSW");
+	map(0x0b004, 0x0b005).nopw();
+	map(0x0b006, 0x0b007).w(FUNC(dynduke_state::control_w));
+	map(0x0c000, 0x0c7ff).ram().w(FUNC(dynduke_state::text_w)).share("videoram");
+	map(0x0d000, 0x0d00d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
+	map(0xa0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(dynduke_state::slave_map)
-	AM_RANGE(0x00000, 0x05fff) AM_RAM
-	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(background_w) AM_SHARE("back_data")
-	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x07000, 0x07fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x0a000, 0x0a001) AM_WRITE(gfxbank_w)
-	AM_RANGE(0x0c000, 0x0c001) AM_WRITENOP
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void dynduke_state::slave_map(address_map &map)
+{
+	map(0x00000, 0x05fff).ram();
+	map(0x06000, 0x067ff).ram().w(FUNC(dynduke_state::background_w)).share("back_data");
+	map(0x06800, 0x06fff).ram().w(FUNC(dynduke_state::foreground_w)).share("fore_data");
+	map(0x07000, 0x07fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08000, 0x08fff).ram().share("share1");
+	map(0x0a000, 0x0a001).w(FUNC(dynduke_state::gfxbank_w));
+	map(0x0c000, 0x0c001).nopw();
+	map(0xc0000, 0xfffff).rom();
+}
 
 /* Memory map used by DlbDyn - probably an addressing PAL is different */
-ADDRESS_MAP_START(dynduke_state::masterj_map)
-	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(text_w) AM_SHARE("videoram")
-	AM_RANGE(0x09000, 0x0900d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
-	AM_RANGE(0x0c000, 0x0c0ff) AM_RAM AM_SHARE("scroll_ram")
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x0f000, 0x0f001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x0f002, 0x0f003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0f004, 0x0f005) AM_WRITENOP
-	AM_RANGE(0x0f006, 0x0f007) AM_WRITE(control_w)
-	AM_RANGE(0xa0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void dynduke_state::masterj_map(address_map &map)
+{
+	map(0x00000, 0x06fff).ram();
+	map(0x07000, 0x07fff).ram().share("spriteram");
+	map(0x08000, 0x087ff).ram().w(FUNC(dynduke_state::text_w)).share("videoram");
+	map(0x09000, 0x0900d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
+	map(0x0c000, 0x0c0ff).ram().share("scroll_ram");
+	map(0x0e000, 0x0efff).ram().share("share1");
+	map(0x0f000, 0x0f001).portr("P1_P2");
+	map(0x0f002, 0x0f003).portr("DSW");
+	map(0x0f004, 0x0f005).nopw();
+	map(0x0f006, 0x0f007).w(FUNC(dynduke_state::control_w));
+	map(0xa0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(dynduke_state::sound_map)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
-	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
-	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void dynduke_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xffff).r("sei80bu", FUNC(sei80bu_device::data_r));
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).w(m_seibu_sound, FUNC(seibu_sound_device::pending_w));
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4007, 0x4007).w(m_seibu_sound, FUNC(seibu_sound_device::bank_w));
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x6000, 0x6000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
-ADDRESS_MAP_START(dynduke_state::sound_decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
-ADDRESS_MAP_END
+void dynduke_state::sound_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xffff).r("sei80bu", FUNC(sei80bu_device::opcode_r));
+}
 
-ADDRESS_MAP_START(dynduke_state::sei80bu_encrypted_full_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audiocpu", 0)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-ADDRESS_MAP_END
+void dynduke_state::sei80bu_encrypted_full_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
 
 /* Input Ports */
 
@@ -288,7 +294,7 @@ static const gfx_layout fg_layout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( dynduke )
+static GFXDECODE_START( gfx_dynduke )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0x500, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bg_layout,     0x000, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, fg_layout,     0x200, 16 )
@@ -297,26 +303,29 @@ GFXDECODE_END
 
 /* Interrupt Generator */
 
-INTERRUPT_GEN_MEMBER(dynduke_state::interrupt)
+WRITE_LINE_MEMBER(dynduke_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   // VBL
+	if (state)
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_slave->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+	}
 }
 
 /* Machine Driver */
 
 MACHINE_CONFIG_START(dynduke_state::dynduke)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynduke_state, interrupt)
+	MCFG_DEVICE_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 
-	MCFG_CPU_ADD("slave", V30, 16000000/2) // NEC V30-8 CPU
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynduke_state, interrupt)
+	MCFG_DEVICE_ADD("slave", V30, 16000000/2) // NEC V30-8 CPU
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
@@ -324,44 +333,45 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
 	// video hardware
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynduke_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(dynduke_state::screen_update));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.screen_vblank().append(FUNC(dynduke_state::vblank_irq));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynduke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dynduke)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynduke_state::dbldyn)
 	dynduke(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(masterj_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(masterj_map)
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -413,9 +423,9 @@ ROM_START( dynduke )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dyndukea )
@@ -465,9 +475,9 @@ ROM_START( dyndukea )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dyndukej )
@@ -517,9 +527,9 @@ ROM_START( dyndukej )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dyndukeja )
@@ -569,9 +579,9 @@ ROM_START( dyndukeja )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dyndukeu )
@@ -621,9 +631,9 @@ ROM_START( dyndukeu )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dbldynj )
@@ -673,9 +683,9 @@ ROM_START( dbldynj )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dbldynu )
@@ -725,18 +735,18 @@ ROM_START( dbldynu )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 
 /* Game Drivers */
 
-GAME( 1989, dynduke,   0,       dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 03SEP89)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukea,  dynduke, dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 25JUL89)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukej,  dynduke, dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 03SEP89)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukeja, dynduke, dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 25JUL89)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukeu,  dynduke, dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US, 25JUL89)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynj,   0,       dbldyn,  dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan, 13NOV89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynu,   dbldynj, dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US, 13NOV89)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dynduke,   0,       dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 03SEP89)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukea,  dynduke, dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 25JUL89)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukej,  dynduke, dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 03SEP89)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeja, dynduke, dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 25JUL89)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeu,  dynduke, dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US, 25JUL89)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynj,   0,       dbldyn,  dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan, 13NOV89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynu,   dbldynj, dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US, 13NOV89)",    MACHINE_SUPPORTS_SAVE )

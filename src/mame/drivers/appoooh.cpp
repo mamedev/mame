@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 			uint8_t *RAM = memregion("adpcm")->base();
 
 			m_adpcm_data = RAM[m_adpcm_address++];
-			m_msm->data_w(m_adpcm_data >> 4);
+			m_msm->write_data(m_adpcm_data >> 4);
 
 			if (m_adpcm_data == 0x70)
 			{
@@ -192,7 +192,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 		}
 		else
 		{
-			m_msm->data_w(m_adpcm_data & 0x0f);
+			m_msm->write_data(m_adpcm_data & 0x0f);
 			m_adpcm_data = -1;
 		}
 	}
@@ -213,37 +213,40 @@ WRITE8_MEMBER(appoooh_state::adpcm_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(appoooh_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM /* RAM ? */
+void appoooh_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xdfff).bankr("bank1");
+	map(0xe000, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram(); /* RAM ? */
 
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-	AM_RANGE(0xf000, 0xf01f) AM_SHARE("spriteram")
-	AM_RANGE(0xf020, 0xf3ff) AM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xf420, 0xf7ff) AM_WRITE(fg_colorram_w) AM_SHARE("fg_colorram")
-	AM_RANGE(0xf800, 0xf81f) AM_SHARE("spriteram_2")
-	AM_RANGE(0xf820, 0xfbff) AM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xfc20, 0xffff) AM_WRITE(bg_colorram_w) AM_SHARE("bg_colorram")
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).ram();
+	map(0xf000, 0xf01f).share("spriteram");
+	map(0xf020, 0xf3ff).w(FUNC(appoooh_state::fg_videoram_w)).share("fg_videoram");
+	map(0xf420, 0xf7ff).w(FUNC(appoooh_state::fg_colorram_w)).share("fg_colorram");
+	map(0xf800, 0xf81f).share("spriteram_2");
+	map(0xf820, 0xfbff).w(FUNC(appoooh_state::bg_videoram_w)).share("bg_videoram");
+	map(0xfc20, 0xffff).w(FUNC(appoooh_state::bg_colorram_w)).share("bg_colorram");
+}
 
-ADDRESS_MAP_START(appoooh_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("maincpu", 0x8000)
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void appoooh_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0x9fff).rom().region("maincpu", 0x8000);
+	map(0xa000, 0xdfff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(appoooh_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76489_device, write)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(adpcm_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("BUTTON3") AM_WRITE(out_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(scroll_w) /* unknown */
-ADDRESS_MAP_END
+void appoooh_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x03, 0x03).portr("DSW1").w(FUNC(appoooh_state::adpcm_w));
+	map(0x04, 0x04).portr("BUTTON3").w(FUNC(appoooh_state::out_w));
+	map(0x05, 0x05).w(FUNC(appoooh_state::scroll_w)); /* unknown */
+}
 
 
 /*************************************
@@ -346,7 +349,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( appoooh )
+static GFXDECODE_START( gfx_appoooh )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     32*8, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,      0, 32 )
@@ -379,7 +382,7 @@ static const gfx_layout robowres_spritelayout =
 };
 
 
-static GFXDECODE_START( robowres )
+static GFXDECODE_START( gfx_robowres )
 	GFXDECODE_ENTRY( "gfx1", 0, robowres_charlayout,        0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, robowres_charlayout,         0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, robowres_spritelayout,      0, 32 )
@@ -413,32 +416,32 @@ void appoooh_state::machine_reset()
 INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(appoooh_state::appoooh_common)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn1", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn2", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn3", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn3", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(appoooh_state, adpcm_int)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, appoooh_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -456,7 +459,7 @@ MACHINE_CONFIG_START(appoooh_state::appoooh)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_appoooh)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", appoooh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_appoooh)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
@@ -467,7 +470,7 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	appoooh_common(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -478,7 +481,7 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_robowres)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", robowres)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robowres)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
@@ -487,11 +490,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(appoooh_state::robowrese)
 	robowres(config);
 
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -600,7 +603,7 @@ ROM_END
  *************************************/
 
 
-DRIVER_INIT_MEMBER(appoooh_state,robowresb)
+void appoooh_state::init_robowresb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x1c000, 0x8000);
 }
@@ -612,6 +615,6 @@ DRIVER_INIT_MEMBER(appoooh_state,robowresb)
  *
  *************************************/
 
-GAME( 1984, appoooh,   0,        appoooh,  appoooh,  appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowres,  0,        robowrese,robowres, appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, appoooh,   0,        appoooh,   appoooh,  appoooh_state, empty_init,     ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowres,  0,        robowrese, robowres, appoooh_state, empty_init,     ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowresb, robowres, robowres,  robowres, appoooh_state, init_robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )

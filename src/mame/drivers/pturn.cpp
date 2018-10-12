@@ -81,6 +81,7 @@ ROMS: All ROM labels say only "PROM" and a number.
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -88,16 +89,22 @@ ROMS: All ROM labels say only "PROM" and a number.
 class pturn_state : public driver_device
 {
 public:
-	pturn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pturn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
+	void pturn(machine_config &config);
+
+	void init_pturn();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -134,7 +141,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(pturn);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -143,7 +149,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(sub_intgen);
 	INTERRUPT_GEN_MEMBER(main_intgen);
-	void pturn(machine_config &config);
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 };
@@ -343,41 +348,43 @@ READ8_MEMBER(pturn_state::custom_r)
 }
 
 
-ADDRESS_MAP_START(pturn_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_WRITENOP AM_READ(custom_r)
+void pturn_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xcfff).nopw().r(FUNC(pturn_state::custom_r));
 
-	AM_RANGE(0xdfe0, 0xdfe0) AM_NOP
+	map(0xdfe0, 0xdfe0).noprw();
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(fgpalette_w)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	map(0xe000, 0xe3ff).ram().w(FUNC(pturn_state::videoram_w)).share("videoram");
+	map(0xe400, 0xe400).w(FUNC(pturn_state::fgpalette_w));
+	map(0xe800, 0xe800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("spriteram")
+	map(0xf000, 0xf0ff).ram().share("spriteram");
 
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(bg_scrollx_w)
+	map(0xf400, 0xf400).w(FUNC(pturn_state::bg_scrollx_w));
 
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_WRITENOP
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(bgcolor_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(bg_scrolly_w)
-	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf806, 0xf806) AM_READNOP /* Protection related, ((val&3)==2) -> jump to 0 */
+	map(0xf800, 0xf800).portr("P1").nopw();
+	map(0xf801, 0xf801).portr("P2").w(FUNC(pturn_state::bgcolor_w));
+	map(0xf802, 0xf802).portr("SYSTEM");
+	map(0xf803, 0xf803).w(FUNC(pturn_state::bg_scrolly_w));
+	map(0xf804, 0xf804).portr("DSW2");
+	map(0xf805, 0xf805).portr("DSW1");
+	map(0xf806, 0xf806).nopr(); /* Protection related, ((val&3)==2) -> jump to 0 */
 
-	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	map(0xfc00, 0xfc07).w("mainlatch", FUNC(ls259_device::write_d0));
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(pturn_state::sub_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(nmi_sub_enable_w)
-	AM_RANGE(0x4000, 0x4000) AM_RAM
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void pturn_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(pturn_state::nmi_sub_enable_w));
+	map(0x4000, 0x4000).ram();
+	map(0x5000, 0x5001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x6000, 0x6001).w("ay2", FUNC(ay8910_device::address_data_w));
+}
 
 static const gfx_layout charlayout =
 {
@@ -407,7 +414,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( pturn )
+static GFXDECODE_START( gfx_pturn )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x000, 32 )
@@ -511,22 +518,22 @@ void pturn_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(pturn_state::pturn)
-	MCFG_CPU_ADD("maincpu", Z80, 12000000/3)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pturn_state,  main_intgen)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pturn_state,  main_intgen)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 12000000/3)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pturn_state, sub_intgen, 3*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(pturn_state, sub_intgen, 3*60)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pturn_state, flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(pturn_state, nmi_main_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(pturn_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pturn_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pturn_state, bgbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pturn_state, fgbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // toggles frequently during gameplay
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_w));
+	mainlatch.q_out_cb<1>().set(FUNC(pturn_state::nmi_main_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(pturn_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(pturn_state::coin_counter_2_w));
+	mainlatch.q_out_cb<4>().set(FUNC(pturn_state::bgbank_w));
+	mainlatch.q_out_cb<5>().set(FUNC(pturn_state::fgbank_w));
+	mainlatch.q_out_cb<6>().set_nop(); // toggles frequently during gameplay
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -538,17 +545,17 @@ MACHINE_CONFIG_START(pturn_state::pturn)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pturn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pturn)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -589,7 +596,7 @@ ROM_START( pturn )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pturn_state,pturn)
+void pturn_state::init_pturn()
 {
 	/*
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0dd, 0xc0dd, read8_delegate(FUNC(pturn_state::protection_r), this));
@@ -597,4 +604,4 @@ DRIVER_INIT_MEMBER(pturn_state,pturn)
 	*/
 }
 
-GAME( 1984, pturn,  0, pturn,  pturn, pturn_state,  pturn, ROT90,   "Jaleco", "Parallel Turn",  MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pturn,  0, pturn,  pturn, pturn_state, init_pturn, ROT90, "Jaleco", "Parallel Turn",  MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

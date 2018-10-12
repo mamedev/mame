@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 class tecmo_mix_device : public device_t, public device_video_interface
 {

@@ -41,9 +41,10 @@ WRITE8_MEMBER( comx35_state::cdp1869_w )
 
 /* CDP1869 */
 
-ADDRESS_MAP_START(comx35_state::cdp1869_page_ram)
-	AM_RANGE(0x000, 0x7ff) AM_RAM
-ADDRESS_MAP_END
+void comx35_state::cdp1869_page_ram(address_map &map)
+{
+	map(0x000, 0x7ff).ram();
+}
 
 CDP1869_CHAR_RAM_READ_MEMBER( comx35_state::comx35_charram_r )
 {
@@ -92,38 +93,36 @@ MACHINE_CONFIG_START(comx35_state::comx35_pal_video)
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_PAL, cdp1869_page_ram)
 	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_PAL)
 	MCFG_CDP1869_CHAR_PCB_READ_OWNER(comx35_state, comx35_pcb_r)
 	MCFG_CDP1869_CHAR_RAM_READ_OWNER(comx35_state, comx35_charram_r)
 	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(comx35_state, comx35_charram_w)
-	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
-	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(comx35_state, prd_w))
+	MCFG_CDP1869_PAL_NTSC_CALLBACK(CONSTANT(1))
+	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(*this, comx35_state, prd_w))
 	MCFG_CDP1869_SET_SCREEN(SCREEN_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(comx35_state::comx35_ntsc_video)
 	MCFG_CDP1869_SCREEN_NTSC_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_NTSC)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_NTSC, cdp1869_page_ram)
 	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_NTSC)
 	MCFG_CDP1869_CHAR_PCB_READ_OWNER(comx35_state, comx35_pcb_r)
 	MCFG_CDP1869_CHAR_RAM_READ_OWNER(comx35_state, comx35_charram_r)
 	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(comx35_state, comx35_charram_w)
-	MCFG_CDP1869_PAL_NTSC_CALLBACK(GND)
-	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(comx35_state, prd_w))
+	MCFG_CDP1869_PAL_NTSC_CALLBACK(CONSTANT(0))
+	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(*this, comx35_state, prd_w))
 	MCFG_CDP1869_SET_SCREEN(SCREEN_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END

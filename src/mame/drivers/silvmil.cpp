@@ -30,6 +30,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -47,7 +48,13 @@ public:
 			m_fg_videoram(*this, "fg_videoram"),
 			m_spriteram(*this, "spriteram") { }
 
+	void puzzlovek(machine_config &config);
+	void puzzlove(machine_config &config);
+	void silvmil(machine_config &config);
 
+	void init_silvmil();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -123,7 +130,6 @@ public:
 	}
 
 
-	DECLARE_DRIVER_INIT(silvmil);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
@@ -132,9 +138,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
-	void puzzlovek(machine_config &config);
-	void puzzlove(machine_config &config);
-	void silvmil(machine_config &config);
+
 	void silvmil_map(address_map &map);
 	void silvmil_sound_map(address_map &map);
 };
@@ -183,26 +187,27 @@ uint32_t silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind1
 }
 
 
-ADDRESS_MAP_START(silvmil_state::silvmil_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+void silvmil_state::silvmil_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(silvmil_tilebank1_w)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(silvmil_fg_scrollx_w)
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(silvmil_fg_scrolly_w)
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(silvmil_bg_scrollx_w)
-	AM_RANGE(0x100008, 0x100009) AM_WRITE(silvmil_bg_scrolly_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(silvmil_tilebank_w)
+	map(0x100000, 0x100001).w(FUNC(silvmil_state::silvmil_tilebank1_w));
+	map(0x100002, 0x100003).w(FUNC(silvmil_state::silvmil_fg_scrollx_w));
+	map(0x100004, 0x100005).w(FUNC(silvmil_state::silvmil_fg_scrolly_w));
+	map(0x100006, 0x100007).w(FUNC(silvmil_state::silvmil_bg_scrollx_w));
+	map(0x100008, 0x100009).w(FUNC(silvmil_state::silvmil_bg_scrolly_w));
+	map(0x10000e, 0x10000f).w(FUNC(silvmil_state::silvmil_tilebank_w));
 
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(silvmil_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(silvmil_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x270000, 0x270001) AM_WRITE(silvmil_soundcmd_w)
-	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
-	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x120000, 0x120fff).ram().w(FUNC(silvmil_state::silvmil_fg_videoram_w)).share("fg_videoram");
+	map(0x122000, 0x122fff).ram().w(FUNC(silvmil_state::silvmil_bg_videoram_w)).share("bg_videoram");
+	map(0x200000, 0x2005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x210000, 0x2107ff).ram().share("spriteram");
+	map(0x270000, 0x270001).w(FUNC(silvmil_state::silvmil_soundcmd_w));
+	map(0x280000, 0x280001).portr("P1_P2");
+	map(0x280002, 0x280003).portr("COIN");
+	map(0x280004, 0x280005).portr("DSW");
+	map(0x300000, 0x30ffff).ram();
+}
 
 
 static INPUT_PORTS_START( silvmil )
@@ -368,7 +373,7 @@ static const gfx_layout tlayout =
 };
 
 
-static GFXDECODE_START( silvmil )
+static GFXDECODE_START( gfx_silvmil )
 	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
 GFXDECODE_END
@@ -390,25 +395,26 @@ void silvmil_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(silvmil_state::silvmil_sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
-	AM_RANGE(0xc006, 0xc006) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ??
-ADDRESS_MAP_END
+void silvmil_state::silvmil_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xd000, 0xd7ff).ram();
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc002, 0xc002).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).mirror(1);
+	map(0xc006, 0xc006).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc00f, 0xc00f).nopw(); // ??
+}
 
 
 MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* Verified */
-	MCFG_CPU_PROGRAM_MAP(silvmil_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", silvmil_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* Verified */
+	MCFG_DEVICE_PROGRAM_MAP(silvmil_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", silvmil_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'096'000)) /* Verified */
-	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'096'000)) /* Verified */
+	MCFG_DEVICE_PROGRAM_MAP(silvmil_sound_map)
 
 
 	/* video hardware */
@@ -422,7 +428,7 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", silvmil)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silvmil)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
@@ -431,36 +437,36 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 	MCFG_DECO_SPRITE_OFFSETS(5, 7)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* Verified */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'096'000)/4, PIN7_HIGH) /* Verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'096'000)/4, okim6295_device::PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(silvmil_state::puzzlove)
 	silvmil(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
-	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
+	MCFG_DEVICE_PROGRAM_MAP(silvmil_sound_map)
 
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(silvmil_state::puzzlovek)
 	puzzlove(config);
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_YM2151_ADD("ymsnd", XTAL(15'000'000)/4) /* Verified */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(15'000'000)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -595,11 +601,11 @@ void silvmil_state::tumblepb_gfx1_rearrange()
 	}
 }
 
-DRIVER_INIT_MEMBER(silvmil_state,silvmil)
+void silvmil_state::init_silvmil()
 {
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, silvmil, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, silvmil, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, init_silvmil, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, init_silvmil, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, init_silvmil, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )

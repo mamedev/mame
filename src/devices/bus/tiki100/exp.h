@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 
 
@@ -39,19 +39,19 @@
 
 
 #define MCFG_TIKI100_BUS_IRQ_CALLBACK(_write) \
-	devcb = &downcast<tiki100_bus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<tiki100_bus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_TIKI100_BUS_NMI_CALLBACK(_write) \
-	devcb = &downcast<tiki100_bus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
+	downcast<tiki100_bus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_TIKI100_BUS_BUSRQ_CALLBACK(_write) \
-	devcb = &downcast<tiki100_bus_device &>(*device).set_busrq_wr_callback(DEVCB_##_write);
+	downcast<tiki100_bus_device &>(*device).set_busrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_TIKI100_BUS_IN_MREQ_CALLBACK(_read) \
-	devcb = &downcast<tiki100_bus_device &>(*device).set_mrq_rd_callback(DEVCB_##_read);
+	downcast<tiki100_bus_device &>(*device).set_mrq_rd_callback(DEVCB_##_read);
 
 #define MCFG_TIKI100_BUS_OUT_MREQ_CALLBACK(_write) \
-	devcb = &downcast<tiki100_bus_device &>(*device).set_mrq_wr_callback(DEVCB_##_write);
+	downcast<tiki100_bus_device &>(*device).set_mrq_wr_callback(DEVCB_##_write);
 
 
 
@@ -186,6 +186,6 @@ DECLARE_DEVICE_TYPE(TIKI100_BUS, tiki100_bus_device)
 
 
 
-SLOT_INTERFACE_EXTERN( tiki100_cards );
+void tiki100_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_TIKI100_EXP_H

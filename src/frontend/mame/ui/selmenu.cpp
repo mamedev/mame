@@ -29,6 +29,7 @@
 #include "emuopts.h"
 #include "rendfont.h"
 #include "rendutil.h"
+#include "romload.h"
 #include "softlist.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
@@ -2065,19 +2066,6 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 				{
 					fullname.assign(software->driver->name).append(".jpg");
 					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
-			}
-			else if (ui_globals::curimage_view == TITLES_VIEW)
-			{
-				// First attempt from name list
-				std::string const pathname = software->listname + "_titles";
-				std::string fullname = software->shortname + ".png";
-				render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-				if (!tmp_bitmap.valid())
-				{
-					fullname.assign(software->shortname).append(".jpg");
-					render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 				}
 			}
 			else

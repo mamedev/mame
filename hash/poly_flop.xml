@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="poly_flop" description="Poly diskettes">
+
+	<software name="cpm1">
+		<description>Proteus Z80 CP/M Operating System (CP/M 2.2, BIOS 3.3)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PROTEUS" />
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="622592">
+				<rom name="cpm1-noskew.cpm" size="622592" crc="a96ef84a" sha1="fbddd9a8a0c97f7903a3c7c0586e48eea30f1cb3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flex">
+		<description>Proteus 6809 FLEX Operating System (Version 2.8:3 - 1.1:2)</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PROTEUS" />
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="591360">
+				<rom name="flex.dsk" size="591360" crc="502feea7" sha1="9449239ff70840446fdd010cf1036daaaf9c644e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -27,7 +27,6 @@
 
 #include "emu.h"
 #include "733_asr.h"
-#include "screen.h"
 
 enum
 {
@@ -68,7 +67,7 @@ static const gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( asr733 )
+static GFXDECODE_START( gfx_asr733 )
 	GFXDECODE_ENTRY( asr733_chr_region, 0, fontlayout, 0, 1 )
 GFXDECODE_END
 
@@ -83,7 +82,7 @@ DEFINE_DEVICE_TYPE(ASR733, asr733_device, "asr733", "733 ASR")
 
 asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ASR733, tag, owner, clock)
-	, device_gfx_interface(mconfig, *this, GFXDECODE_NAME(asr733), "palette")
+	, device_gfx_interface(mconfig, *this, gfx_asr733, "palette")
 	, m_screen(*this, "screen")
 	, m_keyint_line(*this)
 	, m_lineint_line(*this)

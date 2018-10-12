@@ -94,11 +94,15 @@ public:
 
 	enum ssw_id : u32
 	{
-		SSW_ID_C400R0 = 0x00800,
-		SSW_ID_C400R1 = 0x04800,
-		SSW_ID_C400R2 = 0x08800,
-		SSW_ID_C400R3 = 0x0c800,
-		SSW_ID_C400R4 = 0x10800
+		SSW_ID_C1R1 = 0x00000,
+		SSW_ID_C2R1 = 0x00200,
+		SSW_ID_C3R1 = 0x00400,
+		SSW_ID_E1R1 = 0x00600,
+		SSW_ID_C4R0 = 0x00800,
+		SSW_ID_C4R1 = 0x04800,
+		SSW_ID_C4R2 = 0x08800,
+		SSW_ID_C4R3 = 0x0c800,
+		SSW_ID_C4R4 = 0x10800
 	};
 
 	// trap source values are shifted into the correct field in the psw
@@ -161,12 +165,13 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// mmu helpers
 	virtual cammu_device &get_icammu() const = 0;
@@ -189,6 +194,17 @@ protected:
 	// register count helpers
 	virtual int get_ireg_count() const { return 16; }
 	virtual int get_freg_count() const { return 8; }
+
+	// register pair helpers
+	u64 get_64(const u8 reg) const
+	{
+		return u64(m_r[reg | 0x1]) << 32 | u64(m_r[reg & 0xe]);
+	}
+	void set_64(const u8 reg, const u64 data)
+	{
+		m_r[reg & 0xe] = u32(data & ~u32(0));
+		m_r[reg | 0x1] = u32(data >> 32);
+	}
 
 	// floating point helpers
 	float32 get_fp32(const u8 reg) const { return m_f[reg & 0xf]; }
@@ -253,6 +269,9 @@ protected:
 		m_ssw |= SSW_FRD;
 	};
 
+	std::string debug_string(u32 pointer);
+	std::string debug_string_array(u32 array_pointer);
+
 	// emulation state
 	address_space_config m_main_config;
 	address_space_config m_io_config;
@@ -260,15 +279,15 @@ protected:
 
 	enum registers
 	{
-		CLIPPER_IREG = 0,
-		CLIPPER_FREG = 16,
-		CLIPPER_PSW  = 32,
-		CLIPPER_SSW  = 33,
-		CLIPPER_PC   = 34,
+		CLIPPER_UREG = 0,
+		CLIPPER_SREG = 16,
+		CLIPPER_FREG = 32,
+		CLIPPER_PSW  = 48,
+		CLIPPER_SSW  = 49,
+		CLIPPER_PC   = 50,
 	};
 
 	int m_icount;    // instruction cycle count
-	bool m_wait;
 
 	// program-visible cpu state
 	u32 m_pc;  // current instruction address
@@ -284,15 +303,16 @@ protected:
 	u64 m_fp_dst; // original value of destination register during fp exception
 
 	// non-visible cpu state
-	u32 m_ip;        // next instruction address
-	int m_irq;       // interrupt request state
+	bool m_wait;     // waiting for interrupt
 	int m_nmi;       // non-maskable interrupt state
+	int m_irq;       // interrupt request state
 	u8 m_ivec;       // interrupt vector
 	u16 m_exception; // pending exception
 
 	// decoded instruction information
 	struct decode
 	{
+		u32 pc;       // base address of instruction
 		u8 opcode;    // primary instruction opcode
 		u8 subopcode; // secondary instruction opcode
 		u8 r1;        // r1 instruction operand
@@ -338,6 +358,9 @@ public:
 	clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	virtual u32 intrap(const u16 vector, const u32 old_pc) override;
 
 	// C400 has additional 8 floating point registers

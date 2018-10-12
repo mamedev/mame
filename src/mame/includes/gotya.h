@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
 #include "sound/samples.h"
+#include "emupal.h"
 
 class gotya_state : public driver_device
 {
@@ -17,6 +18,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void gotya(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_scroll;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -50,6 +54,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void gotya(machine_config &config);
 	void gotya_map(address_map &map);
 };

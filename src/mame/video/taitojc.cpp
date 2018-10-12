@@ -355,15 +355,15 @@ uint32_t taitojc_state::screen_update_dendego(screen_device &screen, bitmap_ind1
 	for (level = 5; level > 0; level--)
 		if (btn == dendego_mascon_table[level]) break;
 
-	if (level != output().get_value("counter0"))
-		output().set_value("counter0", level);
+	if (level != m_counters[0])
+		m_counters[0] = level;
 
 	btn = m_analog_ports[0]->read() & 0xff;
 	for (level = 10; level > 0; level--)
 		if (btn >= dendego_brake_table[level]) break;
 
-	if (level != output().get_value("counter1"))
-		output().set_value("counter1", level);
+	if (level != m_counters[1])
+		m_counters[1] = level;
 
 	return screen_update_taitojc(screen, bitmap, cliprect);
 }

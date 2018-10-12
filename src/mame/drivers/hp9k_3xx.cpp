@@ -27,6 +27,10 @@
       MC68030 CPU @ 16.67 MHz w/built-in MMU
       MC68881 FPU
 
+  360:
+      MC68030 CPU @ 25 MHz w/built-in MMU
+      MC68882 FPU
+
   370:
       MC68030 CPU @ 33 MHz w/built-in MMU
       MC68881 FPU
@@ -45,7 +49,7 @@
     RTC_DATA: 0x420001
     RTC_CMD:  0x420003
     HIL:      0x428000
-    HPIB:     0x478000
+    HPIB:     0x470000
     KBDNMIST: 0x478005
     DMA:      0x500000
     FRAMEBUF: 0x560000
@@ -55,107 +59,87 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "logmacro.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/6840ptm.h"
-#include "sound/sn76496.h"
 #include "bus/hp_dio/hp_dio.h"
-#include "bus/hp_dio/hp98544.h"
-#include "bus/hp_hil/hp_hil.h"
-#include "bus/hp_hil/hil_devices.h"
-#include "bus/hp_dio/hp98603.h"
+
 #include "screen.h"
-#include "speaker.h"
+#include "softlist_dev.h"
+#include "hp9k_3xx.lh"
 
 #define MAINCPU_TAG "maincpu"
-#define IOCPU_TAG "iocpu"
 #define PTM6840_TAG "ptm"
-#define MLC_TAG "mlc"
-#define SN76494_TAG "sn76494"
-
-#define SN76494_CLOCK 333333
 
 class hp9k3xx_state : public driver_device
 {
 public:
-	hp9k3xx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hp9k3xx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
-		m_iocpu(*this, IOCPU_TAG),
-		m_mlc(*this, MLC_TAG),
-		m_sound(*this, SN76494_TAG),
 		m_vram16(*this, "vram16"),
-		m_vram(*this, "vram")
-		{ }
+		m_vram(*this, "vram"),
+		m_diag_led(*this, "led_diag_%u", 0U)
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<i8042_device> m_iocpu;
-	optional_device<hp_hil_mlc_device> m_mlc;
-	optional_device<sn76494_device> m_sound;
+	void hp9k310(machine_config &config);
+	void hp9k320(machine_config &config);
+	void hp9k330(machine_config &config);
+	void hp9k332(machine_config &config);
+	void hp9k340(machine_config &config);
+	void hp9k360(machine_config &config);
+	void hp9k370(machine_config &config);
+	void hp9k380(machine_config &config);
+	void hp9k382(machine_config &config);
+
+private:
+	void hp9k300(machine_config &config);
+	required_device<m68000_base_device> m_maincpu;
+
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void driver_start() override;
 
 	optional_shared_ptr<uint16_t> m_vram16;
 	optional_shared_ptr<uint32_t> m_vram;
+	output_finder<8> m_diag_led;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 
 	DECLARE_READ16_MEMBER(buserror16_r);
 	DECLARE_WRITE16_MEMBER(buserror16_w);
 	DECLARE_READ32_MEMBER(buserror_r);
 	DECLARE_WRITE32_MEMBER(buserror_w);
 
-	/* 8042 interface */
-	DECLARE_WRITE8_MEMBER(iocpu_port1_w);
-	DECLARE_WRITE8_MEMBER(iocpu_port2_w);
-	DECLARE_READ8_MEMBER(iocpu_port1_r);
-	DECLARE_READ8_MEMBER(iocpu_test0_r);
+	DECLARE_WRITE16_MEMBER(led_w);
 
-	DECLARE_WRITE32_MEMBER(led_w)
-	{
-		if (mem_mask != 0x000000ff)
-		{
-			return;
-		}
-#if 0
-		printf("LED: %02x  (", data&0xff);
-		for (int i = 7; i >= 0; i--)
-		{
-			if (data & (1 << i))
-			{
-				printf("o");
-			}
-			else
-			{
-				printf("*");
-			}
-		}
-		printf(")\n");
-#endif
-	}
-
-	void hp9k370(machine_config &config);
-	void hp9k330(machine_config &config);
-	void hp9k382(machine_config &config);
-	void hp9k310(machine_config &config);
-	void hp9k340(machine_config &config);
-	void hp9k380(machine_config &config);
-	void hp9k320(machine_config &config);
-	void hp9k332(machine_config &config);
 	void hp9k310_map(address_map &map);
 	void hp9k320_map(address_map &map);
 	void hp9k330_map(address_map &map);
 	void hp9k332_map(address_map &map);
+	void hp9k360_map(address_map &map);
 	void hp9k370_map(address_map &map);
 	void hp9k380_map(address_map &map);
 	void hp9k382_map(address_map &map);
 	void hp9k3xx_common(address_map &map);
-	void iocpu_map(address_map &map);
-private:
-	bool m_in_buserr;
-	bool m_hil_read;
-	uint8_t m_hil_data;
-	uint8_t m_latch_data;
+
+	void add_dio16_bus(machine_config &mconfig);
+	void add_dio32_bus(machine_config &mconfig);
+
+        DECLARE_WRITE_LINE_MEMBER(dio_irq1_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, M68K_INT_ACK_AUTOVECTOR); };
+        DECLARE_WRITE_LINE_MEMBER(dio_irq2_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR); };
+        DECLARE_WRITE_LINE_MEMBER(dio_irq3_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR); };
+        DECLARE_WRITE_LINE_MEMBER(dio_irq4_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_4, state, M68K_INT_ACK_AUTOVECTOR); };
+        DECLARE_WRITE_LINE_MEMBER(dio_irq5_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_5, state, M68K_INT_ACK_AUTOVECTOR); };
+        DECLARE_WRITE_LINE_MEMBER(dio_irq6_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR); };
+        DECLARE_WRITE_LINE_MEMBER(dio_irq7_w) { m_maincpu->set_input_line_and_vector(M68K_IRQ_7, state, M68K_INT_ACK_AUTOVECTOR); };
+
+	bool m_bus_error;
+	emu_timer *m_bus_error_timer;
 };
 
 uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -183,93 +167,98 @@ uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bi
 }
 
 // shared mappings for all 9000/3xx systems
-ADDRESS_MAP_START(hp9k3xx_state::hp9k3xx_common)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("maincpu",0) AM_WRITE(led_w)  // writes to 1fffc are the LED
+void hp9k3xx_state::hp9k3xx_common(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
+	map(0x005f4000, 0x005f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
+	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
 
-	AM_RANGE(0x00428000, 0x00428003) AM_DEVREADWRITE8(IOCPU_TAG, upi41_cpu_device, upi41_master_r, upi41_master_w, 0x00ff00ff)
-
-	AM_RANGE(0x00510000, 0x00510003) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
-	AM_RANGE(0x00538000, 0x00538003) AM_READWRITE(buserror_r, buserror_w)   // no "Graphics"
-	AM_RANGE(0x005c0000, 0x005c0003) AM_READWRITE(buserror_r, buserror_w)   // no add-on FP coprocessor
-
-	AM_RANGE(0x00600000, 0x007fffff) AM_READWRITE(buserror_r, buserror_w)   // prevent reading invalid DIO slots
-	AM_RANGE(0x01000000, 0x1fffffff) AM_READWRITE(buserror_r, buserror_w)   // prevent reading invalid DIO-II slots
-
-	AM_RANGE(0x005f8000, 0x005f800f) AM_DEVREADWRITE8(PTM6840_TAG, ptm6840_device, read, write, 0x00ff00ff)
-ADDRESS_MAP_END
+}
 
 // 9000/310 - has onboard video that the graphics card used in other 3xxes conflicts with
-ADDRESS_MAP_START(hp9k3xx_state::hp9k310_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION("maincpu",0) AM_WRITENOP  // writes to 1fffc are the LED
-
-	AM_RANGE(0x00428000, 0x00428003) AM_DEVREADWRITE8(IOCPU_TAG, upi41_cpu_device, upi41_master_r, upi41_master_w, 0x00ff)
-
-	AM_RANGE(0x510000, 0x510003) AM_READWRITE(buserror16_r, buserror16_w)   // no "Alpha display"
-	AM_RANGE(0x538000, 0x538003) AM_READWRITE(buserror16_r, buserror16_w)   // no "Graphics"
-	AM_RANGE(0x5c0000, 0x5c0003) AM_READWRITE(buserror16_r, buserror16_w)   // no add-on FP coprocessor
-
-	AM_RANGE(0x5f8000, 0x5f800f) AM_DEVREADWRITE8(PTM6840_TAG, ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0x600000, 0x7fffff) AM_READWRITE(buserror16_r, buserror16_w)   // prevent reading invalid DIO slots
-	AM_RANGE(0x800000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void hp9k3xx_state::hp9k310_map(address_map &map)
+{
+	map(0x000000, 0xffffff).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));
+	map(0x000000, 0x01ffff).rom().region("maincpu", 0).w(FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
+	map(0x5f4000, 0x5f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
+	map(0x5f8000, 0x5f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0x800000, 0xffffff).ram();
+}
 
 // 9000/320
-ADDRESS_MAP_START(hp9k3xx_state::hp9k320_map)
-	AM_IMPORT_FROM(hp9k3xx_common)
+void hp9k3xx_state::hp9k320_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_RANGE(0xffe00000, 0xffefffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
+	// unknown, but bootrom crashes without
+	map(0x00510000, 0x00510fff).ram();
+	map(0x00516000, 0x00516fff).ram();
+	map(0x00440000, 0x0044ffff).ram();
+
+	// main memory
+	map(0xfff00000, 0xffffffff).ram();
+}
 
 // 9000/330 and 9000/340
-ADDRESS_MAP_START(hp9k3xx_state::hp9k330_map)
-	AM_IMPORT_FROM(hp9k3xx_common)
+void hp9k3xx_state::hp9k330_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffc00000, 0xffffffff).ram();
+}
 
 // 9000/332, with built-in medium-res video
-ADDRESS_MAP_START(hp9k3xx_state::hp9k332_map)
-	AM_IMPORT_FROM(hp9k3xx_common)
+void hp9k3xx_state::hp9k332_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE("vram")    // 98544 mono framebuffer
-	AM_RANGE(0x00560000, 0x00563fff) AM_ROM AM_REGION("graphics", 0x0000)   // 98544 mono ROM
+	map(0x00200000, 0x002fffff).ram().share("vram");    // 98544 mono framebuffer
+	map(0x00560000, 0x00563fff).rom().region("graphics", 0x0000);   // 98544 mono ROM
 
-	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffc00000, 0xffffffff).ram();
+}
+
+// 9000/360 - 16 MB RAM to run HP/UX
+void hp9k3xx_state::hp9k360_map(address_map &map)
+{
+	hp9k3xx_common(map);
+
+	map(0xff000000, 0xffffffff).ram();
+}
 
 // 9000/370 - 8 MB RAM standard
-ADDRESS_MAP_START(hp9k3xx_state::hp9k370_map)
-	AM_IMPORT_FROM(hp9k3xx_common)
+void hp9k3xx_state::hp9k370_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_RANGE(0xff700000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xff700000, 0xff7fffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xff800000, 0xffffffff).ram();
+}
 
 // 9000/380 - '040
-ADDRESS_MAP_START(hp9k3xx_state::hp9k380_map)
-	AM_IMPORT_FROM(hp9k3xx_common)
+void hp9k3xx_state::hp9k380_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_RANGE(0x0051a000, 0x0051afff) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
+	map(0x0051a000, 0x0051afff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
 
-	AM_RANGE(0xc0000000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xc0000000, 0xff7fffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xff800000, 0xffffffff).ram();
+}
 
 // 9000/382 - onboard VGA compatible video (where?)
-ADDRESS_MAP_START(hp9k3xx_state::hp9k382_map)
-	AM_IMPORT_FROM(hp9k3xx_common)
+void hp9k3xx_state::hp9k382_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
+	map(0xffb00000, 0xffbfffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffc00000, 0xffffffff).ram();
 
-	AM_RANGE(0x0051a000, 0x0051afff) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(hp9k3xx_state::iocpu_map)
-ADDRESS_MAP_END
+	map(0x0051a000, 0x0051afff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
+}
 
 uint32_t hp9k3xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -280,232 +269,229 @@ uint32_t hp9k3xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 static INPUT_PORTS_START( hp9k330 )
 INPUT_PORTS_END
 
+void hp9k3xx_state::driver_start()
+{
+	m_diag_led.resolve();
+}
 
 void hp9k3xx_state::machine_reset()
 {
-	m_in_buserr = false;
+	auto *dio = subdevice<bus::hp_dio::dio16_device>("diobus");
+	if (dio)
+		m_maincpu->set_reset_callback(write_line_delegate(FUNC(bus::hp_dio::dio16_device::reset_in), dio));
+}
+
+void hp9k3xx_state::machine_start()
+{
+	m_bus_error_timer = timer_alloc(0);
+}
+
+void hp9k3xx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_bus_error = false;
+}
+
+WRITE16_MEMBER(hp9k3xx_state::led_w)
+{
+	if (!(mem_mask & 0xff))
+	       return;
+
+	LOG("LED: %02x\n", data & 0xff);
+
+	m_diag_led[0] = BIT(data, 0);
+	m_diag_led[1] = BIT(data, 1);
+	m_diag_led[2] = BIT(data, 2);
+	m_diag_led[3] = BIT(data, 3);
+	m_diag_led[4] = BIT(data, 4);
+	m_diag_led[5] = BIT(data, 5);
+	m_diag_led[6] = BIT(data, 6);
+	m_diag_led[7] = BIT(data, 7);
+}
+
+void hp9k3xx_state::add_dio16_bus(machine_config &config)
+{
+	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus", 0));
+	dio16.set_cputag(m_maincpu);
+
+	dio16.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
+	dio16.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));
+	dio16.irq3_out_cb().set(FUNC(hp9k3xx_state::dio_irq3_w));
+	dio16.irq4_out_cb().set(FUNC(hp9k3xx_state::dio_irq4_w));
+	dio16.irq5_out_cb().set(FUNC(hp9k3xx_state::dio_irq5_w));
+	dio16.irq6_out_cb().set(FUNC(hp9k3xx_state::dio_irq6_w));
+	dio16.irq7_out_cb().set(FUNC(hp9k3xx_state::dio_irq7_w));
+}
+
+void hp9k3xx_state::add_dio32_bus(machine_config &config)
+{
+	bus::hp_dio::dio32_device &dio32(DIO32(config, "diobus", 0));
+	dio32.set_cputag(m_maincpu);
+
+	dio32.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
+	dio32.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));
+	dio32.irq3_out_cb().set(FUNC(hp9k3xx_state::dio_irq3_w));
+	dio32.irq4_out_cb().set(FUNC(hp9k3xx_state::dio_irq4_w));
+	dio32.irq5_out_cb().set(FUNC(hp9k3xx_state::dio_irq5_w));
+	dio32.irq6_out_cb().set(FUNC(hp9k3xx_state::dio_irq6_w));
+	dio32.irq7_out_cb().set(FUNC(hp9k3xx_state::dio_irq7_w));
+}
+
+void hp9k3xx_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
+{
+	if (m_bus_error)
+		return;
+
+	m_bus_error = true;
+	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
+        m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
 
 READ16_MEMBER(hp9k3xx_state::buserror16_r)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
-	}
-	return 0;
+	if (!machine().side_effects_disabled())
+		set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
+	return 0xffff;
 }
 
 WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
-	}
+	if (!machine().side_effects_disabled())
+		set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
 }
 
 READ32_MEMBER(hp9k3xx_state::buserror_r)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
-	}
-	return 0;
+	if (!machine().side_effects_disabled())
+		set_bus_error(offset << 2, false, mem_mask);
+	return 0xffffffff;
 }
 
 WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
-	}
+	if (!machine().side_effects_disabled())
+		set_bus_error(offset << 2, false, mem_mask);
 }
 
-WRITE8_MEMBER(hp9k3xx_state::iocpu_port1_w)
-{
-	m_hil_data = data;
-}
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k300)
+	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 250000)); // from oscillator module next to the 6840
+	ptm.set_external_clocks(250000.0f, 0.0f, 250000.0f);
+	ptm.o3_callback().set(PTM6840_TAG, FUNC(ptm6840_device::set_c2));
+	ptm.irq_callback().set_inputline("maincpu", M68K_IRQ_6);
 
-static constexpr uint8_t HIL_CS = 0x01;
-static constexpr uint8_t HIL_WE = 0x02;
-static constexpr uint8_t HIL_OE = 0x04;
-static constexpr uint8_t LATCH_EN = 0x08;
-static constexpr uint8_t SN76494_EN = 0x80;
-
-WRITE8_MEMBER(hp9k3xx_state::iocpu_port2_w)
-{
-	if ((data & (HIL_CS|HIL_WE)) == 0)
-		m_mlc->write(space, (m_latch_data & 0xc0) >> 6, m_hil_data, 0xff);
-
-	if ((data & SN76494_EN) == 0)
-		m_sound->write(m_hil_data);
-
-	m_hil_read = ((data & (HIL_CS|HIL_OE)) == 0);
-
-	if (!(data & LATCH_EN))
-		m_latch_data = m_hil_data;
-
-	m_maincpu->set_input_line(M68K_IRQ_1, data & 0x10 ? ASSERT_LINE : CLEAR_LINE);
-}
-
-READ8_MEMBER(hp9k3xx_state::iocpu_port1_r)
-{
-	if (m_hil_read)
-		return m_mlc->read(space, (m_latch_data & 0xc0) >> 6, 0xff);
-	return 0xff;
-}
-
-READ8_MEMBER(hp9k3xx_state::iocpu_test0_r)
-{
-	return !m_mlc->get_int();
-}
-
-static SLOT_INTERFACE_START(dio16_cards)
-	SLOT_INTERFACE("98544", HPDIO_98544) /* 98544 High Resolution Monochrome Card */
-	SLOT_INTERFACE("98603", HPDIO_98603) /* 98603 ROM BASIC */
-SLOT_INTERFACE_END
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "hp9k3xx_flop")
+	config.set_default_layout(layout_hp9k_3xx);
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
-	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, M68010, 10000000)
-	MCFG_CPU_PROGRAM_MAP(hp9k310_map)
 
-	MCFG_CPU_ADD(IOCPU_TAG, I8042, 5000000)
-	MCFG_CPU_PROGRAM_MAP(iocpu_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(hp9k3xx_state, iocpu_port1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(hp9k3xx_state, iocpu_port2_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
+	hp9k300(config);
 
-	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
-	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
+	MCFG_DEVICE_ADD(m_maincpu, M68010, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k310_map)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
+	add_dio16_bus(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	DIO16_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", false);
+	DIO16_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
+	DIO16_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
+	DIO16_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
+	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
 
-	MCFG_DEVICE_ADD("diobus", DIO16, 0)
-	MCFG_DIO16_CPU(":maincpu")
-	MCFG_DIO16_SLOT_ADD("diobus", "sl1", dio16_cards, "98544", true)
-	MCFG_DIO16_SLOT_ADD("diobus", "sl2", dio16_cards, "98603", true)
-	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
-	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, M68020FPU, 16670000)
-	MCFG_CPU_PROGRAM_MAP(hp9k320_map)
+	MCFG_DEVICE_ADD(m_maincpu, M68020FPU, 16670000)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k320_map)
 
-	MCFG_CPU_ADD(IOCPU_TAG, I8042, 5000000)
-	MCFG_CPU_PROGRAM_MAP(iocpu_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(hp9k3xx_state, iocpu_port1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(hp9k3xx_state, iocpu_port2_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
+	hp9k300(config);
+	add_dio32_bus(config);
 
-	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
-	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
-
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-	MCFG_DEVICE_ADD("diobus", DIO32, 0)
-	MCFG_DIO32_CPU(":maincpu")
-	MCFG_DIO32_SLOT_ADD("diobus", "sl1", dio16_cards, "98544", true)
-	MCFG_DIO16_SLOT_ADD("diobus", "sl2", dio16_cards, "98603", true)
-	MCFG_DIO32_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
+	DIO32_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
+	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
+	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
+	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
+	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98620", false);
+	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, "98265a", false);
+	DIO32_SLOT(config, "sl6", 0, "diobus", dio16_cards, nullptr, false);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
-	hp9k320(config);
-	/* basic machine hardware */
-	MCFG_CPU_REPLACE(MAINCPU_TAG, M68020PMMU, 16670000)
-	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
+	MCFG_DEVICE_ADD(m_maincpu, M68020PMMU, 16670000)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k330_map)
+
+	hp9k300(config);
+	add_dio32_bus(config);
+
+	DIO32_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
+	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
+	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
+	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
+	DIO32_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
-	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, M68020PMMU, 16670000)
-	MCFG_CPU_PROGRAM_MAP(hp9k332_map)
+	MCFG_DEVICE_ADD(m_maincpu, M68020PMMU, 16670000)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k332_map)
 
-	MCFG_CPU_ADD(IOCPU_TAG, I8042, 5000000)
-	MCFG_CPU_PROGRAM_MAP(iocpu_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(hp9k3xx_state, iocpu_port1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(hp9k3xx_state, iocpu_port2_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
+	hp9k300(config);
+	add_dio16_bus(config);
 
-	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
-	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
+	DIO16_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
+	DIO16_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98603b", false);
+	DIO16_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98644", false);
+	DIO16_SLOT(config, "sl3", 0, "diobus", dio16_cards, nullptr, false);
+	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-	MCFG_SCREEN_ADD( "screen", RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hp9k3xx_state, hp_medres_update)
 	MCFG_SCREEN_SIZE(512,390)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 390-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k340)
 	hp9k320(config);
-	/* basic machine hardware */
-	MCFG_CPU_REPLACE(MAINCPU_TAG, M68030, 16670000)
-	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
+
+	MCFG_DEVICE_REPLACE(m_maincpu, M68030, 16670000)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k330_map)
 MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k360)
+	hp9k320(config);
+
+	MCFG_DEVICE_REPLACE(m_maincpu, M68030, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k370_map)
+MACHINE_CONFIG_END
+
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k370)
 	hp9k320(config);
-	/* basic machine hardware */
-	MCFG_CPU_REPLACE(MAINCPU_TAG, M68030, 33000000)
-	MCFG_CPU_PROGRAM_MAP(hp9k370_map)
+
+	MCFG_DEVICE_REPLACE(m_maincpu, M68030, 33000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k370_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k380)
 	hp9k320(config);
-	/* basic machine hardware */
-	MCFG_CPU_REPLACE(MAINCPU_TAG, M68040, 25000000)
-	MCFG_CPU_PROGRAM_MAP(hp9k380_map)
+
+	MCFG_DEVICE_REPLACE(m_maincpu, M68040, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k380_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k382)
 	hp9k320(config);
-	/* basic machine hardware */
-	MCFG_CPU_REPLACE(MAINCPU_TAG, M68040, 25000000)
-	MCFG_CPU_PROGRAM_MAP(hp9k382_map)
+
+	MCFG_DEVICE_REPLACE(m_maincpu, M68040, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k382_map)
 MACHINE_CONFIG_END
 
 ROM_START( hp9k310 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
 	ROM_LOAD16_BYTE( "1818-3771.bin", 0x000001, 0x008000, CRC(b9e4e3ad) SHA1(ed6f1fad94a15d95362701dbe124b52877fc3ec4) )
 	ROM_LOAD16_BYTE( "1818-3772.bin", 0x000000, 0x008000, CRC(a3665919) SHA1(ec1bc7e5b7990a1b09af947a06401e8ed3cb0516) )
-
-	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4784_1.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
-	ROM_LOAD( "1820-4784_2.bin", 0x000000, 0x000800, CRC(8defcf50) SHA1(d3abfea468a43db7c2369500a3e390e77a8e22e6) )
 
 	ROM_REGION( 0x4000, "graphics", ROMREGION_ERASEFF | ROMREGION_BE )
 	ROM_LOAD16_BYTE( "98544_1818-1999.bin", 0x000000, 0x002000, CRC(8c7d6480) SHA1(d2bcfd39452c38bc652df39f84c7041cfdf6bd51) )
@@ -517,27 +503,18 @@ ROM_START( hp9k320 )
 	ROM_LOAD16_BYTE( "5061-6539.bin", 0x000000, 0x004000, CRC(a7ff104c) SHA1(c640fe68314654716bd41b04c6a7f4e560036c7e) )
 	ROM_LOAD16_BYTE( "5061-6540.bin", 0x008001, 0x004000, CRC(4f6796d6) SHA1(fd254897ac1afb8628f40ea93213f60a082c8d36) )
 	ROM_LOAD16_BYTE( "5061-6541.bin", 0x008000, 0x004000, CRC(39d32998) SHA1(6de1bda75187b0878c03c074942b807cf2924f0e) )
-
-	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 ROM_END
 
 ROM_START( hp9k330 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
 	ROM_LOAD16_BYTE( "1818-4416.bin", 0x000000, 0x010000, CRC(cd71e85e) SHA1(3e83a80682f733417fdc3720410e45a2cfdcf869) )
 	ROM_LOAD16_BYTE( "1818-4417.bin", 0x000001, 0x010000, CRC(374d49db) SHA1(a12cbf6c151e2f421da4571000b5dffa3ef403b3) )
-
-	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 ROM_END
 
 ROM_START( hp9k332 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
 	ROM_LOAD16_BYTE( "1818-4796.bin", 0x000000, 0x010000, CRC(8a7642da) SHA1(7ba12adcea85916d18b021255391bec806c32e94) )
 	ROM_LOAD16_BYTE( "1818-4797.bin", 0x000001, 0x010000, CRC(98129eb1) SHA1(f3451a854060f1be1bee9f17c5c198b4b1cd61ac) )
-
-	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 
 	ROM_REGION( 0x4000, "graphics", ROMREGION_ERASEFF | ROMREGION_BE | ROMREGION_32BIT )
 	ROM_LOAD16_BYTE( "5180-0471.bin", 0x000001, 0x002000, CRC(7256af2e) SHA1(584e8d4dcae8c898c1438125dc9c4709631b32f7) )
@@ -548,44 +525,41 @@ ROM_START( hp9k340 )
 	ROM_LOAD16_BYTE( "1818-4416.bin", 0x000000, 0x010000, CRC(cd71e85e) SHA1(3e83a80682f733417fdc3720410e45a2cfdcf869) )
 	ROM_LOAD16_BYTE( "1818-4417.bin", 0x000001, 0x010000, CRC(374d49db) SHA1(a12cbf6c151e2f421da4571000b5dffa3ef403b3) )
 
-	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 ROM_END
+
+ROM_START( hp9k360 )
+	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
+	ROM_LOAD16_BYTE( "1818-4796.bin", 0x000000, 0x010000, CRC(8a7642da) SHA1(7ba12adcea85916d18b021255391bec806c32e94) )
+	ROM_LOAD16_BYTE( "1818-4797.bin", 0x000001, 0x010000, CRC(98129eb1) SHA1(f3451a854060f1be1bee9f17c5c198b4b1cd61ac) )
+ROM_END
+
 
 ROM_START( hp9k370 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
 	ROM_LOAD16_BYTE( "1818-4416.bin", 0x000000, 0x010000, CRC(cd71e85e) SHA1(3e83a80682f733417fdc3720410e45a2cfdcf869) )
 	ROM_LOAD16_BYTE( "1818-4417.bin", 0x000001, 0x010000, CRC(374d49db) SHA1(a12cbf6c151e2f421da4571000b5dffa3ef403b3) )
-
-	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 ROM_END
 
 ROM_START( hp9k380 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
 	ROM_LOAD16_WORD_SWAP( "1818-5062_98754_9000-380_27c210.bin", 0x000000, 0x020000, CRC(500a0797) SHA1(4c0a3929e45202a2689e353657e5c4b58ff9a1fd) )
-
-	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
 ROM_END
 
 ROM_START( hp9k382 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
 	ROM_LOAD16_WORD_SWAP( "1818-5468_27c1024.bin", 0x000000, 0x020000, CRC(d1d9ef13) SHA1(6bbb17b9adad402fbc516dc2f3143e9c38ceef8e) )
 
-	ROM_REGION( 0x800, IOCPU_TAG, 0 )
-	ROM_LOAD( "1820-4874.bin", 0x000000, 0x000800, CRC(e929044a) SHA1(90849a10bdb8c6e38e73ce027c9c0ad8b3956b1b) )
-
 	ROM_REGION( 0x2000, "unknown", ROMREGION_ERASEFF | ROMREGION_BE | ROMREGION_32BIT )
 	ROM_LOAD( "1818-5282_8ce61e951207_28c64.bin", 0x000000, 0x002000, CRC(740442f3) SHA1(ab65bd4eec1024afb97fc2dd3bd3f017e90f49ae) )
 ROM_END
 
-/*    YEAR  NAME    PARENT   COMPAT  MACHINE   INPUT    STATE       INIT  COMPANY            FULLNAME      FLAGS */
-COMP( 1985, hp9k310, 0,      0,      hp9k310,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING)
-COMP( 1985, hp9k320, 0,      0,      hp9k320,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING)
-COMP( 1987, hp9k330, 0,      0,      hp9k330,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING)
-COMP( 1987, hp9k332, 0,      0,      hp9k332,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/332", MACHINE_NOT_WORKING)
-COMP( 1989, hp9k340, hp9k330,0,      hp9k340,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING)
-COMP( 1988, hp9k370, hp9k330,0,      hp9k370,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING)
-COMP( 1991, hp9k380, 0,      0,      hp9k380,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING)
-COMP( 1991, hp9k382, 0,      0,      hp9k382,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME      FLAGS */
+COMP( 1985, hp9k310, 0,       0,      hp9k310, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING)
+COMP( 1985, hp9k320, 0,       0,      hp9k320, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING)
+COMP( 1987, hp9k330, 0,       0,      hp9k330, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING)
+COMP( 1987, hp9k332, 0,       0,      hp9k332, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/332", MACHINE_NOT_WORKING)
+COMP( 1989, hp9k340, hp9k330, 0,      hp9k340, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING)
+COMP( 1988, hp9k360, hp9k330, 0,      hp9k360, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/360", MACHINE_NOT_WORKING)
+COMP( 1988, hp9k370, hp9k330, 0,      hp9k370, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING)
+COMP( 1991, hp9k380, 0,       0,      hp9k380, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING)
+COMP( 1991, hp9k382, 0,       0,      hp9k382, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING)

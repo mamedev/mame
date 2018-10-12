@@ -8,6 +8,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class jack_state : public driver_device
 {
@@ -26,6 +27,19 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
+	void joinem(machine_config &config);
+	void treahunt(machine_config &config);
+	void unclepoo(machine_config &config);
+	void striv(machine_config &config);
+	void jack(machine_config &config);
+
+	void init_zzyzzyxx();
+	void init_striv();
+	void init_treahunt();
+	void init_loverboy();
+	void init_jack();
+
+private:
 	/* device- and memory pointers */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -59,12 +73,6 @@ public:
 	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
 	DECLARE_READ8_MEMBER(timer_r);
 
-	DECLARE_DRIVER_INIT(zzyzzyxx);
-	DECLARE_DRIVER_INIT(striv);
-	DECLARE_DRIVER_INIT(treahunt);
-	DECLARE_DRIVER_INIT(loverboy);
-	DECLARE_DRIVER_INIT(jack);
-
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
 	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
@@ -87,11 +95,6 @@ public:
 	void jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void treahunt_decode(  );
-	void joinem(machine_config &config);
-	void treahunt(machine_config &config);
-	void unclepoo(machine_config &config);
-	void striv(machine_config &config);
-	void jack(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void jack_map(address_map &map);
 	void joinem_map(address_map &map);

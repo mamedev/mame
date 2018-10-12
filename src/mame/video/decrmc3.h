@@ -14,10 +14,10 @@
 
 ******************************************************************************/
 
-#pragma once
-
 #ifndef MAME_VIDEO_DECORMC3_H
 #define MAME_VIDEO_DECORMC3_H
+
+#pragma once
 
 
 
@@ -40,7 +40,7 @@
 // other standard palettes
 #define MCFG_DECO_RMC3_ADD_PROMS(_tag, _region, _entries) \
 	MCFG_DECO_RMC3_ADD(_tag, _entries) \
-	downcast<deco_rmc3_device &>(*device).set_prom_region("^" _region); \
+	downcast<deco_rmc3_device &>(*device).set_prom_region(_region); \
 	downcast<deco_rmc3_device &>(*device).set_init(deco_rmc3_palette_init_delegate(FUNC(deco_rmc3_device::palette_init_proms), downcast<deco_rmc3_device *>(device)));
 
 //#define MCFG_DECO_RMC3_INIT_OWNER(_class, _method)

@@ -147,7 +147,7 @@ public:
 
 protected:
 	virtual void execute_run() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	void execute_instruction_8kw();
@@ -162,7 +162,7 @@ public:
 
 protected:
 	virtual void execute_run() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	void execute_instruction_64kw();

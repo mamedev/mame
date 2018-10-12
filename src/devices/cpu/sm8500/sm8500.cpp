@@ -25,7 +25,7 @@ they are internally.
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(SM8500, sm8500_cpu_device, "sm8500", "SM8500")
+DEFINE_DEVICE_TYPE(SM8500, sm8500_cpu_device, "sm8500", "Sharp SM8500")
 
 
 static constexpr uint8_t sm8500_b2w[8] = {
@@ -146,7 +146,7 @@ void sm8500_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_PC).formatstr("%8s").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_PS1).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -349,9 +349,9 @@ void sm8500_cpu_device::process_interrupts()
 }
 
 
-util::disasm_interface *sm8500_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm8500_cpu_device::create_disassembler()
 {
-	return new sm8500_disassembler;
+	return std::make_unique<sm8500_disassembler>();
 }
 
 
@@ -365,7 +365,7 @@ void sm8500_cpu_device::execute_run()
 		uint32_t  d1,d2;
 		uint32_t  res;
 
-		debugger_instruction_hook(this, m_PC);
+		debugger_instruction_hook(m_PC);
 		m_oldpc = m_PC;
 		process_interrupts();
 		if ( !m_halted ) {

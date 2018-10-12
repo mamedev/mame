@@ -9,10 +9,10 @@
 //**************************************************************************
 
 #define MCFG_TC0140SYT_MASTER_CPU(_tag) \
-	downcast<tc0140syt_device &>(*device).set_master_tag("^" _tag);
+	downcast<tc0140syt_device &>(*device).set_master_tag(_tag);
 
 #define MCFG_TC0140SYT_SLAVE_CPU(_tag) \
-	downcast<tc0140syt_device &>(*device).set_slave_tag("^" _tag);
+	downcast<tc0140syt_device &>(*device).set_slave_tag(_tag);
 
 #define MCFG_PC060HA_MASTER_CPU(_tag) MCFG_TC0140SYT_MASTER_CPU(_tag)
 #define MCFG_PC060HA_SLAVE_CPU(_tag) MCFG_TC0140SYT_SLAVE_CPU(_tag)

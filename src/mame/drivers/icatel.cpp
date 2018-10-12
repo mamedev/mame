@@ -24,7 +24,7 @@
 //#include "sound/speaker.h"
 
 #include "debugger.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -37,6 +37,11 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
+	void icatel(machine_config &config);
+
+	void init_icatel();
+
+private:
 	DECLARE_READ8_MEMBER(magic_string);
 
 	DECLARE_READ8_MEMBER(i80c31_p1_r);
@@ -59,43 +64,44 @@ public:
 	DECLARE_READ8_MEMBER(ci16_r);
 	DECLARE_WRITE8_MEMBER(ci16_w);
 
-	DECLARE_DRIVER_INIT(icatel);
 	DECLARE_PALETTE_INIT(icatel);
 
 	HD44780_PIXEL_UPDATE(icatel_pixel_update);
 
-	void icatel(machine_config &config);
 	void i80c31_data(address_map &map);
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
 
-ADDRESS_MAP_START(icatel_state::i80c31_prg)
-	AM_RANGE(0x0000, 0x7FFF) AM_MIRROR(0x8000) AM_ROM
-ADDRESS_MAP_END
+void icatel_state::i80c31_prg(address_map &map)
+{
+	map(0x0000, 0x7FFF).mirror(0x8000).rom();
+}
 
-ADDRESS_MAP_START(icatel_state::i80c31_io)
-	AM_RANGE(0x0000,0x3FFF) AM_RAM
-	AM_RANGE(0x8000,0x8002) AM_RAM /* HACK! */
-	AM_RANGE(0x8040,0x8040) AM_MIRROR(0x3F1E) AM_DEVWRITE("hd44780", hd44780_device, control_write) // not sure yet. CI12 (73LS273)
-	AM_RANGE(0x8041,0x8041) AM_MIRROR(0x3F1E) AM_DEVWRITE("hd44780", hd44780_device, data_write) // not sure yet.  CI12
-	AM_RANGE(0x8060,0x8060) AM_MIRROR(0x3F1F) AM_READWRITE(ci8_r, ci8_w)
-	AM_RANGE(0x8080,0x8080) AM_MIRROR(0x3F1F) AM_READWRITE(ci16_r, ci16_w) // card reader (?)
-	AM_RANGE(0x80C0,0x80C0) AM_MIRROR(0x3F1F) AM_READWRITE(ci15_r, ci15_w) // 74LS244 (tristate buffer)
-	AM_RANGE(0xC000,0xCFFF) AM_READWRITE(cn8_extension_r, cn8_extension_w)
-	AM_RANGE(0xE000,0xEFFF) AM_READWRITE(modem_r, modem_w)
-ADDRESS_MAP_END
+void icatel_state::i80c31_io(address_map &map)
+{
+	map(0x0000, 0x3FFF).ram();
+	map(0x8000, 0x8002).ram(); /* HACK! */
+	map(0x8040, 0x8040).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::control_write)); // not sure yet. CI12 (73LS273)
+	map(0x8041, 0x8041).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::data_write)); // not sure yet.  CI12
+	map(0x8060, 0x8060).mirror(0x3F1F).rw(FUNC(icatel_state::ci8_r), FUNC(icatel_state::ci8_w));
+	map(0x8080, 0x8080).mirror(0x3F1F).rw(FUNC(icatel_state::ci16_r), FUNC(icatel_state::ci16_w)); // card reader (?)
+	map(0x80C0, 0x80C0).mirror(0x3F1F).rw(FUNC(icatel_state::ci15_r), FUNC(icatel_state::ci15_w)); // 74LS244 (tristate buffer)
+	map(0xC000, 0xCFFF).rw(FUNC(icatel_state::cn8_extension_r), FUNC(icatel_state::cn8_extension_w));
+	map(0xE000, 0xEFFF).rw(FUNC(icatel_state::modem_r), FUNC(icatel_state::modem_w));
+}
 
-ADDRESS_MAP_START(icatel_state::i80c31_data)
+void icatel_state::i80c31_data(address_map &map)
+{
 //  AM_RANGE(0x0056,0x005A) AM_READ(magic_string) /* This is a hack! */
-ADDRESS_MAP_END
+}
 
-DRIVER_INIT_MEMBER( icatel_state, icatel )
+void icatel_state::init_icatel()
 {
 }
 
@@ -229,7 +235,7 @@ static const gfx_layout prot_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( icatel )
+static GFXDECODE_START( gfx_icatel )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, prot_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -248,14 +254,14 @@ HD44780_PIXEL_UPDATE(icatel_state::icatel_pixel_update)
 
 MACHINE_CONFIG_START(icatel_state::icatel)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL(2'097'152))
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_DATA_MAP(i80c31_data)
-	MCFG_CPU_IO_MAP(i80c31_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(icatel_state, i80c31_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(icatel_state, i80c31_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(icatel_state, i80c31_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(icatel_state, i80c31_p3_w))
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(2'097'152))
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_DATA_MAP(i80c31_data)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, icatel_state, i80c31_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, icatel_state, i80c31_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, icatel_state, i80c31_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, icatel_state, i80c31_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -266,10 +272,9 @@ MACHINE_CONFIG_START(icatel_state::icatel)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(icatel_state, icatel)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", icatel)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_icatel)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
@@ -281,6 +286,6 @@ ROM_START( icatel )
 	ROM_LOAD( "icatel_tpci_em._4_v16.05.ci14",  0x00000, 0x8000, CRC(d310586e) SHA1(21736ad5a06cf9695f8cc5ff2dc2d19b101504f5) )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS         INIT    COMPANY   FULLNAME                            FLAGS
-COMP( 1995, icatel,   0,      0,      icatel,     0,        icatel_state, icatel, "Icatel", "TPCI (Brazilian public payphone)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT         COMPANY   FULLNAME                            FLAGS
+COMP( 1995, icatel, 0,      0,      icatel,  0,     icatel_state, init_icatel, "Icatel", "TPCI (Brazilian public payphone)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 /*The hardware was clearly manufactured in 1995. There's no evindence of the actual date of the firmware.*/

@@ -24,7 +24,6 @@
 #include "emu.h"
 #include "taito.h"
 
-#include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
 
@@ -237,7 +236,7 @@ void nes_tc0190fmc_pal16r4_device::hblank_irq( int scanline, int vblank, int bla
 			m_irq_count--;
 
 		if (m_irq_enable && !blanked && (m_irq_count == 0) && prior_count)
-			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			set_irq_line(ASSERT_LINE);
 	}
 }
 
@@ -270,7 +269,7 @@ WRITE8_MEMBER(nes_tc0190fmc_pal16r4_device::write_h)
 			break;
 		case 0x4003:
 			m_irq_enable = 0;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x6000:
 			set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);

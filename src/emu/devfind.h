@@ -17,9 +17,12 @@
 
 #pragma once
 
+#include <functional>
 #include <iterator>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
+#include <utility>
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -35,20 +38,15 @@ template <typename T, unsigned Count>
 class object_array_finder
 {
 private:
-	template <unsigned... V> struct indices { };
-	template <unsigned C, unsigned... V> struct range : public range<C - 1, C - 1, V...> { };
-	template <unsigned... V> struct range<0U, V...> { typedef indices<V...> type; };
-	template <unsigned C> using index_range = typename range<C>::type;
-
 	template <typename F, typename... Param, unsigned... V>
-	object_array_finder(device_t &base, F const &fmt, unsigned start, indices<V...>, Param const &... arg)
+	object_array_finder(device_t &base, F const &fmt, unsigned start, std::integer_sequence<unsigned, V...>, Param const &... arg)
 		: m_tag{ util::string_format(fmt, start + V)... }
 		, m_array{ { base, m_tag[V].c_str(), arg... }... }
 	{
 	}
 
 	template <typename... Param, unsigned... V>
-	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, indices<V...>, Param const &... arg)
+	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, std::integer_sequence<unsigned, V...>, Param const &... arg)
 		: m_array{ { base, tags[V], arg... }... }
 	{
 	}
@@ -107,7 +105,7 @@ public:
 	/// \sa util::string_format
 	template <typename F, typename... Param>
 	object_array_finder(device_t &base, F const &fmt, unsigned start, Param const &... arg)
-		: object_array_finder(base, fmt, start, index_range<Count>(), arg...)
+		: object_array_finder(base, fmt, start, std::make_integer_sequence<unsigned, Count>(), arg...)
 	{
 	}
 
@@ -123,7 +121,7 @@ public:
 	///   all elements.
 	template <typename... Param>
 	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, Param const &... arg)
-		: object_array_finder(base, tags, index_range<Count>(), arg...)
+		: object_array_finder(base, tags, std::make_integer_sequence<unsigned, Count>(), arg...)
 	{
 	}
 
@@ -248,32 +246,67 @@ public:
 	///   otherwise.
 	virtual bool findit(bool isvalidation = false) = 0;
 
+	/// \brief Clear temporary binding from configuration
+	///
+	/// Concrete derived classes must implement this member function.
+	/// Object finders may allow temporary binding to the anticipated
+	/// target during configuration.  This needs to be cleared to ensure
+	/// the correct target is found if a device further up the hierarchy
+	/// subsequently removes or replaces devices.
+	virtual void end_configuration() = 0;
+
 	/// \brief Get search tag
 	///
 	/// Returns the search tag.
 	/// \return The object tag this helper will search for.
-	const char *finder_tag() const { return m_tag; }
+	char const *finder_tag() const { return m_tag; }
+
+	/// \brief Get search target
+	///
+	/// Returns the search base device and tag.
+	/// \return a pair consisting of a reference to the device to search
+	///   relative to and the relative tag.
+	std::pair<device_t &, char const *> finder_target() const { return std::make_pair(m_base, m_tag); }
 
 	/// \brief Set search tag
 	///
 	/// Allows search tag to be changed after construction.  Note that
 	/// this must be done before resolution time to take effect.  Also
 	/// note that the tag is not copied.
+	/// \param [in] base Updated search base.  The tag must be specified
+	///   relative to this device.
 	/// \param [in] tag Updated search tag.  This is not copied, it is
 	///   the caller's responsibility to ensure this pointer remains
 	///   valid until resolution time.
-	void set_tag(char const *tag) { m_tag = tag; }
+	void set_tag(device_t &base, char const *tag)
+	{
+		assert(!m_resolved);
+		m_base = base;
+		m_tag = tag;
+	}
 
-	/// \brief Is the object to be resolved before memory maps?
+	/// \brief Set search tag
 	///
-	/// Some objects must be resolved before memory maps are loaded
-	/// (devices for instance), some after (memory shares for
-	/// instance).
-	///
-	/// \return True if the target object has to be resolved before
-	/// memory maps are loaded
+	/// Allows search tag to be changed after construction.  Note that
+	/// this must be done before resolution time to take effect.  Also
+	/// note that the tag is not copied.
+	/// \param [in] tag Updated search tag relative to the current
+	///   device being configured.  This is not copied, it is the
+	///   caller's responsibility to ensure this pointer remains valid
+	///   until resolution time.
+	void set_tag(char const *tag);
 
-	virtual bool is_pre_map() const { return false; }
+	/// \brief Set search tag
+	///
+	/// Allows search tag to be changed after construction.  Note that
+	/// this must be done before resolution time to take effect.
+	/// \param [in] finder Object finder to take the search base and tag
+	///   from.
+	void set_tag(finder_base const &finder)
+	{
+		assert(!m_resolved);
+		std::tie(m_base, m_tag) = finder.finder_target();
+	}
 
 	/// \brief Dummy tag always treated as not found
 	constexpr static char DUMMY_TAG[17] = "finder_dummy_tag";
@@ -375,10 +408,13 @@ protected:
 	finder_base *const m_next;
 
 	/// \brief Base device to search from
-	device_t &m_base;
+	std::reference_wrapper<device_t> m_base;
 
 	/// \brief Object tag to search for
 	char const *m_tag;
+
+	/// \brief Set when object resolution completes
+	bool m_resolved;
 };
 
 
@@ -394,6 +430,14 @@ template <class ObjectClass, bool Required>
 class object_finder_base : public finder_base
 {
 public:
+	/// \brief Clear temporary binding from configuration
+	///
+	/// Object finders may allow temporary binding to the anticipated
+	/// target during configuration.  This needs to be cleared to ensure
+	/// the correct target is found if a device further up the hierarchy
+	/// subsequently removes or replaces devices.
+	virtual void end_configuration() override { assert(!m_resolved); m_target = nullptr; }
+
 	/// \brief Get pointer to target object
 	/// \return Pointer to target object if found, or nullptr otherwise.
 	ObjectClass *target() const { return m_target; }
@@ -430,7 +474,7 @@ protected:
 	/// \param [in] tag Object tag to search for.  This is not copied,
 	///   it is the caller's responsibility to ensure this pointer
 	///   remains valid until resolution time.
-	object_finder_base(device_t &base, const char *tag) : finder_base(base, tag), m_target(nullptr) { }
+	object_finder_base(device_t &base, const char *tag) : finder_base(base, tag) { }
 
 	/// \brief Log if object was not found
 	///
@@ -447,7 +491,7 @@ protected:
 	/// Pointer to target object, or nullptr if resolution has not been
 	/// attempted or the search failed.  Concrete derived classes must
 	/// set this in their implementation of the findit member function.
-	ObjectClass *m_target;
+	ObjectClass *m_target = nullptr;
 };
 
 
@@ -464,6 +508,8 @@ template <class DeviceClass, bool Required>
 class device_finder : public object_finder_base<DeviceClass, Required>
 {
 public:
+	using object_finder_base<DeviceClass, Required>::set_tag;
+
 	/// \brief Device finder constructor
 	/// \param [in] base Base device to search from.
 	/// \param [in] tag Device tag to search for.  This is not copied,
@@ -471,17 +517,55 @@ public:
 	///   remains valid until resolution time.
 	device_finder(device_t &base, char const *tag) : object_finder_base<DeviceClass, Required>(base, tag) { }
 
-	/// \brief Is the object to be resolved before memory maps?
+	/// \brief Set search tag
 	///
-	/// Some objects must be resolved before memory maps are loaded
-	/// (devices for instance), some after (memory shares for
-	/// instance).
+	/// Allows search tag to be changed after construction.  Note that
+	/// this must be done before resolution time to take effect.  Note
+	/// that this binds to a particular instance, so the device must not
+	/// be removed or replaced, as it will cause a use-after-free when
+	/// resolving objects.
+	/// \param [in] object Object to refer to.
+	void set_tag(DeviceClass &object) { set_tag(object, DEVICE_SELF); }
+
+	/// \brief Set target during configuration
 	///
-	/// \return True if the target object has to be resolved before
-	/// memory maps are loaded
-	virtual bool is_pre_map() const override { return true; }
+	/// During configuration, device_finder instances may be assigned
+	/// a reference to the anticipated target device to avoid the need
+	/// for tempories during configuration.  Normal resolution will
+	/// still happen after machine configuration is completed to ensure
+	/// device removal/replacement is handled properly.
+	/// \param [in] device Reference to anticipated target device.
+	/// \return The same reference supplied by the caller.
+	template <typename T>
+	std::enable_if_t<std::is_convertible<T *, DeviceClass *>::value, T &> operator=(T &device)
+	{
+		assert(!this->m_resolved);
+		assert(is_expected_tag(device));
+		this->m_target = &device;
+		return device;
+	}
 
 private:
+	/// \brief Check that device implementation has expected tag
+	/// \param [in] device Reference to device.
+	/// \return True if supplied device matches the configured target
+	///   tag, or false otherwise.
+	template <typename T>
+	std::enable_if_t<emu::detail::is_device_implementation<T>::value, bool> is_expected_tag(T const &device) const
+	{
+		return this->m_base.get().subtag(this->m_tag) == device.tag();
+	}
+
+	/// \brief Check that device mixin has expected tag
+	/// \param [in] device Reference to interface/mixin.
+	/// \return True if supplied mixin matches the configured target
+	///   tag, or false otherwise.
+	template <typename T>
+	std::enable_if_t<emu::detail::is_device_interface<T>::value, bool> is_expected_tag(T const &interface) const
+	{
+		return this->m_base.get().subtag(this->m_tag) == interface.device().tag();
+	}
+
 	/// \brief Find device
 	///
 	/// Find device of desired type with requested tag.  If a device
@@ -494,7 +578,13 @@ private:
 	///   is found, false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
-		device_t *const device = this->m_base.subdevice(this->m_tag);
+		if (!isvalidation)
+		{
+			assert(!this->m_resolved);
+			this->m_resolved = true;
+		}
+
+		device_t *const device = this->m_base.get().subdevice(this->m_tag);
 		this->m_target = dynamic_cast<DeviceClass *>(device);
 		if (device && !this->m_target)
 			this->printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag, device->name());
@@ -559,8 +649,12 @@ private:
 	///   memory region is found, false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
-		if (isvalidation) return this->validate_memregion(0, Required);
-		this->m_target = this->m_base.memregion(this->m_tag);
+		if (isvalidation)
+			return this->validate_memregion(0, Required);
+
+		assert(!this->m_resolved);
+		this->m_resolved = true;
+		this->m_target = this->m_base.get().memregion(this->m_tag);
 		return this->report_missing("memory region");
 	}
 };
@@ -619,8 +713,12 @@ public:
 	///   bank is found or this is a dry run, false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
-		if (isvalidation) return true;
-		this->m_target = this->m_base.membank(this->m_tag);
+		if (isvalidation)
+			return true;
+
+		assert(!this->m_resolved);
+		this->m_resolved = true;
+		this->m_target = this->m_base.get().membank(this->m_tag);
 		return this->report_missing("memory bank");
 	}
 };
@@ -690,8 +788,12 @@ private:
 	///   is found or this is a dry run, false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
-		if (isvalidation) return true;
-		this->m_target = this->m_base.ioport(this->m_tag);
+		if (isvalidation)
+			return true;
+
+		assert(!this->m_resolved);
+		this->m_resolved = true;
+		this->m_target = this->m_base.get().ioport(this->m_tag);
 		return this->report_missing("I/O port");
 	}
 };
@@ -788,7 +890,11 @@ private:
 	///   memory region is found, or false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
-		if (isvalidation) return this->validate_memregion(sizeof(PointerType) * m_desired_length, Required);
+		if (isvalidation)
+			return this->validate_memregion(sizeof(PointerType) * m_desired_length, Required);
+
+		assert(!this->m_resolved);
+		this->m_resolved = true;
 		m_length = m_desired_length;
 		this->m_target = reinterpret_cast<PointerType *>(this->find_memregion(sizeof(PointerType), m_length, Required));
 		return this->report_missing("memory region");
@@ -863,14 +969,18 @@ public:
 		m_allocated.resize(entries);
 		this->m_target = &m_allocated[0];
 		m_bytes = entries * sizeof(PointerType);
-		this->m_base.save_item(m_allocated, this->m_tag);
+		this->m_base.get().save_item(m_allocated, this->m_tag);
 	}
 
 private:
 	// finder
 	virtual bool findit(bool isvalidation) override
 	{
-		if (isvalidation) return true;
+		if (isvalidation)
+			return true;
+
+		assert(!this->m_resolved);
+		this->m_resolved = true;
 		this->m_target = reinterpret_cast<PointerType *>(this->find_memshare(m_width, m_bytes, Required));
 		return this->report_missing("shared pointer");
 	}

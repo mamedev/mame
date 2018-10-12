@@ -39,50 +39,51 @@ lev 7 : 0x7c : 0000 05be - xxx
 
 /* some regions might be too large */
 
-ADDRESS_MAP_START(bigstrkb_state::bigstrkb_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void bigstrkb_state::bigstrkb_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 //  AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE_LEGACY(megasys1_vregs_C_r, megasys1_vregs_C_w) AM_SHARE("megasys1_vregs")
 
-	AM_RANGE(0x0C2004, 0x0C2005) AM_WRITENOP
-	AM_RANGE(0x0C200C, 0x0C200d) AM_WRITENOP
-	AM_RANGE(0x0C2104, 0x0C2105) AM_WRITENOP
-	AM_RANGE(0x0C2108, 0x0C2109) AM_WRITENOP
-	AM_RANGE(0x0C2200, 0x0C2201) AM_WRITENOP
-	AM_RANGE(0x0C2208, 0x0C2209) AM_WRITENOP
-	AM_RANGE(0x0c2308, 0x0c2309) AM_WRITENOP    // bit 0 of DSW1 (flip screen) - use vregs
+	map(0x0C2004, 0x0C2005).nopw();
+	map(0x0C200C, 0x0C200d).nopw();
+	map(0x0C2104, 0x0C2105).nopw();
+	map(0x0C2108, 0x0C2109).nopw();
+	map(0x0C2200, 0x0C2201).nopw();
+	map(0x0C2208, 0x0C2209).nopw();
+	map(0x0c2308, 0x0c2309).nopw();    // bit 0 of DSW1 (flip screen) - use vregs
 
-	AM_RANGE(0x0D0000, 0x0dffff) AM_RAM  // 0xd2000 - 0xd3fff?   0xd8000?
+	map(0x0D0000, 0x0dffff).ram();  // 0xd2000 - 0xd3fff?   0xd8000?
 
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(videoram3_w) AM_SHARE("videoram3")
-	AM_RANGE(0x0ec000, 0x0effff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	map(0x0e0000, 0x0e3fff).ram().w(FUNC(bigstrkb_state::videoram2_w)).share("videoram2");
+	map(0x0e8000, 0x0ebfff).ram().w(FUNC(bigstrkb_state::videoram3_w)).share("videoram3");
+	map(0x0ec000, 0x0effff).ram().w(FUNC(bigstrkb_state::videoram_w)).share("videoram");
 
-	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0f8800, 0x0fffff) AM_RAM
+	map(0x0f0000, 0x0f7fff).ram();
+	map(0x0f8000, 0x0f87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0f8800, 0x0fffff).ram();
 
-	AM_RANGE(0x1f0000, 0x1f7fff) AM_RAM
-	AM_RANGE(0x1f8000, 0x1f87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1f8800, 0x1fffff) AM_RAM
+	map(0x1f0000, 0x1f7fff).ram();
+	map(0x1f8000, 0x1f87ff).ram().share("spriteram");
+	map(0x1f8800, 0x1fffff).ram();
 
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW0")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("P2")
-	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("P1")
-	AM_RANGE(0x700020, 0x700027) AM_WRITEONLY AM_SHARE("vidreg1")
-	AM_RANGE(0x700030, 0x700037) AM_WRITEONLY AM_SHARE("vidreg2")
+	map(0x700000, 0x700001).portr("DSW0");
+	map(0x700002, 0x700003).portr("DSW1");
+	map(0x700004, 0x700005).portr("SYSTEM");
+	map(0x70000a, 0x70000b).portr("P2");
+	map(0x70000c, 0x70000d).portr("P1");
+	map(0x700020, 0x700027).writeonly().share("vidreg1");
+	map(0x700030, 0x700037).writeonly().share("vidreg2");
 
-	AM_RANGE(0xB00000, 0xB00001) AM_WRITENOP
+	map(0xB00000, 0xB00001).nopw();
 
-	AM_RANGE(0xE00000, 0xE00001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xE00002, 0xE00003) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
+	map(0xe00001, 0xe00001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe00003, 0xe00003).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0xE00008, 0xE00009) AM_WRITENOP
-	AM_RANGE(0xE0000c, 0xE0000d) AM_WRITENOP
+	map(0xE00008, 0xE00009).nopw();
+	map(0xE0000c, 0xE0000d).nopw();
 
-	AM_RANGE(0xF00000, 0xFFFFFF) AM_RAM
-ADDRESS_MAP_END
+	map(0xF00000, 0xFFFFFF).ram();
+}
 
 #define BIGSTRKB_PLAYER_INPUT( player, start ) \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(player) PORT_8WAY \
@@ -190,7 +191,7 @@ static const gfx_layout bigstrkb_char16layout =
 
 
 
-static GFXDECODE_START( bigstrkb )
+static GFXDECODE_START( gfx_bigstrkb )
 	GFXDECODE_ENTRY( "gfx1", 0, bigstrkb_charlayout,   0x200, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bigstrkb_char16layout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, bigstrkb_char16layout,   0x300, 16 )
@@ -201,11 +202,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(bigstrkb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigstrkb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigstrkb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigstrkb)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -219,14 +220,15 @@ MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-//  MCFG_YM2151_ADD("ymsnd", ym2151_config)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+//  MCFG_DEVICE_ADD("ymsnd", YM2151, ym2151_config)
 
-	MCFG_OKIM6295_ADD("oki1", 4000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki2", 4000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -297,5 +299,5 @@ ROM_END
 
 /* GAME drivers */
 
-GAME( 1992, bigstrkb, bigstrik, bigstrkb, bigstrkb, bigstrkb_state, 0, ROT0, "bootleg", "Big Striker (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bigstrkba,bigstrik, bigstrkb, bigstrkb, bigstrkb_state, 0, ROT0, "bootleg", "Big Striker (bootleg w/Italian teams)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrkb,  bigstrik, bigstrkb, bigstrkb, bigstrkb_state, empty_init, ROT0, "bootleg", "Big Striker (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrkba, bigstrik, bigstrkb, bigstrkb, bigstrkb_state, empty_init, ROT0, "bootleg", "Big Striker (bootleg w/Italian teams)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

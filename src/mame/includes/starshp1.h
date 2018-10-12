@@ -31,6 +31,7 @@
 #pragma once
 
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -58,14 +59,17 @@ public:
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_led(*this, "led0")
 	{ }
+
+	void starshp1(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(starshp1_analog_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
-	void starshp1(machine_config &config);
 
-protected:
+private:
+	virtual void machine_start() override;
 	DECLARE_WRITE8_MEMBER(starshp1_collision_reset_w);
 	DECLARE_WRITE8_MEMBER(starshp1_analog_in_w);
 	DECLARE_WRITE_LINE_MEMBER(ship_explode_w);
@@ -136,11 +140,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<> m_led;
 };
 
 /*----------- defined in audio/starshp1.c -----------*/
 
-DISCRETE_SOUND_EXTERN( starshp1 );
+DISCRETE_SOUND_EXTERN( starshp1_discrete );
 
 /* Discrete Sound Input Nodes */
 #define STARSHP1_NOISE_AMPLITUDE    NODE_01

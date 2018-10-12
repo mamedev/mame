@@ -1,16 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 #include "machine/mb14241.h"
+#include "emupal.h"
 #include "screen.h"
 
 class fgoal_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
-
 	fgoal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -19,6 +15,16 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_video_ram(*this, "video_ram") { }
+
+	void fgoal(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(_80_r);
+
+private:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -60,8 +66,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ypos_w);
 	DECLARE_WRITE8_MEMBER(xpos_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(_80_r);
-
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
 	virtual void machine_start() override;
@@ -73,8 +77,7 @@ public:
 	int intensity(int bits);
 	unsigned video_ram_address( );
 
-	void fgoal(machine_config &config);
 	void cpu_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -35,6 +35,7 @@
 #include "machine/pit8253.h"
 #include "sound/beep.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,9 +55,13 @@ public:
 			m_beeper(*this, "beeper"),
 			m_palette(*this, "palette"),
 			m_system_dsw(*this, "SYSTEM_DSW"),
-			m_fd_dsw(*this, "FD_DSW")
+			m_fd_dsw(*this, "FD_DSW"),
+			m_floppy_connector(*this, "upd765a:%u", 0U)
 	{ }
 
+	void mz3500(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
@@ -103,14 +108,13 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void mz3500(machine_config &config);
 	void mz3500_master_io(address_map &map);
 	void mz3500_master_map(address_map &map);
 	void mz3500_slave_io(address_map &map);
 	void mz3500_slave_map(address_map &map);
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -120,7 +124,7 @@ protected:
 private:
 	required_ioport m_system_dsw;
 	required_ioport m_fd_dsw;
-	floppy_connector *m_floppy_connector[4];
+	required_device_array<floppy_connector, 4> m_floppy_connector;
 };
 
 void mz3500_state::video_start()
@@ -591,41 +595,45 @@ READ8_MEMBER(mz3500_state::mz3500_fdc_dma_r)
 	return m_fdc->dma_r();
 }
 
-ADDRESS_MAP_START(mz3500_state::mz3500_master_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mz3500_master_mem_r,mz3500_master_mem_w)
-ADDRESS_MAP_END
+void mz3500_state::mz3500_master_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(mz3500_state::mz3500_master_mem_r), FUNC(mz3500_state::mz3500_master_mem_w));
+}
 
-ADDRESS_MAP_START(mz3500_state::mz3500_master_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void mz3500_state::mz3500_master_io(address_map &map)
+{
+	map.global_mask(0xff);
 //  ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0xe4, 0xe7) SFD upd765
 //  AM_RANGE(0xe8, 0xeb) SFD I/O port and DMAC chip select
 //  AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
-	AM_RANGE(0xf4, 0xf5) AM_DEVICE("upd765a", upd765a_device, map) // MFD upd765
+	map(0xf4, 0xf5).m(m_fdc, FUNC(upd765a_device::map)); // MFD upd765
 //  AM_RANGE(0xf8, 0xfb) MFD I/O port
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(mz3500_fdc_r,mz3500_fdc_w)
-	AM_RANGE(0xf9, 0xf9) AM_READ(mz3500_fdc_dma_r)
-	AM_RANGE(0xfc, 0xff) AM_READWRITE(mz3500_io_r,mz3500_io_w) // memory mapper
-ADDRESS_MAP_END
+	map(0xf8, 0xf8).rw(FUNC(mz3500_state::mz3500_fdc_r), FUNC(mz3500_state::mz3500_fdc_w));
+	map(0xf9, 0xf9).r(FUNC(mz3500_state::mz3500_fdc_dma_r));
+	map(0xfc, 0xff).rw(FUNC(mz3500_state::mz3500_io_r), FUNC(mz3500_state::mz3500_io_w)); // memory mapper
+}
 
-ADDRESS_MAP_START(mz3500_state::mz3500_slave_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ipl", 0)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(mz3500_shared_ram_r, mz3500_shared_ram_w)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-ADDRESS_MAP_END
+void mz3500_state::mz3500_slave_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("ipl", 0);
+	map(0x2000, 0x27ff).rw(FUNC(mz3500_state::mz3500_shared_ram_r), FUNC(mz3500_state::mz3500_shared_ram_w));
+	map(0x4000, 0x5fff).ram();
+}
 
-ADDRESS_MAP_START(mz3500_state::mz3500_slave_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
+void mz3500_state::mz3500_slave_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
 //  AM_RANGE(0x00, 0x0f) f/f and irq to master CPU
 //  AM_RANGE(0x10, 0x1f) i8251
 //  AM_RANGE(0x20, 0x2f) pit8253
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("i8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW")
-	AM_RANGE(0x50, 0x5f) AM_RAM_WRITE(mz3500_crtc_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("upd7220_gfx", upd7220_device, read, write)
-	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("upd7220_chr", upd7220_device, read, write)
-ADDRESS_MAP_END
+	map(0x30, 0x33).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x40).portr("DSW");
+	map(0x50, 0x5f).ram().w(FUNC(mz3500_state::mz3500_crtc_w));
+	map(0x60, 0x61).rw(m_hgdc2, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
+	map(0x70, 0x71).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
+}
 
 WRITE8_MEMBER(mz3500_state::mz3500_pa_w)
 {
@@ -739,7 +747,7 @@ static const gfx_layout charlayout_8x16 =
 	8*16
 };
 
-static GFXDECODE_START( mz3500 )
+static GFXDECODE_START( gfx_mz3500 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_8x8,     0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0008, charlayout_8x8,     0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout_8x16,     0, 1 )
@@ -752,13 +760,6 @@ void mz3500_state::machine_start()
 	m_char_rom = memregion("gfx1")->base();
 	m_work_ram = make_unique_clear<uint8_t[]>(0x40000);
 	m_shared_ram = make_unique_clear<uint8_t[]>(0x800);
-
-	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
-
-	for (int i = 0; i < 4; i++)
-	{
-		m_floppy_connector[i] = machine().device<floppy_connector>(m_fddnames[i]);
-	}
 }
 
 void mz3500_state::machine_reset()
@@ -772,10 +773,7 @@ void mz3500_state::machine_reset()
 	//m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_srdy = 0;
 
-	upd765a_device *fdc;
-	fdc = machine().device<upd765a_device>(":upd765a");
-
-	if (fdc)
+	if (m_fdc.found())
 	{
 		m_fdd_sel = 0;
 		{
@@ -785,7 +783,7 @@ void mz3500_state::machine_reset()
 				elem->get_device()->set_rpm(300);
 			}
 
-			machine().device<upd765a_device>("upd765a")->set_rate(250000);
+			m_fdc->set_rate(250000);
 		}
 	}
 
@@ -793,40 +791,43 @@ void mz3500_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(mz3500_state::upd7220_1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void mz3500_state::upd7220_1_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x00000, 0x00fff).ram().share("video_ram");
+}
 
-ADDRESS_MAP_START(mz3500_state::upd7220_2_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM // AM_SHARE("video_ram_2")
-ADDRESS_MAP_END
+void mz3500_state::upd7220_2_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram(); // AM_SHARE("video_ram_2")
+}
 
-static SLOT_INTERFACE_START( mz3500_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void mz3500_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
 /* TODO: clocks */
 MACHINE_CONFIG_START(mz3500_state::mz3500)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master",Z80,MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(mz3500_master_map)
-	MCFG_CPU_IO_MAP(mz3500_master_io)
+	MCFG_DEVICE_ADD("master",Z80,MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(mz3500_master_map)
+	MCFG_DEVICE_IO_MAP(mz3500_master_io)
 
-	MCFG_CPU_ADD("slave",Z80,MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(mz3500_slave_map)
-	MCFG_CPU_IO_MAP(mz3500_slave_io)
+	MCFG_DEVICE_ADD("slave",Z80,MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(mz3500_slave_map)
+	MCFG_DEVICE_IO_MAP(mz3500_slave_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
-	MCFG_DEVICE_ADD("i8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz3500_state, mz3500_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mz3500_state, mz3500_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz3500_state, mz3500_pc_w))
+	i8255_device &ppi(I8255A(config, "i8255"));
+	ppi.out_pa_callback().set(FUNC(mz3500_state::mz3500_pa_w));
+	ppi.out_pb_callback().set(FUNC(mz3500_state::mz3500_pb_w));
+	ppi.out_pc_callback().set(FUNC(mz3500_state::mz3500_pc_w));
 
-	MCFG_UPD765A_ADD("upd765a", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("master", INPUT_LINE_IRQ0))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_master, INPUT_LINE_IRQ0);
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
@@ -835,7 +836,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, MAIN_CLOCK/5)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(mz3500_state, hgdc_draw_text)
-	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
+	MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
 
 	MCFG_DEVICE_ADD("upd7220_gfx", UPD7220, MAIN_CLOCK/5)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
@@ -849,14 +850,14 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz3500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz3500)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("beeper", BEEP, 2400)
+	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
@@ -878,4 +879,4 @@ ROM_START( mz3500 )
 	ROM_LOAD( "mz-3500_cg-rom_2-b_m5l2764k.bin", 0x000000, 0x002000, CRC(29f2f80a) SHA1(64b307cd9de5a3327e3ec9f3d0d6b3485706f436) )
 ROM_END
 
-COMP( 198?, mz3500,  0,   0,   mz3500,  mz3500, mz3500_state,  0,  "Sharp",      "MZ-3500", MACHINE_IS_SKELETON )
+COMP( 198?, mz3500, 0, 0, mz3500, mz3500, mz3500_state, empty_init, "Sharp", "MZ-3500", MACHINE_IS_SKELETON )

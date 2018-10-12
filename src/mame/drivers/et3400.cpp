@@ -49,11 +49,13 @@ public:
 		, m_digit(*this, "digit%u", 1U)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
-	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
 	void et3400(machine_config &config);
 
-protected:
+	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
+	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
+
+private:
+
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(keypad_r);
@@ -66,7 +68,6 @@ protected:
 
 	void mem_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device_array<ls259_device, 6> m_displatch;
@@ -137,15 +138,16 @@ WRITE8_MEMBER(et3400_state::pia_bw)
 }
 
 
-ADDRESS_MAP_START(et3400_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAM
-	AM_RANGE( 0x1000, 0x1003 ) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE( 0x1400, 0x23ff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0xc000, 0xc0ff ) AM_READ(keypad_r)
-	AM_RANGE( 0xc100, 0xc1ff ) AM_WRITE(display_w)
-	AM_RANGE( 0xfc00, 0xffff ) AM_ROM AM_REGION("roms", 0x1000)
-ADDRESS_MAP_END
+void et3400_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1003).mirror(0x03fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1400, 0x23ff).rom().region("roms", 0);
+	map(0xc000, 0xc0ff).r(FUNC(et3400_state::keypad_r));
+	map(0xc100, 0xc1ff).w(FUNC(et3400_state::display_w));
+	map(0xfc00, 0xffff).rom().region("roms", 0x1000);
+}
 
 WRITE_LINE_MEMBER(et3400_state::reset_key_w)
 {
@@ -219,39 +221,37 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(et3400_state::et3400)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(4'000'000) / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(4'000'000) / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_et3400)
+	config.set_default_layout(layout_et3400);
 
 	// Devices
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(et3400_state, pia_aw))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(et3400_state, pia_bw))
-	MCFG_PIA_READPA_HANDLER(READ8(et3400_state, pia_ar))
-	MCFG_PIA_READPB_HANDLER(READ8(et3400_state, pia_br))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(et3400_state::pia_aw));
+	m_pia->writepb_handler().set(FUNC(et3400_state::pia_bw));
+	m_pia->readpa_handler().set(FUNC(et3400_state::pia_ar));
+	m_pia->readpb_handler().set(FUNC(et3400_state::pia_br));
 
-	MCFG_DEVICE_ADD("displatch1", LS259, 0) // IC28
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<1>))
-	MCFG_DEVICE_ADD("displatch2", LS259, 0) // IC27
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<2>))
-	MCFG_DEVICE_ADD("displatch3", LS259, 0) // IC26
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<3>))
-	MCFG_DEVICE_ADD("displatch4", LS259, 0) // IC25
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<4>))
-	MCFG_DEVICE_ADD("displatch5", LS259, 0) // IC24
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<5>))
-	MCFG_DEVICE_ADD("displatch6", LS259, 0) // IC23
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<6>))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+
+	for (std::size_t i = 0; i < 6; i++)
+		LS259(config, m_displatch[i]);
+
+
+	m_displatch[0]->parallel_out_cb().set(FUNC(et3400_state::led_w<1>));
+	m_displatch[1]->parallel_out_cb().set(FUNC(et3400_state::led_w<2>));
+	m_displatch[2]->parallel_out_cb().set(FUNC(et3400_state::led_w<3>));
+	m_displatch[3]->parallel_out_cb().set(FUNC(et3400_state::led_w<4>));
+	m_displatch[4]->parallel_out_cb().set(FUNC(et3400_state::led_w<5>));
+	m_displatch[5]->parallel_out_cb().set(FUNC(et3400_state::led_w<6>));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -265,5 +265,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY       FULLNAME       FLAGS */
-COMP( 1976, et3400,  0,     0,       et3400,    et3400, et3400_state,  0,    "Heath Company", "Heathkit Model ET-3400 Microprocessor Trainer", 0 )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY          FULLNAME                                         FLAGS */
+COMP( 1976, et3400, 0,      0,      et3400,  et3400, et3400_state, empty_init, "Heath Company", "Heathkit Model ET-3400 Microprocessor Trainer", 0 )

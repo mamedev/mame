@@ -69,6 +69,16 @@ PC16550D
 Same as NS16550A with subtle flaws corrected. This is revision D of the
 16550 family and is the latest design available from National Semiconductor.
 
+Intel 82050
+Essentially a NS16450 squeezed into a 28-pin package with some minor functions
+eliminated. Can be strapped for either a 18.432 MHz XTAL (divided by 10 to
+produce the BRG clock) or an externally generated 9.216 or 18.432 MHz clock.
+
+Intel 82510
+A functional expansion of the 82050 with dozens of extra registers. Adds 4-byte
+Tx/Rx FIFOs with programmable thresholds, MCS-51 compatible 9-bit protocol,
+ASCII/EBCDIC control character recognition, timed interrupts and more.
+
 
 Known issues:
 - MESS does currently not handle all these model specific features.
@@ -86,6 +96,9 @@ History:
 
 #include "emu.h"
 #include "machine/ins8250.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(INS8250,  ins8250_device, "ins8250",  "National Semiconductor INS8250 UART")
 DEFINE_DEVICE_TYPE(NS16450,  ns16450_device, "ns16450",  "National Semiconductor NS16450 UART")
@@ -225,6 +238,23 @@ void ins8250_uart_device::clear_int(int flag)
 	update_interrupt();
 }
 
+READ_LINE_MEMBER(ins8250_uart_device::intrpt_r)
+{
+	return !BIT(m_regs.iir, 0);
+}
+
+// Baud rate generator is reset after writing to either byte of divisor latch
+void ins8250_uart_device::update_baud_rate()
+{
+	LOG("%.1f baud selected (divisor = %d)\n", double(clock()) / (m_regs.dl * 16), m_regs.dl);
+	set_rate(clock(), m_regs.dl * 16);
+
+	// FIXME: Baud rate generator should not affect transmitter or receiver, but device_serial_interface resets them regardless.
+	// If the transmitter is still running at this time and we don't flush it, the shift register will never be emptied!
+	if (!(m_regs.lsr & INS8250_LSR_TSRE))
+		tra_complete();
+}
+
 WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 {
 	int tmp;
@@ -235,7 +265,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			if (m_regs.lcr & INS8250_LCR_DLAB)
 			{
 				m_regs.dl = (m_regs.dl & 0xff00) | data;
-				set_rate(clock(), m_regs.dl*16);
+				update_baud_rate();
 			}
 			else
 			{
@@ -252,7 +282,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			if (m_regs.lcr & INS8250_LCR_DLAB)
 			{
 				m_regs.dl = (m_regs.dl & 0xff) | (data << 8);
-				set_rate(clock(), m_regs.dl*16);
+				update_baud_rate();
 			}
 			else
 			{

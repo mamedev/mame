@@ -10,6 +10,7 @@ Ikki (c) 1985 Sun Electronics
 
 TODO:
 - understand proper CPU communications and irq firing;
+- merge with markham.cpp
 - timings
 
 *****************************************************************************/
@@ -20,6 +21,18 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "speaker.h"
+
+#define MASTER_CLOCK (20_MHz_XTAL)
+#define PIXEL_CLOCK  (MASTER_CLOCK/4) // guess
+#define CPU_CLOCK    (8_MHz_XTAL)
+
+/* also a guess */
+#define HTOTAL       (320)
+#define HBEND        (8)
+#define HBSTART      (248)
+#define VTOTAL       (262)
+#define VBEND        (16)
+#define VBSTART      (240)
 
 
 /*************************************
@@ -47,29 +60,31 @@ WRITE8_MEMBER(ikki_state::ikki_coin_counters)
  *
  *************************************/
 
-ADDRESS_MAP_START(ikki_state::ikki_cpu1)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xe000) AM_READ(ikki_e000_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("P1")
-	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("P2")
-	AM_RANGE(0xe008, 0xe008) AM_WRITE(ikki_scrn_ctrl_w)
-	AM_RANGE(0xe009, 0xe009) AM_WRITE(ikki_coin_counters)
-	AM_RANGE(0xe00a, 0xe00b) AM_WRITEONLY AM_SHARE("scroll")
-ADDRESS_MAP_END
+void ikki_state::ikki_cpu1(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xcfff).ram().share("share1");
+	map(0xd000, 0xd7ff).ram().share("videoram");
+	map(0xe000, 0xe000).r(FUNC(ikki_state::ikki_e000_r));
+	map(0xe001, 0xe001).portr("DSW1");
+	map(0xe002, 0xe002).portr("DSW2");
+	map(0xe003, 0xe003).portr("SYSTEM");
+	map(0xe004, 0xe004).portr("P1");
+	map(0xe005, 0xe005).portr("P2");
+	map(0xe008, 0xe008).w(FUNC(ikki_state::ikki_scrn_ctrl_w));
+	map(0xe009, 0xe009).w(FUNC(ikki_state::ikki_coin_counters));
+	map(0xe00a, 0xe00b).writeonly().share("scroll");
+}
 
-ADDRESS_MAP_START(ikki_state::ikki_cpu2)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd801, 0xd801) AM_DEVWRITE("sn1", sn76496_device, write)
-	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn2", sn76496_device, write)
-ADDRESS_MAP_END
+void ikki_state::ikki_cpu2(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0xc000, 0xc7ff).ram().share("spriteram");
+	map(0xc800, 0xcfff).ram().share("share1");
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::command_w));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::command_w));
+}
 
 
 /*************************************
@@ -199,7 +214,7 @@ static const gfx_layout spritelayout =
 	8*8*8
 };
 
-static GFXDECODE_START( ikki )
+static GFXDECODE_START( gfx_ikki )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   512, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0,   64 )
 GFXDECODE_END
@@ -241,39 +256,35 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
 MACHINE_CONFIG_START(ikki_state::ikki)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
-	MCFG_CPU_PROGRAM_MAP(ikki_cpu1)
+	MCFG_DEVICE_ADD("maincpu", Z80,CPU_CLOCK/2) /* 4.000MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ikki_state, ikki_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
-	MCFG_CPU_PROGRAM_MAP(ikki_cpu2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_ADD("sub", Z80,CPU_CLOCK/2) /* 4.000MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu2)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*(PIXEL_CLOCK/HTOTAL/VTOTAL))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8+3*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(ikki_state, screen_update_ikki)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ikki)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ikki)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
 	MCFG_PALETTE_INIT_OWNER(ikki_state, ikki)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76496, 8000000/4)
+	MCFG_DEVICE_ADD("sn1", SN76496, CPU_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 8000000/2)
+	MCFG_DEVICE_ADD("sn2", SN76496, CPU_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -356,5 +367,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, ikki,   0,    ikki, ikki, ikki_state, 0, ROT0, "Sun Electronics", "Ikki (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1985, farmer, ikki, ikki, ikki, ikki_state, 0, ROT0, "Sun Electronics", "Farmers Rebellion", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ikki,   0,    ikki, ikki, ikki_state, empty_init, ROT0, "Sun Electronics", "Ikki (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, farmer, ikki, ikki, ikki, ikki_state, empty_init, ROT0, "Sun Electronics", "Farmers Rebellion", MACHINE_SUPPORTS_SAVE )

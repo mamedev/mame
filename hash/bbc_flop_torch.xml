@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro - Torch Z80/68000 Co-Processor Discs -->
+<!-- Acorn BBC Micro - Torch Z80/68000 Co-Processor discs -->
 
-<softwarelist name="bbc_flop_torch" description="Torch Z80/68000 Co-Processor Discs">
+<softwarelist name="bbc_flop_torch" description="Torch Z80/68000 Co-Processor discs">
 
 	<!-- Z80 -->
 

@@ -26,6 +26,24 @@ public:
 			out(*this, "out")
 	{ }
 
+	void wpc_s(machine_config &config);
+
+	void init();
+	void init_corv();
+	void init_dh();
+	void init_i500();
+	void init_jb();
+	void init_jm();
+	void init_nf();
+	void init_rs();
+	void init_fs();
+	void init_ts();
+	void init_tom();
+	void init_wd();
+	void init_wcs();
+	void init_tfs();
+
+private:
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
@@ -37,27 +55,11 @@ public:
 	DECLARE_WRITE8_MEMBER(dcs_reset_w);
 	DECLARE_READ8_MEMBER(rtc_r);
 
-	void init();
-	DECLARE_DRIVER_INIT(corv);
-	DECLARE_DRIVER_INIT(dh);
-	DECLARE_DRIVER_INIT(i500);
-	DECLARE_DRIVER_INIT(jb);
-	DECLARE_DRIVER_INIT(jm);
-	DECLARE_DRIVER_INIT(nf);
-	DECLARE_DRIVER_INIT(rs);
-	DECLARE_DRIVER_INIT(fs);
-	DECLARE_DRIVER_INIT(ts);
-	DECLARE_DRIVER_INIT(tom);
-	DECLARE_DRIVER_INIT(wd);
-	DECLARE_DRIVER_INIT(wcs);
-	DECLARE_DRIVER_INIT(tfs);
-
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
-	void wpc_s(machine_config &config);
 	void wpc_s_map(address_map &map);
-protected:
+
 	// devices
 	required_device<cpu_device> maincpu;
 	required_device<dcs_audio_8k_device> dcs;
@@ -71,7 +73,6 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 
-private:
 	static const char *const lamps_corv[64];
 	static const char *const outputs_corv[54];
 	static const char *const lamps_dh[64];
@@ -100,43 +101,44 @@ private:
 	uint16_t rtc_base_day;
 };
 
-ADDRESS_MAP_START(wpc_s_state::wpc_s_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmd0")
-	AM_RANGE(0x3200, 0x33ff) AM_RAMBANK("dmd2")
-	AM_RANGE(0x3400, 0x35ff) AM_RAMBANK("dmd4")
-	AM_RANGE(0x3600, 0x37ff) AM_RAMBANK("dmd6")
-	AM_RANGE(0x3800, 0x39ff) AM_RAMBANK("dmd8")
-	AM_RANGE(0x3a00, 0x3bff) AM_RAMBANK("dmda")
+void wpc_s_state::wpc_s_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("mainram");
+	map(0x3000, 0x31ff).bankrw("dmd0");
+	map(0x3200, 0x33ff).bankrw("dmd2");
+	map(0x3400, 0x35ff).bankrw("dmd4");
+	map(0x3600, 0x37ff).bankrw("dmd6");
+	map(0x3800, 0x39ff).bankrw("dmd8");
+	map(0x3a00, 0x3bff).bankrw("dmda");
 
-	AM_RANGE(0x3fb8, 0x3fbf) AM_DEVICE("dmd", wpc_dmd_device, registers)
+	map(0x3fb8, 0x3fbf).m("dmd", FUNC(wpc_dmd_device::registers));
 
-	AM_RANGE(0x3fd4, 0x3fd4) AM_READ_PORT("FLIPPERS") AM_DEVWRITE("out", wpc_out_device, out4_w)
+	map(0x3fd4, 0x3fd4).portr("FLIPPERS").w(out, FUNC(wpc_out_device::out4_w));
 
-	AM_RANGE(0x3fdc, 0x3fdc) AM_READWRITE(dcs_data_r, dcs_data_w)
-	AM_RANGE(0x3fdd, 0x3fdd) AM_READWRITE(dcs_ctrl_r, dcs_reset_w)
+	map(0x3fdc, 0x3fdc).rw(FUNC(wpc_s_state::dcs_data_r), FUNC(wpc_s_state::dcs_data_w));
+	map(0x3fdd, 0x3fdd).rw(FUNC(wpc_s_state::dcs_ctrl_r), FUNC(wpc_s_state::dcs_reset_w));
 
-	AM_RANGE(0x3fe0, 0x3fe3) AM_DEVWRITE("out", wpc_out_device, out_w)
-	AM_RANGE(0x3fe4, 0x3fe4) AM_READNOP AM_DEVWRITE("lamp", wpc_lamp_device, row_w)
-	AM_RANGE(0x3fe5, 0x3fe5) AM_READNOP AM_DEVWRITE("lamp", wpc_lamp_device, col_w)
-	AM_RANGE(0x3fe6, 0x3fe6) AM_DEVWRITE("out", wpc_out_device, gi_w)
-	AM_RANGE(0x3fe7, 0x3fe7) AM_READ_PORT("DSW")
-	AM_RANGE(0x3fe8, 0x3fe8) AM_READ_PORT("DOOR")
-	AM_RANGE(0x3fe9, 0x3fe9) AM_DEVREAD("pic", wpc_pic_device, read)
-	AM_RANGE(0x3fea, 0x3fea) AM_DEVWRITE("pic", wpc_pic_device, write)
+	map(0x3fe0, 0x3fe3).w(out, FUNC(wpc_out_device::out_w));
+	map(0x3fe4, 0x3fe4).nopr().w(lamp, FUNC(wpc_lamp_device::row_w));
+	map(0x3fe5, 0x3fe5).nopr().w(lamp, FUNC(wpc_lamp_device::col_w));
+	map(0x3fe6, 0x3fe6).w(out, FUNC(wpc_out_device::gi_w));
+	map(0x3fe7, 0x3fe7).portr("DSW");
+	map(0x3fe8, 0x3fe8).portr("DOOR");
+	map(0x3fe9, 0x3fe9).r(pic, FUNC(wpc_pic_device::read));
+	map(0x3fea, 0x3fea).w(pic, FUNC(wpc_pic_device::write));
 
-	AM_RANGE(0x3ff2, 0x3ff2) AM_DEVWRITE("out", wpc_out_device, led_w)
-	AM_RANGE(0x3ff3, 0x3ff3) AM_READNOP AM_WRITE(irq_ack_w)
-	AM_RANGE(0x3ff4, 0x3ff7) AM_DEVICE("shift", wpc_shift_device, registers)
-	AM_RANGE(0x3ff8, 0x3ff8) AM_READ(firq_src_r) AM_WRITENOP // ack?
-	AM_RANGE(0x3ffa, 0x3ffb) AM_READ(rtc_r)
-	AM_RANGE(0x3ffc, 0x3ffc) AM_WRITE(bank_w)
-	AM_RANGE(0x3ffd, 0x3ffe) AM_NOP // memory protection stuff?
-	AM_RANGE(0x3fff, 0x3fff) AM_READWRITE(zc_r, watchdog_w)
+	map(0x3ff2, 0x3ff2).w(out, FUNC(wpc_out_device::led_w));
+	map(0x3ff3, 0x3ff3).nopr().w(FUNC(wpc_s_state::irq_ack_w));
+	map(0x3ff4, 0x3ff7).m("shift", FUNC(wpc_shift_device::registers));
+	map(0x3ff8, 0x3ff8).r(FUNC(wpc_s_state::firq_src_r)).nopw(); // ack?
+	map(0x3ffa, 0x3ffb).r(FUNC(wpc_s_state::rtc_r));
+	map(0x3ffc, 0x3ffc).w(FUNC(wpc_s_state::bank_w));
+	map(0x3ffd, 0x3ffe).noprw(); // memory protection stuff?
+	map(0x3fff, 0x3fff).rw(FUNC(wpc_s_state::zc_r), FUNC(wpc_s_state::watchdog_w));
 
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x78000)
-ADDRESS_MAP_END
+	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x8000, 0xffff).rom().region("maincpu", 0x78000);
+}
 
 READ8_MEMBER(wpc_s_state::dcs_data_r)
 {
@@ -262,7 +264,7 @@ void wpc_s_state::init()
 	save_item(NAME(zc));
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, corv)
+void wpc_s_state::init_corv()
 {
 	pic->set_serial("536 123456 12345 123");
 	lamp->set_names(lamps_corv);
@@ -270,7 +272,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, corv)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, dh)
+void wpc_s_state::init_dh()
 {
 	pic->set_serial("530 123456 12345 123");
 	lamp->set_names(lamps_dh);
@@ -278,7 +280,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, dh)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, i500)
+void wpc_s_state::init_i500()
 {
 	pic->set_serial("526 123456 12345 123");
 	lamp->set_names(lamps_i500);
@@ -286,7 +288,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, i500)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, jb)
+void wpc_s_state::init_jb()
 {
 	pic->set_serial("551 123456 12345 123");
 	lamp->set_names(lamps_jb);
@@ -294,7 +296,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, jb)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, jm)
+void wpc_s_state::init_jm()
 {
 	pic->set_serial("542 123456 12345 123");
 	lamp->set_names(lamps_jm);
@@ -302,7 +304,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, jm)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, nf)
+void wpc_s_state::init_nf()
 {
 	pic->set_serial("525 123456 12345 123");
 	lamp->set_names(lamps_nf);
@@ -310,7 +312,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, nf)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, rs)
+void wpc_s_state::init_rs()
 {
 	pic->set_serial("524 123456 12345 123");
 	lamp->set_names(lamps_rs);
@@ -318,7 +320,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, rs)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, fs)
+void wpc_s_state::init_fs()
 {
 	pic->set_serial("529 123456 12345 123");
 	lamp->set_names(lamps_fs);
@@ -326,7 +328,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, fs)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, ts)
+void wpc_s_state::init_ts()
 {
 	pic->set_serial("532 123456 12345 123");
 	lamp->set_names(lamps_ts);
@@ -334,7 +336,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, ts)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, tom)
+void wpc_s_state::init_tom()
 {
 	pic->set_serial("124 123456 12345 123");
 	lamp->set_names(lamps_tom);
@@ -342,7 +344,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, tom)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, wd)
+void wpc_s_state::init_wd()
 {
 	pic->set_serial("544 123456 12345 123");
 	lamp->set_names(lamps_wd);
@@ -350,7 +352,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, wd)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, wcs)
+void wpc_s_state::init_wcs()
 {
 	pic->set_serial("531 123456 12345 123");
 	lamp->set_names(lamps_wcs);
@@ -358,7 +360,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, wcs)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, tfs)
+void wpc_s_state::init_tfs()
 {
 	pic->set_serial("648 123456 12345 123");
 	lamp->set_names(nullptr);
@@ -1971,18 +1973,19 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(wpc_s_state::wpc_s)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(8'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(wpc_s_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wpc_s_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(8'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(wpc_s_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_s_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_s_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
 
-	MCFG_WPC_SHIFT_ADD("shift")
-	MCFG_WPC_PIC_ADD("pic")
-	MCFG_WPC_LAMP_ADD("lamp")
-	MCFG_WPC_OUT_ADD("out", 5)
-	MCFG_WPC_DMD_ADD("dmd", WRITELINE(wpc_s_state, scanline_irq))
+	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
+	MCFG_DEVICE_ADD("pic", WPC_PIC, 0)
+	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
+	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 5)
+	MCFG_DEVICE_ADD("dmd", WPC_DMD, 0)
+	MCFG_WPC_DMD_SCANLINE_CALLBACK(WRITELINE(*this, wpc_s_state, scanline_irq))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
 MACHINE_CONFIG_END
 
@@ -2132,6 +2135,17 @@ ROM_START(jb_10b)
 	ROM_LOAD("jack1_0b.rom", 0x00000, 0x80000, CRC(da3b2735) SHA1(f895b1548107052f469d8e3fa205bce6113962d9))
 	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD16_BYTE("jbsnd_u2.rom", 0x000000, 0x080000, CRC(b116d59f) SHA1(c87c82d7fa4ca40d337fb59476b0b1c90dff86f0))
+	ROM_LOAD16_BYTE("jbsnd_u3.rom", 0x200000, 0x080000, CRC(76ad3aad) SHA1(012b44c48d1cbb282eb763e40db40b141397f426))
+	ROM_LOAD16_BYTE("jbsnd_u4.rom", 0x400000, 0x080000, CRC(038b1309) SHA1(a6e337476902ed9ec5123fe4e088a0608c0d5f48))
+	ROM_LOAD16_BYTE("jbsnd_u5.rom", 0x600000, 0x080000, CRC(0957e2ad) SHA1(0fb4e3fdb949b0979721064162a41cfba84d0013))
+	ROM_LOAD16_BYTE("jbsnd_u6.rom", 0x800000, 0x080000, CRC(7a1e2c3d) SHA1(0c6ccb937328509cb0a87e4c557a64c13bbed2db))
+ROM_END
+
+ROM_START(jb_04a) // WPC-S 5-Board
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("jack0_4a.rom", 0x00000, 0x80000, CRC(cc02e024) SHA1(5de886e4631c3c99b83f6692482259e2a6bf0bca))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("jbsnd_04a.u2", 0x000000, 0x080000, CRC(f90ebf0f) SHA1(d18362c1946504dd456f6edc28bb5812d584874a))
 	ROM_LOAD16_BYTE("jbsnd_u3.rom", 0x200000, 0x080000, CRC(76ad3aad) SHA1(012b44c48d1cbb282eb763e40db40b141397f426))
 	ROM_LOAD16_BYTE("jbsnd_u4.rom", 0x400000, 0x080000, CRC(038b1309) SHA1(a6e337476902ed9ec5123fe4e088a0608c0d5f48))
 	ROM_LOAD16_BYTE("jbsnd_u5.rom", 0x600000, 0x080000, CRC(0957e2ad) SHA1(0fb4e3fdb949b0979721064162a41cfba84d0013))
@@ -2738,61 +2752,62 @@ ROM_START(tfs_12)
 	ROM_LOAD16_BYTE("u2_10.rom", 0x000000, 0x080000, CRC(d705b41e) SHA1(a7811b4bb1b2b5f7e3d1a809da3363b97dfca680))
 ROM_END
 
-GAME(1994,  corv_21,    0,          wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "Bally",        "Corvette (2.1)",                    MACHINE_MECHANICAL)
-GAME(1994,  corv_px4,   corv_21,    wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "Bally",        "Corvette (PX4)",                    MACHINE_MECHANICAL)
-GAME(1994,  corv_lx1,   corv_21,    wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "Bally",        "Corvette (LX1)",                    MACHINE_MECHANICAL)
-GAME(1994,  corv_lx2,   corv_21,    wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "Bally",        "Corvette (LX2)",                    MACHINE_MECHANICAL)
-GAME(1994,  corv_la1,   corv_21,    wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "Bally",        "Corvette (LA1)",                    MACHINE_MECHANICAL)
-GAME(1995,  dh_lx2,     0,          wpc_s,  dh,   wpc_s_state,  dh,    ROT0,  "Williams",     "Dirty Harry (LX-2)",                MACHINE_MECHANICAL)
-GAME(1995,  dh_lf2,     dh_lx2,     wpc_s,  dh,   wpc_s_state,  dh,    ROT0,  "Williams",     "Dirty Harry (LF-2)",                MACHINE_MECHANICAL)
-GAME(1995,  i500_11r,   0,          wpc_s,  i500, wpc_s_state,  i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1R)",           MACHINE_MECHANICAL)
-GAME(1995,  i500_10r,   i500_11r,   wpc_s,  i500, wpc_s_state,  i500,  ROT0,  "Bally",        "Indianapolis 500 (1.0R)",           MACHINE_MECHANICAL)
-GAME(1995,  i500_11b,   i500_11r,   wpc_s,  i500, wpc_s_state,  i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",    MACHINE_MECHANICAL)
-GAME(1995,  jb_10r,     0,          wpc_s,  jb,   wpc_s_state,  jb,    ROT0,  "Williams",     "Jack*Bot (1.0R)",                   MACHINE_MECHANICAL)
-GAME(1995,  jb_10b,     jb_10r,     wpc_s,  jb,   wpc_s_state,  jb,    ROT0,  "Williams",     "Jack*Bot (1.0B) (Belgium/Canada)",  MACHINE_MECHANICAL)
-GAME(1995,  jm_12r,     0,          wpc_s,  jm,   wpc_s_state,  jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2R)",            MACHINE_MECHANICAL)
-GAME(1995,  jm_12b,     jm_12r,     wpc_s,  jm,   wpc_s_state,  jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2B) Belgium",    MACHINE_MECHANICAL)
-GAME(1995,  jm_05r,     jm_12r,     wpc_s,  jm,   wpc_s_state,  jm,    ROT0,  "Williams",     "Johnny Mnemonic (0.5R)",            MACHINE_MECHANICAL)
-GAME(1995,  nf_23x,     0,          wpc_s,  nf,   wpc_s_state,  nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3X)",  MACHINE_MECHANICAL)
-GAME(1995,  nf_23,      nf_23x,     wpc_s,  nf,   wpc_s_state,  nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3)",   MACHINE_MECHANICAL)
-GAME(1995,  nf_23f,     nf_23x,     wpc_s,  nf,   wpc_s_state,  nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3F)",  MACHINE_MECHANICAL)
-GAME(1995,  nf_22,      nf_23x,     wpc_s,  nf,   wpc_s_state,  nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.2)",   MACHINE_MECHANICAL)
-GAME(1995,  nf_20,      nf_23x,     wpc_s,  nf,   wpc_s_state,  nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.0)",   MACHINE_MECHANICAL)
-GAME(1995,  nf_10,      nf_23x,     wpc_s,  nf,   wpc_s_state,  nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (1.0)",   MACHINE_MECHANICAL)
-GAME(1994,  rs_l6,      0,          wpc_s,  rs,   wpc_s_state,  rs,    ROT0,  "Williams",     "Red and Ted's Road Show (L-6)",     MACHINE_MECHANICAL)
-GAME(1994,  rs_la5,     rs_l6,      wpc_s,  rs,   wpc_s_state,  rs,    ROT0,  "Williams",     "Red and Ted's Road Show (La-5)",    MACHINE_MECHANICAL)
-GAME(1994,  rs_lx5,     rs_l6,      wpc_s,  rs,   wpc_s_state,  rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-5)",    MACHINE_MECHANICAL)
-GAME(1994,  rs_la4,     rs_l6,      wpc_s,  rs,   wpc_s_state,  rs,    ROT0,  "Williams",     "Red and Ted's Road Show (La-4)",    MACHINE_MECHANICAL)
-GAME(1994,  rs_lx4,     rs_l6,      wpc_s,  rs,   wpc_s_state,  rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-4)",    MACHINE_MECHANICAL)
-GAME(1994,  rs_lx3,     rs_l6,      wpc_s,  rs,   wpc_s_state,  rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-3)",    MACHINE_MECHANICAL)
-GAME(1994,  rs_lx2,     rs_l6,      wpc_s,  rs,   wpc_s_state,  rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-2)",    MACHINE_MECHANICAL)
-GAME(1994,  fs_lx5,     0,          wpc_s,  fs,   wpc_s_state,  fs,    ROT0,  "Williams",     "The Flintstones (LX-5)",            MACHINE_MECHANICAL)
-GAME(1994,  fs_lx2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  fs,    ROT0,  "Williams",     "The Flintstones (LX-2)",            MACHINE_MECHANICAL)
-GAME(1994,  fs_sp2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  fs,    ROT0,  "Williams",     "The Flintstones (SP-2)",            MACHINE_MECHANICAL)
-GAME(1994,  fs_lx4,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  fs,    ROT0,  "Williams",     "The Flintstones (LX-4)",            MACHINE_MECHANICAL)
-GAME(1995,  ts_lx5,     0,          wpc_s,  ts,   wpc_s_state,  ts,    ROT0,  "Bally",        "The Shadow (LX-5)",                 MACHINE_MECHANICAL)
-GAME(1995,  ts_lh6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  ts,    ROT0,  "Bally",        "The Shadow (LH-6)",                 MACHINE_MECHANICAL)
-GAME(1995,  ts_lx4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  ts,    ROT0,  "Bally",        "The Shadow (LX-4)",                 MACHINE_MECHANICAL)
-GAME(1995,  ts_la4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  ts,    ROT0,  "Bally",        "The Shadow (LA-4)",                 MACHINE_MECHANICAL)
-GAME(1994,  ts_la2,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  ts,    ROT0,  "Bally",        "The Shadow (LA-2)",                 MACHINE_MECHANICAL)
-GAME(1994,  ts_pa1,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  ts,    ROT0,  "Bally",        "The Shadow (PA-1)",                 MACHINE_MECHANICAL)
-GAME(1994,  ts_lf6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  ts,    ROT0,  "Bally",        "The Shadow (LF-6) French",          MACHINE_MECHANICAL)
-GAME(1994,  ts_lm6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  ts,    ROT0,  "Bally",        "The Shadow (LM-6) Mild",            MACHINE_MECHANICAL)
-GAME(1995,  tom_13,     0,          wpc_s,  tom,  wpc_s_state,  tom,   ROT0,  "Bally",        "Theatre Of Magic (1.3X)",           MACHINE_MECHANICAL)
-GAME(2005,  tom_14h,    tom_13,     wpc_s,  tom,  wpc_s_state,  tom,   ROT0,  "Bally",        "Theatre Of Magic (1.4H)",           MACHINE_MECHANICAL)
-GAME(1995,  tom_12,     tom_13,     wpc_s,  tom,  wpc_s_state,  tom,   ROT0,  "Bally",        "Theatre Of Magic (1.2X)",           MACHINE_MECHANICAL)
-GAME(1995,  tom_10f,    tom_13,     wpc_s,  tom,  wpc_s_state,  tom,   ROT0,  "Bally",        "Theatre Of Magic (1.0 French)",     MACHINE_MECHANICAL)
-GAME(1995,  tom_06,     tom_13,     wpc_s,  tom,  wpc_s_state,  tom,   ROT0,  "Bally",        "Theatre Of Magic (0.6a)",           MACHINE_MECHANICAL)
-GAME(1995,  wd_12,      0,          wpc_s,  wd,   wpc_s_state,  wd,    ROT0,  "Bally",        "Who Dunnit (1.2)",                  MACHINE_MECHANICAL)
-GAME(1995,  wd_12g,     wd_12,      wpc_s,  wd,   wpc_s_state,  wd,    ROT0,  "Bally",        "Who Dunnit (1.2 Germany)",          MACHINE_MECHANICAL)
-GAME(1995,  wd_11,      wd_12,      wpc_s,  wd,   wpc_s_state,  wd,    ROT0,  "Bally",        "Who Dunnit (1.1)",                  MACHINE_MECHANICAL)
-GAME(1995,  wd_10r,     wd_12,      wpc_s,  wd,   wpc_s_state,  wd,    ROT0,  "Bally",        "Who Dunnit (1.0 R)",                MACHINE_MECHANICAL)
-GAME(1995,  wd_10g,     wd_12,      wpc_s,  wd,   wpc_s_state,  wd,    ROT0,  "Bally",        "Who Dunnit (1.0 Germany)",          MACHINE_MECHANICAL)
-GAME(1995,  wd_10f,     wd_12,      wpc_s,  wd,   wpc_s_state,  wd,    ROT0,  "Bally",        "Who Dunnit (1.0 French)",           MACHINE_MECHANICAL)
-GAME(1995,  wd_03r,     wd_12,      wpc_s,  wd,   wpc_s_state,  wd,    ROT0,  "Bally",        "Who Dunnit (0.3 R)",                MACHINE_MECHANICAL)
-GAME(1995,  wd_048r,    wd_12,      wpc_s,  wd,   wpc_s_state,  wd,    ROT0,  "Bally",        "Who Dunnit (0.48 R)",               MACHINE_MECHANICAL)
-GAME(1994,  wcs_l2,     0,          wpc_s,  wcs,  wpc_s_state,  wcs,   ROT0,  "Bally",        "World Cup Soccer (Lx-2)",           MACHINE_MECHANICAL)
-GAME(1994,  wcs_la2,    wcs_l2,     wpc_s,  wcs,  wpc_s_state,  wcs,   ROT0,  "Bally",        "World Cup Soccer (La-2)",           MACHINE_MECHANICAL)
-GAME(1994,  wcs_p2,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  wcs,   ROT0,  "Bally",        "World Cup Soccer (Pa-2)",           MACHINE_MECHANICAL)
-GAME(1994,  wcs_p3,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  wcs,   ROT0,  "Bally",        "World Cup Soccer (Px-3)",           MACHINE_MECHANICAL)
-GAME(1994,  tfs_12,     0,          wpc_s,  tfs,  wpc_s_state,  tfs,   ROT0,  "Bally",        "WPC Test Fixture: Security (1.2)",  MACHINE_MECHANICAL)
+GAME(1994,  corv_21,    0,          wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (2.1)",                    MACHINE_MECHANICAL)
+GAME(1994,  corv_px4,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (PX4)",                    MACHINE_MECHANICAL)
+GAME(1994,  corv_lx1,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LX1)",                    MACHINE_MECHANICAL)
+GAME(1994,  corv_lx2,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LX2)",                    MACHINE_MECHANICAL)
+GAME(1994,  corv_la1,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LA1)",                    MACHINE_MECHANICAL)
+GAME(1995,  dh_lx2,     0,          wpc_s,  dh,   wpc_s_state,  init_dh,    ROT0,  "Williams",     "Dirty Harry (LX-2)",                MACHINE_MECHANICAL)
+GAME(1995,  dh_lf2,     dh_lx2,     wpc_s,  dh,   wpc_s_state,  init_dh,    ROT0,  "Williams",     "Dirty Harry (LF-2)",                MACHINE_MECHANICAL)
+GAME(1995,  i500_11r,   0,          wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1R)",           MACHINE_MECHANICAL)
+GAME(1995,  i500_10r,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.0R)",           MACHINE_MECHANICAL)
+GAME(1995,  i500_11b,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",    MACHINE_MECHANICAL)
+GAME(1995,  jb_10r,     0,          wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0R)",                   MACHINE_MECHANICAL)
+GAME(1995,  jb_10b,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0B) (Belgium/Canada)",  MACHINE_MECHANICAL)
+GAME(1995,  jb_04a,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (0.4A prototype)",         MACHINE_MECHANICAL)
+GAME(1995,  jm_12r,     0,          wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2R)",            MACHINE_MECHANICAL)
+GAME(1995,  jm_12b,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2B) Belgium",    MACHINE_MECHANICAL)
+GAME(1995,  jm_05r,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (0.5R)",            MACHINE_MECHANICAL)
+GAME(1995,  nf_23x,     0,          wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3X)",  MACHINE_MECHANICAL)
+GAME(1995,  nf_23,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3)",   MACHINE_MECHANICAL)
+GAME(1995,  nf_23f,     nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3F)",  MACHINE_MECHANICAL)
+GAME(1995,  nf_22,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.2)",   MACHINE_MECHANICAL)
+GAME(1995,  nf_20,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.0)",   MACHINE_MECHANICAL)
+GAME(1995,  nf_10,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (1.0)",   MACHINE_MECHANICAL)
+GAME(1994,  rs_l6,      0,          wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (L-6)",     MACHINE_MECHANICAL)
+GAME(1994,  rs_la5,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (La-5)",    MACHINE_MECHANICAL)
+GAME(1994,  rs_lx5,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-5)",    MACHINE_MECHANICAL)
+GAME(1994,  rs_la4,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (La-4)",    MACHINE_MECHANICAL)
+GAME(1994,  rs_lx4,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-4)",    MACHINE_MECHANICAL)
+GAME(1994,  rs_lx3,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-3)",    MACHINE_MECHANICAL)
+GAME(1994,  rs_lx2,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-2)",    MACHINE_MECHANICAL)
+GAME(1994,  fs_lx5,     0,          wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-5)",            MACHINE_MECHANICAL)
+GAME(1994,  fs_lx2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-2)",            MACHINE_MECHANICAL)
+GAME(1994,  fs_sp2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (SP-2)",            MACHINE_MECHANICAL)
+GAME(1994,  fs_lx4,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-4)",            MACHINE_MECHANICAL)
+GAME(1995,  ts_lx5,     0,          wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LX-5)",                 MACHINE_MECHANICAL)
+GAME(1995,  ts_lh6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LH-6)",                 MACHINE_MECHANICAL)
+GAME(1995,  ts_lx4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LX-4)",                 MACHINE_MECHANICAL)
+GAME(1995,  ts_la4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LA-4)",                 MACHINE_MECHANICAL)
+GAME(1994,  ts_la2,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LA-2)",                 MACHINE_MECHANICAL)
+GAME(1994,  ts_pa1,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (PA-1)",                 MACHINE_MECHANICAL)
+GAME(1994,  ts_lf6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LF-6) French",          MACHINE_MECHANICAL)
+GAME(1994,  ts_lm6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LM-6) Mild",            MACHINE_MECHANICAL)
+GAME(1995,  tom_13,     0,          wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.3X)",           MACHINE_MECHANICAL)
+GAME(2005,  tom_14h,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.4H)",           MACHINE_MECHANICAL)
+GAME(1995,  tom_12,     tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.2X)",           MACHINE_MECHANICAL)
+GAME(1995,  tom_10f,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.0 French)",     MACHINE_MECHANICAL)
+GAME(1995,  tom_06,     tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (0.6a)",           MACHINE_MECHANICAL)
+GAME(1995,  wd_12,      0,          wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.2)",                  MACHINE_MECHANICAL)
+GAME(1995,  wd_12g,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.2 Germany)",          MACHINE_MECHANICAL)
+GAME(1995,  wd_11,      wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.1)",                  MACHINE_MECHANICAL)
+GAME(1995,  wd_10r,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 R)",                MACHINE_MECHANICAL)
+GAME(1995,  wd_10g,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 Germany)",          MACHINE_MECHANICAL)
+GAME(1995,  wd_10f,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 French)",           MACHINE_MECHANICAL)
+GAME(1995,  wd_03r,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (0.3 R)",                MACHINE_MECHANICAL)
+GAME(1995,  wd_048r,    wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (0.48 R)",               MACHINE_MECHANICAL)
+GAME(1994,  wcs_l2,     0,          wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Lx-2)",           MACHINE_MECHANICAL)
+GAME(1994,  wcs_la2,    wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (La-2)",           MACHINE_MECHANICAL)
+GAME(1994,  wcs_p2,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Pa-2)",           MACHINE_MECHANICAL)
+GAME(1994,  wcs_p3,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Px-3)",           MACHINE_MECHANICAL)
+GAME(1994,  tfs_12,     0,          wpc_s,  tfs,  wpc_s_state,  init_tfs,   ROT0,  "Bally",        "WPC Test Fixture: Security (1.2)",  MACHINE_MECHANICAL)

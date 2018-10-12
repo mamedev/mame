@@ -6,13 +6,14 @@
 #pragma once
 
 #include "machine/i8255.h"
+#include "emupal.h"
 
 typedef device_delegate<uint16_t (uint16_t)> igs017_igs031_palette_scramble_delegate;
 
-#define MCFG_PALETTE_SCRAMBLE_CB( _class, _method) \
+#define MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( _class, _method) \
 	downcast<igs017_igs031_device &>(*device).set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
-#define MCFG_REVERSE_TEXT_BITS \
+#define MCFG_IGS017_IGS031_REVERSE_TEXT_BITS \
 	downcast<igs017_igs031_device &>(*device).set_text_reverse_bits();
 
 class igs017_igs031_device : public device_t,
@@ -22,7 +23,6 @@ class igs017_igs031_device : public device_t,
 {
 public:
 	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 
 	template <typename Object> void set_palette_scramble_cb(Object &&cb) { m_palette_scramble_cb = std::forward<Object>(cb); }
 

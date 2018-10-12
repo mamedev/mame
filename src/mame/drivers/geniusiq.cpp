@@ -158,6 +158,7 @@ PCB - German Version:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -166,14 +167,6 @@ PCB - German Version:
 class geniusiq_state : public driver_device
 {
 public:
-	enum
-	{
-		IQ128_ROM_CART      = 0x00,
-		IQ128_ROMLESS1_CART = 0x01,
-		IQ128_ROMLESS2_CART = 0x02,
-		IQ128_NO_CART       = 0x03
-	};
-
 	geniusiq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -183,6 +176,21 @@ public:
 		m_mouse_gfx(*this, "mouse_gfx"),
 		m_cart_state(IQ128_NO_CART)
 	{ }
+
+	void iqtv512(machine_config &config);
+	void iq128(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(send_input);
+	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
+
+private:
+	enum
+	{
+		IQ128_ROM_CART      = 0x00,
+		IQ128_ROMLESS1_CART = 0x01,
+		IQ128_ROMLESS2_CART = 0x02,
+		IQ128_NO_CART       = 0x03
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -197,8 +205,6 @@ public:
 
 	DECLARE_READ16_MEMBER(input_r);
 	DECLARE_WRITE16_MEMBER(mouse_pos_w);
-	DECLARE_INPUT_CHANGED_MEMBER(send_input);
-	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
 	DECLARE_WRITE16_MEMBER(gfx_base_w);
 	DECLARE_WRITE16_MEMBER(gfx_dest_w);
 	DECLARE_WRITE16_MEMBER(gfx_color_w);
@@ -211,10 +217,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( iq128_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( iq128_cart );
 
-	void iqtv512(machine_config &config);
-	void iq128(machine_config &config);
 	void geniusiq_mem(address_map &map);
-private:
+
 	uint16_t      m_gfx_y;
 	uint16_t      m_gfx_x;
 	uint32_t      m_gfx_base;
@@ -415,30 +419,31 @@ INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
 }
 
 
-ADDRESS_MAP_START(geniusiq_state::geniusiq_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1FFFFF) AM_ROM
-	AM_RANGE(0x200000, 0x23FFFF) AM_RAM
-	AM_RANGE(0x300000, 0x30FFFF) AM_RAM     AM_SHARE("vram")
-	AM_RANGE(0x310000, 0x31FFFF) AM_RAM
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_DEVREADWRITE8("flash", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x600300, 0x600301) AM_READ(input_r)
+void geniusiq_state::geniusiq_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1FFFFF).rom();
+	map(0x200000, 0x23FFFF).ram();
+	map(0x300000, 0x30FFFF).ram().share("vram");
+	map(0x310000, 0x31FFFF).ram();
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x600300, 0x600301).r(FUNC(geniusiq_state::input_r));
 	//AM_RANGE(0x600500, 0x60050f)                      // read during IRQ 5
 	//AM_RANGE(0x600600, 0x600605)                      // sound ??
-	AM_RANGE(0x600606, 0x600609) AM_WRITE(gfx_base_w)
-	AM_RANGE(0x60060a, 0x60060b) AM_WRITE(gfx_idx_w)
-	AM_RANGE(0x600802, 0x600803) AM_READ(cart_state_r)  // cartridge state
-	AM_RANGE(0x600108, 0x600109) AM_READ(unk0_r)        // read before run a BASIC program
-	AM_RANGE(0x600918, 0x600919) AM_READ(unk0_r)        // loop at start if bit 0 is set
-	AM_RANGE(0x601008, 0x601009) AM_READ(unk_r)         // unknown, read at start and expect that bit 2 changes several times before continue
-	AM_RANGE(0x601010, 0x601011) AM_READ(unk0_r)        // loop at start if bit 1 is set
-	AM_RANGE(0x601018, 0x60101b) AM_WRITE(gfx_dest_w)
-	AM_RANGE(0x60101c, 0x60101f) AM_WRITE(gfx_color_w)
-	AM_RANGE(0x601060, 0x601063) AM_WRITE(mouse_pos_w)
-	AM_RANGE(0x601100, 0x6011ff) AM_RAM     AM_SHARE("mouse_gfx")   // mouse cursor gfx (24x16)
-	AM_RANGE(0xa00000, 0xafffff) AM_DEVREAD("cartslot", generic_slot_device, read16_rom)
+	map(0x600606, 0x600609).w(FUNC(geniusiq_state::gfx_base_w));
+	map(0x60060a, 0x60060b).w(FUNC(geniusiq_state::gfx_idx_w));
+	map(0x600802, 0x600803).r(FUNC(geniusiq_state::cart_state_r));  // cartridge state
+	map(0x600108, 0x600109).r(FUNC(geniusiq_state::unk0_r));        // read before run a BASIC program
+	map(0x600918, 0x600919).r(FUNC(geniusiq_state::unk0_r));        // loop at start if bit 0 is set
+	map(0x601008, 0x601009).r(FUNC(geniusiq_state::unk_r));         // unknown, read at start and expect that bit 2 changes several times before continue
+	map(0x601010, 0x601011).r(FUNC(geniusiq_state::unk0_r));        // loop at start if bit 1 is set
+	map(0x601018, 0x60101b).w(FUNC(geniusiq_state::gfx_dest_w));
+	map(0x60101c, 0x60101f).w(FUNC(geniusiq_state::gfx_color_w));
+	map(0x601060, 0x601063).w(FUNC(geniusiq_state::mouse_pos_w));
+	map(0x601100, 0x6011ff).ram().share("mouse_gfx");   // mouse cursor gfx (24x16)
+	map(0xa00000, 0xafffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
 	// 0x600000 : some memory mapped hardware
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( geniusiq )
@@ -694,9 +699,9 @@ DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
 
 MACHINE_CONFIG_START(geniusiq_state::iq128)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // The main crystal is at 32MHz, not sure whats the CPU freq
-	MCFG_CPU_PROGRAM_MAP(geniusiq_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(geniusiq_state, irq6_line_hold,  125)  // the internal clock is increased by 1 sec every 125 interrupts
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // The main crystal is at 32MHz, not sure whats the CPU freq
+	MCFG_DEVICE_PROGRAM_MAP(geniusiq_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(geniusiq_state, irq6_line_hold,  125)  // the internal clock is increased by 1 sec every 125 interrupts
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -711,7 +716,7 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	MCFG_PALETTE_INIT_OWNER(geniusiq_state, geniusiq)
 
 	/* internal flash */
-	MCFG_AMD_29F010_ADD("flash")
+	AMD_29F010(config, "flash");
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "iq128_cart")
@@ -722,12 +727,12 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq128")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(geniusiq_state::iqtv512)
+void geniusiq_state::iqtv512(machine_config &config)
+{
 	iq128(config);
 	/* internal flash */
-	MCFG_DEVICE_REMOVE("flash")
-	MCFG_AMD_29F040_ADD("flash")
-MACHINE_CONFIG_END
+	AMD_29F040(config.replace(), "flash");
+}
 
 /* ROM definition */
 
@@ -753,8 +758,8 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE    INPUT        STATE           INIT  COMPANY             FULLNAME                                     FLAGS
-COMP( 1997, iq128,      0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius IQ 128 (Germany)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1997, iq128_fr,   iq128,  0,      iq128,     geniusiq,    geniusiq_state, 0,    "Video Technology", "Genius IQ 128 (France)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, iqtv512,    0,      0,      iqtv512,   geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius IQ TV 512 (Germany)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, itunlim,    0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "VTech IT Unlimited (UK)",                   MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT        CLASS           INIT        COMPANY             FULLNAME                      FLAGS
+COMP( 1997, iq128,    0,      0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "Genius IQ 128 (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1997, iq128_fr, iq128,  0,      iq128,   geniusiq,    geniusiq_state, empty_init, "Video Technology", "Genius IQ 128 (France)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, iqtv512,  0,      0,      iqtv512, geniusiq_de, geniusiq_state, empty_init, "Video Technology", "Genius IQ TV 512 (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, itunlim,  0,      0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "VTech IT Unlimited (UK)",    MACHINE_NO_SOUND)

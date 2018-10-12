@@ -71,6 +71,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -83,7 +84,8 @@ public:
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc0_attr(*this, "sc0_attr"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void vvillage(machine_config &config);
@@ -110,6 +112,7 @@ private:
 	tilemap_t *m_sc0_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	output_finder<5> m_lamps;
 };
 
 
@@ -127,6 +130,7 @@ TILE_GET_INFO_MEMBER(caswin_state::get_sc0_tile_info)
 
 void caswin_state::video_start()
 {
+	m_lamps.resolve();
 	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(caswin_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
@@ -190,32 +194,32 @@ WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
 	---- --x- lamp button 2
 	---- ---x lamp button 1
 	*/
-	output().set_led_value(0, data & 0x01);
-	output().set_led_value(1, data & 0x02);
-	output().set_led_value(2, data & 0x04);
-	output().set_led_value(3, data & 0x08);
-	output().set_led_value(4, data & 0x10);
+
+	for (unsigned i = 0; i < 5; i++)
+		m_lamps[i] = BIT(data, i);
 }
 
-ADDRESS_MAP_START(caswin_state::vvillage_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_READ(vvillage_rng_r) //accessed by caswin only
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_SHARE("sc0_attr")
-ADDRESS_MAP_END
+void caswin_state::vvillage_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa000).r(FUNC(caswin_state::vvillage_rng_r)); //accessed by caswin only
+	map(0xe000, 0xe7ff).ram().share("nvram");
+	map(0xf000, 0xf3ff).ram().w(FUNC(caswin_state::sc0_vram_w)).share("sc0_vram");
+	map(0xf800, 0xfbff).ram().w(FUNC(caswin_state::sc0_attr_w)).share("sc0_attr");
+}
 
-ADDRESS_MAP_START(caswin_state::vvillage_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("IN0")
-	AM_RANGE(0x11,0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x10,0x10) AM_WRITE(vvillage_scroll_w)
-	AM_RANGE(0x11,0x11) AM_WRITE(vvillage_vregs_w)
-	AM_RANGE(0x12,0x12) AM_WRITE(vvillage_lamps_w)
-	AM_RANGE(0x13,0x13) AM_WRITE(vvillage_output_w)
-ADDRESS_MAP_END
+void caswin_state::vvillage_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("IN0");
+	map(0x11, 0x11).portr("IN1");
+	map(0x10, 0x10).w(FUNC(caswin_state::vvillage_scroll_w));
+	map(0x11, 0x11).w(FUNC(caswin_state::vvillage_vregs_w));
+	map(0x12, 0x12).w(FUNC(caswin_state::vvillage_lamps_w));
+	map(0x13, 0x13).w(FUNC(caswin_state::vvillage_output_w));
+}
 
 
 static INPUT_PORTS_START( vvillage )
@@ -299,7 +303,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( vvillage )
+static GFXDECODE_START( gfx_vvillage )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -332,10 +336,10 @@ PALETTE_INIT_MEMBER(caswin_state, caswin)
 
 MACHINE_CONFIG_START(caswin_state::vvillage)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(vvillage_mem)
-	MCFG_CPU_IO_MAP(vvillage_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", caswin_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(vvillage_mem)
+	MCFG_DEVICE_IO_MAP(vvillage_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", caswin_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -346,15 +350,15 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 	MCFG_SCREEN_UPDATE_DRIVER(caswin_state, screen_update_vvillage)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vvillage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vvillage)
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(caswin_state, caswin)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 4000000 / 4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 4000000 / 4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -425,7 +429,7 @@ ROM_START( rcasinoo )
 	ROM_LOAD( "prom1.e8",  0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) ) /* MB7051 */
 ROM_END
 
-GAME( 1984, rcasino,  0,       vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, rcasino1, rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, caswin,   rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Aristocrat",       "Casino Winner",                               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino,  0,       vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino1, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, caswin,   rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Aristocrat",       "Casino Winner",                               MACHINE_IMPERFECT_GRAPHICS )

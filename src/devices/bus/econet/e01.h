@@ -17,7 +17,7 @@
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
 #include "machine/buffer.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 #include "machine/mc146818.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
@@ -92,8 +92,7 @@ private:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<input_buffer_device> m_scsi_ctrl_in;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
 

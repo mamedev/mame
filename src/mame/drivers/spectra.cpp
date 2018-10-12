@@ -54,37 +54,43 @@ public:
 		, m_snsnd(*this, "snsnd")
 		, m_switch(*this, "SWITCH.%u", 0)
 		, m_p_ram(*this, "nvram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void spectra(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
-	void spectra(machine_config &config);
 	void spectra_map(address_map &map);
-private:
+
 	uint8_t m_porta;
 	uint8_t m_portb;
 	uint8_t m_t_c;
 	uint8_t m_out_offs;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76477_device> m_snsnd;
 	required_ioport_array<4> m_switch;
 	required_shared_ptr<uint8_t> m_p_ram;
+	output_finder<40> m_digits;
 };
 
 
-ADDRESS_MAP_START(spectra_state::spectra_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("nvram") // battery backed, 2x 5101L
-	AM_RANGE(0x0100, 0x017f) AM_RAM // RIOT RAM
-	AM_RANGE(0x0180, 0x019f) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x0400, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void spectra_state::spectra_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xfff);
+	map(0x0000, 0x00ff).ram().share("nvram"); // battery backed, 2x 5101L
+	map(0x0100, 0x017f).ram(); // RIOT RAM
+	map(0x0180, 0x019f).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0400, 0x0fff).rom();
+}
 
 static INPUT_PORTS_START( spectra )
 	PORT_START("SWITCH.0")
@@ -178,7 +184,7 @@ WRITE8_MEMBER( spectra_state::portb_w )
 TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::nmitimer)
 {
 	if (m_t_c > 0x10)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_t_c++;
 }
@@ -195,7 +201,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 	{
 		uint8_t data = m_p_ram[m_out_offs];
 		uint8_t segments = patterns[data&15] | (BIT(data, 4) ? 0x80 : 0);
-		output().set_digit_value(m_out_offs, segments);
+		m_digits[m_out_offs] = segments;
 	}
 	else
 	if (m_out_offs < 0x6f)
@@ -225,29 +231,29 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 
 MACHINE_CONFIG_START(spectra_state::spectra)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(3'579'545)/4)  // actually a M6503
-	MCFG_CPU_PROGRAM_MAP(spectra_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)  // actually a M6503
+	MCFG_DEVICE_PROGRAM_MAP(spectra_map)
 
-	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(spectra_state, porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(spectra_state, porta_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(spectra_state, portb_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(spectra_state, portb_w))
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	riot6532_device &riot(RIOT6532(config, "riot", XTAL(3'579'545)/4));
+	riot.in_pa_callback().set(FUNC(spectra_state::porta_r));
+	riot.out_pa_callback().set(FUNC(spectra_state::porta_w));
+	riot.in_pb_callback().set(FUNC(spectra_state::portb_r));
+	riot.out_pb_callback().set(FUNC(spectra_state::portb_w));
+	riot.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", spectra_state, nmitimer, attotime::from_hz(120))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("outtimer", spectra_state, outtimer, attotime::from_hz(1200))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_spectra)
+	config.set_default_layout(layout_spectra);
 
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_M(1000), RES_M(1000), CAP_N(0)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(470))                    // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_N(1), RES_K(22))       // attack_decay_cap + attack_res
@@ -275,4 +281,4 @@ ROM_START(spectra)
 ROM_END
 
 
-GAME(1979,  spectra,  0,  spectra,  spectra, spectra_state, 0,  ROT0,  "Valley", "Spectra IV", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  spectra,  0,  spectra,  spectra, spectra_state, empty_init, ROT0, "Valley", "Spectra IV", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

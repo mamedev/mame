@@ -7,7 +7,7 @@
 **************************************************************************/
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -16,6 +16,7 @@
 #include "audio/midway.h"
 #include "audio/csd.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 /* constants */
 #define MAIN_OSC_MCR_I      XTAL(19'968'000)
@@ -24,8 +25,8 @@
 class mcr_state : public driver_device
 {
 public:
-	mcr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mcr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
@@ -63,16 +64,16 @@ public:
 	DECLARE_READ8_MEMBER(demoderb_ip2_r);
 	DECLARE_WRITE8_MEMBER(demoderb_op4_w);
 
-	DECLARE_DRIVER_INIT(mcr_91490);
-	DECLARE_DRIVER_INIT(kroozr);
-	DECLARE_DRIVER_INIT(solarfox);
-	DECLARE_DRIVER_INIT(kick);
-	DECLARE_DRIVER_INIT(twotiger);
-	DECLARE_DRIVER_INIT(demoderb);
-	DECLARE_DRIVER_INIT(wacko);
-	DECLARE_DRIVER_INIT(mcr_90010);
-	DECLARE_DRIVER_INIT(dotrone);
-	DECLARE_DRIVER_INIT(journey);
+	void init_mcr_91490();
+	void init_kroozr();
+	void init_solarfox();
+	void init_kick();
+	void init_twotiger();
+	void init_demoderb();
+	void init_wacko();
+	void init_mcr_90010();
+	void init_dotrone();
+	void init_journey();
 
 	uint32_t screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcr_interrupt);
@@ -136,10 +137,12 @@ private:
 class mcr_dpoker_state : public mcr_state
 {
 public:
-	mcr_dpoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mcr_state(mconfig, type, tag),
+	mcr_dpoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mcr_state(mconfig, type, tag),
 		m_coin_in_timer(*this, "coinin"),
-		m_hopper_timer(*this, "hopper") {}
+		m_hopper_timer(*this, "hopper"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_READ8_MEMBER(ip0_r);
 	DECLARE_WRITE8_MEMBER(lamps1_w);
@@ -152,15 +155,20 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(hopper_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(coin_in_callback);
 
-	DECLARE_DRIVER_INIT(dpoker);
+	void init_dpoker();
 
 	void mcr_90009_dp(machine_config &config);
+
+protected:
+	virtual void machine_start() override { mcr_state::machine_start(); m_lamps.resolve(); }
+
 private:
 	uint8_t m_coin_status;
 	uint8_t m_output;
 
 	required_device<timer_device> m_coin_in_timer;
 	required_device<timer_device> m_hopper_timer;
+	output_finder<14> m_lamps;
 };
 
 class mcr_nflfoot_state : public mcr_state
@@ -185,7 +193,7 @@ public:
 	TIMER_CALLBACK_MEMBER(ipu_watchdog_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(ipu_interrupt);
 
-	DECLARE_DRIVER_INIT(nflfoot);
+	void init_nflfoot();
 
 	void mcr_91490_ipu(machine_config &config);
 	void ipu_91695_map(address_map &map);
@@ -198,7 +206,7 @@ private:
 	int m_ipu_sio_txdb;
 	emu_timer *m_ipu_watchdog_timer;
 
-	required_device<cpu_device> m_ipu;
+	required_device<z80_device> m_ipu;
 	required_device<z80dart_device> m_ipu_sio;
 	required_device<z80ctc_device> m_ipu_ctc;
 	required_device<z80pio_device> m_ipu_pio0;

@@ -115,9 +115,6 @@ void hp48_state::rs232_start_recv_byte(uint8_t data)
 /* end of send event */
 TIMER_CALLBACK_MEMBER(hp48_state::rs232_byte_sent_cb)
 {
-	//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine().device("rs232_x"));
-	//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine().device("rs232_k"));
-
 	LOG_SERIAL(("%f hp48_state::rs232_byte_sent_cb: end of send, data=%02x\n", machine().time().as_double(), param));
 
 	m_io[0x12] &= ~3; /* clear byte sending and buffer full */
@@ -127,10 +124,6 @@ TIMER_CALLBACK_MEMBER(hp48_state::rs232_byte_sent_cb)
 	{
 		pulse_irq(SATURN_IRQ_LINE);
 	}
-
-	/* protocol action */
-	//if ( xmodem && xmodem->exists() ) xmodem_receive_byte( &xmodem->device(), param );
-	//else if ( kermit && kermit->exists() ) kermit_receive_byte( &kermit->device(), param );
 }
 
 /* CPU initiates a send event */
@@ -445,17 +438,8 @@ READ8_MEMBER(hp48_state::io_r)
 	/* serial */
 	case 0x15:
 	{
-		/* second nibble of received data */
-
-		//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine().device("rs232_x"));
-		//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine().device("rs232_k"));
-
 		m_io[0x11] &= ~1;  /* clear byte received */
 		data = m_io[offset];
-
-		/* protocol action */
-		//if ( xmodem && xmodem->exists() ) xmodem_byte_transmitted( &xmodem->device() );
-		//else if ( kermit && kermit->exists() ) kermit_byte_transmitted( &kermit->device() );
 		break;
 	}
 
@@ -468,17 +452,33 @@ READ8_MEMBER(hp48_state::io_r)
 		data = 0;
 		if ( HP48_G_SERIES )
 		{
-			if ( m_port_size[1] ) data |= 1;
-			if ( m_port_size[0] ) data |= 2;
-			if ( m_port_size[1] && m_port_write[1] ) data |= 4;
-			if ( m_port_size[0] && m_port_write[0] ) data |= 8;
+			if (m_port[1].found() && m_port[1]->port_size() > 0)
+			{
+				data |= 1;
+				if (m_port[1]->port_write())
+					data |= 4;
+			}
+			if (m_port[0].found() && m_port[0]->port_size() > 0)
+			{
+				data |= 2;
+				if (m_port[0]->port_write())
+					data |= 8;
+			}
 		}
 		else
 		{
-			if ( m_port_size[0] ) data |= 1;
-			if ( m_port_size[1] ) data |= 2;
-			if ( m_port_size[0] && m_port_write[0] ) data |= 4;
-			if ( m_port_size[1] && m_port_write[1] ) data |= 8;
+			if (m_port[0].found() && m_port[0]->port_size() > 0)
+			{
+				data |= 1;
+				if (m_port[0]->port_write())
+					data |= 4;
+			}
+			if (m_port[1].found() && m_port[1]->port_size() > 0)
+			{
+				data |= 2;
+				if (m_port[1]->port_write())
+					data |= 8;
+			}
 		}
 		LOG(( "%s: card info read %02x\n", machine().describe_context(), data ));
 		break;
@@ -523,7 +523,7 @@ WRITE8_MEMBER(hp48_state::hp49_bank_w)
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
 	{
-		LOG(( "%05x %f hp49_bank_w: off=%03x\n", space.device().safe_pcbase(), machine().time().as_double(), offset ));
+		LOG(("%s %f hp49_bank_w: off=%03x\n", machine().describe_context(), machine().time().as_double(), offset));
 		m_bank_switch = offset;
 		apply_modules();
 	}
@@ -649,11 +649,11 @@ void hp48_state::apply_modules()
 	else if (HP48_G_SERIES)
 	{
 		/* port 2 bank switch */
-		if (m_port_size[1] > 0)
+		if (m_port[1].found() && m_port[1]->port_size() > 0)
 		{
-			int off = (m_bank_switch << 16) % m_port_size[1];
+			int off = (m_bank_switch << 16) % m_port[1]->port_size();
 			LOG(("hp48_state::apply_modules: port 2 offset is %i\n", off));
-			m_modules[HP48_NCE3].data = m_port_data[1].get() + off;
+			m_modules[HP48_NCE3].data = m_port[1]->port_data() + off;
 		}
 
 		/* ROM A19 (hi 256 KB) / NCE3 (port 2) control switch */
@@ -897,119 +897,14 @@ void hp48_state::encode_nibble(uint8_t* dst, uint8_t* src, int size)
 	}
 }
 
-
-
-/* ----- card images ------ */
-DEFINE_DEVICE_TYPE(HP48_PORT, hp48_port_image_device, "hp48_port_image", "HP48 memory card")
-
-/* helper for load and create */
-void hp48_port_image_device::fill_port()
-{
-	hp48_state *state = machine().driver_data<hp48_state>();
-	int size = state->m_port_size[m_port];
-	LOG(("hp48_port_image_device::fill_port: %s module=%i size=%i rw=%i\n", tag(), m_module, size, state->m_port_write[m_port]));
-	state->m_port_data[m_port] = make_unique_clear<uint8_t[]>(2 * size);
-	state->m_modules[m_module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
-	state->m_modules[m_module].read     = read8_delegate();
-	state->m_modules[m_module].write    = write8_delegate();
-	state->m_modules[m_module].isnop    = state->m_port_write[m_port] ? 0 : 1;
-	state->m_modules[m_module].data     = (void*)state->m_port_data[m_port].get();
-	state->apply_modules();
-}
-
-/* helper for start and unload */
-void hp48_port_image_device::unfill_port()
-{
-	hp48_state *state = machine().driver_data<hp48_state>();
-	LOG(("hp48_port_image_device::unfill_port\n"));
-	state->m_modules[m_module].off_mask = 0x00fff;  /* 2 KB */
-	state->m_modules[m_module].read     = read8_delegate();
-	state->m_modules[m_module].write    = write8_delegate();
-	state->m_modules[m_module].data     = nullptr;
-	state->m_modules[m_module].isnop    = 1;
-	state->m_port_size[m_port]          = 0;
-}
-
-
-image_init_result hp48_port_image_device::call_load()
-{
-	hp48_state *state = machine().driver_data<hp48_state>();
-	int size = length();
-	if (size == 0) size = m_max_size; /* default size */
-	LOG(("hp48_port_image load: size=%i\n", size));
-
-	/* check size */
-	if ((size < 32*1024) || (size > m_max_size) || (size & (size-1)))
-	{
-		logerror("hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, m_max_size);
-		return image_init_result::FAIL;
-	}
-
-	state->m_port_size[m_port] = size;
-	state->m_port_write[m_port] = !is_readonly();
-	fill_port();
-	fread(state->m_port_data[m_port].get(), state->m_port_size[m_port] );
-	state->decode_nibble(state->m_port_data[m_port].get(), state->m_port_data[m_port].get(), state->m_port_size[m_port]);
-	return image_init_result::PASS;
-}
-
-image_init_result hp48_port_image_device::call_create(int format_type, util::option_resolution *format_options)
-{
-	hp48_state *state = machine().driver_data<hp48_state>();
-	int size = m_max_size;
-	LOG(( "hp48_port_image create: size=%i\n", size ));
-	/* XXX defaults to max_size; get user-specified size instead */
-
-	/* check size */
-	/* size must be a power of 2 between 32K and max_size */
-	if ( (size < 32*1024) || (size > m_max_size) || (size & (size-1)) )
-	{
-		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, m_max_size );
-		return image_init_result::FAIL;
-	}
-
-	state->m_port_size[m_port] = size;
-	state->m_port_write[m_port] = 1;
-	fill_port();
-	return image_init_result::PASS;
-}
-
-void hp48_port_image_device::call_unload()
-{
-	hp48_state *state = machine().driver_data<hp48_state>();
-	LOG(("hp48_port image unload: %s size=%i rw=%i\n", tag(), state->m_port_size[m_port], state->m_port_write[m_port]));
-	if (state->m_port_write[m_port])
-	{
-		state->encode_nibble(state->m_port_data[m_port].get(), state->m_port_data[m_port].get(), state->m_port_size[m_port]);
-		fseek(0, SEEK_SET);
-		fwrite(state->m_port_data[m_port].get(), state->m_port_size[m_port]);
-	}
-	state->m_port_data[m_port] = nullptr;
-	unfill_port();
-	state->apply_modules();
-}
-
-void hp48_port_image_device::device_start()
-{
-	LOG(("hp48_port_image start\n"));
-	unfill_port();
-}
-
-hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP48_PORT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
-{
-}
-
 /***************************************************************************
     MACHINES
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(hp48_state,hp48)
+void hp48_state::init_hp48()
 {
-	int i;
 	LOG(( "hp48: driver init called\n" ));
-	for ( i = 0; i < 6; i++ )
+	for (int i = 0; i < 6; i++)
 	{
 		m_modules[i].off_mask = 0x00fff;  /* 2 KB */
 		m_modules[i].read     = read8_delegate();
@@ -1017,8 +912,6 @@ DRIVER_INIT_MEMBER(hp48_state,hp48)
 		m_modules[i].data     = nullptr;
 		m_modules[i].isnop    = 0;
 	}
-	m_port_size[0] = 0;
-	m_port_size[1] = 0;
 	m_rom = nullptr;
 }
 
@@ -1042,7 +935,7 @@ void hp48_state::base_machine_start(hp48_models model)
 		HP48_GX_MODEL ? (128 * 1024) : (32 * 1024);
 
 	uint8_t *ram = auto_alloc_array(machine(), uint8_t, 2 * ram_size);
-	machine().device<nvram_device>("nvram")->set_base(ram, 2 * ram_size);
+	subdevice<nvram_device>("nvram")->set_base(ram, 2 * ram_size);
 
 
 	/* ROM load */

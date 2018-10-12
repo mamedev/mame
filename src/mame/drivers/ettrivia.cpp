@@ -31,6 +31,7 @@ Notes:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,6 +49,9 @@ public:
 	{
 	}
 
+	void ettrivia(machine_config &config);
+
+private:
 	int m_palreg;
 	int m_gfx_bank;
 	int m_question_bank;
@@ -75,7 +79,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<ay8912_device, 3> m_ay;
-	void ettrivia(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -155,21 +158,23 @@ WRITE8_MEMBER(ettrivia_state::b800_w)
 	m_b800_prev = data;
 }
 
-ADDRESS_MAP_START(ettrivia_state::cpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ettrivia_control_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITENOP
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
-	AM_RANGE(0xb000, 0xb000) AM_READ(b000_r) AM_WRITE(b000_w)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(b800_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ettrivia_fg_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ettrivia_bg_w) AM_SHARE("bg_videoram")
-ADDRESS_MAP_END
+void ettrivia_state::cpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x9000, 0x9000).w(FUNC(ettrivia_state::ettrivia_control_w));
+	map(0x9800, 0x9800).nopw();
+	map(0xa000, 0xa000).nopw();
+	map(0xb000, 0xb000).r(FUNC(ettrivia_state::b000_r)).w(FUNC(ettrivia_state::b000_w));
+	map(0xb800, 0xb800).w(FUNC(ettrivia_state::b800_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(ettrivia_state::ettrivia_fg_w)).share("fg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(ettrivia_state::ettrivia_bg_w)).share("bg_videoram");
+}
 
-ADDRESS_MAP_START(ettrivia_state::io_map)
-	AM_RANGE(0x0000, 0xffff) AM_READ(ettrivia_question_r)
-ADDRESS_MAP_END
+void ettrivia_state::io_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(ettrivia_state::ettrivia_question_r));
+}
 
 static INPUT_PORTS_START( ettrivia )
 	PORT_START("IN0")
@@ -207,7 +212,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( ettrivia )
+static GFXDECODE_START( gfx_ettrivia )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
@@ -287,18 +292,18 @@ uint32_t ettrivia_state::screen_update_ettrivia(screen_device &screen, bitmap_in
 INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 {
 	if( ioport("COIN")->read() & 0x01 )
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 MACHINE_CONFIG_START(ettrivia_state::ettrivia)
-	MCFG_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ettrivia_state,  ettrivia_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ettrivia_state,  ettrivia_interrupt)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -309,21 +314,21 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	MCFG_SCREEN_UPDATE_DRIVER(ettrivia_state, screen_update_ettrivia)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ettrivia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ettrivia)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ettrivia_state, ettrivia)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay3", AY8912, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -471,8 +476,8 @@ ROM_START( strvmstr )
 	ROM_LOAD( "entrtn.hi3",   0x38000, 0x8000, CRC(a8cf603b) SHA1(6efa5753d8d252452b3f5be8635a28364e4d8de1) )
 ROM_END
 
-GAME( 1985, promutrv,  0,        ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
-GAME( 1985, promutrva, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
-GAME( 1985, promutrvb, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
-GAME( 1985, promutrvc, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
-GAME( 1986, strvmstr,  0,        ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master",                       MACHINE_WRONG_COLORS )
+GAME( 1985, promutrv,  0,        ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
+GAME( 1985, promutrva, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
+GAME( 1985, promutrvb, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
+GAME( 1985, promutrvc, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
+GAME( 1986, strvmstr,  0,        ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master",                       MACHINE_WRONG_COLORS )

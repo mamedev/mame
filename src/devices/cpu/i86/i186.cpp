@@ -118,14 +118,13 @@ const uint8_t i80186_cpu_device::m_i80186_timing[] =
 	33,             /* (80186) BOUND */
 };
 
-DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "I80186")
-DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "I80188")
+DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "Intel I80186")
+DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "Intel I80188")
 
 i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	m_fetch_xor = 0;
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
@@ -133,7 +132,6 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *
 	: i80186_cpu_device(mconfig, I80186, tag, owner, clock, 16)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	m_fetch_xor = BYTE_XOR_LE(0);
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
@@ -166,7 +164,7 @@ device_memory_interface::space_config_vector i80186_cpu_device::memory_space_con
 
 uint8_t i80186_cpu_device::fetch()
 {
-	uint8_t data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
+	uint8_t data = m_or8(update_pc());
 	m_ip++;
 	return data;
 }
@@ -230,7 +228,7 @@ void i80186_cpu_device::execute_run()
 			}
 		}
 
-		debugger_instruction_hook( this, update_pc() );
+		debugger_instruction_hook( update_pc() );
 
 		uint8_t op = fetch_op();
 
@@ -691,7 +689,7 @@ uint8_t i80186_cpu_device::read_port_byte(uint16_t port)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
-		uint16_t ret = internal_port_r(*m_io, (port >> 1) - ((m_reloc & 0xff) << 7), (port & 1) ? 0xff00 : 0x00ff);
+		uint16_t ret = internal_port_r(*m_io, (port >> 1) & 0x7f, (port & 1) ? 0xff00 : 0x00ff);
 		return (port & 1) ? (ret >> 8) : (ret & 0xff);
 	}
 	return m_io->read_byte(port);
@@ -706,7 +704,7 @@ uint16_t i80186_cpu_device::read_port_word(uint16_t port)
 			uint8_t low = read_port_byte(port);
 			return read_port_byte(port + 1) << 8 | low;
 		}
-		return internal_port_r(*m_io, (port >> 1) - ((m_reloc & 0xff) << 7));
+		return internal_port_r(*m_io, (port >> 1) & 0x7f);
 	}
 	return m_io->read_word_unaligned(port);
 }
@@ -714,7 +712,7 @@ uint16_t i80186_cpu_device::read_port_word(uint16_t port)
 void i80186_cpu_device::write_port_byte(uint16_t port, uint8_t data)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
-		internal_port_w(*m_io, (port >> 1) - ((m_reloc & 0xff) << 7), (port & 1) ? (data << 8) : data, (port & 1) ? 0xff00 : 0x00ff);
+		internal_port_w(*m_io, (port >> 1) & 0x7f, (port & 1) ? (data << 8) : data, (port & 1) ? 0xff00 : 0x00ff);
 	else
 		m_io->write_byte(port, data);
 }
@@ -729,10 +727,58 @@ void i80186_cpu_device::write_port_word(uint16_t port, uint16_t data)
 			write_port_byte(port + 1, data >> 8);
 		}
 		else
-			internal_port_w(*m_io, (port >> 1) - ((m_reloc & 0xff) << 7), data);
+			internal_port_w(*m_io, (port >> 1) & 0x7f, data);
 	}
 	else
 		m_io->write_word_unaligned(port, data);
+}
+
+uint8_t i80186_cpu_device::read_byte(uint32_t addr)
+{
+	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
+	{
+		uint16_t ret = internal_port_r(*m_program, (addr >> 1) & 0x7f, (addr & 1) ? 0xff00 : 0x00ff);
+		return (addr & 1) ? (ret >> 8) : (ret & 0xff);
+	}
+	return m_program->read_byte(addr);
+}
+
+uint16_t i80186_cpu_device::read_word(uint32_t addr)
+{
+	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
+	{
+		if(addr & 1)
+		{
+			uint8_t low = read_byte(addr);
+			return read_byte(addr + 1) << 8 | low;
+		}
+		return internal_port_r(*m_program, (addr >> 1) & 0x7f);
+	}
+	return m_program->read_word_unaligned(addr);
+}
+
+void i80186_cpu_device::write_byte(uint32_t addr, uint8_t data)
+{
+	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
+		internal_port_w(*m_program, (addr >> 1) & 0x7f, (addr & 1) ? (data << 8) : data, (addr & 1) ? 0xff00 : 0x00ff);
+	else
+		m_program->write_byte(addr, data);
+}
+
+void i80186_cpu_device::write_word(uint32_t addr, uint16_t data)
+{
+	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
+	{
+		if(addr & 1)
+		{
+			write_byte(addr, data & 0xff);
+			write_byte(addr + 1, data >> 8);
+		}
+		else
+			internal_port_w(*m_program, (addr >> 1) & 0x7f, data);
+	}
+	else
+		m_program->write_word_unaligned(addr, data);
 }
 
 /*************************************
@@ -1735,15 +1781,6 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 
 		case 0x7f:
 			if (LOG_PORTS) logerror("%05X:80186 relocation register = %04X\n", m_pc, data);
-			if ((data & 0x1fff) != (m_reloc & 0x1fff))
-			{
-				uint32_t newmap = (data & 0xfff) << 8;
-				uint32_t oldmap = (m_reloc & 0xfff) << 8;
-				if (m_reloc & 0x1000)
-					m_program->unmap_readwrite(oldmap, oldmap + 0xff);
-				if (data & 0x1000) // TODO: make work with 80188 if needed
-					m_program->install_readwrite_handler(newmap, newmap + 0xff, read16_delegate(FUNC(i80186_cpu_device::internal_port_r), this), write16_delegate(FUNC(i80186_cpu_device::internal_port_w), this));
-			}
 			m_reloc = data;
 
 			break;

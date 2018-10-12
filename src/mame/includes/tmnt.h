@@ -12,15 +12,11 @@
 #include "video/k053936.h"
 #include "video/k054000.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 
 class tmnt_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_NMI
-	};
-
 	tmnt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
@@ -42,6 +38,29 @@ public:
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
+
+	void cuebrick(machine_config &config);
+	void blswhstl(machine_config &config);
+	void ssriders(machine_config &config);
+	void tmnt2(machine_config &config);
+	void lgtnfght(machine_config &config);
+	void thndrx2(machine_config &config);
+	void prmrsocr(machine_config &config);
+	void sunsetbl(machine_config &config);
+	void glfgreat(machine_config &config);
+	void tmnt(machine_config &config);
+	void mia(machine_config &config);
+	void punkshot(machine_config &config);
+
+	void init_mia();
+	void init_tmnt();
+	void init_cuebrick();
+
+private:
+	enum
+	{
+		TIMER_NMI
+	};
 
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -139,9 +158,7 @@ public:
 	DECLARE_WRITE8_MEMBER(glfgreat_sound_w);
 	DECLARE_WRITE8_MEMBER(tmnt_upd_start_w);
 	DECLARE_READ8_MEMBER(tmnt_upd_busy_r);
-	DECLARE_DRIVER_INIT(mia);
-	DECLARE_DRIVER_INIT(tmnt);
-	DECLARE_DRIVER_INIT(cuebrick);
+
 	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
 	TILE_GET_INFO_MEMBER(prmrsocr_get_roz_tile_info);
 	DECLARE_MACHINE_START(common);
@@ -183,18 +200,6 @@ public:
 	K052109_CB_MEMBER(blswhstl_tile_callback);
 	SAMPLES_START_CB_MEMBER(tmnt_decode_sample);
 
-	void cuebrick(machine_config &config);
-	void blswhstl(machine_config &config);
-	void ssriders(machine_config &config);
-	void tmnt2(machine_config &config);
-	void lgtnfght(machine_config &config);
-	void thndrx2(machine_config &config);
-	void prmrsocr(machine_config &config);
-	void sunsetbl(machine_config &config);
-	void glfgreat(machine_config &config);
-	void tmnt(machine_config &config);
-	void mia(machine_config &config);
-	void punkshot(machine_config &config);
 	void blswhstl_main_map(address_map &map);
 	void cuebrick_main_map(address_map &map);
 	void glfgreat_audio_map(address_map &map);
@@ -215,6 +220,6 @@ public:
 	void tmnt2_main_map(address_map &map);
 	void tmnt_audio_map(address_map &map);
 	void tmnt_main_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

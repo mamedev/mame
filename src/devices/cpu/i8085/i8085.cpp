@@ -197,9 +197,9 @@ op_call 8085    11        +7(18)   -2(9)
 */
 
 
-DEFINE_DEVICE_TYPE(I8080,  i8080_cpu_device,  "i8080",  "8080")
-DEFINE_DEVICE_TYPE(I8080A, i8080a_cpu_device, "i8080a", "8080A")
-DEFINE_DEVICE_TYPE(I8085A, i8085a_cpu_device, "i8085a", "8085A")
+DEFINE_DEVICE_TYPE(I8080,  i8080_cpu_device,  "i8080",  "Intel 8080")
+DEFINE_DEVICE_TYPE(I8080A, i8080a_cpu_device, "i8080a", "Intel 8080A")
+DEFINE_DEVICE_TYPE(I8085A, i8085a_cpu_device, "i8085a", "Intel 8085A")
 
 
 i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -345,8 +345,8 @@ void i8085a_cpu_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
-	m_opcode_direct = has_space(AS_OPCODES) ? space(AS_OPCODES).direct<0>() : m_direct;
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
+	m_opcode_cache = has_space(AS_OPCODES) ? space(AS_OPCODES).cache<0, 0, ENDIANNESS_LITTLE>() : m_cache;
 	m_io = &space(AS_IO);
 
 	/* resolve callbacks */
@@ -372,7 +372,7 @@ void i8085a_cpu_device::device_start()
 	save_item(NAME(m_trap_im_copy));
 	save_item(NAME(m_sod_state));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -464,9 +464,9 @@ void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-util::disasm_interface *i8085a_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8085a_cpu_device::create_disassembler()
 {
-	return new i8085_disassembler;
+	return std::make_unique<i8085_disassembler>();
 }
 
 
@@ -669,21 +669,21 @@ u8 i8085a_cpu_device::get_rim_value()
 // memory access
 u8 i8085a_cpu_device::read_arg()
 {
-	return m_direct->read_byte(m_PC.w.l++);
+	return m_cache->read_byte(m_PC.w.l++);
 }
 
 PAIR i8085a_cpu_device::read_arg16()
 {
 	PAIR p;
-	p.b.l = m_direct->read_byte(m_PC.w.l++);
-	p.b.h = m_direct->read_byte(m_PC.w.l++);
+	p.b.l = m_cache->read_byte(m_PC.w.l++);
+	p.b.h = m_cache->read_byte(m_PC.w.l++);
 	return p;
 }
 
 u8 i8085a_cpu_device::read_op()
 {
 	set_status(0xa2); // instruction fetch
-	return m_opcode_direct->read_byte(m_PC.w.l++);
+	return m_opcode_cache->read_byte(m_PC.w.l++);
 }
 
 u8 i8085a_cpu_device::read_mem(u32 a)
@@ -854,7 +854,7 @@ void i8085a_cpu_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, m_PC.d);
+		debugger_instruction_hook(m_PC.d);
 
 		/* the instruction after an EI does not take an interrupt, so
 		   we cannot check immediately; handle post-EI behavior here */

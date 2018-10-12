@@ -46,7 +46,7 @@ protected:
 };
 
 
-SLOT_INTERFACE_EXTERN( msx_audio_keyboards );
+void msx_audio_keyboards(device_slot_interface &device);
 
 
 #endif // MAME_BUS_MSX_CART_MSX_AUDIO_KB_H

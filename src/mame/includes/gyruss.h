@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 class gyruss_state : public driver_device
@@ -27,6 +28,11 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void gyruss(machine_config &config);
+
+	void init_gyruss();
+
+private:
 	/* devices/memory pointers */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -59,17 +65,14 @@ public:
 	DECLARE_WRITE8_MEMBER(gyruss_dac_w);
 	DECLARE_WRITE8_MEMBER(gyruss_filter0_w);
 	DECLARE_WRITE8_MEMBER(gyruss_filter1_w);
-	DECLARE_DRIVER_INIT(gyruss);
 	TILE_GET_INFO_MEMBER(gyruss_get_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(gyruss);
 	uint32_t screen_update_gyruss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(master_vblank_irq);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void filter_w(address_space &space, int chip, int data );
-	void gyruss(machine_config &config);
 	void audio_cpu1_io_map(address_map &map);
 	void audio_cpu1_map(address_map &map);
 	void audio_cpu2_io_map(address_map &map);

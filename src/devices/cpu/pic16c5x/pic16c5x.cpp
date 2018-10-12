@@ -77,46 +77,51 @@
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(PIC16C54, pic16c54_device, "pic16c54", "PIC16C54")
-DEFINE_DEVICE_TYPE(PIC16C55, pic16c55_device, "pic16c55", "PIC16C55")
-DEFINE_DEVICE_TYPE(PIC16C56, pic16c56_device, "pic16c56", "PIC16C56")
-DEFINE_DEVICE_TYPE(PIC16C57, pic16c57_device, "pic16c57", "PIC16C57")
-DEFINE_DEVICE_TYPE(PIC16C58, pic16c58_device, "pic16c58", "PIC16C58")
+DEFINE_DEVICE_TYPE(PIC16C54, pic16c54_device, "pic16c54", "Microchip PIC16C54")
+DEFINE_DEVICE_TYPE(PIC16C55, pic16c55_device, "pic16c55", "Microchip PIC16C55")
+DEFINE_DEVICE_TYPE(PIC16C56, pic16c56_device, "pic16c56", "Microchip PIC16C56")
+DEFINE_DEVICE_TYPE(PIC16C57, pic16c57_device, "pic16c57", "Microchip PIC16C57")
+DEFINE_DEVICE_TYPE(PIC16C58, pic16c58_device, "pic16c58", "Microchip PIC16C58")
 
-DEFINE_DEVICE_TYPE(PIC1650,  pic1650_device,  "pic1650",  "PIC1650")
-DEFINE_DEVICE_TYPE(PIC1655,  pic1655_device,  "pic1655",  "PIC1655")
+DEFINE_DEVICE_TYPE(PIC1650,  pic1650_device,  "pic1650",  "Microchip PIC1650")
+DEFINE_DEVICE_TYPE(PIC1655,  pic1655_device,  "pic1655",  "Microchip PIC1655")
 
 
 /****************************************************************************
  *  Internal Memory Maps
  ****************************************************************************/
 
-ADDRESS_MAP_START(pic16c5x_device::pic16c5x_rom_9)
-	AM_RANGE(0x000, 0x1ff) AM_ROM
-ADDRESS_MAP_END
+void pic16c5x_device::pic16c5x_rom_9(address_map &map)
+{
+	map(0x000, 0x1ff).rom();
+}
 
-ADDRESS_MAP_START(pic16c5x_device::pic16c5x_ram_5)
-	AM_RANGE(0x00, 0x07) AM_RAM
-	AM_RANGE(0x08, 0x0f) AM_RAM
-	AM_RANGE(0x10, 0x1f) AM_RAM
-ADDRESS_MAP_END
+void pic16c5x_device::pic16c5x_ram_5(address_map &map)
+{
+	map(0x00, 0x07).ram();
+	map(0x08, 0x0f).ram();
+	map(0x10, 0x1f).ram();
+}
 
-ADDRESS_MAP_START(pic16c5x_device::pic16c5x_rom_10)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void pic16c5x_device::pic16c5x_rom_10(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(pic16c5x_device::pic16c5x_rom_11)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void pic16c5x_device::pic16c5x_rom_11(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(pic16c5x_device::pic16c5x_ram_7)
-	AM_RANGE(0x00, 0x07) AM_RAM AM_MIRROR(0x60)
-	AM_RANGE(0x08, 0x0f) AM_RAM AM_MIRROR(0x60)
-	AM_RANGE(0x10, 0x1f) AM_RAM
-	AM_RANGE(0x30, 0x3f) AM_RAM
-	AM_RANGE(0x50, 0x5f) AM_RAM
-	AM_RANGE(0x70, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void pic16c5x_device::pic16c5x_ram_7(address_map &map)
+{
+	map(0x00, 0x07).ram().mirror(0x60);
+	map(0x08, 0x0f).ram().mirror(0x60);
+	map(0x10, 0x1f).ram();
+	map(0x30, 0x3f).ram();
+	map(0x50, 0x5f).ram();
+	map(0x70, 0x7f).ram();
+}
 
 
 pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, int picmodel)
@@ -184,9 +189,9 @@ device_memory_interface::space_config_vector pic16c5x_device::memory_space_confi
 	};
 }
 
-util::disasm_interface *pic16c5x_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pic16c5x_device::create_disassembler()
 {
-	return new pic16c5x_disassembler;
+	return std::make_unique<pic16c5x_disassembler>();
 }
 
 
@@ -197,7 +202,7 @@ void pic16c5x_device::update_internalram_ptr()
 
 
 
-#define PIC16C5x_RDOP(A)         (m_direct->read_word(A))
+#define PIC16C5x_RDOP(A)         (m_cache->read_word(A))
 #define PIC16C5x_RAM_RDMEM(A)    ((uint8_t)m_data->read_byte(A))
 #define PIC16C5x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
 
@@ -883,7 +888,7 @@ enum
 void pic16c5x_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 
 	m_read_a.resolve_safe(0);
@@ -945,7 +950,7 @@ void pic16c5x_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_PREVPC).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_OPTION).formatstr("%13s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1167,7 +1172,7 @@ void pic16c5x_device::execute_run()
 		{
 			m_count_pending = false;
 			m_inst_cycles = 1;
-			debugger_instruction_hook(this, m_PC);
+			debugger_instruction_hook(m_PC);
 			if (WDTE) {
 				pic16c5x_update_watchdog(1);
 			}
@@ -1181,7 +1186,7 @@ void pic16c5x_device::execute_run()
 
 			m_PREVPC = m_PC;
 
-			debugger_instruction_hook(this, m_PC);
+			debugger_instruction_hook(m_PC);
 
 			m_opcode.d = M_RDOP(m_PC);
 			m_PC++;

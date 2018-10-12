@@ -147,10 +147,6 @@ Common Issues:
 
 - Some ROMs aren't used (priorities?)
 - Screen control register (priorities, layers enabling etc.) - Where is it?
-- In cischeat & bigrun, at the start of some levels, you can see the empty
-  scrolling layers as they are filled. In f1gpstar, I'm unsure whether they
-  are correct in a few places (e.g. in the attract mode, where cars move
-  horizontally, the wheels don't follow for this reason, I think
 - Sound communication not quite right: see Test Mode
 
 To Do:
@@ -159,8 +155,21 @@ To Do:
 - Use the Tilemap Manager for the road layers (when this kind of layers
   will be supported) for performance and better priority support.
   A line based zooming is additionally needed for f1gpstar.
+- Wild Pilot road needs some serious work (empty gaps, ship "floating"
+  in stage 6 etc.);
 - Force feedback :)
+- Major cleanups needed, especially in video file;
+- Split the non-road games into own driver, merge them with Alien Command,
+  device-ify the sprite chip;
 
+BTANBs:
+- In cischeat & bigrun, at the start of some levels, you can see the empty
+  scrolling layers as they are filled. In f1gpstar, I'm unsure whether they
+  are correct in a few places (e.g. in the attract mode, where cars move
+  horizontally, the wheels don't follow for this reason, I think)
+  Update: this happens on real HW as well (at least for Big Run);
+- Some serious sprite popups happening in Big Run, again this happens on
+  the reference video too so not a bug.
 
 2008-08
 Dip locations verified for Big Run with the manual. Also added missing dips
@@ -176,6 +185,7 @@ Cisco Heat.
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "machine/jalcrpt.h"
+#include "machine/nvram.h"
 #include "speaker.h"
 
 #include "cischeat.lh"
@@ -196,44 +206,45 @@ Cisco Heat.
 **************************************************************************/
 
 
-ADDRESS_MAP_START(cischeat_state::bigrun_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN1") AM_WRITE(leds_out_w)       // Coins
-	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN2") AM_WRITE(unknown_out_w)    // Buttons
-	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("IN3") AM_WRITE(motor_out_w)      // Motor Limit Switches
-	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("IN4") AM_WRITE(wheel_out_w)      // DSW 1 & 2
-	AM_RANGE(0x080008, 0x080009) AM_DEVREAD("soundlatch2", generic_latch_16_device, read)   // From sound cpu
-	AM_RANGE(0x08000a, 0x08000b) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)  // To sound cpu
-	AM_RANGE(0x08000c, 0x08000d) AM_WRITENOP            // ??
-	AM_RANGE(0x080010, 0x080011) AM_READWRITE(bigrun_ip_select_r, ip_select_w)
-	AM_RANGE(0x080012, 0x080013) AM_WRITE(ip_select_plus1_w)
-	AM_RANGE(0x082000, 0x082005) AM_DEVREADWRITE("scroll0", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082008, 0x08200d) AM_DEVREADWRITE("scroll1", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082100, 0x082105) AM_DEVREADWRITE("scroll2", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082108, 0x082109) AM_NOP                 // ? written with 0 only
-	AM_RANGE(0x082200, 0x082201) AM_READ_PORT("IN5")    // DSW 3 (4 bits)
-	AM_RANGE(0x082208, 0x082209) AM_NOP                 // watchdog reset
-	AM_RANGE(0x082308, 0x082309) AM_WRITE(cischeat_comms_w)
-	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
+void cischeat_state::bigrun_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x080000, 0x080001).portr("IN1").w(FUNC(cischeat_state::leds_out_w));       // Coins
+	map(0x080002, 0x080003).portr("IN2").w(FUNC(cischeat_state::unknown_out_w));    // Buttons
+	map(0x080004, 0x080005).portr("IN3").w(FUNC(cischeat_state::motor_out_w));      // Motor Limit Switches
+	map(0x080006, 0x080007).portr("IN4").w(FUNC(cischeat_state::wheel_out_w));      // DSW 1 & 2
+	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));   // From sound cpu
+	map(0x08000a, 0x08000b).w(m_soundlatch, FUNC(generic_latch_16_device::write));  // To sound cpu
+	map(0x08000c, 0x08000d).nopw();            // ??
+	map(0x080010, 0x080011).rw(FUNC(cischeat_state::bigrun_ip_select_r), FUNC(cischeat_state::ip_select_w));
+	map(0x080012, 0x080013).w(FUNC(cischeat_state::ip_select_plus1_w));
+	map(0x082000, 0x082005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082008, 0x08200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
+	map(0x082200, 0x082201).portr("IN5");    // DSW 3 (4 bits)
+	map(0x082208, 0x082209).noprw();                 // watchdog reset
+	map(0x082308, 0x082309).w(FUNC(cischeat_state::cischeat_comms_w));
+	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
-	/* It's actually 0x840000-0x847ff, divided in four banks and shared with other boards.
+	/* It's actually 0x84000-0x847ff, divided in four banks and shared with other boards.
 	    Each board expects reads from the other boards and writes to own bank.
 	    Amusingly, if you run the communication test as ID = X then soft reset -> ID = Y, what was at ID = X gets an OK in the second test
 	    so it's likely to be the only thing needed. */
-	AM_RANGE(0x084000, 0x0847ff) AM_RAM                                                 // Linking with other units
-	AM_RANGE(0x088000, 0x08bfff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
-	AM_RANGE(0x08c000, 0x08ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
+	map(0x084000, 0x0847ff).ram();                                                 // Linking with other units
+	map(0x088000, 0x08bfff).ram().share("share2"); // Sharedram with sub CPU#2
+	map(0x08c000, 0x08ffff).ram().share("share1"); // Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
-	AM_RANGE(0x094000, 0x097fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
-	AM_RANGE(0x098000, 0x09bfff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
+	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
+	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");     // Scroll ram 1
+	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
 
-	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")            // Palettes
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                         // RAM
-	AM_RANGE(0x100000, 0x13ffff) AM_ROM AM_REGION("user1",0)                                                        // ROM
-ADDRESS_MAP_END
+	map(0x09c000, 0x09ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");            // Palettes
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // RAM
+	map(0x100000, 0x13ffff).rom().region("user1", 0);                                                        // ROM
+}
 
 
 /**************************************************************************
@@ -250,27 +261,28 @@ ADDRESS_MAP_END
     bec00-befff     <               text        */
 
 
-ADDRESS_MAP_START(cischeat_state::cischeat_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN1") AM_WRITE(leds_out_w)       // Coins
-	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN2") AM_WRITE(unknown_out_w)    // Buttons
-	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("IN3") AM_WRITE(motor_out_w)      // Motor Limit Switches
-	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("IN4") AM_WRITE(wheel_out_w)      // DSW 1 & 2
-	AM_RANGE(0x08000a, 0x08000b) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)  // To sound cpu
-	AM_RANGE(0x08000c, 0x08000d) AM_WRITENOP            // ??
-	AM_RANGE(0x080010, 0x080011) AM_READWRITE(cischeat_ip_select_r, ip_select_w)
-	AM_RANGE(0x080012, 0x080013) AM_WRITENOP            // value above + 1
-	AM_RANGE(0x082000, 0x082005) AM_DEVREADWRITE("scroll0", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082008, 0x08200d) AM_DEVREADWRITE("scroll1", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082100, 0x082105) AM_DEVREADWRITE("scroll2", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082108, 0x082109) AM_NOP                 // ? written with 0 only
-	AM_RANGE(0x082200, 0x082201) AM_READ_PORT("IN5")    // DSW 3 (4 bits)
-	AM_RANGE(0x082208, 0x082209) AM_NOP                 // watchdog reset
-	AM_RANGE(0x082300, 0x082301) AM_DEVREAD("soundlatch2", generic_latch_16_device, read) AM_WRITE(cischeat_soundlatch_w) // From sound cpu
-	AM_RANGE(0x082308, 0x082309) AM_WRITE(cischeat_comms_w)
-	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
+void cischeat_state::cischeat_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                                     // ROM
+	map(0x080000, 0x080001).portr("IN1").w(FUNC(cischeat_state::leds_out_w));       // Coins
+	map(0x080002, 0x080003).portr("IN2").w(FUNC(cischeat_state::unknown_out_w));    // Buttons
+	map(0x080004, 0x080005).portr("IN3").w(FUNC(cischeat_state::motor_out_w));      // Motor Limit Switches
+	map(0x080006, 0x080007).portr("IN4").w(FUNC(cischeat_state::wheel_out_w));      // DSW 1 & 2
+	map(0x08000a, 0x08000b).w(m_soundlatch, FUNC(generic_latch_16_device::write));  // To sound cpu
+	map(0x08000c, 0x08000d).nopw();            // ??
+	map(0x080010, 0x080011).rw(FUNC(cischeat_state::cischeat_ip_select_r), FUNC(cischeat_state::ip_select_w));
+	map(0x080012, 0x080013).nopw();            // value above + 1
+	map(0x082000, 0x082005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082008, 0x08200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
+	map(0x082200, 0x082201).portr("IN5");    // DSW 3 (4 bits)
+	map(0x082208, 0x082209).noprw();                 // watchdog reset
+	map(0x082300, 0x082301).r(m_soundlatch2, FUNC(generic_latch_16_device::read)).w(FUNC(cischeat_state::cischeat_soundlatch_w)); // From sound cpu
+	map(0x082308, 0x082309).w(FUNC(cischeat_state::cischeat_comms_w));
+	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM                                                                     // Linking with other units
+	map(0x088000, 0x0887ff).ram();                                                                     // Linking with other units
 
 /*  Only the first 0x800 bytes are tested but:
     CPU #0 PC 0000278c: warning - write 68c0 to unmapped memory address 0009c7fe
@@ -278,19 +290,19 @@ ADDRESS_MAP_START(cischeat_state::cischeat_map)
     No mem access error from the other CPU's, though.. */
 
 	/* this is the right order of sharedram's */
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
-	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
+	map(0x090000, 0x097fff).ram().share("share2"); // Sharedram with sub CPU#2
+	map(0x098000, 0x09ffff).ram().share("share1"); // Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
-	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")              // Palettes
+	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
+	map(0x0a8000, 0x0affff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");     // Scroll ram 1
+	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");              // Palettes
 
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
-ADDRESS_MAP_END
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                             // RAM
+	map(0x100000, 0x17ffff).rom().region("user1", 0);                                                            // ROM
+}
 
 
 /**************************************************************************
@@ -312,41 +324,42 @@ CPU #0 PC 002350 : Warning, vreg 0002 <- 0000
 CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 */
 
-ADDRESS_MAP_START(cischeat_state::f1gpstar_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN1")    // DSW 1 & 2
-	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("IN2") AM_WRITE(f1gpstar_motor_w)   // Buttons
-	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("IN3")    // ? Read at boot only
-	AM_RANGE(0x080008, 0x080009) AM_DEVREAD("soundlatch2", generic_latch_16_device, read)     // From sound cpu
-	AM_RANGE(0x080008, 0x080009) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)    // To sound cpu
-	AM_RANGE(0x08000c, 0x08000d) AM_READ_PORT("IN4")    // DSW 3
-	AM_RANGE(0x080010, 0x080011) AM_READ(f1gpstar_wheel_r) AM_WRITENOP // Accel + Driving Wheel
-	AM_RANGE(0x080014, 0x080015) AM_WRITENOP
-	AM_RANGE(0x080018, 0x080019) AM_WRITE(f1gpstar_soundint_w)
+void cischeat_state::f1gpstar_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                                     // ROM
+	map(0x080000, 0x080001).portr("IN1");    // DSW 1 & 2
+	map(0x080004, 0x080005).portr("IN2").w(FUNC(cischeat_state::f1gpstar_motor_w));   // Buttons
+	map(0x080006, 0x080007).portr("IN3");    // ? Read at boot only
+	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));     // From sound cpu
+	map(0x080008, 0x080009).w(m_soundlatch, FUNC(generic_latch_16_device::write));    // To sound cpu
+	map(0x08000c, 0x08000d).portr("IN4");    // DSW 3
+	map(0x080010, 0x080011).r(FUNC(cischeat_state::f1gpstar_wheel_r)).nopw(); // Accel + Driving Wheel
+	map(0x080014, 0x080015).nopw();
+	map(0x080018, 0x080019).w(FUNC(cischeat_state::f1gpstar_soundint_w));
 
-	AM_RANGE(0x082000, 0x082005) AM_DEVREADWRITE("scroll0", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082008, 0x08200d) AM_DEVREADWRITE("scroll1", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082100, 0x082105) AM_DEVREADWRITE("scroll2", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082108, 0x082109) AM_NOP                 // ? written with 0 only
-	AM_RANGE(0x082208, 0x082209) AM_NOP                 // watchdog reset
-	AM_RANGE(0x082308, 0x082309) AM_READNOP AM_WRITE(f1gpstar_comms_w)
-	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
+	map(0x082000, 0x082005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082008, 0x08200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
+	map(0x082208, 0x082209).noprw();                 // watchdog reset
+	map(0x082308, 0x082309).nopr().w(FUNC(cischeat_state::f1gpstar_comms_w));
+	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM                                                                     // Linking with other units
+	map(0x088000, 0x0883ff).ram();                                                                     // Linking with other units
 
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
-	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
+	map(0x090000, 0x097fff).ram().share("share2"); // Sharedram with sub CPU#2
+	map(0x098000, 0x09ffff).ram().share("share1"); // Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
-	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")              // Palettes
+	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
+	map(0x0a8000, 0x0affff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");     // Scroll ram 1
+	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");              // Palettes
 
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
-ADDRESS_MAP_END
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                             // RAM
+	map(0x100000, 0x17ffff).rom().region("user1", 0);                                                            // ROM
+}
 
 
 /**************************************************************************
@@ -386,42 +399,43 @@ WRITE16_MEMBER(cischeat_state::wildplt_mux_w)
 
 
 // Same as f1gpstar, but vregs are slightly different:
-ADDRESS_MAP_START(cischeat_state::wildplt_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") AM_WRITE(f1gpstr2_io_w)    // DSW 1 & 2
-	AM_RANGE(0x080004, 0x080005) AM_READ(wildplt_mux_r) AM_WRITE(wildplt_mux_w) // Buttons
-	AM_RANGE(0x080008, 0x080009) AM_DEVREAD("soundlatch2", generic_latch_16_device, read)     // From sound cpu
-	AM_RANGE(0x080008, 0x080009) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)    // To sound cpu
-	AM_RANGE(0x08000c, 0x08000d) AM_WRITENOP // 1000, 3000
-	AM_RANGE(0x080010, 0x080011) AM_READ(wildplt_xy_r) AM_WRITE(ip_select_w) // X, Y
-	AM_RANGE(0x080014, 0x080015) AM_WRITENOP
-	AM_RANGE(0x080018, 0x080019) AM_READWRITE(f1gpstr2_ioready_r, f1gpstar_soundint_w)
+void wildplt_state::wildplt_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                                     // ROM
+	map(0x080000, 0x080001).portr("IN0").w(FUNC(cischeat_state::f1gpstr2_io_w));    // DSW 1 & 2
+	map(0x080004, 0x080005).r(FUNC(cischeat_state::wildplt_mux_r)).w(FUNC(cischeat_state::wildplt_mux_w)); // Buttons
+	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));     // From sound cpu
+	map(0x080008, 0x080009).w(m_soundlatch, FUNC(generic_latch_16_device::write));    // To sound cpu
+	map(0x08000c, 0x08000d).w(FUNC(wildplt_state::sprite_dma_w)); // 1000, 3000
+	map(0x080010, 0x080011).r(FUNC(cischeat_state::wildplt_xy_r)).w(FUNC(cischeat_state::ip_select_w)); // X, Y
+	map(0x080014, 0x080015).nopw();
+	map(0x080018, 0x080019).rw(FUNC(cischeat_state::f1gpstr2_ioready_r), FUNC(cischeat_state::f1gpstar_soundint_w));
 
-	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_SHARE("shareio")
+	map(0x081000, 0x081fff).ram().share("shareio");
 
-	AM_RANGE(0x082000, 0x082005) AM_DEVREADWRITE("scroll0", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082008, 0x08200d) AM_DEVREADWRITE("scroll1", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082100, 0x082105) AM_DEVREADWRITE("scroll2", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082108, 0x082109) AM_NOP                 // ? written with 0 only
-	AM_RANGE(0x082208, 0x082209) AM_NOP                 // watchdog reset
-	AM_RANGE(0x082308, 0x082309) AM_READNOP AM_WRITE(f1gpstar_comms_w)
-	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
+	map(0x082000, 0x082005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082008, 0x08200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
+	map(0x082208, 0x082209).noprw();                 // watchdog reset
+	map(0x082308, 0x082309).nopr().w(FUNC(cischeat_state::f1gpstar_comms_w));
+	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
-//  AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+//  map(0x088000, 0x088fff).ram(); // Linking with other units (not present on this)
 
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
-	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
+	map(0x090000, 0x097fff).ram().share("share2"); // Sharedram with sub CPU#2
+	map(0x098000, 0x09ffff).ram().share("share1"); // Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
-	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")               // Palettes
+	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
+	map(0x0a8000, 0x0affff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");     // Scroll ram 1
+	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");               // Palettes
 
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
-ADDRESS_MAP_END
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                             // RAM
+	map(0x100000, 0x17ffff).rom().region("user1", 0);                                                            // ROM
+}
 
 
 /**************************************************************************
@@ -429,44 +443,45 @@ ADDRESS_MAP_END
 **************************************************************************/
 
 // Same as f1gpstar, but vregs are slightly different:
-ADDRESS_MAP_START(cischeat_state::f1gpstr2_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN1") AM_WRITE(f1gpstr2_io_w)      // DSW 1 & 2
-	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("IN2") AM_WRITE(f1gpstar_motor_w)   // Buttons
-	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("IN3")    // ? Read at boot only
-	AM_RANGE(0x080008, 0x080009) AM_DEVREAD("soundlatch2", generic_latch_16_device, read)     // From sound cpu
-	AM_RANGE(0x080008, 0x080009) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)    // To sound cpu
-	AM_RANGE(0x08000c, 0x08000d) AM_READ_PORT("IN4")    // DSW 3
-	AM_RANGE(0x080010, 0x080011) AM_READ(f1gpstar_wheel_r) AM_WRITENOP
-	AM_RANGE(0x080014, 0x080015) AM_WRITENOP
-	AM_RANGE(0x080018, 0x080019) AM_READWRITE(f1gpstr2_ioready_r, f1gpstar_soundint_w)
+void cischeat_state::f1gpstr2_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                                     // ROM
+	map(0x080000, 0x080001).portr("IN1").w(FUNC(cischeat_state::f1gpstr2_io_w));      // DSW 1 & 2
+	map(0x080004, 0x080005).portr("IN2").w(FUNC(cischeat_state::f1gpstar_motor_w));   // Buttons
+	map(0x080006, 0x080007).portr("IN3");    // ? Read at boot only
+	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));     // From sound cpu
+	map(0x080008, 0x080009).w(m_soundlatch, FUNC(generic_latch_16_device::write));    // To sound cpu
+	map(0x08000c, 0x08000d).portr("IN4");    // DSW 3
+	map(0x080010, 0x080011).r(FUNC(cischeat_state::f1gpstar_wheel_r)).nopw();
+	map(0x080014, 0x080015).nopw();
+	map(0x080018, 0x080019).rw(FUNC(cischeat_state::f1gpstr2_ioready_r), FUNC(cischeat_state::f1gpstar_soundint_w));
 
-	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_SHARE("shareio")
+	map(0x081000, 0x081fff).ram().share("shareio");
 
-	AM_RANGE(0x082000, 0x082005) AM_DEVREADWRITE("scroll0", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082008, 0x08200d) AM_DEVREADWRITE("scroll1", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082100, 0x082105) AM_DEVREADWRITE("scroll2", megasys1_tilemap_device, scroll_r, scroll_w)
-	AM_RANGE(0x082108, 0x082109) AM_NOP                 // ? written with 0 only
-	AM_RANGE(0x082208, 0x082209) AM_NOP                 // watchdog reset
-	AM_RANGE(0x082308, 0x082309) AM_READNOP AM_WRITE(f1gpstar_comms_w)
-	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
+	map(0x082000, 0x082005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082008, 0x08200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
+	map(0x082208, 0x082209).noprw();                 // watchdog reset
+	map(0x082308, 0x082309).nopr().w(FUNC(cischeat_state::f1gpstar_comms_w));
+	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
 	// 0x100 RAM banks instead of 0x200
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM                                                                     // Linking with other units
+	map(0x088000, 0x0887ff).ram();                                                                     // Linking with other units
 
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
-	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
+	map(0x090000, 0x097fff).ram().share("share2"); // Sharedram with sub CPU#2
+	map(0x098000, 0x09ffff).ram().share("share1"); // Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
-	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")               // Palettes
+	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
+	map(0x0a8000, 0x0affff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");     // Scroll ram 1
+	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");               // Palettes
 
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
-ADDRESS_MAP_END
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                             // RAM
+	map(0x100000, 0x17ffff).rom().region("user1", 0);                                                            // ROM
+}
 
 
 /**************************************************************************
@@ -539,15 +554,15 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(0, data & 0x0100);    // 3 buttons
-		output().set_led_value(1, data & 0x0200);
-		output().set_led_value(2, data & 0x0400);
+		m_leds[0] = BIT(data, 8);    // 3 buttons
+		m_leds[1] = BIT(data, 9);
+		m_leds[2] = BIT(data, 10);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-//      output().set_led_value(3, data & 0x0010);   // if we had more leds..
-//      output().set_led_value(4, data & 0x0020);
+		m_leds[3] = BIT(data, 4);
+		m_leds[4] = BIT(data, 5);
 	}
 }
 
@@ -570,26 +585,27 @@ WRITE16_MEMBER(cischeat_state::scudhamm_oki_bank_w)
 	}
 }
 
-ADDRESS_MAP_START(cischeat_state::scudhamm_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
-	AM_RANGE(0x082000, 0x082005) AM_DEVWRITE("scroll0", megasys1_tilemap_device, scroll_w)
-	AM_RANGE(0x082008, 0x08200d) AM_WRITENOP //      UNUSED LAYER
-	AM_RANGE(0x082100, 0x082105) AM_DEVWRITE("scroll2", megasys1_tilemap_device, scroll_w)
-	AM_RANGE(0x082208, 0x082209) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")   // Scroll RAM 0
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")   // Scroll RAM 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")          // Palette
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                         // Work RAM + Spriteram
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(scudhamm_oki_bank_w)                                          // Sound
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITE(scudhamm_leds_w)                          // Buttons
-	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)             // Sound
-	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)             //
-	AM_RANGE(0x10001c, 0x10001d) AM_WRITE(scudhamm_enable_w)                                            // ?
-	AM_RANGE(0x100040, 0x100041) AM_READ(scudhamm_analog_r) AM_WRITENOP                         // A / D
-	AM_RANGE(0x100044, 0x100045) AM_READ(scudhamm_motor_pos_r)                                  // Motor Position
-	AM_RANGE(0x100050, 0x100051) AM_READ(scudhamm_motor_status_r) AM_WRITE(scudhamm_motor_command_w)        // Motor Limit Switches
-	AM_RANGE(0x10005c, 0x10005d) AM_READ_PORT("IN2")                                                    // 2 x DSW
-ADDRESS_MAP_END
+void cischeat_state::scudhamm_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x082000, 0x082005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082008, 0x08200d).nopw(); //      UNUSED LAYER
+	map(0x082100, 0x082105).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082208, 0x082209).rw(m_watchdog, FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0x0a0000, 0x0a3fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");   // Scroll RAM 0
+	map(0x0b0000, 0x0b3fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");   // Scroll RAM 2
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");          // Palette
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // Work RAM + Spriteram
+	map(0x100000, 0x100001).w(FUNC(cischeat_state::scudhamm_oki_bank_w));                                          // Sound
+	map(0x100008, 0x100009).portr("IN0").w(FUNC(cischeat_state::scudhamm_leds_w));                          // Buttons
+	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             // Sound
+	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             //
+	map(0x10001c, 0x10001d).w(FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
+	map(0x100040, 0x100041).r(FUNC(cischeat_state::scudhamm_analog_r)).nopw();                         // A / D
+	map(0x100044, 0x100045).r(FUNC(cischeat_state::scudhamm_motor_pos_r));                                  // Motor Position
+	map(0x100050, 0x100051).r(FUNC(cischeat_state::scudhamm_motor_status_r)).w(FUNC(cischeat_state::scudhamm_motor_command_w));        // Motor Limit Switches
+	map(0x10005c, 0x10005d).portr("IN2");                                                    // 2 x DSW
+}
 
 
 /**************************************************************************
@@ -641,10 +657,10 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(0, data & 0x0100);
-		output().set_led_value(1, data & 0x1000);
-		output().set_led_value(2, data & 0x2000);
-		output().set_led_value(3, data & 0x4000);
+		m_leds[0] = BIT(data, 8);
+		m_leds[1] = BIT(data, 12);
+		m_leds[2] = BIT(data, 13);
+		m_leds[3] = BIT(data, 14);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -654,24 +670,25 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 	}
 }
 
-ADDRESS_MAP_START(cischeat_state::armchmp2_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
-	AM_RANGE(0x082000, 0x082005) AM_DEVWRITE("scroll0", megasys1_tilemap_device, scroll_w)
-	AM_RANGE(0x082008, 0x08200d) AM_WRITENOP //      UNUSED LAYER
-	AM_RANGE(0x082100, 0x082105) AM_DEVWRITE("scroll2", megasys1_tilemap_device, scroll_w)
-	AM_RANGE(0x082208, 0x082209) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")              // Palette
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                         // Work RAM + Spriteram
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN2") AM_WRITE(scudhamm_oki_bank_w)                      // DSW + Sound
-	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("IN3")                                                    // DSW
-	AM_RANGE(0x100008, 0x100009) AM_READWRITE(armchmp2_buttons_r, armchmp2_leds_w)                      // Leds + Coin Counters + Buttons + Sensors
-	AM_RANGE(0x10000c, 0x10000d) AM_READ(armchmp2_analog_r) AM_WRITENOP                         // A / D
-	AM_RANGE(0x100010, 0x100011) AM_READWRITE(armchmp2_motor_status_r, armchmp2_motor_command_w)        // Motor Limit Switches?
-	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff  )           // Sound
-	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff  )           //
-ADDRESS_MAP_END
+void cischeat_state::armchmp2_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x082000, 0x082005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082008, 0x08200d).nopw(); //      UNUSED LAYER
+	map(0x082100, 0x082105).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082208, 0x082209).rw(m_watchdog, FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
+	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");              // Palette
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // Work RAM + Spriteram
+	map(0x100000, 0x100001).portr("IN2").w(FUNC(cischeat_state::scudhamm_oki_bank_w));                      // DSW + Sound
+	map(0x100004, 0x100005).portr("IN3");                                                    // DSW
+	map(0x100008, 0x100009).rw(FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));                      // Leds + Coin Counters + Buttons + Sensors
+	map(0x10000c, 0x10000d).r(FUNC(cischeat_state::armchmp2_analog_r)).nopw();                         // A / D
+	map(0x100010, 0x100011).rw(FUNC(cischeat_state::armchmp2_motor_status_r), FUNC(cischeat_state::armchmp2_motor_command_w));        // Motor Limit Switches?
+	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           // Sound
+	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           //
+}
 
 
 /**************************************************************************
@@ -687,9 +704,9 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(1, data & 0x0100);    // coin 2
-		output().set_led_value(0, data & 0x0200);    // decide
+		m_leds[0] = BIT(data, 8);    // decide
 		machine().bookkeeping().coin_counter_w(0, data & 0x0400);    // coin 1
-		output().set_led_value(1, data & 0x2000);    // select
+		m_leds[1] = BIT(data, 13);    // select
 
 		int power = (data & 0x1000);
 		m_captflag_hopper->motor_w(power ? 1 : 0);    // prize motor
@@ -798,37 +815,40 @@ CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_busy_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(cischeat_state::captflag_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
-	AM_RANGE(0x082000, 0x082005) AM_DEVWRITE("scroll0", megasys1_tilemap_device, scroll_w)
-	AM_RANGE(0x082008, 0x08200d) AM_WRITENOP //      UNUSED LAYER
-	AM_RANGE(0x082100, 0x082105) AM_DEVWRITE("scroll2", megasys1_tilemap_device, scroll_w)
-	AM_RANGE(0x082208, 0x082209) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0x090008, 0x090009) AM_WRITENOP                                                            // 0?
-	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0") // Scroll RAM 0
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2") // Scroll RAM 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")  // Palette
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                                 // Work RAM + Spriteram
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SW1_2") AM_WRITE(captflag_oki_bank_w)                    // 2 x DSW + Sound
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("Buttons") AM_WRITE(captflag_leds_w)                      // Buttons + Leds
-	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)         // Sound
-	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)         //
-	AM_RANGE(0x10001c, 0x10001d) AM_WRITE(scudhamm_enable_w)                                            // ?
-	AM_RANGE(0x100040, 0x100041) AM_READ_PORT("SW01")                                                   // DSW + Motor
-	AM_RANGE(0x100044, 0x100045) AM_WRITE(captflag_motor_command_left_w)                                // Motor Command (Left)
-	AM_RANGE(0x100048, 0x100049) AM_WRITE(captflag_motor_command_right_w)                               // Motor Command (Right)
-	AM_RANGE(0x100060, 0x10007d) AM_RAM                                                                 // 7-seg? NVRAM?
-ADDRESS_MAP_END
+void cischeat_state::captflag_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x082000, 0x082005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082008, 0x08200d).nopw(); //      UNUSED LAYER
+	map(0x082100, 0x082105).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082208, 0x082209).rw(m_watchdog, FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0x090008, 0x090009).nopw();                                                            // 0?
+	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0"); // Scroll RAM 0
+	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2"); // Scroll RAM 2
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                                 // Work RAM + Spriteram
+	map(0x100000, 0x100001).portr("SW1_2").w(FUNC(cischeat_state::captflag_oki_bank_w));                    // 2 x DSW + Sound
+	map(0x100008, 0x100009).portr("Buttons").w(FUNC(cischeat_state::captflag_leds_w));                      // Buttons + Leds
+	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));         // Sound
+	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));         //
+	map(0x10001c, 0x10001d).w(FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
+	map(0x100040, 0x100041).portr("SW01");                                                   // DSW + Motor
+	map(0x100044, 0x100045).w(FUNC(cischeat_state::captflag_motor_command_left_w));                                // Motor Command (Left)
+	map(0x100048, 0x100049).w(FUNC(cischeat_state::captflag_motor_command_right_w));                               // Motor Command (Right)
+	map(0x100060, 0x10007f).ram().share("nvram");      // NVRAM (even bytes only)
+}
 
-ADDRESS_MAP_START(cischeat_state::captflag_oki1_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki1_bank")
-ADDRESS_MAP_END
+void cischeat_state::captflag_oki1_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("oki1_bank");
+}
 
-ADDRESS_MAP_START(cischeat_state::captflag_oki2_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki2_bank")
-ADDRESS_MAP_END
+void cischeat_state::captflag_oki2_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("oki2_bank");
+}
 
 
 /**************************************************************************
@@ -843,42 +863,46 @@ ADDRESS_MAP_END
                                 Big Run
 **************************************************************************/
 
-ADDRESS_MAP_START(cischeat_state::bigrun_map2)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
-	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share1")                              // Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.0")   // Road RAM
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM                                                 // RAM
-ADDRESS_MAP_END
+void cischeat_state::bigrun_map2(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                 // ROM
+	map(0x040000, 0x047fff).ram().share("share1");                              // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.0");   // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
+}
 
-ADDRESS_MAP_START(cischeat_state::bigrun_map3)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
-	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share2")                              // Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.1")   // Road RAM
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM                                                 // RAM
-ADDRESS_MAP_END
+void cischeat_state::bigrun_map3(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                 // ROM
+	map(0x040000, 0x047fff).ram().share("share2");                              // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.1");   // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
+}
 
 
 /**************************************************************************
                                 Cisco Heat
 **************************************************************************/
 
-ADDRESS_MAP_START(cischeat_state::cischeat_map2)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
-	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share1")                              // Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.0")   // Road RAM
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM                                                 // RAM
-	AM_RANGE(0x100000, 0x100001) AM_WRITENOP                                            // watchdog
-	AM_RANGE(0x200000, 0x23ffff) AM_ROM AM_REGION("cpu2",0x40000)                                       // ROM
-ADDRESS_MAP_END
+void cischeat_state::cischeat_map2(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                 // ROM
+	map(0x040000, 0x047fff).ram().share("share1");                              // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.0");   // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
+	map(0x100000, 0x100001).nopw();                                            // watchdog
+	map(0x200000, 0x23ffff).rom().region("cpu2", 0x40000);                                       // ROM
+}
 
-ADDRESS_MAP_START(cischeat_state::cischeat_map3)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
-	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share2")                              // Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.1")   // Road RAM
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM                                                 // RAM
-	AM_RANGE(0x100000, 0x100001) AM_WRITENOP                                            // watchdog
-	AM_RANGE(0x200000, 0x23ffff) AM_ROM AM_REGION("cpu3",0x40000)                                       // ROM
-ADDRESS_MAP_END
+void cischeat_state::cischeat_map3(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                 // ROM
+	map(0x040000, 0x047fff).ram().share("share2");                              // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.1");   // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
+	map(0x100000, 0x100001).nopw();                                            // watchdog
+	map(0x200000, 0x23ffff).rom().region("cpu3", 0x40000);                                       // ROM
+}
 
 
 
@@ -886,21 +910,23 @@ ADDRESS_MAP_END
                             F1 GrandPrix Star
 **************************************************************************/
 
-ADDRESS_MAP_START(cischeat_state::f1gpstar_map2)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("share1")                              // Shared RAM (with Main CPU)
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("roadram.0")   // Road RAM
-	AM_RANGE(0x180000, 0x183fff) AM_RAM                                                 // RAM
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                                            // watchdog
-ADDRESS_MAP_END
+void cischeat_state::f1gpstar_map2(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                 // ROM
+	map(0x080000, 0x0807ff).ram().share("share1");                              // Shared RAM (with Main CPU)
+	map(0x100000, 0x1007ff).ram().share("roadram.0");   // Road RAM
+	map(0x180000, 0x183fff).ram();                                                 // RAM
+	map(0x200000, 0x200001).nopw();                                            // watchdog
+}
 
-ADDRESS_MAP_START(cischeat_state::f1gpstar_map3)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("share2")                              // Shared RAM (with Main CPU)
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("roadram.1")   // Road RAM
-	AM_RANGE(0x180000, 0x183fff) AM_RAM                                                 // RAM
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                                            // watchdog
-ADDRESS_MAP_END
+void cischeat_state::f1gpstar_map3(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                 // ROM
+	map(0x080000, 0x0807ff).ram().share("share2");                              // Shared RAM (with Main CPU)
+	map(0x100000, 0x1007ff).ram().share("roadram.1");   // Road RAM
+	map(0x180000, 0x183fff).ram();                                                 // RAM
+	map(0x200000, 0x200001).nopw();                                            // watchdog
+}
 
 
 /**************************************************************************
@@ -927,15 +953,16 @@ WRITE16_MEMBER(cischeat_state::bigrun_soundbank_w)
 	}
 }
 
-ADDRESS_MAP_START(cischeat_state::bigrun_sound_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
-	AM_RANGE(0x040000, 0x040001) AM_DEVREAD("soundlatch", generic_latch_16_device, read) AM_WRITE(bigrun_soundbank_w)    // From Main CPU
-	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write)                           // To Main CPU
-	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM                                                 // RAM
-ADDRESS_MAP_END
+void cischeat_state::bigrun_sound_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                 // ROM
+	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(FUNC(cischeat_state::bigrun_soundbank_w));    // From Main CPU
+	map(0x060000, 0x060001).w(m_soundlatch2, FUNC(generic_latch_16_device::write));                           // To Main CPU
+	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0x0a0000, 0x0a0003).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0c0000, 0x0c0003).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0f0000, 0x0fffff).ram();                                                 // RAM
+}
 
 
 /**************************************************************************
@@ -952,51 +979,54 @@ WRITE16_MEMBER(cischeat_state::cischeat_soundbank_2_w)
 	if (ACCESSING_BITS_0_7) m_oki2->set_rom_bank(data & 1);
 }
 
-ADDRESS_MAP_START(cischeat_state::cischeat_sound_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
-	AM_RANGE(0x040002, 0x040003) AM_WRITE(cischeat_soundbank_1_w)               // Sample Banking
-	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_2_w)               // Sample Banking
-	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write)                          // To Main CPU
-	AM_RANGE(0x060004, 0x060005) AM_DEVREAD("soundlatch", generic_latch_16_device, read)                             // From Main CPU
-	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM                                                 // RAM
-ADDRESS_MAP_END
+void cischeat_state::cischeat_sound_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                 // ROM
+	map(0x040002, 0x040003).w(FUNC(cischeat_state::cischeat_soundbank_1_w));               // Sample Banking
+	map(0x040004, 0x040005).w(FUNC(cischeat_state::cischeat_soundbank_2_w));               // Sample Banking
+	map(0x060002, 0x060003).w(m_soundlatch2, FUNC(generic_latch_16_device::write));                          // To Main CPU
+	map(0x060004, 0x060005).r(m_soundlatch, FUNC(generic_latch_16_device::read));                             // From Main CPU
+	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0x0a0000, 0x0a0003).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0c0000, 0x0c0003).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0f0000, 0x0fffff).ram();                                                 // RAM
+}
 
 
 /**************************************************************************
                             F1 GrandPrix Star
 **************************************************************************/
 
-ADDRESS_MAP_START(cischeat_state::f1gpstar_sound_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
-	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_1_w)               // Sample Banking   (cischeat: 40002)
-	AM_RANGE(0x040008, 0x040009) AM_WRITE(cischeat_soundbank_2_w)               // Sample Banking   (cischeat: 40004)
-	AM_RANGE(0x060000, 0x060001) AM_DEVREAD("soundlatch", generic_latch_16_device, read) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write)   // From Main CPU    (cischeat: 60004)
-	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM                                                 // RAM              (cischeat: f0000-fffff)
-ADDRESS_MAP_END
+void cischeat_state::f1gpstar_sound_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                 // ROM
+	map(0x040004, 0x040005).w(FUNC(cischeat_state::cischeat_soundbank_1_w));               // Sample Banking   (cischeat: 40002)
+	map(0x040008, 0x040009).w(FUNC(cischeat_state::cischeat_soundbank_2_w));               // Sample Banking   (cischeat: 40004)
+	map(0x060000, 0x060001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(m_soundlatch2, FUNC(generic_latch_16_device::write));   // From Main CPU    (cischeat: 60004)
+	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0x0a0000, 0x0a0003).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0c0000, 0x0c0003).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0e0000, 0x0fffff).ram();                                                 // RAM              (cischeat: f0000-fffff)
+}
 
 
 /**************************************************************************
                             F1 GrandPrix Star II
 **************************************************************************/
 
-ADDRESS_MAP_START(cischeat_state::f1gpstr2_sound_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM // ROM
-	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_1_w)                   // Sample Banking
-	AM_RANGE(0x040008, 0x040009) AM_WRITE(cischeat_soundbank_2_w)                   // Sample Banking
-	AM_RANGE(0x04000e, 0x04000f) AM_WRITENOP                                            // ? 0              (f1gpstar: no)
-	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write)                          // To Main CPU
-	AM_RANGE(0x060004, 0x060005) AM_DEVREAD("soundlatch", generic_latch_16_device, read)                             // From Main CPU
-	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM                                                     // RAM
-ADDRESS_MAP_END
+void cischeat_state::f1gpstr2_sound_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom(); // ROM
+	map(0x040004, 0x040005).w(FUNC(cischeat_state::cischeat_soundbank_1_w));                   // Sample Banking
+	map(0x040008, 0x040009).w(FUNC(cischeat_state::cischeat_soundbank_2_w));                   // Sample Banking
+	map(0x04000e, 0x04000f).nopw();                                            // ? 0              (f1gpstar: no)
+	map(0x060002, 0x060003).w(m_soundlatch2, FUNC(generic_latch_16_device::write));                          // To Main CPU
+	map(0x060004, 0x060005).r(m_soundlatch, FUNC(generic_latch_16_device::read));                             // From Main CPU
+	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0x0a0000, 0x0a0003).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0c0000, 0x0c0003).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0e0000, 0x0fffff).ram();                                                     // RAM
+}
 
 /**************************************************************************
 
@@ -1006,13 +1036,14 @@ ADDRESS_MAP_END
 
 **************************************************************************/
 
-ADDRESS_MAP_START(cischeat_state::f1gpstr2_io_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                         // ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("shareio")
-	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_SHARE("ioready")   //
-	AM_RANGE(0x180000, 0x183fff) AM_RAM                                         // RAM
-	AM_RANGE(0x200000, 0x200001) AM_NOP                                //
-ADDRESS_MAP_END
+void cischeat_state::f1gpstr2_io_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                         // ROM
+	map(0x080000, 0x080fff).ram().share("shareio");
+	map(0x100000, 0x100001).writeonly().share("ioready");   //
+	map(0x180000, 0x183fff).ram();                                         // RAM
+	map(0x200000, 0x200001).noprw();                                //
+}
 
 
 /***************************************************************************
@@ -1596,9 +1627,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( armchmp2 )
 	PORT_START("IN0")   // Buttons + Sensors
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) // left   sensor
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL ) // right  sensor
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL ) // center sensor
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) // left   sensor
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) // right  sensor
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) // center sensor
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1721,11 +1752,11 @@ static INPUT_PORTS_START( captflag )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW2:8" )
 
 	PORT_START("SW01")
-	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)LEFT)
-	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)RIGHT)
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)LEFT)
+	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)RIGHT)
 
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)LEFT)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)RIGHT)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)LEFT)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)RIGHT)
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW01:1,2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
@@ -1823,20 +1854,20 @@ static const gfx_layout road_layout =
                                 Big Run
 **************************************************************************/
 
-static GFXDECODE_START( bigrun )
+static GFXDECODE_START( gfx_bigrun )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x0e00/2 , 16 ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x1600/2 , 16 ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x3600/2 , 16 ) // Scroll 2
 	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x2800/2 , 64 ) // [0] Sprites
-	GFXDECODE_ENTRY( "road0", 0, road_layout,0x1800/2 , 64 ) // [1] Road 0
-	GFXDECODE_ENTRY( "road1", 0, road_layout,0x2000/2 , 64 ) // [2] Road 1
+	GFXDECODE_ENTRY( "road0", 0, road_layout,0x2000/2 , 64 ) // [1] Road 0
+	GFXDECODE_ENTRY( "road1", 0, road_layout,0x1800/2 , 64 ) // [2] Road 1
 GFXDECODE_END
 
 /**************************************************************************
                                 Cisco Heat
 **************************************************************************/
 
-static GFXDECODE_START( cischeat )
+static GFXDECODE_START( gfx_cischeat )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1c00/2, 32  ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2c00/2, 32  ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6c00/2, 32  ) // Scroll 2
@@ -1849,7 +1880,7 @@ GFXDECODE_END
                             F1 GrandPrix Star
 **************************************************************************/
 
-static GFXDECODE_START( f1gpstar )
+static GFXDECODE_START( gfx_f1gpstar )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1e00/2, 16  ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2e00/2, 16  ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6e00/2, 16  ) // Scroll 2
@@ -1862,7 +1893,7 @@ GFXDECODE_END
                                 Scud Hammer
 **************************************************************************/
 
-static GFXDECODE_START( scudhamm )
+static GFXDECODE_START( gfx_scudhamm )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x1e00/2, 16  )   // Scroll 0
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x0000/2, 16  )   // UNUSED
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,          0x4e00/2, 16  )   // Scroll 2
@@ -1883,50 +1914,60 @@ GFXDECODE_END
                     Big Run, Cisco Heat, F1 GrandPrix Star
 **************************************************************************/
 
-/*
- irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times. Wild Pilot of course doesn't need it.
- irq 2/4 controls gameplay speed, currently unknown about the timing
- */
+// TODO: irq generation is unknown, as usual with Jaleco/NMK HW
+//       - irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times.
+//         Wild Pilot of course doesn't need it.
+//       - irq 2/4 controls gameplay speed, currently unknown about the timing
+//       - 2 updates palettes while 4 is vblank?
+//       - Calling 2 every frame causes attract mode to desync in Big Run.
+//       - Not calling 1 in Big Run causes service mode to not work at all, so even if the comms doesn't work
+//         something still triggers it somehow?
 TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 {
 	int scanline = param;
 
+	if(m_screen->frame_number() & 1)
+	{
+		if(scanline == 240)
+			m_cpu1->set_input_line(1, HOLD_LINE);
+
+		return;
+	}
+
 	if(scanline == 240) // vblank-out irq
-		m_cpu1->set_input_line(m_screen->frame_number() & 1 ? 4 : 1, HOLD_LINE);
+		m_cpu1->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0)
 		m_cpu1->set_input_line(2, HOLD_LINE);
-
-//  if(scanline == 69)
-//      m_cpu1->set_input_line(1, HOLD_LINE);
 }
 
-
-
-#define STD_FM_CLOCK    3000000
-#define STD_OKI_CLOCK     (1584000)
-
+WRITE_LINE_MEMBER(cischeat_state::sound_irq)
+{
+	if(state)
+		m_soundcpu->set_input_line(4, HOLD_LINE);
+}
 
 
 
 MACHINE_CONFIG_START(cischeat_state::bigrun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map)
+	MCFG_DEVICE_ADD("cpu1", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, bigrun_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("cpu2", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("cpu2", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("cpu3", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map3)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("cpu3", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map3)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", M68000, 6000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
+	MCFG_DEVICE_ADD("soundcpu", M68000, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_sound_map)
+	// timing set by the YM irqhandler
+//  MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -1940,7 +1981,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigrun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigrun)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000/2)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -1950,20 +1991,23 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x3600/2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", STD_FM_CLOCK)
+	// TODO: all sound frequencies unverified (assume same as Mega System 1)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 7000000/2)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, cischeat_state,sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki1", STD_OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_OKIM6295_ADD("oki2", STD_OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -1973,24 +2017,24 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map)
 
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map2)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map2)
 
-	MCFG_CPU_MODIFY("cpu3")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map3)
+	MCFG_DEVICE_MODIFY("cpu3")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map3)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(cischeat_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cischeat)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cischeat)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -2011,23 +2055,23 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map)
 
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map2)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map2)
 
-	MCFG_CPU_MODIFY("cpu3")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map3)
+	MCFG_DEVICE_MODIFY("cpu3")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map3)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gpstar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gpstar)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -2049,23 +2093,23 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstr2)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_sound_map)
 
-	MCFG_CPU_ADD("cpu5", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_io_map)
+	MCFG_DEVICE_ADD("cpu5", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(cischeat_state::wildplt)
+MACHINE_CONFIG_START(wildplt_state::wildplt)
 	f1gpstr2(config);
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(wildplt_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(wildplt_map)
 MACHINE_CONFIG_END
 
 
@@ -2094,11 +2138,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 MACHINE_CONFIG_START(cischeat_state::scudhamm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(scudhamm_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(scudhamm_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, scudhamm_scanline, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2110,7 +2154,7 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2119,13 +2163,14 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x4e00/2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 MACHINE_CONFIG_END
@@ -2150,8 +2195,8 @@ MACHINE_CONFIG_START(cischeat_state::armchmp2)
 	scudhamm(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(armchmp2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(armchmp2_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(cischeat_state, armchamp2_scanline)
 MACHINE_CONFIG_END
@@ -2182,13 +2227,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
-	MCFG_CPU_PROGRAM_MAP(captflag_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
+	MCFG_DEVICE_PROGRAM_MAP(captflag_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, captflag_scanline, "screen", 0, 1)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2200,7 +2246,7 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2213,17 +2259,18 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_TIMER_ADD_NONE("motor_right")
 
 	// Layout
-	MCFG_DEFAULT_LAYOUT(layout_captflag)
+	config.set_default_layout(layout_captflag);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
@@ -2402,7 +2449,7 @@ ROM_START( bigrun )
 	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) ) // 000xxxxxxxxxxxxx
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,bigrun)
+void cischeat_state::init_bigrun()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
 	phantasm_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
@@ -2521,7 +2568,7 @@ ROM_START( cischeat )
 	ROM_LOAD( "ch9072.03",  0x000000, 0x040000, CRC(7e79151a) SHA1(5a305cff8600446be426641ce112208b379094b9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,cischeat)
+void cischeat_state::init_cischeat()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
 	astyanax_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
@@ -2819,7 +2866,7 @@ ROM_START( f1gpstaro )
 	ROM_LOAD( "pr90015b",  0x000000, 0x000100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )   // FIXED BITS (000xxxxx000xxxx1)
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,f1gpstar)
+void cischeat_state::init_f1gpstar()
 {
 	cischeat_untangle_sprites("sprites");
 }
@@ -3449,6 +3496,51 @@ Notes:
 
 ROM_START( armchmp2 )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_LOAD16_BYTE( "4_ver_2.7.ic63", 0x000000, 0x020000, CRC(e0cec032) SHA1(743b022b6de3efb045c4f1cca49caed0259ccfff) ) // same rom contents as ver 2.6, it appears to be correct;
+	ROM_LOAD16_BYTE( "3_ver_2.7.ic62", 0x000001, 0x020000, CRC(44186a37) SHA1(d21fbba11e9c82f48de2a699011ca7f3b90061ba) ) // modifications are in data area, where upper bytes are 00
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "mr91042-07-r66_6.ic95",  0x000000, 0x080000, CRC(d1be8699) SHA1(67563761f95892b08c7113ab1c52ab5aa7118fb8) )
+
+//  ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+//  UNUSED
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "ac91106_ver1.2_7.ic99", 0x000000, 0x020000, CRC(09755aef) SHA1(39c901fb9408a0ba488f0112d7f48b929b092e3b) )
+
+	ROM_REGION( 0x300000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD16_BYTE( "mr91042-01-r60_1.ic1",  0x000000, 0x080000, CRC(fdfe6951) SHA1(ba6c5cd5d16fdca6f131302b19e621f8abe8136a) )
+	ROM_LOAD16_BYTE( "mr91042-02-r61_2.ic2",  0x000001, 0x080000, CRC(2e6c8b30) SHA1(70503fec251606b37fea2c7f91e682aece252035) )
+	ROM_LOAD16_BYTE( "mr91042-03-r62_3.ic5",  0x100000, 0x080000, CRC(07ba6d3a) SHA1(9c58e3a1931b593448c53a59e7f5b9aaac40ff88) )
+	ROM_LOAD16_BYTE( "mr91042-04-r63_4.ic6",  0x100001, 0x080000, CRC(f37cb12c) SHA1(282ebbd795284d7efa335b797ca1eedc1110e9da) )
+	ROM_LOAD16_BYTE( "mr91042-05-r64_5.ic11", 0x200000, 0x080000, CRC(7a3bb52d) SHA1(7f9d1dad4c89e6b55415b082363bc261115e9f96) )
+	ROM_LOAD16_BYTE( "mr91042-06-r65_6.ic12", 0x200001, 0x080000, CRC(5312a4f2) SHA1(4dcd2839bb5acccecf1eb6c0e19e877a0cff6875) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )       /* Samples (4x40000) */
+	ROM_LOAD( "mr91042-08_2.ic57",     0x000000, 0x080000, CRC(dc015f6c) SHA1(9d0677c50a25be1d11d43e54dbf3005f18b79b66) )
+	ROM_RELOAD(                        0x080000, 0x080000 )
+
+	ROM_REGION( 0x100000, "oki2", 0 )       /* Samples (4x40000) */
+	ROM_LOAD( "ac-91106v2.0_1.ic56", 0x000000, 0x080000, CRC(0ff5cbcf) SHA1(25ef8d67749ca78afc4c13a31b3f7a87284947c1) )
+	ROM_RELOAD(                        0x080000, 0x080000 )
+
+	ROM_REGION( 0x80000, "user2", 0 )       /* ? Unused ROMs ? */
+	ROM_LOAD( "ch9072-4_13.ic39", 0x000000, 0x002000, CRC(b45b4dc0) SHA1(b9fae0c9ac2d40f0a202c538d866d5f2941ba8dd) )
+	ROM_LOAD( "ch9072-5_11.ic33", 0x000000, 0x002000, CRC(e122916b) SHA1(86d5ecc7ecc6f175ecb28459697ef33e1ee06860) )
+	ROM_LOAD( "ch9072-6_12.ic35", 0x000000, 0x002000, CRC(05d95bf7) SHA1(78181cf71f22c090a1e62823a43757353a9ef6ab) )
+	ROM_LOAD( "ch9072-8_15.ic59", 0x000000, 0x002000, CRC(6bf52596) SHA1(bf4e7e7df3daae4aa6a441b58b15a435aa45630e) )
+
+	ROM_LOAD( "mr90015-35-w33_17.ic67", 0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
+	ROM_LOAD( "mr90015-35-w33_14.ic54", 0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
+
+	ROM_LOAD( "pr88004q_8.ic102", 0x000000, 0x000200, CRC(9327dc37) SHA1(cfe7b144cdcd76170d47f1c4e0f72b6d4fca0c8d) )
+	ROM_LOAD( "pr88004w_16.ic66", 0x000000, 0x000100, CRC(3d648467) SHA1(bf8dbaa2176c801f7370313425c87f0eefe8a3a4) )
+
+	ROM_LOAD( "pr91042_5.ic91", 0x000000, 0x000100, CRC(e71de4aa) SHA1(d06e5a35ad2127df2d6328cce153073380ee7819) )
+ROM_END
+
+ROM_START( armchmp2o2 )
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* Main CPU Code */
 	ROM_LOAD16_BYTE( "ac-91106v2.6_4.ic63", 0x000000, 0x020000, CRC(e0cec032) SHA1(743b022b6de3efb045c4f1cca49caed0259ccfff) )
 	ROM_LOAD16_BYTE( "ac-91106v2.6_3.ic62", 0x000001, 0x020000, CRC(5de6da19) SHA1(1f46056596924789394ad2d99ec2d7fcb7845d3c) )
 
@@ -3592,7 +3684,7 @@ ROM_START( captflag )
 	ROM_LOAD( "mr92027-09_w26.ic18", 0x000000, 0x100000, CRC(3aaa332a) SHA1(6c19364069e0b077a07ac4f9c4b0cf0c0985a42a) ) // 1 on the PCB
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state, captflag)
+void cischeat_state::init_captflag()
 {
 	m_oki1_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki1")->base(), 0x20000);
 	m_oki2_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);
@@ -3607,13 +3699,14 @@ DRIVER_INIT_MEMBER(cischeat_state, captflag)
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,   0,        bigrun,   bigrun,   cischeat_state, bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
-GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
-GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAMEL( 1991, f1gpstaro,f1gpstar, f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, wildplt,  0,        wildplt,  wildplt,  cischeat_state, f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
-GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstr2, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME ( 1993, captflag, 0,        captflag, captflag, cischeat_state, captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, cischeat_state, 0,        ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )
+GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
+GAMEL( 1991, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 3.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstaro, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 2.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.7)",       MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.6)",       MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",       MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,  init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
+GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAME(  1993, captflag,  0,        captflag, captflag, cischeat_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )

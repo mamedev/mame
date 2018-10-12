@@ -621,7 +621,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
 	}
 }
 
-DRIVER_INIT_MEMBER(gamecom_state,gamecom)
+void gamecom_state::init_gamecom()
 {
 	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_clock_timer_callback),this));
 	m_sound0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_sound0_timer_callback),this));

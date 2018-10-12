@@ -233,6 +233,7 @@ TODO:
 #include "sound/wave.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -261,6 +262,10 @@ public:
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
 	{}
+
+	void spc1500(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(psga_r);
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
@@ -291,10 +296,10 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
-	void spc1500(machine_config &config);
+
 	void spc1500_double_io(address_map &map);
 	void spc1500_mem(address_map &map);
-private:
+
 	uint8_t *m_p_ram;
 	uint8_t m_ipl;
 	uint8_t m_palet[3];
@@ -642,7 +647,7 @@ WRITE8_MEMBER( spc1500_state::double_w)
 		if (offset < 0x1800) { pcg_w(space, offset, data); } else
 		if (offset < 0x1900) { crtc_w(space, offset, data); } else
 		if (offset < 0x1a00) {} else
-		if (offset < 0x1b00) { m_pio->write(space, offset, data);} else
+		if (offset < 0x1b00) { m_pio->write(offset, data); } else
 		if (offset < 0x1c00) { m_sound->data_w(space, offset, data);} else
 		if (offset < 0x1d00) { m_sound->address_w(space, offset, data);} else
 		if (offset < 0x1e00) { romsel(space, offset, data);} else
@@ -669,7 +674,7 @@ READ8_MEMBER( spc1500_state::io_r)
 	if (offset < 0x1800) { return pcg_r(space, offset); } else
 	if (offset < 0x1900) { return crtc_r(space, offset); } else
 	if (offset < 0x1a00) { return keyboard_r(space, offset); } else
-	if (offset < 0x1b00) { return m_pio->read(space, offset); } else
+	if (offset < 0x1b00) { return m_pio->read(offset); } else
 	if (offset < 0x1c00) { return m_sound->data_r(space, offset); } else
 	if (offset < 0x2000) {} else
 	if (offset < 0x10000){
@@ -679,12 +684,13 @@ READ8_MEMBER( spc1500_state::io_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(spc1500_state::spc1500_double_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0000, 0x17ff) AM_RAM AM_SHARE("pcgram")
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, double_w)
-ADDRESS_MAP_END
+void spc1500_state::spc1500_double_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x2000, 0xffff).ram().share("videoram");
+	map(0x0000, 0x17ff).ram().share("pcgram");
+	map(0x0000, 0xffff).rw(FUNC(spc1500_state::io_r), FUNC(spc1500_state::double_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( spc1500 )
@@ -814,11 +820,12 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH,IPT_UNUSED) // DIP SW3 for 200/400 line
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(spc1500_state::spc1500_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE_BANK("bank4")
-ADDRESS_MAP_END
+void spc1500_state::spc1500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankr("bank1").bankw("bank2");
+	map(0x8000, 0xffff).bankrw("bank4");
+}
 
 void spc1500_state::machine_start()
 {
@@ -872,11 +879,11 @@ READ8_MEMBER( spc1500_state::porta_r )
 
 MACHINE_CONFIG_START(spc1500_state::spc1500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(spc1500_mem)
-	//MCFG_CPU_IO_MAP(spc1500_io)
-	MCFG_CPU_IO_MAP(spc1500_double_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spc1500_state, irq0_line_hold,  60)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spc1500_mem)
+	//MCFG_DEVICE_IO_MAP(spc1500_io)
+	MCFG_DEVICE_IO_MAP(spc1500_double_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(spc1500_state, irq0_line_hold,  60)
 
 	/* video hardware */
 
@@ -895,25 +902,24 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTB_CB(READ8(spc1500_state, portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1500_state, portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1500_state, portc_w))
+	I8255(config, m_pio);
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->in_pb_callback().set(FUNC(spc1500_state::portb_r));
+	m_pio->out_pb_callback().set(FUNC(spc1500_state::portb_w));
+	m_pio->out_pc_callback().set(FUNC(spc1500_state::portc_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(4'000'000) / 2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1500_state, psga_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(spc1500_state, psgb_w))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(4'000'000) / 2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1500_state, psga_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, spc1500_state, psgb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(spc1500_state, centronics_busy_w))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, spc1500_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
@@ -925,8 +931,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1500_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -946,5 +951,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT  COMPANY    FULLNAME    FLAGS
-COMP( 1987, spc1500,  0,      0,       spc1500,   spc1500, spc1500_state, 0,    "Samsung", "SPC-1500", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
+COMP( 1987, spc1500, 0,      0,      spc1500, spc1500, spc1500_state, empty_init, "Samsung", "SPC-1500", 0 )

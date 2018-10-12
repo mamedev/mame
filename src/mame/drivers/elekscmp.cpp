@@ -40,7 +40,7 @@ public:
 
 	void elekscmp(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -49,7 +49,6 @@ protected:
 
 	void mem_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_x;
 	output_finder<8> m_digit;
@@ -98,14 +97,15 @@ READ8_MEMBER(elekscmp_state::keyboard_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(elekscmp_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
-	AM_RANGE(0x000, 0x5ff) AM_ROM // ROM
-	AM_RANGE(0x700, 0x707) AM_WRITE(hex_display_w)
-	AM_RANGE(0x708, 0x70f) AM_READ(keyboard_r)
-	AM_RANGE(0x800, 0xfff) AM_RAM // RAM - up to 2K of RAM
-ADDRESS_MAP_END
+void elekscmp_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x0fff);
+	map(0x000, 0x5ff).rom(); // ROM
+	map(0x700, 0x707).w(FUNC(elekscmp_state::hex_display_w));
+	map(0x708, 0x70f).r(FUNC(elekscmp_state::keyboard_r));
+	map(0x800, 0xfff).ram(); // RAM - up to 2K of RAM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( elekscmp )
@@ -146,11 +146,11 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(elekscmp_state::elekscmp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",INS8060, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu",INS8060, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_elekscmp)
+	config.set_default_layout(layout_elekscmp);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -164,5 +164,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT   MACHINE    INPUT     STATE            INIT  COMPANY                FULLNAME         FLAGS */
-COMP( 1977, elekscmp,  0,      0,       elekscmp,  elekscmp, elekscmp_state,  0,    "Elektor Electronics", "Elektor SC/MP", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                FULLNAME         FLAGS */
+COMP( 1977, elekscmp, 0,      0,      elekscmp, elekscmp, elekscmp_state, empty_init, "Elektor Electronics", "Elektor SC/MP", MACHINE_NO_SOUND_HW)

@@ -397,10 +397,10 @@ void nbmj8900_state::video_start()
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_clutsel));
 	//save_item(NAME(m_gfxdraw_mode)); //always 1?
-	save_pointer(NAME(m_videoram0.get()), m_screen_width * m_screen_height);
-	save_pointer(NAME(m_videoram1.get()), m_screen_width * m_screen_height);
-	save_pointer(NAME(m_palette_ptr.get()), 0x200);
-	save_pointer(NAME(m_clut.get()), 0x800);
+	save_pointer(NAME(m_videoram0), m_screen_width * m_screen_height);
+	save_pointer(NAME(m_videoram1), m_screen_width * m_screen_height);
+	save_pointer(NAME(m_palette_ptr), 0x200);
+	save_pointer(NAME(m_clut), 0x800);
 	save_item(NAME(m_flipscreen_old));
 }
 

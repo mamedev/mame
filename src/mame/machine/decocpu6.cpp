@@ -31,14 +31,14 @@ void deco_cpu6_device::device_reset()
 uint8_t deco_cpu6_device::mi_decrypt::read_sync(uint16_t adr)
 {
 	if (adr&1)
-		return bitswap<8>(direct->read_byte(adr),6,4,7,5,3,2,1,0);
+		return bitswap<8>(cache->read_byte(adr),6,4,7,5,3,2,1,0);
 	else
-		return direct->read_byte(adr);
+		return cache->read_byte(adr);
 }
 
-util::disasm_interface *deco_cpu6_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> deco_cpu6_device::create_disassembler()
 {
-	return new disassembler;
+	return std::make_unique<disassembler>();
 }
 
 u32 deco_cpu6_device::disassembler::interface_flags() const

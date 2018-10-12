@@ -37,12 +37,13 @@ enum mn10200_flag
 };
 
 
-DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "MN1020012A")
+DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "Panasonic MN1020012A")
 
 // internal memory maps
-ADDRESS_MAP_START(mn10200_device::mn1020012a_internal_map)
-	AM_RANGE(0x00fc00, 0x00ffff) AM_READWRITE8(io_control_r, io_control_w, 0xffff)
-ADDRESS_MAP_END
+void mn10200_device::mn1020012a_internal_map(address_map &map)
+{
+	map(0x00fc00, 0x00ffff).rw(FUNC(mn10200_device::io_control_r), FUNC(mn10200_device::io_control_w));
+}
 
 
 mn10200_device::mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program)
@@ -89,9 +90,9 @@ void mn10200_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-util::disasm_interface *mn10200_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mn10200_device::create_disassembler()
 {
-	return new mn10200_disassembler;
+	return std::make_unique<mn10200_disassembler>();
 }
 
 
@@ -251,7 +252,7 @@ void mn10200_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_psw).formatstr("%26s").noshow();
 
-	m_icountptr = &m_cycles;
+	set_icountptr(m_cycles);
 }
 
 
@@ -565,7 +566,7 @@ void mn10200_device::execute_run()
 		check_irq();
 	}
 
-	debugger_instruction_hook(this, m_pc);
+	debugger_instruction_hook(m_pc);
 
 	m_cycles -= 1;
 	uint8_t op = read_arg8(m_pc);

@@ -304,7 +304,7 @@ public:
 	//  clamp_to_uint8();
 	//}
 
-	// This version needs values to be 12 bits or less
+	// This version needs absolute value of value and scale to be 11 bits or less
 	inline void scale_imm_and_clamp(const s16 scale)
 	{
 		// Set mult a 16 bit inputs to scale
@@ -324,7 +324,7 @@ public:
 		m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
 	}
 
-	// This function needs values to be 12 bits or less
+	// This function needs absolute value of color and scale to be 11 bits or less
 	inline void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 	{
 		// Pack scale into mult a 16 bits
@@ -337,16 +337,15 @@ public:
 		m_value = _mm_slli_epi16(m_value, 4);
 		// Do the 16 bit multiply, bottom 64 bits will contain 16 bit truncated results
 		m_value = _mm_mulhi_epi16(m_value, tmp1);
-		// Clamp to u8
-		m_value = _mm_packus_epi16(m_value, _mm_setzero_si128());
-		// Unpack up to s32
-		m_value = _mm_unpacklo_epi8(m_value, _mm_setzero_si128());
-		m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
+		// Unpack up to s32, putting the 16 bit value at the top so the sign bit is set by the 16 bit result
+		m_value = _mm_unpacklo_epi16(_mm_setzero_si128(), m_value);
+		// Arithmetic shift down the 16 bit value to the lower 16 bits
+		sra_imm(16);
 		add(other);
 		clamp_to_uint8();
 	}
 
-	// This function needs values to be 12 bits or less
+	// This function needs absolute value of color and scale to be 11 bits or less
 	inline void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
 	{
 		// Pack both scale values into mult a 16 bits
@@ -359,9 +358,12 @@ public:
 		m_value = _mm_slli_epi16(m_value, 4);
 		// Do the 16 bit multiply, top and bottom 64 bits will contain 16 bit truncated results
 		tmp1 = _mm_mulhi_epi16(m_value, tmp1);
-		// Unpack the results
-		m_value = _mm_unpacklo_epi16(tmp1, _mm_setzero_si128());
-		tmp1 = _mm_unpackhi_epi16(tmp1, _mm_setzero_si128());
+		// Unpack up to s32, putting the 16 bit value at the top so the sign bit is set by the 16 bit result
+		m_value = _mm_unpacklo_epi16(_mm_setzero_si128(), tmp1);
+		tmp1 = _mm_unpackhi_epi16(_mm_setzero_si128(), tmp1);
+		// Arithmetic shift down the 16 bit value to the lower 16 bits
+		sra_imm(16);
+		tmp1 = _mm_srai_epi32(tmp1, 16);
 		// Add the results
 		m_value = _mm_add_epi32(m_value, tmp1);
 		clamp_to_uint8();

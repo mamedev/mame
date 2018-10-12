@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/decmxc06.h"
+#include "emupal.h"
 
 
 class thedeep_state : public driver_device
@@ -25,6 +26,9 @@ public:
 		m_scroll2(*this, "scroll2")
 		{ }
 
+	void thedeep(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_mcu;
@@ -74,7 +78,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	void thedeep(machine_config &config);
+
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 };

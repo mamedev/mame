@@ -51,19 +51,21 @@
 DEFINE_DEVICE_TYPE(ISA8_MYB3K_FDC4710, isa8_myb3k_fdc4710_device, "isa8_myb3k_fdc4710", "FDC4710 SSDD Floppy Disk Controller")
 DEFINE_DEVICE_TYPE(ISA8_MYB3K_FDC4711, isa8_myb3k_fdc4711_device, "isa8_myb3k_fdc4711", "FDC4711 DSDD Floppy Disk Controller")
 
-ADDRESS_MAP_START(isa8_myb3k_fdc4710_device::map)
+void isa8_myb3k_fdc4710_device::map(address_map &map)
+{
 //  AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", mb8876_device, read, write) AM_MIRROR(0x500)
-	AM_RANGE(0x00, 0x03) AM_READ(myb3k_inv_fdc_data_r) AM_WRITE(myb3k_inv_fdc_data_w) AM_MIRROR(0x500)
-	AM_RANGE(0x04, 0x04) AM_WRITE(myb3k_fdc_command) AM_MIRROR(0x500)
-	AM_RANGE(0x05, 0x05) AM_READ(myb3k_fdc_status) AM_MIRROR(0x500)
-ADDRESS_MAP_END
+	map(0x00, 0x03).r(FUNC(isa8_myb3k_fdc4710_device::myb3k_inv_fdc_data_r)).w(FUNC(isa8_myb3k_fdc4710_device::myb3k_inv_fdc_data_w)).mirror(0x500);
+	map(0x04, 0x04).w(FUNC(isa8_myb3k_fdc4710_device::myb3k_fdc_command)).mirror(0x500);
+	map(0x05, 0x05).r(FUNC(isa8_myb3k_fdc4710_device::myb3k_fdc_status)).mirror(0x500);
+}
 
-ADDRESS_MAP_START(isa8_myb3k_fdc4711_device::map)
+void isa8_myb3k_fdc4711_device::map(address_map &map)
+{
 //  AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", fd1791_device, read, write) AM_MIRROR(0x500)
-	AM_RANGE(0x00, 0x03) AM_READ(myb3k_inv_fdc_data_r) AM_WRITE(myb3k_inv_fdc_data_w) AM_MIRROR(0x500)
-	AM_RANGE(0x04, 0x04) AM_WRITE(myb3k_fdc_command) AM_MIRROR(0x500)
-	AM_RANGE(0x05, 0x05) AM_READ(myb3k_fdc_status) AM_MIRROR(0x500)
-ADDRESS_MAP_END
+	map(0x00, 0x03).r(FUNC(isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_r)).w(FUNC(isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_w)).mirror(0x500);
+	map(0x04, 0x04).w(FUNC(isa8_myb3k_fdc4711_device::myb3k_fdc_command)).mirror(0x500);
+	map(0x05, 0x05).r(FUNC(isa8_myb3k_fdc4711_device::myb3k_fdc_status)).mirror(0x500);
+}
 
 FLOPPY_FORMATS_MEMBER( isa8_myb3k_fdc4710_device::myb3k_floppy_formats )
 	FLOPPY_IMD_FORMAT
@@ -74,51 +76,57 @@ FLOPPY_FORMATS_MEMBER( isa8_myb3k_fdc4711_device::myb3k_floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( myb3k_sd_floppies )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
-SLOT_INTERFACE_END
+static void myb3k_sd_floppies(device_slot_interface &device)
+{
+	device.option_add("525sd", FLOPPY_525_SD);
+}
 
-static SLOT_INTERFACE_START( myb3k_qd_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void myb3k_qd_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 #if 0
-static SLOT_INTERFACE_START( myb3k_8inch_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void myb3k_8inch_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 #endif
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 /*  */
-MACHINE_CONFIG_START(isa8_myb3k_fdc4710_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", MB8876, XTAL(15'974'400) / 8) /* From StepOne schematics */
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4710_device, irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4710_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", myb3k_sd_floppies, "525sd", isa8_myb3k_fdc4710_device::myb3k_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", myb3k_sd_floppies, "525sd", isa8_myb3k_fdc4710_device::myb3k_floppy_formats)
-MACHINE_CONFIG_END
+void isa8_myb3k_fdc4710_device::device_add_mconfig(machine_config &config)
+{
+	MB8876(config, m_fdc, XTAL(15'974'400) / 8); /* From StepOne schematics */
+	m_fdc->intrq_wr_callback().set(FUNC(isa8_myb3k_fdc4710_device::irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(isa8_myb3k_fdc4710_device::drq_w));
+	FLOPPY_CONNECTOR(config, m_fdd0, myb3k_sd_floppies, "525sd", isa8_myb3k_fdc4710_device::myb3k_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdd1, myb3k_sd_floppies, "525sd", isa8_myb3k_fdc4710_device::myb3k_floppy_formats);
+}
 
-/* Main difference from fdc4710 is that a Hitachi HA16632AP has replaced the descrete VFO enabling 720Kb disks */
-MACHINE_CONFIG_START(isa8_myb3k_fdc4711_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", FD1791, XTAL(15'974'400) / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4711_device, irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4711_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats)
-MACHINE_CONFIG_END
+/* Main difference from fdc4710 is that a Hitachi HA16632AP has replaced the discrete VFO enabling 720Kb disks */
+void isa8_myb3k_fdc4711_device::device_add_mconfig(machine_config &config)
+{
+	FD1791(config, m_fdc, XTAL(15'974'400) / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(isa8_myb3k_fdc4711_device::irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(isa8_myb3k_fdc4711_device::drq_w));
+	FLOPPY_CONNECTOR(config, m_fdd0, myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdd1, myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdd2, myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdd3, myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
+}
 
 #if 0
-MACHINE_CONFIG_START(isa8_myb3k_fdc4712_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", FD1791, XTAL(15'974'400) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4712_device, irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4712_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", myb3k_8inch_floppies, "8dsdd", isa8_myb3k_fdc4712_device::myb3k_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", myb3k_8inch_floppies, "8dsdd", isa8_myb3k_fdc4712_device::myb3k_floppy_formats)
-MACHINE_CONFIG_END
+void isa8_myb3k_fdc4712_device::device_add_mconfig(machine_config &config)
+{
+	FD1791(config, m_fdc, XTAL(15'974'400) / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(isa8_myb3k_fdc4712_device::irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(isa8_myb3k_fdc4712_device::drq_w));
+	FLOPPY_CONNECTOR(config, m_fdd0, myb3k_8inch_floppies, "8dsdd", isa8_myb3k_fdc4712_device::myb3k_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdd1, myb3k_8inch_floppies, "8dsdd", isa8_myb3k_fdc4712_device::myb3k_floppy_formats);
+}
 #endif
 
 //**************************************************************************
@@ -259,14 +267,14 @@ void isa8_myb3k_fdc4711_device::eop_w(int state)
 //--------------------------------------------------------
 READ8_MEMBER( isa8_myb3k_fdc4710_device::myb3k_inv_fdc_data_r )
 {
-	uint8_t tmp = m_fdc->read(space, offset);
+	uint8_t tmp = m_fdc->read(offset);
 	LOGR("%s: %02x -> %02x\n", FUNCNAME, tmp, (~tmp) & 0xff);
 	return ~tmp;
 }
 
 READ8_MEMBER( isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_r )
 {
-	uint8_t tmp = m_fdc->read(space, offset);
+	uint8_t tmp = m_fdc->read(offset);
 	LOGR("%s: %02x -> %02x\n", FUNCNAME, tmp, (~tmp) & 0xff);
 	return ~tmp;
 }
@@ -277,13 +285,13 @@ READ8_MEMBER( isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_r )
 WRITE8_MEMBER( isa8_myb3k_fdc4710_device::myb3k_inv_fdc_data_w )
 {
 	LOG("%s: %02x -> %02x\n", FUNCNAME, data, (~data) & 0xff);
-	m_fdc->write(space, offset, (~data) & 0xff);
+	m_fdc->write(offset, (~data) & 0xff);
 }
 
 WRITE8_MEMBER( isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_w )
 {
 	LOG("%s: %02x -> %02x\n", FUNCNAME, data, (~data) & 0xff);
-	m_fdc->write(space, offset, (~data) & 0xff);
+	m_fdc->write(offset, (~data) & 0xff);
 }
 
 //-------------------------------------------------

@@ -41,6 +41,9 @@ public:
 		: fidelbase_state(mconfig, type, tag)
 	{ }
 
+	void sc6(machine_config &config);
+
+private:
 	// SC6
 	void sc6_prepare_display();
 	DECLARE_WRITE8_MEMBER(sc6_mux_w);
@@ -49,7 +52,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(sc6_input6_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input7_r);
 	void sc6_map(address_map &map);
-	void sc6(machine_config &config);
 };
 
 
@@ -116,9 +118,10 @@ READ_LINE_MEMBER(fidelmcs48_state::sc6_input7_r)
 
 // SC6
 
-ADDRESS_MAP_START(fidelmcs48_state::sc6_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void fidelmcs48_state::sc6_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
 
@@ -149,22 +152,22 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(fidelmcs48_state::sc6)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8040, 11_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(sc6_map)
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(fidelmcs48_state, sc6_mux_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(fidelmcs48_state, sc6_input_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(fidelmcs48_state, sc6_select_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(fidelmcs48_state, sc6_input6_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(fidelmcs48_state, sc6_input7_r))
+	MCFG_DEVICE_ADD("maincpu", I8040, 11_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(sc6_map)
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, fidelmcs48_state, sc6_mux_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, fidelmcs48_state, sc6_input_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, fidelmcs48_state, sc6_select_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, fidelmcs48_state, sc6_input6_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, fidelmcs48_state, sc6_input7_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_sc6)
+	config.set_default_layout(layout_fidel_sc6);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -184,5 +187,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT  CMP MACHINE    INPUT   STATE          INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1982, fscc6,    0,       0, sc6,       sc6,    fidelmcs48_state, 0, "Fidelity Electronics", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME   PARENT  CMP MACHINE  INPUT  CLASS             INIT        COMPANY                 FULLNAME                      FLAGS
+CONS( 1982, fscc6, 0,       0, sc6,     sc6,   fidelmcs48_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

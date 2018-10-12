@@ -22,6 +22,10 @@ public:
 	DECLARE_WRITE16_MEMBER( l7a1045_sound_w );
 	DECLARE_READ16_MEMBER( l7a1045_sound_r );
 
+	DECLARE_READ8_MEMBER(dma_r_cb);
+	DECLARE_WRITE8_MEMBER(dma_w_cb);
+	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

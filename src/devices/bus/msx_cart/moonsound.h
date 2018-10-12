@@ -9,7 +9,7 @@
 #include "sound/ymf278b.h"
 
 
-extern const device_type MSX_CART_MOONSOUND;
+DECLARE_DEVICE_TYPE(MSX_CART_MOONSOUND, msx_cart_moonsound_device)
 
 
 class msx_cart_moonsound_device : public device_t, public msx_cart_interface

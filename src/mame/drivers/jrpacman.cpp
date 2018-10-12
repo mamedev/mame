@@ -114,11 +114,15 @@ class jrpacman_state : public pacman_state
 public:
 	jrpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag) { }
+
+	void jrpacman(machine_config &config);
+
+	void init_jrpacman();
+
+private:
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_DRIVER_INIT(jrpacman);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void jrpacman(machine_config &config);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 };
@@ -142,28 +146,30 @@ WRITE_LINE_MEMBER(jrpacman_state::irq_mask_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(jrpacman_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fef) AM_RAM
-	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("P1")
-	AM_RANGE(0x5000, 0x5007) AM_DEVWRITE("latch1", ls259_device, write_d0)
-	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("P2")
-	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x5060, 0x506f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x5070, 0x5077) AM_DEVWRITE("latch2", ls259_device, write_d0)
-	AM_RANGE(0x5080, 0x50bf) AM_READ_PORT("DSW")
-	AM_RANGE(0x5080, 0x5080) AM_WRITE(jrpacman_scroll_w)
-	AM_RANGE(0x50c0, 0x50c0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x8000, 0xdfff) AM_ROM
-ADDRESS_MAP_END
+void jrpacman_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().w(FUNC(jrpacman_state::jrpacman_videoram_w)).share("videoram");
+	map(0x4800, 0x4fef).ram();
+	map(0x4ff0, 0x4fff).ram().share("spriteram");
+	map(0x5000, 0x503f).portr("P1");
+	map(0x5000, 0x5007).w("latch1", FUNC(ls259_device::write_d0));
+	map(0x5040, 0x507f).portr("P2");
+	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5060, 0x506f).writeonly().share("spriteram2");
+	map(0x5070, 0x5077).w("latch2", FUNC(ls259_device::write_d0));
+	map(0x5080, 0x50bf).portr("DSW");
+	map(0x5080, 0x5080).w(FUNC(jrpacman_state::jrpacman_scroll_w));
+	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x8000, 0xdfff).rom();
+}
 
 
-ADDRESS_MAP_START(jrpacman_state::port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0, 0) AM_WRITE(jrpacman_interrupt_vector_w)
-ADDRESS_MAP_END
+void jrpacman_state::port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0, 0).w(FUNC(jrpacman_state::jrpacman_interrupt_vector_w));
+}
 
 
 
@@ -254,7 +260,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( jrpacman )
+static GFXDECODE_START( gfx_jrpacman )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x2000, spritelayout, 0, 128 )
 GFXDECODE_END
@@ -267,34 +273,33 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(jrpacman_state::vblank_irq)
+WRITE_LINE_MEMBER(jrpacman_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jrpacman_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(port_map)
 
-	MCFG_DEVICE_ADD("latch1", LS259, 0) // 5P
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jrpacman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("namco", namco_device, pacman_sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(jrpacman_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(jrpacman_state, coin_counter_w))
+	ls259_device &latch1(LS259(config, "latch1")); // 5P
+	latch1.q_out_cb<0>().set(FUNC(jrpacman_state::irq_mask_w));
+	latch1.q_out_cb<1>().set("namco", FUNC(namco_device::sound_enable_w));
+	latch1.q_out_cb<3>().set(FUNC(jrpacman_state::flipscreen_w));
+	latch1.q_out_cb<7>().set(FUNC(jrpacman_state::coin_counter_w));
 
-	MCFG_DEVICE_ADD("latch2", LS259, 0) // 1H
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jrpacman_state, pengo_palettebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jrpacman_state, pengo_colortablebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(jrpacman_state, jrpacman_bgpriority_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(jrpacman_state, jrpacman_charbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(jrpacman_state, jrpacman_spritebank_w))
+	ls259_device &latch2(LS259(config, "latch2")); // 1H
+	latch2.q_out_cb<0>().set(FUNC(jrpacman_state::pengo_palettebank_w));
+	latch2.q_out_cb<1>().set(FUNC(jrpacman_state::pengo_colortablebank_w));
+	latch2.q_out_cb<3>().set(FUNC(jrpacman_state::jrpacman_bgpriority_w));
+	latch2.q_out_cb<4>().set(FUNC(jrpacman_state::jrpacman_charbank_w));
+	latch2.q_out_cb<5>().set(FUNC(jrpacman_state::jrpacman_spritebank_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -304,17 +309,18 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jrpacman_state, screen_update_pacman)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jrpacman_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jrpacman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jrpacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jrpacman_state,pacman)
 	MCFG_VIDEO_START_OVERRIDE(jrpacman_state,jrpacman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("namco", NAMCO, 3072000/32)
+	MCFG_DEVICE_ADD("namco", NAMCO, 3072000/32)
 	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -379,7 +385,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
+void jrpacman_state::init_jrpacman()
 {
 	/* The encryption PALs garble bits 0, 2 and 7 of the ROMs. The encryption */
 	/* scheme is complex (basically it's a state machine) and can only be */
@@ -417,10 +423,8 @@ DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
 	};
 
 	uint8_t *RAM = memregion("maincpu")->base();
-	int i, j, A;
-
-	for (i = A = 0; table[i].count; i++)
-		for (j = 0; j < table[i].count; j++)
+	for (int i = 0, A = 0; table[i].count; i++)
+		for (int j = 0; j < table[i].count; j++)
 			RAM[A++] ^= table[i].value;
 }
 
@@ -432,5 +436,5 @@ DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
  *
  *************************************/
 
-GAME( 1983, jrpacman,  0,        jrpacman, jrpacman, jrpacman_state, jrpacman, ROT90, "Bally Midway", "Jr. Pac-Man (11/9/83)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jrpacmanf, jrpacman, jrpacman, jrpacman, jrpacman_state, jrpacman, ROT90, "hack", "Jr. Pac-Man (speedup hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jrpacman,  0,        jrpacman, jrpacman, jrpacman_state, init_jrpacman, ROT90, "Bally Midway", "Jr. Pac-Man (11/9/83)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jrpacmanf, jrpacman, jrpacman, jrpacman, jrpacman_state, init_jrpacman, ROT90, "hack", "Jr. Pac-Man (speedup hack)", MACHINE_SUPPORTS_SAVE )

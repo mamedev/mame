@@ -99,16 +99,19 @@ public:
 			m_uart(*this, "ns16450_0"),
 			m_microtouch(*this, "microtouch") { }
 
+	void bonanza(machine_config &config);
+	void pcat_nit(machine_config &config);
+
+	void init_pcat_nit();
+
+private:
 	std::unique_ptr<uint8_t[]> m_banked_nvram;
 	required_device<ns16450_device> m_uart;
 	required_device<microtouch_device> m_microtouch;
 
 	DECLARE_WRITE8_MEMBER(pcat_nit_rombank_w);
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
-	DECLARE_DRIVER_INIT(pcat_nit);
 	virtual void machine_start() override;
-	void bonanza(machine_config &config);
-	void pcat_nit(machine_config &config);
 	void bonanza_io_map(address_map &map);
 	void bonanza_map(address_map &map);
 	void pcat_map(address_map &map);
@@ -152,27 +155,29 @@ WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 	}
 }
 
-ADDRESS_MAP_START(pcat_nit_state::pcat_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
-	AM_RANGE(0x000d0000, 0x000d3fff) AM_RAM AM_REGION("disk_bios", 0)
-	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8(pcat_nit_rombank_w, 0xff)
-	AM_RANGE(0x000d8000, 0x000dffff) AM_ROMBANK("rombank")
-	AM_RANGE(0x000f0000, 0x000fffff) AM_RAM AM_REGION("bios", 0 )
-	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
-ADDRESS_MAP_END
+void pcat_nit_state::pcat_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
+	map(0x000d0000, 0x000d3fff).ram().region("disk_bios", 0);
+	map(0x000d7000, 0x000d7000).w(FUNC(pcat_nit_state::pcat_nit_rombank_w));
+	map(0x000d8000, 0x000dffff).bankr("rombank");
+	map(0x000f0000, 0x000fffff).ram().region("bios", 0);
+	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(pcat_nit_state::bonanza_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
-	AM_RANGE(0x000d0000, 0x000d3fff) AM_RAM AM_REGION("disk_bios", 0)
-	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8(pcat_nit_rombank_w, 0xff)
-	AM_RANGE(0x000d8000, 0x000dffff) AM_ROMBANK("rombank")
-	AM_RANGE(0x000f0000, 0x000fffff) AM_RAM AM_REGION("bios", 0 )
-	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
-ADDRESS_MAP_END
+void pcat_nit_state::bonanza_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
+	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
+	map(0x000d0000, 0x000d3fff).ram().region("disk_bios", 0);
+	map(0x000d7000, 0x000d7000).w(FUNC(pcat_nit_state::pcat_nit_rombank_w));
+	map(0x000d8000, 0x000dffff).bankr("rombank");
+	map(0x000f0000, 0x000fffff).ram().region("bios", 0);
+	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
+}
 
 READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
 {
@@ -189,25 +194,27 @@ READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
 	}
 }
 
-ADDRESS_MAP_START(pcat_nit_state::pcat_nit_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
-	AM_RANGE(0x0280, 0x0283) AM_READNOP
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
-ADDRESS_MAP_END
+void pcat_nit_state::pcat_nit_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x0278, 0x027f).r(FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
+	map(0x0280, 0x0283).nopr();
+	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
+}
 
-ADDRESS_MAP_START(pcat_nit_state::bonanza_io_map)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
-	AM_RANGE(0x0280, 0x0283) AM_READNOP
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
-ADDRESS_MAP_END
+void pcat_nit_state::bonanza_io_map(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x0278, 0x027f).r(FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
+	map(0x0280, 0x0283).nopr();
+	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
+}
 
 static INPUT_PORTS_START( pcat_nit )
 	PORT_START("IN0")
@@ -226,40 +233,43 @@ void pcat_nit_state::machine_start()
 
 MACHINE_CONFIG_START(pcat_nit_state::pcat_nit)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
-	MCFG_CPU_PROGRAM_MAP(pcat_map)
-	MCFG_CPU_IO_MAP(pcat_nit_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(pcat_map)
+	MCFG_DEVICE_IO_MAP(pcat_nit_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
 	pcvideo_vga(config);
 
 	pcat_common(config);
-	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	ns16450_device &uart(NS16450(config, "ns16450_0", XTAL(1'843'200)));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	uart.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
+
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE(uart, ins8250_uart_device, rx_w) ) // rate?
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcat_nit_state::bonanza)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
-	MCFG_CPU_PROGRAM_MAP(bonanza_map)
-	MCFG_CPU_IO_MAP(bonanza_io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(bonanza_map)
+	MCFG_DEVICE_IO_MAP(bonanza_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
 	pcvideo_cirrus_gd5428(config);
 
 	pcat_common(config);
-	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
+	ns16450_device &uart(NS16450(config, "ns16450_0", XTAL(1'843'200)));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	uart.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE(uart, ins8250_uart_device, rx_w) ) // rate?
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 /***************************************
@@ -418,15 +428,15 @@ ROM_START(streetg2r5)
 	ROM_LOAD("8k_nvram.u9",     0x00000, 0x02000, CRC(44be0b89) SHA1(81666dd369d1d85269833293136d61ffe80e940a))
 ROM_END
 
-DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
+void pcat_nit_state::init_pcat_nit()
 {
 	m_banked_nvram = std::make_unique<uint8_t[]>(0x2000);
-	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);
+	subdevice<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);
 }
 
-GAME( 1993, streetg,    0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 3)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 1993, streetg2,   0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", MACHINE_NO_SOUND ) // Street Games II+, 10-0007-07 083194
-GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", MACHINE_NO_SOUND )
-GAME( 1994, bonanza,    0,         bonanza,   pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Touchstar Bonanza (Revision 3)", MACHINE_NO_SOUND ) // Bonanza 10-0018-03 090894
-GAME( 1994, bonanzar2,  bonanza,   bonanza,   pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Touchstar Bonanza (Revision 2)", MACHINE_NO_SOUND ) // Bonanza 10-0018-02 081794
+GAME( 1993, streetg,    0,         pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 3)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1993, streetg2,   0,         pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", MACHINE_NO_SOUND ) // Street Games II+, 10-0007-07 083194
+GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", MACHINE_NO_SOUND )
+GAME( 1994, bonanza,    0,         bonanza,   pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Touchstar Bonanza (Revision 3)", MACHINE_NO_SOUND ) // Bonanza 10-0018-03 090894
+GAME( 1994, bonanzar2,  bonanza,   bonanza,   pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Touchstar Bonanza (Revision 2)", MACHINE_NO_SOUND ) // Bonanza 10-0018-02 081794

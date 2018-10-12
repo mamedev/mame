@@ -158,65 +158,6 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 }
 
 
-//-------------------------------------------------
-//  interrupt_check - check interrupts
-//-------------------------------------------------
-
-void vidbrain_state::interrupt_check()
-{
-	int interrupt = CLEAR_LINE;
-
-	switch (m_int_enable)
-	{
-	case 1:
-		if (m_ext_int_latch) interrupt = ASSERT_LINE;
-		break;
-
-	case 3:
-		if (m_timer_int_latch) interrupt = ASSERT_LINE;
-		break;
-	}
-
-	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, interrupt);
-}
-
-
-//-------------------------------------------------
-//  f3853_w - F3853 SMI write
-//-------------------------------------------------
-
-WRITE8_MEMBER( vidbrain_state::f3853_w )
-{
-	switch (offset)
-	{
-	case 0:
-		// interrupt vector address high
-		m_vector = (data << 8) | (m_vector & 0xff);
-		logerror("%s: F3853 Interrupt Vector %04x\n", machine().describe_context(), m_vector);
-		break;
-
-	case 1:
-		// interrupt vector address low
-		m_vector = (m_vector & 0xff00) | data;
-		logerror("%s: F3853 Interrupt Vector %04x\n", machine().describe_context(), m_vector);
-		break;
-
-	case 2:
-		// interrupt control
-		m_int_enable = data & 0x03;
-		logerror("%s: F3853 Interrupt Control %u\n", machine().describe_context(), m_int_enable);
-		interrupt_check();
-
-		if (m_int_enable == 0x03) logerror("F3853 Timer not supported!\n");
-		break;
-
-	case 3:
-		// timer 8-bit polynomial counter
-		logerror("%s: F3853 Timer not supported!\n", machine().describe_context());
-	}
-}
-
-
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -226,28 +167,29 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 //  ADDRESS_MAP( vidbrain_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(vidbrain_state::vidbrain_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("res1", 0)
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x2300) AM_DEVREADWRITE(UV201_TAG, uv201_device, read, write)
-	AM_RANGE(0x0c00, 0x0fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE(VIDEOBRAIN_EXPANSION_SLOT_TAG, videobrain_expansion_slot_device, cs1_r, cs1_w)
-	AM_RANGE(0x1800, 0x1fff) AM_DEVREADWRITE(VIDEOBRAIN_EXPANSION_SLOT_TAG, videobrain_expansion_slot_device, cs2_r, cs2_w)
-	AM_RANGE(0x2000, 0x27ff) AM_ROM AM_REGION("res2", 0)
-	AM_RANGE(0x3000, 0x3fff) AM_DEVREADWRITE(VIDEOBRAIN_EXPANSION_SLOT_TAG, videobrain_expansion_slot_device, unmap_r, unmap_w)
-ADDRESS_MAP_END
+void vidbrain_state::vidbrain_mem(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom().region("res1", 0);
+	map(0x0800, 0x08ff).mirror(0x2300).rw(m_uv, FUNC(uv201_device::read), FUNC(uv201_device::write));
+	map(0x0c00, 0x0fff).mirror(0x2000).ram();
+	map(0x1000, 0x17ff).rw(m_exp, FUNC(videobrain_expansion_slot_device::cs1_r), FUNC(videobrain_expansion_slot_device::cs1_w));
+	map(0x1800, 0x1fff).rw(m_exp, FUNC(videobrain_expansion_slot_device::cs2_r), FUNC(videobrain_expansion_slot_device::cs2_w));
+	map(0x2000, 0x27ff).rom().region("res2", 0);
+	map(0x3000, 0x3fff).rw(m_exp, FUNC(videobrain_expansion_slot_device::unmap_r), FUNC(videobrain_expansion_slot_device::unmap_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vidbrain_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(vidbrain_state::vidbrain_io)
-	AM_RANGE(0x00, 0x00) AM_WRITE(keyboard_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r, sound_w)
-	AM_RANGE(0x0c, 0x0f) AM_WRITE(f3853_w)
-//  AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(F3853_TAG, f3853_device, read, write)
-ADDRESS_MAP_END
+void vidbrain_state::vidbrain_io(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(vidbrain_state::keyboard_w));
+	map(0x01, 0x01).rw(FUNC(vidbrain_state::keyboard_r), FUNC(vidbrain_state::sound_w));
+	map(0x0c, 0x0f).rw(F3853_TAG, FUNC(f3853_device::read), FUNC(f3853_device::write));
+}
 
 
 
@@ -365,16 +307,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  f3853 interrupt request callback
-//-------------------------------------------------
-
-F3853_INTERRUPT_REQ_CB(vidbrain_state::f3853_int_req_w)
-{
-	m_vector = addr;
-	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level);
-}
-
-//-------------------------------------------------
 //  UV201_INTERFACE( uv_intf )
 //-------------------------------------------------
 
@@ -382,8 +314,7 @@ WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
 {
 	if (state)
 	{
-		m_ext_int_latch = state;
-		interrupt_check();
+		m_smi->ext_int_w(0);
 	}
 }
 
@@ -425,42 +356,13 @@ READ8_MEMBER(vidbrain_state::memory_read_byte)
 //**************************************************************************
 
 //-------------------------------------------------
-//      IRQ_CALLBACK_MEMBER(vidbrain_int_ack)
-//-------------------------------------------------
-
-IRQ_CALLBACK_MEMBER(vidbrain_state::vidbrain_int_ack)
-{
-	uint16_t vector = m_vector;
-
-	switch (m_int_enable)
-	{
-	case 1:
-		vector |= 0x80;
-		m_ext_int_latch = 0;
-		break;
-
-	case 3:
-		vector &= ~0x80;
-		m_timer_int_latch = 0;
-		break;
-	}
-
-	interrupt_check();
-
-	return vector;
-}
-
-
-//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
 void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_uv->ext_int_w(0);
-
-	m_ext_int_latch = 1;
-	interrupt_check();
+	m_smi->ext_int_w(1);
 }
 
 
@@ -474,10 +376,6 @@ void vidbrain_state::machine_start()
 	m_timer_ne555 = timer_alloc(TIMER_JOYSTICK);
 
 	// register for state saving
-	save_item(NAME(m_vector));
-	save_item(NAME(m_int_enable));
-	save_item(NAME(m_ext_int_latch));
-	save_item(NAME(m_timer_int_latch));
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_joy_enable));
 	save_item(NAME(m_sound_clk));
@@ -486,9 +384,6 @@ void vidbrain_state::machine_start()
 
 void vidbrain_state::machine_reset()
 {
-	m_int_enable = 0;
-	m_ext_int_latch = 0;
-	m_timer_int_latch = 0;
 }
 
 
@@ -502,28 +397,32 @@ void vidbrain_state::machine_reset()
 
 MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	// basic machine hardware
-	MCFG_CPU_ADD(F3850_TAG, F8, XTAL(4'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(vidbrain_mem)
-	MCFG_CPU_IO_MAP(vidbrain_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vidbrain_state,vidbrain_int_ack)
+	MCFG_DEVICE_ADD(F3850_TAG, F8, XTAL(4'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(vidbrain_mem)
+	MCFG_DEVICE_IO_MAP(vidbrain_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(F3853_TAG, f3853_device, int_acknowledge)
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_vidbrain)
+	config.set_default_layout(layout_vidbrain);
 
-	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, 3636363, uv_intf)
-	MCFG_UV201_EXT_INT_CALLBACK(WRITELINE(vidbrain_state, ext_int_w))
-	MCFG_UV201_HBLANK_CALLBACK(WRITELINE(vidbrain_state, hblank_w))
-	MCFG_UV201_DB_CALLBACK(READ8(vidbrain_state, memory_read_byte))
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(UV201_TAG, uv201_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(3636363, 232, 18, 232, 262, 21, 262)
+	MCFG_DEVICE_ADD(UV201_TAG, UV201, 3636363)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_UV201_EXT_INT_CALLBACK(WRITELINE(*this, vidbrain_state, ext_int_w))
+	MCFG_UV201_HBLANK_CALLBACK(WRITELINE(*this, vidbrain_state, hblank_w))
+	MCFG_UV201_DB_CALLBACK(READ8(*this, vidbrain_state, memory_read_byte))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.167) // 74ls74.u16 + 120k + 56k
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.167) // 74ls74.u16 + 120k + 56k
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// devices
-	MCFG_DEVICE_ADD(F3853_TAG, F3853, XTAL(4'000'000)/2)
-	MCFG_F3853_EXT_INPUT_CB(vidbrain_state, f3853_int_req_w)
+	F3853(config, m_smi, XTAL(4'000'000)/2);
+	m_smi->int_req_callback().set_inputline(F3850_TAG, F8_INPUT_LINE_INT_REQ);
 
 	// cartridge
 	MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(VIDEOBRAIN_EXPANSION_SLOT_TAG, vidbrain_expansion_cards, nullptr)
@@ -532,8 +431,7 @@ MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vidbrain")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, RAM_TAG).set_default_size("1K");
 MACHINE_CONFIG_END
 
 
@@ -563,5 +461,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT    COMPANY                         FULLNAME                        FLAGS
-COMP( 1977, vidbrain,   0,      0,      vidbrain,   vidbrain, vidbrain_state, 0,      "VideoBrain Computer Company",  "VideoBrain FamilyComputer",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME                     FLAGS
+COMP( 1977, vidbrain, 0,      0,      vidbrain, vidbrain, vidbrain_state, empty_init, "VideoBrain Computer Company", "VideoBrain FamilyComputer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

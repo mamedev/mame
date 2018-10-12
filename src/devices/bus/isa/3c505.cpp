@@ -1644,7 +1644,7 @@ READ16_MEMBER(threecom3c505_device::read)
 		// omit excessive logging
 		if (data == last_data)
 		{
-			uint32_t pc = space.device().safe_pcbase();
+			uint32_t pc = space.device().state().pcbase();
 			if (pc == last_pc)
 			{
 				return data;

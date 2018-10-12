@@ -9,6 +9,7 @@
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
 #include "video/pc080sn.h"
+#include "emupal.h"
 
 #define DARIUS_VOL_MAX    (3*2 + 2)
 #define DARIUS_PAN_MAX    (2 + 2 + 1)   /* FM 2port + PSG 2port + DA 1port */
@@ -46,6 +47,10 @@ public:
 		m_msm5205_r(*this, "msm5205.r"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
+
+	void darius(machine_config &config);
+
+private:
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -130,7 +135,6 @@ public:
 	void update_psg1( int port );
 	void update_da(  );
 	DECLARE_WRITE_LINE_MEMBER(darius_adpcm_int);
-	void darius(machine_config &config);
 	void darius_cpub_map(address_map &map);
 	void darius_map(address_map &map);
 	void darius_sound2_io_map(address_map &map);

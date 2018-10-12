@@ -84,7 +84,7 @@ MACHINE_CONFIG_START(stvcd_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD("sector_timer", stvcd_device, stv_sector_cb)
 	MCFG_TIMER_DRIVER_ADD("sh1_cmd", stvcd_device, stv_sh1_sim)
 
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
+	MCFG_DEVICE_ADD("cdda", CDDA)
 	// FIXME: these outputs should not be hardcoded
 	MCFG_SOUND_ROUTE(0, ":lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, ":rspeaker", 1.0)
@@ -1417,6 +1417,13 @@ void stvcd_device::cd_exec_command()
 			status_type = 0;
 			break;
 
+		// Get MPEG Card Boot ROM
+		// TODO: incomplete, needs to actually retrieve from MPEG ROM, just silence popmessage for now.
+		case 0xe2:
+			cr_standard_return(cd_stat);
+			hirqreg |= (CMOK|MPED);
+			break;
+
 		// following are MPEG commands, enough to get Sport Fishing to do something
 		// MPEG Get Status
 		case 0x90:
@@ -1448,6 +1455,7 @@ void stvcd_device::cd_exec_command()
 			cr3 = 0;
 			cr4 = 0;
 			break;
+
 
 		default:
 			LOG("Unknown command %04x\n", cr1>>8);

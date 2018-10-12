@@ -90,7 +90,7 @@ enum
 
 
 #define MCFG_SUPERFX_OUT_IRQ(_devcb) \
-	devcb = &downcast<superfx_device &>(*device).set_out_irq_func(DEVCB_##_devcb);
+	downcast<superfx_device &>(*device).set_out_irq_func(DEVCB_##_devcb);
 
 
 class superfx_device :  public cpu_device, public superfx_disassembler::config
@@ -129,7 +129,7 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;

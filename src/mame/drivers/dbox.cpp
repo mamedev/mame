@@ -32,10 +32,10 @@
  *
  * History of Nokia Multimedia Division
  *-------------------------------------
- * Luxor AB was a swedish home electronics and computer manufacturer located in Motala from 1923 and aquired
+ * Luxor AB was a swedish home electronics and computer manufacturer located in Motala from 1923 and acquired
  * by Nokia 1985. Luxor designed among other things TV setsm Radios and the famous ABC-80. The Nokia Multimedia
  * Division was formed in Linköping as a result of the Luxor aquesition. Their main design was a satellite
- * receiver, the first satellite in Europee was launched in 1988 and market was growing fast however it took
+ * receiver, the first satellite in Europe was launched in 1988 and the market was growing fast however it took
  * a long time, almost 10 years before the breakthrough came for Nokia, a deal with the Kirsch Gruppe was struck and
  * in 1996 the 68340 based Dbox-1 was released in Germany. The original design was expensive, so soon a cost reduced
  * version based on PPC, the Dbox-2, was released. The boxes sold in millions but the margins were negative or very
@@ -435,32 +435,36 @@
 
 class dbox_state : public driver_device
 {
- public:
- dbox_state(const machine_config &mconfig, device_type type, const char *tag)
-   : driver_device(mconfig, type, tag)
-   , m_maincpu(*this, "maincpu")
-   , m_display(*this, "display")
-   , m_ip16_74259(*this, "hct259.ip16")
-  { }
+public:
+	dbox_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_display(*this, "display")
+		, m_ip16_74259(*this, "hct259.ip16")
+	{ }
+
+	void dbox(machine_config &config);
+
+	void init_dbox();
+
+private:
 	required_device<m68340_cpu_device> m_maincpu;
 	required_device<sda5708_device> m_display;
 	required_device<latch8_device> m_ip16_74259;
 
 	virtual void machine_reset() override;
-	virtual void machine_start () override;
-	DECLARE_DRIVER_INIT(dbox);
+	virtual void machine_start() override;
 	DECLARE_WRITE8_MEMBER(sda5708_reset);
 	DECLARE_WRITE8_MEMBER(sda5708_clk);
 	DECLARE_WRITE8_MEMBER(write_pa);
 
-	void dbox(machine_config &config);
 	void dbox_map(address_map &map);
 
 #if LOCALFLASH
-	DECLARE_READ16_MEMBER (sysflash_r);
-	DECLARE_WRITE16_MEMBER (sysflash_w);
+	DECLARE_READ16_MEMBER(sysflash_r);
+	DECLARE_WRITE16_MEMBER(sysflash_w);
 private:
-	uint16_t *m_sysflash;
+	uint16_t * m_sysflash;
 	uint32_t m_sf_mode;
 	uint32_t m_sf_state;
 #endif
@@ -568,15 +572,16 @@ READ16_MEMBER (dbox_state::sysflash_r){
 /* End of flash emulation */
 #endif
 
-ADDRESS_MAP_START(dbox_state::dbox_map)
+void dbox_state::dbox_map(address_map &map)
+{
 // CS0 - bootrom
 // 008004ee Address mask CS0 00000040, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 008004f8 Base address CS0 00000044, 0000005b (ffffffff) - Base: 00000000 BFC:05 WP:1 FTE:0 NCS:1 Valid: Yes
 #if LOCALFLASH
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_READ16(sysflash_r, 0xffffffff) AM_REGION("flash", 0)
-	AM_RANGE(0x000000, 0x3fffff) AM_WRITE16(sysflash_w, 0xffffffff)
+	map(0x000000, 0x3fffff).rom().r(FUNC(dbox_state::sysflash_r)).region("flash", 0);
+	map(0x000000, 0x3fffff).w(FUNC(dbox_state::sysflash_w));
 #else
-	AM_RANGE(0x000000, 0x3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
+	map(0x000000, 0x3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 #endif
 // CS2 - CS demux
 // 0000009a Address mask CS2 00000050, 00007fff (ffffffff) - Mask: 00007f00 FCM:0f DD:3 PS: External DSACK response
@@ -586,51 +591,50 @@ ADDRESS_MAP_START(dbox_state::dbox_map)
 // 000000aa Address mask CS3 00000058, 000007f2 (ffffffff) - Mask: 00000700 FCM:0f DD:0 PS: 8-bit
 // 000000b2 Base address CS3 0000005c, 00780003 (ffffffff) - Base: 00780000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
 	// AM_RANGE(0x780000, 0x7807ff)
-	AM_RANGE(0x780100, 0x7801ff) AM_WRITE8(sda5708_reset, 0xffffffff)
-	AM_RANGE(0x780600, 0x7806ff) AM_WRITE8(sda5708_clk, 0xffffffff)
+	map(0x780100, 0x7801ff).w(FUNC(dbox_state::sda5708_reset));
+	map(0x780600, 0x7806ff).w(FUNC(dbox_state::sda5708_clk));
 // CS1 - RAM area
 // 0000008a Address mask CS1 00000048, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 00000092 Base address CS1 0000004c, 00800003 (ffffffff) - Base: 00800000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
-	AM_RANGE(0x800000, 0xcfffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x800000, 0xcfffff).ram();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dbox )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(dbox_state::dbox)
-	MCFG_CPU_ADD("maincpu", M68340, 0)       // The 68340 has an internal VCO as clock source, hence need no CPU clock
-	MCFG_MC68340_ADD_CRYSTAL(XTAL(32'768)) // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
-	MCFG_CPU_PROGRAM_MAP(dbox_map)
-	MCFG_MC68340_PA_OUTPUT_CB(WRITE8(dbox_state, write_pa))
+	M68340(config, m_maincpu, 0);       // The 68340 has an internal VCO as clock source, hence need no CPU clock
+	m_maincpu->set_crystal(XTAL(32'768)); // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
+	m_maincpu->set_addrmap(AS_PROGRAM, &dbox_state::dbox_map);
+	m_maincpu->pa_out_callback().set(FUNC(dbox_state::write_pa));
 
 	/* Timer 2 is used to communicate with the descrambler module TODO: Write the descrambler  module */
-	//MCFG_MC68340_TOUT2_OUTPUT_CB(DEVWRITELINE("dcs", descrambler_device,  txd_receiver))
-	//MCFG_MC68340_TGATE2_INPUT_CB(DEVREADLINE("dsc", descrambler_device,  rxd_receiver))
+	//m_maincpu->tout2_out_callback().set("dcs", FUNC(descrambler_device::txd_receiver));
+	//m_maincpu->tgate2_in_callback().set("dsc", FUNC(descrambler_device::rxd_receiver));
 
 	/* Configure the serial ports */
-#define CHA ":rs232"
-#define CHB ":modem"
 	MCFG_DEVICE_MODIFY("maincpu:serial")
-	MCFG_MC68340SER_A_TX_CALLBACK(DEVWRITELINE(CHA, rs232_port_device, write_txd))
-	MCFG_MC68340SER_B_TX_CALLBACK(DEVWRITELINE(CHB, rs232_port_device, write_txd))
-	MCFG_RS232_PORT_ADD (CHA, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", mc68340_serial_module_device, rx_a_w))
-	MCFG_RS232_PORT_ADD (CHB, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", mc68340_serial_module_device, rx_b_w))
+	MCFG_MC68340SER_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68340SER_B_TX_CALLBACK(WRITELINE("modem", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD ("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("maincpu:serial", mc68340_serial_module_device, rx_a_w))
+	MCFG_DEVICE_ADD ("modem", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("maincpu:serial", mc68340_serial_module_device, rx_b_w))
 
 	/* Add the boot flash */
-	MCFG_AMD_29F800B_16BIT_ADD("flash")
+	AMD_29F800B_16BIT(config, "flash");
 
 	/* LED Matrix Display */
 	MCFG_SDA5708_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_sda5708)
+	config.set_default_layout(layout_sda5708);
+
 	/* IP16 74256 8 bit latch */
-	MCFG_LATCH8_ADD("hct259.ip16")
-	MCFG_LATCH8_WRITE_4(DEVWRITELINE("display", sda5708_device, reset_w))
+	LATCH8(config, m_ip16_74259);
+	m_ip16_74259->write_cb<4>().set("display", FUNC(sda5708_device::reset_w));
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(dbox_state, dbox)
+void dbox_state::init_dbox()
 {
 }
 
@@ -641,13 +645,13 @@ ROM_START( dbox )
 	ROM_DEFAULT_BIOS("b200uns")
 
 	ROM_SYSTEM_BIOS(0, "b200uns", "Nokia Bootloader B200uns")
-	ROMX_LOAD( "b200uns.bin",   0x000000, 0x020000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f), ROM_BIOS(1) )
+	ROMX_LOAD( "b200uns.bin",   0x000000, 0x020000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS(1, "b210uns", "Nokia Bootloader B210uns")
-	ROMX_LOAD( "b210uns.bin",   0x000000, 0x020000, CRC(e8de221c) SHA1(db6e20ae73b11e8051f389968803732bd73fc1e4), ROM_BIOS(2) )
+	ROMX_LOAD( "b210uns.bin",   0x000000, 0x020000, CRC(e8de221c) SHA1(db6e20ae73b11e8051f389968803732bd73fc1e4), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(2, "nbc106.bin", "Nokia Bootloader CI v1.06")
-	ROMX_LOAD( "bootCi106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(3) )
+	ROMX_LOAD( "bootci106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(2) )
 ROM_END
 
-COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, init_dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

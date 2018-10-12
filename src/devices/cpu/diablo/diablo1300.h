@@ -38,7 +38,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_state_interface overrides
 	//virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -74,7 +74,7 @@ protected:
 	// address spaces
 	address_space *m_program;
 	address_space *m_data;
-	direct_read_data<-1> *m_direct;
+	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
 };
 
 // device type definition

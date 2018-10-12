@@ -10,6 +10,7 @@
 #include "machine/timer.h"
 #include "machine/msm6242.h"
 #include "sound/c140.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -34,9 +35,27 @@ public:
 		m_scroll(*this, "scroll"),
 		m_spriteram(*this, "spriteram"),
 		m_prgrom(*this, "maincpu"),
-		m_maskrom(*this, "maskrom")
+		m_maskrom(*this, "maskrom"),
+		m_scan_timer(nullptr)
 	{ }
 
+	void namcona_base(machine_config &config);
+	void c69(machine_config &config);
+	void namcona1(machine_config &config);
+
+	void init_bkrtmaq();
+	void init_fa();
+	void init_cgangpzl();
+	void init_tinklpit();
+	void init_swcourt();
+	void init_exvania();
+	void init_emeraldj();
+	void init_swcourtb();
+
+	void namcona1_mcu_io_map(address_map &map);
+	void namcona1_mcu_map(address_map &map);
+
+protected:
 	DECLARE_READ16_MEMBER(custom_key_r);
 	DECLARE_WRITE16_MEMBER(custom_key_w);
 	DECLARE_WRITE16_MEMBER(vreg_w);
@@ -63,25 +82,14 @@ public:
 	DECLARE_READ16_MEMBER(snd_r);
 	DECLARE_WRITE16_MEMBER(snd_w);
 
-	DECLARE_DRIVER_INIT(bkrtmaq);
-	DECLARE_DRIVER_INIT(fa);
-	DECLARE_DRIVER_INIT(cgangpzl);
-	DECLARE_DRIVER_INIT(tinklpit);
-	DECLARE_DRIVER_INIT(swcourt);
-	DECLARE_DRIVER_INIT(exvania);
-	DECLARE_DRIVER_INIT(emeraldj);
-	DECLARE_DRIVER_INIT(swcourtb);
-
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-
-	void namcona1(machine_config &config);
+	void scanline_interrupt(int scanline);
 
 	void namcona1_main_map(address_map &map);
-	void namcona1_mcu_io_map(address_map &map);
-	void namcona1_mcu_map(address_map &map);
-protected:
+	void namcona1_c140_map(address_map &map);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -102,9 +110,12 @@ protected:
 		NAMCO_SWCOURTB
 	};
 
-	int m_gametype;
+	enum
+	{
+		TIMER_SCANLINE
+	};
 
-private:
+	int m_gametype;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -127,6 +138,7 @@ private:
 	required_region_ptr<uint16_t> m_prgrom;
 	required_region_ptr<uint16_t> m_maskrom;
 
+	emu_timer * m_scan_timer;
 	// this has to be uint8_t to be in the right byte order for the tilemap system
 	std::vector<uint8_t> m_shaperam;
 
@@ -171,12 +183,13 @@ public:
 		: namcona1_state(mconfig, type, tag)
 	{}
 
-	DECLARE_DRIVER_INIT(knckhead);
-	DECLARE_DRIVER_INIT(emeralda);
-	DECLARE_DRIVER_INIT(numanath);
-	DECLARE_DRIVER_INIT(quiztou);
-
+	void c70(machine_config &config);
 	void namcona2(machine_config &config);
+
+	void init_knckhead();
+	void init_emeralda();
+	void init_numanath();
+	void init_quiztou();
 };
 
 class xday2_namcona2_state : public namcona2_state
@@ -189,12 +202,15 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
 
+	void xday2(machine_config &config);
+
+	void init_xday2();
+
+private:
 	required_device <msm6242_device> m_rtc;
 
 	DECLARE_READ8_MEMBER(printer_r);
 	DECLARE_WRITE8_MEMBER(printer_w);
 
-	DECLARE_DRIVER_INIT(xday2);
-	void xday2(machine_config &config);
 	void xday2_main_map(address_map &map);
 };

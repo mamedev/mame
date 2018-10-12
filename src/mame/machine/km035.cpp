@@ -45,9 +45,10 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-ADDRESS_MAP_START(km035_device::km035_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void km035_device::km035_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
 
 //-------------------------------------------------
@@ -55,18 +56,18 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(km035_device::device_add_mconfig)
-	MCFG_CPU_ADD(KM035_CPU_TAG, I8035, XTAL(4'608'000))
-	MCFG_CPU_PROGRAM_MAP(km035_map)
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(km035_device, bus_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(km035_device, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(km035_device, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(km035_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(km035_device, p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(km035_device, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(km035_device, t1_r))
+	MCFG_DEVICE_ADD(KM035_CPU_TAG, I8035, XTAL(4'608'000))
+	MCFG_DEVICE_PROGRAM_MAP(km035_map)
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, km035_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, km035_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, km035_device, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, km035_device, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, km035_device, p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, km035_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, km035_device, t1_r))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(KM035_SPK_TAG, BEEP, 3250)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(KM035_SPK_TAG, BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

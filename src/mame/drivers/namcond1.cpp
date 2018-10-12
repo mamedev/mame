@@ -190,32 +190,35 @@ Some logic, resistors/caps/transistors, some connectors etc.
 #include "cpu/m68000/m68000.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 /*************************************************************/
 
-ADDRESS_MAP_START(namcond1_state::namcond1_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x800000, 0x80000f) AM_DEVICE8("ygv608", ygv608_device, port_map, 0xff00)
-	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
-	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(cuskey_r,cuskey_w)
-ADDRESS_MAP_END
+void namcond1_state::namcond1_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40ffff).ram().share("shared_ram");
+	map(0x800000, 0x80000f).m(m_ygv608, FUNC(ygv608_device::port_map)).umask16(0xff00);
+	map(0xa00000, 0xa00fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask16(0xff00);
+	map(0xc3ff00, 0xc3ffff).rw(FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
+}
 
-ADDRESS_MAP_START(namcond1_state::abcheck_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("zpr1")
-	AM_RANGE(0x608000, 0x60ffff) AM_RAM AM_SHARE("zpr2")
-	AM_RANGE(0x700000, 0x700001) AM_WRITENOP
-	AM_RANGE(0x740000, 0x740001) AM_WRITENOP
-	AM_RANGE(0x780000, 0x780001) AM_READ(printer_r)
-	AM_RANGE(0x800000, 0x80000f) AM_DEVICE8("ygv608", ygv608_device, port_map, 0xff00)
-	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
-	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(cuskey_r,cuskey_w)
-ADDRESS_MAP_END
+void namcond1_state::abcheck_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40ffff).ram().share("shared_ram");
+	map(0x600000, 0x607fff).ram().share("zpr1");
+	map(0x608000, 0x60ffff).ram().share("zpr2");
+	map(0x700000, 0x700001).nopw();
+	map(0x740000, 0x740001).nopw();
+	map(0x780000, 0x780001).r(FUNC(namcond1_state::printer_r));
+	map(0x800000, 0x80000f).m(m_ygv608, FUNC(ygv608_device::port_map)).umask16(0xff00);
+	map(0xa00000, 0xa00fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask16(0xff00);
+	map(0xc3ff00, 0xc3ffff).rw(FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
+}
 
 READ16_MEMBER(namcond1_state::printer_r)
 {
@@ -298,25 +301,27 @@ WRITE16_MEMBER(namcond1_state::mcu_pa_write)
 }
 
 /* H8/3002 MCU stuff */
-ADDRESS_MAP_START(namcond1_state::nd1h8rwmap)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW")
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xc00010, 0xc00011) AM_NOP
-	AM_RANGE(0xc00030, 0xc00031) AM_NOP
-	AM_RANGE(0xc00040, 0xc00041) AM_NOP
-	AM_RANGE(0xffff1a, 0xffff1b) AM_NOP     // abcheck
-	AM_RANGE(0xffff1e, 0xffff1f) AM_NOP     // ^
-ADDRESS_MAP_END
+void namcond1_state::nd1h8rwmap(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x20ffff).ram().share("shared_ram");
+	map(0xa00000, 0xa07fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
+	map(0xc00000, 0xc00001).portr("DSW");
+	map(0xc00002, 0xc00003).portr("P1_P2");
+	map(0xc00010, 0xc00011).noprw();
+	map(0xc00030, 0xc00031).noprw();
+	map(0xc00040, 0xc00041).noprw();
+	map(0xffff1a, 0xffff1b).noprw();     // abcheck
+	map(0xffff1e, 0xffff1f).noprw();     // ^
+}
 
-ADDRESS_MAP_START(namcond1_state::nd1h8iomap)
-	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(mcu_p7_read )
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_read, mcu_pa_write )
-	AM_RANGE(h8_device::ADC_0,  h8_device::ADC_3)  AM_NOP // MCU reads these, but the games have no analog controls
-	AM_RANGE(0x14, 0x17) AM_READNOP         // abcheck
-ADDRESS_MAP_END
+void namcond1_state::nd1h8iomap(address_map &map)
+{
+	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(namcond1_state::mcu_p7_read));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcond1_state::mcu_pa_read), FUNC(namcond1_state::mcu_pa_write));
+	map(h8_device::ADC_0, h8_device::ADC_3).noprw(); // MCU reads these, but the games have no analog controls
+	map(0x14, 0x17).nopr();         // abcheck
+}
 
 INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
 {
@@ -346,22 +351,22 @@ WRITE_LINE_MEMBER( namcond1_state::raster_irq_w )
 MACHINE_CONFIG_START(namcond1_state::namcond1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(49'152'000)/4)
-	MCFG_CPU_PROGRAM_MAP(namcond1_map)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(49'152'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcond1_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("mcu", H83002, XTAL(49'152'000)/3 )
-	MCFG_CPU_PROGRAM_MAP( nd1h8rwmap)
-	MCFG_CPU_IO_MAP( nd1h8iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
+	MCFG_DEVICE_ADD("mcu", H83002, XTAL(49'152'000)/3 )
+	MCFG_DEVICE_PROGRAM_MAP( nd1h8rwmap)
+	MCFG_DEVICE_IO_MAP( nd1h8iomap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
-	MCFG_YGV608_ADD("ygv608")
-	MCFG_YGV608_PALETTE("palette")
-	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(namcond1_state, vblank_irq_w))
-	MCFG_YGV608_RASTER_HANDLER(WRITELINE(namcond1_state, raster_irq_w))
+	MCFG_DEVICE_ADD("ygv608", YGV608, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(*this, namcond1_state, vblank_irq_w))
+	MCFG_YGV608_RASTER_HANDLER(WRITELINE(*this, namcond1_state, raster_irq_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -376,27 +381,26 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", XTAL(49'152'000)/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, XTAL(49'152'000)/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_AT28C16_ADD( "at28c16", nullptr )
-
-
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcond1_state::abcheck)
 	namcond1(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(49'152'000)/4)
-	MCFG_CPU_PROGRAM_MAP(abcheck_map)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(49'152'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(abcheck_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("zpr1")
-	MCFG_NVRAM_ADD_0FILL("zpr2")
+	NVRAM(config, "zpr1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "zpr2", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START( ncv1 )
@@ -508,9 +512,9 @@ ROM_START( abcheck )
 	ROM_LOAD( "npg1624lc.u4", 0x020000, 0x200000, CRC(7e00254f) SHA1(b0fa8f979e8322d71f842de5358ae2a2e36386f7) )
 ROM_END
 
-GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, 0, ROT0,  "Namco", "Abnormal Check", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )

@@ -69,7 +69,7 @@ public:
 
 	void globalvr(machine_config &config);
 	void globalvr_map(address_map &map);
-protected:
+private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -77,9 +77,10 @@ protected:
 
 
 
-ADDRESS_MAP_START(globalvr_state::globalvr_map)
-	AM_RANGE(0x00000000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void globalvr_state::globalvr_map(address_map &map)
+{
+	map(0x00000000, 0xffffff).ram();
+}
 
 
 static INPUT_PORTS_START( globalvr )
@@ -88,8 +89,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(globalvr_state::globalvr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 100000000)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(globalvr_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 100000000)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(globalvr_map)
 MACHINE_CONFIG_END
 
 
@@ -138,24 +139,24 @@ ROM_END
 
 ROM_START( nfs )
 	DISK_REGION( "drive_1" )
-	DISK_IMAGE_READONLY( "NEED FOR SPEED DISK 1 VERSION 1.0.1 Rev B", 0, SHA1(799017103c46712534e4bd9c04695fb8241a7ba4) )
+	DISK_IMAGE_READONLY( "need for speed disk 1 version 1.0.1 rev b", 0, SHA1(799017103c46712534e4bd9c04695fb8241a7ba4) )
 
 	DISK_REGION( "drive_2" )
-	DISK_IMAGE_READONLY( "NEED FOR SPEED DISK 2 VERSION 1.0.1 Rev B", 0, SHA1(800d1786bb9d2a2448c03c19ea6626af487aed90) )
+	DISK_IMAGE_READONLY( "need for speed disk 2 version 1.0.1 rev b", 0, SHA1(800d1786bb9d2a2448c03c19ea6626af487aed90) )
 
 	DISK_REGION( "recovery" )
-	DISK_IMAGE_READONLY( "EMERGENCY RECOVERY DISK 11.11.2003 Rev A", 0, SHA1(38656b9da94150e5e8ed8a4183d2cc149e96aedd) )
+	DISK_IMAGE_READONLY( "emergency recovery disk 11.11.2003 rev a", 0, SHA1(38656b9da94150e5e8ed8a4183d2cc149e96aedd) )
 ROM_END
 
 ROM_START( nfsgt )
 	DISK_REGION( "ide:0:hdd:image" )
-	DISK_IMAGE_READONLY( "NEED FOR SPEED GT", 0, SHA1(58bb2b47e30b65f2f09d2c2f2d7f300cf420b18a) )
+	DISK_IMAGE_READONLY( "need for speed gt", 0, SHA1(58bb2b47e30b65f2f09d2c2f2d7f300cf420b18a) )
 
 	DISK_REGION( "drive_1" )
-	DISK_IMAGE_READONLY( "NEED FOR SPEED GT DISK 1 1.1.0 REV C", 0, SHA1(49d967a808f415d3ceb59a5758ee5b3fc4cfb551) )
+	DISK_IMAGE_READONLY( "need for speed gt disk 1 1.1.0 rev c", 0, SHA1(49d967a808f415d3ceb59a5758ee5b3fc4cfb551) )
 
 	DISK_REGION( "drive_2" )
-	DISK_IMAGE_READONLY( "NEED FOR SPEED GT DISK 2 1.1.0 REV C", 0, SHA1(abbae9e61936079112c25c2b7bf2bbb608345ed2) )
+	DISK_IMAGE_READONLY( "need for speed gt disk 2 1.1.0 rev c", 0, SHA1(abbae9e61936079112c25c2b7bf2bbb608345ed2) )
 ROM_END
 
 ROM_START( nfsug )
@@ -171,16 +172,16 @@ ROM_END
 
 
 // OS/Global VR specific Setup Installers
-GAME( 2002, hyperv2,   0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 06/12/02",   MACHINE_IS_SKELETON )
-GAME( 2001, hyperv2a,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 09/30/01",   MACHINE_IS_SKELETON )
-GAME( 2001, gvrxpsys,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Global VR XP OS Install - 09/30/01",        MACHINE_IS_SKELETON )
-GAME( 2002, gvrxpsup,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Global VR XP OS Update/Install - 06/11/02", MACHINE_IS_SKELETON )
+GAME( 2002, hyperv2,  0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 06/12/02",   MACHINE_IS_SKELETON )
+GAME( 2001, hyperv2a, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 09/30/01",   MACHINE_IS_SKELETON )
+GAME( 2001, gvrxpsys, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Global VR XP OS Install - 09/30/01",        MACHINE_IS_SKELETON )
+GAME( 2002, gvrxpsup, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Global VR XP OS Update/Install - 06/11/02", MACHINE_IS_SKELETON )
 
 // Game Installer CDs
-GAME( 2000, bhead2k,   0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2000 Install - 05/27/03",                   MACHINE_IS_SKELETON )
-GAME( 2000, bhead2ka,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2000 Install - 09/16/01",                   MACHINE_IS_SKELETON )
-GAME( 2002, bhead2k2,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2002 Install - 05/27/03",                   MACHINE_IS_SKELETON )
-GAME( 2003, bhead2k3,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2003 Desert War Install - 05/27/03",        MACHINE_IS_SKELETON )
-GAME( 2003, nfs,       0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need for Speed - 4 Cab Link (2 Discs) (v1.0.1 Rev B)", MACHINE_IS_SKELETON )
-GAME( 2004, nfsgt,     0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)",MACHINE_IS_SKELETON )
-GAME( 2005, nfsug,     0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", MACHINE_IS_SKELETON )
+GAME( 2000, bhead2k,  0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2000 Install - 05/27/03",                   MACHINE_IS_SKELETON )
+GAME( 2000, bhead2ka, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2000 Install - 09/16/01",                   MACHINE_IS_SKELETON )
+GAME( 2002, bhead2k2, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2002 Install - 05/27/03",                   MACHINE_IS_SKELETON )
+GAME( 2003, bhead2k3, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2003 Desert War Install - 05/27/03",        MACHINE_IS_SKELETON )
+GAME( 2003, nfs,      0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Need for Speed - 4 Cab Link (2 Discs) (v1.0.1 Rev B)", MACHINE_IS_SKELETON )
+GAME( 2004, nfsgt,    0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)",MACHINE_IS_SKELETON )
+GAME( 2005, nfsug,    0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", MACHINE_IS_SKELETON )

@@ -149,64 +149,68 @@ Video:
 
 
 /* Memory Maps */
-ADDRESS_MAP_START(bloodbro_state::common_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08afff) AM_RAM
-	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
-	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x08d400, 0x08d7ff) AM_RAM
-	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0x08e000, 0x08e7ff) AM_RAM
-	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
-	AM_RANGE(0x0a0000, 0x0a000d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
-//  AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x0c0080, 0x0c0081) AM_WRITENOP // ??? IRQ Ack VBL?
-	AM_RANGE(0x0c00c0, 0x0c00c1) AM_WRITENOP // ??? watchdog?
-	AM_RANGE(0x0c0100, 0x0c0101) AM_WRITENOP // ??? written once
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("DSW")
-	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("IN0")
-	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(bloodbro_state::bloodbro_map)
-	AM_IMPORT_FROM(common_map)
-	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(bloodbro_state::skysmash_map)
-	AM_IMPORT_FROM(common_map)
-	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
-ADDRESS_MAP_END
-
-WRITE8_MEMBER(bloodbro_state::weststry_soundlatch_w)
+void bloodbro_state::common_map(address_map &map)
 {
-	m_seibu_sound->main_w(space, offset, data, mem_mask);
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08afff).ram();
+	map(0x08b000, 0x08bfff).ram().share("spriteram");
+	map(0x08c000, 0x08c3ff).ram().w(FUNC(bloodbro_state::bgvideoram_w)).share("bgvideoram");
+	map(0x08c400, 0x08cfff).ram();
+	map(0x08d000, 0x08d3ff).ram().w(FUNC(bloodbro_state::fgvideoram_w)).share("fgvideoram");
+	map(0x08d400, 0x08d7ff).ram();
+	map(0x08d800, 0x08dfff).ram().w(FUNC(bloodbro_state::txvideoram_w)).share("txvideoram");
+	map(0x08e000, 0x08e7ff).ram();
+	map(0x08e800, 0x08f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08f800, 0x08ffff).ram();
+	map(0x0a0000, 0x0a000d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
+//  AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
+	map(0x0c0080, 0x0c0081).nopw(); // ??? IRQ Ack VBL?
+	map(0x0c00c0, 0x0c00c1).nopw(); // ??? watchdog?
+	map(0x0c0100, 0x0c0101).nopw(); // ??? written once
+	map(0x0e0000, 0x0e0001).portr("DSW");
+	map(0x0e0002, 0x0e0003).portr("IN0");
+	map(0x0e0004, 0x0e0005).portr("IN1");
+}
+
+void bloodbro_state::bloodbro_map(address_map &map)
+{
+	common_map(map);
+	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+}
+
+void bloodbro_state::skysmash_map(address_map &map)
+{
+	common_map(map);
+	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read_alt), FUNC(seibu_crtc_device::write_alt));
+}
+
+void bloodbro_state::weststry_soundlatch_w(offs_t offset, u8 data)
+{
+	m_seibu_sound->main_w(offset, data);
 
 	if (offset == 1)
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-ADDRESS_MAP_START(bloodbro_state::weststry_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM // old VRAM areas still used, but bootleg code copies them to higher addresses
-	AM_RANGE(0x0c1000, 0x0c1001) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c1002, 0x0c1003) AM_READ_PORT("IN0")
-	AM_RANGE(0x0c1004, 0x0c1005) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c1000, 0x0c1003) AM_WRITE8(weststry_soundlatch_w, 0xff00)
-	AM_RANGE(0x0c1004, 0x0c100b) AM_WRITE(weststry_layer_scroll_w)
-	AM_RANGE(0x0e0002, 0x0e0003) AM_READNOP // remnant of old code
-	AM_RANGE(0x122800, 0x122bff) AM_RAM // cleared at startup
-	AM_RANGE(0x122c00, 0x122fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x123000, 0x1233ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x123400, 0x1237ff) AM_RAM // cleared at startup
-	AM_RANGE(0x123800, 0x123fff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0x124000, 0x124005) AM_RAM
-	AM_RANGE(0x124006, 0x1247fd) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x128000, 0x1287ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-ADDRESS_MAP_END
+void bloodbro_state::weststry_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08ffff).ram(); // old VRAM areas still used, but bootleg code copies them to higher addresses
+	map(0x0c1000, 0x0c1001).portr("DSW");
+	map(0x0c1002, 0x0c1003).portr("IN0");
+	map(0x0c1004, 0x0c1005).portr("IN1");
+	map(0x0c1000, 0x0c1003).w(FUNC(bloodbro_state::weststry_soundlatch_w)).umask16(0xff00);
+	map(0x0c1004, 0x0c100b).w(FUNC(bloodbro_state::weststry_layer_scroll_w));
+	map(0x0e0002, 0x0e0003).nopr(); // remnant of old code
+	map(0x122800, 0x122bff).ram(); // cleared at startup
+	map(0x122c00, 0x122fff).ram().w(FUNC(bloodbro_state::fgvideoram_w)).share("fgvideoram");
+	map(0x123000, 0x1233ff).ram().w(FUNC(bloodbro_state::bgvideoram_w)).share("bgvideoram");
+	map(0x123400, 0x1237ff).ram(); // cleared at startup
+	map(0x123800, 0x123fff).ram().w(FUNC(bloodbro_state::txvideoram_w)).share("txvideoram");
+	map(0x124000, 0x124005).ram();
+	map(0x124006, 0x1247fd).ram().share("spriteram");
+	map(0x128000, 0x1287ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
 
 WRITE_LINE_MEMBER(bloodbro_state::weststry_opl_irq_w)
 {
@@ -234,10 +238,11 @@ void bloodbro_state::weststry_soundnmi_update()
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-ADDRESS_MAP_START(bloodbro_state::weststry_sound_map)
-	AM_IMPORT_FROM(seibu_sound_map)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(weststry_soundnmi_ack_w)
-ADDRESS_MAP_END
+void bloodbro_state::weststry_sound_map(address_map &map)
+{
+	seibu_sound_map(map);
+	map(0x4002, 0x4002).w(FUNC(bloodbro_state::weststry_soundnmi_ack_w));
+}
 
 /* Input Ports */
 
@@ -486,14 +491,14 @@ static const gfx_layout weststry_spritelayout =
 
 /* Graphics Decode Info */
 
-static GFXDECODE_START( bloodbro )
+static GFXDECODE_START( gfx_bloodbro )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, textlayout,   0x70*16,  0x10 ) /* Text */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0x40*16,  0x10 ) /* Background */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0x50*16,  0x10 ) /* Foreground */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout, 0x00*16,  0x10 ) /* Sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( weststry )
+static GFXDECODE_START( gfx_weststry )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, weststry_textlayout,     0x10*16,  0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, weststry_spritelayout,   0x30*16,  0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, weststry_spritelayout,   0x20*16,  0x10 )
@@ -519,12 +524,13 @@ WRITE16_MEMBER( bloodbro_state::weststry_layer_scroll_w )
 
 MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(bloodbro_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(bloodbro_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(7'159'090)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(7'159'090)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	// video hardware
 
@@ -537,43 +543,44 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(bloodbro_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(bloodbro_state, layer_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, bloodbro_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, bloodbro_state, layer_scroll_w))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bloodbro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bloodbro)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(7'159'090)/2)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(7'159'090)/2)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bloodbro_state::weststry)
 	bloodbro(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(weststry_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(weststry_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq6_line_hold)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK(XTAL(20'000'000)/4) /* 5MHz - verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(weststry_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_CLOCK(XTAL(20'000'000)/4) /* 5MHz - verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(weststry_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE()
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", weststry)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_weststry)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -586,23 +593,23 @@ MACHINE_CONFIG_START(bloodbro_state::weststry)
 
 	// Bootleg sound hardware is close copy of Seibu, but uses different interrupts
 
-	MCFG_OKIM6295_REPLACE("oki", XTAL(20'000'000)/16, PIN7_HIGH) /* 1.25MHz - verified on PCB */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, XTAL(20'000'000)/16, okim6295_device::PIN7_HIGH) /* 1.25MHz - verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL(20'000'000)/4) /* ~4.9MHz - see notes at top */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(bloodbro_state, weststry_opl_irq_w))
+	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(20'000'000)/4) /* ~4.9MHz - see notes at top */
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(*this, bloodbro_state, weststry_opl_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_MODIFY("seibu_sound")
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8(bloodbro_state, weststry_opl_w))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8(*this, bloodbro_state, weststry_opl_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bloodbro_state::skysmash)
 	bloodbro(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(skysmash_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq2_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(skysmash_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq2_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_skysmash)
@@ -627,10 +634,10 @@ ROM_START( bloodbro )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
@@ -656,10 +663,10 @@ ROM_START( bloodbroj )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
@@ -685,10 +692,10 @@ ROM_START( bloodbroja )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
@@ -714,10 +721,10 @@ ROM_START( bloodbrou )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
@@ -848,16 +855,14 @@ ROM_START( skysmash )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(bloodbro_state,weststry)
+void bloodbro_state::init_weststry()
 {
 	// Patch out jp nz,$3000; no code known to exist at that address
 	memory_region *z80_rom = memregion("audiocpu");
 	z80_rom->as_u8(0x160e) = 0x00;
 	z80_rom->as_u8(0x1610) = 0x00;
 
-
 	uint8_t *sprites = memregion("gfx3")->base();
-
 	for (int i = 0; i < 0x40000; i++)
 	{
 		/* sprite roms ws25 and ws26 have 2 bits swapped
@@ -875,10 +880,10 @@ DRIVER_INIT_MEMBER(bloodbro_state,weststry)
 
 /* Game Drivers */
 
-GAME( 1990, bloodbro,   0,        bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (World?)",                       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bloodbroj,  bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (Japan, rev A)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bloodbroja, bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (Japan)",                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bloodbrou,  bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation (Fabtek license)", "Blood Bros. (US)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, weststry,   bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, weststrya,  bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, skysmash,   0,        skysmash, skysmash, bloodbro_state, 0,        ROT270, "Nihon System",    "Sky Smasher",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbro,   0,        bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (World?)",                       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbroj,  bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (Japan, rev A)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbroja, bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (Japan)",                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbrou,  bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation (Fabtek license)", "Blood Bros. (US)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, weststry,   bloodbro, weststry, weststry, bloodbro_state, init_weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, weststrya,  bloodbro, weststry, weststry, bloodbro_state, init_weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, skysmash,   0,        skysmash, skysmash, bloodbro_state, empty_init,    ROT270, "Nihon System",    "Sky Smasher",                                MACHINE_SUPPORTS_SAVE )

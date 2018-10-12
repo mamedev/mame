@@ -42,11 +42,12 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(gamecube_state::ppc_mem)
-	AM_RANGE(0x00000000, 0x017fffff) AM_RAM // 24 MB main memory
-	AM_RANGE(0x08000000, 0x081fffff) AM_RAM //  2 MB embedded framebuffer
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROMBANK("boot")
-ADDRESS_MAP_END
+void gamecube_state::ppc_mem(address_map &map)
+{
+	map(0x00000000, 0x017fffff).ram(); // 24 MB main memory
+	map(0x08000000, 0x081fffff).ram(); //  2 MB embedded framebuffer
+	map(0xfff00000, 0xffffffff).bankr("boot");
+}
 
 
 //**************************************************************************
@@ -142,8 +143,8 @@ void gamecube_state::machine_reset()
 //**************************************************************************
 
 MACHINE_CONFIG_START(gamecube_state::gc)
-	MCFG_CPU_ADD("maincpu", PPC603, 485000000 / 100) // 485 MHz IBM "Gekko" (750CXe/750FX based)
-	MCFG_CPU_PROGRAM_MAP(ppc_mem)
+	MCFG_DEVICE_ADD("maincpu", PPC603, 485000000 / 100) // 485 MHz IBM "Gekko" (750CXe/750FX based)
+	MCFG_DEVICE_PROGRAM_MAP(ppc_mem)
 MACHINE_CONFIG_END
 
 
@@ -164,11 +165,11 @@ ROM_START( gcjp ) // DOL-001(JPN) and DOL-101(JPN); NTSC gamecube board, outputs
 	ROM_REGION(0x200000, "ipl", 0)
 	ROM_DEFAULT_BIOS("v12")
 	ROM_SYSTEM_BIOS(0, "v10", "NTSC Revision 1.0") // Internal version 36  Mar 22 2001 22:38:31
-	ROMX_LOAD("ipl_ntsc_v10.bin", 0x000000, 0x200000, CRC(6dac1f2a) SHA1(a1837968288253ed541f2b11440b68f5a9b33875), ROM_BIOS(1))
+	ROMX_LOAD("ipl_ntsc_v10.bin", 0x000000, 0x200000, CRC(6dac1f2a) SHA1(a1837968288253ed541f2b11440b68f5a9b33875), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v11", "NTSC Revision 1.1") // Internal version 47  Sep 27 2001 15:15:22
-	ROMX_LOAD("ipl_ntsc_v11.bin", 0x000000, 0x200000, CRC(d5e6feea) SHA1(239eacd86527ff9a75aeb7282da65797baeef010), ROM_BIOS(2))
+	ROMX_LOAD("ipl_ntsc_v11.bin", 0x000000, 0x200000, CRC(d5e6feea) SHA1(239eacd86527ff9a75aeb7282da65797baeef010), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v12", "NTSC Revision 1.2") // Internal version 0x2301  Jun 16 2003 04:27:06
-	ROMX_LOAD("ipl_ntsc_v12.bin", 0x000000, 0x200000, CRC(86573808) SHA1(ef9194ab4804aa0aa8540d846caf291b28331165), ROM_BIOS(3)) // not verified from console yet but seems good
+	ROMX_LOAD("ipl_ntsc_v12.bin", 0x000000, 0x200000, CRC(86573808) SHA1(ef9194ab4804aa0aa8540d846caf291b28331165), ROM_BIOS(2)) // not verified from console yet but seems good
 	// There may be another IPL with the same "NTSC Revision 1.2" string as above but not the same code. If so, it is undumped.
 
 	ROM_REGION(0x20000, "dvd", 0)
@@ -185,11 +186,11 @@ ROM_START( gcus ) // DOL-001(USA) and DOL-101(USA); NTSC gamecube board, outputs
 	ROM_REGION(0x200000, "ipl", 0)
 	ROM_DEFAULT_BIOS("v12")
 	ROM_SYSTEM_BIOS(0, "v10", "NTSC Revision 1.0") // Internal version 36  Mar 22 2001 22:38:31
-	ROMX_LOAD("ipl_ntsc_v10.bin", 0x000000, 0x200000, CRC(6dac1f2a) SHA1(a1837968288253ed541f2b11440b68f5a9b33875), ROM_BIOS(1))
+	ROMX_LOAD("ipl_ntsc_v10.bin", 0x000000, 0x200000, CRC(6dac1f2a) SHA1(a1837968288253ed541f2b11440b68f5a9b33875), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v11", "NTSC Revision 1.1") // Internal version 47  Sep 27 2001 15:15:22
-	ROMX_LOAD("ipl_ntsc_v11.bin", 0x000000, 0x200000, CRC(d5e6feea) SHA1(239eacd86527ff9a75aeb7282da65797baeef010), ROM_BIOS(2))
+	ROMX_LOAD("ipl_ntsc_v11.bin", 0x000000, 0x200000, CRC(d5e6feea) SHA1(239eacd86527ff9a75aeb7282da65797baeef010), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v12", "NTSC Revision 1.2") // Internal version 0x2301  Jun 16 2003 04:27:06
-	ROMX_LOAD("ipl_ntsc_v12.bin", 0x000000, 0x200000, CRC(86573808) SHA1(ef9194ab4804aa0aa8540d846caf291b28331165), ROM_BIOS(3)) // not verified from console yet but seems good
+	ROMX_LOAD("ipl_ntsc_v12.bin", 0x000000, 0x200000, CRC(86573808) SHA1(ef9194ab4804aa0aa8540d846caf291b28331165), ROM_BIOS(2)) // not verified from console yet but seems good
 	// There may be another IPL with the same "NTSC Revision 1.2" string as above but not the same code. If so, it is undumped.
 
 	ROM_REGION(0x20000, "dvd", 0)
@@ -206,10 +207,10 @@ ROM_START( gceu ) // DOL-001(EUR) and DOL-101(EUR); PAL gamecube board, outputs 
 	ROM_REGION(0x200000, "ipl", 0)
 	ROM_DEFAULT_BIOS("v12")
 	ROM_SYSTEM_BIOS(0, "v10", "PAL Revision 1.0") // Internal version 47  Sep 27 2001 15:15:22
-	ROMX_LOAD("ipl_pal_v10.bin", 0x000000, 0x200000, CRC(4f319f43) SHA1(f27c63e5394e2fd1606f70df004c4fc2d6027700), ROM_BIOS(1))
-	// there might be an undumped "PAL Revision 1.1" IPL
+	ROMX_LOAD("ipl_pal_v10.bin", 0x000000, 0x200000, CRC(4f319f43) SHA1(f27c63e5394e2fd1606f70df004c4fc2d6027700), ROM_BIOS(0))
+	// "PAL Revision 1.1" IPL probably doesn't exist; the internal version of "PAL Revision 1.0" lines up with "NTSC Revision 1.1"
 	ROM_SYSTEM_BIOS(1, "v12", "PAL Revision 1.2") // Internal version 0x2301  Jun 16 2003 04:27:06
-	ROMX_LOAD("ipl_pal_v12.bin", 0x000000, 0x200000, CRC(ad1b7f16) SHA1(80b8744ff5e43585392f55546bd03a673d11ef5f), ROM_BIOS(2)) // not verified from console yet but seems good
+	ROMX_LOAD("ipl_pal_v12.bin", 0x000000, 0x200000, CRC(ad1b7f16) SHA1(80b8744ff5e43585392f55546bd03a673d11ef5f), ROM_BIOS(1)) // not verified from console yet but seems good
 
 	ROM_REGION(0x20000, "dvd", 0)
 	ROM_LOAD("20010608.bin", 0x00000, 0x20000, CRC(c047465a) SHA1(27872c201e87b06a19bf85d36c796ef383f8d52d))
@@ -240,8 +241,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  CLASS           INIT  COMPANY    FULLNAME  FLAGS
-CONS( 2001, gcjp,  0,      0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (Japan)",  MACHINE_IS_SKELETON )
-CONS( 2001, gcus,  gcjp,   0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (USA)",    MACHINE_IS_SKELETON )
-CONS( 2002, gceu,  gcjp,   0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (EUR)",    MACHINE_IS_SKELETON )
-CONS( 2002, gcbr,  gcjp,   0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (Brazil)", MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY     FULLNAME             FLAGS
+CONS( 2001, gcjp,  0,      0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Japan)",  MACHINE_IS_SKELETON )
+CONS( 2001, gcus,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (USA)",    MACHINE_IS_SKELETON )
+CONS( 2002, gceu,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (EUR)",    MACHINE_IS_SKELETON )
+CONS( 2002, gcbr,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Brazil)", MACHINE_IS_SKELETON )

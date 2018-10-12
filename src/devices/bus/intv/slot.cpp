@@ -535,12 +535,13 @@ WRITE16_MEMBER(intv_cart_slot_device::write_speech)
 //#include "bus/intv/keycomp.h"
 #include "bus/intv/voice.h"
 
-SLOT_INTERFACE_START(intv_cart)
-	SLOT_INTERFACE_INTERNAL("intv_rom",     INTV_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("intv_ram",     INTV_ROM_RAM)
-	SLOT_INTERFACE_INTERNAL("intv_gfact",   INTV_ROM_GFACT)
-	SLOT_INTERFACE_INTERNAL("intv_wsmlb",   INTV_ROM_WSMLB)
-	SLOT_INTERFACE_INTERNAL("intv_voice",   INTV_ROM_VOICE)
-	SLOT_INTERFACE_INTERNAL("intv_ecs",     INTV_ROM_ECS)
-//  SLOT_INTERFACE_INTERNAL("intv_keycomp", INTV_ROM_KEYCOMP)
-SLOT_INTERFACE_END
+void intv_cart(device_slot_interface &device)
+{
+	device.option_add_internal("intv_rom",     INTV_ROM_STD);
+	device.option_add_internal("intv_ram",     INTV_ROM_RAM);
+	device.option_add_internal("intv_gfact",   INTV_ROM_GFACT);
+	device.option_add_internal("intv_wsmlb",   INTV_ROM_WSMLB);
+	device.option_add_internal("intv_voice",   INTV_ROM_VOICE);
+	device.option_add_internal("intv_ecs",     INTV_ROM_ECS);
+//  device.option_add_internal("intv_keycomp", INTV_ROM_KEYCOMP);
+}

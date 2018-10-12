@@ -106,10 +106,13 @@ private:
 	void execute_go(int ref, const std::vector<std::string> &params);
 	void execute_go_vblank(int ref, const std::vector<std::string> &params);
 	void execute_go_interrupt(int ref, const std::vector<std::string> &params);
+	void execute_go_exception(int ref, const std::vector<std::string> &params);
 	void execute_go_time(int ref, const std::vector<std::string> &params);
 	void execute_focus(int ref, const std::vector<std::string> &params);
 	void execute_ignore(int ref, const std::vector<std::string> &params);
 	void execute_observe(int ref, const std::vector<std::string> &params);
+	void execute_suspend(int ref, const std::vector<std::string> &params);
+	void execute_resume(int ref, const std::vector<std::string> &params);
 	void execute_next(int ref, const std::vector<std::string> &params);
 	void execute_comment_add(int ref, const std::vector<std::string> &params);
 	void execute_comment_del(int ref, const std::vector<std::string> &params);

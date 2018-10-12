@@ -248,60 +248,63 @@ READ8_MEMBER( atomeb_state::dos_r )
     ADDRESS_MAP( atom_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(atom_state::atom_mem)
-	AM_RANGE(0x0000, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVICE(I8271_TAG, i8271_device, map)
-	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_device, data_r, data_w)
-	AM_RANGE(0x0a05, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x9800, 0x9fff) AM_RAM
-//  AM_RANGE(0xa000, 0xafff)        // mapped by the cartslot
-	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
-//  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
-//  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
-	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
-ADDRESS_MAP_END
+void atom_state::atom_mem(address_map &map)
+{
+	map(0x0000, 0x09ff).ram();
+	map(0x0a00, 0x0a03).mirror(0x1f8).m(m_fdc, FUNC(i8271_device::map));
+	map(0x0a04, 0x0a04).mirror(0x1f8).rw(m_fdc, FUNC(i8271_device::data_r), FUNC(i8271_device::data_w));
+	map(0x0a05, 0x7fff).ram();
+	map(0x8000, 0x97ff).ram().share("video_ram");
+	map(0x9800, 0x9fff).ram();
+//  map(0xa000, 0xafff)        // mapped by the cartslot
+	map(0xb000, 0xb003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+//  map(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
+//  map(0xb404, 0xb404) AM_READ_PORT("ECONET")
+	map(0xb800, 0xb80f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xc000, 0xffff).rom().region(SY6502_TAG, 0);
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( atomeb_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(atomeb_state::atomeb_mem)
-	AM_IMPORT_FROM(atom_mem)
-	AM_RANGE(0xa000, 0xafff) AM_READ(ext_r)
-	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(eprom_r, eprom_w)
-	AM_RANGE(0xe000, 0xefff) AM_READ(dos_r)
-ADDRESS_MAP_END
+void atomeb_state::atomeb_mem(address_map &map)
+{
+	atom_mem(map);
+	map(0xa000, 0xafff).r(FUNC(atomeb_state::ext_r));
+	map(0xbfff, 0xbfff).rw(FUNC(atomeb_state::eprom_r), FUNC(atomeb_state::eprom_w));
+	map(0xe000, 0xefff).r(FUNC(atomeb_state::dos_r));
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( atombb_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(atom_state::atombb_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x57ff) AM_RAM AM_SHARE("video_ram")
-
-	AM_RANGE(0x7000, 0x7003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
-	AM_RANGE(0x7800, 0x780f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("basic", 0)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
-ADDRESS_MAP_END
+void atom_state::atombb_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0x57ff).ram().share("video_ram");
+	map(0x7000, 0x7003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7800, 0x780f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0xbfff).rom().region("basic", 0);
+	map(0xf000, 0xffff).rom().region(SY6502_TAG, 0);
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( prophet_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(atom_state::prophet_mem)
-	AM_RANGE(0x0000, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x9800, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("ic24", 0)
-	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
-	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
-ADDRESS_MAP_END
+void atom_state::prophet_mem(address_map &map)
+{
+	map(0x0000, 0x09ff).ram();
+	map(0x0a00, 0x7fff).ram();
+	map(0x8000, 0x97ff).ram().share("video_ram");
+	map(0x9800, 0x9fff).ram();
+	map(0xa000, 0xafff).rom().region("ic24", 0);
+	map(0xb000, 0xb003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb800, 0xb80f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xc000, 0xffff).rom().region(SY6502_TAG, 0);
+}
 
 /***************************************************************************
     INPUT PORTS
@@ -594,7 +597,7 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 
@@ -659,8 +662,8 @@ void atom_state::machine_start()
 	m_baseram[0x0a] = machine().rand() & 0x0ff;
 	m_baseram[0x0b] = machine().rand() & 0x0ff;
 
-	if (m_cart && m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xafff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+	if (m_cart.found() && m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xafff, read8_delegate(FUNC(generic_slot_device::read_rom), &*m_cart));
 }
 
 /*-------------------------------------------------
@@ -676,9 +679,9 @@ void atomeb_state::machine_start()
     MACHINE DRIVERS
 ***************************************************************************/
 
-image_init_result atom_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+image_init_result atom_state::load_cart(device_image_interface &image, generic_slot_device &slot)
 {
-	uint32_t size = slot->common_get_size("rom");
+	uint32_t size = slot.common_get_size("rom");
 
 	if (size > 0x1000)
 	{
@@ -686,15 +689,16 @@ image_init_result atom_state::load_cart(device_image_interface &image, generic_s
 		return image_init_result::FAIL;
 	}
 
-	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	slot->common_load_rom(slot->get_rom_base(), size, "rom");
+	slot.rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	slot.common_load_rom(slot.get_rom_base(), size, "rom");
 
 	return image_init_result::PASS;
 }
 
-static SLOT_INTERFACE_START(atom_floppies)
-	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void atom_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+}
 
 FLOPPY_FORMATS_MEMBER(atom_state::floppy_formats)
 	FLOPPY_ATOM_FORMAT
@@ -706,45 +710,45 @@ FLOPPY_FORMATS_END0
 
 MACHINE_CONFIG_START(atom_state::atom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
-	MCFG_CPU_PROGRAM_MAP(atom_mem)
+	MCFG_DEVICE_ADD(SY6502_TAG, M6502, X2/4)
+	MCFG_DEVICE_PROGRAM_MAP(atom_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
 	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(atom_state, vdg_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, atom_state, vdg_videoram_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
-	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
+	via6522_device &via(VIA6522(config, R6522_TAG, X2/4));
+	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
+	via.irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(atom_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(atom_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(atom_state, ppi_pc_w))
+	i8255_device &ppi(I8255(config, INS8255_TAG));
+	ppi.out_pa_callback().set(FUNC(atom_state::ppi_pa_w));
+	ppi.in_pb_callback().set(FUNC(atom_state::ppi_pb_r));
+	ppi.in_pc_callback().set(FUNC(atom_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(atom_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8271_TAG, I8271 , 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(atom_state, atom_8271_interrupt_callback))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(atom_state, motor_w))
+	I8271(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
+	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_pa7))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -761,10 +765,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_GENERIC_LOAD(atom_state, cart_load)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,4K,6K,8K,10K,12K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("2K,4K,6K,8K,10K,12K").set_default_value(0x00);
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("rom_list","atom_rom")
@@ -783,28 +784,28 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atomeb_state::atomeb)
 	atom(config);
-	MCFG_CPU_MODIFY(SY6502_TAG)
-	MCFG_CPU_PROGRAM_MAP(atomeb_mem)
+	MCFG_DEVICE_MODIFY(SY6502_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(atomeb_mem)
 
 	/* cartridges */
 	MCFG_DEVICE_REMOVE("cartslot")
 
-	MCFG_ATOM_ROM_ADD("rom_a0", a0_load)
-	MCFG_ATOM_ROM_ADD("rom_a1", a1_load)
-	MCFG_ATOM_ROM_ADD("rom_a2", a2_load)
-	MCFG_ATOM_ROM_ADD("rom_a3", a3_load)
-	MCFG_ATOM_ROM_ADD("rom_a4", a4_load)
-	MCFG_ATOM_ROM_ADD("rom_a5", a5_load)
-	MCFG_ATOM_ROM_ADD("rom_a6", a6_load)
-	MCFG_ATOM_ROM_ADD("rom_a7", a7_load)
-	MCFG_ATOM_ROM_ADD("rom_a8", a8_load)
-	MCFG_ATOM_ROM_ADD("rom_a9", a9_load)
-	MCFG_ATOM_ROM_ADD("rom_aa", aa_load)
-	MCFG_ATOM_ROM_ADD("rom_ab", ab_load)
-	MCFG_ATOM_ROM_ADD("rom_ac", ac_load)
-	MCFG_ATOM_ROM_ADD("rom_ad", ad_load)
-	MCFG_ATOM_ROM_ADD("rom_ae", ae_load)
-	MCFG_ATOM_ROM_ADD("rom_af", af_load)
+	MCFG_ATOM_ROM_ADD("rom_a0", ext_load<0x0>)
+	MCFG_ATOM_ROM_ADD("rom_a1", ext_load<0x1>)
+	MCFG_ATOM_ROM_ADD("rom_a2", ext_load<0x2>)
+	MCFG_ATOM_ROM_ADD("rom_a3", ext_load<0x3>)
+	MCFG_ATOM_ROM_ADD("rom_a4", ext_load<0x4>)
+	MCFG_ATOM_ROM_ADD("rom_a5", ext_load<0x5>)
+	MCFG_ATOM_ROM_ADD("rom_a6", ext_load<0x6>)
+	MCFG_ATOM_ROM_ADD("rom_a7", ext_load<0x7>)
+	MCFG_ATOM_ROM_ADD("rom_a8", ext_load<0x8>)
+	MCFG_ATOM_ROM_ADD("rom_a9", ext_load<0x9>)
+	MCFG_ATOM_ROM_ADD("rom_aa", ext_load<0xa>)
+	MCFG_ATOM_ROM_ADD("rom_ab", ext_load<0xb>)
+	MCFG_ATOM_ROM_ADD("rom_ac", ext_load<0xc>)
+	MCFG_ATOM_ROM_ADD("rom_ad", ext_load<0xd>)
+	MCFG_ATOM_ROM_ADD("rom_ae", ext_load<0xe>)
+	MCFG_ATOM_ROM_ADD("rom_af", ext_load<0xf>)
 
 	MCFG_ATOM_ROM_ADD("rom_e0", e0_load)
 	MCFG_ATOM_ROM_ADD("rom_e1", e1_load)
@@ -816,37 +817,37 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atom_state::atombb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
-	MCFG_CPU_PROGRAM_MAP(atombb_mem)
+	MCFG_DEVICE_ADD(SY6502_TAG, M6502, X2/4)
+	MCFG_DEVICE_PROGRAM_MAP(atombb_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
 	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(atom_state, vdg_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, atom_state, vdg_videoram_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
-	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
+	via6522_device &via(VIA6522(config, R6522_TAG, X2/4));
+	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
+	via.irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(atom_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(atom_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(atom_state, ppi_pc_w))
+	i8255_device &ppi(I8255(config, INS8255_TAG));
+	ppi.out_pa_callback().set(FUNC(atom_state::ppi_pa_w));
+	ppi.in_pb_callback().set(FUNC(atom_state::ppi_pb_r));
+	ppi.in_pc_callback().set(FUNC(atom_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(atom_state::ppi_pc_w));
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_pa7))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -856,10 +857,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_CASSETTE_INTERFACE("atom_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,12K")
-
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -869,8 +867,8 @@ MACHINE_CONFIG_END
 //static MACHINE_CONFIG_START( prophet2 )
 //  atom(config);
 //  /* basic machine hardware */
-//  MCFG_CPU_MODIFY(SY6502_TAG)
-//  MCFG_CPU_PROGRAM_MAP(prophet_mem)
+//  MCFG_DEVICE_MODIFY(SY6502_TAG)
+//  MCFG_DEVICE_PROGRAM_MAP(prophet_mem)
 //
 //  /* fdc */
 //  MCFG_DEVICE_REMOVE(I8271_TAG)
@@ -893,8 +891,8 @@ MACHINE_CONFIG_END
 //static MACHINE_CONFIG_START( prophet3 )
 //  atom(config);
 //  /* basic machine hardware */
-//  MCFG_CPU_MODIFY(SY6502_TAG)
-//  MCFG_CPU_PROGRAM_MAP(prophet_mem)
+//  MCFG_DEVICE_MODIFY(SY6502_TAG)
+//  MCFG_DEVICE_PROGRAM_MAP(prophet_mem)
 //
 //  /* internal ram */
 //  MCFG_RAM_MODIFY(RAM_TAG)
@@ -970,26 +968,15 @@ ROM_END
 //  ROM_LOAD( "atommc2-2.9-a000.rom", 0x2000, 0x1000, CRC(ba73e36c) SHA1(ea9739e96f3283c90b5306288c796fc01144b771) )
 //ROM_END
 
-DRIVER_INIT_MEMBER(atomeb_state, atomeb)
-{
-	// these have to be set here, so that we can pass m_ext[*] to device_image_load!
-	char str[8];
-	for (int i = 0; i < 16; i++)
-	{
-		sprintf(str,"rom_a%x", i);
-		m_ext[i] = machine().device<generic_slot_device>(str);
-	}
-}
-
 
 /***************************************************************************
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS         INIT      COMPANY          FULLNAME                FLAGS */
-COMP( 1979, atom,     0,        0,      atom,     atom, atom_state,   0,        "Acorn",         "Atom"                , 0)
-COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, atomeb_state, atomeb,   "Acorn",         "Atom with Eprom Box" , 0)
-COMP( 1982, atombb,   atom,     0,      atombb,   atom, atom_state,   0,        "Acorn",         "Atom with BBC Basic" , 0)
-//COMP( 1983, prophet2, atom,     0,      prophet2, atom, driver_device,     0,        "Busicomputers", "Prophet 2"           , 0)
-//COMP( 1983, prophet3, atom,     0,      prophet3, atom, driver_device,     0,        "Busicomputers", "Prophet 3"           , 0)
-//COMP( 2011, atommc,   atom,     0,      atommc,   atom, driver_device,     0,        "Acorn",         "Atom with AtoMMC2"   , 0)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS          INIT         COMPANY          FULLNAME               FLAGS */
+COMP( 1979, atom,     0,      0,      atom,     atom,  atom_state,    empty_init,  "Acorn",         "Atom",                0)
+COMP( 1979, atomeb,   atom,   0,      atomeb,   atom,  atomeb_state,  empty_init,  "Acorn",         "Atom with Eprom Box", 0)
+COMP( 1982, atombb,   atom,   0,      atombb,   atom,  atom_state,    empty_init,  "Acorn",         "Atom with BBC Basic", 0)
+//COMP( 1983, prophet2, atom,   0,      prophet2, atom,  driver_device, empty_init,  "Busicomputers", "Prophet 2",           0)
+//COMP( 1983, prophet3, atom,   0,      prophet3, atom,  driver_device, empty_init,  "Busicomputers", "Prophet 3",           0)
+//COMP( 2011, atommc,   atom,   0,      atommc,   atom,  driver_device, empty_init,  "Acorn",         "Atom with AtoMMC2",   0)

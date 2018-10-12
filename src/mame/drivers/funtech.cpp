@@ -13,7 +13,7 @@ PROGRAM-VERSION:1.0
 PROGRAM-DATE:09/23/1993
 
 8x8 tiles and 8x32 reels, likely going to be very similar to skylncr.cpp or goldstar.cpp (which are both very similar anyway)
-palette addresses are the same as unkch in goldtar.cpp, but the io stuff is definitely different here
+palette addresses are the same as unkch in goldstar.cpp, but the io stuff is definitely different here
 
 board has an M5255 for sound
 and an unpopulated position for a YM2413 or UM3567
@@ -26,6 +26,7 @@ and an unpopulated position for a YM2413 or UM3567
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,8 +49,16 @@ public:
 		m_reel1_alt_scroll(*this, "reel1_alt_scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_hopper(*this, "hopper"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamps(*this, "lamp%u", 0U) { }
 
+	void funtech(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint8_t> m_fgram;
 	required_shared_ptr<uint8_t> m_reel1_ram;
 	required_shared_ptr<uint8_t> m_reel2_ram;
@@ -58,18 +67,20 @@ public:
 	required_shared_ptr<uint8_t> m_reel2_scroll;
 	required_shared_ptr<uint8_t> m_reel3_scroll;
 	required_shared_ptr<uint8_t> m_reel1_alt_scroll;
-
-
-	INTERRUPT_GEN_MEMBER(funtech_vblank_interrupt);
-
-	DECLARE_WRITE8_MEMBER(funtech_lamps_w);
-	DECLARE_WRITE8_MEMBER(funtech_coins_w);
-	DECLARE_WRITE8_MEMBER(funtech_vreg_w);
-
+	required_device<cpu_device> m_maincpu;
+	required_device<ticket_dispenser_device> m_hopper;
+	required_device<gfxdecode_device> m_gfxdecode;
+	output_finder<8> m_lamps;
 
 	uint8_t m_vreg;
 
 	tilemap_t *m_fg_tilemap;
+
+	INTERRUPT_GEN_MEMBER(vblank_interrupt);
+
+	DECLARE_WRITE8_MEMBER(lamps_w);
+	DECLARE_WRITE8_MEMBER(coins_w);
+	DECLARE_WRITE8_MEMBER(vreg_w);
 
 	DECLARE_WRITE8_MEMBER(fgram_w);
 
@@ -87,14 +98,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_funtech(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<ticket_dispenser_device> m_hopper;
-	required_device<gfxdecode_device> m_gfxdecode;
-	void funtech(machine_config &config);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void funtech_io_map(address_map &map);
 	void funtech_map(address_map &map);
 };
@@ -175,12 +180,12 @@ WRITE8_MEMBER(fun_tech_corp_state::reel3_ram_w)
 
 void fun_tech_corp_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_fg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_reel1_tile_info), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_reel2_tile_info), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fun_tech_corp_state::get_reel3_tile_info), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
@@ -195,7 +200,7 @@ WRITE8_MEMBER(fun_tech_corp_state::fgram_w)
 }
 
 
-uint32_t fun_tech_corp_state::screen_update_funtech(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fun_tech_corp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -234,53 +239,48 @@ uint32_t fun_tech_corp_state::screen_update_funtech(screen_device &screen, bitma
 
 
 
-INTERRUPT_GEN_MEMBER(fun_tech_corp_state::funtech_vblank_interrupt)
+INTERRUPT_GEN_MEMBER(fun_tech_corp_state::vblank_interrupt)
 {
 //  if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 
-ADDRESS_MAP_START(fun_tech_corp_state::funtech_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-
-	AM_RANGE(0xd000, 0xd7ff) AM_ROM // maybe
-
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
-
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(reel1_ram_w) AM_SHARE("reel1ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(reel2_ram_w) AM_SHARE("reel2ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(reel3_ram_w) AM_SHARE("reel3ram")
-	AM_RANGE(0xf600, 0xf7ff) AM_RAM
-
-	AM_RANGE(0xf840, 0xf87f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf880, 0xf8bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf900, 0xf93f) AM_RAM AM_SHARE("reel3_scroll")
-
-	AM_RANGE(0xf9c0, 0xf9ff) AM_RAM AM_SHARE("reel1_alt_scroll") // or a mirror, gets used in 'full screen' mode.
-ADDRESS_MAP_END
-
-
-WRITE8_MEMBER(fun_tech_corp_state::funtech_lamps_w)
+void fun_tech_corp_state::funtech_map(address_map &map)
 {
-	output().set_lamp_value(0, (data >> 0) & 1);
-	output().set_lamp_value(1, (data >> 1) & 1);
-	output().set_lamp_value(2, (data >> 2) & 1);
-	output().set_lamp_value(3, (data >> 3) & 1);
-	output().set_lamp_value(4, (data >> 4) & 1);
-	output().set_lamp_value(5, (data >> 5) & 1);
-	output().set_lamp_value(6, (data >> 6) & 1);
-	output().set_lamp_value(7, (data >> 7) & 1);
+	map(0x0000, 0xbfff).rom();
+
+	map(0xc000, 0xc1ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xc800, 0xc9ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
+
+	map(0xd000, 0xd7ff).rom(); // maybe
+
+	map(0xd800, 0xdfff).ram().share("nvram");
+
+	map(0xe000, 0xefff).ram().w(FUNC(fun_tech_corp_state::fgram_w)).share("fgram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(fun_tech_corp_state::reel1_ram_w)).share("reel1ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(fun_tech_corp_state::reel2_ram_w)).share("reel2ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(fun_tech_corp_state::reel3_ram_w)).share("reel3ram");
+	map(0xf600, 0xf7ff).ram();
+
+	map(0xf840, 0xf87f).ram().share("reel1_scroll");
+	map(0xf880, 0xf8bf).ram().share("reel2_scroll");
+	map(0xf900, 0xf93f).ram().share("reel3_scroll");
+
+	map(0xf9c0, 0xf9ff).ram().share("reel1_alt_scroll"); // or a mirror, gets used in 'full screen' mode.
 }
 
-WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
+
+WRITE8_MEMBER(fun_tech_corp_state::lamps_w)
 {
-	if (data & 0x01) printf("funtech_coins_w %02x\n", data);
+	for (int i = 0; i < 8; i++)
+		m_lamps[i] = BIT(data, i);
+}
+
+WRITE8_MEMBER(fun_tech_corp_state::coins_w)
+{
+	if (data & 0x01) printf("coins_w %02x\n", data);
 
 	// 80 = hopper motor?
 	m_hopper->motor_w(BIT(data, 7));
@@ -302,9 +302,9 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
 	// 02 = used when hopper is used (coin out counter?)
 }
 
-WRITE8_MEMBER(fun_tech_corp_state::funtech_vreg_w)
+WRITE8_MEMBER(fun_tech_corp_state::vreg_w)
 {
-	if (data & 0xb2) printf("funtech_vreg_w %02x\n", data);
+	if (data & 0xb2) printf("vreg_w %02x\n", data);
 
 	// -x-- rr-t
 	// t = text tile bank
@@ -318,24 +318,25 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_vreg_w)
 
 
 
-ADDRESS_MAP_START(fun_tech_corp_state::funtech_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void fun_tech_corp_state::funtech_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 	// lamps?
-	AM_RANGE(0x00, 0x00) AM_WRITE(funtech_lamps_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(funtech_coins_w)
+	map(0x00, 0x00).w(FUNC(fun_tech_corp_state::lamps_w));
+	map(0x01, 0x01).w(FUNC(fun_tech_corp_state::coins_w));
 
-	AM_RANGE(0x03, 0x03) AM_WRITE(funtech_vreg_w)
+	map(0x03, 0x03).w(FUNC(fun_tech_corp_state::vreg_w));
 
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN1")
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW1")
-	AM_RANGE(0x07, 0x07) AM_READ_PORT("DSW2")
+	map(0x04, 0x04).portr("IN0");
+	map(0x05, 0x05).portr("IN1");
+	map(0x06, 0x06).portr("DSW1");
+	map(0x07, 0x07).portr("DSW2");
 
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN4")
+	map(0x10, 0x10).portr("IN4");
 
-	AM_RANGE(0x11, 0x11) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x12, 0x12) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+	map(0x11, 0x11).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x12, 0x12).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
 static INPUT_PORTS_START( funtech )
 	PORT_START("IN0")
@@ -352,7 +353,7 @@ static INPUT_PORTS_START( funtech )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_DIPNAME( 0x08, 0x08, "IN1-08" ) // some kind of key-out? reduces credits to 0
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -471,7 +472,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( funtech )
+static GFXDECODE_START( gfx_funtech )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32_layout, 0x100, 1 )
 GFXDECODE_END
@@ -481,19 +482,17 @@ GFXDECODE_END
 
 void fun_tech_corp_state::machine_start()
 {
+	m_lamps.resolve();
 }
 
-void fun_tech_corp_state::machine_reset()
-{
-}
 
 MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(funtech_map)
-	MCFG_CPU_IO_MAP(funtech_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fun_tech_corp_state,  funtech_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(funtech_map)
+	MCFG_DEVICE_IO_MAP(funtech_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fun_tech_corp_state, vblank_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -501,21 +500,21 @@ MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 8, 256-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fun_tech_corp_state, screen_update_funtech)
+	MCFG_SCREEN_UPDATE_DRIVER(fun_tech_corp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funtech)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funtech)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000) /* M5255, ? MHz */
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* M5255, ? MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -533,4 +532,4 @@ ROM_START( fts2in1 )
 	ROM_LOAD16_BYTE( "u30.bin", 0x00001, 0x20000, CRC(d572bddc) SHA1(06499aeb47085a02af9eb4987ed987f9a3a397f7) )
 ROM_END
 
-GAMEL( 1993, fts2in1,  0,    funtech, funtech, fun_tech_corp_state,  0, ROT0, "Fun Tech Corporation", "Super Two In One", 0, layout_fts2in1 )
+GAMEL( 1993, fts2in1, 0, funtech, funtech, fun_tech_corp_state, empty_init, ROT0, "Fun Tech Corporation", "Super Two In One", 0, layout_fts2in1 )

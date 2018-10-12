@@ -806,7 +806,7 @@ void k1ge_device::device_start()
 	m_vram = make_unique_clear<uint8_t[]>(0x4000);
 	m_bitmap = std::make_unique<bitmap_ind16>(screen().width(), screen().height() );
 
-	save_pointer(NAME(m_vram.get()), 0x4000);
+	save_pointer(NAME(m_vram), 0x4000);
 	save_item(NAME(m_wba_h));
 	save_item(NAME(m_wba_v));
 	save_item(NAME(m_wsi_h));

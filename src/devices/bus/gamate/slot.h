@@ -99,6 +99,6 @@ DECLARE_DEVICE_TYPE(GAMATE_CART_SLOT, gamate_cart_slot_device)
 	MCFG_DEVICE_ADD(_tag, GAMATE_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-SLOT_INTERFACE_EXTERN( gamate_cart );
+void gamate_cart(device_slot_interface &device);
 
 #endif // MAME_BUS_GAMATE_SLOT_H

@@ -11,6 +11,9 @@
 #pragma once
 
 #include "machine/timer.h"
+#include "machine/x2212.h"
+#include "sound/pokey.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define IR_TIMING               1       /* try to emulate MB and VG running time */
@@ -18,6 +21,27 @@
 class irobot_state : public driver_device
 {
 public:
+	irobot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+#if IR_TIMING
+		m_irvg_timer(*this, "irvg_timer"),
+		m_irmb_timer(*this, "irmb_timer"),
+#endif
+		m_novram(*this, "nvram"),
+		m_pokey(*this, "pokey%u", 1U),
+		m_leds(*this, "led%u", 0U)
+	{ }
+
+	void init_irobot();
+
+	void irobot(machine_config &config);
+
+private:
 	struct irmb_ops
 	{
 		const struct irmb_ops *nxtop;
@@ -32,26 +56,11 @@ public:
 		uint8_t ramsel;
 	};
 
-	irobot_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_nvram(*this, "nvram") ,
-		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
-	{ }
-
-	DECLARE_DRIVER_INIT(irobot);
-
-	void irobot(machine_config &config);
-
-protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void irobot_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(irobot_nvram_w);
 	DECLARE_WRITE8_MEMBER(irobot_clearirq_w);
 	DECLARE_WRITE8_MEMBER(irobot_clearfirq_w);
 	DECLARE_READ8_MEMBER(irobot_sharedmem_r);
@@ -59,8 +68,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(irobot_statwr_w);
 	DECLARE_WRITE8_MEMBER(irobot_out0_w);
 	DECLARE_WRITE8_MEMBER(irobot_rom_banksel_w);
-	DECLARE_WRITE8_MEMBER(irobot_control_w);
-	DECLARE_READ8_MEMBER(irobot_control_r);
 	DECLARE_READ8_MEMBER(irobot_status_r);
 	DECLARE_WRITE8_MEMBER(irobot_paletteram_w);
 	DECLARE_READ8_MEMBER(quad_pokeyn_r);
@@ -79,8 +86,6 @@ protected:
 	void load_oproms();
 	void irmb_run();
 
-private:
-	required_shared_ptr<uint8_t>  m_nvram;
 	required_shared_ptr<uint8_t> m_videoram;
 	uint8_t m_vg_clear;
 	uint8_t m_bufsel;
@@ -89,14 +94,9 @@ private:
 	uint8_t m_irvg_vblank;
 	uint8_t m_irvg_running;
 	uint8_t m_irmb_running;
-#if IR_TIMING
-	timer_device *m_irvg_timer;
-	timer_device *m_irmb_timer;
-#endif
 	uint8_t *m_comRAM[2];
 	uint8_t *m_mbRAM;
 	uint8_t *m_mbROM;
-	uint8_t m_control_num;
 	uint8_t m_statwr;
 	uint8_t m_out0;
 	uint8_t m_outx;
@@ -112,11 +112,19 @@ private:
 	int m_ir_ymin;
 	int m_ir_xmax;
 	int m_ir_ymax;
+	emu_timer *m_scanline_timer;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+#if IR_TIMING
+	required_device<timer_device> m_irvg_timer;
+	required_device<timer_device> m_irmb_timer;
+#endif
+	required_device<x2212_device> m_novram;
+	required_device_array<pokey_device, 4> m_pokey;
+	output_finder<2> m_leds;
 };
 
 #endif // MAME_INCLUDES_IROBOT_H

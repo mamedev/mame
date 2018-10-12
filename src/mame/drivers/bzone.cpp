@@ -213,7 +213,6 @@
 #include "machine/watchdog.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
-#include "machine/atari_vg.h"
 #include "sound/pokey.h"
 #include "screen.h"
 #include "speaker.h"
@@ -231,6 +230,7 @@
 void bzone_state::machine_start()
 {
 	save_item(NAME(m_analog_data));
+	m_startled.resolve();
 }
 
 
@@ -238,6 +238,12 @@ void redbaron_state::machine_start()
 {
 	bzone_state::machine_start();
 	save_item(NAME(m_rb_input_select));
+}
+
+
+void redbaron_state::machine_reset()
+{
+	earom_control_w(machine().dummy_space(), 0, 0);
 }
 
 
@@ -251,7 +257,7 @@ void redbaron_state::machine_start()
 INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
 {
 	if (ioport("IN0")->read() & 0x10)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -296,53 +302,81 @@ WRITE8_MEMBER(redbaron_state::redbaron_joysound_w)
 
 /*************************************
  *
+ *  Red Baron EAROM
+ *
+ *************************************/
+
+READ8_MEMBER(redbaron_state::earom_read)
+{
+	return m_earom->data();
+}
+
+WRITE8_MEMBER(redbaron_state::earom_write)
+{
+	m_earom->set_address((offset ^ 0x20) & 0x3f);
+	m_earom->set_data(data);
+}
+
+WRITE8_MEMBER(redbaron_state::earom_control_w)
+{
+	// CK = EDB0, C1 = /EDB2, C2 = EDB1, CS1 = EDB3, /CS2 = GND
+	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
+	m_earom->set_clk(BIT(data, 0));
+}
+
+
+
+/*************************************
+ *
  *  Main CPU memory handlers
  *
  *************************************/
 
-ADDRESS_MAP_START(bzone_state::bzone_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
-	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(bzone_coin_counter_w)
-	AM_RANGE(0x1200, 0x1200) AM_DEVWRITE("avg", avg_bzone_device, go_w)
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1600, 0x1600) AM_DEVWRITE("avg", avg_bzone_device, reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("mathbox", mathbox_device, status_r)
-	AM_RANGE(0x1810, 0x1810) AM_DEVREAD("mathbox", mathbox_device, lo_r)
-	AM_RANGE(0x1818, 0x1818) AM_DEVREAD("mathbox", mathbox_device, hi_r)
-	AM_RANGE(0x1820, 0x182f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0x1840, 0x1840) AM_WRITE(bzone_sounds_w)
-	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE("mathbox", mathbox_device, go_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x2000)
-	AM_RANGE(0x3000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void bzone_state::bzone_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x0800).portr("IN0");
+	map(0x0a00, 0x0a00).portr("DSW0");
+	map(0x0c00, 0x0c00).portr("DSW1");
+	map(0x1000, 0x1000).w(FUNC(bzone_state::bzone_coin_counter_w));
+	map(0x1200, 0x1200).w("avg", FUNC(avg_bzone_device::go_w));
+	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1600, 0x1600).w("avg", FUNC(avg_bzone_device::reset_w));
+	map(0x1800, 0x1800).r(m_mathbox, FUNC(mathbox_device::status_r));
+	map(0x1810, 0x1810).r(m_mathbox, FUNC(mathbox_device::lo_r));
+	map(0x1818, 0x1818).r(m_mathbox, FUNC(mathbox_device::hi_r));
+	map(0x1820, 0x182f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1840, 0x1840).w(FUNC(bzone_state::bzone_sounds_w));
+	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
+	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x3000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(redbaron_state::redbaron_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
-	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP        /* coin out - Manual states this is "Coin Counter" */
-	AM_RANGE(0x1200, 0x1200) AM_DEVWRITE("avg", avg_bzone_device, go_w)
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1600, 0x1600) AM_DEVWRITE("avg", avg_bzone_device, reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("mathbox", mathbox_device, status_r)
-	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN4")
-	AM_RANGE(0x1804, 0x1804) AM_DEVREAD("mathbox", mathbox_device, lo_r)
-	AM_RANGE(0x1806, 0x1806) AM_DEVREAD("mathbox", mathbox_device, hi_r)
-	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_joysound_w)  /* and select joystick pot also */
-	AM_RANGE(0x180a, 0x180a) AM_WRITENOP                /* sound reset, yet todo */
-	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE("earom", atari_vg_earom_device, read, write)
-	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE("mathbox", mathbox_device, go_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x2000)
-	AM_RANGE(0x3000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void redbaron_state::redbaron_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x0800).portr("IN0");
+	map(0x0a00, 0x0a00).portr("DSW0");
+	map(0x0c00, 0x0c00).portr("DSW1");
+	map(0x1000, 0x1000).nopw();        /* coin out - Manual states this is "Coin Counter" */
+	map(0x1200, 0x1200).w("avg", FUNC(avg_bzone_device::go_w));
+	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1600, 0x1600).w("avg", FUNC(avg_bzone_device::reset_w));
+	map(0x1800, 0x1800).r("mathbox", FUNC(mathbox_device::status_r));
+	map(0x1802, 0x1802).portr("IN4");
+	map(0x1804, 0x1804).r("mathbox", FUNC(mathbox_device::lo_r));
+	map(0x1806, 0x1806).r("mathbox", FUNC(mathbox_device::hi_r));
+	map(0x1808, 0x1808).w(FUNC(redbaron_state::redbaron_joysound_w));  /* and select joystick pot also */
+	map(0x180a, 0x180a).nopw();                /* sound reset, yet todo */
+	map(0x180c, 0x180c).w(FUNC(redbaron_state::earom_control_w));
+	map(0x1810, 0x181f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1820, 0x185f).rw(FUNC(redbaron_state::earom_read), FUNC(redbaron_state::earom_write));
+	map(0x1860, 0x187f).w("mathbox", FUNC(mathbox_device::go_w));
+	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x3000, 0x7fff).rom();
+}
 
 
 
@@ -361,9 +395,9 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step") \
 	/* bit 6 is the VG HALT bit. We set it to "low" */\
 	/* per default (busy vector processor). */\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_bzone_device, done_r, nullptr)\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_bzone_device, done_r, nullptr)\
 	/* bit 7 is tied to a 3kHz clock */\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, nullptr)
 
 
 #define BZONEDSW0\
@@ -538,11 +572,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bzone_state::bzone_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(bzone_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
+	MCFG_DEVICE_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(bzone_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -574,10 +608,10 @@ MACHINE_CONFIG_START(redbaron_state::redbaron)
 	bzone_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(redbaron_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(redbaron_map)
 
-	MCFG_ATARIVGEAROM_ADD("earom")
+	MCFG_DEVICE_ADD("earom", ER2055)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -585,13 +619,13 @@ MACHINE_CONFIG_START(redbaron_state::redbaron)
 	MCFG_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey", POKEY, 1500000)
-	MCFG_POKEY_ALLPOT_R_CB(READ8(redbaron_state, redbaron_joy_r))
+	MCFG_DEVICE_ADD("pokey", POKEY, 1500000)
+	MCFG_POKEY_ALLPOT_R_CB(READ8(*this, redbaron_state, redbaron_joy_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("custom", REDBARON, 0)
+	MCFG_DEVICE_ADD("custom", REDBARON, 0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -635,7 +669,7 @@ ROM_START( bzone ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036409-01.n1",  0x7800, 0x0800, CRC(1e14e919) SHA1(448fab30535e6fad7e0ab4427bc06bbbe075e797) )
 	/* Vector Generator ROMs */
 	ROM_LOAD( "036422-01.bc3", 0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )
-	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )
+	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -665,7 +699,7 @@ ROM_START( bzonea ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036409-01.n1",  0x7800, 0x0800, CRC(1e14e919) SHA1(448fab30535e6fad7e0ab4427bc06bbbe075e797) )
 	/* Vector Generator ROMs */
 	ROM_LOAD( "036422-01.bc3", 0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )
-	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )
+	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -862,7 +896,7 @@ WRITE8_MEMBER(bzone_state::analog_select_w)
 }
 
 
-DRIVER_INIT_MEMBER(bzone_state,bradley)
+void bzone_state::init_bradley()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_ram(0x400, 0x7ff);
@@ -880,9 +914,9 @@ DRIVER_INIT_MEMBER(bzone_state,bradley)
  *
  *************************************/
 
-GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
-GAME( 1980, bradley,   0,        bzone,    bradley,  bzone_state,    bradley, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
-GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, 0,       ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
-GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, 0,       ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )
+GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
+GAME( 1980, bradley,   0,        bzone,    bradley,  bzone_state,    init_bradley, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
+GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
+GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )

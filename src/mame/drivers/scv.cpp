@@ -11,6 +11,7 @@
 #include "sound/upd1771.h"
 #include "bus/scv/slot.h"
 #include "bus/scv/rom.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -19,8 +20,8 @@
 class scv_state : public driver_device
 {
 public:
-	scv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	scv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this,"videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
@@ -28,31 +29,44 @@ public:
 		m_cart(*this, "cartslot"),
 		m_pa(*this, "PA.%u", 0),
 		m_pc0(*this, "PC0"),
-		m_charrom(*this, "charrom") { }
+		m_charrom(*this, "charrom")
+	{ }
 
+	void scv(machine_config &config);
+	void scv_pal(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_READ8_MEMBER(portc_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE_LINE_MEMBER(upd1771_ack_w);
-	required_shared_ptr<uint8_t> m_videoram;
-	uint8_t m_porta;
-	uint8_t m_portc;
-	emu_timer *m_vb_timer;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(scv);
 	uint32_t screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void scv(machine_config &config);
-	void scv_pal(machine_config &config);
+	void plot_sprite_part(bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t pat, uint8_t col, uint8_t screen_sprite_start_line);
+	void draw_sprite(bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t tile_idx, uint8_t col, uint8_t left, uint8_t right, uint8_t top, uint8_t bottom, uint8_t clip_y, uint8_t screen_sprite_start_line);
+	void draw_text(bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t *char_data, uint8_t fg, uint8_t bg);
+	void draw_semi_graph(bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t data, uint8_t fg);
+	void draw_block_graph(bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t col);
+
 	void scv_mem(address_map &map);
-protected:
+
 	enum
 	{
 		TIMER_VB
 	};
 
+	uint8_t m_porta;
+	uint8_t m_portc;
+	emu_timer *m_vb_timer;
+
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd1771c_device> m_upd1771c;
@@ -60,27 +74,19 @@ protected:
 	required_ioport_array<8> m_pa;
 	required_ioport m_pc0;
 	required_memory_region m_charrom;
-
-	ioport_port *m_key[8];
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	inline void plot_sprite_part( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t pat, uint8_t col, uint8_t screen_sprite_start_line );
-	inline void draw_sprite( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t tile_idx, uint8_t col, uint8_t left, uint8_t right, uint8_t top, uint8_t bottom, uint8_t clip_y, uint8_t screen_sprite_start_line );
-	inline void draw_text( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t *char_data, uint8_t fg, uint8_t bg );
-	inline void draw_semi_graph( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t data, uint8_t fg );
-	inline void draw_block_graph( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t col );
 };
 
 
-ADDRESS_MAP_START(scv_state::scv_mem)
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM   // BIOS
+void scv_state::scv_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();   // BIOS
 
-	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_SHARE("videoram")  // VRAM + 4 registers
-	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE("upd1771c", upd1771c_device, write)
+	map(0x2000, 0x3403).ram().share("videoram");  // VRAM + 4 registers
+	map(0x3600, 0x3600).w(m_upd1771c, FUNC(upd1771c_device::write));
 
-	AM_RANGE( 0x8000, 0xff7f ) AM_DEVREADWRITE("cartslot", scv_cart_slot_device, read_cart, write_cart) // cartridge
-	AM_RANGE( 0xff80, 0xffff ) AM_RAM   // upd7801 internal RAM
-ADDRESS_MAP_END
+	map(0x8000, 0xff7f).rw(m_cart, FUNC(scv_cart_slot_device::read_cart), FUNC(scv_cart_slot_device::write_cart)); // cartridge
+	map(0xff80, 0xffff).ram();   // upd7801 internal RAM
+}
 
 
 static INPUT_PORTS_START( scv )
@@ -641,45 +647,46 @@ static const gfx_layout scv_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( scv )
+static GFXDECODE_START( gfx_scv )
 	GFXDECODE_ENTRY( "charrom", 0x0000, scv_charlayout, 0, 8 )
 GFXDECODE_END
 
 
-static SLOT_INTERFACE_START(scv_cart)
-	SLOT_INTERFACE_INTERNAL("rom8k",       SCV_ROM8K)
-	SLOT_INTERFACE_INTERNAL("rom16k",      SCV_ROM16K)
-	SLOT_INTERFACE_INTERNAL("rom32k",      SCV_ROM32K)
-	SLOT_INTERFACE_INTERNAL("rom32k_ram",  SCV_ROM32K_RAM8K)
-	SLOT_INTERFACE_INTERNAL("rom64k",      SCV_ROM64K)
-	SLOT_INTERFACE_INTERNAL("rom128k",     SCV_ROM128K)
-	SLOT_INTERFACE_INTERNAL("rom128k_ram", SCV_ROM128K_RAM4K)
-SLOT_INTERFACE_END
+static void scv_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom8k",       SCV_ROM8K);
+	device.option_add_internal("rom16k",      SCV_ROM16K);
+	device.option_add_internal("rom32k",      SCV_ROM32K);
+	device.option_add_internal("rom32k_ram",  SCV_ROM32K_RAM8K);
+	device.option_add_internal("rom64k",      SCV_ROM64K);
+	device.option_add_internal("rom128k",     SCV_ROM128K);
+	device.option_add_internal("rom128k_ram", SCV_ROM128K_RAM4K);
+}
 
 MACHINE_CONFIG_START(scv_state::scv)
 
-	MCFG_CPU_ADD( "maincpu", UPD7801, XTAL(4'000'000) )
-	MCFG_CPU_PROGRAM_MAP( scv_mem )
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(scv_state, porta_w))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(scv_state, portb_r))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(scv_state, portc_r))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(scv_state, portc_w))
+	upd7801_device &upd(UPD7801(config, m_maincpu, 4_MHz_XTAL));
+	upd.set_addrmap(AS_PROGRAM, &scv_state::scv_mem);
+	upd.pa_out_cb().set(FUNC(scv_state::porta_w));
+	upd.pb_in_cb().set(FUNC(scv_state::portb_r));
+	upd.pc_in_cb().set(FUNC(scv_state::portc_r));
+	upd.pc_out_cb().set(FUNC(scv_state::portc_w));
 
 	/* Video chip is EPOCH TV-1 */
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL(14'318'181)/2, 456, 24, 24+192, 262, 23, 23+222 )  /* TODO: Verify */
-	MCFG_SCREEN_UPDATE_DRIVER(scv_state, screen_update_scv)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(14'318'181)/2, 456, 24, 24+192, 262, 23, 23+222);  // TODO: Verify
+	m_screen->set_screen_update(FUNC(scv_state::screen_update_scv));
+	m_screen->set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scv)
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(scv_state, scv)
 
 	/* Sound is generated by UPD1771C clocked at XTAL(6'000'000) */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD( "upd1771c", UPD1771C, XTAL(6'000'000) )
-	MCFG_UPD1771_ACK_HANDLER(WRITELINE(scv_state, upd1771_ack_w))
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER(config, "mono").front_center();
+	UPD1771C(config, m_upd1771c, 6_MHz_XTAL);
+	m_upd1771c->ack_handler().set(FUNC(scv_state::upd1771_ack_w));
+	m_upd1771c->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	MCFG_SCV_CARTRIDGE_ADD("cartslot", scv_cart, nullptr)
 
@@ -688,15 +695,15 @@ MACHINE_CONFIG_START(scv_state::scv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(scv_state::scv_pal)
+void scv_state::scv_pal(machine_config &config)
+{
 	scv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_CLOCK( 3780000 )
 
-	/* Video chip is EPOCH TV-1A */
-	MCFG_SCREEN_MODIFY( "screen" )
-	MCFG_SCREEN_RAW_PARAMS( XTAL(13'400'000)/2, 456, 24, 24+192, 342, 23, 23+222 )      /* TODO: Verify */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(3780000);
+
+	// Video chip is EPOCH TV-1A
+	m_screen->set_raw(13.4_MHz_XTAL/2, 456, 24, 24+192, 342, 23, 23+222);     // TODO: Verify
+}
 
 
 /* The same bios is used in both the NTSC and PAL versions of the console */
@@ -718,6 +725,6 @@ ROM_START( scv_pal )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE      INIT    COMPANY  FULLNAME                       FLAGS */
-CONS( 1984, scv,     0,      0,      scv,     scv,   scv_state, 0,      "Epoch", "Super Cassette Vision",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, scv_pal, scv,    0,      scv_pal, scv,   scv_state, 0,      "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                       FLAGS */
+CONS( 1984, scv,     0,      0,      scv,     scv,   scv_state, empty_init, "Epoch", "Super Cassette Vision",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, scv_pal, scv,    0,      scv_pal, scv,   scv_state, empty_init, "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

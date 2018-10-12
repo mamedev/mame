@@ -12,8 +12,8 @@ This is for common pinball machine coding.
 
 
 MACHINE_CONFIG_START(genpin_class::genpin_audio)
-	MCFG_SPEAKER_STANDARD_MONO("mechvol")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	SPEAKER(config, "mechvol").front_center();
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(genpin_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mechvol", 1.0)

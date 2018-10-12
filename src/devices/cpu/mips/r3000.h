@@ -22,16 +22,16 @@
 	downcast<r3000_device &>(*device).set_endianness(_endianness);
 
 #define MCFG_R3000_BRCOND0_INPUT(_devcb) \
-	devcb = &downcast<r3000_device &>(*device).set_brcond0_input(DEVCB_##_devcb);
+	downcast<r3000_device &>(*device).set_brcond0_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND1_INPUT(_devcb) \
-	devcb = &downcast<r3000_device &>(*device).set_brcond1_input(DEVCB_##_devcb);
+	downcast<r3000_device &>(*device).set_brcond1_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND2_INPUT(_devcb) \
-	devcb = &downcast<r3000_device &>(*device).set_brcond2_input(DEVCB_##_devcb);
+	downcast<r3000_device &>(*device).set_brcond2_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND3_INPUT(_devcb) \
-	devcb = &downcast<r3000_device &>(*device).set_brcond3_input(DEVCB_##_devcb);
+	downcast<r3000_device &>(*device).set_brcond3_input(DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -87,7 +87,8 @@ protected:
 		CHIP_TYPE_R3051,
 		CHIP_TYPE_R3052,
 		CHIP_TYPE_R3071,
-		CHIP_TYPE_R3081
+		CHIP_TYPE_R3081,
+		CHIP_TYPE_IOP
 	};
 
 	r3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype);
@@ -113,7 +114,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// memory accessors
 	struct r3000_data_accessors
@@ -149,7 +150,7 @@ protected:
 	void writecache_le_dword(offs_t offset, uint32_t data);
 
 	// interrupts
-	void generate_exception(int exception);
+	void generate_exception(int exception, bool backup);
 	void check_irqs();
 	void set_irq_line(int irqline, int state);
 	void invalid_instruction();
@@ -194,7 +195,8 @@ protected:
 	const address_space_config m_program_config_be;
 	const address_space_config m_program_config_le;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u32 (offs_t)> m_pr32;
+	std::function<const void * (offs_t)> m_prptr;
 
 	// configuration
 	chip_type       m_chip_type;
@@ -290,12 +292,25 @@ public:
 };
 
 
+// ======================> iop_device
+
+class iop_device : public r3000_device
+{
+public:
+	iop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+};
+
+
 // device type definition
 
-DECLARE_DEVICE_TYPE(R3041, r3041_device)
-DECLARE_DEVICE_TYPE(R3051, r3051_device)
-DECLARE_DEVICE_TYPE(R3052, r3052_device)
-DECLARE_DEVICE_TYPE(R3071, r3071_device)
-DECLARE_DEVICE_TYPE(R3081, r3081_device)
+DECLARE_DEVICE_TYPE(R3041,       r3041_device)
+DECLARE_DEVICE_TYPE(R3051,       r3051_device)
+DECLARE_DEVICE_TYPE(R3052,       r3052_device)
+DECLARE_DEVICE_TYPE(R3071,       r3071_device)
+DECLARE_DEVICE_TYPE(R3081,       r3081_device)
+DECLARE_DEVICE_TYPE(SONYPS2_IOP, iop_device)
 
 #endif // MAME_CPU_MIPS_R3000_H

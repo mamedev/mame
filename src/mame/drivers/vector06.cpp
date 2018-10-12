@@ -33,28 +33,30 @@ TODO:
 #include "speaker.h"
 
 /* Address maps */
-ADDRESS_MAP_START(vector06_state::vector06_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_BANK("bank1")
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank2")
-	AM_RANGE(0xa000, 0xdfff) AM_READWRITE_BANK("bank3")
-ADDRESS_MAP_END
+void vector06_state::vector06_mem(address_map &map)
+{
+	map(0x0000, 0xffff).bankrw("bank1");
+	map(0x0000, 0x7fff).bankr("bank2");
+	map(0xa000, 0xdfff).bankrw("bank3");
+}
 
-ADDRESS_MAP_START(vector06_state::vector06_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	;
-	map(0x00, 0x03).lrw8("ppi8255_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255->write(space, offset^3, data, mem_mask); });
-	map(0x04, 0x07).lrw8("ppi8255_2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255_2->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255_2->write(space, offset^3, data, mem_mask); });
-	map(0x08, 0x0b).lrw8("pit8253_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_pit8253->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pit8253->write(space, offset^3, data, mem_mask); });
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(vector06_color_set)
-	AM_RANGE(0x10, 0x10) AM_WRITE(vector06_ramdisk_w)
-	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_address_w)
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("wd1793", kr1818vg93_device, data_r, data_w)
-	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("wd1793", kr1818vg93_device, sector_r, sector_w)
-	AM_RANGE(0x1a, 0x1a) AM_DEVREADWRITE("wd1793", kr1818vg93_device, track_r, track_w)
-	AM_RANGE(0x1b, 0x1b) AM_DEVREADWRITE("wd1793", kr1818vg93_device, status_r, cmd_w)
-	AM_RANGE(0x1c, 0x1c) AM_WRITE(vector06_disc_w)
-ADDRESS_MAP_END
+void vector06_state::vector06_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+
+	map(0x00, 0x03).lrw8("ppi8255_rw", [this](offs_t offset) -> u8 { return m_ppi8255->read(offset^3); }, [this](offs_t offset, u8 data) { m_ppi8255->write(offset^3, data); });
+	map(0x04, 0x07).lrw8("ppi8255_2_rw", [this](offs_t offset) -> u8 { return m_ppi8255_2->read(offset^3); }, [this](offs_t offset, u8 data) { m_ppi8255_2->write(offset^3, data); });
+	map(0x08, 0x0b).lrw8("pit8253_rw", [this](offs_t offset) -> u8 { return m_pit8253->read(offset^3); }, [this](offs_t offset, u8 data) { m_pit8253->write(offset^3, data); });
+	map(0x0c, 0x0c).w(FUNC(vector06_state::vector06_color_set));
+	map(0x10, 0x10).w(FUNC(vector06_state::vector06_ramdisk_w));
+	map(0x14, 0x15).rw(m_ay, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_address_w));
+	map(0x18, 0x18).rw(m_fdc, FUNC(kr1818vg93_device::data_r), FUNC(kr1818vg93_device::data_w));
+	map(0x19, 0x19).rw(m_fdc, FUNC(kr1818vg93_device::sector_r), FUNC(kr1818vg93_device::sector_w));
+	map(0x1a, 0x1a).rw(m_fdc, FUNC(kr1818vg93_device::track_r), FUNC(kr1818vg93_device::track_w));
+	map(0x1b, 0x1b).rw(m_fdc, FUNC(kr1818vg93_device::status_r), FUNC(kr1818vg93_device::cmd_w));
+	map(0x1c, 0x1c).w(FUNC(vector06_state::vector06_disc_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vector06 )
@@ -150,20 +152,21 @@ FLOPPY_FORMATS_MEMBER( vector06_state::floppy_formats )
 	FLOPPY_VECTOR06_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( vector06_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void vector06_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 /* Machine driver */
 MACHINE_CONFIG_START(vector06_state::vector06)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 3000000)     // actual speed is wrong due to unemulated latency
-	MCFG_CPU_PROGRAM_MAP(vector06_mem)
-	MCFG_CPU_IO_MAP(vector06_io)
-	MCFG_I8085A_STATUS(WRITE8(vector06_state, vector06_status_callback))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vector06_state,  vector06_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vector06_state,vector06_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", I8080, 3000000)     // actual speed is wrong due to unemulated latency
+	MCFG_DEVICE_PROGRAM_MAP(vector06_mem)
+	MCFG_DEVICE_IO_MAP(vector06_io)
+	MCFG_I8085A_STATUS(WRITE8(*this, vector06_state, vector06_status_callback))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vector06_state,  vector06_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vector06_state,vector06_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -177,27 +180,26 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(vector06_state, vector06)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(vector06_state, vector06_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(vector06_state, vector06_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(vector06_state, vector06_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(vector06_state, vector06_8255_portc_r))
+	I8255(config, m_ppi8255);
+	m_ppi8255->in_pb_callback().set(FUNC(vector06_state::vector06_8255_portb_r));
+	m_ppi8255->in_pc_callback().set(FUNC(vector06_state::vector06_8255_portc_r));
+	m_ppi8255->out_pa_callback().set(FUNC(vector06_state::vector06_8255_porta_w));
+	m_ppi8255->out_pb_callback().set(FUNC(vector06_state::vector06_8255_portb_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(vector06_state, vector06_romdisk_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(vector06_state, vector06_romdisk_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(vector06_state, vector06_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(vector06_state, vector06_romdisk_portc_w))
+	I8255(config, m_ppi8255_2);
+	m_ppi8255_2->in_pb_callback().set(FUNC(vector06_state::vector06_romdisk_portb_r));
+	m_ppi8255_2->out_pa_callback().set(FUNC(vector06_state::vector06_romdisk_porta_w));
+	m_ppi8255_2->out_pb_callback().set(FUNC(vector06_state::vector06_romdisk_portb_w));
+	m_ppi8255_2->out_pc_callback().set(FUNC(vector06_state::vector06_romdisk_portc_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_KR1818VG93_ADD("wd1793", XTAL(1'000'000))
+	KR1818VG93(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)
@@ -210,23 +212,21 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vector06_cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("320K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, RAM_TAG).set_default_size("320K").set_default_value(0);
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(1500000)
 	MCFG_PIT8253_CLK1(1500000)
 	MCFG_PIT8253_CLK2(1500000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(vector06_state, speaker_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(vector06_state, speaker_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(vector06_state, speaker_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, vector06_state, speaker_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, vector06_state, speaker_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, vector06_state, speaker_w))
 
 	// optional
-	MCFG_SOUND_ADD("aysnd", AY8910, 1773400)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1773400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -235,17 +235,17 @@ MACHINE_CONFIG_END
 ROM_START( vector06 )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "unboot32k", "Universal Boot 32K")
-	ROMX_LOAD( "unboot32k.rt", 0x10000, 0x8000, CRC(28c9b5cd) SHA1(8cd7fb658896a7066ae93b10eaafa0f12139ad81), ROM_BIOS(1))
+	ROMX_LOAD( "unboot32k.rt", 0x10000, 0x8000, CRC(28c9b5cd) SHA1(8cd7fb658896a7066ae93b10eaafa0f12139ad81), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "unboot2k", "Universal Boot 2K")
-	ROMX_LOAD( "unboot2k.rt",  0x10000, 0x0800, CRC(4c80dc31) SHA1(7e5e3acfdbea2e52b0d64c5868821deaec383815), ROM_BIOS(2))
+	ROMX_LOAD( "unboot2k.rt",  0x10000, 0x0800, CRC(4c80dc31) SHA1(7e5e3acfdbea2e52b0d64c5868821deaec383815), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "coman", "Boot Coman")
-	ROMX_LOAD( "coman.rt",     0x10000, 0x0800, CRC(f8c4a85a) SHA1(47fa8b02f09a1d06aa63a2b90b2597b1d93d976f), ROM_BIOS(3))
+	ROMX_LOAD( "coman.rt",     0x10000, 0x0800, CRC(f8c4a85a) SHA1(47fa8b02f09a1d06aa63a2b90b2597b1d93d976f), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "bootbyte", "Boot Byte")
-	ROMX_LOAD( "bootbyte.rt",  0x10000, 0x0800, CRC(3b42fd9d) SHA1(a112f4fe519bc3dbee85b09040d4804a17c9eda2), ROM_BIOS(4))
+	ROMX_LOAD( "bootbyte.rt",  0x10000, 0x0800, CRC(3b42fd9d) SHA1(a112f4fe519bc3dbee85b09040d4804a17c9eda2), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "bootos", "Boot OS")
-	ROMX_LOAD( "bootos.rt",    0x10000, 0x0200, CRC(46bef038) SHA1(6732f4a360cd38112c53c458842d31f5b035cf59), ROM_BIOS(5))
+	ROMX_LOAD( "bootos.rt",    0x10000, 0x0200, CRC(46bef038) SHA1(6732f4a360cd38112c53c458842d31f5b035cf59), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "boot512", "Boot 512")
-	ROMX_LOAD( "boot512.rt",   0x10000, 0x0200, CRC(a0b1c6b2) SHA1(f6fe15cb0974aed30f9b7aa72133324a66d1ed3f), ROM_BIOS(6))
+	ROMX_LOAD( "boot512.rt",   0x10000, 0x0200, CRC(a0b1c6b2) SHA1(f6fe15cb0974aed30f9b7aa72133324a66d1ed3f), ROM_BIOS(5))
 ROM_END
 
 ROM_START( vec1200 )
@@ -268,8 +268,8 @@ ROM_START( krista2 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY      FULLNAME       FLAGS */
-COMP( 1987, vector06,    0,        0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Vector 06c",  0)
-COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
-COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
-COMP( 1987, krista2,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME       FLAGS */
+COMP( 1987, vector06, 0,        0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Vector 06c",  0)
+COMP( 1987, vec1200,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
+COMP( 1987, pk6128c,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
+COMP( 1987, krista2,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)

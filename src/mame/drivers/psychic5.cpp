@@ -435,106 +435,114 @@ WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(psychic5_state::psychic5_main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
-	AM_RANGE(0xc000, 0xdfff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf001, 0xf001) AM_READNOP AM_WRITE(psychic5_coin_counter_w)
-	AM_RANGE(0xf002, 0xf002) AM_READWRITE(bankselect_r, psychic5_bankselect_w)
-	AM_RANGE(0xf003, 0xf003) AM_READWRITE(vram_page_select_r, vram_page_select_w)
-	AM_RANGE(0xf004, 0xf004) AM_NOP // ???
-	AM_RANGE(0xf005, 0xf005) AM_READNOP AM_WRITE(psychic5_title_screen_w)
-	AM_RANGE(0xf006, 0xf1ff) AM_NOP
-	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void psychic5_state::psychic5_main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0xc000, 0xdfff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xf000).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xf001, 0xf001).nopr().w(FUNC(psychic5_state::psychic5_coin_counter_w));
+	map(0xf002, 0xf002).rw(FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::psychic5_bankselect_w));
+	map(0xf003, 0xf003).rw(FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
+	map(0xf004, 0xf004).noprw(); // ???
+	map(0xf005, 0xf005).nopr().w(FUNC(psychic5_state::psychic5_title_screen_w));
+	map(0xf006, 0xf1ff).noprw();
+	map(0xf200, 0xf7ff).ram().share("spriteram");
+	map(0xf800, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(psychic5_state::psychic5_vrambank_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM
+void psychic5_state::psychic5_vrambank_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
+	map(0x1000, 0x1fff).ram();
 
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1")
-	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P2")
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2004, 0x2004) AM_READ_PORT("DSW2")
+	map(0x2000, 0x2000).portr("SYSTEM");
+	map(0x2001, 0x2001).portr("P1");
+	map(0x2002, 0x2002).portr("P2");
+	map(0x2003, 0x2003).portr("DSW1");
+	map(0x2004, 0x2004).portr("DSW2");
 
-	AM_RANGE(0x2308, 0x230c) AM_RAM AM_SHARE("bg_control")
+	map(0x2308, 0x230c).ram().share("bg_control");
 
-	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(sprite_col_w) AM_SHARE("palette_ram_sp")
-	AM_RANGE(0x2800, 0x29ff) AM_RAM_WRITE(bg_col_w) AM_SHARE("palette_ram_bg")
-	AM_RANGE(0x2a00, 0x2bff) AM_RAM_WRITE(tx_col_w) AM_SHARE("palette_ram_tx")
+	map(0x2400, 0x25ff).ram().w(FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
+	map(0x2800, 0x29ff).ram().w(FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
+	map(0x2a00, 0x2bff).ram().w(FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
 
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
+	map(0x3000, 0x37ff).ram().w(FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
 
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(psychic5_state::psychic5_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(psychic5_state::psychic5_soundport_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ym2203_device, write)
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(psychic5_state::bombsa_main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
+void psychic5_state::psychic5_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
+
+void psychic5_state::psychic5_soundport_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ym1", FUNC(ym2203_device::write));
+	map(0x80, 0x81).w("ym2", FUNC(ym2203_device::write));
+}
+
+
+void psychic5_state::bombsa_main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0xc000, 0xcfff).ram();
 
 	/* ports look like the other games */
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // confirmed
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(bombsa_flipscreen_w)
-	AM_RANGE(0xd002, 0xd002) AM_READWRITE(bankselect_r, bombsa_bankselect_w)
-	AM_RANGE(0xd003, 0xd003) AM_READWRITE(vram_page_select_r, vram_page_select_w)
-	AM_RANGE(0xd005, 0xd005) AM_WRITE(bombsa_unknown_w) // ?
+	map(0xd000, 0xd1ff).ram();
+	map(0xd000, 0xd000).w("soundlatch", FUNC(generic_latch_8_device::write)); // confirmed
+	map(0xd001, 0xd001).w(FUNC(psychic5_state::bombsa_flipscreen_w));
+	map(0xd002, 0xd002).rw(FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::bombsa_bankselect_w));
+	map(0xd003, 0xd003).rw(FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
+	map(0xd005, 0xd005).w(FUNC(psychic5_state::bombsa_unknown_w)); // ?
 
-	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
+	map(0xd200, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+	map(0xe000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(psychic5_state::bombsa_sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY                               // Is this a confirm of some sort?
-ADDRESS_MAP_END
+void psychic5_state::bombsa_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xf000, 0xf000).writeonly();                               // Is this a confirm of some sort?
+}
 
-ADDRESS_MAP_START(psychic5_state::bombsa_soundport_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-ADDRESS_MAP_END
+void psychic5_state::bombsa_soundport_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x80, 0x81).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
-ADDRESS_MAP_START(psychic5_state::bombsa_vrambank_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+void psychic5_state::bombsa_vrambank_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
 
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1")
-	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P2")
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2004, 0x2004) AM_READ_PORT("DSW2")
+	map(0x2000, 0x2000).portr("SYSTEM");
+	map(0x2001, 0x2001).portr("P1");
+	map(0x2002, 0x2002).portr("P2");
+	map(0x2003, 0x2003).portr("DSW1");
+	map(0x2004, 0x2004).portr("DSW2");
 
-	AM_RANGE(0x2308, 0x230c) AM_RAM AM_SHARE("bg_control")
+	map(0x2308, 0x230c).ram().share("bg_control");
 
-	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(sprite_col_w) AM_SHARE("palette_ram_sp")
-	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(bg_col_w) AM_SHARE("palette_ram_bg")
-	AM_RANGE(0x3400, 0x35ff) AM_RAM_WRITE(tx_col_w) AM_SHARE("palette_ram_tx")
+	map(0x3000, 0x31ff).ram().w(FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
+	map(0x3200, 0x33ff).ram().w(FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
+	map(0x3400, 0x35ff).ram().w(FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
 
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-ADDRESS_MAP_END
+	map(0x2800, 0x2fff).ram().w(FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
+}
 
 
 static INPUT_PORTS_START( psychic5 )
@@ -699,13 +707,13 @@ static const gfx_layout spritelayout =
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( psychic5 )
+static GFXDECODE_START( gfx_psychic5 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   32*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( bombsa )
+static GFXDECODE_START( gfx_bombsa )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 32*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0*16,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   16*16, 16 )
@@ -715,20 +723,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(psychic5_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(psychic5_vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&psychic5_state::psychic5_vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 14, 0x2000);
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
-	MCFG_CPU_IO_MAP(psychic5_soundport_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(psychic5_sound_map)
+	MCFG_DEVICE_IO_MAP(psychic5_soundport_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))      /* Allow time for 2nd cpu to interleave */
 
@@ -739,7 +742,7 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psychic5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psychic5)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
@@ -748,18 +751,18 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -769,20 +772,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2 ) /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(bombsa_main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2 ) /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bombsa_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bombsa_vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&psychic5_state::bombsa_vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 14, 0x2000);
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000) )
-	MCFG_CPU_PROGRAM_MAP(bombsa_sound_map)
-	MCFG_CPU_IO_MAP(bombsa_soundport_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(bombsa_sound_map)
+	MCFG_DEVICE_IO_MAP(bombsa_soundport_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -793,25 +791,25 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombsa)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombsa)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
 	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)
@@ -972,6 +970,6 @@ ROM_START( bombsa )
 ROM_END
 
 
-GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
-GAME( 1987, psychic5j, psychic5, psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bombsa,    0,        bombsa,   bombsa,   psychic5_state, 0, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, empty_init, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
+GAME( 1987, psychic5j, psychic5, psychic5, psychic5, psychic5_state, empty_init, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bombsa,    0,        bombsa,   bombsa,   psychic5_state, empty_init, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

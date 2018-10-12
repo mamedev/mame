@@ -17,10 +17,10 @@ typedef device_delegate<void (int layer, int bank, int *code, int *color, int *f
 	downcast<k052109_device &>(*device).set_ram(_ram);
 
 #define MCFG_K052109_SCREEN_TAG(_tag) \
-	downcast<k052109_device &>(*device).set_screen_tag("^" _tag);
+	downcast<k052109_device &>(*device).set_screen_tag(_tag);
 
 #define MCFG_K052109_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<k052109_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<k052109_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 class k052109_device : public device_t, public device_gfx_interface
@@ -76,6 +76,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state

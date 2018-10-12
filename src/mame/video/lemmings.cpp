@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "includes/lemmings.h"
 
+#include <algorithm>
 
 /******************************************************************************/
 
@@ -37,15 +38,19 @@ void lemmings_state::video_start()
 	m_vram_tilemap->set_transparent_pen(0);
 	m_bitmap0.fill(0x100);
 
-	m_gfxdecode->gfx(2)->set_source(m_vram_buffer);
+	m_vram_buffer = make_unique_clear<uint8_t[]>(2048 * 64); // 64 bytes per VRAM character
+	m_gfxdecode->gfx(2)->set_source(m_vram_buffer.get());
 
-	m_sprgen->alloc_sprite_bitmap();
-	m_sprgen2->alloc_sprite_bitmap();
+	m_sprgen[0]->alloc_sprite_bitmap();
+	m_sprgen[1]->alloc_sprite_bitmap();
+
+	m_sprite_triple_buffer[0] = make_unique_clear<uint16_t[]>(0x800/2);
+	m_sprite_triple_buffer[1] = make_unique_clear<uint16_t[]>(0x800/2);
 
 	save_item(NAME(m_bitmap0));
-	save_item(NAME(m_vram_buffer));
-	save_item(NAME(m_sprite_triple_buffer_0));
-	save_item(NAME(m_sprite_triple_buffer_1));
+	save_pointer(NAME(m_vram_buffer), 2048 * 64);
+	save_pointer(NAME(m_sprite_triple_buffer[0]), 0x800/2, 0);
+	save_pointer(NAME(m_sprite_triple_buffer[1]), 0x800/2, 1);
 }
 
 WRITE_LINE_MEMBER(lemmings_state::screen_vblank_lemmings)
@@ -53,8 +58,8 @@ WRITE_LINE_MEMBER(lemmings_state::screen_vblank_lemmings)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_sprite_triple_buffer_0, m_spriteram->buffer(), 0x800);
-		memcpy(m_sprite_triple_buffer_1, m_spriteram2->buffer(), 0x800);
+		for (int chip = 0; chip < 2; chip++)
+			std::copy_n(&m_spriteram[chip]->buffer()[0], 0x800/2, &m_sprite_triple_buffer[chip][0]);
 	}
 }
 
@@ -65,13 +70,13 @@ WRITE16_MEMBER(lemmings_state::lemmings_pixel_0_w)
 {
 	int sx, sy, src, old;
 
-	old = m_pixel_0_data[offset];
-	COMBINE_DATA(&m_pixel_0_data[offset]);
-	src = m_pixel_0_data[offset];
+	old = m_pixel_data[0][offset];
+	COMBINE_DATA(&m_pixel_data[0][offset]);
+	src = m_pixel_data[0][offset];
 	if (old == src)
 		return;
 
-	sy = (offset << 1) / 0x800;
+	sy = (offset << 1) >> 11;
 	sx = (offset << 1) & 0x7ff;
 
 	if (sx > 2047 || sy > 255)
@@ -86,11 +91,11 @@ WRITE16_MEMBER(lemmings_state::lemmings_pixel_1_w)
 {
 	int sx, sy, src, tile;
 
-	COMBINE_DATA(&m_pixel_1_data[offset]);
-	src = m_pixel_1_data[offset];
+	COMBINE_DATA(&m_pixel_data[1][offset]);
+	src = m_pixel_data[1][offset];
 
-	sy = ((offset << 1) / 0x200);
-	sx = ((offset << 1) & 0x1ff);
+	sy = (offset << 1) >> 9;
+	sx = (offset << 1) & 0x1ff;
 
 	/* Copy pixel to buffer for easier decoding later */
 	tile = ((sx / 8) * 32) + (sy / 8);
@@ -108,18 +113,18 @@ WRITE16_MEMBER(lemmings_state::lemmings_vram_w)
 }
 
 
-void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect)
+void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, int* xscroll, int* yscroll, const rectangle& cliprect)
 {
 	int y,x;
 	const pen_t *paldata = m_palette->pens();
 
-	for (y=cliprect.min_y; y<cliprect.max_y;y++)
+	for (y=cliprect.top(); y<cliprect.bottom();y++)
 	{
 		uint32_t* dst = &bitmap.pix32(y,0);
 
-		for (x=cliprect.min_x; x<cliprect.max_x;x++)
+		for (x=cliprect.left(); x<cliprect.right();x++)
 		{
-			uint16_t src = srcbitmap.pix16((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
+			uint16_t src = m_bitmap0.pix16((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
 
 			if (src!=0x100)
 				dst[x] = paldata[src];
@@ -132,38 +137,34 @@ uint32_t lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rg
 	int x1 = -m_control_data[0];
 	int x0 = -m_control_data[2];
 	int y = 0;
-	rectangle rect;
-	rect.max_y = cliprect.max_y;
-	rect.min_y = cliprect.min_y;
+	rectangle rect(0, 0, cliprect.top(), cliprect.bottom());
 
 	// sprites are flipped relative to tilemaps
-	m_sprgen->set_flip_screen(true);
-	m_sprgen2->set_flip_screen(true);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_1, 0x400);
-	m_sprgen2->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_0, 0x400);
+	m_sprgen[0]->set_flip_screen(true);
+	m_sprgen[1]->set_flip_screen(true);
+	m_sprgen[0]->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer[1].get(), 0x400);
+	m_sprgen[1]->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer[0].get(), 0x400);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x300, 0xff);
+	m_sprgen[0]->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x300, 0xff);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((m_control_data[6] & 2) == 0)
 	{
-		lemmings_copy_bitmap(bitmap, m_bitmap0, &x1, &y, cliprect);
+		lemmings_copy_bitmap(bitmap, &x1, &y, cliprect);
 	}
 	else
 	{
-		rect.max_x = 159;
-		rect.min_x = 0;
-		lemmings_copy_bitmap(bitmap, m_bitmap0, &x0, &y, rect);
+		rect.setx(0, 159);
+		lemmings_copy_bitmap(bitmap, &x0, &y, rect);
 
-		rect.max_x = 319;
-		rect.min_x = 160;
-		lemmings_copy_bitmap(bitmap, m_bitmap0, &x1, &y, rect);
+		rect.setx(160, 319);
+		lemmings_copy_bitmap(bitmap, &x1, &y, rect);
 	}
 
-	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0xff);
-	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x300, 0xff);
+	m_sprgen[1]->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0xff);
+	m_sprgen[0]->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x300, 0xff);
 	m_vram_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0xff);
+	m_sprgen[1]->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0xff);
 	return 0;
 }

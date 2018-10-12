@@ -89,10 +89,11 @@ static const char *const v9938_modes[] = {
 Similar to the TMS9928, the V9938 has an own address space. It can handle
 at most 192 KiB RAM (128 KiB base, 64 KiB expansion).
 */
-ADDRESS_MAP_START(v99x8_device::memmap)
-	ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
-	AM_RANGE(0x00000, 0x2ffff) AM_RAM
-ADDRESS_MAP_END
+void v99x8_device::memmap(address_map &map)
+{
+	map.global_mask(0x3ffff);
+	map(0x00000, 0x2ffff).ram();
+}
 
 
 // devices
@@ -107,6 +108,7 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	device_video_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 18),
 	m_model(model),
+	m_pal_config(false),
 	m_offset_x(0),
 	m_offset_y(0),
 	m_visible_y(0),
@@ -149,6 +151,25 @@ device_memory_interface::space_config_vector v99x8_device::memory_space_config()
 	return space_config_vector {
 		std::make_pair(AS_DATA, &m_space_config)
 	};
+}
+
+
+void v99x8_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
+
+	if (!screen().refresh_attoseconds())
+		screen().set_raw(clock(),
+			HTOTAL,
+			0,
+			HVISIBLE - 1,
+			(m_pal_config ? VTOTAL_PAL : VTOTAL_NTSC) * 2,
+			VERTICAL_ADJUST * 2,
+			(m_pal_config ? VVISIBLE_PAL : VVISIBLE_NTSC) * 2 - 1 - VERTICAL_ADJUST * 2);
+
+	if (!screen().has_screen_update())
+		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(v99x8_device::screen_update), this));
 }
 
 

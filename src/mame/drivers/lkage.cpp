@@ -116,39 +116,42 @@ READ8_MEMBER(lkage_state::sound_status_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(lkage_state::lkage_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf000, 0xf003) AM_RAM AM_SHARE("vreg") /* video registers */
-	AM_RANGE(0xf060, 0xf060) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ(sound_status_r)
-	AM_RANGE(0xf063, 0xf063) AM_WRITENOP /* pulsed; nmi on sound cpu? */
-	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf082, 0xf082) AM_READ_PORT("DSW3")
-	AM_RANGE(0xf083, 0xf083) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("P1")
-	AM_RANGE(0xf086, 0xf086) AM_READ_PORT("P2")
-	AM_RANGE(0xf0a0, 0xf0a3) AM_RAM /* unknown */
-	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITENOP /* pulsed */
-	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf160, 0xf1ff) AM_RAM /* unknown - no valid sprite data */
-	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void lkage_state::lkage_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram(); /* work ram */
+	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf003).ram().share("vreg"); /* video registers */
+	map(0xf060, 0xf060).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xf061, 0xf061).nopw().r(FUNC(lkage_state::sound_status_r));
+	map(0xf063, 0xf063).nopw(); /* pulsed; nmi on sound cpu? */
+	map(0xf080, 0xf080).portr("DSW1");
+	map(0xf081, 0xf081).portr("DSW2");
+	map(0xf082, 0xf082).portr("DSW3");
+	map(0xf083, 0xf083).portr("SYSTEM");
+	map(0xf084, 0xf084).portr("P1");
+	map(0xf086, 0xf086).portr("P2");
+	map(0xf0a0, 0xf0a3).ram(); /* unknown */
+	map(0xf0c0, 0xf0c5).ram().share("scroll");
+	map(0xf0e1, 0xf0e1).nopw(); /* pulsed */
+	map(0xf100, 0xf15f).ram().share("spriteram");
+	map(0xf160, 0xf1ff).ram(); /* unknown - no valid sprite data */
+	map(0xf400, 0xffff).ram().w(FUNC(lkage_state::lkage_videoram_w)).share("videoram");
+}
 
-ADDRESS_MAP_START(lkage_state::lkage_map_mcu)
-	AM_IMPORT_FROM(lkage_map)
-	AM_RANGE(0xf062, 0xf062) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xf087, 0xf087) AM_READ(mcu_status_r)
-ADDRESS_MAP_END
+void lkage_state::lkage_map_mcu(address_map &map)
+{
+	lkage_map(map);
+	map(0xf062, 0xf062).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0xf087, 0xf087).r(FUNC(lkage_state::mcu_status_r));
+}
 
-ADDRESS_MAP_START(lkage_state::lkage_map_boot)
-	AM_IMPORT_FROM(lkage_map)
-	AM_RANGE(0xf062, 0xf062) AM_READWRITE(fake_mcu_r, fake_mcu_w)
-	AM_RANGE(0xf087, 0xf087) AM_READ(fake_status_r)
-ADDRESS_MAP_END
+void lkage_state::lkage_map_boot(address_map &map)
+{
+	lkage_map(map);
+	map(0xf062, 0xf062).rw(FUNC(lkage_state::fake_mcu_r), FUNC(lkage_state::fake_mcu_w));
+	map(0xf087, 0xf087).r(FUNC(lkage_state::fake_status_r));
+}
 
 
 READ8_MEMBER(lkage_state::port_fetch_r)
@@ -156,26 +159,28 @@ READ8_MEMBER(lkage_state::port_fetch_r)
 	return memregion("user1")->base()[offset];
 }
 
-ADDRESS_MAP_START(lkage_state::lkage_io_map)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(port_fetch_r)
-ADDRESS_MAP_END
+void lkage_state::lkage_io_map(address_map &map)
+{
+	map(0x4000, 0x7fff).r(FUNC(lkage_state::port_fetch_r));
+}
 
 
 /***************************************************************************/
 
 /* sound section is almost identical to Bubble Bobble, YM2203 instead of YM3526 */
 
-ADDRESS_MAP_START(lkage_state::lkage_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP /* ??? */
-	AM_RANGE(0xb001, 0xb001) AM_READNOP /* ??? */ AM_WRITE(lkage_sh_nmi_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)
-	AM_RANGE(0xb003, 0xb003) AM_WRITENOP
-	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM? */
-ADDRESS_MAP_END
+void lkage_state::lkage_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb000, 0xb000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); /* ??? */
+	map(0xb001, 0xb001).nopr() /* ??? */ .w(FUNC(lkage_state::lkage_sh_nmi_enable_w));
+	map(0xb002, 0xb002).w(FUNC(lkage_state::lkage_sh_nmi_disable_w));
+	map(0xb003, 0xb003).nopw();
+	map(0xe000, 0xefff).rom(); /* space for diagnostic ROM? */
+}
 
 /***************************************************************************/
 
@@ -454,7 +459,7 @@ static const gfx_layout sprite_layout =
 	32*8
 };
 
-static GFXDECODE_START( lkage )
+static GFXDECODE_START( gfx_lkage )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tile_layout,  /*128*/0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprite_layout,  0, 16 )
 GFXDECODE_END
@@ -485,13 +490,13 @@ void lkage_state::machine_reset()
 MACHINE_CONFIG_START(lkage_state::lkage)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_map_mcu)
-	MCFG_CPU_IO_MAP(lkage_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_map_mcu)
+	MCFG_DEVICE_IO_MAP(lkage_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,MCU_CLOCK)
@@ -506,28 +511,28 @@ MACHINE_CONFIG_START(lkage_state::lkage)
 	MCFG_SCREEN_UPDATE_DRIVER(lkage_state, screen_update_lkage)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lkage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lkage)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK )
+	MCFG_DEVICE_ADD("ym1", YM2203, AUDIO_CLOCK )
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, AUDIO_CLOCK )
+	MCFG_DEVICE_ADD("ym2", YM2203, AUDIO_CLOCK )
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -538,13 +543,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(lkage_state::lkageb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_map_boot)
-	MCFG_CPU_IO_MAP(lkage_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_map_boot)
+	MCFG_DEVICE_IO_MAP(lkage_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
 
@@ -557,28 +562,28 @@ MACHINE_CONFIG_START(lkage_state::lkageb)
 	MCFG_SCREEN_UPDATE_DRIVER(lkage_state, screen_update_lkage)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lkage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lkage)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK)
+	MCFG_DEVICE_ADD("ym1", YM2203, AUDIO_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, AUDIO_CLOCK)
+	MCFG_DEVICE_ADD("ym2", YM2203, AUDIO_CLOCK)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -909,21 +914,21 @@ READ8_MEMBER(lkage_state::fake_status_r)
 	return m_mcu_ready;
 }
 
-DRIVER_INIT_MEMBER(lkage_state,lkage)
+void lkage_state::init_lkage()
 {
-	m_sprite_dx=0;
+	m_sprite_dx = 0;
 }
 
 
-DRIVER_INIT_MEMBER(lkage_state,bygone)
+void lkage_state::init_bygone()
 {
-	m_sprite_dx=1;
+	m_sprite_dx = 1;
 }
 
-GAME( 1984, lkage,    0,        lkage,    lkage,  lkage_state,   lkage,    ROT0, "Taito Corporation", "The Legend of Kage",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageo,   lkage,    lkage,    lkage,  lkage_state,   lkage,    ROT0, "Taito Corporation", "The Legend of Kage (older)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageoo,  lkage,    lkage,    lkage,  lkage_state,   lkage,    ROT0, "Taito Corporation", "The Legend of Kage (oldest)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb,   lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg",           "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg",           "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg",           "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, bygone,   0,        lkage,    bygone, lkage_state,   bygone,   ROT0, "Taito Corporation", "Bygone (prototype)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkage,   0,     lkage,  lkage,  lkage_state, init_lkage,  ROT0, "Taito Corporation", "The Legend of Kage",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageo,  lkage, lkage,  lkage,  lkage_state, init_lkage,  ROT0, "Taito Corporation", "The Legend of Kage (older)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageoo, lkage, lkage,  lkage,  lkage_state, init_lkage,  ROT0, "Taito Corporation", "The Legend of Kage (oldest)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb,  lkage, lkageb, lkageb, lkage_state, init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb2, lkage, lkageb, lkageb, lkage_state, init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb3, lkage, lkageb, lkageb, lkage_state, init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bygone,  0,     lkage,  bygone, lkage_state, init_bygone, ROT0, "Taito Corporation", "Bygone (prototype)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

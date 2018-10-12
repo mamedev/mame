@@ -11,25 +11,29 @@
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
+#include "sound/huc6230.h"
 #include "video/huc6261.h"
 #include "video/huc6270.h"
 #include "video/huc6271.h"
 #include "video/huc6272.h"
 #include "screen.h"
+#include "speaker.h"
 
 class pcfx_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_PAD_FUNC
-	};
-
 	pcfx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_huc6261(*this, "huc6261") { }
 
+	void pcfx(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_PAD_FUNC
+	};
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( irq_read );
@@ -49,15 +53,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq15_w );
 	TIMER_CALLBACK_MEMBER(pad_func);
 
-	void pcfx(machine_config &config);
 	void pcfx_io(address_map &map);
 	void pcfx_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void machine_reset() override;
 
-private:
 	// Interrupt controller (component unknown)
 	uint16_t m_irq_mask;
 	uint16_t m_irq_pending;
@@ -94,14 +96,15 @@ WRITE8_MEMBER(pcfx_state::extio_w)
 	io_space.write_byte(offset, data);
 }
 
-ADDRESS_MAP_START(pcfx_state::pcfx_mem)
-	AM_RANGE( 0x00000000, 0x001FFFFF ) AM_RAM   /* RAM */
+void pcfx_state::pcfx_mem(address_map &map)
+{
+	map(0x00000000, 0x001FFFFF).ram();   /* RAM */
 //  AM_RANGE( 0x80000000, 0x807FFFFF ) AM_READWRITE8(extio_r,extio_w,0xffffffff)    /* EXTIO */
-	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP   /* BackUp RAM */
-	AM_RANGE( 0xE8000000, 0xE9FFFFFF ) AM_NOP   /* Extended BackUp RAM */
-	AM_RANGE( 0xF8000000, 0xF8000007 ) AM_NOP   /* PIO */
-	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROM AM_REGION("ipl", 0)  /* ROM */
-ADDRESS_MAP_END
+	map(0xE0000000, 0xE7FFFFFF).noprw();   /* BackUp RAM */
+	map(0xE8000000, 0xE9FFFFFF).noprw();   /* Extended BackUp RAM */
+	map(0xF8000000, 0xF8000007).noprw();   /* PIO */
+	map(0xFFF00000, 0xFFFFFFFF).rom().region("ipl", 0);  /* ROM */
+}
 
 READ16_MEMBER( pcfx_state::pad_r )
 {
@@ -185,21 +188,22 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 }
 
 
-ADDRESS_MAP_START(pcfx_state::pcfx_io)
-	AM_RANGE( 0x00000000, 0x000000FF ) AM_READWRITE16(pad_r, pad_w, 0xffffffff) /* PAD */
-	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP   /* HuC6230 */
-	AM_RANGE( 0x00000200, 0x000002FF ) AM_DEVICE16( "huc6271", huc6271_device, regs, 0xffff )   /* HuC6271 */
-	AM_RANGE( 0x00000300, 0x000003FF ) AM_DEVREADWRITE16( "huc6261", huc6261_device, read, write, 0xffff )  /* HuC6261 */
-	AM_RANGE( 0x00000400, 0x000004FF ) AM_DEVREADWRITE8( "huc6270_a", huc6270_device, read, write, 0xffff ) /* HuC6270-A */
-	AM_RANGE( 0x00000500, 0x000005FF ) AM_DEVREADWRITE8( "huc6270_b", huc6270_device, read, write, 0xffff ) /* HuC6270-B */
-	AM_RANGE( 0x00000600, 0x000006FF ) AM_DEVREADWRITE( "huc6272", huc6272_device, read, write )    /* HuC6272 */
-	AM_RANGE( 0x00000C80, 0x00000C83 ) AM_NOP
-	AM_RANGE( 0x00000E00, 0x00000EFF ) AM_READWRITE16( irq_read, irq_write, 0xffff )    /* Interrupt controller */
-	AM_RANGE( 0x00000F00, 0x00000FFF ) AM_NOP
+void pcfx_state::pcfx_io(address_map &map)
+{
+	map(0x00000000, 0x000000FF).rw(FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
+	map(0x00000100, 0x000001FF).w("huc6230", FUNC(huc6230_device::write)).umask32(0x00ff00ff);   /* HuC6230 */
+	map(0x00000200, 0x000002FF).m("huc6271", FUNC(huc6271_device::regs)).umask32(0x0000ffff);   /* HuC6271 */
+	map(0x00000300, 0x000003FF).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
+	map(0x00000400, 0x000004FF).rw("huc6270_a", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-A */
+	map(0x00000500, 0x000005FF).rw("huc6270_b", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-B */
+	map(0x00000600, 0x000006FF).rw("huc6272", FUNC(huc6272_device::read), FUNC(huc6272_device::write));    /* HuC6272 */
+	map(0x00000C80, 0x00000C83).noprw();
+	map(0x00000E00, 0x00000EFF).rw(FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
+	map(0x00000F00, 0x00000FFF).noprw();
 //  AM_RANGE( 0x00600000, 0x006FFFFF ) AM_READ(scsi_ctrl_r)
-	AM_RANGE( 0x00780000, 0x007FFFFF ) AM_ROM AM_REGION("scsi_rom", 0 )
-	AM_RANGE( 0x80500000, 0x805000FF ) AM_NOP   /* HuC6273 */
-ADDRESS_MAP_END
+	map(0x00780000, 0x007FFFFF).rom().region("scsi_rom", 0);
+	map(0x80500000, 0x805000FF).noprw();   /* HuC6273 */
+}
 
 
 static INPUT_PORTS_START( pcfx )
@@ -414,9 +418,9 @@ uint32_t pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 
 MACHINE_CONFIG_START(pcfx_state::pcfx)
-	MCFG_CPU_ADD( "maincpu", V810, XTAL(21'477'272) )
-	MCFG_CPU_PROGRAM_MAP( pcfx_mem)
-	MCFG_CPU_IO_MAP( pcfx_io)
+	MCFG_DEVICE_ADD( "maincpu", V810, XTAL(21'477'272) )
+	MCFG_DEVICE_PROGRAM_MAP( pcfx_mem)
+	MCFG_DEVICE_IO_MAP( pcfx_io)
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_UPDATE_DRIVER(pcfx_state, screen_update)
@@ -424,33 +428,44 @@ MACHINE_CONFIG_START(pcfx_state::pcfx)
 
 	MCFG_DEVICE_ADD( "huc6270_a", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x20000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pcfx_state, irq12_w))
+	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(*this, pcfx_state, irq12_w))
 
 	MCFG_DEVICE_ADD( "huc6270_b", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x20000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pcfx_state, irq14_w))
+	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(*this, pcfx_state, irq14_w))
 
 	MCFG_DEVICE_ADD("huc6261", HUC6261, XTAL(21'477'272))
 	MCFG_HUC6261_VDC1("huc6270_a")
 	MCFG_HUC6261_VDC2("huc6270_b")
 	MCFG_HUC6261_KING("huc6272")
 
-	MCFG_HUC6272_ADD( "huc6272", XTAL(21'477'272) )
-	MCFG_HUC6272_IRQ_CHANGED_CB(WRITELINE(pcfx_state, irq13_w))
+	MCFG_DEVICE_ADD( "huc6272", HUC6272, XTAL(21'477'272) )
+	MCFG_HUC6272_IRQ_CHANGED_CB(WRITELINE(*this, pcfx_state, irq13_w))
 	MCFG_HUC6272_RAINBOW("huc6271")
 
-	MCFG_HUC6271_ADD( "huc6271", XTAL(21'477'272) )
+	MCFG_DEVICE_ADD( "huc6271", HUC6271, XTAL(21'477'272) )
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "pcfx")
+
+	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	huc6230_device &huc6230(HuC6230(config, "huc6230", XTAL(21'477'272)));
+	huc6230.adpcm_update_cb<0>().set("huc6272", FUNC(huc6272_device::adpcm_update_0));
+	huc6230.adpcm_update_cb<1>().set("huc6272", FUNC(huc6272_device::adpcm_update_1));
+	huc6230.cdda_cb().set("huc6272", FUNC(huc6272_device::cdda_update));
+	huc6230.add_route(0, "lspeaker", 1.0);
+	huc6230.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 
 ROM_START( pcfx )
 	ROM_REGION( 0x100000, "ipl", 0 )
 	ROM_SYSTEM_BIOS( 0, "v100", "BIOS v1.00 - 2 Sep 1994" )
-	ROMX_LOAD( "pcfxbios.bin", 0x000000, 0x100000, CRC(76ffb97a) SHA1(1a77fd83e337f906aecab27a1604db064cf10074), ROM_BIOS(1) )
+	ROMX_LOAD( "pcfxbios.bin", 0x000000, 0x100000, CRC(76ffb97a) SHA1(1a77fd83e337f906aecab27a1604db064cf10074), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v101", "BIOS v1.01 - 5 Dec 1994" )
-	ROMX_LOAD( "pcfxv101.bin", 0x000000, 0x100000, CRC(236102c9) SHA1(8b662f7548078be52a871565e19511ccca28c5c8), ROM_BIOS(2) )
+	ROMX_LOAD( "pcfxv101.bin", 0x000000, 0x100000, CRC(236102c9) SHA1(8b662f7548078be52a871565e19511ccca28c5c8), ROM_BIOS(1) )
 
 	ROM_REGION( 0x80000, "scsi_rom", 0 )
 	ROM_LOAD( "fx-scsi.rom", 0x00000, 0x80000, CRC(f3e60e5e) SHA1(65482a23ac5c10a6095aee1db5824cca54ead6e5) )
@@ -471,6 +486,6 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE            INIT    COMPANY  FULLNAME                  FLAGS
-CONS( 1994, pcfx,       0,      0,      pcfx,       pcfx,  pcfx_state,      0,      "NEC",   "PC-FX",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 199?, pcfxga,     pcfx,   0,      pcfx,       pcfx,  pcfx_state,      0,      "NEC",   "PC-FX/GA (PC ISA Card)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME                  FLAGS
+CONS( 1994, pcfx,   0,      0,      pcfx,    pcfx,  pcfx_state, empty_init, "NEC",   "PC-FX",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, pcfxga, pcfx,   0,      pcfx,    pcfx,  pcfx_state, empty_init, "NEC",   "PC-FX/GA (PC ISA Card)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

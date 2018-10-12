@@ -275,71 +275,74 @@ WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
 	if (ACCESSING_BITS_0_7)     m_soundlatch->write(space, 0, (data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)    m_soundlatch2->write(space, 0, (data >> 8) & 0xff);
 
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-ADDRESS_MAP_START(lordgun_state::lordgun_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("priority_ram")                        // PRIORITY
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_SHARE("vram.0")  // DISPLAY
-	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_SHARE("vram.1")  // DISPLAY
-	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_SHARE("vram.2")  // DISPLAY
-	AM_RANGE(0x315000, 0x317fff) AM_RAM                                                     //
-	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_SHARE("vram.3")  // DISPLAY
-	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_SHARE("scrollram")                           // LINE
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_SHARE("spriteram")                       // ANIMATOR
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_SHARE("scroll_x.0")
-	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_SHARE("scroll_x.1")
-	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_SHARE("scroll_x.2")
-	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_SHARE("scroll_x.3")
-	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_SHARE("scroll_y.0")
-	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_SHARE("scroll_y.1")
-	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_SHARE("scroll_y.2")
-	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_SHARE("scroll_y.3")
-	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
-	AM_RANGE(0x503800, 0x503801) AM_READ(lordgun_gun_0_x_r)
-	AM_RANGE(0x503a00, 0x503a01) AM_READ(lordgun_gun_1_x_r)
-	AM_RANGE(0x503c00, 0x503c01) AM_READ(lordgun_gun_0_y_r)
-	AM_RANGE(0x503e00, 0x503e01) AM_READ(lordgun_gun_1_y_r)
-	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
-	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x50a900, 0x50a9ff) AM_READWRITE(lordgun_protection_r, lordgun_protection_w)
-ADDRESS_MAP_END
+void lordgun_state::lordgun_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x210000, 0x21ffff).ram().share("priority_ram");                        // PRIORITY
+	map(0x300000, 0x30ffff).ram().w(FUNC(lordgun_state::lordgun_vram_0_w)).share("vram.0");  // DISPLAY
+	map(0x310000, 0x313fff).ram().w(FUNC(lordgun_state::lordgun_vram_1_w)).share("vram.1");  // DISPLAY
+	map(0x314000, 0x314fff).ram().w(FUNC(lordgun_state::lordgun_vram_2_w)).share("vram.2");  // DISPLAY
+	map(0x315000, 0x317fff).ram();                                                     //
+	map(0x318000, 0x319fff).ram().w(FUNC(lordgun_state::lordgun_vram_3_w)).share("vram.3");  // DISPLAY
+	map(0x31c000, 0x31c7ff).ram().share("scrollram");                           // LINE
+	map(0x400000, 0x4007ff).ram().share("spriteram");                       // ANIMATOR
+	map(0x500000, 0x500fff).ram().w(FUNC(lordgun_state::lordgun_paletteram_w)).share("paletteram");
+	map(0x502000, 0x502001).writeonly().share("scroll_x.0");
+	map(0x502200, 0x502201).writeonly().share("scroll_x.1");
+	map(0x502400, 0x502401).writeonly().share("scroll_x.2");
+	map(0x502600, 0x502601).writeonly().share("scroll_x.3");
+	map(0x502800, 0x502801).writeonly().share("scroll_y.0");
+	map(0x502a00, 0x502a01).writeonly().share("scroll_y.1");
+	map(0x502c00, 0x502c01).writeonly().share("scroll_y.2");
+	map(0x502e00, 0x502e01).writeonly().share("scroll_y.3");
+	map(0x503000, 0x503001).w(FUNC(lordgun_state::lordgun_priority_w));
+	map(0x503800, 0x503801).r(FUNC(lordgun_state::lordgun_gun_0_x_r));
+	map(0x503a00, 0x503a01).r(FUNC(lordgun_state::lordgun_gun_1_x_r));
+	map(0x503c00, 0x503c01).r(FUNC(lordgun_state::lordgun_gun_0_y_r));
+	map(0x503e00, 0x503e01).r(FUNC(lordgun_state::lordgun_gun_1_y_r));
+	map(0x504000, 0x504001).w(FUNC(lordgun_state::lordgun_soundlatch_w));
+	map(0x506000, 0x506007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x508000, 0x508007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x50a900, 0x50a9ff).rw(FUNC(lordgun_state::lordgun_protection_r), FUNC(lordgun_state::lordgun_protection_w));
+}
 
 
-ADDRESS_MAP_START(lordgun_state::aliencha_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("priority_ram")                        // PRIORITY
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_SHARE("vram.0")  // BACKGROUND 1
-	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_SHARE("vram.1")  // BACKGROUND 2
-	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_SHARE("vram.2")  // BACKGROUND 3
-	AM_RANGE(0x315000, 0x317fff) AM_RAM                                                     //
-	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_SHARE("vram.3")  // TEXT
-	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_SHARE("scrollram")                           // LINE OFFSET
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_SHARE("spriteram")                       // ANIMATE
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_SHARE("scroll_x.0")
-	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_SHARE("scroll_x.1")
-	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_SHARE("scroll_x.2")
-	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_SHARE("scroll_x.3")
-	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_SHARE("scroll_y.0")
-	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_SHARE("scroll_y.1")
-	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_SHARE("scroll_y.2")
-	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_SHARE("scroll_y.3")
-	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
-	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
-	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x50b900, 0x50b9ff) AM_READWRITE(aliencha_protection_r, aliencha_protection_w)
-ADDRESS_MAP_END
+void lordgun_state::aliencha_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x210000, 0x21ffff).ram().share("priority_ram");                        // PRIORITY
+	map(0x300000, 0x30ffff).ram().w(FUNC(lordgun_state::lordgun_vram_0_w)).share("vram.0");  // BACKGROUND 1
+	map(0x310000, 0x313fff).ram().w(FUNC(lordgun_state::lordgun_vram_1_w)).share("vram.1");  // BACKGROUND 2
+	map(0x314000, 0x314fff).ram().w(FUNC(lordgun_state::lordgun_vram_2_w)).share("vram.2");  // BACKGROUND 3
+	map(0x315000, 0x317fff).ram();                                                     //
+	map(0x318000, 0x319fff).ram().w(FUNC(lordgun_state::lordgun_vram_3_w)).share("vram.3");  // TEXT
+	map(0x31c000, 0x31c7ff).ram().share("scrollram");                           // LINE OFFSET
+	map(0x400000, 0x4007ff).ram().share("spriteram");                       // ANIMATE
+	map(0x500000, 0x500fff).ram().w(FUNC(lordgun_state::lordgun_paletteram_w)).share("paletteram");
+	map(0x502000, 0x502001).writeonly().share("scroll_x.0");
+	map(0x502200, 0x502201).writeonly().share("scroll_x.1");
+	map(0x502400, 0x502401).writeonly().share("scroll_x.2");
+	map(0x502600, 0x502601).writeonly().share("scroll_x.3");
+	map(0x502800, 0x502801).writeonly().share("scroll_y.0");
+	map(0x502a00, 0x502a01).writeonly().share("scroll_y.1");
+	map(0x502c00, 0x502c01).writeonly().share("scroll_y.2");
+	map(0x502e00, 0x502e01).writeonly().share("scroll_y.3");
+	map(0x503000, 0x503001).w(FUNC(lordgun_state::lordgun_priority_w));
+	map(0x504000, 0x504001).w(FUNC(lordgun_state::lordgun_soundlatch_w));
+	map(0x506000, 0x506007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x508000, 0x508007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x50b900, 0x50b9ff).rw(FUNC(lordgun_state::aliencha_protection_r), FUNC(lordgun_state::aliencha_protection_w));
+}
 
-ADDRESS_MAP_START(lordgun_state::ymf278_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-ADDRESS_MAP_END
+void lordgun_state::ymf278_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+}
 
 /***************************************************************************
 
@@ -347,10 +350,11 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(lordgun_state::lordgun_soundmem_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void lordgun_state::lordgun_soundmem_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
 WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
 {
@@ -359,25 +363,27 @@ WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
 //  popmessage("OKI %x", data);
 }
 
-ADDRESS_MAP_START(lordgun_state::lordgun_soundio_map)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x5000, 0x5000) AM_READNOP
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(lordgun_okibank_w )
-ADDRESS_MAP_END
+void lordgun_state::lordgun_soundio_map(address_map &map)
+{
+	map(0x1000, 0x1001).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x2000, 0x2000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3000, 0x3000).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x5000, 0x5000).nopr();
+	map(0x6000, 0x6000).w(FUNC(lordgun_state::lordgun_okibank_w));
+}
 
 
-ADDRESS_MAP_START(lordgun_state::aliencha_soundio_map)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x5000, 0x5000) AM_WRITENOP    // writes 03 then 07 at end of NMI
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("ymf", ymf278b_device, read)
-	AM_RANGE(0x7000, 0x7005) AM_DEVWRITE("ymf", ymf278b_device, write)
-	AM_RANGE(0x7400, 0x7400) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x7800, 0x7800) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-ADDRESS_MAP_END
+void lordgun_state::aliencha_soundio_map(address_map &map)
+{
+	map(0x3000, 0x3000).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x5000, 0x5000).nopw();    // writes 03 then 07 at end of NMI
+	map(0x7000, 0x7000).r("ymf", FUNC(ymf278b_device::read));
+	map(0x7000, 0x7005).w("ymf", FUNC(ymf278b_device::write));
+	map(0x7400, 0x7400).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x7800, 0x7800).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /***************************************************************************
@@ -425,7 +431,7 @@ static const gfx_layout lordgun_32x32x6_layout =
 	32*32*2
 };
 
-static GFXDECODE_START( lordgun )
+static GFXDECODE_START( gfx_lordgun )
 	GFXDECODE_ENTRY( "tiles0",  0, lordgun_8x8x6_layout,    0x000, 0x800/0x40*8  )  // [0] Tilemap 0
 	GFXDECODE_ENTRY( "tiles1",  0, lordgun_16x16x6_layout,  0x000, 0x800/0x40*8  )  // [1] Tilemap 1
 	GFXDECODE_ENTRY( "tiles1",  0, lordgun_32x32x6_layout,  0x000, 0x800/0x40*8  )  // [2] Tilemap 2
@@ -457,7 +463,7 @@ static INPUT_PORTS_START( lordgun )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("START1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1   )
@@ -578,7 +584,7 @@ static INPUT_PORTS_START( aliencha )
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW3:8" ) /* Listed as "Unused" */
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -633,30 +639,30 @@ void lordgun_state::machine_start()
 }
 
 MACHINE_CONFIG_START(lordgun_state::lordgun)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(lordgun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(lordgun_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
-	MCFG_CPU_IO_MAP(lordgun_soundio_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lordgun_soundmem_map)
+	MCFG_DEVICE_IO_MAP(lordgun_soundio_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DIP"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, lordgun_eeprom_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake2_w))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("DIP");
+	ppi0.out_pa_callback().set(FUNC(lordgun_state::fake_w));
+	ppi0.out_pb_callback().set(FUNC(lordgun_state::lordgun_eeprom_w));
+	ppi0.in_pc_callback().set_ioport("SERVICE");
+	ppi0.out_pc_callback().set(FUNC(lordgun_state::fake2_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("START1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("START2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("START1");
+	ppi1.out_pa_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pb_callback().set_ioport("START2");
+	ppi1.out_pb_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pc_callback().set_ioport("COIN");
+	ppi1.out_pc_callback().set(FUNC(lordgun_state::fake_w));
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -666,49 +672,49 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lordgun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lordgun)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 20, PIN7_HIGH)   // ? 5MHz can't be right!
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)   // ? 5MHz can't be right!
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(lordgun_state::aliencha)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(aliencha_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(aliencha_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
-	MCFG_CPU_IO_MAP(aliencha_soundio_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lordgun_soundmem_map)
+	MCFG_DEVICE_IO_MAP(aliencha_soundio_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(lordgun_state, aliencha_dip_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake2_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, aliencha_eeprom_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, aliencha_dip_w))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set(FUNC(lordgun_state::aliencha_dip_r));
+	ppi0.out_pa_callback().set(FUNC(lordgun_state::fake2_w));
+	ppi0.out_pb_callback().set(FUNC(lordgun_state::aliencha_eeprom_w));
+	ppi0.in_pc_callback().set_ioport("SERVICE");
+	ppi0.out_pc_callback().set(FUNC(lordgun_state::aliencha_dip_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("P1");
+	ppi1.out_pa_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pb_callback().set_ioport("P2");
+	ppi1.out_pb_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pc_callback().set_ioport("COIN");
+	ppi1.out_pc_callback().set(FUNC(lordgun_state::fake_w));
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -718,24 +724,24 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lordgun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lordgun)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymf", YMF278B, 26000000)            // ? 26MHz matches video (decrease for faster music tempo)
+	MCFG_DEVICE_ADD("ymf", YMF278B, 26000000)            // ? 26MHz matches video (decrease for faster music tempo)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 20, PIN7_HIGH)   // ? 5MHz can't be right
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)   // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(20'000'000) / 20, PIN7_HIGH)  // ? 5MHz can't be right
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)  // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1043,7 +1049,7 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(lordgun_state, lordgun)
+void lordgun_state::init_lordgun()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	int rom_size = 0x100000;
@@ -1069,7 +1075,7 @@ DRIVER_INIT_MEMBER(lordgun_state, lordgun)
 	}
 }
 
-DRIVER_INIT_MEMBER(lordgun_state, aliencha)
+void lordgun_state::init_aliencha()
 {
 	save_item(NAME(m_aliencha_dip_sel));
 }
@@ -1080,6 +1086,6 @@ DRIVER_INIT_MEMBER(lordgun_state, aliencha)
 
 ***************************************************************************/
 
-GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, lordgun,  ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, 0,        ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, 0,        ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, init_lordgun, ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, empty_init,   ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, empty_init,   ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )

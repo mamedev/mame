@@ -52,24 +52,4 @@ private:
 /* OSD can call this to safely flush all traces in the event of a crash */
 void debugger_flush_all_traces_on_abnormal_exit();
 
-
-
-/***************************************************************************
-    CPU CORE STATIC FUNCTIONS
-***************************************************************************/
-
-void debugger_instruction_hook(device_t *device, offs_t curpc);
-void debugger_exception_hook(device_t *device, int exception);
-
-
-
-/***************************************************************************
-    CPU EXECUTION SYSTEM STATIC FUNCTIONS
-***************************************************************************/
-
-void debugger_start_cpu_hook(device_t *device, const attotime &endtime);
-void debugger_stop_cpu_hook(device_t *device);
-void debugger_interrupt_hook(device_t *device, int irqline);
-
-
 #endif // MAME_EMU_DEBUGGER_H

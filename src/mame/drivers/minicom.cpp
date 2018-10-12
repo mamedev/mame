@@ -50,27 +50,33 @@ public:
 	minicom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void minicom(machine_config &config);
+
+	void init_minicom();
+
+private:
 	DECLARE_WRITE8_MEMBER(i87c52_p0_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p1_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p2_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p3_w);
 	DECLARE_READ8_MEMBER(i87c52_p1_r);
 	DECLARE_READ8_MEMBER(i87c52_p2_r);
-	DECLARE_DRIVER_INIT(minicom);
-	void minicom(machine_config &config);
-private:
+
 	uint8_t m_p[4];
 	uint16_t m_display_data;
 	int m_digit_index;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	output_finder<20> m_digits;
 };
 
 void minicom_state::machine_start()
 {
+	m_digits.resolve();
 	// zerofill
 	memset(m_p, 0, 4);
 	m_digit_index = 0;
@@ -88,7 +94,7 @@ void minicom_state::machine_reset()
 	m_display_data = 0;
 
 	for (int i=0; i<20; i++)
-		output().set_digit_value(i, 0);
+		m_digits[i] = 0;
 }
 
 READ8_MEMBER(minicom_state::i87c52_p1_r)
@@ -203,29 +209,29 @@ WRITE8_MEMBER(minicom_state::i87c52_p3_w)
 
 		if (BIT(changed,4) || BIT(changed,5))
 		{
-			output().set_digit_value(m_digit_index, bitswap<16>(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
+			m_digits[m_digit_index] = bitswap<16>(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF;
 		}
 		m_p[3] = data;
 	}
 }
 
-DRIVER_INIT_MEMBER( minicom_state, minicom )
+void minicom_state::init_minicom()
 {
 }
 
 MACHINE_CONFIG_START(minicom_state::minicom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I87C52, XTAL(10'000'000)) /*FIX-ME: verify the correct clock frequency */
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(minicom_state, i87c52_p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(minicom_state, i87c52_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(minicom_state, i87c52_p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(minicom_state, i87c52_p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(minicom_state, i87c52_p2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(minicom_state, i87c52_p3_w))
+	MCFG_DEVICE_ADD("maincpu", I87C52, XTAL(10'000'000)) /*FIX-ME: verify the correct clock frequency */
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, minicom_state, i87c52_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, minicom_state, i87c52_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, minicom_state, i87c52_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, minicom_state, i87c52_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, minicom_state, i87c52_p2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, minicom_state, i87c52_p3_w))
 
 	/* video hardware */
 	/* fluorescent 14-segment display forming a row of 20 characters */
-	MCFG_DEFAULT_LAYOUT(layout_minicom)
+	config.set_default_layout(layout_minicom);
 
 /* TODO: Map the keyboard rows/cols inputs (43-key, 4-row keyboard) */
 
@@ -242,6 +248,6 @@ ROM_START( mcom4_02 )
 	ROM_LOAD( "ultratec_minicom_iv_20020419.rom",  0x0000, 0x2000, CRC(99b6cc35) SHA1(32577005bf02042f893c8880f8ce5b3d8a5f55f9) )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT     COMPANY     FULLNAME                   FLAGS
-COMP( 1997, minicom,  0,      0,      minicom, 0,     minicom_state, minicom, "Ultratec", "Minicom IV (1997-08-11)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // fw release data: 11th Aug 1997
-COMP( 2002, mcom4_02, 0,      0,      minicom, 0,     minicom_state, minicom, "Ultratec", "Minicom IV (2002-04-19)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // fw release data: 19th Apr 2002
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT          COMPANY     FULLNAME                   FLAGS
+COMP( 1997, minicom,  0,      0,      minicom, 0,     minicom_state, init_minicom, "Ultratec", "Minicom IV (1997-08-11)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // fw release data: 11th Aug 1997
+COMP( 2002, mcom4_02, 0,      0,      minicom, 0,     minicom_state, init_minicom, "Ultratec", "Minicom IV (2002-04-19)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // fw release data: 19th Apr 2002

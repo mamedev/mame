@@ -32,29 +32,28 @@ class xor100_state : public driver_device
 {
 public:
 	xor100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_dbrg(*this, COM5016_TAG),
-			m_uart_a(*this, I8251_A_TAG),
-			m_uart_b(*this, I8251_B_TAG),
-			m_fdc(*this, WD1795_TAG),
-			m_ctc(*this, Z80CTC_TAG),
-			m_ram(*this, RAM_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_s100(*this, S100_TAG),
-			m_floppy0(*this, WD1795_TAG":0"),
-			m_floppy1(*this, WD1795_TAG":1"),
-			m_floppy2(*this, WD1795_TAG":2"),
-			m_floppy3(*this, WD1795_TAG":3"),
-			m_rom(*this, Z80_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_uart_a(*this, I8251_A_TAG)
+		, m_uart_b(*this, I8251_B_TAG)
+		, m_fdc(*this, WD1795_TAG)
+		, m_ctc(*this, Z80CTC_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_s100(*this, S100_TAG)
+		, m_floppy0(*this, WD1795_TAG":0")
+		, m_floppy1(*this, WD1795_TAG":1")
+		, m_floppy2(*this, WD1795_TAG":2")
+		, m_floppy3(*this, WD1795_TAG":3")
+		, m_rom(*this, Z80_TAG)
 	{ }
 
+	void xor100(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER( mmu_w );
 	DECLARE_WRITE8_MEMBER( prom_toggle_w );
 	DECLARE_READ8_MEMBER( prom_disable_r );
-	DECLARE_WRITE8_MEMBER( baud_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_READ8_MEMBER( fdc_wait_r );
 	DECLARE_WRITE8_MEMBER( fdc_dcont_w );
 	DECLARE_WRITE8_MEMBER( fdc_dsel_w );
@@ -68,10 +67,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 
-	void xor100(machine_config &config);
 	void xor100_io(address_map &map);
 	void xor100_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -79,7 +77,6 @@ protected:
 	void post_load();
 
 	required_device<cpu_device> m_maincpu;
-	required_device<com8116_device> m_dbrg;
 	required_device<i8251_device> m_uart_a;
 	required_device<i8251_device> m_uart_b;
 	required_device<fd1795_device> m_fdc;

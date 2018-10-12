@@ -104,12 +104,12 @@
 
 
 // device type definitions
-DEFINE_DEVICE_TYPE(ADSP2100, adsp2100_device, "adsp2100", "ADSP-2100")
-DEFINE_DEVICE_TYPE(ADSP2101, adsp2101_device, "adsp2101", "ADSP-2101")
-DEFINE_DEVICE_TYPE(ADSP2104, adsp2104_device, "adsp2104", "ADSP-2104")
-DEFINE_DEVICE_TYPE(ADSP2105, adsp2105_device, "adsp2105", "ADSP-2105")
-DEFINE_DEVICE_TYPE(ADSP2115, adsp2115_device, "adsp2115", "ADSP-2115")
-DEFINE_DEVICE_TYPE(ADSP2181, adsp2181_device, "adsp2181", "ADSP-2181")
+DEFINE_DEVICE_TYPE(ADSP2100, adsp2100_device, "adsp2100", "Analog Devices ADSP-2100")
+DEFINE_DEVICE_TYPE(ADSP2101, adsp2101_device, "adsp2101", "Analog Devices ADSP-2101")
+DEFINE_DEVICE_TYPE(ADSP2104, adsp2104_device, "adsp2104", "Analog Devices ADSP-2104")
+DEFINE_DEVICE_TYPE(ADSP2105, adsp2105_device, "adsp2105", "Analog Devices ADSP-2105")
+DEFINE_DEVICE_TYPE(ADSP2115, adsp2115_device, "adsp2115", "Analog Devices ADSP-2115")
+DEFINE_DEVICE_TYPE(ADSP2181, adsp2181_device, "adsp2181", "Analog Devices ADSP-2181")
 
 
 //**************************************************************************
@@ -418,7 +418,7 @@ void adsp21xx_device::device_start()
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-2>();
+	m_cache = m_program->cache<2, -2, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = has_space(AS_IO) ? &space(AS_IO) : nullptr;
 
@@ -588,7 +588,7 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_FL2,     "FL2",       m_fl2).mask(1);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -763,9 +763,9 @@ void adsp21xx_device::state_string_export(const device_state_entry &entry, std::
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *adsp21xx_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> adsp21xx_device::create_disassembler()
 {
-	return new adsp21xx_disassembler;
+	return std::make_unique<adsp21xx_disassembler>();
 }
 
 
@@ -806,7 +806,7 @@ inline void adsp21xx_device::program_write(uint32_t addr, uint32_t data)
 
 inline uint32_t adsp21xx_device::opcode_read()
 {
-	return m_direct->read_dword(m_pc);
+	return m_cache->read_dword(m_pc);
 }
 
 
@@ -1156,7 +1156,7 @@ void adsp21xx_device::execute_set_input(int inputnum, int state)
 void adsp21xx_device::execute_run()
 {
 	// Return if CPU is halted
-	if (m_input[INPUT_LINE_HALT].m_curstate) {
+	if (current_input_state(INPUT_LINE_HALT)) {
 		m_icount = 0;
 		return;
 	}
@@ -1170,7 +1170,7 @@ void adsp21xx_device::execute_run()
 		// debugging
 		m_ppc = m_pc;   // copy PC to previous PC
 		if (check_debugger)
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 
 #if ADSP_TRACK_HOTSPOTS
 		m_pcbucket[m_pc & 0x3fff]++;

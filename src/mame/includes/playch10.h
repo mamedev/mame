@@ -7,6 +7,7 @@
 
 #include "machine/rp5h01.h"
 #include "video/ppu2c0x.h"
+#include "emupal.h"
 
 class playch10_state : public driver_device
 {
@@ -14,6 +15,7 @@ public:
 	playch10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_cartcpu(*this, "cart")
 		, m_ppu(*this, "ppu")
 		, m_rp5h01(*this, "rp5h01")
 		, m_ram_8w(*this, "ram_8w")
@@ -25,6 +27,32 @@ public:
 	{
 	}
 
+	void playch10(machine_config &config);
+	void playchnv(machine_config &config);
+	void playch10_hboard(machine_config &config);
+
+	void init_playch10();
+	void init_pc_gun();
+	void init_pcaboard();
+	void init_pcbboard();
+	void init_pccboard();
+	void init_pcdboard();
+	void init_pcdboard_2();
+	void init_pceboard();
+	void init_pcfboard();
+	void init_pcfboard_2();
+	void init_virus();
+	void init_ttoon();
+	void init_pcgboard();
+	void init_pcgboard_type2();
+	void init_pchboard();
+	void init_pciboard();
+	void init_pckboard();
+	void init_pc_hrz();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(up8w_w);
 	DECLARE_READ8_MEMBER(ram_8w_r);
 	DECLARE_WRITE8_MEMBER(ram_8w_w);
@@ -57,43 +85,17 @@ public:
 	DECLARE_WRITE8_MEMBER(iboard_rom_switch_w);
 	DECLARE_WRITE8_MEMBER(hboard_rom_switch_w);
 	DECLARE_WRITE8_MEMBER(playch10_videoram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
-
-	DECLARE_DRIVER_INIT(playch10);
-	DECLARE_DRIVER_INIT(pc_gun);
-	DECLARE_DRIVER_INIT(pcaboard);
-	DECLARE_DRIVER_INIT(pcbboard);
-	DECLARE_DRIVER_INIT(pccboard);
-	DECLARE_DRIVER_INIT(pcdboard);
-	DECLARE_DRIVER_INIT(pcdboard_2);
-	DECLARE_DRIVER_INIT(pceboard);
-	DECLARE_DRIVER_INIT(pcfboard);
-	DECLARE_DRIVER_INIT(pcfboard_2);
-	DECLARE_DRIVER_INIT(virus);
-	DECLARE_DRIVER_INIT(ttoon);
-	DECLARE_DRIVER_INIT(pcgboard);
-	DECLARE_DRIVER_INIT(pcgboard_type2);
-	DECLARE_DRIVER_INIT(pchboard);
-	DECLARE_DRIVER_INIT(pciboard);
-	DECLARE_DRIVER_INIT(pckboard);
-	DECLARE_DRIVER_INIT(pc_hrz);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-
-	// machine configuration builders
-	void playch10(machine_config &config);
-	void playchnv(machine_config &config);
-	void playch10_hboard(machine_config &config);
 
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
 	void cart_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	struct chr_bank
 	{
 		int writable;   // 1 for RAM, 0 for ROM
@@ -103,20 +105,21 @@ private:
 	DECLARE_PALETTE_INIT(playch10);
 	DECLARE_MACHINE_START(playch10_hboard);
 	DECLARE_VIDEO_START(playch10_hboard);
-	INTERRUPT_GEN_MEMBER(playch10_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void pc10_set_videorom_bank( int first, int count, int bank, int size );
 	void set_videoram_bank( int first, int count, int bank, int size );
 	void gboard_scanline_cb( int scanline, int vblank, int blanked );
-	void ppu_irq(int *ppu_regs);
+	DECLARE_WRITE_LINE_MEMBER(int_detect_w);
 	void mapper9_latch(offs_t offset);
 	void pc10_set_mirroring(int mirroring);
 
-	uint32_t screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_playch10_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_playch10_top(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_playch10_bottom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_playch10_single(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_cartcpu;
 	required_device<ppu2c0x_device> m_ppu;
 	optional_device<rp5h01_device> m_rp5h01;
 

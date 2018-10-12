@@ -14,6 +14,7 @@
 #include "ui/ui.h"
 
 #include "drivenum.h"
+#include "romload.h"
 #include "softlist.h"
 #include "emuopts.h"
 
@@ -384,7 +385,7 @@ std::string machine_info::game_info_string() const
 				const rectangle &visarea = screen.visible_area();
 				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz",
 						visarea.width(), visarea.height(),
-						(m_machine.system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
+						(screen.orientation() & ORIENTATION_SWAP_XY) ? "V" : "H",
 						ATTOSECONDS_TO_HZ(screen.frame_period().attoseconds()));
 			}
 

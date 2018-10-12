@@ -22,13 +22,16 @@
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
+#include "machine/i8087.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 
@@ -36,6 +39,7 @@
 #include "machine/isbc_215g.h"
 #include "machine/keyboard.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -58,11 +62,15 @@ public:
 		, m_pic8259(*this, "pic8259")
 		, m_gfxcpu(*this, "gfxcpu")
 		, m_ctc(*this, Z80CTC_TAG)
+		, m_rs232(*this, "rs232")
 		, m_video_ram(*this, "video_ram")
 		, m_video_bankdev(*this, "video_bankdev")
 		, m_palette(*this, "palette")
 	{ }
 
+	void a7150(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -72,14 +80,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(a7150_tmr2_w);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
 
+	DECLARE_WRITE_LINE_MEMBER(ifss_write_txd);
+	DECLARE_WRITE_LINE_MEMBER(ifss_write_dtr);
+
 	DECLARE_READ8_MEMBER(kgs_host_r);
 	DECLARE_WRITE8_MEMBER(kgs_host_w);
 	DECLARE_WRITE_LINE_MEMBER(kgs_iml_w);
+	DECLARE_WRITE_LINE_MEMBER(ifss_loopback_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	void kgs_memory_remap();
 
 	bool m_kgs_msel, m_kgs_iml;
 	uint8_t m_kgs_datao, m_kgs_datai, m_kgs_ctrl;
+	bool m_ifss_loopback;
 
 	uint32_t screen_update_k7072(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
@@ -91,10 +104,11 @@ public:
 
 	required_device<z80_device> m_gfxcpu;
 	required_device<z80ctc_device> m_ctc;
+	required_device<rs232_port_device> m_rs232;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
-	void a7150(machine_config &config);
+
 	void a7150_io(address_map &map);
 	void a7150_mem(address_map &map);
 	void k7070_cpu_banked(address_map &map);
@@ -136,15 +150,33 @@ WRITE_LINE_MEMBER(a7150_state::a7150_tmr2_w)
 	m_uart8251->write_txc(state);
 }
 
+WRITE_LINE_MEMBER(a7150_state::ifss_loopback_w)
+{
+	m_ifss_loopback = !state;
+}
+
+WRITE_LINE_MEMBER(a7150_state::ifss_write_txd)
+{
+	if (m_ifss_loopback)
+		m_uart8251->write_rxd(state);
+	else
+		m_rs232->write_txd(state);
+}
+
+WRITE_LINE_MEMBER(a7150_state::ifss_write_dtr)
+{
+	if (m_ifss_loopback)
+		m_uart8251->write_dsr(state);
+	else
+		m_rs232->write_dtr(state);
+}
+
 WRITE8_MEMBER(a7150_state::ppi_c_w)
 {
 	// b0 -- INTR(B)
 	// b1 -- /OBF(B)
 	// m_centronics->write_ack(BIT(data, 2));
 	// m_centronics->write_strobe(BIT(data, 3));
-	// b4 -- serial loopback?
-	// b6
-	// b7
 }
 
 #define KGS_ST_OBF  0x01
@@ -281,62 +313,66 @@ WRITE8_MEMBER(a7150_state::a7150_kgs_w)
 }
 
 
-ADDRESS_MAP_START(a7150_state::a7150_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xf7fff) AM_RAM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void a7150_state::a7150_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xf7fff).ram();
+	map(0xf8000, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(a7150_state::a7150_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x004a, 0x004b) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff) // KES board
-	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x00d8, 0x00d9) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x00da, 0x00db) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x0200, 0x0203) AM_READWRITE8(a7150_kgs_r, a7150_kgs_w, 0x00ff) // ABS/KGS board
-	AM_RANGE(0x0300, 0x031f) AM_UNMAP // ASP board #1
-	AM_RANGE(0x0320, 0x033f) AM_UNMAP // ASP board #2
-ADDRESS_MAP_END
+void a7150_state::a7150_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x004a, 0x004a).w("isbc_215g", FUNC(isbc_215g_device::write)); // KES board
+	map(0x00c0, 0x00c3).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00c8, 0x00cf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x00d0, 0x00d7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x0200, 0x0203).rw(FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
+	map(0x0300, 0x031f).unmaprw(); // ASP board #1
+	map(0x0320, 0x033f).unmaprw(); // ASP board #2
+}
 
-ADDRESS_MAP_START(a7150_state::k7070_cpu_banked)
-	ADDRESS_MAP_UNMAP_HIGH
+void a7150_state::k7070_cpu_banked(address_map &map)
+{
+	map.unmap_value_high();
 	// default map: IML=0, MSEL=0.  ROM + local RAM.
-	AM_RANGE(0x00000, 0x01fff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x02000, 0x07fff) AM_RAMBANK("kgs_ram1")
-	AM_RANGE(0x08000, 0x0ffff) AM_RAMBANK("kgs_ram2")
+	map(0x00000, 0x01fff).rom().region("user2", 0);
+	map(0x02000, 0x07fff).bankrw("kgs_ram1");
+	map(0x08000, 0x0ffff).bankrw("kgs_ram2");
 	// IML=1, MSEL=0.   local RAM only.
-	AM_RANGE(0x10000, 0x11fff) AM_RAMBANK("kgs_ram0")
-	AM_RANGE(0x12000, 0x17fff) AM_RAMBANK("kgs_ram1")
-	AM_RANGE(0x18000, 0x1ffff) AM_RAMBANK("kgs_ram2")
+	map(0x10000, 0x11fff).bankrw("kgs_ram0");
+	map(0x12000, 0x17fff).bankrw("kgs_ram1");
+	map(0x18000, 0x1ffff).bankrw("kgs_ram2");
 	// IML=0, MSEL=1.  ROM + local RAM.
-	AM_RANGE(0x20000, 0x21fff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x22000, 0x27fff) AM_RAMBANK("kgs_ram1")
+	map(0x20000, 0x21fff).rom().region("user2", 0);
+	map(0x22000, 0x27fff).bankrw("kgs_ram1");
 	// IML=1, MSEL=1.   local RAM only.
-	AM_RANGE(0x30000, 0x31fff) AM_RAMBANK("kgs_ram0")
-	AM_RANGE(0x32000, 0x37fff) AM_RAMBANK("kgs_ram1")
-	AM_RANGE(0x38000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+	map(0x30000, 0x31fff).bankrw("kgs_ram0");
+	map(0x32000, 0x37fff).bankrw("kgs_ram1");
+	map(0x38000, 0x3ffff).ram().share("video_ram");
+}
 
-ADDRESS_MAP_START(a7150_state::k7070_cpu_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("video_bankdev", address_map_bank_device, read8, write8)
-ADDRESS_MAP_END
+void a7150_state::k7070_cpu_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(m_video_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+}
 
 
-ADDRESS_MAP_START(a7150_state::k7070_cpu_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x0008, 0x000b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x0010, 0x0017) AM_READWRITE(kgs_host_r, kgs_host_w) // p. 11 of KGS-K7070.pdf
+void a7150_state::k7070_cpu_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x0000, 0x0003).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0008, 0x000b).rw(Z80SIO_TAG, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x0010, 0x0017).rw(FUNC(a7150_state::kgs_host_r), FUNC(a7150_state::kgs_host_w)); // p. 11 of KGS-K7070.pdf
 
-	AM_RANGE(0x0020, 0x0021) AM_NOP // address register
-	AM_RANGE(0x0022, 0x0022) AM_NOP // function register (p. 6 of ABG-K7072.pdf)
-	AM_RANGE(0x0023, 0x0023) AM_NOP // split register
-	AM_RANGE(0x0030, 0x003f) AM_NOP // palette register
-ADDRESS_MAP_END
+	map(0x0020, 0x0021).noprw(); // address register
+	map(0x0022, 0x0022).noprw(); // function register (p. 6 of ABG-K7072.pdf)
+	map(0x0023, 0x0023).noprw(); // split register
+	map(0x0030, 0x003f).noprw(); // palette register
+}
 
 /* Input ports */
 static INPUT_PORTS_START( a7150 )
@@ -406,6 +442,7 @@ void a7150_state::machine_reset()
 	m_kgs_ctrl = 3;
 	m_kgs_datao = m_kgs_datai = 0;
 	m_kgs_iml = m_kgs_msel = 0;
+	m_ifss_loopback = false;
 	kgs_memory_remap();
 }
 
@@ -430,81 +467,96 @@ static const z80_daisy_config k7070_daisy_chain[] =
  * (framebuffer and terminal should be slot devices.)
  */
 MACHINE_CONFIG_START(a7150_state::a7150)
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(9'832'000)/2)
-	MCFG_CPU_PROGRAM_MAP(a7150_mem)
-	MCFG_CPU_IO_MAP(a7150_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(9'832'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(a7150_mem)
+	MCFG_DEVICE_IO_MAP(a7150_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_I8086_ESC_OPCODE_HANDLER(WRITE32("i8087", i8087_device, insn_w))
+	MCFG_I8086_ESC_DATA_HANDLER(WRITE32("i8087", i8087_device, addr_w))
+
+	i8087_device &i8087(I8087(config, "i8087", XTAL(9'832'000)/2));
+	i8087.set_addrmap(AS_PROGRAM, &a7150_state::a7150_mem);
+	i8087.set_data_width(16);
+	i8087.irq().set("pic8259", FUNC(pic8259_device::ir0_w));
+	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	// IFSP port on processor card
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-//  MCFG_I8255_IN_PORTA_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
-//  MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(a7150_state, ppi_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+//  ppi.in_pa_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
+//  ppi.out_pb_callback().set("cent_data_out", output_latch_device::bus_w));
+	ppi.out_pc_callback().set(FUNC(a7150_state::ppi_c_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'745'600)/4)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_PIT8253_CLK1(XTAL(14'745'600)/4)
-	MCFG_PIT8253_CLK2(XTAL(14'745'600)/4)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(a7150_state, a7150_tmr2_w))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(14.7456_MHz_XTAL/4);
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	m_pit8253->set_clk<1>(14.7456_MHz_XTAL/4);
+	m_pit8253->set_clk<2>(14.7456_MHz_XTAL/4);
+	m_pit8253->out_handler<2>().set(FUNC(a7150_state::a7150_tmr2_w));
 
-	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
+	INPUT_MERGER_ANY_HIGH(config, "uart_irq").output_handler().set(m_pic8259, FUNC(pic8259_device::ir4_w));
+
+	I8251(config, m_uart8251, 0);
+	m_uart8251->txd_handler().set(FUNC(a7150_state::ifss_write_txd));
+	m_uart8251->dtr_handler().set(FUNC(a7150_state::ifss_write_dtr));
+	m_uart8251->rts_handler().set(FUNC(a7150_state::ifss_loopback_w));
+	m_uart8251->rxrdy_handler().set("uart_irq", FUNC(input_merger_device::in_w<0>));
+	m_uart8251->txrdy_handler().set("uart_irq", FUNC(input_merger_device::in_w<1>));
 
 	// IFSS port on processor card -- keyboard runs at 28800 8N2
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard") // "loopback" allows ACT to pass
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
+	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard");
+	m_rs232->rxd_handler().set(m_uart8251, FUNC(i8251_device::write_rxd));
+	m_rs232->cts_handler().set(m_uart8251, FUNC(i8251_device::write_cts));
+	m_rs232->dsr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
+	m_rs232->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(kbd_rs232_defaults));
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x4a, "maincpu")
-	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
+	ISBC_215G(config, "isbc_215g", 0, 0x4a, m_maincpu).irq_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer
-	MCFG_CPU_ADD("gfxcpu", Z80, XTAL(16'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(k7070_cpu_mem)
-	MCFG_CPU_IO_MAP(k7070_cpu_io)
-	MCFG_Z80_DAISY_CHAIN(k7070_daisy_chain)
+	Z80(config, m_gfxcpu, XTAL(16'000'000)/4);
+	m_gfxcpu->set_addrmap(AS_PROGRAM, &a7150_state::k7070_cpu_mem);
+	m_gfxcpu->set_addrmap(AS_IO, &a7150_state::k7070_cpu_io);
+	m_gfxcpu->set_daisy_config(k7070_daisy_chain);
 
-	MCFG_DEVICE_ADD("video_bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(k7070_cpu_banked)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, m_video_bankdev, 0);
+	m_video_bankdev->set_map(&a7150_state::k7070_cpu_banked);
+	m_video_bankdev->set_endianness(ENDIANNESS_BIG);
+	m_video_bankdev->set_addr_width(18);
+	m_video_bankdev->set_data_width(8);
+	m_video_bankdev->set_stride(0x10000);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/3)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80SIO_TAG, z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxtxcb_w))
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1230750));
+	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, 4800)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE(a7150_state, kgs_iml_w))
-//  MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE(a7150_state, kgs_ifss_loopback_w))
+	Z80CTC(config, m_ctc, 16_MHz_XTAL/3);
+	m_ctc->intr_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<0>().append(Z80SIO_TAG, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
+
+	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, XTAL(16'000'000)/4));
+	sio.out_int_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
+	sio.out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	sio.out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	sio.out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	sio.out_dtrb_callback().set(FUNC(a7150_state::kgs_iml_w));
+	//sio.out_rtsb_callback().set(FUNC(a7150_state::kgs_ifss_loopback_w));
 
 	// V.24 port (graphics tablet)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "loopback")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, ctsa_w))
 
 	// IFSS (current loop) port (keyboard)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxb_w))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, "loopback")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, rxb_w))
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS( XTAL(16'000'000), 737,0,640, 431,0,400 )
@@ -520,38 +572,38 @@ ROM_START( a7150 )
 
 	// A7100
 	ROM_SYSTEM_BIOS(0, "1.1", "ACT 1.1")
-	ROMX_LOAD("Q259.BIN", 0x4001, 0x2000, CRC(fb5b547b) SHA1(1d17fcededa91cad321a7b237a46a308142d902b),ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD("Q260.BIN", 0x0001, 0x2000, CRC(b51f8ed6) SHA1(9aa6291bf8ab49a343741717366992649e2957b3),ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD("Q261.BIN", 0x4000, 0x2000, CRC(43c08ea3) SHA1(ea697180b415b71d834968be84431a6efe9490c2),ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD("Q262.BIN", 0x0000, 0x2000, CRC(9df1c396) SHA1(a627889e1162e5b2fe95804de52bb78e41aaf7cc),ROM_BIOS(1)|ROM_SKIP(1))
+	ROMX_LOAD("q259.bin", 0x4001, 0x2000, CRC(fb5b547b) SHA1(1d17fcededa91cad321a7b237a46a308142d902b), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("q260.bin", 0x0001, 0x2000, CRC(b51f8ed6) SHA1(9aa6291bf8ab49a343741717366992649e2957b3), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("q261.bin", 0x4000, 0x2000, CRC(43c08ea3) SHA1(ea697180b415b71d834968be84431a6efe9490c2), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("q262.bin", 0x0000, 0x2000, CRC(9df1c396) SHA1(a627889e1162e5b2fe95804de52bb78e41aaf7cc), ROM_BIOS(0) | ROM_SKIP(1))
 
 	// A7150
 	ROM_SYSTEM_BIOS(1, "2.1", "ACT 2.1")
-	ROMX_LOAD("265.bin",  0x4001, 0x2000, CRC(a5fb5f35) SHA1(9d9501441cad0ef724dec7b5ffb52b17a678a9f8),ROM_BIOS(2)|ROM_SKIP(1))
-	ROMX_LOAD("266.bin",  0x0001, 0x2000, CRC(f5898eb7) SHA1(af3fd82813fbea7883dea4d7e23a9b5e5b2b844a),ROM_BIOS(2)|ROM_SKIP(1))
-	ROMX_LOAD("267.bin",  0x4000, 0x2000, CRC(c1873a01) SHA1(77f15cc217cd854732fbe33d395e1ea9867fedd7),ROM_BIOS(2)|ROM_SKIP(1))
-	ROMX_LOAD("268.bin",  0x0000, 0x2000, CRC(e3f09213) SHA1(1e2d69061f8e84697440b219181e0b870fe21835),ROM_BIOS(2)|ROM_SKIP(1))
+	ROMX_LOAD("265.bin",  0x4001, 0x2000, CRC(a5fb5f35) SHA1(9d9501441cad0ef724dec7b5ffb52b17a678a9f8), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("266.bin",  0x0001, 0x2000, CRC(f5898eb7) SHA1(af3fd82813fbea7883dea4d7e23a9b5e5b2b844a), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("267.bin",  0x4000, 0x2000, CRC(c1873a01) SHA1(77f15cc217cd854732fbe33d395e1ea9867fedd7), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("268.bin",  0x0000, 0x2000, CRC(e3f09213) SHA1(1e2d69061f8e84697440b219181e0b870fe21835), ROM_BIOS(1) | ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(2, "2.2", "ACT 2.2")
-	ROMX_LOAD("269.bin",  0x4001, 0x2000, CRC(f137f94b) SHA1(7cb79f332db48cb66dae04c1ce1bdd169a6ab561),ROM_BIOS(3)|ROM_SKIP(1))
-	ROMX_LOAD("270.bin",  0x0001, 0x2000, CRC(1ea44a33) SHA1(f5708d1f6a9dc109979a9a91a80f2a4e4956d1eb),ROM_BIOS(3)|ROM_SKIP(1))
-	ROMX_LOAD("271.bin",  0x4000, 0x2000, CRC(de2222c9) SHA1(e02225c93b49f0380dfb2d996b63370141359199),ROM_BIOS(3)|ROM_SKIP(1))
-	ROMX_LOAD("272.bin",  0x0000, 0x2000, CRC(5001c528) SHA1(ce67c35326fbfd17f086a37ffe81b79aefaef0cb),ROM_BIOS(3)|ROM_SKIP(1))
+	ROMX_LOAD("269.bin",  0x4001, 0x2000, CRC(f137f94b) SHA1(7cb79f332db48cb66dae04c1ce1bdd169a6ab561), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("270.bin",  0x0001, 0x2000, CRC(1ea44a33) SHA1(f5708d1f6a9dc109979a9a91a80f2a4e4956d1eb), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("271.bin",  0x4000, 0x2000, CRC(de2222c9) SHA1(e02225c93b49f0380dfb2d996b63370141359199), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("272.bin",  0x0000, 0x2000, CRC(5001c528) SHA1(ce67c35326fbfd17f086a37ffe81b79aefaef0cb), ROM_BIOS(2) | ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(3, "2.3", "ACT 2.3")
-	ROMX_LOAD("273.ROM",  0x4001, 0x2000, CRC(67ca9b78) SHA1(bcb6221f6df28b24b602846b149ac12e93b5e356),ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("274.ROM",  0x0001, 0x2000, CRC(6fa68834) SHA1(49abe48bbb5ae151f977a9c63b27336c15e8a08d),ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("275.ROM",  0x4000, 0x2000, CRC(0da54426) SHA1(7492caff98b1d1a896c5964942b17beadf996b60),ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("276.ROM",  0x0000, 0x2000, CRC(5924192a) SHA1(eb494d9f96a0b3ea69f4b9cb2b7add66a8c16946),ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("273.rom",  0x4001, 0x2000, CRC(67ca9b78) SHA1(bcb6221f6df28b24b602846b149ac12e93b5e356), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("274.rom",  0x0001, 0x2000, CRC(6fa68834) SHA1(49abe48bbb5ae151f977a9c63b27336c15e8a08d), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("275.rom",  0x4000, 0x2000, CRC(0da54426) SHA1(7492caff98b1d1a896c5964942b17beadf996b60), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("276.rom",  0x0000, 0x2000, CRC(5924192a) SHA1(eb494d9f96a0b3ea69f4b9cb2b7add66a8c16946), ROM_BIOS(3) | ROM_SKIP(1))
 
 	ROM_REGION( 0x10000, "user2", ROMREGION_ERASEFF )
 	// ROM from A7100
-	ROM_LOAD( "KGS7070-152.bin", 0x0000, 0x2000, CRC(403f4235) SHA1(d07ccd40f8b600651d513f588bcf1ea4f15ed094))
-//  ROM_LOAD( "KGS7070-153.rom", 0x0000, 0x2000, CRC(a72fe820) SHA1(4b77ab2b59ea8c3632986847ff359df26b16196b))
-//  ROM_LOAD( "KGS7070-154.rom", 0x0000, 0x2000, CRC(2995ade0) SHA1(62516f2e1cb62698445f80fd823d39a1a78a7807))
+	ROM_LOAD( "kgs7070-152.bin", 0x0000, 0x2000, CRC(403f4235) SHA1(d07ccd40f8b600651d513f588bcf1ea4f15ed094))
+//  ROM_LOAD( "kgs7070-153.rom", 0x0000, 0x2000, CRC(a72fe820) SHA1(4b77ab2b59ea8c3632986847ff359df26b16196b))
+//  ROM_LOAD( "kgs7070-154.rom", 0x0000, 0x2000, CRC(2995ade0) SHA1(62516f2e1cb62698445f80fd823d39a1a78a7807))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY           FULLNAME  FLAGS
-COMP( 1986, a7150,  0,      0,       a7150,     a7150, a7150_state, 0,     "VEB Robotron",   "A7150",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY         FULLNAME  FLAGS
+COMP( 1986, a7150, 0,      0,      a7150,   a7150, a7150_state, empty_init, "VEB Robotron", "A7150",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

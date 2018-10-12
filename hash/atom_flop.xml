@@ -26,6 +26,17 @@
 		</part>
 	</software>
 
+	<software name="dosutils">
+		<description>Atom DOS Utilities</description>
+		<year>1982</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="utilities_disc.dsk" size="102400" crc="f4541c02" sha1="51711a7cf705bb6757ee39d5b3ed225009774d9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="egghead">
 		<description>Egghead in Space (32K)</description>
 		<year>2016</year>

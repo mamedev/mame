@@ -355,11 +355,9 @@ void dec0_state::h6280_decrypt(const char *cputag)
 		RAM[i] = (RAM[i] & 0x7e) | ((RAM[i] & 0x1) << 7) | ((RAM[i] & 0x80) >> 7);
 }
 
-DRIVER_INIT_MEMBER(dec0_state,hippodrm)
+void dec0_state::init_hippodrm()
 {
 	uint8_t *RAM = memregion("sub")->base();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x18003f, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
 
 	h6280_decrypt("sub");
 
@@ -373,7 +371,7 @@ DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 	save_item(NAME(m_hippodrm_lsb));
 }
 
-DRIVER_INIT_MEMBER(dec0_state,slyspy)
+void dec0_state::init_slyspy()
 {
 	h6280_decrypt("audiocpu");
 
@@ -381,22 +379,17 @@ DRIVER_INIT_MEMBER(dec0_state,slyspy)
 	save_item(NAME(m_slyspy_sound_state));
 }
 
-DRIVER_INIT_MEMBER(dec0_state,robocop)
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),this), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),this));
-}
-
-DRIVER_INIT_MEMBER(dec0_state,drgninja)
+void dec0_state::init_drgninja()
 {
 	m_game = mcu_type::BADDUDES_SIM;
 }
 
-DRIVER_INIT_MEMBER(dec0_state,hbarrel)
+void dec0_state::init_hbarrel()
 {
 	m_game = mcu_type::EMULATED;
 }
 
-DRIVER_INIT_MEMBER(dec0_state,birdtry)
+void dec0_state::init_birdtry()
 {
 	m_game = mcu_type::BIRDTRY_SIM;
 }

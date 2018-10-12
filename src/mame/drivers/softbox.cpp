@@ -103,17 +103,6 @@
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-//-------------------------------------------------
-//  dbrg_w - baud rate selection
-//-------------------------------------------------
-
-WRITE8_MEMBER( softbox_state::dbrg_w )
-{
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
-}
-
-
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -123,25 +112,26 @@ WRITE8_MEMBER( softbox_state::dbrg_w )
 //  ADDRESS_MAP( softbox_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(softbox_state::softbox_mem)
-	AM_RANGE(0x0000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(Z80_TAG, 0)
-ADDRESS_MAP_END
+void softbox_state::softbox_mem(address_map &map)
+{
+	map(0x0000, 0xefff).ram();
+	map(0xf000, 0xffff).rom().region(Z80_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( softbox_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(softbox_state::softbox_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(dbrg_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(I8255_0_TAG, i8255_device, read, write)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(I8255_1_TAG, i8255_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE(CORVUS_HDC_TAG, corvus_hdc_device, read, write)
-ADDRESS_MAP_END
+void softbox_state::softbox_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x08, 0x09).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x0c, 0x0c).w(COM8116_TAG, FUNC(com8116_device::stt_str_w));
+	map(0x10, 0x13).rw(I8255_0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x14, 0x17).rw(I8255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x18, 0x18).rw(m_hdc, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
+}
 
 
 
@@ -180,12 +170,12 @@ INPUT_PORTS_END
 
 READ8_MEMBER( softbox_state::ppi0_pa_r )
 {
-	return m_ieee->dio_r() ^ 0xff;
+	return m_ieee->read_dio() ^ 0xff;
 }
 
 WRITE8_MEMBER( softbox_state::ppi0_pb_w )
 {
-	m_ieee->dio_w(data ^ 0xff);
+	m_ieee->write_dio(data ^ 0xff);
 }
 
 //-------------------------------------------------
@@ -240,14 +230,14 @@ WRITE8_MEMBER( softbox_state::ppi1_pb_w )
 
 	*/
 
-	m_ieee->atn_w(!BIT(data, 0));
-	m_ieee->dav_w(!BIT(data, 1));
-	m_ieee->ndac_w(!BIT(data, 2));
-	m_ieee->nrfd_w(!BIT(data, 3));
-	m_ieee->eoi_w(!BIT(data, 4));
-	m_ieee->srq_w(!BIT(data, 5));
-	m_ieee->ren_w(!BIT(data, 6));
-	m_ieee->ifc_w(!BIT(data, 7));
+	m_ieee->host_atn_w(!BIT(data, 0));
+	m_ieee->host_dav_w(!BIT(data, 1));
+	m_ieee->host_ndac_w(!BIT(data, 2));
+	m_ieee->host_nrfd_w(!BIT(data, 3));
+	m_ieee->host_eoi_w(!BIT(data, 4));
+	m_ieee->host_srq_w(!BIT(data, 5));
+	m_ieee->host_ren_w(!BIT(data, 6));
+	m_ieee->host_ifc_w(!BIT(data, 7));
 }
 
 READ8_MEMBER( softbox_state::ppi1_pc_r )
@@ -293,9 +283,9 @@ WRITE8_MEMBER( softbox_state::ppi1_pc_w )
 
 	*/
 
-	output().set_led_value(LED_A, !BIT(data, 0));
-	output().set_led_value(LED_B, !BIT(data, 1));
-	output().set_led_value(LED_READY, !BIT(data, 2));
+	m_leds[LED_A] = BIT(~data, 0);
+	m_leds[LED_B] = BIT(~data, 1);
+	m_leds[LED_READY] = BIT(~data, 2);
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -319,6 +309,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void softbox_state::machine_start()
 {
+	m_leds.resolve();
 }
 
 
@@ -370,36 +361,36 @@ void softbox_state::ieee488_ifc(int state)
 
 MACHINE_CONFIG_START(softbox_state::softbox)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(softbox_mem)
-	MCFG_CPU_IO_MAP(softbox_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(softbox_mem)
+	MCFG_DEVICE_IO_MAP(softbox_io)
 
 	// devices
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	i8251_device &i8251(I8251(config, I8251_TAG, 0));
+	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD(I8255_0_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(softbox_state, ppi0_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(softbox_state, ppi0_pb_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SW1"))
+	i8255_device &ppi0(I8255A(config, I8255_0_TAG));
+	ppi0.in_pa_callback().set(FUNC(softbox_state::ppi0_pa_r));
+	ppi0.out_pb_callback().set(FUNC(softbox_state::ppi0_pb_w));
+	ppi0.in_pc_callback().set_ioport("SW1");
 
-	MCFG_DEVICE_ADD(I8255_1_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(softbox_state, ppi1_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(softbox_state, ppi1_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(softbox_state, ppi1_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(softbox_state, ppi1_pc_w))
+	i8255_device &ppi1(I8255A(config, I8255_1_TAG));
+	ppi1.in_pa_callback().set(FUNC(softbox_state::ppi1_pa_r));
+	ppi1.out_pb_callback().set(FUNC(softbox_state::ppi1_pb_w));
+	ppi1.in_pc_callback().set(FUNC(softbox_state::ppi1_pc_r));
+	ppi1.out_pc_callback().set(FUNC(softbox_state::ppi1_pc_w));
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
+	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set(I8251_TAG, FUNC(i8251_device::write_rxc));
+	dbrg.ft_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
 
 	MCFG_CBM_IEEE488_ADD("c8050")
 
@@ -433,14 +424,14 @@ ROM_START( softbox )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS("19830609")
 	ROM_SYSTEM_BIOS( 0, "19810908", "8/9/81" )
-	ROMX_LOAD( "375.ic3", 0x000, 0x800, CRC(177580e7) SHA1(af6a97495de825b80cdc9fbf72329d5440826177), ROM_BIOS(1) )
-	ROMX_LOAD( "376.ic4", 0x800, 0x800, CRC(edfee5be) SHA1(5662e9071cc622a1c071d89b00272fc6ba122b9a), ROM_BIOS(1) )
+	ROMX_LOAD( "375.ic3", 0x000, 0x800, CRC(177580e7) SHA1(af6a97495de825b80cdc9fbf72329d5440826177), ROM_BIOS(0) )
+	ROMX_LOAD( "376.ic4", 0x800, 0x800, CRC(edfee5be) SHA1(5662e9071cc622a1c071d89b00272fc6ba122b9a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "19811027", "27-Oct-81" )
-	ROMX_LOAD( "379.ic3", 0x000, 0x800, CRC(7b5a737c) SHA1(2348590884b026b7647f6864af8c9ba1c6f8746b), ROM_BIOS(2) )
-	ROMX_LOAD( "380.ic4", 0x800, 0x800, CRC(65a13029) SHA1(46de02e6f04be298047efeb412e00a5714dc21b3), ROM_BIOS(2) )
+	ROMX_LOAD( "379.ic3", 0x000, 0x800, CRC(7b5a737c) SHA1(2348590884b026b7647f6864af8c9ba1c6f8746b), ROM_BIOS(1) )
+	ROMX_LOAD( "380.ic4", 0x800, 0x800, CRC(65a13029) SHA1(46de02e6f04be298047efeb412e00a5714dc21b3), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "19830609", "09-June-1983" )
-	ROMX_LOAD( "389.ic3", 0x000, 0x800, CRC(d66e581a) SHA1(2403e25c140c41b0e6d6975d39c9cd9d6f335048), ROM_BIOS(3) )
-	ROMX_LOAD( "390.ic4", 0x800, 0x800, CRC(abe6cb30) SHA1(4b26d5db36f828e01268f718799f145d09b449ad), ROM_BIOS(3) )
+	ROMX_LOAD( "389.ic3", 0x000, 0x800, CRC(d66e581a) SHA1(2403e25c140c41b0e6d6975d39c9cd9d6f335048), ROM_BIOS(2) )
+	ROMX_LOAD( "390.ic4", 0x800, 0x800, CRC(abe6cb30) SHA1(4b26d5db36f828e01268f718799f145d09b449ad), ROM_BIOS(2) )
 ROM_END
 
 
@@ -449,5 +440,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY                      FULLNAME   FLAGS
-COMP( 1981, softbox, 0,      0,      softbox, softbox, softbox_state, 0,    "Small Systems Engineering", "SoftBox", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                      FULLNAME   FLAGS
+COMP( 1981, softbox, 0,      0,      softbox, softbox, softbox_state, empty_init, "Small Systems Engineering", "SoftBox", MACHINE_NO_SOUND_HW )

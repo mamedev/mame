@@ -32,6 +32,13 @@ public:
 		, m_p_chargen(*this, "chargen")
 		{ }
 
+	void mz80kj(machine_config &config);
+	void mz80k(machine_config &config);
+	void mz80a(machine_config &config);
+
+	void init_mz80k();
+
+private:
 	DECLARE_READ8_MEMBER(mz80k_strobe_r);
 	DECLARE_WRITE8_MEMBER(mz80k_strobe_w);
 	DECLARE_READ8_MEMBER(mz80k_8255_portb_r);
@@ -40,18 +47,13 @@ public:
 	DECLARE_WRITE8_MEMBER(mz80k_8255_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
-	DECLARE_DRIVER_INIT(mz80k);
 	uint32_t screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tempo_callback);
 
-	void mz80kj(machine_config &config);
-	void mz80k(machine_config &config);
-	void mz80a(machine_config &config);
 	void mz80k_io(address_map &map);
 	void mz80k_mem(address_map &map);
-private:
 	bool m_mz80k_vertical;
 	bool m_mz80k_tempo_strobe;
 	uint8_t m_speaker_level;

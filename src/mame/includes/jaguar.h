@@ -29,47 +29,77 @@ class jaguar_state : public driver_device
 {
 public:
 	jaguar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_gpu(*this, "gpu"),
-			m_dsp(*this, "dsp"),
-			m_ldac(*this, "ldac"),
-			m_rdac(*this, "rdac"),
-			m_cdrom(*this, "cdrom"),
-			m_nvram(*this, "nvram"),
-			m_rom_base(*this, "rom"),
-			m_cart_base(*this, "cart"),
-			m_dsp_ram(*this, "dspram"),
-			m_wave_rom(*this, "waverom"),
-			m_shared_ram(*this, "sharedram"),
-			m_gpu_ram(*this, "gpuram"),
-			m_gpu_clut(*this, "gpuclut"),
-			m_romboard_region(*this, "romboard"),
-			m_mainram(*this, "mainram"),
-			m_mainram2(*this, "mainram2"),
-			m_is_r3000(false),
-			m_is_cojag(false),
-			m_hacks_enabled(false),
-			m_using_cart(false),
-			m_misc_control_data(0),
-			m_eeprom_enable(true),
-			m_gpu_jump_address(nullptr),
-			m_gpu_command_pending(false),
-			m_gpu_spin_pc(0),
-			m_main_speedup(nullptr),
-			m_main_speedup_hits(0),
-			m_main_speedup_last_cycles(0),
-			m_main_speedup_max_cycles(0),
-			m_main_gpu_wait(nullptr),
-			m_joystick_data(0),
-			m_eeprom_bit_count(0),
-			m_protection_check(0) ,
-		m_eeprom(*this, "eeprom"),
-		m_ide(*this, "ide"),
-		m_screen(*this, "screen")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gpu(*this, "gpu")
+		, m_dsp(*this, "dsp")
+		, m_ldac(*this, "ldac")
+		, m_rdac(*this, "rdac")
+		, m_cdrom(*this, "cdrom")
+		, m_nvram(*this, "nvram")
+		, m_rom_base(*this, "rom")
+		, m_cart_base(*this, "cart")
+		, m_dsp_ram(*this, "dspram")
+		, m_wave_rom(*this, "waverom")
+		, m_shared_ram(*this, "sharedram")
+		, m_gpu_ram(*this, "gpuram")
+		, m_gpu_clut(*this, "gpuclut")
+		, m_romboard_region(*this, "romboard")
+		, m_mainram(*this, "mainram")
+		, m_mainram2(*this, "mainram2")
+		, m_maingfxbank(*this, "maingfxbank")
+		, m_gpugfxbank(*this, "gpugfxbank")
+		, m_mainsndbank(*this, "mainsndbank")
+		, m_dspsndbank(*this, "dspsndbank")
+		, m_config_io(*this, "CONFIG")
+		, m_joy(*this, "JOY%u", 0U)
+		, m_buttons(*this, "BUTTONS%u", 0U)
+		, m_is_r3000(false)
+		, m_is_cojag(false)
+		, m_hacks_enabled(false)
+		, m_using_cart(false)
+		, m_misc_control_data(0)
+		, m_eeprom_enable(true)
+		, m_gpu_jump_address(nullptr)
+		, m_gpu_command_pending(false)
+		, m_gpu_spin_pc(0)
+		, m_main_speedup(nullptr)
+		, m_main_speedup_hits(0)
+		, m_main_speedup_last_cycles(0)
+		, m_main_speedup_max_cycles(0)
+		, m_main_gpu_wait(nullptr)
+		, m_joystick_data(0)
+		, m_eeprom_bit_count(0)
+		, m_protection_check(0)
+		, m_eeprom(*this, "eeprom")
+		, m_ide(*this, "ide")
+		, m_screen(*this, "screen")
 	{
 	}
 
+	void cojag68k(machine_config &config);
+	void cojagr3k(machine_config &config);
+	void cojagr3k_rom(machine_config &config);
+	void jaguarcd(machine_config &config);
+	void jaguar(machine_config &config);
+
+	void init_jaguar();
+	void init_jaguarcd();
+	void init_area51mx();
+	void init_maxforce();
+	void init_freezeat();
+	void init_fishfren();
+	void init_a51mxr3k();
+	void init_area51();
+	void init_freezeat4();
+	void init_freezeat5();
+	void init_freezeat6();
+	void init_vcircle();
+	void init_freezeat3();
+	void init_freezeat2();
+	void init_area51a();
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<jaguargpu_cpu_device> m_gpu;
@@ -90,6 +120,14 @@ public:
 	optional_memory_region      m_romboard_region;
 	optional_shared_ptr<uint32_t> m_mainram;
 	optional_shared_ptr<uint32_t> m_mainram2;
+
+	optional_memory_bank m_maingfxbank;
+	optional_memory_bank m_gpugfxbank;
+	optional_memory_bank m_mainsndbank;
+	optional_memory_bank m_dspsndbank;
+	optional_ioport m_config_io;
+	optional_ioport_array<8> m_joy;
+	optional_ioport_array<8> m_buttons;
 
 	// configuration
 	bool m_is_r3000;
@@ -209,21 +247,6 @@ public:
 	DECLARE_WRITE16_MEMBER(butch_regs_w16);
 	DECLARE_READ32_MEMBER(butch_regs_r);
 	DECLARE_WRITE32_MEMBER(butch_regs_w);
-	DECLARE_DRIVER_INIT(jaguar);
-	DECLARE_DRIVER_INIT(jaguarcd);
-	DECLARE_DRIVER_INIT(area51mx);
-	DECLARE_DRIVER_INIT(maxforce);
-	DECLARE_DRIVER_INIT(freezeat);
-	DECLARE_DRIVER_INIT(fishfren);
-	DECLARE_DRIVER_INIT(a51mxr3k);
-	DECLARE_DRIVER_INIT(area51);
-	DECLARE_DRIVER_INIT(freezeat4);
-	DECLARE_DRIVER_INIT(freezeat5);
-	DECLARE_DRIVER_INIT(freezeat6);
-	DECLARE_DRIVER_INIT(vcircle);
-	DECLARE_DRIVER_INIT(freezeat3);
-	DECLARE_DRIVER_INIT(freezeat2);
-	DECLARE_DRIVER_INIT(area51a);
 
 	// from audio/jaguar.c
 	DECLARE_READ16_MEMBER( jerry_regs_r );
@@ -249,13 +272,10 @@ public:
 	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
-	void cojagr3k_rom(machine_config &config);
-	void jaguarcd(machine_config &config);
-	void jaguar(machine_config &config);
-	void cojag68k(machine_config &config);
-	void cojagr3k(machine_config &config);
 	void dsp_map(address_map &map);
+	void dsp_rom_map(address_map &map);
 	void gpu_map(address_map &map);
+	void gpu_rom_map(address_map &map);
 	void jag_dsp_map(address_map &map);
 	void jag_gpu_map(address_map &map);
 	void jagcd_dsp_map(address_map &map);
@@ -264,7 +284,8 @@ public:
 	void jaguarcd_map(address_map &map);
 	void m68020_map(address_map &map);
 	void r3000_map(address_map &map);
-protected:
+	void r3000_rom_map(address_map &map);
+
 	// timer IDs
 	enum
 	{
@@ -276,6 +297,7 @@ protected:
 	};
 
 	// device overrides
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
 	virtual void video_start() override;

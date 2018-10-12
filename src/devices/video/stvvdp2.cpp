@@ -1354,7 +1354,6 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_VCSTAL (m_vdp2_regs[0x09e/2])
 
-
 /* 1800a0 - LSTA0U - Line Scroll Table Address (NBG0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
@@ -1468,10 +1467,12 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_KTCTL  (m_vdp2_regs[0x0b4/2])
+	#define STV_VDP2_RBUNK  ((STV_VDP2_KTCTL & 0x6000) >> 13)
 	#define STV_VDP2_RBKLCE ((STV_VDP2_KTCTL & 0x1000) >> 12)
 	#define STV_VDP2_RBKMD  ((STV_VDP2_KTCTL & 0x0c00) >> 10)
 	#define STV_VDP2_RBKDBS ((STV_VDP2_KTCTL & 0x0200) >> 9)
 	#define STV_VDP2_RBKTE  ((STV_VDP2_KTCTL & 0x0100) >> 8)
+	#define STV_VDP2_RAUNK  ((STV_VDP2_KTCTL & 0x0060) >> 5)
 	#define STV_VDP2_RAKLCE ((STV_VDP2_KTCTL & 0x0010) >> 4)
 	#define STV_VDP2_RAKMD  ((STV_VDP2_KTCTL & 0x000c) >> 2)
 	#define STV_VDP2_RAKDBS ((STV_VDP2_KTCTL & 0x0002) >> 1)
@@ -1543,7 +1544,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_WPSY0 (m_vdp2_regs[0x0c2/2])
 
-	#define STV_VDP2_W0SY ((STV_VDP2_WPSY0 & 0x03ff) >> 0)
+	#define STV_VDP2_W0SY ((STV_VDP2_WPSY0 & 0x07ff) >> 0)
 
 /* 1800c4 - Window Position (W0, Horizontal End Point)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1565,7 +1566,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_WPEY0 (m_vdp2_regs[0x0c6/2])
 
-	#define STV_VDP2_W0EY ((STV_VDP2_WPEY0 & 0x03ff) >> 0)
+	#define STV_VDP2_W0EY ((STV_VDP2_WPEY0 & 0x07ff) >> 0)
 
 /* 1800c8 - Window Position (W1, Horizontal Start Point)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1587,7 +1588,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_WPSY1 (m_vdp2_regs[0x0ca/2])
 
-	#define STV_VDP2_W1SY ((STV_VDP2_WPSY1 & 0x03ff) >> 0)
+	#define STV_VDP2_W1SY ((STV_VDP2_WPSY1 & 0x07ff) >> 0)
 
 /* 1800cc - Window Position (W1, Horizontal End Point)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1609,7 +1610,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_WPEY1 (m_vdp2_regs[0x0ce/2])
 
-	#define STV_VDP2_W1EY ((STV_VDP2_WPEY1 & 0x03ff) >> 0)
+	#define STV_VDP2_W1EY ((STV_VDP2_WPEY1 & 0x07ff) >> 0)
 
 /* 1800d0 - Window Control (NBG0, NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1757,7 +1758,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |  SPCLMD  | SPWINEN  |  SPTYPE3 |  SPTYPE2 |  SPTYPE1 |  SPTYPE0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SPCTL  (m_vdp2_regs[0xe0/2])
+	#define STV_VDP2_SPCTL  (m_vdp2_regs[0x0e0/2])
 	#define STV_VDP2_SPCCCS     ((STV_VDP2_SPCTL & 0x3000) >> 12)
 	#define STV_VDP2_SPCCN      ((STV_VDP2_SPCTL & 0x700) >> 8)
 	#define STV_VDP2_SPCLMD     ((STV_VDP2_SPCTL & 0x20) >> 5)
@@ -2160,26 +2161,32 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 	switch(rot_parameter)
 	{
 		case 1:
-			if(!STV_VDP2_RAXSTRE)
-				stv_current_rotation_parameter_table.xst = 0;
+			// TODO: disable read control if these undocumented bits are on (Radiant Silvergun Xiga final boss)
+			if(!STV_VDP2_RAUNK)
+			{
+				if(!STV_VDP2_RAXSTRE)
+					stv_current_rotation_parameter_table.xst = 0;
 
-			if(!STV_VDP2_RAYSTRE)
-				stv_current_rotation_parameter_table.yst = 0;
+				if(!STV_VDP2_RAYSTRE)
+					stv_current_rotation_parameter_table.yst = 0;
 
-			if(!STV_VDP2_RAKASTRE)
-				stv_current_rotation_parameter_table.dkax = 0;
-
+				if(!STV_VDP2_RAKASTRE)
+					stv_current_rotation_parameter_table.dkax = 0;
+			}
 			break;
 		case 2:
-			if(!STV_VDP2_RBXSTRE)
-				stv_current_rotation_parameter_table.xst = 0;
+			// same as above
+			if(!STV_VDP2_RBUNK)
+			{
+				if(!STV_VDP2_RBXSTRE)
+					stv_current_rotation_parameter_table.xst = 0;
 
-			if(!STV_VDP2_RBYSTRE)
-				stv_current_rotation_parameter_table.yst = 0;
+				if(!STV_VDP2_RBYSTRE)
+					stv_current_rotation_parameter_table.yst = 0;
 
-			if(!STV_VDP2_RBKASTRE)
-				stv_current_rotation_parameter_table.dkax = 0;
-
+				if(!STV_VDP2_RBKASTRE)
+					stv_current_rotation_parameter_table.dkax = 0;
+			}
 			break;
 	}
 
@@ -2244,7 +2251,8 @@ uint8_t saturn_state::stv_vdp2_is_rotation_applied(void)
 			RP.dx == _FIXED_1 &&
 			RP.dy == _FIXED_0 &&
 			RP.kx == _FIXED_1 &&
-			RP.ky == _FIXED_1 )
+			RP.ky == _FIXED_1 &&
+			STV_VDP2_RPMD < 2) // disable optimizations if roz mode is 2 or 3
 	{
 		return 0;
 	}
@@ -2494,27 +2502,27 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 				y_index = 0;
 			}
 
-			if( sx < myclip.min_x)
+			if( sx < myclip.left())
 			{ /* clip left */
-				int pixels = myclip.min_x-sx;
+				int pixels = myclip.left()-sx;
 				sx += pixels;
 				x_index_base += pixels*dx;
 			}
-			if( sy < myclip.min_y )
+			if( sy < myclip.top() )
 			{ /* clip top */
-				int pixels = myclip.min_y-sy;
+				int pixels = myclip.top()-sy;
 				sy += pixels;
 				y_index += pixels*dy;
 			}
 			/* NS 980211 - fixed incorrect clipping */
-			if( ex > myclip.max_x+1 )
+			if( ex > myclip.right()+1 )
 			{ /* clip right */
-				int pixels = ex-myclip.max_x-1;
+				int pixels = ex-myclip.right()-1;
 				ex -= pixels;
 			}
-			if( ey > myclip.max_y+1 )
+			if( ey > myclip.bottom()+1 )
 			{ /* clip bottom */
-				int pixels = ey-myclip.max_y-1;
+				int pixels = ey-myclip.bottom()-1;
 				ey -= pixels;
 			}
 
@@ -2695,27 +2703,27 @@ void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
 				y_index = 0;
 			}
 
-			if( sx < myclip.min_x)
+			if( sx < myclip.left())
 			{ /* clip left */
-				int pixels = myclip.min_x-sx;
+				int pixels = myclip.left()-sx;
 				sx += pixels;
 				x_index_base += pixels*dx;
 			}
-			if( sy < myclip.min_y )
+			if( sy < myclip.top() )
 			{ /* clip top */
-				int pixels = myclip.min_y-sy;
+				int pixels = myclip.top()-sy;
 				sy += pixels;
 				y_index += pixels*dy;
 			}
 			/* NS 980211 - fixed incorrect clipping */
-			if( ex > myclip.max_x+1 )
+			if( ex > myclip.right()+1 )
 			{ /* clip right */
-				int pixels = ex-myclip.max_x-1;
+				int pixels = ex-myclip.right()-1;
 				ex -= pixels;
 			}
-			if( ey > myclip.max_y+1 )
+			if( ey > myclip.bottom()+1 )
 			{ /* clip bottom */
-				int pixels = ey-myclip.max_y-1;
+				int pixels = ey-myclip.bottom()-1;
 				ey -= pixels;
 			}
 
@@ -2885,27 +2893,27 @@ void saturn_state::stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectan
 			y_index = 0;
 		}
 
-		if( sx < myclip.min_x)
+		if( sx < myclip.left())
 		{ /* clip left */
-			int pixels = myclip.min_x-sx;
+			int pixels = myclip.left()-sx;
 			sx += pixels;
 			x_index_base += pixels*dx;
 		}
-		if( sy < myclip.min_y )
+		if( sy < myclip.top() )
 		{ /* clip top */
-			int pixels = myclip.min_y-sy;
+			int pixels = myclip.top()-sy;
 			sy += pixels;
 			y_index += pixels*dy;
 		}
 		/* NS 980211 - fixed incorrect clipping */
-		if( ex > myclip.max_x+1 )
+		if( ex > myclip.right()+1 )
 		{ /* clip right */
-			int pixels = ex-myclip.max_x-1;
+			int pixels = ex-myclip.right()-1;
 			ex -= pixels;
 		}
-		if( ey > myclip.max_y+1 )
+		if( ey > myclip.bottom()+1 )
 		{ /* clip bottom */
-			int pixels = ey-myclip.max_y-1;
+			int pixels = ey-myclip.bottom()-1;
 			ey -= pixels;
 		}
 
@@ -2998,27 +3006,27 @@ void saturn_state::stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectan
 			y_index = 0;
 		}
 
-		if( sx < myclip.min_x)
+		if( sx < myclip.left())
 		{ /* clip left */
-			int pixels = myclip.min_x-sx;
+			int pixels = myclip.left()-sx;
 			sx += pixels;
 			x_index_base += pixels*dx;
 		}
-		if( sy < myclip.min_y )
+		if( sy < myclip.top() )
 		{ /* clip top */
-			int pixels = myclip.min_y-sy;
+			int pixels = myclip.top()-sy;
 			sy += pixels;
 			y_index += pixels*dy;
 		}
 		/* NS 980211 - fixed incorrect clipping */
-		if( ex > myclip.max_x+1 )
+		if( ex > myclip.right()+1 )
 		{ /* clip right */
-			int pixels = ex-myclip.max_x-1;
+			int pixels = ex-myclip.right()-1;
 			ex -= pixels;
 		}
-		if( ey > myclip.max_y+1 )
+		if( ey > myclip.bottom()+1 )
 		{ /* clip bottom */
-			int pixels = ey-myclip.max_y-1;
+			int pixels = ey-myclip.bottom()-1;
 			ey -= pixels;
 		}
 
@@ -3088,29 +3096,29 @@ void saturn_state::stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle
 	ey = sy + gfx->height();
 
 	/* clip left */
-	if (sx < clip.min_x)
+	if (sx < clip.left())
 	{
-		int pixels = clip.min_x-sx;
+		int pixels = clip.left()-sx;
 		sx += pixels;
 		x_index_base += xinc*pixels;
 	}
 
 	/* clip top */
-	if (sy < clip.min_y)
-	{   int pixels = clip.min_y-sy;
+	if (sy < clip.top())
+	{   int pixels = clip.top()-sy;
 		sy += pixels;
 		y_index += yinc*pixels;
 	}
 
 	/* clip right */
-	if (ex > clip.max_x+1)
+	if (ex > clip.right()+1)
 	{
-		ex = clip.max_x+1;
+		ex = clip.right()+1;
 	}
 	/* clip bottom */
-	if (ey > clip.max_y+1)
+	if (ey > clip.bottom()+1)
 	{
-		ey = clip.max_y+1;
+		ey = clip.bottom()+1;
 	}
 
 	/* skip if inner loop doesn't draw anything */
@@ -3165,29 +3173,29 @@ void saturn_state::stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectan
 	ey = sy + gfx->height();
 
 	/* clip left */
-	if (sx < clip.min_x)
+	if (sx < clip.left())
 	{
-		int pixels = clip.min_x-sx;
+		int pixels = clip.left()-sx;
 		sx += pixels;
 		x_index_base += xinc*pixels;
 	}
 
 	/* clip top */
-	if (sy < clip.min_y)
-	{   int pixels = clip.min_y-sy;
+	if (sy < clip.top())
+	{   int pixels = clip.top()-sy;
 		sy += pixels;
 		y_index += yinc*pixels;
 	}
 
 	/* clip right */
-	if (ex > clip.max_x+1)
+	if (ex > clip.right()+1)
 	{
-		ex = clip.max_x+1;
+		ex = clip.right()+1;
 	}
 	/* clip bottom */
-	if (ey > clip.max_y+1)
+	if (ey > clip.bottom()+1)
 	{
-		ey = clip.max_y+1;
+		ey = clip.bottom()+1;
 	}
 
 	/* skip if inner loop doesn't draw anything */
@@ -3243,9 +3251,9 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	if(stv2_current_tilemap.fade_control & 1)
 		pal_bank += ((stv2_current_tilemap.fade_control & 2) ? (2*2048) : (2048));
 
-	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
+	for(ydst=cliprect.top();ydst<=cliprect.bottom();ydst++)
 	{
-		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
+		for(xdst=cliprect.left();xdst<=cliprect.right();xdst++)
 		{
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
@@ -3300,9 +3308,9 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	if(stv2_current_tilemap.fade_control & 1)
 		pal_bank += ((stv2_current_tilemap.fade_control & 2) ? (2*2048) : (2048));
 
-	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
+	for(ydst=cliprect.top();ydst<=cliprect.bottom();ydst++)
 	{
-		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
+		for(xdst=cliprect.left();xdst<=cliprect.right();xdst++)
 		{
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
@@ -3356,9 +3364,9 @@ void saturn_state::draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	if(stv2_current_tilemap.fade_control & 1)
 		pal_bank = ((stv2_current_tilemap.fade_control & 2) ? (2*2048) : (2048));
 
-	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
+	for(ydst=cliprect.top();ydst<=cliprect.bottom();ydst++)
 	{
-		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
+		for(xdst=cliprect.left();xdst<=cliprect.right();xdst++)
 		{
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
@@ -3410,9 +3418,9 @@ void saturn_state::draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	xsize_mask = (stv2_current_tilemap.linescroll_enable) ? 1024 : xsize;
 	ysize_mask = (stv2_current_tilemap.vertical_linescroll_enable) ? 512 : ysize;
 
-	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
+	for(ydst=cliprect.top();ydst<=cliprect.bottom();ydst++)
 	{
-		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
+		for(xdst=cliprect.left();xdst<=cliprect.right();xdst++)
 		{
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
@@ -3468,9 +3476,9 @@ void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	xsize_mask = (stv2_current_tilemap.linescroll_enable) ? 1024 : xsize;
 	ysize_mask = (stv2_current_tilemap.vertical_linescroll_enable) ? 512 : ysize;
 
-	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
+	for(ydst=cliprect.top();ydst<=cliprect.bottom();ydst++)
 	{
-		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
+		for(xdst=cliprect.left();xdst<=cliprect.right();xdst++)
 		{
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
@@ -3950,7 +3958,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		{
 			int drawyposinc = tilesizey*(stv2_current_tilemap.tile_size ? 2 : 1);
 			drawypos = -(stv2_current_tilemap.scrolly*scaley);
-			while( ((drawypos + drawyposinc) >> 16) < cliprect.min_y )
+			while( ((drawypos + drawyposinc) >> 16) < cliprect.top() )
 			{
 				drawypos += drawyposinc;
 				y++;
@@ -3961,7 +3969,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		{
 			drawypos += tilesizey*(stv2_current_tilemap.tile_size ? 2 : 1);
 		}
-		if ((drawypos >> 16) > cliprect.max_y) break;
+		if ((drawypos >> 16) > cliprect.bottom()) break;
 
 		ypageoffs = y & (pgtiles_y-1);
 
@@ -3973,7 +3981,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 			{
 				int drawxposinc = tilesizex*(stv2_current_tilemap.tile_size ? 2 : 1);
 				drawxpos = -(stv2_current_tilemap.scrollx*scalex);
-				while( ((drawxpos + drawxposinc) >> 16) < cliprect.min_x )
+				while( ((drawxpos + drawxposinc) >> 16) < cliprect.left() )
 				{
 					drawxpos += drawxposinc;
 					x++;
@@ -3984,7 +3992,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 			{
 				drawxpos+=tilesizex*(stv2_current_tilemap.tile_size ? 2 : 1);
 			}
-			if ( (drawxpos >> 16) > cliprect.max_x ) break;
+			if ( (drawxpos >> 16) > cliprect.right() ) break;
 
 			xpageoffs = x & (pgtiles_x-1);
 
@@ -4182,7 +4190,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 
 		if ( LOG_VDP2 )
 		{
-			logerror( "Layer RBG%d, size %d x %d\n", stv2_current_tilemap.layer_name & 0x7f, cliprect.max_x + 1, cliprect.max_y + 1 );
+			logerror( "Layer RBG%d, size %d x %d\n", stv2_current_tilemap.layer_name & 0x7f, cliprect.right() + 1, cliprect.bottom() + 1 );
 			logerror( "Tiles: min %08X, max %08X\n", tilecodemin, tilecodemax );
 			logerror( "MAP size in dwords %08X\n", mpsize_dwords );
 			for (i = 0; i < stv2_current_tilemap.map_count; i++)
@@ -4194,12 +4202,18 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		// store map information
 		stv_vdp2_layer_data_placement.map_offset_min = 0x7fffffff;
 		stv_vdp2_layer_data_placement.map_offset_max = 0x00000000;
+
 		for (i = 0; i < stv2_current_tilemap.map_count; i++)
 		{
+			uint32_t max_base;
+
 			if ( base[i] < stv_vdp2_layer_data_placement.map_offset_min )
 				stv_vdp2_layer_data_placement.map_offset_min = base[i];
-			if ( base[i] > stv_vdp2_layer_data_placement.map_offset_max )
-				stv_vdp2_layer_data_placement.map_offset_max = base[i];
+
+			// Head On in Sega Memorial Collection 1 cares (uses RBG0 with all map regs equal to 0x20)
+			max_base = (base[i] + plsize_bytes/4);
+			if (  max_base > stv_vdp2_layer_data_placement.map_offset_max )
+				stv_vdp2_layer_data_placement.map_offset_max = max_base;
 		}
 
 
@@ -4226,7 +4240,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rectangle mycliprect;
-	int cur_line = cliprect.min_y;
+	int cur_line = cliprect.top();
 	int address;
 	int active_functions = 0;
 	int32_t scroll_values[3], prev_scroll_values[3];
@@ -4264,7 +4278,7 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 	if ( linezoom_enable ) active_functions++;
 
 	// address of data table
-	address = stv2_current_tilemap.linescroll_table_address + active_functions*4*cliprect.min_y;
+	address = stv2_current_tilemap.linescroll_table_address + active_functions*4*cliprect.top();
 
 	// get the first scroll values
 	for ( i = 0; i < active_functions; i++ )
@@ -4280,7 +4294,7 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 		}
 	}
 
-	while( cur_line <= cliprect.max_y )
+	while( cur_line <= cliprect.bottom() )
 	{
 		lines = 0;
 		do
@@ -4311,12 +4325,11 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 			{
 				scroll_values_equal &= (scroll_values[i] == prev_scroll_values[i]);
 			}
-		} while( scroll_values_equal && ((cur_line + lines) <= cliprect.max_y) );
+		} while( scroll_values_equal && ((cur_line + lines) <= cliprect.bottom()) );
 
 		// determined how many lines can be drawn
 		// prepare clipping rectangle
-		mycliprect.min_y = cur_line;
-		mycliprect.max_y = cur_line + lines - 1;
+		mycliprect.sety(cur_line, cur_line + lines - 1);
 
 		// prepare scroll values
 		i = 0;
@@ -4344,7 +4357,7 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 			i++;
 		}
 
-//      if ( LOG_VDP2 ) logerror( "Linescroll: y < %d, %d >, scrollx = %d, scrolly = %d, incx = %f\n", mycliprect.min_y, mycliprect.max_y, stv2_current_tilemap.scrollx, stv2_current_tilemap.scrolly, (float)stv2_current_tilemap.incx/65536.0 );
+//      if ( LOG_VDP2 ) logerror( "Linescroll: y < %d, %d >, scrollx = %d, scrolly = %d, incx = %f\n", mycliprect.top(), mycliprect.bottom(), stv2_current_tilemap.scrollx, stv2_current_tilemap.scrolly, (float)stv2_current_tilemap.incx/65536.0 );
 		// render current tilemap portion
 		if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
 		{
@@ -4375,14 +4388,14 @@ void saturn_state::stv_vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cli
 	{
 		base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
 
-		for(y=cliprect.min_y;y<=cliprect.max_y;y++)
+		for(y=cliprect.top();y<=cliprect.bottom();y++)
 		{
 			base_offs = (STV_VDP2_LCTA & base_mask) << 1;
 
 			if(STV_VDP2_LCCLMD)
 				base_offs += (y / interlace) << 1;
 
-			for(x=cliprect.min_x;x<=cliprect.max_x;x++)
+			for(x=cliprect.left();x<=cliprect.right();x++)
 			{
 				uint16_t pen;
 
@@ -4413,9 +4426,9 @@ void saturn_state::stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &c
 	if(STV_VDP2_LSMD == 3)
 		v_size <<= 1;
 
-	for(y=cliprect.min_y;y<=cliprect.max_y;y+=v_size)
+	for(y=cliprect.top();y<=cliprect.bottom();y+=v_size)
 	{
-		for(x=cliprect.min_x;x<=cliprect.max_x;x+=h_size)
+		for(x=cliprect.left();x<=cliprect.right();x+=h_size)
 		{
 			pix = bitmap.pix32(y, x);
 
@@ -4435,12 +4448,71 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 
 	if ( stv2_current_tilemap.linescroll_enable ||
 			stv2_current_tilemap.vertical_linescroll_enable ||
-			stv2_current_tilemap.linezoom_enable )
+			stv2_current_tilemap.linezoom_enable ||
+			stv2_current_tilemap.vertical_cell_scroll_enable)
 	{
-		stv_vdp2_check_tilemap_with_linescroll(bitmap, cliprect);
+		// check for vertical cell scroll enable (Sonic Jam)
+		// TODO: it is unknown how this works with vertical linescroll enable too (probably it doesn't?)
+		if(stv2_current_tilemap.vertical_cell_scroll_enable)
+		{
+			uint32_t vcsc_address;
+			uint32_t base_mask;
+			int base_offset, base_multiplier;
+			int16_t base_scrollx, base_scrolly;
+			//uint32_t base_incx, base_incy;
+			int cur_char = 0;
+
+			base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+			vcsc_address = (((STV_VDP2_VCSTAU << 16) | STV_VDP2_VCSTAL) & base_mask) * 2;
+			vcsc_address >>= 2;
+
+			base_offset = 0;
+			base_multiplier = 1;
+			// offset for both enabled
+			if(STV_VDP2_N0VCSC && STV_VDP2_N1VCSC)
+			{
+				// NBG1
+				if(stv2_current_tilemap.layer_name & 1)
+					base_offset = 1;
+
+				base_multiplier = 2;
+			}
+
+			base_scrollx = stv2_current_tilemap.scrollx;
+			base_scrolly = stv2_current_tilemap.scrolly;
+			//base_incx = stv2_current_tilemap.incx;
+			//base_incy = stv2_current_tilemap.incy;
+
+			while(cur_char <= cliprect.right())
+			{
+				mycliprect.setx(cur_char, cur_char + 8 - 1);
+
+				uint32_t cur_address;
+				int16_t char_scroll;
+
+				cur_address = vcsc_address;
+				cur_address += ((cur_char >> 3) * base_multiplier) + base_offset;
+
+				char_scroll = m_vdp2_vram[ cur_address ] >> 16;
+				char_scroll &= 0x07ff;
+				if ( char_scroll & 0x0400 ) char_scroll |= 0xf800;
+				stv2_current_tilemap.scrollx = base_scrollx;
+				stv2_current_tilemap.scrolly = base_scrolly + (char_scroll);
+				//stv2_current_tilemap.incx = base_incx;
+				//stv2_current_tilemap.incy = base_incy;
+
+				stv_vdp2_check_tilemap_with_linescroll(bitmap, mycliprect);
+
+				// TODO: + 16 for tilemap and char size = 16?
+				cur_char += 8;
+
+			}
+		}
+		else
+			stv_vdp2_check_tilemap_with_linescroll(bitmap, cliprect);
+
 		return;
 	}
-
 
 	if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
 	{
@@ -4452,7 +4524,8 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		stv_vdp2_draw_basic_tilemap(bitmap, mycliprect);
 	}
 
-	/* post-processing functions (TODO: needs layer bitmaps to be individual planes to work correctly) */
+	/* post-processing functions */
+	// (TODO: needs layer bitmaps to be individual planes to work correctly)
 	if(stv2_current_tilemap.line_screen_enabled && TEST_FUNCTIONS)
 		stv_vdp2_draw_line(bitmap,cliprect);
 
@@ -4505,7 +4578,7 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 			popmessage("Special Function Code Select enable %04x %04x, contact MAMEdev",STV_VDP2_SFSEL,STV_VDP2_SFCODE);
 
 		/* Albert Odyssey Gaiden 0x0001 */
-		/* Asuka 120% (doesn't make sense?) 0x0101 */
+		/* Asuka 120% 0x0101 */
 		/* Slam n Jam 96 0x0003 */
 		if(STV_VDP2_ZMCTL & 0x0200)
 			popmessage("Reduction enable %04x, contact MAMEdev",STV_VDP2_ZMCTL);
@@ -4652,8 +4725,11 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 			clipxmask = clipymask = 0;
 			break;
 		case 1:
-			/* screen over pattern, not supported */
-			clipxmask = clipymask = 0;
+			/* screen over pattern */
+			// TODO: not supported, cfr. STV_VDP2_OVPNRA / STV_VDP2_OVPNRB
+			// D-Xhird uses this on practice stage
+			clipxmask = ~planesizex;
+			clipymask = ~planesizey;
 			break;
 		case 2:
 			/* outside display area, scroll screen is transparent */
@@ -4677,7 +4753,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	xp = mul_fixed32( RP.A, RP.px - RP.cx ) + mul_fixed32( RP.B, RP.py - RP.cy ) + mul_fixed32( RP.C, RP.pz - RP.cz ) + RP.cx + RP.mx;
 	yp = mul_fixed32( RP.D, RP.px - RP.cx ) + mul_fixed32( RP.E, RP.py - RP.cy ) + mul_fixed32( RP.F, RP.pz - RP.cz ) + RP.cy + RP.my;
 
-	for (vcnt = cliprect.min_y; vcnt <= cliprect.max_y; vcnt++ )
+	for (vcnt = cliprect.top(); vcnt <= cliprect.bottom(); vcnt++ )
 	{
 		/*xsp = RP.A * ( ( RP.xst + RP.dxst * (vcnt << 16) ) - RP.px ) +
 		      RP.B * ( ( RP.yst + RP.dyst * (vcnt << 16) ) - RP.py ) +
@@ -4769,12 +4845,15 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 			dxs = mul_fixed32( kx, mul_fixed32( dx, 1 << (16-hcnt_shift)));
 			dys = mul_fixed32( ky, mul_fixed32( dy, 1 << (16-hcnt_shift)));
 
-			for (hcnt = cliprect.min_x; hcnt <= cliprect.max_x; xs+=dxs, ys+=dys, hcnt++ )
+			for (hcnt = cliprect.left(); hcnt <= cliprect.right(); xs+=dxs, ys+=dys, hcnt++ )
 			{
 				x = xs >> 16;
 				y = ys >> 16;
 
 				if ( x & clipxmask || y & clipymask ) continue;
+				if ( stv_vdp2_roz_window(hcnt, vcnt) == false )
+					continue;
+
 				if ( stv2_current_tilemap.roz_mode3 == true )
 				{
 					if( stv_vdp2_roz_mode3_window(hcnt, vcnt, iRP-1) == false )
@@ -4823,7 +4902,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 		}
 		else
 		{
-			for (hcnt = cliprect.min_x; hcnt <= cliprect.max_x; hcnt++ )
+			for (hcnt = cliprect.left(); hcnt <= cliprect.right(); hcnt++ )
 			{
 				switch( coeff_table_size )
 				{
@@ -4934,7 +5013,30 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	}
 }
 
-bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
+inline bool saturn_state::stv_vdp2_roz_window(int x, int y)
+{
+	int s_x=0,e_x=0,s_y=0,e_y=0;
+	int w0_pix, w1_pix;
+	uint8_t logic = STV_VDP2_R0LOG;
+	uint8_t w0_enable = STV_VDP2_R0W0E;
+	uint8_t w1_enable = STV_VDP2_R0W1E;
+	uint8_t w0_area = STV_VDP2_R0W0A;
+	uint8_t w1_area = STV_VDP2_R0W1A;
+
+	if (w0_enable == 0 &&
+		w1_enable == 0)
+		return true;
+
+	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y, y);
+	w0_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
+
+	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y, y);
+	w1_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
+
+	return (logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix));
+}
+
+inline bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
 {
 	int s_x=0,e_x=0,s_y=0,e_y=0;
 	int w0_pix, w1_pix;
@@ -4948,16 +5050,16 @@ bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
 		w1_enable == 0)
 		return rot_parameter ^ 1;
 
-	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
-	w0_pix = get_roz_mode3_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
+	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y, y);
+	w0_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
 
-	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
-	w1_pix = get_roz_mode3_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
+	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y, y);
+	w1_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
 
 	return (logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix)) ^ rot_parameter;
 }
 
-int saturn_state::get_roz_mode3_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable, uint8_t winarea)
+inline int saturn_state::get_roz_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable, uint8_t winarea)
 {
 	int res;
 
@@ -5046,6 +5148,7 @@ void saturn_state::stv_vdp2_draw_NBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.linescroll_table_address = (((STV_VDP2_LSTA0U << 16) | STV_VDP2_LSTA0L) & base_mask) * 2;
 	stv2_current_tilemap.vertical_linescroll_enable = STV_VDP2_N0LSCY;
 	stv2_current_tilemap.linezoom_enable = STV_VDP2_N0LZMX;
+	stv2_current_tilemap.vertical_cell_scroll_enable = STV_VDP2_N0VCSC;
 
 	stv2_current_tilemap.plane_size = (STV_VDP2_R1ON) ? STV_VDP2_RBPLSZ : STV_VDP2_N0PLSZ;
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_N0CAOS;
@@ -5146,6 +5249,7 @@ void saturn_state::stv_vdp2_draw_NBG1(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.linescroll_table_address = (((STV_VDP2_LSTA1U << 16) | STV_VDP2_LSTA1L) & base_mask) * 2;
 	stv2_current_tilemap.vertical_linescroll_enable = STV_VDP2_N1LSCY;
 	stv2_current_tilemap.linezoom_enable = STV_VDP2_N1LZMX;
+	stv2_current_tilemap.vertical_cell_scroll_enable = STV_VDP2_N1VCSC;
 
 	stv2_current_tilemap.plane_size = STV_VDP2_N1PLSZ;
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_N1CAOS;
@@ -5248,6 +5352,7 @@ void saturn_state::stv_vdp2_draw_NBG2(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.linescroll_table_address = 0;
 	stv2_current_tilemap.vertical_linescroll_enable = 0;
 	stv2_current_tilemap.linezoom_enable = 0;
+	stv2_current_tilemap.vertical_cell_scroll_enable = 0;
 
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_N2CAOS;
 	stv2_current_tilemap.fade_control = (STV_VDP2_N2COEN * 1) | (STV_VDP2_N2COSL * 2);
@@ -5351,6 +5456,7 @@ void saturn_state::stv_vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.linescroll_table_address = 0;
 	stv2_current_tilemap.vertical_linescroll_enable = 0;
 	stv2_current_tilemap.linezoom_enable = 0;
+	stv2_current_tilemap.vertical_cell_scroll_enable = 0;
 
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_N3CAOS;
 	stv2_current_tilemap.fade_control = (STV_VDP2_N3COEN * 1) | (STV_VDP2_N3COSL * 2);
@@ -5381,7 +5487,7 @@ void saturn_state::stv_vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cli
 
 void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, int iRP)
 {
-	rectangle roz_clip_rect, mycliprect;
+	rectangle roz_clip_rect;
 	int planesizex = 0, planesizey = 0;
 	int planerenderedsizex, planerenderedsizey;
 	uint8_t colour_calculation_enabled;
@@ -5477,7 +5583,39 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 		stv2_current_tilemap.scrollx = stv_current_rotation_parameter_table.mx >> 16;
 		stv2_current_tilemap.scrolly = stv_current_rotation_parameter_table.my >> 16;
 
-		stv_vdp2_check_tilemap(bitmap,cliprect);
+		if(stv2_current_tilemap.roz_mode3 == true)
+		{
+			// TODO: Cotton 2 enables mode 3 without an actual RP window enabled
+			//       Technically you could use split screen effect without rotation applied,
+			//       which will be annoying to emulate with this video structure.
+			//       Let's see if anything will do it ...
+			if(STV_VDP2_RPW0E || STV_VDP2_RPW1E)
+				popmessage("ROZ Mode 3 window enabled without zooming, contact MAMEdev!");
+
+			if(iRP == 2)
+				return;
+		}
+
+		// TODO: legacy code, to be removed
+		stv2_current_tilemap.window_control.logic = STV_VDP2_R0LOG;
+		stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_R0W0E;
+		stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_R0W1E;
+//      stv2_current_tilemap.window_control.? = STV_VDP2_R0SWE;
+		stv2_current_tilemap.window_control.area[0] = STV_VDP2_R0W0A;
+		stv2_current_tilemap.window_control.area[1] = STV_VDP2_R0W1A;
+//      stv2_current_tilemap.window_control.? = STV_VDP2_R0SWA;
+
+		rectangle mycliprect = cliprect;
+
+		if ( stv2_current_tilemap.window_control.enabled[0] || stv2_current_tilemap.window_control.enabled[1] )
+		{
+			//popmessage("Window control for RBG");
+			stv_vdp2_apply_window_on_layer(mycliprect);
+			stv2_current_tilemap.window_control.enabled[0] = 0;
+			stv2_current_tilemap.window_control.enabled[1] = 0;
+		}
+
+		stv_vdp2_check_tilemap(bitmap,mycliprect);
 	}
 	else
 	{
@@ -5541,9 +5679,10 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 			stv2_current_tilemap.transparency = STV_TRANSPARENCY_ALPHA;
 		}
 
+		#ifdef UNUSED_FUNCTION
+		// old reference code
 		mycliprect = cliprect;
 
-		/* TODO: remove me. */
 		if ( stv2_current_tilemap.window_control.enabled[0] || stv2_current_tilemap.window_control.enabled[1] )
 		{
 			//popmessage("Window control for RBG");
@@ -5551,11 +5690,12 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 			stv2_current_tilemap.window_control.enabled[0] = 0;
 			stv2_current_tilemap.window_control.enabled[1] = 0;
 		}
+		#endif
 
 		stv2_current_tilemap.fade_control = fade_control;
 
 		g_profiler.start(PROFILER_USER2);
-		stv_vdp2_copy_roz_bitmap(bitmap, m_vdp2.roz_bitmap[iRP-1], mycliprect, iRP, planesizex, planesizey, planerenderedsizex, planerenderedsizey );
+		stv_vdp2_copy_roz_bitmap(bitmap, m_vdp2.roz_bitmap[iRP-1], cliprect, iRP, planesizex, planesizey, planerenderedsizex, planerenderedsizey );
 		g_profiler.stop();
 	}
 
@@ -5616,12 +5756,13 @@ void saturn_state::stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_R0CAOS;
 	stv2_current_tilemap.fade_control = (STV_VDP2_R0COEN * 1) | (STV_VDP2_R0COSL * 2);
 	stv_vdp2_check_fade_control_for_layer();
-	stv2_current_tilemap.window_control.logic = STV_VDP2_R0LOG;
-	stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_R0W0E;
-	stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_R0W1E;
+	// disable these, we apply them in the roz routines (they were interfering with stv_vdp2_roz_window() ?)
+	stv2_current_tilemap.window_control.logic = 0; //STV_VDP2_R0LOG;
+	stv2_current_tilemap.window_control.enabled[0] = 0; //STV_VDP2_R0W0E;
+	stv2_current_tilemap.window_control.enabled[1] = 0; //STV_VDP2_R0W1E;
 //  stv2_current_tilemap.window_control.? = STV_VDP2_R0SWE;
-	stv2_current_tilemap.window_control.area[0] = STV_VDP2_R0W0A;
-	stv2_current_tilemap.window_control.area[1] = STV_VDP2_R0W1A;
+	stv2_current_tilemap.window_control.area[0] = 0; //STV_VDP2_R0W0A;
+	stv2_current_tilemap.window_control.area[1] = 0; //STV_VDP2_R0W1A;
 //  stv2_current_tilemap.window_control.? = STV_VDP2_R0SWA;
 
 	stv2_current_tilemap.scrollx = 0;
@@ -5634,6 +5775,7 @@ void saturn_state::stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.linescroll_table_address = 0;
 	stv2_current_tilemap.vertical_linescroll_enable = 0;
 	stv2_current_tilemap.linezoom_enable = 0;
+	stv2_current_tilemap.vertical_cell_scroll_enable = 0;
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_R0LCEN;
 	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_R0MZE;
@@ -5686,13 +5828,13 @@ void saturn_state::stv_vdp2_draw_back(bitmap_rgb32 &bitmap, const rectangle &cli
 	{
 		base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
 
-		for(y=cliprect.min_y;y<=cliprect.max_y;y++)
+		for(y=cliprect.top();y<=cliprect.bottom();y++)
 		{
 			base_offs = ((STV_VDP2_BKTA ) & base_mask) << 1;
 			if(STV_VDP2_BKCLMD)
 				base_offs += ((y / interlace) << 1);
 
-			for(x=cliprect.min_x;x<=cliprect.max_x;x++)
+			for(x=cliprect.left();x<=cliprect.right();x++)
 			{
 				int r,g,b;
 				uint16_t dot;
@@ -6038,7 +6180,7 @@ uint8_t saturn_state::get_hblank( void )
 	const rectangle &visarea = m_screen->visible_area();
 	int cur_h = m_screen->hpos();
 
-	if (cur_h > visarea.max_x) //TODO
+	if (cur_h > visarea.right()) //TODO
 		return 1;
 
 	return 0;
@@ -6206,9 +6348,9 @@ int saturn_state::stv_vdp2_start ( void )
 	stv_rbg_cache_data.is_cache_dirty = 3;
 	memset( &stv_vdp2_layer_data_placement, 0, sizeof(stv_vdp2_layer_data_placement));
 
-	save_pointer(NAME(m_vdp2_regs.get()), 0x040000/2);
-	save_pointer(NAME(m_vdp2_vram.get()), 0x100000/4);
-	save_pointer(NAME(m_vdp2_cram.get()), 0x080000/4);
+	save_pointer(NAME(m_vdp2_regs), 0x040000/2);
+	save_pointer(NAME(m_vdp2_vram), 0x100000/4);
+	save_pointer(NAME(m_vdp2_cram), 0x080000/4);
 	machine().save().register_postload(save_prepost_delegate(FUNC(saturn_state::stv_vdp2_state_save_postload), this));
 
 	return 0;
@@ -6340,7 +6482,7 @@ void saturn_state::stv_vdp2_fade_effects( void )
 	//popmessage("%04x %04x %04x %04x %04x %04x",STV_VDP2_COAR,STV_VDP2_COAG,STV_VDP2_COAB,STV_VDP2_COBR,STV_VDP2_COBG,STV_VDP2_COBB);
 }
 
-void saturn_state::stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y)
+void saturn_state::stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y)
 {
 	/*W0*/
 	switch(STV_VDP2_LSMD & 3)
@@ -6356,36 +6498,51 @@ void saturn_state::stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y
 			*e_y = ((STV_VDP2_W0EY & 0x7ff) >> 0);
 			break;
 	}
-	switch(STV_VDP2_HRES & 6)
+	// check if line window is enabled
+	if(STV_VDP2_W0LWE)
 	{
-		/*Normal*/
-		case 0:
-			*s_x = ((STV_VDP2_W0SX & 0x3fe) >> 1);
-			*e_x = ((STV_VDP2_W0EX & 0x3fe) >> 1);
-			break;
-		/*Hi-Res*/
-		case 2:
-			*s_x = ((STV_VDP2_W0SX & 0x3ff) >> 0);
-			*e_x = ((STV_VDP2_W0EX & 0x3ff) >> 0);
-			break;
-		/*Exclusive Normal*/
-		case 4:
-			*s_x = ((STV_VDP2_W0SX & 0x1ff) >> 0);
-			*e_x = ((STV_VDP2_W0EX & 0x1ff) >> 0);
-			*s_y = ((STV_VDP2_W0SY & 0x3ff) >> 0);
-			*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
-			break;
-		/*Exclusive Hi-Res*/
-		case 6:
-			*s_x = ((STV_VDP2_W0SX & 0x1ff) << 1);
-			*e_x = ((STV_VDP2_W0EX & 0x1ff) << 1);
-			*s_y = ((STV_VDP2_W0SY & 0x3ff) >> 0);
-			*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
-			break;
+		uint32_t base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+		uint32_t address = (STV_VDP2_W0LWTA & base_mask) * 2;
+		// double density makes the line window to fetch data every two lines
+		uint8_t interlace = (STV_VDP2_LSMD == 3);
+		uint32_t vram_data = m_vdp2_vram[(address >> 2)+(y >> interlace)];
+
+		*s_x = (vram_data >> 16) & 0x3ff;
+		*e_x = (vram_data & 0x3ff);
+	}
+	else
+	{
+		switch(STV_VDP2_HRES & 6)
+		{
+			/*Normal*/
+			case 0:
+				*s_x = ((STV_VDP2_W0SX & 0x3fe) >> 1);
+				*e_x = ((STV_VDP2_W0EX & 0x3fe) >> 1);
+				break;
+			/*Hi-Res*/
+			case 2:
+				*s_x = ((STV_VDP2_W0SX & 0x3ff) >> 0);
+				*e_x = ((STV_VDP2_W0EX & 0x3ff) >> 0);
+				break;
+			/*Exclusive Normal*/
+			case 4:
+				*s_x = ((STV_VDP2_W0SX & 0x1ff) >> 0);
+				*e_x = ((STV_VDP2_W0EX & 0x1ff) >> 0);
+				*s_y = ((STV_VDP2_W0SY & 0x3ff) >> 0);
+				*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
+				break;
+			/*Exclusive Hi-Res*/
+			case 6:
+				*s_x = ((STV_VDP2_W0SX & 0x1ff) << 1);
+				*e_x = ((STV_VDP2_W0EX & 0x1ff) << 1);
+				*s_y = ((STV_VDP2_W0SY & 0x3ff) >> 0);
+				*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
+				break;
+		}
 	}
 }
 
-void saturn_state::stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y)
+void saturn_state::stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y)
 {
 	/*W1*/
 	switch(STV_VDP2_LSMD & 3)
@@ -6401,34 +6558,48 @@ void saturn_state::stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y
 			*e_y = ((STV_VDP2_W1EY & 0x7ff) >> 0);
 			break;
 	}
-	switch(STV_VDP2_HRES & 6)
+	// check if line window is enabled
+	if(STV_VDP2_W1LWE)
 	{
-		/*Normal*/
-		case 0:
-			*s_x = ((STV_VDP2_W1SX & 0x3fe) >> 1);
-			*e_x = ((STV_VDP2_W1EX & 0x3fe) >> 1);
-			break;
-		/*Hi-Res*/
-		case 2:
-			*s_x = ((STV_VDP2_W1SX & 0x3ff) >> 0);
-			*e_x = ((STV_VDP2_W1EX & 0x3ff) >> 0);
-			break;
-		/*Exclusive Normal*/
-		case 4:
-			*s_x = ((STV_VDP2_W1SX & 0x1ff) >> 0);
-			*e_x = ((STV_VDP2_W1EX & 0x1ff) >> 0);
-			*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0);
-			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
-			break;
-		/*Exclusive Hi-Res*/
-		case 6:
-			*s_x = ((STV_VDP2_W1SX & 0x1ff) << 1);
-			*e_x = ((STV_VDP2_W1EX & 0x1ff) << 1);
-			*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0);
-			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
-			break;
-	}
+		uint32_t base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+		uint32_t address = (STV_VDP2_W1LWTA & base_mask) * 2;
+		// double density makes the line window to fetch data every two lines
+		uint8_t interlace = (STV_VDP2_LSMD == 3);
+		uint32_t vram_data = m_vdp2_vram[(address >> 2)+(y >> interlace)];
 
+		*s_x = (vram_data >> 16) & 0x3ff;
+		*e_x = (vram_data & 0x3ff);
+	}
+	else
+	{
+		switch(STV_VDP2_HRES & 6)
+		{
+			/*Normal*/
+			case 0:
+				*s_x = ((STV_VDP2_W1SX & 0x3fe) >> 1);
+				*e_x = ((STV_VDP2_W1EX & 0x3fe) >> 1);
+				break;
+			/*Hi-Res*/
+			case 2:
+				*s_x = ((STV_VDP2_W1SX & 0x3ff) >> 0);
+				*e_x = ((STV_VDP2_W1EX & 0x3ff) >> 0);
+				break;
+			/*Exclusive Normal*/
+			case 4:
+				*s_x = ((STV_VDP2_W1SX & 0x1ff) >> 0);
+				*e_x = ((STV_VDP2_W1EX & 0x1ff) >> 0);
+				*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0);
+				*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
+				break;
+			/*Exclusive Hi-Res*/
+			case 6:
+				*s_x = ((STV_VDP2_W1SX & 0x1ff) << 1);
+				*e_x = ((STV_VDP2_W1EX & 0x1ff) << 1);
+				*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0);
+				*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
+				break;
+		}
+	}
 }
 
 int saturn_state::get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t win_num)
@@ -6456,10 +6627,10 @@ inline int saturn_state::stv_vdp2_window_process(int x,int y)
 		stv2_current_tilemap.window_control.enabled[1] == 0)
 		return 1;
 
-	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
+	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y, y);
 	w0_pix = get_window_pixel(s_x,e_x,s_y,e_y,x,y,0);
 
-	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
+	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y, y);
 	w1_pix = get_window_pixel(s_x,e_x,s_y,e_y,x,y,1);
 
 	return stv2_current_tilemap.window_control.logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix);
@@ -6473,7 +6644,7 @@ int saturn_state::stv_vdp2_apply_window_on_layer(rectangle &cliprect)
 	if ( stv2_current_tilemap.window_control.enabled[0] && (!stv2_current_tilemap.window_control.area[0]))
 	{
 		/* w0, transparent outside supported */
-		stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
+		stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y, 0);
 
 		if ( s_x > cliprect.min_x ) cliprect.min_x = s_x;
 		if ( e_x < cliprect.max_x ) cliprect.max_x = e_x;
@@ -6485,7 +6656,7 @@ int saturn_state::stv_vdp2_apply_window_on_layer(rectangle &cliprect)
 	else if (  stv2_current_tilemap.window_control.enabled[1] && (!stv2_current_tilemap.window_control.area[1]) )
 	{
 		/* w1, transparent outside supported */
-		stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
+		stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y, 0);
 
 		if ( s_x > cliprect.min_x ) cliprect.min_x = s_x;
 		if ( e_x < cliprect.max_x ) cliprect.max_x = e_x;
@@ -6618,7 +6789,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	{
 		if ( alpha_enabled == 0 )
 		{
-			for ( y = cliprect.min_y; y <= cliprect.max_y; y++ )
+			for ( y = cliprect.top(); y <= cliprect.bottom(); y++ )
 			{
 				if ( stv_sprite_priorities_usage_valid )
 					if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -6627,7 +6798,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				framebuffer_line = m_vdp1.framebuffer_display_lines[y];
 				bitmap_line = &bitmap.pix32(y);
 
-				for ( x = cliprect.min_x; x <= cliprect.max_x; x++ )
+				for ( x = cliprect.left(); x <= cliprect.right(); x++ )
 				{
 					if(!stv_vdp2_window_process(x,y))
 						continue;
@@ -6665,6 +6836,15 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 							continue;
 						};
 
+						// Pretty Fighter X, Game Tengoku shadows
+						// TODO: Pretty Fighter X doesn't read what's behind on title screen, VDP1 bug?
+						// TODO: seldomly Game Tengoku shadows aren't drawn properly
+						if(pix & 0x8000 && STV_VDP2_SDCTL & 0x100)
+						{
+							rgb_t p = bitmap_line[x];
+							bitmap_line[x] = rgb_t(p.r() >> 1, p.g() >> 1, p.b() >> 1);
+						}
+						else
 						{
 							pix &= sprite_colormask;
 							if ( pix == (sprite_colormask - 1) )
@@ -6683,10 +6863,11 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 								pix &= 0x7ff;
 								pix += color_offset_pal;
 								bitmap_line[x] = m_palette->pen( pix );
+
 							}
 						}
 
-						/* TODO: I don't think this one makes much logic ... (1) */
+						/* TODO: I don't think this one makes much sense ... (1) */
 						if ( pix & sprite_shadow )
 						{
 							if ( pix & ~sprite_shadow )
@@ -6701,7 +6882,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		}
 		else //alpha_enabled == 1
 		{
-			for ( y = cliprect.min_y; y <= cliprect.max_y; y++ )
+			for ( y = cliprect.top(); y <= cliprect.bottom(); y++ )
 			{
 				if ( stv_sprite_priorities_usage_valid )
 					if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -6710,7 +6891,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				framebuffer_line = m_vdp1.framebuffer_display_lines[y];
 				bitmap_line = &bitmap.pix32(y);
 
-				for ( x = cliprect.min_x; x <= cliprect.max_x; x++ )
+				for ( x = cliprect.left(); x <= cliprect.right(); x++ )
 				{
 					if(!stv_vdp2_window_process(x,y))
 						continue;
@@ -6810,7 +6991,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	}
 	else
 	{
-		for ( y = cliprect.min_y; y <= cliprect.max_y / (interlace_framebuffer+1); y++ )
+		for ( y = cliprect.top(); y <= cliprect.bottom() / (interlace_framebuffer+1); y++ )
 		{
 			if ( stv_sprite_priorities_usage_valid )
 				if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -6827,7 +7008,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				bitmap_line2 = &bitmap.pix32(2*y + 1);
 			}
 
-			for ( x = cliprect.min_x; x <= cliprect.max_x /(double_x+1) ; x++ )
+			for ( x = cliprect.left(); x <= cliprect.right() /(double_x+1) ; x++ )
 			{
 				if(!stv_vdp2_window_process(x,y))
 					continue;

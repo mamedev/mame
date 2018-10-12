@@ -95,12 +95,12 @@ void intv_ecs_device::late_subslot_setup()
 
 
 MACHINE_CONFIG_START(intv_ecs_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono_ecs")
+	SPEAKER(config, "mono_ecs").front_center();
 
-	MCFG_SOUND_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("ctrl_port", intvecs_control_port_device, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("ctrl_port", intvecs_control_port_device, portB_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("ctrl_port", intvecs_control_port_device, portA_w))
+	MCFG_DEVICE_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("ctrl_port", intvecs_control_port_device, portA_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("ctrl_port", intvecs_control_port_device, portB_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("ctrl_port", intvecs_control_port_device, portA_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono_ecs", 0.33)
 
 	MCFG_INTVECS_CONTROL_PORT_ADD("ctrl_port", intvecs_control_port_devices, "keybd")

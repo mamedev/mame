@@ -221,6 +221,7 @@
 #include "sound/ymz280b.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -243,8 +244,8 @@ public:
 		m_palette2(*this, "palette2") { }
 
 	required_shared_ptr<uint16_t> m_vram;
-	DECLARE_DRIVER_INIT(colorama);
-	DECLARE_DRIVER_INIT(cmrltv75);
+	void init_colorama();
+	void init_cmrltv75();
 	virtual void video_start() override;
 	uint32_t screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -315,34 +316,36 @@ READ16_MEMBER(coinmvga_state::test_r)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(coinmvga_state::coinmvga_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0) //maybe not
+void coinmvga_state::coinmvga_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x0fffff).rom().region("maincpu", 0); //maybe not
 
 //  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
 //  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("vram")
+	map(0x210000, 0x21ffff).ram().share("vram");
 //  AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
 //  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM
+	map(0x400000, 0x40ffff).ram();
 
-	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
-	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x600002, 0x600003) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
-	AM_RANGE(0x600004, 0x600005) AM_DEVWRITE8("ramdac2", ramdac_device, index_w, 0xff00)
-	AM_RANGE(0x600004, 0x600005) AM_DEVWRITE8("ramdac2", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x600006, 0x600007) AM_DEVWRITE8("ramdac2", ramdac_device, mask_w, 0xff00)
-	AM_RANGE(0x600008, 0x600009) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff)
-	AM_RANGE(0x610000, 0x61000f) AM_RAM //touch screen i/o
+	map(0x600000, 0x600000).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x600001, 0x600001).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x600002, 0x600002).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x600004, 0x600004).w("ramdac2", FUNC(ramdac_device::index_w));
+	map(0x600005, 0x600005).w("ramdac2", FUNC(ramdac_device::pal_w));
+	map(0x600006, 0x600006).w("ramdac2", FUNC(ramdac_device::mask_w));
+	map(0x600008, 0x600009).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+	map(0x610000, 0x61000f).ram(); //touch screen i/o
 
-	AM_RANGE(0x700000, 0x7fffff) AM_ROM AM_REGION("maincpu", 0) // ?
+	map(0x700000, 0x7fffff).rom().region("maincpu", 0); // ?
 
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1") //"arrow" r?
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
+	map(0x800000, 0x800001).portr("DSW1"); //"arrow" r?
+	map(0x800002, 0x800003).portr("DSW2");
 	//0x800008 "arrow" w?
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(coinmvga_state::coinmvga_io_map)
+void coinmvga_state::coinmvga_io_map(address_map &map)
+{
 /*  Digital I/O ports (ports 4-B are valid on 16-bit H8/3xx) */
 //  AM_RANGE(h8_device::PORT_4, h8_device::PORT_4)
 //  AM_RANGE(h8_device::PORT_5, h8_device::PORT_5)
@@ -358,7 +361,7 @@ ADDRESS_MAP_START(coinmvga_state::coinmvga_io_map)
 //  AM_RANGE(h8_device::ADC_1, h8_device::ADC_1)
 //  AM_RANGE(h8_device::ADC_2, h8_device::ADC_2)
 //  AM_RANGE(h8_device::ADC_3, h8_device::ADC_3)
-ADDRESS_MAP_END
+}
 
 /*  unknown writes (cmrltv75):
 
@@ -598,11 +601,11 @@ static const gfx_layout tiles16x16_layout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( coinmvga )
+static GFXDECODE_START( gfx_coinmvga )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 16 )  /* Foreground GFX */
 GFXDECODE_END
 
-static GFXDECODE_START( coinmvga2 )
+static GFXDECODE_START( gfx_coinmvga2 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0x000, 1 )  /* Background GFX */
 GFXDECODE_END
 
@@ -622,24 +625,26 @@ INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
 *    Machine Drivers     *
 *************************/
 
-ADDRESS_MAP_START(coinmvga_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void coinmvga_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
-ADDRESS_MAP_START(coinmvga_state::ramdac2_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac2",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void coinmvga_state::ramdac2_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac2", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */
-	MCFG_CPU_PROGRAM_MAP(coinmvga_map)
-	MCFG_CPU_IO_MAP(coinmvga_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmvga_state,  vblank_irq)   /* wrong, fix me */
+	MCFG_DEVICE_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */
+	MCFG_DEVICE_PROGRAM_MAP(coinmvga_map)
+	MCFG_DEVICE_IO_MAP(coinmvga_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", coinmvga_state,  vblank_irq)   /* wrong, fix me */
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -650,8 +655,8 @@ MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coinmvga)
-	MCFG_GFXDECODE_ADD("gfxdecode2", "palette2", coinmvga2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coinmvga)
+	MCFG_DEVICE_ADD("gfxdecode2", GFXDECODE, "palette2", gfx_coinmvga2)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -660,9 +665,10 @@ MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, SND_CLOCK)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, SND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -713,21 +719,21 @@ ROM_START( coloramas )
 */
 
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "p521_v13_rwof_prog_1_(401)_14-2-00_spanish.bin",  0x00001, 0x80000, CRC(69c26df0) SHA1(a83232e835a24e4da46a613abfa34ca2440727ac) )
-	ROM_LOAD16_BYTE( "p521_v13_rwof_prog_2_(401)_14-2-00_spanish.bin",  0x00000, 0x80000, CRC(42294c43) SHA1(f8a94d0387eb2f58643570017499c70baaa393cc) )
+	ROM_LOAD16_BYTE( "p521_v13_rwof_prog_1_=401=_14-2-00_spanish.bin",  0x00001, 0x80000, CRC(69c26df0) SHA1(a83232e835a24e4da46a613abfa34ca2440727ac) )
+	ROM_LOAD16_BYTE( "p521_v13_rwof_prog_2_=401=_14-2-00_spanish.bin",  0x00000, 0x80000, CRC(42294c43) SHA1(f8a94d0387eb2f58643570017499c70baaa393cc) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "p521_v12_rwof_fore_1_(401)_20-7-99_spanish.bin",  0x00001, 0x80000, CRC(c5187559) SHA1(a32cee8948eb08fa9662622164f7ba9042d297d8) )
-	ROM_LOAD16_BYTE( "p521_v12_rwof_fore_2_(401)_20-7-99_spanish.bin",  0x00000, 0x80000, CRC(fdf71c26) SHA1(4e2e5cc3f847a173283401969e21ccde941f0f20) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_fore_1_=401=_20-7-99_spanish.bin",  0x00001, 0x80000, CRC(c5187559) SHA1(a32cee8948eb08fa9662622164f7ba9042d297d8) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_fore_2_=401=_20-7-99_spanish.bin",  0x00000, 0x80000, CRC(fdf71c26) SHA1(4e2e5cc3f847a173283401969e21ccde941f0f20) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "p521_v12_rwof_back_1_(801)_20-7-99_spanish.bin",  0x200001, 0x100000, CRC(0cbaf152) SHA1(2d6dfc7a4a8ccb6891dd8859594711ddf8a1055e) )
-	ROM_LOAD16_BYTE( "p521_v12_rwof_back_2_(801)_20-7-99_spanish.bin",  0x200000, 0x100000, CRC(7e840b74) SHA1(3825533a824a9a47e4bd44adcebbdc56a01a6f1e) )
-	ROM_LOAD16_BYTE( "p521_v12_rwof_back_3_(801)_20-7-99_spanish.bin",  0x000001, 0x100000, CRC(3163f25d) SHA1(ea2336f2381de1680046c70f217c398d1229f11f) )
-	ROM_LOAD16_BYTE( "p521_v12_rwof_back_4_(801)_20-7-99_spanish.bin",  0x000000, 0x100000, CRC(e741a046) SHA1(8b65205c1d55dfca953e3626d151cb28ba1b2dfc) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_1_=801=_20-7-99_spanish.bin",  0x200001, 0x100000, CRC(0cbaf152) SHA1(2d6dfc7a4a8ccb6891dd8859594711ddf8a1055e) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_2_=801=_20-7-99_spanish.bin",  0x200000, 0x100000, CRC(7e840b74) SHA1(3825533a824a9a47e4bd44adcebbdc56a01a6f1e) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_3_=801=_20-7-99_spanish.bin",  0x000001, 0x100000, CRC(3163f25d) SHA1(ea2336f2381de1680046c70f217c398d1229f11f) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_4_=801=_20-7-99_spanish.bin",  0x000000, 0x100000, CRC(e741a046) SHA1(8b65205c1d55dfca953e3626d151cb28ba1b2dfc) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
-	ROM_LOAD( "p521_v12_rwof_bet_sound_(801)_20-7-99_spanish.bin",  0x00000, 0x100000, CRC(a9bda811) SHA1(c5a9aa83bba4bed00f4b23f17b82100c94e2889c) )
+	ROM_LOAD( "p521_v12_rwof_bet_sound_=801=_20-7-99_spanish.bin",  0x00000, 0x100000, CRC(a9bda811) SHA1(c5a9aa83bba4bed00f4b23f17b82100c94e2889c) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "palce22v10h25.u11",  0x0000, 0x0200, NO_DUMP )
@@ -874,11 +880,11 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(coinmvga_state,colorama)
+void coinmvga_state::init_colorama()
 {
 }
 
-DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
+void coinmvga_state::init_cmrltv75()
 {
 }
 
@@ -887,9 +893,9 @@ DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                    FULLNAME                                       FLAGS
-GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY                    FULLNAME                                       FLAGS
+GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, init_cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

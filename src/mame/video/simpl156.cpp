@@ -19,9 +19,9 @@ void simpl156_state::video_start()
 	memset(m_spriteram.get(), 0xff, 0x2000);
 
 	/* and register the allocated ram so that save states still work */
-	save_pointer(NAME(m_pf1_rowscroll.get()), 0x800/2);
-	save_pointer(NAME(m_pf2_rowscroll.get()), 0x800/2);
-	save_pointer(NAME(m_spriteram.get()), 0x2000/2);
+	save_pointer(NAME(m_pf1_rowscroll), 0x800/2);
+	save_pointer(NAME(m_pf2_rowscroll), 0x800/2);
+	save_pointer(NAME(m_spriteram), 0x2000/2);
 }
 
 uint32_t simpl156_state::screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

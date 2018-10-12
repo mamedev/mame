@@ -81,6 +81,7 @@ ________________________|___________________________
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -108,6 +109,11 @@ public:
 		m_layer = 0;
 	}
 
+	void flipjack(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<hd6845_device> m_crtc;
@@ -127,13 +133,11 @@ public:
 	DECLARE_WRITE8_MEMBER(flipjack_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(flipjack_bank_w);
 	DECLARE_WRITE8_MEMBER(flipjack_layer_w);
-	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
 	DECLARE_READ8_MEMBER(flipjack_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(flipjack_portc_w);
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(flipjack);
 	uint32_t screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void flipjack(machine_config &config);
 	void flipjack_main_io_map(address_map &map);
 	void flipjack_main_map(address_map &map);
 	void flipjack_sound_io_map(address_map &map);
@@ -301,45 +305,49 @@ WRITE8_MEMBER(flipjack_state::flipjack_portc_w)
 INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
 {
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-ADDRESS_MAP_START(flipjack_state::flipjack_main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(flipjack_soundlatch_w)
-	AM_RANGE(0x7010, 0x7010) AM_DEVWRITE("crtc", hd6845_device, address_w)
-	AM_RANGE(0x7011, 0x7011) AM_DEVWRITE("crtc", hd6845_device, register_w)
-	AM_RANGE(0x7020, 0x7020) AM_READ_PORT("DSW")
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(flipjack_layer_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("cram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("fb_ram")
-ADDRESS_MAP_END
+void flipjack_state::flipjack_main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x67ff).ram();
+	map(0x6800, 0x6803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7000, 0x7000).w(FUNC(flipjack_state::flipjack_soundlatch_w));
+	map(0x7010, 0x7010).w(m_crtc, FUNC(hd6845_device::address_w));
+	map(0x7011, 0x7011).w(m_crtc, FUNC(hd6845_device::register_w));
+	map(0x7020, 0x7020).portr("DSW");
+	map(0x7800, 0x7800).w(FUNC(flipjack_state::flipjack_layer_w));
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xbfff).ram().share("cram");
+	map(0xc000, 0xdfff).ram().share("vram");
+	map(0xe000, 0xffff).ram().share("fb_ram");
+}
 
-ADDRESS_MAP_START(flipjack_state::flipjack_main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xff, 0xff) AM_WRITE(flipjack_bank_w)
-ADDRESS_MAP_END
+void flipjack_state::flipjack_main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xff, 0xff).w(FUNC(flipjack_state::flipjack_bank_w));
+}
 
-ADDRESS_MAP_START(flipjack_state::flipjack_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-ADDRESS_MAP_END
+void flipjack_state::flipjack_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x8000, 0x8000).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xa000, 0xa000).w("ay1", FUNC(ay8910_device::address_w));
+}
 
-ADDRESS_MAP_START(flipjack_state::flipjack_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(flipjack_sound_nmi_ack_w)
-ADDRESS_MAP_END
+void flipjack_state::flipjack_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(flipjack_state::flipjack_sound_nmi_ack_w));
+}
 
 
 /***************************************************************************
@@ -422,7 +430,7 @@ static const gfx_layout tilelayout =
 	8*8
 };
 
-static GFXDECODE_START( flipjack )
+static GFXDECODE_START( gfx_flipjack )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 64 )
 GFXDECODE_END
 
@@ -443,21 +451,21 @@ void flipjack_state::machine_start()
 MACHINE_CONFIG_START(flipjack_state::flipjack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(flipjack_main_map)
-	MCFG_CPU_IO_MAP(flipjack_main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flipjack_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(flipjack_main_map)
+	MCFG_DEVICE_IO_MAP(flipjack_main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flipjack_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(flipjack_sound_map)
-	MCFG_CPU_IO_MAP(flipjack_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flipjack_state,  nmi_line_assert)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(flipjack_sound_map)
+	MCFG_DEVICE_IO_MAP(flipjack_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flipjack_state,  nmi_line_assert)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(flipjack_state, flipjack_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("P1");
+	ppi.in_pb_callback().set_ioport("P2");
+	ppi.in_pc_callback().set_ioport("P3");
+	ppi.out_pc_callback().set(FUNC(flipjack_state::flipjack_portc_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -468,19 +476,19 @@ MACHINE_CONFIG_START(flipjack_state::flipjack)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flipjack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flipjack)
 
 	MCFG_PALETTE_ADD("palette", 128+8)
 	MCFG_PALETTE_INIT_OWNER(flipjack_state, flipjack)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(flipjack_state, flipjack_soundlatch_r))  /* Port A read */
+	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, flipjack_state, flipjack_soundlatch_r))  /* Port A read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -508,4 +516,4 @@ ROM_START( flipjack )
 ROM_END
 
 
-GAME( 1983?, flipjack,   0,      flipjack, flipjack, flipjack_state, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983
+GAME( 1983?, flipjack, 0, flipjack, flipjack, flipjack_state, empty_init, ROT90, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983

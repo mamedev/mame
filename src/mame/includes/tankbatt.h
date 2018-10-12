@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
+
 #include "sound/samples.h"
+#include "emupal.h"
+
 class tankbatt_state : public driver_device
 {
 public:
@@ -13,6 +16,11 @@ public:
 		m_bulletsram(*this, "bulletsram"),
 		m_videoram(*this, "videoram") { }
 
+	void tankbatt(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -25,8 +33,6 @@ public:
 	int m_sound_enable;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE_LINE_MEMBER(led0_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
 	DECLARE_READ8_MEMBER(in0_r);
 	DECLARE_READ8_MEMBER(in1_r);
 	DECLARE_READ8_MEMBER(dsw_r);
@@ -40,9 +46,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coinlockout_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 
-
 	INTERRUPT_GEN_MEMBER(interrupt);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -52,6 +56,5 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tankbatt(machine_config &config);
 	void main_map(address_map &map);
 };

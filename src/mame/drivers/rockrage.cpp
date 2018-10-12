@@ -61,10 +61,10 @@ Notes:
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(rockrage_state::rockrage_interrupt)
+WRITE_LINE_MEMBER(rockrage_state::vblank_irq)
 {
-	if (m_k007342->is_int_enabled())
-		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+	if (state && m_k007342->is_int_enabled())
+		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
@@ -97,40 +97,43 @@ WRITE8_MEMBER(rockrage_state::rockrage_speech_w)
 	m_vlm->st((data >> 0) & 0x01);
 }
 
-ADDRESS_MAP_START(rockrage_state::rockrage_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)                    /* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)                    /* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)  /* Scroll RAM */
-	AM_RANGE(0x2400, 0x247f) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_device, vreg_w)                          /* Video Registers */
-	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")
-	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")
-	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(rockrage_sh_irqtrigger_w)                 /* cause interrupt on audio CPU */
-	AM_RANGE(0x2ec0, 0x2ec0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x2f00, 0x2f00) AM_WRITE(rockrage_vreg_w)                          /* ??? */
-	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(rockrage_bankswitch_w)                    /* bankswitch control */
-	AM_RANGE(0x4000, 0x5fff) AM_RAM                                             /* RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")                              /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
-ADDRESS_MAP_END
+void rockrage_state::rockrage_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(m_k007342, FUNC(k007342_device::read), FUNC(k007342_device::write));                    /* Color RAM + Video RAM */
+	map(0x2000, 0x21ff).rw(m_k007420, FUNC(k007420_device::read), FUNC(k007420_device::write));                    /* Sprite RAM */
+	map(0x2200, 0x23ff).rw(m_k007342, FUNC(k007342_device::scroll_r), FUNC(k007342_device::scroll_w));  /* Scroll RAM */
+	map(0x2400, 0x247f).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0x2600, 0x2607).w(m_k007342, FUNC(k007342_device::vreg_w));                          /* Video Registers */
+	map(0x2e00, 0x2e00).portr("SYSTEM");
+	map(0x2e01, 0x2e01).portr("P1");
+	map(0x2e02, 0x2e02).portr("P2");
+	map(0x2e03, 0x2e03).portr("DSW2");
+	map(0x2e40, 0x2e40).portr("DSW1");
+	map(0x2e80, 0x2e80).w(FUNC(rockrage_state::rockrage_sh_irqtrigger_w));                 /* cause interrupt on audio CPU */
+	map(0x2ec0, 0x2ec0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x2f00, 0x2f00).w(FUNC(rockrage_state::rockrage_vreg_w));                          /* ??? */
+	map(0x2f40, 0x2f40).w(FUNC(rockrage_state::rockrage_bankswitch_w));                    /* bankswitch control */
+	map(0x4000, 0x5fff).ram();                                             /* RAM */
+	map(0x6000, 0x7fff).bankr("rombank");                              /* banked ROM */
+	map(0x8000, 0xffff).rom();                                             /* ROM */
+}
 
-ADDRESS_MAP_START(rockrage_state::rockrage_sound_map)
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("vlm", vlm5030_device, data_w)              /* VLM5030 */
-	AM_RANGE(0x3000, 0x3000) AM_READ(rockrage_VLM5030_busy_r)           /* VLM5030 */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(rockrage_speech_w)                /* VLM5030 */
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)         /* YM 2151 */
-	AM_RANGE(0x7000, 0x77ff) AM_RAM                                             /* RAM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
-ADDRESS_MAP_END
+void rockrage_state::rockrage_sound_map(address_map &map)
+{
+	map(0x2000, 0x2000).w(m_vlm, FUNC(vlm5030_device::data_w));              /* VLM5030 */
+	map(0x3000, 0x3000).r(FUNC(rockrage_state::rockrage_VLM5030_busy_r));           /* VLM5030 */
+	map(0x4000, 0x4000).w(FUNC(rockrage_state::rockrage_speech_w));                /* VLM5030 */
+	map(0x5000, 0x5000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x6000, 0x6001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));         /* YM 2151 */
+	map(0x7000, 0x77ff).ram();                                             /* RAM */
+	map(0x8000, 0xffff).rom();                                             /* ROM */
+}
 
-ADDRESS_MAP_START(rockrage_state::rockrage_vlm_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void rockrage_state::rockrage_vlm_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x7fff).rom();
+}
 
 /***************************************************************************
 
@@ -220,7 +223,7 @@ static const gfx_layout spritelayout =
 	32*8            /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( rockrage )
+static GFXDECODE_START( gfx_rockrage )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 32 )  /* colors 00..31, using 2 lookup tables */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 512, 16 )  /* colors 32..47, using lookup table */
 GFXDECODE_END
@@ -248,14 +251,13 @@ void rockrage_state::machine_reset()
 MACHINE_CONFIG_START(rockrage_state::rockrage)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(rockrage_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rockrage_state,  rockrage_interrupt)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(rockrage_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(24'000'000) / 16)
-	MCFG_CPU_PROGRAM_MAP(rockrage_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(24'000'000) / 16)
+	MCFG_DEVICE_PROGRAM_MAP(rockrage_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -265,6 +267,7 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rockrage_state, screen_update_rockrage)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rockrage_state, vblank_irq))
 
 	MCFG_K007342_ADD("k007342")
 	MCFG_K007342_GFXNUM(0)
@@ -276,7 +279,7 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_K007420_CALLBACK_OWNER(rockrage_state, rockrage_sprite_callback)
 	MCFG_K007420_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rockrage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rockrage)
 	MCFG_PALETTE_ADD("palette", 16*16*3)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -284,15 +287,16 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_PALETTE_INIT_OWNER(rockrage_state, rockrage)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
+	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
 	MCFG_DEVICE_ADDRESS_MAP(0, rockrage_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
@@ -391,6 +395,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1986, rockrage,  0,        rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragea, rockrage, rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragej, rockrage, rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockrage,  0,        rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragea, rockrage, rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragej, rockrage, rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )

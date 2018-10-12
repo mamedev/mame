@@ -30,7 +30,7 @@ TODO:
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(MACHINE_CDISLAVE, cdislave_device, "cdislave", "CDISLAVE")
+DEFINE_DEVICE_TYPE(CDI_SLAVE, cdislave_device, "cdislave", "CD-i Mono-I Slave")
 
 
 #if ENABLE_VERBOSE_LOG
@@ -56,11 +56,9 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 
 TIMER_CALLBACK_MEMBER( cdislave_device::trigger_readback_int )
 {
-	cdi_state *state = machine().driver_data<cdi_state>();
-
 	verboselog(*this, 0, "%s", "Asserting IRQ2\n" );
-	state->m_maincpu->set_input_line_vector(M68K_IRQ_2, 26);
-	state->m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
+	m_maincpu->set_input_line_vector(M68K_IRQ_2, 26);
+	m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	m_interrupt_timer->adjust(attotime::never);
 }
 
@@ -79,11 +77,9 @@ void cdislave_device::prepare_readback(const attotime &delay, uint8_t channel, u
 
 void cdislave_device::perform_mouse_update()
 {
-	cdi_state *state = machine().driver_data<cdi_state>();
-
-	uint16_t x = state->m_mousex->read();
-	uint16_t y = state->m_mousey->read();
-	uint8_t buttons = state->m_mousebtn->read();
+	uint16_t x = m_mousex->read();
+	uint16_t y = m_mousey->read();
+	uint8_t buttons = m_mousebtn->read();
 
 	uint16_t old_mouse_x = m_real_mouse_x;
 	uint16_t old_mouse_y = m_real_mouse_y;
@@ -124,10 +120,26 @@ INPUT_CHANGED_MEMBER( cdislave_device::mouse_update )
 	perform_mouse_update();
 }
 
+static INPUT_PORTS_START(cdislave_mouse)
+	PORT_START("MOUSEX")
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_device, mouse_update, 0)
+
+	PORT_START("MOUSEY")
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_device, mouse_update, 0)
+
+	PORT_START("MOUSEBTN")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_device, mouse_update, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_device, mouse_update, 0)
+	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+ioport_constructor cdislave_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(cdislave_mouse);
+}
+
 READ16_MEMBER( cdislave_device::slave_r )
 {
-	cdi_state *state = machine().driver_data<cdi_state>();
-
 	if(m_channel[offset].m_out_count)
 	{
 		uint8_t ret = m_channel[offset].m_out_buf[m_channel[offset].m_out_index];
@@ -143,7 +155,7 @@ READ16_MEMBER( cdislave_device::slave_r )
 				case 0xf4:
 				case 0xf7:
 					verboselog(*this, 0, "%s", "slave_r: De-asserting IRQ2\n" );
-					state->m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+					m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 					break;
 			}
 		}
@@ -181,8 +193,6 @@ void cdislave_device::set_mouse_position()
 
 WRITE16_MEMBER( cdislave_device::slave_w )
 {
-	cdi_state *state = machine().driver_data<cdi_state>();
-
 	switch(offset)
 	{
 		case 0:
@@ -302,14 +312,16 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 				{
 					case 0x82: // Mute Audio
 						verboselog(*this, 0, "slave_w: Channel %d: Mute Audio (0x82)\n", offset );
-						dmadac_enable(&state->m_dmadac[0], 2, 0);
+						m_dmadac[0]->enable(0);
+						m_dmadac[1]->enable(0);
 						m_in_index = 0;
 						m_in_count = 0;
 						//cdic->audio_sample_timer->adjust(attotime::never);
 						break;
 					case 0x83: // Unmute Audio
 						verboselog(*this, 0, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset );
-						dmadac_enable(&state->m_dmadac[0], 2, 1);
+						m_dmadac[0]->enable(1);
+						m_dmadac[1]->enable(1);
 						m_in_index = 0;
 						m_in_count = 0;
 						break;
@@ -421,7 +433,12 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 //-------------------------------------------------
 
 cdislave_device::cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MACHINE_CDISLAVE, tag, owner, clock)
+	: device_t(mconfig, CDI_SLAVE, tag, owner, clock)
+	, m_maincpu(*this, ":maincpu")
+	, m_dmadac(*this, ":dac%u", 1U)
+	, m_mousex(*this, "MOUSEX")
+	, m_mousey(*this, "MOUSEY")
+	, m_mousebtn(*this, "MOUSEBTN")
 {
 }
 

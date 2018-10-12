@@ -24,7 +24,7 @@
 	downcast<atari_motion_objects_device &>(*device).set_config(_config);
 
 #define MCFG_ATARI_MOTION_OBJECTS_GFXDECODE(_gfxtag) \
-	downcast<atari_motion_objects_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<atari_motion_objects_device &>(*device).set_gfxdecode(_gfxtag);
 
 
 //**************************************************************************
@@ -86,7 +86,7 @@ public:
 	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_config(const atari_motion_objects_config &config) { static_cast<atari_motion_objects_config &>(*this) = config; }
 
 	// getters

@@ -15,23 +15,25 @@ FLOPPY_FORMATS_MEMBER( jasmin_device::floppy_formats )
 	FLOPPY_ORIC_DSK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( jasmin_floppies )
-	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
-SLOT_INTERFACE_END
+static void jasmin_floppies(device_slot_interface &device)
+{
+	device.option_add("3dsdd", FLOPPY_3_DSDD);
+}
 
 INPUT_PORTS_START( jasmin )
 	PORT_START("JASMIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, jasmin_device, boot_pressed, nullptr)
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(jasmin_device::map)
-	AM_RANGE(0x3f4, 0x3f7) AM_DEVREADWRITE("fdc", wd1770_device, read, write)
-	AM_RANGE(0x3f8, 0x3f8) AM_WRITE(side_sel_w)
-	AM_RANGE(0x3f9, 0x3f9) AM_WRITE(fdc_reset_w)
-	AM_RANGE(0x3fa, 0x3fa) AM_WRITE(ram_access_w)
-	AM_RANGE(0x3fb, 0x3fb) AM_WRITE(rom_access_w)
-	AM_RANGE(0x3fc, 0x3ff) AM_WRITE(select_w)
-ADDRESS_MAP_END
+void jasmin_device::map(address_map &map)
+{
+	map(0x3f4, 0x3f7).rw("fdc", FUNC(wd1770_device::read), FUNC(wd1770_device::write));
+	map(0x3f8, 0x3f8).w(FUNC(jasmin_device::side_sel_w));
+	map(0x3f9, 0x3f9).w(FUNC(jasmin_device::fdc_reset_w));
+	map(0x3fa, 0x3fa).w(FUNC(jasmin_device::ram_access_w));
+	map(0x3fb, 0x3fb).w(FUNC(jasmin_device::rom_access_w));
+	map(0x3fc, 0x3ff).w(FUNC(jasmin_device::select_w));
+}
 
 jasmin_device::jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	oricext_device(mconfig, JASMIN, tag, owner, clock),
@@ -70,15 +72,16 @@ const tiny_rom_entry *jasmin_device::device_rom_region() const
 	return ROM_NAME( jasmin );
 }
 
-MACHINE_CONFIG_START(jasmin_device::device_add_mconfig)
-	MCFG_WD1770_ADD("fdc", XTAL(8'000'000))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(oricext_device, irq_w))
+void jasmin_device::device_add_mconfig(machine_config &config)
+{
+	WD1770(config, fdc, 8_MHz_XTAL);
+	fdc->drq_wr_callback().set(FUNC(oricext_device::irq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", jasmin_floppies, nullptr, jasmin_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", jasmin_floppies, nullptr, jasmin_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", jasmin_floppies, nullptr, jasmin_device::floppy_formats);
+}
 
 ioport_constructor jasmin_device::device_input_ports() const
 {

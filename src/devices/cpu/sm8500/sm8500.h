@@ -6,10 +6,10 @@
 #pragma once
 
 #define MCFG_SM8500_DMA_CB(_devcb) \
-	devcb = &downcast<sm8500_cpu_device &>(*device).set_dma_cb(DEVCB_##_devcb);
+	downcast<sm8500_cpu_device &>(*device).set_dma_cb(DEVCB_##_devcb);
 
 #define MCFG_SM8500_TIMER_CB(_devcb) \
-	devcb = &downcast<sm8500_cpu_device &>(*device).set_timer_cb(DEVCB_##_devcb);
+	downcast<sm8500_cpu_device &>(*device).set_timer_cb(DEVCB_##_devcb);
 
 enum
 {
@@ -74,7 +74,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	inline void get_sp();
 	uint8_t mem_readbyte(uint32_t offset) const;

@@ -68,21 +68,18 @@ public:
 	{
 	}
 
+	void ramtek(machine_config &config);
+
+private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-
-	void ramtek(machine_config &config);
-protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-
-private:
-
 };
 
 
@@ -243,10 +240,10 @@ ROM_START( trivia )
 	ROM_LOAD( "550548.e3",      0x0000, 0x0020, CRC(2b7c6a5e) SHA1(943cc3901c651bfe5bf11a40c27801952731b6de) )
 ROM_END
 
-GAME( 1973, vollyrmt,  0, ramtek, 0, ramtek_state,  0, ROT0, "Ramtek", "Volly (Ramtek) [TTL]",    MACHINE_IS_SKELETON )
-GAME( 1973, hockyrmt,  0, ramtek, 0, ramtek_state,  0, ROT0, "Ramtek", "Hockey (Ramtek) [TTL]",   MACHINE_IS_SKELETON )
-GAME( 1973, soccrrmt,  0, ramtek, 0, ramtek_state,  0, ROT0, "Ramtek", "Soccer (Ramtek) [TTL]",   MACHINE_IS_SKELETON )
-GAME( 1974, wipeormt,  0, ramtek, 0, ramtek_state,  0, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]",  MACHINE_IS_SKELETON )
-GAME( 1974, cleanswp,  0, ramtek, 0, ramtek_state,  0, ROT0, "Ramtek", "Clean Sweep [TTL]",       MACHINE_IS_SKELETON )
-GAME( 1974, bballrmt,  0, ramtek, 0, ramtek_state,  0, ROT0, "Ramtek", "Baseball (Ramtek) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1975, trivia,    0, ramtek, 0, ramtek_state,  0, ROT0, "Ramtek", "Trivia (Rev B) [TTL]",    MACHINE_IS_SKELETON )
+GAME( 1973, vollyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Volly (Ramtek) [TTL]",    MACHINE_IS_SKELETON )
+GAME( 1973, hockyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Hockey (Ramtek) [TTL]",   MACHINE_IS_SKELETON )
+GAME( 1973, soccrrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Soccer (Ramtek) [TTL]",   MACHINE_IS_SKELETON )
+GAME( 1974, wipeormt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]",  MACHINE_IS_SKELETON )
+GAME( 1974, cleanswp,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Clean Sweep [TTL]",       MACHINE_IS_SKELETON )
+GAME( 1974, bballrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Baseball (Ramtek) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1975, trivia,    0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Trivia (Rev B) [TTL]",    MACHINE_IS_SKELETON )

@@ -42,6 +42,7 @@
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
@@ -56,17 +57,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_speaker(*this, "speaker"),
 		m_fdc(*this, "upd765"),
+		m_floppy(*this, "upd765:%u", 0U),
 		m_ram(*this, RAM_TAG),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
-	uint8_t m_rom_page;
-	uint32_t m_vdisk_addr;
-	uint8_t m_key_code;
-	uint8_t m_keyboard_clk;
-	uint8_t m_video_mode;
-	uint8_t m_tick50_mark;
-	uint8_t m_floppy_ctrl;
+	void pyl601(machine_config &config);
+	void pyl601a(machine_config &config);
+	void init_pyl601();
+
+private:
 	DECLARE_READ8_MEMBER(rom_page_r);
 	DECLARE_WRITE8_MEMBER(rom_page_w);
 	DECLARE_WRITE8_MEMBER(vdisk_page_w);
@@ -86,19 +86,27 @@ public:
 	MC6845_UPDATE_ROW(pyl601_update_row);
 	MC6845_UPDATE_ROW(pyl601a_update_row);
 	uint8_t selectedline(uint16_t data);
-	required_device<speaker_sound_device> m_speaker;
-	required_device<upd765a_device> m_fdc;
-	required_device<ram_device> m_ram;
-	DECLARE_DRIVER_INIT(pyl601);
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	void pyl601_mem(address_map &map);
+
+	uint8_t m_rom_page;
+	uint32_t m_vdisk_addr;
+	uint8_t m_key_code;
+	uint8_t m_keyboard_clk;
+	uint8_t m_video_mode;
+	uint8_t m_tick50_mark;
+	uint8_t m_floppy_ctrl;
+
+	required_device<speaker_sound_device> m_speaker;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	void pyl601(machine_config &config);
-	void pyl601a(machine_config &config);
-	void pyl601_mem(address_map &map);
 };
 
 
@@ -240,7 +248,7 @@ WRITE8_MEMBER(pyl601_state::floppy_w)
 		//reset
 		m_fdc->reset();
 
-	floppy_image_device *floppy = machine().device<floppy_connector>(BIT(data,2) ? "upd765:1" : "upd765:0")->get_device();
+	floppy_image_device *floppy = m_floppy[BIT(data, 2)]->get_device();
 	if(floppy)
 		floppy->mon_w(!BIT(data, 3));
 
@@ -254,29 +262,30 @@ READ8_MEMBER(pyl601_state::floppy_r)
 	return m_floppy_ctrl;
 }
 
-ADDRESS_MAP_START(pyl601_state::pyl601_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xbfff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0xc000, 0xdfff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0xe000, 0xe5ff ) AM_RAMBANK("bank3")
-	AM_RANGE( 0xe600, 0xe600 ) AM_MIRROR(4) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE( 0xe601, 0xe601 ) AM_MIRROR(4) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE( 0xe628, 0xe628 ) AM_READ(keyboard_r)
-	AM_RANGE( 0xe629, 0xe629 ) AM_READWRITE(video_mode_r,video_mode_w)
-	AM_RANGE( 0xe62a, 0xe62a ) AM_READWRITE(keycheck_r,led_w)
-	AM_RANGE( 0xe62b, 0xe62b ) AM_READWRITE(timer_r,speaker_w)
-	AM_RANGE( 0xe62d, 0xe62d ) AM_READ(video_mode_r)
-	AM_RANGE( 0xe62e, 0xe62e ) AM_READWRITE(keycheck_r,led_w)
-	AM_RANGE( 0xe680, 0xe680 ) AM_WRITE(vdisk_page_w)
-	AM_RANGE( 0xe681, 0xe681 ) AM_WRITE(vdisk_h_w)
-	AM_RANGE( 0xe682, 0xe682 ) AM_WRITE(vdisk_l_w)
-	AM_RANGE( 0xe683, 0xe683 ) AM_READWRITE(vdisk_data_r,vdisk_data_w)
-	AM_RANGE( 0xe6c0, 0xe6c0 ) AM_READWRITE(floppy_r, floppy_w)
-	AM_RANGE( 0xe6d0, 0xe6d1 ) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE( 0xe6f0, 0xe6f0 ) AM_READWRITE(rom_page_r, rom_page_w)
-	AM_RANGE( 0xe700, 0xefff ) AM_RAMBANK("bank4")
-	AM_RANGE( 0xf000, 0xffff ) AM_READ_BANK("bank5") AM_WRITE_BANK("bank6")
-ADDRESS_MAP_END
+void pyl601_state::pyl601_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).bankrw("bank1");
+	map(0xc000, 0xdfff).bankrw("bank2");
+	map(0xe000, 0xe5ff).bankrw("bank3");
+	map(0xe600, 0xe600).mirror(4).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xe601, 0xe601).mirror(4).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xe628, 0xe628).r(FUNC(pyl601_state::keyboard_r));
+	map(0xe629, 0xe629).rw(FUNC(pyl601_state::video_mode_r), FUNC(pyl601_state::video_mode_w));
+	map(0xe62a, 0xe62a).rw(FUNC(pyl601_state::keycheck_r), FUNC(pyl601_state::led_w));
+	map(0xe62b, 0xe62b).rw(FUNC(pyl601_state::timer_r), FUNC(pyl601_state::speaker_w));
+	map(0xe62d, 0xe62d).r(FUNC(pyl601_state::video_mode_r));
+	map(0xe62e, 0xe62e).rw(FUNC(pyl601_state::keycheck_r), FUNC(pyl601_state::led_w));
+	map(0xe680, 0xe680).w(FUNC(pyl601_state::vdisk_page_w));
+	map(0xe681, 0xe681).w(FUNC(pyl601_state::vdisk_h_w));
+	map(0xe682, 0xe682).w(FUNC(pyl601_state::vdisk_l_w));
+	map(0xe683, 0xe683).rw(FUNC(pyl601_state::vdisk_data_r), FUNC(pyl601_state::vdisk_data_w));
+	map(0xe6c0, 0xe6c0).rw(FUNC(pyl601_state::floppy_r), FUNC(pyl601_state::floppy_w));
+	map(0xe6d0, 0xe6d1).m(m_fdc, FUNC(upd765a_device::map));
+	map(0xe6f0, 0xe6f0).rw(FUNC(pyl601_state::rom_page_r), FUNC(pyl601_state::rom_page_w));
+	map(0xe700, 0xefff).bankrw("bank4");
+	map(0xf000, 0xffff).bankr("bank5").bankw("bank6");
+}
 
 /* Input ports */
 /* A small note about natural keyboard mode: Ctrl is mapped to PGUP and the 'Lat/Cyr' key is mapped to PGDOWN */
@@ -478,7 +487,7 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 
 
 
-DRIVER_INIT_MEMBER(pyl601_state,pyl601)
+void pyl601_state::init_pyl601()
 {
 	memset(m_ram->pointer(), 0, 64 * 1024);
 }
@@ -493,9 +502,10 @@ FLOPPY_FORMATS_MEMBER( pyl601_state::floppy_formats )
 	FLOPPY_PYLDIN_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pyl601_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pyl601_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout pyl601_charlayout =
@@ -524,19 +534,19 @@ static const gfx_layout pyl601a_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( pyl601 )
+static GFXDECODE_START( gfx_pyl601 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( pyl601a )
+static GFXDECODE_START( gfx_pyl601a )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601a_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(pyl601_state::pyl601)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6800, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(pyl601_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
+	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pyl601_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -545,12 +555,12 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pyl601)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pyl601)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -559,22 +569,21 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
 	MCFG_MC6845_UPDATE_ROW_CB(pyl601_state, pyl601_update_row)
 
-	MCFG_UPD765A_ADD("upd765", true, true)
+	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("576K") // 64 + 512
+	RAM(config, RAM_TAG).set_default_size("576K"); // 64 + 512
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pyl601_state::pyl601a)
 	pyl601(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(2'000'000))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(2'000'000))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pyl601a)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pyl601a)
 
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(2'000'000))
@@ -627,6 +636,6 @@ ROM_START( pyl601a )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   STATE          INIT    COMPANY             FULLNAME       FLAGS */
-COMP( 1989, pyl601,  0,       0,       pyl601,    pyl601, pyl601_state,  pyl601, "Mikroelektronika", "Pyldin-601",  0 )
-COMP( 1989, pyl601a, pyl601,  0,       pyl601a,   pyl601, pyl601_state,  pyl601, "Mikroelektronika", "Pyldin-601A", 0 )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY             FULLNAME       FLAGS */
+COMP( 1989, pyl601,  0,      0,      pyl601,  pyl601, pyl601_state, init_pyl601, "Mikroelektronika", "Pyldin-601",  0 )
+COMP( 1989, pyl601a, pyl601, 0,      pyl601a, pyl601, pyl601_state, init_pyl601, "Mikroelektronika", "Pyldin-601A", 0 )

@@ -252,6 +252,7 @@ cosmic.cpp
 cps1.cpp
 cps2.cpp
 cps3.cpp
+cpzodiac.cpp
 crbaloon.cpp
 crgolf.cpp
 crimfght.cpp
@@ -266,6 +267,7 @@ cultures.cpp
 cupidon.cpp
 cv1k.cpp
 cvs.cpp
+cwheel.cpp
 cyberbal.cpp
 cybertnk.cpp
 cybstorm.cpp
@@ -312,6 +314,7 @@ divebomb.cpp
 diverboy.cpp
 djboy.cpp
 djmain.cpp
+dkmb.cpp
 dkong.cpp
 dlair.cpp
 dlair2.cpp
@@ -333,12 +336,14 @@ drw80pkr.cpp
 dunhuang.cpp
 dwarfd.cpp
 dynadice.cpp
+dynamoah.cpp
 dynax.cpp
 dynduke.cpp
 ecoinf1.cpp
 ecoinf2.cpp
 ecoinf3.cpp
 ecoinfr.cpp
+efdt.cpp
 egghunt.cpp
 electra.cpp
 embargo.cpp
@@ -428,6 +433,7 @@ galpanic.cpp
 galspnbl.cpp
 gambl186.cpp
 gamecstl.cpp
+gamemasters.cpp
 gameplan.cpp
 gammagic.cpp
 gamtor.cpp
@@ -625,6 +631,7 @@ laz_awetoss.cpp
 laz_ribrac.cpp
 lazercmd.cpp
 lbeach.cpp
+lckydraw.cpp
 legionna.cpp
 leland.cpp
 lemmings.cpp
@@ -642,10 +649,10 @@ looping.cpp
 lordgun.cpp
 lsasquad.cpp
 ltcasino.cpp
-luckybal.cpp
 ltd.cpp
 luckgrln.cpp
 lucky74.cpp
+luckybal.cpp
 lvcards.cpp
 lwings.cpp
 m10.cpp
@@ -684,6 +691,7 @@ mario.cpp
 markham.cpp
 marywu.cpp
 mastboy.cpp
+mastboyo.cpp
 matmania.cpp
 maxaflex.cpp
 maygay1b.cpp
@@ -809,6 +817,8 @@ namcos11.cpp
 namcos12.cpp
 namcos2.cpp
 namcos21.cpp
+namcos21_c67.cpp
+namcos21_de.cpp
 namcos22.cpp
 namcos23.cpp
 namcos86.cpp
@@ -827,7 +837,9 @@ neptunp2.cpp
 news.cpp
 nexus3d.cpp
 nibble.cpp
+nichild.cpp
 nightgal.cpp
+nightmare.cpp
 ninjakd2.cpp
 ninjaw.cpp
 nitedrvr.cpp
@@ -1038,6 +1050,7 @@ segas18.cpp
 segas24.cpp
 segas32.cpp
 segasp.cpp
+segattl.cpp
 segaufo.cpp
 segaxbd.cpp
 segaybd.cpp
@@ -1151,7 +1164,6 @@ stellafr.cpp
 stfight.cpp
 stlforce.cpp
 strkzn.cpp
-strnskil.cpp
 stuntair.cpp
 stv.cpp
 su2000.cpp
@@ -1214,7 +1226,6 @@ tattack.cpp
 taxidriv.cpp
 tbowl.cpp
 tceptor.cpp
-tcl.cpp
 techno.cpp
 tecmo.cpp
 tecmo16.cpp
@@ -1306,8 +1317,10 @@ vendetta.cpp
 vertigo.cpp
 vicdual.cpp
 victory.cpp
+video21.cpp
 videopin.cpp
 videopkr.cpp
+videosaa.cpp
 vigilant.cpp
 vindictr.cpp
 viper.cpp
@@ -1362,6 +1375,7 @@ xtom3d.cpp
 xxmissio.cpp
 xybots.cpp
 xyonix.cpp
+y2.cpp
 yiear.cpp
 yunsun16.cpp
 yunsung8.cpp
@@ -1397,6 +1411,11 @@ zwackery.cpp
 -jaguarcd
 //neogeo.cpp
 -aes
+-ng_mv1
+-ng_mv1f
+-ng_mv1fz
+-ng_mv2f
+-ng_mv4f
 //saturn.cpp
 -saturn
 -saturnjp

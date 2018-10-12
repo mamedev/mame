@@ -192,14 +192,15 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(crbaloon_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 is not decoded */
-	AM_RANGE(0x0000, 0x3fff) AM_ROM     /* not fully populated */
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x5800, 0x7fff) AM_NOP
-ADDRESS_MAP_END
+void crbaloon_state::main_map(address_map &map)
+{
+	map.global_mask(0x7fff); /* A15 is not decoded */
+	map(0x0000, 0x3fff).rom();     /* not fully populated */
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(crbaloon_state::crbaloon_videoram_w)).share("videoram");
+	map(0x5000, 0x53ff).mirror(0x0400).ram().w(FUNC(crbaloon_state::crbaloon_colorram_w)).share("colorram");
+	map(0x5800, 0x7fff).noprw();
+}
 
 
 
@@ -209,23 +210,24 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(crbaloon_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("DSW0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_SELECT(0x0c) AM_READ(pc3259_r)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
+void crbaloon_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xf);
+	map(0x00, 0x00).mirror(0x0c).portr("DSW0");
+	map(0x01, 0x01).mirror(0x0c).portr("IN0");
+	map(0x02, 0x02).select(0x0c).r(FUNC(crbaloon_state::pc3259_r));
+	map(0x03, 0x03).mirror(0x0c).portr("IN1");
 
-	AM_RANGE(0x00, 0x00) AM_WRITENOP    /* not connected */
-	AM_RANGE(0x01, 0x01) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x02, 0x04) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x05, 0x05) AM_WRITE(crbaloon_audio_set_music_freq)
-	AM_RANGE(0x06, 0x06) AM_WRITE(port_sound_w)
-	AM_RANGE(0x07, 0x0b) AM_WRITE(pc3092_w) AM_SHARE("pc3092_data")
-	AM_RANGE(0x0c, 0x0c) AM_WRITENOP /* MSK - to PC3259 */
-	AM_RANGE(0x0d, 0x0d) AM_WRITENOP /* schematics has it in a box marked "NOT USE" */
-	AM_RANGE(0x0e, 0x0f) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0x00, 0x00).nopw();    /* not connected */
+	map(0x01, 0x01).nopw(); /* watchdog */
+	map(0x02, 0x04).writeonly().share("spriteram");
+	map(0x05, 0x05).w(FUNC(crbaloon_state::crbaloon_audio_set_music_freq));
+	map(0x06, 0x06).w(FUNC(crbaloon_state::port_sound_w));
+	map(0x07, 0x0b).w(FUNC(crbaloon_state::pc3092_w)).share("pc3092_data");
+	map(0x0c, 0x0c).nopw(); /* MSK - to PC3259 */
+	map(0x0d, 0x0d).nopw(); /* schematics has it in a box marked "NOT USE" */
+	map(0x0e, 0x0f).nopw();
+}
 
 
 
@@ -272,7 +274,7 @@ static INPUT_PORTS_START( crbaloon )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DSW1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* PC3259 */
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* PC3259 */
 	PORT_DIPNAME( 0x10, 0x10, "Invulnerability") PORT_DIPLOCATION("SW B:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -293,7 +295,7 @@ static INPUT_PORTS_START( crbaloon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Name Reset")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, crbaloon_state,pc3092_r, nullptr)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, crbaloon_state,pc3092_r, nullptr)
 
 	PORT_START("PC3092")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -323,7 +325,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( crbaloon )
+static GFXDECODE_START( gfx_crbaloon )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -362,14 +364,14 @@ INTERRUPT_GEN_MEMBER(crbaloon_state::vblank_irq)
 MACHINE_CONFIG_START(crbaloon_state::crbaloon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crbaloon_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crbaloon_state,  vblank_irq)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crbaloon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crbaloon)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(crbaloon_state, crbaloon)
 
@@ -436,5 +438,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, crbaloon, 0,        crbaloon, crbaloon, crbaloon_state, 0, ROT90, "Taito Corporation", "Crazy Balloon (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, crbaloon2,crbaloon, crbaloon, crbaloon, crbaloon_state, 0, ROT90, "Taito Corporation", "Crazy Balloon (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, crbaloon,  0,        crbaloon, crbaloon, crbaloon_state, empty_init, ROT90, "Taito Corporation", "Crazy Balloon (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, crbaloon2, crbaloon, crbaloon, crbaloon, crbaloon_state, empty_init, ROT90, "Taito Corporation", "Crazy Balloon (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

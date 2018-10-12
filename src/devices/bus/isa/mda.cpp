@@ -81,7 +81,7 @@ static const gfx_layout pc_8_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( pcmda )
+static GFXDECODE_START( gfx_pcmda )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 1, 1 )
 GFXDECODE_END
@@ -121,13 +121,13 @@ MACHINE_CONFIG_START(isa8_mda_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(isa8_mda_device, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_mda_device, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_mda_device, vsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, isa8_mda_device, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, isa8_mda_device, vsync_changed))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcmda)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcmda)
 
-	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
+	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
+	lpt.irq_handler().set(FUNC(isa8_mda_device::pc_cpu_line));
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -519,7 +519,7 @@ allow this.
 The divder/pixels per 6845 clock is 9 for text mode and 16 for graphics mode.
 */
 
-static GFXDECODE_START( pcherc )
+static GFXDECODE_START( gfx_pcherc )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
 GFXDECODE_END
 
@@ -549,13 +549,13 @@ MACHINE_CONFIG_START(isa8_hercules_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(isa8_hercules_device, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_mda_device, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_mda_device, vsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, isa8_mda_device, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, isa8_mda_device, vsync_changed))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcherc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcherc)
 
-	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
+	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
+	lpt.irq_handler().set(FUNC(isa8_mda_device::pc_cpu_line));
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -767,8 +767,8 @@ MACHINE_CONFIG_START(isa8_ec1840_0002_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(isa8_mda_device, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_mda_device, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_mda_device, vsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, isa8_mda_device, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, isa8_mda_device, vsync_changed))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

@@ -349,34 +349,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::scanline)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(shadfrce_state::shadfrce_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(bg0videoram_w) AM_SHARE("bg0videoram") /* video */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(bg1videoram_w) AM_SHARE("bg1videoram") /* bg 2 */
-	AM_RANGE(0x102800, 0x103fff) AM_RAM
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_SHARE("spvideoram") /* sprites */
-	AM_RANGE(0x180000, 0x187fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(bg0scrollx_w) /* SCROLL X */
-	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(bg0scrolly_w) /* SCROLL Y */
-	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE(bg1scrollx_w) /* SCROLL X */
-	AM_RANGE(0x1c0006, 0x1c0007) AM_WRITE(bg1scrolly_w) /* SCROLL Y */
-	AM_RANGE(0x1c0008, 0x1c0009) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1c000a, 0x1c000b) AM_READNOP AM_WRITE(flip_screen)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1d0000, 0x1d0005) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x1d0006, 0x1d0007) AM_WRITE(irq_w)
-	AM_RANGE(0x1d0008, 0x1d0009) AM_WRITE(scanline_w)
-	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
-	AM_RANGE(0x1d000c, 0x1d000d) AM_WRITE8(screen_brt_w, 0x00ff)
-	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1d0016, 0x1d0017) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x1d0020, 0x1d0027) AM_READ(input_ports_r)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
-ADDRESS_MAP_END
+void shadfrce_state::shadfrce_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x100fff).ram().w(FUNC(shadfrce_state::bg0videoram_w)).share("bg0videoram"); /* video */
+	map(0x101000, 0x101fff).ram();
+	map(0x102000, 0x1027ff).ram().w(FUNC(shadfrce_state::bg1videoram_w)).share("bg1videoram"); /* bg 2 */
+	map(0x102800, 0x103fff).ram();
+	map(0x140000, 0x141fff).ram().w(FUNC(shadfrce_state::fgvideoram_w)).share("fgvideoram");
+	map(0x142000, 0x143fff).ram().share("spvideoram"); /* sprites */
+	map(0x180000, 0x187fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x1c0000, 0x1c0001).w(FUNC(shadfrce_state::bg0scrollx_w)); /* SCROLL X */
+	map(0x1c0002, 0x1c0003).w(FUNC(shadfrce_state::bg0scrolly_w)); /* SCROLL Y */
+	map(0x1c0004, 0x1c0005).w(FUNC(shadfrce_state::bg1scrollx_w)); /* SCROLL X */
+	map(0x1c0006, 0x1c0007).w(FUNC(shadfrce_state::bg1scrolly_w)); /* SCROLL Y */
+	map(0x1c0008, 0x1c0009).nopw(); /* ?? */
+	map(0x1c000a, 0x1c000b).nopr().w(FUNC(shadfrce_state::flip_screen));
+	map(0x1c000c, 0x1c000d).nopw(); /* ?? */
+	map(0x1d0000, 0x1d0005).w(FUNC(shadfrce_state::irq_ack_w));
+	map(0x1d0006, 0x1d0007).w(FUNC(shadfrce_state::irq_w));
+	map(0x1d0008, 0x1d0009).w(FUNC(shadfrce_state::scanline_w));
+	map(0x1d000c, 0x1d000d).nopr();
+	map(0x1d000c, 0x1d000c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1d000d, 0x1d000d).w(FUNC(shadfrce_state::screen_brt_w));
+	map(0x1d0010, 0x1d0011).nopw(); /* ?? */
+	map(0x1d0012, 0x1d0013).nopw(); /* ?? */
+	map(0x1d0014, 0x1d0015).nopw(); /* ?? */
+	map(0x1d0016, 0x1d0017).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x1d0020, 0x1d0027).r(FUNC(shadfrce_state::input_ports_r));
+	map(0x1f0000, 0x1fffff).ram();
+}
 
 /* and the sound cpu */
 
@@ -385,15 +387,16 @@ WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
 	m_oki->set_rom_bank(data & 1);
 }
 
-ADDRESS_MAP_START(shadfrce_state::shadfrce_sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(oki_bankswitch_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void shadfrce_state::shadfrce_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xc801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xd800, 0xd800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xe800, 0xe800).w(FUNC(shadfrce_state::oki_bankswitch_w));
+	map(0xf000, 0xffff).ram();
+}
 
 
 /* Input Ports */
@@ -437,7 +440,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("MISC")  /* Fake IN5 (misc) */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )            /* guess */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )            /* guess */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
 	PORT_BIT( 0xeb, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -524,7 +527,7 @@ static const gfx_layout bg16x16x6_layout =
 	2*16*16
 };
 
-static GFXDECODE_START( shadfrce )
+static GFXDECODE_START( gfx_shadfrce )
 	GFXDECODE_ENTRY( "chars",   0, fg8x8x4_layout,   0x0000, 256 )
 	GFXDECODE_ENTRY( "sprites", 0, sp16x16x5_layout, 0x1000, 128 )
 	GFXDECODE_ENTRY( "tiles",   0, bg16x16x6_layout, 0x2000, 128 )
@@ -534,37 +537,38 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000) / 2)          /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(shadfrce_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)          /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(shadfrce_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shadfrce_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))         /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(shadfrce_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))         /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(shadfrce_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(shadfrce_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shadfrce_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shadfrce)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shadfrce)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))      /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))      /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(13'495'200)/8, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(13'495'200)/8, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -660,6 +664,6 @@ ROM_START( shadfrcej )
 ROM_END
 
 
-GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (World, Version 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (US, Version 2)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (World, Version 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (US, Version 2)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

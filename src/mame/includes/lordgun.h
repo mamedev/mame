@@ -8,6 +8,7 @@
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 struct lordgun_gun_data
@@ -38,6 +39,13 @@ public:
 		m_scroll_x(*this, "scroll_x.%u", 0),
 		m_scroll_y(*this, "scroll_y.%u", 0) { }
 
+	void aliencha(machine_config &config);
+	void lordgun(machine_config &config);
+
+	void init_aliencha();
+	void init_lordgun();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<okim6295_device> m_oki;
@@ -89,9 +97,6 @@ public:
 	DECLARE_WRITE8_MEMBER(aliencha_dip_w);
 	DECLARE_WRITE8_MEMBER(lordgun_okibank_w);
 
-	DECLARE_DRIVER_INIT(aliencha);
-	DECLARE_DRIVER_INIT(lordgun);
-
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
@@ -106,8 +111,6 @@ public:
 	void lorddgun_calc_gun_scr(int i);
 	void lordgun_update_gun(int i);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void aliencha(machine_config &config);
-	void lordgun(machine_config &config);
 	void aliencha_map(address_map &map);
 	void aliencha_soundio_map(address_map &map);
 	void lordgun_map(address_map &map);

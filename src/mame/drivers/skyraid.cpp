@@ -14,7 +14,10 @@ Atari Sky Raider driver
 #include "screen.h"
 #include "speaker.h"
 
-
+void skyraid_state::machine_start()
+{
+	m_led.resolve();
+}
 
 PALETTE_INIT_MEMBER(skyraid_state, skyraid)
 {
@@ -71,23 +74,24 @@ WRITE8_MEMBER(skyraid_state::skyraid_scroll_w)
 }
 
 
-ADDRESS_MAP_START(skyraid_state::skyraid_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x300)
-	AM_RANGE(0x0400, 0x040f) AM_WRITEONLY AM_SHARE("pos_ram")
-	AM_RANGE(0x0800, 0x087f) AM_RAM AM_MIRROR(0x480) AM_SHARE("alpha_num_ram")
-	AM_RANGE(0x1000, 0x1000) AM_READ(skyraid_port_0_r)
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW")
-	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("COIN")
-	AM_RANGE(0x1401, 0x1401) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_SHARE("obj_ram")
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(skyraid_scroll_w)
-	AM_RANGE(0x4400, 0x4400) AM_WRITE(skyraid_sound_w)
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(skyraid_range_w)
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(skyraid_offset_w)
-	AM_RANGE(0x7000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void skyraid_state::skyraid_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().mirror(0x300);
+	map(0x0400, 0x040f).writeonly().share("pos_ram");
+	map(0x0800, 0x087f).ram().mirror(0x480).share("alpha_num_ram");
+	map(0x1000, 0x1000).r(FUNC(skyraid_state::skyraid_port_0_r));
+	map(0x1001, 0x1001).portr("DSW");
+	map(0x1400, 0x1400).portr("COIN");
+	map(0x1401, 0x1401).portr("SYSTEM");
+	map(0x1c00, 0x1c0f).writeonly().share("obj_ram");
+	map(0x4000, 0x4000).w(FUNC(skyraid_state::skyraid_scroll_w));
+	map(0x4400, 0x4400).w(FUNC(skyraid_state::skyraid_sound_w));
+	map(0x4800, 0x4800).w(FUNC(skyraid_state::skyraid_range_w));
+	map(0x5000, 0x5000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x5800, 0x5800).w(FUNC(skyraid_state::skyraid_offset_w));
+	map(0x7000, 0x7fff).rom();
+	map(0xf000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( skyraid )
 	PORT_START("LANGUAGE")
@@ -211,7 +215,7 @@ static const gfx_layout skyraid_missile_layout =
 };
 
 
-static GFXDECODE_START( skyraid )
+static GFXDECODE_START( gfx_skyraid )
 	GFXDECODE_ENTRY( "gfx1", 0, skyraid_text_layout, 18, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, skyraid_sprite_layout, 8, 2 )
 	GFXDECODE_ENTRY( "gfx3", 0, skyraid_missile_layout, 16, 1 )
@@ -221,12 +225,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(skyraid_state::skyraid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 12)
-	MCFG_CPU_PROGRAM_MAP(skyraid_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyraid_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 12)
+	MCFG_DEVICE_PROGRAM_MAP(skyraid_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyraid_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 4)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 4);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -237,16 +240,15 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	MCFG_SCREEN_UPDATE_DRIVER(skyraid_state, screen_update_skyraid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyraid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyraid)
 
 	MCFG_PALETTE_ADD("palette", 20)
 	MCFG_PALETTE_INIT_OWNER(skyraid_state, skyraid)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(skyraid)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, skyraid_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -281,4 +283,4 @@ ROM_START( skyraid )
 ROM_END
 
 
-GAME( 1978, skyraid, 0, skyraid, skyraid, skyraid_state, 0, ORIENTATION_FLIP_Y, "Atari", "Sky Raider", MACHINE_IMPERFECT_COLORS )
+GAME( 1978, skyraid, 0, skyraid, skyraid, skyraid_state, empty_init, ORIENTATION_FLIP_Y, "Atari", "Sky Raider", MACHINE_IMPERFECT_COLORS )

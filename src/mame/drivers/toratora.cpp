@@ -63,6 +63,9 @@ public:
 		m_pia_u2(*this, "pia_u2"),
 		m_pia_u3(*this, "pia_u3") { }
 
+	void toratora(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -93,7 +96,6 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(toratora_timer);
-	void toratora(machine_config &config);
 	void main_map(address_map &map);
 };
 
@@ -199,7 +201,7 @@ INTERRUPT_GEN_MEMBER(toratora_state::toratora_timer)
 	if (m_timer & 0x100)
 		popmessage("watchdog!");
 
-	m_pia_u1->porta_w(ioport("INPUT")->read() & 0x0f);
+	m_pia_u1->write_porta(ioport("INPUT")->read() & 0x0f);
 	m_pia_u1->ca1_w(ioport("INPUT")->read() & 0x10);
 	m_pia_u1->ca2_w(ioport("INPUT")->read() & 0x20);
 }
@@ -316,21 +318,22 @@ WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(toratora_state::main_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x7fff) AM_ROM  /* not fully populated */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xf047) AM_NOP
-	AM_RANGE(0xf048, 0xf049) AM_NOP
-	AM_RANGE(0xf04a, 0xf04a) AM_WRITE(clear_tv_w)   /* the read is mark *LEDEN, but not used */
-	AM_RANGE(0xf04b, 0xf04b) AM_READWRITE(timer_r, clear_timer_w)
-	AM_RANGE(0xf04c, 0xf09f) AM_NOP
-	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE("pia_u1", pia6821_device, read, write)
-	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE("pia_u2", pia6821_device, read, write)
-	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE("pia_u3", pia6821_device, read, write)
-	AM_RANGE(0xf0ac, 0xf7ff) AM_NOP
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void toratora_state::main_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x7fff).rom();  /* not fully populated */
+	map(0x8000, 0x9fff).ram().share("videoram");
+	map(0xa000, 0xf047).noprw();
+	map(0xf048, 0xf049).noprw();
+	map(0xf04a, 0xf04a).w(FUNC(toratora_state::clear_tv_w));   /* the read is mark *LEDEN, but not used */
+	map(0xf04b, 0xf04b).rw(FUNC(toratora_state::timer_r), FUNC(toratora_state::clear_timer_w));
+	map(0xf04c, 0xf09f).noprw();
+	map(0xf0a0, 0xf0a3).rw(m_pia_u1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf0a4, 0xf0a7).rw(m_pia_u2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf0a8, 0xf0ab).rw(m_pia_u3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf0ac, 0xf7ff).noprw();
+	map(0xf800, 0xffff).rom();
+}
 
 
 
@@ -395,26 +398,26 @@ void toratora_state::machine_reset()
 MACHINE_CONFIG_START(toratora_state::toratora)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 5185000 / 8) /* 5.185 MHz XTAL divided by 8 (@ U94.12) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 250) /* timer counting at 250 Hz */
+	MCFG_DEVICE_ADD("maincpu", M6800, 5185000 / 8) /* 5.185 MHz XTAL divided by 8 (@ U94.12) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 250) /* timer counting at 250 Hz */
 
-	MCFG_DEVICE_ADD("pia_u1", PIA6821, 0)
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,port_b_u1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
+	PIA6821(config, m_pia_u1, 0);
+	m_pia_u1->writepb_handler().set(FUNC(toratora_state::port_b_u1_w));
+	m_pia_u1->irqa_handler().set(FUNC(toratora_state::main_cpu_irq));
+	m_pia_u1->irqb_handler().set(FUNC(toratora_state::main_cpu_irq));
 
-	MCFG_DEVICE_ADD("pia_u3", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state, sn1_port_a_u3_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state, sn1_port_b_u3_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state, sn1_ca2_u3_w))
+	PIA6821(config, m_pia_u3, 0);
+	m_pia_u3->writepa_handler().set(FUNC(toratora_state::sn1_port_a_u3_w));
+	m_pia_u3->writepb_handler().set(FUNC(toratora_state::sn1_port_b_u3_w));
+	m_pia_u3->ca2_handler().set(FUNC(toratora_state::sn1_ca2_u3_w));
 
-	MCFG_DEVICE_ADD("pia_u2", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state,sn2_port_a_u2_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,sn2_port_b_u2_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state,sn2_ca2_u2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(toratora_state,cb2_u2_w))
+	PIA6821(config, m_pia_u2, 0);
+	m_pia_u2->readpb_handler().set_ioport("DSW");
+	m_pia_u2->writepa_handler().set(FUNC(toratora_state::sn2_port_a_u2_w));
+	m_pia_u2->writepb_handler().set(FUNC(toratora_state::sn2_port_b_u2_w));
+	m_pia_u2->ca2_handler().set(FUNC(toratora_state::sn2_ca2_u2_w));
+	m_pia_u2->cb2_handler().set(FUNC(toratora_state::cb2_u2_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -425,9 +428,9 @@ MACHINE_CONFIG_START(toratora_state::toratora)
 	MCFG_SCREEN_UPDATE_DRIVER(toratora_state, screen_update_toratora)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76477, 0)
+	MCFG_DEVICE_ADD("sn1", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(470), CAP_P(470)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_M(2))                     // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.2),  RES_K(3.3))  // attack_decay_cap + attack_res
@@ -443,7 +446,7 @@ MACHINE_CONFIG_START(toratora_state::toratora)
 	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76477, 0)
+	MCFG_DEVICE_ADD("sn2", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(470), CAP_P(470)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_M(2))                     // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.2),  RES_K(3.3))  // attack_decay_cap + attack_res
@@ -524,5 +527,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, toratora, 0,        toratora, toratora, toratora_state, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, toratorab,toratora, toratora, toratora, toratora_state, 0, ROT90, "Game Plan", "Tora Tora (set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratora, 0,        toratora, toratora, toratora_state, empty_init, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratorab,toratora, toratora, toratora, toratora_state, empty_init, ROT90, "Game Plan", "Tora Tora (set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

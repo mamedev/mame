@@ -40,6 +40,7 @@ HSync - 15.510kHz
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,6 +55,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ichibanjyan(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
@@ -63,7 +67,6 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ichibanjyan(machine_config &config);
 	void ichibanjyan_io(address_map &map);
 	void ichibanjyan_map(address_map &map);
 };
@@ -78,13 +81,15 @@ uint32_t ichibanjyan_state::screen_update( screen_device &screen, bitmap_ind16 &
 }
 
 
-ADDRESS_MAP_START(ichibanjyan_state::ichibanjyan_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void ichibanjyan_state::ichibanjyan_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(ichibanjyan_state::ichibanjyan_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void ichibanjyan_state::ichibanjyan_io(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 static INPUT_PORTS_START( ichibanjyan )
 INPUT_PORTS_END
@@ -100,7 +105,7 @@ static const gfx_layout charlayout =
 	8*8*8
 };
 
-static GFXDECODE_START( ichibanjyan )
+static GFXDECODE_START( gfx_ichibanjyan )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 1 )
 GFXDECODE_END
@@ -121,9 +126,9 @@ void ichibanjyan_state::machine_reset()
 MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(ichibanjyan_map)
-	MCFG_CPU_IO_MAP(ichibanjyan_io)
+	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(ichibanjyan_map)
+	MCFG_DEVICE_IO_MAP(ichibanjyan_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -134,16 +139,16 @@ MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ichibanjyan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ichibanjyan)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, MAIN_CLOCK/12)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", YM2149, MAIN_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, MAIN_CLOCK/6)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, MAIN_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -170,4 +175,4 @@ ROM_START( ichiban )
 	ROM_LOAD( "mjb.u38", 0x400, 0x200, CRC(0ef881cb) SHA1(44b61a443d683f5cb2d1b1a4f74d8a8f41021de5) )
 ROM_END
 
-GAME( 199?, ichiban,  0,   ichibanjyan,  ichibanjyan, ichibanjyan_state,  0,       ROT0, "Excel",      "Ichi Ban Jyan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, ichiban, 0, ichibanjyan, ichibanjyan, ichibanjyan_state, empty_init, ROT0, "Excel",      "Ichi Ban Jyan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

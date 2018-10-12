@@ -101,7 +101,7 @@ protected:
 DECLARE_DEVICE_TYPE(COMPIS_GRAPHICS_SLOT, compis_graphics_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( compis_graphics_cards );
+void compis_graphics_cards(device_slot_interface &device);
 
 
 #endif // MAME_BUS_COMPIS_GRAPHICS_H

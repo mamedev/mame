@@ -63,23 +63,23 @@ Configuration Settings
 ----------------------
 
 | **gl_glsl**
-| 
+|
 | 	Enables GLSL when set to 1, disabled if set to 0. Defaults to *0*.
-| 
+|
 | **gl_glsl_filter**
-| 
+|
 | 	Enables filtering to GLSL output. Reduces jagginess at the cost of blurriness.
-| 
+|
 | **glsl_shader_mame0**
 |         ...
 | **glsl_shader_mame9**
-| 
+|
 | 	Specifies the shaders to run, in the order from 0 to 9. See your shader pack author for details on which to run in which order for best effect.
-| 
+|
 | **glsl_shader_screen0**
 |         ...
 | **glsl_shader_screen9**
-| 
+|
 | 	Specifies screen to apply the shaders on.
 |
 

@@ -132,48 +132,50 @@ ROM15.BIN       MX29F1610, SOP44 Surface Mounted Mask ROM /
 
 */
 
-WRITE32_MEMBER(silkroad_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
+WRITE8_MEMBER(silkroad_state::okibank_w)
 {
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> (10+16)),pal5bit(m_generic_paletteram_32[offset] >> (5+16)),pal5bit(m_generic_paletteram_32[offset] >> (0+16)));
+	int bank = (data & 0x3);
+	if(bank < 3)
+		m_okibank->set_entry(bank);
 }
 
-WRITE32_MEMBER(silkroad_state::silk_6295_bank_w)
+WRITE8_MEMBER(silkroad_state::coin_w)
 {
-	if (ACCESSING_BITS_24_31)
-	{
-		int bank = (data & 0x3000000) >> 24;
-		if(bank < 3)
-			m_oki1->set_rom_bank(bank);
-	}
+	machine().bookkeeping().coin_counter_w(0, data & 0x1);
+	machine().bookkeeping().coin_counter_w(1, data & 0x8);
 }
 
-WRITE32_MEMBER(silkroad_state::silk_coin_counter_w)
+template<int Layer>
+WRITE32_MEMBER(silkroad_state::vram_w)
 {
-	if (ACCESSING_BITS_16_23)
-	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x10000);
-		machine().bookkeeping().coin_counter_w(1, data & 0x80000);
-	}
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
-ADDRESS_MAP_START(silkroad_state::cpu_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x40c000, 0x40cfff) AM_RAM AM_SHARE("sprram") // sprites
-	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_SHARE("paletteram") // palette
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(silkroad_fgram_w) AM_SHARE("vidram")  // lower Layer
-	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(silkroad_fgram2_w) AM_SHARE("vidram2")  // mid layer
-	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE(silkroad_fgram3_w) AM_SHARE("vidram3") // higher layer
-	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("DSW")
-	AM_RANGE(0xc00024, 0xc00027) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff0000)
-	AM_RANGE(0xc00028, 0xc0002f) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff0000)
-	AM_RANGE(0xc00030, 0xc00033) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff0000)
-	AM_RANGE(0xc00034, 0xc00037) AM_WRITE(silk_6295_bank_w)
-	AM_RANGE(0xc00038, 0xc0003b) AM_WRITE(silk_coin_counter_w)
-	AM_RANGE(0xc0010c, 0xc00123) AM_WRITEONLY AM_SHARE("regs")
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void silkroad_state::cpu_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x40c000, 0x40cfff).ram().share("sprram"); // sprites
+	map(0x600000, 0x603fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0xffff0000).share("palette"); // palette
+	map(0x800000, 0x803fff).ram().w(FUNC(silkroad_state::vram_w<0>)).share("vram1");  // lower Layer
+	map(0x804000, 0x807fff).ram().w(FUNC(silkroad_state::vram_w<1>)).share("vram2");  // mid layer
+	map(0x808000, 0x80bfff).ram().w(FUNC(silkroad_state::vram_w<2>)).share("vram3"); // higher layer
+	map(0xc00000, 0xc00003).portr("INPUTS");
+	map(0xc00004, 0xc00007).portr("DSW");
+	map(0xc00025, 0xc00025).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc00028, 0xc0002f).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x00ff0000);
+	map(0xc00031, 0xc00031).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc00034, 0xc00034).w(FUNC(silkroad_state::okibank_w));
+	map(0xc00039, 0xc00039).w(FUNC(silkroad_state::coin_w));
+	map(0xc0010c, 0xc00123).writeonly().share("regs");
+	map(0xfe0000, 0xffffff).ram();
+}
+
+void silkroad_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 
 static INPUT_PORTS_START( silkroad )
@@ -185,7 +187,7 @@ static INPUT_PORTS_START( silkroad )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SERVICE2 ) /* Not mentioned in the "test mode" */
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SPECIAL )  /* See notes - Stephh*/
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_CUSTOM )  /* See notes - Stephh*/
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )  // this input makes the 020 lock up...- RB
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -252,7 +254,7 @@ static INPUT_PORTS_START( silkroad )
 	PORT_DIPSETTING(          0x80000000, DEF_STR(1C_4C))
 
 //  PORT_START("MISC")  /* Misc inputs */
-//  PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* VBLANK ? */
+//  PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* VBLANK ? */
 //  PORT_BIT( 0xff7f, IP_ACTIVE_LOW, IPT_UNUSED ) /* unknown / unused */
 INPUT_PORTS_END
 
@@ -269,16 +271,21 @@ static const gfx_layout tiles16x16x6_layout =
 	16*32
 };
 
-static GFXDECODE_START( silkroad )
+static GFXDECODE_START( gfx_silkroad )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x6_layout,  0x0000, 256 )
 GFXDECODE_END
+
+void silkroad_state::machine_start()
+{
+	m_okibank->configure_entries(0, 4, memregion("oki1")->base() + 0x20000, 0x20000);
+}
 
 MACHINE_CONFIG_START(silkroad_state::silkroad)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -286,25 +293,28 @@ MACHINE_CONFIG_START(silkroad_state::silkroad)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(6*8+2, 64*8-1-(10*8)-2, 2*8, 32*8-1-(2*8))
-	MCFG_SCREEN_UPDATE_DRIVER(silkroad_state, screen_update_silkroad)
+	MCFG_SCREEN_UPDATE_DRIVER(silkroad_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", silkroad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silkroad)
 	MCFG_PALETTE_ADD("palette", 0x2000)
-
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_MEMBITS(16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/32, PIN7_HIGH) // clock frequency & pin 7 not verified (was 1056000)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified (was 1056000)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified (was 2112000)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified (was 2112000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
 MACHINE_CONFIG_END
@@ -339,20 +349,12 @@ ROM_START( silkroad )
 	ROM_LOAD( "rom11.rom11", 0x0e00000, 0x0200000, CRC(11abaf1c) SHA1(19e86f3ebfec518a96c0520f36cfc1b525e7e55c) ) // 3
 	ROM_LOAD( "rom15.rom15", 0x1600000, 0x0200000, CRC(26a3b168) SHA1(a4b7955cc4d4fbec7c975a9456f2219ef33f1166) ) // 3
 
-	ROM_REGION( 0x080000, "user1", 0 )
-	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
-
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0xc0000, "oki1", 0 ) /* Samples */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0a0000, 0x020000)
+	ROM_REGION( 0x080000, "oki1", 0 )
+	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
 
-	ROM_REGION( 0x080000, "oki2", 0 )
+	ROM_REGION( 0x040000, "oki2", 0 )
 	ROM_LOAD( "rom01.bin", 0x000000, 0x040000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
 ROM_END
 
@@ -375,23 +377,15 @@ ROM_START( silkroada )
 	ROM_LOAD( "rom11.rom11",      0x0e00000, 0x0200000, CRC(11abaf1c) SHA1(19e86f3ebfec518a96c0520f36cfc1b525e7e55c) ) // 3
 	ROM_LOAD( "rom15.rom15",      0x1600000, 0x0200000, CRC(26a3b168) SHA1(a4b7955cc4d4fbec7c975a9456f2219ef33f1166) ) // 3
 
-	ROM_REGION( 0x080000, "user1", 0 )
-	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
-
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0xc0000, "oki1", 0 ) /* Samples */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0a0000, 0x020000)
+	ROM_REGION( 0x080000, "oki1", 0 )
+	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
 
-	ROM_REGION( 0x080000, "oki2", 0 )
+	ROM_REGION( 0x040000, "oki2", 0 )
 	ROM_LOAD( "rom01.bin", 0x000000, 0x040000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
 ROM_END
 
 
-GAME( 1999, silkroad,  0,        silkroad, silkroad, silkroad_state, 0, ROT0, "Unico", "The Legend of Silkroad",               MACHINE_SUPPORTS_SAVE )
-GAME( 1999, silkroada, silkroad, silkroad, silkroad, silkroad_state, 0, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", MACHINE_SUPPORTS_SAVE ) // same content but fewer GFX roms of a larger size
+GAME( 1999, silkroad,  0,        silkroad, silkroad, silkroad_state, empty_init, ROT0, "Unico", "The Legend of Silkroad",               MACHINE_SUPPORTS_SAVE )
+GAME( 1999, silkroada, silkroad, silkroad, silkroad, silkroad_state, empty_init, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", MACHINE_SUPPORTS_SAVE ) // same content but fewer GFX roms of a larger size

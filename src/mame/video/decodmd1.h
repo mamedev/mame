@@ -35,7 +35,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_READ8_MEMBER(ctrl_r);
 	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(status_w);
 	DECLARE_READ8_MEMBER(dmd_port_r);
 	DECLARE_WRITE8_MEMBER(dmd_port_w);
 

@@ -16,7 +16,7 @@
 #include "sound/dac.h"
 #include "video/hd44780.h"
 #include "imagedev/cassette.h"
-#include "rendlay.h"
+#include "emupal.h"
 
 #define MCFG_ALESIS_DM3AG_ADD(_tag,_clock) \
 	MCFG_DEVICE_ADD( _tag, ALESIS_DM3AG, _clock )
@@ -71,10 +71,68 @@ public:
 		m_col5(*this, "COL5"),
 		m_col6(*this, "COL6"),
 		m_select(*this, "SELECT"),
-		m_track_led(*this, "track_led%u", 1U)
+		m_digit(*this, "digit%u", 0U),
+		m_track_led(*this, "track_led%u", 1U),
+		m_patt_led(*this, "patt_led"),
+		m_song_led(*this, "song_led"),
+		m_play_led(*this, "play_led"),
+		m_record_led(*this, "record_led"),
+		m_voice_led(*this, "voice_led"),
+		m_tune_led(*this, "tune_led"),
+		m_mix_led(*this, "mix_led"),
+		m_tempo_led(*this, "tempo_led"),
+		m_midi_led(*this, "midi_led"),
+		m_part_led(*this, "part_led"),
+		m_edit_led(*this, "edit_led"),
+		m_echo_led(*this, "echo_led"),
+		m_loop_led(*this, "loop_led"),
+		m_a_next(*this, "a_next"),
+		m_b_next(*this, "b_next"),
+		m_fill_next(*this, "fill_next"),
+		m_user_next(*this, "user_next"),
+		m_play(*this, "play"),
+		m_record(*this, "record"),
+		m_compose(*this, "compose"),
+		m_perform(*this, "perform"),
+		m_song(*this, "song"),
+		m_b(*this, "b"),
+		m_a(*this, "a"),
+		m_fill(*this, "fill"),
+		m_user(*this, "user"),
+		m_edited(*this, "edited"),
+		m_set(*this, "set"),
+		m_drum(*this, "drum"),
+		m_press_play(*this, "press_play"),
+		m_metronome(*this, "metronome"),
+		m_tempo(*this, "tempo"),
+		m_page(*this, "page"),
+		m_step_edit(*this, "step_edit"),
+		m_swing_off(*this, "swing_off"),
+		m_swing_62(*this, "swing_62"),
+		m_click_l1(*this, "click_l1"),
+		m_click_note(*this, "click_note"),
+		m_click_l2(*this, "click_l2"),
+		m_click_3(*this, "click_3"),
+		m_backup(*this, "backup"),
+		m_drum_set(*this, "drum_set"),
+		m_swing(*this, "swing"),
+		m_swing_58(*this, "swing_58"),
+		m_click_off(*this, "click_off"),
+		m_click(*this, "click"),
+		m_quantize_off(*this, "quantize_off"),
+		m_quantize_3(*this, "quantize_3"),
+		m_midi_setup(*this, "midi_setup"),
+		m_record_setup(*this, "record_setup"),
+		m_quantize(*this, "quantize"),
+		m_swing_54(*this, "swing_54"),
+		m_quantize_l1(*this, "quantize_l1"),
+		m_quantize_l2(*this, "quantize_l2"),
+		m_quantize_l3(*this, "quantize_l3"),
+		m_quantize_note(*this, "quantize_note"),
+		m_setup(*this, "setup")
 	{ }
 
-	DECLARE_DRIVER_INIT(hr16);
+	void init_hr16();
 	void mmt8(machine_config &config);
 	void hr16(machine_config &config);
 	void sr16(machine_config &config);
@@ -111,7 +169,7 @@ private:
 
 	required_device<hd44780_device> m_lcdc;
 	optional_device<cassette_image_device> m_cassette;
-	required_device<cpu_device> m_maincpu;
+	required_device<mcs51_cpu_device> m_maincpu;
 
 	required_ioport m_col1;
 	required_ioport m_col2;
@@ -120,7 +178,65 @@ private:
 	required_ioport m_col5;
 	required_ioport m_col6;
 	optional_ioport m_select;
+	output_finder<5> m_digit;
 	output_finder<8> m_track_led;
+	output_finder<> m_patt_led;
+	output_finder<> m_song_led;
+	output_finder<> m_play_led;
+	output_finder<> m_record_led;
+	output_finder<> m_voice_led;
+	output_finder<> m_tune_led;
+	output_finder<> m_mix_led;
+	output_finder<> m_tempo_led;
+	output_finder<> m_midi_led;
+	output_finder<> m_part_led;
+	output_finder<> m_edit_led;
+	output_finder<> m_echo_led;
+	output_finder<> m_loop_led;
+	output_finder<> m_a_next;
+	output_finder<> m_b_next;
+	output_finder<> m_fill_next;
+	output_finder<> m_user_next;
+	output_finder<> m_play;
+	output_finder<> m_record;
+	output_finder<> m_compose;
+	output_finder<> m_perform;
+	output_finder<> m_song;
+	output_finder<> m_b;
+	output_finder<> m_a;
+	output_finder<> m_fill;
+	output_finder<> m_user;
+	output_finder<> m_edited;
+	output_finder<> m_set;
+	output_finder<> m_drum;
+	output_finder<> m_press_play;
+	output_finder<> m_metronome;
+	output_finder<> m_tempo;
+	output_finder<> m_page;
+	output_finder<> m_step_edit;
+	output_finder<> m_swing_off;
+	output_finder<> m_swing_62;
+	output_finder<> m_click_l1;
+	output_finder<> m_click_note;
+	output_finder<> m_click_l2;
+	output_finder<> m_click_3;
+	output_finder<> m_backup;
+	output_finder<> m_drum_set;
+	output_finder<> m_swing;
+	output_finder<> m_swing_58;
+	output_finder<> m_click_off;
+	output_finder<> m_click;
+	output_finder<> m_quantize_off;
+	output_finder<> m_quantize_3;
+	output_finder<> m_midi_setup;
+	output_finder<> m_record_setup;
+	output_finder<> m_quantize;
+	output_finder<> m_swing_54;
+	output_finder<> m_quantize_l1;
+	output_finder<> m_quantize_l2;
+	output_finder<> m_quantize_l3;
+	output_finder<> m_quantize_note;
+	output_finder<> m_setup;
 };
 
 // device type definition

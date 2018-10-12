@@ -21,24 +21,26 @@
 //     TDO, SBIT, RETN, SETR, REAC, XDA, SAL, RBIT, ..., OFF, SBL, LDP, redir(------00- + R0^BL)
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions
 // - 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
-DEFINE_DEVICE_TYPE(TMS0980, tms0980_cpu_device, "tms0980", "TMS0980") // 28-pin DIP, 9 R pins
+DEFINE_DEVICE_TYPE(TMS0980, tms0980_cpu_device, "tms0980", "Texas Instruments TMS0980") // 28-pin DIP, 9 R pins
 
 // TMS1980 is a TMS0980 with a TMS1x00 style opla
 // - RAM, ROM, and main instructions PLAs is the same as TMS0980
 // - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
 // - 32-term inverted output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
-DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "TMS1980") // 28-pin DIP, 7 O pins, 10 R pins, high voltage
+DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "Texas Instruments TMS1980") // 28-pin DIP, 7 O pins, 10 R pins, high voltage
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms0980_cpu_device::program_11bit_9)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void tms0980_cpu_device::program_11bit_9(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(tms0980_cpu_device::data_144x4)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x70) // DAM
-ADDRESS_MAP_END
+void tms0980_cpu_device::data_144x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+	map(0x80, 0x8f).ram().mirror(0x70); // DAM
+}
 
 
 // device definitions
@@ -85,9 +87,9 @@ MACHINE_CONFIG_END
 
 
 // disasm
-util::disasm_interface *tms0980_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms0980_cpu_device::create_disassembler()
 {
-	return new tms0980_disassembler;
+	return std::make_unique<tms0980_disassembler>();
 }
 
 
@@ -173,7 +175,7 @@ u32 tms0980_cpu_device::read_micro()
 
 void tms0980_cpu_device::read_opcode()
 {
-	debugger_instruction_hook(this, m_rom_address);
+	debugger_instruction_hook(m_rom_address);
 	m_opcode = m_program->read_word(m_rom_address) & 0x1ff;
 	m_c4 = bitswap<8>(m_opcode,7,6,5,4,0,1,2,3) & 0xf; // opcode operand is bitswapped for most opcodes
 

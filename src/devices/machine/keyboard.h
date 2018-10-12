@@ -61,6 +61,7 @@ protected:
 	virtual void key_repeat(u8 row, u8 column);
 	virtual void key_break(u8 row, u8 column);
 	virtual void will_scan_row(u8 row);
+	virtual void scan_complete();
 
 	bool are_all_keys_up();
 

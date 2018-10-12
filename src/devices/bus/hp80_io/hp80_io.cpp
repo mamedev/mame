@@ -145,6 +145,7 @@ WRITE_LINE_MEMBER(hp80_io_card_device::halt_w)
 
 #include "82937.h"
 
-SLOT_INTERFACE_START(hp80_io_slot_devices)
-SLOT_INTERFACE("82937_hpib" , HP82937_IO_CARD)
-SLOT_INTERFACE_END
+void hp80_io_slot_devices(device_slot_interface &device)
+{
+	device.option_add("82937_hpib" , HP82937_IO_CARD);
+}

@@ -338,47 +338,49 @@ WRITE16_MEMBER(macrossp_state::palette_fade_w)
 
 /*** MEMORY MAPS *************************************************************/
 
-ADDRESS_MAP_START(macrossp_state::macrossp_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_SHARE("spriteram")
+void macrossp_state::macrossp_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x800000, 0x802fff).ram().share("spriteram");
 	/* SCR A Layer */
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(macrossp_scra_videoram_w) AM_SHARE("scra_videoram")
-	AM_RANGE(0x904200, 0x9043ff) AM_RAM AM_SHARE("scra_linezoom") /* W/O? */
-	AM_RANGE(0x905000, 0x90500b) AM_RAM AM_SHARE("scra_videoregs") /* W/O? */
+	map(0x900000, 0x903fff).ram().w(FUNC(macrossp_state::macrossp_scra_videoram_w)).share("scra_videoram");
+	map(0x904200, 0x9043ff).ram().share("scra_linezoom"); /* W/O? */
+	map(0x905000, 0x90500b).ram().share("scra_videoregs"); /* W/O? */
 	/* SCR B Layer */
-	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(macrossp_scrb_videoram_w) AM_SHARE("scrb_videoram")
-	AM_RANGE(0x90c200, 0x90c3ff) AM_RAM AM_SHARE("scrb_linezoom") /* W/O? */
-	AM_RANGE(0x90d000, 0x90d00b) AM_RAM AM_SHARE("scrb_videoregs") /* W/O? */
+	map(0x908000, 0x90bfff).ram().w(FUNC(macrossp_state::macrossp_scrb_videoram_w)).share("scrb_videoram");
+	map(0x90c200, 0x90c3ff).ram().share("scrb_linezoom"); /* W/O? */
+	map(0x90d000, 0x90d00b).ram().share("scrb_videoregs"); /* W/O? */
 	/* SCR C Layer */
-	AM_RANGE(0x910000, 0x913fff) AM_RAM_WRITE(macrossp_scrc_videoram_w) AM_SHARE("scrc_videoram")
-	AM_RANGE(0x914200, 0x9143ff) AM_RAM AM_SHARE("scrc_linezoom")/* W/O? */
-	AM_RANGE(0x915000, 0x91500b) AM_RAM AM_SHARE("scrc_videoregs") /* W/O? */
+	map(0x910000, 0x913fff).ram().w(FUNC(macrossp_state::macrossp_scrc_videoram_w)).share("scrc_videoram");
+	map(0x914200, 0x9143ff).ram().share("scrc_linezoom");/* W/O? */
+	map(0x915000, 0x91500b).ram().share("scrc_videoregs"); /* W/O? */
 	/* Text Layer */
-	AM_RANGE(0x918000, 0x91bfff) AM_RAM_WRITE(macrossp_text_videoram_w) AM_SHARE("text_videoram")
-	AM_RANGE(0x91c200, 0x91c3ff) AM_RAM AM_SHARE("text_linezoom") /* W/O? */
-	AM_RANGE(0x91d000, 0x91d00b) AM_RAM AM_SHARE("text_videoregs") /* W/O? */
+	map(0x918000, 0x91bfff).ram().w(FUNC(macrossp_state::macrossp_text_videoram_w)).share("text_videoram");
+	map(0x91c200, 0x91c3ff).ram().share("text_linezoom"); /* W/O? */
+	map(0x91d000, 0x91d00b).ram().share("text_videoregs"); /* W/O? */
 
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
+	map(0xa00000, 0xa03fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 
-	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?
-	AM_RANGE(0xb00008, 0xb0000b) AM_WRITENOP    // irq related?
-	AM_RANGE(0xb0000c, 0xb0000f) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xb00010, 0xb00013) AM_WRITE16(palette_fade_w, 0x0000ffff)
-	AM_RANGE(0xb00020, 0xb00023) AM_WRITENOP
+	map(0xb00000, 0xb00003).portr("INPUTS");
+	map(0xb00004, 0xb00007).r(FUNC(macrossp_state::macrossp_soundstatus_r)).nopw(); // irq related?
+	map(0xb00008, 0xb0000b).nopw();    // irq related?
+	map(0xb0000c, 0xb0000f).portr("DSW").nopw();
+	map(0xb00012, 0xb00013).w(FUNC(macrossp_state::palette_fade_w));
+	map(0xb00020, 0xb00023).nopw();
 
-	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(macrossp_soundcmd_w)
+	map(0xc00000, 0xc00003).w(FUNC(macrossp_state::macrossp_soundcmd_w));
 
-	AM_RANGE(0xf00000, 0xf1ffff) AM_RAM AM_SHARE("mainram") /* Main Ram */
-//  AM_RANGE(0xfe0000, 0xfe0003) AM_NOP
-ADDRESS_MAP_END
+	map(0xf00000, 0xf1ffff).ram().share("mainram"); /* Main Ram */
+//  map(0xfe0000, 0xfe0003).noprw();
+}
 
-ADDRESS_MAP_START(macrossp_state::macrossp_sound_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x207fff) AM_RAM
-	AM_RANGE(0x400000, 0x40007f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0x00ff)
-	AM_RANGE(0x600000, 0x600001) AM_READ(macrossp_soundcmd_r)
-ADDRESS_MAP_END
+void macrossp_state::macrossp_sound_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x207fff).ram();
+	map(0x400000, 0x40007f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write)).umask16(0x00ff);
+	map(0x600000, 0x600001).r(FUNC(macrossp_state::macrossp_soundcmd_r));
+}
 
 /*** INPUT PORTS *************************************************************/
 
@@ -508,7 +510,7 @@ static const gfx_layout macrossp_char16x16x8layout =
 	16*128
 };
 
-static GFXDECODE_START( macrossp )
+static GFXDECODE_START( gfx_macrossp )
 	GFXDECODE_ENTRY( "gfx1", 0, macrossp_char16x16x8layout,   0x000, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx2", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx3", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
@@ -542,12 +544,12 @@ void macrossp_state::machine_reset()
 MACHINE_CONFIG_START(macrossp_state::macrossp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
-	MCFG_CPU_PROGRAM_MAP(macrossp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", macrossp_state,  irq3_line_hold) // there are others ...
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(macrossp_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", macrossp_state,  irq3_line_hold) // there are others ...
 
-	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)    /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(macrossp_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 32000000/2)    /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(macrossp_sound_map)
 
 
 	/* video hardware */
@@ -557,25 +559,26 @@ MACHINE_CONFIG_START(macrossp_state::macrossp)
 	MCFG_SCREEN_SIZE(32*16, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 0*16, 15*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(macrossp_state, screen_update_macrossp)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(macrossp_state, screen_vblank_macrossp))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, macrossp_state, screen_vblank_macrossp))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macrossp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macrossp)
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RGBX)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ensoniq", ES5506, 16000000)
+	MCFG_DEVICE_ADD("ensoniq", ES5506, 16000000)
 	MCFG_ES5506_REGION0("ensoniq.0")
 	MCFG_ES5506_REGION1("ensoniq.1")
 	MCFG_ES5506_REGION2("ensoniq.2")
 	MCFG_ES5506_REGION3("ensoniq.3")
 	MCFG_ES5506_CHANNELS(1)               /* channels */
-	MCFG_ES5506_IRQ_CB(WRITELINE(macrossp_state, irqhandler))
+	MCFG_ES5506_IRQ_CB(WRITELINE(*this, macrossp_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
 MACHINE_CONFIG_END
@@ -711,17 +714,17 @@ WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
 }
 #endif
 
-DRIVER_INIT_MEMBER(macrossp_state,macrossp)
+void macrossp_state::init_macrossp()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf10158, 0xf1015b, write32_delegate(FUNC(macrossp_state::macrossp_speedup_w),this));
 }
 
-DRIVER_INIT_MEMBER(macrossp_state,quizmoon)
+void macrossp_state::init_quizmoon()
 {
 #ifdef UNUSED_FUNCTION
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf00020, 0xf00023, write32_delegate(FUNC(macrossp_state::quizmoon_speedup_w),this));
 #endif
 }
 
-GAME( 1996, macrossp, 0, macrossp, macrossp, macrossp_state, macrossp, ROT270, "MOSS / Banpresto", "Macross Plus", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, quizmoon, 0, quizmoon, quizmoon, macrossp_state, quizmoon, ROT0,   "Banpresto", "Quiz Bisyoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, macrossp, 0, macrossp, macrossp, macrossp_state, init_macrossp, ROT270, "MOSS / Banpresto", "Macross Plus", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, quizmoon, 0, quizmoon, quizmoon, macrossp_state, init_quizmoon, ROT0,   "Banpresto", "Quiz Bisyoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

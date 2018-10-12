@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/tms5220.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/mhavoc.h"
 
@@ -66,6 +65,8 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_irq_ack_w)
 
 void mhavoc_state::machine_start()
 {
+	m_lamps.resolve();
+
 	save_item(NAME(m_alpha_data));
 	save_item(NAME(m_alpha_rcvd));
 	save_item(NAME(m_alpha_xmtd));
@@ -129,7 +130,7 @@ TIMER_CALLBACK_MEMBER(mhavoc_state::delayed_gamma_w)
 	m_alpha_data = param;
 
 	/* signal with an NMI pulse */
-	m_gamma->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_gamma->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
 	machine().scheduler().timer_set(attotime::from_usec(250), timer_expired_delegate());
@@ -205,8 +206,7 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_rom_banksel_w)
 
 CUSTOM_INPUT_MEMBER(mhavoc_state::tms5220_r)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-	return tms5220->readyq_r() ? 1 : 0;
+	return m_tms->readyq_r() ? 1 : 0;
 }
 
 CUSTOM_INPUT_MEMBER(mhavoc_state::mhavoc_bit67_r)
@@ -269,17 +269,17 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_out_0_w)
 	/* this is the unpopulated processor in the corner of the pcb farthest from the quad pokey, not used on shipping boards */
 
 	/* Bit 0 = Roller light (Blinks on fatal errors) */
-	output().set_led_value(0, data & 0x01);
+	m_lamps[0] = BIT(data, 0);
 }
 
 
 WRITE8_MEMBER(mhavoc_state::alphaone_out_0_w)
 {
 	/* Bit 5 = P2 lamp */
-	output().set_led_value(0, ~data & 0x20);
+	m_lamps[0] = BIT(~data, 5);
 
 	/* Bit 4 = P1 lamp */
-	output().set_led_value(1, ~data & 0x10);
+	m_lamps[1] = BIT(~data, 4);
 
 	/* Bit 1 = right coin counter */
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -314,8 +314,7 @@ WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_data_w)
 
 WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-	tms5220->data_w(space, 0, m_speech_write_buffer);
+	m_tms->data_w(m_speech_write_buffer);
 }
 
 /*************************************
@@ -324,7 +323,7 @@ WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(mhavoc_state,mhavocrv)
+void mhavoc_state::init_mhavocrv()
 {
 	/* install the speech support that was only optionally stuffed for use */
 	/* in the Return to Vax hack */

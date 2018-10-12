@@ -76,16 +76,16 @@ public:
 		m_rombank(*this, "rombank")
 	{ }
 
-	DECLARE_DRIVER_INIT(virus);
 	void virus(machine_config &config);
 
-protected:
+	void init_virus();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void virus_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
 };
@@ -100,16 +100,18 @@ void acvirus_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(acvirus_state::virus_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0) // fixed 32K of flash image
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
-ADDRESS_MAP_END
+void acvirus_state::virus_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0); // fixed 32K of flash image
+	map(0x8000, 0xffff).bankr("rombank");
+}
 
 MACHINE_CONFIG_START(acvirus_state::virus)
-	MCFG_CPU_ADD("maincpu", I8052, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(virus_map)
+	MCFG_DEVICE_ADD("maincpu", I8052, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(virus_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( virus )
@@ -145,9 +147,9 @@ ROM_START( viruscl )
 	ROM_LOAD( "virus_cl_061_release.bin", 0x000000, 0x080000, CRC(a202e443) SHA1(33d5f4ebbacc817ab1e5dd572e8dc755f6c5e253) )
 ROM_END
 
-CONS( 1997, virusa, 0, 0, virus, virus, acvirus_state, 0, "Access", "Virus A", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 1999, virusb, 0, 0, virus, virus, acvirus_state, 0, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 2002, virusc, 0, 0, virus, virus, acvirus_state, 0, "Access", "Virus C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 2001, virusrck, 0, 0, virus, virus, acvirus_state, 0, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 2002, virusrckxl, 0, 0, virus, virus, acvirus_state, 0, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 2004, viruscl, 0, 0, virus, virus, acvirus_state, 0, "Access", "Virus Classic", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1997, virusa,     0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus A", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1999, virusb,     0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 2002, virusc,     0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 2001, virusrck,   0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 2002, virusrckxl, 0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 2004, viruscl,    0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus Classic", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

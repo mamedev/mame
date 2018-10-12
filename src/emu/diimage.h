@@ -198,7 +198,7 @@ public:
 
 	u8 *get_software_region(const char *tag);
 	u32 get_software_region_length(const char *tag);
-	const char *get_feature(const char *feature_name);
+	const char *get_feature(const char *feature_name) const;
 	bool load_software_region(const char *tag, optional_shared_ptr<u8> &ptr);
 
 	u32 crc();

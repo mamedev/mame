@@ -35,17 +35,8 @@
  *
  *************************************/
 
-void batman_state::update_interrupts()
-{
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void batman_state::machine_start()
 {
-	atarigen_state::machine_start();
-
 	save_item(NAME(m_latch_data));
 	save_item(NAME(m_alpha_tile_bank));
 }
@@ -89,31 +80,32 @@ WRITE16_MEMBER(batman_state::latch_w)
 /* full map verified from schematics and GALs */
 /* addresses in the 1xxxxx region map to /WAIT */
 /* addresses in the 2xxxxx region map to /WAIT2 */
-ADDRESS_MAP_START(batman_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM
-	AM_RANGE(0x120000, 0x120fff) AM_MIRROR(0x01f000) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x11ff8c) AM_READ_PORT("260000")
-	AM_RANGE(0x260002, 0x260003) AM_MIRROR(0x11ff8c) AM_READ_PORT("260002")
-	AM_RANGE(0x260010, 0x260011) AM_MIRROR(0x11ff8e) AM_READ_PORT("260010")
-	AM_RANGE(0x260030, 0x260031) AM_MIRROR(0x11ff8e) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
-	AM_RANGE(0x260040, 0x260041) AM_MIRROR(0x11ff8e) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
-	AM_RANGE(0x260050, 0x260051) AM_MIRROR(0x11ff8e) AM_WRITE(latch_w)
-	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x2e0000, 0x2e0fff) AM_MIRROR(0x100000) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x2effc0, 0x2effff) AM_MIRROR(0x100000) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
-	AM_RANGE(0x2f0000, 0x2fffff) AM_MIRROR(0x100000) AM_RAM
-	AM_RANGE(0x2f0000, 0x2f1fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
-	AM_RANGE(0x2f2000, 0x2f3fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
-	AM_RANGE(0x2f4000, 0x2f5fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
-	AM_RANGE(0x2f6000, 0x2f7fff) AM_MIRROR(0x100000) AM_RAM AM_SHARE("vad:mob")
-	AM_RANGE(0x2f8000, 0x2f8eff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
-	AM_RANGE(0x2f8f00, 0x2f8f7f) AM_MIRROR(0x100000) AM_SHARE("vad:eof")
-	AM_RANGE(0x2f8f80, 0x2f8fff) AM_MIRROR(0x100000) AM_RAM AM_SHARE("vad:mob:slip")
-ADDRESS_MAP_END
+void batman_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fffff);
+	map(0x000000, 0x0bffff).rom();
+	map(0x100000, 0x10ffff).mirror(0x010000).ram();
+	map(0x120000, 0x120fff).mirror(0x01f000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x260000, 0x260001).mirror(0x11ff8c).portr("260000");
+	map(0x260002, 0x260003).mirror(0x11ff8c).portr("260002");
+	map(0x260010, 0x260011).mirror(0x11ff8e).portr("260010");
+	map(0x260031, 0x260031).mirror(0x11ff8e).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
+	map(0x260041, 0x260041).mirror(0x11ff8e).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
+	map(0x260050, 0x260051).mirror(0x11ff8e).w(FUNC(batman_state::latch_w));
+	map(0x260060, 0x260061).mirror(0x11ff8e).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x2a0000, 0x2a0001).mirror(0x11fffe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x2e0000, 0x2e0fff).mirror(0x100000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x2effc0, 0x2effff).mirror(0x100000).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
+	map(0x2f0000, 0x2fffff).mirror(0x100000).ram();
+	map(0x2f0000, 0x2f1fff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::playfield2_latched_msb_w)).share("vad:playfield2");
+	map(0x2f2000, 0x2f3fff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::playfield_latched_lsb_w)).share("vad:playfield");
+	map(0x2f4000, 0x2f5fff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::playfield_upper_w)).share("vad:playfield_ext");
+	map(0x2f6000, 0x2f7fff).mirror(0x100000).ram().share("vad:mob");
+	map(0x2f8000, 0x2f8eff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::alpha_w)).share("vad:alpha");
+	map(0x2f8f00, 0x2f8f7f).mirror(0x100000).share("vad:eof");
+	map(0x2f8f80, 0x2f8fff).mirror(0x100000).ram().share("vad:mob:slip");
+}
 
 
 
@@ -177,7 +169,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( batman )
+static GFXDECODE_START( gfx_batman )
 	GFXDECODE_ENTRY( "gfx3", 0, pfmolayout,  512, 32 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, anlayout,      0, 64 )      /* characters 8x8 */
@@ -194,20 +186,19 @@ GFXDECODE_END
 MACHINE_CONFIG_START(batman_state::batman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", batman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batman)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(batman_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))
 	MCFG_ATARI_VAD_PLAYFIELD(batman_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(batman_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_ALPHA(batman_state, "gfxdecode", get_alpha_tile_info)
@@ -222,9 +213,9 @@ MACHINE_CONFIG_START(batman_state::batman)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(batman_state, sound_int_write_line))
+	MCFG_ATARI_JSA_III_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -300,4 +291,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, batman, 0, batman, batman, batman_state, 0, ROT0, "Atari Games", "Batman", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, batman, 0, batman, batman, batman_state, empty_init, ROT0, "Atari Games", "Batman", MACHINE_SUPPORTS_SAVE )

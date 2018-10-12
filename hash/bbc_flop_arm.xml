@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro - ARM Co-Processor Discs -->
+<!-- Acorn BBC Micro - ARM Co-Processor discs -->
 
 <!-- Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_flop_arm" description="ARM Co-Processor Discs">
+<softwarelist name="bbc_flop_arm" description="Acorn ARM Co-Processor discs">
 
 	<software name="armevals">
 		<description>ARM Evaluation System Discs</description>

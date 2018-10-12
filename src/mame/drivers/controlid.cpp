@@ -31,63 +31,96 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "video/nt7534.h"
+#include "emupal.h"
 #include "screen.h"
 
 class controlidx628_state : public driver_device
 {
 public:
 	controlidx628_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_lcdc(*this, "nt7534") { }
+		: driver_device(mconfig, type, tag)
+		, m_lcdc(*this, "nt7534")
+	{ }
 
 	void controlidx628(machine_config &config);
 private:
+	virtual void machine_start() override;
+
 	DECLARE_WRITE8_MEMBER(p0_w);
+	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
+	DECLARE_READ8_MEMBER(p2_r);
+	DECLARE_READ8_MEMBER(p3_r);
 	DECLARE_WRITE8_MEMBER(p3_w);
 	DECLARE_PALETTE_INIT(controlidx628);
 
 	void io_map(address_map &map);
-	void prog_map(address_map &map);
 
 	required_device<nt7534_device> m_lcdc;
 
-	uint8_t p0_data;
-	uint8_t p1_data;
-	uint8_t p3_data;
+	uint8_t m_p0_data;
+	uint8_t m_p1_data;
+	uint8_t m_p3_data;
 };
 
+
+void controlidx628_state::machine_start()
+{
+	m_p0_data = 0xff;
+	m_p1_data = 0xff;
+	m_p3_data = 0xff;
+
+	save_item(NAME(m_p0_data));
+	save_item(NAME(m_p1_data));
+	save_item(NAME(m_p3_data));
+}
 
 /*************************
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(controlidx628_state::prog_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(controlidx628_state::io_map)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-
-WRITE8_MEMBER( controlidx628_state::p0_w )
+void controlidx628_state::io_map(address_map &map)
 {
-	p0_data = data;
+	map(0x8000, 0xffff).ram();
 }
 
-WRITE8_MEMBER( controlidx628_state::p1_w )
+
+WRITE8_MEMBER(controlidx628_state::p0_w)
 {
-	if ((BIT(p1_data, 6) == 0) && (BIT(data, 6) == 1)) // on raising-edge of bit 6
+	m_p0_data = data;
+}
+
+READ8_MEMBER(controlidx628_state::p1_r)
+{
+	// P1.1 is used for serial I/O; P1.4 and P1.5 are also used bidirectionally
+	return 0xcd;
+}
+
+WRITE8_MEMBER(controlidx628_state::p1_w)
+{
+	if ((BIT(m_p1_data, 6) == 0) && (BIT(data, 6) == 1)) // on raising-edge of bit 6
 	{
-		m_lcdc->write(space, BIT(data, 7), p0_data);
+		m_lcdc->write(space, BIT(data, 7), m_p0_data);
 	}
-	p1_data = data;
+	// P1.0 is also used as a serial I/O clock
+	m_p1_data = data;
 }
 
-WRITE8_MEMBER( controlidx628_state::p3_w )
+READ8_MEMBER(controlidx628_state::p2_r)
 {
-	p3_data = data;
+	// Low nibble used for input
+	return 0xf0;
+}
+
+READ8_MEMBER(controlidx628_state::p3_r)
+{
+	// P3.3 (INT1) and P3.4 (T0) used bidirectionally
+	return 0xff;
+}
+
+WRITE8_MEMBER(controlidx628_state::p3_w)
+{
+	m_p3_data = data;
 }
 
 /*************************
@@ -111,26 +144,28 @@ PALETTE_INIT_MEMBER(controlidx628_state, controlidx628)
 
 MACHINE_CONFIG_START(controlidx628_state::controlidx628)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL(11'059'200)) /* Actually the board has an Atmel AT89S52 mcu. */
-	MCFG_CPU_PROGRAM_MAP(prog_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(controlidx628_state, p0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(controlidx628_state, p1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(controlidx628_state, p3_w))
+	MCFG_DEVICE_ADD("maincpu", AT89S52, XTAL(11'059'200))
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, controlidx628_state, p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, controlidx628_state, p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, controlidx628_state, p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, controlidx628_state, p2_r))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, controlidx628_state, p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, controlidx628_state, p3_w))
 
-		/* video hardware */
-		MCFG_SCREEN_ADD("screen", LCD)
-		MCFG_SCREEN_REFRESH_RATE(50)
-		MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-		MCFG_SCREEN_SIZE(132, 65)
-		MCFG_SCREEN_VISIBLE_AREA(3, 130, 0, 63)
-		MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
-		MCFG_SCREEN_PALETTE("palette")
+	// video hardware
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+	MCFG_SCREEN_SIZE(132, 65)
+	MCFG_SCREEN_VISIBLE_AREA(3, 130, 0, 63)
+	MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-		MCFG_PALETTE_ADD("palette", 2)
-		MCFG_PALETTE_INIT_OWNER(controlidx628_state, controlidx628)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(controlidx628_state, controlidx628)
 
-		MCFG_NT7534_ADD("nt7534")
+	NT7534(config, m_lcdc);
 MACHINE_CONFIG_END
 
 
@@ -143,4 +178,4 @@ ROM_START( cidx628 )
 	ROM_LOAD( "controlid_x628.u1",   0x0000, 0x2000, CRC(500d79b4) SHA1(5522115f2da622db389e067fcdd4bccb7aa8561a) )
 ROM_END
 
-COMP(200?, cidx628, 0, 0, controlidx628, 0, controlidx628_state, 0, "ControlID", "X628", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP(200?, cidx628, 0, 0, controlidx628, 0, controlidx628_state, empty_init, "ControlID", "X628", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

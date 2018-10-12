@@ -31,10 +31,10 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(battlnts_state::battlnts_interrupt)
+WRITE_LINE_MEMBER(battlnts_state::vblank_irq)
 {
-	if (m_k007342->is_int_enabled())
-		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+	if (state && m_k007342->is_int_enabled())
+		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(battlnts_state::battlnts_sh_irqtrigger_w)
@@ -61,33 +61,35 @@ WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(battlnts_state::battlnts_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)    /* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)    /* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)      /* Scroll RAM */
-	AM_RANGE(0x2400, 0x24ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")/* palette */
-	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_device, vreg_w)          /* Video Registers */
-	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P2")
-	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P1")
-	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW3")               /* coinsw, testsw, startsw */
-	AM_RANGE(0x2e04, 0x2e04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2e08, 0x2e08) AM_WRITE(battlnts_bankswitch_w)    /* bankswitch control */
-	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE(battlnts_spritebank_w)    /* sprite bank select */
-	AM_RANGE(0x2e10, 0x2e10) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x2e14, 0x2e14) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* sound code # */
-	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w) /* cause interrupt on audio CPU */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")              /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM 777e02.bin */
-ADDRESS_MAP_END
+void battlnts_state::battlnts_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(m_k007342, FUNC(k007342_device::read), FUNC(k007342_device::write));    /* Color RAM + Video RAM */
+	map(0x2000, 0x21ff).rw(m_k007420, FUNC(k007420_device::read), FUNC(k007420_device::write));    /* Sprite RAM */
+	map(0x2200, 0x23ff).rw(m_k007342, FUNC(k007342_device::scroll_r), FUNC(k007342_device::scroll_w));      /* Scroll RAM */
+	map(0x2400, 0x24ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");/* palette */
+	map(0x2600, 0x2607).w(m_k007342, FUNC(k007342_device::vreg_w));          /* Video Registers */
+	map(0x2e00, 0x2e00).portr("DSW1");
+	map(0x2e01, 0x2e01).portr("P2");
+	map(0x2e02, 0x2e02).portr("P1");
+	map(0x2e03, 0x2e03).portr("DSW3");               /* coinsw, testsw, startsw */
+	map(0x2e04, 0x2e04).portr("DSW2");
+	map(0x2e08, 0x2e08).w(FUNC(battlnts_state::battlnts_bankswitch_w));    /* bankswitch control */
+	map(0x2e0c, 0x2e0c).w(FUNC(battlnts_state::battlnts_spritebank_w));    /* sprite bank select */
+	map(0x2e10, 0x2e10).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x2e14, 0x2e14).w("soundlatch", FUNC(generic_latch_8_device::write)); /* sound code # */
+	map(0x2e18, 0x2e18).w(FUNC(battlnts_state::battlnts_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
+	map(0x4000, 0x7fff).bankr("rombank");              /* banked ROM */
+	map(0x8000, 0xffff).rom();                             /* ROM 777e02.bin */
+}
 
-ADDRESS_MAP_START(battlnts_state::battlnts_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                         /* ROM 777c01.rom */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                         /* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym3812_device, read, write)      /* YM3812 (chip 1) */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym3812_device, read, write)      /* YM3812 (chip 2) */
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void battlnts_state::battlnts_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                         /* ROM 777c01.rom */
+	map(0x8000, 0x87ff).ram();                         /* RAM */
+	map(0xa000, 0xa001).rw("ym1", FUNC(ym3812_device::read), FUNC(ym3812_device::write));      /* YM3812 (chip 1) */
+	map(0xc000, 0xc001).rw("ym2", FUNC(ym3812_device::read), FUNC(ym3812_device::write));      /* YM3812 (chip 2) */
+	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 /*************************************
  *
@@ -203,7 +205,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( battlnts )
+static GFXDECODE_START( gfx_battlnts )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 ) /* colors  0-15 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 4*16, 1 ) /* colors 64-79 */
 GFXDECODE_END
@@ -232,14 +234,13 @@ void battlnts_state::machine_reset()
 MACHINE_CONFIG_START(battlnts_state::battlnts)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, XTAL(24'000'000) / 2 /* 3000000*4? */)
-	MCFG_CPU_PROGRAM_MAP(battlnts_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", battlnts_state,  battlnts_interrupt)
+	MCFG_DEVICE_ADD("maincpu", HD6309, XTAL(24'000'000) / 2 /* 3000000*4? */)
+	MCFG_DEVICE_PROGRAM_MAP(battlnts_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000) / 6 /* 3579545? */)
-	MCFG_CPU_PROGRAM_MAP(battlnts_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000) / 6 /* 3579545? */)
+	MCFG_DEVICE_PROGRAM_MAP(battlnts_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -249,8 +250,9 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(battlnts_state, screen_update_battlnts)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, battlnts_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlnts)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_battlnts)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -265,14 +267,14 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_K007420_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM3812, XTAL(24'000'000) / 8)
+	MCFG_DEVICE_ADD("ym1", YM3812, XTAL(24'000'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL(24'000'000) / 8)
+	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(24'000'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -381,9 +383,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, battlnts,  0,        battlnts, battlnts, battlnts_state, 0, ROT90, "Konami", "Battlantis (program code G)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, battlntsa, battlnts, battlnts, battlnts, battlnts_state, 0, ROT90, "Konami", "Battlantis (program code F)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, battlntsj, battlnts, battlnts, battlnts, battlnts_state, 0, ROT90, "Konami", "Battlantis (Japan, program code E)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rackemup,  0,        battlnts, rackemup, battlnts_state, 0, ROT90, "Konami", "Rack 'em Up (program code L)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, thehustl,  rackemup, battlnts, thehustl, battlnts_state, 0, ROT90, "Konami", "The Hustler (Japan, program code M)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, thehustlj, rackemup, battlnts, thehustl, battlnts_state, 0, ROT90, "Konami", "The Hustler (Japan, program code J)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlnts,  0,        battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (program code G)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlntsa, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (program code F)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlntsj, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (Japan, program code E)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rackemup,  0,        battlnts, rackemup, battlnts_state, empty_init, ROT90, "Konami", "Rack 'em Up (program code L)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thehustl,  rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, program code M)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thehustlj, rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, program code J)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

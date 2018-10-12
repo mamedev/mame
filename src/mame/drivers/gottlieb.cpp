@@ -223,6 +223,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 void gottlieb_state::machine_start()
 {
+	m_leds.resolve();
 	/* register for save states */
 	save_item(NAME(m_joystick_select));
 	save_item(NAME(m_track));
@@ -248,7 +249,7 @@ void gottlieb_state::machine_start()
 		save_item(NAME(m_laserdisc_status));
 		save_item(NAME(m_laserdisc_philips_code));
 
-		save_pointer(NAME(m_laserdisc_audio_buffer.get()), AUDIORAM_SIZE);
+		save_pointer(NAME(m_laserdisc_audio_buffer), AUDIORAM_SIZE);
 		save_item(NAME(m_laserdisc_audio_address));
 		save_item(NAME(m_laserdisc_last_samples));
 		save_item(NAME(m_laserdisc_last_time));
@@ -327,9 +328,9 @@ WRITE8_MEMBER(gottlieb_state::reactor_output_w)
 {
 	general_output_w(space, offset, data & ~0xe0);
 
-	output().set_led_value(0, data & 0x20);
-	output().set_led_value(1, data & 0x40);
-	output().set_led_value(2, data & 0x80);
+	m_leds[0] = BIT(data, 5);
+	m_leds[1] = BIT(data, 6);
+	m_leds[2] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(gottlieb_state::qbert_output_w)
@@ -673,9 +674,9 @@ static const char *const qbert_knocker_names[] =
 };
 
 MACHINE_CONFIG_START(gottlieb_state::qbert_knocker)
-	MCFG_SPEAKER_ADD("knocker", 0.0, 0.0, 1.0)
+	SPEAKER(config, "knocker", 0.0, 0.0, 1.0);
 
-	MCFG_SOUND_ADD("knocker_sam", SAMPLES, 0)
+	MCFG_DEVICE_ADD("knocker_sam", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(qbert_knocker_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "knocker", 1.0)
@@ -749,48 +750,50 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_sh_w)
 		m_r2_sound->write(space, offset, data);
 }
 
-ADDRESS_MAP_START(gottlieb_state::reactor_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0f00) AM_WRITEONLY AM_SHARE("spriteram")                           /* FRSEL */
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM_WRITE(gottlieb_videoram_w) AM_SHARE("videoram")       /* BRSEL */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_SHARE("charram")               /* BOJRSEL1 */
+void gottlieb_state::reactor_map(address_map &map)
+{
+	map.global_mask(0xffff);
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x20ff).mirror(0x0f00).writeonly().share("spriteram");                           /* FRSEL */
+	map(0x3000, 0x33ff).mirror(0x0c00).ram().w(FUNC(gottlieb_state::gottlieb_videoram_w)).share("videoram");       /* BRSEL */
+	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::gottlieb_charram_w)).share("charram");               /* BOJRSEL1 */
 /*  AM_RANGE(0x5000, 0x5fff) AM_WRITE() */                                                               /* BOJRSEL2 */
-	AM_RANGE(0x6000, 0x601f) AM_MIRROR(0x0fe0) AM_WRITE(gottlieb_paletteram_w) AM_SHARE("paletteram")       /* COLSEL */
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_analog_reset_w)                        /* A1J2 interface */
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_sh_w)                                  /* trackball H */
-	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff8) AM_WRITE(reactor_output_w)                               /* trackball V */
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_READ_PORT("DSW")
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff8) AM_READ_PORT("IN1")                                      /* buttons */
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff8) AM_READ_PORT("IN2")                                      /* trackball H */
-	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff8) AM_READ_PORT("IN3")                                      /* trackball V */
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x0ff8) AM_READ_PORT("IN4")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x6000, 0x601f).mirror(0x0fe0).w(FUNC(gottlieb_state::gottlieb_paletteram_w)).share("paletteram");       /* COLSEL */
+	map(0x7000, 0x7000).mirror(0x0ff8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x7001, 0x7001).mirror(0x0ff8).w(FUNC(gottlieb_state::gottlieb_analog_reset_w));                        /* A1J2 interface */
+	map(0x7002, 0x7002).mirror(0x0ff8).w(FUNC(gottlieb_state::gottlieb_sh_w));                                  /* trackball H */
+	map(0x7003, 0x7003).mirror(0x0ff8).w(FUNC(gottlieb_state::reactor_output_w));                               /* trackball V */
+	map(0x7000, 0x7000).mirror(0x0ff8).portr("DSW");
+	map(0x7001, 0x7001).mirror(0x0ff8).portr("IN1");                                      /* buttons */
+	map(0x7002, 0x7002).mirror(0x0ff8).portr("IN2");                                      /* trackball H */
+	map(0x7003, 0x7003).mirror(0x0ff8).portr("IN3");                                      /* trackball V */
+	map(0x7004, 0x7004).mirror(0x0ff8).portr("IN4");
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(gottlieb_state::gottlieb_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_REGION("maincpu", 0x1000)    /* or ROM */
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_REGION("maincpu", 0x2000)    /* or ROM */
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0700) AM_WRITEONLY AM_SHARE("spriteram")                           /* FRSEL */
-	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_SHARE("videoram")       /* BRSEL */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_SHARE("charram")               /* BOJRSEL1 */
-	AM_RANGE(0x5000, 0x501f) AM_MIRROR(0x07e0) AM_WRITE(gottlieb_paletteram_w) AM_SHARE("paletteram")       /* COLSEL */
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_analog_reset_w)                        /* A1J2 interface */
-	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_sh_w)                                  /* OP20-27 */
-	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_WRITE(general_output_w)                               /* OP30-37 */
+void gottlieb_state::gottlieb_map(address_map &map)
+{
+	map.global_mask(0xffff);
+	map(0x0000, 0x0fff).ram().share("nvram");
+	map(0x1000, 0x1fff).ram().region("maincpu", 0x1000);    /* or ROM */
+	map(0x2000, 0x2fff).ram().region("maincpu", 0x2000);    /* or ROM */
+	map(0x3000, 0x30ff).mirror(0x0700).writeonly().share("spriteram");                           /* FRSEL */
+	map(0x3800, 0x3bff).mirror(0x0400).ram().w(FUNC(gottlieb_state::gottlieb_videoram_w)).share("videoram");       /* BRSEL */
+	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::gottlieb_charram_w)).share("charram");               /* BOJRSEL1 */
+	map(0x5000, 0x501f).mirror(0x07e0).w(FUNC(gottlieb_state::gottlieb_paletteram_w)).share("paletteram");       /* COLSEL */
+	map(0x5800, 0x5800).mirror(0x07f8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x5801, 0x5801).mirror(0x07f8).w(FUNC(gottlieb_state::gottlieb_analog_reset_w));                        /* A1J2 interface */
+	map(0x5802, 0x5802).mirror(0x07f8).w(FUNC(gottlieb_state::gottlieb_sh_w));                                  /* OP20-27 */
+	map(0x5803, 0x5803).mirror(0x07f8).w(FUNC(gottlieb_state::general_output_w));                               /* OP30-37 */
 /*  AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_WRITE()*/                                              /* OP40-47 */
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_READ_PORT("DSW")
-	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_READ_PORT("IN1")                                      /* IP10-17 */
-	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_READ_PORT("IN2")                                      /* trackball H */
-	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_READ_PORT("IN3")                                      /* trackball V */
-	AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_READ_PORT("IN4")                                      /* IP40-47 */
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x5800, 0x5800).mirror(0x07f8).portr("DSW");
+	map(0x5801, 0x5801).mirror(0x07f8).portr("IN1");                                      /* IP10-17 */
+	map(0x5802, 0x5802).mirror(0x07f8).portr("IN2");                                      /* trackball H */
+	map(0x5803, 0x5803).mirror(0x07f8).portr("IN3");                                      /* trackball V */
+	map(0x5804, 0x5804).mirror(0x07f8).portr("IN4");                                      /* IP40-47 */
+	map(0x6000, 0xffff).rom();
+}
 
 
 
@@ -832,10 +835,10 @@ static INPUT_PORTS_START( reactor )
 	PORT_BIT ( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")   /* trackball H */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "0TRACKX")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "0TRACKX")
 
 	PORT_START("IN3")   /* trackball V */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -1043,10 +1046,10 @@ static INPUT_PORTS_START( argusg )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")   /* trackball H */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "0TRACKX")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "0TRACKX")
 
 	PORT_START("IN3")   /* trackball V */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 /* NOTE: Buttons are shared for both players; are mirrored to each side of the controller */
 	PORT_START("IN4")
@@ -1100,7 +1103,7 @@ static INPUT_PORTS_START( mplanets )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* trackball V (dial) */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1579,7 +1582,7 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN4")   /* joystick inputs */
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,stooges_joystick_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,stooges_joystick_r, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
@@ -1691,7 +1694,7 @@ static INPUT_PORTS_START( wizwarz )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* trackball V is a dial input */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 	PORT_START("IN4")   /* ? */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -1767,45 +1770,44 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(gottlieb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gottlieb_state,  gottlieb_interrupt)
+	MCFG_DEVICE_ADD("maincpu", I8088, CPU_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(gottlieb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gottlieb_state,  gottlieb_interrupt)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK)
 	MCFG_SCREEN_UPDATE_DRIVER(gottlieb_state, screen_update_gottlieb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gfxdecode)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// basic speaker configuration
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(gottlieb_state::gottlieb1)
 	gottlieb_core(config);
-	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
+	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(gottlieb_state::gottlieb2)
 	gottlieb_core(config);
-	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(gottlieb_state::g2laser)
 	gottlieb_core(config);
-	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
@@ -1831,7 +1833,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gottlieb_state::gottlieb1_votrax)
 	gottlieb_core(config);
-	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_VOTRAX, 0)
+	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_VOTRAX)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -1840,8 +1842,8 @@ MACHINE_CONFIG_START(gottlieb_state::reactor)
 	gottlieb1_votrax(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(reactor_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(reactor_map)
 
 	MCFG_DEVICE_REMOVE("nvram")
 MACHINE_CONFIG_END
@@ -1868,7 +1870,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gottlieb_state::cobram3)
 	gottlieb_core(config);
-	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
 	MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
@@ -1884,9 +1886,9 @@ MACHINE_CONFIG_START(gottlieb_state::cobram3)
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("r2sound:dac")
+	MCFG_DEVICE_MODIFY("r2sound:dac")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "r2sound", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -2593,47 +2595,47 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(gottlieb_state,ramtiles)
+void gottlieb_state::init_ramtiles()
 {
 	m_gfxcharlo = m_gfxcharhi = 0;
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,romtiles)
+void gottlieb_state::init_romtiles()
 {
 	m_gfxcharlo = m_gfxcharhi = 1;
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,qbert)
+void gottlieb_state::init_qbert()
 {
-	DRIVER_INIT_CALL(romtiles);
+	init_romtiles();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::qbert_output_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,qbertqub)
+void gottlieb_state::init_qbertqub()
 {
-	DRIVER_INIT_CALL(romtiles);
+	init_romtiles();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::qbertqub_output_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,stooges)
+void gottlieb_state::init_stooges()
 {
-	DRIVER_INIT_CALL(ramtiles);
+	init_ramtiles();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::stooges_output_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,screwloo)
+void gottlieb_state::init_screwloo()
 {
 	m_gfxcharlo = 0;
 	m_gfxcharhi = 1;
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,vidvince)
+void gottlieb_state::init_vidvince()
 {
 	m_gfxcharlo = 1;
 	m_gfxcharhi = 0;
@@ -2648,33 +2650,33 @@ DRIVER_INIT_MEMBER(gottlieb_state,vidvince)
  *************************************/
 
 /* games using rev 1 sound board */
-GAME( 1982, reactor,   0,        reactor,   reactor,  gottlieb_state, ramtiles, ROT0,   "Gottlieb",                  "Reactor", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbert,     0,        qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qberta,    qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbertj,    qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, myqbert,   qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qberttst,  qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbtrktst,  qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, insector,  0,        gottlieb1, insector, gottlieb_state, romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", 0 )
-GAME( 1982, tylz,      0,        tylz,      tylz,     gottlieb_state, romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND ) // modified sound hw?
-GAME( 1984, argusg,    0,        gottlieb1, argusg,   gottlieb_state, ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
-GAME( 1983, mplanets,  0,        gottlieb1, mplanets, gottlieb_state, romtiles, ROT270, "Gottlieb",                  "Mad Planets", 0 )
-GAME( 1983, mplanetsuk,mplanets, gottlieb1, mplanets, gottlieb_state, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
-GAME( 1983, krull,     0,        gottlieb1, krull,    gottlieb_state, ramtiles, ROT270, "Gottlieb",                  "Krull", 0 )
-GAME( 1983, kngtmare,  0,        gottlieb1, kngtmare, gottlieb_state, romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", MACHINE_NO_SOUND ) // Missing sound ROMs
-GAME( 1983, sqbert,    0,        qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, qbertqub,  0,        qbert,     qbertqub, gottlieb_state, qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", MACHINE_IMPERFECT_SOUND )
-GAME( 1984, curvebal,  0,        gottlieb1, curvebal, gottlieb_state, romtiles, ROT270, "Mylstar",                   "Curve Ball", 0 )
+GAME( 1982, reactor,    0,        reactor,   reactor,  gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Reactor", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qbert,      0,        qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qberta,     qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qbertj,     qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, myqbert,    qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qberttst,   qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qbtrktst,   qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, insector,   0,        gottlieb1, insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", 0 )
+GAME( 1982, tylz,       0,        tylz,      tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1984, argusg,     0,        gottlieb1, argusg,   gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
+GAME( 1983, mplanets,   0,        gottlieb1, mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", 0 )
+GAME( 1983, mplanetsuk, mplanets, gottlieb1, mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
+GAME( 1983, krull,      0,        gottlieb1, krull,    gottlieb_state, init_ramtiles, ROT270, "Gottlieb",                  "Krull", 0 )
+GAME( 1983, kngtmare,   0,        gottlieb1, kngtmare, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", MACHINE_NO_SOUND ) // Missing sound ROMs
+GAME( 1983, sqbert,     0,        qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, qbertqub,   0,        qbert,     qbertqub, gottlieb_state, init_qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", MACHINE_IMPERFECT_SOUND )
+GAME( 1984, curvebal,   0,        gottlieb1, curvebal, gottlieb_state, init_romtiles, ROT270, "Mylstar",                   "Curve Ball", 0 )
 
 /* games using rev 2 sound board */
-GAME( 1983, screwloo,  0,        screwloo,  screwloo, gottlieb_state, screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", 0 )
-GAME( 1983, mach3,     0,        g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
-GAME( 1983, mach3a,    mach3,    g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
-GAME( 1983, mach3b,    mach3,    g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
-GAME( 1984, cobram3,   cobra,    cobram3,   cobram3,  gottlieb_state, romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 1)", 0 )
-GAME( 1984, cobram3a,  cobra,    cobram3,   cobram3,  gottlieb_state, romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 2)", 0 )
-GAME( 1984, usvsthem,  0,        g2laser,   usvsthem, gottlieb_state, romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
-GAME( 1984, 3stooges,  0,        gottlieb2, 3stooges, gottlieb_state, stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", 0 )
-GAME( 1984, 3stoogesa, 3stooges, gottlieb2, 3stooges, gottlieb_state, stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", 0 )
-GAME( 1984, vidvince,  0,        gottlieb2, vidvince, gottlieb_state, vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", MACHINE_IMPERFECT_GRAPHICS ) // sprite wrapping issues
-GAME( 1984, wizwarz,   0,        gottlieb2, wizwarz,  gottlieb_state, romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", 0 )
+GAME( 1983, screwloo,   0,        screwloo,  screwloo, gottlieb_state, init_screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", 0 )
+GAME( 1983, mach3,      0,        g2laser,   mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
+GAME( 1983, mach3a,     mach3,    g2laser,   mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
+GAME( 1983, mach3b,     mach3,    g2laser,   mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
+GAME( 1984, cobram3,    cobra,    cobram3,   cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 1)", 0 )
+GAME( 1984, cobram3a,   cobra,    cobram3,   cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 2)", 0 )
+GAME( 1984, usvsthem,   0,        g2laser,   usvsthem, gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
+GAME( 1984, 3stooges,   0,        gottlieb2, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", 0 )
+GAME( 1984, 3stoogesa,  3stooges, gottlieb2, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", 0 )
+GAME( 1984, vidvince,   0,        gottlieb2, vidvince, gottlieb_state, init_vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", MACHINE_IMPERFECT_GRAPHICS ) // sprite wrapping issues
+GAME( 1984, wizwarz,    0,        gottlieb2, wizwarz,  gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", 0 )

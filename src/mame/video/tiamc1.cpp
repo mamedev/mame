@@ -165,7 +165,7 @@ void tiamc1_state::video_start()
 	m_spriteram_a = m_videoram.get() + 0x3030;
 	m_paletteram  = m_videoram.get() + 0x3040;
 
-	save_pointer(NAME(m_videoram.get()), 0x3050);
+	save_pointer(NAME(m_videoram), 0x3050);
 
 	m_bg_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
@@ -200,7 +200,7 @@ VIDEO_START_MEMBER(tiamc1_state, kot)
 	m_spriteram_a = m_videoram.get() + 0x430;
 	m_paletteram  = m_videoram.get() + 0x440;
 
-	save_pointer(NAME(m_videoram.get()), 0x450);
+	save_pointer(NAME(m_videoram), 0x450);
 
 	m_bg_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info), this), TILEMAP_SCAN_ROWS,
 		8, 8, 32, 32);

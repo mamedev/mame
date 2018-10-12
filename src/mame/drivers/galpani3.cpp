@@ -72,6 +72,7 @@ Dumped by Uki
 #include "sound/ymz280b.h"
 #include "video/kaneko_grap2.h"
 #include "video/sknsspr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -89,9 +90,11 @@ public:
 		m_priority_buffer(*this, "priority_buffer"),
 		m_sprregs(*this, "sprregs"),
 		m_sprite_bitmap(1024, 1024)
-
 	{ }
 
+	void galpani3(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<kaneko_grap2_device, 3> m_grap2;
 	required_device<palette_device> m_palette;
@@ -113,12 +116,10 @@ public:
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrollx_w);
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrolly_w);
 
-
 	virtual void video_start() override;
 
 	uint32_t screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
-	void galpani3(machine_config &config);
 	void galpani3_map(address_map &map);
 };
 
@@ -150,14 +151,14 @@ void galpani3_state::video_start()
 {
 	/* so we can use video/sknsspr.c */
 	m_spritegen->skns_sprite_kludge(0,0);
-	
+
 	m_spriteram32 = make_unique_clear<uint32_t[]>(0x4000/4);
 	m_spc_regs = make_unique_clear<uint32_t[]>(0x40/4);
 
 	save_item(NAME(m_priority_buffer_scrollx));
 	save_item(NAME(m_priority_buffer_scrolly));
-	save_pointer(NAME(m_spriteram32.get()), 0x4000/4);
-	save_pointer(NAME(m_spc_regs.get()), 0x40/4);
+	save_pointer(NAME(m_spriteram32), 0x4000/4);
+	save_pointer(NAME(m_spc_regs), 0x40/4);
 }
 
 #define SPRITE_DRAW_PIXEL(_pri)                                    \
@@ -170,7 +171,7 @@ void galpani3_state::video_start()
 // TODO : m_framebuffer_bright1 is alpha-blended?
 #define FB_DRAW_PIXEL(_chip, _pixel)                                                              \
 	int alpha = 0xff;                                                                             \
-	uint32_t pal = m_grap2[_chip]->pen_r(_pixel);                                                 \
+	const pen_t &pal = m_grap2[_chip]->pen(_pixel);                                               \
 	if (m_grap2[_chip]->m_framebuffer_palette[_pixel] & 0x8000)                                   \
 	{                                                                                             \
 		alpha = (m_grap2[_chip]->m_framebuffer_bright2 & 0xff);                                   \
@@ -190,10 +191,8 @@ void galpani3_state::video_start()
 uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *paldata = m_palette->pens();
-	
+
 	bitmap.fill(0, cliprect);
-	
-	m_sprite_bitmap.fill(0x0000, cliprect);
 
 	m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram32.get(), 0x4000, m_spc_regs.get() );
 
@@ -209,7 +208,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 			uint16_t* srcline3 = m_grap2[2]->m_framebuffer.get() + ((drawy+m_grap2[2]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
 
 			uint16_t* priline  = m_priority_buffer + ((drawy+m_priority_buffer_scrolly+11)&0x1ff) * 0x200;
-			
+
 			uint32_t* dst = &bitmap.pix32(drawy & 0x3ff);
 
 			for (drawx=cliprect.min_x;drawx<=cliprect.max_x;drawx++)
@@ -251,11 +250,33 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 				else if (pridat==0xcf) // the girl
 				{
 					SPRITE_DRAW_PIXEL(0x0000);
-					FB_DRAW_PIXEL(0, 0x100);
+					if (m_grap2[0]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(0, 0x100);
+					}
 					SPRITE_DRAW_PIXEL(0x4000);
 					if (m_grap2[1]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(1, 0x100);
+					}
+					SPRITE_DRAW_PIXEL(0x8000);
+					if (dat3 && m_grap2[2]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(2, dat3);
+					}
+					SPRITE_DRAW_PIXEL(0xc000);
+				}
+				else if (pridat==0x30) // during the 'gals boxes' on the intro
+				{
+					SPRITE_DRAW_PIXEL(0x0000);
+					if (m_grap2[1]->m_framebuffer_enable) // TODO : Opaqued and Swapped order?
+					{
+						FB_DRAW_PIXEL(1, dat2);
+					}
+					SPRITE_DRAW_PIXEL(0x4000);
+					if (dat1 && m_grap2[0]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(0, dat1);
 					}
 					SPRITE_DRAW_PIXEL(0x8000);
 					if (dat3 && m_grap2[2]->m_framebuffer_enable)
@@ -390,47 +411,48 @@ WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrolly_w)
 }
 
 
-ADDRESS_MAP_START(galpani3_state::galpani3_map)
-	AM_RANGE(0x000000, 0x17ffff) AM_ROM
+void galpani3_state::galpani3_map(address_map &map)
+{
+	map(0x000000, 0x17ffff).rom();
 
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // area [A] - palette for sprites
+	map(0x200000, 0x20ffff).ram(); // area [B] - Work RAM
+	map(0x280000, 0x287fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // area [A] - palette for sprites
 
-	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(galpani3_suprnova_sprite32_w) AM_SHARE("spriteram")
-	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE(galpani3_suprnova_sprite32regs_w) AM_SHARE("sprregs")
+	map(0x300000, 0x303fff).ram().w(FUNC(galpani3_state::galpani3_suprnova_sprite32_w)).share("spriteram");
+	map(0x380000, 0x38003f).ram().w(FUNC(galpani3_state::galpani3_suprnova_sprite32regs_w)).share("sprregs");
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("mcuram") // area [C]
+	map(0x400000, 0x40ffff).ram().share("mcuram"); // area [C]
 
-	AM_RANGE(0x580000, 0x580001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)
-	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
-	AM_RANGE(0x680000, 0x680001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
-	AM_RANGE(0x780000, 0x780001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
-	
-	AM_RANGE(0x800000, 0x9fffff) AM_DEVICE( "grap2_0", kaneko_grap2_device, grap2_map)
-	AM_RANGE(0xa00000, 0xbfffff) AM_DEVICE( "grap2_1", kaneko_grap2_device, grap2_map)
-	AM_RANGE(0xc00000, 0xdfffff) AM_DEVICE( "grap2_2", kaneko_grap2_device, grap2_map)
+	map(0x580000, 0x580001).w("toybox", FUNC(kaneko_toybox_device::mcu_com0_w));
+	map(0x600000, 0x600001).w("toybox", FUNC(kaneko_toybox_device::mcu_com1_w));
+	map(0x680000, 0x680001).w("toybox", FUNC(kaneko_toybox_device::mcu_com2_w));
+	map(0x700000, 0x700001).w("toybox", FUNC(kaneko_toybox_device::mcu_com3_w));
+	map(0x780000, 0x780001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
+
+	map(0x800000, 0x9fffff).m("grap2_0", FUNC(kaneko_grap2_device::grap2_map));
+	map(0xa00000, 0xbfffff).m("grap2_1", FUNC(kaneko_grap2_device::grap2_map));
+	map(0xc00000, 0xdfffff).m("grap2_2", FUNC(kaneko_grap2_device::grap2_map));
 
 	// ?? priority / alpha buffer?
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_SHARE("priority_buffer") // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(galpani3_priority_buffer_scrollx_w) // scroll?
-	AM_RANGE(0xe80002, 0xe80003) AM_WRITE(galpani3_priority_buffer_scrolly_w) // scroll?
+	map(0xe00000, 0xe7ffff).ram().share("priority_buffer"); // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
+	map(0xe80000, 0xe80001).w(FUNC(galpani3_state::galpani3_priority_buffer_scrollx_w)); // scroll?
+	map(0xe80002, 0xe80003).w(FUNC(galpani3_state::galpani3_priority_buffer_scrolly_w)); // scroll?
 
 
-	AM_RANGE(0xf00000, 0xf00001) AM_NOP // ? written once (2nd opcode, $1.b)
-	AM_RANGE(0xf00010, 0xf00011) AM_READ_PORT("P1")
-	AM_RANGE(0xf00012, 0xf00013) AM_READ_PORT("P2")
-	AM_RANGE(0xf00014, 0xf00015) AM_READ_PORT("COIN")
-	AM_RANGE(0xf00016, 0xf00017) AM_NOP // ? read, but overwritten
-	AM_RANGE(0xf00020, 0xf00023) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff)     // sound
-	AM_RANGE(0xf00040, 0xf00041) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0xf00050, 0xf00051) AM_NOP // ? written once (3rd opcode, $30.b)
-ADDRESS_MAP_END
+	map(0xf00000, 0xf00001).noprw(); // ? written once (2nd opcode, $1.b)
+	map(0xf00010, 0xf00011).portr("P1");
+	map(0xf00012, 0xf00013).portr("P2");
+	map(0xf00014, 0xf00015).portr("COIN");
+	map(0xf00016, 0xf00017).noprw(); // ? read, but overwritten
+	map(0xf00020, 0xf00023).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);     // sound
+	map(0xf00040, 0xf00041).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0xf00050, 0xf00051).noprw(); // ? written once (3rd opcode, $30.b)
+}
 
 
 MACHINE_CONFIG_START(galpani3_state::galpani3)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'636'363)/2) // Confirmed from PCB
-	MCFG_CPU_PROGRAM_MAP(galpani3_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'636'363)/2) // Confirmed from PCB
+	MCFG_DEVICE_PROGRAM_MAP(galpani3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpani3_state, galpani3_vblank, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -441,11 +463,11 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galpani3_state, screen_update_galpani3)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
@@ -462,9 +484,9 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 	MCFG_DEVICE_ROM("rlebg")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(33'333'000) / 2)  // Confirmed from PCB
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'333'000) / 2)  // Confirmed from PCB
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -567,7 +589,7 @@ ROM_START( galpani3k ) /* Some game text in Korean, but no "For use in Korea" ty
 ROM_END
 
 
-GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, 0, ROT90, "Kaneko", "Gals Panic 3 (Euro)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, galpani3j, galpani3, galpani3, galpani3, galpani3_state, 0, ROT90, "Kaneko", "Gals Panic 3 (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, galpani3k, galpani3, galpani3, galpani3, galpani3_state, 0, ROT90, "Kaneko", "Gals Panic 3 (Korea)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, galpani3hk,galpani3, galpani3, galpani3, galpani3_state, 0, ROT90, "Kaneko", "Gals Panic 3 (Hong Kong)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, empty_init, ROT90, "Kaneko", "Gals Panic 3 (Euro)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3j, galpani3, galpani3, galpani3, galpani3_state, empty_init, ROT90, "Kaneko", "Gals Panic 3 (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3k, galpani3, galpani3, galpani3, galpani3_state, empty_init, ROT90, "Kaneko", "Gals Panic 3 (Korea)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3hk,galpani3, galpani3, galpani3, galpani3_state, empty_init, ROT90, "Kaneko", "Gals Panic 3 (Hong Kong)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

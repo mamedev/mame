@@ -165,7 +165,7 @@ const uint8_t i80286_cpu_device::m_i80286_timing[] =
 	13,             /* (80186) BOUND */
 };
 
-DEFINE_DEVICE_TYPE(I80286, i80286_cpu_device, "i80286", "I80286")
+DEFINE_DEVICE_TYPE(I80286, i80286_cpu_device, "i80286", "Intel I80286")
 
 i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_common_cpu_device(mconfig, I80286, tag, owner, clock)
@@ -176,7 +176,6 @@ i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *
 {
 	memcpy(m_timing, m_i80286_timing, sizeof(m_i80286_timing));
 	m_amask = 0xffffff;
-	m_fetch_xor = BYTE_XOR_LE(0);
 	memset(m_sregs, 0x00, sizeof(m_sregs));
 	m_sregs[CS] = 0xf000;
 	memset(m_base, 0x00, sizeof(m_base));
@@ -1026,7 +1025,7 @@ uint8_t i80286_cpu_device::fetch()
 	if(m_ip > m_limit[CS])
 		throw TRAP(FAULT_GP, 0);
 
-	data = m_direct_opcodes->read_byte( update_pc() & m_amask, m_fetch_xor );
+	data = m_or8(update_pc() & m_amask);
 	m_ip++;
 	return data;
 }
@@ -1101,7 +1100,7 @@ void i80286_cpu_device::execute_run()
 				}
 			}
 
-			debugger_instruction_hook( this, update_pc() & m_amask );
+			debugger_instruction_hook( update_pc() & m_amask );
 
 			uint8_t op = fetch_op();
 

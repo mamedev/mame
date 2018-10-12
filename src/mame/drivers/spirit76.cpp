@@ -33,6 +33,9 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu") { }
 
+	void spirit76(machine_config &config);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
@@ -40,24 +43,24 @@ public:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(unk_r);
-	void spirit76(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
+
 	u8 m_t_c;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(spirit76_state::maincpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void spirit76_state::maincpu_map(address_map &map)
+{
+	map.unmap_value_high();
 //  ADDRESS_MAP_GLOBAL_MASK(0xfff) // this could most likely go in once the memory map is sorted
-	AM_RANGE(0x0000, 0x00ff) AM_RAM // 2x 2112
-	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia", pia6821_device, read, write) // 6820
-	AM_RANGE(0x2400, 0x2400) AM_READ(unk_r)
-	AM_RANGE(0x2401, 0x2401) AM_WRITE(unk_w)
-	AM_RANGE(0x0600, 0x0fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0xfe00, 0xffff) AM_ROM AM_REGION("roms", 0x800)
-ADDRESS_MAP_END
+	map(0x0000, 0x00ff).ram(); // 2x 2112
+	map(0x2200, 0x2203).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // 6820
+	map(0x2400, 0x2400).r(FUNC(spirit76_state::unk_r));
+	map(0x2401, 0x2401).w(FUNC(spirit76_state::unk_w));
+	map(0x0600, 0x0fff).rom().region("roms", 0);
+	map(0xfe00, 0xffff).rom().region("roms", 0x800);
+}
 
 
 static INPUT_PORTS_START( spirit76 )
@@ -120,23 +123,23 @@ void spirit76_state::machine_reset()
 
 MACHINE_CONFIG_START(spirit76_state::spirit76)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 500000)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 500000)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", spirit76_state, irq, attotime::from_hz(120))
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
 
 	//6821pia
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(spirit76_state, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spirit76_state, portb_w))
-	MCFG_PIA_READPA_HANDLER(READ8(spirit76_state, porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(spirit76_state, portb_r))
-//  MCFG_PIA_CA2_HANDLER(WRITELINE(spirit76_state, pia22_ca2_w))
-//  MCFG_PIA_CB2_HANDLER(WRITELINE(spirit76_state, pia22_cb2_w))
-//  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-//  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set(FUNC(spirit76_state::porta_w));
+	pia.writepb_handler().set(FUNC(spirit76_state::portb_w));
+	pia.readpa_handler().set(FUNC(spirit76_state::porta_r));
+	pia.readpb_handler().set(FUNC(spirit76_state::portb_r));
+//  pia.ca2_handler().set(FUNC(spirit76_state::pia22_ca2_w));
+//  pia.cb2_handler().set(FUNC(spirit76_state::pia22_cb2_w));
+//  pia.irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+//  pia.irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	/* sound hardware */
 	genpin_audio(config);
@@ -158,4 +161,4 @@ ROM_START(spirit76)
 ROM_END
 
 
-GAME( 1975, spirit76, 0, spirit76, spirit76, spirit76_state, 0, ROT0, "Mirco", "Spirit of 76", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1975, spirit76, 0, spirit76, spirit76, spirit76_state, empty_init, ROT0, "Mirco", "Spirit of 76", MACHINE_IS_SKELETON_MECHANICAL )

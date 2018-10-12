@@ -42,7 +42,7 @@
 	<software name="ord800">
 		<description>ORD 800 v2.4 (Swe)</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>P-Data</publisher>
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="65069">
@@ -66,7 +66,7 @@
 	<software name="red800">
 		<description>Bokföring 800 v2.0 (Swe)</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>P-Data</publisher>
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="141304">
@@ -78,7 +78,7 @@
 	<software name="sana800">
 		<description>Sana 800 v2.3 (Fin)</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>P-Data</publisher>
 		<info name="serial" value="68 20037-56" />
 
 		<part name="flop" interface="floppy_5_25">
@@ -201,6 +201,33 @@
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="77214">
 				<rom name="pascal10.td0" size="77214" crc="5ded710c" sha1="66be481e7bff83c1dc3c7c7af85bc34f6813dc6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufd631">
+		<description>Systemskiva v6.31 för UFD-DOS (Swe)</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<info name="serial" value="68 29251-51" />
+		<info name="usage" value="RUN&quot;LIB&quot;" />
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="140772">
+				<rom name="ufd631.td0" size="140772" crc="c767e073" sha1="42fb39f3a9fe5020d339d6b00c13170898a6059e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abc832">
+		<description>ABC832 Systemskiva v2.5 (Swe)</description>
+		<year>1982</year>
+		<publisher>Luxor</publisher>
+		<info name="usage" value="BYE" />
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="abc832.dsk" size="655360" crc="36c1ff01" sha1="7aceaa4bf79301f545ec4b8ca7cbaa7f34fff462" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -9,11 +9,12 @@
 #include "bus/newbrain/exp.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/cop400/cop400.h"
 #include "imagedev/cassette.h"
 #include "machine/rescap.h"
 #include "machine/ram.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "409"
@@ -40,6 +41,7 @@ public:
 		m_rom(*this, Z80_TAG),
 		m_char_rom(*this, "chargen"),
 		m_y(*this, "Y%u", 0),
+		m_digits(*this, "digit%u", 0U),
 		m_pwrup(0),
 		m_userint(1),
 		m_clkint(1),
@@ -49,6 +51,13 @@ public:
 	{
 	}
 
+	void newbrain(machine_config &config);
+	void newbrain_a(machine_config &config);
+	void newbrain_ad(machine_config &config);
+	void newbrain_md(machine_config &config);
+	void newbrain_video(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mreq_r );
@@ -69,14 +78,9 @@ public:
 	DECLARE_READ_LINE_MEMBER( tdi_r );
 	DECLARE_WRITE_LINE_MEMBER( k1_w );
 
-	void newbrain(machine_config &config);
-	void newbrain_a(machine_config &config);
-	void newbrain_ad(machine_config &config);
-	void newbrain_md(machine_config &config);
-	void newbrain_video(machine_config &config);
 	void newbrain_iorq(address_map &map);
 	void newbrain_mreq(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -113,6 +117,7 @@ protected:
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
 	required_ioport_array<16> m_y;
+	output_finder<16> m_digits;
 
 	int m_clk;
 	int m_tvp;

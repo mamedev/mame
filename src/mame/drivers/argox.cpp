@@ -51,30 +51,35 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-		DECLARE_DRIVER_INIT(os214);
-	required_device<cpu_device> m_maincpu;
 	void os214(machine_config &config);
+
+	void init_os214();
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void os214_io_map(address_map &map);
 	void os214_prg_map(address_map &map);
 };
 
-ADDRESS_MAP_START(os214_state::os214_prg_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-ADDRESS_MAP_END
+void os214_state::os214_prg_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+}
 
-ADDRESS_MAP_START(os214_state::os214_io_map)
+void os214_state::os214_io_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 MACHINE_CONFIG_START(os214_state::os214)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83002, XTAL(16'000'000)) /* X1 xtal value is correct,
+	MCFG_DEVICE_ADD("maincpu", H83002, XTAL(16'000'000)) /* X1 xtal value is correct,
 	                                                   but there can be some clock divider perhaps ? */
-	MCFG_CPU_PROGRAM_MAP(os214_prg_map)
-	MCFG_CPU_IO_MAP(os214_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(os214_prg_map)
+	MCFG_DEVICE_IO_MAP(os214_io_map)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER( os214_state, os214 )
+void os214_state::init_os214()
 {
 }
 
@@ -84,5 +89,5 @@ ROM_START( os214 )
 	ROM_LOAD16_BYTE( "u8_s2a2-4.03_argox_am.u8", 0x000001, 0x040000, CRC(d49f52af) SHA1(0ca5a70c6c3995f275226af26db965f6ba7ed123) )
 ROM_END
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY  FULLNAME                         FLAGS
-COMP( 1996, os214, 0,      0,      os214,   0,     os214_state, os214, "Argox", "Rabbit Printer (model OS-214)", MACHINE_IS_SKELETON)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME                         FLAGS
+COMP( 1996, os214, 0,      0,      os214,   0,     os214_state, init_os214, "Argox", "Rabbit Printer (model OS-214)", MACHINE_IS_SKELETON)

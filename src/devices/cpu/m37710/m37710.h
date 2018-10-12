@@ -99,11 +99,10 @@ enum
 
 class m37710_cpu_device : public cpu_device, public m7700_disassembler::config
 {
-public:
+protected:
 	DECLARE_READ8_MEMBER( m37710_internal_r );
 	DECLARE_WRITE8_MEMBER( m37710_internal_w );
 
-protected:
 	// construction/destruction
 	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
 
@@ -127,7 +126,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual bool get_m_flag() const override;
 	virtual bool get_x_flag() const override;
 
@@ -171,7 +170,7 @@ private:
 	uint32_t m_source;        /* temp register */
 	uint32_t m_destination;   /* temp register */
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_io;
 	uint32_t m_stopped;       /* Sets how the CPU is stopped */
 
@@ -203,9 +202,9 @@ private:
 	static const int m37710_irq_vectors[M37710_LINE_MAX];
 	static const char *const m37710_rnames[128];
 	static const char *const m37710_tnames[8];
-	static const opcode_func *m37710i_opcodes[4];
-	static const opcode_func *m37710i_opcodes2[4];
-	static const opcode_func *m37710i_opcodes3[4];
+	static const opcode_func *const m37710i_opcodes[4];
+	static const opcode_func *const m37710i_opcodes2[4];
+	static const opcode_func *const m37710i_opcodes3[4];
 	static const get_reg_func m37710i_get_reg[4];
 	static const set_reg_func m37710i_set_reg[4];
 	static const set_line_func m37710i_set_line[4];
@@ -236,8 +235,6 @@ private:
 	TIMER_CALLBACK_MEMBER( m37710_timer_cb );
 	void m37710_external_tick(int timer, int state);
 	void m37710_recalc_timer(int timer);
-	uint8_t m37710_internal_r(int offset);
-	void m37710_internal_w(int offset, uint8_t data);
 	uint32_t m37710i_get_reg_M0X0(int regnum);
 	uint32_t m37710i_get_reg_M0X1(int regnum);
 	uint32_t m37710i_get_reg_M1X0(int regnum);

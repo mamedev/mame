@@ -12,6 +12,7 @@
 
 #include "machine/74259.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -30,7 +31,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void copsnrob(machine_config &config);
@@ -64,6 +66,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	output_finder<2> m_leds;
 };
 
 #endif // MAME_INCLUDES_COPSNROB_H

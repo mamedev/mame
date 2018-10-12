@@ -42,55 +42,63 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cpu2(*this, "cpu2")
 		, m_p_ram(*this, "ram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void rowamet(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(mute_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void rowamet(machine_config &config);
 	void rowamet_map(address_map &map);
 	void rowamet_sub_io(address_map &map);
 	void rowamet_sub_map(address_map &map);
-private:
+
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
 	uint8_t m_io[16];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
 	required_shared_ptr<uint8_t> m_p_ram;
+	output_finder<32> m_digits;
 };
 
 
-ADDRESS_MAP_START(rowamet_state::rowamet_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("X0")
-	AM_RANGE(0x2801, 0x2801) AM_READ_PORT("X1")
-	AM_RANGE(0x2802, 0x2802) AM_READ_PORT("X2")
-	AM_RANGE(0x2803, 0x2803) AM_READ_PORT("X3")
-	AM_RANGE(0x2804, 0x2804) AM_READ_PORT("X4")
-	AM_RANGE(0x2805, 0x2805) AM_READ_PORT("X5")
-	AM_RANGE(0x2806, 0x2806) AM_READ_PORT("X6")
-	AM_RANGE(0x2807, 0x2807) AM_READ_PORT("X7")
-	AM_RANGE(0x2808, 0x2808) AM_READ_PORT("X8")
-	AM_RANGE(0x4000, 0x407f) AM_RAM
-	AM_RANGE(0x4080, 0x408f) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x4090, 0x409f) AM_READWRITE(io_r,io_w)
-	AM_RANGE(0x40a0, 0x40ff) AM_RAM
-ADDRESS_MAP_END
+void rowamet_state::rowamet_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("roms", 0);
+	map(0x2800, 0x2800).portr("X0");
+	map(0x2801, 0x2801).portr("X1");
+	map(0x2802, 0x2802).portr("X2");
+	map(0x2803, 0x2803).portr("X3");
+	map(0x2804, 0x2804).portr("X4");
+	map(0x2805, 0x2805).portr("X5");
+	map(0x2806, 0x2806).portr("X6");
+	map(0x2807, 0x2807).portr("X7");
+	map(0x2808, 0x2808).portr("X8");
+	map(0x4000, 0x407f).ram();
+	map(0x4080, 0x408f).ram().share("ram");
+	map(0x4090, 0x409f).rw(FUNC(rowamet_state::io_r), FUNC(rowamet_state::io_w));
+	map(0x40a0, 0x40ff).ram();
+}
 
-ADDRESS_MAP_START(rowamet_state::rowamet_sub_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0x2000)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-ADDRESS_MAP_END
+void rowamet_state::rowamet_sub_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("roms", 0x2000);
+	map(0x1000, 0x17ff).ram();
+}
 
-ADDRESS_MAP_START(rowamet_state::rowamet_sub_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(sound_r,mute_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void rowamet_state::rowamet_sub_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(FUNC(rowamet_state::sound_r), FUNC(rowamet_state::mute_w));
+	map(0x01, 0x01).w("dac", FUNC(dac_byte_interface::data_w));
+}
 
 static INPUT_PORTS_START( rowamet )
 	PORT_START("X0")
@@ -190,7 +198,7 @@ WRITE8_MEMBER( rowamet_state::io_w )
 		if (cmd != m_sndcmd)
 		{
 			m_sndcmd = cmd;
-			m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_cpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 }
@@ -210,27 +218,27 @@ TIMER_DEVICE_CALLBACK_MEMBER( rowamet_state::timer_a )
 	m_out_offs &= 15;
 
 	uint8_t digit = m_out_offs << 1;
-	output().set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
-	output().set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
+	m_digits[digit] = patterns[m_p_ram[m_out_offs]>>4];
+	m_digits[++digit] = patterns[m_p_ram[m_out_offs++]&15];
 }
 
 MACHINE_CONFIG_START(rowamet_state::rowamet)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1888888)
-	MCFG_CPU_PROGRAM_MAP(rowamet_map)
-	MCFG_CPU_ADD("cpu2", Z80, 1888888)
-	MCFG_CPU_PROGRAM_MAP(rowamet_sub_map)
-	MCFG_CPU_IO_MAP(rowamet_sub_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 1888888)
+	MCFG_DEVICE_PROGRAM_MAP(rowamet_map)
+	MCFG_DEVICE_ADD("cpu2", Z80, 1888888)
+	MCFG_DEVICE_PROGRAM_MAP(rowamet_sub_map)
+	MCFG_DEVICE_IO_MAP(rowamet_sub_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", rowamet_state, timer_a, attotime::from_hz(200))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_rowamet)
+	config.set_default_layout(layout_rowamet);
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -254,4 +262,4 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 
-GAME(198?, heavymtl, 0, rowamet, rowamet, rowamet_state, 0,  ROT0,  "Rowamet", "Heavy Metal", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(198?, heavymtl, 0, rowamet, rowamet, rowamet_state, empty_init, ROT0, "Rowamet", "Heavy Metal", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

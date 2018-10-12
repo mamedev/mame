@@ -8,7 +8,7 @@
 #include "bus/scsi/sa1403d.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/i86/i86.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"
@@ -22,6 +22,8 @@
 #include "machine/z80dart.h"
 #include "sound/spkrdev.h"
 #include "sound/beep.h"
+#include "imagedev/snapquik.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 
@@ -67,7 +69,10 @@ public:
 		m_400_460(0)
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void mk83(machine_config &config);
+	void xerox820(machine_config &config);
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(xerox820);
 
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
@@ -76,22 +81,23 @@ public:
 	DECLARE_READ8_MEMBER( kbpio_pa_r );
 	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
 	DECLARE_READ8_MEMBER( kbpio_pb_r );
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
+protected:
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 
-	void mk83(machine_config &config);
-	void xerox820(machine_config &config);
 	void mk83_mem(address_map &map);
 	void xerox820_io(address_map &map);
 	void xerox820_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_kbpio;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80sio0_device> m_sio;

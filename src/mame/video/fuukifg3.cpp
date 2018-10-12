@@ -50,37 +50,13 @@
 
 ***************************************************************************/
 
-inline void fuuki32_state::get_tile_info8bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
+template<int Layer, int ColShift>
+TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info)
 {
-	uint16_t code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
-	uint16_t attr = (m_vram[_N_][tile_index] & 0x0000ffff);
-	SET_TILE_INFO_MEMBER(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX(attr >> 6));
+	uint16_t code = (m_vram[Layer][tile_index] & 0xffff0000) >> 16;
+	uint16_t attr = (m_vram[Layer][tile_index] & 0x0000ffff);
+	SET_TILE_INFO_MEMBER((Layer < 2) ? (1 + Layer) : 3, code, (attr & 0x3f) >> ColShift, TILE_FLIPYX(attr >> 6));
 }
-
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_0){ get_tile_info8bpp(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_1){ get_tile_info8bpp(tileinfo, tile_index, 1); }
-
-inline void fuuki32_state::get_tile_info4bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
-{
-	uint16_t code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
-	uint16_t attr = (m_vram[_N_][tile_index] & 0x0000ffff);
-	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX(attr >> 6));
-}
-
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_2){ get_tile_info4bpp(tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_3){ get_tile_info4bpp(tileinfo, tile_index, 3); }
-
-inline void fuuki32_state::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask, int _N_)
-{
-	COMBINE_DATA(&m_vram[_N_][offset]);
-	m_tilemap[_N_]->mark_tile_dirty(offset);
-}
-
-WRITE32_MEMBER(fuuki32_state::vram_0_w){ vram_w(offset, data, mem_mask, 0); }
-WRITE32_MEMBER(fuuki32_state::vram_1_w){ vram_w(offset, data, mem_mask, 1); }
-WRITE32_MEMBER(fuuki32_state::vram_2_w){ vram_w(offset, data, mem_mask, 2); }
-WRITE32_MEMBER(fuuki32_state::vram_3_w){ vram_w(offset, data, mem_mask, 3); }
-
 
 /***************************************************************************
 
@@ -95,12 +71,10 @@ void fuuki32_state::video_start()
 //  m_buf_spriteram = std::make_unique<uint32_t[]>(m_spriteram.bytes() / 4);
 //  m_buf_spriteram2 = std::make_unique<uint32_t[]>(m_spriteram.bytes() / 4);
 
-
-
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fuuki32_state::get_tile_info<0, 4>, "layer0", this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fuuki32_state::get_tile_info<1, 4>, "layer1", this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fuuki32_state::get_tile_info<2, 0>, "layer2", this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fuuki32_state::get_tile_info<3, 0>, "layer3", this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0xff);    // 8 bits
 	m_tilemap[1]->set_transparent_pen(0xff);    // 8 bits
@@ -149,12 +123,11 @@ void fuuki32_state::video_start()
 /* Wrapper to handle bg and bg2 ttogether */
 void fuuki32_state::draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
-	int buffer = ((m_vregs[0x1e / 4] & 0x0000ffff) & 0x40);
+	int buffer = ((m_vregs[0x1e / 4] & 0x0000ffff) & 0x40) >> 6;
 
 	switch( i )
 	{
-		case 2: if (buffer) m_tilemap[3]->draw(screen, bitmap, cliprect, flag, pri);
-				else        m_tilemap[2]->draw(screen, bitmap, cliprect, flag, pri);
+		case 2: m_tilemap[2|buffer]->draw(screen, bitmap, cliprect, flag, pri);
 				return;
 		case 1: m_tilemap[1]->draw(screen, bitmap, cliprect, flag, pri);
 				return;

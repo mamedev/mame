@@ -51,12 +51,14 @@ public:
 		, m_usart_clock_state(0)
 	{ }
 
+	void sdk80(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
 
-	void sdk80(machine_config &config);
 	void sdk80_io(address_map &map);
 	void sdk80_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
 	required_device<i8255_device> m_ppi_0;
@@ -68,20 +70,21 @@ private:
 	uint8_t m_usart_clock_state;
 };
 
-ADDRESS_MAP_START(sdk80_state::sdk80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void sdk80_state::sdk80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+}
 
-ADDRESS_MAP_START(sdk80_state::sdk80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xec, 0xef) AM_DEVREADWRITE(I8255A_1_TAG, i8255_device, read, write)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(I8255A_0_TAG, i8255_device, read, write)
-	AM_RANGE(0xfa, 0xfa) AM_DEVREADWRITE(I8251A_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE(I8251A_TAG, i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void sdk80_state::sdk80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xec, 0xef).rw(m_ppi_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf4, 0xf7).rw(m_ppi_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xfa, 0xfb).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+}
 
 static INPUT_PORTS_START( sdk80 )
 	PORT_START(I8251A_BAUD_TAG)
@@ -120,26 +123,26 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sdk80_state::sdk80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'432'000)/9)
-	MCFG_CPU_PROGRAM_MAP(sdk80_mem)
-	MCFG_CPU_IO_MAP(sdk80_io)
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'432'000)/9)
+	MCFG_DEVICE_PROGRAM_MAP(sdk80_mem)
+	MCFG_DEVICE_IO_MAP(sdk80_io)
 
-	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	I8251(config, m_usart, 0);
+	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(I8255A_0_TAG, I8255A, 0)
 	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(18'432'000)/60)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sdk80_state, usart_clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sdk80_state, usart_clock_tick))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -148,5 +151,5 @@ ROM_START( sdk80 )
 	ROM_LOAD( "mcs80.a14", 0x0000, 0x0400, BAD_DUMP CRC(3ce7bd37) SHA1(04cc67875b53d4cdfefce07041af12be3acedf4f)) // Compiled from manual listing
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS         INIT   COMPANY   FULLNAME     FLAGS */
-COMP( 1975, sdk80,  0,      0,      sdk80,     sdk80,  sdk80_state,  0,     "Intel",  "SDK-80",    MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY   FULLNAME     FLAGS */
+COMP( 1975, sdk80, 0,      0,      sdk80,   sdk80,  sdk80_state, empty_init, "Intel",  "SDK-80",    MACHINE_NO_SOUND_HW )

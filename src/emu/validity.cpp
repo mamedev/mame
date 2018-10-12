@@ -12,6 +12,7 @@
 #include "validity.h"
 
 #include "emuopts.h"
+#include "romload.h"
 #include "video/rgbutil.h"
 
 #include <ctype.h>
@@ -80,7 +81,7 @@ void validity_checker::validate_tag(const char *tag)
 		osd_printf_error("Invalid generic tag '%s' used\n", tag);
 
 	// scan for invalid characters
-	static const char *validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
+	static char const *const validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
 	for (const char *p = tag; *p != 0; p++)
 	{
 		// only lower-case permitted
@@ -511,16 +512,18 @@ void validity_checker::validate_inlines()
 	if (fabsf(recip_approx(100.0f) - 0.01f) > 0.0001f)
 		osd_printf_error("Error testing recip_approx\n");
 
-	testi32a = (testi32a & 0x0000ffff) | 0x400000;
-	if (count_leading_zeros(testi32a) != 9)
-		osd_printf_error("Error testing count_leading_zeros\n");
-	if (count_leading_zeros(0) != 32)
-		osd_printf_error("Error testing count_leading_zeros\n");
-	testi32a = (testi32a | 0xffff0000) & ~0x400000;
-	if (count_leading_ones(testi32a) != 9)
-		osd_printf_error("Error testing count_leading_ones\n");
-	if (count_leading_ones(0xffffffff) != 32)
-		osd_printf_error("Error testing count_leading_ones\n");
+	for (int i = 0; i <= 32; i++)
+	{
+		u32 t = i < 32 ? (1 << (31 - i) | testu32a >> i) : 0;
+		u8 resultu8 = count_leading_zeros(t);
+		if (resultu8 != i)
+			osd_printf_error("Error testing count_leading_zeros %08x=%02x (expected %02x)\n", t, resultu8, i);
+
+		t ^= 0xffffffff;
+		resultu8 = count_leading_ones(t);
+		if (resultu8 != i)
+			osd_printf_error("Error testing count_leading_ones %08x=%02x (expected %02x)\n", t, resultu8, i);
+	}
 }
 
 
@@ -1514,7 +1517,7 @@ void validity_checker::validate_roms(device_t &root)
 		char const *last_name = "???";
 		u32 current_length = 0;
 		int items_since_region = 1;
-		int last_bios = 0;
+		int last_bios = 0, max_bios = 0;
 		int total_files = 0;
 		std::unordered_map<std::string, int> bios_names;
 		std::unordered_map<std::string, std::string> bios_descs;
@@ -1555,7 +1558,7 @@ void validity_checker::validate_roms(device_t &root)
 				int const bios_flags = ROM_GETBIOSFLAGS(romp);
 				char const *const biosname = romp->name;
 				if (bios_flags != last_bios + 1)
-					osd_printf_error("Non-sequential BIOS %s (specified as %d, expected to be %d)\n", biosname, bios_flags, last_bios + 1);
+					osd_printf_error("Non-sequential BIOS %s (specified as %d, expected to be %d)\n", biosname, bios_flags - 1, last_bios);
 				last_bios = bios_flags;
 
 				// validate the name
@@ -1573,7 +1576,7 @@ void validity_checker::validate_roms(device_t &root)
 				// check for duplicate names/descriptions
 				auto const nameins = bios_names.emplace(biosname, bios_flags);
 				if (!nameins.second)
-					osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags);
+					osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags - 1);
 				auto const descins = bios_descs.emplace(romp->hashdata, biosname);
 				if (!descins.second)
 					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, romp->hashdata, descins.first->second.c_str());
@@ -1587,6 +1590,19 @@ void validity_checker::validate_roms(device_t &root)
 				// track the last filename we found
 				last_name = romp->name;
 				total_files++;
+				max_bios = std::max<int>(max_bios, ROM_GETBIOSFLAGS(romp));
+
+				// validate the name
+				if (strlen(last_name) > 127)
+					osd_printf_error("ROM label %s exceeds maximum 127 characters\n", last_name);
+				for (char const *s = last_name; *s; ++s)
+				{
+					if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != ' ') && (*s != '@') && (*s != '.') && (*s != ',') && (*s != '_') && (*s != '-') && (*s != '+') && (*s != '='))
+					{
+						osd_printf_error("ROM label %s contains invalid characters\n", last_name);
+						break;
+					}
+				}
 
 				// make sure the hash is valid
 				util::hash_collection hashes;
@@ -1598,7 +1614,7 @@ void validity_checker::validate_roms(device_t &root)
 			if (!ROMENTRY_ISREGIONEND(romp) && current_length > 0)
 			{
 				items_since_region++;
-				if (ROM_GETOFFSET(romp) + ROM_GETLENGTH(romp) > current_length)
+				if (!ROMENTRY_ISIGNORE(romp) && (ROM_GETOFFSET(romp) + ROM_GETLENGTH(romp) > current_length))
 					osd_printf_error("ROM '%s' extends past the defined memory region\n", last_name);
 			}
 		}
@@ -1606,6 +1622,12 @@ void validity_checker::validate_roms(device_t &root)
 		// check that default BIOS exists
 		if (defbios && (bios_names.find(defbios) == bios_names.end()))
 			osd_printf_error("Default BIOS '%s' not found\n", defbios);
+		if (!device.get_default_bios_tag().empty() && (bios_names.find(device.get_default_bios_tag()) == bios_names.end()))
+			osd_printf_error("Configured BIOS '%s' not found\n", device.get_default_bios_tag().c_str());
+
+		// check that there aren't ROMs for a non-existent BIOS option
+		if (max_bios > last_bios)
+			osd_printf_error("BIOS %d set on file is higher than maximum system BIOS number %d\n", max_bios - 1, last_bios - 1);
 
 		// final check for empty regions
 		if (items_since_region == 0)
@@ -1829,6 +1851,9 @@ void validity_checker::validate_inputs()
 				if (field.type() == IPT_INVALID)
 					osd_printf_error("Field has an invalid type (0); use IPT_OTHER instead\n");
 
+				if (field.type() == IPT_SPECIAL)
+					osd_printf_error("Field has an invalid type IPT_SPECIAL\n");
+
 				// verify dip switches
 				if (field.type() == IPT_DIPSWITCH)
 				{
@@ -1919,14 +1944,7 @@ void validity_checker::validate_devices()
 		m_current_device = &device;
 
 		// validate auto-finders
-		device.findit(true, true);
-		device.findit(false, true);
-
-		// validate callbacks
-		for (auto &cb : device.input_callbacks())
-			cb->validity_check(*this);
-		for (auto &cb : device.output_callbacks())
-			cb->validity_check(*this);
+		device.findit(true);
 
 		// validate the device tag
 		validate_tag(device.basetag());
@@ -1944,7 +1962,7 @@ void validity_checker::validate_devices()
 
 		// if it's a slot, iterate over possible cards (don't recurse, or you'll stack infinite tee connectors)
 		device_slot_interface *const slot = dynamic_cast<device_slot_interface *>(&device);
-		if (slot != nullptr && !slot->fixed() && !duplicate)
+		if (slot && !slot->fixed() && !duplicate)
 		{
 			for (auto &option : slot->option_list())
 			{
@@ -1952,23 +1970,29 @@ void validity_checker::validate_devices()
 				if (slot->default_option() != nullptr && option.first == slot->default_option())
 					continue;
 
-				device_t *const card = m_current_config->device_add(&slot->device(), option.second->name(), option.second->devtype(), option.second->clock());
+				device_t *card;
+				{
+					machine_config::token const tok(m_current_config->begin_configuration(slot->device()));
+					card = m_current_config->device_add(option.second->name(), option.second->devtype(), option.second->clock());
 
-				const char *const def_bios = option.second->default_bios();
-				if (def_bios)
-					card->set_default_bios_tag(def_bios);
-				auto additions = option.second->machine_config();
-				if (additions)
-					additions(card);
+					const char *const def_bios = option.second->default_bios();
+					if (def_bios)
+						card->set_default_bios_tag(def_bios);
+					auto additions = option.second->machine_config();
+					if (additions)
+						additions(card);
+				}
 
 				for (device_slot_interface &subslot : slot_interface_iterator(*card))
 				{
 					if (subslot.fixed())
 					{
-						device_slot_option const *const suboption = subslot.option(subslot.default_option());
+						// TODO: make this self-contained so it can apply itself
+						device_slot_interface::slot_option const *suboption = subslot.option(subslot.default_option());
 						if (suboption)
 						{
-							device_t *const sub_card = m_current_config->device_add(&subslot.device(), suboption->name(), suboption->devtype(), suboption->clock());
+							machine_config::token const tok(m_current_config->begin_configuration(subslot.device()));
+							device_t *const sub_card = m_current_config->device_add(suboption->name(), suboption->devtype(), suboption->clock());
 							const char *const sub_bios = suboption->default_bios();
 							if (sub_bios)
 								sub_card->set_default_bios_tag(sub_bios);
@@ -1986,13 +2010,13 @@ void validity_checker::validate_devices()
 				for (device_t &card_dev : device_iterator(*card))
 				{
 					m_current_device = &card_dev;
-					card_dev.findit(true, true);
-					card_dev.findit(false, true);
+					card_dev.findit(true);
 					card_dev.validity_check(*this);
 					m_current_device = nullptr;
 				}
 
-				m_current_config->device_remove(&slot->device(), option.second->name());
+				machine_config::token const tok(m_current_config->begin_configuration(slot->device()));
+				m_current_config->device_remove(option.second->name());
 			}
 		}
 	}
@@ -2015,9 +2039,10 @@ void validity_checker::validate_device_types()
 
 	std::unordered_map<std::string, std::add_pointer_t<device_type> > device_name_map, device_shortname_map;
 	machine_config config(GAME_NAME(___empty), m_drivlist.options());
+	machine_config::token const tok(config.begin_configuration(config.root_device()));
 	for (device_type type : registered_device_types)
 	{
-		device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+		device_t *const dev = config.device_add("_tmp", type, 0);
 
 		char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
 		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
@@ -2054,9 +2079,9 @@ void validity_checker::validate_device_types()
 			}
 			else if (!devname.second)
 			{
-				device_t *const dup = config.device_add(&config.root_device(), "_dup", *devname.first->second, 0);
+				device_t *const dup = config.device_add("_dup", *devname.first->second, 0);
 				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
-				config.device_remove(&config.root_device(), "_dup");
+				config.device_remove("_dup");
 			}
 		}
 
@@ -2078,9 +2103,9 @@ void validity_checker::validate_device_types()
 			}
 			else if (!devdesc.second)
 			{
-				device_t *const dup = config.device_add(&config.root_device(), "_dup", *devdesc.first->second, 0);
+				device_t *const dup = config.device_add("_dup", *devdesc.first->second, 0);
 				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
-				config.device_remove(&config.root_device(), "_dup");
+				config.device_remove("_dup");
 			}
 		}
 
@@ -2102,7 +2127,7 @@ void validity_checker::validate_device_types()
 		if (unemulated & imperfect)
 			osd_printf_error("Device cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
 
-		config.device_remove(&config.root_device(), "_tmp");
+		config.device_remove("_tmp");
 	}
 
 	// if we had warnings or errors, output

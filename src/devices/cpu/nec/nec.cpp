@@ -116,33 +116,32 @@ typedef uint32_t DWORD;
 
 #include "necpriv.h"
 
-DEFINE_DEVICE_TYPE(V20,  v20_device,  "v20",  "V20")
-DEFINE_DEVICE_TYPE(V30,  v30_device,  "v30",  "V30")
-DEFINE_DEVICE_TYPE(V33,  v33_device,  "v33",  "V33")
-DEFINE_DEVICE_TYPE(V33A, v33a_device, "v33a", "V33A")
+DEFINE_DEVICE_TYPE(V20,  v20_device,  "v20",  "NEC V20")
+DEFINE_DEVICE_TYPE(V30,  v30_device,  "v30",  "NEC V30")
+DEFINE_DEVICE_TYPE(V33,  v33_device,  "v33",  "NEC V33")
+DEFINE_DEVICE_TYPE(V33A, v33a_device, "v33a", "NEC V33A")
 
 
-
-nec_common_device::nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
+nec_common_device::nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, address_map_constructor internal_port_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0)
-	, m_fetch_xor(fetch_xor)
+	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, chip_type == V33_TYPE ? 24 : 20, 0, 20, chip_type == V33_TYPE ? 14 : 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0, internal_port_map)
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
 	, m_chip_type(chip_type)
+	, m_v33_transtable(*this, "v33_transtable")
 {
 }
 
 
 v20_device::v20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V20, tag, owner, clock, false, 0, 4, 4, V20_TYPE)
+	: nec_common_device(mconfig, V20, tag, owner, clock, false, 4, 4, V20_TYPE)
 {
 }
 
 
 v30_device::v30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V30, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 2, V30_TYPE)
+	: nec_common_device(mconfig, V30, tag, owner, clock, true, 6, 2, V30_TYPE)
 {
 }
 
@@ -158,21 +157,57 @@ device_memory_interface::space_config_vector nec_common_device::memory_space_con
 /* FIXME: Need information about prefetch size and cycles for V33.
  * complete guess below, nbbatman will not work
  * properly without. */
+v33_base_device::v33_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_port_map)
+	: nec_common_device(mconfig, type, tag, owner, clock, true, 6, 1, V33_TYPE, internal_port_map)
+{
+}
+
+
 v33_device::v33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V33, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: v33_base_device(mconfig, V33, tag, owner, clock, address_map_constructor(FUNC(v33_device::v33_internal_port_map), this))
 {
 }
 
 
 v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V33A, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: v33_base_device(mconfig, V33A, tag, owner, clock, address_map_constructor(FUNC(v33a_device::v33_internal_port_map), this))
 {
 }
 
 
-util::disasm_interface *nec_common_device::create_disassembler()
+uint16_t v33_base_device::xam_r()
 {
-	return new nec_disassembler;
+	// Only bit 0 is defined
+	return m_xa ? 1 : 0;
+}
+
+void v33_base_device::v33_internal_port_map(address_map &map)
+{
+	map(0xff00, 0xff7f).ram().share("v33_transtable");
+	map(0xff80, 0xff81).r(FUNC(v33_base_device::xam_r)).unmapw();
+	map(0xff82, 0xffff).unmaprw();
+}
+
+
+offs_t nec_common_device::v33_translate(offs_t addr)
+{
+	if (m_xa)
+		return uint32_t(m_v33_transtable[(addr >> 14) & 63]) << 14 | (addr & 0x03fff);
+	else
+		return addr & 0xfffff;
+}
+
+bool v33_base_device::memory_translate(int spacenum, int intention, offs_t &address)
+{
+	if (spacenum == AS_PROGRAM)
+		address = v33_translate(address);
+	return true;
+}
+
+
+std::unique_ptr<util::disasm_interface> nec_common_device::create_disassembler()
+{
+	return std::make_unique<nec_disassembler>();
 }
 
 
@@ -218,7 +253,7 @@ void nec_common_device::do_prefetch(int previous_ICount)
 uint8_t nec_common_device::fetch()
 {
 	prefetch();
-	return m_direct->read_byte((Sreg(PS)<<4)+m_ip++, m_fetch_xor);
+	return m_dr8((Sreg(PS)<<4)+m_ip++);
 }
 
 uint16_t nec_common_device::fetchword()
@@ -238,7 +273,7 @@ static uint8_t parity_table[256];
 uint8_t nec_common_device::fetchop()
 {
 	prefetch();
-	return m_direct->read_byte(( Sreg(PS)<<4)+m_ip++, m_fetch_xor);
+	return m_dr8((Sreg(PS)<<4)+m_ip++);
 }
 
 
@@ -265,6 +300,9 @@ void nec_common_device::device_reset()
 	m_irq_state = 0;
 	m_poll_state = 1;
 	m_halted = 0;
+
+	if (m_chip_type == V33_TYPE)
+		m_xa = false;
 
 	Sreg(PS) = 0xffff;
 	Sreg(SS) = 0;
@@ -299,6 +337,13 @@ void nec_common_device::nec_trap()
 {
 	(this->*s_nec_instruction[fetchop()])();
 	nec_interrupt(NEC_TRAP_VECTOR, BRK);
+}
+
+void nec_common_device::nec_brk(unsigned int_num)
+{
+	m_ip = read_mem_word(int_num*4);
+	Sreg(PS) = read_mem_word(int_num*4+2);
+	CHANGE_PC;
 }
 
 void nec_common_device::external_int()
@@ -419,7 +464,23 @@ void nec_common_device::device_start()
 	save_item(NAME(m_prefetch_reset));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if (m_program->data_width() == 8)
+	{
+		auto cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
+		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+	}
+	else if (m_chip_type == V33_TYPE)
+	{
+		save_item(NAME(m_xa));
+		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_dr8 = [cache, this](offs_t address) -> u8 { return cache->read_byte(v33_translate(address)); };
+	}
+	else
+	{
+		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+	}
+
 	m_io = &space(AS_IO);
 
 	state_add( NEC_PC,    "PC", m_debugger_temp).callimport().callexport().formatstr("%05X");
@@ -438,12 +499,15 @@ void nec_common_device::device_start()
 	state_add( NEC_SS,    "SS", Sreg(SS)).formatstr("%04X");
 	state_add( NEC_DS,    "DS0", Sreg(DS0)).formatstr("%04X");
 
+	if (m_chip_type == V33_TYPE)
+		state_add(NEC_XA, "XA", m_xa);
+
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void nec_common_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -479,7 +543,7 @@ void nec_common_device::state_import(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case NEC_PC:
-			if( m_debugger_temp - (Sreg(PS)<<4) < 0x10000 )
+			if (m_debugger_temp - (Sreg(PS)<<4) < 0x10000)
 			{
 				m_ip = m_debugger_temp - (Sreg(PS)<<4);
 			}
@@ -525,7 +589,7 @@ void nec_common_device::execute_run()
 	if (m_halted)
 	{
 		m_icount = 0;
-		debugger_instruction_hook(this, (Sreg(PS)<<4) + m_ip);
+		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
 		return;
 	}
 
@@ -543,7 +607,7 @@ void nec_common_device::execute_run()
 		if (m_no_interrupt)
 			m_no_interrupt--;
 
-		debugger_instruction_hook(this, (Sreg(PS)<<4) + m_ip);
+		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
 		prev_ICount = m_icount;
 		(this->*s_nec_instruction[fetchop()])();
 		do_prefetch(prev_ICount);

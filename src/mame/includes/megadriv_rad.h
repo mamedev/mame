@@ -13,7 +13,7 @@ public:
 		m_rom(*this, "maincpu")
 	{}
 
-	DECLARE_DRIVER_INIT(megadriv_radica_6button_pal);
+	void init_megadriv_radica_6button_pal();
 
 	DECLARE_MACHINE_START(megadriv_radica_6button);
 	DECLARE_MACHINE_START(megadriv_radica_3button);

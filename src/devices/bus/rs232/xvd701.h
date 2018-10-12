@@ -4,10 +4,11 @@
 #define MAME_BUS_RS232_XVD701_H
 
 #include "rs232.h"
+#include "diserial.h"
 
 class jvc_xvd701_device : public device_t,
-	public device_serial_interface,
-	public device_rs232_port_interface
+		public device_serial_interface,
+		public device_rs232_port_interface
 {
 public:
 	jvc_xvd701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

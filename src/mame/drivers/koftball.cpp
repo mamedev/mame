@@ -34,6 +34,7 @@ ft5_v6_c4.u58 /
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -52,6 +53,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void koftball(machine_config &config);
+
+	void init_koftball();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_main_ram;
 	required_shared_ptr<uint16_t> m_bmc_1_videoram;
@@ -67,13 +73,11 @@ public:
 	DECLARE_WRITE16_MEMBER(prot_w);
 	DECLARE_WRITE16_MEMBER(bmc_1_videoram_w);
 	DECLARE_WRITE16_MEMBER(bmc_2_videoram_w);
-	DECLARE_DRIVER_INIT(koftball);
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bmc_interrupt);
-	void koftball(machine_config &config);
 	void koftball_mem(address_map &map);
 	void ramdac_map(address_map &map);
 };
@@ -149,36 +153,38 @@ WRITE16_MEMBER(koftball_state::bmc_2_videoram_w)
 	m_tilemap_2->mark_tile_dirty(offset);
 }
 
-ADDRESS_MAP_START(koftball_state::koftball_mem)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_SHARE("main_ram")
+void koftball_state::koftball_mem(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x220000, 0x22ffff).ram().share("main_ram");
 
-	AM_RANGE(0x260000, 0x260fff) AM_WRITE(bmc_1_videoram_w) AM_SHARE("bmc_1_videoram")
-	AM_RANGE(0x261000, 0x261fff) AM_WRITE(bmc_2_videoram_w) AM_SHARE("bmc_2_videoram")
-	AM_RANGE(0x262000, 0x26ffff) AM_RAM
+	map(0x260000, 0x260fff).w(FUNC(koftball_state::bmc_1_videoram_w)).share("bmc_1_videoram");
+	map(0x261000, 0x261fff).w(FUNC(koftball_state::bmc_2_videoram_w)).share("bmc_2_videoram");
+	map(0x262000, 0x26ffff).ram();
 
-	AM_RANGE(0x280000, 0x28ffff) AM_RAM /* unused ? */
-	AM_RANGE(0x2a0000, 0x2a001f) AM_WRITENOP
-	AM_RANGE(0x2a0000, 0x2a001f) AM_READ(random_number_r)
-	AM_RANGE(0x2b0000, 0x2b0003) AM_READ(random_number_r)
-	AM_RANGE(0x2d8000, 0x2d8001) AM_READ(random_number_r)
-	AM_RANGE(0x2da000, 0x2da003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
+	map(0x280000, 0x28ffff).ram(); /* unused ? */
+	map(0x2a0000, 0x2a001f).nopw();
+	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
+	map(0x2b0000, 0x2b0003).r(FUNC(koftball_state::random_number_r));
+	map(0x2d8000, 0x2d8001).r(FUNC(koftball_state::random_number_r));
+	map(0x2da000, 0x2da003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
 
-	AM_RANGE(0x2db000, 0x2db001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x2db002, 0x2db003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x2db004, 0x2db005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	map(0x2db001, 0x2db001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x2db003, 0x2db003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x2db005, 0x2db005).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x2dc000, 0x2dc001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x2f0000, 0x2f0003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x300000, 0x300001) AM_WRITENOP
-	AM_RANGE(0x320000, 0x320001) AM_WRITENOP
-	AM_RANGE(0x340000, 0x340001) AM_READ(prot_r)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(prot_w)
-ADDRESS_MAP_END
+	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x2f0000, 0x2f0003).portr("INPUTS");
+	map(0x300000, 0x300001).nopw();
+	map(0x320000, 0x320001).nopw();
+	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
+	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
+}
 
-ADDRESS_MAP_START(koftball_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void koftball_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 static INPUT_PORTS_START( koftball )
 	PORT_START("INPUTS")
@@ -227,14 +233,14 @@ static const gfx_layout tilelayout =
 	8*32
 };
 
-static GFXDECODE_START( koftball )
+static GFXDECODE_START( gfx_koftball )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(koftball_state::koftball)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(21'477'272) / 2)
-	MCFG_CPU_PROGRAM_MAP(koftball_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(21'477'272) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(koftball_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", koftball_state, bmc_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -248,15 +254,16 @@ MACHINE_CONFIG_START(koftball_state::koftball)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koftball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_koftball)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))  // guessed chip type, clock not verified
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))  // guessed chip type, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_LOW) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_LOW) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -302,14 +309,14 @@ static const uint16_t nvram[]=
 };
 
 #endif
-DRIVER_INIT_MEMBER(koftball_state,koftball)
+void koftball_state::init_koftball()
 {
 	save_item(NAME(m_prot_data));
 
 #if NVRAM_HACK
 	{
-		int offset=0;
-		while(nvram[offset]!=0xffff)
+		int offset = 0;
+		while(nvram[offset] != 0xffff)
 		{
 			m_main_ram[offset]=nvram[offset];
 			++offset;
@@ -318,4 +325,4 @@ DRIVER_INIT_MEMBER(koftball_state,koftball)
 #endif
 }
 
-GAME( 1995, koftball,    0, koftball,    koftball, koftball_state,    koftball, ROT0,  "BMC", "King of Football", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

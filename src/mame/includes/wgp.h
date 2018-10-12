@@ -9,18 +9,12 @@
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
 #include "video/tc0100scn.h"
+#include "emupal.h"
 
 
 class wgp_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT4,
-		TIMER_INTERRUPT6,
-		TIMER_CPUB_INTERRUPT6
-	};
-
 	wgp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spritemap(*this, "spritemap"),
@@ -41,6 +35,20 @@ public:
 		m_fake(*this, "FAKE")
 	{ }
 
+	void wgp2(machine_config &config);
+	void wgp(machine_config &config);
+
+	void init_wgp();
+	void init_wgp2();
+
+private:
+	enum
+	{
+		TIMER_INTERRUPT4,
+		TIMER_INTERRUPT6,
+		TIMER_CPUB_INTERRUPT6
+	};
+
 	DECLARE_WRITE8_MEMBER(coins_w);
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_READ16_MEMBER(lan_status_r);
@@ -50,24 +58,20 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(pivram_word_w);
 	DECLARE_WRITE16_MEMBER(piv_ctrl_word_w);
-	DECLARE_DRIVER_INIT(wgp);
-	DECLARE_DRIVER_INIT(wgp2);
+
 	DECLARE_VIDEO_START(wgp2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpub_interrupt);
 
-	void wgp2(machine_config &config);
-	void wgp(machine_config &config);
 	void cpu2_map(address_map &map);
 	void main_map(address_map &map);
 	void z80_sound_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	TILE_GET_INFO_MEMBER(get_piv0_tile_info);
 	TILE_GET_INFO_MEMBER(get_piv1_tile_info);
 	TILE_GET_INFO_MEMBER(get_piv2_tile_info);

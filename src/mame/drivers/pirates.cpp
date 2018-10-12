@@ -130,7 +130,7 @@ CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
 	   602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	pc = machine().device("main")->safe_pc();
+	pc = m_maincpu->pc();
 	if (pc == 0x6134)
 	{
 		bit = prot & 1;
@@ -153,25 +153,26 @@ CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(pirates_state::pirates_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM // main ram
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM")
+void pirates_state::pirates_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10ffff).ram(); // main ram
+	map(0x300000, 0x300001).portr("INPUTS");
+	map(0x400000, 0x400001).portr("SYSTEM");
 //  AM_RANGE(0x500000, 0x5007ff) AM_RAM
-	AM_RANGE(0x500000, 0x5007ff) AM_WRITEONLY AM_SHARE("spriteram")
+	map(0x500000, 0x5007ff).writeonly().share("spriteram");
 //  AM_RANGE(0x500800, 0x50080f) AM_WRITENOP
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(out_w)
-	AM_RANGE(0x700000, 0x700001) AM_WRITEONLY AM_SHARE("scroll")    // scroll reg
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x900000, 0x90017f) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0x900180, 0x90137f) AM_RAM_WRITE(tx_tileram_w) AM_SHARE("tx_tileram")
-	AM_RANGE(0x901380, 0x902a7f) AM_RAM_WRITE(fg_tileram_w) AM_SHARE("fg_tileram")
+	map(0x600000, 0x600001).w(FUNC(pirates_state::out_w));
+	map(0x700000, 0x700001).writeonly().share("scroll");    // scroll reg
+	map(0x800000, 0x803fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x900000, 0x90017f).ram();  // more of tilemaps ?
+	map(0x900180, 0x90137f).ram().w(FUNC(pirates_state::tx_tileram_w)).share("tx_tileram");
+	map(0x901380, 0x902a7f).ram().w(FUNC(pirates_state::fg_tileram_w)).share("fg_tileram");
 //  AM_RANGE(0x902580, 0x902a7f) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0x902a80, 0x904187) AM_RAM_WRITE(bg_tileram_w) AM_SHARE("bg_tileram")
+	map(0x902a80, 0x904187).ram().w(FUNC(pirates_state::bg_tileram_w)).share("bg_tileram");
 //  AM_RANGE(0x903c80, 0x904187) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /* Input Ports */
@@ -200,10 +201,10 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)  // EEPROM data
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)  // EEPROM data
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )     // seems checked in "test mode"
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )     // seems checked in "test mode"
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pirates_state,prot_r, nullptr)      // protection
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pirates_state,prot_r, nullptr)      // protection
 	/* What do these bits do ? */
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -241,7 +242,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( pirates )
+static GFXDECODE_START( gfx_pirates )
 
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x0000, 3*128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x1800,   128 )
@@ -252,13 +253,13 @@ GFXDECODE_END
 /* Machine Driver + Related bits */
 
 MACHINE_CONFIG_START(pirates_state::pirates)
-	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
-	MCFG_CPU_PROGRAM_MAP(pirates_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) /* 16mhz */
+	MCFG_DEVICE_PROGRAM_MAP(pirates_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pirates)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pirates)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -273,9 +274,9 @@ MACHINE_CONFIG_START(pirates_state::pirates)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1333333, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -307,23 +308,23 @@ ROM_END
 
 ROM_START( piratesb )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code (encrypted) */
-	ROM_LOAD16_BYTE( "U15",  0x00000, 0x80000, CRC(0cfd6415) SHA1(ff5d3631702f64351afa3b7435a6977ae856dff7) )
-	ROM_LOAD16_BYTE( "U16",  0x00001, 0x80000, CRC(98cece02) SHA1(79858623a2b6ae24067e0ba1af009444bafba490) )
+	ROM_LOAD16_BYTE( "u15",  0x00000, 0x80000, CRC(0cfd6415) SHA1(ff5d3631702f64351afa3b7435a6977ae856dff7) )
+	ROM_LOAD16_BYTE( "u16",  0x00001, 0x80000, CRC(98cece02) SHA1(79858623a2b6ae24067e0ba1af009444bafba490) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* GFX (encrypted) */
-	ROM_LOAD( "U34", 0x000000, 0x080000, CRC(89fda216) SHA1(ea31e750460e67a24972b04171230633eb2b6d9d) )
-	ROM_LOAD( "U35", 0x080000, 0x080000, CRC(40e069b4) SHA1(515d12cbb29bdbf3f3016e5bbe14941209978095) )
-	ROM_LOAD( "U48", 0x100000, 0x080000, CRC(26d78518) SHA1(c293f1194f8ef38241d149cf1db1a511a7fb4936) )
-	ROM_LOAD( "U49", 0x180000, 0x080000, CRC(f31696ea) SHA1(f5ab59e441317b02b615a1cdc6d075c5bdcdea73) )
+	ROM_LOAD( "u34", 0x000000, 0x080000, CRC(89fda216) SHA1(ea31e750460e67a24972b04171230633eb2b6d9d) )
+	ROM_LOAD( "u35", 0x080000, 0x080000, CRC(40e069b4) SHA1(515d12cbb29bdbf3f3016e5bbe14941209978095) )
+	ROM_LOAD( "u48", 0x100000, 0x080000, CRC(26d78518) SHA1(c293f1194f8ef38241d149cf1db1a511a7fb4936) )
+	ROM_LOAD( "u49", 0x180000, 0x080000, CRC(f31696ea) SHA1(f5ab59e441317b02b615a1cdc6d075c5bdcdea73) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* GFX (encrypted) */
-	ROM_LOAD( "U69", 0x000000, 0x080000, CRC(c78a276f) SHA1(d5127593e68f9e8f2878803c652a35a1c6d82b2c) )
-	ROM_LOAD( "U70", 0x080000, 0x080000, CRC(9f0bad96) SHA1(b8f910aa259192e261815392f5d7c9c7dabe0b4d) )
-	ROM_LOAD( "U71", 0x100000, 0x080000, CRC(0bb7c816) SHA1(bc786b6d04ae964f0ea5d6dd314fd7b18f8872e8) ) // 1 bit different, is one of them bad?
-	ROM_LOAD( "U72", 0x180000, 0x080000, CRC(1c41bd2c) SHA1(fba264a3c195f303337223a74cbad5eec5c457ec) )
+	ROM_LOAD( "u69", 0x000000, 0x080000, CRC(c78a276f) SHA1(d5127593e68f9e8f2878803c652a35a1c6d82b2c) )
+	ROM_LOAD( "u70", 0x080000, 0x080000, CRC(9f0bad96) SHA1(b8f910aa259192e261815392f5d7c9c7dabe0b4d) )
+	ROM_LOAD( "u71", 0x100000, 0x080000, CRC(0bb7c816) SHA1(bc786b6d04ae964f0ea5d6dd314fd7b18f8872e8) ) // 1 bit different, is one of them bad?
+	ROM_LOAD( "u72", 0x180000, 0x080000, CRC(1c41bd2c) SHA1(fba264a3c195f303337223a74cbad5eec5c457ec) )
 
 	ROM_REGION( 0x080000, "oki", 0) /* OKI samples (encrypted) */
-	ROM_LOAD( "U31", 0x000000, 0x080000, CRC(63a739ec) SHA1(c57f657225e62b3c9c5f0c7185ad7a87794d55f4) )
+	ROM_LOAD( "u31", 0x000000, 0x080000, CRC(63a739ec) SHA1(c57f657225e62b3c9c5f0c7185ad7a87794d55f4) )
 ROM_END
 
 
@@ -443,7 +444,7 @@ void pirates_state::decrypt_oki()
 }
 
 
-DRIVER_INIT_MEMBER(pirates_state,pirates)
+void pirates_state::init_pirates()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -458,7 +459,7 @@ DRIVER_INIT_MEMBER(pirates_state,pirates)
 
 READ16_MEMBER(pirates_state::genix_prot_r){ if(!offset) return 0x0004; else return 0x0000; }
 
-DRIVER_INIT_MEMBER(pirates_state,genix)
+void pirates_state::init_genix()
 {
 	decrypt_68k();
 	decrypt_p();
@@ -472,7 +473,7 @@ DRIVER_INIT_MEMBER(pirates_state,genix)
 
 /* GAME */
 
-GAME( 1994, pirates,  0,       pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, piratesb, pirates, pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 2)", MACHINE_SUPPORTS_SAVE ) // shows 'Copyright 1995' instead of (c)1994 Nix, but isn't unprotected, various changes to the names in the credis + a few other minor alterations
+GAME( 1994, pirates,  0,       pirates, pirates, pirates_state, init_pirates, 0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, piratesb, pirates, pirates, pirates, pirates_state, init_pirates, 0, "NIX", "Pirates (set 2)", MACHINE_SUPPORTS_SAVE ) // shows 'Copyright 1995' instead of (c)1994 Nix, but isn't unprotected, various changes to the names in the credis + a few other minor alterations
 
-GAME( 1994, genix,    0,       pirates, pirates, pirates_state, genix,    0, "NIX", "Genix Family",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, genix,    0,       pirates, pirates, pirates_state, init_genix,   0, "NIX", "Genix Family",    MACHINE_SUPPORTS_SAVE )

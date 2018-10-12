@@ -143,6 +143,7 @@ Pin #11(+) | | R               |
 #include "includes/lethalj.h"
 
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -178,16 +179,16 @@ WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	m_ticket->motor_w(BIT(data, 1));
-	output().set_lamp_value(0, BIT(data, 2));
+	m_lamps[0] = BIT(data, 2);
 }
 
 
 WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 {
 	m_ticket->motor_w(BIT(data, 0));
-	output().set_lamp_value(0, BIT(data, 2));
-	output().set_lamp_value(1, BIT(data, 3));
-	output().set_lamp_value(2, BIT(data, 4));
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 3);
+	m_lamps[2] = BIT(data, 4);
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
@@ -195,9 +196,9 @@ WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 WRITE16_MEMBER(lethalj_state::cclownz_control_w)
 {
 	m_ticket->motor_w(BIT(data, 0));
-	output().set_lamp_value(0, BIT(data, 2));
-	output().set_lamp_value(1, BIT(data, 4));
-	output().set_lamp_value(2, BIT(data, 5));
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 4);
+	m_lamps[2] = BIT(data, 5);
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
 }
 
@@ -209,22 +210,23 @@ WRITE16_MEMBER(lethalj_state::cclownz_control_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(lethalj_state::lethalj_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x04000000, 0x0400000f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x04100000, 0x0410000f) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x00ff)
+void lethalj_state::lethalj_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram();
+	map(0x04000000, 0x0400000f).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x04000010, 0x0400001f).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x04100000, 0x0410000f).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
-	AM_RANGE(0x04200000, 0x0420001f) AM_WRITENOP    /* clocks bits through here */
-	AM_RANGE(0x04300000, 0x0430007f) AM_READ(lethalj_gun_r)
-	AM_RANGE(0x04400000, 0x0440000f) AM_WRITENOP    /* clocks bits through here */
-	AM_RANGE(0x04500010, 0x0450001f) AM_READ_PORT("IN0")
-	AM_RANGE(0x04600000, 0x0460000f) AM_READ_PORT("IN1")
-	AM_RANGE(0x04700000, 0x0470007f) AM_WRITE(lethalj_blitter_w)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP    /* seems to be a bug in their code, one of many. */
-	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+	map(0x04200000, 0x0420001f).nopw();    /* clocks bits through here */
+	map(0x04300000, 0x0430007f).r(FUNC(lethalj_state::lethalj_gun_r));
+	map(0x04400000, 0x0440000f).nopw();    /* clocks bits through here */
+	map(0x04500010, 0x0450001f).portr("IN0");
+	map(0x04600000, 0x0460000f).portr("IN1");
+	map(0x04700000, 0x0470007f).w(FUNC(lethalj_state::blitter_w));
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xc0000240, 0xc000025f).nopw();    /* seems to be a bug in their code, one of many. */
+	map(0xff800000, 0xffffffff).rom().region("maincpu", 0);
+}
 
 
 
@@ -375,7 +377,7 @@ static INPUT_PORTS_START( ripribit )
 	PORT_START("IN0")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -462,7 +464,7 @@ static INPUT_PORTS_START( cfarm )
 	PORT_DIPSETTING(      0x0000, "10" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0006, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -513,8 +515,8 @@ static INPUT_PORTS_START( cclownz )
 	PORT_DIPSETTING(      0x0000, "3000" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, nullptr)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, nullptr)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -632,8 +634,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(lethalj_state::gameroom)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lethalj_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lethalj_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -650,15 +652,15 @@ MACHINE_CONFIG_START(lethalj_state::gameroom)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_OKIM6295_ADD("oki3", SOUND_CLOCK, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki3", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
@@ -666,7 +668,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(lethalj_state::lethalj)
 	gameroom(config);
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK_LETHALJ) /* pixel clock */
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -682,11 +684,11 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( lethalj )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "lethal_vc8_2.3.vc8",  0x000000, 0x080000, CRC(8d568e1d) SHA1(e4dd3794789f9ccd7be8374978a3336f2b79136f) ) /* Labeled as LETHAL VC8 2.3, also found labeled as VC-8 */
 	ROM_LOAD16_BYTE( "lethal_vc9_2.3.vc9",  0x000001, 0x080000, CRC(8f22add4) SHA1(e773d3ae9cf512810fc266e784d21ed115c8830c) ) /* Labeled as LETHAL VC9 2.3, also found labeled as VC-9 */
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "gr1.gr1",             0x000000, 0x100000, CRC(27f7b244) SHA1(628b29c066e217e1fe54553ea3ed98f86735e262) ) /* These had non specific GRx labels, also found labeled as GR-x */
 	ROM_LOAD16_BYTE( "gr2.gr2",             0x000001, 0x100000, CRC(1f25d3ab) SHA1(bdb8a3c546cdee9a5630c47b9c5079a956e8a093) )
 	ROM_LOAD16_BYTE( "gr4.gr4",             0x200000, 0x100000, CRC(c5838b4c) SHA1(9ad03d0f316eb31fdf0ca6f65c02a27d3406d072) )
@@ -706,13 +708,13 @@ ROM_END
 
 
 ROM_START( eggventr )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "evc8.10.vc8", 0x000000, 0x020000, CRC(225d1164) SHA1(b0dc55f2e8ded1fe7874de05987fcf879772289e) ) /* Labeled as EVC8.10 */
 	ROM_LOAD16_BYTE( "evc9.10.vc9", 0x000001, 0x020000, CRC(42f6e904) SHA1(11be8e7383a218aac0e1a63236bbdb7cca0993bf) ) /* Labeled as EVC9.10 */
-	ROM_COPY( "user1", 0x00000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
-	ROM_COPY( "user1", 0x00000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "maincpu", 0x00000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "maincpu", 0x00000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2",   0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.gr4",   0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -732,13 +734,13 @@ ROM_END
 
 
 ROM_START( eggventr8 )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "evc8.8.vc8", 0x000000, 0x020000, CRC(5a130c04) SHA1(00408912b436efa003bb02dce90fae4fe33a0180) ) /* Labeled as EVC8.8 */
 	ROM_LOAD16_BYTE( "evc9.8.vc9", 0x000001, 0x020000, CRC(3ac0a95b) SHA1(7f3bd0e6d2d790af4aa6881ea8de8b296a64164a) ) /* Labeled as EVC9.8 */
-	ROM_COPY( "user1", 0x00000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
-	ROM_COPY( "user1", 0x00000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "maincpu", 0x00000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "maincpu", 0x00000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2",   0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.gr4",   0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -758,13 +760,13 @@ ROM_END
 
 
 ROM_START( eggventr7 )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "evc8.7.vc8", 0x000000, 0x020000, CRC(99999899) SHA1(e3908600fa711baa7f7562f86498ec7e988a5bea) ) /* Labeled as EVC8.7 */
 	ROM_LOAD16_BYTE( "evc9.7.vc9", 0x000001, 0x020000, CRC(1b608155) SHA1(256dd981515d57f806a3770bdc6ff46b9000f7f3) ) /* Labeled as EVC9.7 */
-	ROM_COPY( "user1", 0x00000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
-	ROM_COPY( "user1", 0x00000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "maincpu", 0x00000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "maincpu", 0x00000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2",   0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.gr4",   0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -784,11 +786,11 @@ ROM_END
 
 
 ROM_START( eggventr2 ) /* Comes from a PCB with an early serial number EV00123, program roms are 27C040 with required data at 0x7ffe0 in each rom */
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "ev_vc8.2.vc8", 0x000000, 0x080000, CRC(ce1da4f7) SHA1(c163041d684dc6a6fab07394e8aac3d82a2ecb52) ) /* Labeled as EV VC8.2 */
 	ROM_LOAD16_BYTE( "ev_vc9.2.vc9", 0x000001, 0x080000, CRC(4b24906b) SHA1(2e9b85a658cb02d76854f3ee5a071e4161d0d0cf) ) /* Labeled as EV VC9.2 */
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",     0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2",     0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.gr4",     0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -808,11 +810,11 @@ ROM_END
 
 
 ROM_START( eggventra ) /* A.L. Australia license */
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "egr8.vc8", 0x000000, 0x080000, CRC(a62c4143) SHA1(a21d6b7efdba4965285265426ed79f3249a86685) )
 	ROM_LOAD16_BYTE( "egr9.vc9", 0x000001, 0x080000, CRC(bc55bc7a) SHA1(d6e3fc76b4a0a20176af1338a32bb81f0599fdc0) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1", 0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2", 0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.gr4", 0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -832,13 +834,13 @@ ROM_END
 
 
 ROM_START( eggventrd )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "eggdlx.vc8", 0x000000, 0x020000, CRC(8d678842) SHA1(92b18ec903ec8579e7dffb40284987f1d44255b8) )
 	ROM_LOAD16_BYTE( "eggdlx.vc9", 0x000001, 0x020000, CRC(9db3fd23) SHA1(165a12a2d107c93cf216e755596e7457010a8f17) )
-	ROM_COPY( "user1", 0x00000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with data repeated 4 times
-	ROM_COPY( "user1", 0x00000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with data repeated 4 times
+	ROM_COPY( "maincpu", 0x00000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with data repeated 4 times
+	ROM_COPY( "maincpu", 0x00000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with data repeated 4 times
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2",   0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "eggdlx.gr4", 0x200000, 0x100000, CRC(cfb1e28b) SHA1(8d535a27158acee893233cf2012b4ab0ffc8dc03) )
@@ -858,11 +860,11 @@ ROM_END
 
 
 ROM_START( franticf )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "fred_vc-8.vc8", 0x000000, 0x080000, CRC(f7eb92a2) SHA1(c56a0432b8c4fe8522f6dd1e0b60eded3dfc25d2) )
 	ROM_LOAD16_BYTE( "fred_vc-9.vc9", 0x000001, 0x080000, CRC(b657b800) SHA1(12649becab0019ea7150b5d797b72b07121c6a3e) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "fred_gr1.gr1", 0x000000, 0x080000, CRC(acb75e63) SHA1(637ec6b7101f34a2bb93be8d0d5eaa800aafd332) )
 	ROM_LOAD16_BYTE( "fred_gr2.gr2", 0x000001, 0x080000, CRC(b47c6363) SHA1(0acfd7dc45d21e6e73b5abbc544e7c0fa192c462) )
 	ROM_LOAD16_BYTE( "fred_gr4.gr4", 0x200000, 0x080000, CRC(ac63729f) SHA1(dd856d983d85c38a784666105cb2d421bee8e76a) )
@@ -882,11 +884,11 @@ ROM_END
 
 
 ROM_START( cclownz )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "cc-v1-vc8.bin", 0x000000, 0x080000, CRC(433fe6ac) SHA1(dea7aede9882ee52be88927418b7395418757d12) )
 	ROM_LOAD16_BYTE( "cc-v1-vc9.bin", 0x000001, 0x080000, CRC(9d1b3dae) SHA1(44a97c38bc9685e97721722c67505832fa06b44d) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "cc-gr1.bin",   0x000000, 0x100000, CRC(17c0ab2a) SHA1(f5ec66f4ac3292ef74f6434fe3ef17f9e977e8f6) )
 	ROM_LOAD16_BYTE( "cc-gr2.bin",   0x000001, 0x100000, CRC(dead9528) SHA1(195ad9f7da61ecb5a364da92ba837aa3fcb3a347) )
 	ROM_LOAD16_BYTE( "cc-gr4.bin",   0x200000, 0x100000, CRC(78cceed8) SHA1(bc8e5bb625072b17a5711402b07a39ea4a87a0f8) )
@@ -914,11 +916,11 @@ ROM_END
 
 
 ROM_START( ripribit )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "ribbit_vc8_v3.5.vc8", 0x000000, 0x080000, CRC(8ce7f8f2) SHA1(b40b5127a0dc84a44e0283711cc526114e012c09) )
 	ROM_LOAD16_BYTE( "ribbit_vc9_v3.5.vc9", 0x000001, 0x080000, CRC(70be27c3) SHA1(61328e51d083b0ffde739711675d19cfe3253244) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "ribbit_gr1_rv2.81.gr1",   0x000000, 0x100000, CRC(e02c79b7) SHA1(75e352424c449cd5cba1057555928d7ee13ab113) )
 	ROM_LOAD16_BYTE( "ribbit_gr2_rv2.81.gr2",   0x000001, 0x100000, CRC(09f48db7) SHA1(d0156c6e3d05ff81540c0eeb66e9a5e7fc4d053c) )
 	ROM_LOAD16_BYTE( "ribbit_gr4_rv2.81.gr4",   0x200000, 0x100000, CRC(94d0db81) SHA1(aa46c2e5a627cf01c1d57002204ec3419f0d4503) )
@@ -946,11 +948,11 @@ ROM_END
 
 
 ROM_START( ripribita )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "rr_v2-84-vc8.bin", 0x000000, 0x080000, CRC(5ecc432d) SHA1(073062528fbcf63be7e3c6695d60d048430f6e4b) )
 	ROM_LOAD16_BYTE( "rr_v2-84-vc9.bin", 0x000001, 0x080000, CRC(d9bae3f8) SHA1(fcf8099ebe170ad5778aaa533bcfd1e5ead46e6b) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "rr-gr1.bin",   0x000000, 0x100000, CRC(e02c79b7) SHA1(75e352424c449cd5cba1057555928d7ee13ab113) ) /* Same data, different labels */
 	ROM_LOAD16_BYTE( "rr-gr2.bin",   0x000001, 0x100000, CRC(09f48db7) SHA1(d0156c6e3d05ff81540c0eeb66e9a5e7fc4d053c) )
 	ROM_LOAD16_BYTE( "rr-gr4.bin",   0x200000, 0x100000, CRC(94d0db81) SHA1(aa46c2e5a627cf01c1d57002204ec3419f0d4503) )
@@ -978,11 +980,11 @@ ROM_END
 
 
 ROM_START( cfarm )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "cf-v2-vc8.bin", 0x000000, 0x080000, CRC(93bcf145) SHA1(134ac3ee4fd837f56fb0b338289cf03108346539) )
 	ROM_LOAD16_BYTE( "cf-v2-vc9.bin", 0x000001, 0x080000, CRC(954421f9) SHA1(bf1faa9b085f066d1e2ff6ee01c468b1c1d945e9) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "cf-gr1.bin",   0x000000, 0x100000, CRC(2241a06e) SHA1(f07a99372bb951dd345378da212b41cb8204e782) )
 	ROM_LOAD16_BYTE( "cf-gr2.bin",   0x000001, 0x100000, CRC(31182263) SHA1(d5d36f9b5d612f681e6aa563831b6704bc05489e) )
 	ROM_LOAD16_BYTE( "cf-gr4.bin",   0x200000, 0x100000, CRC(0883a6f2) SHA1(ef259dcdc7b1325f15a98f6c97ecb965b2b6f9b1) )
@@ -1016,19 +1018,19 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(lethalj_state,ripribit)
+void lethalj_state::init_ripribit()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(lethalj_state,cfarm)
+void lethalj_state::init_cfarm()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(lethalj_state,cclownz)
+void lethalj_state::init_cclownz()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),this));
 }
@@ -1041,15 +1043,15 @@ DRIVER_INIT_MEMBER(lethalj_state,cclownz)
  *
  *************************************/
 
-GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, 0,        ROT0,  "The Game Room", "Lethal Justice (Version 2.3)", 0 )
-GAME( 1996, franticf,  0,        gameroom, franticf,  lethalj_state, 0,        ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
-GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
-GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
-GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
-GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 2)", 0 )
-GAME( 1997, eggventra, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )
-GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
-GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 3.5)", 0 )
-GAME( 1997, ripribita, ripribit, gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
-GAME( 1999, cfarm,     0,        gameroom, cfarm,     lethalj_state, cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
-GAME( 1999, cclownz,   0,        gameroom, cclownz,   lethalj_state, cclownz,  ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", 0 )
+GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, empty_init,    ROT0,  "The Game Room", "Lethal Justice (Version 2.3)", 0 )
+GAME( 1996, franticf,  0,        gameroom, franticf,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
+GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
+GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
+GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 2)", 0 )
+GAME( 1997, eggventra, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )
+GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
+GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, init_ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 3.5)", 0 )
+GAME( 1997, ripribita, ripribit, gameroom, ripribit,  lethalj_state, init_ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
+GAME( 1999, cfarm,     0,        gameroom, cfarm,     lethalj_state, init_cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
+GAME( 1999, cclownz,   0,        gameroom, cclownz,   lethalj_state, init_cclownz,  ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", 0 )

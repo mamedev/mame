@@ -192,7 +192,7 @@ protected:
 	ATTR_HOT virtual void execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -284,7 +284,7 @@ class netlist_mame_analog_input_device : public device_t, public netlist_mame_su
 public:
 
 	// construction/destruction
-	netlist_mame_analog_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	netlist_mame_analog_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_name(const char *param_name) { m_param_name = param_name; }
 
@@ -323,7 +323,7 @@ public:
 	typedef device_delegate<void (const double, const attotime &)> output_delegate;
 
 	// construction/destruction
-	netlist_mame_analog_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	netlist_mame_analog_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_params(const char *in_name, output_delegate &&adelegate);
 
@@ -347,9 +347,17 @@ public:
 	typedef device_delegate<void(const int, const attotime &)> output_delegate;
 
 	// construction/destruction
-	netlist_mame_logic_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	netlist_mame_logic_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_params(const char *in_name, output_delegate &&adelegate);
+	template <class FunctionClass> void set_params(const char *in_name, void (FunctionClass::*callback)(const int, const attotime &), const char *name)
+	{
+		set_params(in_name, output_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_params(const char *in_name, const char *devname, void (FunctionClass::*callback)(const int, const attotime &), const char *name)
+	{
+		set_params(in_name, output_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
 
 protected:
 	// device-level overrides
@@ -369,7 +377,7 @@ class netlist_mame_int_input_device : public device_t, public netlist_mame_sub_i
 {
 public:
 	// construction/destruction
-	netlist_mame_int_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	netlist_mame_int_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_params(const char *param_name, const uint32_t mask, const uint32_t shift);
 
@@ -403,7 +411,7 @@ class netlist_mame_logic_input_device : public device_t, public netlist_mame_sub
 {
 public:
 	// construction/destruction
-	netlist_mame_logic_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	netlist_mame_logic_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_params(const char *param_name, const uint32_t shift);
 
@@ -435,7 +443,7 @@ class netlist_mame_ram_pointer_device : public device_t, public netlist_mame_sub
 {
 public:
 	// construction/destruction
-	netlist_mame_ram_pointer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	netlist_mame_ram_pointer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t* ptr() const { return m_data; }
 
@@ -460,7 +468,7 @@ class netlist_mame_stream_input_device : public device_t, public netlist_mame_su
 {
 public:
 	// construction/destruction
-	netlist_mame_stream_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	netlist_mame_stream_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_params(int channel, const char *param_name);
 
@@ -481,7 +489,7 @@ class netlist_mame_stream_output_device : public device_t, public netlist_mame_s
 {
 public:
 	// construction/destruction
-	netlist_mame_stream_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	netlist_mame_stream_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_params(int channel, const char *out_name);
 

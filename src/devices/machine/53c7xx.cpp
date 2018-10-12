@@ -105,7 +105,7 @@ ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *ta
 void ncr53c7xx_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve line callbacks
 	m_irq_handler.resolve_safe();
@@ -1736,7 +1736,7 @@ void ncr53c7xx_device::tc_int()
 
 const char* ncr53c7xx_device::disassemble_scripts()
 {
-	static const char* phases[] =
+	static char const *const phases[] =
 	{
 		"Data Out",
 		"Data In",
@@ -1760,7 +1760,7 @@ const char* ncr53c7xx_device::disassemble_scripts()
 		}
 		case 1:
 		{
-			static const char* ops[] =
+			static char const *const ops[] =
 			{
 				"SELECT",
 				"DISCONNECT",
@@ -1777,7 +1777,7 @@ const char* ncr53c7xx_device::disassemble_scripts()
 		}
 		case 2:
 		{
-			static const char* ops[] =
+			static char const *const ops[] =
 			{
 				"JUMP",
 				"CALL",

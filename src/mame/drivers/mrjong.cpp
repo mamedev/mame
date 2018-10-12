@@ -72,21 +72,23 @@ READ8_MEMBER(mrjong_state::io_0x03_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(mrjong_state::mrjong_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(mrjong_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(mrjong_colorram_w) AM_SHARE("colorram")
-ADDRESS_MAP_END
+void mrjong_state::mrjong_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa7ff).ram();
+	map(0xe000, 0xe3ff).ram().w(FUNC(mrjong_state::mrjong_videoram_w)).share("videoram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(mrjong_state::mrjong_colorram_w)).share("colorram");
+}
 
-ADDRESS_MAP_START(mrjong_state::mrjong_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P2") AM_WRITE(mrjong_flipscreen_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW") AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x03, 0x03) AM_READ(io_0x03_r)     // Unknown
-ADDRESS_MAP_END
+void mrjong_state::mrjong_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P2").w(FUNC(mrjong_state::mrjong_flipscreen_w));
+	map(0x01, 0x01).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).portr("DSW").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x03, 0x03).r(FUNC(mrjong_state::io_0x03_r));     // Unknown
+}
 
 /*************************************
  *
@@ -171,7 +173,7 @@ static const gfx_layout spritelayout =
 	32*8                /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( mrjong )
+static GFXDECODE_START( gfx_mrjong )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,      0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,    0, 32 )
 GFXDECODE_END
@@ -186,10 +188,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mrjong_state::mrjong)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */
-	MCFG_CPU_PROGRAM_MAP(mrjong_map)
-	MCFG_CPU_IO_MAP(mrjong_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrjong_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */
+	MCFG_DEVICE_PROGRAM_MAP(mrjong_map)
+	MCFG_DEVICE_IO_MAP(mrjong_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -199,19 +200,20 @@ MACHINE_CONFIG_START(mrjong_state::mrjong)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mrjong_state, screen_update_mrjong)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrjong)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrjong)
 	MCFG_PALETTE_ADD("palette", 4*32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(mrjong_state, mrjong)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, 15468000/6)
+	MCFG_DEVICE_ADD("sn1", SN76489, 15468000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 15468000/6)
+	MCFG_DEVICE_ADD("sn2", SN76489, 15468000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -276,6 +278,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mrjong,   0,      mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako",               "Mr. Jong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, crazyblk, mrjong, mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks",     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, blkbustr, mrjong, mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako (ECI license)", "BlockBuster",      MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrjong,   0,      mrjong, mrjong, mrjong_state, empty_init, ROT90, "Kiwako",               "Mr. Jong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, crazyblk, mrjong, mrjong, mrjong, mrjong_state, empty_init, ROT90, "Kiwako (ECI license)", "Crazy Blocks",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, blkbustr, mrjong, mrjong, mrjong, mrjong_state, empty_init, ROT90, "Kiwako (ECI license)", "BlockBuster",      MACHINE_SUPPORTS_SAVE )

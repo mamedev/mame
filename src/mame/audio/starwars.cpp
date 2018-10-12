@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/tms5220.h"
 #include "includes/starwars.h"
 
 
@@ -35,18 +34,16 @@ READ8_MEMBER(starwars_state::r6532_porta_r)
 	/* Note: bit 4 is always set to avoid sound self test */
 	uint8_t olddata = m_riot->porta_in_get();
 
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-	return (olddata & 0xc0) | 0x10 | (tms5220->readyq_r() << 2);
+	return (olddata & 0xc0) | 0x10 | (m_tms->readyq_r() << 2);
 }
 
 
 WRITE8_MEMBER(starwars_state::r6532_porta_w)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	/* handle 5220 read */
-	tms5220->rsq_w((data & 2)>>1);
+	m_tms->rsq_w((data & 2)>>1);
 	/* handle 5220 write */
-	tms5220->wsq_w((data & 1)>>0);
+	m_tms->wsq_w((data & 1)>>0);
 }
 
 
@@ -75,5 +72,5 @@ WRITE8_MEMBER(starwars_state::starwars_soundrst_w)
 	m_mainlatch->acknowledge_w(space, 0, 0);
 
 	/* reset sound CPU here  */
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }

@@ -80,6 +80,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -90,24 +91,23 @@ class kingdrby_state : public driver_device
 {
 public:
 	kingdrby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_vram(*this, "vram"),
-		m_attr(*this, "attr"),
-		m_spriteram(*this, "spriteram"),
-		m_soundcpu(*this, "soundcpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_vram(*this, "vram")
+		, m_attr(*this, "attr")
+		, m_ppi(*this, "ppi8255_%u", 0U)
+		, m_spriteram(*this, "spriteram")
+		, m_soundcpu(*this, "soundcpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_digits(*this, "digit%u", 0U)
+	{
+	}
 
-	uint8_t m_sound_cmd;
-	required_shared_ptr<uint8_t> m_vram;
-	required_shared_ptr<uint8_t> m_attr;
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc0w_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	uint8_t m_p1_hopper;
-	uint8_t m_p2_hopper;
-	uint8_t m_mux_data;
-	required_shared_ptr<uint8_t> m_spriteram;
+	void kingdrbb(machine_config &config);
+	void cowrace(machine_config &config);
+	void kingdrby(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
 	DECLARE_WRITE8_MEMBER(led_array_w);
@@ -127,12 +127,7 @@ public:
 	DECLARE_PALETTE_INIT(kingdrbb);
 	uint32_t screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_soundcpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void kingdrbb(machine_config &config);
-	void cowrace(machine_config &config);
-	void kingdrby(machine_config &config);
+
 	void cowrace_sound_io(address_map &map);
 	void cowrace_sound_map(address_map &map);
 	void master_io_map(address_map &map);
@@ -142,6 +137,22 @@ public:
 	void slave_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
+
+	uint8_t m_sound_cmd;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_attr;
+	tilemap_t *m_sc0_tilemap;
+	tilemap_t *m_sc0w_tilemap;
+	tilemap_t *m_sc1_tilemap;
+	uint8_t m_p1_hopper;
+	uint8_t m_p2_hopper;
+	uint8_t m_mux_data;
+	required_device_array<i8255_device, 2> m_ppi;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_device<cpu_device> m_soundcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<30> m_digits;
 };
 
 
@@ -204,6 +215,8 @@ void kingdrby_state::video_start()
 	m_sc0w_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingdrby_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_sc1_tilemap->set_transparent_pen(0);
+
+	m_digits.resolve();
 }
 
 static const uint8_t hw_sprite[16] =
@@ -407,8 +420,8 @@ WRITE8_MEMBER(kingdrby_state::led_array_w)
 	they goes from 0 to 5, to indicate the number.
 	If one player bets something, the other led will toggle between p1 and p2 bets.
 	*/
-	output().set_digit_value(0xf + offset, led_map[(data & 0xf0) >> 4]);
-	output().set_digit_value(0x0 + offset, led_map[(data & 0x0f) >> 0]);
+	m_digits[0xf + offset] = led_map[(data & 0xf0) >> 4];
+	m_digits[0x0 + offset] = led_map[(data & 0x0f) >> 0];
 
 }
 
@@ -418,82 +431,91 @@ WRITE8_MEMBER(kingdrby_state::led_array_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(kingdrby_state::master_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_MIRROR(0xc00) AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("vram")
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(sc0_attr_w) AM_SHARE("attr")
-ADDRESS_MAP_END
+void kingdrby_state::master_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x33ff).ram().mirror(0xc00).share("share1");
+	map(0x4000, 0x43ff).ram().w(FUNC(kingdrby_state::sc0_vram_w)).share("vram");
+	map(0x5000, 0x53ff).ram().w(FUNC(kingdrby_state::sc0_attr_w)).share("attr");
+}
 
-ADDRESS_MAP_START(kingdrby_state::master_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_NOP //interrupt ack
-ADDRESS_MAP_END
+void kingdrby_state::master_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).noprw(); //interrupt ack
+}
 
-ADDRESS_MAP_START(kingdrby_state::slave_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom, tested for the post check
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram") //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* I/O Ports */
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* I/O Ports */
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x7801, 0x780f) AM_WRITE(led_array_w)
-	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+void kingdrby_state::slave_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x3fff).rom(); //sound rom, tested for the post check
+	map(0x4000, 0x43ff).ram().share("nvram"); //backup ram
+	map(0x5000, 0x5003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+	map(0x6000, 0x6003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+	map(0x7000, 0x73ff).ram().share("share1");
+	map(0x7400, 0x74ff).ram().share("spriteram");
+	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x7601, 0x7601).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x7801, 0x780f).w(FUNC(kingdrby_state::led_array_w));
+	map(0x7a00, 0x7a00).ram(); //buffer for the key matrix
+	map(0x7c00, 0x7c00).portr("DSW");
+}
 
 WRITE8_MEMBER(kingdrby_state::kingdrbb_lamps_w)
 {
 	// (same as the inputs but active high)
 }
 
-ADDRESS_MAP_START(kingdrby_state::slave_1986_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram") //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* I/O Ports */
-//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) /* I/O Ports */
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("KEY0")
-	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("KEY1")
-	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("KEY2")
-	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("KEY3")
-	AM_RANGE(0x7800, 0x7803) AM_WRITE(kingdrbb_lamps_w)
-	AM_RANGE(0x7a00, 0x7a00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+void kingdrby_state::slave_1986_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x3fff).rom(); //sound rom tested for the post check
+	map(0x4000, 0x47ff).ram().share("nvram"); //backup ram
+	map(0x5000, 0x5003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE(m_ppi[1], i8255_device, read, write) /* I/O Ports */
+	map(0x7000, 0x73ff).ram().share("share1");
+	map(0x7400, 0x74ff).ram().share("spriteram");
+	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x7601, 0x7601).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x7800, 0x7800).portr("KEY0");
+	map(0x7801, 0x7801).portr("KEY1");
+	map(0x7802, 0x7802).portr("KEY2");
+	map(0x7803, 0x7803).portr("KEY3");
+	map(0x7800, 0x7803).w(FUNC(kingdrby_state::kingdrbb_lamps_w));
+	map(0x7a00, 0x7a00).portr("SYSTEM");
+	map(0x7c00, 0x7c00).portr("DSW");
+}
 
-ADDRESS_MAP_START(kingdrby_state::slave_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_NOP //interrupt ack
-ADDRESS_MAP_END
+void kingdrby_state::slave_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).noprw(); //interrupt ack
+}
 
-ADDRESS_MAP_START(kingdrby_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-ADDRESS_MAP_END
+void kingdrby_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
 
-ADDRESS_MAP_START(kingdrby_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void kingdrby_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
-ADDRESS_MAP_START(kingdrby_state::cowrace_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-ADDRESS_MAP_END
+void kingdrby_state::cowrace_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
 
-ADDRESS_MAP_START(kingdrby_state::cowrace_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ym2203_device, write)
-ADDRESS_MAP_END
+void kingdrby_state::cowrace_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x41).w("aysnd", FUNC(ym2203_device::write));
+}
 
 
 WRITE8_MEMBER(kingdrby_state::outportb_w)
@@ -528,8 +550,8 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) //1p hopper i/o
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) //1p hopper i/o
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper i/o
 
 	PORT_START("IN1")   // ppi0 (5001)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
@@ -685,8 +707,8 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) //1p hopper i/o
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) //1p hopper i/o
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper i/o
 
 	PORT_START("IN0")   // ppi0 (5001)
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )
@@ -864,12 +886,12 @@ static const gfx_layout cowrace_layout16x16x2 =
 	16*16
 };
 
-static GFXDECODE_START( kingdrby )
+static GFXDECODE_START( gfx_kingdrby )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16x2, 0x080, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, layout8x8x2,   0x000, 0x80 )
 GFXDECODE_END
 
-static GFXDECODE_START( cowrace )
+static GFXDECODE_START( gfx_cowrace )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, cowrace_layout16x16x2, 0x080, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0x000, 0x80 )
 GFXDECODE_END
@@ -939,40 +961,40 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 }
 
 MACHINE_CONFIG_START(kingdrby_state::kingdrby)
-	MCFG_CPU_ADD("master", Z80, CLK_2)
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_IO_MAP(master_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("master", Z80, CLK_2)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_IO_MAP(master_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("slave", Z80, CLK_2)
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_IO_MAP(slave_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("slave", Z80, CLK_2)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_IO_MAP(slave_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, CLK_2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kingdrby_state, irq0_line_hold, 1000) /* guess, controls ay8910 tempo.*/
+	MCFG_DEVICE_ADD("soundcpu", Z80, CLK_2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kingdrby_state, irq0_line_hold, 1000) /* guess, controls ay8910 tempo.*/
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// 5000-5003 PPI group modes 0/0 - A & B as input, C (all) as output.
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(kingdrby_state, hopper_io_r))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kingdrby_state, hopper_io_w))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set(FUNC(kingdrby_state::hopper_io_r));
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->out_pc_callback().set(FUNC(kingdrby_state::hopper_io_w));
 
 	// 6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kingdrby_state, sound_cmd_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
-	MCFG_I8255_IN_PORTB_CB(READ8(kingdrby_state, key_matrix_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(kingdrby_state, input_mux_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kingdrby_state, outport2_w))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->out_pa_callback().set(FUNC(kingdrby_state::sound_cmd_w));
+	m_ppi[1]->tri_pa_callback().set_constant(0x7f);
+	m_ppi[1]->in_pb_callback().set(FUNC(kingdrby_state::key_matrix_r));
+	m_ppi[1]->in_pc_callback().set(FUNC(kingdrby_state::input_mux_r));
+	m_ppi[1]->out_pc_callback().set(FUNC(kingdrby_state::outport2_w));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kingdrby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingdrby)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -987,54 +1009,57 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(kingdrby_state, sound_cmd_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
 	kingdrby(config);
 
-	MCFG_CPU_MODIFY("slave")
-	MCFG_CPU_PROGRAM_MAP(slave_1986_map)
+	MCFG_DEVICE_MODIFY("slave")
+	MCFG_DEVICE_PROGRAM_MAP(slave_1986_map)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrbb)
 
-	MCFG_DEVICE_REMOVE("ppi8255_0")
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	/* C as input, (all) as output */
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kingdrby_state, sound_cmd_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(kingdrby_state, outportb_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
+	m_ppi[0]->out_pa_callback().set(FUNC(kingdrby_state::sound_cmd_w));
+	m_ppi[0]->in_pa_callback().set_constant(0);
+	m_ppi[0]->tri_pa_callback().set_constant(0x7f);
+	m_ppi[0]->in_pb_callback().set_ioport("IN0");
+	m_ppi[0]->out_pb_callback().set(FUNC(kingdrby_state::outportb_w));
+	m_ppi[0]->in_pc_callback().set_ioport("IN1");
+	m_ppi[0]->out_pc_callback().set_nop();
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	/* actually unused */
+	/* PPI1 is actually unused */
+	m_ppi[1]->in_pa_callback().set_constant(0);
+	m_ppi[1]->in_pb_callback().set_constant(0);
+	m_ppi[1]->in_pc_callback().set_constant(0);
+	m_ppi[1]->out_pa_callback().set_nop();
+	m_ppi[1]->out_pb_callback().set_nop();
+	m_ppi[1]->out_pc_callback().set_nop();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kingdrby_state::cowrace)
 	kingdrbb(config);
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(cowrace_sound_map)
-	MCFG_CPU_IO_MAP(cowrace_sound_io)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(cowrace_sound_map)
+	MCFG_DEVICE_IO_MAP(cowrace_sound_io)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cowrace)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cowrace)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_REPLACE("aysnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(kingdrby_state, sound_cmd_r))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("oki", okim6295_device, read))   // read B
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("oki", okim6295_device, write))   // write B
+	MCFG_DEVICE_REPLACE("aysnd", YM2203, 3000000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("oki", okim6295_device, read))   // read B
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("oki", okim6295_device, write))   // write B
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -1103,13 +1128,13 @@ ROM_START( kingdrbb ) // has 'Made in Taiwan' on the PCB.
 //  ROM_COPY( "raw_prom", 0x3000, 0x200, 0x200 ) //identical to 0x1000 bank
 
 	ROM_REGION( 0x4000, "pals", 0 ) // all read protected
-	ROM_LOAD( "palce16v.u101.bin", 0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u113.bin", 0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u160.bin", 0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u2.bin",   0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u29.bin",  0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u4.bin",   0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u75.bin",  0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u101.bin", 0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u113.bin", 0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u160.bin", 0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u2.bin",   0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u29.bin",  0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u4.bin",   0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u75.bin",  0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
 	// jedutil just complains these are invalid..
 	ROM_LOAD( "palce16v8q.u53.jed", 0x0000, 0x892, CRC(123d539a) SHA1(cccf0cbae3175b091a998eedf4aa44a55b679400) )
 	ROM_LOAD( "palce16v8q.u77.jed", 0x0000, 0x892, CRC(b7956421) SHA1(57db38b571adf6cf49d7c221cd65a068a9a3383a) )
@@ -1208,7 +1233,7 @@ ROM_START( kingdrbb2 )
 ROM_END
 
 
-GAMEL( 1981, kingdrby,  0,        kingdrby, kingdrby, kingdrby_state, 0, ROT0, "Tazmi",                        "King Derby (1981)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
-GAME ( 1986, kingdrbb,  kingdrby, kingdrbb, kingdrbb, kingdrby_state, 0, ROT0, "bootleg (Casino Electronics)", "King Derby (Taiwan bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
-GAMEL( 198?, kingdrbb2, kingdrby, kingdrby, kingdrby, kingdrby_state, 0, ROT0, "bootleg",                      "King Derby (bootleg set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
-GAME ( 2000, cowrace,   kingdrby, cowrace,  kingdrbb, kingdrby_state, 0, ROT0, "bootleg (Gate In)",            "Cow Race (King Derby hack)",  MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )
+GAMEL( 1981, kingdrby,  0,        kingdrby, kingdrby, kingdrby_state, empty_init, ROT0, "Tazmi",                        "King Derby (1981)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
+GAME(  1986, kingdrbb,  kingdrby, kingdrbb, kingdrbb, kingdrby_state, empty_init, ROT0, "bootleg (Casino Electronics)", "King Derby (Taiwan bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
+GAMEL( 198?, kingdrbb2, kingdrby, kingdrby, kingdrby, kingdrby_state, empty_init, ROT0, "bootleg",                      "King Derby (bootleg set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
+GAME(  2000, cowrace,   kingdrby, cowrace,  kingdrbb, kingdrby_state, empty_init, ROT0, "bootleg (Gate In)",            "Cow Race (King Derby hack)",  MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )

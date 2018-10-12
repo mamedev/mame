@@ -34,11 +34,16 @@ public:
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
+	void stfight_base(machine_config &config);
+	void stfight(machine_config &config);
+	void cshooter(machine_config &config);
 
-	DECLARE_DRIVER_INIT(stfight);
-	DECLARE_DRIVER_INIT(empcity);
-	DECLARE_DRIVER_INIT(cshooter);
+	void init_stfight();
+	void init_empcity();
+	void init_cshooter();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 
 	DECLARE_WRITE8_MEMBER(stfight_io_w);
 	DECLARE_READ8_MEMBER(stfight_coin_r);
@@ -58,15 +63,12 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_68705_port_b_w);
 	DECLARE_WRITE8_MEMBER(stfight_68705_port_c_w);
 
-	void stfight_base(machine_config &config);
-	void stfight(machine_config &config);
-	void cshooter(machine_config &config);
 	void cpu1_map(address_map &map);
 	void cpu2_map(address_map &map);
 	void cshooter_cpu1_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void stfight_cpu1_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

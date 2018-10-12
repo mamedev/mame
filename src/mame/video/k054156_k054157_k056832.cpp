@@ -168,8 +168,6 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 #include "k054156_k054157_k056832.h"
 #include "konami_helper.h"
 
-#include "video/k055555.h" // still needs k055555_get_palette_index
-
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -200,7 +198,6 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_bpp(-1),
 	m_big(0),
 	m_djmain_hack(0),
-	m_k055555_tag(nullptr),
 	//m_layer_assoc_with_page[K056832_PAGE_COUNT],
 	//m_layer_offs[8][2],
 	//m_lsram_page[8][2],
@@ -224,7 +221,7 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_use_ext_linescroll(0),
 	m_uses_tile_banks(0),
 	m_cur_tile_bank(0),
-	m_k055555(nullptr)
+	m_k055555(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -330,9 +327,6 @@ void k056832_device::finalize_init()
 	save_item(NAME(m_use_ext_linescroll));
 	save_item(NAME(m_uses_tile_banks));
 	save_item(NAME(m_cur_tile_bank));
-
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(k056832_device::postload), this));
 }
 
 
@@ -343,9 +337,6 @@ void k056832_device::device_start()
 
 	memset(m_regs,     0x00, sizeof(m_regs) );
 	memset(m_regsb,    0x00, sizeof(m_regsb) );
-
-	if (m_k055555_tag)
-		m_k055555 = machine().device<k055555_device>(m_k055555_tag);
 
 /* TODO: understand which elements MUST be init here (to keep correct layer
    associations) and which ones can can be init at RESET, if any */
@@ -1948,7 +1939,7 @@ int k056832_device::read_register( int regnum )
 	return(m_regs[regnum]);
 }
 
-void k056832_device::postload()
+void k056832_device::device_post_load()
 {
 	update_page_layout();
 	change_rambank();

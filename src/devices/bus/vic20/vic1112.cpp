@@ -79,9 +79,9 @@ WRITE8_MEMBER( vic1112_device::via0_pb_w )
 
 	*/
 
-	m_bus->dav_w(BIT(data, 0));
-	m_bus->nrfd_w(BIT(data, 1));
-	m_bus->ndac_w(BIT(data, 2));
+	m_bus->host_dav_w(BIT(data, 0));
+	m_bus->host_nrfd_w(BIT(data, 1));
+	m_bus->host_ndac_w(BIT(data, 2));
 }
 
 
@@ -97,22 +97,24 @@ WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vic1112_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, DERIVED_CLOCK(1, 1))
-	MCFG_VIA6522_READPB_HANDLER(READ8(vic1112_device, via0_pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic1112_device, via0_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(vic1112_device, via0_irq_w))
+void vic1112_device::device_add_mconfig(machine_config &config)
+{
+	VIA6522(config, m_via0, DERIVED_CLOCK(1, 1));
+	m_via0->readpb_handler().set(FUNC(vic1112_device::via0_pb_r));
+	m_via0->writepb_handler().set(FUNC(vic1112_device::via0_pb_w));
+	m_via0->irq_handler().set(FUNC(vic1112_device::via0_irq_w));
 
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, DERIVED_CLOCK(1, 1))
-	MCFG_VIA6522_READPB_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, atn_w))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(vic1112_device, via1_irq_w))
+	VIA6522(config, m_via1, DERIVED_CLOCK(1, 1));
+	m_via1->readpb_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	m_via1->writepa_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
+	m_via1->ca2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	m_via1->cb2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	m_via1->irq_handler().set(FUNC(vic1112_device::via1_irq_w));
 
-	MCFG_CBM_IEEE488_ADD(nullptr)
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_cb1))
-MACHINE_CONFIG_END
+	IEEE488(config, m_bus, 0);
+	ieee488_slot_device::add_cbm_defaults(config, nullptr);
+	m_bus->srq_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+}
 
 
 
@@ -153,8 +155,8 @@ void vic1112_device::device_start()
 
 void vic1112_device::device_reset()
 {
-	m_bus->ifc_w(0);
-	m_bus->ifc_w(1);
+	m_bus->host_ifc_w(0);
+	m_bus->host_ifc_w(1);
 }
 
 
@@ -166,7 +168,7 @@ uint8_t vic1112_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t 
 {
 	if (!io2)
 	{
-		data = (BIT(offset, 4) ? m_via1 : m_via0)->read(space, offset & 0x0f);
+		data = (BIT(offset, 4) ? m_via1 : m_via0)->read(offset & 0x0f);
 	}
 	else if (!blk5)
 	{
@@ -186,6 +188,6 @@ void vic1112_device::vic20_cd_w(address_space &space, offs_t offset, uint8_t dat
 {
 	if (!io2)
 	{
-		(BIT(offset, 4) ? m_via1 : m_via0)->write(space, offset & 0x0f, data);
+		(BIT(offset, 4) ? m_via1 : m_via0)->write(offset & 0x0f, data);
 	}
 }

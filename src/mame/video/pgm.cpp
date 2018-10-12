@@ -94,7 +94,7 @@ void pgm_state::draw_sprite_line( int wide, uint16_t* dest, uint8_t* destpri, in
 	{
 		int x;
 
-		msk = ((m_bdata[(m_boffset + 1) & m_bdatasize] << 8) |( m_bdata[(m_boffset + 0) & m_bdatasize] << 0));
+		msk = ((m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) |( m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0));
 
 		for (x = 0; x < 16; x++)
 		{
@@ -177,8 +177,8 @@ void pgm_state::draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, 
 	int xcnt = 0;
 
 
-	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdatasize] << 24) | (m_bdata[(m_boffset + 2) & m_bdatasize] << 16) |
-				(m_bdata[(m_boffset + 1) & m_bdatasize] << 8) | (m_bdata[(m_boffset + 0) & m_bdatasize] << 0);
+	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdata.mask()] << 24) | (m_bdata[(m_boffset + 2) & m_bdata.mask()] << 16) |
+				(m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
 	m_aoffset = m_aoffset >> 2; m_aoffset *= 3;
 
 	m_boffset+=4;
@@ -344,7 +344,7 @@ void pgm_state::draw_sprite_line_basic( int wide, uint16_t* dest, uint8_t* destp
 		{
 			int x;
 
-			msk = ((m_bdata[(m_boffset + 1) & m_bdatasize] << 8) |( m_bdata[(m_boffset + 0) & m_bdatasize] << 0));
+			msk = ((m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) |( m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0));
 
 			for (x = 0; x < 16; x++)
 			{
@@ -386,7 +386,7 @@ void pgm_state::draw_sprite_line_basic( int wide, uint16_t* dest, uint8_t* destp
 		{
 			int x;
 
-			msk = ((m_bdata[(m_boffset + 1) & m_bdatasize] << 8) |( m_bdata[(m_boffset + 0) & m_bdatasize] << 0));
+			msk = ((m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) |( m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0));
 
 			for (x = 0; x < 16; x++)
 			{
@@ -437,8 +437,8 @@ void pgm_state::draw_sprite_new_basic( int wide, int high, int xpos, int ypos, i
 	uint8_t* destpri;
 	int ycntdraw;
 
-	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdatasize] << 24) | (m_bdata[(m_boffset + 2) & m_bdatasize] << 16) |
-				(m_bdata[(m_boffset + 1) & m_bdatasize] << 8) | (m_bdata[(m_boffset + 0) & m_bdatasize] << 0);
+	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdata.mask()] << 24) | (m_bdata[(m_boffset + 2) & m_bdata.mask()] << 16) |
+				(m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
 	m_aoffset = m_aoffset >> 2; m_aoffset *= 3;
 
 	m_boffset+=4;
@@ -615,8 +615,6 @@ VIDEO_START_MEMBER(pgm_state,pgm)
 {
 	int i;
 
-	m_bdata = memregion("sprmask")->base();
-	m_bdatasize = memregion("sprmask")->bytes() - 1;
 	m_aoffset = 0;
 	m_boffset = 0;
 
@@ -632,7 +630,7 @@ VIDEO_START_MEMBER(pgm_state,pgm)
 
 	m_spritebufferram = make_unique_clear<uint16_t[]>(0xa00/2);
 
-	save_pointer(NAME(m_spritebufferram.get()), 0xa00/2);
+	save_pointer(NAME(m_spritebufferram), 0xa00/2);
 }
 
 uint32_t pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -21,15 +21,16 @@
 	downcast<aica_device &>(*device).set_roffset((offs));
 
 #define MCFG_AICA_IRQ_CB(cb) \
-	devcb = &downcast<aica_device &>(*device).set_irq_callback((DEVCB_##cb));
+	downcast<aica_device &>(*device).set_irq_callback((DEVCB_##cb));
 
 #define MCFG_AICA_MAIN_IRQ_CB(cb) \
-	devcb = &downcast<aica_device &>(*device).set_main_irq_callback((DEVCB_##cb));
+	downcast<aica_device &>(*device).set_main_irq_callback((DEVCB_##cb));
 
-class aica_device : public device_t,
-									public device_sound_interface
+class aica_device : public device_t, public device_sound_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_master(bool master) { m_master = master; }
@@ -50,6 +51,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -127,6 +129,7 @@ private:
 	void StartSlot(AICA_SLOT *slot);
 	void StopSlot(AICA_SLOT *slot,int keyoff);
 	void Init();
+	void ClockChange();
 	void UpdateSlotReg(int s,int r);
 	void UpdateReg(address_space &space, int reg);
 	void UpdateSlotRegR(int slot,int reg);
@@ -144,6 +147,7 @@ private:
 	void AICALFO_ComputeStep(AICA_LFO_t *LFO,uint32_t LFOF,uint32_t LFOWS,uint32_t LFOS,int ALFO);
 
 	bool m_master;
+	double m_rate;
 	int m_roffset;                /* offset in the region */
 	devcb_write_line m_irq_cb;
 	devcb_write_line m_main_irq_cb;
@@ -164,8 +168,8 @@ private:
 	uint32_t m_AICARAM_LENGTH, m_RAM_MASK, m_RAM_MASK16;
 	sound_stream * m_stream;
 
-	std::unique_ptr<int32_t[]> m_buffertmpl;
-	std::unique_ptr<int32_t[]> m_buffertmpr;
+	std::vector<int32_t> m_buffertmpl;
+	std::vector<int32_t> m_buffertmpr;
 
 	uint32_t m_IrqTimA;
 	uint32_t m_IrqTimBC;
@@ -202,6 +206,8 @@ private:
 
 	stream_sample_t *m_bufferl;
 	stream_sample_t *m_bufferr;
+	stream_sample_t *m_exts0;
+	stream_sample_t *m_exts1;
 
 	int m_length;
 
@@ -214,7 +220,6 @@ private:
 
 };
 
-extern const device_type AICA;
+DECLARE_DEVICE_TYPE(AICA, aica_device)
 
-
-#endif /* __AICA_H__ */
+#endif // MAME_SOUND_AICA_H

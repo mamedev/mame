@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-
 #ifndef MAME_MACHINE_ISBC_215G_H
 #define MAME_MACHINE_ISBC_215G_H
 
@@ -13,7 +12,17 @@
 class isbc_215g_device : public device_t
 {
 public:
+	template <typename T>
+	isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint16_t wakeup, T &&cpu_tag)
+		: isbc_215g_device(mconfig, tag, owner, clock)
+	{
+		m_wakeup = wakeup;
+		m_maincpu.set_tag(std::forward<T>(cpu_tag));
+	}
+
 	isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto irq_callback() { return m_out_irq_func.bind(); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ16_MEMBER(io_r);
@@ -21,23 +30,21 @@ public:
 	DECLARE_READ16_MEMBER(mem_r);
 	DECLARE_WRITE16_MEMBER(mem_w);
 
-	void set_wakeup_addr(uint32_t wakeup) { m_wakeup = wakeup; }
-	void set_maincpu_tag(const char *maincpu_tag) { m_maincpu_tag = maincpu_tag; }
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_out_irq_func.set_callback(std::forward<Object>(cb)); }
-
-	void isbc_215g_io(address_map &map);
-	void isbc_215g_mem(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	const tiny_rom_entry *device_rom_region() const override;
 
+	void isbc_215g_io(address_map &map);
+	void isbc_215g_mem(address_map &map);
+
 private:
 	void find_sector();
 	uint16_t read_sector();
 	bool write_sector(uint16_t data);
 
+	required_device<cpu_device> m_maincpu;
 	required_device<i8089_device> m_dmac;
 	required_device<harddisk_image_device> m_hdd0;
 	required_device<harddisk_image_device> m_hdd1;
@@ -47,16 +54,27 @@ private:
 	devcb_write_line m_out_irq_func;
 
 	int m_reset;
-	uint16_t m_wakeup, m_secoffset, m_sector[512];
-	const char *m_maincpu_tag;
+	uint16_t m_wakeup;
+	uint16_t m_secoffset;
+	uint16_t m_sector[512];
 	address_space *m_maincpu_mem;
 	uint32_t m_lba[2];
 	uint16_t m_cyl[2];
-	uint8_t m_idcompare[4], m_drive, m_head, m_index;
+	uint8_t m_idcompare[4];
+	uint8_t m_drive;
+	uint8_t m_head;
+	uint8_t m_index;
 	int8_t m_format_bytes;
-	bool m_idfound, m_stepdir, m_wrgate, m_rdgate, m_amsrch;
+	bool m_idfound;
+	bool m_stepdir;
+	bool m_wrgate;
+	bool m_rdgate;
+	bool m_amsrch;
 
-	bool m_isbx_irq[4], m_fdctc, m_step, m_format;
+	bool m_isbx_irq[4];
+	bool m_fdctc;
+	bool m_step;
+	bool m_format;
 
 	const struct hard_disk_info* m_geom[2];
 
@@ -65,14 +83,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(isbx_irq_10_w);
 	DECLARE_WRITE_LINE_MEMBER(isbx_irq_11_w);
 };
-
-#define MCFG_ISBC_215_ADD(_tag, _wakeup, _maincpu_tag) \
-	MCFG_DEVICE_ADD(_tag, ISBC_215G, 0) \
-	downcast<isbc_215g_device &>(*device).set_wakeup_addr(_wakeup); \
-	downcast<isbc_215g_device &>(*device).set_maincpu_tag(_maincpu_tag);
-
-#define MCFG_ISBC_215_IRQ(_irq_line) \
-	devcb = &downcast<isbc_215g_device &>(*device).set_irq_callback(DEVCB_##_irq_line);
 
 DECLARE_DEVICE_TYPE(ISBC_215G, isbc_215g_device)
 

@@ -50,13 +50,15 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void ez2d(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void ez2d(machine_config &config);
 	void ez2d_map(address_map &map);
 };
 
@@ -69,8 +71,9 @@ uint32_t ez2d_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-ADDRESS_MAP_START(ez2d_state::ez2d_map)
-ADDRESS_MAP_END
+void ez2d_state::ez2d_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( ez2d )
 INPUT_PORTS_END
@@ -87,8 +90,8 @@ void ez2d_state::machine_reset()
 MACHINE_CONFIG_START(ez2d_state::ez2d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 533 MHz
-	MCFG_CPU_PROGRAM_MAP(ez2d_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 533 MHz
+	MCFG_DEVICE_PROGRAM_MAP(ez2d_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -107,7 +110,7 @@ MACHINE_CONFIG_END
 
 ROM_START( ez2d2m )
 	ROM_REGION(0x40000, "bios", 0) \
-	ROM_LOAD("Ez2dancer2ndMove_Motherboard_V29C51002T_Award_BIOS", 0x00000, 0x40000, CRC(02a5e84b) SHA1(94b341d268ce9d42597c68bc98c3b8b62e137205) ) // 29f020
+	ROM_LOAD("ez2dancer2ndmove_motherboard_v29c51002t_award_bios", 0x00000, 0x40000, CRC(02a5e84b) SHA1(94b341d268ce9d42597c68bc98c3b8b62e137205) ) // 29f020
 
 	ROM_REGION( 0x10000, "vbios", 0 )   // video card BIOS, not dumped but downloaded from internet
 	ROM_LOAD( "62090211.rom", 0x000000, 0x00b000, CRC(5669135b) SHA1(b704ce0d20b71e40563d12bcc45bd1240227be74) )
@@ -116,4 +119,4 @@ ROM_START( ez2d2m )
 	DISK_IMAGE( "ez2d2m", 0, SHA1(431f0bef3b81f83dad3818bca8994faa8ce9d5b7) )
 ROM_END
 
-GAME( 2001, ez2d2m,  0,   ez2d, ez2d, ez2d_state,  0, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_IS_SKELETON )
+GAME( 2001, ez2d2m, 0, ez2d, ez2d, ez2d_state, empty_init, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_IS_SKELETON )

@@ -45,10 +45,11 @@ READ8_MEMBER(pastelg_state::pastelg_sndrom_r)
 	return ROM[pastelg_blitter_src_addr_r() & 0x7fff];
 }
 
-ADDRESS_MAP_START(pastelg_state::pastelg_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void pastelg_state::pastelg_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xe000, 0xe7ff).ram().share("nvram");
+}
 
 READ8_MEMBER(pastelg_state::pastelg_irq_ack_r)
 {
@@ -56,21 +57,22 @@ READ8_MEMBER(pastelg_state::pastelg_irq_ack_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(pastelg_state::pastelg_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void pastelg_state::pastelg_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0x00) AM_WRITENOP
-	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x90, 0x96) AM_WRITE(pastelg_blitter_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport2_r) AM_WRITE(pastelg_romsel_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
-	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
-ADDRESS_MAP_END
+	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
+	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x90, 0x90).portr("SYSTEM");
+	map(0x90, 0x96).w(FUNC(pastelg_state::pastelg_blitter_w));
+	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
+	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(FUNC(pastelg_state::pastelg_romsel_w));
+	map(0xc0, 0xc0).r(FUNC(pastelg_state::pastelg_sndrom_r));
+	map(0xc0, 0xcf).writeonly().share("clut");
+	map(0xd0, 0xd0).r(FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0xe0, 0xe0).portr("DSWC");
+}
 
 
 READ8_MEMBER(pastelg_state::threeds_inputport1_r)
@@ -111,18 +113,19 @@ CUSTOM_INPUT_MEMBER( pastelg_state::nb1413m3_busyflag_r )
 	return m_nb1413m3->m_busyflag & 0x01;
 }
 
-ADDRESS_MAP_START(pastelg_state::threeds_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM") AM_WRITE(threeds_romsel_w )
-	AM_RANGE(0xf0, 0xf6) AM_WRITE(pastelg_blitter_w)
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(threeds_inputport1_r, threeds_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r) AM_WRITE(threeds_output_w)//writes: bit 3 is coin lockout, bit 1 is coin counter
-	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
-	AM_RANGE(0xc0, 0xc0) AM_READ(threeds_rom_readback_r)
-	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void pastelg_state::threeds_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x90, 0x90).portr("SYSTEM").w(FUNC(pastelg_state::threeds_romsel_w));
+	map(0xf0, 0xf6).w(FUNC(pastelg_state::pastelg_blitter_w));
+	map(0xa0, 0xa0).rw(FUNC(pastelg_state::threeds_inputport1_r), FUNC(pastelg_state::threeds_inputportsel_w));
+	map(0xb0, 0xb0).r(FUNC(pastelg_state::threeds_inputport2_r)).w(FUNC(pastelg_state::threeds_output_w));//writes: bit 3 is coin lockout, bit 1 is coin counter
+	map(0xc0, 0xcf).writeonly().share("clut");
+	map(0xc0, 0xc0).r(FUNC(pastelg_state::threeds_rom_readback_r));
+	map(0xd0, 0xd0).r(FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::data_w));
+}
 
 static INPUT_PORTS_START( pastelg )
 	PORT_START("DSWA")
@@ -199,7 +202,7 @@ static INPUT_PORTS_START( pastelg )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -369,7 +372,7 @@ static INPUT_PORTS_START( threeds )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state,nb1413m3_hackbusyflag_r, nullptr)  // DRAW BUSY
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state,nb1413m3_hackbusyflag_r, nullptr)  // DRAW BUSY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -397,15 +400,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(pastelg_state::pastelg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
-	MCFG_CPU_PROGRAM_MAP(pastelg_map)
-	MCFG_CPU_IO_MAP(pastelg_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert) // nmiclock not written, chip is 1411M1 instead of 1413M3
+	MCFG_DEVICE_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
+	MCFG_DEVICE_PROGRAM_MAP(pastelg_map)
+	MCFG_DEVICE_IO_MAP(pastelg_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert) // nmiclock not written, chip is 1411M1 instead of 1413M3
 
 	MCFG_NB1413M3_ADD("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_PASTELG )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -420,16 +423,16 @@ MACHINE_CONFIG_START(pastelg_state::pastelg)
 	MCFG_PALETTE_INIT_OWNER(pastelg_state, pastelg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWA"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /*
@@ -458,13 +461,13 @@ Note
 MACHINE_CONFIG_START(pastelg_state::threeds)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
-	MCFG_CPU_PROGRAM_MAP(pastelg_map)
-	MCFG_CPU_IO_MAP(threeds_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
+	MCFG_DEVICE_PROGRAM_MAP(pastelg_map)
+	MCFG_DEVICE_IO_MAP(threeds_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert)
 
 	MCFG_NB1413M3_ADD("nb1413m3")
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -479,16 +482,16 @@ MACHINE_CONFIG_START(pastelg_state::threeds)
 	MCFG_PALETTE_INIT_OWNER(pastelg_state, pastelg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWA"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -562,6 +565,6 @@ ROM_END
 
 
 
-GAME( 1985, pastelg, 0,       pastelg, pastelg, pastelg_state, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, threeds, 0,       threeds, threeds, pastelg_state, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, galds,   threeds, threeds, galds,   pastelg_state, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pastelg, 0,       pastelg, pastelg, pastelg_state, empty_init, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, threeds, 0,       threeds, threeds, pastelg_state, empty_init, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, galds,   threeds, threeds, galds,   pastelg_state, empty_init, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )

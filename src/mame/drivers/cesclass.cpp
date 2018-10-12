@@ -26,7 +26,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -125,24 +125,25 @@ WRITE16_MEMBER( cesclassic_state::outputs_w )
 	logerror("Output: %02x\n",data);
 }
 
-ADDRESS_MAP_START(cesclassic_state::cesclassic_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40cfff) AM_RAM
-	AM_RANGE(0x40d000, 0x40ffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x410000, 0x410001) AM_READ_PORT("VBLANK") //probably m68681 lies there instead
-	AM_RANGE(0x410004, 0x410005) AM_WRITE(irq3_ack_w)
-	AM_RANGE(0x410006, 0x410007) AM_WRITE(irq2_ack_w)
-	AM_RANGE(0x480000, 0x481fff) AM_RAM AM_SHARE("nvram") //8k according to schematics (games doesn't use that much tho)
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x610000, 0x610001) AM_WRITE(outputs_w)
+void cesclassic_state::cesclassic_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40cfff).ram();
+	map(0x40d000, 0x40ffff).ram().share("vram");
+	map(0x410000, 0x410001).portr("VBLANK"); //probably m68681 lies there instead
+	map(0x410004, 0x410005).w(FUNC(cesclassic_state::irq3_ack_w));
+	map(0x410006, 0x410007).w(FUNC(cesclassic_state::irq2_ack_w));
+	map(0x480000, 0x481fff).ram().share("nvram"); //8k according to schematics (games doesn't use that much tho)
+	map(0x600000, 0x600001).portr("SYSTEM");
+	map(0x610000, 0x610001).w(FUNC(cesclassic_state::outputs_w));
 //  AM_RANGE(0x640000, 0x640001) AM_WRITENOP
-	AM_RANGE(0x640040, 0x640041) AM_WRITE(lamps_w)
-	AM_RANGE(0x670000, 0x670001) AM_READ_PORT("DSW")
-	AM_RANGE(0x70ff00, 0x70ff01) AM_WRITENOP // writes 0xffff at irq 3 end of service, watchdog?
-	AM_RANGE(0x900000, 0x900001) AM_DEVREAD8("oki", okim6295_device, read,0x00ff) // unsure about this ...
-	AM_RANGE(0x900100, 0x900101) AM_DEVWRITE8("oki", okim6295_device, write,0x00ff)
+	map(0x640040, 0x640041).w(FUNC(cesclassic_state::lamps_w));
+	map(0x670000, 0x670001).portr("DSW");
+	map(0x70ff00, 0x70ff01).nopw(); // writes 0xffff at irq 3 end of service, watchdog?
+	map(0x900001, 0x900001).r(m_oki, FUNC(okim6295_device::read)); // unsure about this ...
+	map(0x900101, 0x900101).w(m_oki, FUNC(okim6295_device::write));
 //  AM_RANGE(0x904000, 0x904001) AM_WRITENOP //some kind of serial
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( cesclassic )
 	PORT_START("SYSTEM")
@@ -251,12 +252,12 @@ PALETTE_INIT_MEMBER(cesclassic_state, cesclassic)
 
 MACHINE_CONFIG_START(cesclassic_state::cesclassic)
 
-	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )
-	MCFG_CPU_PROGRAM_MAP(cesclassic_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("l_lcd", cesclassic_state,  irq2_line_assert)  // TODO: unknown sources
-	MCFG_CPU_PERIODIC_INT_DRIVER(cesclassic_state, irq3_line_assert, 60*8)
+	MCFG_DEVICE_ADD("maincpu", M68000, 24000000/2 )
+	MCFG_DEVICE_PROGRAM_MAP(cesclassic_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("l_lcd", cesclassic_state,  irq2_line_assert)  // TODO: unknown sources
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cesclassic_state, irq3_line_assert, 60*8)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("l_lcd", LCD)
@@ -265,13 +266,12 @@ MACHINE_CONFIG_START(cesclassic_state::cesclassic)
 	MCFG_SCREEN_UPDATE_DRIVER(cesclassic_state, screen_update)
 	MCFG_SCREEN_SIZE(8*16*2, 8*8+3*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 8*16*2-1, 0*8, 8*8-1)
-	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(cesclassic_state, cesclassic)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 24000000/16, PIN7_LOW)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, 24000000/16, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -303,6 +303,6 @@ ROM_START(tsclass)
 ROM_END
 
 
-GAME(1997, hrclass, 0, cesclassic, cesclassic, cesclassic_state, 0, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1997, ccclass, 0, cesclassic, cesclassic, cesclassic_state, 0, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1997, tsclass, 0, cesclassic, cesclassic, cesclassic_state, 0, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1997, hrclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1997, ccclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1997, tsclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

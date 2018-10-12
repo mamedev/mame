@@ -5,11 +5,10 @@
         Psion Organiser II series
 
 ****************************************************************************/
-
-#pragma once
-
 #ifndef MAME_INCLUDES_PSION_H
 #define MAME_INCLUDES_PSION_H
+
+#pragma once
 
 #include "cpu/m6800/m6801.h"
 #include "machine/nvram.h"
@@ -17,6 +16,7 @@
 #include "machine/timer.h"
 #include "video/hd44780.h"
 #include "sound/beep.h"
+#include "emupal.h"
 
 
 // ======================> psion_state
@@ -25,19 +25,31 @@ class psion_state : public driver_device
 {
 public:
 	psion_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_lcdc(*this, "hd44780"),
-			m_beep(*this, "beeper"),
-			m_pack1(*this, "pack1"),
-			m_pack2(*this, "pack2"),
-			m_nvram1(*this, "nvram1"),
-			m_nvram2(*this, "nvram2"),
-			m_nvram3(*this, "nvram3"),
-			m_sys_register(*this, "sys_register"),
-			m_stby_pwr(1),
-			m_ram(*this, "ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_lcdc(*this, "hd44780")
+		, m_beep(*this, "beeper")
+		, m_pack1(*this, "pack1")
+		, m_pack2(*this, "pack2")
+		, m_nvram1(*this, "nvram1")
+		, m_nvram2(*this, "nvram2")
+		, m_nvram3(*this, "nvram3")
+		, m_sys_register(*this, "sys_register")
+		, m_stby_pwr(1)
+		, m_ram(*this, "ram")
+	{ }
 
+	void psion_2lines(machine_config &config);
+	void psion_4lines(machine_config &config);
+	void psionlam(machine_config &config);
+	void psioncm(machine_config &config);
+	void psionlz(machine_config &config);
+	void psionla(machine_config &config);
+	void psionp350(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
+
+protected:
 	required_device<hd63701_cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<beep_device> m_beep;
@@ -79,17 +91,9 @@ public:
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_PALETTE_INIT(psion);
-	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
 	HD44780_PIXEL_UPDATE(lz_pixel_update);
-	void psion_2lines(machine_config &config);
-	void psion_4lines(machine_config &config);
-	void psionlam(machine_config &config);
-	void psioncm(machine_config &config);
-	void psionlz(machine_config &config);
-	void psionla(machine_config &config);
-	void psionp350(machine_config &config);
 	void psioncm_mem(address_map &map);
 	void psionla_mem(address_map &map);
 	void psionlam_mem(address_map &map);
@@ -103,8 +107,11 @@ class psion1_state : public psion_state
 public:
 	psion1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: psion_state(mconfig, type, tag)
-		{ }
+	{ }
 
+	void psion1(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( reset_kb_counter_r );
@@ -112,7 +119,6 @@ public:
 	DECLARE_READ8_MEMBER( switchoff_r );
 
 	HD44780_PIXEL_UPDATE(psion1_pixel_update);
-	void psion1(machine_config &config);
 	void psion1_mem(address_map &map);
 };
 

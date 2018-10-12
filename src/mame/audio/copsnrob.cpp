@@ -590,7 +590,7 @@ DISCRETE_RESET(copsnrob_zings_555_astable)
  ************************************************/
 
 
-static DISCRETE_SOUND_START(copsnrob)
+static DISCRETE_SOUND_START(copsnrob_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -691,26 +691,27 @@ DISCRETE_SOUND_END
 WRITE_LINE_MEMBER(copsnrob_state::one_start_w)
 {
 	/* One Start */
-	output().set_led_value(0, !state);
+	m_leds[0] = state ? 0 :1;
 }
 
 
-MACHINE_CONFIG_START(copsnrob_state::copsnrob_audio)
+void copsnrob_state::copsnrob_audio(machine_config &config)
+{
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(copsnrob)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	discrete_sound_device &discrete(DISCRETE(config, "discrete", copsnrob_discrete));
+	discrete.add_route(0, "lspeaker", 1.0);
+	discrete.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("latch", F9334, 0) // H3 on audio board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_MOTOR3_INV>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_MOTOR2_INV>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_MOTOR1_INV>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_MOTOR0_INV>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_SCREECH_INV>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_CRASH_INV>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(copsnrob_state, one_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<COPSNROB_AUDIO_ENABLE>))
-MACHINE_CONFIG_END
+	f9334_device &latch(F9334(config, "latch")); // H3 on audio board
+	latch.q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_MOTOR3_INV>));
+	latch.q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_MOTOR2_INV>));
+	latch.q_out_cb<2>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_MOTOR1_INV>));
+	latch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_MOTOR0_INV>));
+	latch.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_SCREECH_INV>));
+	latch.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_CRASH_INV>));
+	latch.q_out_cb<6>().set(FUNC(copsnrob_state::one_start_w));
+	latch.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_AUDIO_ENABLE>));
+}

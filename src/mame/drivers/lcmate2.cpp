@@ -35,7 +35,7 @@
 #include "machine/rp5c15.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -51,6 +51,9 @@ public:
 	m_speaker(*this, "speaker")
 	{ }
 
+	void lcmate2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<rp5c15_device> m_rtc;
@@ -62,7 +65,6 @@ public:
 	DECLARE_WRITE8_MEMBER( speaker_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 	DECLARE_PALETTE_INIT(lcmate2);
-	void lcmate2(machine_config &config);
 	void lcmate2_io(address_map &map);
 	void lcmate2_mem(address_map &map);
 };
@@ -95,26 +97,28 @@ WRITE8_MEMBER( lcmate2_state::bankswitch_w )
 	membank("rombank")->set_entry(data&0x0f);
 }
 
-ADDRESS_MAP_START(lcmate2_state::lcmate2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK("rombank")
-	AM_RANGE( 0x8000, 0x9fff ) AM_RAM   AM_MIRROR(0x6000) AM_SHARE("nvram")
-ADDRESS_MAP_END
+void lcmate2_state::lcmate2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x8000, 0x9fff).ram().mirror(0x6000).share("nvram");
+}
 
-ADDRESS_MAP_START(lcmate2_state::lcmate2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c15_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(speaker_w)
-	AM_RANGE(0x1fff, 0x1fff) AM_WRITE(bankswitch_w)
+void lcmate2_state::lcmate2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x000f).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write));
+	map(0x1000, 0x1000).w(FUNC(lcmate2_state::speaker_w));
+	map(0x1fff, 0x1fff).w(FUNC(lcmate2_state::bankswitch_w));
 
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("hd44780", hd44780_device, control_write)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("hd44780", hd44780_device, data_write)
-	AM_RANGE(0x3002, 0x3002) AM_DEVREAD("hd44780", hd44780_device, control_read)
-	AM_RANGE(0x3003, 0x3003) AM_DEVREAD("hd44780", hd44780_device, data_read)
+	map(0x3000, 0x3000).w(m_lcdc, FUNC(hd44780_device::control_write));
+	map(0x3001, 0x3001).w(m_lcdc, FUNC(hd44780_device::data_write));
+	map(0x3002, 0x3002).r(m_lcdc, FUNC(hd44780_device::control_read));
+	map(0x3003, 0x3003).r(m_lcdc, FUNC(hd44780_device::data_read));
 
-	AM_RANGE(0x5000, 0x50ff) AM_READ(key_r)
-ADDRESS_MAP_END
+	map(0x5000, 0x50ff).r(FUNC(lcmate2_state::key_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( lcmate2 )
@@ -221,16 +225,16 @@ static const gfx_layout lcmate2_charlayout =
 	8*8 /* 8 bytes */
 };
 
-static GFXDECODE_START( lcmate2 )
+static GFXDECODE_START( gfx_lcmate2 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, lcmate2_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // confirmed
-	MCFG_CPU_PROGRAM_MAP(lcmate2_mem)
-	MCFG_CPU_IO_MAP(lcmate2_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545)) // confirmed
+	MCFG_DEVICE_PROGRAM_MAP(lcmate2_mem)
+	MCFG_DEVICE_IO_MAP(lcmate2_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -243,17 +247,16 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(lcmate2_state, lcmate2)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lcmate2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lcmate2)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -269,5 +272,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY  FULLNAME             FLAGS
-COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, 0,    "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, empty_init, "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )

@@ -45,7 +45,7 @@
 
 #define PPC    m_ppc.w.h
 
-#define FETCH() m_direct->read_word(rPC++)
+#define FETCH() m_cache->read_word(rPC++)
 #define PROGRAM_WORD(a) m_program->read_word(a)
 #define GET_PPC_OFFS() PPC
 
@@ -191,7 +191,7 @@
 #endif
 
 
-DEFINE_DEVICE_TYPE(SSP1601, ssp1601_device, "ssp1601", "SSP1601")
+DEFINE_DEVICE_TYPE(SSP1601, ssp1601_device, "ssp1601", "Samsung SSP1601")
 
 
 ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -210,9 +210,9 @@ device_memory_interface::space_config_vector ssp1601_device::memory_space_config
 }
 
 
-util::disasm_interface *ssp1601_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ssp1601_device::create_disassembler()
 {
-	return new ssp1601_disassembler;
+	return std::make_unique<ssp1601_disassembler>();
 }
 
 
@@ -522,7 +522,7 @@ void ssp1601_device::device_start()
 
 	m_gr[0].w.h = 0xffff; // constant reg
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	state_add( SSP_R0,     "REG0",   m_gr[0].w.h).formatstr("%04X");
@@ -552,7 +552,7 @@ void ssp1601_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", PPC).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", rST).formatstr("%4s").noshow();
 
-	m_icountptr = &m_g_cycles;
+	set_icountptr(m_g_cycles);
 }
 
 
@@ -589,7 +589,7 @@ void ssp1601_device::execute_run()
 
 		PPC = rPC;
 
-		debugger_instruction_hook(this, rPC);
+		debugger_instruction_hook(rPC);
 
 		op = FETCH();
 

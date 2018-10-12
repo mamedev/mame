@@ -65,6 +65,13 @@ public:
 		, m_vdp(*this, "vdp")
 	{ }
 
+	void magerror(machine_config &config);
+	void hyprduel(machine_config &config);
+
+	void init_magerror();
+	void init_hyprduel();
+
+private:
 	DECLARE_READ16_MEMBER(irq_cause_r);
 	DECLARE_WRITE16_MEMBER(irq_cause_w);
 	DECLARE_WRITE16_MEMBER(subcpu_control_w);
@@ -72,25 +79,21 @@ public:
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger1_w);
 	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger2_r);
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger2_w);
-	DECLARE_DRIVER_INIT(magerror);
-	DECLARE_DRIVER_INIT(hyprduel);
 	DECLARE_MACHINE_START(hyprduel);
 	DECLARE_MACHINE_START(magerror);
 	TIMER_CALLBACK_MEMBER(vblank_end_callback);
 	DECLARE_WRITE_LINE_MEMBER(vdp_blit_end_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	
-	void magerror(machine_config &config);
-	void hyprduel(machine_config &config);
+
 	void i4220_config(machine_config &config);
+
 	void hyprduel_map(address_map &map);
 	void hyprduel_map2(address_map &map);
 	void magerror_map(address_map &map);
 	void magerror_map2(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_irq_enable;
 	required_shared_ptr_array<uint16_t, 3> m_sharedram;
@@ -257,60 +260,64 @@ WRITE_LINE_MEMBER(hyprduel_state::vdp_blit_end_w)
                                 Memory Maps
 ***************************************************************************/
 
-ADDRESS_MAP_START(hyprduel_state::hyprduel_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp", imagetek_i4220_device, v2_map)
-	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(irq_cause_r, irq_cause_w)   /* IRQ Cause,Acknowledge */
-	AM_RANGE(0x4788a4, 0x4788a5) AM_RAM AM_SHARE("irq_enable")      /* IRQ Enable */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(subcpu_control_w)
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("sharedram1")
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
-	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
-	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("sharedram2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
-ADDRESS_MAP_END
+void hyprduel_state::hyprduel_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x400000, 0x47ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
+	map(0x4788a2, 0x4788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause,Acknowledge */
+	map(0x4788a4, 0x4788a5).ram().share("irq_enable");      /* IRQ Enable */
+	map(0x800000, 0x800001).w(FUNC(hyprduel_state::subcpu_control_w));
+	map(0xc00000, 0xc07fff).ram().share("sharedram1");
+	map(0xe00000, 0xe00001).portr("SERVICE").nopw();
+	map(0xe00002, 0xe00003).portr("DSW");
+	map(0xe00004, 0xe00005).portr("P1_P2");
+	map(0xe00006, 0xe00007).portr("SYSTEM");
+	map(0xfe0000, 0xfe3fff).ram().share("sharedram2");
+	map(0xfe4000, 0xffffff).ram().share("sharedram3");
+}
 
-ADDRESS_MAP_START(hyprduel_state::hyprduel_map2)
-	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("sharedram1")                      /* shadow ($c00000 - $c03fff : vector) */
-	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("sharedram3")         /* shadow ($fe4000 - $fe7fff : read only) */
-	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0x400004, 0x400005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x800000, 0x800001) AM_NOP
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("sharedram1")
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("sharedram2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
-ADDRESS_MAP_END
+void hyprduel_state::hyprduel_map2(address_map &map)
+{
+	map(0x000000, 0x003fff).ram().share("sharedram1");                      /* shadow ($c00000 - $c03fff : vector) */
+	map(0x004000, 0x007fff).readonly().nopw().share("sharedram3");         /* shadow ($fe4000 - $fe7fff : read only) */
+	map(0x400000, 0x400003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0x400005, 0x400005).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x800000, 0x800001).noprw();
+	map(0xc00000, 0xc07fff).ram().share("sharedram1");
+	map(0xfe0000, 0xfe3fff).ram().share("sharedram2");
+	map(0xfe4000, 0xffffff).ram().share("sharedram3");
+}
 
 
 /* Magical Error - video is at 8x now */
 
-ADDRESS_MAP_START(hyprduel_state::magerror_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(subcpu_control_w)
-	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp", imagetek_i4220_device, v2_map)
-	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(irq_cause_r, irq_cause_w)   /* IRQ Cause, Acknowledge */
-	AM_RANGE(0x8788a4, 0x8788a5) AM_RAM AM_SHARE("irq_enable")      /* IRQ Enable */
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("sharedram1")
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
-	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
-	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("sharedram2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
-ADDRESS_MAP_END
+void hyprduel_state::magerror_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x400000, 0x400001).w(FUNC(hyprduel_state::subcpu_control_w));
+	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
+	map(0x8788a2, 0x8788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause, Acknowledge */
+	map(0x8788a4, 0x8788a5).ram().share("irq_enable");      /* IRQ Enable */
+	map(0xc00000, 0xc1ffff).ram().share("sharedram1");
+	map(0xe00000, 0xe00001).portr("SERVICE").nopw();
+	map(0xe00002, 0xe00003).portr("DSW");
+	map(0xe00004, 0xe00005).portr("P1_P2");
+	map(0xe00006, 0xe00007).portr("SYSTEM");
+	map(0xfe0000, 0xfe3fff).ram().share("sharedram2");
+	map(0xfe4000, 0xffffff).ram().share("sharedram3");
+}
 
-ADDRESS_MAP_START(hyprduel_state::magerror_map2)
-	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("sharedram1")                      /* shadow ($c00000 - $c03fff : vector) */
-	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("sharedram3")     /* shadow ($fe4000 - $fe7fff : read only) */
-	AM_RANGE(0x400000, 0x400003) AM_NOP
-	AM_RANGE(0x800000, 0x800003) AM_READNOP AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
-	AM_RANGE(0x800004, 0x800005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("sharedram1")
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("sharedram2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
-ADDRESS_MAP_END
+void hyprduel_state::magerror_map2(address_map &map)
+{
+	map(0x000000, 0x003fff).ram().share("sharedram1");                      /* shadow ($c00000 - $c03fff : vector) */
+	map(0x004000, 0x007fff).readonly().nopw().share("sharedram3");     /* shadow ($fe4000 - $fe7fff : read only) */
+	map(0x400000, 0x400003).noprw();
+	map(0x800000, 0x800003).nopr().w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x800005, 0x800005).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc00000, 0xc1ffff).ram().share("sharedram1");
+	map(0xfe0000, 0xfe3fff).ram().share("sharedram2");
+	map(0xfe4000, 0xffffff).ram().share("sharedram3");
+}
 
 /***************************************************************************
                                 Input Ports
@@ -436,7 +443,7 @@ static const gfx_layout layout_16x16x4 =
 /* 16x16x8 tiles for later games */
 static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 32*8 )
 
-static GFXDECODE_START( i4220 )
+static GFXDECODE_START( gfx_i4220 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -472,7 +479,7 @@ MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 MACHINE_CONFIG_START(hyprduel_state::i4220_config)
 	MCFG_DEVICE_ADD("vdp", I4220, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
-	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(hyprduel_state,vdp_blit_end_w))
+	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(*this, hyprduel_state,vdp_blit_end_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
@@ -483,18 +490,18 @@ MACHINE_CONFIG_START(hyprduel_state::i4220_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE(":vdp:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp:palette", i4220)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, ":vdp:palette", gfx_i4220)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
-	MCFG_CPU_PROGRAM_MAP(hyprduel_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
+	MCFG_DEVICE_PROGRAM_MAP(hyprduel_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000,20000000/2)      /* 10MHz */
-	MCFG_CPU_PROGRAM_MAP(hyprduel_map2)
+	MCFG_DEVICE_ADD("sub", M68000,20000000/2)      /* 10MHz */
+	MCFG_DEVICE_PROGRAM_MAP(hyprduel_map2)
 
 	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
@@ -502,13 +509,13 @@ MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 	i4220_config(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("sub", 1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 4000000/16/16*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000/16/16*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.57)
 MACHINE_CONFIG_END
 
@@ -516,13 +523,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hyprduel_state::magerror)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
-	MCFG_CPU_PROGRAM_MAP(magerror_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
+	MCFG_DEVICE_PROGRAM_MAP(magerror_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000,20000000/2)      /* 10MHz */
-	MCFG_CPU_PROGRAM_MAP(magerror_map2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hyprduel_state, irq1_line_hold, 968)        /* tempo? */
+	MCFG_DEVICE_ADD("sub", M68000,20000000/2)      /* 10MHz */
+	MCFG_DEVICE_PROGRAM_MAP(magerror_map2)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hyprduel_state, irq1_line_hold, 968)        /* tempo? */
 
 	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
@@ -530,12 +537,12 @@ MACHINE_CONFIG_START(hyprduel_state::magerror)
 	i4220_config(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", 4000000/16/16*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000/16/16*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.57)
 MACHINE_CONFIG_END
 
@@ -589,7 +596,7 @@ ROM_START( magerror )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
+void hyprduel_state::init_hyprduel()
 {
 	m_int_num = 0x02;
 
@@ -600,12 +607,12 @@ DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),this));
 }
 
-DRIVER_INIT_MEMBER(hyprduel_state,magerror)
+void hyprduel_state::init_magerror()
 {
 	m_int_num = 0x01;
 }
 
 
-GAME( 1993, hyprduel, 0,        hyprduel, hyprduel, hyprduel_state, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hyprduel2,hyprduel, hyprduel, hyprduel, hyprduel_state, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, magerror, 0,        magerror, magerror, hyprduel_state, magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hyprduel,  0,        hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hyprduel2, hyprduel, hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, magerror,  0,        magerror, magerror, hyprduel_state, init_magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase",  MACHINE_SUPPORTS_SAVE )

@@ -93,9 +93,9 @@ READ8_MEMBER(scramble_state::cavelon_banksw_r )
 	cavelon_banksw();
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
-		return m_ppi8255_0->read(space, offset - 0x0100);
+		return m_ppi8255_0->read(offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return m_ppi8255_1->read(space, offset - 0x0200);
+		return m_ppi8255_1->read(offset - 0x0200);
 
 	return 0xff;
 }
@@ -105,9 +105,9 @@ WRITE8_MEMBER(scramble_state::cavelon_banksw_w )
 	cavelon_banksw();
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
-		m_ppi8255_0->write(space, offset - 0x0100, data);
+		m_ppi8255_0->write(offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		m_ppi8255_1->write(space, offset - 0x0200, data);
+		m_ppi8255_1->write(offset - 0x0200, data);
 }
 
 
@@ -123,44 +123,44 @@ WRITE8_MEMBER(scramble_state::hunchbks_mirror_w )
 
 
 
-DRIVER_INIT_MEMBER(scramble_state,scramble_ppi)
+void scramble_state::init_scramble_ppi()
 {
 }
 
-DRIVER_INIT_MEMBER(scramble_state,scobra)
+void scramble_state::init_scobra()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa803, 0xa803, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
 #ifdef UNUSED_FUNCTION
-DRIVER_INIT_MEMBER(scramble_state,atlantis)
+void scramble_state::init_atlantis()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6803, 0x6803, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
-DRIVER_INIT_MEMBER(scramble_state,scramble)
+void scramble_state::init_scramble()
 {
-	DRIVER_INIT_CALL(atlantis);
+	init_atlantis();
 }
 #endif
 
-DRIVER_INIT_MEMBER(scramble_state,stratgyx)
+void scramble_state::init_stratgyx()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb000, 0xb000, write8_delegate(FUNC(scramble_state::scrambold_background_green_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8_delegate(FUNC(scramble_state::scrambold_background_blue_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8_delegate(FUNC(scramble_state::scrambold_background_red_w),this));
 }
 
-DRIVER_INIT_MEMBER(scramble_state,tazmani2)
+void scramble_state::init_tazmani2()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
-DRIVER_INIT_MEMBER(scramble_state,ckongs)
+void scramble_state::init_ckongs()
 {
 }
 
-DRIVER_INIT_MEMBER(scramble_state,mariner)
+void scramble_state::init_mariner()
 {
 	/* extra ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5800, 0x67ff, "bank1");
@@ -175,39 +175,30 @@ DRIVER_INIT_MEMBER(scramble_state,mariner)
 }
 
 #ifdef UNUSED_FUNCTION
-DRIVER_INIT_MEMBER(scramble_state,frogger)
+void scramble_state::init_frogger()
 {
-	offs_t A;
-	uint8_t *ROM;
-
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
-	ROM = memregion("audiocpu")->base();
-	for (A = 0;A < 0x0800;A++)
+	uint8_t *ROM = memregion("audiocpu")->base();
+	for (offs_t A = 0; A < 0x0800; A++)
 		ROM[A] = bitswap<8>(ROM[A],7,6,5,4,3,2,0,1);
 
 	/* likewise, the 2nd gfx ROM has data lines D0 and D1 swapped. Decode it. */
 	ROM = memregion("gfx1")->base();
-	for (A = 0x0800;A < 0x1000;A++)
+	for (offs_t A = 0x0800; A < 0x1000; A++)
 		ROM[A] = bitswap<8>(ROM[A],7,6,5,4,3,2,0,1);
 }
 
-DRIVER_INIT_MEMBER(scramble_state,froggers)
+void scramble_state::init_froggers()
 {
-	offs_t A;
-	uint8_t *ROM;
-
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
-	ROM = memregion("audiocpu")->base();
-	for (A = 0;A < 0x0800;A++)
+	uint8_t *ROM = memregion("audiocpu")->base();
+	for (offs_t A = 0; A < 0x0800; A++)
 		ROM[A] = bitswap<8>(ROM[A],7,6,5,4,3,2,0,1);
 }
 #endif
 
-DRIVER_INIT_MEMBER(scramble_state,devilfsh)
+void scramble_state::init_devilfsh()
 {
-	offs_t i;
-	uint8_t *RAM;
-
 	/* Address lines are scrambled on the main CPU */
 
 	/* A0 -> A2 */
@@ -215,13 +206,12 @@ DRIVER_INIT_MEMBER(scramble_state,devilfsh)
 	/* A2 -> A3 */
 	/* A3 -> A1 */
 
-	RAM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i += 16)
+	uint8_t *RAM = memregion("maincpu")->base();
+	for (offs_t i = 0; i < 0x10000; i += 16)
 	{
-		offs_t j;
 		uint8_t swapbuffer[16];
 
-		for (j = 0; j < 16; j++)
+		for (offs_t j = 0; j < 16; j++)
 		{
 			offs_t newval = bitswap<8>(j,7,6,5,4,2,0,3,1);
 
@@ -232,19 +222,19 @@ DRIVER_INIT_MEMBER(scramble_state,devilfsh)
 	}
 }
 
-DRIVER_INIT_MEMBER(scramble_state,mars)
+void scramble_state::init_mars()
 {
-	DRIVER_INIT_CALL(devilfsh);
+	init_devilfsh();
 }
 
-DRIVER_INIT_MEMBER(scramble_state,hotshock)
+void scramble_state::init_hotshock()
 {
 	/* protection??? The game jumps into never-neverland here. I think
 	   it just expects a RET there */
 	memregion("maincpu")->base()[0x2ef9] = 0xc9;
 }
 
-DRIVER_INIT_MEMBER(scramble_state,cavelon)
+void scramble_state::init_cavelon()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -264,12 +254,12 @@ DRIVER_INIT_MEMBER(scramble_state,cavelon)
 
 
 
-DRIVER_INIT_MEMBER(scramble_state,darkplnt)
+void scramble_state::init_darkplnt()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8_delegate(FUNC(scramble_state::darkplnt_bullet_color_w),this));
 }
 
-DRIVER_INIT_MEMBER(scramble_state,mimonkey)
+void scramble_state::init_mimonkey()
 {
 	static const uint8_t xortable[16][16] =
 	{
@@ -292,24 +282,23 @@ DRIVER_INIT_MEMBER(scramble_state,mimonkey)
 	};
 
 	uint8_t *ROM = memregion("maincpu")->base();
-	int A, ctr = 0, line, col;
-
-	for( A = 0; A < 0x4000; A++ )
+	int ctr = 0;
+	for (int A = 0; A < 0x4000; A++)
 	{
-		line = (ctr & 0x07) | ((ctr & 0x200) >> 6);
-		col = ((ROM[A] & 0x80) >> 4) | (ROM[A] & 0x07);
+		int line = (ctr & 0x07) | ((ctr & 0x200) >> 6);
+		int col = ((ROM[A] & 0x80) >> 4) | (ROM[A] & 0x07);
 		ROM[A] = ROM[A] ^ xortable[line][col];
 		ctr++;
 	}
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa804, 0xa804, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
-DRIVER_INIT_MEMBER(scramble_state,mimonsco)
+void scramble_state::init_mimonsco()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa804, 0xa804, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
-DRIVER_INIT_MEMBER(scramble_state,mimonscr)
+void scramble_state::init_mimonscr()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6804, 0x6804, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
@@ -322,33 +311,25 @@ inline int scramble_state::bit(int i,int n)
 
 
 #ifdef UNUSED_FUNCTION
-DRIVER_INIT_MEMBER(scramble_state,anteater)
+void scramble_state::init_anteater()
 {
-	offs_t i, len;
-	uint8_t *RAM;
-	uint8_t *scratch;
-
-
-	DRIVER_INIT_CALL(scobra);
+	init_scobra();
 
 	/*
 	*   Code To Decode Lost Tomb by Mirko Buffoni
 	*   Optimizations done by Fabio Buffoni
 	*/
 
-	RAM = memregion("gfx1")->base();
-	len = memregion("gfx1")->bytes();
+	uint8_t *RAM = memregion("gfx1")->base();
+	offs_t len = memregion("gfx1")->bytes();
 
-	scratch = alloc_array_or_die(uint8_t, len);
+	uint8_t *scratch = alloc_array_or_die(uint8_t, len);
 
 		memcpy(scratch, RAM, len);
 
-		for (i = 0; i < len; i++)
+		for (offs_t i = 0; i < len; i++)
 		{
-			int j;
-
-
-			j = i & 0x9bf;
+			int j = i & 0x9bf;
 			j |= ( bit(i,4) ^ bit(i,9) ^ ( bit(i,2) & bit(i,10) ) ) << 6;
 			j |= ( bit(i,2) ^ bit(i,10) ) << 9;
 			j |= ( bit(i,0) ^ bit(i,6) ^ 1 ) << 10;
@@ -360,32 +341,25 @@ DRIVER_INIT_MEMBER(scramble_state,anteater)
 }
 #endif
 
-DRIVER_INIT_MEMBER(scramble_state,rescue)
+void scramble_state::init_rescue()
 {
-	offs_t i, len;
-	uint8_t *RAM;
-
-
-	DRIVER_INIT_CALL(scobra);
+	init_scobra();
 
 	/*
 	*   Code To Decode Lost Tomb by Mirko Buffoni
 	*   Optimizations done by Fabio Buffoni
 	*/
 
-	RAM = memregion("gfx1")->base();
-	len = memregion("gfx1")->bytes();
+	uint8_t *RAM = memregion("gfx1")->base();
+	offs_t len = memregion("gfx1")->bytes();
 
 	std::vector<uint8_t> scratch(len);
 
 	memcpy(&scratch[0], RAM, len);
 
-	for (i = 0; i < len; i++)
+	for (offs_t i = 0; i < len; i++)
 	{
-		int j;
-
-
-		j = i & 0xa7f;
+		int j = i & 0xa7f;
 		j |= ( bit(i,3) ^ bit(i,10) ) << 7;
 		j |= ( bit(i,1) ^ bit(i,7) ) << 8;
 		j |= ( bit(i,0) ^ bit(i,8) ) << 10;
@@ -394,26 +368,21 @@ DRIVER_INIT_MEMBER(scramble_state,rescue)
 	}
 }
 
-DRIVER_INIT_MEMBER(scramble_state,minefld)
+void scramble_state::init_minefld()
 {
-	offs_t i, len;
-	uint8_t *RAM;
-
-
-	DRIVER_INIT_CALL(scobra);
+	init_scobra();
 
 	/*
 	*   Code To Decode Minefield by Mike Balfour and Nicola Salmoria
 	*/
 
-	RAM = memregion("gfx1")->base();
-	len = memregion("gfx1")->bytes();
+	uint8_t *RAM = memregion("gfx1")->base();
+	offs_t len = memregion("gfx1")->bytes();
 
 	std::vector<uint8_t> scratch(len);
-
 	memcpy(&scratch[0], RAM, len);
 
-	for (i = 0; i < len; i++)
+	for (offs_t i = 0; i < len; i++)
 	{
 		int j;
 
@@ -429,14 +398,9 @@ DRIVER_INIT_MEMBER(scramble_state,minefld)
 }
 
 #ifdef UNUSED_FUNCTION
-DRIVER_INIT_MEMBER(scramble_state,losttomb)
+void scramble_state::init_losttomb()
 {
-	offs_t i, len;
-	uint8_t *RAM;
-	uint8_t *scratch;
-
-
-	DRIVER_INIT_CALL(scramble);
+	init_scramble();
 
 	/*
 	*   Code To Decode Lost Tomb by Mirko Buffoni
@@ -446,44 +410,32 @@ DRIVER_INIT_MEMBER(scramble_state,losttomb)
 	RAM = memregion("gfx1")->base();
 	len = memregion("gfx1")->bytes();
 
-	scratch = alloc_array_or_die(uint8_t, len);
+	std::vector<uint8_t> scratch(len);
+	memcpy(&scratch[0], RAM, len);
 
-		memcpy(scratch, RAM, len);
+	for (offs_t i = 0; i < len; i++)
+	{
+		int j = i & 0xa7f;
+		j |= ( (bit(i,1) & bit(i,8)) | ((1 ^ bit(i,1)) & (bit(i,10)))) << 7;
+		j |= ( bit(i,7) ^ (bit(i,1) & ( bit(i,7) ^ bit(i,10) ))) << 8;
+		j |= ( (bit(i,1) & bit(i,7)) | ((1 ^ bit(i,1)) & (bit(i,8)))) << 10;
 
-		for (i = 0; i < len; i++)
-		{
-			int j;
-
-
-			j = i & 0xa7f;
-			j |= ( (bit(i,1) & bit(i,8)) | ((1 ^ bit(i,1)) & (bit(i,10)))) << 7;
-			j |= ( bit(i,7) ^ (bit(i,1) & ( bit(i,7) ^ bit(i,10) ))) << 8;
-			j |= ( (bit(i,1) & bit(i,7)) | ((1 ^ bit(i,1)) & (bit(i,8)))) << 10;
-
-			RAM[i] = scratch[j];
-		}
-
-		free(scratch);
+		RAM[i] = scratch[j];
+	}
 }
 #endif
 
-DRIVER_INIT_MEMBER(scramble_state,hustler)
+void scramble_state::init_hustler()
 {
-	offs_t A;
 	uint8_t *rom = memregion("maincpu")->base();
 
-
-	for (A = 0;A < 0x4000;A++)
+	for (offs_t A = 0; A < 0x4000; A++)
 	{
-		uint8_t xormask;
 		int bits[8];
-		int i;
+		for (int i = 0;i < 8;i++)
+			bits[i] = BIT(A, i);;
 
-
-		for (i = 0;i < 8;i++)
-			bits[i] = (A >> i) & 1;
-
-		xormask = 0xff;
+		uint8_t xormask = 0xff;
 		if (bits[0] ^ bits[1]) xormask ^= 0x01;
 		if (bits[3] ^ bits[6]) xormask ^= 0x02;
 		if (bits[4] ^ bits[5]) xormask ^= 0x04;
@@ -497,43 +449,32 @@ DRIVER_INIT_MEMBER(scramble_state,hustler)
 	}
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
-	{
-		rom = memregion("audiocpu")->base();
+	rom = memregion("audiocpu")->base();
 
-
-		for (A = 0;A < 0x0800;A++)
-			rom[A] = bitswap<8>(rom[A],7,6,5,4,3,2,0,1);
-	}
-}
-
-DRIVER_INIT_MEMBER(scramble_state,hustlerd)
-{
-	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
-	offs_t A;
-	uint8_t *rom = memregion("audiocpu")->base();
-
-
-	for (A = 0;A < 0x0800;A++)
+	for (offs_t A = 0; A < 0x0800; A++)
 		rom[A] = bitswap<8>(rom[A],7,6,5,4,3,2,0,1);
 }
 
-DRIVER_INIT_MEMBER(scramble_state,billiard)
+void scramble_state::init_hustlerd()
 {
-	offs_t A;
+	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
+	uint8_t *rom = memregion("audiocpu")->base();
+
+	for (offs_t A = 0; A < 0x0800; A++)
+		rom[A] = bitswap<8>(rom[A],7,6,5,4,3,2,0,1);
+}
+
+void scramble_state::init_billiard()
+{
 	uint8_t *rom = memregion("maincpu")->base();
 
-
-	for (A = 0;A < 0x4000;A++)
+	for (offs_t A = 0; A < 0x4000; A++)
 	{
-		uint8_t xormask;
 		int bits[8];
-		int i;
+		for (int i = 0;i < 8;i++)
+			bits[i] = BIT(A, i);
 
-
-		for (i = 0;i < 8;i++)
-			bits[i] = (A >> i) & 1;
-
-		xormask = 0x55;
+		uint8_t xormask = 0x55;
 		if (bits[2] ^ (( bits[3]) & ( bits[6]))) xormask ^= 0x01;
 		if (bits[4] ^ (( bits[5]) & ( bits[7]))) xormask ^= 0x02;
 		if (bits[0] ^ (( bits[7]) & (!bits[3]))) xormask ^= 0x04;
@@ -544,18 +485,14 @@ DRIVER_INIT_MEMBER(scramble_state,billiard)
 		if (bits[7] ^ ((!bits[1]) & ( bits[0]))) xormask ^= 0x80;
 
 		rom[A] ^= xormask;
-
 		rom[A] = bitswap<8>(rom[A],6,1,2,5,4,3,0,7);
 	}
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
-	{
-		rom = memregion("audiocpu")->base();
+	rom = memregion("audiocpu")->base();
 
-
-		for (A = 0;A < 0x0800;A++)
-			rom[A] = bitswap<8>(rom[A],7,6,5,4,3,2,0,1);
-	}
+	for (offs_t A = 0; A < 0x0800; A++)
+		rom[A] = bitswap<8>(rom[A],7,6,5,4,3,2,0,1);
 }
 
 /************************************************************
@@ -566,20 +503,19 @@ DRIVER_INIT_MEMBER(scramble_state,billiard)
  address lines swapped - a0-a2,a1-a0,a2-a3,a3-a1.
 *************************************************************/
 
-DRIVER_INIT_MEMBER(scramble_state,mrkougar)
+void scramble_state::init_mrkougar()
 {
-	DRIVER_INIT_CALL(devilfsh);
+	init_devilfsh();
 }
 
-DRIVER_INIT_MEMBER(scramble_state,ad2083)
+void scramble_state::init_ad2083()
 {
-	uint8_t c;
-	int i, len = memregion("maincpu")->bytes();
+	offs_t len = memregion("maincpu")->bytes();
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	for (i=0; i<len; i++)
+	for (offs_t i = 0; i < len; i++)
 	{
-		c = ROM[i] ^ 0x35;
+		uint8_t c = ROM[i] ^ 0x35;
 		c = bitswap<8>(c, 6,2,5,1,7,3,4,0); /* also swapped inside of the bigger module */
 		ROM[i] = c;
 	}
@@ -637,14 +573,14 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_rst_w)
 //  logerror("%s: decrypt mode reset\n", machine().describe_context());
 }
 
-DRIVER_INIT_MEMBER(scramble_state,harem)
+void scramble_state::init_harem()
 {
-	uint8_t *ROM      =   memregion("maincpu")->base() + 0x8000;
-	size_t size     =   0x2000;
+	uint8_t *ROM = memregion("maincpu")->base() + 0x8000;
+	size_t size = 0x2000;
 
-	m_harem_decrypted_data      = std::make_unique<uint8_t[]>(size * 3);
+	m_harem_decrypted_data = std::make_unique<uint8_t[]>(size * 3);
 	uint8_t *data = m_harem_decrypted_data.get();
-	m_harem_decrypted_opcodes   = std::make_unique<uint8_t[]>(size * 3);
+	m_harem_decrypted_opcodes = std::make_unique<uint8_t[]>(size * 3);
 	uint8_t *opcodes = m_harem_decrypted_opcodes.get();
 	// decryption 03
 	for (int i = 0; i < size; i++)
@@ -679,9 +615,9 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 	save_item(NAME(m_harem_decrypt_count));
 }
 
-DRIVER_INIT_MEMBER(scramble_state,newsin7a)
+void scramble_state::init_newsin7a()
 {
-	DRIVER_INIT_CALL(devilfsh); // decrypt
+	init_devilfsh(); // decrypt
 
 //  uint8_t *ROM = memregion("maincpu")->base();
 //  ROM[0x0067] ^= 0x22;          /* rst $00         - should be push hl - the NMI routine is corrupt in this set, but the IRQ routine bypasses it? intentional? */

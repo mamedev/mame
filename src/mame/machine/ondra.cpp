@@ -74,7 +74,7 @@ TIMER_CALLBACK_MEMBER(ondra_state::nmi_check_callback)
 {
 	if ((m_nmi->read() & 1) == 1)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

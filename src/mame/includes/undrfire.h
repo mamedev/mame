@@ -1,9 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
+#ifndef MAME_INCLUDES_UNDRFIRE_H
+#define MAME_INCLUDES_UNDRFIRE_H
+
+#pragma once
 
 #include "machine/eepromser.h"
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
+#include "emupal.h"
 
 struct uf_tempsprite
 {
@@ -18,13 +23,8 @@ struct uf_tempsprite
 class undrfire_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT5
-	};
-
-	undrfire_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	undrfire_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_tc0100scn(*this, "tc0100scn"),
@@ -34,7 +34,23 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
+
+	void undrfire(machine_config &config);
+	void cbombers(machine_config &config);
+
+	void init_undrfire();
+	void init_cbombers();
+
+protected:
+	virtual void video_start() override;
+
+private:
+	enum
+	{
+		TIMER_INTERRUPT5
+	};
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
@@ -55,29 +71,20 @@ public:
 	DECLARE_WRITE8_MEMBER(coin_word_w);
 	DECLARE_READ16_MEMBER(shared_ram_r);
 	DECLARE_WRITE16_MEMBER(shared_ram_w);
-	DECLARE_READ32_MEMBER(unknown_hardware_r);
-	DECLARE_WRITE32_MEMBER(unknown_int_req_w);
 	DECLARE_READ32_MEMBER(undrfire_lightgun_r);
 	DECLARE_WRITE32_MEMBER(rotate_control_w);
 	DECLARE_WRITE32_MEMBER(motor_control_w);
 	DECLARE_WRITE32_MEMBER(cbombers_cpua_ctrl_w);
-	DECLARE_READ32_MEMBER(cbombers_adc_r);
-	DECLARE_WRITE8_MEMBER(cbombers_adc_w);
 	DECLARE_READ_LINE_MEMBER(frame_counter_r);
-	DECLARE_DRIVER_INIT(undrfire);
-	DECLARE_DRIVER_INIT(cbombers);
-	virtual void video_start() override;
 	uint32_t screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(undrfire_interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 	void draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 
-	void undrfire(machine_config &config);
-	void cbombers(machine_config &config);
 	void cbombers_cpua_map(address_map &map);
 	void cbombers_cpub_map(address_map &map);
 	void undrfire_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_UNDRFIRE_H

@@ -102,6 +102,7 @@ Lower PCB is plugged in with components facing up.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -120,6 +121,9 @@ public:
 	{
 	}
 
+	void marinedt(machine_config &config);
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(marinedt);
@@ -134,17 +138,15 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void marinedt(machine_config &config);
 	void marinedt_io(address_map &map);
 	void marinedt_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -437,28 +439,30 @@ READ8_MEMBER(marinedt_state::pc3259_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(marinedt_state::marinedt_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 is not decoded */
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("ipl",0)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-ADDRESS_MAP_END
+void marinedt_state::marinedt_map(address_map &map)
+{
+	map.global_mask(0x7fff); /* A15 is not decoded */
+	map(0x0000, 0x3fff).rom().region("ipl", 0);
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(marinedt_state::vram_w)).share("vram");
+}
 
-ADDRESS_MAP_START(marinedt_state::marinedt_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x01, 0x01) AM_READ(trackball_r)
-	AM_RANGE(0x02, 0x02) AM_SELECT(0xc) AM_READ(pc3259_r)
-	AM_RANGE(0x02, 0x04) AM_WRITE(obj_0_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x05, 0x05) AM_WRITE(bgm_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(sfx_w)
-	AM_RANGE(0x08, 0x0b) AM_WRITE(obj_1_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(layer_enable_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITENOP // watchdog
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(output_w)
-ADDRESS_MAP_END
+void marinedt_state::marinedt_io(address_map &map)
+{
+	map.global_mask(0x0f);
+	map(0x00, 0x00).portr("DSW1");
+	map(0x01, 0x01).r(FUNC(marinedt_state::trackball_r));
+	map(0x02, 0x02).select(0xc).r(FUNC(marinedt_state::pc3259_r));
+	map(0x02, 0x04).w(FUNC(marinedt_state::obj_0_w));
+	map(0x03, 0x03).portr("SYSTEM");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x05, 0x05).w(FUNC(marinedt_state::bgm_w));
+	map(0x06, 0x06).w(FUNC(marinedt_state::sfx_w));
+	map(0x08, 0x0b).w(FUNC(marinedt_state::obj_1_w));
+	map(0x0d, 0x0d).w(FUNC(marinedt_state::layer_enable_w));
+	map(0x0e, 0x0e).nopw(); // watchdog
+	map(0x0f, 0x0f).w(FUNC(marinedt_state::output_w));
+}
 
 static INPUT_PORTS_START( marinedt )
 	PORT_START("SYSTEM")
@@ -566,7 +570,7 @@ static const gfx_layout objlayout =
 	32*32*2
 };
 
-static GFXDECODE_START( marinedt )
+static GFXDECODE_START( gfx_marinedt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, objlayout,     48, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, objlayout,     32, 4 )
@@ -627,10 +631,10 @@ PALETTE_INIT_MEMBER(marinedt_state, marinedt)
 MACHINE_CONFIG_START(marinedt_state::marinedt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(marinedt_map)
-	MCFG_CPU_IO_MAP(marinedt_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", marinedt_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(marinedt_map)
+	MCFG_DEVICE_IO_MAP(marinedt_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", marinedt_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -638,14 +642,14 @@ MACHINE_CONFIG_START(marinedt_state::marinedt)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 328, 0, 256, 263, 32, 256) // template to get ~60 fps
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marinedt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marinedt)
 
 	MCFG_PALETTE_ADD("palette", 64+64)
 	MCFG_PALETTE_INIT_OWNER(marinedt_state, marinedt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -684,4 +688,4 @@ ROM_START( marinedt )
 	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) ) // sea bitmap colors
 ROM_END
 
-GAME( 1981, marinedt,  0,   marinedt,  marinedt, marinedt_state,  0,       ROT270, "Taito",      "Marine Date", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
+GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT270, "Taito", "Marine Date", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )

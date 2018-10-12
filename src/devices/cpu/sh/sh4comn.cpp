@@ -240,9 +240,9 @@ void sh34_base_device::sh4_swap_fp_registers()
 
 	for (s = 0;s <= 15;s++)
 	{
-		z = m_fr[s];
-		m_fr[s] = m_xf[s];
-		m_xf[s] = z;
+		z = m_sh2_state->m_fr[s];
+		m_sh2_state->m_fr[s] = m_sh2_state->m_xf[s];
+		m_sh2_state->m_xf[s] = z;
 	}
 }
 
@@ -253,12 +253,12 @@ void sh34_base_device::sh4_swap_fp_couples()
 
 	for (s = 0;s <= 15;s = s+2)
 	{
-		z = m_fr[s];
-		m_fr[s] = m_fr[s + 1];
-		m_fr[s + 1] = z;
-		z = m_xf[s];
-		m_xf[s] = m_xf[s + 1];
-		m_xf[s + 1] = z;
+		z = m_sh2_state->m_fr[s];
+		m_sh2_state->m_fr[s] = m_sh2_state->m_fr[s + 1];
+		m_sh2_state->m_fr[s + 1] = z;
+		z = m_sh2_state->m_xf[s];
+		m_sh2_state->m_xf[s] = m_sh2_state->m_xf[s + 1];
+		m_sh2_state->m_xf[s + 1] = z;
 	}
 }
 
@@ -271,16 +271,16 @@ void sh34_base_device::sh4_change_register_bank(int to)
 	{
 		for (s = 0;s < 8;s++)
 		{
-			m_rbnk[0][s] = m_sh2_state->r[s];
-			m_sh2_state->r[s] = m_rbnk[1][s];
+			m_sh2_state->m_rbnk[0][s] = m_sh2_state->r[s];
+			m_sh2_state->r[s] = m_sh2_state->m_rbnk[1][s];
 		}
 	}
 	else // 1 -> 0
 	{
 		for (s = 0;s < 8;s++)
 		{
-			m_rbnk[1][s] = m_sh2_state->r[s];
-			m_sh2_state->r[s] = m_rbnk[0][s];
+			m_sh2_state->m_rbnk[1][s] = m_sh2_state->r[s];
+			m_sh2_state->r[s] = m_sh2_state->m_rbnk[0][s];
 		}
 	}
 }
@@ -291,7 +291,7 @@ void sh34_base_device::sh4_syncronize_register_bank(int to)
 
 	for (s = 0;s < 8;s++)
 	{
-		m_rbnk[to][s] = m_sh2_state->r[s];
+		m_sh2_state->m_rbnk[to][s] = m_sh2_state->r[s];
 	}
 }
 
@@ -315,8 +315,8 @@ void sh34_base_device::sh4_exception_recompute() // checks if there is any inter
 {
 	int a,z;
 
-	m_test_irq = 0;
-	if ((!m_pending_irq) || ((m_sh2_state->sr & BL) && (m_exception_requesting[SH4_INTC_NMI] == 0)))
+	m_sh2_state->m_test_irq = 0;
+	if ((!m_sh2_state->m_pending_irq) || ((m_sh2_state->sr & BL) && (m_exception_requesting[SH4_INTC_NMI] == 0)))
 		return;
 	z = (m_sh2_state->sr >> 4) & 15;
 	for (a=0;a <= SH4_INTC_ROVI;a++)
@@ -328,7 +328,7 @@ void sh34_base_device::sh4_exception_recompute() // checks if there is any inter
 			if (pri > z)
 			{
 				//logerror("will test\n");
-				m_test_irq = 1; // will check for exception at end of instructions
+				m_sh2_state->m_test_irq = 1; // will check for exception at end of instructions
 				break;
 			}
 		}
@@ -342,7 +342,7 @@ void sh34_base_device::sh4_exception_request(int exception) // start requesting 
 	{
 		//logerror("sh4_exception_request b\n");
 		m_exception_requesting[exception] = 1;
-		m_pending_irq++;
+		m_sh2_state->m_pending_irq++;
 		sh4_exception_recompute();
 	}
 }
@@ -352,7 +352,7 @@ void sh34_base_device::sh4_exception_unrequest(int exception) // stop requesting
 	if (m_exception_requesting[exception])
 	{
 		m_exception_requesting[exception] = 0;
-		m_pending_irq--;
+		m_sh2_state->m_pending_irq--;
 		sh4_exception_recompute();
 	}
 }
@@ -371,9 +371,9 @@ void sh34_base_device::sh4_exception_process(int exception, uint32_t vector)
 {
 	sh4_exception_checkunrequest(exception);
 
-	m_spc = m_sh2_state->pc;
-	m_ssr = m_sh2_state->sr;
-	m_sgr = m_sh2_state->r[15];
+	m_sh2_state->m_spc = m_sh2_state->pc;
+	m_sh2_state->m_ssr = m_sh2_state->sr;
+	m_sh2_state->m_sgr = m_sh2_state->r[15];
 
 	//printf("stored m_spc %08x m_ssr %08x m_sgr %08x\n", m_spc, m_ssr, m_sgr);
 
@@ -1066,23 +1066,16 @@ READ32_MEMBER( sh4_base_device::sh4_internal_r )
 	return m_m[offset];
 }
 
-void sh34_base_device::sh4_set_frt_input(int state)
+void sh34_base_device::set_frt_input(int state)
 {
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_set_frt_input uses m_m[] with SH3\n");
 
-	if(state == PULSE_LINE)
-	{
-		sh4_set_frt_input(ASSERT_LINE);
-		sh4_set_frt_input(CLEAR_LINE);
+	if(m_sh2_state->m_frt_input == state) {
 		return;
 	}
 
-	if(m_frt_input == state) {
-		return;
-	}
-
-	m_frt_input = state;
+	m_sh2_state->m_frt_input = state;
 
 	if (m_cpu_type == CPU_TYPE_SH4)
 	{
@@ -1218,7 +1211,7 @@ void sh34_base_device::execute_set_input(int irqline, int state) // set state of
 				LOG(("SH-4 '%s' IRLn0-IRLn3 level #%d\n", tag(), m_irln));
 			}
 		}
-		if (m_test_irq && (!m_sh2_state->m_delay))
+		if (m_sh2_state->m_test_irq && (!m_sh2_state->m_delay))
 			sh4_check_pending_irq("sh4_set_irq_line");
 	}
 }

@@ -92,10 +92,6 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_EMUPAL_H
 #define MAME_EMU_EMUPAL_H
 
@@ -174,8 +170,8 @@
 //**************************************************************************
 
 #define MCFG_PALETTE_ADD(_tag, _entries) \
-	MCFG_DEVICE_ADD(_tag, PALETTE, 0) \
-	MCFG_PALETTE_ENTRIES(_entries)
+	MCFG_DEVICE_ADD(_tag, PALETTE, _entries)
+
 #define MCFG_PALETTE_ADD_INIT_BLACK(_tag, _entries) \
 	MCFG_PALETTE_ADD(_tag, _entries) \
 	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_all_black), downcast<palette_device *>(device)));
@@ -265,11 +261,15 @@
 	MCFG_PALETTE_ADD(_tag, 65536) \
 	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGGBBBBB), downcast<palette_device *>(device)));
 
+#define MCFG_PALETTE_ADD_BBBBBGGGGGGRRRRR(_tag) \
+	MCFG_PALETTE_ADD(_tag, 65536) \
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_BBBBBGGGGGGRRRRR), downcast<palette_device *>(device)));
+
 
 // other standard palettes
 #define MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS(_tag, _region, _entries) \
 	MCFG_PALETTE_ADD(_tag, _entries) \
-	downcast<palette_device &>(*device).set_prom_region("^" _region); \
+	downcast<palette_device &>(*device).set_prom_region(_region); \
 	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
 
 // not implemented yet
@@ -285,6 +285,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class palette_device;
 typedef device_delegate<void (palette_device &)> palette_init_delegate;
 
 
@@ -308,32 +309,32 @@ public:
 	rgb_t operator()(u32 raw) const { return (*m_func)(raw); }
 
 	// generic raw-to-RGB conversion helpers
-	template<int _RedBits, int _GreenBits, int _BlueBits, int _RedShift, int _GreenShift, int _BlueShift>
+	template<int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t standard_rgb_decoder(u32 raw)
 	{
-		u8 const r = palexpand<_RedBits>(raw >> _RedShift);
-		u8 const g = palexpand<_GreenBits>(raw >> _GreenShift);
-		u8 const b = palexpand<_BlueBits>(raw >> _BlueShift);
+		u8 const r = palexpand<RedBits>(raw >> RedShift);
+		u8 const g = palexpand<GreenBits>(raw >> GreenShift);
+		u8 const b = palexpand<BlueBits>(raw >> BlueShift);
 		return rgb_t(r, g, b);
 	}
 
 	// data-inverted generic raw-to-RGB conversion helpers
-	template<int _RedBits, int _GreenBits, int _BlueBits, int _RedShift, int _GreenShift, int _BlueShift>
+	template<int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t inverted_rgb_decoder(u32 raw)
 	{
-		u8 const r = palexpand<_RedBits>(~raw >> _RedShift);
-		u8 const g = palexpand<_GreenBits>(~raw >> _GreenShift);
-		u8 const b = palexpand<_BlueBits>(~raw >> _BlueShift);
+		u8 const r = palexpand<RedBits>(~raw >> RedShift);
+		u8 const g = palexpand<GreenBits>(~raw >> GreenShift);
+		u8 const b = palexpand<BlueBits>(~raw >> BlueShift);
 		return rgb_t(r, g, b);
 	}
 
-	template<int _IntBits, int _RedBits, int _GreenBits, int _BlueBits, int _IntShift, int _RedShift, int _GreenShift, int _BlueShift>
+	template<int IntBits, int RedBits, int GreenBits, int BlueBits, int IntShift, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t standard_irgb_decoder(u32 raw)
 	{
-		u8 const i = palexpand<_IntBits>(raw >> _IntShift);
-		u8 const r = (i * palexpand<_RedBits>(raw >> _RedShift)) >> 8;
-		u8 const g = (i * palexpand<_GreenBits>(raw >> _GreenShift)) >> 8;
-		u8 const b = (i * palexpand<_BlueBits>(raw >> _BlueShift)) >> 8;
+		u8 const i = palexpand<IntBits>(raw >> IntShift);
+		u8 const r = (i * palexpand<RedBits>(raw >> RedShift)) >> 8;
+		u8 const g = (i * palexpand<GreenBits>(raw >> GreenShift)) >> 8;
+		u8 const b = (i * palexpand<BlueBits>(raw >> BlueShift)) >> 8;
 		return rgb_t(r, g, b);
 	}
 
@@ -360,10 +361,20 @@ class palette_device : public device_t, public device_palette_interface
 {
 public:
 	// construction/destruction
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 entries);
 
 	// configuration
 	template <typename Object> void set_init(Object &&init) { m_init = std::forward<Object>(init); }
+	void set_init(palette_init_delegate callback) { m_init = callback; }
+	template <class FunctionClass> void set_init(const char *devname, void (FunctionClass::*callback)(palette_device &), const char *name)
+	{
+		set_init(palette_init_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_init(void (FunctionClass::*callback)(palette_device &), const char *name)
+	{
+		set_init(palette_init_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+
 	void set_format(raw_to_rgb_converter raw_to_rgb) { m_raw_to_rgb = raw_to_rgb; }
 	void set_membits(int membits) { m_membits = membits; m_membits_supplied = true; }
 	void set_endianness(endianness_t endianness) { m_endianness = endianness; m_endianness_supplied = true; }
@@ -388,11 +399,13 @@ public:
 
 	// generic read/write handlers
 	DECLARE_READ8_MEMBER(read8);
+	DECLARE_READ8_MEMBER(read8_ext);
 	DECLARE_WRITE8_MEMBER(write8);
 	DECLARE_WRITE8_MEMBER(write8_ext);
 	DECLARE_WRITE8_MEMBER(write_indirect);
 	DECLARE_WRITE8_MEMBER(write_indirect_ext);
 	DECLARE_READ16_MEMBER(read16);
+	DECLARE_READ16_MEMBER(read16_ext);
 	DECLARE_WRITE16_MEMBER(write16);
 	DECLARE_WRITE16_MEMBER(write16_ext);
 	DECLARE_READ32_MEMBER(read32);
@@ -413,6 +426,7 @@ public:
 	void palette_init_RRRRRGGGGGBBBBB(palette_device &palette);
 	void palette_init_BBBBBGGGGGRRRRR(palette_device &palette);
 	void palette_init_RRRRRGGGGGGBBBBB(palette_device &palette);
+	void palette_init_BBBBBGGGGGGRRRRR(palette_device &palette);
 
 	// helper to update palette when data changed
 	void update() { if (!m_init.isnull()) m_init(*this); }

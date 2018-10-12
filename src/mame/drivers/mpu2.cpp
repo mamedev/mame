@@ -51,23 +51,23 @@ public:
 
 	void mpu2(machine_config &config);
 
-protected:
+private:
 	void mpu2_basemap(address_map &map);
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(mpu2_state::mpu2_basemap)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff) // A14/A15 Not Connected
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("romp1", 0)
-	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_REGION("maskrom", 0)
-	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("romp2", 0) AM_MIRROR(0x2000)
-	AM_RANGE(0x2000, 0x2003) AM_RAM // maybe a 6821?
-	AM_RANGE(0x2004, 0x2007) AM_RAM // maybe a 6821?
-ADDRESS_MAP_END
+void mpu2_state::mpu2_basemap(address_map &map)
+{
+	map.global_mask(0x3fff); // A14/A15 Not Connected
+	map(0x0000, 0x007f).ram();
+	map(0x0800, 0x0fff).rom().region("romp1", 0);
+	map(0x1000, 0x17ff).rom().region("maskrom", 0);
+	map(0x1800, 0x1fff).rom().region("romp2", 0).mirror(0x2000);
+	map(0x2000, 0x2003).ram(); // maybe a 6821?
+	map(0x2004, 0x2007).ram(); // maybe a 6821?
+}
 
 static INPUT_PORTS_START( mpu2 )
 INPUT_PORTS_END
@@ -75,8 +75,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(mpu2_state::mpu2)
-	MCFG_CPU_ADD("maincpu", M6800, 2000000) // ?
-	MCFG_CPU_PROGRAM_MAP(mpu2_basemap)
+	MCFG_DEVICE_ADD("maincpu", M6800, 2000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(mpu2_basemap)
 MACHINE_CONFIG_END
 
 // technically not a 'bios' because they're all on the same board.
@@ -105,5 +105,5 @@ ROM_START( m2svlite )
 	ROM_LOAD( "sl1.bin", 0x0000, 0x0800, CRC(afe04b5a) SHA1(3b3385a9b039992279fda5b87926b5089a448581) )
 ROM_END
 
-GAME(198?,  m2hilite,  0, mpu2,  mpu2, mpu2_state,  0,  ROT0,  "Barcrest",    "Hi-Lights (Barcrest) (MPU2)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  m2svlite,  0, mpu2,  mpu2, mpu2_state,  0,  ROT0,  "Barcrest",    "Silver Lights (Barcrest) (MPU2)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  m2hilite,  0, mpu2,  mpu2, mpu2_state, empty_init, ROT0,  "Barcrest",    "Hi-Lights (Barcrest) (MPU2)",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  m2svlite,  0, mpu2,  mpu2, mpu2_state, empty_init, ROT0,  "Barcrest",    "Silver Lights (Barcrest) (MPU2)",     MACHINE_IS_SKELETON_MECHANICAL)

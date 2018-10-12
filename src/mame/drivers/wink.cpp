@@ -14,9 +14,11 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -31,6 +33,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram") { }
 
+	void wink(machine_config &config);
+
+	void init_wink();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -41,10 +48,14 @@ public:
 	uint8_t m_sound_flag;
 	uint8_t m_tile_bank;
 
+	bool m_nmi_enable;
+
 	DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_WRITE8_MEMBER(player_mux_w);
-	DECLARE_WRITE8_MEMBER(tile_banking_w);
-	DECLARE_WRITE8_MEMBER(wink_coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(player_mux_w);
+	DECLARE_WRITE_LINE_MEMBER(tile_banking_w);
+	template<int Player> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_READ8_MEMBER(analog_port_r);
 	DECLARE_READ8_MEMBER(player_inputs_r);
 	DECLARE_WRITE8_MEMBER(sound_irq_w);
@@ -54,7 +65,6 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(wink);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -62,7 +72,6 @@ public:
 	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(wink_sound);
-	void wink(machine_config &config);
 	void wink_io(address_map &map);
 	void wink_map(address_map &map);
 	void wink_sound_io(address_map &map);
@@ -103,21 +112,35 @@ WRITE8_MEMBER(wink_state::bgram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(wink_state::player_mux_w)
+WRITE_LINE_MEMBER(wink_state::nmi_clock_w)
 {
-	//player_mux = data & 1;
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(wink_state::nmi_enable_w)
+{
+	m_nmi_enable = state;
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(wink_state::player_mux_w)
+{
+	//player_mux = state;
 	//no mux / cocktail mode in the real pcb? strange...
 }
 
-WRITE8_MEMBER(wink_state::tile_banking_w)
+WRITE_LINE_MEMBER(wink_state::tile_banking_w)
 {
-	m_tile_bank = data & 1;
+	m_tile_bank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(wink_state::wink_coin_counter_w)
+template<int Player>
+WRITE_LINE_MEMBER(wink_state::coin_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(offset,data & 1);
+	machine().bookkeeping().coin_counter_w(Player, state);
 }
 
 READ8_MEMBER(wink_state::analog_port_r)
@@ -137,12 +160,13 @@ WRITE8_MEMBER(wink_state::sound_irq_w)
 	//machine().scheduler().synchronize();
 }
 
-ADDRESS_MAP_START(wink_state::wink_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void wink_state::wink_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x97ff).ram().share("nvram");
+	map(0xa000, 0xa3ff).ram().w(FUNC(wink_state::bgram_w)).share("videoram");
+}
 
 
 READ8_MEMBER(wink_state::prot_r)
@@ -170,40 +194,38 @@ WRITE8_MEMBER(wink_state::prot_w)
 	//take a9-a15 and stuff them in a variable for later use.
 }
 
-ADDRESS_MAP_START(wink_state::wink_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") //0x10-0x1f is likely to be something else
-//  AM_RANGE(0x20, 0x20) AM_WRITENOP                //??? seems unused..
-	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)     //??? no mux on the pcb.
-	AM_RANGE(0x22, 0x22) AM_WRITE(tile_banking_w)
-//  AM_RANGE(0x23, 0x23) AM_WRITENOP                //?
-//  AM_RANGE(0x24, 0x24) AM_WRITENOP                //cab Knocker like in q-bert!
-	AM_RANGE(0x25, 0x27) AM_WRITE(wink_coin_counter_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x80, 0x80) AM_READ(analog_port_r)
-	AM_RANGE(0xa0, 0xa0) AM_READ(player_inputs_r)
-	AM_RANGE(0xa4, 0xa4) AM_READ_PORT("DSW1")   //dipswitch bank2
-	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("DSW2")   //dipswitch bank1
+void wink_state::wink_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x1f).ram().w("palette", FUNC(palette_device::write8)).share("palette"); //0x10-0x1f is likely to be something else
+	map(0x20, 0x27).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x40, 0x40).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x60, 0x60).w(FUNC(wink_state::sound_irq_w));
+	map(0x80, 0x80).r(FUNC(wink_state::analog_port_r));
+	map(0xa0, 0xa0).r(FUNC(wink_state::player_inputs_r));
+	map(0xa4, 0xa4).portr("DSW1");   //dipswitch bank2
+	map(0xa8, 0xa8).portr("DSW2");   //dipswitch bank1
 //  AM_RANGE(0xac, 0xac) AM_WRITENOP            //protection - loads video xor unit (written only once at startup)
-	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("DSW3")   //unused inputs
-	AM_RANGE(0xb4, 0xb4) AM_READ_PORT("DSW4")   //dipswitch bank3
-	AM_RANGE(0xc0, 0xdf) AM_WRITE(prot_w)       //load load protection-buffer from upper address bus
-	AM_RANGE(0xc3, 0xc3) AM_READNOP             //watchdog?
-	AM_RANGE(0xe0, 0xff) AM_READ(prot_r)        //load math unit from buffer & lower address-bus
-ADDRESS_MAP_END
+	map(0xb0, 0xb0).portr("DSW3");   //unused inputs
+	map(0xb4, 0xb4).portr("DSW4");   //dipswitch bank3
+	map(0xc0, 0xdf).w(FUNC(wink_state::prot_w));       //load load protection-buffer from upper address bus
+	map(0xc3, 0xc3).nopr();             //watchdog?
+	map(0xe0, 0xff).r(FUNC(wink_state::prot_r));        //load math unit from buffer & lower address-bus
+}
 
-ADDRESS_MAP_START(wink_state::wink_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void wink_state::wink_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x8000, 0x8000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(wink_state::wink_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+void wink_state::wink_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
 static INPUT_PORTS_START( wink )
 	PORT_START("DIAL1")
@@ -333,7 +355,7 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( wink )
+static GFXDECODE_START( gfx_wink )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -352,6 +374,7 @@ void wink_state::machine_start()
 {
 	save_item(NAME(m_sound_flag));
 	save_item(NAME(m_tile_bank));
+	save_item(NAME(m_nmi_enable));
 }
 
 void wink_state::machine_reset()
@@ -361,17 +384,26 @@ void wink_state::machine_reset()
 
 MACHINE_CONFIG_START(wink_state::wink)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12000000 / 4)
-	MCFG_CPU_PROGRAM_MAP(wink_map)
-	MCFG_CPU_IO_MAP(wink_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wink_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12000000 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(wink_map)
+	MCFG_DEVICE_IO_MAP(wink_io)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 12000000 / 8)
-	MCFG_CPU_PROGRAM_MAP(wink_sound_map)
-	MCFG_CPU_IO_MAP(wink_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wink_state, wink_sound,  15625)
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(wink_state::nmi_enable_w));
+	mainlatch.q_out_cb<1>().set(FUNC(wink_state::player_mux_w)); //??? no mux on the pcb.
+	mainlatch.q_out_cb<2>().set(FUNC(wink_state::tile_banking_w));
+	mainlatch.q_out_cb<3>().set_nop();                //?
+	mainlatch.q_out_cb<4>().set_nop();                //cab Knocker like in q-bert!
+	mainlatch.q_out_cb<5>().set(FUNC(wink_state::coin_counter_w<0>));
+	mainlatch.q_out_cb<6>().set(FUNC(wink_state::coin_counter_w<1>));
+	mainlatch.q_out_cb<7>().set(FUNC(wink_state::coin_counter_w<2>));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000 / 8)
+	MCFG_DEVICE_PROGRAM_MAP(wink_sound_map)
+	MCFG_DEVICE_IO_MAP(wink_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wink_state, wink_sound,  15625)
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -381,19 +413,20 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wink_state, screen_update_wink)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wink_state, nmi_clock_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wink)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wink)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 12000000 / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(wink_state, sound_r))
+	MCFG_DEVICE_ADD("aysnd", AY8912, 12000000 / 8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, wink_state, sound_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -431,9 +464,8 @@ ROM_START( winka )
 	ROM_LOAD( "wink4.bin",    0x4000, 0x2000, CRC(06dd229b) SHA1(9057cf10e9ec4119297c2d40b26f0ce0c1d7b86a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(wink_state,wink)
+void wink_state::init_wink()
 {
-	uint32_t i;
 	uint8_t *ROM = memregion("maincpu")->base();
 	std::vector<uint8_t> buffer(0x8000);
 
@@ -441,21 +473,21 @@ DRIVER_INIT_MEMBER(wink_state,wink)
 
 	memcpy(&buffer[0],ROM,0x8000);
 
-	for (i = 0x0000; i <= 0x1fff; i++)
+	for (uint32_t i = 0x0000; i <= 0x1fff; i++)
 		ROM[i] = buffer[bitswap<16>(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
 
-	for (i = 0x2000; i <= 0x3fff; i++)
+	for (uint32_t i = 0x2000; i <= 0x3fff; i++)
 		ROM[i] = buffer[bitswap<16>(i,15,14,13, 10, 7,12, 9, 8,11, 6, 3, 1, 5, 2, 4, 0)];
 
-	for (i = 0x4000; i <= 0x5fff; i++)
+	for (uint32_t i = 0x4000; i <= 0x5fff; i++)
 		ROM[i] = buffer[bitswap<16>(i,15,14,13,  7,10,11, 9, 8,12, 6, 1, 3, 4, 2, 5, 0)];
 
-	for (i = 0x6000; i <= 0x7fff; i++)
+	for (uint32_t i = 0x6000; i <= 0x7fff; i++)
 		ROM[i] = buffer[bitswap<16>(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
 
-	for (i = 0; i < 0x8000; i++)
+	for (uint32_t i = 0; i < 0x8000; i++)
 		ROM[i] += bitswap<8>(i & 0xff, 7,5,3,1,6,4,2,0);
 }
 
-GAME( 1985, wink,  0,    wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, winka, wink, wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wink,  0,    wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, winka, wink, wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

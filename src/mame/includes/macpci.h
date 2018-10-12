@@ -37,15 +37,20 @@ public:
 		m_awacs(*this, "awacs"),
 		m_cuda(*this, CUDA_TAG),
 		m_ram(*this, RAM_TAG),
+		m_scc(*this, "scc"),
 		m_539x_1(*this, MAC_539X_1_TAG),
 		m_539x_2(*this, MAC_539X_2_TAG)
 		{ }
 
+	void pippin(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	optional_device<awacs_device> m_awacs;
 	required_device<cuda_device> m_cuda;
 	required_device<ram_device> m_ram;
+	optional_device<scc8530_t> m_scc;
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 
@@ -138,17 +143,14 @@ public:
 	DECLARE_READ64_MEMBER ( unk1_r );
 	DECLARE_READ64_MEMBER ( unk2_r );
 
-	DECLARE_DRIVER_INIT(pippin);
-	void pippin(machine_config &config);
+	void init_pippin();
 	void pippin_mem(address_map &map);
-private:
 	// wait states for accessing the VIA
 	int m_via_cycles;
 
 	// hack
 	uint16_t m_unk1_test;
 
-public:
 	emu_timer *m_scanline_timer;
 	uint32_t screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);

@@ -10,8 +10,7 @@ Described in Electronics Australia magazine in 1982/1983.
 
 - The ROM was keyed in by hand from a printout, so is therefore considered a bad dump.
 - It has routines for adc, dac, cassette, but there's no hardware to support these.
-- The basic machine is fully emulated as per the schematic, but still marked not working
-  until the ROM can be confirmed as ok.
+- The basic machine is fully emulated as per the schematic.
 
 Memory Map:
 0000-007F = RAM inside the cpu
@@ -63,34 +62,39 @@ public:
 		, m_pia1(*this, "pia1")
 		, m_keyboard(*this, "X%u", 0)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void datum(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+
+private:
 	DECLARE_READ8_MEMBER(pa_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
-	void datum(machine_config &config);
 	void datum_mem(address_map &map);
-private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<pia6821_device> m_pia1;
 	required_ioport_array<4> m_keyboard;
 	required_device<cpu_device> m_maincpu;
+	output_finder<16> m_digits;
 };
 
 
-ADDRESS_MAP_START(datum_state::datum_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK (0x7fff) // A15 not used
-	AM_RANGE(0x0000, 0x007f) AM_RAM // inside CPU
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM // main ram 2x 2114
-	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void datum_state::datum_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x7fff); // A15 not used
+	map(0x0000, 0x007f).ram(); // inside CPU
+	map(0x1000, 0x13ff).mirror(0x0c00).ram(); // main ram 2x 2114
+	map(0x4000, 0x4001).mirror(0x0ffe).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x5000, 0x5003).mirror(0x0ffc).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x6003).mirror(0x0ffc).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x7000, 0x77ff).mirror(0x0800).rom().region("roms", 0);
+}
 
 
 /* Input ports */
@@ -163,7 +167,7 @@ WRITE8_MEMBER( datum_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		output().set_digit_value(m_keydata, bitswap<8>(data & 0x7f, 7, 0, 5, 6, 4, 2, 1, 3));
+		m_digits[m_keydata] = bitswap<8>(data & 0x7f, 7, 0, 5, 6, 4, 2, 1, 3);
 		m_keydata = 0;
 	}
 
@@ -180,23 +184,23 @@ WRITE8_MEMBER( datum_state::pb_w )
 
 MACHINE_CONFIG_START(datum_state::datum)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6802, XTAL(4'000'000)) // internally divided to 1 MHz
-	MCFG_CPU_PROGRAM_MAP(datum_mem)
+	MCFG_DEVICE_ADD("maincpu",M6802, XTAL(4'000'000)) // internally divided to 1 MHz
+	MCFG_DEVICE_PROGRAM_MAP(datum_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_datum)
+	config.set_default_layout(layout_datum);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0) // keyboard & display
-	MCFG_PIA_READPA_HANDLER(READ8(datum_state, pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(datum_state, pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(datum_state, pb_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
+	PIA6821(config, m_pia1, 0); // keyboard & display
+	m_pia1->readpa_handler().set(FUNC(datum_state::pa_r));
+	m_pia1->writepa_handler().set(FUNC(datum_state::pa_w));
+	m_pia1->writepb_handler().set(FUNC(datum_state::pb_w));
+	m_pia1->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
+	m_pia1->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0) // expansion
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
+	pia6821_device &pia2(PIA6821(config, "pia2", 0)); // expansion
+	pia2.irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
+	pia2.irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0) // rs232
 MACHINE_CONFIG_END
@@ -208,5 +212,5 @@ ROM_START( datum )
 	ROM_LOAD( "datum.bin", 0x0000, 0x0800, BAD_DUMP CRC(6fb11628) SHA1(8a77a846b62eee0d12848da76e16b4c66ef445d8) )
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS        INIT  COMPANY       FULLNAME   FLAGS
-COMP( 1982, datum,   0,      0,       datum,      datum,  datum_state, 0,    "Gammatron",  "Datum",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NO_SOUND_HW )

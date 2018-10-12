@@ -164,24 +164,25 @@ DEFINE_DEVICE_TYPE(VME_MVME350, vme_mvme350_card_device, "mvme350", "Motorola MV
 #define MVME350_CPU_TAG "mvme350_cpu"
 #define MVME350_ROM "mvme350_rom"
 
-ADDRESS_MAP_START(vme_mvme350_card_device::mvme350_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION(MVME350_ROM, 0)
-	AM_RANGE(0x020000, 0x03ffff) AM_RAM
+void vme_mvme350_card_device::mvme350_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x01ffff).rom().region(MVME350_ROM, 0);
+	map(0x020000, 0x03ffff).ram();
 
 #if 0
-	AM_RANGE(0x040000,  0x040035) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff) /* PIT ?*/
-	AM_RANGE(0x060000,  0x06001f) AM_RAM /* Area is cleared on start */
-	AM_RANGE(0x080000,  0x080035) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff) /* PIT ?*/
+	map(0x040000, 0x040035).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff); /* PIT ?*/
+	map(0x060000, 0x06001f).ram(); /* Area is cleared on start */
+	map(0x080000, 0x080035).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff); /* PIT ?*/
 #endif
 //AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 //AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
-ADDRESS_MAP_END
+}
 
 ROM_START( mvme350 )
 	ROM_REGION (0x20000, MVME350_ROM, 0)
-	ROM_LOAD16_BYTE ("mvme350U40v2.3.bin", 0x0001, 0x4000, CRC (bcef82ef) SHA1 (e6fdf26e4714cbaeb3e97d7b5acf02d64d8ad744))
-	ROM_LOAD16_BYTE ("mvme350U47v2.3.bin", 0x0000, 0x4000, CRC (582ce095) SHA1 (d0929dbfeb0cfda63df6b5bc29ee27fbf665def7))
+	ROM_LOAD16_BYTE ("mvme350u40v2.3.bin", 0x0001, 0x4000, CRC (bcef82ef) SHA1 (e6fdf26e4714cbaeb3e97d7b5acf02d64d8ad744))
+	ROM_LOAD16_BYTE ("mvme350u47v2.3.bin", 0x0000, 0x4000, CRC (582ce095) SHA1 (d0929dbfeb0cfda63df6b5bc29ee27fbf665def7))
 ROM_END
 
 //-------------------------------------------------
@@ -190,8 +191,8 @@ ROM_END
 
 MACHINE_CONFIG_START(vme_mvme350_card_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD (MVME350_CPU_TAG, M68010, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP (mvme350_mem)
+	MCFG_DEVICE_ADD (MVME350_CPU_TAG, M68010, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP (mvme350_mem)
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
 	MCFG_DEVICE_ADD("pit", PIT68230, XTAL(16'000'000) / 2)
 MACHINE_CONFIG_END

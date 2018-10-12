@@ -12,75 +12,27 @@
 
 #define TGP_FUNCTION(name) void name()
 
-
-uint32_t model1_state::fifoout_pop()
+void model1_state::fifoout_push(u32 data)
 {
-	if(m_fifoout_wpos == m_fifoout_rpos) {
-		fatalerror("TGP FIFOOUT underflow (%x)\n", safe_pc());
-	}
-	uint32_t v = m_fifoout_data[m_fifoout_rpos++];
-	if(m_fifoout_rpos == FIFO_SIZE)
-		m_fifoout_rpos = 0;
-	return v;
-}
-
-
-void model1_state::fifoout_push(uint32_t data)
-{
-	if(!m_puuu)
-		logerror("TGP: Push %d\n", data);
-	else
-		m_puuu = 0;
-	m_fifoout_data[m_fifoout_wpos++] = data;
-	if(m_fifoout_wpos == FIFO_SIZE)
-		m_fifoout_wpos = 0;
-	if(m_fifoout_wpos == m_fifoout_rpos)
-		logerror("TGP FIFOOUT overflow\n");
+	m_copro_fifo_out->push(u32(data));
 }
 
 void model1_state::fifoout_push_f(float data)
 {
-	m_puuu = 1;
-
-	logerror("TGP: Push %f\n", (double) data);
-	fifoout_push(f2u(data));
+	m_copro_fifo_out->push(f2u(data));
 }
 
-uint32_t model1_state::fifoin_pop()
+u32 model1_state::fifoin_pop()
 {
-	if(m_fifoin_wpos == m_fifoin_rpos)
-		logerror("TGP FIFOIN underflow\n");
-	uint32_t v = m_fifoin_data[m_fifoin_rpos++];
-	if(m_fifoin_rpos == FIFO_SIZE)
-		m_fifoin_rpos = 0;
-	return v;
-}
-
-void model1_state::fifoin_push(uint32_t data)
-{
-	//  logerror("TGP FIFOIN write %08x (%x)\n", data, safe_pc());
-	m_fifoin_data[m_fifoin_wpos++] = data;
-	if(m_fifoin_wpos == FIFO_SIZE)
-		m_fifoin_wpos = 0;
-	if(m_fifoin_wpos == m_fifoin_rpos)
-		logerror("TGP FIFOIN overflow\n");
-	m_fifoin_cbcount--;
-	if(!m_fifoin_cbcount)
-		(this->*m_fifoin_cb)();
+	return m_copro_fifo_in->pop();
 }
 
 float model1_state::fifoin_pop_f()
 {
-	return u2f(fifoin_pop());
+	return u2f(m_copro_fifo_in->pop());
 }
 
-void model1_state::next_fn()
-{
-	m_fifoin_cbcount = 1;
-	m_fifoin_cb = m_swa ? &model1_state::function_get_swa : &model1_state::function_get_vf;
-}
-
-static float tcos(int16_t a)
+float model1_state::tcos(s16 a)
 {
 	if(a == 16384 || a == -16384)
 		return 0;
@@ -92,7 +44,7 @@ static float tcos(int16_t a)
 		return cos(a*(2*M_PI/65536.0));
 }
 
-static float tsin(int16_t a)
+float model1_state::tsin(s16 a)
 {
 	if(a == 0 || a == -32768)
 		return 0;
@@ -104,14 +56,14 @@ static float tsin(int16_t a)
 		return sin(a*(2*M_PI/65536.0));
 }
 
-uint16_t model1_state::ram_get_i()
+u16 model1_state::ram_get_i()
 {
-	return m_ram_data[m_ram_scanadr++];
+	return m_copro_ram_data[(m_copro_hle_ram_scan_adr++) & 0x7fff];
 }
 
 float model1_state::ram_get_f()
 {
-	return u2f(m_ram_data[m_ram_scanadr++]);
+	return u2f(m_copro_ram_data[(m_copro_hle_ram_scan_adr++) & 0x7fff]);
 }
 
 TGP_FUNCTION( model1_state::fadd )
@@ -121,7 +73,6 @@ TGP_FUNCTION( model1_state::fadd )
 	float r = a+b;
 	logerror("TGP fadd %f+%f=%f (%x)\n", a, b, r, m_pushpc);
 	fifoout_push_f(r);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::fsub )
@@ -129,10 +80,8 @@ TGP_FUNCTION( model1_state::fsub )
 	float a = fifoin_pop_f();
 	float b = fifoin_pop_f();
 	float r = a-b;
-	m_dump = true;
 	logerror("TGP fsub %f-%f=%f (%x)\n", a, b, r, m_pushpc);
 	fifoout_push_f(r);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::fmul )
@@ -142,7 +91,6 @@ TGP_FUNCTION( model1_state::fmul )
 	float r = a*b;
 	logerror("TGP fmul %f*%f=%f (%x)\n", a, b, r, m_pushpc);
 	fifoout_push_f(r);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::fdiv )
@@ -153,7 +101,6 @@ TGP_FUNCTION( model1_state::fdiv )
 	float r = !b ? 0 : a * (1/b);
 	logerror("TGP fdiv %f/%f=%f (%x)\n", a, b, r, m_pushpc);
 	fifoout_push_f(r);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_push )
@@ -163,7 +110,6 @@ TGP_FUNCTION( model1_state::matrix_push )
 		m_mat_stack_pos++;
 	}
 	logerror("TGP matrix_push (depth=%d, pc=%x)\n", m_mat_stack_pos, m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_pop )
@@ -173,7 +119,6 @@ TGP_FUNCTION( model1_state::matrix_pop )
 		memcpy(m_cmat, m_mat_stack[m_mat_stack_pos], sizeof(m_cmat));
 	}
 	logerror("TGP matrix_pop (depth=%d, pc=%x)\n", m_mat_stack_pos, m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_write )
@@ -184,14 +129,12 @@ TGP_FUNCTION( model1_state::matrix_write )
 	logerror("TGP matrix_write %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f) (%x)\n",
 				m_cmat[0], m_cmat[1], m_cmat[2], m_cmat[3], m_cmat[4], m_cmat[5], m_cmat[6], m_cmat[7], m_cmat[8], m_cmat[9], m_cmat[10], m_cmat[11],
 				m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::clear_stack )
 {
 	logerror("TGP clear_stack (%x)\n", m_pushpc);
 	m_mat_stack_pos = 0;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_mul )
@@ -224,7 +167,6 @@ TGP_FUNCTION( model1_state::matrix_mul )
 	m[11] = j*m_cmat[2] + k*m_cmat[5] + l*m_cmat[8] + m_cmat[11];
 
 	memcpy(m_cmat, m, sizeof(m));
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::anglev )
@@ -236,15 +178,14 @@ TGP_FUNCTION( model1_state::anglev )
 		if(a>=0)
 			fifoout_push(0);
 		else
-			fifoout_push((uint32_t)-32768);
+			fifoout_push((u32)-32768);
 	} else if(!a) {
 		if(b>=0)
 			fifoout_push(16384);
 		else
-			fifoout_push((uint32_t)-16384);
+			fifoout_push((u32)-16384);
 	} else
-		fifoout_push((int16_t)(atan2(b, a)*32768/M_PI));
-	next_fn();
+		fifoout_push((s16)(atan2(b, a)*32768/M_PI));
 }
 
 TGP_FUNCTION( model1_state::triangle_normal )
@@ -277,7 +218,6 @@ TGP_FUNCTION( model1_state::triangle_normal )
 	fifoout_push_f(nx);
 	fifoout_push_f(ny);
 	fifoout_push_f(nz);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::normalize )
@@ -290,16 +230,13 @@ TGP_FUNCTION( model1_state::normalize )
 	fifoout_push_f(a/n);
 	fifoout_push_f(b/n);
 	fifoout_push_f(c/n);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::acc_seti )
 {
 	int32_t a = fifoin_pop();
-	m_dump = true;
 	logerror("TGP acc_seti %d (%x)\n", a, m_pushpc);
 	m_acc = a;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::track_select )
@@ -307,7 +244,6 @@ TGP_FUNCTION( model1_state::track_select )
 	int32_t a = fifoin_pop();
 	logerror("TGP track_select %d (%x)\n", a, m_pushpc);
 	m_tgp_vr_select = a;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::load_base )
@@ -318,7 +254,6 @@ TGP_FUNCTION( model1_state::load_base )
 	m_tgp_vr_base[3] = fifoin_pop_f();
 
 	logerror("TGP load_base %f, %f, %f, %f (%x)\n", m_tgp_vr_base[0], m_tgp_vr_base[1], m_tgp_vr_base[2], m_tgp_vr_base[3], m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::transpose )
@@ -329,8 +264,6 @@ TGP_FUNCTION( model1_state::transpose )
 	t = m_cmat[1]; m_cmat[1] = m_cmat[3]; m_cmat[3] = t;
 	t = m_cmat[2]; m_cmat[2] = m_cmat[6]; m_cmat[6] = t;
 	t = m_cmat[5]; m_cmat[5] = m_cmat[7]; m_cmat[7] = t;
-
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::anglep )
@@ -346,15 +279,14 @@ TGP_FUNCTION( model1_state::anglep )
 		if(c>=0)
 			fifoout_push(0);
 		else
-			fifoout_push((uint32_t)-32768);
+			fifoout_push((u32)-32768);
 	} else if(!c) {
 		if(d>=0)
 			fifoout_push(16384);
 		else
-			fifoout_push((uint32_t)-16384);
+			fifoout_push((u32)-16384);
 	} else
-		fifoout_push((int16_t)(atan2(d, c)*32768/M_PI));
-	next_fn();
+		fifoout_push((s16)(atan2(d, c)*32768/M_PI));
 }
 
 TGP_FUNCTION( model1_state::matrix_ident )
@@ -364,7 +296,6 @@ TGP_FUNCTION( model1_state::matrix_ident )
 	m_cmat[0] = 1.0;
 	m_cmat[4] = 1.0;
 	m_cmat[8] = 1.0;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_read )
@@ -374,7 +305,6 @@ TGP_FUNCTION( model1_state::matrix_read )
 				m_cmat[0], m_cmat[1], m_cmat[2], m_cmat[3], m_cmat[4], m_cmat[5], m_cmat[6], m_cmat[7], m_cmat[8], m_cmat[9], m_cmat[10], m_cmat[11], m_pushpc);
 	for(i=0; i<12; i++)
 		fifoout_push_f(m_cmat[i]);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_trans )
@@ -388,7 +318,6 @@ TGP_FUNCTION( model1_state::matrix_trans )
 	m_cmat[ 9] += m_cmat[0]*a+m_cmat[3]*b+m_cmat[6]*c;
 	m_cmat[10] += m_cmat[1]*a+m_cmat[4]*b+m_cmat[7]*c;
 	m_cmat[11] += m_cmat[2]*a+m_cmat[5]*b+m_cmat[8]*c;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_scale )
@@ -406,12 +335,11 @@ TGP_FUNCTION( model1_state::matrix_scale )
 	m_cmat[6] *= c;
 	m_cmat[7] *= c;
 	m_cmat[8] *= c;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_rotx )
 {
-	int16_t a = fifoin_pop();
+	s16 a = fifoin_pop();
 	float s = tsin(a);
 	float c = tcos(a);
 	float t1, t2;
@@ -428,12 +356,11 @@ TGP_FUNCTION( model1_state::matrix_rotx )
 	t2 = m_cmat[8];
 	m_cmat[5] = c*t1-s*t2;
 	m_cmat[8] = s*t1+c*t2;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_roty )
 {
-	int16_t a = fifoin_pop();
+	s16 a = fifoin_pop();
 	float s = tsin(a);
 	float c = tcos(a);
 	float t1, t2;
@@ -451,12 +378,11 @@ TGP_FUNCTION( model1_state::matrix_roty )
 	t2 = m_cmat[2];
 	m_cmat[8] = c*t1-s*t2;
 	m_cmat[2] = s*t1+c*t2;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_rotz )
 {
-	int16_t a = fifoin_pop();
+	s16 a = fifoin_pop();
 	float s = tsin(a);
 	float c = tcos(a);
 	float t1, t2;
@@ -474,30 +400,28 @@ TGP_FUNCTION( model1_state::matrix_rotz )
 	t2 = m_cmat[5];
 	m_cmat[2] = c*t1-s*t2;
 	m_cmat[5] = s*t1+c*t2;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::track_read_quad )
 {
-	uint32_t a = fifoin_pop();
+	u32 a = fifoin_pop();
 	int offd;
 
 	logerror("TGP track_read_quad %d (%x)\n", a, m_pushpc);
 
-	offd = m_tgp_data[0x20+m_tgp_vr_select] + 16*a;
-	fifoout_push(m_tgp_data[offd]);
-	fifoout_push(m_tgp_data[offd+1]);
-	fifoout_push(m_tgp_data[offd+2]);
-	fifoout_push(m_tgp_data[offd+3]);
-	fifoout_push(m_tgp_data[offd+4]);
-	fifoout_push(m_tgp_data[offd+5]);
-	fifoout_push(m_tgp_data[offd+6]);
-	fifoout_push(m_tgp_data[offd+7]);
-	fifoout_push(m_tgp_data[offd+8]);
-	fifoout_push(m_tgp_data[offd+9]);
-	fifoout_push(m_tgp_data[offd+10]);
-	fifoout_push(m_tgp_data[offd+11]);
-	next_fn();
+	offd = m_copro_data->as_u32(0x20+m_tgp_vr_select) + 16*a;
+	fifoout_push(m_copro_data->as_u32(offd));
+	fifoout_push(m_copro_data->as_u32(offd+1));
+	fifoout_push(m_copro_data->as_u32(offd+2));
+	fifoout_push(m_copro_data->as_u32(offd+3));
+	fifoout_push(m_copro_data->as_u32(offd+4));
+	fifoout_push(m_copro_data->as_u32(offd+5));
+	fifoout_push(m_copro_data->as_u32(offd+6));
+	fifoout_push(m_copro_data->as_u32(offd+7));
+	fifoout_push(m_copro_data->as_u32(offd+8));
+	fifoout_push(m_copro_data->as_u32(offd+9));
+	fifoout_push(m_copro_data->as_u32(offd+10));
+	fifoout_push(m_copro_data->as_u32(offd+11));
 }
 
 TGP_FUNCTION( model1_state::intercept )
@@ -508,7 +432,7 @@ TGP_FUNCTION( model1_state::intercept )
 	float x2 = fifoin_pop_f();
 	float y2 = fifoin_pop_f();
 	float z2 = fifoin_pop_f();
-	uint32_t idx = fifoin_pop();
+	u32 idx = fifoin_pop();
 
 	logerror("TGP intercept %f, %f, %f, %f, %f, %f, %x (%x)\n", x1, y1, z1, x2, y2, z2, idx, m_pushpc);
 
@@ -516,19 +440,19 @@ TGP_FUNCTION( model1_state::intercept )
 	float dy = y2-y1;
 	float dz = z2-z1;
 
-	idx = m_tgp_data[0x10] + 2*idx;
-	uint32_t count = m_tgp_data[idx];
-	uint32_t adr = m_tgp_data[idx+1];
-	uint32_t ret = 1;
+	idx = m_copro_data->as_u32(0x10) + 2*idx;
+	u32 count = m_copro_data->as_u32(idx);
+	u32 adr = m_copro_data->as_u32(idx+1);
+	u32 ret = 1;
 
 	for(unsigned int j=0; j<count; j++) {
 		float point[4][3];
 		for(int pt=0; pt<4; pt++)
 			for(int dim=0; dim<3; dim++)
-				point[pt][dim] = u2f(m_tgp_data[adr++]);
+				point[pt][dim] = u2f(m_copro_data->as_u32(adr++));
 		float plane[4];
 		for(int dim=0; dim<4; dim++)
-			plane[dim] = u2f(m_tgp_data[adr++]);
+			plane[dim] = u2f(m_copro_data->as_u32(adr++));
 		adr++; // 0, 1 or 2...
 
 		float den = dx * plane[0] + dy * plane[1] + dz * plane[2];
@@ -566,7 +490,6 @@ TGP_FUNCTION( model1_state::intercept )
 
 	m_tgp_int_adr = adr;
 	fifoout_push(ret);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::transform_point )
@@ -574,46 +497,44 @@ TGP_FUNCTION( model1_state::transform_point )
 	float x = fifoin_pop_f();
 	float y = fifoin_pop_f();
 	float z = fifoin_pop_f();
-	logerror("TGP transform_point %f, %f, %f (%x)\n", x, y, z, m_pushpc);
+	logerror("TGP transform_point %f, %f, %f -> %f, %f, %f (%x)\n", x, y, z,
+			 m_cmat[0]*x+m_cmat[3]*y+m_cmat[6]*z+m_cmat[9],
+			 m_cmat[1]*x+m_cmat[4]*y+m_cmat[7]*z+m_cmat[10],
+			 m_cmat[2]*x+m_cmat[5]*y+m_cmat[8]*z+m_cmat[11],
+			 m_pushpc);
 	fifoout_push_f(m_cmat[0]*x+m_cmat[3]*y+m_cmat[6]*z+m_cmat[9]);
 	fifoout_push_f(m_cmat[1]*x+m_cmat[4]*y+m_cmat[7]*z+m_cmat[10]);
 	fifoout_push_f(m_cmat[2]*x+m_cmat[5]*y+m_cmat[8]*z+m_cmat[11]);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::fcos_m1 )
 {
-	int16_t a = fifoin_pop();
+	s16 a = fifoin_pop();
 	logerror("TGP fcos %d (%x)\n", a, m_pushpc);
 	fifoout_push_f(tcos(a));
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::fsin_m1 )
 {
-	int16_t a = fifoin_pop();
+	s16 a = fifoin_pop();
 	logerror("TGP fsin %d (%x)\n", a, m_pushpc);
 	fifoout_push_f(tsin(a));
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::fcosm_m1 )
 {
-	int16_t a = fifoin_pop();
+	s16 a = fifoin_pop();
 	float b = fifoin_pop_f();
 	logerror("TGP fcosm %d, %f (%x)\n", a, b, m_pushpc);
 	fifoout_push_f(b*tcos(a));
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::fsinm_m1 )
 {
-	int16_t a = fifoin_pop();
+	s16 a = fifoin_pop();
 	float b = fifoin_pop_f();
-	m_dump = true;
 	logerror("TGP fsinm %d, %f (%x)\n", a, b, m_pushpc);
 	fifoout_push_f(b*tsin(a));
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::distance3 )
@@ -629,7 +550,6 @@ TGP_FUNCTION( model1_state::distance3 )
 	b -= e;
 	c -= f;
 	fifoout_push_f(sqrtf(a*a+b*b+c*c));
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::ftoi )
@@ -637,7 +557,6 @@ TGP_FUNCTION( model1_state::ftoi )
 	float a = fifoin_pop_f();
 	logerror("TGP ftoi %f (%x)\n", a, m_pushpc);
 	fifoout_push((int)a);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::itof )
@@ -645,7 +564,6 @@ TGP_FUNCTION( model1_state::itof )
 	int32_t a = fifoin_pop();
 	logerror("TGP itof %d (%x)\n", a, m_pushpc);
 	fifoout_push_f(a);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::acc_set )
@@ -653,14 +571,12 @@ TGP_FUNCTION( model1_state::acc_set )
 	float a = fifoin_pop_f();
 	logerror("TGP acc_set %f (%x)\n", a, m_pushpc);
 	m_acc = a;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::acc_get )
 {
 	logerror("TGP acc_get (%x)\n", m_pushpc);
 	fifoout_push_f(m_acc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::acc_add )
@@ -668,7 +584,6 @@ TGP_FUNCTION( model1_state::acc_add )
 	float a = fifoin_pop_f();
 	logerror("TGP acc_add %f (%x)\n", a, m_pushpc);
 	m_acc += a;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::acc_sub )
@@ -676,7 +591,6 @@ TGP_FUNCTION( model1_state::acc_sub )
 	float a = fifoin_pop_f();
 	logerror("TGP acc_sub %f (%x)\n", a, m_pushpc);
 	m_acc -= a;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::acc_mul )
@@ -684,7 +598,6 @@ TGP_FUNCTION( model1_state::acc_mul )
 	float a = fifoin_pop_f();
 	logerror("TGP acc_mul %f (%x)\n", a, m_pushpc);
 	m_acc *= a;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::acc_div )
@@ -692,7 +605,6 @@ TGP_FUNCTION( model1_state::acc_div )
 	float a = fifoin_pop_f();
 	logerror("TGP acc_div %f (%x)\n", a, m_pushpc);
 	m_acc /= a;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f42 )
@@ -711,7 +623,6 @@ TGP_FUNCTION( model1_state::f42 )
 	fifoout_push_f(0);
 	fifoout_push_f(0);
 	fifoout_push_f(0);
-	next_fn();
 }
 
 
@@ -730,14 +641,14 @@ TGP_FUNCTION( model1_state::xyz2rqf )
 		if(a>=0)
 			fifoout_push(0);
 		else
-			fifoout_push((uint32_t)-32768);
+			fifoout_push((u32)-32768);
 	} else if(!a) {
 		if(c>=0)
 			fifoout_push(16384);
 		else
-			fifoout_push((uint32_t)-16384);
+			fifoout_push((u32)-16384);
 	} else
-		fifoout_push((int16_t)(atan2(c, a)*32768/M_PI));
+		fifoout_push((s16)(atan2(c, a)*32768/M_PI));
 
 	if(!b)
 		fifoout_push(0);
@@ -745,11 +656,9 @@ TGP_FUNCTION( model1_state::xyz2rqf )
 		if(b>=0)
 			fifoout_push(16384);
 		else
-			fifoout_push((uint32_t)-16384);
+			fifoout_push((u32)-16384);
 	} else
-		fifoout_push((int16_t)(atan2(b, norm)*32768/M_PI));
-
-	next_fn();
+		fifoout_push((s16)(atan2(b, norm)*32768/M_PI));
 }
 
 TGP_FUNCTION( model1_state::f43 )
@@ -771,7 +680,6 @@ TGP_FUNCTION( model1_state::f43 )
 	fifoout_push_f(0);
 	fifoout_push_f(0);
 	fifoout_push_f(0);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f43_swa )
@@ -786,21 +694,19 @@ TGP_FUNCTION( model1_state::f43_swa )
 	fifoout_push_f(0);
 	fifoout_push_f(0);
 	fifoout_push_f(0);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::track_read_tri )
 {
-	uint32_t a = fifoin_pop();
+	u32 a = fifoin_pop();
 	int offd;
 
 	logerror("TGP track_read_tri %d (%x)\n", a, m_pushpc);
 
-	offd = m_tgp_data[0x20+m_tgp_vr_select] + 16*a;
-	fifoout_push(m_tgp_data[offd+12]);
-	fifoout_push(m_tgp_data[offd+13]);
-	fifoout_push(m_tgp_data[offd+14]);
-	next_fn();
+	offd = m_copro_data->as_u32(0x20+m_tgp_vr_select) + 16*a;
+	fifoout_push(m_copro_data->as_u32(offd+12));
+	fifoout_push(m_copro_data->as_u32(offd+13));
+	fifoout_push(m_copro_data->as_u32(offd+14));
 }
 
 TGP_FUNCTION( model1_state::matrix_sdir )
@@ -849,8 +755,6 @@ TGP_FUNCTION( model1_state::matrix_sdir )
 	m[8]  = t[6]*m_cmat[2] + t[7]*m_cmat[5] + t[8]*m_cmat[8];
 
 	memcpy(m_cmat, m, sizeof(m));
-
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::fsqrt )
@@ -858,7 +762,6 @@ TGP_FUNCTION( model1_state::fsqrt )
 	float a = fifoin_pop_f();
 	logerror("TGP fsqrt %f (%x)\n", a, m_pushpc);
 	fifoout_push_f(sqrtf(a));
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::vlength )
@@ -872,7 +775,6 @@ TGP_FUNCTION( model1_state::vlength )
 	y -= m_tgp_vr_base[1];
 	z -= m_tgp_vr_base[2];
 	fifoout_push_f(sqrtf(x*x + y*y + z*z) - m_tgp_vr_base[3]);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f47 )
@@ -883,19 +785,17 @@ TGP_FUNCTION( model1_state::f47 )
 	logerror("TGP f47 %f, %f, %f (%x)\n", a, b, c, m_pushpc);
 	fifoout_push_f(a+c);
 	fifoout_push_f(b+c);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::track_read_info )
 {
-	uint16_t a = fifoin_pop();
+	u16 a = fifoin_pop();
 	int offd;
 
 	logerror("TGP track_read_info %d (%x)\n", a, m_pushpc);
 
-	offd = m_tgp_data[0x20+m_tgp_vr_select] + 16*a;
-	fifoout_push(m_tgp_data[offd+15]);
-	next_fn();
+	offd = m_copro_data->as_u32(0x20+m_tgp_vr_select) + 16*a;
+	fifoout_push(m_copro_data->as_u32(offd+15));
 }
 
 TGP_FUNCTION( model1_state::colbox_set )
@@ -925,7 +825,6 @@ TGP_FUNCTION( model1_state::colbox_set )
 	m_tgp_vr_cbox[ 9] = j;
 	m_tgp_vr_cbox[10] = k;
 	m_tgp_vr_cbox[11] = l;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::colbox_test )
@@ -941,7 +840,6 @@ TGP_FUNCTION( model1_state::colbox_test )
 	// #### Wrong, need to check with the tgp_vr_cbox coordinates
 	// Game only test sign, negative = collision
 	fifoout_push_f(-1);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f49_swa )
@@ -959,7 +857,6 @@ TGP_FUNCTION( model1_state::f49_swa )
 	(void)e;
 	(void)f;
 	logerror("TGP f49_swa %f, %f, %f, %f, %f, %f (%x)\n", a, b, c, d, e, f, m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f50_swa )
@@ -974,13 +871,11 @@ TGP_FUNCTION( model1_state::f50_swa )
 	(void)d;
 	logerror("TGP f50_swa %f, %f, %f, %f (%x)\n", a, b, c, d, m_pushpc);
 	fifoout_push_f(d);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f52 )
 {
 	logerror("TGP f52 (%x)\n", m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_rdir )
@@ -1014,7 +909,6 @@ TGP_FUNCTION( model1_state::matrix_rdir )
 	t2 = m_cmat[2];
 	m_cmat[8] = c*t1-a*t2;
 	m_cmat[2] = a*t1+c*t2;
-	next_fn();
 }
 
 // A+(B-A)*t1 + (C-A)*t2 = P
@@ -1035,21 +929,21 @@ static void tri_calc_pq(float ax, float ay, float bx, float by, float cx, float 
 TGP_FUNCTION( model1_state::track_lookup )
 {
 	float a = fifoin_pop_f();
-	uint32_t b = fifoin_pop();
+	u32 b = fifoin_pop();
 	float c = fifoin_pop_f();
 	float d = fifoin_pop_f();
 	int offi, offd, len;
 	float dist;
 	int i;
-	uint32_t entry;
+	u32 entry;
 	float height;
 
 	logerror("TGP track_lookup %f, 0x%x, %f, %f (%x)\n", a, b, c, d, m_pushpc);
 
-	offi = m_tgp_data[0x10+m_tgp_vr_select] + b;
-	offd = m_tgp_data[0x20+m_tgp_vr_select];
+	offi = m_copro_data->as_u32(0x10+m_tgp_vr_select) + b;
+	offd = m_copro_data->as_u32(0x20+m_tgp_vr_select);
 
-	len = m_tgp_data[offi++];
+	len = m_copro_data->as_u32(offi++);
 
 	dist = -1;
 
@@ -1059,9 +953,9 @@ TGP_FUNCTION( model1_state::track_lookup )
 
 	for(i=0; i<len; i++) {
 		int j;
-		int bpos = m_tgp_data[offi++];
+		int bpos = m_copro_data->as_u32(offi++);
 		int posd = offd + bpos*0x10;
-		const float *pts = (const float *)&m_tgp_data[posd];
+		const float *pts = (const float *)&m_copro_data->as_u32(posd);
 		float ax = pts[12];
 		float ay = pts[14];
 		float az = pts[13];
@@ -1074,7 +968,7 @@ TGP_FUNCTION( model1_state::track_lookup )
 				float d = (a-z)*(a-z);
 				if(dist == -1 || d<dist) {
 					dist = d;
-//                  behaviour = m_tgp_data[posd+15];
+//                  behaviour = m_copro_data->as_u32(posd+15);
 					height = z;
 					entry = bpos+i;
 				}
@@ -1082,11 +976,9 @@ TGP_FUNCTION( model1_state::track_lookup )
 		}
 	}
 
-	m_ram_data[0x0000] = 0; // non zero = still computing
-	m_ram_data[0x8001] = f2u(height);
-	m_ram_data[0x8002] = entry;
-
-	next_fn();
+	m_copro_ram_data[0x0000] = 0; // non zero (ffffffff) = still searching
+	m_copro_ram_data[0x0001] = f2u(height);
+	m_copro_ram_data[0x0002] = entry;
 }
 
 TGP_FUNCTION( model1_state::f56 )
@@ -1097,7 +989,7 @@ TGP_FUNCTION( model1_state::f56 )
 	float d = fifoin_pop_f();
 	float e = fifoin_pop_f();
 	float f = fifoin_pop_f();
-	uint32_t g = fifoin_pop();
+	u32 g = fifoin_pop();
 	(void)a;
 	(void)b;
 	(void)c;
@@ -1108,16 +1000,14 @@ TGP_FUNCTION( model1_state::f56 )
 
 	logerror("TGP f56 %f, %f, %f, %f, %f, %f, %d (%x)\n", a, b, c, d, e, f, g, m_pushpc);
 	fifoout_push(0);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::int_normal )
 {
 	logerror("TGP int_normal (%x)\n", m_pushpc);
-	fifoout_push_f(u2f(m_tgp_data[m_tgp_int_adr+12]));
-	fifoout_push_f(u2f(m_tgp_data[m_tgp_int_adr+13]));
-	fifoout_push_f(u2f(m_tgp_data[m_tgp_int_adr+14]));
-	next_fn();
+	fifoout_push_f(u2f(m_copro_data->as_u32(m_tgp_int_adr+12)));
+	fifoout_push_f(u2f(m_copro_data->as_u32(m_tgp_int_adr+13)));
+	fifoout_push_f(u2f(m_copro_data->as_u32(m_tgp_int_adr+14)));
 }
 
 TGP_FUNCTION( model1_state::matrix_readt )
@@ -1126,14 +1016,12 @@ TGP_FUNCTION( model1_state::matrix_readt )
 	fifoout_push_f(m_cmat[9]);
 	fifoout_push_f(m_cmat[10]);
 	fifoout_push_f(m_cmat[11]);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::acc_geti )
 {
 	logerror("TGP acc_geti (%x)\n", m_pushpc);
 	fifoout_push((int)m_acc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::int_point )
@@ -1142,7 +1030,6 @@ TGP_FUNCTION( model1_state::int_point )
 	fifoout_push_f(m_tgp_int_px);
 	fifoout_push_f(m_tgp_int_py);
 	fifoout_push_f(m_tgp_int_pz);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::col_setcirc )
@@ -1154,7 +1041,6 @@ TGP_FUNCTION( model1_state::col_setcirc )
 	m_tgp_vr_circx = a;
 	m_tgp_vr_circy = b;
 	m_tgp_vr_circrad = c;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::col_testpt )
@@ -1166,7 +1052,6 @@ TGP_FUNCTION( model1_state::col_testpt )
 	x = a - m_tgp_vr_circx;
 	y = b - m_tgp_vr_circy;
 	fifoout_push_f(sqrtf(x*x+y*y) - m_tgp_vr_circrad);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::push_and_ident )
@@ -1180,7 +1065,6 @@ TGP_FUNCTION( model1_state::push_and_ident )
 	m_cmat[0] = 1.0;
 	m_cmat[4] = 1.0;
 	m_cmat[8] = 1.0;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::catmull_rom )
@@ -1214,7 +1098,6 @@ TGP_FUNCTION( model1_state::catmull_rom )
 	fifoout_push_f(a*w1+d*w2+g*w3+j*w4);
 	fifoout_push_f(b*w1+e*w2+h*w3+k*w4);
 	fifoout_push_f(c*w1+f*w2+i*w3+l*w4);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::distance )
@@ -1227,12 +1110,11 @@ TGP_FUNCTION( model1_state::distance )
 	c -= a;
 	d -= b;
 	fifoout_push_f(sqrtf(c*c+d*d));
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::car_move )
 {
-	int16_t a = fifoin_pop();
+	s16 a = fifoin_pop();
 	float b = fifoin_pop_f();
 	float c = fifoin_pop_f();
 	float d = fifoin_pop_f();
@@ -1246,7 +1128,6 @@ TGP_FUNCTION( model1_state::car_move )
 	fifoout_push_f(dy);
 	fifoout_push_f(c+dx);
 	fifoout_push_f(d+dy);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::cpa )
@@ -1290,35 +1171,32 @@ TGP_FUNCTION( model1_state::cpa )
 	dv2 = dv_x*dv_x + dv_y*dv_y + dv_z*dv_z;
 
 	fifoout_push_f(sqrtf(dv2));
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::vmat_store )
 {
-	uint32_t a = fifoin_pop();
+	u32 a = fifoin_pop();
 	if(a<21)
 		memcpy(m_mat_vector[a], m_cmat, sizeof(m_cmat));
 	else
 		logerror("TGP ERROR bad vector index\n");
 	logerror("TGP vmat_store %d (%x)\n", a, m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::vmat_restore )
 {
-	uint32_t a = fifoin_pop();
+	u32 a = fifoin_pop();
 	if(a<21)
 		memcpy(m_cmat, m_mat_vector[a], sizeof(m_cmat));
 	else
 		logerror("TGP ERROR bad vector index\n");
 	logerror("TGP vmat_restore %d (%x)\n", a, m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::vmat_mul )
 {
-	uint32_t a = fifoin_pop();
-	uint32_t b = fifoin_pop();
+	u32 a = fifoin_pop();
+	u32 b = fifoin_pop();
 	if(a<21 && b<21) {
 		m_mat_vector[b][0]  = m_mat_vector[a][ 0]*m_cmat[0] + m_mat_vector[a][ 1]*m_cmat[3] + m_mat_vector[a][ 2]*m_cmat[6];
 		m_mat_vector[b][1]  = m_mat_vector[a][ 0]*m_cmat[1] + m_mat_vector[a][ 1]*m_cmat[4] + m_mat_vector[a][ 2]*m_cmat[7];
@@ -1335,12 +1213,11 @@ TGP_FUNCTION( model1_state::vmat_mul )
 	} else
 		logerror("TGP ERROR bad vector index\n");
 	logerror("TGP vmat_mul %d, %d (%x)\n", a, b, m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::vmat_read )
 {
-	uint32_t a = fifoin_pop();
+	u32 a = fifoin_pop();
 	logerror("TGP vmat_read %d (%x)\n", a, m_pushpc);
 	if(a<21) {
 		int i;
@@ -1352,7 +1229,6 @@ TGP_FUNCTION( model1_state::vmat_read )
 		for(i=0; i<12; i++)
 			fifoout_push_f(0);
 	}
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_rtrans )
@@ -1361,7 +1237,6 @@ TGP_FUNCTION( model1_state::matrix_rtrans )
 	fifoout_push_f(m_cmat[ 9]);
 	fifoout_push_f(m_cmat[10]);
 	fifoout_push_f(m_cmat[11]);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::matrix_unrot )
@@ -1371,41 +1246,36 @@ TGP_FUNCTION( model1_state::matrix_unrot )
 	m_cmat[0] = 1.0;
 	m_cmat[4] = 1.0;
 	m_cmat[8] = 1.0;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f80 )
 {
 	logerror("TGP f80 (%x)\n", m_pushpc);
 	//  m_cmat[9] = m_cmat[10] = m_cmat[11] = 0;
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::vmat_save )
 {
-	uint32_t a = fifoin_pop();
+	u32 a = fifoin_pop();
 	int i;
 	logerror("TGP vmat_save 0x%x (%x)\n", a, m_pushpc);
 	for(i=0; i<16; i++)
-		memcpy(m_ram_data.get()+a+0x10*i, m_mat_vector[i], sizeof(m_cmat));
-	next_fn();
+		memcpy(m_copro_ram_data.get()+a+0x10*i, m_mat_vector[i], sizeof(m_cmat));
 }
 
 TGP_FUNCTION( model1_state::vmat_load )
 {
-	uint32_t a = fifoin_pop();
+	u32 a = fifoin_pop();
 	int i;
 	logerror("TGP vmat_load 0x%x (%x)\n", a, m_pushpc);
 	for(i=0; i<16; i++)
-		memcpy(m_mat_vector[i], m_ram_data.get()+a+0x10*i, sizeof(m_cmat));
-	next_fn();
+		memcpy(m_mat_vector[i], m_copro_ram_data.get()+a+0x10*i, sizeof(m_cmat));
 }
 
 TGP_FUNCTION( model1_state::ram_setadr )
 {
-	m_ram_scanadr = fifoin_pop() - 0x8000;
-	logerror("TGP f0 ram_setadr 0x%x (%x)\n", m_ram_scanadr+0x8000, m_pushpc);
-	next_fn();
+	m_copro_hle_ram_scan_adr = fifoin_pop() - 0x8000;
+	logerror("TGP f0 ram_setadr 0x%x (%x)\n", m_copro_hle_ram_scan_adr+0x8000, m_pushpc);
 }
 
 TGP_FUNCTION( model1_state::groundbox_test )
@@ -1428,21 +1298,19 @@ TGP_FUNCTION( model1_state::groundbox_test )
 	fifoout_push(out_x);
 	fifoout_push(out_y);
 	fifoout_push(out_z);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f89 )
 {
-	uint32_t a = fifoin_pop();
-	uint32_t b = fifoin_pop();
-	uint32_t c = fifoin_pop();
-	uint32_t d = fifoin_pop();
+	u32 a = fifoin_pop();
+	u32 b = fifoin_pop();
+	u32 c = fifoin_pop();
+	u32 d = fifoin_pop();
 	(void)a;
 	(void)b;
 	(void)c;
 	logerror("TGP list set base 0x%x, 0x%x, %d, length=%d (%x)\n", a, b, c, d, m_pushpc);
-	m_list_length = d;
-	next_fn();
+	m_copro_hle_list_length = d;
 }
 
 TGP_FUNCTION( model1_state::f92 )
@@ -1456,7 +1324,6 @@ TGP_FUNCTION( model1_state::f92 )
 	(void)c;
 	(void)d;
 	logerror("TGP f92 %f, %f, %f, %f (%x)\n", a, b, c, d, m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f93 )
@@ -1464,15 +1331,13 @@ TGP_FUNCTION( model1_state::f93 )
 	float a = fifoin_pop_f();
 	(void)a;
 	logerror("TGP f93 %f (%x)\n", a, m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f94 )
 {
-	uint32_t a = fifoin_pop();
+	u32 a = fifoin_pop();
 	(void)a;
 	logerror("TGP f94 %d (%x)\n", a, m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::vmat_flatten )
@@ -1498,15 +1363,13 @@ TGP_FUNCTION( model1_state::vmat_flatten )
 		m_mat_vector[i][10] = m[ 9]*m_cmat[1] + m[10]*m_cmat[4] + m[11]*m_cmat[7] + m_cmat[10];
 		m_mat_vector[i][11] = m[ 9]*m_cmat[2] + m[10]*m_cmat[5] + m[11]*m_cmat[8] + m_cmat[11];
 	}
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::vmat_load1 )
 {
-	uint32_t a = fifoin_pop();
+	u32 a = fifoin_pop();
 	logerror("TGP vmat_load1 0x%x (%x)\n", a, m_pushpc);
-	memcpy(m_cmat, m_ram_data.get()+a, sizeof(m_cmat));
-	next_fn();
+	memcpy(m_cmat, m_copro_ram_data.get()+a, sizeof(m_cmat));
 }
 
 TGP_FUNCTION( model1_state::ram_trans )
@@ -1518,42 +1381,28 @@ TGP_FUNCTION( model1_state::ram_trans )
 	m_cmat[ 9] += m_cmat[0]*a+m_cmat[3]*b+m_cmat[6]*c;
 	m_cmat[10] += m_cmat[1]*a+m_cmat[4]*b+m_cmat[7]*c;
 	m_cmat[11] += m_cmat[2]*a+m_cmat[5]*b+m_cmat[8]*c;
-	next_fn();
-}
-
-TGP_FUNCTION( model1_state::f98_load )
-{
-	int i;
-	for(i=0; i<m_list_length; i++) {
-		float f = fifoin_pop_f();
-		(void)f;
-		logerror("TGP load list (%2d/%2d) %f (%x)\n", i, m_list_length, f, m_pushpc);
-	}
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f98 )
 {
-	uint32_t a = fifoin_pop();
+	u32 a = fifoin_pop();
 	(void)a;
 	logerror("TGP load list start %d (%x)\n", a, m_pushpc);
-	m_fifoin_cbcount = m_list_length;
-	m_fifoin_cb = &model1_state::f98_load;
+	m_copro_hle_active_list_length = m_copro_hle_list_length;
+	m_copro_hle_active_list_pos = 0;
 }
 
 TGP_FUNCTION( model1_state::f99 )
 {
 	logerror("TGP f99 (%x)\n", m_pushpc);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f100 )
 {
 	int i;
 	logerror("TGP f100 get list (%x)\n", m_pushpc);
-	for(i=0; i<m_list_length; i++)
+	for(i=0; i<m_copro_hle_list_length; i++)
 		fifoout_push_f((machine().rand() % 1000)/100.0);
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::groundbox_set )
@@ -1573,8 +1422,6 @@ TGP_FUNCTION( model1_state::groundbox_set )
 	m_tgp_vf_ygnd = b;
 	m_tgp_vf_yflr = a;
 	m_tgp_vf_yjmp = c;
-
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f102 )
@@ -1585,17 +1432,17 @@ TGP_FUNCTION( model1_state::f102 )
 	float c = fifoin_pop_f();
 	float d = fifoin_pop_f();
 	float e = fifoin_pop_f();
-	uint32_t f = fifoin_pop();
-	uint32_t g = fifoin_pop();
-	uint32_t h = fifoin_pop();
+	u32 f = fifoin_pop();
+	u32 g = fifoin_pop();
+	u32 h = fifoin_pop();
 
 	m_ccount++;
 
 	logerror("TGP f0 mve_calc %f, %f, %f, %f, %f, %d, %d, %d (%d) (%x)\n", a, b, c, d, e, f, g, h, m_ccount, m_pushpc);
 
-	px = u2f(m_ram_data[m_ram_scanadr+0x16]);
-	py = u2f(m_ram_data[m_ram_scanadr+0x17]);
-	pz = u2f(m_ram_data[m_ram_scanadr+0x18]);
+	px = u2f(m_copro_ram_data[m_copro_hle_ram_scan_adr+0x16]);
+	py = u2f(m_copro_ram_data[m_copro_hle_ram_scan_adr+0x17]);
+	pz = u2f(m_copro_ram_data[m_copro_hle_ram_scan_adr+0x18]);
 
 	//  memset(m_cmat, 0, sizeof(m_cmat));
 	//  m_cmat[0] = 1.0;
@@ -1624,97 +1471,93 @@ TGP_FUNCTION( model1_state::f102 )
 	fifoout_push(f);
 	fifoout_push(g);
 	fifoout_push(h);
-
-
-	next_fn();
 }
 
 TGP_FUNCTION( model1_state::f103 )
 {
-	m_ram_scanadr = fifoin_pop() - 0x8000;
-	logerror("TGP f0 mve_setadr 0x%x (%x)\n", m_ram_scanadr, m_pushpc);
+	m_copro_hle_ram_scan_adr = fifoin_pop() - 0x8000;
+	logerror("TGP f0 mve_setadr 0x%x (%x)\n", m_copro_hle_ram_scan_adr, m_pushpc);
 	ram_get_i();
-	next_fn();
 }
 
-// Addresses in daytona's TGP program
+// Addresses in daytona's and VR's TGP programs
 const struct model1_state::function model1_state::ftab_vf[] = {
-	{ &model1_state::fadd,            2 }, /* 0x00 */ // 0b5
-	{ &model1_state::fsub,            2 },            // 0ba
-	{ &model1_state::fmul,            2 },            // 0bf
-	{ &model1_state::fdiv,            2 },            // 0c4
-	{ nullptr,                        0 },            // 0d2
-	{ &model1_state::matrix_push,     0 },            // 0e3
-	{ &model1_state::matrix_pop,      0 },            // 0f7
-	{ &model1_state::matrix_write,   12 },            // 106
-	{ &model1_state::clear_stack,     0 },            // 10a
-	{ &model1_state::matrix_mul,     12 },            // 10e
-	{ &model1_state::anglev,          2 },            // 154
-	{ nullptr,                        0 },            // 15d
-	{ nullptr,                        0 },            // 19f
-	{ &model1_state::track_select,    1 },            // 1b8
-	{ &model1_state::load_base,       4 },            // 1bb
-	{ &model1_state::anglep,          4 },            // 1c1
+	{ &model1_state::fadd,            2 }, /* 0x00 */ // 0b5 09b
+	{ &model1_state::fsub,            2 },            // 0ba 0a0
+	{ &model1_state::fmul,            2 },            // 0bf 0a5
+	{ &model1_state::fdiv,            2 },            // 0c4 0aa
+	{ nullptr,                        0 },            // 0d2 0b9
+	{ &model1_state::matrix_push,     0 },            // 0e3 0cc
+	{ &model1_state::matrix_pop,      0 },            // 0f7 0e0
+	{ &model1_state::matrix_write,   12 },            // 106 0ef
+	{ &model1_state::clear_stack,     0 },            // 10a 0f4
+	{ &model1_state::matrix_mul,     12 },            // 10e 0f8
+	{ &model1_state::anglev,          2 },            // 154 13f
+	{ nullptr,                        0 },            // 15d 149
+	{ nullptr,                        0 },            // 19f 18a
+	{ &model1_state::track_select,    1 },            // 1b8 1a5
+	{ &model1_state::load_base,       4 },            // 1bb 1a8
+	{ &model1_state::anglep,          4 },            // 1c1 1ae
 
-	{ &model1_state::matrix_ident,    0 }, /* 0x10 */ // 1d2
-	{ &model1_state::matrix_read,     0 },            // 1d9
-	{ &model1_state::matrix_trans,    3 },            // 1dd
-	{ &model1_state::matrix_scale,    3 },            // 1f3
-	{ &model1_state::matrix_rotx,     1 },            // 20a
-	{ &model1_state::matrix_roty,     1 },            // 223
-	{ &model1_state::matrix_rotz,     1 },            // 23b
-	{ nullptr,                        0 },            // 253
-	{ &model1_state::track_read_quad, 1 },            // 2aa
-	{ nullptr,                        0 },            // 2b0
-	{ &model1_state::transform_point, 3 },            // 2b2
-	{ &model1_state::fsin_m1,         1 },            // 2cb
-	{ &model1_state::fcos_m1,         1 },            // 2ce
-	{ &model1_state::fsinm_m1,        2 },            // 2d1
-	{ &model1_state::fcosm_m1,        2 },            // 2d7
-	{ &model1_state::distance3,       6 },            // 2dd
+	{ &model1_state::matrix_ident,    0 }, /* 0x10 */ // 1d2 1c1
+	{ &model1_state::matrix_read,     0 },            // 1d9 1c8
+	{ &model1_state::matrix_trans,    3 },            // 1dd 1d1
+	{ &model1_state::matrix_scale,    3 },            // 1f3 1e8
+	{ &model1_state::matrix_rotx,     1 },            // 20a 200
+	{ &model1_state::matrix_roty,     1 },            // 223 21a
+	{ &model1_state::matrix_rotz,     1 },            // 23b 233
+	{ nullptr,                        0 },            // 253 24c
+	{ &model1_state::track_read_quad, 1 },            // 2aa 2a8
+	{ nullptr,                        0 },            // 2b0 2b0
+	{ &model1_state::transform_point, 3 },            // 2b2 2b4
+	{ &model1_state::fsin_m1,         1 },            // 2cb 2d7
+	{ &model1_state::fcos_m1,         1 },            // 2ce 2df
+	{ &model1_state::fsinm_m1,        2 },            // 2d1 2e7
+	{ &model1_state::fcosm_m1,        2 },            // 2d7 2f1
+	{ &model1_state::distance3,       6 },            // 2dd 2fb
 
-	{ nullptr,                        0 }, /* 0x20 */ // 2ff
-	{ nullptr,                        0 },            // 2ff
-	{ nullptr,                        0 },            // 300
-	{ nullptr,                        0 },            // 304
-	{ &model1_state::acc_set,         1 },            // 308
-	{ &model1_state::acc_get,         0 },            // 30a
-	{ &model1_state::acc_add,         1 },            // 30c
-	{ &model1_state::acc_sub,         1 },            // 311
-	{ &model1_state::acc_mul,         1 },            // 316
-	{ &model1_state::acc_div,         1 },            // 31b
-	{ &model1_state::f42,             3 },            // 329
-	{ &model1_state::f43,             6 },            // 36c
-	{ &model1_state::track_read_tri,  1 },            // 3c2
-	{ &model1_state::fsqrt,           1 },            // 3c7
-	{ &model1_state::vlength,         3 },            // 3cf
-	{ nullptr,                        0 },            // 3ef
+	{ nullptr,                        0 }, /* 0x20 */ // 2ff 31e
+	{ nullptr,                        0 },            // 2ff 31e
+	{ nullptr,                        0 },            // 300 31f
+	{ nullptr,                        0 },            // 304 323
+	{ &model1_state::acc_set,         1 },            // 308 327
+	{ &model1_state::acc_get,         0 },            // 30a 32a
+	{ &model1_state::acc_add,         1 },            // 30c 32e
+	{ &model1_state::acc_sub,         1 },            // 311 333
+	{ &model1_state::acc_mul,         1 },            // 316 338
+	{ &model1_state::acc_div,         1 },            // 31b 33d
+	{ &model1_state::f42,             3 },            // 329 34b
+	{ &model1_state::f43,             6 },            // 36c 38f
+	{ &model1_state::track_read_tri,  1 },            // 3c2 3e2
+	{ &model1_state::fsqrt,           1 },            // 3c7 3e9
+	{ &model1_state::vlength,         3 },            // 3cf 3f2
+	{ nullptr,                        0 },            // 3ef 411
 
-	{ &model1_state::track_read_info, 1 }, /* 0x30 */ // 410
-	{ &model1_state::colbox_set,     12 },            // 413
-	{ &model1_state::colbox_test,     3 },            // 417
-	{ nullptr,                        0 },            // 43b
-	{ nullptr,                        0 },            // 44d
-	{ nullptr,                        0 },            // 452
-	{ &model1_state::track_lookup,    4 },            // 457
-	{ nullptr,                        0 },            // 51a
-	{ nullptr,                        0 },            // 521
-	{ nullptr,                        0 },            // 52f
-	{ nullptr,                        0 },            // 53d
-	{ nullptr,                        0 },            // 545
-	{ nullptr,                        0 },            // 558
-	{ nullptr,                        0 },            // 559
-	{ nullptr,                        0 },            // 5c6
-	{ nullptr,                        0 },            // 5e9
+	{ &model1_state::track_read_info, 1 }, /* 0x30 */ // 410 431
+	{ &model1_state::colbox_set,     12 },            // 413 436
+	{ &model1_state::colbox_test,     3 },            // 417 43b
+	{ nullptr,                        0 },            // 43b 463
+	{ nullptr,                        0 },            // 44d 478
+	{ nullptr,                        0 },            // 452 47d
+	{ &model1_state::track_lookup,    4 },            // 457 482
+	{ nullptr,                        0 },            // 51a 522
+	{ nullptr,                        0 },            // 521 527
+	{ nullptr,                        0 },            // 52f 535
+	{ nullptr,                        0 },            // 53d 543
+	{ nullptr,                        0 },            // 545 54c
+	{ nullptr,                        0 },            // 558 55e
+	{ nullptr,                        0 },            // 559 55f
+	{ nullptr,                        0 },            // 5c6 5cd
+	{ nullptr,                        0 },            // 5e9 5f4
 
-	{ &model1_state::col_setcirc,     3 }, /* 0x40 */ // 5f3
-	{ &model1_state::col_testpt,      2 },            // 5fa
-	{ nullptr,                        0 },            // 615
-	{ &model1_state::distance,        4 },            // 631
-	{ nullptr,                        0 },            // 63f
-	{ nullptr,                        0 },            // 643
-	{ nullptr,                        0 },            // 64b
-	{ &model1_state::car_move,        4 },            // 661
+	{ &model1_state::col_setcirc,     3 }, /* 0x40 */ // 5f3 5fe
+	{ &model1_state::col_testpt,      2 },            // 5fa 603
+	{ nullptr,                        0 },            // 615 61e
+	{ &model1_state::distance,        4 },            // 631 639
+	{ nullptr,                        0 },            // 63f 648
+	{ nullptr,                        0 },            // 643 64e
+	{ nullptr,                        0 },            // 64b 657
+	{ &model1_state::car_move,        4 },            // 661 66e
 	{ &model1_state::cpa,            12 },            // 7d9
 	{ nullptr,                        0 },
 	{ &model1_state::vmat_store,      1 },
@@ -1829,344 +1672,354 @@ const struct model1_state::function model1_state::ftab_swa[] = {
 	{ &model1_state::catmull_rom,    13 }
 };
 
-
-TGP_FUNCTION( model1_state::dump )
+void model1_state::copro_hle_vf()
 {
-	logerror("TGP FIFOIN write %08x (%x)\n", fifoin_pop(), m_pushpc);
-	m_fifoin_cbcount = 1;
-	m_fifoin_cb = &model1_state::dump;
-}
-
-TGP_FUNCTION( model1_state::function_get_vf )
-{
-	uint32_t f = fifoin_pop() >> 23;
-
-	if(m_fifoout_rpos != m_fifoout_wpos) {
-		int count = m_fifoout_wpos - m_fifoout_rpos;
-		if(count < 0)
-			count += FIFO_SIZE;
-		logerror("TGP function called with sizeout = %d\n", count);
+	if(m_copro_hle_active_list_length) {
+		while(m_copro_hle_active_list_pos < m_copro_hle_active_list_length && !m_copro_fifo_in->is_empty()) {
+			u32 v = m_copro_fifo_in->pop();
+			m_copro_hle_active_list_pos++;
+			logerror("TGP load list %d/%d: %08x\n", m_copro_hle_active_list_pos, m_copro_hle_active_list_length, v);
+		}
+		if(m_copro_hle_active_list_pos == m_copro_hle_active_list_length)
+			m_copro_hle_active_list_pos = m_copro_hle_active_list_length = 0;
+		if(m_copro_fifo_in->is_empty())
+			return;
 	}
-	if(ARRAY_LENGTH(ftab_vf) > f && nullptr != ftab_vf[f].cb) {
-		m_fifoin_cbcount = ftab_vf[f].count;
-		m_fifoin_cb = model1_state::ftab_vf[f].cb;
-		//      logerror("TGP function %d request, %d parameters\n", f, m_fifoin_cbcount);
-		if(!m_fifoin_cbcount)
-			(this->*m_fifoin_cb)();
+
+ next:
+	u32 f = m_copro_fifo_in->peek(0) >> 23; // Extracts the exponent of the ieee float
+
+	//  logerror("function %02x size %d/%d\n", f, int(m_copro_fifo_in->size() - 1), ftab_vf[f].count);
+
+	if(f < ARRAY_LENGTH(ftab_vf) && ftab_vf[f].cb != nullptr) {
+		unsigned np = ftab_vf[f].count;
+		if(m_copro_fifo_in->size() >= np+1) {
+			m_copro_fifo_in->pop();
+			(this->*ftab_vf[f].cb)();
+			if(!m_copro_fifo_in->is_empty())
+				goto next;
+		}
+
 	} else {
 		logerror("TGP function %d unimplemented (%x)\n", f, m_pushpc);
-		m_fifoin_cbcount = 1;
-		m_fifoin_cb = &model1_state::dump;
+		m_copro_fifo_in->pop();
 	}
 }
 
-TGP_FUNCTION( model1_state::function_get_swa )
+void model1_state::copro_hle_swa()
 {
-	uint32_t f = fifoin_pop();
+	u32 f = m_copro_fifo_in->peek(0);
 
-	if(m_fifoout_rpos != m_fifoout_wpos) {
-		int count = m_fifoout_wpos - m_fifoout_rpos;
-		if(count < 0)
-			count += FIFO_SIZE;
-		logerror("TGP function called with sizeout = %d\n", count);
-	}
-	if(ARRAY_LENGTH(ftab_swa) > f && nullptr != ftab_swa[f].cb) {
-		m_fifoin_cbcount = ftab_swa[f].count;
-		m_fifoin_cb = model1_state::ftab_swa[f].cb;
-		//      logerror("TGP function %d request, %d parameters\n", f, m_fifoin_cbcount);
-		if(!m_fifoin_cbcount)
-			(this->*m_fifoin_cb)();
+	if(f < ARRAY_LENGTH(ftab_swa) && ftab_swa[f].cb != nullptr) {
+		unsigned np = ftab_swa[f].count;
+		if(m_copro_fifo_in->size() >= np+1) {
+			m_copro_fifo_in->pop();
+			(this->*ftab_swa[f].cb)();
+		}
+
 	} else {
 		logerror("TGP function %d unimplemented (%x)\n", f, m_pushpc);
-		m_fifoin_cbcount = 1;
-		m_fifoin_cb = &model1_state::dump;
+		m_copro_fifo_in->pop();
 	}
 }
 
-READ16_MEMBER(model1_state::model1_tgp_copro_r)
+void model1_state::machine_start()
 {
-	if(!offset) {
-		m_copro_r = fifoout_pop();
-		return m_copro_r;
-	} else
-		return m_copro_r >> 16;
-}
+	m_digits.resolve();
+	m_copro_ram_data = std::make_unique<u32[]>(0x8000);
 
-WRITE16_MEMBER(model1_state::model1_tgp_copro_w)
-{
-	if(offset) {
-		m_copro_w = (m_copro_w & 0x0000ffff) | (data << 16);
-		m_pushpc = m_maincpu->pc();
-		fifoin_push(m_copro_w);
-	} else
-		m_copro_w = (m_copro_w & 0xffff0000) | data;
-}
-
-READ16_MEMBER(model1_state::model1_tgp_copro_adr_r)
-{
-	return m_ram_adr;
-}
-
-WRITE16_MEMBER(model1_state::model1_tgp_copro_adr_w)
-{
-	COMBINE_DATA(&m_ram_adr);
-}
-
-READ16_MEMBER(model1_state::model1_tgp_copro_ram_r)
-{
-	if(!offset) {
-		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", m_ram_adr, m_ram_data[m_ram_adr], u2f(m_ram_data[m_ram_adr]), m_maincpu->pc());
-		return m_ram_data[m_ram_adr];
-	} else
-		return m_ram_data[m_ram_adr++] >> 16;
-}
-
-WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
-{
-	COMBINE_DATA(m_ram_latch+offset);
-	if(offset) {
-		uint32_t v = m_ram_latch[0]|(m_ram_latch[1]<<16);
-		logerror("TGP f0 ram write %04x, %08x (%f) (%x)\n", m_ram_adr, v, u2f(v), m_maincpu->pc());
-		m_ram_data[m_ram_adr] = v;
-		m_ram_adr++;
-	}
-}
-
-MACHINE_START_MEMBER(model1_state,model1)
-{
-	m_ram_data = std::make_unique<uint32_t[]>(0x10000);
-	m_io_command = 0;
-
-	save_pointer(NAME(m_ram_data.get()), 0x10000);
-	save_item(NAME(m_ram_adr));
-	save_item(NAME(m_ram_scanadr));
-	save_item(NAME(m_ram_latch));
-	save_item(NAME(m_fifoout_rpos));
-	save_item(NAME(m_fifoout_wpos));
-	save_item(NAME(m_fifoout_data));
-	save_item(NAME(m_fifoin_rpos));
-	save_item(NAME(m_fifoin_wpos));
-	save_item(NAME(m_fifoin_data));
+	save_pointer(NAME(m_copro_ram_data), 0x8000);
+	save_item(NAME(m_v60_copro_ram_adr));
+	save_item(NAME(m_copro_hle_ram_scan_adr));
+	save_item(NAME(m_v60_copro_ram_latch));
 	save_item(NAME(m_cmat));
 	save_item(NAME(m_mat_stack));
 	save_item(NAME(m_mat_vector));
 	save_item(NAME(m_mat_stack_pos));
 	save_item(NAME(m_acc));
-	save_item(NAME(m_list_length));
-	save_item(NAME(m_io_command));
-}
+	save_item(NAME(m_copro_hle_list_length));
+	save_item(NAME(m_copro_hle_active_list_length));
+	save_item(NAME(m_copro_hle_active_list_pos));
 
-void model1_state::tgp_reset(bool swa)
-{
-	m_ram_adr = 0;
-	memset(m_ram_data.get(), 0, 0x10000*4);
+	if(m_tgp_copro) {
+		m_copro_fifo_in->setup(16,
+							   [this]() { m_tgp_copro->stall(); },
+							   [this]() { m_tgp_copro->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
+							   [this]() { m_tgp_copro->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
+							   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
+							   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
+							   [    ]() { },
+							   [    ]() { });
+		m_copro_fifo_out->setup(16,
+								[this]() { m_maincpu->stall(); },
+								[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
+								[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
+								[this]() { m_tgp_copro->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
+								[this]() { m_tgp_copro->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
+								[    ]() { },
+								[    ]() { });
 
-	m_fifoout_rpos = 0;
-	m_fifoout_wpos = 0;
-	m_fifoin_rpos = 0;
-	m_fifoin_wpos = 0;
+	} else {
+		bool is_swa =
+			!strcmp(machine().system().name, "swa") ||
+			!strcmp(machine().system().name, "wingwar") ||
+			!strcmp(machine().system().name, "wingwaru") ||
+			!strcmp(machine().system().name, "wingwarj") ||
+			!strcmp(machine().system().name, "wingwar360") ||
+			!strcmp(machine().system().name, "netmerc");
 
-	m_acc = 0;
-	m_mat_stack_pos = 0;
-	memset(m_cmat, 0, sizeof(m_cmat));
-	m_cmat[0] = 1.0;
-	m_cmat[4] = 1.0;
-	m_cmat[8] = 1.0;
+		std::function<void ()> push_cb;
+		if(is_swa)
+			push_cb = [this]() { copro_hle_swa(); };
+		else
+			push_cb = [this]() { copro_hle_vf(); };
 
-	m_dump = false;
-	m_swa = swa;
-	next_fn();
-}
-
-/*********************************** Virtua Racing ***********************************/
-
-
-void model1_state::vr_tgp_reset()
-{
-	m_ram_adr = 0;
-	memset(m_ram_data.get(), 0, 0x8000*4);
-
-	m_copro_fifoout_rpos = 0;
-	m_copro_fifoout_wpos = 0;
-	m_copro_fifoout_num = 0;
-	m_copro_fifoin_rpos = 0;
-	m_copro_fifoin_wpos = 0;
-	m_copro_fifoin_num = 0;
-}
-
-/* FIFO */
-READ_LINE_MEMBER(model1_state::copro_fifoin_pop_ok)
-{
-	if (m_copro_fifoin_num == 0)
-	{
-		return CLEAR_LINE;
+		m_copro_fifo_in->setup(16,
+							   [    ]() { },
+							   [    ]() { },
+							   [    ]() { },
+							   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
+							   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
+							   push_cb,
+							   [    ]() { });
+		m_copro_fifo_out->setup(16,
+								[this]() { m_maincpu->stall(); },
+								[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
+								[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
+								[    ]() { },
+								[    ]() { },
+								[    ]() { },
+								[    ]() { });
 	}
-
-	return ASSERT_LINE;
 }
 
-READ32_MEMBER(model1_state::copro_fifoin_pop)
+void model1_state::copro_reset()
 {
-	uint32_t r = m_copro_fifoin_data[m_copro_fifoin_rpos++];
+	m_v60_copro_ram_adr = 0;
+	m_copro_ram_adr = 0;
+	m_copro_sincos_base = 0;
+	m_copro_inv_base = 0;
+	m_copro_isqrt_base = 0;
+	std::fill(std::begin(m_copro_atan_base), std::end(m_copro_atan_base), 0);
+	std::fill(std::begin(m_v60_copro_ram_latch), std::end(m_v60_copro_ram_latch), 0);
+	memset(m_copro_ram_data.get(), 0, 0x8000*4);
 
-	if (m_copro_fifoin_rpos == FIFO_SIZE)
-	{
-		m_copro_fifoin_rpos = 0;
+	if(!m_tgp_copro) {
+		m_acc = 0;
+		m_mat_stack_pos = 0;
+		m_copro_hle_active_list_length = 0;
+		m_copro_hle_active_list_pos = 0;
+		m_copro_hle_list_length = 0;
+
+		memset(m_cmat, 0, sizeof(m_cmat));
+		m_cmat[0] = 1.0;
+		m_cmat[4] = 1.0;
+		m_cmat[8] = 1.0;
 	}
-
-	m_copro_fifoin_num--;
-
-	return r;
 }
 
-
-void model1_state::copro_fifoin_push(uint32_t data)
+READ16_MEMBER(model1_state::v60_copro_ram_adr_r)
 {
-	if (m_copro_fifoin_num == FIFO_SIZE)
-	{
-		fatalerror("Copro FIFOIN overflow (at %08X)\n", safe_pc());
-	}
-
-	m_copro_fifoin_data[m_copro_fifoin_wpos++] = data;
-
-	if (m_copro_fifoin_wpos == FIFO_SIZE)
-	{
-		m_copro_fifoin_wpos = 0;
-	}
-
-	m_copro_fifoin_num++;
+	return m_v60_copro_ram_adr;
 }
 
-uint32_t model1_state::copro_fifoout_pop()
+WRITE16_MEMBER(model1_state::v60_copro_ram_adr_w)
 {
-	if (m_copro_fifoout_num == 0)
-	{
-		// Reading from empty FIFO causes the v60 to enter wait state
-		m_maincpu->stall();
-
-		machine().scheduler().synchronize();
-
-		return 0;
-	}
-
-	uint32_t r = m_copro_fifoout_data[m_copro_fifoout_rpos++];
-
-	if (m_copro_fifoout_rpos == FIFO_SIZE)
-	{
-		m_copro_fifoout_rpos = 0;
-	}
-
-	m_copro_fifoout_num--;
-
-	return r;
+	COMBINE_DATA(&m_v60_copro_ram_adr);
 }
 
-WRITE32_MEMBER(model1_state::copro_fifoout_push)
+READ16_MEMBER(model1_state::v60_copro_ram_r)
 {
-	if (m_copro_fifoout_num == FIFO_SIZE)
-	{
-		fatalerror("Copro FIFOOUT overflow (at %08X)\n", m_tgp->pc());
-	}
-
-	m_copro_fifoout_data[m_copro_fifoout_wpos++] = data;
-
-	if (m_copro_fifoout_wpos == FIFO_SIZE)
-	{
-		m_copro_fifoout_wpos = 0;
-	}
-
-	m_copro_fifoout_num++;
-}
-
-READ32_MEMBER(model1_state::copro_ram_r)
-{
-	return m_ram_data[offset & 0x7fff];
-}
-
-WRITE32_MEMBER(model1_state::copro_ram_w)
-{
-	m_ram_data[offset&0x7fff] = data;
-}
-
-READ16_MEMBER(model1_state::model1_tgp_vr_adr_r)
-{
-	if ( m_ram_adr == 0 && m_copro_fifoin_num != 0 )
-	{
-		/* spin the main cpu and let the TGP catch up */
-		m_maincpu->spin_until_time(attotime::from_usec(100));
-	}
-
-	return m_ram_adr;
-}
-
-WRITE16_MEMBER(model1_state::model1_tgp_vr_adr_w)
-{
-	COMBINE_DATA(&m_ram_adr);
-}
-
-READ16_MEMBER(model1_state::model1_vr_tgp_ram_r)
-{
-	uint16_t  r;
+	u16 r;
 
 	if (!offset)
-	{
-		r = m_ram_data[m_ram_adr&0x7fff];
-	}
-	else
-	{
-		r = m_ram_data[m_ram_adr&0x7fff] >> 16;
+		r = m_copro_ram_data[m_v60_copro_ram_adr & 0x7fff];
 
-		if ( m_ram_adr == 0 && r == 0xffff )
-		{
-			/* if the TGP is busy, spin some more */
-			m_maincpu->spin_until_time(attotime::from_usec(100));
-		}
+	else {
+		r = m_copro_ram_data[m_v60_copro_ram_adr & 0x7fff] >> 16;
 
-		if ( m_ram_adr & 0x8000 )
-			m_ram_adr++;
+		if(m_v60_copro_ram_adr & 0x8000)
+			m_v60_copro_ram_adr ++;
 	}
 
 	return r;
 }
 
-WRITE16_MEMBER(model1_state::model1_vr_tgp_ram_w)
+WRITE16_MEMBER(model1_state::v60_copro_ram_w)
 {
-	COMBINE_DATA(m_ram_latch+offset);
+	COMBINE_DATA(m_v60_copro_ram_latch + offset);
 
-	if (offset)
-	{
-		uint32_t v = m_ram_latch[0]|(m_ram_latch[1]<<16);
-		m_ram_data[m_ram_adr&0x7fff] = v;
-		if ( m_ram_adr & 0x8000 )
-			m_ram_adr++;
+	if (offset) {
+		u32 v = m_v60_copro_ram_latch[0] | (m_v60_copro_ram_latch[1] << 16);
+		m_copro_ram_data[m_v60_copro_ram_adr & 0x7fff] = v;
+		if(m_v60_copro_ram_adr & 0x8000)
+			m_v60_copro_ram_adr++;
 	}
 }
 
-READ16_MEMBER(model1_state::model1_vr_tgp_r)
+READ16_MEMBER(model1_state::v60_copro_fifo_r)
 {
-	if (!offset)
-	{
-		m_vr_r = copro_fifoout_pop();
-		return m_vr_r;
-	}
-	else
-		return m_vr_r >> 16;
+	if (!offset) {
+		m_v60_copro_fifo_r = m_copro_fifo_out->pop();
+		return m_v60_copro_fifo_r;
+
+	} else
+		return m_v60_copro_fifo_r >> 16;
 }
 
-WRITE16_MEMBER(model1_state::model1_vr_tgp_w)
+WRITE16_MEMBER(model1_state::v60_copro_fifo_w)
 {
-	if (offset)
-	{
-		m_vr_w = (m_vr_w & 0x0000ffff) | (data << 16);
-		copro_fifoin_push(m_vr_w);
-	}
-	else
-		m_vr_w = (m_vr_w & 0xffff0000) | data;
+	if(offset) {
+		m_v60_copro_fifo_w = (m_v60_copro_fifo_w & 0x0000ffff) | (data << 16);
+		m_pushpc = m_maincpu->pc();
+		m_copro_fifo_in->push(u32(m_v60_copro_fifo_w));
+
+	} else
+		m_v60_copro_fifo_w = (m_v60_copro_fifo_w & 0xffff0000) | data;
 }
 
-/* TGP memory map */
-ADDRESS_MAP_START(model1_state::model1_vr_tgp_map)
-	AM_RANGE(0x00000000, 0x000007ff) AM_RAM AM_REGION("tgp", 0)
-	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_ram_r, copro_ram_w)
-	AM_RANGE(0xff800000, 0xff87ffff) AM_ROM AM_REGION("tgp_data", 0)
-ADDRESS_MAP_END
+/* Coprocessor TGP memory map */
+void model1_state::copro_prog_map(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
+
+void model1_state::copro_data_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x0100, 0x0100).r(m_copro_fifo_in, FUNC(generic_fifo_u32_device::read));
+
+	map(0x0200, 0x03ff).ram();
+	map(0x0400, 0x0400).w(m_copro_fifo_out, FUNC(generic_fifo_u32_device::write));
+}
+
+void model1_state::copro_io_map(address_map &map)
+{
+	map(0x0008, 0x0008).rw(FUNC(model1_state::copro_ramadr_r), FUNC(model1_state::copro_ramadr_w));
+	map(0x0009, 0x0009).rw(FUNC(model1_state::copro_ramdata_r), FUNC(model1_state::copro_ramdata_w));
+	map(0x0020, 0x0023).rw(FUNC(model1_state::copro_sincos_r), FUNC(model1_state::copro_sincos_w));
+	map(0x0024, 0x0027).rw(FUNC(model1_state::copro_atan_r), FUNC(model1_state::copro_atan_w));
+	map(0x0028, 0x0029).rw(FUNC(model1_state::copro_inv_r), FUNC(model1_state::copro_inv_w));
+	map(0x002a, 0x002b).rw(FUNC(model1_state::copro_isqrt_r), FUNC(model1_state::copro_isqrt_w));
+	map(0x002e, 0x002e).w(FUNC(model1_state::copro_data_w));
+	map(0x8000, 0xffff).r(FUNC(model1_state::copro_data_r));
+}
+
+void model1_state::copro_rf_map(address_map &map)
+{
+	map(0x0, 0x0).nopw(); // leds? busy flag?
+}
+
+WRITE32_MEMBER(model1_state::copro_ramadr_w)
+{
+	COMBINE_DATA(&m_copro_ram_adr);
+}
+
+READ32_MEMBER(model1_state::copro_ramadr_r)
+{
+	return m_copro_ram_adr;
+}
+
+WRITE32_MEMBER(model1_state::copro_ramdata_w)
+{
+	COMBINE_DATA(&m_copro_ram_data[m_copro_ram_adr & 0x7fff]);
+	m_copro_ram_adr ++;
+}
+
+READ32_MEMBER(model1_state::copro_ramdata_r)
+{
+	u32 val = m_copro_ram_data[m_copro_ram_adr & 0x7fff];
+	m_copro_ram_adr ++;
+	return val;
+}
+
+
+
+WRITE32_MEMBER(model1_state::copro_sincos_w)
+{
+	COMBINE_DATA(&m_copro_sincos_base);
+}
+
+READ32_MEMBER(model1_state::copro_sincos_r)
+{
+	offs_t ang = m_copro_sincos_base + offset * 0x4000;
+	offs_t index = ang & 0x3fff;
+	if(ang & 0x4000)
+		index ^= 0x3fff;
+	u32 result = m_copro_tables[index];
+	if(ang & 0x8000)
+		result ^= 0x80000000;
+	return result;
+}
+
+WRITE32_MEMBER(model1_state::copro_inv_w)
+{
+	COMBINE_DATA(&m_copro_inv_base);
+}
+
+READ32_MEMBER(model1_state::copro_inv_r)
+{
+	offs_t index = ((m_copro_inv_base >> 9) & 0x3ffe) | (offset & 1);
+	u32 result = m_copro_tables[index | 0x8000];
+	u8 bexp = (m_copro_inv_base >> 23) & 0xff;
+	u8 exp = (result >> 23) + (0x7f - bexp);
+	result = (result & 0x807fffff) | (exp << 23);
+	if(m_copro_inv_base & 0x80000000)
+		result ^= 0x80000000;
+	return result;
+}
+
+WRITE32_MEMBER(model1_state::copro_isqrt_w)
+{
+	COMBINE_DATA(&m_copro_isqrt_base);
+}
+
+READ32_MEMBER(model1_state::copro_isqrt_r)
+{
+	offs_t index = 0x2000 ^ (((m_copro_isqrt_base>> 10) & 0x3ffe) | (offset & 1));
+	u32 result = m_copro_tables[index | 0xc000];
+	u8 bexp = (m_copro_isqrt_base >> 24) & 0x7f;
+	u8 exp = (result >> 23) + (0x3f - bexp);
+	result = (result & 0x807fffff) | (exp << 23);
+	if(!(offset & 1))
+		result &= 0x7fffffff;
+	return result;
+}
+
+WRITE32_MEMBER(model1_state::copro_atan_w)
+{
+	COMBINE_DATA(&m_copro_atan_base[offset]);
+}
+
+READ32_MEMBER(model1_state::copro_atan_r)
+{
+	offs_t index = (m_copro_atan_base[3] << 1);
+	if(index == 0x4000)
+		index = 0x3fff;
+	u32 result = m_copro_tables[index | 0x4000];
+
+	bool s0 = m_copro_atan_base[0] & 0x80000000;
+	bool s1 = m_copro_atan_base[1] & 0x80000000;
+	bool s2 = m_copro_atan_base[2] & 0x80000000;
+
+	if(s0 ^ s1 ^ s2)
+		result >>= 16;
+	if(s2)
+		result += 0x4000;
+	if((s0 && !s2) || (s1 && s2))
+		result += 0x8000;
+
+	return result & 0xffff;
+}
+
+WRITE32_MEMBER(model1_state::copro_data_w)
+{
+	COMBINE_DATA(&m_copro_data_base);
+}
+
+READ32_MEMBER(model1_state::copro_data_r)
+{
+	offs_t index = (m_copro_data_base & ~0x7fff) | offset;
+	index &= (m_copro_data->bytes() >> 2) - 1;
+	return m_copro_data->as_u32(index);
+}

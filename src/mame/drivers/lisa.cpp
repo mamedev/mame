@@ -12,7 +12,6 @@
 
 #include "emu.h"
 #include "includes/lisa.h"
-#include "cpu/m6502/m6504.h"
 #include "cpu/cop400/cop400.h"
 #include "formats/ap_dsk35.h"
 #include "screen.h"
@@ -23,26 +22,29 @@
     ADDRESS MAP
 ***************************************************************************/
 
-ADDRESS_MAP_START(lisa_state::lisa_map)
-	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(lisa_r, lisa_w)           /* no fixed map, we use an MMU */
-ADDRESS_MAP_END
+void lisa_state::lisa_map(address_map &map)
+{
+	map(0x000000, 0xffffff).rw(FUNC(lisa_state::lisa_r), FUNC(lisa_state::lisa_w));           /* no fixed map, we use an MMU */
+}
 
-ADDRESS_MAP_START(lisa_state::lisa_fdc_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff) // only 8k of address space
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fdc_ram")             /* RAM (shared with 68000) */
-	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
-	AM_RANGE(0x0800, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")     /* ROM */
-ADDRESS_MAP_END
+void lisa_state::lisa_fdc_map(address_map &map)
+{
+	map.global_mask(0x1fff); // only 8k of address space
+	map(0x0000, 0x03ff).ram().share("fdc_ram");             /* RAM (shared with 68000) */
+	map(0x0400, 0x07ff).rw(FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
+	map(0x0800, 0x0fff).noprw();
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000).share("fdc_rom");     /* ROM */
+}
 
-ADDRESS_MAP_START(lisa_state::lisa210_fdc_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff) // only 8k of address space
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fdc_ram")             /* RAM (shared with 68000) */
-	AM_RANGE(0x0400, 0x07ff) AM_NOP                                     /* nothing, or RAM wrap-around ??? */
-	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
-	AM_RANGE(0x0c00, 0x0fff) AM_NOP                                     /* nothing, or IO port wrap-around ??? */
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")         /* ROM */
-ADDRESS_MAP_END
+void lisa_state::lisa210_fdc_map(address_map &map)
+{
+	map.global_mask(0x1fff); // only 8k of address space
+	map(0x0000, 0x03ff).ram().share("fdc_ram");             /* RAM (shared with 68000) */
+	map(0x0400, 0x07ff).noprw();                                     /* nothing, or RAM wrap-around ??? */
+	map(0x0800, 0x0bff).rw(FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
+	map(0x0c00, 0x0fff).noprw();                                     /* nothing, or IO port wrap-around ??? */
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000).share("fdc_rom");         /* ROM */
+}
 
 
 
@@ -95,102 +97,100 @@ static const floppy_interface lisa_floppy_interface =
 ***************************************************************************/
 
 /* Lisa1 and Lisa 2 machine */
-MACHINE_CONFIG_START(lisa_state::lisa)
+void lisa_state::lisa(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
-	MCFG_CPU_PROGRAM_MAP(lisa_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, lisa_state,  lisa_interrupt)
+	M68000(config, m_maincpu, 5093760);        /* 20.37504 MHz / 4 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa_map);
+	m_maincpu->set_vblank_int(SCREEN_TAG, FUNC(lisa_state::lisa_interrupt));
 
-	MCFG_CPU_ADD(COP421_TAG, COP421, 3900000)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
+	cop421_cpu_device &cop(COP421(config, COP421_TAG, 3900000));
+	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
 
-	MCFG_CPU_ADD(KB_COP421_TAG, COP421, 3900000) // ?
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
+	cop421_cpu_device &kbcop(COP421(config, KB_COP421_TAG, 3900000)); // ?
+	kbcop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
 
-	MCFG_CPU_ADD("fdccpu", M6504, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
-	MCFG_CPU_PROGRAM_MAP(lisa_fdc_map)
+	M6504(config, m_fdc_cpu, 2000000);        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
+	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa_fdc_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // U4E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(lisa_state, diag1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(lisa_state, diag2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(lisa_state, seg1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(lisa_state, seg2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(lisa_state, setup_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(lisa_state, sfmsk_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(lisa_state, vtmsk_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(lisa_state, hdmsk_w))
+	LS259(config, m_latch, 0); // U4E
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(880, 380)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 364-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lisa_state, screen_update_lisa)
-	MCFG_SCREEN_PALETTE("palette")
+	m_latch->q_out_cb<0>().set(FUNC(lisa_state::diag1_w));
+	m_latch->q_out_cb<1>().set(FUNC(lisa_state::diag2_w));
+	m_latch->q_out_cb<2>().set(FUNC(lisa_state::seg1_w));
+	m_latch->q_out_cb<3>().set(FUNC(lisa_state::seg2_w));
+	m_latch->q_out_cb<4>().set(FUNC(lisa_state::setup_w));
+	m_latch->q_out_cb<5>().set(FUNC(lisa_state::sfmsk_w));
+	m_latch->q_out_cb<6>().set(FUNC(lisa_state::vtmsk_w));
+	m_latch->q_out_cb<7>().set(FUNC(lisa_state::hdmsk_w));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(880, 380);
+	m_screen->set_visarea(0, 720-1, 0, 364-1);
+	m_screen->set_screen_update(FUNC(lisa_state::screen_update_lisa));
+	m_screen->set_palette("palette");
 
+	PALETTE(config, m_palette, 2);
+	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* nvram */
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", lisa_state, nvram_init)
+	NVRAM(config, m_nvram);
+	m_nvram->set_custom_handler(FUNC(lisa_state::nvram_init));
 
 	/* devices */
-	MCFG_IWM_ADD("fdc", lisa2_fdc_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_interface)
+	IWM(config, m_fdc, &lisa2_fdc_interface);
+	sonydriv_floppy_image_device::legacy_2_drives_add(config, &lisa_floppy_interface);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","lisa")
+	SOFTWARE_LIST(config, "disk_list").set_type("lisa", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 500000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(lisa_state, COPS_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(lisa_state, COPS_via_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(lisa_state, COPS_via_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(lisa_state, COPS_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(lisa_state, COPS_via_irq_func))
+	VIA6522(config, m_via0, 500000);
+	m_via0->writepa_handler().set(FUNC(lisa_state::COPS_via_out_a));
+	m_via0->writepb_handler().set(FUNC(lisa_state::COPS_via_out_b));
+	m_via0->ca2_handler().set(FUNC(lisa_state::COPS_via_out_ca2));
+	m_via0->cb2_handler().set(FUNC(lisa_state::COPS_via_out_cb2));
+	m_via0->irq_handler().set(FUNC(lisa_state::COPS_via_irq_func));
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 500000)
+	VIA6522(config, m_via1, 500000);
 
-	MCFG_DEVICE_ADD("scc", SCC8530, 7833600)
-MACHINE_CONFIG_END
+	SCC8530(config, m_scc, 7833600);
+}
 
-
-MACHINE_CONFIG_START(lisa_state::lisa210)
+void lisa_state::lisa210(machine_config &config)
+{
 	lisa(config);
-	MCFG_CPU_MODIFY( "fdccpu" )
-	MCFG_CPU_PROGRAM_MAP(lisa210_fdc_map)
+	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa210_fdc_map);
 
 	/* Lisa 2/10 and MacXL had a slightly different FDC interface */
-	MCFG_IWM_MODIFY("fdc", lisa210_fdc_interface)
+	m_fdc->set_config(&lisa210_fdc_interface);
 
 	/* via */
-	MCFG_DEVICE_MODIFY("via6522_0")
-	MCFG_DEVICE_CLOCK(1250000)
-	MCFG_DEVICE_MODIFY("via6522_1")
-	MCFG_DEVICE_CLOCK(1250000)
-MACHINE_CONFIG_END
+	m_via0->set_clock(1250000);
+	m_via1->set_clock(1250000);
+}
 
-
-MACHINE_CONFIG_START(lisa_state::macxl)
+void lisa_state::macxl(machine_config &config)
+{
 	lisa210(config);
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_SIZE(   768/* ???? */, 447/* ???? */)
-	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 431-1)
-MACHINE_CONFIG_END
+	m_screen->set_size(   768/* ???? */, 447/* ???? */);
+	m_screen->set_visarea(0, 608-1, 0, 431-1);
+}
 
 /* 2008-05 FP:
 Small note about natural keyboard support: currently,
 - "Clear" (on the Keypad) is mapped to 'F1'
-- "Enter" (different from Return) is mapped to 'F2'
-- "Keypad ," is currently unmapped                   */
+- "Enter" (different from Return) is mapped to 'F2' */
 
 static INPUT_PORTS_START( lisa )
 	PORT_START("MOUSE_X") /* Mouse - X AXIS */
@@ -208,18 +208,18 @@ static INPUT_PORTS_START( lisa )
 	PORT_BIT(0xFFFF, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("LINE2")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad + [\xe2\x97\x80]") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad * [\xe2\x96\xb6]") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)             PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)             PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)             PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad / [\xe2\x96\xb2]") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)             PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)             PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)             PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad ,")    // this one would be between '+' and 'Enter' on a modern keypad.
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad , [\xe2\x96\xbc]") PORT_CODE(KEYCODE_COMMA_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))    // this one would be between '+' and 'Enter' on a modern keypad.
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)           PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)             PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)             PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
@@ -333,54 +333,54 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROM_DEFAULT_BIOS( "revh" )
 
 	ROM_SYSTEM_BIOS( 0, "revh", "LISA Bootrom Rev H (2/24/84)")
-	ROMX_LOAD( "341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0175-H LISA Bootrom Rev H (2/24/84) (High) */
-	ROMX_LOAD( "341-0176-h", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0176-H LISA Bootrom Rev H (2/24/84) (Low) */
+	ROMX_LOAD("341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(0)) // 341-0175-H LISA Bootrom Rev H (2/24/84) (High)
+	ROMX_LOAD("341-0176-h", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d), ROM_SKIP(1) | ROM_BIOS(0)) // 341-0176-H LISA Bootrom Rev H (2/24/84) (Low)
 
-	ROM_SYSTEM_BIOS( 1, "revg", "LISA Bootrom Rev G (2/08/84)") /* limited test release before release of rom rev H */
-	ROMX_LOAD( "341-0175-g", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(2)) /* 341-0175-G LISA Bootrom Rev G (2/08/84) (High) */
-	ROMX_LOAD( "341-0176-g", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(2)) /* 341-0176-G LISA Bootrom Rev G (2/08/84) (Low) */
+	ROM_SYSTEM_BIOS( 1, "revg", "LISA Bootrom Rev G (2/08/84)") // limited test release before release of rom rev H
+	ROMX_LOAD("341-0175-g", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1)) // 341-0175-G LISA Bootrom Rev G (2/08/84) (High)
+	ROMX_LOAD("341-0176-g", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1)) // 341-0176-G LISA Bootrom Rev G (2/08/84) (Low)
 
 	ROM_SYSTEM_BIOS( 2, "revf", "LISA Bootrom Rev F (12/21/83)")
-	ROMX_LOAD( "341-0175-f", 0x000000, 0x2000, CRC(701b9dab) SHA1(b116e5fada7b9a51f1b6e25757b2814d1b2737a5), ROM_SKIP(1) | ROM_BIOS(3)) /* 341-0175-F LISA Bootrom Rev F (12/21/83) (High) */
-	ROMX_LOAD( "341-0176-f", 0x000001, 0x2000, CRC(036010b6) SHA1(ac93e6dbe4ce59396d7d191ee3e3e79a504e518f), ROM_SKIP(1) | ROM_BIOS(3)) /* 341-0176-F LISA Bootrom Rev F (12/21/83) (Low) */
+	ROMX_LOAD("341-0175-f", 0x000000, 0x2000, CRC(701b9dab) SHA1(b116e5fada7b9a51f1b6e25757b2814d1b2737a5), ROM_SKIP(1) | ROM_BIOS(2)) // 341-0175-F LISA Bootrom Rev F (12/21/83) (High)
+	ROMX_LOAD("341-0176-f", 0x000001, 0x2000, CRC(036010b6) SHA1(ac93e6dbe4ce59396d7d191ee3e3e79a504e518f), ROM_SKIP(1) | ROM_BIOS(2)) // 341-0176-F LISA Bootrom Rev F (12/21/83) (Low)
 
 	ROM_SYSTEM_BIOS( 3, "reve", "LISA Bootrom Rev E (10/20/83)")
-	ROMX_LOAD( "341-0175-e", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) /* 341-0175-E LISA Bootrom Rev E (10/20/83) (High) */
-	ROMX_LOAD( "341-0176-e", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) /* 341-0176-E LISA Bootrom Rev E (10/20/83) (Low) */
+	ROMX_LOAD("341-0175-e", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(3)) // 341-0175-E LISA Bootrom Rev E (10/20/83) (High)
+	ROMX_LOAD("341-0176-e", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(3)) // 341-0176-E LISA Bootrom Rev E (10/20/83) (Low)
 
 	ROM_SYSTEM_BIOS( 4, "revd", "LISA Bootrom Rev D (5/12/83)")
-	ROMX_LOAD( "341-0175-d", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* 341-0175-D LISA Bootrom Rev D (5/12/83) (High) */
-	ROMX_LOAD( "341-0176-d", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* 341-0176-D LISA Bootrom Rev D (5/12/83) (Low) */
+	ROMX_LOAD("341-0175-d", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) // 341-0175-D LISA Bootrom Rev D (5/12/83) (High)
+	ROMX_LOAD("341-0176-d", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) // 341-0176-D LISA Bootrom Rev D (5/12/83) (Low)
 
 	ROM_SYSTEM_BIOS( 5, "revc", "LISA Bootrom Rev C (1/28/83?)")
-	ROMX_LOAD( "341-0175-c", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(6)) /* 341-0175-C LISA Bootrom Rev C (1/28/83) (High) */
-	ROMX_LOAD( "341-0176-c", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(6)) /* 341-0176-C LISA Bootrom Rev C (1/28/83) (Low) */
+	ROMX_LOAD("341-0175-c", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) // 341-0175-C LISA Bootrom Rev C (1/28/83) (High)
+	ROMX_LOAD("341-0176-c", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) // 341-0176-C LISA Bootrom Rev C (1/28/83) (Low)
 
 	ROM_SYSTEM_BIOS( 6, "revb", "LISA Bootrom Rev B (11/19/82?)")
-	ROMX_LOAD( "341-0175-b", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(7)) /* 341-0175-B LISA Bootrom Rev B (11/19/82?) (High) */
-	ROMX_LOAD( "341-0176-b", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(7)) /* 341-0176-B LISA Bootrom Rev B (11/19/82?) (Low) */
+	ROMX_LOAD("341-0175-b", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(6)) // 341-0175-B LISA Bootrom Rev B (11/19/82?) (High)
+	ROMX_LOAD("341-0176-b", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(6)) // 341-0176-B LISA Bootrom Rev B (11/19/82?) (Low)
 
-	ROM_SYSTEM_BIOS( 7, "reva", "LISA Bootrom Rev A (10/12/82?)") /* possibly only prototypes */
-	ROMX_LOAD( "341-0175-a", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8)) /* 341-0175-A LISA Bootrom Rev A (10/12/82?) (High) */
-	ROMX_LOAD( "341-0176-a", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8)) /* 341-0176-A LISA Bootrom Rev A (10/12/82?) (Low) */
+	ROM_SYSTEM_BIOS( 7, "reva", "LISA Bootrom Rev A (10/12/82?)") // possibly only prototypes
+	ROMX_LOAD("341-0175-a", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(7)) // 341-0175-A LISA Bootrom Rev A (10/12/82?) (High)
+	ROMX_LOAD("341-0176-a", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(7)) // 341-0176-A LISA Bootrom Rev A (10/12/82?) (Low)
 
 	ROM_REGION( 0x400, COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
-	ROM_REGION(0x2000,"fdccpu",0)       /* 6504 RAM and ROM */
-	/* note: other ?prototype? revisions of this rom for the lisa probably exist as well */
+	ROM_REGION(0x2000,"fdccpu",0)       // 6504 RAM and ROM
+	// note: other ?prototype? revisions of this rom for the lisa probably exist as well
 	ROM_LOAD( "341-0138f.bin", 0x001000, 0x001000, CRC(edd8d560) SHA1(872211d21386cd9625b3735d7682e2b2ecff05b4) )
 
-	ROM_REGION(0x4000,"profile", 0)     /* Profile/5 HDD */
-	ROM_LOAD_OPTIONAL( "341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) /* 341-0080-B z8 mcu piggyback rom */
+	ROM_REGION(0x4000,"profile", 0)     // Profile/5 HDD
+	ROM_LOAD_OPTIONAL("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM
 
-	/* TODO: the 341-0193-A parallel interface card rom should be loaded here as well for the lisa 1 and 2/5? */
+	// TODO: the 341-0193-A parallel interface card rom should be loaded here as well for the lisa 1 and 2/5?
 
-	ROM_REGION(0x100,"gfx1",0)      /* video ROM (includes S/N) */
-	ROM_LOAD( "vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
+	ROM_REGION(0x100,"gfx1",0)      // video ROM (includes S/N)
+	ROM_LOAD("vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 
 ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K drive, ioa8 i/o rom */
@@ -388,111 +388,112 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 	ROM_DEFAULT_BIOS( "revh" )
 
 	ROM_SYSTEM_BIOS( 0, "revh", "LISA Bootrom Rev H (2/24/84)")
-	ROMX_LOAD( "341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0175-H LISA Bootrom Rev H (2/24/84) (High) */
-	ROMX_LOAD( "341-0176-h", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0176-H LISA Bootrom Rev H (2/24/84) (Low) */
+	ROMX_LOAD("341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(0)) // 341-0175-H LISA Bootrom Rev H (2/24/84) (High)
+	ROMX_LOAD("341-0176-h", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d), ROM_SKIP(1) | ROM_BIOS(0)) // 341-0176-H LISA Bootrom Rev H (2/24/84) (Low)
 
-	ROM_SYSTEM_BIOS( 1, "revg", "LISA Bootrom Rev G (2/08/84)") /* limited test release before release of rom rev H */
-	ROMX_LOAD( "341-0175-g", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(2)) /* 341-0175-G LISA Bootrom Rev G (2/08/84) (High) */
-	ROMX_LOAD( "341-0176-g", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(2)) /* 341-0176-G LISA Bootrom Rev G (2/08/84) (Low) */
+	ROM_SYSTEM_BIOS( 1, "revg", "LISA Bootrom Rev G (2/08/84)") // limited test release before release of rom rev H
+	ROMX_LOAD("341-0175-g", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1)) // 341-0175-G LISA Bootrom Rev G (2/08/84) (High)
+	ROMX_LOAD("341-0176-g", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1)) // 341-0176-G LISA Bootrom Rev G (2/08/84) (Low)
 
 	ROM_SYSTEM_BIOS( 2, "revf", "LISA Bootrom Rev F (12/21/83)")
-	ROMX_LOAD( "341-0175-f", 0x000000, 0x2000, CRC(701b9dab) SHA1(b116e5fada7b9a51f1b6e25757b2814d1b2737a5), ROM_SKIP(1) | ROM_BIOS(3)) /* 341-0175-F LISA Bootrom Rev F (12/21/83) (High) */
-	ROMX_LOAD( "341-0176-f", 0x000001, 0x2000, CRC(036010b6) SHA1(ac93e6dbe4ce59396d7d191ee3e3e79a504e518f), ROM_SKIP(1) | ROM_BIOS(3)) /* 341-0176-F LISA Bootrom Rev F (12/21/83) (Low) */
+	ROMX_LOAD("341-0175-f", 0x000000, 0x2000, CRC(701b9dab) SHA1(b116e5fada7b9a51f1b6e25757b2814d1b2737a5), ROM_SKIP(1) | ROM_BIOS(2)) // 341-0175-F LISA Bootrom Rev F (12/21/83) (High)
+	ROMX_LOAD("341-0176-f", 0x000001, 0x2000, CRC(036010b6) SHA1(ac93e6dbe4ce59396d7d191ee3e3e79a504e518f), ROM_SKIP(1) | ROM_BIOS(2)) // 341-0176-F LISA Bootrom Rev F (12/21/83) (Low)
 
 	ROM_SYSTEM_BIOS( 3, "reve", "LISA Bootrom Rev E (10/20/83)")
-	ROMX_LOAD( "341-0175-e", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) /* 341-0175-E LISA Bootrom Rev E (10/20/83) (High) */
-	ROMX_LOAD( "341-0176-e", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) /* 341-0176-E LISA Bootrom Rev E (10/20/83) (Low) */
+	ROMX_LOAD("341-0175-e", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(3)) // 341-0175-E LISA Bootrom Rev E (10/20/83) (High)
+	ROMX_LOAD("341-0176-e", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(3)) // 341-0176-E LISA Bootrom Rev E (10/20/83) (Low)
 
-	ROM_SYSTEM_BIOS( 4, "rev3b", "LISA Bootrom Rev 3B (9/8/83)") /* Earliest lisa2 rom, prototype. */
-	ROMX_LOAD( "341-0175-3b", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* ?label? 341-0175-3b LISA Bootrom Rev 3B (9/8/83) (High) */
-	ROMX_LOAD( "341-0176-3b", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* ?label? 341-0176-3b LISA Bootrom Rev 3B (9/8/83) (Low) */
+	ROM_SYSTEM_BIOS( 4, "rev3b", "LISA Bootrom Rev 3B (9/8/83)") // Earliest lisa2 rom, prototype.
+	ROMX_LOAD("341-0175-3b", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) // ?label? 341-0175-3b LISA Bootrom Rev 3B (9/8/83) (High)
+	ROMX_LOAD("341-0176-3b", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) // ?label? 341-0176-3b LISA Bootrom Rev 3B (9/8/83) (Low)
 
 	ROM_REGION( 0x400, COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
-	ROM_REGION(0x2000,"fdccpu",0)       /* 6504 RAM and ROM */
-	ROM_LOAD( "341-0290-b", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) /* 341-0290-B LISA 2/5 Disk Rom (ioa8), supports profile on external port */
+	ROM_REGION(0x2000,"fdccpu",0)       // 6504 RAM and ROM
+	ROM_LOAD("341-0290-b", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) // 341-0290-B LISA 2/5 Disk Rom (ioa8), supports profile on external port
 
-	ROM_REGION(0x4000,"profile", 0)     /* Profile/5 HDD */
-	ROM_LOAD_OPTIONAL( "341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) /* 341-0080-B z8 mcu piggyback rom */
+	ROM_REGION(0x4000,"profile", 0)     // Profile/5 HDD
+	ROM_LOAD_OPTIONAL("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM
 
-	/* TODO: the 341-0193-A parallel interface card rom should be loaded here as well for the lisa 1 and 2/5? */
+	// TODO: the 341-0193-A parallel interface card rom should be loaded here as well for the lisa 1 and 2/5?
 
-	ROM_REGION(0x100,"gfx1",0)      /* video ROM (includes S/N) */
-	ROM_LOAD( "vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
+	ROM_REGION(0x100,"gfx1",0)      // video ROM (includes S/N)
+	ROM_LOAD("vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 
 ROM_START( lisa210 ) /* newer motherboard and i/o board; has io88 i/o rom, built in widget hdd */
 	ROM_REGION16_BE(0x204000,"maincpu", 0)  /* 68k rom and ram */
 	ROM_DEFAULT_BIOS( "revh" )
-	ROM_SYSTEM_BIOS( 0, "revh", "LISA Bootrom Rev H (2/24/84)")
-	ROMX_LOAD( "341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0175-H LISA Bootrom Rev H (2/24/84) (High) */
-	ROMX_LOAD( "341-0176-h", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0176-H LISA Bootrom Rev H (2/24/84) (Low) */
+	ROM_SYSTEM_BIOS(0, "revh", "LISA Bootrom Rev H (2/24/84)")
+	ROMX_LOAD("341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(0)) // 341-0175-H LISA Bootrom Rev H (2/24/84) (High)
+	ROMX_LOAD("341-0176-h", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d), ROM_SKIP(1) | ROM_BIOS(0)) // 341-0176-H LISA Bootrom Rev H (2/24/84) (Low)
 
-	ROM_SYSTEM_BIOS( 1, "revg", "LISA Bootrom Rev G (2/08/84)") /* limited test release before release of rom rev H */
-	ROMX_LOAD( "341-0175-g", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(2)) /* 341-0175-G LISA Bootrom Rev G (2/08/84) (High) */
-	ROMX_LOAD( "341-0176-g", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(2)) /* 341-0176-G LISA Bootrom Rev G (2/08/84) (Low) */
+	ROM_SYSTEM_BIOS(1, "revg", "LISA Bootrom Rev G (2/08/84)") // limited test release before release of rom rev H
+	ROMX_LOAD("341-0175-g", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1)) // 341-0175-G LISA Bootrom Rev G (2/08/84) (High)
+	ROMX_LOAD("341-0176-g", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1)) // 341-0176-G LISA Bootrom Rev G (2/08/84) (Low)
 
-	ROM_SYSTEM_BIOS( 2, "revf", "LISA Bootrom Rev F (12/21/83)")
-	ROMX_LOAD( "341-0175-f", 0x000000, 0x2000, CRC(701b9dab) SHA1(b116e5fada7b9a51f1b6e25757b2814d1b2737a5), ROM_SKIP(1) | ROM_BIOS(3)) /* 341-0175-F LISA Bootrom Rev F (12/21/83) (High) */
-	ROMX_LOAD( "341-0176-f", 0x000001, 0x2000, CRC(036010b6) SHA1(ac93e6dbe4ce59396d7d191ee3e3e79a504e518f), ROM_SKIP(1) | ROM_BIOS(3)) /* 341-0176-F LISA Bootrom Rev F (12/21/83) (Low) */
+	ROM_SYSTEM_BIOS(2, "revf", "LISA Bootrom Rev F (12/21/83)")
+	ROMX_LOAD("341-0175-f", 0x000000, 0x2000, CRC(701b9dab) SHA1(b116e5fada7b9a51f1b6e25757b2814d1b2737a5), ROM_SKIP(1) | ROM_BIOS(2)) // 341-0175-F LISA Bootrom Rev F (12/21/83) (High)
+	ROMX_LOAD("341-0176-f", 0x000001, 0x2000, CRC(036010b6) SHA1(ac93e6dbe4ce59396d7d191ee3e3e79a504e518f), ROM_SKIP(1) | ROM_BIOS(2)) // 341-0176-F LISA Bootrom Rev F (12/21/83) (Low)
 
 	ROM_REGION( 0x400, COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 #if 1
-	ROM_REGION(0x2000,"fdccpu", 0)      /* 6504 RAM and ROM */
-	ROM_LOAD( "341-0281-d", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) /* 341-0281-D LISA 2/10 Disk Rom (io88), supports widget on internal port */
+	ROM_REGION(0x2000,"fdccpu", 0)      // 6504 RAM and ROM
+	ROM_LOAD("341-0281-d", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) // 341-0281-D LISA 2/10 Disk Rom (io88), supports widget on internal port
 #else
-	ROM_REGION(0x2000,"fdccpu", 0)      /* 6504 RAM and ROM */
-	ROM_LOAD( "341-8003-c", 0x1000, 0x1000, CRC(8c67959a) SHA1(aa446b0c4acb4cb6c9d0adfbbea900fb8c04c1e9)) /* 341-8003-C Sun Mac XL Disk rom for 800k drives (Rev C, from Goodwill XL) (io88800k) */
-	/* Note: there are two earlier/alternate versions of this rom as well which are dumped */
+	ROM_REGION(0x2000,"fdccpu", 0)      // 6504 RAM and ROM
+	ROM_LOAD("341-8003-c", 0x1000, 0x1000, CRC(8c67959a) SHA1(aa446b0c4acb4cb6c9d0adfbbea900fb8c04c1e9)) // 341-8003-C Sun Mac XL Disk rom for 800k drives (Rev C, from Goodwill XL) (io88800k)
+	// Note: there are two earlier/alternate versions of this rom as well which are dumped */
 #endif
 
-	ROM_REGION(0x4000,"widget", 0)      /* Widget HDD controller */
-	ROM_LOAD( "341-0288-a", 0x0000, 0x800, CRC(a26ef1c6) SHA1(5aaeb6ff7f7d4f7ce7c70402f75e82533635dda4)) /* 341-0288-A z8 mcu piggyback rom */
-	ROM_LOAD( "341-0289-d", 0x2000, 0x2000, CRC(25e86e95) SHA1(72a346c2074d2256adde491b930023ebdcb5f51a)) /* 341-0289-D external rom on widget board */
+	ROM_REGION(0x4000,"widget", 0)      // Widget HDD controller
+	ROM_LOAD("341-0288-a", 0x0000, 0x800, CRC(a26ef1c6) SHA1(5aaeb6ff7f7d4f7ce7c70402f75e82533635dda4)) // 341-0288-A z8 MCU piggyback ROM
+	ROM_LOAD("341-0289-d", 0x2000, 0x2000, CRC(25e86e95) SHA1(72a346c2074d2256adde491b930023ebdcb5f51a)) // 341-0289-D external rom on widget board
 
-	ROM_REGION(0x100,"gfx1", 0)     /* video ROM (includes S/N) */
-	ROM_LOAD( "vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
+	ROM_REGION(0x100,"gfx1", 0)     // video ROM (includes S/N)
+	ROM_LOAD("vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 
 ROM_START( macxl )
 	ROM_REGION16_BE(0x204000,"maincpu", 0)  /* 68k rom and ram */
-	ROM_LOAD16_BYTE( "341-0347-a", 0x000000, 0x2000, CRC(80add605) SHA1(82215688b778d8c712a8186235f7981e3dc4dd7f)) /* 341-0347-A Mac XL '3A' Bootrom Hi (boot3a.hi)*/
-	ROM_LOAD16_BYTE( "341-0346-a", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76)) /* 341-0346-A Mac XL '3A' Bootrom Lo (boot3a.lo)*/
+	ROM_LOAD16_BYTE("341-0347-a", 0x000000, 0x2000, CRC(80add605) SHA1(82215688b778d8c712a8186235f7981e3dc4dd7f)) // 341-0347-A Mac XL '3A' Bootrom Hi (boot3a.hi)
+	ROM_LOAD16_BYTE("341-0346-a", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76)) // 341-0346-A Mac XL '3A' Bootrom Lo (boot3a.lo)
 
 	ROM_REGION( 0x400, COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 #if 1
-	ROM_REGION(0x2000,"fdccpu", 0)      /* 6504 RAM and ROM */
-	ROM_LOAD( "341-0281-d", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) /* 341-0281-D LISA 2/10 Disk Rom (io88), supports widget on internal port */
+	ROM_REGION(0x2000,"fdccpu", 0)      // 6504 RAM and ROM
+	ROM_LOAD("341-0281-d", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) // 341-0281-D LISA 2/10 Disk Rom (io88), supports widget on internal port
 #else
-	ROM_REGION(0x2000,"fdccpu", 0)      /* 6504 RAM and ROM */
-	ROM_LOAD( "341-8003-c", 0x1000, 0x1000, CRC(8c67959a) SHA1(aa446b0c4acb4cb6c9d0adfbbea900fb8c04c1e9)) /* 341-8003-C Sun Mac XL Disk rom for 800k drives (Rev C, from Goodwill XL) (io88800k) */
-	/* Note: there are two earlier/alternate versions of this rom as well which are dumped */
+	ROM_REGION(0x2000,"fdccpu", 0)      // 6504 RAM and ROM
+	ROM_LOAD("341-8003-c", 0x1000, 0x1000, CRC(8c67959a) SHA1(aa446b0c4acb4cb6c9d0adfbbea900fb8c04c1e9)) // 341-8003-C Sun Mac XL Disk rom for 800k drives (Rev C, from Goodwill XL) (io88800k)
+	// Note: there are two earlier/alternate versions of this ROM as well which are dumped
 #endif
 
-	ROM_REGION(0x100,"gfx1", 0)     /* video ROM (includes S/N) ; no dump known, although Lisa ROM works fine at our level of emulation */
-	ROM_LOAD( "vidstatem.rom", 0x00, 0x100, BAD_DUMP CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
+	ROM_REGION(0x100,"gfx1", 0)     // video ROM (includes S/N) ; no dump known, although Lisa ROM works fine at our level of emulation
+	ROM_LOAD("vidstatem.rom", 0x00, 0x100, BAD_DUMP CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 
 /*
     Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
     the MACHINE_NOT_WORKING flag...
 */
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  STATE        INIT     COMPANY            FULLNAME */
-COMP( 1983, lisa,     0,       0,      lisa,     lisa,  lisa_state,  lisa2,   "Apple Computer",  "Lisa",         MACHINE_NOT_WORKING )
-COMP( 1984, lisa2,    0,       0,      lisa,     lisa,  lisa_state,  lisa2,   "Apple Computer",  "Lisa2",        MACHINE_NOT_WORKING )
-COMP( 1984, lisa210,  lisa2,   0,      lisa210,  lisa,  lisa_state,  lisa210, "Apple Computer",  "Lisa2/10",     MACHINE_NOT_WORKING )
-COMP( 1985, macxl,    lisa2,   0,      macxl,    lisa,  lisa_state,  mac_xl,  "Apple Computer",  "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY           FULLNAME */
+COMP( 1983, lisa,    0,      0,      lisa,    lisa,  lisa_state, init_lisa2,   "Apple Computer", "Lisa",         MACHINE_NOT_WORKING )
+COMP( 1984, lisa2,   0,      0,      lisa,    lisa,  lisa_state, init_lisa2,   "Apple Computer", "Lisa2",        MACHINE_NOT_WORKING )
+COMP( 1984, lisa210, lisa2,  0,      lisa210, lisa,  lisa_state, init_lisa210, "Apple Computer", "Lisa2/10",     MACHINE_NOT_WORKING )
+COMP( 1985, macxl,   lisa2,  0,      macxl,   lisa,  lisa_state, init_mac_xl,  "Apple Computer", "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )
+

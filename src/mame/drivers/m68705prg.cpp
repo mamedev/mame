@@ -45,11 +45,19 @@ public:
 		, m_mcu_region(*this, "mcu")
 		, m_eprom_image(*this, "eprom_image")
 		, m_mcu_image(*this, "mcu_image")
+		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 		, m_input_poll_timer(nullptr)
 		, m_addr(0x0000)
 		, m_pb_val(0xff)
 	{
 	}
+
+protected:
+	enum
+	{
+		TIMER_INPUT_POLL
+	};
 
 	void m68705prg(machine_config &config);
 
@@ -86,8 +94,11 @@ public:
 		}
 	}
 
-	DECLARE_DRIVER_INIT(m68705prg)
+	virtual void machine_start() override
 	{
+		m_digits.resolve();
+		m_leds.resolve();
+
 		m_input_poll_timer = timer_alloc(TIMER_INPUT_POLL);
 
 		save_item(NAME(m_addr));
@@ -95,27 +106,20 @@ public:
 
 		m_addr = 0x0000;
 		m_pb_val = 0xff;
-	}
 
-	DECLARE_MACHINE_START(m68705prg)
-	{
-		output().set_digit_value(0, s_7seg[(m_addr >> 0) & 0x0f]);
-		output().set_digit_value(1, s_7seg[(m_addr >> 4) & 0x0f]);
-		output().set_digit_value(2, s_7seg[(m_addr >> 8) & 0x0f]);
+		m_digits[0] = s_7seg[(m_addr >> 0) & 0x0f];
+		m_digits[1] = s_7seg[(m_addr >> 4) & 0x0f];
+		m_digits[2] = s_7seg[(m_addr >> 8) & 0x0f];
 
 		m_input_poll_timer->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
 	}
-
-protected:
-	enum
-	{
-		TIMER_INPUT_POLL
-	};
 
 	required_ioport                         m_sw;
 	required_region_ptr<u8>                 m_mcu_region;
 	required_device<generic_slot_device>    m_eprom_image;
 	required_device<generic_slot_device>    m_mcu_image;
+	output_finder<3>                        m_digits;
+	output_finder<4>                        m_leds;
 
 	emu_timer *     m_input_poll_timer;
 
@@ -138,6 +142,9 @@ public:
 	{
 	}
 
+	void prg(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(pb_w)
 	{
 		// PB4: address counter reset (active high)
@@ -150,9 +157,9 @@ public:
 			m_addr = 0x0000;
 		else if (!BIT(data, 3) && BIT(m_pb_val, 3))
 			m_addr = (m_addr + 1) & 0x0fff;
-		output().set_led_value(0, !BIT(data, 2));
-		output().set_led_value(1, !BIT(data, 1));
-		output().set_led_value(3, !BIT(data, 0) && BIT(m_sw->read(), 1));
+		m_leds[0] = !BIT(data, 2);
+		m_leds[1] = !BIT(data, 1);
+		m_leds[3] = !BIT(data, 0) && BIT(m_sw->read(), 1);
 		m_mcu->set_input_line(M68705_VPP_LINE, (!BIT(data, 0) && BIT(m_sw->read(), 1)) ? ASSERT_LINE : CLEAR_LINE);
 
 		m_pb_val = data;
@@ -160,18 +167,18 @@ public:
 		u8 const *const ptr(m_eprom_image->get_rom_base());
 		m_mcu->pa_w(space, 0, ptr ? ptr[m_addr & m_mcu_region.mask()] : 0xff);
 
-		output().set_digit_value(0, s_7seg[(m_addr >> 0) & 0x0f]);
-		output().set_digit_value(1, s_7seg[(m_addr >> 4) & 0x0f]);
-		output().set_digit_value(2, s_7seg[(m_addr >> 8) & 0x0f]);
+		m_digits[0] = s_7seg[(m_addr >> 0) & 0x0f];
+		m_digits[1] = s_7seg[(m_addr >> 4) & 0x0f];
+		m_digits[2] = s_7seg[(m_addr >> 8) & 0x0f];
 	}
 
-	DECLARE_MACHINE_RESET(m68705prg)
+	virtual void machine_reset() override
 	{
 		m_sw->field(0x01)->live().value = 0;
 		m_sw->field(0x02)->live().value = 0;
 
-		output().set_led_value(2, 1);
-		output().set_led_value(3, 0);
+		m_leds[2] = 1;
+		m_leds[3] = 0;
 
 		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 		m_mcu->set_input_line(M68705_VPP_LINE, CLEAR_LINE);
@@ -179,9 +186,6 @@ public:
 		m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	void prg(machine_config &config);
-
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
 	{
 		switch (id)
@@ -200,8 +204,8 @@ protected:
 		bool const reset(!BIT(switches, 0));
 		bool const vpp(BIT(switches, 1) && !BIT(m_pb_val, 0));
 
-		output().set_led_value(2, reset);
-		output().set_led_value(3, vpp);
+		m_leds[2] = reset;
+		m_leds[3] = vpp;
 
 		m_mcu->set_input_line(M68705_VPP_LINE, vpp ? ASSERT_LINE : CLEAR_LINE);
 		m_mcu->set_input_line(INPUT_LINE_RESET, reset ? ASSERT_LINE : CLEAR_LINE);
@@ -234,41 +238,31 @@ MACHINE_CONFIG_START(m68705prg_state_base::m68705prg)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(m68705prg_state_base, mcu_load)
 
-	MCFG_MACHINE_START_OVERRIDE(m68705prg_state_base, m68705prg)
-
-	MCFG_DEFAULT_LAYOUT(layout_m68705prg)
+	config.set_default_layout(layout_m68705prg);
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(p3prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705P3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(p3prg_state, pb_w))
-
-	MCFG_MACHINE_RESET_OVERRIDE(p3prg_state, m68705prg)
+	MCFG_DEVICE_ADD("mcu", M68705P3, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, p3prg_state, pb_w))
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(p5prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705P5, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(p5prg_state, pb_w))
-
-	MCFG_MACHINE_RESET_OVERRIDE(p5prg_state, m68705prg)
+	MCFG_DEVICE_ADD("mcu", M68705P5, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, p5prg_state, pb_w))
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(r3prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705R3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(r3prg_state, pb_w))
-
-	MCFG_MACHINE_RESET_OVERRIDE(r3prg_state, m68705prg)
+	MCFG_DEVICE_ADD("mcu", M68705R3, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, r3prg_state, pb_w))
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(u3prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705U3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(u3prg_state, pb_w))
-
-	MCFG_MACHINE_RESET_OVERRIDE(u3prg_state, m68705prg)
+	MCFG_DEVICE_ADD("mcu", M68705U3, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, u3prg_state, pb_w))
 MACHINE_CONFIG_END
 
 
@@ -295,8 +289,8 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT      STATE        INIT       COMPANY     FULLNAME                FLAGS
-COMP( 1984, 705p5prg, 0,        0,      prg,         m68705prg, p5prg_state, m68705prg, "Motorola", "MC68705P5 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1984, 705p3prg, 705p5prg, 0,      prg,         m68705prg, p3prg_state, m68705prg, "Motorola", "MC68705P3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1984, 705r3prg, 705p5prg, 0,      prg,         m68705prg, r3prg_state, m68705prg, "Motorola", "MC68705R3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1984, 705u3prg, 705p5prg, 0,      prg,         m68705prg, u3prg_state, m68705prg, "Motorola", "MC68705U3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT      CLASS        INIT        COMPANY     FULLNAME                FLAGS
+COMP( 1984, 705p5prg, 0,        0,      prg,     m68705prg, p5prg_state, empty_init, "Motorola", "MC68705P5 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, 705p3prg, 705p5prg, 0,      prg,     m68705prg, p3prg_state, empty_init, "Motorola", "MC68705P3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, 705r3prg, 705p5prg, 0,      prg,     m68705prg, r3prg_state, empty_init, "Motorola", "MC68705R3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, 705u3prg, 705p5prg, 0,      prg,     m68705prg, u3prg_state, empty_init, "Motorola", "MC68705U3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

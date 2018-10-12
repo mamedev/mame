@@ -16,7 +16,6 @@ enum
 									/* Active eddge is selecrable by internal reg.  */
 									/* raise eddge : CLEAR_LINE  -> ASSERT_LINE     */
 									/* fall  eddge : ASSERT_LINE -> CLEAR_LINE      */
-									/* it is usuali to use PULSE_LINE state         */
 	M6801_SC1_LINE
 };
 
@@ -52,9 +51,9 @@ enum
 
 
 #define MCFG_M6801_SC2(_devcb) \
-	devcb = &downcast<m6801_cpu_device &>(*device).set_out_sc2_func(DEVCB_##_devcb);
+	downcast<m6801_cpu_device &>(*device).set_out_sc2_func(DEVCB_##_devcb);
 #define MCFG_M6801_SER_TX(_devcb) \
-	devcb = &downcast<m6801_cpu_device &>(*device).set_out_sertx_func(DEVCB_##_devcb);
+	downcast<m6801_cpu_device &>(*device).set_out_sertx_func(DEVCB_##_devcb);
 
 
 class m6801_cpu_device : public m6800_cpu_device
@@ -88,7 +87,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_io_config;
 
@@ -159,7 +158,7 @@ public:
 	m6803_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -171,7 +170,7 @@ public:
 protected:
 	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -181,7 +180,7 @@ public:
 	hd63701_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void TAKE_TRAP() override;
 };

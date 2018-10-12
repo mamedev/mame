@@ -177,37 +177,38 @@ WRITE16_MEMBER(mcatadv_state::vram_w)
 }
 
 
-ADDRESS_MAP_START(mcatadv_state::mcatadv_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+void mcatadv_state::mcatadv_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10ffff).ram();
 
 //  AM_RANGE(0x180018, 0x18001f) AM_READNOP // ?
 
-	AM_RANGE(0x200000, 0x200005) AM_RAM AM_SHARE("scroll1")
-	AM_RANGE(0x300000, 0x300005) AM_RAM AM_SHARE("scroll2")
+	map(0x200000, 0x200005).ram().share("scroll1");
+	map(0x300000, 0x300005).ram().share("scroll2");
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_1") // Tilemap 0
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_2") // Tilemap 1
+	map(0x400000, 0x401fff).ram().w(FUNC(mcatadv_state::vram_w<0>)).share("vram_1"); // Tilemap 0
+	map(0x500000, 0x501fff).ram().w(FUNC(mcatadv_state::vram_w<1>)).share("vram_2"); // Tilemap 1
 
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?
+	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x602000, 0x602fff).ram(); // Bigger than needs to be?
 
-	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_SHARE("spriteram") // Sprites, two halves for double buffering
-	AM_RANGE(0x708000, 0x70ffff) AM_RAM // Tests more than is needed?
+	map(0x700000, 0x707fff).ram().share("spriteram"); // Sprites, two halves for double buffering
+	map(0x708000, 0x70ffff).ram(); // Tests more than is needed?
 
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("P2")
+	map(0x800000, 0x800001).portr("P1");
+	map(0x800002, 0x800003).portr("P2");
 //  AM_RANGE(0x900000, 0x900001) AM_WRITE(mcat_coin_w) // Lockout / Counter MCAT Only
-	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW2")
+	map(0xa00000, 0xa00001).portr("DSW1");
+	map(0xa00002, 0xa00003).portr("DSW2");
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_RAM AM_SHARE("vidregs")
+	map(0xb00000, 0xb0000f).ram().share("vidregs");
 
-	AM_RANGE(0xb00018, 0xb00019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // NOST Only
-	AM_RANGE(0xb0001e, 0xb0001f) AM_READ(mcat_wd_r) // MCAT Only
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff).cswidth(16)
-ADDRESS_MAP_END
+	map(0xb00018, 0xb00019).w(m_watchdog, FUNC(watchdog_timer_device::reset16_w)); // NOST Only
+	map(0xb0001e, 0xb0001f).r(FUNC(mcatadv_state::mcat_wd_r)); // MCAT Only
+	map(0xc00001, 0xc00001).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0xc00000, 0xc00001).w("soundlatch", FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
+}
 
 /*** Sound ***/
 
@@ -217,33 +218,37 @@ WRITE8_MEMBER(mcatadv_state::mcatadv_sound_bw_w)
 }
 
 
-ADDRESS_MAP_START(mcatadv_state::mcatadv_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM                     // ROM
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("soundbank")                // ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM                     // RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcatadv_sound_bw_w)
-ADDRESS_MAP_END
+void mcatadv_state::mcatadv_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();                     // ROM
+	map(0x4000, 0xbfff).bankr("soundbank");                // ROM
+	map(0xc000, 0xdfff).ram();                     // RAM
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xf000, 0xf000).w(FUNC(mcatadv_state::mcatadv_sound_bw_w));
+}
 
-ADDRESS_MAP_START(mcatadv_state::mcatadv_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void mcatadv_state::mcatadv_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
 
-ADDRESS_MAP_START(mcatadv_state::nost_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                     // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")                // ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM                     // RAM
-ADDRESS_MAP_END
+void mcatadv_state::nost_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                     // ROM
+	map(0x8000, 0xbfff).bankr("soundbank");                // ROM
+	map(0xc000, 0xdfff).ram();                     // RAM
+}
 
-ADDRESS_MAP_START(mcatadv_state::nost_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ymsnd", ym2610_device, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREAD("ymsnd", ym2610_device, read)
-	AM_RANGE(0x40, 0x40) AM_WRITE(mcatadv_sound_bw_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void mcatadv_state::nost_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).w("ymsnd", FUNC(ym2610_device::write));
+	map(0x04, 0x07).r("ymsnd", FUNC(ym2610_device::read));
+	map(0x40, 0x40).w(FUNC(mcatadv_state::mcatadv_sound_bw_w));
+	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
 /*** Inputs ***/
 
@@ -413,7 +418,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16*4
 };
 
-static GFXDECODE_START( mcatadv )
+static GFXDECODE_START( gfx_mcatadv )
 	GFXDECODE_ENTRY( "bg0", 0, layout_16x16x4, 0, 0x200 )
 	GFXDECODE_ENTRY( "bg1", 0, layout_16x16x4, 0, 0x200 )
 GFXDECODE_END
@@ -432,13 +437,13 @@ void mcatadv_state::machine_start()
 MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mcatadv_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcatadv_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mcatadv_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mcatadv_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mcatadv_sound_map)
-	MCFG_CPU_IO_MAP(mcatadv_sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mcatadv_sound_map)
+	MCFG_DEVICE_IO_MAP(mcatadv_sound_io_map)
 
 
 	/* video hardware */
@@ -448,26 +453,25 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcatadv_state, screen_update_mcatadv)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mcatadv_state, screen_vblank_mcatadv))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mcatadv_state, screen_vblank_mcatadv))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcatadv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcatadv)
 	MCFG_PALETTE_ADD("palette", 0x2000/2)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.32)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
@@ -477,11 +481,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mcatadv_state::nost)
 	mcatadv(config);
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(nost_sound_map)
-	MCFG_CPU_IO_MAP(nost_sound_io_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(nost_sound_map)
+	MCFG_DEVICE_IO_MAP(nost_sound_io_map)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_REPLACE("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.2)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
@@ -662,9 +666,9 @@ ROM_START( nostk )
 ROM_END
 
 
-GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Catt (Japan)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nost,     0,       nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus (Japan)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus (Korea)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, mcatadv_state, empty_init, ROT0,   "Wintechno", "Magical Cat Adventure",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, mcatadv_state, empty_init, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv_state, empty_init, ROT0,   "Wintechno", "Catt (Japan)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nost,     0,       nost,    nost,    mcatadv_state, empty_init, ROT270, "Face",      "Nostradamus",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv_state, empty_init, ROT270, "Face",      "Nostradamus (Japan)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv_state, empty_init, ROT270, "Face",      "Nostradamus (Korea)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

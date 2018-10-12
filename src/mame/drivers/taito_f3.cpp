@@ -13,7 +13,6 @@
     sprite sync fixes, sprite zoom fixes and others!
 
     Other Issues:
-    - ES5510 DSP isn't hooked up.
     - Various hacks in video core that needs squashing;
     - When playing space invaders dx in original mode, t.t. with overlay, the
       alpha blending effect is wrong (see Taito B version of game)
@@ -36,7 +35,6 @@
 #include "includes/taito_f3.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
@@ -184,44 +182,46 @@ WRITE16_MEMBER(taito_f3_state::f3_unk_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(taito_f3_state::f3_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
-	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE(f3_palette_24bit_w) AM_SHARE("paletteram")
-	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
-	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
-	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_SHARE("spriteram")
-	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff)       //AM_SHARE("f3_pf_data")
-	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16(f3_videoram_r,f3_videoram_w,0xffffffff)     //AM_SHARE("videoram")
-	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff)             //AM_SHARE("f3_vram")
-	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16(f3_lineram_r,f3_lineram_w,0xffffffff)       //AM_SHARE("f3_line_ram")
-	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)           //AM_SHARE("f3_pivot_ram")
-	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
-	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
-	AM_RANGE(0xc00000, 0xc007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
-	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
-	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
-ADDRESS_MAP_END
+void taito_f3_state::f3_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x300000, 0x30007f).w(FUNC(taito_f3_state::f3_sound_bankswitch_w));
+	map(0x400000, 0x41ffff).mirror(0x20000).ram().share("f3_ram");
+	map(0x440000, 0x447fff).ram().w(FUNC(taito_f3_state::f3_palette_24bit_w)).share("paletteram");
+	map(0x4a0000, 0x4a001f).rw(FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
+	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_unk_w));
+	map(0x600000, 0x60ffff).rw(FUNC(taito_f3_state::f3_spriteram_r), FUNC(taito_f3_state::f3_spriteram_w)); //AM_SHARE("spriteram")
+	map(0x610000, 0x61bfff).rw(FUNC(taito_f3_state::f3_pf_data_r), FUNC(taito_f3_state::f3_pf_data_w));       //AM_SHARE("f3_pf_data")
+	map(0x61c000, 0x61dfff).rw(FUNC(taito_f3_state::f3_videoram_r), FUNC(taito_f3_state::f3_videoram_w));     //AM_SHARE("videoram")
+	map(0x61e000, 0x61ffff).rw(FUNC(taito_f3_state::f3_vram_r), FUNC(taito_f3_state::f3_vram_w));             //AM_SHARE("f3_vram")
+	map(0x620000, 0x62ffff).rw(FUNC(taito_f3_state::f3_lineram_r), FUNC(taito_f3_state::f3_lineram_w));       //AM_SHARE("f3_line_ram")
+	map(0x630000, 0x63ffff).rw(FUNC(taito_f3_state::f3_pivot_r), FUNC(taito_f3_state::f3_pivot_w));           //AM_SHARE("f3_pivot_ram")
+	map(0x660000, 0x66000f).w(FUNC(taito_f3_state::f3_control_0_w));
+	map(0x660010, 0x66001f).w(FUNC(taito_f3_state::f3_control_1_w));
+	map(0xc00000, 0xc007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0xc80000, 0xc80003).w(FUNC(taito_f3_state::f3_sound_reset_0_w));
+	map(0xc80100, 0xc80103).w(FUNC(taito_f3_state::f3_sound_reset_1_w));
+}
 
-ADDRESS_MAP_START(taito_f3_state::bubsympb_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
-	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE(f3_palette_24bit_w) AM_SHARE("paletteram")
-	AM_RANGE(0x4a0000, 0x4a001b) AM_READWRITE(f3_control_r,  f3_control_w)
-	AM_RANGE(0x4a001c, 0x4a001f) AM_READWRITE(bubsympb_oki_r, bubsympb_oki_w)
-	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
-	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_SHARE("spriteram")
-	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff)       //AM_SHARE("f3_pf_data")
-	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16(f3_videoram_r,f3_videoram_w,0xffffffff)     //AM_SHARE("videoram")
-	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff)             //AM_SHARE("f3_vram")
-	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16(f3_lineram_r,f3_lineram_w,0xffffffff)       //AM_SHARE("f3_line_ram")
-	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)           //AM_SHARE("f3_pivot_ram")
-	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
-	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM
-ADDRESS_MAP_END
+void taito_f3_state::bubsympb_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x300000, 0x30007f).w(FUNC(taito_f3_state::f3_sound_bankswitch_w));
+	map(0x400000, 0x41ffff).mirror(0x20000).ram().share("f3_ram");
+	map(0x440000, 0x447fff).ram().w(FUNC(taito_f3_state::f3_palette_24bit_w)).share("paletteram");
+	map(0x4a0000, 0x4a001b).rw(FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
+	map(0x4a001c, 0x4a001f).rw(FUNC(taito_f3_state::bubsympb_oki_r), FUNC(taito_f3_state::bubsympb_oki_w));
+	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_unk_w));
+	map(0x600000, 0x60ffff).rw(FUNC(taito_f3_state::f3_spriteram_r), FUNC(taito_f3_state::f3_spriteram_w)); //AM_SHARE("spriteram")
+	map(0x610000, 0x61bfff).rw(FUNC(taito_f3_state::f3_pf_data_r), FUNC(taito_f3_state::f3_pf_data_w));       //AM_SHARE("f3_pf_data")
+	map(0x61c000, 0x61dfff).rw(FUNC(taito_f3_state::f3_videoram_r), FUNC(taito_f3_state::f3_videoram_w));     //AM_SHARE("videoram")
+	map(0x61e000, 0x61ffff).rw(FUNC(taito_f3_state::f3_vram_r), FUNC(taito_f3_state::f3_vram_w));             //AM_SHARE("f3_vram")
+	map(0x620000, 0x62ffff).rw(FUNC(taito_f3_state::f3_lineram_r), FUNC(taito_f3_state::f3_lineram_w));       //AM_SHARE("f3_line_ram")
+	map(0x630000, 0x63ffff).rw(FUNC(taito_f3_state::f3_pivot_r), FUNC(taito_f3_state::f3_pivot_w));           //AM_SHARE("f3_pivot_ram")
+	map(0x660000, 0x66000f).w(FUNC(taito_f3_state::f3_control_0_w));
+	map(0x660010, 0x66001f).w(FUNC(taito_f3_state::f3_control_1_w));
+	map(0xc00000, 0xc007ff).ram();
+}
 
 
 
@@ -252,8 +252,8 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,eeprom_read, nullptr)
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,eeprom_read, nullptr)
+	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,eeprom_read, nullptr)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,eeprom_read, nullptr)
 
 	/* MSW: Coin counters/lockouts are readable, LSW: Joysticks (Player 1 & 2) */
 	PORT_START("IN.1")
@@ -266,7 +266,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* These must be high */
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_coin_r, (void *)0)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_coin_r, (void *)0)
 
 	/* Player 3 & 4 fire buttons (Player 2 top fire buttons in Kaiser Knuckle) */
 	PORT_START("IN.4")
@@ -292,21 +292,21 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_coin_r, (void *)1)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_coin_r, (void *)1)
 
 	/* Analog control 1 */
 	PORT_START("IN.2")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, (void*)0)
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, (void*)0)
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Analog control 2 */
 	PORT_START("IN.3")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, (void *)1)
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, (void *)1)
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* These are not read directly, but through PORT_CUSTOMs above */
 	PORT_START("EEPROMIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* Another service mode */
@@ -404,7 +404,7 @@ static const gfx_layout tile_layout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( taito_f3 )
+static GFXDECODE_START( gfx_taito_f3 )
 	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,      0x0000, 0x2000>>4 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spriteram_layout, 0x1000, 0x1000>>4 ) /* Sprites area */
@@ -449,82 +449,75 @@ void taito_f3_state::machine_start()
 	save_item(NAME(m_coin_word));
 }
 
-MACHINE_RESET_MEMBER(taito_f3_state,f3)
+void taito_f3_state::machine_reset()
 {
 	/* start with sound m68k off, qtheater relies on it (otherwise main CPU tries to reset it while 68k is working with irq table vectors). */
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	if(m_audiocpu)
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(taito_f3_state::f3)
-
+void taito_f3_state::f3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(f3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
+	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::f3_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::f3_interrupt2));
 
-	MCFG_MACHINE_RESET_OVERRIDE(taito_f3_state,f3)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.97)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
-	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+232-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taito_f3_state, screen_vblank_f3))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.97);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
+	m_screen->set_size(40*8+48*2, 32*8);
+	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+232-1);
+	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update_f3));
+	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank_f3));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_f3)
-	MCFG_PALETTE_ADD("palette", 0x2000)
-
-	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_taito_f3);
+	PALETTE(config, m_palette, 0x2000);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
-MACHINE_CONFIG_END
+	TAITO_EN(config, m_taito_en, 0);
+}
 
 /* These games reprogram the video output registers to display different scanlines,
  we can't change our screen display at runtime, so we do it here instead.  None
  of the games change the registers during the game (to do so would probably require
  monitor recalibration.)
 */
-MACHINE_CONFIG_START(taito_f3_state::f3_224a)
+void taito_f3_state::f3_224a(machine_config &config)
+{
 	f3(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(46, 40*8-1 + 46, 31, 31+224-1);
+}
 
-MACHINE_CONFIG_START(taito_f3_state::f3_224b)
+void taito_f3_state::f3_224b(machine_config &config)
+{
 	f3(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 32, 32+224-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(46, 40*8-1 + 46, 32, 32+224-1);
+}
 
-MACHINE_CONFIG_START(taito_f3_state::f3_224c)
+void taito_f3_state::f3_224c(machine_config &config)
+{
 	f3(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+224-1);
+}
 
 /* recalh and gseeker need a default EEPROM to work */
-MACHINE_CONFIG_START(taito_f3_state::f3_eeprom)
+void taito_f3_state::f3_eeprom(machine_config &config)
+{
 	f3(config);
+	m_eeprom->default_data(recalh_eeprom, 128); //TODO: convert this into ROM
+}
 
-	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(taito_f3_state::f3_224b_eeprom)
+void taito_f3_state::f3_224b_eeprom(machine_config &config)
+{
 	f3_224b(config);
-
-	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
-MACHINE_CONFIG_END
+	m_eeprom->default_data(recalh_eeprom, 128); //TODO: convert this into ROM
+}
 
 static const gfx_layout bubsympb_sprite_layout =
 {
@@ -549,43 +542,42 @@ static const gfx_layout bubsympb_tile_layout =
 };
 
 
-static GFXDECODE_START( bubsympb )
+static GFXDECODE_START( gfx_bubsympb )
 	GFXDECODE_ENTRY( nullptr,           0x000000, charlayout,          0,  64 ) /* Dynamically modified */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, bubsympb_tile_layout, 0, 512 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, bubsympb_sprite_layout, 4096, 256 ) /* Sprites area */
 	GFXDECODE_ENTRY( nullptr,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
 GFXDECODE_END
 
-MACHINE_CONFIG_START(taito_f3_state::bubsympb)
+void taito_f3_state::bubsympb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(bubsympb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
+	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::bubsympb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::f3_interrupt2));
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.97)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
-	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taito_f3_state, screen_vblank_f3))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.97);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
+	m_screen->set_size(40*8+48*2, 32*8);
+	m_screen->set_visarea(46, 40*8-1 + 46, 31, 31+224-1);
+	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update_f3));
+	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank_f3));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bubsympb)
-	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_bubsympb);
+	PALETTE(config, m_palette, 0x2000);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000 , PIN7_HIGH) // not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); // not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /******************************************************************************/
 
@@ -705,14 +697,14 @@ ROM_START( arabianm )
 	ROM_LOAD16_BYTE("d29-02.ic18", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) )   // -std-
 
 	ROM_REGION( 0x1200, "plds", 0 )
-	ROM_LOAD( "D29-11.IC15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
+	ROM_LOAD( "d29-11.ic15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
 	ROM_LOAD( "pal20l8b.2",      0x0200, 0x0144, CRC(c91437e2) SHA1(5bd6fb57fd7e0ff957a6ef9509b8f2e35a8ca29a) ) /* D29-12 */
-	ROM_LOAD( "D29-13.IC14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
+	ROM_LOAD( "d29-13.ic14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
 	ROM_LOAD( "palce16v8h.11",   0x0600, 0x0117, CRC(51088324) SHA1(b985835b92c9d1e1dae6ae7cba9fa83c4db58bbb) ) /* D29-16 */
 	ROM_LOAD( "pal16l8b.22",     0x0800, 0x0104, CRC(3e01e854) SHA1(72f48982673ac8337dac3358b7a79e45c60b9601) ) /* D29-09 */
 	ROM_LOAD( "palce16v8h.31",   0x0a00, 0x0117, CRC(e0789727) SHA1(74add02cd194741de5ca6e36a99f9dd3e756fbdf) ) /* D29-17 */
 	ROM_LOAD( "pal16l8b.62",     0x0c00, 0x0104, CRC(7093e2f3) SHA1(62bb0085ed93cc8a5fb3a1b08ce9c8071ebda657) ) /* D29-10 */
-	ROM_LOAD( "D29-14.IC28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
+	ROM_LOAD( "d29-14.ic28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
 	ROM_LOAD( "pal20l8b.70",     0x1000, 0x0144, CRC(92b5b97c) SHA1(653ab0467f71d93eceb8143b124cdedaf1ede750) ) /* D29-15 */
 ROM_END
 
@@ -745,14 +737,14 @@ ROM_START( arabianmj )
 	ROM_LOAD16_BYTE("d29-02.ic18", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) )   // -std-
 
 	ROM_REGION( 0x1200, "plds", 0 )
-	ROM_LOAD( "D29-11.IC15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
+	ROM_LOAD( "d29-11.ic15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
 	ROM_LOAD( "pal20l8b.2",      0x0200, 0x0144, CRC(c91437e2) SHA1(5bd6fb57fd7e0ff957a6ef9509b8f2e35a8ca29a) ) /* D29-12 */
-	ROM_LOAD( "D29-13.IC14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
+	ROM_LOAD( "d29-13.ic14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
 	ROM_LOAD( "palce16v8h.11",   0x0600, 0x0117, CRC(51088324) SHA1(b985835b92c9d1e1dae6ae7cba9fa83c4db58bbb) ) /* D29-16 */
 	ROM_LOAD( "pal16l8b.22",     0x0800, 0x0104, CRC(3e01e854) SHA1(72f48982673ac8337dac3358b7a79e45c60b9601) ) /* D29-09 */
 	ROM_LOAD( "palce16v8h.31",   0x0a00, 0x0117, CRC(e0789727) SHA1(74add02cd194741de5ca6e36a99f9dd3e756fbdf) ) /* D29-17 */
 	ROM_LOAD( "pal16l8b.62",     0x0c00, 0x0104, CRC(7093e2f3) SHA1(62bb0085ed93cc8a5fb3a1b08ce9c8071ebda657) ) /* D29-10 */
-	ROM_LOAD( "D29-14.IC28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
+	ROM_LOAD( "d29-14.ic28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
 	ROM_LOAD( "pal20l8b.70",     0x1000, 0x0144, CRC(92b5b97c) SHA1(653ab0467f71d93eceb8143b124cdedaf1ede750) ) /* D29-15 */
 ROM_END
 
@@ -785,14 +777,14 @@ ROM_START( arabianmu )
 	ROM_LOAD16_BYTE("d29-02.ic18", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) )   // -std-
 
 	ROM_REGION( 0x1200, "plds", 0 )
-	ROM_LOAD( "D29-11.IC15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
+	ROM_LOAD( "d29-11.ic15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
 	ROM_LOAD( "pal20l8b.2",      0x0200, 0x0144, CRC(c91437e2) SHA1(5bd6fb57fd7e0ff957a6ef9509b8f2e35a8ca29a) ) /* D29-12 */
-	ROM_LOAD( "D29-13.IC14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
+	ROM_LOAD( "d29-13.ic14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
 	ROM_LOAD( "palce16v8h.11",   0x0600, 0x0117, CRC(51088324) SHA1(b985835b92c9d1e1dae6ae7cba9fa83c4db58bbb) ) /* D29-16 */
 	ROM_LOAD( "pal16l8b.22",     0x0800, 0x0104, CRC(3e01e854) SHA1(72f48982673ac8337dac3358b7a79e45c60b9601) ) /* D29-09 */
 	ROM_LOAD( "palce16v8h.31",   0x0a00, 0x0117, CRC(e0789727) SHA1(74add02cd194741de5ca6e36a99f9dd3e756fbdf) ) /* D29-17 */
 	ROM_LOAD( "pal16l8b.62",     0x0c00, 0x0104, CRC(7093e2f3) SHA1(62bb0085ed93cc8a5fb3a1b08ce9c8071ebda657) ) /* D29-10 */
-	ROM_LOAD( "D29-14.IC28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
+	ROM_LOAD( "d29-14.ic28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
 	ROM_LOAD( "pal20l8b.70",     0x1000, 0x0144, CRC(92b5b97c) SHA1(653ab0467f71d93eceb8143b124cdedaf1ede750) ) /* D29-15 */
 ROM_END
 
@@ -1097,18 +1089,18 @@ ROM_START( hthero93u )
 	ROM_LOAD16_BYTE("d49-05.41", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) ) // -std-
 
 	ROM_REGION(0x800000, "palsgame" , ROMREGION_ERASE00 ) // all unprotected / unlocked (dumped from single PCB version of game)
-	ROM_LOAD ("D49-12.IC60.bin", 0x000, 0x104, CRC(aa4cff37) SHA1(58e67e3807a32c403b1ef145d4bc5f91e1537554) )
-	ROM_LOAD ("D49-21.IC17.bin", 0x000, 0x104, CRC(821775d4) SHA1(f066cf6ee2118dd57c904fcff3bb287d57e16367) )
+	ROM_LOAD ("d49-12.ic60.bin", 0x000, 0x104, CRC(aa4cff37) SHA1(58e67e3807a32c403b1ef145d4bc5f91e1537554) )
+	ROM_LOAD ("d49-21.ic17.bin", 0x000, 0x104, CRC(821775d4) SHA1(f066cf6ee2118dd57c904fcff3bb287d57e16367) )
 
 	ROM_REGION(0x800000, "palsbase" , ROMREGION_ERASE00 ) // all unprotected / unlocked (dumped from single PCB version of game)
 	// these should be the same on this and Arabian Magic, but the dumps don't match in all cases, maybe the AM ones were protected?
-	ROM_LOAD ("D29-11.IC15.bin", 0x000000, 0x157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) )
-	ROM_LOAD ("D29-12.IC12.bin", 0x000000, 0x144, CRC(c872f1fd) SHA1(6bcf766f76d83c18fa1c095716a1298581aa06c2) )
-	ROM_LOAD ("D29-13.IC14.bin", 0x000000, 0x157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) )
-	ROM_LOAD ("D29-14.IC28.bin", 0x000000, 0x157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) )
-	ROM_LOAD ("D29-15.IC29.bin", 0x000000, 0x157, CRC(692eb582) SHA1(db40eb294cecc65d4a0d65e75b6daef75dcc2fb7) )
-	ROM_LOAD ("D29-16.IC7.bin",  0x000000, 0x117, CRC(11875f52) SHA1(2c3a7a15b3184421ca1bc88383eeccf49ee0d22c) )
-	ROM_LOAD ("D29-17.IC16.bin", 0x000000, 0x117, CRC(a0f74b51) SHA1(9d19e9099be965152a3cfbc5593e6abedb7c9d71) )
+	ROM_LOAD ("d29-11.ic15.bin", 0x000000, 0x157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) )
+	ROM_LOAD ("d29-12.ic12.bin", 0x000000, 0x144, CRC(c872f1fd) SHA1(6bcf766f76d83c18fa1c095716a1298581aa06c2) )
+	ROM_LOAD ("d29-13.ic14.bin", 0x000000, 0x157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) )
+	ROM_LOAD ("d29-14.ic28.bin", 0x000000, 0x157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) )
+	ROM_LOAD ("d29-15.ic29.bin", 0x000000, 0x157, CRC(692eb582) SHA1(db40eb294cecc65d4a0d65e75b6daef75dcc2fb7) )
+	ROM_LOAD ("d29-16.ic7.bin",  0x000000, 0x117, CRC(11875f52) SHA1(2c3a7a15b3184421ca1bc88383eeccf49ee0d22c) )
+	ROM_LOAD ("d29-17.ic16.bin", 0x000000, 0x117, CRC(a0f74b51) SHA1(9d19e9099be965152a3cfbc5593e6abedb7c9d71) )
 
 ROM_END
 
@@ -2297,18 +2289,18 @@ ROM_END
 
 ROM_START( pwrgoal )
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
-	ROM_LOAD32_BYTE("d94-18.bin", 0x000000, 0x40000, CRC(b92681c3) SHA1(0ca05a69d046668c878df3d2b7ae3172d748e290) )
-	ROM_LOAD32_BYTE("d94-17.bin", 0x000001, 0x40000, CRC(6009333e) SHA1(4ab28f2d9e2b75adc668f5d9390e06086bbd97dc) )
-	ROM_LOAD32_BYTE("d94-16.bin", 0x000002, 0x40000, CRC(c6dbc9c8) SHA1(4f096b59734db51eeddcf0649f2a6f11bdde9590) )
-	ROM_LOAD32_BYTE("d94-22.rom", 0x000003, 0x40000, CRC(f672e487) SHA1(da62afc82aeae4aeeebbee0965cda3d84464ad09) )
+	ROM_LOAD32_BYTE("d94-18.20", 0x000000, 0x40000, CRC(b92681c3) SHA1(0ca05a69d046668c878df3d2b7ae3172d748e290) )
+	ROM_LOAD32_BYTE("d94-17.19", 0x000001, 0x40000, CRC(6009333e) SHA1(4ab28f2d9e2b75adc668f5d9390e06086bbd97dc) )
+	ROM_LOAD32_BYTE("d94-16.18", 0x000002, 0x40000, CRC(c6dbc9c8) SHA1(4f096b59734db51eeddcf0649f2a6f11bdde9590) )
+	ROM_LOAD32_BYTE("d94-22.17", 0x000003, 0x40000, CRC(f672e487) SHA1(da62afc82aeae4aeeebbee0965cda3d84464ad09) )
 
 	ROM_REGION(0x1800000, "gfx1" , 0) /* Sprites */
-	ROM_LOAD16_BYTE("d94-09.bin", 0x000000, 0x200000, CRC(425e6bec) SHA1(512508e7137fcdebdf2240dbbd37ea0cf1c4dcdc) )
-	ROM_LOAD16_BYTE("d94-08.bin", 0x400000, 0x200000, CRC(bd909caf) SHA1(33952883afb8fe9b55dd258435af99881925e8d5) )
-	ROM_LOAD16_BYTE("d94-07.bin", 0x800000, 0x200000, CRC(c8c95e49) SHA1(9bfdf63d6059b01a4cd5813239ba1bd98453a56b) )
-	ROM_LOAD16_BYTE("d94-06.bin", 0x000001, 0x200000, CRC(0ed1df55) SHA1(10b22407ad0e03c37363783ee80f2cbf98a802a0) )
-	ROM_LOAD16_BYTE("d94-05.bin", 0x400001, 0x200000, CRC(121c8542) SHA1(ec9b7e56c97a8b6ed0423f05b789ca89b1bb0d36) )
-	ROM_LOAD16_BYTE("d94-04.bin", 0x800001, 0x200000, CRC(24958b50) SHA1(ea15ffa3a615e3e67c1bade6f6ef45424479115e) )
+	ROM_LOAD16_BYTE("d94-09.bin", 0x0000000, 0x200000, CRC(425e6bec) SHA1(512508e7137fcdebdf2240dbbd37ea0cf1c4dcdc) )
+	ROM_LOAD16_BYTE("d94-08.bin", 0x0400000, 0x200000, CRC(bd909caf) SHA1(33952883afb8fe9b55dd258435af99881925e8d5) )
+	ROM_LOAD16_BYTE("d94-07.bin", 0x0800000, 0x200000, CRC(c8c95e49) SHA1(9bfdf63d6059b01a4cd5813239ba1bd98453a56b) )
+	ROM_LOAD16_BYTE("d94-06.bin", 0x0000001, 0x200000, CRC(0ed1df55) SHA1(10b22407ad0e03c37363783ee80f2cbf98a802a0) )
+	ROM_LOAD16_BYTE("d94-05.bin", 0x0400001, 0x200000, CRC(121c8542) SHA1(ec9b7e56c97a8b6ed0423f05b789ca89b1bb0d36) )
+	ROM_LOAD16_BYTE("d94-04.bin", 0x0800001, 0x200000, CRC(24958b50) SHA1(ea15ffa3a615e3e67c1bade6f6ef45424479115e) )
 	ROM_LOAD       ("d94-03.bin", 0x1200000, 0x200000, CRC(95e32072) SHA1(9797f65ecadc6b0f209bf262396315b61855c433) )
 	ROM_LOAD       ("d94-02.bin", 0x1400000, 0x200000, CRC(f460b9ac) SHA1(e36a812791bd0360380f397b1bc6c357391f585a) )
 	ROM_LOAD       ("d94-01.bin", 0x1600000, 0x200000, CRC(410ffccd) SHA1(0cab00c8e9de92ad81ac61f25bbe8bfd60f45ae0) )
@@ -2331,18 +2323,18 @@ ROM_END
 
 ROM_START( hthero95 )
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
-	ROM_LOAD32_BYTE("d94-18.bin", 0x000000, 0x40000, CRC(b92681c3) SHA1(0ca05a69d046668c878df3d2b7ae3172d748e290) )
-	ROM_LOAD32_BYTE("d94-17.bin", 0x000001, 0x40000, CRC(6009333e) SHA1(4ab28f2d9e2b75adc668f5d9390e06086bbd97dc) )
-	ROM_LOAD32_BYTE("d94-16.bin", 0x000002, 0x40000, CRC(c6dbc9c8) SHA1(4f096b59734db51eeddcf0649f2a6f11bdde9590) )
-	ROM_LOAD32_BYTE("d94-15.bin", 0x000003, 0x40000, CRC(187c85ab) SHA1(8270930b95fafe5ad92ea978c1558c491d9668b0) )
+	ROM_LOAD32_BYTE("d94-18.20", 0x000000, 0x40000, CRC(b92681c3) SHA1(0ca05a69d046668c878df3d2b7ae3172d748e290) )
+	ROM_LOAD32_BYTE("d94-17.19", 0x000001, 0x40000, CRC(6009333e) SHA1(4ab28f2d9e2b75adc668f5d9390e06086bbd97dc) )
+	ROM_LOAD32_BYTE("d94-16.18", 0x000002, 0x40000, CRC(c6dbc9c8) SHA1(4f096b59734db51eeddcf0649f2a6f11bdde9590) )
+	ROM_LOAD32_BYTE("d94-15.17", 0x000003, 0x40000, CRC(187c85ab) SHA1(8270930b95fafe5ad92ea978c1558c491d9668b0) )
 
 	ROM_REGION(0x1800000, "gfx1" , 0) /* Sprites */
-	ROM_LOAD16_BYTE("d94-09.bin", 0x000000, 0x200000, CRC(425e6bec) SHA1(512508e7137fcdebdf2240dbbd37ea0cf1c4dcdc) )
-	ROM_LOAD16_BYTE("d94-08.bin", 0x400000, 0x200000, CRC(bd909caf) SHA1(33952883afb8fe9b55dd258435af99881925e8d5) )
-	ROM_LOAD16_BYTE("d94-07.bin", 0x800000, 0x200000, CRC(c8c95e49) SHA1(9bfdf63d6059b01a4cd5813239ba1bd98453a56b) )
-	ROM_LOAD16_BYTE("d94-06.bin", 0x000001, 0x200000, CRC(0ed1df55) SHA1(10b22407ad0e03c37363783ee80f2cbf98a802a0) )
-	ROM_LOAD16_BYTE("d94-05.bin", 0x400001, 0x200000, CRC(121c8542) SHA1(ec9b7e56c97a8b6ed0423f05b789ca89b1bb0d36) )
-	ROM_LOAD16_BYTE("d94-04.bin", 0x800001, 0x200000, CRC(24958b50) SHA1(ea15ffa3a615e3e67c1bade6f6ef45424479115e) )
+	ROM_LOAD16_BYTE("d94-09.bin", 0x0000000, 0x200000, CRC(425e6bec) SHA1(512508e7137fcdebdf2240dbbd37ea0cf1c4dcdc) )
+	ROM_LOAD16_BYTE("d94-08.bin", 0x0400000, 0x200000, CRC(bd909caf) SHA1(33952883afb8fe9b55dd258435af99881925e8d5) )
+	ROM_LOAD16_BYTE("d94-07.bin", 0x0800000, 0x200000, CRC(c8c95e49) SHA1(9bfdf63d6059b01a4cd5813239ba1bd98453a56b) )
+	ROM_LOAD16_BYTE("d94-06.bin", 0x0000001, 0x200000, CRC(0ed1df55) SHA1(10b22407ad0e03c37363783ee80f2cbf98a802a0) )
+	ROM_LOAD16_BYTE("d94-05.bin", 0x0400001, 0x200000, CRC(121c8542) SHA1(ec9b7e56c97a8b6ed0423f05b789ca89b1bb0d36) )
+	ROM_LOAD16_BYTE("d94-04.bin", 0x0800001, 0x200000, CRC(24958b50) SHA1(ea15ffa3a615e3e67c1bade6f6ef45424479115e) )
 	ROM_LOAD       ("d94-03.bin", 0x1200000, 0x200000, CRC(95e32072) SHA1(9797f65ecadc6b0f209bf262396315b61855c433) )
 	ROM_LOAD       ("d94-02.bin", 0x1400000, 0x200000, CRC(f460b9ac) SHA1(e36a812791bd0360380f397b1bc6c357391f585a) )
 	ROM_LOAD       ("d94-01.bin", 0x1600000, 0x200000, CRC(410ffccd) SHA1(0cab00c8e9de92ad81ac61f25bbe8bfd60f45ae0) )
@@ -2365,18 +2357,52 @@ ROM_END
 
 ROM_START( hthero95u )
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
-	ROM_LOAD32_BYTE("d94-18.bin", 0x000000, 0x40000, CRC(b92681c3) SHA1(0ca05a69d046668c878df3d2b7ae3172d748e290) )
-	ROM_LOAD32_BYTE("d94-17.bin", 0x000001, 0x40000, CRC(6009333e) SHA1(4ab28f2d9e2b75adc668f5d9390e06086bbd97dc) )
-	ROM_LOAD32_BYTE("d94-16.bin", 0x000002, 0x40000, CRC(c6dbc9c8) SHA1(4f096b59734db51eeddcf0649f2a6f11bdde9590) )
-	ROM_LOAD32_BYTE("d94-21.bin", 0x000003, 0x40000, CRC(8175d411) SHA1(b93ffef510ecfaced6cae07ea6cd549af7473049) )
+	ROM_LOAD32_BYTE("d94-18.20", 0x000000, 0x40000, CRC(b92681c3) SHA1(0ca05a69d046668c878df3d2b7ae3172d748e290) )
+	ROM_LOAD32_BYTE("d94-17.19", 0x000001, 0x40000, CRC(6009333e) SHA1(4ab28f2d9e2b75adc668f5d9390e06086bbd97dc) )
+	ROM_LOAD32_BYTE("d94-16.18", 0x000002, 0x40000, CRC(c6dbc9c8) SHA1(4f096b59734db51eeddcf0649f2a6f11bdde9590) )
+	ROM_LOAD32_BYTE("d94-21.17", 0x000003, 0x40000, CRC(8175d411) SHA1(b93ffef510ecfaced6cae07ea6cd549af7473049) )
 
 	ROM_REGION(0x1800000, "gfx1" , 0) /* Sprites */
-	ROM_LOAD16_BYTE("d94-09.bin", 0x000000, 0x200000, CRC(425e6bec) SHA1(512508e7137fcdebdf2240dbbd37ea0cf1c4dcdc) )
-	ROM_LOAD16_BYTE("d94-08.bin", 0x400000, 0x200000, CRC(bd909caf) SHA1(33952883afb8fe9b55dd258435af99881925e8d5) )
-	ROM_LOAD16_BYTE("d94-07.bin", 0x800000, 0x200000, CRC(c8c95e49) SHA1(9bfdf63d6059b01a4cd5813239ba1bd98453a56b) )
-	ROM_LOAD16_BYTE("d94-06.bin", 0x000001, 0x200000, CRC(0ed1df55) SHA1(10b22407ad0e03c37363783ee80f2cbf98a802a0) )
-	ROM_LOAD16_BYTE("d94-05.bin", 0x400001, 0x200000, CRC(121c8542) SHA1(ec9b7e56c97a8b6ed0423f05b789ca89b1bb0d36) )
-	ROM_LOAD16_BYTE("d94-04.bin", 0x800001, 0x200000, CRC(24958b50) SHA1(ea15ffa3a615e3e67c1bade6f6ef45424479115e) )
+	ROM_LOAD16_BYTE("d94-09.bin", 0x0000000, 0x200000, CRC(425e6bec) SHA1(512508e7137fcdebdf2240dbbd37ea0cf1c4dcdc) )
+	ROM_LOAD16_BYTE("d94-08.bin", 0x0400000, 0x200000, CRC(bd909caf) SHA1(33952883afb8fe9b55dd258435af99881925e8d5) )
+	ROM_LOAD16_BYTE("d94-07.bin", 0x0800000, 0x200000, CRC(c8c95e49) SHA1(9bfdf63d6059b01a4cd5813239ba1bd98453a56b) )
+	ROM_LOAD16_BYTE("d94-06.bin", 0x0000001, 0x200000, CRC(0ed1df55) SHA1(10b22407ad0e03c37363783ee80f2cbf98a802a0) )
+	ROM_LOAD16_BYTE("d94-05.bin", 0x0400001, 0x200000, CRC(121c8542) SHA1(ec9b7e56c97a8b6ed0423f05b789ca89b1bb0d36) )
+	ROM_LOAD16_BYTE("d94-04.bin", 0x0800001, 0x200000, CRC(24958b50) SHA1(ea15ffa3a615e3e67c1bade6f6ef45424479115e) )
+	ROM_LOAD       ("d94-03.bin", 0x1200000, 0x200000, CRC(95e32072) SHA1(9797f65ecadc6b0f209bf262396315b61855c433) )
+	ROM_LOAD       ("d94-02.bin", 0x1400000, 0x200000, CRC(f460b9ac) SHA1(e36a812791bd0360380f397b1bc6c357391f585a) )
+	ROM_LOAD       ("d94-01.bin", 0x1600000, 0x200000, CRC(410ffccd) SHA1(0cab00c8e9de92ad81ac61f25bbe8bfd60f45ae0) )
+	ROM_FILL       (              0xc00000, 0x600000,0x00 )
+
+	ROM_REGION(0x400000, "gfx2" , 0) /* Tiles */
+	ROM_LOAD16_BYTE("d94-14.bin", 0x000000, 0x100000, CRC(b8ba5761) SHA1(7966ef3166d7d6b9913478eaef5dd4a2bf7d5a06) )
+	ROM_LOAD16_BYTE("d94-13.bin", 0x000001, 0x100000, CRC(cafc68ce) SHA1(5c1f49951e83d812f0c7697751f4876ab1d08141) )
+	ROM_LOAD       ("d94-12.bin", 0x300000, 0x100000, CRC(47064189) SHA1(99ceeb326dcc2e1c3acba8ac14d94dcb17c6e032) )
+	ROM_FILL       (              0x200000, 0x100000,0x00 )
+
+	ROM_REGION(0x180000, "taito_en:audiocpu", 0) /* 68000 sound CPU */
+	ROM_LOAD16_BYTE("d94-19.bin", 0x100000, 0x40000, CRC(c93dbcf4) SHA1(413520e652d809651aff9b1b74e6353112d34c12) ) /* Over dump?? 0x20000-0x3ffff == 0xFF */
+	ROM_LOAD16_BYTE("d94-20.bin", 0x100001, 0x40000, CRC(f232bf64) SHA1(bbfeae0785fc49c12aa6d9b1bd6ff7c8515f8fe7) ) /* Over dump?? 0x20000-0x3ffff == 0xFF */
+
+	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
+	ROM_LOAD16_BYTE("d94-10.bin", 0x000000, 0x200000, CRC(a22563ae) SHA1(85f2a4ca5e085ac1d4c15feb737229764697ae85) )    // C8 C9 CA CB
+	ROM_LOAD16_BYTE("d94-11.bin", 0x400000, 0x200000, CRC(61ed83fa) SHA1(f6ca60b7af61fd3ac01a987f949d7a7bc96e43ff) )    // CD CE -std-
+ROM_END
+
+ROM_START( hthero95a )
+	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
+	ROM_LOAD32_BYTE("d94-26.20", 0x000000, 0x40000, CRC(3170fa0b) SHA1(75ce8eacbf64e370c5967541102e34d8aa3f815a) )
+	ROM_LOAD32_BYTE("d94-25.19", 0x000001, 0x40000, CRC(dfd5cbf9) SHA1(56b15eaf1032fa32c1c08ca0f9ab9701af12cbe4) )
+	ROM_LOAD32_BYTE("d94-24.18", 0x000002, 0x40000, CRC(d97269cc) SHA1(bbbd40368c713ce5baaaca3735ca41e0e72e8dc0) )
+	ROM_LOAD32_BYTE("d94-23.17", 0x000003, 0x40000, CRC(71092708) SHA1(ceb4bc42406c4627d3046b56958344496688b060) )
+
+	ROM_REGION(0x1800000, "gfx1" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("d94-09.bin", 0x0000000, 0x200000, CRC(425e6bec) SHA1(512508e7137fcdebdf2240dbbd37ea0cf1c4dcdc) )
+	ROM_LOAD16_BYTE("d94-08.bin", 0x0400000, 0x200000, CRC(bd909caf) SHA1(33952883afb8fe9b55dd258435af99881925e8d5) )
+	ROM_LOAD16_BYTE("d94-07.bin", 0x0800000, 0x200000, CRC(c8c95e49) SHA1(9bfdf63d6059b01a4cd5813239ba1bd98453a56b) )
+	ROM_LOAD16_BYTE("d94-06.bin", 0x0000001, 0x200000, CRC(0ed1df55) SHA1(10b22407ad0e03c37363783ee80f2cbf98a802a0) )
+	ROM_LOAD16_BYTE("d94-05.bin", 0x0400001, 0x200000, CRC(121c8542) SHA1(ec9b7e56c97a8b6ed0423f05b789ca89b1bb0d36) )
+	ROM_LOAD16_BYTE("d94-04.bin", 0x0800001, 0x200000, CRC(24958b50) SHA1(ea15ffa3a615e3e67c1bade6f6ef45424479115e) )
 	ROM_LOAD       ("d94-03.bin", 0x1200000, 0x200000, CRC(95e32072) SHA1(9797f65ecadc6b0f209bf262396315b61855c433) )
 	ROM_LOAD       ("d94-02.bin", 0x1400000, 0x200000, CRC(f460b9ac) SHA1(e36a812791bd0360380f397b1bc6c357391f585a) )
 	ROM_LOAD       ("d94-01.bin", 0x1600000, 0x200000, CRC(410ffccd) SHA1(0cab00c8e9de92ad81ac61f25bbe8bfd60f45ae0) )
@@ -3119,6 +3145,36 @@ ROM_START( bubblem )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "bubblem.nv", 0x0000, 0x0080, CRC(9a59326e) SHA1(071dbfbfd77f7020476ddb54c93f5fafa7a08159) )
+ROM_END
+
+ROM_START( bubblemu )
+	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
+	ROM_LOAD32_BYTE("e21-17.20", 0x000000, 0x080000, CRC(0b72e8f1) SHA1(1b0289cafb1d4d3387c6ec42c0e8599229c79bba) )
+	ROM_LOAD32_BYTE("e21-16.19", 0x000001, 0x080000, CRC(b47354cc) SHA1(08e66573cae3ce21a6dbdbd79e32a2ab050f9bbd) )
+	ROM_LOAD32_BYTE("e21-15.18", 0x000002, 0x080000, CRC(64bf2c24) SHA1(be2d81fdc307841340a86a4ca0409a2bdbd35532) )
+	ROM_LOAD32_BYTE("e21-14.17", 0x000003, 0x080000, CRC(48aecd47) SHA1(3d2b7d3474968b0450731644e593338c9cf6f5b0) )
+
+	ROM_REGION(0x800000, "gfx1" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("e21-02.rom", 0x000000, 0x200000, CRC(b7cb9232) SHA1(ba71cb98d49eadebb26d9f53bbaec1dc211077f5) )
+	ROM_LOAD16_BYTE("e21-01.rom", 0x000001, 0x200000, CRC(a11f2f99) SHA1(293c5996600cad05bf98f936f5f820d93d546099) )
+	ROM_FILL       (              0x400000, 0x400000, 0x00 )
+
+	ROM_REGION(0x400000, "gfx2" , 0) /* Tiles */
+	ROM_LOAD16_BYTE("e21-07.rom", 0x000000, 0x100000, CRC(7789bf7c) SHA1(bc8ef1696adac99a1fabae9b79afcd3461cf323b) )
+	ROM_LOAD16_BYTE("e21-06.rom", 0x000001, 0x100000, CRC(997fc0d7) SHA1(58a546f739072fedebfe7c972fe85f72107726b2) )
+	ROM_LOAD       ("e21-05.rom", 0x300000, 0x100000, CRC(07eab58f) SHA1(ae2d7b839b39d88d11652df74804a39230674467) )
+	ROM_FILL       (              0x200000, 0x100000, 0x00 )
+
+	ROM_REGION(0x180000, "taito_en:audiocpu", 0) /* Sound CPU */
+	ROM_LOAD16_BYTE("e21-12.32", 0x100000, 0x40000, CRC(34093de1) SHA1(d69d6b5f10b8fe86f727d739ed5aecceb15e01f7) )
+	ROM_LOAD16_BYTE("e21-13.33", 0x100001, 0x40000, CRC(9e9ec437) SHA1(b0265b688846c642d240b2f3677d2330d31eaa87) )
+
+	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
+	ROM_LOAD16_BYTE("e21-03.rom", 0x000000, 0x200000, CRC(54c5f83d) SHA1(10a993199c8d5a1361bd29a4b92c404451c6da01) )    // C8 C9 CA CB
+	ROM_LOAD16_BYTE("e21-04.rom", 0x400000, 0x200000, CRC(e5af2a2d) SHA1(62a49504decc7160b710260218920d2d6d2af8f0) )    // CC CD -std-
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "bubblemu.nv", 0x0000, 0x0080, CRC(a503276c) SHA1(f07dd49decee7e8e7551e37b9b0f612bfaf8a2b0) )
 ROM_END
 
 ROM_START( bubblemj )
@@ -3899,109 +3955,109 @@ static void tile_decode(running_machine &machine)
 	}
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,ringrage)
+void taito_f3_state::init_ringrage()
 {
 	m_f3_game=RINGRAGE;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,arabianm)
+void taito_f3_state::init_arabianm()
 {
 	m_f3_game=ARABIANM;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,ridingf)
+void taito_f3_state::init_ridingf()
 {
 	m_f3_game=RIDINGF;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,gseeker)
+void taito_f3_state::init_gseeker()
 {
 	m_f3_game=GSEEKER;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,gunlock)
+void taito_f3_state::init_gunlock()
 {
 	m_f3_game=GUNLOCK;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,elvactr)
+void taito_f3_state::init_elvactr()
 {
 	m_f3_game=EACTION2;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,cupfinal)
+void taito_f3_state::init_cupfinal()
 {
 	m_f3_game=SCFINALS;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,trstaroj)
+void taito_f3_state::init_trstaroj()
 {
 	m_f3_game=TRSTAR;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,scfinals)
+void taito_f3_state::init_scfinals()
 {
 	m_f3_game=SCFINALS;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,lightbr)
+void taito_f3_state::init_lightbr()
 {
 	m_f3_game=LIGHTBR;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,kaiserkn)
+void taito_f3_state::init_kaiserkn()
 {
 	m_f3_game=KAISERKN;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,dariusg)
+void taito_f3_state::init_dariusg()
 {
 	m_f3_game=DARIUSG;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,spcinvdj)
+void taito_f3_state::init_spcinvdj()
 {
 	m_f3_game=SPCINVDX;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,qtheater)
+void taito_f3_state::init_qtheater()
 {
 	m_f3_game=QTHEATER;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,spcinv95)
+void taito_f3_state::init_spcinv95()
 {
 	m_f3_game=SPCINV95;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,gekirido)
+void taito_f3_state::init_gekirido()
 {
 	m_f3_game=GEKIRIDO;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,ktiger2)
+void taito_f3_state::init_ktiger2()
 {
 	m_f3_game=KTIGER2;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,bubsymph)
+void taito_f3_state::init_bubsymph()
 {
 	m_f3_game=BUBSYMPH;
 	tile_decode(machine());
@@ -4031,7 +4087,7 @@ WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
 }
 
 
-DRIVER_INIT_MEMBER(taito_f3_state,bubsympb)
+void taito_f3_state::init_bubsympb()
 {
 	m_f3_game=BUBSYMPH;
 	//tile_decode(machine());
@@ -4057,31 +4113,31 @@ DRIVER_INIT_MEMBER(taito_f3_state,bubsympb)
 }
 
 
-DRIVER_INIT_MEMBER(taito_f3_state,bubblem)
+void taito_f3_state::init_bubblem()
 {
 	m_f3_game=BUBBLEM;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,cleopatr)
+void taito_f3_state::init_cleopatr()
 {
 	m_f3_game=CLEOPATR;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,popnpop)
+void taito_f3_state::init_popnpop()
 {
 	m_f3_game=POPNPOP;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,landmakr)
+void taito_f3_state::init_landmakr()
 {
 	m_f3_game=LANDMAKR;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,landmkrp)
+void taito_f3_state::init_landmkrp()
 {
 	uint32_t *RAM = (uint32_t *)memregion("maincpu")->base();
 
@@ -4096,31 +4152,31 @@ DRIVER_INIT_MEMBER(taito_f3_state,landmkrp)
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,pbobble3)
+void taito_f3_state::init_pbobble3()
 {
 	m_f3_game=PBOBBLE3;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,pbobble4)
+void taito_f3_state::init_pbobble4()
 {
 	m_f3_game=PBOBBLE4;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,quizhuhu)
+void taito_f3_state::init_quizhuhu()
 {
 	m_f3_game=QUIZHUHU;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,pbobble2)
+void taito_f3_state::init_pbobble2()
 {
 	m_f3_game=PBOBBLE2;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,pbobbl2p)
+void taito_f3_state::init_pbobbl2p()
 {
 	// has 040092: beq     $30000; (2+)
 	// which eventually causes the game to crash
@@ -4138,55 +4194,55 @@ DRIVER_INIT_MEMBER(taito_f3_state,pbobbl2p)
 
 
 
-DRIVER_INIT_MEMBER(taito_f3_state,pbobbl2x)
+void taito_f3_state::init_pbobbl2x()
 {
 	m_f3_game=PBOBBLE2;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,hthero95)
+void taito_f3_state::init_hthero95()
 {
 	m_f3_game=HTHERO95;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,kirameki)
+void taito_f3_state::init_kirameki()
 {
 	m_f3_game=KIRAMEKI;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,puchicar)
+void taito_f3_state::init_puchicar()
 {
 	m_f3_game=PUCHICAR;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,twinqix)
+void taito_f3_state::init_twinqix()
 {
 	m_f3_game=TWINQIX;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,arkretrn)
+void taito_f3_state::init_arkretrn()
 {
 	m_f3_game=ARKRETRN;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,intcup94)
+void taito_f3_state::init_intcup94()
 {
 	m_f3_game=SCFINALS;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,recalh)
+void taito_f3_state::init_recalh()
 {
 	m_f3_game=RECALH;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,commandw)
+void taito_f3_state::init_commandw()
 {
 	m_f3_game=COMMANDW;
 	tile_decode(machine());
@@ -4194,97 +4250,99 @@ DRIVER_INIT_MEMBER(taito_f3_state,commandw)
 
 /******************************************************************************/
 
-GAME( 1992, ringrage, 0,        f3_224a, f3, taito_f3_state, ringrage, ROT0,   "Taito Corporation Japan",   "Ring Rage (Ver 2.3O 1992/08/09)", 0 )
-GAME( 1992, ringragej,ringrage, f3_224a, f3, taito_f3_state, ringrage, ROT0,   "Taito Corporation",         "Ring Rage (Ver 2.3J 1992/08/09)", 0 )
-GAME( 1992, ringrageu,ringrage, f3_224a, f3, taito_f3_state, ringrage, ROT0,   "Taito America Corporation", "Ring Rage (Ver 2.3A 1992/08/09)", 0 )
-GAME( 1992, arabianm, 0,        f3_224a, f3, taito_f3_state, arabianm, ROT0,   "Taito Corporation Japan",   "Arabian Magic (Ver 1.0O 1992/07/06)", 0 )
-GAME( 1992, arabianmj,arabianm, f3_224a, f3, taito_f3_state, arabianm, ROT0,   "Taito Corporation",         "Arabian Magic (Ver 1.0J 1992/07/06)", 0 )
-GAME( 1992, arabianmu,arabianm, f3_224a, f3, taito_f3_state, arabianm, ROT0,   "Taito America Corporation", "Arabian Magic (Ver 1.0A 1992/07/06)", 0 )
-GAME( 1992, ridingf,  0,        f3_224b, f3, taito_f3_state, ridingf,  ROT0,   "Taito Corporation Japan",   "Riding Fight (Ver 1.0O)", 0 )
-GAME( 1992, ridingfj, ridingf,  f3_224b, f3, taito_f3_state, ridingf,  ROT0,   "Taito Corporation",         "Riding Fight (Ver 1.0J)", 0 )
-GAME( 1992, ridingfu, ridingf,  f3_224b, f3, taito_f3_state, ridingf,  ROT0,   "Taito America Corporation", "Riding Fight (Ver 1.0A)", 0 )
-GAME( 1992, gseeker,  0,        f3_224b_eeprom, f3, taito_f3_state, gseeker,  ROT90,  "Taito Corporation Japan",   "Grid Seeker: Project Storm Hammer (Ver 1.3O)", 0 )
-GAME( 1992, gseekerj, gseeker,  f3_224b_eeprom, f3, taito_f3_state, gseeker,  ROT90,  "Taito Corporation",         "Grid Seeker: Project Storm Hammer (Ver 1.3J)", 0 )
-GAME( 1992, gseekeru, gseeker,  f3_224b_eeprom, f3, taito_f3_state, gseeker,  ROT90,  "Taito America Corporation", "Grid Seeker: Project Storm Hammer (Ver 1.3A)", 0 )
-GAME( 1992, commandw, 0,        f3_224b, f3, taito_f3_state, commandw, ROT0,   "Taito Corporation",         "Command War - Super Special Battle & War Game (Ver 0.0J, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ringrage, 0,        f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito Corporation Japan",   "Ring Rage (Ver 2.3O 1992/08/09)", 0 )
+GAME( 1992, ringragej,ringrage, f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito Corporation",         "Ring Rage (Ver 2.3J 1992/08/09)", 0 )
+GAME( 1992, ringrageu,ringrage, f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito America Corporation", "Ring Rage (Ver 2.3A 1992/08/09)", 0 )
+GAME( 1992, arabianm, 0,        f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito Corporation Japan",   "Arabian Magic (Ver 1.0O 1992/07/06)", 0 )
+GAME( 1992, arabianmj,arabianm, f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito Corporation",         "Arabian Magic (Ver 1.0J 1992/07/06)", 0 )
+GAME( 1992, arabianmu,arabianm, f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito America Corporation", "Arabian Magic (Ver 1.0A 1992/07/06)", 0 )
+GAME( 1992, ridingf,  0,        f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito Corporation Japan",   "Riding Fight (Ver 1.0O)", 0 )
+GAME( 1992, ridingfj, ridingf,  f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito Corporation",         "Riding Fight (Ver 1.0J)", 0 )
+GAME( 1992, ridingfu, ridingf,  f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito America Corporation", "Riding Fight (Ver 1.0A)", 0 )
+GAME( 1992, gseeker,  0,        f3_224b_eeprom, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito Corporation Japan",   "Grid Seeker: Project Storm Hammer (Ver 1.3O)", 0 )
+GAME( 1992, gseekerj, gseeker,  f3_224b_eeprom, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito Corporation",         "Grid Seeker: Project Storm Hammer (Ver 1.3J)", 0 )
+GAME( 1992, gseekeru, gseeker,  f3_224b_eeprom, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito America Corporation", "Grid Seeker: Project Storm Hammer (Ver 1.3A)", 0 )
+GAME( 1992, commandw, 0,        f3_224b, f3, taito_f3_state, init_commandw, ROT0,   "Taito Corporation",         "Command War - Super Special Battle & War Game (Ver 0.0J, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 /* Most of the football games share some GFX roms but shouldn't be considered clones unless they have the same Taito game code for the program roms */
-GAME( 1993, cupfinal, 0,        f3_224a, f3, taito_f3_state, cupfinal, ROT0,   "Taito Corporation Japan",   "Taito Cup Finals (Ver 1.0O 1993/02/28)", 0 )
-GAME( 1993, hthero93, cupfinal, f3_224a, f3, taito_f3_state, cupfinal, ROT0,   "Taito Corporation",         "Hat Trick Hero '93 (Ver 1.0J 1993/02/28)", 0 )
-GAME( 1993, hthero93u,cupfinal, f3_224a, f3, taito_f3_state, cupfinal, ROT0,   "Taito Corporation",         "Hat Trick Hero '93 (Ver 1.0A 1993/02/28)", 0 )
-GAME( 1993, trstar,   0,        f3,      f3, taito_f3_state, trstaroj, ROT0,   "Taito Corporation Japan",   "Top Ranking Stars (Ver 2.1O 1993/05/21) (New Version)", 0 )
-GAME( 1993, trstarj,  trstar,   f3,      f3, taito_f3_state, trstaroj, ROT0,   "Taito Corporation",         "Top Ranking Stars (Ver 2.1J 1993/05/21) (New Version)", 0 )
-GAME( 1993, trstaro,  trstar,   f3,      f3, taito_f3_state, trstaroj, ROT0,   "Taito Corporation Japan",   "Top Ranking Stars (Ver 2.1O 1993/05/21) (Old Version)", 0 )
-GAME( 1993, trstaroj, trstar,   f3,      f3, taito_f3_state, trstaroj, ROT0,   "Taito Corporation",         "Top Ranking Stars (Ver 2.1J 1993/05/21) (Old Version)", 0 )
-GAME( 1993, prmtmfgt, trstar,   f3,      f3, taito_f3_state, trstaroj, ROT0,   "Taito America Corporation", "Prime Time Fighter (Ver 2.1A 1993/05/21) (New Version)", 0 )
-GAME( 1993, prmtmfgto,trstar,   f3,      f3, taito_f3_state, trstaroj, ROT0,   "Taito America Corporation", "Prime Time Fighter (Ver 2.1A 1993/05/21) (Old Version)", 0 )
-GAME( 1993, gunlock,  0,        f3_224a, f3, taito_f3_state, gunlock,  ROT90,  "Taito Corporation Japan",   "Gunlock (Ver 2.3O 1994/01/20)", 0 )
-GAME( 1993, rayforcej,gunlock,  f3_224a, f3, taito_f3_state, gunlock,  ROT90,  "Taito Corporation",         "Ray Force (Ver 2.3J 1994/01/20)", 0 )
-GAME( 1993, rayforce, gunlock,  f3_224a, f3, taito_f3_state, gunlock,  ROT90,  "Taito America Corporation", "Ray Force (Ver 2.3A 1994/01/20)", 0 )
-GAME( 1993, scfinals, 0,        f3_224a, f3, taito_f3_state, scfinals, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.2O 1994/01/13)", 0 )
-GAME( 1993, scfinalso,scfinals, f3_224a, f3, taito_f3_state, scfinals, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.1O 1993/11/19)", 0 )
-GAME( 1993, lightbr,  0,        f3_224a, f3, taito_f3_state, lightbr,  ROT0,   "Taito Corporation Japan",   "Light Bringer (Ver 2.2O 1994/04/08)", 0 )
-GAME( 1993, lightbrj, lightbr,  f3_224a, f3, taito_f3_state, lightbr,  ROT0,   "Taito Corporation",         "Light Bringer (Ver 2.1J 1994/02/18)", 0 )
-GAME( 1993, dungeonm, lightbr,  f3_224a, f3, taito_f3_state, lightbr,  ROT0,   "Taito Corporation Japan",   "Dungeon Magic (Ver 2.1O 1994/02/18)", 0 )
-GAME( 1993, dungeonmu,lightbr,  f3_224a, f3, taito_f3_state, lightbr,  ROT0,   "Taito America Corporation", "Dungeon Magic (Ver 2.1A 1994/02/18)", 0 )
-GAME( 1994, intcup94, 0,        f3_224a, f3, taito_f3_state, intcup94, ROT0,   "Taito Corporation Japan",   "International Cup '94 (Ver 2.2O 1994/05/26)", 0 )
-GAME( 1994, hthero94, intcup94, f3_224a, f3, taito_f3_state, intcup94, ROT0,   "Taito America Corporation", "Hat Trick Hero '94 (Ver 2.2A 1994/05/26)", 0 )
-GAME( 1994, kaiserkn, 0,        f3_224a, kn, taito_f3_state, kaiserkn, ROT0,   "Taito Corporation Japan",   "Kaiser Knuckle (Ver 2.1O 1994/07/29)", 0 )
-GAME( 1994, kaiserknj,kaiserkn, f3_224a, kn, taito_f3_state, kaiserkn, ROT0,   "Taito Corporation",         "Kaiser Knuckle (Ver 2.1J 1994/07/29)", 0 )
-GAME( 1994, gblchmp,  kaiserkn, f3_224a, kn, taito_f3_state, kaiserkn, ROT0,   "Taito America Corporation", "Global Champion (Ver 2.1A 1994/07/29)", 0 )
-GAME( 1994, dankuga,  0,        f3_224a, kn, taito_f3_state, kaiserkn, ROT0,   "Taito Corporation",         "Dan-Ku-Ga (Ver 0.0J 1994/12/13, prototype)", 0 )
-GAME( 1994, dariusg,  0,        f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito Corporation Japan",   "Darius Gaiden - Silver Hawk (Ver 2.5O 1994/09/19)", 0 )
-GAME( 1994, dariusgj, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk (Ver 2.5J 1994/09/19)", 0 )
-GAME( 1994, dariusgu, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito America Corporation", "Darius Gaiden - Silver Hawk (Ver 2.5A 1994/09/19)", 0 )
-GAME( 1994, dariusgx, 0,        f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk Extra Version (Ver 2.7J 1995/03/06) (Official Hack)", 0 )
-GAME( 1994, bublbob2, 0,        f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.6O 1994/12/16)", 0 )
-GAME( 1994, bublbob2o,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.5O 1994/10/05)", 0 )
-GAME( 1994, bublbob2p,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 0.0J 1993/12/13, prototype)", 0 )
-GAME( 1994, bubsymphe,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Symphony (Ver 2.5O 1994/10/05)", 0 )
-GAME( 1994, bubsymphu,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito America Corporation", "Bubble Symphony (Ver 2.5A 1994/10/05)", 0 )
-GAME( 1994, bubsymphj,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation",         "Bubble Symphony (Ver 2.5J 1994/10/05)", 0 )
-GAME( 1994, bubsymphb,bublbob2, bubsympb,f3, taito_f3_state, bubsympb, ROT0,   "bootleg",                   "Bubble Symphony (bootleg with OKI6295)", MACHINE_NOT_WORKING ) // backgrounds don't display
-GAME( 1994, spcinvdj, spacedx,  f3,      f3, taito_f3_state, spcinvdj, ROT0,   "Taito Corporation",         "Space Invaders DX (Ver 2.6J 1994/09/14) (F3 Version)", 0 )
-GAME( 1994, pwrgoal,  0,        f3_224a, f3, taito_f3_state, hthero95, ROT0,   "Taito Corporation Japan",   "Taito Power Goal (Ver 2.5O 1994/11/03)", 0 )
-GAME( 1994, hthero95, pwrgoal,  f3_224a, f3, taito_f3_state, hthero95, ROT0,   "Taito Corporation",         "Hat Trick Hero '95 (Ver 2.5J 1994/11/03)", 0 )
-GAME( 1994, hthero95u,pwrgoal,  f3_224a, f3, taito_f3_state, hthero95, ROT0,   "Taito America Corporation", "Hat Trick Hero '95 (Ver 2.5A 1994/11/03)", 0 )
-GAME( 1994, qtheater, 0,        f3_224c, f3, taito_f3_state, qtheater, ROT0,   "Taito Corporation",         "Quiz Theater - 3tsu no Monogatari (Ver 2.3J 1994/11/10)", 0 )
-GAME( 1994, elvactr,  0,        f3,      f3, taito_f3_state, elvactr,  ROT0,   "Taito Corporation Japan",   "Elevator Action Returns (Ver 2.2O 1995/02/20)", 0 )
-GAME( 1994, elvactrj, elvactr,  f3,      f3, taito_f3_state, elvactr,  ROT0,   "Taito Corporation",         "Elevator Action Returns (Ver 2.2J 1995/02/20)", 0 )
-GAME( 1994, elvact2u, elvactr,  f3,      f3, taito_f3_state, elvactr,  ROT0,   "Taito America Corporation", "Elevator Action II (Ver 2.2A 1995/02/20)", 0 )
+GAME( 1993, cupfinal, 0,        f3_224a, f3, taito_f3_state, init_cupfinal, ROT0,   "Taito Corporation Japan",   "Taito Cup Finals (Ver 1.0O 1993/02/28)", 0 )
+GAME( 1993, hthero93, cupfinal, f3_224a, f3, taito_f3_state, init_cupfinal, ROT0,   "Taito Corporation",         "Hat Trick Hero '93 (Ver 1.0J 1993/02/28)", 0 )
+GAME( 1993, hthero93u,cupfinal, f3_224a, f3, taito_f3_state, init_cupfinal, ROT0,   "Taito Corporation",         "Hat Trick Hero '93 (Ver 1.0A 1993/02/28)", 0 )
+GAME( 1993, trstar,   0,        f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito Corporation Japan",   "Top Ranking Stars (Ver 2.1O 1993/05/21) (New Version)", 0 )
+GAME( 1993, trstarj,  trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito Corporation",         "Top Ranking Stars (Ver 2.1J 1993/05/21) (New Version)", 0 )
+GAME( 1993, trstaro,  trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito Corporation Japan",   "Top Ranking Stars (Ver 2.1O 1993/05/21) (Old Version)", 0 )
+GAME( 1993, trstaroj, trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito Corporation",         "Top Ranking Stars (Ver 2.1J 1993/05/21) (Old Version)", 0 )
+GAME( 1993, prmtmfgt, trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito America Corporation", "Prime Time Fighter (Ver 2.1A 1993/05/21) (New Version)", 0 )
+GAME( 1993, prmtmfgto,trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito America Corporation", "Prime Time Fighter (Ver 2.1A 1993/05/21) (Old Version)", 0 )
+GAME( 1993, gunlock,  0,        f3_224a, f3, taito_f3_state, init_gunlock,  ROT90,  "Taito Corporation Japan",   "Gunlock (Ver 2.3O 1994/01/20)", 0 )
+GAME( 1993, rayforcej,gunlock,  f3_224a, f3, taito_f3_state, init_gunlock,  ROT90,  "Taito Corporation",         "Ray Force (Ver 2.3J 1994/01/20)", 0 )
+GAME( 1993, rayforce, gunlock,  f3_224a, f3, taito_f3_state, init_gunlock,  ROT90,  "Taito America Corporation", "Ray Force (Ver 2.3A 1994/01/20)", 0 )
+GAME( 1993, scfinals, 0,        f3_224a, f3, taito_f3_state, init_scfinals, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.2O 1994/01/13)", 0 )
+GAME( 1993, scfinalso,scfinals, f3_224a, f3, taito_f3_state, init_scfinals, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.1O 1993/11/19)", 0 )
+GAME( 1993, lightbr,  0,        f3_224a, f3, taito_f3_state, init_lightbr,  ROT0,   "Taito Corporation Japan",   "Light Bringer (Ver 2.2O 1994/04/08)", 0 )
+GAME( 1993, lightbrj, lightbr,  f3_224a, f3, taito_f3_state, init_lightbr,  ROT0,   "Taito Corporation",         "Light Bringer (Ver 2.1J 1994/02/18)", 0 )
+GAME( 1993, dungeonm, lightbr,  f3_224a, f3, taito_f3_state, init_lightbr,  ROT0,   "Taito Corporation Japan",   "Dungeon Magic (Ver 2.1O 1994/02/18)", 0 )
+GAME( 1993, dungeonmu,lightbr,  f3_224a, f3, taito_f3_state, init_lightbr,  ROT0,   "Taito America Corporation", "Dungeon Magic (Ver 2.1A 1994/02/18)", 0 )
+GAME( 1994, intcup94, 0,        f3_224a, f3, taito_f3_state, init_intcup94, ROT0,   "Taito Corporation Japan",   "International Cup '94 (Ver 2.2O 1994/05/26)", 0 )
+GAME( 1994, hthero94, intcup94, f3_224a, f3, taito_f3_state, init_intcup94, ROT0,   "Taito America Corporation", "Hat Trick Hero '94 (Ver 2.2A 1994/05/26)", 0 )
+GAME( 1994, kaiserkn, 0,        f3_224a, kn, taito_f3_state, init_kaiserkn, ROT0,   "Taito Corporation Japan",   "Kaiser Knuckle (Ver 2.1O 1994/07/29)", 0 )
+GAME( 1994, kaiserknj,kaiserkn, f3_224a, kn, taito_f3_state, init_kaiserkn, ROT0,   "Taito Corporation",         "Kaiser Knuckle (Ver 2.1J 1994/07/29)", 0 )
+GAME( 1994, gblchmp,  kaiserkn, f3_224a, kn, taito_f3_state, init_kaiserkn, ROT0,   "Taito America Corporation", "Global Champion (Ver 2.1A 1994/07/29)", 0 )
+GAME( 1994, dankuga,  0,        f3_224a, kn, taito_f3_state, init_kaiserkn, ROT0,   "Taito Corporation",         "Dan-Ku-Ga (Ver 0.0J 1994/12/13, prototype)", 0 )
+GAME( 1994, dariusg,  0,        f3,      f3, taito_f3_state, init_dariusg,  ROT0,   "Taito Corporation Japan",   "Darius Gaiden - Silver Hawk (Ver 2.5O 1994/09/19)", 0 )
+GAME( 1994, dariusgj, dariusg,  f3,      f3, taito_f3_state, init_dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk (Ver 2.5J 1994/09/19)", 0 )
+GAME( 1994, dariusgu, dariusg,  f3,      f3, taito_f3_state, init_dariusg,  ROT0,   "Taito America Corporation", "Darius Gaiden - Silver Hawk (Ver 2.5A 1994/09/19)", 0 )
+GAME( 1994, dariusgx, 0,        f3,      f3, taito_f3_state, init_dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk Extra Version (Ver 2.7J 1995/03/06) (Official Hack)", 0 )
+GAME( 1994, bublbob2, 0,        f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.6O 1994/12/16)", 0 )
+GAME( 1994, bublbob2o,bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.5O 1994/10/05)", 0 )
+GAME( 1994, bublbob2p,bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 0.0J 1993/12/13, prototype)", 0 )
+GAME( 1994, bubsymphe,bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Symphony (Ver 2.5O 1994/10/05)", 0 )
+GAME( 1994, bubsymphu,bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito America Corporation", "Bubble Symphony (Ver 2.5A 1994/10/05)", 0 )
+GAME( 1994, bubsymphj,bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation",         "Bubble Symphony (Ver 2.5J 1994/10/05)", 0 )
+GAME( 1994, bubsymphb,bublbob2, bubsympb,f3, taito_f3_state, init_bubsympb, ROT0,   "bootleg",                   "Bubble Symphony (bootleg with OKI6295)", MACHINE_NOT_WORKING ) // backgrounds don't display
+GAME( 1994, spcinvdj, spacedx,  f3,      f3, taito_f3_state, init_spcinvdj, ROT0,   "Taito Corporation",         "Space Invaders DX (Ver 2.6J 1994/09/14) (F3 Version)", 0 )
+GAME( 1994, pwrgoal,  0,        f3_224a, f3, taito_f3_state, init_hthero95, ROT0,   "Taito Corporation Japan",   "Taito Power Goal (Ver 2.5O 1994/11/03)", 0 )
+GAME( 1994, hthero95, pwrgoal,  f3_224a, f3, taito_f3_state, init_hthero95, ROT0,   "Taito Corporation",         "Hat Trick Hero '95 (Ver 2.5J 1994/11/03)", 0 )
+GAME( 1994, hthero95u,pwrgoal,  f3_224a, f3, taito_f3_state, init_hthero95, ROT0,   "Taito America Corporation", "Hat Trick Hero '95 (Ver 2.5A 1994/11/03)", 0 )
+GAME( 1994, hthero95a,pwrgoal,  f3_224a, f3, taito_f3_state, init_hthero95, ROT0,   "Taito Corporation Japan",   "Hat Trick Hero '95 (Ver 2.6Asia 1994/11/17)", 0 )
+GAME( 1994, qtheater, 0,        f3_224c, f3, taito_f3_state, init_qtheater, ROT0,   "Taito Corporation",         "Quiz Theater - 3tsu no Monogatari (Ver 2.3J 1994/11/10)", 0 )
+GAME( 1994, elvactr,  0,        f3,      f3, taito_f3_state, init_elvactr,  ROT0,   "Taito Corporation Japan",   "Elevator Action Returns (Ver 2.2O 1995/02/20)", 0 )
+GAME( 1994, elvactrj, elvactr,  f3,      f3, taito_f3_state, init_elvactr,  ROT0,   "Taito Corporation",         "Elevator Action Returns (Ver 2.2J 1995/02/20)", 0 )
+GAME( 1994, elvact2u, elvactr,  f3,      f3, taito_f3_state, init_elvactr,  ROT0,   "Taito America Corporation", "Elevator Action II (Ver 2.2A 1995/02/20)", 0 )
 /* There is also a prototype Elevator Action II (US) pcb with the graphics in a different rom format (same program code) */
-GAME( 1994, recalh,   0,        f3_eeprom,f3, taito_f3_state, recalh,  ROT0,   "Taito Corporation",         "Recalhorn (Ver 1.42J 1994/5/11, prototype)", 0 )
-GAME( 1995, spcinv95, 0,        f3_224a, f3, taito_f3_state, spcinv95, ROT270, "Taito Corporation Japan",   "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5O 1995/06/14)", 0 )
-GAME( 1995, spcinv95u,spcinv95, f3_224a, f3, taito_f3_state, spcinv95, ROT270, "Taito America Corporation", "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5A 1995/06/14)", 0 )
-GAME( 1995, akkanvdr, spcinv95, f3_224a, f3, taito_f3_state, spcinv95, ROT270, "Taito Corporation",         "Akkanbeder (Ver 2.5J 1995/06/14)", 0 )
-GAME( 1995, twinqix,  0,        f3_224a, f3, taito_f3_state, twinqix,  ROT0,   "Taito America Corporation", "Twin Qix (Ver 1.0A 1995/01/17, prototype)", 0 )
-GAME( 1995, quizhuhu, 0,        f3,      f3, taito_f3_state, quizhuhu, ROT0,   "Taito Corporation",         "Moriguchi Hiroko no Quiz de Hyuu!Hyuu! (Ver 2.2J 1995/05/25)", 0 )
-GAME( 1995, pbobble2, 0,        f3,      f3, taito_f3_state, pbobbl2p, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.3O 1995/07/31)", 0 )
-GAME( 1995, pbobble2o,pbobble2, f3,      f3, taito_f3_state, pbobble2, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.2O 1995/07/20)", 0 )
-GAME( 1995, pbobble2j,pbobble2, f3,      f3, taito_f3_state, pbobble2, ROT0,   "Taito Corporation",         "Puzzle Bobble 2 (Ver 2.2J 1995/07/20)", 0 )
-GAME( 1995, pbobble2u,pbobble2, f3,      f3, taito_f3_state, pbobble2, ROT0,   "Taito America Corporation", "Bust-A-Move Again (Ver 2.3A 1995/07/31)", 0 )
-GAME( 1995, pbobble2x,pbobble2, f3,      f3, taito_f3_state, pbobbl2x, ROT0,   "Taito Corporation",         "Puzzle Bobble 2X (Ver 2.2J 1995/11/11)", 0 )
-GAME( 1995, gekiridn, 0,        f3,      f3, taito_f3_state, gekirido, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3O 1995/09/21)", 0 )
-GAME( 1995, gekiridnj,gekiridn, f3,      f3, taito_f3_state, gekirido, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3J 1995/09/21)", 0 )
-GAME( 1995, tcobra2,  0,        f3,      f3, taito_f3_state, ktiger2,  ROT270, "Taito Corporation Japan",   "Twin Cobra II (Ver 2.1O 1995/11/30)", 0 )
-GAME( 1995, tcobra2u, tcobra2,  f3,      f3, taito_f3_state, ktiger2,  ROT270, "Taito America Corporation", "Twin Cobra II (Ver 2.1A 1995/11/30)", 0 )
-GAME( 1995, ktiger2,  tcobra2,  f3,      f3, taito_f3_state, ktiger2,  ROT270, "Taito Corporation",         "Kyukyoku Tiger II (Ver 2.1J 1995/11/30)", 0 )
-GAME( 1995, bubblem,  0,        f3_224a, f3, taito_f3_state, bubblem,  ROT0,   "Taito Corporation Japan",   "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.4O 1996/02/15)", 0 )
-GAME( 1995, bubblemj, bubblem,  f3_224a, f3, taito_f3_state, bubblem,  ROT0,   "Taito Corporation",         "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.3J 1996/02/07)", 0 )
-GAME( 1996, cleopatr, 0,        f3_224a, f3, taito_f3_state, cleopatr, ROT0,   "Taito Corporation",         "Cleopatra Fortune (Ver 2.1J 1996/09/05)", 0 )
-GAME( 1996, pbobble3, 0,        f3,      f3, taito_f3_state, pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1O 1996/09/27)", 0 )
-GAME( 1996, pbobble3u,pbobble3, f3,      f3, taito_f3_state, pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1A 1996/09/27)", 0 )
-GAME( 1996, pbobble3j,pbobble3, f3,      f3, taito_f3_state, pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1J 1996/09/27)", 0 )
-GAME( 1997, arkretrn, 0,        f3,      f3, taito_f3_state, arkretrn, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02O 1997/02/10)", 0 )
-GAME( 1997, arkretrnu,arkretrn, f3,      f3, taito_f3_state, arkretrn, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02A 1997/02/10)", 0 )
-GAME( 1997, arkretrnj,arkretrn, f3,      f3, taito_f3_state, arkretrn, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02J 1997/02/10)", 0 )
-GAME( 1997, kirameki, 0,        f3_224a, f3, taito_f3_state, kirameki, ROT0,   "Taito Corporation",         "Kirameki Star Road (Ver 2.10J 1997/08/29)", 0 )
-GAME( 1997, puchicar, 0,        f3,      f3, taito_f3_state, puchicar, ROT0,   "Taito Corporation",         "Puchi Carat (Ver 2.02O 1997/10/29)", 0 )
-GAME( 1997, puchicarj,puchicar, f3,      f3, taito_f3_state, puchicar, ROT0,   "Taito Corporation",         "Puchi Carat (Ver 2.02J 1997/10/29)", 0 )
-GAME( 1997, pbobble4, 0,        f3,      f3, taito_f3_state, pbobble4, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04O 1997/12/19)", 0 )
-GAME( 1997, pbobble4j,pbobble4, f3,      f3, taito_f3_state, pbobble4, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04J 1997/12/19)", 0 )
-GAME( 1997, pbobble4u,pbobble4, f3,      f3, taito_f3_state, pbobble4, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04A 1997/12/19)", 0 )
-GAME( 1997, popnpop,  0,        f3,      f3, taito_f3_state, popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07O 1998/02/09)", 0 )
-GAME( 1997, popnpopj, popnpop,  f3,      f3, taito_f3_state, popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07J 1998/02/09)", 0 )
-GAME( 1997, popnpopu, popnpop,  f3,      f3, taito_f3_state, popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07A 1998/02/09)", 0 )
-GAME( 1998, landmakr, 0,        f3,      f3, taito_f3_state, landmakr, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.01J 1998/06/01)", 0 )
-GAME( 1998, landmakrp,landmakr, f3,      f3, taito_f3_state, landmkrp, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.02O 1998/06/02, prototype)", 0 )
+GAME( 1994, recalh,   0,        f3_eeprom,f3,taito_f3_state, init_recalh,   ROT0,   "Taito Corporation",         "Recalhorn (Ver 1.42J 1994/5/11, prototype)", 0 )
+GAME( 1995, spcinv95, 0,        f3_224a, f3, taito_f3_state, init_spcinv95, ROT270, "Taito Corporation Japan",   "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5O 1995/06/14)", 0 )
+GAME( 1995, spcinv95u,spcinv95, f3_224a, f3, taito_f3_state, init_spcinv95, ROT270, "Taito America Corporation", "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5A 1995/06/14)", 0 )
+GAME( 1995, akkanvdr, spcinv95, f3_224a, f3, taito_f3_state, init_spcinv95, ROT270, "Taito Corporation",         "Akkanbeder (Ver 2.5J 1995/06/14)", 0 )
+GAME( 1995, twinqix,  0,        f3_224a, f3, taito_f3_state, init_twinqix,  ROT0,   "Taito America Corporation", "Twin Qix (Ver 1.0A 1995/01/17, prototype)", 0 )
+GAME( 1995, quizhuhu, 0,        f3,      f3, taito_f3_state, init_quizhuhu, ROT0,   "Taito Corporation",         "Moriguchi Hiroko no Quiz de Hyuu!Hyuu! (Ver 2.2J 1995/05/25)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // quiz text positioning, heavy sprite window usage
+GAME( 1995, pbobble2, 0,        f3,      f3, taito_f3_state, init_pbobbl2p, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.3O 1995/07/31)", 0 )
+GAME( 1995, pbobble2o,pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.2O 1995/07/20)", 0 )
+GAME( 1995, pbobble2j,pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito Corporation",         "Puzzle Bobble 2 (Ver 2.2J 1995/07/20)", 0 )
+GAME( 1995, pbobble2u,pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito America Corporation", "Bust-A-Move Again (Ver 2.3A 1995/07/31)", 0 )
+GAME( 1995, pbobble2x,pbobble2, f3,      f3, taito_f3_state, init_pbobbl2x, ROT0,   "Taito Corporation",         "Puzzle Bobble 2X (Ver 2.2J 1995/11/11)", 0 )
+GAME( 1995, gekiridn, 0,        f3,      f3, taito_f3_state, init_gekirido, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3O 1995/09/21)", 0 )
+GAME( 1995, gekiridnj,gekiridn, f3,      f3, taito_f3_state, init_gekirido, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3J 1995/09/21)", 0 )
+GAME( 1995, tcobra2,  0,        f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito Corporation Japan",   "Twin Cobra II (Ver 2.1O 1995/11/30)", 0 )
+GAME( 1995, tcobra2u, tcobra2,  f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito America Corporation", "Twin Cobra II (Ver 2.1A 1995/11/30)", 0 )
+GAME( 1995, ktiger2,  tcobra2,  f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito Corporation",         "Kyukyoku Tiger II (Ver 2.1J 1995/11/30)", 0 )
+GAME( 1995, bubblem,  0,        f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito Corporation Japan",   "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.4O 1996/02/15)", 0 )
+GAME( 1995, bubblemu, bubblem,  f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito America Corporation", "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.5A 1996/02/21)", 0 )
+GAME( 1995, bubblemj, bubblem,  f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito Corporation",         "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.3J 1996/02/07)", 0 )
+GAME( 1996, cleopatr, 0,        f3_224a, f3, taito_f3_state, init_cleopatr, ROT0,   "Taito Corporation",         "Cleopatra Fortune (Ver 2.1J 1996/09/05)", 0 )
+GAME( 1996, pbobble3, 0,        f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1O 1996/09/27)", 0 )
+GAME( 1996, pbobble3u,pbobble3, f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1A 1996/09/27)", 0 )
+GAME( 1996, pbobble3j,pbobble3, f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1J 1996/09/27)", 0 )
+GAME( 1997, arkretrn, 0,        f3,      f3, taito_f3_state, init_arkretrn, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02O 1997/02/10)", 0 )
+GAME( 1997, arkretrnu,arkretrn, f3,      f3, taito_f3_state, init_arkretrn, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02A 1997/02/10)", 0 )
+GAME( 1997, arkretrnj,arkretrn, f3,      f3, taito_f3_state, init_arkretrn, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02J 1997/02/10)", 0 )
+GAME( 1997, kirameki, 0,        f3_224a, f3, taito_f3_state, init_kirameki, ROT0,   "Taito Corporation",         "Kirameki Star Road (Ver 2.10J 1997/08/29)", 0 )
+GAME( 1997, puchicar, 0,        f3,      f3, taito_f3_state, init_puchicar, ROT0,   "Taito Corporation",         "Puchi Carat (Ver 2.02O 1997/10/29)", 0 )
+GAME( 1997, puchicarj,puchicar, f3,      f3, taito_f3_state, init_puchicar, ROT0,   "Taito Corporation",         "Puchi Carat (Ver 2.02J 1997/10/29)", 0 )
+GAME( 1997, pbobble4, 0,        f3,      f3, taito_f3_state, init_pbobble4, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04O 1997/12/19)", 0 )
+GAME( 1997, pbobble4j,pbobble4, f3,      f3, taito_f3_state, init_pbobble4, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04J 1997/12/19)", 0 )
+GAME( 1997, pbobble4u,pbobble4, f3,      f3, taito_f3_state, init_pbobble4, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04A 1997/12/19)", 0 )
+GAME( 1997, popnpop,  0,        f3,      f3, taito_f3_state, init_popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07O 1998/02/09)", 0 )
+GAME( 1997, popnpopj, popnpop,  f3,      f3, taito_f3_state, init_popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07J 1998/02/09)", 0 )
+GAME( 1997, popnpopu, popnpop,  f3,      f3, taito_f3_state, init_popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07A 1998/02/09)", 0 )
+GAME( 1998, landmakr, 0,        f3,      f3, taito_f3_state, init_landmakr, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.01J 1998/06/01)", 0 )
+GAME( 1998, landmakrp,landmakr, f3,      f3, taito_f3_state, init_landmkrp, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.02O 1998/06/02, prototype)", 0 )

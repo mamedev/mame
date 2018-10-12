@@ -29,6 +29,7 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -44,10 +45,12 @@ public:
 		m_ymz(*this, "ymz")
 	{ }
 
+	void kzaurus(machine_config &config);
+
+private:
 	uint32_t screen_update_konmedal68k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cliprect, int pen_idx, int mode);
 
-	void kzaurus(machine_config &config);
 
 	K056832_CB_MEMBER(tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -79,14 +82,13 @@ public:
 	}
 
 	void kzaurus_main(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	static constexpr int NUM_LAYERS = 4;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<k055555_device> m_k055555;
@@ -188,24 +190,25 @@ uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bit
 	return 0;
 }
 
-ADDRESS_MAP_START(konmedal68k_state::kzaurus_main)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x400000, 0x403fff) AM_RAM
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(control_w)
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW")
-	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("IN1")
-	AM_RANGE(0x800008, 0x800009) AM_READ_PORT("IN0")
-	AM_RANGE(0x810000, 0x810001) AM_WRITE(control2_w)
-	AM_RANGE(0x830000, 0x83003f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
-	AM_RANGE(0x840000, 0x84000f) AM_DEVWRITE("k056832", k056832_device, b_word_w)
-	AM_RANGE(0x85001c, 0x85001f) AM_WRITENOP
-	AM_RANGE(0x870000, 0x87005f) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
-	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
-	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0xa02000, 0xa03fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0xb00000, 0xb01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xc00000, 0xc01fff) AM_READ(vrom_r)
-ADDRESS_MAP_END
+void konmedal68k_state::kzaurus_main(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x400000, 0x403fff).ram();
+	map(0x800000, 0x800001).w(FUNC(konmedal68k_state::control_w));
+	map(0x800004, 0x800005).portr("DSW");
+	map(0x800006, 0x800007).portr("IN1");
+	map(0x800008, 0x800009).portr("IN0");
+	map(0x810000, 0x810001).w(FUNC(konmedal68k_state::control2_w));
+	map(0x830000, 0x83003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
+	map(0x840000, 0x84000f).w(m_k056832, FUNC(k056832_device::b_word_w));
+	map(0x85001c, 0x85001f).nopw();
+	map(0x870000, 0x87005f).w(m_k055555, FUNC(k055555_device::K055555_word_w));
+	map(0x880000, 0x880003).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
+	map(0xa00000, 0xa01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xa02000, 0xa03fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xb00000, 0xb01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_r));
+}
 
 static INPUT_PORTS_START( kzaurus )
 	PORT_START("IN0")
@@ -293,8 +296,8 @@ void konmedal68k_state::machine_reset()
 
 MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(33'868'800)/4 )    // 33.8688 MHz crystal verified on PCB
-	MCFG_CPU_PROGRAM_MAP(kzaurus_main)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(33'868'800)/4 )    // 33.8688 MHz crystal verified on PCB
+	MCFG_DEVICE_PROGRAM_MAP(kzaurus_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal68k_state, scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -312,13 +315,14 @@ MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(konmedal68k_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'868'800)/2) // 33.8688 MHz xtal verified on PCB
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -337,4 +341,4 @@ ROM_START( kzaurus )
 	ROM_LOAD( "540-a01-2f.bin", 0x000000, 0x080000, CRC(391c6ee6) SHA1(a345934687a8abf818350d0597843a1159395fc0) )
 ROM_END
 
-GAME( 1995, kzaurus,    0, kzaurus, kzaurus,  konmedal68k_state, 0, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, kzaurus, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

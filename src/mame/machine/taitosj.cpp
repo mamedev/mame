@@ -34,9 +34,6 @@ void taitosj_state::machine_reset()
 	/* never write to the bank selector register) */
 	taitosj_bankswitch_w(space, 0, 0);
 
-	if (m_mcu)
-		m_mcu->reset_w(PULSE_LINE);
-
 	m_spacecr_prot_value = 0;
 }
 
@@ -124,7 +121,7 @@ WRITE_LINE_MEMBER(taitosj_state::mcu_busrq_w)
 
 READ8_MEMBER(taitosj_state::spacecr_prot_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if( pc != 0x368A && pc != 0x36A6 )
 		logerror("Read protection from an unknown location: %04X\n",pc);

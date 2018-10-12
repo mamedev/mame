@@ -44,6 +44,6 @@ private:
 DECLARE_DEVICE_TYPE(FUUKI_VIDEO, fuukivid_device)
 
 #define MCFG_FUUKI_VIDEO_GFXDECODE(_gfxtag) \
-	downcast<fuukivid_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<fuukivid_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_FUUKIFH_H

@@ -17,13 +17,13 @@ pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type 
 	device_gfx_interface(mconfig, *this, nullptr, "palette"),
 	m_maincpu(*this, ":maincpu"),
 	m_mcu(*this, "graphics"),
-	m_crtc(*this, "crtc"),
 	m_pic2(*this, ":pic2")
 {
 }
 
 pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pcdx_video_device(mconfig, PCD_VIDEO, tag, owner, clock),
+	m_crtc(*this, "crtc"),
 	m_mouse_btn(*this, "MOUSE"),
 	m_mouse_x(*this, "MOUSEX"),
 	m_mouse_y(*this, "MOUSEY"),
@@ -35,7 +35,7 @@ pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *ta
 pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pcdx_video_device(mconfig, PCX_VIDEO, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
-	m_vram(4*1024),
+	m_crtc(*this, "crtc"),
 	m_charrom(*this, "char"),
 	m_txd_handler(*this)
 {
@@ -78,7 +78,7 @@ static const gfx_layout pcd_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( pcx )
+static GFXDECODE_START( gfx_pcx )
 	GFXDECODE_DEVICE( "char", 0x0000, pcd_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -100,67 +100,74 @@ ioport_constructor pcd_video_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
-	MCFG_CPU_ADD("graphics", I8741, XTAL(16'000'000)/2)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcd_video_device, p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcd_video_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pcd_video_device, t1_r))
+	MCFG_DEVICE_ADD("graphics", I8741, 16_MHz_XTAL / 2)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, pcd_video_device, p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pcd_video_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pcd_video_device, t1_r))
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(640, 350)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 349)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(16_MHz_XTAL, 832, 0, 640, 381, 0, 350);
+	screen.set_screen_update("crtc", FUNC(scn2674_device::screen_update));
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(pcdx_video_device, pcdx)
 
-	MCFG_DEVICE_ADD("crtc", SCN2674, 0)
-	MCFG_SCN2674_CHARACTER_WIDTH(16)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcd_video_device, display_pixels)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SCN2674(config, m_crtc, 16_MHz_XTAL / 16);
+	m_crtc->set_character_width(16);
+	m_crtc->set_display_callback(FUNC(pcd_video_device::display_pixels));
+	m_crtc->set_screen("screen");
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pcd_video_device, mouse_timer, attotime::from_hz(15000)) // guess
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(pcx_video_device::pcx_vid_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("graphics", 0)
-ADDRESS_MAP_END
+void pcx_video_device::pcx_vid_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().region("graphics", 0);
+}
 
-ADDRESS_MAP_START(pcx_video_device::pcx_vid_io)
-	AM_RANGE(0x8000, 0x8007) AM_DEVREADWRITE("crtc", scn2674_device, read, write)
-	AM_RANGE(0x8008, 0x8008) AM_READ(unk_r)
-	AM_RANGE(0xa000, 0xa001) AM_READWRITE(vram_latch_r, vram_latch_w)
-	AM_RANGE(0xa002, 0xa003) AM_READWRITE(term_mcu_r, term_mcu_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void pcx_video_device::pcx_vid_io(address_map &map)
+{
+	map(0x8000, 0x8007).rw(m_crtc, FUNC(scn2672_device::read), FUNC(scn2672_device::write));
+	map(0x8008, 0x8008).r(FUNC(pcx_video_device::unk_r));
+	map(0xa000, 0xa000).rw(m_crtc, FUNC(scn2672_device::buffer_r), FUNC(scn2672_device::buffer_w));
+	map(0xa001, 0xa001).rw(m_crtc, FUNC(scn2672_device::attr_buffer_r), FUNC(scn2672_device::attr_buffer_w));
+	map(0xa002, 0xa003).rw(FUNC(pcx_video_device::term_mcu_r), FUNC(pcx_video_device::term_mcu_w));
+	map(0xc000, 0xc7ff).ram();
+}
 
-ADDRESS_MAP_START(pcx_video_device::pcx_vram)
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void pcx_video_device::pcx_char_ram(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+}
+
+void pcx_video_device::pcx_attr_ram(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+}
 
 MACHINE_CONFIG_START(pcx_video_device::device_add_mconfig)
-	MCFG_CPU_ADD("graphics", I8031, XTAL(24'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(pcx_vid_map)
-	MCFG_CPU_IO_MAP(pcx_vid_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(pcx_video_device, p1_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(pcx_video_device, tx_callback))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(pcx_video_device, rx_callback))
+	MCFG_DEVICE_ADD("graphics", I8031, 24_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pcx_vid_map)
+	MCFG_DEVICE_IO_MAP(pcx_vid_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, pcx_video_device, p1_w))
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, pcx_video_device, tx_callback))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, pcx_video_device, rx_callback))
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(640, 350)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 349)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(24_MHz_XTAL, 1272, 0, 960, 381, 0, 350);
+	screen.set_screen_update("crtc", FUNC(scn2672_device::screen_update));
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("crtc", SCN2674, 0)
-	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("graphics", MCS51_INT0_LINE))
-	MCFG_SCN2674_CHARACTER_WIDTH(16)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcx_video_device, display_pixels)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_DEVICE_ADDRESS_MAP(0, pcx_vram)
+	SCN2672(config, m_crtc, 24_MHz_XTAL / 12); // used with SCB2673B
+	m_crtc->intr_callback().set_inputline("graphics", MCS51_INT0_LINE);
+	m_crtc->set_character_width(12);
+	m_crtc->set_display_callback(FUNC(pcx_video_device::display_pixels));
+	m_crtc->set_screen("screen");
+	m_crtc->set_addrmap(0, &pcx_video_device::pcx_char_ram);
+	m_crtc->set_addrmap(1, &pcx_video_device::pcx_attr_ram);
 MACHINE_CONFIG_END
 
 
@@ -208,21 +215,27 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 	}
 }
 
-SCN2674_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
+SCN2672_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 {
-	uint8_t data;
-	address <<= 1;
-	data = m_charrom[m_vram[address] * 16 + linecount + (m_vram[address + 1] & 0x20 ? 4096 : 0)];
-	if(cursor && blink)
-		data = 0xff;
-	if(m_p1 & 0x20)
-		data = ~data;
-	for(int i = 0; i < 8; i++)
+	uint16_t data = m_charrom[charcode * 16 + linecount + (attrcode & 0x20 ? 4096 : 0)];
+
+	if (cursor && blink)
+		data = 0x3ff;
+	else
 	{
-		rgb_t pix = palette().pen(BIT(data, 7) ? 1 : 0);
-		bitmap.pix32(y, x++) = pix;
-		bitmap.pix32(y, x++) = pix;
 		data <<= 1;
+		data |= data << 1;
+	}
+
+	if (m_p1 & 0x20)
+		data ^= 0x3ff;
+
+	for (int i = 0; i < 12; i++)
+	{
+		rgb_t pix = palette().pen(BIT(data, 10) ? 1 : 0);
+		bitmap.pix32(y, x++) = pix;
+		if (i != 1)
+			data <<= 1;
 	}
 }
 
@@ -364,31 +377,6 @@ WRITE8_MEMBER(pcx_video_device::term_mcu_w)
 	}
 }
 
-WRITE8_MEMBER(pcx_video_device::vram_w)
-{
-	offset <<= 1;
-	m_vram[offset] = m_vram_latch_w[0];
-	m_vram[offset+1] = m_vram_latch_w[1];
-}
-
-READ8_MEMBER(pcx_video_device::vram_r)
-{
-	offset <<= 1;
-	m_vram_latch_r[0] = m_vram[offset];
-	m_vram_latch_r[1] = m_vram[offset+1];
-	return m_vram[offset];
-}
-
-WRITE8_MEMBER(pcx_video_device::vram_latch_w)
-{
-	m_vram_latch_w[offset] = data;
-}
-
-READ8_MEMBER(pcx_video_device::vram_latch_r)
-{
-	return m_vram_latch_r[offset];
-}
-
 READ8_MEMBER(pcdx_video_device::detect_r)
 {
 	return 0;
@@ -426,12 +414,13 @@ void pcd_video_device::device_reset()
 	m_t1 = CLEAR_LINE;
 }
 
-ADDRESS_MAP_START(pcd_video_device::map)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE8("crtc", scn2674_device, write, 0x00ff)
-	AM_RANGE(0x00, 0x0f) AM_DEVREAD8("crtc", scn2674_device, read, 0xff00)
-	AM_RANGE(0x20, 0x21) AM_WRITE8(vram_sw_w, 0x00ff)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE8("graphics", i8741_device, upi41_master_r, upi41_master_w, 0x00ff)
-ADDRESS_MAP_END
+void pcd_video_device::map(address_map &map)
+{
+	map(0x00, 0x0f).w(m_crtc, FUNC(scn2674_device::write)).umask16(0x00ff);
+	map(0x00, 0x0f).r(m_crtc, FUNC(scn2674_device::read)).umask16(0xff00);
+	map(0x20, 0x20).w(FUNC(pcd_video_device::vram_sw_w));
+	map(0x30, 0x33).rw("graphics", FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w)).umask16(0x00ff);
+}
 
 void pcx_video_device::device_start()
 {
@@ -441,7 +430,7 @@ void pcx_video_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(600*2);  // FIXME: fix the keyboard when the mc2661 baud rate calc is fixed
 
-	decode_gfx(GFXDECODE_NAME(pcx));
+	decode_gfx(gfx_pcx);
 }
 
 void pcx_video_device::device_reset()
@@ -454,9 +443,10 @@ void pcx_video_device::device_reset()
 	m_txd_handler(1);
 }
 
-ADDRESS_MAP_START(pcx_video_device::map)
-	AM_RANGE(0x0, 0xf) AM_READWRITE8(term_r, term_w, 0xffff)
-ADDRESS_MAP_END
+void pcx_video_device::map(address_map &map)
+{
+	map(0x0, 0xf).rw(FUNC(pcx_video_device::term_r), FUNC(pcx_video_device::term_w));
+}
 
 READ8_MEMBER(pcx_video_device::rx_callback)
 {

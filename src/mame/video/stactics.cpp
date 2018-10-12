@@ -307,23 +307,22 @@ template <unsigned N> void stactics_state::set_indicator_leds(unsigned offset, o
 WRITE_LINE_MEMBER(stactics_state::barrier_lamp_w)
 {
 	// this needs to flash on/off, not implemented
-	machine().output().set_value("barrier_lamp", state);
+	m_barrier_lamp = state;
 }
 
 
 WRITE_LINE_MEMBER(stactics_state::start_lamp_w)
 {
-	machine().output().set_value("start_lamp", state);
+	m_start_lamp = state;
 }
 
 
 void stactics_state::update_artwork()
 {
-	int i;
 	uint8_t *beam_region = memregion("user1")->base();
 
 	/* laser beam - loop for each LED */
-	for (i = 0; i < 0x40; i++)
+	for (int i = 0; i < 0x40; i++)
 	{
 		offs_t const beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | m_beam_state;
 		uint8_t const beam_data = beam_region[beam_data_offs];
@@ -334,10 +333,10 @@ void stactics_state::update_artwork()
 	}
 
 	/* sight LED */
-	output().set_value("sight_led", m_motor_on);
+	m_sight_led = m_motor_on;
 
 	/* score display */
-	for (i = 0x01; i < 0x07; i++)
+	for (int i = 0x01; i < 0x07; i++)
 		m_score_digits[i - 1] = to_7seg[~m_display_buffer[i] & 0x0f];
 
 	/* credits indicator */
@@ -373,6 +372,9 @@ void stactics_state::video_start()
 	m_credit_leds.resolve();
 	m_barrier_leds.resolve();
 	m_round_leds.resolve();
+	m_barrier_lamp.resolve();
+	m_start_lamp.resolve();
+	m_sight_led.resolve();
 
 	m_y_scroll_d = 0;
 	m_y_scroll_e = 0;

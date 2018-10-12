@@ -257,6 +257,7 @@ Logic:
 
 #include "emu.h"
 #include "includes/metalmx.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -331,8 +332,8 @@ WRITE32_MEMBER(metalmx_state::reset_w)
 	if (ACCESSING_BITS_16_31)
 	{
 		data >>= 16;
-		m_dsp32c_1->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
-		m_dsp32c_2->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+		m_dsp32c[0]->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+		m_dsp32c[1]->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -373,7 +374,8 @@ WRITE8_MEMBER(metalmx_state::cage_irq_callback)
  *
  *************************************/
 
-WRITE32_MEMBER(metalmx_state::dsp32c_1_w)
+template<int Chip>
+WRITE32_MEMBER(metalmx_state::dsp32c_w)
 {
 	offset <<= 1;
 
@@ -382,10 +384,11 @@ WRITE32_MEMBER(metalmx_state::dsp32c_1_w)
 	else if (ACCESSING_BITS_16_31)
 		data >>= 16;
 
-	m_dsp32c_1->pio_w(offset, data);
+	m_dsp32c[Chip]->pio_w(offset, data);
 }
 
-READ32_MEMBER(metalmx_state::dsp32c_1_r)
+template<int Chip>
+READ32_MEMBER(metalmx_state::dsp32c_r)
 {
 	uint32_t data;
 
@@ -394,36 +397,7 @@ READ32_MEMBER(metalmx_state::dsp32c_1_r)
 	if (ACCESSING_BITS_0_15)
 		offset += 1;
 
-	data = m_dsp32c_1->pio_r(offset);
-
-	if (ACCESSING_BITS_16_31)
-		data <<= 16;
-
-	return data;
-}
-
-WRITE32_MEMBER(metalmx_state::dsp32c_2_w)
-{
-	offset <<= 1;
-
-	if (ACCESSING_BITS_0_15)
-		offset += 1;
-	else if (ACCESSING_BITS_16_31)
-		data >>= 16;
-
-	m_dsp32c_2->pio_w(offset, data);
-}
-
-READ32_MEMBER(metalmx_state::dsp32c_2_r)
-{
-	uint32_t data;
-
-	offset <<= 1;
-
-	if (ACCESSING_BITS_0_15)
-		offset += 1;
-
-	data = m_dsp32c_2->pio_r(offset);
+	data = m_dsp32c[Chip]->pio_r(offset);
 
 	if (ACCESSING_BITS_16_31)
 		data <<= 16;
@@ -505,30 +479,31 @@ WRITE32_MEMBER(metalmx_state::timer_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(metalmx_state::main_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x4000ff) AM_READWRITE(host_gsp_r, host_gsp_w)
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(host_dram_r, host_dram_w)
-	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(host_vram_r, host_vram_w)
-	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(dsp32c_2_r, dsp32c_2_w)
-	AM_RANGE(0x800020, 0x85ffff) AM_NOP         /* Unknown */
-	AM_RANGE(0x880000, 0x88001f) AM_READWRITE(dsp32c_1_r, dsp32c_1_w)
-	AM_RANGE(0x980000, 0x9800ff) AM_WRITE(reset_w)
-	AM_RANGE(0xb40000, 0xb40003) AM_READWRITE(sound_data_r, sound_data_w)
-	AM_RANGE(0xf00000, 0xf00003) AM_RAM         /* Network message port */
-	AM_RANGE(0xf02000, 0xf02003) AM_READWRITE(watchdog_r, shifter_w)
-	AM_RANGE(0xf03000, 0xf03003) AM_READ_PORT("P1") AM_WRITE(motor_w)
-	AM_RANGE(0xf04000, 0xf04003) AM_READ_PORT("P2")
-	AM_RANGE(0xf05000, 0xf05fff) AM_WRITENOP    /* Lamps */ // f06000 = ADC  // f01xxx = ADC
-	AM_RANGE(0xf19000, 0xf19003) AM_WRITENOP    /* Network */
-	AM_RANGE(0xf1a000, 0xf1a003) AM_WRITENOP
-	AM_RANGE(0xf1b000, 0xf1b003) AM_WRITENOP
-	AM_RANGE(0xf1e000, 0xf1e003) AM_RAM         /* Network status flags : 1000 = LIRQ  4000 = SFLAG  8000 = 68FLAG */
-	AM_RANGE(0xf20000, 0xf2ffff) AM_WRITE(timer_w)
-	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM         /* Zero power RAM */
-	AM_RANGE(0xfd0000, 0xffffff) AM_RAM         /* Scratch RAM */
-ADDRESS_MAP_END
+void metalmx_state::main_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x3fffff).rom();
+	map(0x400000, 0x4000ff).rw(FUNC(metalmx_state::host_gsp_r), FUNC(metalmx_state::host_gsp_w));
+	map(0x600000, 0x6fffff).rw(FUNC(metalmx_state::host_dram_r), FUNC(metalmx_state::host_dram_w));
+	map(0x700000, 0x7fffff).rw(FUNC(metalmx_state::host_vram_r), FUNC(metalmx_state::host_vram_w));
+	map(0x800000, 0x80001f).rw(FUNC(metalmx_state::dsp32c_r<1>), FUNC(metalmx_state::dsp32c_w<1>));
+	map(0x800020, 0x85ffff).noprw();         /* Unknown */
+	map(0x880000, 0x88001f).rw(FUNC(metalmx_state::dsp32c_r<0>), FUNC(metalmx_state::dsp32c_w<0>));
+	map(0x980000, 0x9800ff).w(FUNC(metalmx_state::reset_w));
+	map(0xb40000, 0xb40003).rw(FUNC(metalmx_state::sound_data_r), FUNC(metalmx_state::sound_data_w));
+	map(0xf00000, 0xf00003).ram();         /* Network message port */
+	map(0xf02000, 0xf02003).rw(FUNC(metalmx_state::watchdog_r), FUNC(metalmx_state::shifter_w));
+	map(0xf03000, 0xf03003).portr("P1").w(FUNC(metalmx_state::motor_w));
+	map(0xf04000, 0xf04003).portr("P2");
+	map(0xf05000, 0xf05fff).nopw();    /* Lamps */ // f06000 = ADC  // f01xxx = ADC
+	map(0xf19000, 0xf19003).nopw();    /* Network */
+	map(0xf1a000, 0xf1a003).nopw();
+	map(0xf1b000, 0xf1b003).nopw();
+	map(0xf1e000, 0xf1e003).ram();         /* Network status flags : 1000 = LIRQ  4000 = SFLAG  8000 = 68FLAG */
+	map(0xf20000, 0xf2ffff).w(FUNC(metalmx_state::timer_w));
+	map(0xfc0000, 0xfc1fff).ram();         /* Zero power RAM */
+	map(0xfd0000, 0xffffff).ram();         /* Scratch RAM */
+}
 
 
 /*************************************
@@ -537,15 +512,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(metalmx_state::adsp_program_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("adsp_intprog")
-ADDRESS_MAP_END
+void metalmx_state::adsp_program_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("adsp_intprog");
+}
 
-ADDRESS_MAP_START(metalmx_state::adsp_data_map)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x2000, 0x2007) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_RAM // TODO: CPU control registers
-ADDRESS_MAP_END
+void metalmx_state::adsp_data_map(address_map &map)
+{
+	map(0x3800, 0x39ff).ram();
+	map(0x2000, 0x2007).ram();
+	map(0x3fe0, 0x3fff).ram(); // TODO: CPU control registers
+}
 
 
 /*************************************
@@ -554,13 +531,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(metalmx_state::gsp_map)
-	AM_RANGE(0x88800000, 0x8880000f) AM_RAM /* ? */
-	AM_RANGE(0x88c00000, 0x88c0000f) AM_RAM /* ? */
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_DEVREADWRITE("gsp", tms34020_device, io_register_r, io_register_w)
-	AM_RANGE(0xff000000, 0xff7fffff) AM_RAM AM_SHARE("gsp_dram")
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_SHARE("gsp_vram")
-ADDRESS_MAP_END
+void metalmx_state::gsp_map(address_map &map)
+{
+	map(0x88800000, 0x8880000f).ram(); /* ? */
+	map(0x88c00000, 0x88c0000f).ram(); /* ? */
+	map(0xc0000000, 0xc00003ff).rw(m_gsp, FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w));
+	map(0xff000000, 0xff7fffff).ram().share("gsp_dram");
+	map(0xff800000, 0xffffffff).ram().share("gsp_vram");
+}
 
 
 /*************************************
@@ -569,16 +547,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(metalmx_state::dsp32c_1_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM
-	AM_RANGE(0x700000, 0x700003) AM_WRITENOP    /* LEDs? */
-	AM_RANGE(0xa00000, 0xa00003) AM_READ(unk_r)
-	AM_RANGE(0xb00000, 0xb00003) AM_READ(unk_r)
-	AM_RANGE(0xc00000, 0xc00003) AM_RAM         /* FIFO? */
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM         /* 3D registers */
-ADDRESS_MAP_END
+void metalmx_state::dsp32c_1_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).ram();
+	map(0x600000, 0x67ffff).ram();
+	map(0x700000, 0x700003).nopw();    /* LEDs? */
+	map(0xa00000, 0xa00003).r(FUNC(metalmx_state::unk_r));
+	map(0xb00000, 0xb00003).r(FUNC(metalmx_state::unk_r));
+	map(0xc00000, 0xc00003).ram();         /* FIFO? */
+	map(0xf00000, 0xffffff).ram();         /* 3D registers */
+}
 
 /*************************************
  *
@@ -586,16 +565,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(metalmx_state::dsp32c_2_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM
-	AM_RANGE(0x700000, 0x700003) AM_WRITENOP    /* LEDs? */
-	AM_RANGE(0xa00000, 0xa00003) AM_READ(unk_r)
-	AM_RANGE(0xb00000, 0xb00003) AM_READ(unk_r)
-	AM_RANGE(0xc00000, 0xc00003) AM_RAM         /* FIFO? */
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM         /* 3D registers */
-ADDRESS_MAP_END
+void metalmx_state::dsp32c_2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).ram();
+	map(0x600000, 0x67ffff).ram();
+	map(0x700000, 0x700003).nopw();    /* LEDs? */
+	map(0xa00000, 0xa00003).r(FUNC(metalmx_state::unk_r));
+	map(0xb00000, 0xb00003).r(FUNC(metalmx_state::unk_r));
+	map(0xc00000, 0xc00003).ram();         /* FIFO? */
+	map(0xf00000, 0xffffff).ram();         /* 3D registers */
+}
 
 
 /*************************************
@@ -687,26 +667,25 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(metalmx_state::metalmx)
 
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(14'318'181))
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(14'318'181))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("adsp", ADSP2105, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2105, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 
-	MCFG_CPU_ADD("gsp", TMS34020, 40000000)         /* Unverified */
-	MCFG_CPU_PROGRAM_MAP(gsp_map)
+	MCFG_DEVICE_ADD("gsp", TMS34020, 40000000)         /* Unverified */
+	MCFG_DEVICE_PROGRAM_MAP(gsp_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_OUTPUT_INT_CB(INPUTLINE("maincpu", 4))
 
-	MCFG_CPU_ADD("dsp32c_1", DSP32C, 40000000)      /* Unverified */
-	MCFG_CPU_PROGRAM_MAP(dsp32c_1_map)
+	MCFG_DEVICE_ADD("dsp32c_1", DSP32C, 40000000)      /* Unverified */
+	MCFG_DEVICE_PROGRAM_MAP(dsp32c_1_map)
 
-	MCFG_CPU_ADD("dsp32c_2", DSP32C, 40000000)      /* Unverified */
-	MCFG_CPU_PROGRAM_MAP(dsp32c_2_map)
-
+	MCFG_DEVICE_ADD("dsp32c_2", DSP32C, 40000000)      /* Unverified */
+	MCFG_DEVICE_PROGRAM_MAP(dsp32c_2_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -720,11 +699,11 @@ MACHINE_CONFIG_START(metalmx_state::metalmx)
 
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0) // TODO: speedup address
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(metalmx_state,cage_irq_callback))
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, metalmx_state,cage_irq_callback))
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(metalmx_state,metalmx)
+void metalmx_state::init_metalmx()
 {
 	uint8_t *adsp_boot = (uint8_t*)memregion("adsp")->base();
 
@@ -733,8 +712,8 @@ DRIVER_INIT_MEMBER(metalmx_state,metalmx)
 
 void metalmx_state::machine_reset()
 {
-	m_dsp32c_1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_dsp32c_2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp32c[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp32c[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -769,7 +748,7 @@ ROM_START( metalmx )
 /* ------------------------------------------------
     ROMCH31 A053443 (there are 2 of these boards)
 -------------------------------------------------*/
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )
 	ROM_LOAD32_BYTE( "bootmetl.r34", 0x00000, 0x80000, CRC(ec799644) SHA1(32c77abb70fee1da8e3d7141bce2032e73e0eb35) )
 
 	ROM_REGION32_LE( 0x80000, "cage", 0 )
@@ -855,4 +834,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, metalmx, 0, metalmx, metalmx, metalmx_state, metalmx, ROT0, "Atari Games", "Metal Maniax (prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, metalmx, 0, metalmx, metalmx, metalmx_state, init_metalmx, ROT0, "Atari Games", "Metal Maniax (prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

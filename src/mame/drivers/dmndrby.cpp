@@ -57,6 +57,7 @@ DD10 DD14  DD18     H5            DD21
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -76,6 +77,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void dderby(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_scroll_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_dderby_vidchars;
@@ -98,7 +102,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void dderby(machine_config &config);
 	void dderby_sound_map(address_map &map);
 	void memmap(address_map &map);
 };
@@ -145,31 +148,33 @@ WRITE8_MEMBER(dmndrby_state::output_w)
 //  popmessage("%02x|%02x|%02x|%02x|%02x|%02x|%02x|%02x|",m_io_port[0],m_io_port[1],m_io_port[2],m_io_port[3],m_io_port[4],m_io_port[5],m_io_port[6],m_io_port[7]);
 }
 
-ADDRESS_MAP_START(dmndrby_state::memmap)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xc007) AM_READ(input_r)
-	AM_RANGE(0xc000, 0xc007) AM_WRITE(output_w)
-	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("DSW2")
-	AM_RANGE(0xca00, 0xca00) AM_WRITENOP//(vblank_irq_w) //???
-	AM_RANGE(0xca01, 0xca01) AM_WRITENOP //watchdog
-	AM_RANGE(0xca02, 0xca02) AM_RAM_WRITE(dderby_sound_w)
-	AM_RANGE(0xca03, 0xca03) AM_WRITENOP//(timer_irq_w) //???
-	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_SHARE("scroll_ram")
-	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_SHARE("sprite_ram") // horse sprites
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("vidchars") // char ram
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("vidattribs") // colours/ attrib ram
-ADDRESS_MAP_END
+void dmndrby_state::memmap(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x8000, 0x8fff).ram().share("nvram");
+	map(0xc000, 0xc007).r(FUNC(dmndrby_state::input_r));
+	map(0xc000, 0xc007).w(FUNC(dmndrby_state::output_w));
+	map(0xc802, 0xc802).portr("DSW1");
+	map(0xc803, 0xc803).portr("DSW2");
+	map(0xca00, 0xca00).nopw();//(vblank_irq_w) //???
+	map(0xca01, 0xca01).nopw(); //watchdog
+	map(0xca02, 0xca02).ram().w(FUNC(dmndrby_state::dderby_sound_w));
+	map(0xca03, 0xca03).nopw();//(timer_irq_w) //???
+	map(0xcc00, 0xcc05).ram().share("scroll_ram");
+	map(0xce08, 0xce1f).ram().share("sprite_ram"); // horse sprites
+	map(0xd000, 0xd3ff).ram().share("vidchars"); // char ram
+	map(0xd400, 0xd7ff).ram().share("vidattribs"); // colours/ attrib ram
+}
 
-ADDRESS_MAP_START(dmndrby_state::dderby_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x1000) AM_RAM //???
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x4001, 0x4001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-ADDRESS_MAP_END
+void dmndrby_state::dderby_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x1000).ram(); //???
+	map(0x4000, 0x4001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x4001, 0x4001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x6000, 0x67ff).ram();
+}
 
 static INPUT_PORTS_START( dderby )
 	PORT_START("IN0")
@@ -335,7 +340,7 @@ static const gfx_layout tiles8x8_layout2 =
 	8*8,
 };
 
-static GFXDECODE_START( dmndrby )
+static GFXDECODE_START( gfx_dmndrby )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 32*16, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0, 8)
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 16*16, 32 )
@@ -528,16 +533,16 @@ INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 
 MACHINE_CONFIG_START(dmndrby_state::dderby)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dmndrby_state,  dderby_irq)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dmndrby_state, dderby_timer_irq,  244/2)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dmndrby_state,  dderby_irq)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(dmndrby_state, dderby_timer_irq,  244/2)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
-	MCFG_CPU_PROGRAM_MAP(dderby_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
+	MCFG_DEVICE_PROGRAM_MAP(dderby_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -548,16 +553,16 @@ MACHINE_CONFIG_START(dmndrby_state::dderby)
 	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dmndrby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dmndrby)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
 	MCFG_PALETTE_INIT_OWNER(dmndrby_state, dmndrby)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1789750) // frequency guessed
+	MCFG_DEVICE_ADD("ay1", AY8910, 1789750) // frequency guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
@@ -661,6 +666,6 @@ ROM_START( dmndrbya )
 ROM_END
 
 
-//    YEAR, NAME,     PARENT,  MACHINE, INPUT,   STATE,         INIT, MONITOR, COMPANY,       FULLNAME                    FLAGS
-GAME( 1994, dmndrby,  0,       dderby,  dderby,  dmndrby_state, 0,    ROT0,    "Electrocoin", "Diamond Derby (Newer)",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING ) // hack?
-GAME( 1986, dmndrbya, dmndrby, dderby,  dderbya, dmndrby_state, 0,    ROT0,    "Electrocoin", "Diamond Derby (Original)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING )
+//    YEAR, NAME,     PARENT,  MACHINE, INPUT,   STATE,         INIT,       MONITOR, COMPANY,       FULLNAME                    FLAGS
+GAME( 1994, dmndrby,  0,       dderby,  dderby,  dmndrby_state, empty_init, ROT0,    "Electrocoin", "Diamond Derby (Newer)",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING ) // hack?
+GAME( 1986, dmndrbya, dmndrby, dderby,  dderbya, dmndrby_state, empty_init, ROT0,    "Electrocoin", "Diamond Derby (Original)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING )

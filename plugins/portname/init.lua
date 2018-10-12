@@ -1,9 +1,22 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Carl
--- use plugin options to save the input port list to a gettext formatted file
--- the file is saved in the ctrlrpath dir
--- use #import <filename.po> to load names from a different file
--- use #set <set1>,<set2>,... to override names for a child set, common names should be listed at the top before any #set tags
+-- data files are json files named <romname>.json
+-- {
+--   "import":"<import filename>"
+--   "ports":{
+--     "<ioport name>":{
+--       "labels":{
+--         "<field mask>":{
+--           "player":<int player number>,
+--           "name":"<field label>"
+--         }
+--     },{
+--       ...
+--     }
+--   }
+-- }
+-- any additional metadata can be included for other usage
+-- and will be ignored
 local exports = {}
 exports.name = "portname"
 exports.version = "0.0.1"
@@ -14,75 +27,76 @@ exports.author = { name = "Carl" }
 local portname = exports
 
 function portname.startplugin()
+	local json = require("json")
 	local ctrlrpath = lfs.env_replace(manager:options().entries.ctrlrpath:value():match("([^;]+)"))
 	local function get_filename(nosoft)
 		local filename
 		if emu.softname() ~= "" and not nosoft then
-			filename = emu.romname() .. "_" .. emu.softname() .. ".po"
+			local soft = emu.softname():match("([^:]*)$")
+			filename = emu.romname() .. "_" .. soft .. ".json"
 		else
-			filename = emu.romname() .. ".po"
+			filename = emu.romname() .. ".json"
 		end
 		return filename
 	end
 
-	emu.register_start(function()
-		local reclevel = 0
-		local function parse_names(names)
-			local orig, rep
-			local setfound = true
-			reclevel = reclevel + 1
-			if reclevel == 3 then
-				emu.print_verbose("portname: too many import levels\n")
-				return
+	local function parse_names(ctable, depth)
+		if depth >= 5 then
+			emu.print_error("portname: max import depth exceeded\n")
+			return
+		end
+		if ctable.import then
+			local file = emu.file(ctrlrpath .. "/portname", "r")
+			local ret = file:open(ctable.import)
+			if not ret then
+				parse_names(json.parse(file:read(file:size())), depth + 1)
 			end
-			names:gsub("[^\n\r]*", function (line)
-				if line:find("^#import") then
-					local impfile = emu.file(ctrlrpath .. "/portname", "r")
-					local ret = impfile:open(line:match("^#import (.*)"))
-					if ret then
-						emu.print_verbose("portname: import file not found\n")
-					else
-						parse_names(impfile:read(impfile:size()))
-					end
-				elseif line:find("^#set") then
-					local sets = line:match("^#set (.*)")
-					setfound = false
-					for s in sets:gmatch("[^,]*") do
-						if s == emu.romname() then
-							setfound = true
-							break
-						end
-					end
-				elseif line:find("^msgid") then
-					orig = line:match("^msgid \"(.+)\"")
-				elseif line:find("^msgstr") then
-					rep = line:match("^msgstr \"(.+)\"")
-					if rep and rep ~= "" and setfound then
-						rep = rep:gsub("\\(.)", "%1")
-						orig = orig:gsub("\\(.)", "%1")
-						for pname, port in pairs(manager:machine():ioport().ports) do
-							if port.fields[orig] then
-								port.fields[orig].live.name = rep
-							end
+		end
+		if not ctable.ports then
+			return
+		end
+		for pname, port in pairs(ctable.ports) do
+			local ioport = manager:machine():ioport().ports[pname]
+			if ioport then
+				for mask, label in pairs(port.labels) do
+					for num3, field in pairs(ioport.fields) do
+						local nummask = tonumber(mask, 16)
+						if nummask == field.mask and label.player == field.player then
+							field.live.name = label.name
 						end
 					end
 				end
-				return line
-			end)
-			reclevel = reclevel - 1
+			end
 		end
+	end
+
+	emu.register_start(function()
 		local file = emu.file(ctrlrpath .. "/portname", "r")
 		local ret = file:open(get_filename())
 		if ret then
-			ret = file:open(get_filename(true))
+			if emu.softname() ~= "" then
+				local parent
+				for tag, image in pairs(manager:machine().images) do
+					parent = image.software_parent
+					if parent ~= "" then
+						break
+					end
+				end
+				if parent ~= "" then
+					ret = file:open(emu.romname() .. "_" .. parent:match("([^:]*)$")  .. ".json")
+				end
+			end
 			if ret then
-				ret = file:open(manager:machine():system().parent .. ".po")
+				ret = file:open(get_filename(true))
 				if ret then
-					return
+					ret = file:open(manager:machine():system().parent .. ".json")
+					if ret then
+						return
+					end
 				end
 			end
 		end
-		parse_names(file:read(file:size()))
+		parse_names(json.parse(file:read(file:size())), 0)
 	end)
 
 	local function menu_populate()
@@ -91,20 +105,25 @@ function portname.startplugin()
 
 	local function menu_callback(index, event)
 		if event == "select" then
-			local fields = {}
+			local ports = {}
 			for pname, port in pairs(manager:machine():ioport().ports) do
+				local labels = {}
+				local sort = {}
 				for fname, field in pairs(port.fields) do
-					local dname = field.default_name
-					if not fields[dname] then
-						fields[dname] = {}
-						fields[dname].name = ""
+					local mask = string.format("%x", field.mask)
+					if not labels[mask] then
+						sort[#sort + 1] = mask
+						labels[mask] = { name = fname, player = field.player }
+						setmetatable(labels[mask], { __tojson = function(v,s)
+							local label = { name = v.name, player = v.player }
+							setmetatable(label, { __jsonorder = { "player", "name" }})
+							return json.stringify(label) end })
 					end
-					if fname ~= dname then
-						fields[dname].name = fname
-					end
-					fields[dname].port = pname
-					fields[dname].mask = field.mask
-					fields[dname].default = dname
+				end
+				if #sort > 0 then
+					table.sort(sort, function(i, j) return tonumber(i, 16) < tonumber(j, 16) end)
+					setmetatable(labels, { __jsonorder = sort })
+					ports[pname] = { labels = labels }
 				end
 			end
 			local function check_path(path)
@@ -137,18 +156,13 @@ function portname.startplugin()
 				file:close()
 				return false
 			end
-			local sfields = {}
-			for def, field in pairs(fields) do
-				sfields[#sfields + 1] = field
-			end
-			table.sort(sfields, function(a, b) if(a.port == b.port) then return a.mask < b.mask end return a.port < b.port end)
 			file = io.open(ctrlrpath .. "/portname/" .. filename, "w")
-			for n, field in ipairs(sfields) do
-				def = field.default:gsub("[\\\"]", function (s) return "\\" .. s end)
-				custom = field.name:gsub("[\\\"]", function (s) return "\\" .. s end)
-				file:write(string.format("# port %s mask %08x\n", field.port, field.mask))
-				file:write("msgid \"" .. def .."\"\nmsgstr \"" .. custom .. "\"\n\n")
+			local ctable = { romname = emu.romname(), ports = ports }
+			if emu.softname() ~= "" then
+				ctable.softname = emu.softname()
 			end
+			setmetatable(ctable, { __jsonorder = { "romname", "softname", "ports" }})
+			file:write(json.stringify(ctable, { indent = true }))
 			file:close()
 			manager:machine():popmessage(string.format(_("Input port name file saved to %s"), ctrlrpath .. "/portname/" .. filename))
 		end

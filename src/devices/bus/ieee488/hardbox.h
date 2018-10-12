@@ -61,13 +61,14 @@ private:
 
 	enum
 	{
-		LED_A,
+		LED_A = 0,
 		LED_B,
 		LED_READY
 	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<corvus_hdc_device> m_hdc;
+	output_finder<3> m_leds;
 
 	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 };

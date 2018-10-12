@@ -460,15 +460,17 @@ SOUND_RESET_MEMBER(n8080_state,helifire)
 }
 
 
-ADDRESS_MAP_START(n8080_state::n8080_sound_cpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
+void n8080_state::n8080_sound_cpu_map(address_map &map)
+{
+	map.global_mask(0x3ff);
+	map(0x0000, 0x03ff).rom();
+}
 
 
-ADDRESS_MAP_START(n8080_state::helifire_sound_io_map)
-	AM_RANGE(0x00, 0x7f) AM_READ(helifire_8035_external_ram_r)
-ADDRESS_MAP_END
+void n8080_state::helifire_sound_io_map(address_map &map)
+{
+	map(0x00, 0x7f).r(FUNC(n8080_state::helifire_8035_external_ram_r));
+}
 
 
 MACHINE_CONFIG_START(n8080_state::spacefev_sound)
@@ -477,23 +479,23 @@ MACHINE_CONFIG_START(n8080_state::spacefev_sound)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,spacefev)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
-	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(n8080_state, n8080_8035_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(n8080_state, n8080_8035_t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(n8080_state, n8080_8035_p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(n8080_state, n8080_dac_w))
+	MCFG_DEVICE_ADD("audiocpu", I8035, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(n8080_sound_cpu_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, n8080_state, n8080_8035_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, n8080_state, n8080_8035_t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, n8080_state, n8080_8035_p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, n8080_state, n8080_dac_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("vco_timer", n8080_state, spacefev_vco_voltage_timer, attotime::from_hz(1000))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	MCFG_DEVICE_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(36), RES_K(150), CAP_N(1)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_M(1))                    // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(20))   // attack_decay_cap + attack_res
@@ -517,21 +519,21 @@ MACHINE_CONFIG_START(n8080_state::sheriff_sound)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,sheriff)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
-	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(n8080_state, n8080_8035_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(n8080_state, n8080_8035_t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(n8080_state, n8080_8035_p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(n8080_state, n8080_dac_w))
+	MCFG_DEVICE_ADD("audiocpu", I8035, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(n8080_sound_cpu_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, n8080_state, n8080_8035_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, n8080_state, n8080_8035_t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, n8080_state, n8080_8035_p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, n8080_state, n8080_dac_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	MCFG_DEVICE_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(36), RES_K(100), CAP_N(1)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(620))                  // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(20))   // attack_decay_cap + attack_res
@@ -555,20 +557,20 @@ MACHINE_CONFIG_START(n8080_state::helifire_sound)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,helifire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
-	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MCFG_CPU_IO_MAP(helifire_sound_io_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(n8080_state, helifire_8035_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(n8080_state, helifire_8035_t1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(n8080_state, helifire_8035_p2_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("helifire_dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(n8080_state, helifire_sound_ctrl_w))
+	MCFG_DEVICE_ADD("audiocpu", I8035, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(n8080_sound_cpu_map)
+	MCFG_DEVICE_IO_MAP(helifire_sound_io_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, n8080_state, helifire_8035_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, n8080_state, helifire_8035_t1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, n8080_state, helifire_8035_p2_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("helifire_dac", dac_byte_interface, data_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, n8080_state, helifire_sound_ctrl_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("helifire_dac_volume_timer", n8080_state, helifire_dac_volume_timer, attotime::from_hz(1000))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("helifire_dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("helifire_dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "helifire_dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "helifire_dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "helifire_dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "helifire_dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

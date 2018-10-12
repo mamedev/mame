@@ -301,9 +301,9 @@ WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 	{
 		output().set_value("left-ssr",       !!(data & 0x08000000));  // SSR
 		output().set_value("right-ssr",      !!(data & 0x08000000));  // SSR
-		output().set_led_value(0, data & 0x00010000);            // 1P START
-		output().set_led_value(1, data & 0x00020000);            // 2P START
-		output().set_led_value(2, data & 0x00040000);            // EFFECT
+		m_leds[0] = BIT(data, 16);            // 1P START
+		m_leds[1] = BIT(data, 17);            // 2P START
+		m_leds[2] = BIT(data, 18);            // EFFECT
 	}
 }
 
@@ -373,58 +373,63 @@ WRITE_LINE_MEMBER( djmain_state::ide_interrupt )
  *
  *************************************/
 
-ADDRESS_MAP_START(djmain_state::maincpu_djmain)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                         // PRG ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM                         // WORK RAM
-	AM_RANGE(0x480000, 0x48443f) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")       // COLOR RAM
-	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)               // SOUND RAM
-	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE("k056832", k056832_device, long_r, long_w)      // VIDEO REG (tilemap)
-	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)                  // ??
-	AM_RANGE(0x5a0000, 0x5a005f) AM_DEVWRITE("k055555", k055555_device, K055555_long_w)                  // 055555: priority encoder
-	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00ff00)
-	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("k054539_2", k054539_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x5c0000, 0x5c0003) AM_READ8(inp1_r, 0xffffffff)  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
-	AM_RANGE(0x5c8000, 0x5c8003) AM_READ8(inp2_r, 0xffffffff)  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
-	AM_RANGE(0x5d0000, 0x5d0003) AM_WRITE(light_ctrl_1_w)                   // light/coin blocker control
-	AM_RANGE(0x5d2000, 0x5d2003) AM_WRITE(light_ctrl_2_w)                   // light/coin blocker control
-	AM_RANGE(0x5d4000, 0x5d4003) AM_WRITE(v_ctrl_w)                     // VIDEO control
-	AM_RANGE(0x5d6000, 0x5d6003) AM_WRITE(sndram_bank_w)                    // SOUND RAM bank
-	AM_RANGE(0x5e0000, 0x5e0003) AM_READWRITE(turntable_r, turntable_select_w)      // input port control (turn tables)
-	AM_RANGE(0x600000, 0x601fff) AM_READ(v_rom_r)                       // VIDEO ROM readthrough (for POST)
-	AM_RANGE(0x801000, 0x8017ff) AM_RAM AM_SHARE("obj_ram")             // OBJECT RAM
-	AM_RANGE(0x802000, 0x802fff) AM_WRITE(unknown802000_w)                  // ??
-	AM_RANGE(0x803000, 0x80309f) AM_READWRITE(obj_ctrl_r, obj_ctrl_w)           // OBJECT REGS
-	AM_RANGE(0x803800, 0x803fff) AM_READ(obj_rom_r)                     // OBJECT ROM readthrough (for POST)
-ADDRESS_MAP_END
+void djmain_state::maincpu_djmain(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                         // PRG ROM
+	map(0x400000, 0x40ffff).ram();                         // WORK RAM
+	map(0x480000, 0x48443f).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");       // COLOR RAM
+	map(0x500000, 0x57ffff).rw(FUNC(djmain_state::sndram_r), FUNC(djmain_state::sndram_w));               // SOUND RAM
+	map(0x580000, 0x58003f).rw(m_k056832, FUNC(k056832_device::long_r), FUNC(k056832_device::long_w));      // VIDEO REG (tilemap)
+	map(0x590000, 0x590007).w(FUNC(djmain_state::unknown590000_w));                  // ??
+	map(0x5a0000, 0x5a005f).w(m_k055555, FUNC(k055555_device::K055555_long_w));                  // 055555: priority encoder
+	map(0x5b0000, 0x5b04ff).rw("k054539_1", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask32(0xff00ff00);
+	map(0x5b0000, 0x5b04ff).rw("k054539_2", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask32(0x00ff00ff);
+	map(0x5c0000, 0x5c0003).r(FUNC(djmain_state::inp1_r));  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
+	map(0x5c8000, 0x5c8003).r(FUNC(djmain_state::inp2_r));  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
+	map(0x5d0000, 0x5d0003).w(FUNC(djmain_state::light_ctrl_1_w));                   // light/coin blocker control
+	map(0x5d2000, 0x5d2003).w(FUNC(djmain_state::light_ctrl_2_w));                   // light/coin blocker control
+	map(0x5d4000, 0x5d4003).w(FUNC(djmain_state::v_ctrl_w));                     // VIDEO control
+	map(0x5d6000, 0x5d6003).w(FUNC(djmain_state::sndram_bank_w));                    // SOUND RAM bank
+	map(0x5e0000, 0x5e0003).rw(FUNC(djmain_state::turntable_r), FUNC(djmain_state::turntable_select_w));      // input port control (turn tables)
+	map(0x600000, 0x601fff).r(FUNC(djmain_state::v_rom_r));                       // VIDEO ROM readthrough (for POST)
+	map(0x801000, 0x8017ff).ram().share("obj_ram");             // OBJECT RAM
+	map(0x802000, 0x802fff).w(FUNC(djmain_state::unknown802000_w));                  // ??
+	map(0x803000, 0x80309f).rw(FUNC(djmain_state::obj_ctrl_r), FUNC(djmain_state::obj_ctrl_w));           // OBJECT REGS
+	map(0x803800, 0x803fff).r(FUNC(djmain_state::obj_rom_r));                     // OBJECT ROM readthrough (for POST)
+}
 
-ADDRESS_MAP_START(djmain_state::maincpu_djmainj)
-	AM_IMPORT_FROM(maincpu_djmain)
+void djmain_state::maincpu_djmainj(address_map &map)
+{
+	maincpu_djmain(map);
 
-	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (beatmania)
-	AM_RANGE(0xc02000, 0xc02047) AM_WRITE(unknownc02000_w)                  // ??
-	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (beatmania)
-	AM_RANGE(0xf40000, 0xf4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (beatmania)
-ADDRESS_MAP_END
+	map(0xc00000, 0xc01fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));  // VIDEO RAM (tilemap) (beatmania)
+	map(0xc02000, 0xc02047).w(FUNC(djmain_state::unknownc02000_w));                  // ??
+	map(0xf00000, 0xf0000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)); // IDE control regs (beatmania)
+	map(0xf40000, 0xf4000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)); // IDE status control reg (beatmania)
+}
 
-ADDRESS_MAP_START(djmain_state::maincpu_djmainu)
-	AM_IMPORT_FROM(maincpu_djmain)
+void djmain_state::maincpu_djmainu(address_map &map)
+{
+	maincpu_djmain(map);
 
-	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (hiphopmania)
-	AM_RANGE(0xd40000, 0xd4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (hiphopmania)
-	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (hiphopmania)
-ADDRESS_MAP_END
+	map(0xd00000, 0xd0000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)); // IDE control regs (hiphopmania)
+	map(0xd40000, 0xd4000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)); // IDE status control reg (hiphopmania)
+	map(0xe00000, 0xe01fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));  // VIDEO RAM (tilemap) (hiphopmania)
+}
 
-ADDRESS_MAP_START(djmain_state::maincpu_djmaina)
-	AM_IMPORT_FROM(maincpu_djmain)
+void djmain_state::maincpu_djmaina(address_map &map)
+{
+	maincpu_djmain(map);
 
-	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs
-	AM_RANGE(0xc40000, 0xc4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg
-	AM_RANGE(0xf00000, 0xf01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap)
-ADDRESS_MAP_END
+	map(0xc00000, 0xc0000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)); // IDE control regs
+	map(0xc40000, 0xc4000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)); // IDE status control reg
+	map(0xf00000, 0xf01fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));  // VIDEO RAM (tilemap)
+}
 
-ADDRESS_MAP_START(djmain_state::k054539_map)
-	AM_RANGE(0x000000, 0xffffff) AM_RAM AM_SHARE("sndram")
-ADDRESS_MAP_END
+void djmain_state::k054539_map(address_map &map)
+{
+	map(0x000000, 0xffffff).ram().share("sndram");
+}
 
 
 /*************************************
@@ -1325,7 +1330,7 @@ static const gfx_layout spritelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( djmain )
+static GFXDECODE_START( gfx_djmain )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,  (0x4440/4)/16 )
 GFXDECODE_END
 
@@ -1346,6 +1351,8 @@ void djmain_state::machine_start()
 	if (m_ata_user_password != nullptr)
 		hdd->set_user_password(m_ata_user_password);
 
+	m_leds.resolve();
+
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_pending_vb_int));
 	save_item(NAME(m_v_ctrl));
@@ -1359,9 +1366,9 @@ void djmain_state::machine_reset()
 	m_sndram_bank = 0;
 
 	/* reset LEDs */
-	output().set_led_value(0, 1);
-	output().set_led_value(1, 1);
-	output().set_led_value(2, 1);
+	m_leds[0] = 1;
+	m_leds[1] = 1;
+	m_leds[2] = 1;
 }
 
 
@@ -1376,13 +1383,13 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 
 	/* basic machine hardware */
 	// popn3 works 9.6 MHz or slower in some songs */
-	//MCFG_CPU_ADD("maincpu", M68EC020, 18432000/2)    /*  9.216 MHz!? */
-	MCFG_CPU_ADD("maincpu", M68EC020, 32000000/4)   /*  8.000 MHz!? */
-	MCFG_CPU_PROGRAM_MAP(maincpu_djmainj)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", djmain_state,  vb_interrupt)
+	//MCFG_DEVICE_ADD("maincpu", M68EC020, 18432000/2)    /*  9.216 MHz!? */
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 32000000/4)   /*  8.000 MHz!? */
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_djmainj)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djmain_state,  vb_interrupt)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(djmain_state, ide_interrupt))
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_ata->irq_handler().set(FUNC(djmain_state::ide_interrupt));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1394,17 +1401,18 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 
 	MCFG_PALETTE_ADD("palette", 0x4440/4)
 	MCFG_PALETTE_FORMAT(XBGR)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", djmain)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djmain)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(djmain_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx2", K056832_BPP_4dj, 1, 1, "none")
+	MCFG_K056832_CONFIG("gfx2", K056832_BPP_4dj, 1, 1)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
@@ -1419,14 +1427,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(djmain_state::djmainu)
 	djmainj(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(maincpu_djmainu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_djmainu)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(djmain_state::djmaina)
 	djmainj(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(maincpu_djmaina)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_djmaina)
 MACHINE_CONFIG_END
 
 
@@ -1937,7 +1945,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(djmain_state,beatmania)
+void djmain_state::init_beatmania()
 {
 	m_ata_master_password = nullptr;
 	m_ata_user_password = nullptr;
@@ -1952,7 +1960,7 @@ static const uint8_t beatmania_master_password[2 + 32] =
 	0x53, 0x45, 0x52, 0x45, 0x45, 0x56, 0x2e, 0x44
 };
 
-DRIVER_INIT_MEMBER(djmain_state,hmcompmx)
+void djmain_state::init_hmcompmx()
 {
 	static const uint8_t hmcompmx_user_password[2 + 32] =
 	{
@@ -1963,13 +1971,13 @@ DRIVER_INIT_MEMBER(djmain_state,hmcompmx)
 		0x6b, 0x09, 0x02, 0x0f, 0x05, 0x00, 0x7d, 0x1b
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = hmcompmx_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bm4thmix)
+void djmain_state::init_bm4thmix()
 {
 	static const uint8_t bm4thmix_user_password[2 + 32] =
 	{
@@ -1980,12 +1988,12 @@ DRIVER_INIT_MEMBER(djmain_state,bm4thmix)
 		0x18, 0x06, 0x1e, 0x07, 0x77, 0x1a, 0x7d, 0x77
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_user_password = bm4thmix_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bm5thmix)
+void djmain_state::init_bm5thmix()
 {
 	static const uint8_t bm5thmix_user_password[2 + 32] =
 	{
@@ -1996,13 +2004,13 @@ DRIVER_INIT_MEMBER(djmain_state,bm5thmix)
 		0x6b, 0x1a, 0x1e, 0x06, 0x04, 0x01, 0x7d, 0x1f
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bm5thmix_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bmclubmx)
+void djmain_state::init_bmclubmx()
 {
 	static const uint8_t bmclubmx_user_password[2 + 32] =
 	{
@@ -2013,14 +2021,14 @@ DRIVER_INIT_MEMBER(djmain_state,bmclubmx)
 		0x0a, 0x1a, 0x71, 0x07, 0x1e, 0x19, 0x7d, 0x02
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bmclubmx_user_password;
 }
 
 
-DRIVER_INIT_MEMBER(djmain_state,bmcompm2)
+void djmain_state::init_bmcompm2()
 {
 	static const uint8_t bmcompm2_user_password[2 + 32] =
 	{
@@ -2031,13 +2039,13 @@ DRIVER_INIT_MEMBER(djmain_state,bmcompm2)
 		0x6b, 0x0d, 0x71, 0x0f, 0x1d, 0x10, 0x7d, 0x7a
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bmcompm2_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,hmcompm2)
+void djmain_state::init_hmcompm2()
 {
 	static const uint8_t hmcompm2_user_password[2 + 32] =
 	{
@@ -2048,13 +2056,13 @@ DRIVER_INIT_MEMBER(djmain_state,hmcompm2)
 		0x09, 0x68, 0x71, 0x0b, 0x77, 0x15, 0x17, 0x1e
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = hmcompm2_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bmdct)
+void djmain_state::init_bmdct()
 {
 	static const uint8_t bmdct_user_password[2 + 32] =
 	{
@@ -2065,13 +2073,13 @@ DRIVER_INIT_MEMBER(djmain_state,bmdct)
 		0x0e, 0x0a, 0x05, 0x0f, 0x13, 0x74, 0x09, 0x19
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bmdct_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bmcorerm)
+void djmain_state::init_bmcorerm()
 {
 	static const uint8_t bmcorerm_user_password[2 + 32] =
 	{
@@ -2082,13 +2090,13 @@ DRIVER_INIT_MEMBER(djmain_state,bmcorerm)
 		0x05, 0x09, 0x14, 0x0d, 0x7a, 0x74, 0x7d, 0x7a
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bmcorerm_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bm6thmix)
+void djmain_state::init_bm6thmix()
 {
 	static const uint8_t bm6thmix_user_password[2 + 32] =
 	{
@@ -2099,13 +2107,13 @@ DRIVER_INIT_MEMBER(djmain_state,bm6thmix)
 		0x02, 0x06, 0x09, 0x0f, 0x7a, 0x74, 0x7d, 0x7a
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bm6thmix_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bm7thmix)
+void djmain_state::init_bm7thmix()
 {
 	static const uint8_t bm7thmix_user_password[2 + 32] =
 	{
@@ -2116,13 +2124,13 @@ DRIVER_INIT_MEMBER(djmain_state,bm7thmix)
 		0x0c, 0x06, 0x7c, 0x6e, 0x77, 0x74, 0x7d, 0x7a
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bm7thmix_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bmfinal)
+void djmain_state::init_bmfinal()
 {
 	static const uint8_t bmfinal_user_password[2 + 32] =
 	{
@@ -2133,7 +2141,7 @@ DRIVER_INIT_MEMBER(djmain_state,bmfinal)
 		0x0c, 0x06, 0x71, 0x6e, 0x77, 0x79, 0x7d, 0x7a
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bmfinal_user_password;
@@ -2148,31 +2156,31 @@ DRIVER_INIT_MEMBER(djmain_state,bmfinal)
 
 // commented out games should also run on this driver
 
-GAME( 1997, bm1stmix, 0,        djmainj,   bm1stmix, djmain_state, beatmania, ROT0, "Konami", "beatmania (ver JA-B)", 0 )
-GAME( 1998, bm2ndmix, 0,        djmainj,   bm2ndmix, djmain_state, beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-B)", 0 )
-GAME( 1998, bm2ndmxa, bm2ndmix, djmainj,   bm2ndmix, djmain_state, beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-A)", 0 )
-GAME( 1998, bm3rdmix, 0,        djmainj,   bm3rdmix, djmain_state, beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-A)", 0 )
-GAME( 1999, bmcompmx, 0,        djmainj,   bmcompmx, djmain_state, beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", 0 )
-GAME( 1999, hmcompmx, bmcompmx, djmainu,   bmcompmx, djmain_state, hmcompmx,  ROT0, "Konami", "hiphopmania complete MIX (ver UA-B)", 0 )
-GAME( 1999, bm4thmix, 0,        djmainj,   bm4thmix, djmain_state, bm4thmix,  ROT0, "Konami", "beatmania 4th MIX (ver JA-A)", 0 )
-GAME( 1999, bm5thmix, 0,        djmainj,   bm5thmix, djmain_state, bm5thmix,  ROT0, "Konami", "beatmania 5th MIX (ver JA-A)", 0 )
-GAME( 2000, bmcompm2, 0,        djmainj,   bm5thmix, djmain_state, bmcompm2,  ROT0, "Konami", "beatmania complete MIX 2 (ver JA-A)", 0 )
-GAME( 2000, hmcompm2, bmcompm2, djmainu,   hmcompm2, djmain_state, hmcompm2,  ROT0, "Konami", "hiphopmania complete MIX 2 (ver UA-A)", 0 )
-GAME( 2000, bmclubmx, 0,        djmainj,   bmclubmx, djmain_state, bmclubmx,  ROT0, "Konami", "beatmania Club MIX (ver JA-A)", 0 )
-GAME( 2000, bmdct,    0,        djmainj,   bmdct,    djmain_state, bmdct,     ROT0, "Konami", "beatmania featuring Dreams Come True (ver JA-A)", 0 )
-GAME( 2000, bmcorerm, 0,        djmainj,   bmcorerm, djmain_state, bmcorerm,  ROT0, "Konami", "beatmania CORE REMIX (ver JA-A)", 0 )
-GAME( 2001, bm6thmix, 0,        djmainj,   bm6thmix, djmain_state, bm6thmix,  ROT0, "Konami", "beatmania 6th MIX (ver JA-A)", 0 )
-GAME( 2001, bm7thmix, 0,        djmainj,   bm6thmix, djmain_state, bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", 0 )
-GAME( 2002, bmfinal,  0,        djmainj,   bm6thmix, djmain_state, bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", 0 )
+GAME( 1997, bm1stmix, 0,        djmainj, bm1stmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania (ver JA-B)", 0 )
+GAME( 1998, bm2ndmix, 0,        djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-B)", 0 )
+GAME( 1998, bm2ndmxa, bm2ndmix, djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-A)", 0 )
+GAME( 1998, bm3rdmix, 0,        djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-A)", 0 )
+GAME( 1999, bmcompmx, 0,        djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", 0 )
+GAME( 1999, hmcompmx, bmcompmx, djmainu, bmcompmx,  djmain_state, init_hmcompmx,  ROT0, "Konami", "hiphopmania complete MIX (ver UA-B)", 0 )
+GAME( 1999, bm4thmix, 0,        djmainj, bm4thmix,  djmain_state, init_bm4thmix,  ROT0, "Konami", "beatmania 4th MIX (ver JA-A)", 0 )
+GAME( 1999, bm5thmix, 0,        djmainj, bm5thmix,  djmain_state, init_bm5thmix,  ROT0, "Konami", "beatmania 5th MIX (ver JA-A)", 0 )
+GAME( 2000, bmcompm2, 0,        djmainj, bm5thmix,  djmain_state, init_bmcompm2,  ROT0, "Konami", "beatmania complete MIX 2 (ver JA-A)", 0 )
+GAME( 2000, hmcompm2, bmcompm2, djmainu, hmcompm2,  djmain_state, init_hmcompm2,  ROT0, "Konami", "hiphopmania complete MIX 2 (ver UA-A)", 0 )
+GAME( 2000, bmclubmx, 0,        djmainj, bmclubmx,  djmain_state, init_bmclubmx,  ROT0, "Konami", "beatmania Club MIX (ver JA-A)", 0 )
+GAME( 2000, bmdct,    0,        djmainj, bmdct,     djmain_state, init_bmdct,     ROT0, "Konami", "beatmania featuring Dreams Come True (ver JA-A)", 0 )
+GAME( 2000, bmcorerm, 0,        djmainj, bmcorerm,  djmain_state, init_bmcorerm,  ROT0, "Konami", "beatmania CORE REMIX (ver JA-A)", 0 )
+GAME( 2001, bm6thmix, 0,        djmainj, bm6thmix,  djmain_state, init_bm6thmix,  ROT0, "Konami", "beatmania 6th MIX (ver JA-A)", 0 )
+GAME( 2001, bm7thmix, 0,        djmainj, bm6thmix,  djmain_state, init_bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", 0 )
+GAME( 2002, bmfinal,  0,        djmainj, bm6thmix,  djmain_state, init_bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", 0 )
 
-GAME( 1998, popn1,    0,        djmaina,   popn1,    djmain_state, beatmania, ROT0, "Konami", "Pop'n Music 1 (ver AA-A)", 0 )
-GAME( 1998, popn2,    0,        djmainj,   popn2,    djmain_state, beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
-GAME( 1998, popn3,    0,        djmainj,   popn2,    djmain_state, beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", 0 )
-GAME( 1999, popnstage,0,        djmainj,   popnstage,djmain_state, beatmania, ROT0, "Konami", "Pop'n Stage (ver JB-A)", MACHINE_NOT_WORKING )
+GAME( 1998, popn1,    0,        djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver AA-A)", 0 )
+GAME( 1999, popn2,    0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
+GAME( 1999, popn3,    0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", 0 )
+GAME( 1999, popnstage,0,        djmainj, popnstage, djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Stage (ver JB-A)", MACHINE_NOT_WORKING )
 
 // for reference, these sets have not been verified
-//GAME( 1998, bm3rdmxb, bm3rdmix, djmainj,   bm3rdmix, djmain_state, beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", 0 )
+//GAME( 1998, bm3rdmxb, bm3rdmix, djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", 0 )
 
-//GAME( 1998, popn1j,   popn1,    djmainj,   popn1,    djmain_state, beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A)", 0 )
+//GAME( 1998, popn1j,   popn1,    djmainj, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A)", 0 )
 
-//GAME( 1999, popnstex, 0,        djmainj,   popnstex, djmain_state, beatmania, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)", 0 )
+//GAME( 1999, popnstex, 0,        djmainj, popnstex,  djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)", 0 )

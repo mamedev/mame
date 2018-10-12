@@ -8,6 +8,7 @@
 #include "machine/74259.h"
 #include "machine/timer.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 class sprint8_state : public driver_device
@@ -28,7 +29,7 @@ public:
 
 	void sprint8(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(collision_r);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(lockout_w);
@@ -54,7 +55,6 @@ protected:
 	void sprint8_audio(machine_config &config);
 	void sprint8_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -81,6 +81,6 @@ private:
 };
 
 /*----------- defined in audio/sprint8.c -----------*/
-DISCRETE_SOUND_EXTERN( sprint8 );
+DISCRETE_SOUND_EXTERN( sprint8_discrete );
 
 #endif // MAME_INCLUDES_SPRINT8_H

@@ -110,6 +110,9 @@ WRITE8_MEMBER(buggychl_state::bankswitch_w)
 
 WRITE8_MEMBER(buggychl_state::sound_enable_w)
 {
+	// does this really only control the sound irq 'timer' enable state, rather than the entire sound system?
+	// this would be more in line with the (admittedly incorrect) schematic...
+	//logerror("Sound_enable_w written with data of %02x\n", data);
 	machine().sound().system_enable(data & 1);
 }
 
@@ -194,63 +197,122 @@ READ8_MEMBER(buggychl_state::sound_status_sound_r)
  1  1  1  0  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?   ?  (unknown, cut off on schematic)
  1  1  1  1  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?   ?  (unknown, cut off on schematic)
 */
-ADDRESS_MAP_START(buggychl_state::buggychl_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM /* A22-04 (23) */
-	AM_RANGE(0x4000, 0x7fff) AM_ROM /* A22-05 (22) */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM /* 6116 SRAM (36) */
-	AM_RANGE(0x8800, 0x8fff) AM_RAM /* 6116 SRAM (35) */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1") AM_WRITE(buggychl_chargen_w) AM_SHARE("charram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // ???
-	AM_RANGE(0xd100, 0xd100) AM_MIRROR(0x00ff) AM_WRITE(buggychl_ctrl_w)
-	AM_RANGE(0xd200, 0xd200) AM_MIRROR(0x00ff) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00f8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+void buggychl_state::buggychl_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom(); /* A22-04 (23) */
+	map(0x4000, 0x7fff).rom(); /* A22-05 (22) */
+	map(0x8000, 0x87ff).ram(); /* 6116 SRAM (36) */
+	map(0x8800, 0x8fff).ram(); /* 6116 SRAM (35) */
+	map(0x9000, 0x9fff).w(FUNC(buggychl_state::buggychl_sprite_lookup_w));
+	map(0xa000, 0xbfff).bankr("bank1").w(FUNC(buggychl_state::buggychl_chargen_w)).share("charram");
+	map(0xc800, 0xcfff).ram().share("videoram");
+	map(0xd000, 0xd000).nopw(); // ???
+	map(0xd100, 0xd100).mirror(0x00ff).w(FUNC(buggychl_state::buggychl_ctrl_w));
+	map(0xd200, 0xd200).mirror(0x00ff).w(FUNC(buggychl_state::bankswitch_w));
+	map(0xd300, 0xd300).mirror(0x00f8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	// d301 = flp stuff, unused?
 	// d302 = mcu reset latched d0
-	AM_RANGE(0xd303, 0xd303) AM_MIRROR(0x00f8) AM_WRITE(buggychl_sprite_lookup_bank_w)
-	AM_RANGE(0xd304, 0xd307) AM_WRITENOP // d304-d307 is SCCON, which seems to be for a bezel mounted 7seg score/time display like Grand Champion has
-	AM_RANGE(0xd400, 0xd400) AM_MIRROR(0x00fc) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xd401, 0xd401) AM_MIRROR(0x00fc) AM_READ(mcu_status_r)
-	AM_RANGE(0xd500, 0xd57f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00e4) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd601, 0xd601) AM_MIRROR(0x00e4) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd602, 0xd602) AM_MIRROR(0x00e4) AM_READ_PORT("DSW3")
-	AM_RANGE(0xd603, 0xd603) AM_MIRROR(0x00e4) AM_READ_PORT("IN0")    /* player inputs */
-	AM_RANGE(0xd608, 0xd608) AM_MIRROR(0x00e4) AM_READ_PORT("WHEEL")
-	AM_RANGE(0xd609, 0xd609) AM_MIRROR(0x00e4) AM_READ_PORT("IN1")    /* coin + accelerator */
+	map(0xd303, 0xd303).mirror(0x00f8).w(FUNC(buggychl_state::buggychl_sprite_lookup_bank_w));
+	map(0xd304, 0xd307).nopw(); // d304-d307 is SCCON, which seems to be for a bezel mounted 7seg score/time display like Grand Champion has
+	map(0xd400, 0xd400).mirror(0x00fc).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0xd401, 0xd401).mirror(0x00fc).r(FUNC(buggychl_state::mcu_status_r));
+	map(0xd500, 0xd57f).writeonly().share("spriteram");
+	map(0xd600, 0xd600).mirror(0x00e4).portr("DSW1");
+	map(0xd601, 0xd601).mirror(0x00e4).portr("DSW2");
+	map(0xd602, 0xd602).mirror(0x00e4).portr("DSW3");
+	map(0xd603, 0xd603).mirror(0x00e4).portr("IN0");    /* player inputs */
+	map(0xd608, 0xd608).mirror(0x00e4).portr("WHEEL");
+	map(0xd609, 0xd609).mirror(0x00e4).portr("IN1");    /* coin + accelerator */
 //  AM_RANGE(0xd60a, 0xd60a) AM_MIRROR(0x00e4) // other inputs, not used?
 //  AM_RANGE(0xd60b, 0xd60b) AM_MIRROR(0x00e4) // other inputs, not used?
-	AM_RANGE(0xd610, 0xd610) AM_MIRROR(0x00e4) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd611, 0xd611) AM_MIRROR(0x00e4) AM_READ(sound_status_main_r)
+	map(0xd610, 0xd610).mirror(0x00e4).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xd611, 0xd611).mirror(0x00e4).r(FUNC(buggychl_state::sound_status_main_r));
 //  AM_RANGE(0xd613, 0xd613) AM_MIRROR(0x00e4) AM_WRITE(sound_reset_w)
-	AM_RANGE(0xd618, 0xd618) AM_MIRROR(0x00e7) AM_WRITENOP    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
-	AM_RANGE(0xd700, 0xd7ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xd820, 0xd83f) AM_RAM // TODO
-	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_SHARE("scrollv")
-	AM_RANGE(0xdb00, 0xdbff) AM_WRITEONLY AM_SHARE("scrollh")
-	AM_RANGE(0xdc04, 0xdc04) AM_WRITEONLY /* should be fg scroll */
-	AM_RANGE(0xdc06, 0xdc06) AM_WRITE(buggychl_bg_scrollx_w)
-ADDRESS_MAP_END
+	map(0xd618, 0xd618).mirror(0x00e7).nopw();    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
+	map(0xd700, 0xd7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd820, 0xd83f).ram(); // TODO
+	map(0xd840, 0xd85f).writeonly().share("scrollv");
+	map(0xdb00, 0xdbff).writeonly().share("scrollh");
+	map(0xdc04, 0xdc04).writeonly(); /* should be fg scroll */
+	map(0xdc06, 0xdc06).w(FUNC(buggychl_state::buggychl_bg_scrollx_w));
+}
 
 /* The schematics for buggy challenge has the wrong sound board schematic attached to it.
   (The schematic is for an unknown taito game, possibly never released.)
    The final buggy challenge sound board is more similar to Fairyland Story sound
    hardware, except it has two YM2149 chips instead of one, and much less ROM space. */
-ADDRESS_MAP_START(buggychl_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE("msm", msm5232_device, write)
-	AM_RANGE(0x4820, 0x4820) AM_WRITE(ta7630_volbal_msm_w) /* VOL/BAL   for the 7630 on the MSM5232 output */
-	AM_RANGE(0x4830, 0x4830) AM_RAM /* TRBL/BASS for the 7630 on the MSM5232 output */
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0x5001, 0x5001) AM_READ(sound_status_sound_r) AM_DEVWRITE("soundnmi", input_merger_device, in_set<1>)
-	AM_RANGE(0x5002, 0x5002) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<1>)
-	AM_RANGE(0x5003, 0x5003) AM_WRITE(sound_enable_w) // unclear what this actually controls
-	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostics ROM */
-ADDRESS_MAP_END
+void buggychl_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4801).w(m_ay1, FUNC(ay8910_device::address_data_w));
+	map(0x4802, 0x4803).w(m_ay2, FUNC(ay8910_device::address_data_w));
+	map(0x4810, 0x481d).w(m_msm, FUNC(msm5232_device::write));
+	map(0x4820, 0x4820).w(FUNC(buggychl_state::ta7630_volbal_msm_w)); /* VOL/BAL   for the 7630 on the MSM5232 output */
+	map(0x4830, 0x4830).ram(); /* TRBL/BASS for the 7630 on the MSM5232 output */
+	map(0x5000, 0x5000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0x5001, 0x5001).r(FUNC(buggychl_state::sound_status_sound_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
+	map(0x5002, 0x5002).w(m_soundnmi, FUNC(input_merger_device::in_clear<1>));
+	map(0x5003, 0x5003).w(FUNC(buggychl_state::sound_enable_w)); // unclear what this actually controls
+	map(0xe000, 0xefff).rom(); /* space for diagnostics ROM */
+}
+
+/* Here is the memory maps from the 'wrong' sound schematic
+THIS DOES NOT MATCH THE ACTUAL HARDWARE, but seems to be of the hardware from
+which the final sound board design was derived from (as well as flstory/40love and msisaac hw, and possibly retofinv).
+Sound Master CPU (SMCPU)
+           |           |           |
+15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+ *  *  *                                          R  74LS138 @ ic17
+ 0  0  0  *  *  *  *  *  *  *  *  *  *  *  *  *   R  2764 ROM (ic11)
+ 0  0  1  *  *  *  *  *  *  *  *  *  *  *  *  *   R  2764 ROM (ic19)
+ 0  1  0  *  *  *  *  *  *  *  *  *  *  *  *  *   R  2764 ROM (ic4)
+ 0  1  1                                          SM-6 /CS
+ 0  1  1  0  *  *                                 RW 74ls155 @ ic14
+ 0  1  1  0  0  0  x  x  x  x  x  x  x  x  x  x   R  Read sound latch from maincpu, clear semaphore
+ 0  1  1  0  0  0  x  x  x  x  x  x  x  x  x  x   W  Enable sound NMI from sound latch semaphore
+ 0  1  1  0  0  1  x  x  x  x  x  x  x  x  x  x   R  Read sound semaphores
+ 0  1  1  0  0  1  x  x  x  x  x  x  x  x  x  x   W  Disable sound NMI from sound latch semaphore
+ 0  1  1  0  1  0  x  x  x  x  x  x  x  x  x  x   R  Read 3 ?debug? bits from edge connector pins in d0-d2
+ 0  1  1  0  1  0  x  x  x  x  x  x  x  x  x  x   W  SM-INT CTL:
+                                                     D0: if 0, enable SM CPU INT on timer (((soundclock(4MHz)/2)/256)/(128 or 256)) = 60hz or 30hz (or 120hz?)
+                                                     D1: switch speed of timer: 0 = 30.51757hz, 1 = 61.0351hz (or is this 61/122hz?)
+                                                     D2: if 0, enable SS CPU int to SM CPU
+                                                     D3: connects to SS CPU /RESET
+                                                     D4: not used
+                                                     D5: not used
+                                                     D6: gate ay2 to left channels
+                                                     D7: gate ay2 to right channels
+ 0  1  1  0  1  1  x  x  x  x  x  x  x  x  x  x   R  OPEN BUS
+ 0  1  1  0  1  1  x  x  x  x  x  x  x  x  x  x   W  Write to sound latch 2 to maincpu, set semaphore
+ 0  1  1  1  *  *  *                              W  74LS138 @ ic23
+ 0  1  1  1  0  0  0  x  x  x  x  x  x  x  x  x   W  Slave Sound CPU IntReq
+ 0  1  1  1  0  0  1  x  x  x  x  x  x  x  x  x   W  OPEN BUS
+ 0  1  1  1  0  1  0  x  x  x  x  x  x  x  x  x   W  Main VR Control voltage DAC
+ 0  1  1  1  0  1  1  x  x  x  x  x  x  x  x  x   W  OPEN BUS
+ 0  1  1  1  1  0  0  x  x  x  x  x  x  x  x  x   W  CHA Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for front right)
+ 0  1  1  1  1  0  1  x  x  x  x  x  x  x  x  x   W  CHB Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for rear right)
+ 0  1  1  1  1  1  0  x  x  x  x  x  x  x  x  x   W  CHC Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for front left)
+ 0  1  1  1  1  1  1  x  x  x  x  x  x  x  x  x   W  CHD Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for rear left)
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  *  *  *   SM-8 /CS (inject ?4? SM waitstates cycles)
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  0  0  x   W  OPEN BUS
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  0  1  0   W  AY #1 @ic42 Address write
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  0  1  1   W  AY #1 @ic42 Data write
+                                                     AY #1 IOB7-4 connect to an r2r dac+opamp controlling ay1 TA7630P Treble
+                                                     AY #1 IOB3-0 connect to an r2r dac+opamp controlling ay1 TA7630P Bass
+                                                     AY #1 IOA7-4 connect to an r2r dac+opamp controlling ay1 TA7630P Volume
+                                                     AY #1 IOA3-0 connect to an r2r dac+opamp controlling ay1 TA7630P Balance
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  1  0  0   W  AY #2 @ic41 Address write
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  1  0  1   W  AY #2 @ic41 Data write
+                                                     AY #2 IOB7-4 connect to an r2r dac+opamp controlling ay2 TA7630P Treble
+                                                     AY #2 IOB3-0 connect to an r2r dac+opamp controlling ay2 TA7630P Bass
+                                                     AY #2 IOA7-4 connect to an r2r dac+opamp controlling ay2 TA7630P Volume
+                                                     AY #2 IOA3-0 connect to an r2r dac+opamp controlling ay2 TA7630P Balance
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  1  1  x   W  OPEN BUS
+ 1  0  1  *  *  *  *  *  *  *  *  *  *  *  *  *   RW SM-A /CS (read or write to slave cpu address space 0000-1fff; slave cpu is held in waitstate during this)
+ 1  1  0  x  x  *  *  *  *  *  *  *  *  *  *  *   RW SRAM (ic3)
+ 1  1  1  x  x  x  x  x  x  x  x  x  x  x  x  x   OPEN BUS (diag rom may map here?)
+*/
 
 /******************************************************************************/
 
@@ -355,7 +417,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, buggychl_state, pedal_in_r, nullptr)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, buggychl_state, pedal_in_r, nullptr)
 
 	PORT_START("PEDAL")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_NAME("P1 Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(15)   /* accelerator */
@@ -389,7 +451,7 @@ static const gfx_layout spritelayout =
 	8
 };
 
-static GFXDECODE_START( buggychl )
+static GFXDECODE_START( gfx_buggychl )
 	GFXDECODE_ENTRY( nullptr,           0, charlayout,   0, 8 ) /* decoded at runtime */
 	/* sprites are drawn pixel by pixel by draw_sprites() */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 8 )
@@ -435,6 +497,8 @@ void buggychl_state::machine_start()
 	save_item(NAME(m_sky_on));
 	save_item(NAME(m_sprite_color_base));
 	save_item(NAME(m_bg_scrollx));
+
+	m_led.resolve();
 }
 
 void buggychl_state::machine_reset()
@@ -449,24 +513,27 @@ void buggychl_state::machine_reset()
 MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(48'000'000)/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
-	MCFG_CPU_PROGRAM_MAP(buggychl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 48_MHz_XTAL/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
+	MCFG_DEVICE_PROGRAM_MAP(buggychl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz according to schematics */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, ((((XTAL(8'000'000)/2)/2)/256)/64)) // timer irq
-	// schematics shows a 61.035 (x2?) Hz, similar to flstory.cpp and other Taito MSM5232 based games.
-	// apparently schematics also shows a switch for the timer irq that makes it to run at half speed, no idea where this is located.
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL/2) /* 4 MHz according to schematics */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 8_MHz_XTAL/2/2/256/64) // timer irq
+	//MCFG_TIMER_DEVICE_ADD_PERIODIC("soundirq", "audiocpu",  irq0_line_hold, 8_MHz_XTAL/2/2/256/64)
+	// The schematics (which are at least partly for the wrong sound board) show a configurable timer with rates of
+	// 61.035Hz (8_MHz_XTAL/2/2/256/128)
+	// or 122.0Hz (8_MHz_XTAL/2/2/256/64)
+	// similar to flstory.cpp and other Taito MSM5232 based games.
+	// The real sound pcb probably lacks the latch for this configurable timer, but does have a jumper which likely has a similar function.
+	// The game code implies the timer int is enable/disabled by one of the "sound_enable_w" bits?
+	// TODO: actually hook this up?
 	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
 
-	// schematics show a secondary sound z80 cpu as well, running at the same speed as the audiocpu; unclear if actually populated, or if it only existed on a certain hardware release (cocktail deluxe version?)
-
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,8000000/2)  /* 4 MHz */
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 48_MHz_XTAL/8/2)  /* CPUspeed/2 MHz according to schematics, so 3MHz if cpu is jumpered for 6MHz */
 
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // typical Taito 74ls392
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // typical Taito 74ls392
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -475,21 +542,21 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	// derived from ladyfrog.cpp, causes glitches?
-//  MCFG_SCREEN_RAW_PARAMS( XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
+//  MCFG_SCREEN_RAW_PARAMS( 8_MHz_XTAL, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(buggychl_state, screen_update_buggychl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buggychl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buggychl)
 	MCFG_PALETTE_ADD("palette", 128+128)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_PALETTE_INIT_OWNER(buggychl_state, buggychl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -498,17 +565,17 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("ay1", YM2149, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay1_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_0_w))
+	MCFG_DEVICE_ADD("ay1", YM2149, 8_MHz_XTAL/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggychl_state, ta7630_volbal_ay1_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggychl_state, port_b_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", YM2149, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_1_w))
+	MCFG_DEVICE_ADD("ay2", YM2149, 8_MHz_XTAL/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggychl_state, ta7630_volbal_ay2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggychl_state, port_b_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5232, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, 8_MHz_XTAL/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
@@ -590,5 +657,5 @@ ROM_START( buggychlt )
 ROM_END
 
 
-GAMEL( 1984, buggychl, 0,        buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
-GAMEL( 1984, buggychlt,buggychl, buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychl,  0,        buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychlt, buggychl, buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )

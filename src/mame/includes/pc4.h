@@ -11,8 +11,8 @@
 #ifndef MAME_INCLUDES_PC4_H
 #define MAME_INCLUDES_PC4_H
 
-
 #include "sound/beep.h"
+#include "emupal.h"
 
 class pc4_state : public driver_device
 {

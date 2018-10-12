@@ -15,9 +15,9 @@
 
 // port setup
 #define MCFG_MN10200_READ_PORT_CB(X, _devcb) \
-	devcb = &downcast<mn10200_device &>(*device).set_read_port##X##_callback(DEVCB_##_devcb);
+	downcast<mn10200_device &>(*device).set_read_port##X##_callback(DEVCB_##_devcb);
 #define MCFG_MN10200_WRITE_PORT_CB(X, _devcb) \
-	devcb = &downcast<mn10200_device &>(*device).set_write_port##X##_callback(DEVCB_##_devcb);
+	downcast<mn10200_device &>(*device).set_write_port##X##_callback(DEVCB_##_devcb);
 
 enum
 {
@@ -88,7 +88,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;

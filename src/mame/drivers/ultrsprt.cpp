@@ -13,6 +13,7 @@
 #include "machine/upd4701.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -31,6 +32,9 @@ public:
 		m_upd(*this, "upd%u", 1),
 		m_service(*this, "SERVICE") { }
 
+	void ultrsprt(machine_config &config);
+
+private:
 	static const uint32_t VRAM_PAGES      = 2;
 	static const uint32_t VRAM_PAGE_BYTES = 512 * 1024;
 
@@ -52,14 +56,12 @@ public:
 
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ultrsprt(machine_config &config);
 	void sound_map(address_map &map);
 	void ultrsprt_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint32_t m_cpu_vram_page;
 };
@@ -148,28 +150,30 @@ READ16_MEMBER(ultrsprt_state::upd2_r)
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(ultrsprt_state::ultrsprt_map)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAMBANK("vram")
-	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE8(eeprom_r, eeprom_w, 0xff000000)
-	AM_RANGE(0x70000020, 0x70000023) AM_READ16(upd1_r, 0xffffffff)
-	AM_RANGE(0x70000040, 0x70000043) AM_READ16(upd2_r, 0xffffffff)
-	AM_RANGE(0x70000080, 0x7000008f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
-	AM_RANGE(0x700000c0, 0x700000cf) AM_WRITENOP // Written following DMA interrupt - unused int ack?
-	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
-	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_DEVWRITE("palette",  palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x00600000) AM_ROM AM_REGION("program", 0)
-ADDRESS_MAP_END
+void ultrsprt_state::ultrsprt_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).bankrw("vram");
+	map(0x70000000, 0x70000000).rw(FUNC(ultrsprt_state::eeprom_r), FUNC(ultrsprt_state::eeprom_w));
+	map(0x70000020, 0x70000023).r(FUNC(ultrsprt_state::upd1_r));
+	map(0x70000040, 0x70000043).r(FUNC(ultrsprt_state::upd2_r));
+	map(0x70000080, 0x7000008f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
+	map(0x700000c0, 0x700000cf).nopw(); // Written following DMA interrupt - unused int ack?
+	map(0x700000e0, 0x700000e3).w(FUNC(ultrsprt_state::int_ack_w));
+	map(0x7f000000, 0x7f01ffff).ram().share("workram");
+	map(0x7f700000, 0x7f703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x7f800000, 0x7f9fffff).mirror(0x00600000).rom().region("program", 0);
+}
 
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(ultrsprt_state::sound_map)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
-	AM_RANGE(0x00100000, 0x00101fff) AM_RAM
-	AM_RANGE(0x00200000, 0x0020000f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0xffff)
-	AM_RANGE(0x00400000, 0x004002ff) AM_DEVREADWRITE8("k054539", k054539_device, read, write, 0xffff)
-ADDRESS_MAP_END
+void ultrsprt_state::sound_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom();
+	map(0x00100000, 0x00101fff).ram();
+	map(0x00200000, 0x0020000f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w));
+	map(0x00400000, 0x004002ff).rw("k054539", FUNC(k054539_device::read), FUNC(k054539_device::write));
+}
 
 
 /*****************************************************************************/
@@ -197,8 +201,8 @@ static INPUT_PORTS_START( ultrsprt )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // VRAM page flip status?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // VRAM page flip status?
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
@@ -217,7 +221,7 @@ void ultrsprt_state::machine_start()
 
 	membank("vram")->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
 
-	save_pointer(NAME(m_vram.get()), VRAM_PAGE_BYTES * VRAM_PAGES);
+	save_pointer(NAME(m_vram), VRAM_PAGE_BYTES * VRAM_PAGES);
 	save_item(NAME(m_cpu_vram_page));
 }
 
@@ -234,22 +238,22 @@ void ultrsprt_state::machine_reset()
 
 MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)
-	MCFG_CPU_PROGRAM_MAP(ultrsprt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ultrsprt_state, irq1_line_assert)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(ultrsprt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ultrsprt_state, irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 8000000) // Unconfirmed
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("P1X")
-	MCFG_UPD4701_PORTY("P1Y")
+	UPD4701A(config, m_upd[0]);
+	m_upd[0]->set_portx_tag("P1X");
+	m_upd[0]->set_porty_tag("P1Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("P2X")
-	MCFG_UPD4701_PORTY("P2Y")
+	UPD4701A(config, m_upd[1]);
+	m_upd[1]->set_portx_tag("P2X");
+	m_upd[1]->set_porty_tag("P2Y");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -263,10 +267,11 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_6))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_6);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_5))
@@ -296,4 +301,4 @@ ROM_START( fiveside )
 ROM_END
 
 // Undumped: Ultra Hockey
-GAME(1995, fiveside, 0, ultrsprt, ultrsprt, ultrsprt_state, 0, ROT90, "Konami", "Five a Side Soccer (ver UAA)", 0)
+GAME(1995, fiveside, 0, ultrsprt, ultrsprt, ultrsprt_state, empty_init, ROT90, "Konami", "Five a Side Soccer (ver UAA)", 0)

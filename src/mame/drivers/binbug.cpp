@@ -53,7 +53,7 @@
 #include "emu.h"
 #include "bus/rs232/keyboard.h"
 #include "cpu/s2650/s2650.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -61,6 +61,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -85,7 +86,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// needed by dg680 class
-	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu; // S2650 or Z80
 	required_device<cassette_image_device> m_cass;
 
 	void binbug(machine_config &config);
@@ -113,18 +114,20 @@ WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-ADDRESS_MAP_START(binbug_state::binbug_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff) AM_ROM
-	AM_RANGE( 0x0400, 0x77ff) AM_RAM
-	AM_RANGE( 0x7800, 0x7bff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x7c00, 0x7fff) AM_RAM AM_SHARE("attribram")
-ADDRESS_MAP_END
+void binbug_state::binbug_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x77ff).ram();
+	map(0x7800, 0x7bff).ram().share("videoram");
+	map(0x7c00, 0x7fff).ram().share("attribram");
+}
 
-ADDRESS_MAP_START(binbug_state::binbug_data)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(binbug_ctrl_w)
-ADDRESS_MAP_END
+void binbug_state::binbug_data(address_map &map)
+{
+	map.unmap_value_high();
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(binbug_state::binbug_ctrl_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( binbug )
@@ -220,7 +223,7 @@ static const gfx_layout dg640_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dg640 )
+static GFXDECODE_START( gfx_dg640 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dg640_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -298,11 +301,11 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(binbug_state::binbug)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(binbug_mem)
-	MCFG_CPU_DATA_MAP(binbug_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(binbug_state, binbug_serial_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(binbug_state, binbug_serial_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(binbug_mem)
+	MCFG_DEVICE_DATA_MAP(binbug_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, binbug_state, binbug_serial_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, binbug_state, binbug_serial_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
@@ -313,18 +316,17 @@ MACHINE_CONFIG_START(binbug_state::binbug)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dg640)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dg640)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
-	MCFG_RS232_PORT_ADD("keyboard", default_rs232_devices, "keyboard")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", binbug_state, binbug, "pgm", 1)
@@ -343,8 +345,8 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT  COMPANY      FULLNAME      FLAGS
-COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, binbug_state, 0,    "MicroByte", "BINBUG 3.6", 0 )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT        COMPANY      FULLNAME      FLAGS
+COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, binbug_state, empty_init, "MicroByte", "BINBUG 3.6", 0 )
 
 
 
@@ -437,25 +439,27 @@ private:
 	required_device<z80pio_device> m_pio;
 };
 
-ADDRESS_MAP_START(dg680_state::dg680_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xcfff) AM_RAM
-	AM_RANGE( 0xd000, 0xd7ff) AM_ROM
-	AM_RANGE( 0xd800, 0xefff) AM_RAM
-	AM_RANGE( 0xf000, 0xf3ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0xf400, 0xf7ff) AM_RAM AM_SHARE("attribram")
-ADDRESS_MAP_END
+void dg680_state::dg680_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xcfff).ram();
+	map(0xd000, 0xd7ff).rom();
+	map(0xd800, 0xefff).ram();
+	map(0xf000, 0xf3ff).ram().share("videoram");
+	map(0xf400, 0xf7ff).ram().share("attribram");
+}
 
-ADDRESS_MAP_START(dg680_state::dg680_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x04,0x07) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x08,0x08) AM_READWRITE(port08_r,port08_w) //SWP Control and Status
+void dg680_state::dg680_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x04, 0x07).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x08, 0x08).rw(FUNC(dg680_state::port08_r), FUNC(dg680_state::port08_w)); //SWP Control and Status
 	//AM_RANGE(0x09,0x09) parallel input port
 	// Optional AM9519 Programmable Interrupt Controller (port c = data, port d = control)
 	//AM_RANGE(0x0c,0x0d) AM_DEVREADWRITE("am9519", am9519_device, read, write)
-ADDRESS_MAP_END
+}
 
 void dg680_state::machine_reset()
 {
@@ -533,10 +537,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 
 MACHINE_CONFIG_START(dg680_state::dg680)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(dg680_mem)
-	MCFG_CPU_IO_MAP(dg680_io)
-	MCFG_Z80_DAISY_CHAIN(dg680_daisy_chain)
+	z80_device& maincpu(Z80(config, m_maincpu, XTAL(8'000'000) / 4));
+	maincpu.set_addrmap(AS_PROGRAM, &dg680_state::dg680_mem);
+	maincpu.set_addrmap(AS_IO, &dg680_state::dg680_io);
+	maincpu.set_daisy_config(dg680_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
@@ -547,7 +551,7 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dg640)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dg640)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
@@ -556,21 +560,20 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(8'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(8'000'000) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(8'000'000) / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(dg680_state, porta_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(8'000'000) / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio.in_pa_callback().set(FUNC(dg680_state::porta_r));
 	// OUT_ARDY - this activates to ask for kbd data but not known if actually used
-	MCFG_Z80PIO_IN_PB_CB(READ8(dg680_state, portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(dg680_state, portb_w))
+	pio.in_pb_callback().set(FUNC(dg680_state::portb_r));
+	pio.out_pb_callback().set(FUNC(dg680_state::portb_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc0", dg680_state, time_tick, attotime::from_hz(200))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc3", dg680_state, uart_tick, attotime::from_hz(4800))
@@ -591,5 +594,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  CLASS        INIT  COMPANY            FULLNAME                   FLAGS
-COMP( 1980, dg680, 0,      0,       dg680,   dg680, dg680_state, 0,    "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY            FULLNAME                   FLAGS
+COMP( 1980, dg680, 0,      0,      dg680,   dg680, dg680_state, empty_init, "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

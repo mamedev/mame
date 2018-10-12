@@ -159,17 +159,6 @@
 
   Game notes...
 
-  The third set is resetting after drawing the maze, and when start a game.
-
-  Attract reset:
-
-  bp d28e (this is after all the jsr tables that draw the maze)
-  $d296: jsr $e0cd...
-  $e189 (jsr $6337) ; $6337 ---> Goes nowhere. Hit the 00's (BRK) and reset.
-
-  Start reset:
-
-  $e0e9: 4c ee 60  ; jmp $60ee <--- nothing here.
 
 ***************************************************************************************
 
@@ -193,15 +182,16 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/netlist.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include "netlist/devices/net_lib.h"
 
 
-#define MASTER_CLOCK    XTAL(20'000'000)           /* confirmed */
-#define CPU_CLOCK       MASTER_CLOCK / 16    /* confirmed */
-#define SND_CLOCK       MASTER_CLOCK / 8     /* confirmed */
+#define MASTER_CLOCK    XTAL(20'000'000)     // confirmed
+#define CPU_CLOCK       MASTER_CLOCK / 16    // confirmed
+#define SND_CLOCK       MASTER_CLOCK / 8     // confirmed
 
 
 class cocoloco_state : public driver_device
@@ -225,8 +215,6 @@ public:
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-	DECLARE_DRIVER_INIT(cocob);
 
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cocoloco);
@@ -316,7 +304,7 @@ void cocoloco_state::video_start()
 {
 	m_videoram = std::make_unique<uint8_t[]>(0x2000 * 8);
 
-	save_pointer(NAME(m_videoram.get()), 0x2000 * 8);
+	save_pointer(NAME(m_videoram), 0x2000 * 8);
 	save_item(NAME(m_videobank));
 }
 
@@ -399,18 +387,19 @@ WRITE8_MEMBER( cocoloco_state::coincounter_w )
 *      Memory Map Information      *
 ***********************************/
 
-ADDRESS_MAP_START(cocoloco_state::cocoloco_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(vram_r, vram_w)     // 256 x 256 x 1
-	AM_RANGE(0x6001, 0x6001) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0x6003, 0x6003) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(vbank_w)
-	AM_RANGE(0x8005, 0x8005) AM_WRITE(coincounter_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa005, 0xa005) AM_WRITE(vram_clear_w)
-	AM_RANGE(0xd000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cocoloco_state::cocoloco_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x3fff).rw(FUNC(cocoloco_state::vram_r), FUNC(cocoloco_state::vram_w));     // 256 x 256 x 1
+	map(0x6001, 0x6001).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x6002, 0x6002).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0x6003, 0x6003).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0x8003, 0x8003).w(FUNC(cocoloco_state::vbank_w));
+	map(0x8005, 0x8005).w(FUNC(cocoloco_state::coincounter_w));
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa005, 0xa005).w(FUNC(cocoloco_state::vram_clear_w));
+	map(0xd000, 0xffff).rom();
+}
 
 /*
   1800-3fff: RW  --> code inits reading and writing the whole range.
@@ -454,7 +443,7 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(cocoloco_state::coin_inserted)
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 static INPUT_PORTS_START( cocoloco )
@@ -524,12 +513,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
-	MCFG_CPU_PROGRAM_MAP(cocoloco_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cocoloco_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256) /* TODO: not accurate, ~50 Hz */
+	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256)  // TODO: not accurate, ~50 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(cocoloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -537,18 +526,18 @@ MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 	MCFG_PALETTE_INIT_OWNER(cocoloco_state, cocoloco)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, SND_CLOCK) /* confirmed */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
+	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, 48000)
 	MCFG_NETLIST_SETUP(nl_cocoloco)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -592,49 +581,25 @@ ROM_START( cocolocoa )
 	ROM_LOAD( "tbp28l22.bin", 0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )  // same decode prom from abattle (astrof.cpp)
 ROM_END
 
-/* This Petaco's 2-player game
-   seems to soffer of some bitrot.
-
-   The code executes subroutines located out of the ROM space.
-   Finally jumps to nowhere.
-*/
 ROM_START( cocolocob )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b1.bin",   0xd000, 0x0800, CRC(5ead42c4) SHA1(f2b8bf48f80c99c8c109ec67cdd6e1105f7f9702) )
 	ROM_LOAD( "b-c1.bin", 0xd800, 0x0800, CRC(104db6b3) SHA1(d0a9ce1b920124078f442bdcb226e8da9f96d60a) )
-	ROM_LOAD( "c1.bin",   0xe000, 0x0800, BAD_DUMP CRC(8774b1bc) SHA1(b7c09883c136dedfffd0724b49cc5ff987831850) )
+	ROM_LOAD( "c1.bin",   0xe000, 0x0800, CRC(64a51a8c) SHA1(571ab5b29101ce400381538209f5da7ecbd9a523) )
 	ROM_LOAD( "d1.bin",   0xe800, 0x0800, CRC(41b22627) SHA1(241659448074e5101ca7da3feb4a0a38580b12e9) )
 	ROM_LOAD( "d-e1.bin", 0xf000, 0x0800, CRC(db93f941) SHA1(b827341e408b5dc50acdfd3586f829f7bb2bb915) )
 	ROM_LOAD( "e1.bin",   0xf800, 0x0800, CRC(4e5705f0) SHA1(271d6c8eff331327dc1a75f7a4b0c64d3e363e3d) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp28l22.bin", 0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )  // from the other set.
+	ROM_LOAD( "tbp18s22n.bin", 0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )  // verified.
 ROM_END
-
-
-/***********************************
-*           Driver Init            *
-***********************************/
-
-DRIVER_INIT_MEMBER(cocoloco_state, cocob)
-{
-//  Just for testing...
-
-	uint8_t *rom = memregion("maincpu")->base();
-
-	rom[0xe18b] = rom[0xe18b] ^ 0x80; // with jsr $e337, the character doesn't turn and eat straight (maze included)
-
-	rom[0xe049] = 0xea;
-	rom[0xe04a] = 0xea;
-	rom[0xe04b] = 0xea;
-}
 
 
 /***********************************
 *           Game Drivers           *
 ***********************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT   ROT    COMPANY         FULLNAME             FLAGS
-GAME( 198?, cocoloco,  0,        cocoloco, cocoloco,  cocoloco_state, 0,     ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, cocolocoa, cocoloco, cocoloco, cocolocoa, cocoloco_state, 0,     ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, cocolocob, cocoloco, cocoloco, cocoloco,  cocoloco_state, cocob, ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT        ROT    COMPANY         FULLNAME             FLAGS
+GAME( 1981, cocoloco,  0,        cocoloco, cocoloco,  cocoloco_state, empty_init, ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )  // PCB 112-020
+GAME( 1981, cocolocoa, cocoloco, cocoloco, cocolocoa, cocoloco_state, empty_init, ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )  // PCB 112-020
+GAME( 1981, cocolocob, cocoloco, cocoloco, cocoloco,  cocoloco_state, empty_init, ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_SUPPORTS_SAVE )  // PCB 112-025

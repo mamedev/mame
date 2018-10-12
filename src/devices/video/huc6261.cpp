@@ -34,8 +34,9 @@ DEFINE_DEVICE_TYPE(HUC6261, huc6261_device, "huc6261", "Hudson HuC6261 VCE")
 huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, HUC6261, tag, owner, clock),
 		device_video_interface(mconfig, *this),
-		m_huc6270_a_tag(nullptr), m_huc6270_b_tag(nullptr), m_huc6272_tag(nullptr),
-		m_huc6270_a(nullptr), m_huc6270_b(nullptr), m_huc6272(nullptr),
+		m_huc6270_a(*this, finder_base::DUMMY_TAG),
+		m_huc6270_b(*this, finder_base::DUMMY_TAG),
+		m_huc6272(*this, finder_base::DUMMY_TAG),
 		m_last_h(0), m_last_v(0), m_height(0), m_address(0), m_palette_latch(0), m_register(0), m_control(0), m_pixels_per_clock(0), m_pixel_data_a(0), m_pixel_data_b(0), m_pixel_clock(0), m_timer(nullptr), m_bmp(nullptr)
 {
 	// Set up UV lookup table
@@ -413,22 +414,9 @@ WRITE16_MEMBER( huc6261_device::write )
 
 void huc6261_device::device_start()
 {
-	/* Make sure we are supplied all our mandatory tags */
-	assert( m_huc6270_a_tag != nullptr );
-	assert( m_huc6270_b_tag != nullptr );
-	assert( m_huc6272_tag != nullptr );
-
 	m_timer = timer_alloc();
-	m_huc6270_a = machine().device<huc6270_device>(m_huc6270_a_tag);
-	m_huc6270_b = machine().device<huc6270_device>(m_huc6270_b_tag);
-	m_huc6272 = machine().device<huc6272_device>(m_huc6272_tag);
 
 	m_bmp = std::make_unique<bitmap_rgb32>(WPF, LPF);
-
-	/* We want to have valid devices */
-	assert( m_huc6270_a != nullptr );
-	assert( m_huc6270_b != nullptr );
-	assert( m_huc6272 != nullptr );
 
 	save_item(NAME(m_last_h));
 	save_item(NAME(m_last_v));

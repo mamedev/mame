@@ -46,12 +46,11 @@ TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
 {
 	/* Star Force has more tiles in bg1, so to get a uniform color code spread */
 	/* they wired bit 7 of the tile code in place of bit 4 to get the color code */
-	static const uint8_t colormap[8] = { 0, 2, 4, 6, 1, 3, 5, 7 };
 	uint8_t code = m_bg1videoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(1,
 			code,
-			colormap[(code & 0xe0) >> 5],
+			bitswap<3>(((code & 0xe0) >> 5), 1, 0, 2),
 			0);
 }
 

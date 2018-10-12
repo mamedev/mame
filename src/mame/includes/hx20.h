@@ -17,7 +17,7 @@
 #include "bus/epson_sio/epson_sio.h"
 #include "bus/rs232/rs232.h"
 
-#include "rendlay.h"
+#include "emupal.h"
 
 #define HD6301V1_MAIN_TAG   "8g"
 #define HD6301V1_SLAVE_TAG  "6d"
@@ -68,8 +68,12 @@ public:
 			m_kbrequest(1)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	void cm6000(machine_config &config);
+	void hx20(machine_config &config);
+
+private:
+	required_device<hd63701_cpu_device> m_maincpu;
+	required_device<hd63701_cpu_device> m_subcpu;
 	required_device<mc146818_device> m_rtc;
 	required_device<upd7227_device> m_lcdc0;
 	required_device<upd7227_device> m_lcdc1;
@@ -143,8 +147,6 @@ public:
 	// sio state
 	int m_sio_rx;
 	int m_sio_pin;
-	void cm6000(machine_config &config);
-	void hx20(machine_config &config);
 	void cm6000_mem(address_map &map);
 	void hx20_io(address_map &map);
 	void hx20_mem(address_map &map);

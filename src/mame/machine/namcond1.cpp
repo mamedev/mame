@@ -64,8 +64,8 @@ READ16_MEMBER(namcond1_state::cuskey_r)
 			return( 0x0000 );
 
 		default :
-			logerror( "offset $%X accessed from $%X\n",
-						offset<<1, space.device().safe_pc() );
+			logerror("%s offset $%X accessed\n",
+				machine().describe_context(), offset << 1);
 			return( 0 );
 	}
 }

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro Model B (US) Disks -->
+<!-- Acorn BBC Micro Model B (US) Disks -->
 
 <!-- Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbcb_flop_us" description="BBC Micro Model B (US) disks">
+<softwarelist name="bbcb_flop_us" description="Acorn BBC Micro Model B (US) disks">
 
 	<software name="intrutil">
 		<description>Introductory and Utilities Disk</description>

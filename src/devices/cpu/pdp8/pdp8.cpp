@@ -43,7 +43,7 @@
 #define OPR_GROUP1_VAL  0000
 #define OPR_GROUP2_VAL  0400
 
-DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "PDP8")
+DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "DEC PDP8")
 
 //-------------------------------------------------
 //  pdp8_device - constructor
@@ -94,7 +94,7 @@ void pdp8_device::device_start()
 	save_item(NAME(m_halt));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void pdp8_device::device_stop()
@@ -151,9 +151,9 @@ void pdp8_device::state_string_export(const device_state_entry &entry, std::stri
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *pdp8_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pdp8_cpu_device::create_disassembler()
 {
-	return new pdp8_disassembler;
+	return std::make_unique<pdp8_disassembler>();
 }
 
 
@@ -216,7 +216,7 @@ void pdp8_device::execute_run()
 	{
 		m_pc &= 07777;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		uint16_t op = m_program->read_word(m_pc);
 

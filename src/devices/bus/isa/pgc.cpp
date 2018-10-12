@@ -3,7 +3,7 @@
 
 /***************************************************************************
 
-  IBM Professional Graphics Controller (PGC), skeleton driver.
+  IBM Professional Graphics Controller (PGC).
 
   Designed for IBM by Vermont Microsystems.  References:
 
@@ -16,13 +16,13 @@
     http://www.seasip.info/VintagePC/pgc.html
 
   To do:
-  - decode memory map
-  - various VRAM write modes
+  - pass IBM diagnostics (currently fail with code 3905)
+  - CGA emulator
   - what's up with irq 3 (= vblank irq)? (causes soft reset)
   - "test pin of the microprocessor samples the hsync pulse"
-  - CGA emulator
   - bus state handling?
   - VRAM address translator ROM?
+  - clones/compatibles?  CompuShow apparently was tested with a clone and sends opcode E6, writes 2 to C630C
 
 ***************************************************************************/
 
@@ -32,17 +32,18 @@
 #include "screen.h"
 
 
-#define VERBOSE_PGC     1
+//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
+#define LOG_VRAM    (1U << 1)
+#define LOG_CMD     (1U << 2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_PGC>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_GENERAL | LOG_VRAM)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGV(...)   LOGMASKED(LOG_VRAM, __VA_ARGS__)
+#define LOGCMD(...) LOGMASKED(LOG_CMD,  __VA_ARGS__)
+
 
 #define PGC_SCREEN_NAME "pgc_screen"
 
@@ -63,12 +64,12 @@ ROM_START( pgc )
 	ROM_DEFAULT_BIOS("1985")
 
 	ROM_SYSTEM_BIOS(0, "1984", "1984 firmware, P/N 6137322/3")
-	ROMX_LOAD("ibm_6137323_pgc_card_27256.bin", 0x00000, 0x8000, CRC(f564f342) SHA1(c5ef17fd1569043cb59f61faf828ea8b0ee95526), ROM_BIOS(1))
-	ROMX_LOAD("ibm_6137322_pgc_card_27256.bin", 0x08000, 0x8000, CRC(5e6cc82f) SHA1(45b3ffb5a9c51986862f8d47b3e03dcaaf4073d5), ROM_BIOS(1))
+	ROMX_LOAD("ibm_6137323_pgc_card_27256.bin", 0x00000, 0x8000, CRC(f564f342) SHA1(c5ef17fd1569043cb59f61faf828ea8b0ee95526), ROM_BIOS(0))
+	ROMX_LOAD("ibm_6137322_pgc_card_27256.bin", 0x08000, 0x8000, CRC(5e6cc82f) SHA1(45b3ffb5a9c51986862f8d47b3e03dcaaf4073d5), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "1985", "1985 firmware, P/N 59X7354/5")
-	ROMX_LOAD("pgc_u44.bin", 0x00000, 0x8000, CRC(71280241) SHA1(7042ccd4ebd03f576a256a433b8aa38d1b4fefa8), ROM_BIOS(2))
-	ROMX_LOAD("pgc_u43.bin", 0x08000, 0x8000, CRC(923f5ea3) SHA1(2b2a55d64b20d3a613b00c51443105aa03eca5d6), ROM_BIOS(2))
+	ROMX_LOAD("pgc_u44.bin", 0x00000, 0x8000, CRC(71280241) SHA1(7042ccd4ebd03f576a256a433b8aa38d1b4fefa8), ROM_BIOS(1))
+	ROMX_LOAD("pgc_u43.bin", 0x08000, 0x8000, CRC(923f5ea3) SHA1(2b2a55d64b20d3a613b00c51443105aa03eca5d6), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "commarea", ROMREGION_ERASE00)
 
@@ -105,21 +106,21 @@ read only
     3C001       INIT L/INIT H
 */
 
-ADDRESS_MAP_START(isa8_pgc_device::pgc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x07fff) AM_ROM
-	AM_RANGE(0x08000, 0x0ffff) AM_ROM AM_REGION("maincpu", 0x8000)
-	AM_RANGE(0x10000, 0x1001f) AM_READWRITE(stateparam_r, stateparam_w)
-//  AM_RANGE(0x18000, 0x18fff) AM_RAM   // ??
-	AM_RANGE(0x28000, 0x287ff) AM_RAM AM_REGION("commarea", 0) AM_MIRROR(0x800)
-	AM_RANGE(0x3c000, 0x3c001) AM_READ(init_r)
-//  AM_RANGE(0x3e000, 0x3efff) AM_RAM   // ??
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x8000)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(isa8_pgc_device::pgc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void isa8_pgc_device::pgc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x07fff).rom();
+	map(0x08000, 0x0ffff).rom().region("maincpu", 0x8000);
+	map(0x10000, 0x1001f).rw(FUNC(isa8_pgc_device::stateparam_r), FUNC(isa8_pgc_device::stateparam_w));
+//  map(0x18000, 0x18fff).ram();   // ??
+	map(0x28000, 0x287ff).ram().region("commarea", 0).mirror(0x800);
+	map(0x32001, 0x32001).nopw();
+	map(0x32020, 0x3203f).w(FUNC(isa8_pgc_device::accel_w));
+	map(0x3c000, 0x3c001).r(FUNC(isa8_pgc_device::init_r));
+//  map(0x3e000, 0x3efff).ram();   // ??
+	map(0x80000, 0xf7fff).rw(FUNC(isa8_pgc_device::vram_r), FUNC(isa8_pgc_device::vram_w));
+	map(0xf8000, 0xfffff).rom().region("maincpu", 0x8000);
+}
 
 static const gfx_layout pgc_charlayout =
 {
@@ -134,7 +135,7 @@ static const gfx_layout pgc_charlayout =
 	8*16                    /* every char takes 10 bytes */
 };
 
-static GFXDECODE_START( pgc )
+static GFXDECODE_START( gfx_pgc )
 	GFXDECODE_REVERSEBITS("chargen", 0, pgc_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -151,12 +152,10 @@ DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional G
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(24'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(pgc_map)
-	MCFG_CPU_IO_MAP(pgc_io)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(pgc_map)
 #if 0
-	MCFG_CPU_VBLANK_INT_DRIVER(PGC_SCREEN_NAME, isa8_pgc_device, vblank_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
 #endif
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", isa8_pgc_device, scanline_callback,
@@ -169,8 +168,11 @@ MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 		PGC_TOTAL_VERT, PGC_VERT_START, PGC_VERT_START+PGC_DISP_VERT)
 	MCFG_SCREEN_UPDATE_DRIVER(isa8_pgc_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+#if 0
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, isa8_pgc_device, vblank_irq))
+#endif
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pgc)
 	MCFG_PALETTE_ADD( "palette", 256 )
 MACHINE_CONFIG_END
 
@@ -180,7 +182,7 @@ MACHINE_CONFIG_END
 
 const tiny_rom_entry *isa8_pgc_device::device_rom_region() const
 {
-	return ROM_NAME( pgc );
+	return ROM_NAME(pgc);
 }
 
 //-------------------------------------------------
@@ -189,7 +191,7 @@ const tiny_rom_entry *isa8_pgc_device::device_rom_region() const
 
 ioport_constructor isa8_pgc_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( pgc );
+	return INPUT_PORTS_NAME(pgc);
 }
 
 //**************************************************************************
@@ -217,7 +219,6 @@ isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type
 
 void isa8_pgc_device::device_start()
 {
-	address_space &space = m_cpu->space( AS_PROGRAM );
 	int width = PGC_DISP_HORZ;
 	int height = PGC_DISP_VERT;
 
@@ -226,18 +227,15 @@ void isa8_pgc_device::device_start()
 
 	set_isa_device();
 
-	for (int i = 0; i < 256; i++ )
+	for (int i = 0; i < 256; i++)
 	{
-		m_palette->set_pen_color( i, 0, 0, 0 );
+		m_palette->set_pen_color(i, 0, 0, 0);
 	}
 
 	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 	m_bitmap->fill(0);
 
 	m_vram = std::make_unique<uint8_t[]>(0x78000);
-	space.install_readwrite_bank(0x80000, 0xf7fff, "vram");
-	membank("vram")->set_base(m_vram.get());
-
 	m_eram = std::make_unique<uint8_t[]>(0x8000);
 
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&isa8_pgc_device::reset_common, this));
@@ -245,7 +243,7 @@ void isa8_pgc_device::device_start()
 
 void isa8_pgc_device::reset_common()
 {
-	address_space &space = m_cpu->space( AS_PROGRAM );
+	address_space &space = m_cpu->space(AS_PROGRAM);
 
 	space.unmap_readwrite(0xf8000, 0xfffff);
 	space.install_rom(0xf8000, 0xfffff, memregion("maincpu")->base() + 0x8000);
@@ -255,6 +253,7 @@ void isa8_pgc_device::device_reset()
 {
 	memset(m_stateparam, 0, sizeof(m_stateparam));
 	memset(m_lut, 0, sizeof(m_lut));
+	m_accel = 0;
 
 	m_commarea = memregion("commarea")->base();
 	if (BIT(ioport("DSW")->read(), 1))
@@ -265,63 +264,140 @@ void isa8_pgc_device::device_reset()
 
 //
 
-INTERRUPT_GEN_MEMBER(isa8_pgc_device::vblank_irq)
+WRITE_LINE_MEMBER(isa8_pgc_device::vblank_irq)
 {
-	DBG_LOG(2,"irq",("vblank_irq\n"));
-	m_cpu->set_input_line(0, ASSERT_LINE);
+	if (state)
+	{
+		LOGCMD("vblank_irq\n");
+		m_cpu->set_input_line(0, ASSERT_LINE);
+	}
 }
 
 IRQ_CALLBACK_MEMBER(isa8_pgc_device::irq_callback)
 {
-	DBG_LOG(2,"irq",("irq_callback\n"));
+	LOGCMD("irq_callback\n");
 	m_cpu->set_input_line(0, CLEAR_LINE);
 	return 3;
 }
 
 // memory handlers
 
-READ8_MEMBER( isa8_pgc_device::stateparam_r ) {
+READ8_MEMBER(isa8_pgc_device::vram_r)
+{
+	uint8_t ret;
+
+	ret = m_vram[offset];
+	LOGV("vram R @ %02x == %02x\n", offset, ret);
+	return ret;
+}
+
+/*
+ * accel modes (decimal)
+ *
+ * 0 - none
+ * 1 - write 4 pixels, starting at offset
+ * 2 - write up to 4 pixels, ending at offset
+ * 3 - write up to 4 pixels, starting at offset
+ * 5 - write 20 pixels, starting at offset
+ * 9 - write up to 5 pixel groups, ending at offset.  offset may be in the middle of pixel group.
+ * 13 - write up to 5 pixel groups, starting at offset.
+ */
+WRITE8_MEMBER(isa8_pgc_device::vram_w)
+{
+	bool handled = true;
+
+	switch (m_accel)
+	{
+	case 0:
+		m_vram[offset] = data;
+		break;
+
+	case 1:
+		std::fill(&m_vram[offset], &m_vram[offset + 4], data);
+		break;
+
+	case 2:
+		std::fill(&m_vram[offset & ~3], &m_vram[offset + 1], data);
+		break;
+
+	case 3:
+		std::fill(&m_vram[offset], &m_vram[(offset + 4) & ~3], data);
+		break;
+
+	case 5:
+		std::fill(&m_vram[offset], &m_vram[offset + 20], data);
+		break;
+
+	case 9:
+		std::fill(&m_vram[offset - ((offset % 1024) % 20)], &m_vram[(offset + 4) & ~3], data);
+		break;
+
+	case 13:
+		std::fill(&m_vram[offset], &m_vram[(offset + 20) - ((offset % 1024) + 20) % 20], data);
+		break;
+
+	default:
+		m_vram[offset] = data;
+		handled = false;
+		break;
+	}
+	LOGV("vram W @ %02x <- %02x (accel %d)%s\n", offset, data, m_accel,
+		 handled ? "" : " (unsupported)");
+}
+
+WRITE8_MEMBER(isa8_pgc_device::accel_w)
+{
+	m_accel = offset >> 1;
+	LOGV("accel  @ %05x <- %02x (%d)\n", 0x32020 + offset, data, m_accel);
+}
+
+READ8_MEMBER(isa8_pgc_device::stateparam_r)
+{
 	uint8_t ret;
 
 	ret = m_stateparam[offset >> 1];
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		DBG_LOG(1,"stateparam",("R @ %02x == %02x\n", offset, ret));
+		LOG("stateparam R @ %02x == %02x\n", offset, ret);
 	}
 	return ret;
 }
 
-WRITE8_MEMBER( isa8_pgc_device::stateparam_w ) {
+WRITE8_MEMBER(isa8_pgc_device::stateparam_w)
+{
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		DBG_LOG(1,"stateparam",("W @ %02x <- %02x\n", offset, data));
+		LOG("stateparam W @ %02x <- %02x\n", offset, data);
 	}
 	m_stateparam[offset >> 1] = data;
 }
 
-WRITE8_MEMBER( isa8_pgc_device::lut_w ) {
+WRITE8_MEMBER(isa8_pgc_device::lut_w)
+{
 	uint8_t o = (offset >> 1) * 3;
 
-	if (offset & 1) {
-		m_lut[o + 2] = (data & 15) << 4;
+	if (offset & 1)
+	{
+		m_lut[o + 2] = (data & 15) * 17;
 		m_palette->set_pen_color( offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
-		DBG_LOG(1,"lut",("W @ %02X <- %d %d %d\n",
-			offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] ));
+		LOG("lut W @ %02X <- %d %d %d\n",
+			offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 	} else {
-		m_lut[o    ] = data & 0xf0;
-		m_lut[o + 1] = (data & 15) << 4;
+		m_lut[o    ] = (data >> 4) * 17;
+		m_lut[o + 1] = (data & 15) * 17;
 	}
 }
 
-READ8_MEMBER( isa8_pgc_device::init_r ) {
-	DBG_LOG(1,"INIT",("unmapping ROM\n"));
+READ8_MEMBER(isa8_pgc_device::init_r)
+{
+	LOG("INIT: unmapping ROM\n");
 	space.unmap_read(0xf8000, 0xfffff);
 
-	DBG_LOG(1,"INIT",("mapping emulator RAM\n"));
+	LOG("INIT: mapping emulator RAM\n");
 	space.install_readwrite_bank(0xf8000, 0xfffff, "eram");
 	membank("eram")->set_base(m_eram.get());
 
-	DBG_LOG(1,"INIT",("mapping LUT\n"));
+	LOG("INIT: mapping LUT\n");
 	space.install_write_handler(0xf8400, 0xf85ff,
 		write8_delegate(FUNC(isa8_pgc_device::lut_w), this));
 
@@ -335,9 +411,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
 	uint8_t *v;
 
 	// XXX hpos shifts every frame -- fix
-	if (y == 0) DBG_LOG(2,"scanline_cb",
-		("frame %d x %.4d y %.3d\n",
-		(int) m_screen->frame_number(), m_screen->hpos(), y));
+	if (y == 0) LOGCMD("scanline_cb frame %d x %.4d y %.3d\n",
+		(int) m_screen->frame_number(), m_screen->hpos(), y);
 
 	if (y < PGC_VERT_START) return;
 	y -= PGC_VERT_START;
@@ -347,7 +422,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
 	v = &m_vram[y * 1024];
 	p = &m_bitmap->pix16(y, 0);
 
-	for (x = 0; x < PGC_DISP_HORZ; x++) {
+	for (x = 0; x < PGC_DISP_HORZ; x++)
+	{
 		*p++ = *v++;
 	}
 }

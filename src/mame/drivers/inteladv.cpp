@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -32,18 +33,18 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void inteladv(machine_config &config);
+
+private:
 	uint32_t screen_update_inteladv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void inteladv(machine_config &config);
 	void inteladv_main(address_map &map);
 	void inteladv(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 };
@@ -60,12 +61,13 @@ uint32_t inteladv_state::screen_update_inteladv(screen_device &screen, bitmap_in
 	return 0;
 }
 
-ADDRESS_MAP_START(inteladv_state::inteladv_main)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM // zero page and stack
-	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("maincpu", 0x0000)    // boot code at 4000
-	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_REGION("maincpu", 0x8000)    // fixed ROM region?
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3000)    // boot and other vectors at 3FFx
-ADDRESS_MAP_END
+void inteladv_state::inteladv_main(address_map &map)
+{
+	map(0x0000, 0x01ff).ram(); // zero page and stack
+	map(0x4000, 0x5fff).rom().region("maincpu", 0x0000);    // boot code at 4000
+	map(0x8000, 0x8fff).rom().region("maincpu", 0x8000);    // fixed ROM region?
+	map(0xf000, 0xffff).rom().region("maincpu", 0x3000);    // boot and other vectors at 3FFx
+}
 
 static INPUT_PORTS_START( inteladv )
 INPUT_PORTS_END
@@ -80,8 +82,8 @@ void inteladv_state::machine_reset()
 
 MACHINE_CONFIG_START(inteladv_state::inteladv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL(1'000'000) )
-	MCFG_CPU_PROGRAM_MAP(inteladv_main)
+	MCFG_DEVICE_ADD("maincpu", R65C02, XTAL(1'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(inteladv_main)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -97,7 +99,8 @@ MACHINE_CONFIG_START(inteladv_state::inteladv)
 	MCFG_PALETTE_FORMAT(XBGR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 ROM_START( inteladv )
@@ -105,5 +108,5 @@ ROM_START( inteladv )
 	ROM_LOAD( "vtechinteladv.bin", 0x000000, 0x800000, CRC(e24dbbcb) SHA1(7cb7f25f5eb123ae4c46cd4529aafd95508b2210) )
 ROM_END
 
-//    YEAR  NAME         PARENT  COMPAT  MACHINE   INPUT      STATE         INIT  COMPANY  FULLNAME                                FLAGS
-COMP( 1995, inteladv,    0,      0,      inteladv, inteladv,  inteladv_state, 0, "VTech", "Intelligence Advance E/R Lerncomputer", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME                                 FLAGS
+COMP( 1995, inteladv, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "Intelligence Advance E/R Lerncomputer", MACHINE_NOT_WORKING )

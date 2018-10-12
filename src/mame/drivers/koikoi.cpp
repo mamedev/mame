@@ -42,6 +42,7 @@ to prevent disabling inputs.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,6 +59,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void koikoi(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -82,7 +86,6 @@ public:
 	uint32_t screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void koikoi(machine_config &config);
 	void koikoi_io_map(address_map &map);
 	void koikoi_map(address_map &map);
 };
@@ -232,20 +235,22 @@ WRITE8_MEMBER(koikoi_state::io_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(koikoi_state::koikoi_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW")
-	AM_RANGE(0x9000, 0x9007) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void koikoi_state::koikoi_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x6000, 0x67ff).ram();
+	map(0x7000, 0x77ff).ram().w(FUNC(koikoi_state::vram_w)).share("videoram");
+	map(0x8000, 0x8000).portr("DSW");
+	map(0x9000, 0x9007).rw(FUNC(koikoi_state::io_r), FUNC(koikoi_state::io_w));
+}
 
-ADDRESS_MAP_START(koikoi_state::koikoi_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP //watchdog
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void koikoi_state::koikoi_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x02).nopw(); //watchdog
+	map(0x03, 0x03).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x06, 0x07).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
 /*************************************
  *
@@ -319,7 +324,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( koikoi )
+static GFXDECODE_START( gfx_koikoi )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,      0, 32 )
 GFXDECODE_END
 
@@ -353,10 +358,9 @@ void koikoi_state::machine_reset()
 MACHINE_CONFIG_START(koikoi_state::koikoi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
-	MCFG_CPU_PROGRAM_MAP(koikoi_map)
-	MCFG_CPU_IO_MAP(koikoi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", koikoi_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
+	MCFG_DEVICE_PROGRAM_MAP(koikoi_map)
+	MCFG_DEVICE_IO_MAP(koikoi_io_map)
 
 
 	/* video hardware */
@@ -367,18 +371,19 @@ MACHINE_CONFIG_START(koikoi_state::koikoi)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(koikoi_state, screen_update_koikoi)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koikoi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_koikoi)
 	MCFG_PALETTE_ADD("palette", 8*32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(koikoi_state, koikoi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, KOIKOI_CRYSTAL/8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(koikoi_state, input_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(koikoi_state, unknown_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, KOIKOI_CRYSTAL/8)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, koikoi_state, input_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, koikoi_state, unknown_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -435,4 +440,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, koikoi,   0,      koikoi, koikoi, koikoi_state, 0, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, koikoi, 0, koikoi, koikoi, koikoi_state, empty_init, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

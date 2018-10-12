@@ -79,6 +79,11 @@ public:
 		, m_ram(*this, RAM_TAG)
 	{ }
 
+	void vg5k(machine_config &config);
+
+	void init_vg5k();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
 	required_device<dac_bit_interface> m_dac;
@@ -98,11 +103,9 @@ public:
 	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
 	DECLARE_READ8_MEMBER ( cassette_r );
 	DECLARE_WRITE8_MEMBER ( cassette_w );
-	DECLARE_DRIVER_INIT(vg5k);
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
-	void vg5k(machine_config &config);
 	void vg5k_io(address_map &map);
 	void vg5k_mem(address_map &map);
 };
@@ -159,42 +162,44 @@ WRITE8_MEMBER ( vg5k_state::cassette_w )
 }
 
 
-ADDRESS_MAP_START(vg5k_state::vg5k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_NOP /* messram expansion memory */
-ADDRESS_MAP_END
+void vg5k_state::vg5k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xffff).noprw(); /* messram expansion memory */
+}
 
-ADDRESS_MAP_START(vg5k_state::vg5k_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK (0xff)
+void vg5k_state::vg5k_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 
 	/* joystick */
-	AM_RANGE( 0x07, 0x07 ) AM_READ_PORT("JOY0")
-	AM_RANGE( 0x08, 0x08 ) AM_READ_PORT("JOY1")
+	map(0x07, 0x07).portr("JOY0");
+	map(0x08, 0x08).portr("JOY1");
 
 	/* printer */
-	AM_RANGE( 0x10, 0x10 ) AM_READ(printer_r)
-	AM_RANGE( 0x11, 0x11 ) AM_WRITE(printer_w)
+	map(0x10, 0x10).r(FUNC(vg5k_state::printer_r));
+	map(0x11, 0x11).w(FUNC(vg5k_state::printer_w));
 
 	/* keyboard */
-	AM_RANGE( 0x80, 0x80 ) AM_READ_PORT("ROW1")
-	AM_RANGE( 0x81, 0x81 ) AM_READ_PORT("ROW2")
-	AM_RANGE( 0x82, 0x82 ) AM_READ_PORT("ROW3")
-	AM_RANGE( 0x83, 0x83 ) AM_READ_PORT("ROW4")
-	AM_RANGE( 0x84, 0x84 ) AM_READ_PORT("ROW5")
-	AM_RANGE( 0x85, 0x85 ) AM_READ_PORT("ROW6")
-	AM_RANGE( 0x86, 0x86 ) AM_READ_PORT("ROW7")
-	AM_RANGE( 0x87, 0x87 ) AM_READ_PORT("ROW8")
+	map(0x80, 0x80).portr("ROW1");
+	map(0x81, 0x81).portr("ROW2");
+	map(0x82, 0x82).portr("ROW3");
+	map(0x83, 0x83).portr("ROW4");
+	map(0x84, 0x84).portr("ROW5");
+	map(0x85, 0x85).portr("ROW6");
+	map(0x86, 0x86).portr("ROW7");
+	map(0x87, 0x87).portr("ROW8");
 
 	/* EF9345 */
-	AM_RANGE( 0x8f, 0x8f ) AM_WRITE(ef9345_offset_w)
-	AM_RANGE( 0xcf, 0xcf ) AM_READWRITE(ef9345_io_r, ef9345_io_w)
+	map(0x8f, 0x8f).w(FUNC(vg5k_state::ef9345_offset_w));
+	map(0xcf, 0xcf).rw(FUNC(vg5k_state::ef9345_io_r), FUNC(vg5k_state::ef9345_io_w));
 
 	/* cassette */
-	AM_RANGE( 0xaf,0xaf ) AM_READWRITE(cassette_r, cassette_w)
-ADDRESS_MAP_END
+	map(0xaf, 0xaf).rw(FUNC(vg5k_state::cassette_r), FUNC(vg5k_state::cassette_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vg5k )
@@ -334,20 +339,20 @@ static const gfx_layout vg5k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vg5k )
+static GFXDECODE_START( gfx_vg5k )
 	GFXDECODE_ENTRY( "ef9345", 0x2000, vg5k_charlayout, 0, 4 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(vg5k_state,vg5k)
+void vg5k_state::init_vg5k()
 {
 	uint8_t *FNT = memregion("ef9345")->base();
-	uint16_t a,b,c,d,dest=0x2000;
+	uint16_t dest = 0x2000;
 
 	/* Unscramble the chargen rom as the format is too complex for gfxdecode to handle unaided */
-	for (a = 0; a < 8192; a+=4096)
-		for (b = 0; b < 2048; b+=64)
-			for (c = 0; c < 4; c++)
-				for (d = 0; d < 64; d+=4)
+	for (uint16_t a = 0; a < 8192; a+=4096)
+		for (uint16_t b = 0; b < 2048; b+=64)
+			for (uint16_t c = 0; c < 4; c++)
+				for (uint16_t d = 0; d < 64; d+=4)
 					FNT[dest++]=FNT[a|b|c|d];
 
 
@@ -364,9 +369,9 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 MACHINE_CONFIG_START(vg5k_state::vg5k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(vg5k_mem)
-	MCFG_CPU_IO_MAP(vg5k_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vg5k_mem)
+	MCFG_DEVICE_IO_MAP(vg5k_io)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vg5k_scanline", vg5k_state, vg5k_scanline, "screen", 0, 10)
 
@@ -383,18 +388,17 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_SCREEN_SIZE(336, 300)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vg5k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vg5k)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cassette */
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(0, "speaker", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(vg5k_cassette_formats)
@@ -405,9 +409,7 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,48k")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,48K");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "vg5k")
@@ -417,14 +419,14 @@ MACHINE_CONFIG_END
 ROM_START( vg5k )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v11", "BASIC v1.1")
-	ROMX_LOAD( "vg5k11.bin", 0x0000, 0x4000, CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(1) )  // dumped from a Philips VG-5000.
+	ROMX_LOAD( "vg5k11.bin", 0x0000, 0x4000, CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(0) )  // dumped from a Philips VG-5000.
 	ROM_SYSTEM_BIOS(1, "v10", "BASIC v1.0")
-	ROMX_LOAD( "vg5k10.bin", 0x0000, 0x4000, BAD_DUMP CRC(57983260) SHA1(5ad1787a6a597b5c3eedb7c3704b649faa9be4ca), ROM_BIOS(2) )
+	ROMX_LOAD( "vg5k10.bin", 0x0000, 0x4000, BAD_DUMP CRC(57983260) SHA1(5ad1787a6a597b5c3eedb7c3704b649faa9be4ca), ROM_BIOS(1) )
 
 	ROM_REGION( 0x4000, "ef9345", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )                // from dcvg5k
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY     FULLNAME   FLAGS
-COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k,  vg5k_state,  vg5k, "Philips",  "VG-5000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME   FLAGS
+COMP( 1984, vg5k, 0,      0,      vg5k,    vg5k,  vg5k_state, init_vg5k, "Philips", "VG-5000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

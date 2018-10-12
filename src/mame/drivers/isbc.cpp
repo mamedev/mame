@@ -21,7 +21,6 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "machine/74259.h"
-#include "machine/terminal.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
@@ -37,32 +36,27 @@ class isbc_state : public driver_device
 {
 public:
 	isbc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_uart8251(*this, "uart8251"),
-		m_uart8274(*this, "uart8274"),
-		m_pic_0(*this, "pic_0"),
-		m_pic_1(*this, "pic_1"),
-		m_centronics(*this, "centronics"),
-		m_cent_status_in(*this, "cent_status_in"),
-		m_statuslatch(*this, "statuslatch"),
-		m_bios(*this, "user1"),
-		m_biosram(*this, "biosram")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_uart8251(*this, "uart8251")
+		, m_uart8274(*this, "uart8274")
+		, m_pic_0(*this, "pic_0")
+		, m_pic_1(*this, "pic_1")
+		, m_centronics(*this, "centronics")
+		, m_cent_status_in(*this, "cent_status_in")
+		, m_statuslatch(*this, "statuslatch")
+		, m_bios(*this, "user1")
+		, m_biosram(*this, "biosram")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<i8251_device> m_uart8251;
-//  optional_device<i8274_device> m_uart8274;
-	optional_device<i8274_new_device> m_uart8274;
-	required_device<pic8259_device> m_pic_0;
-	optional_device<pic8259_device> m_pic_1;
-	optional_device<centronics_device> m_centronics;
-	optional_device<input_buffer_device> m_cent_status_in;
-	optional_device<ls259_device> m_statuslatch;
-	optional_memory_region m_bios;
-	optional_shared_ptr<u16> m_biosram;
+	void isbc2861(machine_config &config);
+	void isbc86(machine_config &config);
+	void rpc86(machine_config &config);
+	void isbc8605(machine_config &config);
+	void isbc286(machine_config &config);
+	void isbc8630(machine_config &config);
 
+private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
@@ -77,18 +71,8 @@ public:
 	DECLARE_WRITE8_MEMBER(edge_intr_clear_w);
 	DECLARE_WRITE8_MEMBER(status_register_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(override_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_intr_out1_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_intr_out2_w);
-	DECLARE_WRITE_LINE_MEMBER(led_ds1_w);
-	DECLARE_WRITE_LINE_MEMBER(led_ds3_w);
-	DECLARE_WRITE_LINE_MEMBER(megabyte_select_w);
-	void isbc2861(machine_config &config);
-	void isbc86(machine_config &config);
-	void rpc86(machine_config &config);
-	void isbc8605(machine_config &config);
-	void isbc286(machine_config &config);
-	void isbc8630(machine_config &config);
 	void isbc2861_mem(address_map &map);
 	void isbc286_io(address_map &map);
 	void isbc286_mem(address_map &map);
@@ -98,9 +82,21 @@ public:
 	void isbc_io(address_map &map);
 	void rpc86_io(address_map &map);
 	void rpc86_mem(address_map &map);
-protected:
-	void machine_reset() override;
-private:
+
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<i8251_device> m_uart8251;
+//  optional_device<i8274_device> m_uart8274;
+	optional_device<i8274_new_device> m_uart8274;
+	required_device<pic8259_device> m_pic_0;
+	optional_device<pic8259_device> m_pic_1;
+	optional_device<centronics_device> m_centronics;
+	optional_device<input_buffer_device> m_cent_status_in;
+	optional_device<ls259_device> m_statuslatch;
+	optional_memory_region m_bios;
+	optional_shared_ptr<u16> m_biosram;
+
 	bool m_upperen;
 	offs_t m_megabyte_page;
 	bool m_nmi_enable;
@@ -121,91 +117,96 @@ void isbc_state::machine_reset()
 	m_megabyte_page = 0;
 }
 
-ADDRESS_MAP_START(isbc_state::rpc86_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xcffff) AM_RAM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void isbc_state::rpc86_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xcffff).ram();
+	map(0xf8000, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(isbc_state::rpc86_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
-	AM_RANGE(0x0090, 0x009f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
-	AM_RANGE(0x00b0, 0x00bf) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
-	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00c4, 0x00c7) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x00d8, 0x00d9) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x00da, 0x00db) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x00dc, 0x00dd) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x00de, 0x00df) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
-ADDRESS_MAP_END
+void isbc_state::rpc86_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0080, 0x008f).rw("sbx1", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
+	map(0x0090, 0x009f).rw("sbx1", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
+	map(0x00a0, 0x00af).rw("sbx2", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
+	map(0x00b0, 0x00bf).rw("sbx2", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
+	map(0x00c0, 0x00c3).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00c4, 0x00c7).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x00dc, 0x00df).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(isbc_state::isbc8605_io)
-	AM_IMPORT_FROM(rpc86_io)
-	AM_RANGE(0x0000, 0x002f) AM_DEVICE8("isbc_208", isbc_208_device, map, 0xffff)
-ADDRESS_MAP_END
+void isbc_state::isbc8605_io(address_map &map)
+{
+	rpc86_io(map);
+	map(0x0000, 0x002f).m("isbc_208", FUNC(isbc_208_device::map));
+}
 
-ADDRESS_MAP_START(isbc_state::isbc8630_io)
-	AM_IMPORT_FROM(rpc86_io)
-	AM_RANGE(0x00c0, 0x00c7) AM_WRITE8(edge_intr_clear_w, 0xff00)
-	AM_RANGE(0x00c8, 0x00df) AM_WRITE8(status_register_w, 0xff00)
-	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff)
-ADDRESS_MAP_END
+void isbc_state::isbc8630_io(address_map &map)
+{
+	rpc86_io(map);
+	map(0x00c0, 0x00c7).w(FUNC(isbc_state::edge_intr_clear_w)).umask16(0xff00);
+	map(0x00c8, 0x00df).w(FUNC(isbc_state::status_register_w)).umask16(0xff00);
+	map(0x0100, 0x0100).w("isbc_215g", FUNC(isbc_215g_device::write));
+}
 
-ADDRESS_MAP_START(isbc_state::isbc86_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xfbfff) AM_RAM
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void isbc_state::isbc86_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xfbfff).ram();
+	map(0xfc000, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(isbc_state::isbc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00c4, 0x00c7) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x00d8, 0x00d9) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x00da, 0x00db) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x00dc, 0x00dd) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x00de, 0x00df) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
-ADDRESS_MAP_END
+void isbc_state::isbc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00c0, 0x00c3).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00c4, 0x00c7).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x00dc, 0x00df).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(isbc_state::isbc286_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
-	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs0_r, mcs0_w, 0xff00)
-	AM_RANGE(0x0090, 0x009f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
-	AM_RANGE(0x0090, 0x009f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs1_r, mcs1_w, 0xff00)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs0_r, mcs0_w, 0xff00)
-	AM_RANGE(0x00b0, 0x00bf) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
-	AM_RANGE(0x00b0, 0x00bf) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs1_r, mcs1_w, 0xff00)
-	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00c4, 0x00c7) AM_DEVREADWRITE8("pic_1", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x00c8, 0x00cf) AM_WRITE8(upperen_w, 0xff00)
-	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
-	AM_RANGE(0x00d8, 0x00df) AM_DEVREADWRITE8("uart8274", i8274_new_device, cd_ba_r, cd_ba_w, 0x00ff)
-	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff)
-ADDRESS_MAP_END
+void isbc_state::isbc286_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0080, 0x008f).rw("sbx1", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
+	map(0x0080, 0x008f).rw("sbx1", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0xff00);
+	map(0x0090, 0x009f).rw("sbx1", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
+	map(0x0090, 0x009f).rw("sbx1", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0xff00);
+	map(0x00a0, 0x00af).rw("sbx2", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
+	map(0x00a0, 0x00af).rw("sbx2", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0xff00);
+	map(0x00b0, 0x00bf).rw("sbx2", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
+	map(0x00b0, 0x00bf).rw("sbx2", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0xff00);
+	map(0x00c0, 0x00c3).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00c4, 0x00c7).rw(m_pic_1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x00c8, 0x00cf).w(FUNC(isbc_state::upperen_w)).umask16(0xff00);
+	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
+	map(0x00d8, 0x00df).rw(m_uart8274, FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w)).umask16(0x00ff);
+	map(0x0100, 0x0100).w("isbc_215g", FUNC(isbc_215g_device::write));
+}
 
-ADDRESS_MAP_START(isbc_state::isbc286_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xdffff) AM_RAM
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("user1",0)
-	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void isbc_state::isbc286_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xdffff).ram();
+	map(0xe0000, 0xfffff).rom().region("user1", 0);
+	map(0xfe0000, 0xffffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(isbc_state::isbc2861_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xdffff) AM_RAM
-	AM_RANGE(0xe0000, 0xfffff) AM_READWRITE(bioslo_r, bioslo_w) AM_SHARE("biosram")
+void isbc_state::isbc2861_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xdffff).ram();
+	map(0xe0000, 0xfffff).rw(FUNC(isbc_state::bioslo_r), FUNC(isbc_state::bioslo_w)).share("biosram");
 //  AM_RANGE(0x100000, 0x1fffff) AM_RAM // FIXME: XENIX doesn't like this, IRMX is okay with it
-	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).rom().region("user1", 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( isbc )
@@ -310,12 +311,6 @@ WRITE_LINE_MEMBER(isbc_state::nmi_mask_w)
 	m_nmi_enable = state;
 }
 
-WRITE_LINE_MEMBER(isbc_state::override_w)
-{
-	// 1 = access onboard dual-port RAM
-	m_override = state;
-}
-
 WRITE_LINE_MEMBER(isbc_state::bus_intr_out1_w)
 {
 	// Multibus interrupt request (active high)
@@ -326,224 +321,207 @@ WRITE_LINE_MEMBER(isbc_state::bus_intr_out2_w)
 	// Multibus interrupt request (active high)
 }
 
-WRITE_LINE_MEMBER(isbc_state::led_ds1_w)
-{
-	machine().output().set_led_value(0, !state);
-}
-
-WRITE_LINE_MEMBER(isbc_state::led_ds3_w)
-{
-	machine().output().set_led_value(1, !state);
-}
-
-WRITE_LINE_MEMBER(isbc_state::megabyte_select_w)
-{
-	m_megabyte_enable = !state;
-}
-
 MACHINE_CONFIG_START(isbc_state::isbc86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(isbc86_mem)
-	MCFG_CPU_IO_MAP(isbc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD(m_maincpu, I8086, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(isbc86_mem)
+	MCFG_DEVICE_IO_MAP(isbc_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("pic_0", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic_0, 0);
+	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic_0", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(22'118'400)/18)
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc86_tmr2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc86_tmr2_w))
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	I8255A(config, "ppi");
 
-	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
+	I8251(config, m_uart8251, 0);
+	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_uart8251->rxrdy_handler().set("pic_0", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc86_terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart8251, i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8251, i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart8251, i8251_device, write_dsr))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc86_terminal)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isbc_state::rpc86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(rpc86_mem)
-	MCFG_CPU_IO_MAP(rpc86_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD(m_maincpu, I8086, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(rpc86_mem)
+	MCFG_DEVICE_IO_MAP(rpc86_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("pic_0", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic_0, 0);
+	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir2_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic_0", pic8259_device, ir2_w))
 	MCFG_PIT8253_CLK1(XTAL(22'118'400)/144)
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc86_tmr2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc86_tmr2_w))
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	I8255A(config, "ppi");
 
-	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir7_w))
+	I8251(config, m_uart8251, 0);
+	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_uart8251->rxrdy_handler().set("pic_0", FUNC(pic8259_device::ir6_w));
+	m_uart8251->txrdy_handler().set("pic_0", FUNC(pic8259_device::ir7_w));
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
-	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8251", i8251_device, write_rxd))
+	//MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
-	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir3_w))
-	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir4_w))
+	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_0", pic8259_device, ir3_w))
+	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_0", pic8259_device, ir4_w))
 	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, nullptr)
-	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
-	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
+	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_0", pic8259_device, ir5_w))
+	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_0", pic8259_device, ir6_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(isbc_state::isbc8605)
+void isbc_state::isbc8605(machine_config &config)
+{
 	rpc86(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(isbc8605_io)
 
-	MCFG_DEVICE_ADD("isbc_208", ISBC_208, 0)
-	MCFG_ISBC_208_MAINCPU("maincpu")
-	MCFG_ISBC_208_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &isbc_state::isbc8605_io);
 
-MACHINE_CONFIG_START(isbc_state::isbc8630)
+	ISBC_208(config, "isbc_208", 0, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
+}
+
+void isbc_state::isbc8630(machine_config &config)
+{
 	rpc86(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(isbc8630_io)
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
-	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
+	m_maincpu->set_addrmap(AS_IO, &isbc_state::isbc8630_io);
 
-	MCFG_DEVICE_ADD("statuslatch", LS259, 0) // U14
-//  MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate0))
-//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate1))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(isbc_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(isbc_state, override_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(isbc_state, bus_intr_out1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(isbc_state, bus_intr_out2_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(isbc_state, led_ds1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(isbc_state, led_ds3_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(isbc_state, megabyte_select_w))
-MACHINE_CONFIG_END
+	ISBC_215G(config, "isbc_215g", 0, 0x100, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
+
+	LS259(config, m_statuslatch); // U14
+//  m_statuslatch->q_out_cb<0>().set("pit", FUNC(pit8253_device::write_gate0));
+//  m_statuslatch->q_out_cb<1>().set("pit", FUNC(pit8253_device::write_gate1));
+	m_statuslatch->q_out_cb<2>().set(FUNC(isbc_state::nmi_mask_w));
+	m_statuslatch->q_out_cb<3>().set([this] (int state) { m_override = state; }); // 1 = access onboard dual-port RAM
+	m_statuslatch->q_out_cb<4>().set(FUNC(isbc_state::bus_intr_out1_w));
+	m_statuslatch->q_out_cb<5>().set(FUNC(isbc_state::bus_intr_out2_w));
+	m_statuslatch->q_out_cb<5>().append_output("led0").invert(); // ds1
+	m_statuslatch->q_out_cb<6>().set_output("led1").invert(); // ds3
+	m_statuslatch->q_out_cb<7>().set([this] (int state) { m_megabyte_enable = !state; });
+}
 
 MACHINE_CONFIG_START(isbc_state::isbc286)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL(16'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(isbc286_mem)
-	MCFG_CPU_IO_MAP(isbc286_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD(m_maincpu, I80286, XTAL(16'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(isbc286_mem)
+	MCFG_DEVICE_IO_MAP(isbc286_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("pic_0", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(isbc_state, get_slave_ack))
+	PIC8259(config, m_pic_0, 0);
+	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic_0->in_sp_callback().set_constant(1);
+	m_pic_0->read_slave_ack_callback().set(FUNC(isbc_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic_1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic_0", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	PIC8259(config, m_pic_1, 0);
+	m_pic_1->out_int_callback().set(m_pic_0, FUNC(pic8259_device::ir7_w));
+	m_pic_1->in_sp_callback().set_constant(0);
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic_0", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(22'118'400)/18)
-//  MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxtxcb_w))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxtxcb_w))
+//  MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart8274", z80dart_device, rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxtxcb_w))
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc286_tmr2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc286_tmr2_w))
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(isbc_state, ppi_c_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.in_pb_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
+	ppi.out_pc_callback().set(FUNC(isbc_state::ppi_c_w));
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(isbc_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit6))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, isbc_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 #if 0
-	MCFG_DEVICE_ADD("uart8274", I8274, XTAL(16'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
+	I8274(config, m_uart8274, XTAL(16'000'000)/4);
+	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	m_uart8274->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+	m_uart8274->out_int_callback().set(FUNC(isbc_state::isbc_uart8274_irq));
 #else
-	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL(16'000'000)/4)
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-//  MCFG_Z80SIO_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
+	I8274_NEW(config, m_uart8274, XTAL(16'000'000)/4);
+	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	m_uart8274->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+//  m_uart8274->out_int_callback().set(FUNC(isbc_state::isbc_uart8274_irq));
+	m_uart8274->out_int_callback().set("pic_0", FUNC(pic8259_device::ir6_w));
 #endif
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
 #if 0
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", z80dart_device, ctsa_w))
 #else
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8274, i8274_new_device, ctsa_w))
 #endif
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "terminal")
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
 #if 0
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", z80dart_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", z80dart_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", z80dart_device, ctsb_w))
 #else
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8274, i8274_new_device, ctsb_w))
 #endif
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir3_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir4_w))
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_1", pic8259_device, ir3_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_1", pic8259_device, ir4_w))
 	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir5_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir6_w))
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_1", pic8259_device, ir5_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_1", pic8259_device, ir6_w))
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
-	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
+	ISBC_215G(config, "isbc_215g", 0, 0x100, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(isbc_state::isbc2861)
+void isbc_state::isbc2861(machine_config &config)
+{
 	isbc286(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(isbc2861_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &isbc_state::isbc2861_mem);
+}
 
 /* ROM definition */
 ROM_START( isbc86 )
@@ -562,15 +540,15 @@ ROM_END
 ROM_START( isbc8630 )
 	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "14378", "14378" )
-	ROMX_LOAD( "143780-001_isdm_for_isbc_86-30_socket_u57_i2732a.bin", 0x4000, 0x1000, CRC(db0ef880) SHA1(8ef296066d16881217618e54b410d12157f318ea), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "143782-001_isdm_for_isbc_86-30_socket_u39_i2732a.bin", 0x4001, 0x1000, CRC(ea1ebe78) SHA1(f03b63659e8f5e96f481dbc6c2ddef1d22850ebb), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "143781-001_isdm_for_isbc_86-30_socket_u58_i2732a.bin", 0x6000, 0x1000, CRC(93732612) SHA1(06e751d0f5ab1fe2c52fd79f6f4725ccf3379791), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "143783-001_isdm_for_isbc_86-30_socket_u40_i2732a.bin", 0x6001, 0x1000, CRC(337102d5) SHA1(535f63d24c3948187b208ea594f979bc33579a15), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "143780-001_isdm_for_isbc_86-30_socket_u57_i2732a.bin", 0x4000, 0x1000, CRC(db0ef880) SHA1(8ef296066d16881217618e54b410d12157f318ea), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "143782-001_isdm_for_isbc_86-30_socket_u39_i2732a.bin", 0x4001, 0x1000, CRC(ea1ebe78) SHA1(f03b63659e8f5e96f481dbc6c2ddef1d22850ebb), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "143781-001_isdm_for_isbc_86-30_socket_u58_i2732a.bin", 0x6000, 0x1000, CRC(93732612) SHA1(06e751d0f5ab1fe2c52fd79f6f4725ccf3379791), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "143783-001_isdm_for_isbc_86-30_socket_u40_i2732a.bin", 0x6001, 0x1000, CRC(337102d5) SHA1(535f63d24c3948187b208ea594f979bc33579a15), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "14503", "14503" )
-	ROMX_LOAD( "145032-001_u57.bin", 0x0000, 0x2000, CRC(09a24dea) SHA1(e21277f1d4d72e0858846f7293ac48417b392e3b), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "145030-001_u39.bin", 0x0001, 0x2000, CRC(c58f3a98) SHA1(76f6d5be8ea6854a98f6555320cfcdb814e5c633), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "145033-001_u58.bin", 0x4000, 0x2000, CRC(496aca5f) SHA1(c09f4d2254ece1eb139ef5fd4ad0ce6a55376da5), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "145031-001_u40.bin", 0x4001, 0x2000, CRC(150fcd90) SHA1(4bca0f46b9b05ef0124bac5dea09ddd952e73af2), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "145032-001_u57.bin", 0x0000, 0x2000, CRC(09a24dea) SHA1(e21277f1d4d72e0858846f7293ac48417b392e3b), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "145030-001_u39.bin", 0x0001, 0x2000, CRC(c58f3a98) SHA1(76f6d5be8ea6854a98f6555320cfcdb814e5c633), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "145033-001_u58.bin", 0x4000, 0x2000, CRC(496aca5f) SHA1(c09f4d2254ece1eb139ef5fd4ad0ce6a55376da5), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "145031-001_u40.bin", 0x4001, 0x2000, CRC(150fcd90) SHA1(4bca0f46b9b05ef0124bac5dea09ddd952e73af2), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 ROM_START( isbc286 )
@@ -654,15 +632,15 @@ ROM_END
 ROM_START( isbc2861 )
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v11", "iSDM Monitor V1.1" )
-	ROMX_LOAD( "174894-001.bin", 0x0000, 0x4000, CRC(79e4f7af) SHA1(911a4595d35e6e82b1149e75bb027927cd1c1658), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "174894-002.bin", 0x0001, 0x4000, CRC(66747d21) SHA1(4094b1f10a8bc7db8d6dd48d7128e14e875776c7), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "174894-003.bin", 0x8000, 0x4000, CRC(c98c7f17) SHA1(6e9a14aedd630824dccc5eb6052867e73b1d7db6), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "174894-004.bin", 0x8001, 0x4000, CRC(61bc1dc9) SHA1(feed5a5f0bb4630c8f6fa0d5cca30654a80b4ee5), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "174894-001.bin", 0x0000, 0x4000, CRC(79e4f7af) SHA1(911a4595d35e6e82b1149e75bb027927cd1c1658), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "174894-002.bin", 0x0001, 0x4000, CRC(66747d21) SHA1(4094b1f10a8bc7db8d6dd48d7128e14e875776c7), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "174894-003.bin", 0x8000, 0x4000, CRC(c98c7f17) SHA1(6e9a14aedd630824dccc5eb6052867e73b1d7db6), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "174894-004.bin", 0x8001, 0x4000, CRC(61bc1dc9) SHA1(feed5a5f0bb4630c8f6fa0d5cca30654a80b4ee5), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v10", "iSDM Monitor V1.0" )
-	ROMX_LOAD( "rmx286-_in_socket_u41_on_isbc_286-10.bin.u41", 0x0000, 0x4000, CRC(00996834) SHA1(a17a0f8909be642d89199660b24574b71a9d0c13), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "rmx286-_in_socket_u76_on_isbc_286-10.bin.u76", 0x0001, 0x4000, CRC(90c9c7e8) SHA1(b5f961ab236976713266fe7a378e8750825fd5dc), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "rmx286-_in_socket_u40_on_isbc_286-10.bin.u40", 0x8000, 0x4000, CRC(35716c9b) SHA1(5b717b4c2f6c59ec140635df7448294a22123a16), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "rmx286-_in_socket_u75_on_isbc_286-10.bin.u75", 0x8001, 0x4000, CRC(68c3eb50) SHA1(3eeef2676e4fb187adb8ab50645f4bd172426c15), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "rmx286-_in_socket_u41_on_isbc_286-10.bin.u41", 0x0000, 0x4000, CRC(00996834) SHA1(a17a0f8909be642d89199660b24574b71a9d0c13), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "rmx286-_in_socket_u76_on_isbc_286-10.bin.u76", 0x0001, 0x4000, CRC(90c9c7e8) SHA1(b5f961ab236976713266fe7a378e8750825fd5dc), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "rmx286-_in_socket_u40_on_isbc_286-10.bin.u40", 0x8000, 0x4000, CRC(35716c9b) SHA1(5b717b4c2f6c59ec140635df7448294a22123a16), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "rmx286-_in_socket_u75_on_isbc_286-10.bin.u75", 0x8001, 0x4000, CRC(68c3eb50) SHA1(3eeef2676e4fb187adb8ab50645f4bd172426c15), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 ROM_START( isbc28612 )
@@ -680,11 +658,11 @@ ROM_START( rpc86 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  STATE        INIT  COMPANY   FULLNAME        FLAGS */
-COMP( 19??, rpc86,     0,      0,      rpc86,     isbc,  isbc_state,  0,    "Intel",  "RPC 86",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1978, isbc86,    0,      0,      isbc86,    isbc,  isbc_state,  0,    "Intel",  "iSBC 86/12A",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1981, isbc8605,  0,      0,      isbc8605,  isbc,  isbc_state,  0,    "Intel",  "iSBC 86/05",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1981, isbc8630,  0,      0,      isbc8630,  isbc,  isbc_state,  0,    "Intel",  "iSBC 86/30",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 19??, isbc286,   0,      0,      isbc286,   isbc,  isbc_state,  0,    "Intel",  "iSBC 286",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1983, isbc2861,  0,      0,      isbc2861,  isbc,  isbc_state,  0,    "Intel",  "iSBC 286/10",  MACHINE_NO_SOUND_HW)
-COMP( 1983, isbc28612, 0,      0,      isbc2861,  isbc,  isbc_state,  0,    "Intel",  "iSBC 286/12",  MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY  FULLNAME       FLAGS */
+COMP( 19??, rpc86,     0,      0,      rpc86,    isbc,  isbc_state, empty_init, "Intel", "RPC 86",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1978, isbc86,    0,      0,      isbc86,   isbc,  isbc_state, empty_init, "Intel", "iSBC 86/12A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1981, isbc8605,  0,      0,      isbc8605, isbc,  isbc_state, empty_init, "Intel", "iSBC 86/05",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1981, isbc8630,  0,      0,      isbc8630, isbc,  isbc_state, empty_init, "Intel", "iSBC 86/30",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 19??, isbc286,   0,      0,      isbc286,  isbc,  isbc_state, empty_init, "Intel", "iSBC 286",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1983, isbc2861,  0,      0,      isbc2861, isbc,  isbc_state, empty_init, "Intel", "iSBC 286/10", MACHINE_NO_SOUND_HW)
+COMP( 1983, isbc28612, 0,      0,      isbc2861, isbc,  isbc_state, empty_init, "Intel", "iSBC 286/12", MACHINE_NO_SOUND_HW)

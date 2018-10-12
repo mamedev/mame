@@ -21,7 +21,7 @@ public:
 	beathead_state(const machine_config &mconfig, device_type type, const char *tag) :
 		atarigen_state(mconfig, type, tag),
 		m_jsa(*this, "jsa"),
-		m_nvram(*this, "nvram"),
+		m_scan_timer(*this, "scan_timer"),
 		m_videoram(*this, "videoram"),
 		m_vram_bulk_latch(*this, "vram_bulk_latch"),
 		m_palette_select(*this, "palette_select"),
@@ -36,8 +36,6 @@ protected:
 	virtual void update_interrupts() override;
 	DECLARE_WRITE32_MEMBER( interrupt_control_w );
 	DECLARE_READ32_MEMBER( interrupt_control_r );
-	DECLARE_WRITE32_MEMBER( eeprom_data_w );
-	DECLARE_WRITE32_MEMBER( eeprom_enable_w );
 	DECLARE_WRITE32_MEMBER( sound_reset_w );
 	DECLARE_WRITE32_MEMBER( coin_count_w );
 	DECLARE_READ32_MEMBER( speedup_r );
@@ -61,8 +59,7 @@ protected:
 
 private:
 	required_device<atari_jsa_iii_device> m_jsa;
-
-	required_shared_ptr<uint32_t> m_nvram;
+	required_device<timer_device> m_scan_timer;
 
 	required_shared_ptr<uint32_t> m_videoram;
 

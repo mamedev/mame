@@ -100,8 +100,11 @@
 // CA2: SCSI interrupt     = 0x01
 // CB1: ASC interrupt      = 0x10
 
-INTERRUPT_GEN_MEMBER(mac_state::mac_rbv_vbl)
+WRITE_LINE_MEMBER(mac_state::mac_rbv_vbl)
 {
+	if (!state)
+		return;
+
 	m_rbv_regs[2] &= ~0x40; // set vblank signal
 	m_rbv_vbltime = 10;
 
@@ -260,7 +263,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		{
 			data &= ~0x38;
 			data |= (m_montype.read_safe(2)<<3);
-//            printf("rbv_r montype: %02x (PC %x)\n", data, space.cpu->safe_pc());
+//            printf("%s rbv_r montype: %02x\n", machine().describe_context().c_str(), data);
 		}
 
 		// bit 7 of these registers always reads as 0 on RBV
@@ -566,290 +569,285 @@ WRITE8_MEMBER(mac_state::mac_5396_w)
 	}
 }
 
-#define MAC_MAIN_SND_BUF_OFFSET 0x0300
-#define MAC_ALT_SND_BUF_OFFSET  0x5F00
-
-TIMER_DEVICE_CALLBACK_MEMBER(mac_state::mac_scanline)
-{
-	int scanline = param;
-	uint16_t *mac_snd_buf_ptr;
-
-	if (m_main_buffer)
-	{
-		mac_snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_MAIN_SND_BUF_OFFSET);
-	}
-	else
-	{
-		mac_snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_ALT_SND_BUF_OFFSET);
-	}
-
-	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
-}
-
-
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(mac_state::mac512ke_map)
-	AM_RANGE(0x800000, 0x9fffff) AM_READ(mac_scc_r)
-	AM_RANGE(0xa00000, 0xbfffff) AM_WRITE(mac_scc_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
-	AM_RANGE(0xe80000, 0xefffff) AM_READWRITE(mac_via_r, mac_via_w)
-	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
-ADDRESS_MAP_END
+void mac_state::mac512ke_map(address_map &map)
+{
+	map(0x800000, 0x9fffff).r(FUNC(mac_state::mac_scc_r));
+	map(0xa00000, 0xbfffff).w(FUNC(mac_state::mac_scc_w));
+	map(0xc00000, 0xdfffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0xe80000, 0xefffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
+}
 
-ADDRESS_MAP_START(mac_state::macplus_map)
-	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
-	AM_RANGE(0x800000, 0x9fffff) AM_READ(mac_scc_r)
-	AM_RANGE(0xa00000, 0xbfffff) AM_WRITE(mac_scc_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
-	AM_RANGE(0xe80000, 0xefffff) AM_READWRITE(mac_via_r, mac_via_w)
-	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
-ADDRESS_MAP_END
+void mac_state::macplus_map(address_map &map)
+{
+	map(0x580000, 0x5fffff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
+	map(0x800000, 0x9fffff).r(FUNC(mac_state::mac_scc_r));
+	map(0xa00000, 0xbfffff).w(FUNC(mac_state::mac_scc_w));
+	map(0xc00000, 0xdfffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0xe80000, 0xefffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
+}
 
-ADDRESS_MAP_START(mac_state::macse_map)
-	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
-	AM_RANGE(0x900000, 0x9fffff) AM_READ(mac_scc_r)
-	AM_RANGE(0xb00000, 0xbfffff) AM_WRITE(mac_scc_w)
-	AM_RANGE(0xd00000, 0xdfffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
-	AM_RANGE(0xe80000, 0xefffff) AM_READWRITE(mac_via_r, mac_via_w)
-	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
-ADDRESS_MAP_END
+void mac_state::macse_map(address_map &map)
+{
+	map(0x580000, 0x5fffff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
+	map(0x900000, 0x9fffff).r(FUNC(mac_state::mac_scc_r));
+	map(0xb00000, 0xbfffff).w(FUNC(mac_state::mac_scc_w));
+	map(0xd00000, 0xdfffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0xe80000, 0xefffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
+}
 
-ADDRESS_MAP_START(mac_state::macprtb_map)
-	AM_RANGE(0x900000, 0x93ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0c0000)
-	AM_RANGE(0xf60000, 0xf6ffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
-	AM_RANGE(0xf70000, 0xf7ffff) AM_READWRITE(mac_via_r, mac_via_w)
-	AM_RANGE(0xf90000, 0xf9ffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
-	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM AM_SHARE("vram16")  // VRAM
-	AM_RANGE(0xfb0000, 0xfbffff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffff)
-	AM_RANGE(0xfc0000, 0xfcffff) AM_READ(mac_config_r)
-	AM_RANGE(0xfd0000, 0xfdffff) AM_READWRITE(mac_scc_r, mac_scc_2_w)
-	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
-ADDRESS_MAP_END
+void mac_state::macprtb_map(address_map &map)
+{
+	map(0x900000, 0x93ffff).rom().region("bootrom", 0).mirror(0x0c0000);
+	map(0xf60000, 0xf6ffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0xf70000, 0xf7ffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0xf90000, 0xf9ffff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
+	map(0xfa8000, 0xfaffff).ram().share("vram16");  // VRAM
+	map(0xfb0000, 0xfbffff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0xfc0000, 0xfcffff).r(FUNC(mac_state::mac_config_r));
+	map(0xfd0000, 0xfdffff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
+	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
+}
 
-ADDRESS_MAP_START(mac_state::maclc_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x80ffffff) // V8 uses bit 31 and 23-0 for address decoding only
+void mac_state::maclc_map(address_map &map)
+{
+	map.global_mask(0x80ffffff); // V8 uses bit 31 and 23-0 for address decoding only
 
-	AM_RANGE(0xa00000, 0xafffff) AM_ROM AM_REGION("bootrom", 0) // ROM (in 32-bit mode)
+	map(0xa00000, 0xafffff).rom().region("bootrom", 0); // ROM (in 32-bit mode)
 
-	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
-	AM_RANGE(0xf04000, 0xf05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
-	AM_RANGE(0xf06000, 0xf07fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w)
-	AM_RANGE(0xf10000, 0xf11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
-	AM_RANGE(0xf12000, 0xf13fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w)
-	AM_RANGE(0xf14000, 0xf15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff)
-	AM_RANGE(0xf16000, 0xf17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
-	AM_RANGE(0xf24000, 0xf24003) AM_READWRITE(rbv_ramdac_r, ariel_ramdac_w)
-	AM_RANGE(0xf26000, 0xf27fff) AM_READWRITE8(mac_rbv_r, mac_rbv_w, 0xffffffff)    // VIA2 (V8)
-	AM_RANGE(0xf40000, 0xfbffff) AM_RAM AM_SHARE("vram")
-ADDRESS_MAP_END
+	map(0xf00000, 0xf01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0xf04000, 0xf05fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
+	map(0xf06000, 0xf07fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
+	map(0xf10000, 0xf11fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
+	map(0xf12000, 0xf13fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
+	map(0xf14000, 0xf15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0xf16000, 0xf17fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0xf24000, 0xf24003).rw(FUNC(mac_state::rbv_ramdac_r), FUNC(mac_state::ariel_ramdac_w));
+	map(0xf26000, 0xf27fff).rw(FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w));    // VIA2 (V8)
+	map(0xf40000, 0xfbffff).ram().share("vram");
+}
 
-ADDRESS_MAP_START(mac_state::maclc3_map)
-	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
+void mac_state::maclc3_map(address_map &map)
+{
+	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50006000, 0x50007fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50012000, 0x50013fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50024000, 0x50025fff) AM_WRITE( ariel_ramdac_w ) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE8(mac_rbv_r, mac_rbv_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50028000, 0x50028003) AM_READWRITE8(mac_sonora_vctl_r, mac_sonora_vctl_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
+	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x50012000, 0x50013fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
+	map(0x50024000, 0x50025fff).w(FUNC(mac_state::ariel_ramdac_w)).mirror(0x00f00000);
+	map(0x50026000, 0x50027fff).rw(FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w)).mirror(0x00f00000);
+	map(0x50028000, 0x50028003).rw(FUNC(mac_state::mac_sonora_vctl_r), FUNC(mac_state::mac_sonora_vctl_w)).mirror(0x00f00000);
 
-	AM_RANGE(0x5ffffffc, 0x5fffffff) AM_READ(mac_read_id)
+	map(0x5ffffffc, 0x5fffffff).r(FUNC(mac_state::mac_read_id));
 
-	AM_RANGE(0x60000000, 0x600fffff) AM_RAM AM_MIRROR(0x0ff00000) AM_SHARE("vram")
-ADDRESS_MAP_END
+	map(0x60000000, 0x600fffff).ram().mirror(0x0ff00000).share("vram");
+}
 
-ADDRESS_MAP_START(mac_state::macii_map)
-	AM_RANGE(0x40000000, 0x4003ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ffc0000)
+void mac_state::macii_map(address_map &map)
+{
+	map(0x40000000, 0x4003ffff).rom().region("bootrom", 0).mirror(0x0ffc0000);
 
 	// MMU remaps I/O without the F
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50002000, 0x50003fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50006000, 0x50006003) AM_WRITE(macii_scsi_drq_w) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50006060, 0x50006063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50012060, 0x50012063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-ADDRESS_MAP_END
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
+	map(0x50006000, 0x50006003).w(FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50006060, 0x50006063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
+	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+}
 
-ADDRESS_MAP_START(mac_state::maciici_map)
-	AM_RANGE(0x40000000, 0x4007ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff80000)
+void mac_state::maciici_map(address_map &map)
+{
+	map(0x40000000, 0x4007ffff).rom().region("bootrom", 0).mirror(0x0ff80000);
 
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50006000, 0x50007fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50012060, 0x50012063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50024000, 0x50024007) AM_WRITE( rbv_ramdac_w ) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE8(mac_rbv_r, mac_rbv_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-ADDRESS_MAP_END
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
+	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
+	map(0x50024000, 0x50024007).w(FUNC(mac_state::rbv_ramdac_w)).mirror(0x00f00000);
+	map(0x50026000, 0x50027fff).rw(FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w)).mirror(0x00f00000);
+	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+}
 
-ADDRESS_MAP_START(mac_state::macse30_map)
-	AM_RANGE(0x40000000, 0x4003ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ffc0000)
+void mac_state::macse30_map(address_map &map)
+{
+	map(0x40000000, 0x4003ffff).rom().region("bootrom", 0).mirror(0x0ffc0000);
 
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50002000, 0x50003fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50006000, 0x50007fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50012060, 0x50012063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000) // mirror
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
+	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
+	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000); // mirror
 
-	AM_RANGE(0xfe000000, 0xfe00ffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xfee00000, 0xfee0ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x000f0000)
-	AM_RANGE(0xfeffe000, 0xfeffffff) AM_ROM AM_REGION("se30vrom", 0x0)
-ADDRESS_MAP_END
+	map(0xfe000000, 0xfe00ffff).ram().share("vram");
+	map(0xfee00000, 0xfee0ffff).ram().share("vram").mirror(0x000f0000);
+	map(0xfeffe000, 0xfeffffff).rom().region("se30vrom", 0x0);
+}
 
-ADDRESS_MAP_START(mac_state::maciifx_map)
-	AM_RANGE(0x40000000, 0x4007ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff80000)
+void mac_state::maciifx_map(address_map &map)
+{
+	map(0x40000000, 0x4007ffff).rom().region("bootrom", 0).mirror(0x0ff80000);
 
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE8(scciop_r, scciop_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5000a000, 0x5000bfff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5000c060, 0x5000c063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5000d000, 0x5000d003) AM_WRITE(macii_scsi_drq_w) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5000d060, 0x5000d063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50010000, 0x50011fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50012000, 0x50013fff) AM_READWRITE8(swimiop_r, swimiop_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50018000, 0x50019fff) AM_READWRITE(biu_r, biu_w) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5001a000, 0x5001bfff) AM_READWRITE8(oss_r, oss_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50024000, 0x50027fff) AM_READ(buserror_r) AM_MIRROR(0x00f00000)   // must bus error on access here so ROM can determine we're an FMC
-	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-ADDRESS_MAP_END
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::scciop_r), FUNC(mac_state::scciop_w)).mirror(0x00f00000);
+	map(0x5000a000, 0x5000bfff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
+	map(0x5000c060, 0x5000c063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x5000d000, 0x5000d003).w(FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x5000d060, 0x5000d063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
+	map(0x50012000, 0x50013fff).rw(FUNC(mac_state::swimiop_r), FUNC(mac_state::swimiop_w)).mirror(0x00f00000);
+	map(0x50018000, 0x50019fff).rw(FUNC(mac_state::biu_r), FUNC(mac_state::biu_w)).mirror(0x00f00000);
+	map(0x5001a000, 0x5001bfff).rw(FUNC(mac_state::oss_r), FUNC(mac_state::oss_w)).mirror(0x00f00000);
+	map(0x50024000, 0x50027fff).r(FUNC(mac_state::buserror_r)).mirror(0x00f00000);   // must bus error on access here so ROM can determine we're an FMC
+	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+}
 
 // ROM detects the "Jaws" ASIC by checking for I/O space mirrored at 0x01000000 boundries
-ADDRESS_MAP_START(mac_state::macpb140_map)
-	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
+void mac_state::macpb140_map(address_map &map)
+{
+	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50002000, 0x50003fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50006000, 0x50007fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50012060, 0x50012063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50024000, 0x50027fff) AM_READ(buserror_r) AM_MIRROR(0x01f00000)   // bus error here to make sure we aren't mistaken for another decoder
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x01f00000);
+	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x01f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x01f00000);
+	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x01f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x01f00000);
+	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x01f00000);
+	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x01f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x01f00000);
+	map(0x50024000, 0x50027fff).r(FUNC(mac_state::buserror_r)).mirror(0x01f00000);   // bus error here to make sure we aren't mistaken for another decoder
 
-	AM_RANGE(0xfee08000, 0xfeffffff) AM_RAM AM_SHARE("vram")
-ADDRESS_MAP_END
+	map(0xfee08000, 0xfeffffff).ram().share("vram");
+}
 
-ADDRESS_MAP_START(mac_state::macpb160_map)
-	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
+void mac_state::macpb160_map(address_map &map)
+{
+	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
-	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
-	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
-	AM_RANGE(0x50f06000, 0x50f07fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w)
-	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
-	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
-	AM_RANGE(0x50f14000, 0x50f15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff)
-	AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
-	AM_RANGE(0x50f20000, 0x50f21fff) AM_READWRITE8(mac_gsc_r, mac_gsc_w, 0xffffffff)
-	AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
+	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
+	map(0x50f04000, 0x50f05fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
+	map(0x50f06000, 0x50f07fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
+	map(0x50f10000, 0x50f11fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
+	map(0x50f12060, 0x50f12063).r(FUNC(mac_state::macii_scsi_drq_r));
+	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x50f16000, 0x50f17fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0x50f20000, 0x50f21fff).rw(FUNC(mac_state::mac_gsc_r), FUNC(mac_state::mac_gsc_w));
+	map(0x50f24000, 0x50f27fff).r(FUNC(mac_state::buserror_r));   // bus error here to make sure we aren't mistaken for another decoder
 
-	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
-ADDRESS_MAP_END
+	map(0x60000000, 0x6001ffff).ram().share("vram").mirror(0x0ffe0000);
+}
 
-ADDRESS_MAP_START(mac_state::macpb165c_map)
-	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
+void mac_state::macpb165c_map(address_map &map)
+{
+	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
-	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
-	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
-	AM_RANGE(0x50f06000, 0x50f07fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w)
-	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
-	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
-	AM_RANGE(0x50f14000, 0x50f15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff)
-	AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
-	AM_RANGE(0x50f20000, 0x50f21fff) AM_READ(buserror_r)    // bus error here to detect we're not the grayscale 160/165/180
-	AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
+	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
+	map(0x50f04000, 0x50f05fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
+	map(0x50f06000, 0x50f07fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
+	map(0x50f10000, 0x50f11fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
+	map(0x50f12060, 0x50f12063).r(FUNC(mac_state::macii_scsi_drq_r));
+	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x50f16000, 0x50f17fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0x50f20000, 0x50f21fff).r(FUNC(mac_state::buserror_r));    // bus error here to detect we're not the grayscale 160/165/180
+	map(0x50f24000, 0x50f27fff).r(FUNC(mac_state::buserror_r));   // bus error here to make sure we aren't mistaken for another decoder
 
 	// on-board color video on 165c/180c
-	AM_RANGE(0xfc000000, 0xfc07ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x00380000) // 512k of VRAM
-	AM_RANGE(0xfc400000, 0xfcefffff) AM_READWRITE(macwd_r, macwd_w)
+	map(0xfc000000, 0xfc07ffff).ram().share("vram").mirror(0x00380000); // 512k of VRAM
+	map(0xfc400000, 0xfcefffff).rw(FUNC(mac_state::macwd_r), FUNC(mac_state::macwd_w));
 // fc4003c8 = DAC control, fc4003c9 = DAC data
 // fc4003da bit 3 is VBL
-	AM_RANGE(0xfcff8000, 0xfcffffff) AM_ROM AM_REGION("vrom", 0x0000)
-ADDRESS_MAP_END
+	map(0xfcff8000, 0xfcffffff).rom().region("vrom", 0x0000);
+}
 
-ADDRESS_MAP_START(mac_state::macpd210_map)
-	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
+void mac_state::macpd210_map(address_map &map)
+{
+	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
-	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
-	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
-	AM_RANGE(0x50f06000, 0x50f07fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w)
-	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
-	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
-	AM_RANGE(0x50f14000, 0x50f15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff)
-	AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
-	AM_RANGE(0x50f20000, 0x50f21fff) AM_READWRITE8(mac_gsc_r, mac_gsc_w, 0xffffffff)
-	AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
+	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
+	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
+	map(0x50f04000, 0x50f05fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
+	map(0x50f06000, 0x50f07fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
+	map(0x50f10000, 0x50f11fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
+	map(0x50f12060, 0x50f12063).r(FUNC(mac_state::macii_scsi_drq_r));
+	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x50f16000, 0x50f17fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
+	map(0x50f20000, 0x50f21fff).rw(FUNC(mac_state::mac_gsc_r), FUNC(mac_state::mac_gsc_w));
+	map(0x50f24000, 0x50f27fff).r(FUNC(mac_state::buserror_r));   // bus error here to make sure we aren't mistaken for another decoder
 
-	AM_RANGE(0x5ffffffc, 0x5fffffff) AM_READ(mac_read_id)
+	map(0x5ffffffc, 0x5fffffff).r(FUNC(mac_state::mac_read_id));
 
-	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
-ADDRESS_MAP_END
+	map(0x60000000, 0x6001ffff).ram().share("vram").mirror(0x0ffe0000);
+}
 
-ADDRESS_MAP_START(mac_state::quadra700_map)
-	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
+void mac_state::quadra700_map(address_map &map)
+{
+	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
 
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00fc0000)
-	AM_RANGE(0x50002000, 0x50003fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff) AM_MIRROR(0x00fc0000)
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00fc0000);
+	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00fc0000);
 // 50008000 = Ethernet MAC ID PROM
 // 5000a000 = Sonic (DP83932) ethernet
 // 5000f000 = SCSI cf96, 5000f402 = SCSI #2 cf96
-	AM_RANGE(0x5000f000, 0x5000f3ff) AM_READWRITE8(mac_5396_r, mac_5396_w, 0xffffffff) AM_MIRROR(0x00fc0000)
-	AM_RANGE(0x5000c000, 0x5000dfff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00fc0000)
-	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00fc0000)
-	AM_RANGE(0x5001e000, 0x5001ffff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00fc0000)
+	map(0x5000f000, 0x5000f3ff).rw(FUNC(mac_state::mac_5396_r), FUNC(mac_state::mac_5396_w)).mirror(0x00fc0000);
+	map(0x5000c000, 0x5000dfff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00fc0000);
+	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00fc0000);
+	map(0x5001e000, 0x5001ffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00fc0000);
 
 	// f9800000 = VDAC / DAFB
-	AM_RANGE(0xf9000000, 0xf91fffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xf9800000, 0xf98001ff) AM_READWRITE(dafb_r, dafb_w)
-	AM_RANGE(0xf9800200, 0xf980023f) AM_READWRITE(dafb_dac_r, dafb_dac_w)
-ADDRESS_MAP_END
+	map(0xf9000000, 0xf91fffff).ram().share("vram");
+	map(0xf9800000, 0xf98001ff).rw(FUNC(mac_state::dafb_r), FUNC(mac_state::dafb_w));
+	map(0xf9800200, 0xf980023f).rw(FUNC(mac_state::dafb_dac_r), FUNC(mac_state::dafb_dac_w));
+}
 
-ADDRESS_MAP_START(mac_state::pwrmac_map)
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8 MB standard
+void mac_state::pwrmac_map(address_map &map)
+{
+	map(0x00000000, 0x007fffff).ram(); // 8 MB standard
 
-	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0fc00000)
+	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);
 
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
 	// 50008000 = ethernet ID PROM
 	// 5000a000 = MACE ethernet controller
-	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
 	// 50014000 = sound registers (AWACS)
-	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("awacs", awacs_device, read, write, 0xffffffffffffffffU) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50024000, 0x50025fff) AM_WRITE32( ariel_ramdac_w, 0xffffffffffffffffU ) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50028000, 0x50028007) AM_READWRITE8(mac_sonora_vctl_r, mac_sonora_vctl_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	map(0x50014000, 0x50015fff).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write)).mirror(0x01f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
+	map(0x50024000, 0x50025fff).w(FUNC(mac_state::ariel_ramdac_w)).mirror(0x00f00000);
+	map(0x50026000, 0x50027fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
+	map(0x50028000, 0x50028007).rw(FUNC(mac_state::mac_sonora_vctl_r), FUNC(mac_state::mac_sonora_vctl_w)).mirror(0x00f00000);
 	// 5002a000 = interrupt controller
 	// 5002c000 = diagnostic registers
-	AM_RANGE(0x5002c000, 0x5002dfff) AM_READ8(pmac_diag_r, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50031000, 0x50032fff) AM_READWRITE8(amic_dma_r, amic_dma_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50040000, 0x5004000f) AM_READWRITE8(hmc_r, hmc_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5ffffff8, 0x5fffffff) AM_READ32(mac_read_id, 0xffffffffffffffffU)
+	map(0x5002c000, 0x5002dfff).r(FUNC(mac_state::pmac_diag_r)).mirror(0x00f00000);
+	map(0x50031000, 0x50032fff).rw(FUNC(mac_state::amic_dma_r), FUNC(mac_state::amic_dma_w)).mirror(0x00f00000);
+	map(0x50040000, 0x5004000f).rw(FUNC(mac_state::hmc_r), FUNC(mac_state::hmc_w)).mirror(0x00f00000);
+	map(0x5ffffff8, 0x5fffffff).r(FUNC(mac_state::mac_read_id));
 
-	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom", 0)
-ADDRESS_MAP_END
+	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
+}
 
 /***************************************************************************
     DEVICE CONFIG
@@ -865,39 +863,43 @@ static const applefdc_interface mac_iwm_interface =
 	sony_read_status
 };
 
-static SLOT_INTERFACE_START(mac_nubus_cards)
-	SLOT_INTERFACE("m2video", NUBUS_M2VIDEO)    /* Apple Macintosh II Video Card */
-	SLOT_INTERFACE("48gc", NUBUS_48GC)      /* Apple 4*8 Graphics Card */
-	SLOT_INTERFACE("824gc", NUBUS_824GC)    /* Apple 8*24 Graphics Card */
-	SLOT_INTERFACE("cb264", NUBUS_CB264)    /* RasterOps ColorBoard 264 */
-	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)    /* Moniterm Viking board */
-	SLOT_INTERFACE("image", NUBUS_IMAGE)    /* Disk Image Pseudo-Card */
-	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)    /* SuperMac Spectrum PDQ */
-	SLOT_INTERFACE("m2hires", NUBUS_M2HIRES)    /* Apple Macintosh II Hi-Resolution Card */
-	SLOT_INTERFACE("spec8s3", NUBUS_SPEC8S3)    /* SuperMac Spectrum/8 Series III */
-//  SLOT_INTERFACE("thundergx", NUBUS_THUNDERGX)        /* Radius Thunder GX (not yet) */
-	SLOT_INTERFACE("radiustpd", NUBUS_RADIUSTPD)        /* Radius Two Page Display */
-	SLOT_INTERFACE("asmc3nb", NUBUS_ASNTMC3NB)  /* Asante MC3NB Ethernet card */
-	SLOT_INTERFACE("portrait", NUBUS_WSPORTRAIT)    /* Apple Macintosh II Portrait video card */
-	SLOT_INTERFACE("enetnb", NUBUS_APPLEENET)   /* Apple NuBus Ethernet */
-	SLOT_INTERFACE("bootbug", NUBUS_BOOTBUG)    /* Brigent BootBug debugger card */
-	SLOT_INTERFACE("quadralink", NUBUS_QUADRALINK)  /* AE Quadralink serial card */
-SLOT_INTERFACE_END
+static void mac_nubus_cards(device_slot_interface &device)
+{
+	device.option_add("m2video", NUBUS_M2VIDEO);    /* Apple Macintosh II Video Card */
+	device.option_add("48gc", NUBUS_48GC);      /* Apple 4*8 Graphics Card */
+	device.option_add("824gc", NUBUS_824GC);    /* Apple 8*24 Graphics Card */
+	device.option_add("cb264", NUBUS_CB264);    /* RasterOps ColorBoard 264 */
+	device.option_add("vikbw", NUBUS_VIKBW);    /* Moniterm Viking board */
+	device.option_add("image", NUBUS_IMAGE);    /* Disk Image Pseudo-Card */
+	device.option_add("specpdq", NUBUS_SPECPDQ);    /* SuperMac Spectrum PDQ */
+	device.option_add("m2hires", NUBUS_M2HIRES);    /* Apple Macintosh II Hi-Resolution Card */
+	device.option_add("spec8s3", NUBUS_SPEC8S3);    /* SuperMac Spectrum/8 Series III */
+//  device.option_add("thundergx", NUBUS_THUNDERGX);        /* Radius Thunder GX (not yet) */
+	device.option_add("radiustpd", NUBUS_RADIUSTPD);        /* Radius Two Page Display */
+	device.option_add("asmc3nb", NUBUS_ASNTMC3NB);  /* Asante MC3NB Ethernet card */
+	device.option_add("portrait", NUBUS_WSPORTRAIT);    /* Apple Macintosh II Portrait video card */
+	device.option_add("enetnb", NUBUS_APPLEENET);   /* Apple NuBus Ethernet */
+	device.option_add("bootbug", NUBUS_BOOTBUG);    /* Brigent BootBug debugger card */
+	device.option_add("quadralink", NUBUS_QUADRALINK);  /* AE Quadralink serial card */
+}
 
-static SLOT_INTERFACE_START(mac_pds030_cards)
-	SLOT_INTERFACE("cb264", PDS030_CB264SE30)   // RasterOps Colorboard 264/SE30
-	SLOT_INTERFACE("pc816", PDS030_PROCOLOR816) // Lapis ProColor Server 8*16 PDS
-	SLOT_INTERFACE("lview", PDS030_LVIEW)       // Sigma Designs L-View
-	SLOT_INTERFACE("30hr",  PDS030_XCEED30HR)   // Micron/XCEED Technology Color 30HR
-	SLOT_INTERFACE("mc30",  PDS030_XCEEDMC30)   // Micron/XCEED Technology MacroColor 30
-SLOT_INTERFACE_END
+static void mac_pds030_cards(device_slot_interface &device)
+{
+	device.option_add("cb264", PDS030_CB264SE30);   // RasterOps Colorboard 264/SE30
+	device.option_add("pc816", PDS030_PROCOLOR816); // Lapis ProColor Server 8*16 PDS
+	device.option_add("lview", PDS030_LVIEW);       // Sigma Designs L-View
+	device.option_add("30hr",  PDS030_XCEED30HR);   // Micron/XCEED Technology Color 30HR
+	device.option_add("mc30",  PDS030_XCEEDMC30);   // Micron/XCEED Technology MacroColor 30
+}
 
-static SLOT_INTERFACE_START(mac_sepds_cards)
-	SLOT_INTERFACE("radiusfpd", PDS_SEDISPLAY)  // Radius Full Page Display card for SE
-SLOT_INTERFACE_END
+static void mac_sepds_cards(device_slot_interface &device)
+{
+	device.option_add("radiusfpd", PDS_SEDISPLAY);  // Radius Full Page Display card for SE
+}
 
-static SLOT_INTERFACE_START(mac_lcpds_cards)
-SLOT_INTERFACE_END
+static void mac_lcpds_cards(device_slot_interface &device)
+{
+}
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -910,1079 +912,780 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
-MACHINE_CONFIG_START(mac_state::mac512ke)
+void mac_state::add_base_devices(machine_config &config, bool rtc, bool super_woz)
+{
+	if (rtc)
+		RTC3430042(config, m_rtc, XTAL(32'768));
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
-	MCFG_CPU_PROGRAM_MAP(mac512ke_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	if (super_woz)
+		SWIM(config, m_fdc, &mac_iwm_interface);
+	else
+		IWM(config, m_fdc, &mac_iwm_interface);
+	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
 
-	/* video hardware */
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_mac)
-	MCFG_SCREEN_PALETTE("palette")
+	SCC8530(config, m_scc, C7M);
+	m_scc->intrq_callback().set(FUNC(mac_state::set_scc_interrupt));
+}
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
+void mac_state::add_mackbd(machine_config &config)
+{
+#ifdef MAC_USE_EMULATED_KBD
+	MACKBD(config, m_mackbd, 0);
+	m_mackbd->dataout_handler().set(m_via, FUNC(via6522_device::write_cb2));
+	m_mackbd->clkout_handler().set(FUNC(mac_state::mac_kbd_clk_in));
+#else
+	MACKBD(config, m_mackbd, 0);
+#endif
+}
+
+void mac_state::add_scsi(machine_config &config, bool cdrom)
+{
+	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
+	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
+	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
+	if (cdrom)
+		scsibus.set_slot_device(3, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+
+	NCR5380(config, m_ncr5380, C7M);
+	m_ncr5380->set_scsi_port("scsi");
+	m_ncr5380->irq_callback().set(FUNC(mac_state::mac_scsi_irq));
+
+	SOFTWARE_LIST(config, "hdd_list").set_type("mac_hdd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
+
+void mac_state::add_via1_adb(machine_config &config, bool macii)
+{
+	VIA6522(config, m_via1, C7M/10);
+	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
+	if (macii)
+		m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_ii));
+	else
+		m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b));
+	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_bbadb));
+	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));
+	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
+}
+
+void mac_state::add_via2(machine_config &config)
+{
+	VIA6522(config, m_via2, C7M/10);
+	m_via2->readpa_handler().set(FUNC(mac_state::mac_via2_in_a));
+	m_via2->readpb_handler().set(FUNC(mac_state::mac_via2_in_b));
+	m_via2->writepa_handler().set(FUNC(mac_state::mac_via2_out_a));
+	m_via2->writepb_handler().set(FUNC(mac_state::mac_via2_out_b));
+	m_via2->irq_handler().set(FUNC(mac_state::mac_via2_irq));
+}
+
+void mac_state::add_egret(machine_config &config, int type)
+{
+	EGRET(config, m_egret, type);
+	m_egret->reset_callback().set(FUNC(mac_state::cuda_reset_w));
+	m_egret->linechange_callback().set(FUNC(mac_state::adb_linechange_w));
+	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+}
+
+void mac_state::add_cuda(machine_config &config, int type)
+{
+	CUDA(config, m_cuda, type);
+	m_cuda->reset_callback().set(FUNC(mac_state::cuda_reset_w));
+	m_cuda->linechange_callback().set(FUNC(mac_state::adb_linechange_w));
+	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+}
+
+void mac_state::add_asc(machine_config &config, asc_device::asc_type type)
+{
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	ASC(config, m_asc, C15M, type);
+	m_asc->irqf_callback().set(FUNC(mac_state::mac_asc_irq));
+	m_asc->add_route(0, "lspeaker", 1.0);
+	m_asc->add_route(1, "rspeaker", 1.0);
+}
+
+void mac_state::add_pb1xx_screen(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.15);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_size(700, 480);
+	m_screen->set_visarea(0, 639, 0, 399);
+	m_screen->set_palette(m_palette);
+}
+
+void mac_state::add_pb1xx_vias(machine_config &config)
+{
+	VIA6522(config, m_via1, 783360);
+	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
+	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_via2pmu));
+	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_via2pmu));
+	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));
+	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
+
+	VIA6522(config, m_via2, 783360);
+	m_via2->readpa_handler().set(FUNC(mac_state::mac_via2_in_a_pmu));
+	m_via2->readpb_handler().set(FUNC(mac_state::mac_via2_in_b_pmu));
+	m_via2->writepa_handler().set(FUNC(mac_state::mac_via2_out_a_pmu));
+	m_via2->writepb_handler().set(FUNC(mac_state::mac_via2_out_b_pmu));
+	m_via2->irq_handler().set(FUNC(mac_state::mac_via2_irq));
+}
+
+void mac_state::mac512ke_base(machine_config &config)
+{
+	M68000(config, m_maincpu, C7M);       /* 7.8336 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::mac512ke_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	config.m_minimum_quantum = attotime::from_hz(60);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_mac));
+	m_screen->set_palette(m_palette);
+
+	PALETTE(config, m_palette, 2);
+	m_palette->set_init(DEVICE_SELF, FUNC(mac_state::palette_init_mac));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mac_state, mac_scanline, "screen", 0, 1)
+	SPEAKER(config, "speaker").front_center();
+	DAC_8BIT_PWM(config, m_dac, 0);
+	m_dac->add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
+	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref", 0));
+	vreg.set_output(5.0);
+	vreg.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vreg.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	add_base_devices(config, true, false);
 
-	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
-	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+	VIA6522(config, m_via1, 1000000);
+	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
+	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b));
+	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b));
+	m_via1->cb2_handler().set(FUNC(mac_state::mac_via_out_cb2));
+	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
 
-	MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(mac_state, set_scc_interrupt))
+	RAM(config, m_ram);
+	m_ram->set_default_size("512K");
+}
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+void mac_state::mac512ke(machine_config &config)
+{
+	mac512ke_base(config);
+	add_mackbd(config);
+}
 
-	MCFG_MACKBD_ADD(MACKBD_TAG)
-#ifdef MAC_USE_EMULATED_KBD
-	MCFG_MACKBD_DATAOUT_HANDLER(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-	MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(mac_state, mac_kbd_clk_in))
-#endif
+void mac_state::add_macplus_additions(machine_config &config)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macplus_map);
 
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::macplus)
-	mac512ke(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(macplus_map)
-
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
-
-	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
-
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
+	add_scsi(config);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,2560K,4M")
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("1M,2M,2560K,4M");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-MACHINE_CONFIG_START(mac_state::macse)
-	macplus(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(macse_map)
+void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
+{
+	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus.set_cputag("maincpu");
+	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
+	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
+	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_b_w));
+	nubus.out_irqc_callback().set(FUNC(mac_state::nubus_irq_c_w));
+	nubus.out_irqd_callback().set(FUNC(mac_state::nubus_irq_d_w));
+	nubus.out_irqe_callback().set(FUNC(mac_state::nubus_irq_e_w));
+	if (bank1)
+	{
+		NUBUS_SLOT(config, "nb9", "nubus", mac_nubus_cards, "48gc");
+		NUBUS_SLOT(config, "nba", "nubus", mac_nubus_cards, nullptr);
+		NUBUS_SLOT(config, "nbb", "nubus", mac_nubus_cards, nullptr);
+	}
+	if (bank2)
+	{
+		NUBUS_SLOT(config, "nbc", "nubus", mac_nubus_cards, nullptr);
+		NUBUS_SLOT(config, "nbd", "nubus", mac_nubus_cards, nullptr);
+		NUBUS_SLOT(config, "nbe", "nubus", mac_nubus_cards, nullptr);
+	}
+}
 
-	MCFG_DEVICE_REMOVE("via6522_0")
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_bbadb))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+template <typename T> void mac_state::add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts)
+{
+	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus.set_cputag("maincpu");
+	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
+	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
+	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_b_w));
+	nubus.out_irqc_callback().set(FUNC(mac_state::nubus_irq_c_w));
+	nubus.out_irqd_callback().set(FUNC(mac_state::nubus_irq_d_w));
+	nubus.out_irqe_callback().set(FUNC(mac_state::nubus_irq_e_w));
+	NUBUS_SLOT(config, slot_tag, "pds", std::forward<T>(opts), nullptr);
+}
+
+void mac_state::macplus(machine_config &config)
+{
+	mac512ke_base(config);
+	add_macplus_additions(config);
+	add_mackbd(config);
+}
+
+void mac_state::macse(machine_config &config)
+{
+	mac512ke_base(config);
+	add_macplus_additions(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macse_map);
+
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_bbadb));
+	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,2560K,4M")
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("2M,2560K,4M");
 
-	MCFG_MACKBD_REMOVE(MACKBD_TAG)
+	MACPDS(config, "sepds", "maincpu");
+	MACPDS_SLOT(config, "pds", "sepds", mac_sepds_cards, nullptr);
+}
 
-	MCFG_MACPDS_BUS_ADD("sepds", "maincpu")
-	MCFG_MACPDS_SLOT_ADD("sepds", "pds", mac_sepds_cards, nullptr)
-MACHINE_CONFIG_END
+void mac_state::macclasc(machine_config &config)
+{
+	mac512ke_base(config);
+	add_macplus_additions(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macse_map);
 
-MACHINE_CONFIG_START(mac_state::macclasc)
-	macplus(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(macse_map)
-
-	MCFG_DEVICE_REMOVE("via6522_0")
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_bbadb))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_bbadb));
+	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,2560K,4M")
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("2M,2560K,4M");
+}
 
-	MCFG_MACKBD_REMOVE(MACKBD_TAG)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::macprtb)
+void mac_state::macprtb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, C15M)
-	MCFG_CPU_PROGRAM_MAP(macprtb_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M68000(config, m_maincpu, C15M);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macprtb_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-	/* video hardware */
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.15)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_SIZE(700, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macprtb)
-	MCFG_SCREEN_PALETTE("palette")
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
+	add_pb1xx_screen(config);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macprtb));
+
+	PALETTE(config, m_palette, 2);
+	m_palette->set_init(DEVICE_SELF, FUNC(mac_state::palette_init_mac));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
+	add_base_devices(config);
+	add_scsi(config);
+	add_asc(config, asc_device::asc_type::ASC);
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+	VIA6522(config, m_via1, 783360);
+	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a_pmu));
+	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_pmu));
+	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a_pmu));
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_pmu));
+	m_via1->cb2_handler().set(FUNC(mac_state::mac_via_out_cb2));
+	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
 
-	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
+	RAM(config, m_ram);
+	m_ram->set_default_size("1M");
+	m_ram->set_extra_options("1M,3M,5M,7M,9M");
+}
 
-	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc_type, bool nubus, bool nubus_bank1, bool nubus_bank2)
+{
+	if (cpu)
+	{
+		M68020PMMU(config, m_maincpu, C15M);
+		m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
+		m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	}
 
-	MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(mac_state, set_scc_interrupt))
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a_pmu))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b_pmu))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a_pmu))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_pmu))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+	PALETTE(config, m_palette, 256);
 
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,3M,5M,7M,9M")
+	add_asc(config, asc_type);
+	add_base_devices(config);
+	add_scsi(config, true);
+	if (nubus)
+		add_nubus(config, nubus_bank1, nubus_bank2);
 
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
-MACHINE_CONFIG_END
+	add_via1_adb(config, true);
+	add_via2(config);
 
-MACHINE_CONFIG_START(mac_state::macii)
+	RAM(config, m_ram);
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("8M,32M,64M,96M,128M");
 
+	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
+
+void mac_state::maciihmu(machine_config &config)
+{
+	macii(config, false);
+
+	M68020HMMU(config, m_maincpu, C15M);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+}
+
+void mac_state::maciifx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020PMMU, C15M)
-	MCFG_CPU_PROGRAM_MAP(macii_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+	M68030(config, m_maincpu, 40000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciifx_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-	MCFG_PALETTE_ADD("palette", 256)
+	add_asc(config, asc_device::asc_type::ASC);
+	add_base_devices(config);
+	add_scsi(config);
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	VIA6522(config, m_via1, C7M/10);
+	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
+	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_ii));
+	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b));
+	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));
+	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
 
-	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
-	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
-	MCFG_NUBUS_CPU("maincpu")
-	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
-	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
-	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
-	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
-	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
-	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
-	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc")
-	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbb", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, nullptr)
+	RAM(config, m_ram);
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("8M,16M,32M,64M,96M,128M");
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE3, "cdrom", SCSICD, SCSI_ID_4)
+	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
-	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
+	add_nubus(config);
+}
 
-	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+void mac_state::maclc(machine_config &config, bool cpu, bool egret, asc_device::asc_type asc_type)
+{
+	macii(config, false, asc_type, false);
 
-	MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(mac_state, set_scc_interrupt))
-
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, C7M/10)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b_ii))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_bbadb))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
-
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, C7M/10)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::maciihmu)
-	macii(config);
-	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
-	MCFG_CPU_PROGRAM_MAP(macii_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::maciifx)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68030, 40000000)
-	MCFG_CPU_PROGRAM_MAP(maciifx_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
-	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
-	MCFG_NUBUS_CPU("maincpu")
-	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
-	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
-	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
-	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
-	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
-	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
-	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc")
-	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbb", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, nullptr)
-
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
-
-	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
-
-	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
-
-	MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(mac_state, set_scc_interrupt))
-
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, C7M/10)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b_ii))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,64M,96M,128M")
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::maclc)
-	macii(config);
-
-	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
-	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(256)
+	if (cpu)
+	{
+		M68020HMMU(config, m_maincpu, C15M);
+		m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc_map);
+		m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	}
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macv8)
-	MCFG_DEFAULT_LAYOUT(layout_mac)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	m_screen->set_size(1024, 768);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macv8));
+	m_screen->screen_vblank().set(FUNC(mac_state::mac_rbv_vbl));
+	config.set_default_layout(layout_mac);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("4M,6M,8M,10M");
 
-	MCFG_DEVICE_MODIFY("via6522_0")
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_egadb))
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_egadb));
 
-	MCFG_NUBUS_SLOT_REMOVE("nb9")
-	MCFG_NUBUS_SLOT_REMOVE("nba")
-	MCFG_NUBUS_SLOT_REMOVE("nbb")
-	MCFG_NUBUS_SLOT_REMOVE("nbc")
-	MCFG_NUBUS_SLOT_REMOVE("nbd")
-	MCFG_NUBUS_SLOT_REMOVE("nbe")
-	MCFG_DEVICE_REMOVE("nubus")
+	add_nubus_pds(config, "lcpds", mac_lcpds_cards);
 
-	MCFG_DEVICE_ADD("pds", NUBUS, 0)
-	MCFG_NUBUS_CPU("maincpu")
-	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
-	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
-	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
-	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
-	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
-	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
-	MCFG_NUBUS_SLOT_ADD("pds","lcpds", mac_lcpds_cards, nullptr)
+	if (egret)
+		add_egret(config, EGRET_341S0850);
+}
 
-	MCFG_ASC_REPLACE("asc", C15M, V8, WRITELINE(mac_state, mac_asc_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+void mac_state::maclc2(machine_config &config, bool egret)
+{
+	maclc(config, false, egret);
 
-	MCFG_EGRET_ADD(EGRET_341S0850)
-	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
-	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
-	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-MACHINE_CONFIG_END
+	M68030(config, m_maincpu, C15M);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-MACHINE_CONFIG_START(mac_state::maclc2)
-	maclc(config);
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("6M,8M,10M");
+}
 
-	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
-	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+void mac_state::maccclas(machine_config &config)
+{
+	maclc2(config, false);
+	add_cuda(config, CUDA_341S0788); // should be 0417, but that version won't sync up properly with the '030 right now
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_cdadb));
+}
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("6M,8M,10M")
-MACHINE_CONFIG_END
+void mac_state::maclc3(machine_config &config, bool egret)
+{
+	maclc(config, false, false, asc_device::asc_type::SONORA);
 
-MACHINE_CONFIG_START(mac_state::maccclas)
-	maclc2(config);
-
-	MCFG_EGRET_REMOVE()
-	MCFG_CUDA_ADD(CUDA_341S0788)    // should be 0417, but that version won't sync up properly with the '030 right now
-	MCFG_CUDA_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
-	MCFG_CUDA_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
-	MCFG_CUDA_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-
-	MCFG_DEVICE_MODIFY("via6522_0")
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::maclc3)
-	maclc(config);
-
-	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
-	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+	M68030(config, m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc3_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macsonora)
 
-	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macsonora)
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macsonora));
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,48M,64M,80M")
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("8M,16M,32M,48M,64M,80M");
 
-	MCFG_ASC_REPLACE("asc", C15M, SONORA, WRITELINE(mac_state, mac_asc_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	if (egret)
+		add_egret(config, EGRET_341S0851);
+}
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851)
-	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
-	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
-	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-MACHINE_CONFIG_END
+void mac_state::maclc520(machine_config &config)
+{
+	maclc3(config, false);
+	add_cuda(config, CUDA_341S0060);
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_cdadb));
+}
 
-MACHINE_CONFIG_START(mac_state::maclc520)
-	maclc3(config);
+void mac_state::maciivx(machine_config &config)
+{
+	maclc(config, false);
 
-	MCFG_EGRET_REMOVE()
-	MCFG_CUDA_ADD(CUDA_341S0060)
-	MCFG_CUDA_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
-	MCFG_CUDA_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
-	MCFG_CUDA_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-
-	MCFG_DEVICE_MODIFY("via6522_0")
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::maciivx)
-	maclc(config);
-
-	MCFG_CPU_REPLACE("maincpu", M68030, C32M)
-	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+	M68030(config, m_maincpu, C32M);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc3_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
-	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbvvram)
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbvvram));
 
-	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
-	MCFG_NUBUS_CPU("maincpu")
-	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
-	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
-	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
-	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
-	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
-	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
-	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, nullptr)
+	add_nubus(config, false);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M")
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M");
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851)
-	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
-	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
-	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-MACHINE_CONFIG_END
+	m_egret->set_type(EGRET_341S0851);
+}
 
-MACHINE_CONFIG_START(mac_state::maciivi)
-	maclc(config);
+void mac_state::maciivi(machine_config &config)
+{
+	maciivx(config);
+	m_maincpu->set_clock(C15M);
+}
 
-	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
-	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+void mac_state::maciix(machine_config &config, bool nubus_bank1, bool nubus_bank2)
+{
+	macii(config, false, asc_device::asc_type::ASC, true, nubus_bank1, nubus_bank2);
 
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
+	M68030(config, m_maincpu, C15M);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbvvram)
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("8M,32M,64M,96M,128M");
+}
 
-	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
-	MCFG_NUBUS_CPU("maincpu")
-	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
-	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
-	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
-	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
-	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
-	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
-	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, nullptr)
+void mac_state::maciicx(machine_config &config)    // IIcx is a IIx with only slots 9/a/b
+{
+	maciix(config, true, false);
+}
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M")
-
-	MCFG_EGRET_REPLACE(EGRET_341S0851)
-	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
-	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
-	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::maciix)
-	macii(config);
-
-	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
-	MCFG_CPU_PROGRAM_MAP(macii_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
-
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::maciicx)    // IIcx is a IIx with only slots 9/a/b
-	maciix(config);
-	MCFG_NUBUS_SLOT_REMOVE("nbc")
-	MCFG_NUBUS_SLOT_REMOVE("nbd")
-	MCFG_NUBUS_SLOT_REMOVE("nbe")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::macse30)
-
-	MCFG_CPU_ADD("maincpu", M68030, C15M)
-	MCFG_CPU_PROGRAM_MAP(macse30_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+void mac_state::macse30(machine_config &config)
+{
+	M68030(config, m_maincpu, C15M);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macse30_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60.15)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-	MCFG_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
-	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macse30)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz(60.15);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+	m_screen->set_size(MAC_H_TOTAL, MAC_V_TOTAL);
+	m_screen->set_visarea(0, MAC_H_VIS-1, 0, MAC_V_VIS-1);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macse30));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
+	PALETTE(config, m_palette, 2);
+	m_palette->set_init(DEVICE_SELF, FUNC(mac_state::palette_init_mac));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	add_base_devices(config, true, true);
+	add_asc(config, asc_device::asc_type::ASC);
+	add_scsi(config);
 
-	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
+	add_nubus_pds(config, "pds030", mac_pds030_cards);
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+	add_via1_adb(config, false);
+	add_via2(config);
 
-	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
+	RAM(config, m_ram);
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("8M,16M,32M,48M,64M,96M,128M");
 
-	MCFG_DEVICE_ADD("pds", NUBUS, 0)
-	MCFG_NUBUS_CPU("maincpu")
-	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
-	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
-	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
-	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
-	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
-	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
-	MCFG_NUBUS_SLOT_ADD("pds","pds030", mac_pds030_cards, nullptr)
+	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+void mac_state::macpb140(machine_config &config)
+{
+	M68030(config, m_maincpu, C15M);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macpb140_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-	MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(mac_state, set_scc_interrupt))
+	add_pb1xx_screen(config);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macpb140));
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_bbadb))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
-
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,48M,64M,96M,128M")
-
-	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::macpb140)
-
-	MCFG_CPU_ADD("maincpu", M68030, C15M)
-	MCFG_CPU_PROGRAM_MAP(macpb140_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60.15)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-	MCFG_SCREEN_SIZE(700, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macpb140)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
+	PALETTE(config, m_palette, 2);
+	m_palette->set_init(DEVICE_SELF, FUNC(mac_state::palette_init_mac));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	add_asc(config, asc_device::asc_type::ASC);
+	add_scsi(config);
+	add_base_devices(config, false, true);
+	add_pb1xx_vias(config);
 
-	/* devices */
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+	RAM(config, m_ram);
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("4M,6M,8M");
 
-	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
-
-	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
-
-	MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(mac_state, set_scc_interrupt))
-
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b_via2pmu))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_via2pmu))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
-
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a_pmu))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b_pmu))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a_pmu))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b_pmu))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M")
-
-	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
 // PowerBook 145 = 140 @ 25 MHz (still 2MB RAM - the 145B upped that to 4MB)
-MACHINE_CONFIG_START(mac_state::macpb145)
+void mac_state::macpb145(machine_config &config)
+{
 	macpb140(config);
-	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
-	MCFG_CPU_PROGRAM_MAP(macpb140_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+	m_maincpu->set_clock(25000000);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("6M,8M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("6M,8M");
+}
 
 // PowerBook 170 = 140 @ 25 MHz with an active-matrix LCD (140/145/145B were passive)
-MACHINE_CONFIG_START(mac_state::macpb170)
+void mac_state::macpb170(machine_config &config)
+{
 	macpb140(config);
-	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
-	MCFG_CPU_PROGRAM_MAP(macpb140_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+	m_maincpu->set_clock(25000000);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("6M,8M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("6M,8M");
+}
 
-MACHINE_CONFIG_START(mac_state::macpb160)
+void mac_state::macpb160(machine_config &config)
+{
+	M68030(config, m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macpb160_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-	MCFG_CPU_ADD("maincpu", M68030, 25000000)
-	MCFG_CPU_PROGRAM_MAP(macpb160_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+	add_pb1xx_screen(config);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macpb160));
 
-	/* video hardware */
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60.15)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-	MCFG_SCREEN_SIZE(700, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macpb160)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(mac_state,macgsc)
+	PALETTE(config, m_palette, 16);
+	m_palette->set_init(DEVICE_SELF, FUNC(mac_state::palette_init_macgsc));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	add_asc(config, asc_device::asc_type::ASC);
+	add_scsi(config);
+	add_base_devices(config, false, true);
+	add_pb1xx_vias(config);
 
-	/* devices */
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+	RAM(config, m_ram);
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("8M,12M,16M");
 
-	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
+	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
-
-	MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(mac_state, set_scc_interrupt))
-
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b_via2pmu))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_via2pmu))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
-
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a_pmu))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b_pmu))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a_pmu))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b_pmu))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
-
-	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::macpb180)
+void mac_state::macpb180(machine_config &config)
+{
 	macpb160(config);
-	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
-	MCFG_CPU_PROGRAM_MAP(macpb160_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+	m_maincpu->set_clock(33000000);
+}
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::macpb180c)
+void mac_state::macpb180c(machine_config &config)
+{
 	macpb160(config);
-	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
-	MCFG_CPU_PROGRAM_MAP(macpb165c_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+	m_maincpu->set_clock(33000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macpb165c_map);
 
-	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
-	MCFG_SCREEN_SIZE(800, 525)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macpbwd)
-	MCFG_SCREEN_NO_PALETTE
+	m_screen->set_size(800, 525);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macpbwd));
+	m_screen->set_palette(finder_base::DUMMY_TAG);
+}
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::macpd210)
+void mac_state::macpd210(machine_config &config)
+{
 	macpb160(config);
-	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
-	MCFG_CPU_PROGRAM_MAP(macpd210_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macpd210_map);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M")
-MACHINE_CONFIG_END
+	m_ram->set_extra_options("8M,12M,16M,20M,24M");
+}
 
-MACHINE_CONFIG_START(mac_state::macclas2)
-	maclc(config);
-	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
-	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+void mac_state::macclas2(machine_config &config)
+{
+	maclc(config, false, true, asc_device::asc_type::EAGLE);
+
+	M68030(config, m_maincpu, C15M);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,maceagle)
 
-	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
-	MCFG_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
-	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
+	m_screen->set_size(MAC_H_TOTAL, MAC_V_TOTAL);
+	m_screen->set_visarea(0, MAC_H_VIS-1, 0, MAC_V_VIS-1);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbv));
 
-	MCFG_ASC_REPLACE("asc", C15M, EAGLE, WRITELINE(mac_state, mac_asc_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	m_asc->set_type(asc_device::asc_type::EAGLE);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("10M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,6M,8M,10M")
+	m_ram->set_default_size("10M");
+	m_ram->set_extra_options("2M,4M,6M,8M,10M");
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851)
-	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
-	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
-	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-MACHINE_CONFIG_END
+	m_egret->set_type(EGRET_341S0851);
+}
 
-MACHINE_CONFIG_START(mac_state::maciici)
-	macii(config);
+void mac_state::maciici(machine_config &config)
+{
+	macii(config, false, asc_device::asc_type::ASC, true, false, true);
 
-	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
-	MCFG_CPU_PROGRAM_MAP(maciici_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(256)
-
-	// IIci only has slots c/d/e
-	MCFG_NUBUS_SLOT_REMOVE("nb9")
-	MCFG_NUBUS_SLOT_REMOVE("nba")
-	MCFG_NUBUS_SLOT_REMOVE("nbb")
+	M68030(config, m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macrbv)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(640, 870)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
-	MCFG_DEFAULT_LAYOUT(layout_mac)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	m_screen->set_size(640, 870);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbv));
+	m_screen->screen_vblank().set(FUNC(mac_state::mac_rbv_vbl));
+	config.set_default_layout(layout_mac);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M,128M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("4M,8M,16M,32M,48M,64M,128M");
+}
 
-MACHINE_CONFIG_START(mac_state::maciisi)
-	macii(config);
+void mac_state::maciisi(machine_config &config)
+{
+	macii(config, false, asc_device::asc_type::ASC, false);
 
-	MCFG_CPU_REPLACE("maincpu", M68030, 20000000)
-	MCFG_CPU_PROGRAM_MAP(maciici_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(256)
-
-	MCFG_NUBUS_SLOT_REMOVE("nb9")
-	MCFG_NUBUS_SLOT_REMOVE("nba")
-	MCFG_NUBUS_SLOT_REMOVE("nbb")
-	MCFG_NUBUS_SLOT_REMOVE("nbc")
-	MCFG_NUBUS_SLOT_REMOVE("nbd")
-	MCFG_NUBUS_SLOT_REMOVE("nbe")
-	MCFG_DEVICE_REMOVE("nubus")
+	M68030(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macrbv)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(640, 870)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
-	MCFG_DEFAULT_LAYOUT(layout_mac)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	m_screen->set_size(640, 870);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbv));
+	m_screen->screen_vblank().set(FUNC(mac_state::mac_rbv_vbl));
+	config.set_default_layout(layout_mac);
 
-	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M,128M")
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("4M,8M,16M,32M,48M,64M,128M");
 
-	MCFG_DEVICE_MODIFY("via6522_0")
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_egadb))
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_egadb));
 
-	MCFG_EGRET_ADD(EGRET_344S0100)
-	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
-	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
-	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-MACHINE_CONFIG_END
+	add_egret(config, EGRET_344S0100);
+}
 
-MACHINE_CONFIG_START(mac_state::pwrmac)
+void mac_state::pwrmac(machine_config &config)
+{
+	PPC601(config, m_maincpu, 60000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::pwrmac_map);
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC601, 60000000)
-	MCFG_CPU_PROGRAM_MAP(pwrmac_map)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
+	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_size(1024, 768);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbv));
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_AWACS_ADD("awacs", 44100)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	AWACS(config, m_awacs, 44100);
+	m_awacs->add_route(0, "lspeaker", 1.0);
+	m_awacs->add_route(1, "rspeaker", 1.0);
 
-	/* devices */
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+	add_scsi(config);
+	add_base_devices(config, false, false);
 
-	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
+	add_via1_adb(config, false);
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_cdadb));
 
-	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+	add_via2(config);
 
-	MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(mac_state, set_scc_interrupt))
+	RAM(config, m_ram);
+	m_ram->set_default_size("8M");
+	m_ram->set_extra_options("16M,32M,64M,128M");
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+	add_cuda(config, CUDA_341S0060);
+}
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("16M,32M,64M,128M")
-
-	MCFG_CUDA_ADD(CUDA_341S0060)
-	MCFG_CUDA_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
-	MCFG_CUDA_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
-	MCFG_CUDA_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mac_state::macqd700)
+void mac_state::macqd700(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68040, 25000000)
-	MCFG_CPU_PROGRAM_MAP(quadra700_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
+	M68040(config, m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::quadra700_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(75.08)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-	MCFG_SCREEN_SIZE(1152, 870)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macdafb)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(75.08);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+	m_screen->set_size(1152, 870);
+	m_screen->set_visarea(0, 1152-1, 0, 870-1);
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_macdafb));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macdafb)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macdafb)
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette, 256);
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, EASC, WRITELINE(mac_state, mac_asc_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	add_asc(config, asc_device::asc_type::EASC);
+	add_base_devices(config, true, false);
 
-	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
-	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
-	MCFG_NUBUS_CPU("maincpu")
-	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
-	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
-	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
-	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
-	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
-	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
-	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, nullptr)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, nullptr)
+	add_nubus(config, false, false);
+	NUBUS_SLOT(config, "nbd", "nubus", mac_nubus_cards, nullptr);
+	NUBUS_SLOT(config, "nbe", "nubus", mac_nubus_cards, nullptr);
 
-	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+	add_via1_adb(config, false);
+	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b));
 
-	MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(mac_state, set_scc_interrupt))
+	add_via2(config);
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, C7M/10)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_bbadb))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
+	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
+	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, C7M/10)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
-
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
-
-	MCFG_DEVICE_ADD(MAC_539X_1_TAG, NCR539X, C7M)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR539X_OUT_IRQ_CB(WRITELINE(mac_state, irq_539x_1_w))
-	MCFG_NCR539X_OUT_DRQ_CB(WRITELINE(mac_state, drq_539x_1_w))
+	NCR539X(config, m_539x_1, C7M);
+	m_539x_1->set_scsi_port("scsi");
+	m_539x_1->irq_callback().set(FUNC(mac_state::irq_539x_1_w));
+	m_539x_1->drq_callback().set(FUNC(mac_state::drq_539x_1_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,64M,68M,72M,80M,96M,128M")
+	RAM(config, m_ram);
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("8M,16M,32M,64M,68M,72M,80M,96M,128M");
 
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
 static INPUT_PORTS_START( macadb )
 	PORT_START("MOUSE0") /* Mouse - button */
@@ -2078,7 +1781,7 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x44
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) // 0x45
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x46
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))    // 0x47
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))    // 0x47
 	PORT_BIT(0x0700, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x48, 49, 4a
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // 0x4b
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) // 0x4c
@@ -2088,7 +1791,7 @@ static INPUT_PORTS_START( macadb )
 
 	PORT_START("KEY5")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x50
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad =") PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK)) // 0x51
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD)) // 0x51
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)             PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) // 0x52
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)             PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) // 0x53
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)             PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) // 0x54
@@ -2134,7 +1837,7 @@ ROM_END
 ROM_START( macclasc )
 	ROM_REGION16_BE(0x80000, "bootrom", 0) // a49f9914, second half of chip dump is the 6.0.3 XO rom disk
 	// this dump is big endian
-	ROM_LOAD( "341-0813__(c)1983-90_apple__japan__910d_d.27c4096_be.ue1", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
+	ROM_LOAD( "341-0813__=c=1983-90_apple__japan__910d_d.27c4096_be.ue1", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
 ROM_END
 
 ROM_START( maclc )
@@ -2148,17 +1851,17 @@ ROM_END
 ROM_START( macii )
 	ROM_REGION32_BE(0x40000, "bootrom", 0)
 	ROM_SYSTEM_BIOS(0, "default", "rev. B")
-	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(1) )
+	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "original", "rev. A")
-	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) )
+	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( maciihmu )
 	ROM_REGION32_BE(0x40000, "bootrom", 0)
 	ROM_SYSTEM_BIOS(0, "default", "rev. B")
-	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(1) )
+	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "original", "rev. A")
-	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) )
+	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( mac2fdhd )   // same ROM for II FDHD, IIx, IIcx, and SE/30
@@ -2215,10 +1918,10 @@ ROM_END
 ROM_START( macclas2 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0) // 3193670e
 	//ROM_LOAD( "3193670e.rom", 0x000000, 0x080000, CRC(96d2e1fd) SHA1(50df69c1b6e805e12a405dc610bc2a1471b2eac2) )
-	ROM_LOAD32_BYTE( "341-0867__ba16__(c)apple_91.romhh.27c010.u25", 0x000000, 0x020000, CRC(88230887) SHA1(8f45f6d7eb6a8ec9242a46db4773af1d154409c6) )
-	ROM_LOAD32_BYTE( "341-0866__5be9__(c)apple_91.rommh.27c010.u24", 0x000001, 0x020000, CRC(eae68c36) SHA1(e6ce79647dfe7e66590a012836d0b6e985ff672b) )
-	ROM_LOAD32_BYTE( "341-0865__821e__(c)apple_91.romml.27c010.u23", 0x000002, 0x020000, CRC(cb306c01) SHA1(4d6e409995fd9a4aa9afda0fd790a5b09b1c2aca) )
-	ROM_LOAD32_BYTE( "341-0864__6fc6__(c)apple_91.romll.27c010.u22", 0x000003, 0x020000, CRC(21a51e72) SHA1(bb513c1a5b8a41c7534d66aeacaeea47f58dae92) )
+	ROM_LOAD32_BYTE( "341-0867__ba16__=c=apple_91.romhh.27c010.u25", 0x000000, 0x020000, CRC(88230887) SHA1(8f45f6d7eb6a8ec9242a46db4773af1d154409c6) )
+	ROM_LOAD32_BYTE( "341-0866__5be9__=c=apple_91.rommh.27c010.u24", 0x000001, 0x020000, CRC(eae68c36) SHA1(e6ce79647dfe7e66590a012836d0b6e985ff672b) )
+	ROM_LOAD32_BYTE( "341-0865__821e__=c=apple_91.romml.27c010.u23", 0x000002, 0x020000, CRC(cb306c01) SHA1(4d6e409995fd9a4aa9afda0fd790a5b09b1c2aca) )
+	ROM_LOAD32_BYTE( "341-0864__6fc6__=c=apple_91.romll.27c010.u22", 0x000003, 0x020000, CRC(21a51e72) SHA1(bb513c1a5b8a41c7534d66aeacaeea47f58dae92) )
 ROM_END
 
 ROM_START( maclc2 )
@@ -2334,37 +2037,37 @@ ROM_START( maclc520 )
 	ROM_LOAD( "ede66cbd.rom", 0x000000, 0x100000, CRC(a893cb0f) SHA1(c54ee2f45020a4adeb7451adce04cd6e5fb69790) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    STATE       INIT           COMPANY          FULLNAME */
-//COMP( 1983, mactw,    0,        0,      mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
-COMP( 1987, macse,    0,        0,      macse,    macadb,  mac_state,  macse,        "Apple Computer", "Macintosh SE",  0 )
-COMP( 1987, macsefd,  0,        0,      macse,    macadb,  mac_state,  macse,        "Apple Computer", "Macintosh SE (FDHD)",  0 )
-COMP( 1987, macii,    0,        0,      macii,    macadb,  mac_state,  macii,        "Apple Computer", "Macintosh II",  0 )
-COMP( 1987, maciihmu, macii,    0,      maciihmu, macadb,  mac_state,  macii,        "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
-COMP( 1988, mac2fdhd, 0,        0,      macii,    macadb,  mac_state,  maciifdhd,    "Apple Computer", "Macintosh II (FDHD)",  0 )
-COMP( 1988, maciix,   mac2fdhd, 0,      maciix,   macadb,  mac_state,  maciix,       "Apple Computer", "Macintosh IIx",  0 )
-COMP( 1989, macprtb,  0,        0,      macprtb,  macadb,  mac_state,  macprtb,      "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING )
-COMP( 1989, macse30,  mac2fdhd, 0,      macse30,  macadb,  mac_state,  macse30,      "Apple Computer", "Macintosh SE/30",  0 )
-COMP( 1989, maciicx,  mac2fdhd, 0,      maciicx,  macadb,  mac_state,  maciicx,      "Apple Computer", "Macintosh IIcx",  0 )
-COMP( 1989, maciici,  0,        0,      maciici,  maciici, mac_state,  maciici,      "Apple Computer", "Macintosh IIci", 0 )
-COMP( 1990, maciifx,  0,        0,      maciifx,  macadb,  mac_state,  maciifx,      "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
-COMP( 1990, macclasc, 0,        0,      macclasc, macadb,  mac_state,  macclassic,   "Apple Computer", "Macintosh Classic",  0 )
-COMP( 1990, maclc,    0,        0,      maclc,    maciici, mac_state,  maclc,        "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
-COMP( 1990, maciisi,  0,        0,      maciisi,  maciici, mac_state,  maciisi,      "Apple Computer", "Macintosh IIsi", 0 )
-COMP( 1991, macpb100, 0,        0,      macprtb,  macadb,  mac_state,  macprtb,      "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )
-COMP( 1991, macpb140, 0,        0,      macpb140, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING )
-COMP( 1991, macpb170, macpb140, 0,      macpb170, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING )
-COMP( 1991, macqd700, macpb140, 0,      macqd700, macadb,  mac_state,  macquadra700, "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
-COMP( 1991, macclas2, 0,        0,      macclas2, macadb,  mac_state,  macclassic2,  "Apple Computer", "Macintosh Classic II", MACHINE_IMPERFECT_SOUND )
-COMP( 1991, maclc2,   0,        0,      maclc2,   maciici, mac_state,  maclc2,       "Apple Computer", "Macintosh LC II",  MACHINE_IMPERFECT_SOUND )
-COMP( 1992, macpb145, macpb140, 0,      macpb145, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING )
-COMP( 1992, macpb160, 0,        0,      macpb160, macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING )
-COMP( 1992, macpb180, macpb160, 0,      macpb180, macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING )
-COMP( 1992, macpb180c,macpb160, 0,      macpb180c,macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING )
-COMP( 1992, macpd210, 0,        0,      macpd210, macadb,  mac_state,  macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
-COMP( 1993, maccclas, 0,        0,      maccclas, macadb,  mac_state,  maclrcclassic,"Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
-COMP( 1992, macpb145b,macpb140, 0,      macpb170, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING )
-COMP( 1993, maclc3,   0,        0,      maclc3,   maciici, mac_state,  maclc3,       "Apple Computer", "Macintosh LC III",  MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivx,  0,        0,      maciivx,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivi,  maciivx,  0,      maciivi,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maclc520, 0,        0,      maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
-COMP( 1994, pmac6100, 0,        0,      pwrmac,   macadb,  mac_state,  macpm6100,    "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME */
+//COMP( 1983, mactw,     0,        0,      mac128k,  macplus, mac_state, init_mac128k512k,   "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
+COMP( 1987, macse,     0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE",  0 )
+COMP( 1987, macsefd,   0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE (FDHD)",  0 )
+COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  0 )
+COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
+COMP( 1988, mac2fdhd,  0,        0,      macii,    macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  0 )
+COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",  0 )
+COMP( 1989, macprtb,   0,        0,      macprtb,  macadb,  mac_state, init_macprtb,       "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING )
+COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",  0 )
+COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  0 )
+COMP( 1989, maciici,   0,        0,      maciici,  maciici, mac_state, init_maciici,       "Apple Computer", "Macintosh IIci", 0 )
+COMP( 1990, maciifx,   0,        0,      maciifx,  macadb,  mac_state, init_maciifx,       "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
+COMP( 1990, macclasc,  0,        0,      macclasc, macadb,  mac_state, init_macclassic,    "Apple Computer", "Macintosh Classic",  0 )
+COMP( 1990, maclc,     0,        0,      maclc,    maciici, mac_state, init_maclc,         "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
+COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maciisi,       "Apple Computer", "Macintosh IIsi", 0 )
+COMP( 1991, macpb100,  0,        0,      macprtb,  macadb,  mac_state, init_macprtb,       "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )
+COMP( 1991, macpb140,  0,        0,      macpb140, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING )
+COMP( 1991, macpb170,  macpb140, 0,      macpb170, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING )
+COMP( 1991, macqd700,  macpb140, 0,      macqd700, macadb,  mac_state, init_macquadra700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
+COMP( 1991, macclas2,  0,        0,      macclas2, macadb,  mac_state, init_macclassic2,   "Apple Computer", "Macintosh Classic II", MACHINE_IMPERFECT_SOUND )
+COMP( 1991, maclc2,    0,        0,      maclc2,   maciici, mac_state, init_maclc2,        "Apple Computer", "Macintosh LC II",  MACHINE_IMPERFECT_SOUND )
+COMP( 1992, macpb145,  macpb140, 0,      macpb145, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING )
+COMP( 1992, macpb160,  0,        0,      macpb160, macadb,  mac_state, init_macpb160,      "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING )
+COMP( 1992, macpb180,  macpb160, 0,      macpb180, macadb,  mac_state, init_macpb160,      "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING )
+COMP( 1992, macpb180c, macpb160, 0,      macpb180c,macadb,  mac_state, init_macpb160,      "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING )
+COMP( 1992, macpd210,  0,        0,      macpd210, macadb,  mac_state, init_macpd210,      "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
+COMP( 1993, maccclas,  0,        0,      maccclas, macadb,  mac_state, init_maclrcclassic, "Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
+COMP( 1992, macpb145b, macpb140, 0,      macpb170, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING )
+COMP( 1993, maclc3,    0,        0,      maclc3,   maciici, mac_state, init_maclc3,        "Apple Computer", "Macintosh LC III",  MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivx,   0,        0,      maciivx,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivi,   maciivx,  0,      maciivi,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maclc520,  0,        0,      maclc520, maciici, mac_state, init_maclc520,      "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
+COMP( 1994, pmac6100,  0,        0,      pwrmac,   macadb,  mac_state, init_macpm6100,     "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

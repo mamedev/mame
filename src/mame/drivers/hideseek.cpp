@@ -28,6 +28,7 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 
 #include "emu.h"
 #include "cpu/sh/sh2.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -41,14 +42,17 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(hideseek);
+	void hideseek(machine_config &config);
+
+	void init_hideseek();
+
+private:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(hideseek);
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void hideseek(machine_config &config);
 	void mem_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -63,16 +67,17 @@ uint32_t hideseek_state::screen_update_hideseek(screen_device &screen, bitmap_in
 	return 0;
 }
 
-ADDRESS_MAP_START(hideseek_state::mem_map)
-	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM // On-chip ROM
-	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM // CS0
-	AM_RANGE(0x00400000, 0x005fffff) AM_ROM AM_REGION("prg", 0) // CS1
+void hideseek_state::mem_map(address_map &map)
+{
+	map(0x00000000, 0x0003ffff).rom(); // On-chip ROM
+	map(0x00200000, 0x0023ffff).ram(); // CS0
+	map(0x00400000, 0x005fffff).rom().region("prg", 0); // CS1
 	// CS2 - CS3
-	AM_RANGE(0x01000000, 0x01ffffff) AM_RAM // DRAM
-	AM_RANGE(0xffff8000, 0xffff87ff) AM_RAM // HD64F7045F28 i/os
-	AM_RANGE(0xfffff000, 0xffffffff) AM_RAM // on-chip RAM
+	map(0x01000000, 0x01ffffff).ram(); // DRAM
+	map(0xffff8000, 0xffff87ff).ram(); // HD64F7045F28 i/os
+	map(0xfffff000, 0xffffffff).ram(); // on-chip RAM
 //  AM_RANGE(0x06000000, 0x07ffffff) AM_ROM AM_REGION("blit_data", 0)
-ADDRESS_MAP_END
+}
 
 
 
@@ -83,7 +88,7 @@ INPUT_PORTS_END
 
 static GFXLAYOUT_RAW( hideseek, 2048, 1, 2048*8, 2048*8 )
 
-static GFXDECODE_START( hideseek )
+static GFXDECODE_START( gfx_hideseek )
 	GFXDECODE_ENTRY( "blit_data", 0, hideseek,     0x0000, 0x1 )
 GFXDECODE_END
 
@@ -101,8 +106,8 @@ PALETTE_INIT_MEMBER(hideseek_state, hideseek)
 MACHINE_CONFIG_START(hideseek_state::hideseek)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, 7372800 * 4 )
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", SH2, 7372800 * 4 )
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 //  MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hideseek_state, hideseek_scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -116,9 +121,10 @@ MACHINE_CONFIG_START(hideseek_state::hideseek)
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_INIT_OWNER(hideseek_state, hideseek)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hideseek)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hideseek)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* sound : M9810 */
 MACHINE_CONFIG_END
@@ -153,9 +159,9 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(hideseek_state,hideseek)
+void hideseek_state::init_hideseek()
 {
 }
 
 
-GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, hideseek,    ROT0, "<unknown>", "Hide & Seek",MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, init_hideseek, ROT0, "<unknown>", "Hide & Seek",MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

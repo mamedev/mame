@@ -59,25 +59,26 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_ack_nmi)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(metlclsh_state::metlclsh_master_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
-	AM_RANGE(0xc080, 0xc080) AM_WRITENOP                            // ? 0
-	AM_RANGE(0xc0c2, 0xc0c2) AM_WRITE(metlclsh_cause_irq)           // cause irq on cpu #2
-	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi)             // nmi ack
-/**/AM_RANGE(0xc800, 0xc82f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-/**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-/**/AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(metlclsh_fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfff0, 0xffff) AM_ROM                                 // Reset/IRQ vectors
-ADDRESS_MAP_END
+void metlclsh_state::metlclsh_master_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram().share("share1");
+	map(0xa000, 0xbfff).rom();
+	map(0xc000, 0xc000).portr("IN0");
+	map(0xc001, 0xc001).portr("IN1");
+	map(0xc002, 0xc002).portr("IN2");
+	map(0xc003, 0xc003).portr("DSW");
+	map(0xc080, 0xc080).nopw();                            // ? 0
+	map(0xc0c2, 0xc0c2).w(FUNC(metlclsh_state::metlclsh_cause_irq));           // cause irq on cpu #2
+	map(0xc0c3, 0xc0c3).w(FUNC(metlclsh_state::metlclsh_ack_nmi));             // nmi ack
+/**/map(0xc800, 0xc82f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+/**/map(0xcc00, 0xcc2f).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xd000, 0xd001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+/**/map(0xd800, 0xdfff).ram().w(FUNC(metlclsh_state::metlclsh_fgram_w)).share("fgram");
+	map(0xe000, 0xe001).w("ym2", FUNC(ym3526_device::write));
+	map(0xe800, 0xe9ff).ram().share("spriteram");
+	map(0xfff0, 0xffff).rom();                                 // Reset/IRQ vectors
+}
 
 
 /***************************************************************************
@@ -106,24 +107,25 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_flipscreen_w)
 	flip_screen_set(data & 1);
 }
 
-ADDRESS_MAP_START(metlclsh_state::metlclsh_slave_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0") AM_WRITE(metlclsh_gfxbank_w)   // bg tiles bank
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
-	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(metlclsh_cause_nmi2)          // cause nmi on cpu #1
-	AM_RANGE(0xc0c1, 0xc0c1) AM_WRITE(metlclsh_ack_irq2)            // irq ack
-	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1") AM_WRITE(metlclsh_bgram_w) AM_SHARE("bgram") // this is banked
-	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w)        // 0/1
-	AM_RANGE(0xe401, 0xe401) AM_WRITE(metlclsh_rambank_w)
-	AM_RANGE(0xe402, 0xe403) AM_WRITEONLY AM_SHARE("scrollx")
+void metlclsh_state::metlclsh_slave_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram().share("share1");
+	map(0xc000, 0xc000).portr("IN0").w(FUNC(metlclsh_state::metlclsh_gfxbank_w));   // bg tiles bank
+	map(0xc001, 0xc001).portr("IN1");
+	map(0xc002, 0xc002).portr("IN2");
+	map(0xc003, 0xc003).portr("DSW");
+	map(0xc0c0, 0xc0c0).w(FUNC(metlclsh_state::metlclsh_cause_nmi2));          // cause nmi on cpu #1
+	map(0xc0c1, 0xc0c1).w(FUNC(metlclsh_state::metlclsh_ack_irq2));            // irq ack
+	map(0xd000, 0xd7ff).bankr("bank1").w(FUNC(metlclsh_state::metlclsh_bgram_w)).share("bgram"); // this is banked
+	map(0xe301, 0xe301).w(FUNC(metlclsh_state::metlclsh_flipscreen_w));        // 0/1
+	map(0xe401, 0xe401).w(FUNC(metlclsh_state::metlclsh_rambank_w));
+	map(0xe402, 0xe403).writeonly().share("scrollx");
 //  AM_RANGE(0xe404, 0xe404) AM_WRITENOP                            // ? 0
 //  AM_RANGE(0xe410, 0xe410) AM_WRITENOP                            // ? 0 on startup only
-	AM_RANGE(0xe417, 0xe417) AM_WRITE(metlclsh_ack_nmi2)            // nmi ack
-	AM_RANGE(0xfff0, 0xffff) AM_ROM                                 // Reset/IRQ vectors
-ADDRESS_MAP_END
+	map(0xe417, 0xe417).w(FUNC(metlclsh_state::metlclsh_ack_nmi2));            // nmi ack
+	map(0xfff0, 0xffff).rom();                                 // Reset/IRQ vectors
+}
 
 
 /***************************************************************************
@@ -246,7 +248,7 @@ static const gfx_layout tilelayout8 =
 	8*8
 };
 
-static GFXDECODE_START( metlclsh )
+static GFXDECODE_START( gfx_metlclsh )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x00, 2 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout16, 0x10, 1 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout8,  0x20, 4 ) // [2] Foreground
@@ -276,12 +278,12 @@ void metlclsh_state::machine_reset()
 MACHINE_CONFIG_START(metlclsh_state::metlclsh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)        // ?
-	MCFG_CPU_PROGRAM_MAP(metlclsh_master_map)
+	MCFG_DEVICE_ADD("maincpu", M6809, 1500000)        // ?
+	MCFG_DEVICE_PROGRAM_MAP(metlclsh_master_map)
 	// IRQ by YM3526, NMI by cpu #2
 
-	MCFG_CPU_ADD("sub", M6809, 1500000)        // ?
-	MCFG_CPU_PROGRAM_MAP(metlclsh_slave_map)
+	MCFG_DEVICE_ADD("sub", M6809, 1500000)        // ?
+	MCFG_DEVICE_PROGRAM_MAP(metlclsh_slave_map)
 	// IRQ by cpu #1, NMI by coins insertion
 
 
@@ -294,20 +296,20 @@ MACHINE_CONFIG_START(metlclsh_state::metlclsh)
 	MCFG_SCREEN_UPDATE_DRIVER(metlclsh_state, screen_update_metlclsh)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlclsh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlclsh)
 	MCFG_PALETTE_ADD("palette", 3 * 16)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -416,4 +418,4 @@ ROM_START( metlclsh )
 	ROM_LOAD( "82s123.prm",   0x0000, 0x20, CRC(6844cc88) SHA1(89d23367aa6ff541205416e82781fe938dfeeb52) )
 ROM_END
 
-GAME( 1985, metlclsh, 0, metlclsh, metlclsh, metlclsh_state, 0, ROT0, "Data East", "Metal Clash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, metlclsh, 0, metlclsh, metlclsh, metlclsh_state, empty_init, ROT0, "Data East", "Metal Clash (Japan)", MACHINE_SUPPORTS_SAVE )

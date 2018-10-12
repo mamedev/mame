@@ -83,11 +83,12 @@ const tiny_rom_entry *wangpc_tig_device::device_rom_region() const
 //  UPD7220_INTERFACE( hgdc0_intf )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(wangpc_tig_device::upd7220_0_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_RAM // frame buffer
-	AM_RANGE(0x4000, 0x7fff) AM_RAM // font memory
-ADDRESS_MAP_END
+void wangpc_tig_device::upd7220_0_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x0fff).mirror(0x1000).ram(); // frame buffer
+	map(0x4000, 0x7fff).ram(); // font memory
+}
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( wangpc_tig_device::hgdc_draw_text )
 {
@@ -98,10 +99,11 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( wangpc_tig_device::hgdc_draw_text )
 //  UPD7220_INTERFACE( hgdc1_intf )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(wangpc_tig_device::upd7220_1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0xffff) AM_RAM // graphics memory
-ADDRESS_MAP_END
+void wangpc_tig_device::upd7220_1_map(address_map &map)
+{
+	map.global_mask(0xffff);
+	map(0x0000, 0xffff).ram(); // graphics memory
+}
 
 UPD7220_DISPLAY_PIXELS_MEMBER( wangpc_tig_device::hgdc_display_pixels )
 {

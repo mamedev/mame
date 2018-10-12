@@ -131,6 +131,7 @@ Dumped by Chackn
 #include "machine/segacrp2_device.h"
 #include "sound/2203intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -165,39 +166,42 @@ contain a level.
 
 */
 
-ADDRESS_MAP_START(angelkds_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_SHARE("bgtopvideoram") /* Top Half of Screen */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_SHARE("bgbotvideoram") /* Bottom Half of Screen */
-	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xec00, 0xecff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xed00, 0xedff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xee00, 0xeeff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xef00, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(angelkds_bgbotbank_write)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(angelkds_bgbotscroll_write)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(angelkds_txbank_write)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(angelkds_layer_ctrl_write)
-ADDRESS_MAP_END
+void angelkds_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe3ff).ram().w(FUNC(angelkds_state::angelkds_bgtopvideoram_w)).share("bgtopvideoram"); /* Top Half of Screen */
+	map(0xe400, 0xe7ff).ram().w(FUNC(angelkds_state::angelkds_bgbotvideoram_w)).share("bgbotvideoram"); /* Bottom Half of Screen */
+	map(0xe800, 0xebff).ram().w(FUNC(angelkds_state::angelkds_txvideoram_w)).share("txvideoram");
+	map(0xec00, 0xecff).ram().share("spriteram");
+	map(0xed00, 0xedff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xee00, 0xeeff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xef00, 0xefff).ram();
+	map(0xf000, 0xf000).w(FUNC(angelkds_state::angelkds_bgtopbank_write));
+	map(0xf001, 0xf001).w(FUNC(angelkds_state::angelkds_bgtopscroll_write));
+	map(0xf002, 0xf002).w(FUNC(angelkds_state::angelkds_bgbotbank_write));
+	map(0xf003, 0xf003).w(FUNC(angelkds_state::angelkds_bgbotscroll_write));
+	map(0xf004, 0xf004).w(FUNC(angelkds_state::angelkds_txbank_write));
+	map(0xf005, 0xf005).w(FUNC(angelkds_state::angelkds_layer_ctrl_write));
+}
 
-ADDRESS_MAP_START(angelkds_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void angelkds_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(angelkds_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP // 00 on start-up, not again
+void angelkds_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw(); // 00 on start-up, not again
 
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	map(0x40, 0x43).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	AM_RANGE(0xc0, 0xc3) AM_READWRITE(angelkds_main_sound_r, angelkds_main_sound_w) // 02 various points
-ADDRESS_MAP_END
+	map(0xc0, 0xc3).rw(FUNC(angelkds_state::angelkds_main_sound_r), FUNC(angelkds_state::angelkds_main_sound_w)); // 02 various points
+}
 
 
 
@@ -205,20 +209,22 @@ ADDRESS_MAP_END
 
 /* sub cpu */
 
-ADDRESS_MAP_START(angelkds_state::sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xaaa9, 0xaaa9) AM_READNOP
-	AM_RANGE(0xaaab, 0xaaab) AM_READNOP
-	AM_RANGE(0xaaac, 0xaaac) AM_READNOP
-ADDRESS_MAP_END
+void angelkds_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xaaa9, 0xaaa9).nopr();
+	map(0xaaab, 0xaaab).nopr();
+	map(0xaaac, 0xaaac).nopr();
+}
 
-ADDRESS_MAP_START(angelkds_state::sub_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_READWRITE(angelkds_sub_sound_r, angelkds_sub_sound_w) // spcpostn
-ADDRESS_MAP_END
+void angelkds_state::sub_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x40, 0x41).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x80, 0x83).rw(FUNC(angelkds_state::angelkds_sub_sound_r), FUNC(angelkds_state::angelkds_sub_sound_w)); // spcpostn
+}
 
 
 /* Input Ports */
@@ -469,7 +475,7 @@ static const gfx_layout angelkds_spritelayout =
 	16*32
 };
 
-static GFXDECODE_START( angelkds )
+static GFXDECODE_START( gfx_angelkds )
 	GFXDECODE_ENTRY( "gfx1", 0, angelkds_charlayout,   0x30, 1  )
 	GFXDECODE_ENTRY( "gfx3", 0, angelkds_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, angelkds_charlayout,   0, 16 )
@@ -513,25 +519,25 @@ void angelkds_state::machine_reset()
 
 MACHINE_CONFIG_START(angelkds_state::angelkds)
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(sub_portmap)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_IO_MAP(sub_portmap)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("I40"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("I41"))
-	MCFG_I8255_IN_PORTC_CB(READ8(angelkds_state, angeklds_ff_r)) // or left inputs don't work
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(angelkds_state, angelkds_cpu_bank_write))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("I40");
+	ppi0.in_pb_callback().set_ioport("I41");
+	ppi0.in_pc_callback().set(FUNC(angelkds_state::angeklds_ff_r)); // or left inputs don't work
+	ppi0.out_pc_callback().set(FUNC(angelkds_state::angelkds_cpu_bank_write));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("I80"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("I81"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("I82"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("I80");
+	ppi1.in_pb_callback().set_ioport("I81");
+	ppi1.in_pc_callback().set_ioport("I82");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -544,21 +550,21 @@ MACHINE_CONFIG_START(angelkds_state::angelkds)
 	MCFG_SCREEN_UPDATE_DRIVER(angelkds_state, screen_update_angelkds)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", angelkds)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_angelkds)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(4'000'000))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
@@ -568,11 +574,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(angelkds_state::spcpostn)
 	angelkds(config);
 	/* encryption */
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0005, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0005, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
 MACHINE_CONFIG_END
@@ -675,7 +681,7 @@ ROM_START( spcpostn )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(angelkds_state,angelkds)
+void angelkds_state::init_angelkds()
 {
 	uint8_t *RAM = memregion("user1")->base();
 	membank("bank1")->configure_entries(0, 16, &RAM[0x0000], 0x4000);
@@ -683,5 +689,5 @@ DRIVER_INIT_MEMBER(angelkds_state,angelkds)
 
 
 
-GAME( 1988, angelkds, 0, angelkds, angelkds, angelkds_state, angelkds,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" ,     MACHINE_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
-GAME( 1986, spcpostn, 0, spcpostn, spcpostn, angelkds_state, angelkds,  ROT90,  "Sega / Nasco",  "Space Position (Japan)" , MACHINE_SUPPORTS_SAVE) /* encrypted */
+GAME( 1988, angelkds, 0, angelkds, angelkds, angelkds_state, init_angelkds, ROT90, "Sega / Nasco?", "Angel Kids (Japan)" ,     MACHINE_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
+GAME( 1986, spcpostn, 0, spcpostn, spcpostn, angelkds_state, init_angelkds, ROT90, "Sega / Nasco",  "Space Position (Japan)" , MACHINE_SUPPORTS_SAVE) /* encrypted */

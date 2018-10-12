@@ -177,7 +177,10 @@ void namcoio_device::device_reset()
 		elem = 0;
 
 	if (m_reset != ASSERT_LINE)
-		set_reset_line(PULSE_LINE);
+	{
+		set_reset_line(ASSERT_LINE);
+		set_reset_line(CLEAR_LINE);
+	}
 }
 
 /*****************************************************************************

@@ -16,6 +16,7 @@
 #include "mameopts.h"
 #include "audit.h"
 #include "info.h"
+#include "romload.h"
 #include "unzip.h"
 #include "validity.h"
 #include "sound/samples.h"
@@ -82,7 +83,7 @@ const options_entry cli_option_entries[] =
 	/* core commands */
 	{ nullptr,                              nullptr,   OPTION_HEADER,     "CORE COMMANDS" },
 	{ CLICOMMAND_HELP           ";h;?",     "0",       OPTION_COMMAND,    "show help message" },
-	{ CLICOMMAND_VALIDATE       ";valid",   "0",       OPTION_COMMAND,    "perform driver validation on game drivers" },
+	{ CLICOMMAND_VALIDATE       ";valid",   "0",       OPTION_COMMAND,    "perform validation on system drivers and devices" },
 
 	/* configuration commands */
 	{ nullptr,                              nullptr,   OPTION_HEADER,     "CONFIGURATION COMMANDS" },
@@ -551,7 +552,7 @@ void cli_frontend::listcrc(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	// iterate through matches, and then through ROMs
 	while (drivlist.next())
@@ -679,13 +680,14 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 	if (iswild || first)
 	{
 		machine_config config(GAME_NAME(___empty), m_options);
+		machine_config::token const tok(config.begin_configuration(config.root_device()));
 		for (device_type type : registered_device_types)
 		{
 			if (included(type.shortname()))
 			{
-				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+				device_t *const dev = config.device_add("_tmp", type, 0);
 				list_system_roms(*dev, "device");
-				config.device_remove(&config.root_device(), "_tmp");
+				config.device_remove("_tmp");
 
 				// if it wasn't a wildcard, there can only be one
 				if (!iswild)
@@ -718,7 +720,7 @@ void cli_frontend::listsamples(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	// iterate over drivers, looking for SAMPLES devices
 	bool first = true;
@@ -758,7 +760,7 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	// iterate over drivers, looking for SAMPLES devices
 	bool first = true;
@@ -843,7 +845,7 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	// print header
 	printf("%-16s %-16s %-16s %s\n", "SYSTEM", "SLOT NAME", "SLOT OPTIONS", "SLOT DEVICE NAME");
@@ -859,13 +861,13 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 			if (slot.fixed()) continue;
 
 			// build a list of user-selectable options
-			std::vector<device_slot_option *> option_list;
+			std::vector<device_slot_interface::slot_option const *> option_list;
 			for (auto &option : slot.option_list())
 				if (option.second->selectable())
 					option_list.push_back(option.second.get());
 
 			// sort them by name
-			std::sort(option_list.begin(), option_list.end(), [](device_slot_option *opt1, device_slot_option *opt2) {
+			std::sort(option_list.begin(), option_list.end(), [](device_slot_interface::slot_option const *opt1, device_slot_interface::slot_option const *opt2) {
 				return strcmp(opt1->name(), opt2->name()) < 0;
 			});
 
@@ -876,7 +878,7 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 			bool first_option = true;
 
 			// get the options and print them
-			for (device_slot_option *opt : option_list)
+			for (device_slot_interface::slot_option const *opt : option_list)
 			{
 				if (first_option)
 					printf("%-16s %s\n", opt->name(), opt->devtype().fullname());
@@ -911,7 +913,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	// print header
 	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
@@ -1017,12 +1019,13 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 	if (iswild || !matchcount)
 	{
 		machine_config config(GAME_NAME(___empty), m_options);
+		machine_config::token const tok(config.begin_configuration(config.root_device()));
 		for (device_type type : registered_device_types)
 		{
 			if (included(type.shortname()))
 			{
 				// audit the ROMs in this set
-				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+				device_t *const dev = config.device_add("_tmp", type, 0);
 				media_auditor::summary summary = auditor.audit_device(*dev, AUDIT_VALIDATE_FAST);
 
 				print_summary(
@@ -1030,7 +1033,7 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 						"rom", dev->shortname(), nullptr,
 						correct, incorrect, notfound,
 						summary_string);
-				config.device_remove(&config.root_device(), "_tmp");
+				config.device_remove("_tmp");
 
 				// if it wasn't a wildcard, there can only be one
 				if (!iswild)
@@ -1111,7 +1114,7 @@ void cli_frontend::verifysamples(const std::vector<std::string> &args)
 
 	// return an error if none found
 	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
 	if (matched > 0 && correct == 0 && incorrect == 0)
@@ -1324,7 +1327,7 @@ void cli_frontend::listsoftware(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	while (drivlist.next())
 	{
@@ -1369,9 +1372,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 	// determine which drivers to process; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-	{
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
-	}
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	media_auditor auditor(drivlist);
 	util::ovectorstream summary_string;
@@ -1409,7 +1410,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 
 	// return an error if none found
 	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
 	if (matched > 0 && correct == 0 && incorrect == 0)

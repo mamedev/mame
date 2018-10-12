@@ -286,7 +286,9 @@ to the same bank as defined through A20.
 #include "cpu/sh/sh2.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "machine/315_5649.h"
 #include "sound/scsp.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -303,8 +305,8 @@ to the same bank as defined through A20.
 class coolridr_state : public driver_device
 {
 public:
-	coolridr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	coolridr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_textBytesToWrite(0x00),
 		m_blitterSerialCount(0x00),
 		m_blitterMode(0x00),
@@ -321,14 +323,6 @@ public:
 		m_soundram(*this, "soundram"),
 		m_soundram2(*this, "soundram2"),
 		m_rom(*this, "share1"),
-		m_io_an0(*this, "AN0"),
-		m_io_an1(*this, "AN1"),
-		m_io_an2(*this, "AN2"),
-		m_io_an3(*this, "AN3"),
-		m_io_an4(*this, "AN4"),
-		m_io_an5(*this, "AN5"),
-		m_io_an6(*this, "AN6"),
-		m_io_an7(*this, "AN7"),
 		m_io_config(*this, "CONFIG"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -368,14 +362,6 @@ public:
 	required_shared_ptr<uint16_t> m_soundram;
 	required_shared_ptr<uint16_t> m_soundram2;
 	required_shared_ptr<uint32_t> m_rom;
-	required_ioport m_io_an0;
-	required_ioport m_io_an1;
-	required_ioport m_io_an2;
-	required_ioport m_io_an3;
-	required_ioport m_io_an4;
-	required_ioport m_io_an5;
-	required_ioport m_io_an6;
-	required_ioport m_io_an7;
 	required_ioport m_io_config;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -417,14 +403,12 @@ public:
 	DECLARE_READ16_MEMBER(h1_soundram2_r);
 	DECLARE_WRITE16_MEMBER(h1_soundram_w);
 	DECLARE_WRITE16_MEMBER(h1_soundram2_w);
-	DECLARE_READ8_MEMBER(analog_mux_r);
-	DECLARE_WRITE8_MEMBER(analog_mux_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
 	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
-	DECLARE_DRIVER_INIT(coolridr);
-	DECLARE_DRIVER_INIT(aquastge);
+	void init_coolridr();
+	void init_aquastge();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -544,6 +528,8 @@ public:
 	void coolridr_submap(address_map &map);
 	void system_h1_map(address_map &map);
 	void system_h1_sound_map(address_map &map);
+	void scsp1_map(address_map &map);
+	void scsp2_map(address_map &map);
 };
 
 #define PRINT_BLIT_STUFF \
@@ -2824,33 +2810,35 @@ WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
 }
 
 
-ADDRESS_MAP_START(coolridr_state::system_h1_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
-	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
+void coolridr_state::system_h1_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).rom().share("share1").nopw();
+	map(0x01000000, 0x01ffffff).rom().region("gfx_data", 0x0000000);
 
-	AM_RANGE(0x03c00000, 0x03c1ffff) AM_MIRROR(0x00200000) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") /* mostly mapped at 0x03e00000 */
+	map(0x03c00000, 0x03c1ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::sysh1_dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
 
-	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_SHARE("txt_vram")//text tilemap + "lineram"
-	AM_RANGE(0x04000000, 0x0400000f) AM_READWRITE(sysh1_unk_blit_r,sysh1_unk_blit_w) AM_SHARE("sysh1_txt_blit")
-	AM_RANGE(0x04000010, 0x04000013) AM_WRITE(sysh1_blit_mode_w)
-	AM_RANGE(0x04000014, 0x04000017) AM_WRITE(sysh1_blit_data_w)
-	AM_RANGE(0x04000018, 0x0400001b) AM_WRITE(sysh1_fb_mode_w)
-	AM_RANGE(0x0400001c, 0x0400001f) AM_WRITE(sysh1_fb_data_w)
+	map(0x03f00000, 0x03f0ffff).ram().share("share3"); /*Communication area RAM*/
+	map(0x03f40000, 0x03f4ffff).ram().share("txt_vram");//text tilemap + "lineram"
+	map(0x04000000, 0x0400000f).rw(FUNC(coolridr_state::sysh1_unk_blit_r), FUNC(coolridr_state::sysh1_unk_blit_w)).share("sysh1_txt_blit");
+	map(0x04000010, 0x04000013).w(FUNC(coolridr_state::sysh1_blit_mode_w));
+	map(0x04000014, 0x04000017).w(FUNC(coolridr_state::sysh1_blit_data_w));
+	map(0x04000018, 0x0400001b).w(FUNC(coolridr_state::sysh1_fb_mode_w));
+	map(0x0400001c, 0x0400001f).w(FUNC(coolridr_state::sysh1_fb_data_w));
 
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("sysh1_workrah")
-	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share1")
+	map(0x06000000, 0x060fffff).ram().share("sysh1_workrah");
+	map(0x20000000, 0x201fffff).rom().share("share1");
 
-	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0x60000000, 0x600003ff).nopw();
+}
 
-ADDRESS_MAP_START(coolridr_state::aquastge_h1_map)
-	AM_IMPORT_FROM(system_h1_map)
-	AM_RANGE(0x03c00000, 0x03c0ffff) AM_MIRROR(0x00200000) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") /* mostly mapped at 0x03e00000 */
-	AM_RANGE(0x03f50000, 0x03f5ffff) AM_RAM // video registers
-	AM_RANGE(0x03e10000, 0x03e1ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM  /*Communication area RAM*/
-ADDRESS_MAP_END
+void coolridr_state::aquastge_h1_map(address_map &map)
+{
+	system_h1_map(map);
+	map(0x03c00000, 0x03c0ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::sysh1_dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
+	map(0x03f50000, 0x03f5ffff).ram(); // video registers
+	map(0x03e10000, 0x03e1ffff).ram().share("share3"); /*Communication area RAM*/
+	map(0x03f00000, 0x03f0ffff).ram();  /*Communication area RAM*/
+}
 
 READ16_MEMBER( coolridr_state::h1_soundram_r)
 {
@@ -2872,29 +2860,6 @@ WRITE16_MEMBER( coolridr_state::h1_soundram2_w)
 	COMBINE_DATA(&m_soundram2[offset]);
 }
 
-READ8_MEMBER( coolridr_state::analog_mux_r )
-{
-	uint8_t adc_data = 0;
-	switch(an_mux_data)
-	{
-		case 0x0: adc_data = m_io_an0->read(); break;
-		case 0x1: adc_data = m_io_an1->read(); break;
-		case 0x2: adc_data = m_io_an2->read(); break;
-		case 0x3: adc_data = m_io_an3->read(); break;
-		case 0x4: adc_data = m_io_an4->read(); break;
-		case 0x5: adc_data = m_io_an5->read(); break;
-		case 0x6: adc_data = m_io_an6->read(); break;
-		case 0x7: adc_data = m_io_an7->read(); break;
-	}
-	an_mux_data++;
-	an_mux_data &= 0x7;
-	return adc_data;
-}
-
-WRITE8_MEMBER( coolridr_state::analog_mux_w )
-{
-	an_mux_data = data;
-}
 
 WRITE8_MEMBER( coolridr_state::lamps_w )
 {
@@ -2988,42 +2953,37 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 
 
 
-ADDRESS_MAP_START(coolridr_state::coolridr_submap)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM // note: SH7032 only supports 64KB
+void coolridr_state::coolridr_submap(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom(); // note: SH7032 only supports 64KB
 
-	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM //communication RAM
+	map(0x01000000, 0x0100ffff).ram(); //communication RAM
 
-	AM_RANGE(0x03000000, 0x0307ffff) AM_READWRITE16(h1_soundram_r, h1_soundram_w,0xffffffff) //AM_SHARE("soundram")
-	AM_RANGE(0x03100000, 0x03100fff) AM_DEVREADWRITE16("scsp1", scsp_device, read, write, 0xffffffff)
-	AM_RANGE(0x03200000, 0x0327ffff) AM_READWRITE16(h1_soundram2_r, h1_soundram2_w,0xffffffff) //AM_SHARE("soundram2")
-	AM_RANGE(0x03300000, 0x03300fff) AM_DEVREADWRITE16("scsp2", scsp_device, read, write, 0xffffffff)
+	map(0x03000000, 0x0307ffff).rw(FUNC(coolridr_state::h1_soundram_r), FUNC(coolridr_state::h1_soundram_w)); //.share("soundram");
+	map(0x03100000, 0x03100fff).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x03200000, 0x0327ffff).rw(FUNC(coolridr_state::h1_soundram2_r), FUNC(coolridr_state::h1_soundram2_w)); //.share("soundram2");
+	map(0x03300000, 0x03300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
 
-	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_sound_dma_r,sysh1_sound_dma_w) AM_SHARE("sound_dma")
-//  AM_RANGE(0x04200000, 0x0420003f) AM_RAM /* unknown */
+	map(0x04000000, 0x0400003f).rw(FUNC(coolridr_state::sysh1_sound_dma_r), FUNC(coolridr_state::sysh1_sound_dma_w)).share("sound_dma");
+//  map(0x04200000, 0x0420003f).ram(); /* unknown */
 
-	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
-	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
-	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-//  AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
-	AM_RANGE(0x06000000, 0x060001ff) AM_RAM AM_SHARE("nvram") // backup RAM
-	AM_RANGE(0x06100000, 0x06100003) AM_READ_PORT("IN0") AM_WRITE8(lamps_w,0x000000ff)
-	AM_RANGE(0x06100004, 0x06100007) AM_READ_PORT("IN1")
-	AM_RANGE(0x06100008, 0x0610000b) AM_READ_PORT("IN5")
-	AM_RANGE(0x0610000c, 0x0610000f) AM_READ_PORT("IN6")
-	AM_RANGE(0x06100010, 0x06100013) AM_READ_PORT("IN2") AM_WRITENOP
-	AM_RANGE(0x06100014, 0x06100017) AM_READ_PORT("IN3")
-	AM_RANGE(0x0610001c, 0x0610001f) AM_READWRITE8(analog_mux_r,analog_mux_w,0x000000ff) //AM_WRITENOP
-	AM_RANGE(0x06200000, 0x06200fff) AM_RAM //network related?
-	AM_RANGE(0x07ffe000, 0x07ffffff) AM_RAM // On-Chip RAM (actually mapped at 0x0fffe000-0x0fffffff)
-ADDRESS_MAP_END
+	map(0x05000000, 0x05000fff).ram();
+	map(0x05200000, 0x052001ff).ram();
+	map(0x05300000, 0x0530ffff).ram().share("share3"); /*Communication area RAM*/
+//  map(0x05fffe00, 0x05ffffff).rw(FUNC(coolridr_state::sh7032_r), FUNC(coolridr_state::sh7032_w)); // SH-7032H internal i/o
+	map(0x06000000, 0x060001ff).ram().share("nvram"); // backup RAM
+	map(0x06100000, 0x0610001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
+	map(0x06200000, 0x06200fff).ram(); //network related?
+	map(0x07ffe000, 0x07ffffff).ram(); // On-Chip RAM (actually mapped at 0x0fffe000-0x0fffffff)
+}
 
-ADDRESS_MAP_START(coolridr_state::aquastge_submap)
-	AM_IMPORT_FROM(coolridr_submap)
-	AM_RANGE(0x05200000, 0x0537ffff) AM_RAM
-	AM_RANGE(0x05210000, 0x0521ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-	AM_RANGE(0x06000200, 0x06000207) AM_WRITENOP // program bug?
-	AM_RANGE(0x06100018, 0x0610001b) AM_READ_PORT("IN7")
-ADDRESS_MAP_END
+void coolridr_state::aquastge_submap(address_map &map)
+{
+	coolridr_submap(map);
+	map(0x05200000, 0x0537ffff).ram();
+	map(0x05210000, 0x0521ffff).ram().share("share3"); /*Communication area RAM*/
+	map(0x06000200, 0x06000207).nopw(); // program bug?
+}
 
 /* TODO: what is this for, volume mixing? MIDI? */
 WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
@@ -3031,487 +2991,109 @@ WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
 	sound_fifo = data;
 }
 
-ADDRESS_MAP_START(coolridr_state::system_h1_sound_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1",0) AM_SHARE("soundram")
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_device, read, write)
-	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0) AM_SHARE("soundram2")
-	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE("scsp2", scsp_device, read, write)
-	AM_RANGE(0x800000, 0x80ffff) AM_MIRROR(0x200000) AM_RAM
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(sound_to_sh1_w,0x00ff)
-ADDRESS_MAP_END
+void coolridr_state::system_h1_sound_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("soundram");
+	map(0x100000, 0x100fff).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x200000, 0x27ffff).ram().share("soundram2");
+	map(0x300000, 0x300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x800000, 0x80ffff).mirror(0x200000).ram();
+	map(0x900001, 0x900001).w(FUNC(coolridr_state::sound_to_sh1_w));
+}
+
+void coolridr_state::scsp1_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("soundram");
+}
+
+void coolridr_state::scsp2_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("soundram2");
+}
 
 
 
 
 
-static GFXDECODE_START( coolridr )
+static GFXDECODE_START( gfx_coolridr )
 //  GFXDECODE_ENTRY( nullptr, 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-#define DUMMY_INPUT_PORT(_x_) \
-	PORT_START(_x_) \
-	PORT_DIPNAME( 0x00000001, 0x00000001, _x_ ) \
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00010000, 0x00010000, _x_ ) \
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-static INPUT_PORTS_START( aquastge )
-	DUMMY_INPUT_PORT("IN0")
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN1" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("P2 Coin")
-	PORT_SERVICE_NO_TOGGLE( 0x00040000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Switch")
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Start")
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Switch")
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	DUMMY_INPUT_PORT("IN2")
-
-	DUMMY_INPUT_PORT("IN3")
-
-	DUMMY_INPUT_PORT("IN5")
-
-	DUMMY_INPUT_PORT("IN6")
-
-	DUMMY_INPUT_PORT("IN7")
-
-	PORT_START("AN0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN5")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN6")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN7")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-
-	// driver debug
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x01, "Use Threading Code" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( coolridr )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN0-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "IN0-1" )
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_NAME("P1 Coin")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_NAME("P2 Coin")
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Switch")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("P1 Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )   PORT_NAME("P2 Start")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Switch")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x00000003, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Music <<") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Music >>") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Up")
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Down")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("P2 Coin")
-	PORT_SERVICE_NO_TOGGLE( 0x00040000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Switch")
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Start")
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Switch")
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("P1")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Music <<") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Music >>") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Down")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN2-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "IN2-1" )
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN3-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "IN3-1" )
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN4-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "IN4-1" )
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN5")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN5-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x00030000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Music <<") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Music >>") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Shift Up")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Shift Down")
-	PORT_BIT( 0x00c00000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN6")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN6-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "IN6-1" )
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("P2")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Music <<") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Music >>") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Shift Down")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("P1 Handle Bar")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("P1 Handle Bar")
 
 	PORT_START("AN1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("P1 Throttle")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("P1 Throttle")   PORT_REVERSE
 
 	PORT_START("AN2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("P1 Brake")
-
-	PORT_START("AN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("P1 Brake")      PORT_REVERSE
 
 	PORT_START("AN4")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_NAME("P2 Handle Bar")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_NAME("P2 Handle Bar")
 
 	PORT_START("AN5")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_REVERSE PORT_NAME("P2 Throttle")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_NAME("P2 Throttle")   PORT_REVERSE
 
 	PORT_START("AN6")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_REVERSE PORT_NAME("P2 Brake")
-
-	PORT_START("AN7")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_NAME("P2 Brake")      PORT_REVERSE
 
 	// driver debug
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x01, 0x01, "Use Threading Code" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( aquastge )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_NAME("P1 Coin")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_NAME("P2 Coin")
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Switch")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("P1 Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )   PORT_NAME("P2 Start")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Switch")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )   PORT_PLAYER(1)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// driver debug
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x01, "Use Threading Code" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -3657,9 +3239,9 @@ void coolridr_state::machine_start()
 	decode[1].current_object = 0;
 	debug_randompal = 9;
 
-	save_pointer(NAME(m_h1_vram.get()), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pcg.get()), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pal.get()), VRAM_SIZE);
+	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pal), VRAM_SIZE);
 }
 
 void coolridr_state::machine_reset()
@@ -3695,20 +3277,32 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 #define MAIN_CLOCK XTAL(28'636'363)
 
 MACHINE_CONFIG_START(coolridr_state::coolridr)
-	MCFG_CPU_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
-	MCFG_CPU_PROGRAM_MAP(system_h1_map)
+	MCFG_DEVICE_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
+	MCFG_DEVICE_PROGRAM_MAP(system_h1_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_main, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
-	MCFG_CPU_PROGRAM_MAP(system_h1_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
+	MCFG_DEVICE_PROGRAM_MAP(system_h1_sound_map)
 
-	MCFG_CPU_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 mhz
-	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
+	MCFG_DEVICE_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 mhz
+	MCFG_DEVICE_PROGRAM_MAP(coolridr_submap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, system_h1_sub, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coolridr)
+	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	io.out_pb_callback().set(FUNC(coolridr_state::lamps_w));
+	io.in_pc_callback().set_ioport("IN0");
+	io.in_pd_callback().set_ioport("P1");
+	io.in_pe_callback().set_ioport("P2");
+	io.an_port_callback<0>().set_ioport("AN0");
+	io.an_port_callback<1>().set_ioport("AN1");
+	io.an_port_callback<2>().set_ioport("AN2");
+	io.an_port_callback<4>().set_ioport("AN4");
+	io.an_port_callback<5>().set_ioport("AN5");
+	io.an_port_callback<6>().set_ioport("AN6");
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coolridr)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -3726,28 +3320,36 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(coolridr_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(coolridr_state, scsp1_to_sh1_irq))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	MCFG_DEVICE_ADD("scsp1", SCSP)
+	MCFG_DEVICE_ADDRESS_MAP(0, scsp1_map)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, coolridr_state, scsp_irq))
+	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp1_to_sh1_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("scsp2", SCSP, 0)
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(coolridr_state, scsp2_to_sh1_irq))
+	MCFG_DEVICE_ADD("scsp2", SCSP)
+	MCFG_DEVICE_ADDRESS_MAP(0, scsp2_map)
+	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp2_to_sh1_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coolridr_state::aquastge)
 	coolridr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aquastge_h1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(aquastge_h1_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(aquastge_submap)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(aquastge_submap)
+
+	sega_315_5649_device &io(SEGA_315_5649(config.replace(), "io", 0));
+	io.in_pc_callback().set_ioport("IN0");
+	io.in_pd_callback().set_ioport("IN1");
 MACHINE_CONFIG_END
 
 ROM_START( coolridr )
@@ -3768,8 +3370,6 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "mp17656.17", 0x0c00002, 0x0200000, CRC(945c89e3) SHA1(8776d74f73898d948aae3c446d7c710ad0407603) )
 	ROM_LOAD32_WORD_SWAP( "mp17657.18", 0x0c00000, 0x0200000, CRC(74676b1f) SHA1(b4a9003a052bde93bebfa4bef9e8dff65003c3b2) )
 
-	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
-
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
 
@@ -3785,12 +3385,6 @@ ROM_START( coolridr )
 	ROM_LOAD16_WORD_SWAP( "mpr-17647.ic8", 0x1c00000, 0x0400000, CRC(9dd9330c) SHA1(c91a7f497c1f4bd283bd683b06dff88893724d51) ) // 4900
 	ROM_LOAD16_WORD_SWAP( "mpr-17646.ic7", 0x2000000, 0x0400000, CRC(b77eb2ad) SHA1(b832c0f1798aca39adba840d56ae96a75346670a) ) // 0490
 	ROM_LOAD16_WORD_SWAP( "mpr-17645.ic6", 0x2400000, 0x0400000, CRC(56968d07) SHA1(e88c3d66ea05affb4681a25d155f097bd1b5a84b) ) // 0049
-
-	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
-
-	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
 ROM_END
 
 /*
@@ -3812,8 +3406,6 @@ ROM_START( aquastge )
 	ROM_LOAD32_WORD_SWAP( "mpr-18284.ic18", 0x0c00000, 0x0200000, CRC(5fdf3c1f) SHA1(9976fe4afc3234eecbaf47a2e0f951b6fe1cb5f5) )
 	ROM_RELOAD(0x0000000, 0x0200000)
 
-	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
-
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "epr-18278.ic12", 0x000000, 0x020000,  CRC(e601132a) SHA1(bed103ef2e0dfa8bb485d93d661142b82c23088b) )
 
@@ -3829,12 +3421,6 @@ ROM_START( aquastge )
 	ROM_LOAD16_WORD_SWAP( "mpr-18292.ic8", 0x1c00000, 0x0200000, CRC(59a713f9) SHA1(388b833fa6fb930f26c80674606505ec80668a16) ) // 4900
 	ROM_LOAD16_WORD_SWAP( "mpr-18291.ic7", 0x2000000, 0x0200000, CRC(b6c167bd) SHA1(4990bae50e8804b2e1048aa5c64b086e8427073f) ) // 0490
 	ROM_LOAD16_WORD_SWAP( "mpr-18290.ic6", 0x2400000, 0x0200000, CRC(11f7adb0) SHA1(a72f9892f93506456edc7ffc66224446a58ca38b) ) // 0049
-
-	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
-
-	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
 ROM_END
 
 
@@ -3892,7 +3478,7 @@ READ32_MEMBER(coolridr_state::aquastge_hack_r)
 }
 
 
-DRIVER_INIT_MEMBER(coolridr_state,coolridr)
+void coolridr_state::init_coolridr()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
 
@@ -3908,12 +3494,9 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	m_maincpu->sh2drc_add_fastram(0x20000000, 0x201fffff, 1, &m_rom[0]);
 }
 
-DRIVER_INIT_MEMBER(coolridr_state, aquastge)
+void coolridr_state::init_aquastge()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60c3fd8, 0x60c3fdb, read32_delegate(FUNC(coolridr_state::aquastge_hack_r), this));
-
-
-
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
@@ -3921,5 +3504,5 @@ DRIVER_INIT_MEMBER(coolridr_state, aquastge)
 	m_colbase = 0;
 }
 
-GAME ( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
-GAMEL( 1995, aquastge,    0, aquastge,    aquastge, coolridr_state,    aquastge, ROT0,  "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)
+GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
+GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)

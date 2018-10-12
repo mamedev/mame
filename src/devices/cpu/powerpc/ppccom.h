@@ -7,13 +7,10 @@
     Common PowerPC definitions and functions
 
 ***************************************************************************/
+#ifndef MAME_CPU_POWERPC_PPCCOM_H
+#define MAME_CPU_POWERPC_PPCCOM_H
 
 #pragma once
-
-#ifndef __PPCCOM_H__
-#define __PPCCOM_H__
-
-#include "ppc.h"
 
 
 /***************************************************************************
@@ -478,5 +475,4 @@ enum
 extern offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op);
 
 
-
-#endif /* __PPCCOM_H__ */
+#endif // MAME_CPU_POWERPC_PPCCOM_H

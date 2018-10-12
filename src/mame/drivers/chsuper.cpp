@@ -26,6 +26,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -36,14 +37,34 @@ class chsuper_state : public driver_device
 {
 public:
 	chsuper_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
 	DECLARE_WRITE8_MEMBER(chsuper_outporta_w);
 	DECLARE_WRITE8_MEMBER(chsuper_outportb_w);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void chsuper(machine_config &config);
+	void chsuper_portmap(address_map &map);
+	void chsuper_prg_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void init_chsuper3();
+	void init_chmpnum();
+	void init_chsuper2();
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override { m_lamps.resolve(); }
+	//virtual void machine_reset();
+
+	virtual void video_start() override;
+
 
 	int m_tilexor;
 	uint8_t m_blacklamp;
@@ -53,22 +74,7 @@ public:
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void chsuper(machine_config &config);
-	void chsuper_portmap(address_map &map);
-	void chsuper_prg_map(address_map &map);
-	void ramdac_map(address_map &map);
-protected:
-	// driver_device overrides
-	//virtual void machine_start();
-	//virtual void machine_reset();
-
-	virtual void video_start() override;
-public:
-	DECLARE_DRIVER_INIT(chsuper3);
-	DECLARE_DRIVER_INIT(chmpnum);
-	DECLARE_DRIVER_INIT(chsuper2);
+	output_finder<7> m_lamps;
 };
 
 
@@ -152,11 +158,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin counter
-	output().set_lamp_value(0, (data >> 1) & 1);  // Hold 1 / Black (Nero) lamp.
+	m_lamps[0] = BIT(data, 1);  // Hold 1 / Black (Nero) lamp.
 	machine().bookkeeping().coin_counter_w(1, data & 0x04);  // Payout / Ticket Out pulse
-	output().set_lamp_value(1, (data >> 3) & 1);  // Hold 2 / Low (Bassa) lamp.
+	m_lamps[1] = BIT(data, 3);  // Hold 2 / Low (Bassa) lamp.
 	// D4: unused...
-	output().set_lamp_value(5, (data >> 5) & 1);  // BET lamp
+	m_lamps[5] = BIT(data, 5);  // BET lamp
 	// D6: ticket motor...
 	// D7: unused...
 
@@ -167,11 +173,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		output().set_lamp_value(2, 1);            // HOLD 3 ON
+		m_lamps[2] = 1;            // HOLD 3 ON
 	}
 	else
 	{
-		output().set_lamp_value(2, 0);            // otherwise HOLD 3 OFF
+		m_lamps[2] = 0;            // otherwise HOLD 3 OFF
 	}
 }
 
@@ -179,11 +185,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 {
 	// D0: unknown...
 	// D1: unused...
-	output().set_lamp_value(3, (data >> 2) & 1);  // Hold 4 / High (Alta) lamp.
+	m_lamps[3] = BIT(data, 2);  // Hold 4 / High (Alta) lamp.
 	// D3: unused...
 	// D4: unused...
-	output().set_lamp_value(4, (data >> 5) & 1);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
-	output().set_lamp_value(6, (data >> 6) & 1);  // Start / Gamble (Raddoppio) lamp.
+	m_lamps[4] = BIT(data, 5);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
+	m_lamps[6] = BIT(data, 6);  // Start / Gamble (Raddoppio) lamp.
 	// D7: unused...
 
 /*  Workaround to get the HOLD 3 lamp line active,
@@ -193,11 +199,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		output().set_lamp_value(2, 1);    // Hold 3 ON
+		m_lamps[2] = 1;    // Hold 3 ON
 	}
 	else
 	{
-		output().set_lamp_value(2, 0);    // Hold 3 OFF
+		m_lamps[2] = 0;    // Hold 3 OFF
 	}
 }
 
@@ -206,29 +212,31 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 *   Memory Map handlers    *
 ***************************/
 
-ADDRESS_MAP_START(chsuper_state::chsuper_prg_map)
-	AM_RANGE(0x00000, 0x0efff) AM_ROM
-	AM_RANGE(0x00000, 0x01fff) AM_WRITE( chsuper_vram_w )
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_REGION("maincpu", 0xf000)
-	AM_RANGE(0xfb000, 0xfbfff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void chsuper_state::chsuper_prg_map(address_map &map)
+{
+	map(0x00000, 0x0efff).rom();
+	map(0x00000, 0x01fff).w(FUNC(chsuper_state::chsuper_vram_w));
+	map(0x0f000, 0x0ffff).ram().region("maincpu", 0xf000);
+	map(0xfb000, 0xfbfff).ram().share("nvram");
+}
 
 //  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
-ADDRESS_MAP_START(chsuper_state::chsuper_portmap)
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
-	AM_RANGE( 0x00e8, 0x00e8 ) AM_READ_PORT("IN0")
-	AM_RANGE( 0x00e9, 0x00e9 ) AM_READ_PORT("IN1")
-	AM_RANGE( 0x00ea, 0x00ea ) AM_READ_PORT("DSW")
-	AM_RANGE( 0x00ed, 0x00ed ) AM_WRITENOP // mirror of EFh, but with bit0 active...
-	AM_RANGE( 0x00ee, 0x00ee ) AM_WRITE(chsuper_outporta_w)
-	AM_RANGE( 0x00ef, 0x00ef ) AM_WRITE(chsuper_outportb_w)
-	AM_RANGE( 0x00fc, 0x00fc ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE( 0x00fd, 0x00fd ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE( 0x00fe, 0x00fe ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
-	AM_RANGE( 0x8300, 0x8300 ) AM_READ_PORT("IN2")  // valid input port present in test mode.
-	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE("dac", dac_byte_interface, write) // unk writes
-ADDRESS_MAP_END
+void chsuper_state::chsuper_portmap(address_map &map)
+{
+	map(0x0000, 0x003f).ram(); // Z180 internal regs
+	map(0x00e8, 0x00e8).portr("IN0");
+	map(0x00e9, 0x00e9).portr("IN1");
+	map(0x00ea, 0x00ea).portr("DSW");
+	map(0x00ed, 0x00ed).nopw(); // mirror of EFh, but with bit0 active...
+	map(0x00ee, 0x00ee).w(FUNC(chsuper_state::chsuper_outporta_w));
+	map(0x00ef, 0x00ef).w(FUNC(chsuper_state::chsuper_outportb_w));
+	map(0x00fc, 0x00fc).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x00fd, 0x00fd).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x00fe, 0x00fe).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x8300, 0x8300).portr("IN2");  // valid input port present in test mode.
+	map(0xff20, 0xff3f).w("dac", FUNC(dac_byte_interface::data_w)); // unk writes
+}
 
 /* About Sound...
 
@@ -342,13 +350,14 @@ static const gfx_layout charlayout =
 	8*32
 };
 
-static GFXDECODE_START( chsuper )
+static GFXDECODE_START( gfx_chsuper )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
-ADDRESS_MAP_START(chsuper_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void chsuper_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 /***************************
@@ -358,10 +367,10 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(chsuper_state::chsuper)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 4)   /* HD64180RP8, 8 MHz? */
-	MCFG_CPU_PROGRAM_MAP(chsuper_prg_map)
-	MCFG_CPU_IO_MAP(chsuper_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", chsuper_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 4)   /* HD64180RP8, 8 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(chsuper_prg_map)
+	MCFG_DEVICE_IO_MAP(chsuper_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chsuper_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -372,19 +381,19 @@ MACHINE_CONFIG_START(chsuper_state::chsuper)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chsuper)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chsuper)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -472,21 +481,18 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
+void chsuper_state::init_chsuper2()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	m_tilexor = 0x7f00;
 
 	buffer = std::make_unique<uint8_t[]>(0x100000);
 
-	for (i=0;i<0x100000;i++)
+	for (int i = 0; i < 0x100000; i++)
 	{
-		int j;
-
-		j = i ^ (m_tilexor << 5);
+		int j = i ^ (m_tilexor << 5);
 
 		buffer[j] = rom[i];
 	}
@@ -494,17 +500,16 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 	memcpy(rom,buffer.get(),0x100000);
 }
 
-DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
+void chsuper_state::init_chsuper3()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	m_tilexor = 0x0e00;
 
 	buffer = std::make_unique<uint8_t[]>(0x100000);
 
-	for (i=0;i<0x100000;i++)
+	for (int i = 0; i < 0x100000; i++)
 	{
 		int j;
 
@@ -516,21 +521,18 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 	memcpy(rom,buffer.get(),0x100000);
 }
 
-DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
+void chsuper_state::init_chmpnum()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	m_tilexor = 0x1800;
 
 	buffer = std::make_unique<uint8_t[]>(0x100000);
 
-	for (i=0;i<0x100000;i++)
+	for (int i = 0; i < 0x100000; i++)
 	{
-		int j;
-
-		j = i ^ (m_tilexor << 5);
+		int j = i ^ (m_tilexor << 5);
 
 		j = bitswap<24>(j,23,22,21,20,19,18,17,13, 15,14,16,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
 		j = bitswap<24>(j,23,22,21,20,19,18,17,14, 15,16,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
@@ -547,8 +549,8 @@ DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT    MACHINE  INPUT    STATE           INIT      ROT    COMPANY         FULLNAME                   FLAGS                 LAYOUT */
-GAMEL( 1999, chsuper3, 0,        chsuper, chsuper, chsuper_state,  chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //24/02/99
-GAMEL( 1999, chsuper2, chsuper3, chsuper, chsuper, chsuper_state,  chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //26/01/99
-GAME(  1999, chmpnum,  chsuper3, chsuper, chsuper, chsuper_state,  chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.74)",  MACHINE_IMPERFECT_SOUND )                 //10/11/99
-GAME(  1999, chmpnuma, chsuper3, chsuper, chsuper, chsuper_state,  chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.67)",  MACHINE_IMPERFECT_SOUND )                 //21/10/99
+/*     YEAR  NAME      PARENT    MACHINE  INPUT    CLASS          INIT           ROT   COMPANY         FULLNAME                    FLAGS                    LAYOUT */
+GAMEL( 1999, chsuper3, 0,        chsuper, chsuper, chsuper_state, init_chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //24/02/99
+GAMEL( 1999, chsuper2, chsuper3, chsuper, chsuper, chsuper_state, init_chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //26/01/99
+GAME(  1999, chmpnum,  chsuper3, chsuper, chsuper, chsuper_state, init_chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.74)",  MACHINE_IMPERFECT_SOUND )                 //10/11/99
+GAME(  1999, chmpnuma, chsuper3, chsuper, chsuper, chsuper_state, init_chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.67)",  MACHINE_IMPERFECT_SOUND )                 //21/10/99

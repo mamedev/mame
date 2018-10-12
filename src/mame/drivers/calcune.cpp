@@ -4,8 +4,8 @@
 
     Calcune (Japan, prototype)
 
-    CPUs are HD68HC000CP8 and TMP84C00AU-6 QFP types. Other ICs include two
-    Sega 315-5560-02 VDPs and a YMZ280B-F for sound.
+    CPUs are HD68HC000CP8 and TMPZ84C00AU-6 QFP types. Other ICs include
+    two Sega 315-5660-02 VDPs and a YMZ280B-F for sound.
 
     Oscillators: 53.693MHz (OSC1), 16.9444 (XL1), 14.318 (XL3).
 
@@ -21,6 +21,7 @@
 #include "sound/ymz280b.h"
 #include "video/315_5313.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK_NTSC 53693175
@@ -28,8 +29,8 @@
 class calcune_state : public driver_device
 {
 public:
-	calcune_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	calcune_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		vdp_state(0),
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "gen_vdp"),
@@ -46,7 +47,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
-	DECLARE_DRIVER_INIT(calcune);
+	void init_calcune();
 
 	DECLARE_READ16_MEMBER(cal_700000_r);
 	DECLARE_WRITE16_MEMBER(cal_770000_w);
@@ -123,24 +124,25 @@ WRITE16_MEMBER(calcune_state::cal_vdp_w)
 		m_vdp2->vdp_w(space, offset, data, mem_mask);
 }
 
-ADDRESS_MAP_START(calcune_state::calcune_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+void calcune_state::calcune_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
 
-	AM_RANGE(0x700000, 0x700001) AM_READ(cal_700000_r)
+	map(0x700000, 0x700001).r(FUNC(calcune_state::cal_700000_r));
 
-	AM_RANGE(0x710000, 0x710001) AM_READ_PORT("710000")
-	AM_RANGE(0x720000, 0x720001) AM_READ_PORT("720000")
+	map(0x710000, 0x710001).portr("710000");
+	map(0x720000, 0x720001).portr("720000");
 //  AM_RANGE(0x730000, 0x730001) possible Z80 control?
-	AM_RANGE(0x760000, 0x760003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
+	map(0x760000, 0x760003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 
-	AM_RANGE(0x770000, 0x770001) AM_WRITE(cal_770000_w)
+	map(0x770000, 0x770001).w(FUNC(calcune_state::cal_770000_w));
 
-	AM_RANGE(0xA14100, 0xA14101) AM_NOP // on startup, possible z80 control
+	map(0xA14100, 0xA14101).noprw(); // on startup, possible z80 control
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(cal_vdp_r, cal_vdp_w)
+	map(0xc00000, 0xc0001f).rw(FUNC(calcune_state::cal_vdp_r), FUNC(calcune_state::cal_vdp_w));
 
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram") // battery on PCB
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram().share("nvram"); // battery on PCB
+}
 
 
 uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -248,11 +250,11 @@ MACHINE_START_MEMBER(calcune_state,calcune)
 }
 
 MACHINE_CONFIG_START(calcune_state::calcune)
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MCFG_CPU_PROGRAM_MAP(calcune_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(calcune_state,genesis_int_callback)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calcune_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(calcune_state,genesis_int_callback)
 
-	MCFG_CPU_ADD("z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
+	MCFG_DEVICE_ADD("z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
 	MCFG_DEVICE_DISABLE() /* no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
 
 	MCFG_MACHINE_START_OVERRIDE(calcune_state,calcune)
@@ -265,46 +267,46 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(calcune_state, screen_update_calcune)
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
 	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_lv4irqline_callback_genesis_68k));
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x0000);
 	MCFG_SEGA315_5313_PALETTE("palette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 
-	MCFG_DEVICE_ADD("gen_vdp2", SEGA315_5313, 0)
+	MCFG_DEVICE_ADD("gen_vdp2", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
 	MCFG_SEGA315_5313_IS_PAL(false)
 //  are these not hooked up or should they OR with the other lines?
-//  MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_sndirqline_callback_genesis_z80));
-//  MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_lv6irqline_callback_genesis_68k));
-//  MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_lv4irqline_callback_genesis_68k));
+//  MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_sndirqline_callback_genesis_z80));
+//  MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv6irqline_callback_genesis_68k));
+//  MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x0c0);
 	MCFG_SEGA315_5313_PALETTE("palette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 
 	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer2", "gen_vdp2", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 
 	MCFG_PALETTE_ADD("palette", 0xc0*2)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	/* sound hardware - VDP */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(calcune_state,calcune)
+void calcune_state::init_calcune()
 {
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(false);
@@ -319,18 +321,18 @@ DRIVER_INIT_MEMBER(calcune_state,calcune)
 
 ROM_START( calcune )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code - ROM check fails, but probably due to prototype status, not bad ROM */
-	ROM_LOAD16_BYTE( "1.IC101.27C4001", 0x000001, 0x080000, CRC(2d25544c) SHA1(ef778cbf2aa4fcec43ce2dce9bcefb964f458c0a) )
-	ROM_LOAD16_BYTE( "2.IC102.27C4001", 0x000000, 0x080000, CRC(09330dc9) SHA1(fd888a7469a6290cd372a4b1eed577c2444f0c80) )
-	ROM_LOAD16_BYTE( "3.IC103.27C4001", 0x100001, 0x080000, CRC(736a356d) SHA1(372fa5989a67746efc439d76df1733cf70df57e7) )
-	ROM_LOAD16_BYTE( "4.IC104.27C4001", 0x100000, 0x080000, CRC(0bec031a) SHA1(69b255743f20408b2f14bddf0b85c85a13f29615) )
+	ROM_LOAD16_BYTE( "1.ic101.27c4001", 0x000001, 0x080000, CRC(2d25544c) SHA1(ef778cbf2aa4fcec43ce2dce9bcefb964f458c0a) )
+	ROM_LOAD16_BYTE( "2.ic102.27c4001", 0x000000, 0x080000, CRC(09330dc9) SHA1(fd888a7469a6290cd372a4b1eed577c2444f0c80) )
+	ROM_LOAD16_BYTE( "3.ic103.27c4001", 0x100001, 0x080000, CRC(736a356d) SHA1(372fa5989a67746efc439d76df1733cf70df57e7) )
+	ROM_LOAD16_BYTE( "4.ic104.27c4001", 0x100000, 0x080000, CRC(0bec031a) SHA1(69b255743f20408b2f14bddf0b85c85a13f29615) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )
-	ROM_LOAD( "Sound1.1C.27C4001", 0x000000, 0x080000, CRC(5fb63e84) SHA1(6fad8e76162c81b2cfa4778effb81b78ed4fa299) )
-	ROM_LOAD( "Sound2.2D.27C4001", 0x080000, 0x080000, CRC(8924c6cc) SHA1(c76e6cfcf92a2c2834de62d7136c69e6edda46cc) )
-	ROM_LOAD( "Sound3.3A.27C4001", 0x100000, 0x080000, CRC(18cfa7f4) SHA1(201ea186eb3af9138db6699c9dcf527795f7c0db) )
-	ROM_LOAD( "Sound4.4B.27C4001", 0x180000, 0x080000, CRC(61a8510b) SHA1(177e56c374aa5697545ede28140cb42b5a4b737b) )
+	ROM_LOAD( "sound1.1c.27c4001", 0x000000, 0x080000, CRC(5fb63e84) SHA1(6fad8e76162c81b2cfa4778effb81b78ed4fa299) )
+	ROM_LOAD( "sound2.2d.27c4001", 0x080000, 0x080000, CRC(8924c6cc) SHA1(c76e6cfcf92a2c2834de62d7136c69e6edda46cc) )
+	ROM_LOAD( "sound3.3a.27c4001", 0x100000, 0x080000, CRC(18cfa7f4) SHA1(201ea186eb3af9138db6699c9dcf527795f7c0db) )
+	ROM_LOAD( "sound4.4b.27c4001", 0x180000, 0x080000, CRC(61a8510b) SHA1(177e56c374aa5697545ede28140cb42b5a4b737b) )
 ROM_END
 
 
 
-GAME( 1996, calcune,  0,        calcune,   calcune,     calcune_state, calcune, ROT0, "Yuvo", "Calcune (Japan, prototype)", 0 )
+GAME( 1996, calcune, 0, calcune, calcune, calcune_state, init_calcune, ROT0, "Yuvo", "Calcune (Japan, prototype)", 0 )

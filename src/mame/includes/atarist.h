@@ -20,6 +20,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "sound/lmc1992.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define M68000_TAG      "m68000"
@@ -85,6 +86,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
 			m_fdc(*this, WD1772_TAG),
+			m_floppy(*this, WD1772_TAG ":%u", 0U),
 			m_mfp(*this, MC68901_TAG),
 			m_acia0(*this, MC6850_0_TAG),
 			m_acia1(*this, MC6850_1_TAG),
@@ -112,8 +114,6 @@ public:
 			m_mousex(*this, "IKBD_MOUSEX"),
 			m_mousey(*this, "IKBD_MOUSEY"),
 			m_config(*this, "config"),
-			m_acia_ikbd_irq(1),
-			m_acia_midi_irq(1),
 			m_ikbd_mouse_x(0),
 			m_ikbd_mouse_y(0),
 			m_ikbd_mouse_px(IKBD_MOUSE_PHASE_STATIC),
@@ -122,11 +122,13 @@ public:
 			m_ikbd_joy(1),
 			m_monochrome(1),
 			m_palette(*this, "palette"),
-			m_screen(*this, "screen")
+			m_screen(*this, "screen"),
+			m_led(*this, "led1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mc68901_device> m_mfp;
 	required_device<acia6850_device> m_acia0;
 	required_device<acia6850_device> m_acia1;
@@ -154,10 +156,6 @@ public:
 	optional_ioport m_mousex;
 	optional_ioport m_mousey;
 	optional_ioport m_config;
-
-	void machine_start() override;
-
-	void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -236,8 +234,6 @@ public:
 	DECLARE_WRITE8_MEMBER( psg_pa_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_ikbd_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_midi_irq_w );
 
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
@@ -256,8 +252,6 @@ public:
 	uint8_t m_mmu;
 
 	/* keyboard state */
-	int m_acia_ikbd_irq;
-	int m_acia_midi_irq;
 	uint16_t m_ikbd_keylatch;
 	uint8_t m_ikbd_mouse;
 	uint8_t m_ikbd_mouse_x;
@@ -328,8 +322,6 @@ public:
 
 	bitmap_rgb32 m_bitmap;
 
-	floppy_image_device *floppy_devices[2];
-
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	IRQ_CALLBACK_MEMBER(atarist_int_ack);
 
@@ -344,6 +336,10 @@ public:
 	void st_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	output_finder<> m_led;
 };
 
 class megast_state : public st_state
@@ -374,10 +370,6 @@ public:
 	{ }
 
 	optional_device<lmc1992_device> m_lmc1992;
-
-	void machine_start() override;
-
-	void video_start() override;
 
 	DECLARE_READ8_MEMBER( shifter_base_low_r );
 	DECLARE_WRITE8_MEMBER( shifter_base_low_w );
@@ -443,6 +435,8 @@ public:
 	void ste_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 };
 
 class megaste_state : public ste_state
@@ -452,14 +446,15 @@ public:
 		: ste_state(mconfig, type, tag)
 	{ }
 
-	void machine_start() override;
-
 	DECLARE_READ16_MEMBER( cache_r );
 	DECLARE_WRITE16_MEMBER( cache_w );
 
 	uint16_t m_cache;
 	void megaste(machine_config &config);
 	void megaste_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
 };
 
 class stbook_state : public ste_state
@@ -472,15 +467,15 @@ public:
 
 	required_ioport m_sw400;
 
-	void machine_start() override;
-	void video_start() override;
-
 	DECLARE_READ16_MEMBER( config_r );
 	DECLARE_WRITE16_MEMBER( lcd_control_w );
 
 	DECLARE_WRITE8_MEMBER( psg_pa_w );
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	void stbook_map(address_map &map);
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 };
 
 #endif // MAME_INCLUDES_ATARI_ST_H

@@ -25,17 +25,13 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 
 class plan80_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BOOT
-	};
-
 	plan80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -43,15 +39,23 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void plan80(machine_config &config);
+
+	void init_plan80();
+
+private:
+	enum
+	{
+		TIMER_BOOT
+	};
+
 	DECLARE_READ8_MEMBER(plan80_04_r);
 	DECLARE_WRITE8_MEMBER(plan80_09_w);
-	DECLARE_DRIVER_INIT(plan80);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void plan80(machine_config &config);
 	void plan80_io(address_map &map);
 	void plan80_mem(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_kbd_row;
 	virtual void machine_reset() override;
@@ -88,20 +92,22 @@ WRITE8_MEMBER( plan80_state::plan80_09_w )
 }
 
 
-ADDRESS_MAP_START(plan80_state::plan80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0x0800, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void plan80_state::plan80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0xefff).ram();
+	map(0xf000, 0xf7ff).ram().share("videoram");
+	map(0xf800, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(plan80_state::plan80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_READ(plan80_04_r)
-	AM_RANGE(0x09, 0x09) AM_WRITE(plan80_09_w)
-ADDRESS_MAP_END
+void plan80_state::plan80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x04, 0x04).r(FUNC(plan80_state::plan80_04_r));
+	map(0x09, 0x09).w(FUNC(plan80_state::plan80_09_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( plan80 ) // Keyboard was worked out by trial & error;'F' keys produce foreign symbols
@@ -172,7 +178,7 @@ void plan80_state::machine_reset()
 	timer_set(attotime::from_usec(10), TIMER_BOOT);
 }
 
-DRIVER_INIT_MEMBER(plan80_state,plan80)
+void plan80_state::init_plan80()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
@@ -222,16 +228,16 @@ static const gfx_layout plan80_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( plan80 )
+static GFXDECODE_START( gfx_plan80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, plan80_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(plan80_state::plan80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 2048000)
-	MCFG_CPU_PROGRAM_MAP(plan80_mem)
-	MCFG_CPU_IO_MAP(plan80_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, 2048000)
+	MCFG_DEVICE_PROGRAM_MAP(plan80_mem)
+	MCFG_DEVICE_IO_MAP(plan80_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -242,7 +248,7 @@ MACHINE_CONFIG_START(plan80_state::plan80)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", plan80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plan80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
@@ -260,5 +266,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY         FULLNAME   FLAGS
-COMP( 1988, plan80, 0,       0,     plan80,    plan80, plan80_state, plan80,  "Tesla Eltos",  "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY        FULLNAME   FLAGS
+COMP( 1988, plan80, 0,      0,      plan80,  plan80, plan80_state, init_plan80, "Tesla Eltos", "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

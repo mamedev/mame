@@ -17,7 +17,7 @@
 		downcast<namco_c117_device &>(*device).set_cpu_tags(_maincpu, _subcpu);
 
 #define MCFG_CUS117_SUBRES_CB(_devcb) \
-		devcb = &downcast<namco_c117_device &>(*device).set_subres_cb(DEVCB_##_devcb);
+		downcast<namco_c117_device &>(*device).set_subres_cb(DEVCB_##_devcb);
 
 
 //***************************************************************************
@@ -78,7 +78,7 @@ private:
 
 	// cpu interfaces
 	device_execute_interface * m_cpuexec[2];
-	direct_read_data<0> *      m_cpudirect[2];
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cpucache[2];
 
 	// configuration
 	const char *               m_maincpu_tag;

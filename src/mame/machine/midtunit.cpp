@@ -92,12 +92,12 @@ static const uint8_t mk_prot_values[] =
 
 READ16_MEMBER(midtunit_state::mk_prot_r)
 {
-	logerror("%08X:Protection R @ %05X = %04X\n", space.device().safe_pc(), offset, mk_prot_values[m_mk_prot_index] << 9);
+	logerror("%s:Protection R @ %05X = %04X\n", machine().describe_context(), offset, mk_prot_values[m_mk_prot_index] << 9);
 
 	/* just in case */
 	if (m_mk_prot_index >= sizeof(mk_prot_values))
 	{
-		logerror("%08X:Unexpected protection R @ %05X\n", space.device().safe_pc(), offset);
+		logerror("%s:Unexpected protection R @ %05X\n", machine().describe_context(), offset);
 		m_mk_prot_index = 0;
 	}
 
@@ -122,11 +122,11 @@ WRITE16_MEMBER(midtunit_state::mk_prot_w)
 		/* just in case */
 		if (i == sizeof(mk_prot_values))
 		{
-			logerror("%08X:Unhandled protection W @ %05X = %04X\n", space.device().safe_pc(), offset, data);
+			logerror("%s:Unhandled protection W @ %05X = %04X\n", machine().describe_context(), offset, data);
 			m_mk_prot_index = 0;
 		}
 
-		logerror("%08X:Protection W @ %05X = %04X\n", space.device().safe_pc(), offset, data);
+		logerror("%s:Protection W @ %05X = %04X\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -294,7 +294,7 @@ static const uint8_t jdredd_prot_values_80020[] =
 
 WRITE16_MEMBER(midtunit_state::jdredd_prot_w)
 {
-	logerror("%08X:jdredd_prot_w(%04X,%04X)\n", space.device().safe_pcbase(), offset*16, data);
+	logerror("%s:jdredd_prot_w(%04X,%04X)\n", machine().describe_context(), offset*16, data);
 
 	switch (offset)
 	{
@@ -342,7 +342,7 @@ READ16_MEMBER(midtunit_state::jdredd_prot_r)
 	if (m_jdredd_prot_table && m_jdredd_prot_index < m_jdredd_prot_max)
 		result = m_jdredd_prot_table[m_jdredd_prot_index++] << 9;
 
-	logerror("%08X:jdredd_prot_r(%04X) = %04X\n", space.device().safe_pcbase(), offset*16, result);
+	logerror("%s:jdredd_prot_r(%04X) = %04X\n", machine().describe_context(), offset*16, result);
 	return result;
 }
 
@@ -377,7 +377,7 @@ void midtunit_state::init_tunit_generic(int sound)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(midtunit_state,mktunit)
+void midtunit_state::init_mktunit()
 {
 	/* common init */
 	init_tunit_generic(SOUND_ADPCM);
@@ -386,15 +386,15 @@ DRIVER_INIT_MEMBER(midtunit_state,mktunit)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1b6ffff, read16_delegate(FUNC(midtunit_state::mk_prot_r),this), write16_delegate(FUNC(midtunit_state::mk_prot_w),this));
 
 	/* sound chip protection (hidden RAM) */
-	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6);
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,mkturbo)
+void midtunit_state::init_mkturbo()
 {
 	/* protection */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midtunit_state::mkturbo_prot_r),this));
 
-	DRIVER_INIT_CALL(mktunit);
+	init_mktunit();
 }
 
 
@@ -417,22 +417,22 @@ void midtunit_state::init_nbajam_common(int te_protection)
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
+		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
 	else
-		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
+		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,nbajam)
+void midtunit_state::init_nbajam()
 {
 	init_nbajam_common(0);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,nbajamte)
+void midtunit_state::init_nbajamte()
 {
 	init_nbajam_common(1);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
+void midtunit_state::init_jdreddp()
 {
 	/* common init */
 	init_tunit_generic(SOUND_ADPCM_LARGE);
@@ -444,8 +444,8 @@ DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1bfffff, read16_delegate(FUNC(midtunit_state::jdredd_prot_r),this), write16_delegate(FUNC(midtunit_state::jdredd_prot_w),this));
 
 	/* sound chip protection (hidden RAM) */
-	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_read_bank(0xfbcf, 0xfbf9, "bank7");
-	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_write_bank(0xfbcf, 0xfbf9, "bank9");
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_read_bank(0xfbcf, 0xfbf9, "bank7");
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_write_bank(0xfbcf, 0xfbf9, "bank9");
 	membank("adpcm:bank9")->set_base(auto_alloc_array(machine(), uint8_t, 0x80));
 }
 
@@ -459,7 +459,7 @@ DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(midtunit_state,mk2)
+void midtunit_state::init_mk2()
 {
 	/* common init */
 	init_tunit_generic(SOUND_DCS);
@@ -511,7 +511,7 @@ MACHINE_RESET_MEMBER(midtunit_state,midtunit)
 
 READ16_MEMBER(midtunit_state::midtunit_sound_state_r)
 {
-/*  logerror("%08X:Sound status read\n", space.device().safe_pc());*/
+/*  logerror("%s:Sound status read\n", machine().describe_context());*/
 
 	if (m_chip_type == SOUND_DCS)
 		return m_dcs->control_r() >> 4;

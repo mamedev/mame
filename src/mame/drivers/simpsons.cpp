@@ -106,6 +106,7 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/k053260.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -115,39 +116,42 @@ Notes:
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(simpsons_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0x0000, 0x0fff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2000", address_map_bank_device, amap8)
-	AM_RANGE(0x1f80, 0x1f80) AM_READ_PORT("COIN")
-	AM_RANGE(0x1f81, 0x1f81) AM_READ_PORT("TEST")
-	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("P1")
-	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P2")
-	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P3")
-	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("P4")
-	AM_RANGE(0x1fa0, 0x1fa7) AM_DEVWRITE("k053246", k053247_device, k053246_w)
-	AM_RANGE(0x1fb0, 0x1fbf) AM_DEVWRITE("k053251", k053251_device, write)
-	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(simpsons_coin_counter_w)
-	AM_RANGE(0x1fc2, 0x1fc2) AM_WRITE(simpsons_eeprom_w)
-	AM_RANGE(0x1fc4, 0x1fc4) AM_READ(simpsons_sound_interrupt_r)
-	AM_RANGE(0x1fc6, 0x1fc7) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
-	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD("k053246", k053247_device, k053246_r)
-	AM_RANGE(0x1fca, 0x1fca) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x78000)
-ADDRESS_MAP_END
+void simpsons_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0x0000, 0x0fff).m(m_bank0000, FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_bank2000, FUNC(address_map_bank_device::amap8));
+	map(0x1f80, 0x1f80).portr("COIN");
+	map(0x1f81, 0x1f81).portr("TEST");
+	map(0x1f90, 0x1f90).portr("P1");
+	map(0x1f91, 0x1f91).portr("P2");
+	map(0x1f92, 0x1f92).portr("P3");
+	map(0x1f93, 0x1f93).portr("P4");
+	map(0x1fa0, 0x1fa7).w(m_k053246, FUNC(k053247_device::k053246_w));
+	map(0x1fb0, 0x1fbf).w(m_k053251, FUNC(k053251_device::write));
+	map(0x1fc0, 0x1fc0).w(FUNC(simpsons_state::simpsons_coin_counter_w));
+	map(0x1fc2, 0x1fc2).w(FUNC(simpsons_state::simpsons_eeprom_w));
+	map(0x1fc4, 0x1fc4).r(FUNC(simpsons_state::simpsons_sound_interrupt_r));
+	map(0x1fc6, 0x1fc7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
+	map(0x1fc8, 0x1fc9).r(m_k053246, FUNC(k053247_device::k053246_r));
+	map(0x1fca, 0x1fca).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom().region("maincpu", 0x78000);
+}
 
-ADDRESS_MAP_START(simpsons_state::bank0000_map)
-	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void simpsons_state::bank0000_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0x1000, 0x1fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(simpsons_state::bank2000_map)
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(simpsons_k052109_r, simpsons_k052109_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(simpsons_k053247_r, simpsons_k053247_w)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void simpsons_state::bank2000_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(FUNC(simpsons_state::simpsons_k052109_r), FUNC(simpsons_state::simpsons_k052109_w));
+	map(0x2000, 0x2fff).rw(FUNC(simpsons_state::simpsons_k053247_r), FUNC(simpsons_state::simpsons_k053247_w));
+	map(0x3000, 0x3fff).ram();
+}
 
 WRITE8_MEMBER(simpsons_state::z80_bankswitch_w)
 {
@@ -186,15 +190,16 @@ WRITE8_MEMBER(simpsons_state::z80_arm_nmi_w)
 	timer_set(attotime::from_usec(25), TIMER_NMI);  /* kludge until the K053260 is emulated correctly */
 }
 
-ADDRESS_MAP_START(simpsons_state::z80_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
-	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(z80_bankswitch_w)
-ADDRESS_MAP_END
+void simpsons_state::z80_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank2");
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xfa00, 0xfa00).w(FUNC(simpsons_state::z80_arm_nmi_w));
+	map(0xfc00, 0xfc2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
+	map(0xfe00, 0xfe00).w(FUNC(simpsons_state::z80_bankswitch_w));
+}
 
 /***************************************************************************
 
@@ -227,8 +232,8 @@ static INPUT_PORTS_START( simpsons )
 
 	PORT_START("TEST")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0xce, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
@@ -262,8 +267,8 @@ static INPUT_PORTS_START( simpsn2p )
 
 	PORT_START("TEST")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0xce, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
@@ -320,31 +325,20 @@ INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 MACHINE_CONFIG_START(simpsons_state::simpsons)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", simpsons_state,  simpsons_irq) /* IRQ triggered by the 052109, FIRQ by the sprite hardware */
-	MCFG_KONAMICPU_LINE_CB(WRITE8(simpsons_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", simpsons_state,  simpsons_irq) /* IRQ triggered by the 052109, FIRQ by the sprite hardware */
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, simpsons_state, banking_callback))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(z80_map)   /* NMIs are generated by the 053260 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(z80_map)   /* NMIs are generated by the 053260 */
 
-	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "bank0000").set_map(&simpsons_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
+	ADDRESS_MAP_BANK(config, "bank2000").set_map(&simpsons_state::bank2000_map).set_options(ENDIANNESS_BIG, 8, 14, 0x2000);
 
-	MCFG_DEVICE_ADD("bank2000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank2000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -372,15 +366,16 @@ MACHINE_CONFIG_START(simpsons_state::simpsons)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)    /* only left channel is connected */
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.0)
 
-	MCFG_SOUND_ADD("k053260", K053260, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("k053260", K053260, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -421,7 +416,7 @@ ROM_START( simpsons ) /* World 4 Player */
 	ROM_LOAD( "simpsons.12c.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
 ROM_END
 
-ROM_START( simpsons4pa ) /* World 4 Player, later? (by use of later leters) */
+ROM_START( simpsons4pe ) /* World 4 Player, later? (by use of later leters) */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "072-g02.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
 	ROM_LOAD( "072-g01.17c", 0x20000, 0x20000, CRC(9f843def) SHA1(858432b59101b0577c5cec6ac0c7c20ab0780c9a) )
@@ -430,6 +425,35 @@ ROM_START( simpsons4pa ) /* World 4 Player, later? (by use of later leters) */
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* Z80 code + banks */
 	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
+	ROM_CONTINUE(       0x10000, 0x18000 )
+
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
+	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
+	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
+	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
+	ROM_LOAD64_WORD( "072-b11.16l", 0x000006, 0x100000, CRC(55fab05d) SHA1(54db8559d71ed257de9a29c8808654eaea0df9e2) )
+
+	ROM_REGION( 0x140000, "k053260", 0 ) /* samples for the 053260 */
+	ROM_LOAD( "072-d05.1f", 0x000000, 0x100000, CRC(1397a73b) SHA1(369422c84cca5472967af54b8351e29fcd69f621) )
+	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "simpsons4pe.12c.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
+ROM_END
+
+ROM_START( simpsons4pa ) /* Asia 4 Player */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "072-v02.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
+	ROM_LOAD( "072-v01.17c", 0x20000, 0x20000, CRC(effd6c09) SHA1(e5bcdb753bccdd76de18ad6ff7346f74fd02a78f) )
+	ROM_LOAD( "072-x13.13c", 0x40000, 0x20000, CRC(3304abb9) SHA1(8f23160077f30d76c0c73e0b3f20996826433566) )
+	ROM_LOAD( "072-x12.15c", 0x60000, 0x20000, CRC(fa4fca12) SHA1(3b52a8a52bddfa73d8577315b655eb57ac758326) )
+
+	ROM_REGION( 0x28000, "audiocpu", 0 ) /* Z80 code + banks */
+	ROM_LOAD( "072-g03.6g", 0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
 	ROM_CONTINUE(       0x10000, 0x18000 )
 
 	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
@@ -605,10 +629,11 @@ ROM_END
 ***************************************************************************/
 
 // the region warning, if one exists, is shown after the high-score screen in attract mode
-GAME( 1991, simpsons,    0,        simpsons, simpsons, simpsons_state, 0, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, simpsons_state, 0, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, simpsons_state, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, simpsons_state, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p3, simpsons, simpsons, simpsn2p, simpsons_state, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2pa, simpsons, simpsons, simpsn2p, simpsons_state, 0, ROT0, "Konami", "The Simpsons (2 Players Asia)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2pj, simpsons, simpsons, simpsn2p, simpsons_state, 0, ROT0, "Konami", "The Simpsons (2 Players Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons,    0,        simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pe, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players Asia)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p3, simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2pa, simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players Asia)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2pj, simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players Japan)",        MACHINE_SUPPORTS_SAVE )

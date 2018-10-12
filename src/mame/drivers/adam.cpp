@@ -544,24 +544,16 @@ READ8_MEMBER( adam_state::iorq_r )
 
 	case 5:
 		if (BIT(offset, 0))
-		{
-			data = m_vdc->register_read(space, 0);
-		}
+			data = m_vdc->register_read();
 		else
-		{
-			data = m_vdc->vram_read(space, 0);
-		}
+			data = m_vdc->vram_read();
 		break;
 
 	case 7:
 		if (BIT(offset, 1))
-		{
 			data = m_joy2->read();
-		}
 		else
-		{
 			data = m_joy1->read();
-		}
 		break;
 	}
 
@@ -600,13 +592,9 @@ WRITE8_MEMBER( adam_state::iorq_w )
 
 	case 5:
 		if (BIT(offset, 0))
-		{
-			m_vdc->register_write(space, 0, data);
-		}
+			m_vdc->register_write(data);
 		else
-		{
-			m_vdc->vram_write(space, 0, data);
-		}
+			m_vdc->vram_write(data);
 		break;
 
 	case 6:
@@ -617,7 +605,7 @@ WRITE8_MEMBER( adam_state::iorq_w )
 		break;
 
 	case 7:
-		m_psg->write(space, 0, data);
+		m_psg->write(data);
 		break;
 	}
 
@@ -874,41 +862,45 @@ WRITE8_MEMBER( adam_state::m6801_p4_w )
 //  ADDRESS_MAP( adam_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(adam_state::adam_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
-ADDRESS_MAP_END
+void adam_state::adam_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(adam_state::mreq_r), FUNC(adam_state::mreq_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( adam_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(adam_state::adam_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
-ADDRESS_MAP_END
+void adam_state::adam_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(adam_state::iorq_r), FUNC(adam_state::iorq_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( m6801_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(adam_state::m6801_mem)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_TAG, 0)
-ADDRESS_MAP_END
+void adam_state::m6801_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(m_netcpu, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0080, 0x00ff).ram();
+	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( m6801_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(adam_state::m6801_io)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(m6801_p1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6801_p2_r, m6801_p2_w)
-	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_READWRITE(m6801_p3_r, m6801_p3_w)
-	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_WRITE(m6801_p4_w)
-ADDRESS_MAP_END
+void adam_state::m6801_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).w(FUNC(adam_state::m6801_p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_state::m6801_p2_r), FUNC(adam_state::m6801_p2_w));
+	map(M6801_PORT3, M6801_PORT3).rw(FUNC(adam_state::m6801_p3_r), FUNC(adam_state::m6801_p3_w));
+	map(M6801_PORT4, M6801_PORT4).w(FUNC(adam_state::m6801_p4_w));
+}
 
 
 
@@ -938,7 +930,7 @@ WRITE_LINE_MEMBER( adam_state::vdc_int_w )
 {
 	if (state && !m_vdp_nmi)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 
 	m_vdp_nmi = state;
@@ -1049,28 +1041,28 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(adam_state::adam)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(7'159'090)/2)
-	MCFG_CPU_PROGRAM_MAP(adam_mem)
-	MCFG_CPU_IO_MAP(adam_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(7'159'090)/2)
+	MCFG_DEVICE_PROGRAM_MAP(adam_mem)
+	MCFG_DEVICE_IO_MAP(adam_io)
 
-	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(m6801_mem)
-	MCFG_CPU_IO_MAP(m6801_io)
-	MCFG_M6801_SC2(WRITELINE(adam_state, os3_w))
+	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(m6801_mem)
+	MCFG_DEVICE_IO_MAP(m6801_io)
+	MCFG_M6801_SC2(WRITELINE(*this, adam_state, os3_w))
 	MCFG_QUANTUM_PERFECT_CPU(M6801_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(TMS9928A_TAG, TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(adam_state, vdc_int_w))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC(SCREEN_TAG)
-	MCFG_SCREEN_UPDATE_DEVICE(TMS9928A_TAG, tms9928a_device, screen_update)
+	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");
+	m_vdc->set_vram_size(0x4000);
+	m_vdc->int_callback().set(FUNC(adam_state::vdc_int_w));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL(7'159'090)/2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SN76489A_TAG, SN76489A, XTAL(7'159'090)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SN76496_READY_HANDLER(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
+	// TODO: enable when Z80 has better WAIT pin emulation
+	//MCFG_SN76496_READY_HANDLER(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
 
 	// devices
 	MCFG_ADAMNET_BUS_ADD()
@@ -1079,7 +1071,7 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_ADAMNET_SLOT_ADD("net3", adamnet_devices, "ddp")
 	MCFG_ADAMNET_SLOT_ADD("net4", adamnet_devices, "fdc")
 	MCFG_ADAMNET_SLOT_ADD("net5", adamnet_devices, "fdc")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fdc", drive2)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("fdc", drive2)
 	MCFG_ADAMNET_SLOT_ADD("net6", adamnet_devices, nullptr)
 	MCFG_ADAMNET_SLOT_ADD("net7", adamnet_devices, nullptr)
 	MCFG_ADAMNET_SLOT_ADD("net8", adamnet_devices, nullptr)
@@ -1099,13 +1091,12 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_RIGHT_EXPANSION_SLOT_TAG, XTAL(7'159'090)/2, adam_slot3_devices, "ram")
 
 	MCFG_COLECOVISION_CONTROL_PORT_ADD(CONTROL1_TAG, colecovision_control_port_devices, "hand")
-	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(adam_state, joy1_irq_w))
+	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(*this, adam_state, joy1_irq_w))
 	MCFG_COLECOVISION_CONTROL_PORT_ADD(CONTROL2_TAG, colecovision_control_port_devices, nullptr)
-	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(adam_state, joy2_irq_w))
+	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(*this, adam_state, joy2_irq_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("colec_cart_list", "coleco")
@@ -1129,9 +1120,9 @@ ROM_START( adam )
 	ROM_LOAD( "os7.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
 
 	ROM_REGION( 0xa000, "boot", 0)
-	ROM_LOAD( "alf #1 rev 57 e3d5.u8",  0x0000, 0x2000, CRC(565b364a) SHA1(ebdafad6e268e7ed1674c1fb89607622748a5b36) )
-	ROM_LOAD( "alf #2 rev 57 ae6a.u20", 0x2000, 0x2000, CRC(44a1cff4) SHA1(661cdf36d9699d6c21c5f9e205ebc41c707359dd) )
-	ROM_LOAD( "alf #3 rev 57 8534.u21", 0x4000, 0x2000, CRC(77657b90) SHA1(d25d32ab6c8fafbc21b4b925b3e644fa26d111f7) )
+	ROM_LOAD( "alf @1 rev 57 e3d5.u8",  0x0000, 0x2000, CRC(565b364a) SHA1(ebdafad6e268e7ed1674c1fb89607622748a5b36) )
+	ROM_LOAD( "alf @2 rev 57 ae6a.u20", 0x2000, 0x2000, CRC(44a1cff4) SHA1(661cdf36d9699d6c21c5f9e205ebc41c707359dd) )
+	ROM_LOAD( "alf @3 rev 57 8534.u21", 0x4000, 0x2000, CRC(77657b90) SHA1(d25d32ab6c8fafbc21b4b925b3e644fa26d111f7) )
 	ROM_LOAD( "eos 6 rev 57 08dd.u22",  0x8000, 0x2000, CRC(ef6403c5) SHA1(28c7616cd02e4286f9b4c1c4a8b8850832b49fcb) )
 	ROM_CONTINUE(                       0x6000, 0x2000 )
 	ROM_LOAD( "wp_r80.rom",             0x0000, 0x8000, BAD_DUMP CRC(58d86a2a) SHA1(d4aec4efe1431e56fe52d83baf9118542c525255) ) // should be separate 8/16K ROMs
@@ -1146,5 +1137,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       STATE        INIT    COMPANY         FULLNAME            FLAGS
-COMP( 1982, adam,       0,          coleco, adam,       adam,       adam_state,  0,      "Coleco",       "Adam",             MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY   FULLNAME  FLAGS
+COMP( 1982, adam, 0,      coleco, adam,    adam,  adam_state, empty_init, "Coleco", "Adam",   MACHINE_SUPPORTS_SAVE )

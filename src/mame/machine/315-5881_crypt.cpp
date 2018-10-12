@@ -24,22 +24,24 @@ DEFINE_DEVICE_TYPE(SEGA315_5881_CRYPT, sega_315_5881_crypt_device, "sega315_5881
 
 // TODO: standard hookup doesn't work properly (causes a crash in LA Machine Gun)
 //       might be due of high address variables not properly set (@see sega_315_5881_crypt_device::set_addr_high)
-ADDRESS_MAP_START(sega_315_5881_crypt_device::iomap_64be)
-	AM_RANGE(0x0000, 0x0001) AM_READ(ready_r)
-//	TODO: it is unknown if the 
-	AM_RANGE(0x0010, 0x0011) AM_WRITE(addrlo_w)
-	AM_RANGE(0x0012, 0x0013) AM_WRITE(addrhi_w)
-	AM_RANGE(0x0018, 0x0019) AM_WRITE(subkey_be_w)
-	AM_RANGE(0x001c, 0x001d) AM_READ(decrypt_be_r)
-ADDRESS_MAP_END
+void sega_315_5881_crypt_device::iomap_64be(address_map &map)
+{
+	map(0x0000, 0x0001).r(FUNC(sega_315_5881_crypt_device::ready_r));
+//  TODO: it is unknown if the
+	map(0x0010, 0x0011).w(FUNC(sega_315_5881_crypt_device::addrlo_w));
+	map(0x0012, 0x0013).w(FUNC(sega_315_5881_crypt_device::addrhi_w));
+	map(0x0018, 0x0019).w(FUNC(sega_315_5881_crypt_device::subkey_be_w));
+	map(0x001c, 0x001d).r(FUNC(sega_315_5881_crypt_device::decrypt_be_r));
+}
 
-ADDRESS_MAP_START(sega_315_5881_crypt_device::iomap_le)
-	AM_RANGE(0x0000, 0x0001) AM_READ(ready_r)
-	AM_RANGE(0x0008, 0x0009) AM_WRITE(addrlo_w)
-	AM_RANGE(0x000a, 0x000b) AM_WRITE(addrhi_w)
-	AM_RANGE(0x000c, 0x000d) AM_WRITE(subkey_le_w)
-	AM_RANGE(0x000e, 0x000f) AM_READ(decrypt_le_r)
-ADDRESS_MAP_END
+void sega_315_5881_crypt_device::iomap_le(address_map &map)
+{
+	map(0x0000, 0x0001).r(FUNC(sega_315_5881_crypt_device::ready_r));
+	map(0x0008, 0x0009).w(FUNC(sega_315_5881_crypt_device::addrlo_w));
+	map(0x000a, 0x000b).w(FUNC(sega_315_5881_crypt_device::addrhi_w));
+	map(0x000c, 0x000d).w(FUNC(sega_315_5881_crypt_device::subkey_le_w));
+	map(0x000e, 0x000f).r(FUNC(sega_315_5881_crypt_device::decrypt_le_r));
+}
 
 sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA315_5881_CRYPT, tag, owner, clock)
@@ -56,9 +58,9 @@ void sega_315_5881_crypt_device::device_start()
 
 	m_read.bind_relative_to(*owner());
 
-	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
-	save_pointer(NAME(line_buffer.get()), LINE_SIZE);
-	save_pointer(NAME(line_buffer_prev.get()), LINE_SIZE);
+	save_pointer(NAME(buffer), BUFFER_SIZE);
+	save_pointer(NAME(line_buffer), LINE_SIZE);
+	save_pointer(NAME(line_buffer_prev), LINE_SIZE);
 	save_item(NAME(prot_cur_address));
 	save_item(NAME(subkey));
 	save_item(NAME(enc_ready));
@@ -90,7 +92,7 @@ void sega_315_5881_crypt_device::device_reset()
 	dec_header = 0;
 	enc_ready = false;
 	first_read = false;
-	
+
 	buffer_pos = 0;
 	line_buffer_pos = 0;
 	line_buffer_size = 0;
@@ -141,9 +143,9 @@ WRITE16_MEMBER(sega_315_5881_crypt_device::subkey_be_w)
 READ16_MEMBER(sega_315_5881_crypt_device::decrypt_le_r)
 {
 	uint16_t retval = decrypt_be_r(space,offset,mem_mask);
-	// endian swap the sub-key for little endian CPUs	
+	// endian swap the sub-key for little endian CPUs
 	retval = ((retval & 0xff00) >> 8) | ((retval & 0x00ff) << 8);
-	
+
 	return retval;
 }
 
@@ -163,7 +165,7 @@ READ16_MEMBER(sega_315_5881_crypt_device::decrypt_be_r)
 	uint16_t retval;
 	retval = do_decrypt(base);
 	// retval = ((retval & 0xff00) >> 8) | ((retval & 0x00ff) << 8);
-		
+
 	return retval;
 }
 

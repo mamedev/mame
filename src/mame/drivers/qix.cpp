@@ -245,47 +245,50 @@ Interrupts:
  *
  *************************************/
 
-ADDRESS_MAP_START(qix_state::main_map)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE("sndpia0", pia6821_device, read, write)
-	AM_RANGE(0x9400, 0x97ff) AM_DEVREAD("pia0", pia6821_device, read) AM_WRITE(qix_pia_w)
-	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void qix_state::main_map(address_map &map)
+{
+	map(0x8000, 0x83ff).ram().share("share1");
+	map(0x8400, 0x87ff).ram();
+	map(0x8800, 0x8bff).nopr();   /* 6850 ACIA */
+	map(0x8c00, 0x8c00).mirror(0x3fe).rw(FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x3fe).rw(FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x9000, 0x93ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(qix_state::qix_pia_w));
+	map(0x9800, 0x9bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9c00, 0x9fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(qix_state::kram3_main_map)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE("sndpia0", pia6821_device, read, write)
-	AM_RANGE(0x9400, 0x97ff) AM_DEVREAD("pia0", pia6821_device, read) AM_WRITE(qix_pia_w)
-	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0xa000, 0xffff) AM_ROMBANK("bank0")
-ADDRESS_MAP_END
+void qix_state::kram3_main_map(address_map &map)
+{
+	map(0x8000, 0x83ff).ram().share("share1");
+	map(0x8400, 0x87ff).ram();
+	map(0x8800, 0x8bff).nopr();   /* 6850 ACIA */
+	map(0x8c00, 0x8c00).mirror(0x3fe).rw(FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x3fe).rw(FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x9000, 0x93ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(qix_state::qix_pia_w));
+	map(0x9800, 0x9bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9c00, 0x9fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xffff).bankr("bank0");
+}
 
 
 
-ADDRESS_MAP_START(qix_state::zoo_main_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_READNOP   /* ACIA */
-	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
-	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("sndpia0", pia6821_device, read, write)
-	AM_RANGE(0x1400, 0x17ff) AM_DEVREAD("pia0", pia6821_device, read) AM_WRITE(qix_pia_w)
-	AM_RANGE(0x1800, 0x1bff) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1c00, 0x1fff) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void qix_state::zoo_main_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("share1");
+	map(0x0400, 0x07ff).ram();
+	map(0x0800, 0x0bff).nopr();   /* ACIA */
+	map(0x0c00, 0x0c00).mirror(0x3fe).rw(FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x0c01, 0x0c01).mirror(0x3fe).rw(FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x1000, 0x13ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1400, 0x17ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(qix_state::qix_pia_w));
+	map(0x1800, 0x1bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1c00, 0x1fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -601,26 +604,26 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(qix_state::qix_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	/* high interleave needed to ensure correct text in service mode */
 	/* Zookeeper settings and high score table seem especially sensitive to this */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("P1"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("COIN"))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpa_handler().set_ioport("P1");
+	m_pia0->readpb_handler().set_ioport("COIN");
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SPARE"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set_ioport("SPARE");
+	m_pia1->readpb_handler().set_ioport("IN0");
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("P2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qix_coinctl_w))
+	PIA6821(config, m_pia2, 0);
+	m_pia2->readpa_handler().set_ioport("P2");
+	m_pia2->writepb_handler().set(FUNC(qix_state::qix_coinctl_w));
 
 	/* video hardware */
 	qix_video(config);
@@ -634,9 +637,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(qix_state::kram3)
 	qix(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kram3_main_map)
-	MCFG_MC6809E_LIC_CB(WRITELINE(qix_state, kram3_lic_maincpu_changed))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kram3_main_map)
+	MCFG_MC6809E_LIC_CB(WRITELINE(*this, qix_state, kram3_lic_maincpu_changed))
 
 	kram3_video(config);
 MACHINE_CONFIG_END
@@ -653,20 +656,18 @@ MACHINE_CONFIG_START(qix_state::mcu)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("mcu", M68705P3, COIN_CLOCK_OSC) /* 1.00 MHz */
-	MCFG_M68705_PORTB_R_CB(READ8(qix_state, qix_68705_portB_r))
-	MCFG_M68705_PORTC_R_CB(READ8(qix_state, qix_68705_portC_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(qix_state, qix_68705_portA_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(qix_state, qix_68705_portB_w))
+	MCFG_DEVICE_ADD("mcu", M68705P3, COIN_CLOCK_OSC) /* 1.00 MHz */
+	MCFG_M68705_PORTB_R_CB(READ8(*this, qix_state, qix_68705_portB_r))
+	MCFG_M68705_PORTC_R_CB(READ8(*this, qix_state, qix_68705_portC_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, qix_state, qix_68705_portA_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, qix_state, qix_68705_portB_w))
 
 	MCFG_MACHINE_START_OVERRIDE(qix_state,qixmcu)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPB_HANDLER(READ8(qix_state, qixmcu_coin_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qixmcu_coin_w))
+	m_pia0->readpb_handler().set(FUNC(qix_state::qixmcu_coin_r));
+	m_pia0->writepb_handler().set(FUNC(qix_state::qixmcu_coin_w));
 
-	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qixmcu_coinctrl_w))
+	m_pia2->writepb_handler().set(FUNC(qix_state::qixmcu_coinctrl_w));
 MACHINE_CONFIG_END
 
 
@@ -675,8 +676,8 @@ MACHINE_CONFIG_START(qix_state::zookeep)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(zoo_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(zoo_main_map)
 
 	/* video hardware */
 	zookeep_video(config);
@@ -696,18 +697,16 @@ MACHINE_CONFIG_START(qix_state::slither)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
 
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_READPA_HANDLER(READ8(qix_state, slither_trak_lr_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_76489_0_w))
-	MCFG_PIA_READPB_HANDLER(NOOP)
+	m_pia1->readpa_handler().set(FUNC(qix_state::slither_trak_lr_r));
+	m_pia1->writepb_handler().set(FUNC(qix_state::slither_76489_0_w));
+	m_pia1->readpb_handler().set_constant(0);
 
-	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_READPA_HANDLER(READ8(qix_state, slither_trak_ud_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_76489_1_w))
-	MCFG_PIA_READPB_HANDLER(NOOP)
+	m_pia2->readpa_handler().set(FUNC(qix_state::slither_trak_ud_r));
+	m_pia2->writepb_handler().set(FUNC(qix_state::slither_76489_1_w));
+	m_pia2->readpb_handler().set_constant(0);
 
 	/* video hardware */
 	slither_video(config);
@@ -876,17 +875,17 @@ ROM_END
 // same as above but uses larger ROMs
 ROM_START( sdungeona )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1514.1J", 0xa000, 0x2000, CRC(8fe3e3c6) SHA1(f60acf7d2096a17726e89fee532fc68218657269) )
-	ROM_LOAD( "1716.1K", 0xc000, 0x2000, CRC(9976fe14) SHA1(759e966abaa3dd458c3d3f9ce5ef6abfec196d28) )
-	ROM_LOAD( "1819.1L", 0xe000, 0x2000, CRC(d56a40b0) SHA1(5b98e99938b6a394abca336995959cd97a55ddf7) )
+	ROM_LOAD( "1514.1j", 0xa000, 0x2000, CRC(8fe3e3c6) SHA1(f60acf7d2096a17726e89fee532fc68218657269) )
+	ROM_LOAD( "1716.1k", 0xc000, 0x2000, CRC(9976fe14) SHA1(759e966abaa3dd458c3d3f9ce5ef6abfec196d28) )
+	ROM_LOAD( "1819.1l", 0xe000, 0x2000, CRC(d56a40b0) SHA1(5b98e99938b6a394abca336995959cd97a55ddf7) )
 
 	ROM_REGION( 0x10000, "videocpu", 0 )
-	ROM_LOAD("65.1H",    0xa000, 0x2000, CRC(4b567837) SHA1(985e75829779cac366e57996016e5f949e1202c7) )
-	ROM_LOAD("87.1F",    0xc000, 0x2000, CRC(9298778b) SHA1(26c4dfd932e55e2525e46be8f58f26c67970d2bd) )
-	ROM_LOAD("109.1E",   0xe000, 0x2000, CRC(7437a6f1) SHA1(232fefb28c55338e5f3fed213ee94f44816241a0) )
+	ROM_LOAD("65.1h",    0xa000, 0x2000, CRC(4b567837) SHA1(985e75829779cac366e57996016e5f949e1202c7) )
+	ROM_LOAD("87.1f",    0xc000, 0x2000, CRC(9298778b) SHA1(26c4dfd932e55e2525e46be8f58f26c67970d2bd) )
+	ROM_LOAD("109.1e",   0xe000, 0x2000, CRC(7437a6f1) SHA1(232fefb28c55338e5f3fed213ee94f44816241a0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "2627.2D", 0xf000, 0x1000, CRC(1f830dff) SHA1(05b99d941d8fa53a4a9f9eb82e31d493d21d0f6f) )
+	ROM_LOAD( "2627.2d", 0xf000, 0x1000, CRC(1f830dff) SHA1(05b99d941d8fa53a4a9f9eb82e31d493d21d0f6f) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "sd101",   0x0000, 0x0800, CRC(e255af9a) SHA1(2410d3b7dec8e72a93d71c824c9403a6d96b9e8c) )
@@ -1195,11 +1194,11 @@ static const uint8_t xor1_table[] =
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	12, 3,15, 7,12, 7,99, 7,12,11,11,11,12, 8, 7, 8, 3,13,11,11, 4,15, 8, 6,12,99, 3, 3, 0,12, 7,13,
-		3,13, 3, 3,12, 7, 8,99,13,99,11, 3,99, 8, 7, 8,13,11,11, 3, 3,15, 8, 6,12, 3, 3, 3, 0,12, 7,13,
+	 3,13, 3, 3,12, 7, 8,99,13,99,11, 3,99, 8, 7, 8,13,11,11, 3, 3,15, 8, 6,12, 3, 3, 3, 0,12, 7,13,
 	13,10,10,10,13, 7, 8, 7, 2, 3,13, 3, 2, 8, 7, 8, 2, 2, 2, 2,13,15, 8, 6,13,10, 6, 0, 3,12, 7,13,
 	13, 2, 2, 2, 2, 7, 8, 7,13, 0,14, 0,13, 8, 7, 8,13, 0, 6,10,13,15, 8, 6,12, 3, 3, 3,12,12, 7,13,
 	13,11,11,11, 4, 7, 8, 7,12, 3, 3, 3,12, 8, 7, 8,13,11,11,11, 4,15, 8, 6, 4,11,11,11, 0,12, 7,13,
-		3, 3,13, 3, 3, 7, 8, 7,13, 2, 2, 2,13, 8, 7, 8,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
+	 3, 3,13, 3, 3, 7, 8, 7,13, 2, 2, 2,13, 8, 7, 8,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99, 3, 3,13, 2,99, 7,99, 6, 0,13, 0, 6,15, 8, 6,10,10,10,10,10,12, 7,13,
 	10,14, 8,10,10, 7, 8, 7,14, 6, 6, 6,14, 8, 7, 8,14, 6, 6, 6,10,15, 8, 6,14, 6, 6, 6, 6,12, 7,13,
@@ -1210,32 +1209,32 @@ static const uint8_t xor1_table[] =
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
-		2, 3,99, 1, 7, 5, 4,10, 6, 2, 8,11, 0, 1,12, 6, 6,10,12, 7, 7, 6,99, 1,14,10,12, 0,99, 8, 1, 9,
-		3,15,12, 4,99, 0,11, 3,13, 1, 9, 5,11,15,10, 2, 8, 5,15, 4, 2, 9, 3,14,13,11,12,15, 6,11, 5,13,
-		2,15, 2, 1, 7, 4,12, 8, 6,11, 8,10, 0, 3, 7, 6, 6,10,12, 7, 7, 6, 9, 1,14,10,12, 0,14, 8, 5, 2,
+	 2, 3,99, 1, 7, 5, 4,10, 6, 2, 8,11, 0, 1,12, 6, 6,10,12, 7, 7, 6,99, 1,14,10,12, 0,99, 8, 1, 9,
+	 3,15,12, 4,99, 0,11, 3,13, 1, 9, 5,11,15,10, 2, 8, 5,15, 4, 2, 9, 3,14,13,11,12,15, 6,11, 5,13,
+	 2,15, 2, 1, 7, 4,12, 8, 6,11, 8,10, 0, 3, 7, 6, 6,10,12, 7, 7, 6, 9, 1,14,10,12, 0,14, 8, 5, 2,
 	14,15,12, 4, 0, 0,11, 3,13, 1,14, 5,15,15,10, 2, 8, 5, 9, 4, 2, 8, 3,14,13,11,12,13, 6,11,13, 2,
 	13, 9, 9,12,13,12, 9,12,12,15,15, 8, 8,15,12,12,13,15,14,15,14, 2,13,12, 2,14,14,13,14,14,14,14,
-		2, 2, 6, 1,10, 6, 7, 6, 9,11, 5, 0, 5, 9, 0,10,11, 3, 0, 1,10, 6, 4, 7, 5, 9, 7, 7, 2, 0, 4,10,
-		0, 5, 9, 5, 7, 6, 1, 3,11, 4, 2, 4,10, 3, 0,10, 6, 4, 7,11, 2, 1, 1, 9, 3,11, 8, 3, 3, 3, 3, 9,
-		5, 5, 9, 5, 7, 6, 1, 3,11, 4, 2, 4,10, 3, 0,10, 6, 4, 7,11, 2, 1, 1, 9, 3,11, 8, 3, 3,99, 3,99,
-		2, 3,99, 1, 6,99, 4, 5,10, 2, 8, 1, 2, 5,15, 0,11, 3, 4, 1, 6, 7, 4, 6,10,11, 8, 9, 6, 7,12, 8,
-		2,13, 1, 6, 7, 4, 5,10,11,11,14,14, 7,13,12,13, 8, 3, 0, 1, 6, 8, 5, 9,10,11, 8, 9,14, 7, 4, 5,
+	 2, 2, 6, 1,10, 6, 7, 6, 9,11, 5, 0, 5, 9, 0,10,11, 3, 0, 1,10, 6, 4, 7, 5, 9, 7, 7, 2, 0, 4,10,
+	 0, 5, 9, 5, 7, 6, 1, 3,11, 4, 2, 4,10, 3, 0,10, 6, 4, 7,11, 2, 1, 1, 9, 3,11, 8, 3, 3, 3, 3, 9,
+	 5, 5, 9, 5, 7, 6, 1, 3,11, 4, 2, 4,10, 3, 0,10, 6, 4, 7,11, 2, 1, 1, 9, 3,11, 8, 3, 3,99, 3,99,
+	 2, 3,99, 1, 6,99, 4, 5,10, 2, 8, 1, 2, 5,15, 0,11, 3, 4, 1, 6, 7, 4, 6,10,11, 8, 9, 6, 7,12, 8,
+	 2,13, 1, 6, 7, 4, 5,10,11,11,14,14, 7,13,12,13, 8, 3, 0, 1, 6, 8, 5, 9,10,11, 8, 9,14, 7, 4, 5,
 	15, 8, 9,14,15,12,13, 2, 3, 3,15, 6, 8,11, 9,12, 0, 3, 0, 1,15, 7,10, 5,99,11, 0,13,14,15,12,13,
 	15,12, 1,99, 7, 4, 5,10,11, 3, 0, 1, 6, 7, 4, 5, 8,13, 0, 1, 6, 7, 4, 5,10, 2, 6, 7, 4, 5,10,11,
-		4, 3,99, 1,99, 7, 4, 5,10,10, 9,12,99,10, 9, 3,11,99,99, 1,14,99,99,13,99,15,12, 9,14,15,12,13,
-		9, 3, 0,99, 6, 7, 4, 5,10, 1, 6, 7, 4, 5,10,11,11, 2, 3, 0, 1, 6,99, 4, 5, 2,10,11, 8, 9,14,15,
+	 4, 3,99, 1,99, 7, 4, 5,10,10, 9,12,99,10, 9, 3,11,99,99, 1,14,99,99,13,99,15,12, 9,14,15,12,13,
+	 9, 3, 0,99, 6, 7, 4, 5,10, 1, 6, 7, 4, 5,10,11,11, 2, 3, 0, 1, 6,99, 4, 5, 2,10,11, 8, 9,14,15,
 	14, 8, 9,14,15,12,13, 2, 3, 8, 9,14,15,12,13, 2, 0,11, 8, 9,14,15,12,13,99, 2,12,13, 2, 3, 0, 1,
-		8,11, 8, 9,14,15,12,13, 2,10, 0, 1, 6, 7, 4, 5, 3, 9,14,15,12,13, 2, 3, 0, 2, 8, 9,14,15,12,13,
+	 8,11, 8, 9,14,15,12,13, 2,10, 0, 1, 6, 7, 4, 5, 3, 9,14,15,12,13, 2, 3, 0, 2, 8, 9,14,15,12,13,
 	11, 3, 0, 1, 5,99,12,13,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,13, 5,99,15,12,13,
-		2,13,13, 9, 9,14, 2,15,15,15,14,12, 9, 2, 9, 3, 2, 3, 0, 1, 6, 7, 4, 5,10, 2, 8,12,14,12,12,13,
+	 2,13,13, 9, 9,14, 2,15,15,15,14,12, 9, 2, 9, 3, 2, 3, 0, 1, 6, 7, 4, 5,10, 2, 8,12,14,12,12,13,
 	14, 3, 0, 1, 6, 7, 4, 5,10, 2, 3, 0, 1, 6, 7, 4, 5,10, 2, 0, 1, 6, 7, 4, 5,10, 2, 8, 8, 8,13,15,
 	11, 3, 0, 1, 6, 7, 4, 5,10, 2, 3, 0, 1, 6, 7, 4, 5,10, 2, 0, 1, 6, 7, 4, 5,10,99, 2, 2, 2, 3, 5,
-		2, 3, 0, 1, 2,11, 2,13,99, 2, 2, 9,14,15,12,13, 2,99,99, 1, 2,14,99, 2,10,11, 2, 2,14,15,12,99,
-		2, 2, 2, 2, 2, 8, 5,99, 2, 2, 2, 2, 2, 7, 4, 5,99,99,99,99,99, 6,99,99, 2, 2, 2, 2, 2, 7,99, 8,
-		2,99, 2,99,99, 2, 2, 2,99,99,99,99,99,99,99,99, 4, 2, 2,99, 2, 2,99, 2, 2, 2, 3, 6, 8,11, 9,12,
+	 2, 3, 0, 1, 2,11, 2,13,99, 2, 2, 9,14,15,12,13, 2,99,99, 1, 2,14,99, 2,10,11, 2, 2,14,15,12,99,
+	 2, 2, 2, 2, 2, 8, 5,99, 2, 2, 2, 2, 2, 7, 4, 5,99,99,99,99,99, 6,99,99, 2, 2, 2, 2, 2, 7,99, 8,
+	 2,99, 2,99,99, 2, 2, 2,99,99,99,99,99,99,99,99, 4, 2, 2,99, 2, 2,99, 2, 2, 2, 3, 6, 8,11, 9,12,
 	15,13, 2, 2, 2, 2,99, 2, 2, 2, 2,14, 7,13,12,13, 2, 2, 2, 2, 2, 2,99, 2, 2, 2, 8, 1, 2, 5,15, 0,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99, 2, 8, 9,14,15,12,13, 2, 3, 0, 2,15, 2, 2, 2, 2,
-		2, 2, 1, 6, 7, 4, 5,10,11, 8, 2, 2, 2, 9, 2, 2,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
+	 2, 2, 1, 6, 7, 4, 5,10,11, 8, 2, 2, 2, 9, 2, 2,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
@@ -1262,7 +1261,7 @@ static const uint8_t xor2_table[] =
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
-		9,99,15, 7,15, 7,99, 7, 5,10, 2,10, 5,99, 7, 8,14, 5, 6,14, 1, 7,10, 0, 1,14,14, 6, 8, 8, 5,15,
+	 9,99,15, 7,15, 7,99, 7, 5,10, 2,10, 5,99, 7, 8,14, 5, 6,14, 1, 7,10, 0, 1,14,14, 6, 8, 8, 5,15,
 	14, 5,14, 6, 9, 7, 8,99, 5,99, 6, 6, 6, 8, 7, 8,13, 2, 2,10, 2, 7,10, 0, 1,14,14, 7,13, 8, 5,15,
 	13, 2,10, 2,13, 7, 8, 7, 2,14, 5,14, 2, 8, 7, 8, 8, 6, 6,14, 1, 7,10, 0, 5,10,11, 0,14, 8,99,15,
 	13, 6,14, 6,14, 7, 8, 7, 5,10, 2,10, 5, 8, 7, 8,13, 2, 2,10, 5, 7,10, 0, 1,14,14, 6, 9, 8, 5,15,
@@ -1278,32 +1277,32 @@ static const uint8_t xor2_table[] =
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
-		8,99, 9, 1, 1, 9, 1, 9, 9, 1,13, 1, 3,11,10,10, 5, 5,12,13, 4,12,12, 4,99,12, 3,12,11, 2, 2, 3,
-		0,12, 0,13, 0, 5, 4,12, 4,13,10, 5,11,10, 2, 2, 4,12, 9, 4,13, 9, 5, 8, 8,13, 3, 0, 3, 2,10,13,
-		8, 5,14, 8, 8, 8, 9, 8, 0, 8, 7, 0, 3, 3, 2,10,15,15, 6, 7,14, 6, 6,14,14, 6, 3, 6,11, 2, 3,11,
-		1, 6, 0, 7, 0,15,14, 6,99, 7, 2,15, 3,10,10, 2,14, 6, 0,14, 7, 1,15, 8, 1, 7, 3, 7, 3, 2, 2, 2,
-		8, 3,10, 3, 2, 6, 9, 9, 0, 9, 3, 8, 4, 0,10, 5, 7, 6, 2,10, 1, 8, 4,15, 8, 8,11,11, 7, 4, 4, 7,
-		2, 8,12,14, 6, 6,14, 0, 6,14, 6, 5, 9, 9,12, 9, 2,10,10, 2,10,10, 2, 2,10,10,13, 1, 4, 9,14, 5,
-		6,12,15,15, 7,15,13, 5, 7, 4,13, 7,15,12,15,12, 5,13, 4, 4, 7, 7, 4,12,15,13,14, 6, 6, 6, 6, 5,
-		5, 0,99, 3,11, 3,99, 9,11, 8, 1,11, 3,99, 3, 0, 9,99, 8, 8,11,11, 8, 0, 3, 1, 2, 6, 6, 6, 6,99,
+	 8,99, 9, 1, 1, 9, 1, 9, 9, 1,13, 1, 3,11,10,10, 5, 5,12,13, 4,12,12, 4,99,12, 3,12,11, 2, 2, 3,
+	 0,12, 0,13, 0, 5, 4,12, 4,13,10, 5,11,10, 2, 2, 4,12, 9, 4,13, 9, 5, 8, 8,13, 3, 0, 3, 2,10,13,
+	 8, 5,14, 8, 8, 8, 9, 8, 0, 8, 7, 0, 3, 3, 2,10,15,15, 6, 7,14, 6, 6,14,14, 6, 3, 6,11, 2, 3,11,
+	 1, 6, 0, 7, 0,15,14, 6,99, 7, 2,15, 3,10,10, 2,14, 6, 0,14, 7, 1,15, 8, 1, 7, 3, 7, 3, 2, 2, 2,
+	 8, 3,10, 3, 2, 6, 9, 9, 0, 9, 3, 8, 4, 0,10, 5, 7, 6, 2,10, 1, 8, 4,15, 8, 8,11,11, 7, 4, 4, 7,
+	 2, 8,12,14, 6, 6,14, 0, 6,14, 6, 5, 9, 9,12, 9, 2,10,10, 2,10,10, 2, 2,10,10,13, 1, 4, 9,14, 5,
+	 6,12,15,15, 7,15,13, 5, 7, 4,13, 7,15,12,15,12, 5,13, 4, 4, 7, 7, 4,12,15,13,14, 6, 6, 6, 6, 5,
+	 5, 0,99, 3,11, 3,99, 9,11, 8, 1,11, 3,99, 3, 0, 9,99, 8, 8,11,11, 8, 0, 3, 1, 2, 6, 6, 6, 6,99,
 	99, 1,99, 1, 1, 1, 1, 1, 1, 4,99, 0, 6, 0, 1, 0, 1,11, 3,11,11,11,11, 2,11,11,11,11, 3, 3,11, 3,
-		1, 0, 7, 7, 7, 7, 7, 7, 7, 9, 7, 0, 0, 7, 1, 1, 7,10,10,10,10, 2, 3, 3,10,10,10,10,10, 2, 2, 2,
-		0, 6, 6, 6, 6, 6, 6, 7, 7, 9, 7, 0, 0, 0, 1, 7, 7, 3, 3, 3,11,10, 2,10,99, 3,11,10,99, 3, 3, 3,
-		5, 5, 5, 5, 5, 5, 5, 5, 5,15,15,15,15,15,15,15, 5,11, 9, 9, 9, 9, 9, 9, 9,10,13,13,13,13,13,13,
+	 1, 0, 7, 7, 7, 7, 7, 7, 7, 9, 7, 0, 0, 7, 1, 1, 7,10,10,10,10, 2, 3, 3,10,10,10,10,10, 2, 2, 2,
+	 0, 6, 6, 6, 6, 6, 6, 7, 7, 9, 7, 0, 0, 0, 1, 7, 7, 3, 3, 3,11,10, 2,10,99, 3,11,10,99, 3, 3, 3,
+	 5, 5, 5, 5, 5, 5, 5, 5, 5,15,15,15,15,15,15,15, 5,11, 9, 9, 9, 9, 9, 9, 9,10,13,13,13,13,13,13,
 	99, 6,99, 6, 6, 6,99, 6, 6, 8, 7, 0,99, 0, 0, 0, 6,99,99, 2,99,99,99,99,11,10,10, 2, 2, 2, 2, 2,
-		5, 4, 4, 4, 4, 4, 4, 4, 4,14,14,14,14,14,14,14, 4, 8, 8, 8, 8, 8, 8, 8, 8,99,12,12,12,12,12,12,
-		5, 4, 4, 4, 4, 4, 4, 5, 5,14,14,14,14, 0,14,15, 5, 8, 8, 8, 8, 8, 8, 8, 9, 2,12,12,13,13,13,13,
-		9,15,15,15,15,15,15,15,12,15,12,12,12,12,12,12,12, 9, 9, 9, 9, 9,14,14,14,11,13,13,13,13,13,13,
+	 5, 4, 4, 4, 4, 4, 4, 4, 4,14,14,14,14,14,14,14, 4, 8, 8, 8, 8, 8, 8, 8, 8,99,12,12,12,12,12,12,
+	 5, 4, 4, 4, 4, 4, 4, 5, 5,14,14,14,14, 0,14,15, 5, 8, 8, 8, 8, 8, 8, 8, 9, 2,12,12,13,13,13,13,
+	 9,15,15,15,15,15,15,15,12,15,12,12,12,12,12,12,12, 9, 9, 9, 9, 9,14,14,14,11,13,13,13,13,13,13,
 	99,11,11,11,99,14,99,14,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99, 8,10,99, 8, 8, 8,99,
-		2, 3, 2, 2, 0, 6, 3, 2,99, 0,99, 3, 6, 0,99, 6, 6, 2,99, 2, 2, 2, 2, 2, 2,10, 2, 0,99, 2, 6, 6,
-		2, 3, 3, 3, 3, 3, 3, 3, 3,11, 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 6, 6, 6, 6, 6, 6,14, 3, 6, 0,99, 6,
-		2, 7, 7, 7, 7, 7, 7, 7, 7,15, 1, 1, 1, 1, 1, 1, 1, 1, 9, 4, 4, 4, 4, 4, 4, 4,99, 7, 1, 4, 4,11,
-		2, 2, 2, 2, 2, 2, 2, 5,99, 2, 2, 2,99, 2, 2,99, 3,99, 3,99,12,15, 2, 2, 3, 3,99, 2, 3, 3, 3,99,
+	 2, 3, 2, 2, 0, 6, 3, 2,99, 0,99, 3, 6, 0,99, 6, 6, 2,99, 2, 2, 2, 2, 2, 2,10, 2, 0,99, 2, 6, 6,
+	 2, 3, 3, 3, 3, 3, 3, 3, 3,11, 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 6, 6, 6, 6, 6, 6,14, 3, 6, 0,99, 6,
+	 2, 7, 7, 7, 7, 7, 7, 7, 7,15, 1, 1, 1, 1, 1, 1, 1, 1, 9, 4, 4, 4, 4, 4, 4, 4,99, 7, 1, 4, 4,11,
+	 2, 2, 2, 2, 2, 2, 2, 5,99, 2, 2, 2,99, 2, 2,99, 3,99, 3,99,12,15, 2, 2, 3, 3,99, 2, 3, 3, 3,99,
 	99, 2, 2,99, 2, 2, 3,99,99, 2, 2, 2, 2, 2, 2,99,99,99,99,99,99, 3,99, 2, 2, 2, 2, 2,99, 3, 2, 3,
-		8,99,99, 2, 2,99, 2,99,99,99,99,99,99,99,99,99, 8,99, 2, 2,99, 2,99, 2, 2, 2, 8, 8, 8, 8, 9,15,
-		8, 8, 2, 2, 2, 2, 2, 2, 2,99,99, 8, 8,15, 9, 9, 2, 2, 2, 2, 2, 2,99, 2, 2, 2, 9, 8,14, 8,99, 8,
+	 8,99,99, 2, 2,99, 2,99,99,99,99,99,99,99,99,99, 8,99, 2, 2,99, 2,99, 2, 2, 2, 8, 8, 8, 8, 9,15,
+	 8, 8, 2, 2, 2, 2, 2, 2, 2,99,99, 8, 8,15, 9, 9, 2, 2, 2, 2, 2, 2,99, 2, 2, 2, 9, 8,14, 8,99, 8,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99, 2,12,12,12,12,12,12,13,13,13, 2,13, 2, 2, 2, 2,
-		2, 2,13,13,13,13,13,13,13,13, 2, 2, 2,99, 2, 2,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
+	 2, 2,13,13,13,13,13,13,13,13, 2, 2, 2,99, 2, 2,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
@@ -1371,12 +1370,9 @@ int qix_state::kram3_decrypt(int address, int value)
 	return ((bits2 & 0xe) << 4) | ((bits1 & 0x8) << 1) | ((bits2 & 0x1) << 3) | ((bits1 & 0x7) << 0);
 }
 
-DRIVER_INIT_MEMBER(qix_state,kram3)
+void qix_state::init_kram3()
 {
 	//const uint8_t *patch;
-	uint8_t *rom, *decrypted;
-	int i;
-
 	assert(m_bank0);
 	assert(m_bank1);
 
@@ -1394,13 +1390,12 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 
 	 ********************************/
 
-	i = 0;
 	//patch = memregion("user1")->base();
-	rom = memregion("maincpu")->base();
-	decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
-	for (i = 0xa000; i < 0x10000; ++i)
+	for (int i = 0xa000; i < 0x10000; ++i)
 	{
 		decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
 	}
@@ -1409,13 +1404,12 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 	m_bank0->configure_entry(1, decrypted);
 	m_bank0->set_entry(0);
 
-	i = 0;
 	//patch = memregion("user2")->base();
 	rom = memregion("videocpu")->base();
 	decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
-	for (i = 0xa000; i < 0x10000; ++i)
+	for (int i = 0xa000; i < 0x10000; ++i)
 	{
 		decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
 	}
@@ -1436,7 +1430,7 @@ WRITE_LINE_MEMBER(qix_state::kram3_lic_videocpu_changed)
 }
 
 
-DRIVER_INIT_MEMBER(qix_state,zookeep)
+void qix_state::init_zookeep()
 {
 	/* configure the banking */
 	membank("bank1")->configure_entry(0, memregion("videocpu")->base() + 0xa000);
@@ -1445,7 +1439,7 @@ DRIVER_INIT_MEMBER(qix_state,zookeep)
 }
 
 
-DRIVER_INIT_MEMBER(qix_state,slither)
+void qix_state::init_slither()
 {
 }
 
@@ -1457,21 +1451,21 @@ DRIVER_INIT_MEMBER(qix_state,slither)
  *
  *************************************/
 
-GAME( 1981, qix,      0,        qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (Rev 2)", MACHINE_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
-GAME( 1981, qixa,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, qixb,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, qixo,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (set 3, earlier)", MACHINE_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
-GAME( 1981, qix2,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix II (Tournament)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, sdungeon, 0,        mcu,      sdungeon, qix_state, 0,        ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE ) // actually released July 1982
-GAME( 1981, sdungeona, sdungeon,mcu,      sdungeon, qix_state, 0,        ROT270, "Taito America Corporation", "Space Dungeon (larger roms)", MACHINE_SUPPORTS_SAVE ) // same as above but uses larger ROMs
-GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, qix_state, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
-GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, qix_state, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
-GAME( 1982, kram,     0,        mcu,      kram,     qix_state, 0,        ROT0,   "Taito America Corporation", "Kram (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kram2,    kram,     mcu,      kram,     qix_state, 0,        ROT0,   "Taito America Corporation", "Kram (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kram3,    kram,     kram3,    kram,     qix_state, kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zookeep,  0,        zookeep,  zookeep,  qix_state, zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep,  qix_state, zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep,  qix_state, zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, slither,  0,        slither,  slither,  qix_state, slither,  ROT270, "Century II", "Slither (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, slithera, slither,  slither,  slither,  qix_state, slither,  ROT270, "Century II", "Slither (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, complexx, 0,        qix,      complexx, qix_state, 0,        ROT270, "Taito America Corporation", "Complex X", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, qix,       0,        qix,     qix,      qix_state, empty_init,   ROT270, "Taito America Corporation", "Qix (Rev 2)", MACHINE_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
+GAME( 1981, qixa,      qix,      qix,     qix,      qix_state, empty_init,   ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, qixb,      qix,      qix,     qix,      qix_state, empty_init,   ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, qixo,      qix,      qix,     qix,      qix_state, empty_init,   ROT270, "Taito America Corporation", "Qix (set 3, earlier)", MACHINE_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
+GAME( 1981, qix2,      qix,      qix,     qix,      qix_state, empty_init,   ROT270, "Taito America Corporation", "Qix II (Tournament)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, sdungeon,  0,        mcu,     sdungeon, qix_state, empty_init,   ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE ) // actually released July 1982
+GAME( 1981, sdungeona, sdungeon, mcu,     sdungeon, qix_state, empty_init,   ROT270, "Taito America Corporation", "Space Dungeon (larger roms)", MACHINE_SUPPORTS_SAVE ) // same as above but uses larger ROMs
+GAMEL(1982, elecyoyo,  0,        mcu,     elecyoyo, qix_state, empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoyo2, elecyoyo, mcu,     elecyoyo, qix_state, empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
+GAME( 1982, kram,      0,        mcu,     kram,     qix_state, empty_init,   ROT0,   "Taito America Corporation", "Kram (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kram2,     kram,     mcu,     kram,     qix_state, empty_init,   ROT0,   "Taito America Corporation", "Kram (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kram3,     kram,     kram3,   kram,     qix_state, init_kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zookeep,   0,        zookeep, zookeep,  qix_state, init_zookeep, ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zookeep2,  zookeep,  zookeep, zookeep,  qix_state, init_zookeep, ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zookeep3,  zookeep,  zookeep, zookeep,  qix_state, init_zookeep, ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slither,   0,        slither, slither,  qix_state, init_slither, ROT270, "Century II", "Slither (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slithera,  slither,  slither, slither,  qix_state, init_slither, ROT270, "Century II", "Slither (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, complexx,  0,        qix,     complexx, qix_state, empty_init,   ROT270, "Taito America Corporation", "Complex X", MACHINE_SUPPORTS_SAVE )

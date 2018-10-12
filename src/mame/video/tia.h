@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include "sound/tiaintf.h"
+#include "emupal.h"
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -33,13 +36,13 @@ struct player_gfx {
 //**************************************************************************
 
 #define MCFG_TIA_READ_INPUT_PORT_CB(_devcb) \
-	devcb = &downcast<tia_video_device &>(*device).set_read_input_port_callback(DEVCB_##_devcb);
+	downcast<tia_video_device &>(*device).set_read_input_port_callback(DEVCB_##_devcb);
 
 #define MCFG_TIA_DATABUS_CONTENTS_CB(_devcb) \
-	devcb = &downcast<tia_video_device &>(*device).set_databus_contents_callback(DEVCB_##_devcb);
+	downcast<tia_video_device &>(*device).set_databus_contents_callback(DEVCB_##_devcb);
 
 #define MCFG_TIA_VSYNC_CB(_devcb) \
-	devcb = &downcast<tia_video_device &>(*device).set_vsync_callback(DEVCB_##_devcb);
+	downcast<tia_video_device &>(*device).set_vsync_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -64,6 +67,8 @@ public:
 protected:
 	// construction/destruction
 	tia_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> void set_tia_tag(T &&tag) { m_tia.set_tag(std::forward<T>(tag)); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -115,6 +120,9 @@ private:
 	devcb_read16    m_read_input_port_cb;
 	devcb_read8     m_databus_contents_cb;
 	devcb_write16   m_vsync_cb;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<tia_device> m_tia;
 
 	struct player_gfx p0gfx;
 	struct player_gfx p1gfx;
@@ -210,6 +218,12 @@ private:
 class tia_pal_video_device : public tia_video_device
 {
 public:
+	template <typename T> tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&tia_tag)
+		: tia_pal_video_device(mconfig, tag, owner, clock)
+	{
+		set_tia_tag(std::forward<T>(tia_tag));
+	}
+
 	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -222,6 +236,12 @@ private:
 class tia_ntsc_video_device : public tia_video_device
 {
 public:
+	template <typename T> tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&tia_tag)
+		: tia_ntsc_video_device(mconfig, tag, owner, clock)
+	{
+		set_tia_tag(std::forward<T>(tia_tag));
+	}
+
 	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:

@@ -51,17 +51,15 @@
  *
  *************************************/
 
-void thunderj_state::update_interrupts()
+WRITE_LINE_MEMBER(thunderj_state::scanline_int_write_line)
 {
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_extra->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_4, state ? ASSERT_LINE : CLEAR_LINE);
+	m_extra->set_input_line(M68K_IRQ_4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 void thunderj_state::machine_start()
 {
-	atarigen_state::machine_start();
 	save_item(NAME(m_alpha_tile_bank));
 }
 
@@ -110,30 +108,31 @@ WRITE16_MEMBER(thunderj_state::latch_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(thunderj_state::main_map)
-	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
-	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
-	AM_RANGE(0x260012, 0x260013) AM_READ(special_port2_r)
-	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0x00ff)
-	AM_RANGE(0x2e0000, 0x2e0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x360010, 0x360011) AM_WRITE(latch_w)
-	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
-	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0x00ff)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
-	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM AM_SHARE("vad:mob")
-	AM_RANGE(0x3f8000, 0x3f8eff) AM_RAM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
-	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_SHARE("vad:eof")
-	AM_RANGE(0x3f8f80, 0x3f8fff) AM_RAM AM_SHARE("vad:mob:slip")
-	AM_RANGE(0x3f9000, 0x3fffff) AM_RAM
-ADDRESS_MAP_END
+void thunderj_state::main_map(address_map &map)
+{
+	map(0x000000, 0x09ffff).rom();
+	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x160000, 0x16ffff).ram().share("share1");
+	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x260000, 0x26000f).portr("260000");
+	map(0x260010, 0x260011).portr("260010");
+	map(0x260012, 0x260013).r(FUNC(thunderj_state::special_port2_r));
+	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
+	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x360010, 0x360011).w(FUNC(thunderj_state::latch_w));
+	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
+	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
+	map(0x3e0000, 0x3e0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
+	map(0x3f0000, 0x3f1fff).ram().w(m_vad, FUNC(atari_vad_device::playfield2_latched_msb_w)).share("vad:playfield2");
+	map(0x3f2000, 0x3f3fff).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_lsb_w)).share("vad:playfield");
+	map(0x3f4000, 0x3f5fff).ram().w(m_vad, FUNC(atari_vad_device::playfield_upper_w)).share("vad:playfield_ext");
+	map(0x3f6000, 0x3f7fff).ram().share("vad:mob");
+	map(0x3f8000, 0x3f8eff).ram().w(m_vad, FUNC(atari_vad_device::alpha_w)).share("vad:alpha");
+	map(0x3f8f00, 0x3f8f7f).ram().share("vad:eof");
+	map(0x3f8f80, 0x3f8fff).ram().share("vad:mob:slip");
+	map(0x3f9000, 0x3fffff).ram();
+}
 
 
 
@@ -143,19 +142,19 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(thunderj_state::extra_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x07ffff) AM_ROM
-	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
-	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
-	AM_RANGE(0x260012, 0x260013) AM_READ(special_port2_r)
-	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0x00ff)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x360010, 0x360011) AM_WRITE(latch_w)
-	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
-	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0x00ff)
-ADDRESS_MAP_END
+void thunderj_state::extra_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x060000, 0x07ffff).rom();
+	map(0x160000, 0x16ffff).ram().share("share1");
+	map(0x260000, 0x26000f).portr("260000");
+	map(0x260010, 0x260011).portr("260010");
+	map(0x260012, 0x260013).r(FUNC(thunderj_state::special_port2_r));
+	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
+	map(0x360010, 0x360011).w(FUNC(thunderj_state::latch_w));
+	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
+	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
+}
 
 
 
@@ -227,7 +226,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( thunderj )
+static GFXDECODE_START( gfx_thunderj )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  512,  96 ) /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 112 ) /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx3", 0, anlayout,      0, 512 ) /* characters 8x8 */
@@ -244,26 +243,25 @@ GFXDECODE_END
 MACHINE_CONFIG_START(thunderj_state::thunderj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(extra_map)
+	MCFG_DEVICE_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(extra_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* perfect synchronization due to shared RAM */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thunderj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thunderj)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(thunderj_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(*this, thunderj_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(thunderj_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(thunderj_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_ALPHA(thunderj_state, "gfxdecode", get_alpha_tile_info)
@@ -278,9 +276,9 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(thunderj_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260012", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -453,7 +451,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(thunderj_state,thunderj)
+void thunderj_state::init_thunderj()
 {
 }
 
@@ -465,5 +463,5 @@ DRIVER_INIT_MEMBER(thunderj_state,thunderj)
  *
  *************************************/
 
-GAME( 1990, thunderj,         0, thunderj, thunderj, thunderj_state, thunderj, ROT0, "Atari Games", "ThunderJaws (rev 3)", 0 )
-GAME( 1990, thunderja, thunderj, thunderj, thunderj, thunderj_state, thunderj, ROT0, "Atari Games", "ThunderJaws (rev 2)", 0 )
+GAME( 1990, thunderj,         0, thunderj, thunderj, thunderj_state, init_thunderj, ROT0, "Atari Games", "ThunderJaws (rev 3)", 0 )
+GAME( 1990, thunderja, thunderj, thunderj, thunderj, thunderj_state, init_thunderj, ROT0, "Atari Games", "ThunderJaws (rev 2)", 0 )

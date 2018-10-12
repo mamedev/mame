@@ -360,9 +360,9 @@ void snes_ppu_device::device_start()
 
 	save_item(NAME(m_regs));
 
-	save_pointer(NAME(m_vram.get()), SNES_VRAM_SIZE);
-	save_pointer(NAME(m_cgram.get()), SNES_CGRAM_SIZE/2);
-	save_pointer(NAME(m_oam_ram.get()), SNES_OAM_SIZE/2);
+	save_pointer(NAME(m_vram), SNES_VRAM_SIZE);
+	save_pointer(NAME(m_cgram), SNES_CGRAM_SIZE/2);
+	save_pointer(NAME(m_oam_ram), SNES_OAM_SIZE/2);
 }
 
 void snes_ppu_device::device_reset()

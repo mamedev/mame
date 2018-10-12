@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include "emupal.h"
 
 
 //**************************************************************************
@@ -33,19 +34,19 @@ DECLARE_DEVICE_TYPE(GBA_LCD, gba_lcd_device)
 		MCFG_DEVICE_ADD(_tag, GBA_LCD, 0)
 
 #define MCFG_GBA_LCD_INT_HBLANK(_devcb) \
-	devcb = &downcast<gba_lcd_device &>(*device).set_int_hblank_callback(DEVCB_##_devcb);
+	downcast<gba_lcd_device &>(*device).set_int_hblank_callback(DEVCB_##_devcb);
 
 #define MCFG_GBA_LCD_INT_VBLANK(_devcb) \
-	devcb = &downcast<gba_lcd_device &>(*device).set_int_vblank_callback(DEVCB_##_devcb);
+	downcast<gba_lcd_device &>(*device).set_int_vblank_callback(DEVCB_##_devcb);
 
 #define MCFG_GBA_LCD_INT_VCOUNT(_devcb) \
-	devcb = &downcast<gba_lcd_device &>(*device).set_int_vcount_callback(DEVCB_##_devcb);
+	downcast<gba_lcd_device &>(*device).set_int_vcount_callback(DEVCB_##_devcb);
 
 #define MCFG_GBA_LCD_DMA_HBLANK(_devcb) \
-	devcb = &downcast<gba_lcd_device &>(*device).set_dma_hblank_callback(DEVCB_##_devcb);
+	downcast<gba_lcd_device &>(*device).set_dma_hblank_callback(DEVCB_##_devcb);
 
 #define MCFG_GBA_LCD_DMA_VBLANK(_devcb) \
-	devcb = &downcast<gba_lcd_device &>(*device).set_dma_vblank_callback(DEVCB_##_devcb);
+	downcast<gba_lcd_device &>(*device).set_dma_vblank_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

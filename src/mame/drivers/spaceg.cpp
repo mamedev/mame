@@ -167,6 +167,7 @@ Notes:
 #include "includes/mw8080bw.h"
 
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -424,33 +425,34 @@ WRITE8_MEMBER(spaceg_state::sound3_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(spaceg_state::spaceg_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
+void spaceg_state::spaceg_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x3000, 0x3fff).rom();
+	map(0x7000, 0x77ff).ram();
 
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(colorram_r) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_SHARE("videoram")
+	map(0xa000, 0xbfff).ram().r(FUNC(spaceg_state::colorram_r)).share("colorram");
+	map(0xc000, 0xdfff).ram().w(FUNC(spaceg_state::zvideoram_w)).share("videoram");
 
-	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_SHARE("io9400") /* gfx ctrl */
-	AM_RANGE(0x9401, 0x9401) AM_WRITEONLY AM_SHARE("io9401") /* gfx ctrl */
+	map(0x9400, 0x9400).writeonly().share("io9400"); /* gfx ctrl */
+	map(0x9401, 0x9401).writeonly().share("io9401"); /* gfx ctrl */
 	/* 9402 -
 	    bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
 	    bit 2 - unknown -
 	    bit 3 is probably a flip screen
 	    bit 7 - unknown - set to 1 during the gameplay (coinlock ?)
 	*/
-	AM_RANGE(0x9402, 0x9402) AM_WRITENOP
-	AM_RANGE(0x9405, 0x9405) AM_WRITE(sound1_w)
-	AM_RANGE(0x9406, 0x9406) AM_WRITE(sound2_w)
-	AM_RANGE(0x9407, 0x9407) AM_WRITE(sound3_w)
+	map(0x9402, 0x9402).nopw();
+	map(0x9405, 0x9405).w(FUNC(spaceg_state::sound1_w));
+	map(0x9406, 0x9406).w(FUNC(spaceg_state::sound2_w));
+	map(0x9407, 0x9407).w(FUNC(spaceg_state::sound3_w));
 
-	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("9800")
-	AM_RANGE(0x9801, 0x9801) AM_READ_PORT("9801")
-	AM_RANGE(0x9802, 0x9802) AM_READ_PORT("9802")
-	AM_RANGE(0x9805, 0x9805) AM_READ_PORT("9805")
-	AM_RANGE(0x9806, 0x9806) AM_READ_PORT("9806")
-ADDRESS_MAP_END
+	map(0x9800, 0x9800).portr("9800");
+	map(0x9801, 0x9801).portr("9801");
+	map(0x9802, 0x9802).portr("9802");
+	map(0x9805, 0x9805).portr("9805");
+	map(0x9806, 0x9806).portr("9806");
+}
 
 
 
@@ -508,9 +510,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(spaceg_state::spaceg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(spaceg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spaceg_state,  nmi_line_pulse) /* 60 Hz NMIs (verified) */
+	MCFG_DEVICE_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(spaceg_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -520,15 +521,16 @@ MACHINE_CONFIG_START(spaceg_state::spaceg)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 32, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(spaceg_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // 60 Hz NMIs (verified)
 
 	MCFG_PALETTE_ADD("palette", 16+128-16)
 	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// HACK: SN76477 parameters copied from space invaders
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
@@ -545,7 +547,7 @@ MACHINE_CONFIG_START(spaceg_state::spaceg)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	// HACK: samples copied from space invaders
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(invaders_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -585,4 +587,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, spaceg, 0, spaceg, spaceg, spaceg_state, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spaceg, 0, spaceg, spaceg, spaceg_state, empty_init, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

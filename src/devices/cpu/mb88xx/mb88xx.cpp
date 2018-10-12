@@ -21,12 +21,12 @@
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(MB88201, mb88201_cpu_device, "mb88201", "MB88201")
-DEFINE_DEVICE_TYPE(MB88202, mb88202_cpu_device, "mb88202", "MB88202")
-DEFINE_DEVICE_TYPE(MB8841,  mb8841_cpu_device,  "mb8841",  "MB8841")
-DEFINE_DEVICE_TYPE(MB8842,  mb8842_cpu_device,  "mb8842",  "MB8842")
-DEFINE_DEVICE_TYPE(MB8843,  mb8843_cpu_device,  "mb8843",  "MB8843")
-DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "MB8844")
+DEFINE_DEVICE_TYPE(MB88201, mb88201_cpu_device, "mb88201", "Fujitsu MB88201")
+DEFINE_DEVICE_TYPE(MB88202, mb88202_cpu_device, "mb88202", "Fujitsu MB88202")
+DEFINE_DEVICE_TYPE(MB8841,  mb8841_cpu_device,  "mb8841",  "Fujitsu MB8841")
+DEFINE_DEVICE_TYPE(MB8842,  mb8842_cpu_device,  "mb8842",  "Fujitsu MB8842")
+DEFINE_DEVICE_TYPE(MB8843,  mb8843_cpu_device,  "mb8843",  "Fujitsu MB8843")
+DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "Fujitsu MB8844")
 
 
 /***************************************************************************
@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "MB8844")
     MACROS
 ***************************************************************************/
 
-#define READOP(a)           (m_direct->read_byte(a))
+#define READOP(a)           (m_cache->read_byte(a))
 
 #define RDMEM(a)            (m_data->read_byte(a))
 #define WRMEM(a,v)          (m_data->write_byte((a), (v)))
@@ -77,33 +77,40 @@ DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "MB8844")
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(mb88_cpu_device::program_9bit)
-	AM_RANGE(0x000, 0x1ff) AM_ROM
-ADDRESS_MAP_END
+void mb88_cpu_device::program_9bit(address_map &map)
+{
+	map(0x000, 0x1ff).rom();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::program_10bit)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void mb88_cpu_device::program_10bit(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::program_11bit)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void mb88_cpu_device::program_11bit(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::data_4bit)
-	AM_RANGE(0x00, 0x0f) AM_RAM
-ADDRESS_MAP_END
+void mb88_cpu_device::data_4bit(address_map &map)
+{
+	map(0x00, 0x0f).ram();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::data_5bit)
-	AM_RANGE(0x00, 0x1f) AM_RAM
-ADDRESS_MAP_END
+void mb88_cpu_device::data_5bit(address_map &map)
+{
+	map(0x00, 0x1f).ram();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::data_6bit)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void mb88_cpu_device::data_6bit(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::data_7bit)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void mb88_cpu_device::data_7bit(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
 
 mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width)
@@ -163,9 +170,9 @@ device_memory_interface::space_config_vector mb88_cpu_device::memory_space_confi
 	};
 }
 
-util::disasm_interface *mb88_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mb88_cpu_device::create_disassembler()
 {
-	return new mb88_disassembler;
+	return std::make_unique<mb88_disassembler>();
 }
 
 
@@ -176,7 +183,7 @@ util::disasm_interface *mb88_cpu_device::create_disassembler()
 void mb88_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_data = &space(AS_DATA);
 
 	m_read_k.resolve_safe(0);
@@ -232,7 +239,7 @@ void mb88_cpu_device::device_start()
 	state_add( STATE_GENPC, "GENPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_flags ).callimport().callexport().formatstr("%6s").noshow();
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -471,7 +478,7 @@ void mb88_cpu_device::execute_run()
 		uint8_t opcode, arg, oc;
 
 		/* fetch the opcode */
-		debugger_instruction_hook(this, GETPC());
+		debugger_instruction_hook(GETPC());
 		opcode = READOP(GETPC());
 
 		/* increment the PC */

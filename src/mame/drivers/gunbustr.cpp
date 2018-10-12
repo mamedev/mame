@@ -115,19 +115,20 @@ WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(gunbustr_state::gunbustr_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")                                     /* main CPUA ram */
-	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_SHARE("spriteram")               /* Sprite ram */
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)                                          /* motor, lamps etc. */
-	AM_RANGE(0x390000, 0x3907ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff) /* Sound shared ram */
-	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
-	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)                       /* gun coord read */
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0x900000, 0x901fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM                                                             /* network ram ?? */
-ADDRESS_MAP_END
+void gunbustr_state::gunbustr_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x21ffff).ram().share("ram");                                     /* main CPUA ram */
+	map(0x300000, 0x301fff).ram().share("spriteram");               /* Sprite ram */
+	map(0x380000, 0x380003).w(FUNC(gunbustr_state::motor_control_w));                                          /* motor, lamps etc. */
+	map(0x390000, 0x3907ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
+	map(0x400000, 0x400007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
+	map(0x500000, 0x500003).rw(FUNC(gunbustr_state::gunbustr_gun_r), FUNC(gunbustr_state::gunbustr_gun_w));                       /* gun coord read */
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x900000, 0x901fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xc00000, 0xc03fff).ram();                                                             /* network ram ?? */
+}
 
 /***********************************************************
              INPUT PORTS (dips in eprom)
@@ -142,7 +143,7 @@ static INPUT_PORTS_START( gunbustr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -217,7 +218,7 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( gunbustr )
+static GFXDECODE_START( gfx_gunbustr )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 256 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 256 )
 GFXDECODE_END
@@ -230,21 +231,21 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(gunbustr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(gunbustr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("EXTRA"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS"))
-	MCFG_TC0510NIO_READ_3_CB(IOPORT("SPECIAL"))
-	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(gunbustr_state, coin_word_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_0_callback().set_ioport("EXTRA");
+	tc0510nio.read_2_callback().set_ioport("INPUTS");
+	tc0510nio.read_3_callback().set_ioport("SPECIAL");
+	tc0510nio.write_3_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
+	tc0510nio.write_3_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	tc0510nio.write_3_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
+	tc0510nio.write_4_callback().set(FUNC(gunbustr_state::coin_word_w));
+	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -255,7 +256,7 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 	MCFG_SCREEN_UPDATE_DRIVER(gunbustr_state, screen_update_gunbustr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gunbustr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gunbustr)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -383,7 +384,7 @@ READ32_MEMBER(gunbustr_state::main_cycle_r)
 	return m_ram[0x3acc/4];
 }
 
-DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
+void gunbustr_state::init_gunbustr()
 {
 	/* Speedup handler */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),this));
@@ -391,14 +392,14 @@ DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
 	m_interrupt5_timer = timer_alloc(TIMER_GUNBUSTR_INTERRUPT5);
 }
 
-DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)
+void gunbustr_state::init_gunbustrj()
 {
-	DRIVER_INIT_CALL(gunbustr);
+	init_gunbustr();
 
 	// no coin lockout, perhaps this was a prototype version without proper coin handling?
 	m_coin_lockout = false;
 }
 
-GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_NODEVICE_LAN )
-GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_NODEVICE_LAN )
-GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, init_gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, init_gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, init_gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_NODEVICE_LAN )

@@ -32,8 +32,6 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK_X1 XTAL(1'996'800)
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -46,18 +44,19 @@ DEFINE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device, "pc9801_amd98", "pc9801_am
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc9801_amd98_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK_X1*2)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ay1", AY8910, 1'996'800)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("OPN_PA1"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_amd98_device,ay3_address_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_amd98_device,ay3_address_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK_X1*2)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1'996'800)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("OPN_PA2"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_amd98_device,ay3_data_latch_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_amd98_device,ay3_data_latch_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ay3", AY8910, MAIN_CLOCK_X1*2)
+	MCFG_DEVICE_ADD("ay3", AY8910, 1'996'800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -123,26 +122,6 @@ void pc9801_amd98_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_amd98_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
-{
-	int buswidth = m_bus->io_space().data_width();
-	switch(buswidth)
-	{
-		case 8:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0);
-			break;
-		case 16:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
-			break;
-		case 32:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
-			break;
-		default:
-			fatalerror("PC-9801-AMD98: Bus width %d not supported\n", buswidth);
-	}
-}
-
-
 void pc9801_amd98_device::device_start()
 {
 }
@@ -154,9 +133,9 @@ void pc9801_amd98_device::device_start()
 
 void pc9801_amd98_device::device_reset()
 {
-	install_device(0x00d8, 0x00df, read8_delegate(FUNC(pc9801_amd98_device::read), this), write8_delegate(FUNC(pc9801_amd98_device::write), this) );
+	m_bus->install_io(0x00d8, 0x00df, read8_delegate(FUNC(pc9801_amd98_device::read), this), write8_delegate(FUNC(pc9801_amd98_device::write), this) );
 	// Thexder access with following
-	install_device(0x38d8, 0x38df, read8_delegate(FUNC(pc9801_amd98_device::read), this), write8_delegate(FUNC(pc9801_amd98_device::write), this) );
+	m_bus->install_io(0x38d8, 0x38df, read8_delegate(FUNC(pc9801_amd98_device::read), this), write8_delegate(FUNC(pc9801_amd98_device::write), this) );
 }
 
 

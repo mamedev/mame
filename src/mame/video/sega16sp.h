@@ -19,35 +19,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SEGA_HANGON_SPRITES_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_HANGON_SPRITES, 0)
-#define MCFG_SEGA_SHARRIER_SPRITES_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_SHARRIER_SPRITES, 0)
-#define MCFG_SEGA_OUTRUN_SPRITES_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_OUTRUN_SPRITES, 0)
-#define MCFG_SEGA_SYS16A_SPRITES_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_SYS16A_SPRITES, 0)
-#define MCFG_SEGA_SYS16B_SPRITES_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_SYS16B_SPRITES, 0)
-#define MCFG_SEGA_XBOARD_SPRITES_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_XBOARD_SPRITES, 0)
-#define MCFG_SEGA_YBOARD_SPRITES_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_YBOARD_SPRITES, 0)
-
-#define MCFG_BOOTLEG_SYS16A_SPRITES_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, BOOTLEG_SYS16A_SPRITES, 0)
-#define MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(_0,_1,_2,_3,_4,_5,_6,_7) \
-	downcast<bootleg_sys16a_sprite_device &>(*device).set_remap(_0,_1,_2,_3,_4,_5,_6,_7);
-
-#define MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(_xorigin) \
-	downcast<bootleg_sys16a_sprite_device &>(*device).set_local_originx(_xorigin);
-
 #define MCFG_BOOTLEG_SYS16A_SPRITES_YORIGIN(_yorigin) \
 	downcast<bootleg_sys16a_sprite_device &>(*device).set_local_originy(_yorigin);
 
-
-#define MCFG_BOOTLEG_SYS16B_SPRITES_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_SYS16B_SPRITES, 0)
 #define MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(_xorigin) \
 	downcast<sega_16bit_sprite_device &>(*device).set_local_originx(_xorigin);
 #define MCFG_BOOTLEG_SYS16B_SPRITES_YORIGIN(_yorigin) \
@@ -88,17 +62,16 @@ public:
 		set_origin(x, y);
 	}
 
-	void set_local_originx_(int x)  { m_xoffs_flipped = m_xoffs = x; set_origin(x, m_yoffs); }
-	void set_local_originy_(int y) { m_yoffs_flipped = m_yoffs = y; set_origin(m_xoffs, y); }
-
 	void set_local_originx(int x)
 	{
-		set_local_originx_(x);
+		m_xoffs_flipped = m_xoffs = x;
+		set_origin(x, m_yoffs);
 	};
 
 	void set_local_originy(int y)
 	{
-		set_local_originy_(y);
+		m_yoffs_flipped = m_yoffs = y;
+		set_origin(m_xoffs, y);
 	};
 
 	// write trigger memory handler
@@ -111,9 +84,10 @@ protected:
 	// internal state
 	bool                        m_flip;                 // screen flip?
 	uint8_t                       m_bank[16];             // banking redirection
-	int m_xoffs, m_yoffs;
-	int m_xoffs_flipped, m_yoffs_flipped;
-
+	int m_xoffs;
+	int m_yoffs;
+	int m_xoffs_flipped;
+	int m_yoffs_flipped;
 };
 
 
@@ -201,6 +175,14 @@ class bootleg_sys16a_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
+	bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int originx,
+		uint8_t offs0, uint8_t offs1, uint8_t offs2, uint8_t offs3, uint8_t offs4, uint8_t offs5, uint8_t offs6, uint8_t offs7)
+		: bootleg_sys16a_sprite_device(mconfig, tag, owner, clock)
+	{
+		set_local_originx(originx);
+		set_remap(offs0, offs1, offs2, offs3, offs4, offs5, offs6, offs7);
+	}
+
 	bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
@@ -214,7 +196,7 @@ protected:
 	required_region_ptr<uint16_t> m_sprite_region_ptr;
 
 	// internal state
-	uint8_t       m_addrmap[8];
+	uint8_t m_addrmap[8];
 };
 
 

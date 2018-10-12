@@ -252,21 +252,30 @@ MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro )
 {
 	uint8_t *RAM = memregion("rambank")->base();
-	uint16_t i;
-	uint8_t data;
+
+	/* Avoid loading a program if CP/M-80 is not in memory */
+	if ((RAM[0] != 0xc3) || (RAM[5] != 0xc3))
+		return image_init_result::FAIL;
+
+	if (quickload_size >= 0xfd00)
+		return image_init_result::FAIL;
 
 	/* Load image to the TPA (Transient Program Area) */
-	for (i = 0; i < quickload_size; i++)
+	for (uint16_t i = 0; i < quickload_size; i++)
 	{
-		if (image.fread( &data, 1) != 1) return image_init_result::FAIL;
-
+		uint8_t data;
+		if (image.fread( &data, 1) != 1)
+			return image_init_result::FAIL;
 		RAM[i+0x100] = data;
 	}
 
+
 	membank("bankr0")->set_entry(0);
 	membank("bank3")->set_entry(0);
-	RAM[0x80]=0;                            // clear out command tail
-	RAM[0x81]=0;
-	m_maincpu->set_pc(0x100);                // start program
+	RAM[0x80]=0; RAM[0x81]=0;    // clear out command tail
+
+	m_maincpu->set_pc(0x100);    // start program
+	m_maincpu->set_state_int(Z80_SP, 256 * RAM[7] - 300);   // put the stack a bit before BDOS
+
 	return image_init_result::PASS;
 }

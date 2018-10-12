@@ -38,37 +38,40 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(barni_state::maincpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0xa100, 0xa7ff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void barni_state::maincpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).ram();
+	map(0xa100, 0xa7ff).ram();
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(barni_state::subcpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void barni_state::subcpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).ram();
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(barni_state::audiocpu_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void barni_state::audiocpu_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();
+	map(0xc000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( barni )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(barni_state::barni)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(4'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 
-	MCFG_CPU_ADD("subcpu", MC6809E, XTAL(4'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(subcpu_map)
+	MCFG_DEVICE_ADD("subcpu", MC6809E, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_map)
 
-	MCFG_CPU_ADD("audiocpu", M6802, 4000000) // uses own XTAL, but what is the value?
-	MCFG_CPU_PROGRAM_MAP(audiocpu_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802, 4000000) // uses own XTAL, but what is the value?
+	MCFG_DEVICE_PROGRAM_MAP(audiocpu_map)
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
@@ -102,4 +105,4 @@ ROM_START(redbarnp)
 ROM_END
 
 
-GAME( 1985, redbarnp, 0, barni, barni, barni_state, 0, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, redbarnp, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )

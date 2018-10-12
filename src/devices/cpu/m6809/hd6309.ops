@@ -11,7 +11,7 @@ MAIN:
 
 	// debugger hook
 	m_ppc = m_pc;
-	debugger_instruction_hook(this, m_pc.w);
+	debugger_instruction_hook(m_pc.w);
 
 	// opcode fetch
 	@m_opcode = read_opcode();

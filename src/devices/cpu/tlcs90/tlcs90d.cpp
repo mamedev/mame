@@ -928,13 +928,10 @@ bool tlcs90_disassembler::stream_arg(std::ostream &stream, uint32_t pc, const ch
 
 	case e_mode::R16R8:  util::stream_format(stream, "%s%s+%s",         pre,    r16_names[r],   r8_names[rb]        );   return true;
 	case e_mode::R16D8:  util::stream_format(stream, "%s%s%c$%02X",     pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
-
-	default:
-		fatalerror("%04x: unimplemented addr mode = %d\n",pc,std::underlying_type_t<e_mode>(mode));
 	}
 
 	// never executed
-	return false;
+	throw std::logic_error(util::string_format("%04x: unimplemented addr mode = %d\n",pc,std::underlying_type_t<e_mode>(mode)));
 }
 
 offs_t tlcs90_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)

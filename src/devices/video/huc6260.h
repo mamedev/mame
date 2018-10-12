@@ -13,19 +13,20 @@
 
 
 #define MCFG_HUC6260_NEXT_PIXEL_DATA_CB(_devcb) \
-	devcb = &downcast<huc6260_device &>(*device).set_next_pixel_data_callback(DEVCB_##_devcb);
+	downcast<huc6260_device &>(*device).set_next_pixel_data_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(_devcb) \
-	devcb = &downcast<huc6260_device &>(*device).set_time_til_next_event_callback(DEVCB_##_devcb);
+	downcast<huc6260_device &>(*device).set_time_til_next_event_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6260_VSYNC_CHANGED_CB(_devcb) \
-	devcb = &downcast<huc6260_device &>(*device).set_vsync_changed_callback(DEVCB_##_devcb);
+	downcast<huc6260_device &>(*device).set_vsync_changed_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6260_HSYNC_CHANGED_CB(_devcb) \
-	devcb = &downcast<huc6260_device &>(*device).set_hsync_changed_callback(DEVCB_##_devcb);
+	downcast<huc6260_device &>(*device).set_hsync_changed_callback(DEVCB_##_devcb);
 
 
 class huc6260_device :  public device_t,
+						public device_palette_interface,
 						public device_video_interface
 {
 public:
@@ -56,9 +57,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual uint32_t palette_entries() const override { return PALETTE_SIZE; }
 
 private:
+	void palette_init();
+
 	int     m_last_h;
 	int     m_last_v;
 	int     m_height;
@@ -86,8 +90,6 @@ private:
 
 	emu_timer   *m_timer;
 	std::unique_ptr<bitmap_ind16>   m_bmp;
-
-	DECLARE_PALETTE_INIT(huc6260);
 };
 
 

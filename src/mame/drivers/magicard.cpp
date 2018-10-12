@@ -399,6 +399,7 @@
 #include "sound/ay8910.h"
 #include "sound/saa1099.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -428,6 +429,12 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
+	void magicard(machine_config &config);
+	void hotslots(machine_config &config);
+
+	void init_magicard();
+
+private:
 	required_shared_ptr<uint16_t> m_magicram;
 	required_shared_ptr<uint16_t> m_magicramb;
 	required_shared_ptr<uint16_t> m_pcab_vregs;
@@ -458,7 +465,6 @@ public:
 	DECLARE_WRITE16_MEMBER(scc68070_dma_ch2_w);
 	DECLARE_READ16_MEMBER(scc68070_mmu_r);
 	DECLARE_WRITE16_MEMBER(scc68070_mmu_w);
-	DECLARE_DRIVER_INIT(magicard);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -466,8 +472,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void magicard(machine_config &config);
-	void hotslots(machine_config &config);
 	void hotslots_mem(address_map &map);
 	void magicard_mem(address_map &map);
 	void ramdac_map(address_map &map);
@@ -901,50 +905,53 @@ WRITE16_MEMBER(magicard_state::scc68070_mmu_w)
 *      Memory Maps       *
 *************************/
 
-ADDRESS_MAP_START(magicard_state::scc68070_mem)
-	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_SHARE("scc_xirqc_regs") //lir
-	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_SHARE("scc_iic_regs") //i2c
-	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_SHARE("scc_uart_regs")
-	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE(scc68070_timer_r,scc68070_timer_w) AM_SHARE("scc_timer_regs")
-	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_SHARE("scc_iirqc_regs")
-	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_SHARE("scc_dma1_regs")
-	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_SHARE("scc_dma2_regs")
-	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_SHARE("scc_mmu_regs")
-ADDRESS_MAP_END
+void magicard_state::scc68070_mem(address_map &map)
+{
+	map(0x80001000, 0x8000100f).rw(FUNC(magicard_state::scc68070_ext_irqc_r), FUNC(magicard_state::scc68070_ext_irqc_w)).share("scc_xirqc_regs"); //lir
+	map(0x80002000, 0x8000200f).rw(FUNC(magicard_state::scc68070_iic_r), FUNC(magicard_state::scc68070_iic_w)).share("scc_iic_regs"); //i2c
+	map(0x80002010, 0x8000201f).rw(FUNC(magicard_state::scc68070_uart_r), FUNC(magicard_state::scc68070_uart_w)).share("scc_uart_regs");
+	map(0x80002020, 0x8000202f).rw(FUNC(magicard_state::scc68070_timer_r), FUNC(magicard_state::scc68070_timer_w)).share("scc_timer_regs");
+	map(0x80002040, 0x8000204f).rw(FUNC(magicard_state::scc68070_int_irqc_r), FUNC(magicard_state::scc68070_int_irqc_w)).share("scc_iirqc_regs");
+	map(0x80004000, 0x8000403f).rw(FUNC(magicard_state::scc68070_dma_ch1_r), FUNC(magicard_state::scc68070_dma_ch1_w)).share("scc_dma1_regs");
+	map(0x80004040, 0x8000407f).rw(FUNC(magicard_state::scc68070_dma_ch2_r), FUNC(magicard_state::scc68070_dma_ch2_w)).share("scc_dma2_regs");
+	map(0x80008000, 0x8000807f).rw(FUNC(magicard_state::scc68070_mmu_r), FUNC(magicard_state::scc68070_mmu_w)).share("scc_mmu_regs");
+}
 
-ADDRESS_MAP_START(magicard_state::magicard_mem)
+void magicard_state::magicard_mem(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_IMPORT_FROM(scc68070_mem)
-	AM_RANGE(0x00000000, 0x001ffbff) AM_MIRROR(0x00200000) AM_RAM AM_SHARE("magicram")
-	AM_RANGE(0x00600000, 0x007ffbff) AM_RAM AM_SHARE("magicramb")
+	scc68070_mem(map);
+	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
+	map(0x00600000, 0x007ffbff).ram().share("magicramb");
 	/* 001ffc00-001ffdff System I/O */
-	AM_RANGE(0x001ffc00, 0x001ffc01) AM_MIRROR(0x7fe00000) AM_READ(test_r)
-	AM_RANGE(0x001ffc40, 0x001ffc41) AM_MIRROR(0x7fe00000) AM_READ(test_r)
-	AM_RANGE(0x001ffd00, 0x001ffd01) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x001ffd02, 0x001ffd03) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x001ffd04, 0x001ffd05) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
-	AM_RANGE(0x001ffd40, 0x001ffd43) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ(test_r)
-	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
-	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
-	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_SHARE("pcab_vregs") //video registers
-ADDRESS_MAP_END
+	map(0x001ffc00, 0x001ffc01).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
+	map(0x001ffc40, 0x001ffc41).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
+	map(0x001ffd01, 0x001ffd01).mirror(0x7fe00000).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x001ffd03, 0x001ffd03).mirror(0x7fe00000).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x001ffd05, 0x001ffd05).mirror(0x7fe00000).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x001ffd40, 0x001ffd43).mirror(0x7fe00000).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0x001ffd80, 0x001ffd81).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
+	map(0x001ffd80, 0x001ffd81).mirror(0x7fe00000).nopw(); //?
+	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram(); //DRAM I/O, not accessed by this game, CD buffer?
+	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs"); //video registers
+}
 
-ADDRESS_MAP_START(magicard_state::hotslots_mem)
+void magicard_state::hotslots_mem(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_IMPORT_FROM(scc68070_mem)
-	AM_RANGE(0x00000000, 0x001ffbff) AM_MIRROR(0x00200000) AM_RAM AM_SHARE("magicram")
-	AM_RANGE(0x00600000, 0x007ffbff) AM_RAM AM_SHARE("magicramb")
-	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
-	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_SHARE("pcab_vregs") //video registers
-	AM_RANGE(0x00414000, 0x00414001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x00414002, 0x00414003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x00414004, 0x00414005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
-	AM_RANGE(0x00414006, 0x00414007) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x00415002, 0x00415003) AM_DEVREAD8("ramdac", ramdac_device, pal_r, 0x00ff)
-	AM_RANGE(0x00416000, 0x00416001) AM_DEVWRITE8("ssg", ymz284_device, data_w, 0x00ff)
-	AM_RANGE(0x00417000, 0x00417001) AM_DEVWRITE8("ssg", ymz284_device, address_w, 0x00ff)
-ADDRESS_MAP_END
+	scc68070_mem(map);
+	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
+	map(0x00600000, 0x007ffbff).ram().share("magicramb");
+	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram(); //DRAM I/O, not accessed by this game, CD buffer?
+	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs"); //video registers
+	map(0x00414001, 0x00414001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x00414003, 0x00414003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x00414005, 0x00414005).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x00414007, 0x00414007).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x00415003, 0x00415003).r("ramdac", FUNC(ramdac_device::pal_r));
+	map(0x00416001, 0x00416001).w("ssg", FUNC(ymz284_device::data_w));
+	map(0x00417001, 0x00417001).w("ssg", FUNC(ymz284_device::address_w));
+}
 
 /*************************
 *      Input ports       *
@@ -984,15 +991,16 @@ INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
 		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xf0 / 4);
 }
 
-ADDRESS_MAP_START(magicard_state::ramdac_map)
-	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void magicard_state::ramdac_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 MACHINE_CONFIG_START(magicard_state::magicard)
-	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A / 2)    /* SCC-68070 CCA84 datasheet */
-	MCFG_CPU_PROGRAM_MAP(magicard_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state, magicard_irq) /* no interrupts? (it erases the vectors..) */
+	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A / 2)    /* SCC-68070 CCA84 datasheet */
+	MCFG_DEVICE_PROGRAM_MAP(magicard_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", magicard_state, magicard_irq) /* no interrupts? (it erases the vectors..) */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1004,18 +1012,18 @@ MACHINE_CONFIG_START(magicard_state::magicard)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("saa", SAA1099, CLOCK_B)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("saa", SAA1099, CLOCK_B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(magicard_state::hotslots)
 	magicard(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hotslots_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hotslots_mem)
 
 	MCFG_DEVICE_REMOVE("saa")
-	MCFG_SOUND_ADD("ssg", YMZ284, 4000000)
+	MCFG_DEVICE_ADD("ssg", YMZ284, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1195,7 +1203,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(magicard_state, magicard)
+void magicard_state::init_magicard()
 {
 	//...
 }
@@ -1205,15 +1213,15 @@ DRIVER_INIT_MEMBER(magicard_state, magicard)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY   FULLNAME                     FLAGS
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT   COMPANY   FULLNAME                     FLAGS
 
-GAME( 199?, magicard,  0,        magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card (set 1)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card (set 2)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, magicardb, magicard, magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card (set 3)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicarde, magicard, magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card Export 94",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, magicardj, magicard, magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card Jackpot (4.01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, magicle,   0,        magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Lotto Export (5.03)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, magicard, ROT0, "Impera", "Hot Slots (6.00)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, magicard, ROT0, "Impera", "Quingo Export (5.00)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, belslots,  0,        hotslots, magicard, magicard_state, magicard, ROT0, "Impera", "Bel Slots Export (5.01)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, magicard, ROT0, "Impera", "Big Deal Belgien (5.04)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, magicard,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 1)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 2)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, magicardb, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 3)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicarde, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Export 94",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, magicardj, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Jackpot (4.01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, magicle,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Lotto Export (5.03)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Hot Slots (6.00)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Quingo Export (5.00)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, belslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Bel Slots Export (5.01)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Big Deal Belgien (5.04)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -38,8 +38,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_dips(*this, "X.%u", 0)
 		, m_monotone(*this, "monotone")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void chance(machine_config &config);
+	void play_1(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE8_MEMBER(port02_w);
@@ -54,12 +59,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(ef4_r);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
-	void chance(machine_config &config);
-	void play_1(machine_config &config);
 	void chance_map(address_map &map);
 	void play_1_io(address_map &map);
 	void play_1_map(address_map &map);
-private:
+
 	uint16_t m_resetcnt;
 	uint16_t m_clockcnt;
 	uint16_t m_waitcnt;
@@ -67,34 +70,39 @@ private:
 	uint8_t m_match;
 	uint8_t m_ball;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cosmac_device> m_maincpu;
 	required_ioport_array<4> m_dips;
 	required_device<clock_device> m_monotone;
+	output_finder<46> m_digits;
 };
 
-ADDRESS_MAP_START(play_1_state::play_1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x0800, 0x081f) AM_RAM AM_SHARE("nvram") // capacitor acting as a 2-month "battery"
-	AM_RANGE(0x0c00, 0x0c1f) AM_RAM
-ADDRESS_MAP_END
+void play_1_state::play_1_map(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x0000, 0x07ff).rom().region("roms", 0);
+	map(0x0800, 0x081f).ram().share("nvram"); // capacitor acting as a 2-month "battery"
+	map(0x0c00, 0x0c1f).ram();
+}
 
-ADDRESS_MAP_START(play_1_state::chance_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x0c00, 0x0c1f) AM_RAM
-	AM_RANGE(0x0e00, 0x0e1f) AM_RAM AM_SHARE("nvram") // capacitor acting as a 2-month "battery"
-ADDRESS_MAP_END
+void play_1_state::chance_map(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x0000, 0x0bff).rom().region("roms", 0);
+	map(0x0c00, 0x0c1f).ram();
+	map(0x0e00, 0x0e1f).ram().share("nvram"); // capacitor acting as a 2-month "battery"
+}
 
-ADDRESS_MAP_START(play_1_state::play_1_io)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(port01_w) //segments
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(port02_w) // N1-8
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN3") AM_WRITE(port03_w) // D1-4
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4") AM_WRITE(port04_w) // U1-8
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN5") AM_WRITE(port05_w) // V1-8
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN6") AM_WRITE(port06_w) // W1-8
-	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
-ADDRESS_MAP_END
+void play_1_state::play_1_io(address_map &map)
+{
+	map(0x01, 0x01).portr("IN1").w(FUNC(play_1_state::port01_w)); //segments
+	map(0x02, 0x02).portr("IN2").w(FUNC(play_1_state::port02_w)); // N1-8
+	map(0x03, 0x03).portr("IN3").w(FUNC(play_1_state::port03_w)); // D1-4
+	map(0x04, 0x04).portr("IN4").w(FUNC(play_1_state::port04_w)); // U1-8
+	map(0x05, 0x05).portr("IN5").w(FUNC(play_1_state::port05_w)); // V1-8
+	map(0x06, 0x06).portr("IN6").w(FUNC(play_1_state::port06_w)); // W1-8
+	map(0x07, 0x07).r(FUNC(play_1_state::port07_r));
+}
 
 static INPUT_PORTS_START( chance )
 	PORT_START("X.0")
@@ -270,19 +278,19 @@ WRITE8_MEMBER( play_1_state::port01_w )
 	// d0-1 via 4013 to match-game board
 	// d4-7 via 4511 to match-game board
 	if (BIT(data, 0))
-		output().set_digit_value(40, patterns[1]);
+		m_digits[40] = patterns[1];
 	else
-		output().set_digit_value(40, 0);
+		m_digits[40] = 0;
 
 	if (BIT(data, 1))
 	{
-		output().set_digit_value(44, patterns[0]);
-		output().set_digit_value(45, patterns[0]);
+		m_digits[44] = patterns[0];
+		m_digits[45] = patterns[0];
 	}
 	else
 	{
-		output().set_digit_value(44, 0);
-		output().set_digit_value(45, 0);
+		m_digits[44] = 0;
+		m_digits[45] = 0;
 	}
 
 	m_match = patterns[data>>4];
@@ -339,47 +347,47 @@ WRITE8_MEMBER( play_1_state::port03_w )
 			}
 			break;
 		case 2:
-			output().set_digit_value(0, patterns[m_segment>>4]);
-			output().set_digit_value(1, patterns[m_segment&15]);
+			m_digits[0] = patterns[m_segment>>4];
+			m_digits[1] = patterns[m_segment&15];
 			break;
 		case 3:
-			output().set_digit_value(2, patterns[m_segment>>4]);
-			output().set_digit_value(3, patterns[m_segment&15]);
+			m_digits[2] = patterns[m_segment>>4];
+			m_digits[3] = patterns[m_segment&15];
 			break;
 		case 4:
-			output().set_digit_value(4, patterns[m_segment>>4]);
-			output().set_digit_value(5, patterns[m_segment&15]);
-			output().set_digit_value(14, patterns[m_segment>>4]);
-			output().set_digit_value(15, patterns[m_segment&15]);
-			output().set_digit_value(24, patterns[m_segment>>4]);
-			output().set_digit_value(25, patterns[m_segment&15]);
-			output().set_digit_value(34, patterns[m_segment>>4]);
-			output().set_digit_value(35, patterns[m_segment&15]);
+			m_digits[4] = patterns[m_segment>>4];
+			m_digits[5] = patterns[m_segment&15];
+			m_digits[14] = patterns[m_segment>>4];
+			m_digits[15] = patterns[m_segment&15];
+			m_digits[24] = patterns[m_segment>>4];
+			m_digits[25] = patterns[m_segment&15];
+			m_digits[34] = patterns[m_segment>>4];
+			m_digits[35] = patterns[m_segment&15];
 			break;
 		case 5:
-			output().set_digit_value(10, patterns[m_segment>>4]);
-			output().set_digit_value(11, patterns[m_segment&15]);
+			m_digits[10] = patterns[m_segment>>4];
+			m_digits[11] = patterns[m_segment&15];
 			break;
 		case 6:
-			output().set_digit_value(12, patterns[m_segment>>4]);
-			output().set_digit_value(13, patterns[m_segment&15]);
+			m_digits[12] = patterns[m_segment>>4];
+			m_digits[13] = patterns[m_segment&15];
 			break;
 		case 7:
-			output().set_digit_value(20, patterns[m_segment>>4]);
-			output().set_digit_value(21, patterns[m_segment&15]);
+			m_digits[20] = patterns[m_segment>>4];
+			m_digits[21] = patterns[m_segment&15];
 			break;
 		case 8:
-			output().set_digit_value(22, patterns[m_segment>>4]);
-			output().set_digit_value(23, patterns[m_segment&15]);
+			m_digits[22] = patterns[m_segment>>4];
+			m_digits[23] = patterns[m_segment&15];
 			break;
 		case 9:
-			output().set_digit_value(30, patterns[m_segment>>4]);
-			output().set_digit_value(31, patterns[m_segment&15]);
+			m_digits[30] = patterns[m_segment>>4];
+			m_digits[31] = patterns[m_segment&15];
 			break;
 		case 10:
 		case 11:
-			output().set_digit_value(32, patterns[m_segment>>4]);
-			output().set_digit_value(33, patterns[m_segment&15]);
+			m_digits[32] = patterns[m_segment>>4];
+			m_digits[33] = patterns[m_segment&15];
 			break;
 		default:
 			break;
@@ -449,10 +457,10 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 		m_maincpu->int_w(BIT(m_clockcnt, 0)); // inverted
 		m_maincpu->ef1_w(BIT(m_clockcnt, 1)); // inverted
 		if (BIT(m_clockcnt, 1))
-			output().set_digit_value(41, m_match);
+			m_digits[41] = m_match;
 		else
 		{
-			output().set_digit_value(43, m_match);
+			m_digits[43] = m_match;
 			output().set_value("led1", !BIT(m_ball, 1));
 			output().set_value("led2", !BIT(m_ball, 2));
 			output().set_value("led3", !BIT(m_ball, 3));
@@ -464,36 +472,36 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 
 MACHINE_CONFIG_START(play_1_state::play_1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CDP1802, 400000) // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
-	MCFG_CPU_PROGRAM_MAP(play_1_map)
-	MCFG_CPU_IO_MAP(play_1_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(play_1_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(play_1_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(play_1_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(play_1_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(play_1_state, ef4_r))
+	CDP1802(config, m_maincpu, 400000); // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &play_1_state::play_1_map);
+	m_maincpu->set_addrmap(AS_IO, &play_1_state::play_1_io);
+	m_maincpu->wait_cb().set(FUNC(play_1_state::wait_r));
+	m_maincpu->clear_cb().set(FUNC(play_1_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(play_1_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(play_1_state::ef3_r));
+	m_maincpu->ef4_cb().set(FUNC(play_1_state::ef4_r));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_play_1)
+	config.set_default_layout(layout_play_1);
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 100) // crossing-point detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_1_state, clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_1_state, clock_w))
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADD("monotone", CLOCK, 0) // sound device
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(play_1_state::chance)
 	play_1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(chance_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(chance_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -524,6 +532,15 @@ ROM_START(lastlap)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Third World (??/78)
+/-------------------------------------------------------------------*/
+ROM_START(thrdwrld)
+	ROM_REGION(0x800, "roms", 0)
+	ROM_LOAD("3rdwrlda.bin", 0x0000, 0x0400, CRC(253f1b93) SHA1(7ff5267d0dfe6ae19ec6b0412902f4ce83f23ed1))
+	ROM_LOAD("3rdwrldb.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
+ROM_END
+
+/*-------------------------------------------------------------------
 / Chance (09/78)
 /-------------------------------------------------------------------*/
 ROM_START(chance)
@@ -542,10 +559,21 @@ ROM_START(party)
 	ROM_LOAD("party_b.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ Night Fever (??/79)
+/-------------------------------------------------------------------*/
+ROM_START(ngtfever)
+	ROM_REGION(0x800, "roms", 0)
+	ROM_LOAD("nfevera.bin", 0x0000, 0x0400, CRC(253f1b93) SHA1(7ff5267d0dfe6ae19ec6b0412902f4ce83f23ed1))
+	ROM_LOAD("nfeverb.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
+ROM_END
 
-/* Big Town, Last Lap and Party all reportedly share the same roms with different playfield/machine artworks */
-GAME(1978, bigtown,  0,       play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, lastlap,  bigtown, play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979, party,    bigtown, play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, spcgambl, 0,       play_1, spcgambl, play_1_state, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, chance,   0,       chance, chance,   play_1_state, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+
+/* Big Town, Last Lap, Night Fever, Party and Third World all reportedly share the same roms with different playfield/machine artworks */
+GAME(1978, bigtown,  0,       play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, lastlap,  bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979, party,    bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979, ngtfever, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Night Fever",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, thrdwrld, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Third World",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, spcgambl, 0,       play_1, spcgambl, play_1_state, empty_init, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, chance,   0,       chance, chance,   play_1_state, empty_init, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

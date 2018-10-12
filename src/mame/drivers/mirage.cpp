@@ -46,6 +46,7 @@ MR_01-.3A    [a0b758aa]
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -66,7 +67,11 @@ public:
 		m_sprgen(*this, "spritegen")
 	{ }
 
+	void mirage(machine_config &config);
 
+	void init_mirage();
+
+private:
 	/* misc */
 	uint8_t m_mux_data;
 
@@ -86,13 +91,11 @@ public:
 	DECLARE_READ16_MEMBER(mjmux_r);
 	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
 	DECLARE_WRITE16_MEMBER(okim0_rombank_w);
-	DECLARE_DRIVER_INIT(mirage);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	void mirage(machine_config &config);
 	void mirage_map(address_map &map);
 };
 
@@ -158,29 +161,30 @@ WRITE16_MEMBER(miragemj_state::okim0_rombank_w)
 	m_oki_bgm->set_rom_bank(data & 0x7);
 }
 
-ADDRESS_MAP_START(miragemj_state::mirage_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void miragemj_state::mirage_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 	/* tilemaps */
-	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w) // 0x100000 - 0x101fff tested
-	AM_RANGE(0x102000, 0x103fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w) // 0x102000 - 0x102fff tested
+	map(0x100000, 0x101fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w)); // 0x100000 - 0x101fff tested
+	map(0x102000, 0x103fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w)); // 0x102000 - 0x102fff tested
 	/* linescroll */
-	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_SHARE("pf2_rowscroll")
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x130000, 0x1307ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8("oki_sfx", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x150000, 0x15000f) AM_DEVREADWRITE8("oki_bgm", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x160000, 0x160001) AM_WRITENOP
-	AM_RANGE(0x168000, 0x16800f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x16a000, 0x16a001) AM_WRITENOP
-	AM_RANGE(0x16c000, 0x16c001) AM_WRITE(okim1_rombank_w)
-	AM_RANGE(0x16c002, 0x16c003) AM_WRITE(okim0_rombank_w)
-	AM_RANGE(0x16c004, 0x16c005) AM_WRITE(mjmux_w)
-	AM_RANGE(0x16c006, 0x16c007) AM_READ(mjmux_r)
-	AM_RANGE(0x16e000, 0x16e001) AM_WRITENOP
-	AM_RANGE(0x16e002, 0x16e003) AM_READ_PORT("SYSTEM_IN")
-	AM_RANGE(0x170000, 0x173fff) AM_RAM
-ADDRESS_MAP_END
+	map(0x110000, 0x110bff).ram().share("pf1_rowscroll");
+	map(0x112000, 0x112bff).ram().share("pf2_rowscroll");
+	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x130000, 0x1307ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x140000, 0x14000f).rw(m_oki_sfx, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x150000, 0x15000f).rw(m_oki_bgm, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x160000, 0x160001).nopw();
+	map(0x168000, 0x16800f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x16a000, 0x16a001).nopw();
+	map(0x16c000, 0x16c001).w(FUNC(miragemj_state::okim1_rombank_w));
+	map(0x16c002, 0x16c003).w(FUNC(miragemj_state::okim0_rombank_w));
+	map(0x16c004, 0x16c005).w(FUNC(miragemj_state::mjmux_w));
+	map(0x16c006, 0x16c007).r(FUNC(miragemj_state::mjmux_r));
+	map(0x16e000, 0x16e001).nopw();
+	map(0x16e002, 0x16e003).portr("SYSTEM_IN");
+	map(0x170000, 0x173fff).ram();
+}
 
 
 static INPUT_PORTS_START( mirage )
@@ -190,7 +194,7 @@ static INPUT_PORTS_START( mirage )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY0")
@@ -265,7 +269,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( mirage )
+static GFXDECODE_START( gfx_mirage )
 	GFXDECODE_ENTRY("gfx1", 0, tile_8x8_layout,     0x000, 32)  /* Tiles (8x8) */
 	GFXDECODE_ENTRY("gfx1", 0, tile_16x16_layout,   0x000, 32)  /* Tiles (16x16) */
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout,        0x200, 32)  /* Sprites (16x16) */
@@ -290,14 +294,14 @@ void miragemj_state::machine_reset()
 MACHINE_CONFIG_START(miragemj_state::mirage)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
-	MCFG_CPU_PROGRAM_MAP(mirage_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93C45
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -305,10 +309,10 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(miragemj_state, screen_update_mirage)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirage)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -333,12 +337,12 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki_bgm", 2000000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki_bgm", OKIM6295, 2000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki_sfx", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki_sfx", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -368,9 +372,9 @@ ROM_START( mirage )
 	ROM_LOAD( "mbl-04.12k", 0x000000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(miragemj_state,mirage)
+void miragemj_state::init_mirage()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
 
-GAME( 1994, mirage, 0,     mirage, mirage, miragemj_state, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mirage, 0,     mirage, mirage, miragemj_state, init_mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", MACHINE_SUPPORTS_SAVE )

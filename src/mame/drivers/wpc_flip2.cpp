@@ -9,19 +9,20 @@
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(wpc_flip2_state::wpc_flip2_map)
-	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(ram_r,ram_w)
-	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmdbank1")
-	AM_RANGE(0x3200, 0x33ff) AM_RAMBANK("dmdbank2")
-	AM_RANGE(0x3400, 0x35ff) AM_RAMBANK("dmdbank3")
-	AM_RANGE(0x3600, 0x37ff) AM_RAMBANK("dmdbank4")
-	AM_RANGE(0x3800, 0x39ff) AM_RAMBANK("dmdbank5")
-	AM_RANGE(0x3a00, 0x3bff) AM_RAMBANK("dmdbank6")
-	AM_RANGE(0x3c00, 0x3faf) AM_RAM
-	AM_RANGE(0x3fb0, 0x3fff) AM_DEVREADWRITE("wpc",wpc_device,read,write) // WPC device
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("cpubank")
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("fixedbank")
-ADDRESS_MAP_END
+void wpc_flip2_state::wpc_flip2_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rw(FUNC(wpc_flip2_state::ram_r), FUNC(wpc_flip2_state::ram_w));
+	map(0x3000, 0x31ff).bankrw("dmdbank1");
+	map(0x3200, 0x33ff).bankrw("dmdbank2");
+	map(0x3400, 0x35ff).bankrw("dmdbank3");
+	map(0x3600, 0x37ff).bankrw("dmdbank4");
+	map(0x3800, 0x39ff).bankrw("dmdbank5");
+	map(0x3a00, 0x3bff).bankrw("dmdbank6");
+	map(0x3c00, 0x3faf).ram();
+	map(0x3fb0, 0x3fff).rw(m_wpc, FUNC(wpc_device::read), FUNC(wpc_device::write)); // WPC device
+	map(0x4000, 0x7fff).bankr("cpubank");
+	map(0x8000, 0xffff).bankr("fixedbank");
+}
 
 static INPUT_PORTS_START( wpc_flip2 )
 	PORT_START("INP0")
@@ -181,37 +182,36 @@ INPUT_PORTS_START( wpc_dw )
 	PORT_BIT( 0xfd, IP_ACTIVE_LOW, IPT_UNKNOWN )  // playfield glass - so we don't annoyed by constant warnings about it.
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(wpc_flip2_state,wpc_flip2)
+void wpc_flip2_state::init_wpc_flip2()
 {
 	wpc_flip1_state::init_wpc_flip1();
 }
 
 MACHINE_CONFIG_START(wpc_flip2_state::wpc_flip2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
-	MCFG_CPU_PROGRAM_MAP(wpc_flip2_map)
+	MCFG_DEVICE_ADD("maincpu", M6809, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(wpc_flip2_map)
 
 	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(wpc_dot_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(wpc_dot_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(wpc_dot_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(wpc_dot_state,wpc_sound_ctrl_r),WRITE8(wpc_dot_state,wpc_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(wpc_dot_state,wpc_sound_data_r),WRITE8(wpc_dot_state,wpc_sound_data_w))
-	MCFG_WPC_DMDBANK(WRITE8(wpc_dot_state,wpc_dmdbank_w))
+	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_flip2_state,wpc_irq_w))
+	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_flip2_state,wpc_firq_w))
+	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_flip2_state,wpc_rombank_w))
+	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_flip2_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_flip2_state,wpc_sound_ctrl_w))
+	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_flip2_state,wpc_sound_data_r),WRITE8(*this, wpc_flip2_state,wpc_sound_data_w))
+	MCFG_WPC_DMDBANK(WRITE8(*this, wpc_flip2_state,wpc_dmdbank_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
-	MCFG_WPC_ROM_REGION(":sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(wpc_dot_state,wpcsnd_reply_w))
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
+	MCFG_WPC_ROM_REGION("sound1")
+	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_flip2_state,wpcsnd_reply_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(128, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 32-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(wpc_dot_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_native_aspect();
+	screen.set_size(128, 32);
+	screen.set_visarea(0, 128-1, 0, 32-1);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(wpc_flip2_state::screen_update));
 MACHINE_CONFIG_END
 
 /*-----------------
@@ -850,53 +850,53 @@ ROM_START(lc_11)
 ROM_END
 
 
-GAME(1993,  br_l4,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Black Rose (L-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  br_p17,     br_l4,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Black Rose (SP-1)",                                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  br_l1,      br_l4,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Black Rose (L-1)",                                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  br_l3,      br_l4,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Black Rose (L-3)",                                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  drac_l1,    0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "Bram Stoker's Dracula (L-1)",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  drac_p11,   drac_l1,    wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "Bram Stoker's Dracula (P-11)",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  cftbl_l4,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Creature from the Black Lagoon (L-4)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  cftbl_l3,   cftbl_l4,   wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Creature from the Black Lagoon (L-3,SP-1)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  cftbl_l2,   cftbl_l4,   wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Creature from the Black Lagoon (L-2)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  dw_l2,      0,          wpc_flip2,  wpc_dw,    wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Doctor Who (L-2)",                                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  dw_l1,      dw_l2,      wpc_flip2,  wpc_dw,    wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Doctor Who (L-1)",                                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  dw_p5,      dw_l2,      wpc_flip2,  wpc_dw,    wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Doctor Who (P-5)",                                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  ft_l5,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "Fish Tales (L-5)",                                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  ft_l3,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "Fish Tales (L-3)",                                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  ft_l4,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "Fish Tales (L-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  ft_p4,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "Fish Tales (P-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  tafg_lx3,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition Gold (LX-3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  tafg_h3,    tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition (H-3)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  tafg_la2,   tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition (LA-2)",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  tafg_la3,   tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition (LA-3)",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  gw_l5,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (L-5)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  gw_pb,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (P-B)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  gw_pc,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (P-C)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  gw_l1,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (L-1)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  gw_l2,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (L-2)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  gw_l3,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (L-3)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  gw_p7,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (P-7)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1998,  tz_92,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (9.2)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1998,  tz_94h,     tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (9.4H)",                                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1998,  tz_94ch,    tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (9.4CH)",                                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  tz_pa1,     tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (PA-1)",                                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  tz_p3,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (P-3)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  tz_p4,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (P-4)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  tz_l1,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-1)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  tz_l2,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-2)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  tz_ifpa,    tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (IFPA rules)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  tz_l3,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-3)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  tz_l4,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-4)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  tz_h7,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (H-7)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  tz_h8,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (H-8)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(2000,  ww_l5,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "White Water (L-5)",                                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(2000,  ww_lh6,     ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "White Water (LH-6)",                                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(2000,  ww_lh5,     ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "White Water (LH-5)",                                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  ww_l4,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "White Water (L-4)",                                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  ww_l3,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "White Water (L-3)",                                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  ww_l2,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "White Water (L-2)",                                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  ww_p8,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "White Water (P-8 P-2 sound)",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  ww_p1,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "White Water (P-8 P-1 sound)",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  strik_l4,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "Strike Master (L-4)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  lc_11,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "League Champ (1.1)",                                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  br_l4,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Black Rose (L-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  br_p17,     br_l4,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Black Rose (SP-1)",                                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  br_l1,      br_l4,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Black Rose (L-1)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  br_l3,      br_l4,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Black Rose (L-3)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  drac_l1,    0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Bram Stoker's Dracula (L-1)",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  drac_p11,   drac_l1,    wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Bram Stoker's Dracula (P-11)",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  cftbl_l4,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Creature from the Black Lagoon (L-4)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  cftbl_l3,   cftbl_l4,   wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Creature from the Black Lagoon (L-3,SP-1)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  cftbl_l2,   cftbl_l4,   wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Creature from the Black Lagoon (L-2)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  dw_l2,      0,          wpc_flip2,  wpc_dw,    wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Doctor Who (L-2)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  dw_l1,      dw_l2,      wpc_flip2,  wpc_dw,    wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Doctor Who (L-1)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  dw_p5,      dw_l2,      wpc_flip2,  wpc_dw,    wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Doctor Who (P-5)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  ft_l5,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (L-5)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  ft_l3,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (L-3)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  ft_l4,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (L-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  ft_p4,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (P-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  tafg_lx3,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition Gold (LX-3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  tafg_h3,    tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition (H-3)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  tafg_la2,   tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition (LA-2)",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  tafg_la3,   tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition (LA-3)",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  gw_l5,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (L-5)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  gw_pb,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (P-B)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  gw_pc,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (P-C)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  gw_l1,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (L-1)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  gw_l2,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (L-2)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  gw_l3,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (L-3)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  gw_p7,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "The Getaway: High Speed II (P-7)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1998,  tz_92,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (9.2)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1998,  tz_94h,     tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (9.4H)",                                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1998,  tz_94ch,    tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (9.4CH)",                                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  tz_pa1,     tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (PA-1)",                                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  tz_p3,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (P-3)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  tz_p4,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (P-4)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  tz_l1,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-1)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  tz_l2,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-2)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  tz_ifpa,    tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (IFPA rules)",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  tz_l3,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-3)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  tz_l4,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-4)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  tz_h7,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (H-7)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  tz_h8,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (H-8)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2000,  ww_l5,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (L-5)",                                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2000,  ww_lh6,     ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (LH-6)",                                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2000,  ww_lh5,     ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (LH-5)",                                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  ww_l4,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (L-4)",                                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  ww_l3,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (L-3)",                                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  ww_l2,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (L-2)",                                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  ww_p8,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (P-8 P-2 sound)",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  ww_p1,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (P-8 P-1 sound)",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  strik_l4,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Strike Master (L-4)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  lc_11,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "League Champ (1.1)",                                       MACHINE_IS_SKELETON_MECHANICAL)

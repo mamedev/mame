@@ -382,6 +382,20 @@ end
 
 
 ---------------------------------------------------
+-- Hudsonsoft HuC6230 SoundBox
+--@src/devices/sound/huc6230.h,SOUNDS["HUC6230"] = true
+---------------------------------------------------
+
+if (SOUNDS["HUC6230"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/huc6230.cpp",
+		MAME_DIR .. "src/devices/sound/huc6230.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- Hudsonsoft C6280 sound chip
 --@src/devices/sound/c6280.h,SOUNDS["C6280"] = true
 ---------------------------------------------------
@@ -755,6 +769,8 @@ if (SOUNDS["QSOUND"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/qsound.cpp",
 		MAME_DIR .. "src/devices/sound/qsound.h",
+		MAME_DIR .. "src/devices/sound/qsoundhle.cpp",
+		MAME_DIR .. "src/devices/sound/qsoundhle.h",
 	}
 end
 
@@ -1455,5 +1471,29 @@ if (SOUNDS["LC7535"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/lc7535.cpp",
 		MAME_DIR .. "src/devices/sound/lc7535.h",
+	}
+end
+
+---------------------------------------------------
+-- NEC uPD934G
+--@src/devices/sound/upd934g.h,SOUNDS["UPD934G"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD934G"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd934g.cpp",
+		MAME_DIR .. "src/devices/sound/upd934g.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/iopspu.h,SOUNDS["IOPSPU"] = true
+---------------------------------------------------
+
+if (SOUNDS["IOPSPU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/iopspu.cpp",
+		MAME_DIR .. "src/devices/sound/iopspu.h",
 	}
 end

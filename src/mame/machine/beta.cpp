@@ -72,7 +72,7 @@ void beta_disk_device::disable()
 READ8_MEMBER(beta_disk_device::status_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->status_r(space, 0);
+		return m_wd179x->status_r();
 	} else {
 		return 0xff;
 	}
@@ -81,7 +81,7 @@ READ8_MEMBER(beta_disk_device::status_r)
 READ8_MEMBER(beta_disk_device::track_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->track_r(space, 0);
+		return m_wd179x->track_r();
 	} else {
 		return 0xff;
 	}
@@ -90,7 +90,7 @@ READ8_MEMBER(beta_disk_device::track_r)
 READ8_MEMBER(beta_disk_device::sector_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->sector_r(space, 0);
+		return m_wd179x->sector_r();
 	} else {
 		return 0xff;
 	}
@@ -99,7 +99,7 @@ READ8_MEMBER(beta_disk_device::sector_r)
 READ8_MEMBER(beta_disk_device::data_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->data_r(space, 0);
+		return m_wd179x->data_r();
 	} else {
 		return 0xff;
 	}
@@ -146,28 +146,28 @@ WRITE8_MEMBER(beta_disk_device::param_w)
 WRITE8_MEMBER(beta_disk_device::command_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->cmd_w(space, 0, data);
+		m_wd179x->cmd_w(data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::track_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->track_w(space, 0, data);
+		m_wd179x->track_w(data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::sector_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->sector_w(space, 0, data);
+		m_wd179x->sector_w(data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::data_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->data_w(space, 0, data);
+		m_wd179x->data_w(data);
 	}
 }
 
@@ -175,9 +175,10 @@ FLOPPY_FORMATS_MEMBER(beta_disk_device::floppy_formats)
 	FLOPPY_TRD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( beta_disk_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void beta_disk_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 ROM_START( beta_disk )
@@ -186,9 +187,9 @@ ROM_START( beta_disk )
 
 	ROM_LOAD( "trd503zxvgs.rom",0x00000, 0x4000, CRC(b90ee684) SHA1(c78e1b36812fb2b3e7a62e66049c850d27de74a6))
 	ROM_LOAD( "trd503m.rom",    0x00000, 0x4000, CRC(2f97fe06) SHA1(6b9decc07d5d7322c6c283f5fe950f530a42d70d))
-	ROM_LOAD( "trd503[a].rom",  0x00000, 0x4000, CRC(c43d717f) SHA1(0a74bd34538a03d0e1d214b425d95c14ad10c8c4))
-	ROM_LOAD( "trd503[a2].rom", 0x00000, 0x4000, CRC(121889b0) SHA1(c9d69cf3a0219f6e37e7eb5046961fa8fa8eb2c6))
-	ROM_LOAD( "trd503[a3].rom", 0x00000, 0x4000, CRC(1c5a25b1) SHA1(4a6fbabd82a6a8f3986ac77e7157d1a2551ed40d))
+	ROM_LOAD( "trd503,a.rom",   0x00000, 0x4000, CRC(c43d717f) SHA1(0a74bd34538a03d0e1d214b425d95c14ad10c8c4))
+	ROM_LOAD( "trd503,a2.rom",  0x00000, 0x4000, CRC(121889b0) SHA1(c9d69cf3a0219f6e37e7eb5046961fa8fa8eb2c6))
+	ROM_LOAD( "trd503,a3.rom",  0x00000, 0x4000, CRC(1c5a25b1) SHA1(4a6fbabd82a6a8f3986ac77e7157d1a2551ed40d))
 	ROM_LOAD( "trd503beta3.rom",0x00000, 0x4000, CRC(561662f2) SHA1(4cea8a361eb848cf0ad59605c83d57c30521cfd5))
 	ROM_LOAD( "trd503beta4.rom",0x00000, 0x4000, CRC(23dbc387) SHA1(74b80d3f07dc95e9f09b83c3df4724f063f47116))
 	ROM_LOAD( "trd503all.rom",  0x00000, 0x4000, CRC(4c0187ab) SHA1(21f611e5e0bbf5d6450606e30b470f7c2c9640f1))
@@ -196,7 +197,7 @@ ROM_START( beta_disk )
 	ROM_LOAD( "trd503ext.rom",  0x00000, 0x4000, CRC(abb139e7) SHA1(3c1736857655a48375d30b3865963090ba635635))
 	ROM_LOAD( "trd503kay.rom",  0x00000, 0x4000, CRC(77baccbb) SHA1(9c5fb89b57643f723246453809dad3f669bf59a3))
 	ROM_LOAD( "trd503xbios.rom",0x00000, 0x4000, CRC(8be427cc) SHA1(78f423fd200e720aa6b857f00969fa1f8c7da20e))
-	ROM_LOAD( "trd503[a4].rom", 0x00000, 0x4000, CRC(c2387608) SHA1(93e0b92a3f38b59cc006d22f9c9299f5377b15e5))
+	ROM_LOAD( "trd503,a4.rom",  0x00000, 0x4000, CRC(c2387608) SHA1(93e0b92a3f38b59cc006d22f9c9299f5377b15e5))
 
 
 	ROM_LOAD( "trd504.rom",     0x00000, 0x4000, CRC(ba310874) SHA1(05e55e37df8eee6c68601ba9cf6c92195852ce3f))
@@ -213,14 +214,14 @@ ROM_START( beta_disk )
 	ROM_LOAD( "trd504em.rom",   0x00000, 0x4000, CRC(0d3f8b43) SHA1(d6783983a16b17b79337c22e9460e1cfde3744ae))
 	ROM_LOAD( "trd504-1.rom",   0x00000, 0x4000, CRC(da170c65) SHA1(80f0fe79cbf393ac91ff971d31ff9eab0c9a959e))
 	ROM_LOAD( "trd504m.rom",    0x00000, 0x4000, CRC(2f2cb630) SHA1(40b1f87f8be4e09630d7eb7c14561dde0b85c0c9))
-	ROM_LOAD( "trd504em[a].rom",0x00000, 0x4000, CRC(fcbf11e8) SHA1(8050d371d7049e0c3e946964643396a39aa5ab0f))
+	ROM_LOAD( "trd504em,a.rom", 0x00000, 0x4000, CRC(fcbf11e8) SHA1(8050d371d7049e0c3e946964643396a39aa5ab0f))
 	ROM_LOAD( "trd5043.rom",    0x00000, 0x4000, CRC(165d5ef8) SHA1(99d25234154e4a8b3ad5e06f260b6c41c253b333))
 
 	ROM_LOAD( "trd505.rom",     0x00000, 0x4000, CRC(fdff3810) SHA1(0a0e284d4764a542aa3e5d7c43d0291036e16c35))
-	ROM_LOAD( "trd505[a].rom",  0x00000, 0x4000, CRC(03b76c8f) SHA1(ef2a07767d3b229aa4573dcfee905156a83bc32d))
+	ROM_LOAD( "trd505,a.rom",   0x00000, 0x4000, CRC(03b76c8f) SHA1(ef2a07767d3b229aa4573dcfee905156a83bc32d))
 	ROM_LOAD( "trd505h.rom",    0x00000, 0x4000, CRC(9ba15549) SHA1(5908784cdfb782066bde08f186f0bbb6f6b80545))
 	ROM_LOAD( "trd505d.rom",    0x00000, 0x4000, CRC(31e4be08) SHA1(dd08bdea8b5caa35569f49770e380d16bb37502b))
-	ROM_LOAD( "trd505[a2].rom", 0x00000, 0x4000, CRC(a102e726) SHA1(a3f0ef7b7d8b3022f306be8d9e8a51ae699097df))
+	ROM_LOAD( "trd505,a2.rom",  0x00000, 0x4000, CRC(a102e726) SHA1(a3f0ef7b7d8b3022f306be8d9e8a51ae699097df))
 
 	ROM_LOAD( "trd56661.rom",   0x00000, 0x4000, CRC(8528c789) SHA1(1332a01137bd537fee696ba7adddc0a15b3237c4))
 	ROM_LOAD( "trd5666hte.rom", 0x00000, 0x4000, CRC(03841161) SHA1(4e523768231130947a81247e116fc049bd6da963))
@@ -266,17 +267,14 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(beta_disk_device::device_add_mconfig)
-	MCFG_KR1818VG93_ADD("wd179x", XTAL(8'000'000) / 8)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:3", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void beta_disk_device::device_add_mconfig(machine_config &config)
+{
+	KR1818VG93(config, m_wd179x, 8_MHz_XTAL / 8);
+	FLOPPY_CONNECTOR(config, m_floppy0, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy2, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy3, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+}
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

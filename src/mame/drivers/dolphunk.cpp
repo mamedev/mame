@@ -99,26 +99,31 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void dauphin(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_WRITE8_MEMBER(port06_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dauphin_c);
-	void dauphin(machine_config &config);
 	void dauphin_io(address_map &map);
 	void dauphin_mem(address_map &map);
-private:
+
 	uint8_t m_cass_data;
 	uint8_t m_last_key;
 	bool m_cass_state;
 	bool m_cassold;
 	bool m_speaker_state;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
+	output_finder<4> m_digits;
 };
 
 READ_LINE_MEMBER( dauphin_state::cass_r )
@@ -133,7 +138,7 @@ WRITE_LINE_MEMBER( dauphin_state::cass_w )
 
 WRITE8_MEMBER( dauphin_state::port00_w )
 {
-	output().set_digit_value(offset, data);
+	m_digits[offset] = data;
 }
 
 WRITE8_MEMBER( dauphin_state::port06_w )
@@ -184,19 +189,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(dauphin_state::dauphin_c)
 		m_cass->output(BIT(m_cass_data, 0) ? -1.0 : +1.0); // 2000Hz
 }
 
-ADDRESS_MAP_START(dauphin_state::dauphin_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x01ff) AM_ROM
-	AM_RANGE( 0x0200, 0x02ff) AM_RAM
-	AM_RANGE( 0x0c00, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void dauphin_state::dauphin_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x01ff).rom();
+	map(0x0200, 0x02ff).ram();
+	map(0x0c00, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(dauphin_state::dauphin_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_WRITE(port00_w) // 4-led display
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)  // speaker (NOT a keyclick)
-	AM_RANGE(0x07, 0x07) AM_READ(port07_r) // pushbuttons
-ADDRESS_MAP_END
+void dauphin_state::dauphin_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x03).w(FUNC(dauphin_state::port00_w)); // 4-led display
+	map(0x06, 0x06).w(FUNC(dauphin_state::port06_w));  // speaker (NOT a keyclick)
+	map(0x07, 0x07).r(FUNC(dauphin_state::port07_r)); // pushbuttons
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dauphin )
@@ -228,24 +235,22 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(dauphin_state::dauphin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(dauphin_mem)
-	MCFG_CPU_IO_MAP(dauphin_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(dauphin_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(dauphin_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(dauphin_mem)
+	MCFG_DEVICE_IO_MAP(dauphin_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, dauphin_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, dauphin_state, cass_w))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_dolphunk)
+	config.set_default_layout(layout_dolphunk);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dauphin_c", dauphin_state, dauphin_c, attotime::from_hz(4000))
 MACHINE_CONFIG_END
 
@@ -267,5 +272,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY              FULLNAME   FLAGS
-COMP( 1979, dauphin,  0,      0,      dauphin,  dauphin, dauphin_state, 0,    "LCD EPFL Stoppani", "Dauphin", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY              FULLNAME   FLAGS
+COMP( 1979, dauphin, 0,      0,      dauphin, dauphin, dauphin_state, empty_init, "LCD EPFL Stoppani", "Dauphin", 0 )

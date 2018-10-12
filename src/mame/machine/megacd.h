@@ -97,6 +97,7 @@ public:
 	READ16_MEMBER( font_converted_r );
 
 	void segacd_map(address_map &map);
+	void segacd_pcm_map(address_map &map);
 protected:
 	sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

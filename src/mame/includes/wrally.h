@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "emupal.h"
 
 class wrally_state : public driver_device
 {
@@ -26,7 +27,7 @@ public:
 
 	void wrally(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(shareram_r);
 	DECLARE_WRITE8_MEMBER(shareram_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
@@ -50,7 +51,6 @@ protected:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_outlatch;
 	required_device<gfxdecode_device> m_gfxdecode;

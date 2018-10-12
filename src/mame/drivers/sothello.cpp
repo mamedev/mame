@@ -54,11 +54,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_subcpu(*this, "subcpu"),
-		m_v9938(*this, "v9938"),
 		m_msm(*this, "msm"),
 		m_mainbank(*this, "mainbank")
 	{ }
 
+	void sothello(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(subcpu_halt_set);
 	DECLARE_READ8_MEMBER(subcpu_halt_clear);
@@ -73,17 +75,15 @@ public:
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
-	void sothello(machine_config &config);
 	void maincpu_io_map(address_map &map);
 	void maincpu_mem_map(address_map &map);
 	void soundcpu_io_map(address_map &map);
 	void soundcpu_mem_map(address_map &map);
 	void subcpu_mem_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	int m_subcpu_status;
 	int m_soundcpu_busy;
 	int m_msm_data;
@@ -95,7 +95,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<v9938_device> m_v9938;
 	required_device<msm5205_device> m_msm;
 	required_memory_bank m_mainbank;
 };
@@ -138,7 +137,7 @@ TIMER_CALLBACK_MEMBER(sothello_state::subcpu_suspend)
 TIMER_CALLBACK_MEMBER(sothello_state::subcpu_resume)
 {
 	m_subcpu->resume(SUSPEND_REASON_HALT);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(sothello_state::subcpu_halt_set)
@@ -166,28 +165,30 @@ READ8_MEMBER(sothello_state::soundcpu_status_r)
 	return m_soundcpu_busy;
 }
 
-ADDRESS_MAP_START(sothello_state::maincpu_mem_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("mainsub")
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sothello_state::maincpu_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0xc000, 0xc7ff).ram().mirror(0x1800).share("mainsub");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sothello_state::maincpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x0f) AM_READ_PORT("INPUT1")
-	AM_RANGE( 0x10, 0x1f) AM_READ_PORT("INPUT2")
-	AM_RANGE( 0x20, 0x2f) AM_READ_PORT("SYSTEM")
-	AM_RANGE( 0x30, 0x30) AM_READ(subcpu_halt_set)
-	AM_RANGE( 0x31, 0x31) AM_READ(subcpu_halt_clear)
-	AM_RANGE( 0x32, 0x32) AM_READ(subcpu_comm_status)
-	AM_RANGE( 0x33, 0x33) AM_READ(soundcpu_status_r)
-	AM_RANGE( 0x40, 0x4f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE( 0x50, 0x50) AM_WRITE(bank_w)
-	AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
+void sothello_state::maincpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).portr("INPUT1");
+	map(0x10, 0x1f).portr("INPUT2");
+	map(0x20, 0x2f).portr("SYSTEM");
+	map(0x30, 0x30).r(FUNC(sothello_state::subcpu_halt_set));
+	map(0x31, 0x31).r(FUNC(sothello_state::subcpu_halt_clear));
+	map(0x32, 0x32).r(FUNC(sothello_state::subcpu_comm_status));
+	map(0x33, 0x33).r(FUNC(sothello_state::soundcpu_status_r));
+	map(0x40, 0x4f).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x50, 0x50).w(FUNC(sothello_state::bank_w));
+	map(0x60, 0x61).mirror(0x02).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 						/* not sure, but the A1 line is ignored, code @ $8b8 */
-	AM_RANGE( 0x70, 0x73) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
-ADDRESS_MAP_END
+	map(0x70, 0x73).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
+}
 
 /* sound Z80 */
 
@@ -223,20 +224,22 @@ WRITE8_MEMBER(sothello_state::soundcpu_int_clear_w)
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(sothello_state::soundcpu_mem_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM AM_REGION("soundcpu", 0)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sothello_state::soundcpu_mem_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom().region("soundcpu", 0);
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sothello_state::soundcpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x01, 0x01) AM_WRITE(msm_data_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(msm_cfg_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(soundcpu_busyflag_set_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(soundcpu_busyflag_reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(soundcpu_int_clear_w)
-ADDRESS_MAP_END
+void sothello_state::soundcpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x01, 0x01).w(FUNC(sothello_state::msm_data_w));
+	map(0x02, 0x02).w(FUNC(sothello_state::msm_cfg_w));
+	map(0x03, 0x03).w(FUNC(sothello_state::soundcpu_busyflag_set_w));
+	map(0x04, 0x04).w(FUNC(sothello_state::soundcpu_busyflag_reset_w));
+	map(0x05, 0x05).w(FUNC(sothello_state::soundcpu_int_clear_w));
+}
 
 /* sub 6809 */
 
@@ -248,7 +251,7 @@ void sothello_state::unlock_shared_ram()
 	}
 	else
 	{
-		//logerror("Sub cpu active! @%x\n",device().safe_pc());
+		//logerror("%s Sub cpu active!\n",machine().describe_context());
 	}
 }
 
@@ -263,12 +266,13 @@ READ8_MEMBER(sothello_state::subcpu_status_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(sothello_state::subcpu_mem_map)
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(subcpu_status_r, subcpu_status_w)
-	AM_RANGE(0x2000, 0x77ff) AM_RAM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("mainsub")  /* upper 0x800 of 6264 is shared with main cpu */
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("subcpu", 0)
-ADDRESS_MAP_END
+void sothello_state::subcpu_mem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(FUNC(sothello_state::subcpu_status_r), FUNC(sothello_state::subcpu_status_w));
+	map(0x2000, 0x77ff).ram();
+	map(0x7800, 0x7fff).ram().share("mainsub");  /* upper 0x800 of 6264 is shared with main cpu */
+	map(0x8000, 0xffff).rom().region("subcpu", 0);
+}
 
 static INPUT_PORTS_START( sothello )
 	PORT_START("INPUT1")
@@ -339,7 +343,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
 	/* only 4 bits are used */
-	m_msm->data_w(m_msm_data & 0x0f);
+	m_msm->write_data(m_msm_data & 0x0f);
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -353,30 +357,32 @@ void sothello_state::machine_reset()
 MACHINE_CONFIG_START(sothello_state::sothello)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272) / 6)
-	MCFG_CPU_PROGRAM_MAP(maincpu_mem_map)
-	MCFG_CPU_IO_MAP(maincpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272) / 6)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem_map)
+	MCFG_DEVICE_IO_MAP(maincpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(21'477'272) / 6)
-	MCFG_CPU_PROGRAM_MAP(soundcpu_mem_map)
-	MCFG_CPU_IO_MAP(soundcpu_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(21'477'272) / 6)
+	MCFG_DEVICE_PROGRAM_MAP(soundcpu_mem_map)
+	MCFG_DEVICE_IO_MAP(soundcpu_io_map)
 
-	MCFG_CPU_ADD("subcpu", MC6809, XTAL(8'000'000)) // divided by 4 internally
-	MCFG_CPU_PROGRAM_MAP(subcpu_mem_map)
+	MCFG_DEVICE_ADD("subcpu", MC6809, XTAL(8'000'000)) // divided by 4 internally
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, XTAL(21'477'272))
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", XTAL(21'477'272))
+	v9938_device &v9938(V9938(config, "v9938", XTAL(21'477'272)));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(VDP_MEM);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(21'477'272) / 12)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(21'477'272) / 12)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("subcpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
@@ -387,8 +393,8 @@ MACHINE_CONFIG_START(sothello_state::sothello)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(sothello_state, adpcm_int))      /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, sothello_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -413,4 +419,4 @@ ROM_START( sothello )
 	ROM_LOAD( "6.7f",   0x0000, 0x8000, CRC(ee80fc78) SHA1(9a9d7925847d7a36930f0761c70f67a9affc5e7c) )
 ROM_END
 
-GAME( 1986, sothello,  0,       sothello,  sothello, sothello_state,  0, ROT0, "Success / Fujiwara", "Super Othello", 0 )
+GAME( 1986, sothello,  0,       sothello,  sothello, sothello_state, empty_init, ROT0, "Success / Fujiwara", "Super Othello", 0 )

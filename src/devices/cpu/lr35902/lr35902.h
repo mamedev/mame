@@ -7,7 +7,7 @@
 
 
 #define MCFG_LR35902_TIMER_CB(_devcb) \
-	devcb = &downcast<lr35902_cpu_device &>(*device).set_timer_cb(DEVCB_##_devcb);
+	downcast<lr35902_cpu_device &>(*device).set_timer_cb(DEVCB_##_devcb);
 
 // The first release of this CPU has a bug where the programcounter
 // is not incremented properly after an interrupt after the halt opcode.
@@ -19,7 +19,7 @@
 // a 16-bit register in the $fe** region.
 // note: oldval is in hiword, newval is in loword
 #define MCFG_LR35902_INCDEC16_CB(_devcb) \
-	devcb = &downcast<lr35902_cpu_device &>(*device).set_incdec16_cb(DEVCB_##_devcb);
+	downcast<lr35902_cpu_device &>(*device).set_incdec16_cb(DEVCB_##_devcb);
 
 
 enum
@@ -89,7 +89,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	inline void cycles_passed(uint8_t cycles);
 	inline uint8_t mem_read_byte(uint16_t addr);

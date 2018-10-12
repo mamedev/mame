@@ -1679,27 +1679,46 @@ void floppy_image_format_t::normalize_times(std::vector<uint32_t> &buffer)
 	}
 }
 
-void floppy_image_format_t::generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack)
+void floppy_image_format_t::generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack, int splice)
 {
-	// Maximal number of cells which happens when the buffer is all 1
 	std::vector<uint32_t> &dest = image->get_buffer(track, head, subtrack);
 	dest.clear();
+
+	// If the bitstream has an odd number of inversions, one needs to be added.
+	// Put in in the middle of the half window after the center inversion, where
+	// any fdc ignores it.
+
+	int inversions = 0;
+	for(int i=0; i != track_size; i++)
+		if(trackbuf[i >> 3] & (0x80 >> (i & 7)))
+			inversions++;
+	bool need_flux = inversions & 1;
 
 	uint32_t cbit = floppy_image::MG_A;
 	uint32_t count = 0;
 	for(int i=0; i != track_size; i++)
 		if(trackbuf[i >> 3] & (0x80 >> (i & 7))) {
-			dest.push_back(cbit | (count+1));
+			dest.push_back(cbit | (count+2));
 			cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-			count = 1;
+			if(need_flux) {
+				need_flux = false;
+				dest.push_back(cbit | 1);
+				cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
+				count = 1;
+			} else
+				count = 2;
 		} else
-			count += 2;
+			count += 4;
 
 	if(count)
 		dest.push_back(cbit | count);
 
 	normalize_times(dest);
-	image->set_write_splice_position(track, head, 0, subtrack);
+
+	if(splice >= 0 || splice < track_size) {
+		int splpos = uint64_t(200000000) * splice / track_size;
+		image->set_write_splice_position(track, head, splpos, subtrack);
+	}
 }
 
 void floppy_image_format_t::generate_track_from_levels(int track, int head, std::vector<uint32_t> &trackbuf, int splice_pos, floppy_image *image)

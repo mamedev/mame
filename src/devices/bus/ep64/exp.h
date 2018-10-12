@@ -68,16 +68,16 @@
 	MCFG_DEVICE_SLOT_INTERFACE(ep64_expansion_bus_cards, _def_slot, false)
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_DAVE(_tag) \
-	downcast<ep64_expansion_bus_slot_device &>(*device).set_dave_tag("^" _tag);
+	downcast<ep64_expansion_bus_slot_device &>(*device).set_dave_tag(_tag);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &downcast<ep64_expansion_bus_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<ep64_expansion_bus_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_NMI_CALLBACK(_write) \
-	devcb = &downcast<ep64_expansion_bus_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
+	downcast<ep64_expansion_bus_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_WAIT_CALLBACK(_write) \
-	devcb = &downcast<ep64_expansion_bus_slot_device &>(*device).set_wait_wr_callback(DEVCB_##_write);
+	downcast<ep64_expansion_bus_slot_device &>(*device).set_wait_wr_callback(DEVCB_##_write);
 
 
 
@@ -143,7 +143,7 @@ protected:
 DECLARE_DEVICE_TYPE(EP64_EXPANSION_BUS_SLOT, ep64_expansion_bus_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( ep64_expansion_bus_cards );
+void ep64_expansion_bus_cards(device_slot_interface &device);
 
 
 #endif // MAME_BUS_EP64_EXP_H

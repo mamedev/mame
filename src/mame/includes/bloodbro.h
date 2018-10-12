@@ -2,6 +2,7 @@
 // copyright-holders:Carlos A. Lozano
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
+#include "emupal.h"
 
 class bloodbro_state : public driver_device, protected seibu_sound_common
 {
@@ -47,7 +48,7 @@ public:
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
 	DECLARE_WRITE16_MEMBER(weststry_layer_scroll_w);
-	DECLARE_WRITE8_MEMBER(weststry_soundlatch_w);
+	void weststry_soundlatch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(weststry_opl_irq_w);
 	DECLARE_WRITE8_MEMBER(weststry_opl_w);
 	DECLARE_WRITE8_MEMBER(weststry_soundnmi_ack_w);
@@ -65,7 +66,7 @@ public:
 	void bloodbro_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(weststry);
+	void init_weststry();
 	void bloodbro(machine_config &config);
 	void skysmash(machine_config &config);
 	void weststry(machine_config &config);

@@ -272,7 +272,6 @@ GFX:                Custom 145     ( 80 pin PQFP)
 */
 #include "emu.h"
 #include "includes/namconb1.h"
-#include "machine/namcoic.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/namcomcu.h"
@@ -690,46 +689,48 @@ WRITE32_MEMBER(namconb1_state::share_w)
 	COMBINE_DATA(m_namconb_shareram+offset*2);
 }
 
-ADDRESS_MAP_START(namconb1_state::namconb1_am)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_READ(gunbulet_gun_r)
-	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
-	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(share_r, share_w)
-	AM_RANGE(0x208000, 0x2fffff) AM_RAM
-	AM_RANGE(0x400000, 0x40001f) AM_READWRITE8(namconb1_cpureg_r, namconb1_cpureg_w, 0xffffffff)
-	AM_RANGE(0x580000, 0x5807ff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
-	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
-	AM_RANGE(0x620000, 0x620007) AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
-	AM_RANGE(0x640000, 0x64ffff) AM_READWRITE16(c123_tilemap_videoram_r,c123_tilemap_videoram_w,0xffffffff)
-	AM_RANGE(0x660000, 0x66003f) AM_READWRITE16(c123_tilemap_control_r,c123_tilemap_control_w,0xffffffff)
-	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_SHARE("spritebank32")
-	AM_RANGE(0x6e0000, 0x6e001f) AM_READ(custom_key_r) AM_WRITENOP
-	AM_RANGE(0x700000, 0x707fff) AM_DEVREADWRITE8("c116", namco_c116_device, read, write, 0xffffffff)
-ADDRESS_MAP_END
+void namconb1_state::namconb1_am(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10001f).r(FUNC(namconb1_state::gunbulet_gun_r));
+	map(0x1c0000, 0x1cffff).ram();
+	map(0x1e4000, 0x1e4003).rw(FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
+	map(0x200000, 0x207fff).rw(FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
+	map(0x208000, 0x2fffff).ram();
+	map(0x400000, 0x40001f).rw(FUNC(namconb1_state::namconb1_cpureg_r), FUNC(namconb1_state::namconb1_cpureg_w));
+	map(0x580000, 0x5807ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
+	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
+	map(0x640000, 0x64ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
+	map(0x660000, 0x66003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control_r), FUNC(namco_c123tmap_device::control_w));
+	map(0x680000, 0x68000f).ram().share("spritebank32");
+	map(0x6e0000, 0x6e001f).r(FUNC(namconb1_state::custom_key_r)).nopw();
+	map(0x700000, 0x707fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
+}
 
-ADDRESS_MAP_START(namconb1_state::namconb2_am)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
-	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(share_r, share_w)
-	AM_RANGE(0x208000, 0x2fffff) AM_RAM
-	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("data", 0)
-	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
-	AM_RANGE(0x620000, 0x620007) AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
-	AM_RANGE(0x640000, 0x64000f) AM_RAM /* unknown xy offset */
-	AM_RANGE(0x680000, 0x68ffff) AM_READWRITE16(c123_tilemap_videoram_r,c123_tilemap_videoram_w,0xffffffff)
-	AM_RANGE(0x6c0000, 0x6c003f) AM_READWRITE16(c123_tilemap_control_r,c123_tilemap_control_w,0xffffffff)
-	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE16(c169_roz_videoram_r,c169_roz_videoram_w,0xffffffff) AM_SHARE("rozvideoram")
-	AM_RANGE(0x740000, 0x74001f) AM_READWRITE16(c169_roz_control_r,c169_roz_control_w,0xffffffff)
-	AM_RANGE(0x800000, 0x807fff) AM_DEVREADWRITE8("c116", namco_c116_device, read, write, 0xffffffff)
-	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_SHARE("spritebank32")
-	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_SHARE("tilebank32")
-	AM_RANGE(0x980000, 0x98000f) AM_READWRITE16(c169_roz_bank_r,c169_roz_bank_w,0xffffffff)
-	AM_RANGE(0xa00000, 0xa007ff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
-	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE8(namconb2_cpureg_r, namconb2_cpureg_w, 0xffffffff)
-ADDRESS_MAP_END
+void namconb1_state::namconb2_am(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x1c0000, 0x1cffff).ram();
+	map(0x1e4000, 0x1e4003).rw(FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
+	map(0x200000, 0x207fff).rw(FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
+	map(0x208000, 0x2fffff).ram();
+	map(0x400000, 0x4fffff).rom().region("data", 0);
+	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
+	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
+	map(0x640000, 0x64000f).ram(); /* unknown xy offset */
+	map(0x680000, 0x68ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
+	map(0x6c0000, 0x6c003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control_r), FUNC(namco_c123tmap_device::control_w));
+	map(0x700000, 0x71ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
+	map(0x740000, 0x74001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
+	map(0x800000, 0x807fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
+	map(0x900008, 0x90000f).ram().share("spritebank32");
+	map(0x940000, 0x94000f).ram().share("tilebank32");
+	map(0x980000, 0x98000f).ram().w(FUNC(namconb1_state::rozbank32_w)).share("rozbank32");
+	map(0xa00000, 0xa007ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+	map(0xc00000, 0xc0001f).r(FUNC(namconb1_state::custom_key_r)).nopw();
+	map(0xf00000, 0xf0001f).rw(FUNC(namconb1_state::namconb2_cpureg_r), FUNC(namconb1_state::namconb2_cpureg_w));
+}
 
 WRITE16_MEMBER(namconb1_state::mcu_shared_w)
 {
@@ -752,11 +753,12 @@ WRITE16_MEMBER(namconb1_state::mcu_shared_w)
 	}
 }
 
-ADDRESS_MAP_START(namconb1_state::namcoc75_am)
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(mcu_shared_w) AM_SHARE("namconb_share")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
-ADDRESS_MAP_END
+void namconb1_state::namcoc75_am(address_map &map)
+{
+	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
+	map(0x004000, 0x00bfff).ram().w(FUNC(namconb1_state::mcu_shared_w)).share("namconb_share");
+	map(0x200000, 0x27ffff).rom().region("c75data", 0);
+}
 
 
 READ8_MEMBER(namconb1_state::port6_r)
@@ -835,18 +837,19 @@ READ8_MEMBER(namconb1_state::dac0_r)// bit 6
 	return (m_p3.read_safe(0xff)<<7)&0x80;
 }
 
-ADDRESS_MAP_START(namconb1_state::namcoc75_io)
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE(port6_r, port6_w)
-	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ(port7_r)
-	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ(dac7_r)
-	AM_RANGE(M37710_ADC6_L, M37710_ADC6_L) AM_READ(dac6_r)
-	AM_RANGE(M37710_ADC5_L, M37710_ADC5_L) AM_READ(dac5_r)
-	AM_RANGE(M37710_ADC4_L, M37710_ADC4_L) AM_READ(dac4_r)
-	AM_RANGE(M37710_ADC3_L, M37710_ADC3_L) AM_READ(dac3_r)
-	AM_RANGE(M37710_ADC2_L, M37710_ADC2_L) AM_READ(dac2_r)
-	AM_RANGE(M37710_ADC1_L, M37710_ADC1_L) AM_READ(dac1_r)
-	AM_RANGE(M37710_ADC0_L, M37710_ADC0_L) AM_READ(dac0_r)
-ADDRESS_MAP_END
+void namconb1_state::namcoc75_io(address_map &map)
+{
+	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namconb1_state::port6_r), FUNC(namconb1_state::port6_w));
+	map(M37710_PORT7, M37710_PORT7).r(FUNC(namconb1_state::port7_r));
+	map(M37710_ADC7_L, M37710_ADC7_L).r(FUNC(namconb1_state::dac7_r));
+	map(M37710_ADC6_L, M37710_ADC6_L).r(FUNC(namconb1_state::dac6_r));
+	map(M37710_ADC5_L, M37710_ADC5_L).r(FUNC(namconb1_state::dac5_r));
+	map(M37710_ADC4_L, M37710_ADC4_L).r(FUNC(namconb1_state::dac4_r));
+	map(M37710_ADC3_L, M37710_ADC3_L).r(FUNC(namconb1_state::dac3_r));
+	map(M37710_ADC2_L, M37710_ADC2_L).r(FUNC(namconb1_state::dac2_r));
+	map(M37710_ADC1_L, M37710_ADC1_L).r(FUNC(namconb1_state::dac1_r));
+	map(M37710_ADC0_L, M37710_ADC0_L).r(FUNC(namconb1_state::dac0_r));
+}
 
 
 /****************************************************************************/
@@ -942,52 +945,52 @@ INPUT_PORTS_END
 
 /****************************************************************************/
 
-DRIVER_INIT_MEMBER(namconb1_state,nebulray)
+void namconb1_state::init_nebulray()
 {
 	m_gametype = NAMCONB1_NEBULRAY;
 } /* nebulray */
 
-DRIVER_INIT_MEMBER(namconb1_state,gslgr94u)
+void namconb1_state::init_gslgr94u()
 {
 	m_gametype = NAMCONB1_GSLGR94U;
 } /* gslgr94u */
 
-DRIVER_INIT_MEMBER(namconb1_state,gslgr94j)
+void namconb1_state::init_gslgr94j()
 {
 	m_gametype = NAMCONB1_GSLGR94J;
 } /* gslgr94j */
 
-DRIVER_INIT_MEMBER(namconb1_state,sws95)
+void namconb1_state::init_sws95()
 {
 	m_gametype = NAMCONB1_SWS95;
 } /* sws95 */
 
-DRIVER_INIT_MEMBER(namconb1_state,sws96)
+void namconb1_state::init_sws96()
 {
 	m_gametype = NAMCONB1_SWS96;
 } /* sws96 */
 
-DRIVER_INIT_MEMBER(namconb1_state,sws97)
+void namconb1_state::init_sws97()
 {
 	m_gametype = NAMCONB1_SWS97;
 } /* sws97 */
 
-DRIVER_INIT_MEMBER(namconb1_state,gunbulet)
+void namconb1_state::init_gunbulet()
 {
 	m_gametype = NAMCONB1_GUNBULET;
 } /* gunbulet */
 
-DRIVER_INIT_MEMBER(namconb1_state,vshoot)
+void namconb1_state::init_vshoot()
 {
 	m_gametype = NAMCONB1_VSHOOT;
 } /* vshoot */
 
-DRIVER_INIT_MEMBER(namconb1_state,machbrkr)
+void namconb1_state::init_machbrkr()
 {
 	m_gametype = NAMCONB2_MACH_BREAKERS;
 }
 
-DRIVER_INIT_MEMBER(namconb1_state,outfxies)
+void namconb1_state::init_outfxies()
 {
 	m_gametype = NAMCONB2_OUTFOXIES;
 }
@@ -1040,21 +1043,21 @@ static const gfx_layout roz_layout =
 	16*128
 }; /* roz_layout */
 
-static GFXDECODE_START( namconb1 )
+static GFXDECODE_START( gfx_namconb1 )
 	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,    0, tile_layout, 0x1000, 0x10 )
 	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,  0x0000, 0x10 )
 GFXDECODE_END /* gfxdecodeinfo */
 
-static GFXDECODE_START( 2 )
+static GFXDECODE_START( gfx_namconb2 )
 	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,    0, tile_layout, 0x1000, 0x08 )
 	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,  0x0000, 0x10 )
-	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION, 0, roz_layout,      0x1800, 0x08 )
+	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION,     0, roz_layout,  0x1800, 0x08 )
 GFXDECODE_END /* gfxdecodeinfo2 */
 
 
 /***************************************************************/
 
-MACHINE_RESET_MEMBER(namconb1_state, namconb)
+void namconb1_state::machine_reset()
 {
 	m_pos_irq_level = 0;
 	m_unk_irq_level = 0;
@@ -1065,15 +1068,14 @@ MACHINE_RESET_MEMBER(namconb1_state, namconb)
 /***************************************************************/
 
 MACHINE_CONFIG_START(namconb1_state::namconb1)
-	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(namconb1_am)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(namconb1_am)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
-	MCFG_CPU_IO_MAP(namcoc75_io)
+	MCFG_DEVICE_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
+	MCFG_DEVICE_IO_MAP(namcoc75_io)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
+	EEPROM_2816(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
 
@@ -1089,17 +1091,32 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namconb1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namconb1)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
+	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_gfxregion(NAMCONB1_SPRITEGFX);
+
+	NAMCO_C123TMAP(config, m_c123tmap, 0);
+	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB1TilemapCB, this));
+	m_c123tmap->set_maskregion_tag(NAMCONB1_TILEMASKREGION);
+	m_c123tmap->set_gfxregion(NAMCONB1_TILEGFX);
+
+	NAMCO_C116(config, m_c116, 0);
+	m_c116->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_C352_ADD("c352", MASTER_CLOCK/2, 288)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("c352", C352, MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
@@ -1107,43 +1124,46 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namconb1_state::namconb2)
-	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(namconb2_am)
+	namconb1(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(namconb2_am)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
-	MCFG_CPU_IO_MAP(namcoc75_io)
-
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namconb1_state, mcu_irq0_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namconb1_state, mcu_irq2_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namconb1_state, mcu_adc_cb, attotime::from_hz(60))
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.7)
-	MCFG_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
-	MCFG_SCREEN_VISIBLE_AREA(0, NAMCONB1_HBSTART-1, 0, NAMCONB1_VBSTART-1)
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb2)
-	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_DEVICE_REPLACE("gfxdecode", GFXDECODE, "palette", gfx_namconb2)
 
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C169ROZ(config, m_c169roz, 0);
+	m_c169roz->set_gfxdecode_tag("gfxdecode");
+	m_c169roz->set_is_namcofl(false);
+	m_c169roz->set_ram_words(0x20000/2);
+	m_c169roz->set_maskregion_tag(NAMCONB1_ROTMASKREGION);
+	m_c169roz->set_gfxregion(NAMCONB1_ROTGFX);
 
-	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
+MACHINE_CONFIG_END
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_C352_ADD("c352", MASTER_CLOCK/2, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
+MACHINE_CONFIG_START(namconb1_state::machbrkr)
+	namconb2(config);
+
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_machbrkr, this));
+
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb1_state::NB2RozCB_machbrkr, this));
+
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_machbrkr, this));
+
+	MCFG_VIDEO_START_OVERRIDE(namconb1_state,machbrkr)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(namconb1_state::outfxies)
+	namconb2(config);
+
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_outfxies, this));
+
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb1_state::NB2RozCB_outfxies, this));
+
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_outfxies, this));
+
+	MCFG_VIDEO_START_OVERRIDE(namconb1_state,outfxies)
 MACHINE_CONFIG_END
 
 
@@ -1983,22 +2003,22 @@ ROM_END
 
 /***************************************************************/
 
-GAME( 1994, nebulray, 0,        namconb1, namconb1, namconb1_state, nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nebulrayj,nebulray, namconb1, namconb1, namconb1_state, nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblank,  0,        namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblanka, ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletj,ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletw,ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gslugrsj, 0,        namconb1, namconb1, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94u, 0,        namconb1, namconb1, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94j, gslgr94u, namconb1, namconb1, namconb1_state, gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sws95,    0,        namconb1, namconb1, namconb1_state, sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sws96,    0,        namconb1, namconb1, namconb1_state, sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sws97,    0,        namconb1, namconb1, namconb1_state, sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, vshoot,   0,        namconb1, namconb1, namconb1_state, vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,   FLAGS */
+GAME( 1994, nebulray, 0,        namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nebulrayj,nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblank,  0,        namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblanka, ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletj,ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletw,ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gslugrsj, 0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94u, 0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94j, gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sws95,    0,        namconb1, namconb1, namconb1_state, init_sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sws96,    0,        namconb1, namconb1, namconb1_state, init_sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sws97,    0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, vshoot,   0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
 
-/*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,   FLAGS */
-GAME( 1994, outfxies, 0,        namconb2, namconb1, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesj,outfxies, namconb2, namconb1, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, machbrkr, 0,        namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
-GAME( 1995, machbrkrj,machbrkr, namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxies, 0,        outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesj,outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, machbrkr, 0,        machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
+GAME( 1995, machbrkrj,machbrkr, machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )

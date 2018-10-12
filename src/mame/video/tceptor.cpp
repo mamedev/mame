@@ -182,11 +182,7 @@ WRITE8_MEMBER(tceptor_state::tceptor_bg_ram_w)
 {
 	m_bg_ram[offset] = data;
 
-	offset /= 2;
-	if (offset < 0x800)
-		m_bg1_tilemap->mark_tile_dirty(offset);
-	else
-		m_bg2_tilemap->mark_tile_dirty(offset - 0x800);
+	m_bg_tilemap[offset >> 12]->mark_tile_dirty((offset & 0xfff) >> 1);
 }
 
 WRITE8_MEMBER(tceptor_state::tceptor_bg_scroll_w)
@@ -194,27 +190,27 @@ WRITE8_MEMBER(tceptor_state::tceptor_bg_scroll_w)
 	switch (offset)
 	{
 	case 0:
-		m_bg1_scroll_x &= 0xff;
-		m_bg1_scroll_x |= data << 8;
+		m_bg_scroll_x[0] &= 0xff;
+		m_bg_scroll_x[0] |= data << 8;
 		break;
 	case 1:
-		m_bg1_scroll_x &= 0xff00;
-		m_bg1_scroll_x |= data;
+		m_bg_scroll_x[0] &= 0xff00;
+		m_bg_scroll_x[0] |= data;
 		break;
 	case 2:
-		m_bg1_scroll_y = data;
+		m_bg_scroll_y[0] = data;
 		break;
 
 	case 4:
-		m_bg2_scroll_x &= 0xff;
-		m_bg2_scroll_x |= data << 8;
+		m_bg_scroll_x[1] &= 0xff;
+		m_bg_scroll_x[1] |= data << 8;
 		break;
 	case 5:
-		m_bg2_scroll_x &= 0xff00;
-		m_bg2_scroll_x |= data;
+		m_bg_scroll_x[1] &= 0xff00;
+		m_bg_scroll_x[1] |= data;
 		break;
 	case 6:
-		m_bg2_scroll_y = data;
+		m_bg_scroll_y[1] = data;
 		break;
 	}
 }
@@ -385,14 +381,14 @@ void tceptor_state::video_start()
 	m_tx_tilemap->set_scrolly(0, 0);
 	m_tx_tilemap->configure_groups(*m_gfxdecode->gfx(0), 7);
 
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
-	save_pointer(NAME(m_sprite_ram_buffered.get()), 0x200 / 2);
-	save_item(NAME(m_bg1_scroll_x));
-	save_item(NAME(m_bg1_scroll_y));
-	save_item(NAME(m_bg2_scroll_x));
-	save_item(NAME(m_bg2_scroll_y));
+	save_pointer(NAME(m_sprite_ram_buffered), 0x200 / 2);
+	save_item(NAME(m_bg_scroll_x[0]));
+	save_item(NAME(m_bg_scroll_y[0]));
+	save_item(NAME(m_bg_scroll_x[1]));
+	save_item(NAME(m_bg_scroll_y[1]));
 }
 
 
@@ -502,21 +498,21 @@ uint32_t tceptor_state::screen_update_tceptor(screen_device &screen, bitmap_ind1
 {
 	rectangle rect;
 	int pri;
-	int bg_center = 144 - ((((m_bg1_scroll_x + m_bg2_scroll_x ) & 0x1ff) - 288) / 2);
+	int bg_center = 144 - ((((m_bg_scroll_x[0] + m_bg_scroll_x[1] ) & 0x1ff) - 288) / 2);
 
 	// left background
 	rect = cliprect;
 	rect.max_x = bg_center;
-	m_bg1_tilemap->set_scrollx(0, m_bg1_scroll_x + 12);
-	m_bg1_tilemap->set_scrolly(0, m_bg1_scroll_y + 20); //32?
-	m_bg1_tilemap->draw(screen, bitmap, rect, 0, 0);
+	m_bg_tilemap[0]->set_scrollx(0, m_bg_scroll_x[0] + 12);
+	m_bg_tilemap[0]->set_scrolly(0, m_bg_scroll_y[0] + 20); //32?
+	m_bg_tilemap[0]->draw(screen, bitmap, rect, 0, 0);
 
 	// right background
 	rect.min_x = bg_center;
 	rect.max_x = cliprect.max_x;
-	m_bg2_tilemap->set_scrollx(0, m_bg2_scroll_x + 20);
-	m_bg2_tilemap->set_scrolly(0, m_bg2_scroll_y + 20); // 32?
-	m_bg2_tilemap->draw(screen, bitmap, rect, 0, 0);
+	m_bg_tilemap[1]->set_scrollx(0, m_bg_scroll_x[1] + 20);
+	m_bg_tilemap[1]->set_scrolly(0, m_bg_scroll_y[1] + 20); // 32?
+	m_bg_tilemap[1]->draw(screen, bitmap, rect, 0, 0);
 
 	for (pri = 0; pri < 8; pri++)
 	{
@@ -535,11 +531,24 @@ WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 	if (state)
 	{
 		memcpy(m_sprite_ram_buffered.get(), m_sprite_ram, 0x200);
+
+		if (m_m6809_irq_enable)
+			m_maincpu->set_input_line(0, HOLD_LINE);
+		else
+			m_m6809_irq_enable = 1;
+
+		if (m_m68k_irq_enable)
+			m_subcpu->set_input_line(1, HOLD_LINE);
+
+		if (m_mcu_irq_enable)
+			m_mcu->set_input_line(0, HOLD_LINE);
+		else
+			m_mcu_irq_enable = 1;
 	}
 }
 
 WRITE8_MEMBER(tceptor_state::tceptor2_shutter_w)
 {
 	// 3D scope shutter control
-	output().set_value("shutter", data & 1);
+	m_shutter = BIT(data, 0);
 }

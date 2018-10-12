@@ -23,6 +23,15 @@ enum
 	OUTBOUND = 1
 };
 
+/* Line */
+enum
+{
+	HEXBUS_LINE_HSK = 0x10,
+	HEXBUS_LINE_BAV = 0x04,
+	HEXBUS_LINE_BIT32 = 0xc0,
+	HEXBUS_LINE_BIT10 = 0x03
+};
+
 class hexbus_device;
 class hexbus_chained_device;
 
@@ -54,8 +63,6 @@ public:
 	virtual void device_start() override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-
 	void set_outbound_hexbus(hexbus_device *outbound) { m_hexbus_outbound = outbound; }
 
 	// Link to the inbound Hexbus (if not null, see Oso chip)
@@ -72,13 +79,24 @@ protected:
 	virtual void bus_write(int dir, uint8_t data) override;
 
 	// Methods to be used from subclasses
+	// Write a byte to the Hexbus. Returns the actual line state.
+	// This is important because the bus is a wired-and bus.
 	void hexbus_write(uint8_t data);
+
+	// Levels on the bus, except for this device
+	uint8_t hexbus_get_levels();
+
+	// Read hexbus
 	uint8_t hexbus_read();
 
-	// For interrupts
+	// Callback for changes on the hexbus
 	virtual void hexbus_value_changed(uint8_t data) { };
 
+	// Levels of the lines at this device. 0 means pull down, 1 means release.
 	uint8_t m_myvalue;
+
+	// Utility method to create a Hexbus line state
+	uint8_t to_line_state(uint8_t data, bool bav, bool hsk);
 };
 
 // ------------------------------------------------------------------------
@@ -90,6 +108,16 @@ protected:
 class hexbus_device : public device_t, public device_slot_interface
 {
 public:
+	template <typename U>
+	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: hexbus_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Used to establish the reverse link (inbound)
@@ -110,14 +138,10 @@ private:
 	hexbus_chained_device*  m_chain_element;
 };
 
-#define MCFG_HEXBUS_ADD( _tag )  \
-	MCFG_DEVICE_ADD(_tag, HEXBUS, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE( hexbus_conn, nullptr, false)
-
 }   }   // end namespace bus::hexbus
 
-SLOT_INTERFACE_EXTERN( hexbus_conn );
-
 DECLARE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device)
+
+void hexbus_options(device_slot_interface &device);
 
 #endif // MAME_BUS_HEXBUS_HEXBUS_H

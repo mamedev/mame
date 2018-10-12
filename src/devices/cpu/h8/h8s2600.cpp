@@ -9,9 +9,9 @@ h8s2600_device::h8s2600_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-util::disasm_interface *h8s2600_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> h8s2600_device::create_disassembler()
 {
-	return new h8s2600_disassembler;
+	return std::make_unique<h8s2600_disassembler>();
 }
 
 #include "cpu/h8/h8s2600.hxx"

@@ -11,18 +11,20 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 #define MCFG_K1GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
 	MCFG_DEVICE_ADD( _tag, K1GE, _clock ) \
 	MCFG_VIDEO_SET_SCREEN( _screen ) \
-	devcb = &downcast<k1ge_device &>(*device).set_vblank_callback(DEVCB_##_vblank ); \
-	devcb = &downcast<k1ge_device &>(*device).set_hblank_callback(DEVCB_##_hblank );
+	downcast<k1ge_device &>(*device).set_vblank_callback(DEVCB_##_vblank ); \
+	downcast<k1ge_device &>(*device).set_hblank_callback(DEVCB_##_hblank );
 
 #define MCFG_K2GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
 	MCFG_DEVICE_ADD( _tag, K2GE, _clock ) \
 	MCFG_VIDEO_SET_SCREEN( _screen ) \
-	devcb = &downcast<k1ge_device &>(*device).set_vblank_callback(DEVCB_##_vblank ); \
-	devcb = &downcast<k1ge_device &>(*device).set_hblank_callback(DEVCB_##_hblank );
+	downcast<k1ge_device &>(*device).set_vblank_callback(DEVCB_##_vblank ); \
+	downcast<k1ge_device &>(*device).set_hblank_callback(DEVCB_##_hblank );
 
 
 class k1ge_device : public device_t, public device_video_interface

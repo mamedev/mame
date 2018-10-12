@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(SNES_MOUSE, snes_mouse_device, "snes_mouse", "Nintendo SNES /
 
 static INPUT_PORTS_START( snes_mouse )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) // these must be 0!
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) // these must be 0!
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Button Right")
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Button Left")
 	PORT_BIT( 0x0c00, IP_ACTIVE_HIGH, IPT_UNUSED ) // mouse speed: 0 = slow, 1 = normal, 2 = fast, 3 = unused

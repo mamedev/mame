@@ -88,22 +88,47 @@ const int GIEFLAG   = 0x2000;
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(TMS32031, tms32031_device, "tms32031", "TMS32031")
-DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "TMS32032")
+DEFINE_DEVICE_TYPE(TMS32030, tms32030_device, "tms32030", "Texas Instruments TMS32030")
+DEFINE_DEVICE_TYPE(TMS32031, tms32031_device, "tms32031", "Texas Instruments TMS32031")
+DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "Texas Instruments TMS32032")
 
+// memory map common to all 'C30 devices
+// TODO: expand to cover all the standard internal peripherals
+void tms3203x_device::common_3203x(address_map &map)
+{
+	map(0x808064, 0x808064).rw(FUNC(tms3203x_device::primary_bus_control_r), FUNC(tms3203x_device::primary_bus_control_w));
+}
 
 // internal memory maps
-ADDRESS_MAP_START(tms32031_device::internal_32031)
-	AM_RANGE(0x809800, 0x809fff) AM_RAM
-ADDRESS_MAP_END
+void tms32030_device::internal_32030(address_map &map)
+{
+	common_3203x(map);
 
-ADDRESS_MAP_START(tms32032_device::internal_32032)
-	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x809800, 0x809fff).ram();
+}
+
+void tms32031_device::internal_32031(address_map &map)
+{
+	common_3203x(map);
+
+	map(0x809800, 0x809fff).ram();
+}
+
+void tms32032_device::internal_32032(address_map &map)
+{
+	common_3203x(map);
+
+	map(0x87fe00, 0x87ffff).ram();
+}
 
 
 // ROM definitions for the internal boot loader programs
 // (Using assembled versions until the code ROMs are extracted from both DSPs)
+ROM_START( tms32030 )
+	ROM_REGION(0x4000, "tms32030", 0)
+	ROM_LOAD( "c30boot.bin", 0x0000, 0x4000, BAD_DUMP CRC(bddc2763) SHA1(96b2170ecee5bec5abaa1741bb2d3b6096ecc262))
+ROM_END
+
 ROM_START( tms32031 )
 	ROM_REGION(0x4000, "tms32031", 0)
 	ROM_LOAD( "c31boot.bin", 0x0000, 0x4000, BAD_DUMP CRC(bddc2763) SHA1(96b2170ecee5bec5abaa1741bb2d3b6096ecc262) ) // Assembled from c31boot.asm (02-07-92)
@@ -258,27 +283,34 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 		m_chip_type(chiptype),
 		m_pc(0),
 		m_bkmask(0),
+		m_primary_bus_control(0),
 		m_irq_state(0),
 		m_delayed(false),
 		m_irq_pending(false),
 		m_is_idling(false),
 		m_icount(0),
 		m_program(nullptr),
-		m_direct(nullptr),
+		m_cache(nullptr),
 		m_mcbl_mode(false),
 		m_xf0_cb(*this),
 		m_xf1_cb(*this),
-		m_iack_cb(*this)
+		m_iack_cb(*this),
+		m_holda_cb(*this)
 {
 	// initialize remaining state
 	memset(&m_r, 0, sizeof(m_r));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 #if (TMS_3203X_LOG_OPCODE_USAGE)
 	memset(m_hits, 0, sizeof(m_hits));
 #endif
+}
+
+tms32030_device::tms32030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms3203x_device(mconfig, TMS32030, tag, owner, clock, CHIP_TYPE_TMS32030, address_map_constructor(FUNC(tms32030_device::internal_32030), this))
+{
 }
 
 tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -315,6 +347,7 @@ const tiny_rom_entry *tms3203x_device::device_rom_region() const
 	switch (m_chip_type)
 	{
 		default:
+		case CHIP_TYPE_TMS32030:    return ROM_NAME( tms32030 );
 		case CHIP_TYPE_TMS32031:    return ROM_NAME( tms32031 );
 		case CHIP_TYPE_TMS32032:    return ROM_NAME( tms32032 );
 	}
@@ -329,7 +362,7 @@ inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 	if (m_mcbl_mode && pc < 0x1000)
 		return m_bootrom[pc];
 
-	return m_direct->read_dword(pc);
+	return m_cache->read_dword(pc);
 }
 
 
@@ -364,12 +397,13 @@ void tms3203x_device::device_start()
 {
 	// find address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-2>();
+	m_cache = m_program->cache<2, -2, ENDIANNESS_LITTLE>();
 
 	// resolve devcb handlers
 	m_xf0_cb.resolve_safe();
 	m_xf1_cb.resolve_safe();
 	m_iack_cb.resolve_safe();
+	m_holda_cb.resolve_safe();
 
 	// set up the internal boot loader ROM
 	m_bootrom = reinterpret_cast<uint32_t*>(memregion(shortname())->base());
@@ -379,11 +413,13 @@ void tms3203x_device::device_start()
 	for (int regnum = 0; regnum < 36; regnum++)
 		save_item(NAME(m_r[regnum].i32), regnum);
 	save_item(NAME(m_bkmask));
+	save_item(NAME(m_primary_bus_control));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_delayed));
 	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_is_idling));
 	save_item(NAME(m_mcbl_mode));
+	save_item(NAME(m_hold_state));
 
 	// register our state for the debugger
 	state_add(TMS3203X_PC,      "PC",        m_pc);
@@ -445,6 +481,9 @@ void tms3203x_device::device_reset()
 
 	// update IF with the external interrupt state (required for boot loader operation)
 	IREG(TMR_IF) |= m_irq_state & 0x0f;
+
+	// reset peripheral registers
+	m_primary_bus_control = 0x000010f8;
 
 	// reset internal stuff
 	m_delayed = m_irq_pending = m_is_idling = false;
@@ -558,9 +597,9 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *tms3203x_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms3203x_device::create_disassembler()
 {
-	return new tms32031_disassembler;
+	return std::make_unique<tms32031_disassembler>();
 }
 
 
@@ -692,7 +731,7 @@ uint32_t tms3203x_device::execute_max_cycles() const
 
 uint32_t tms3203x_device::execute_input_lines() const
 {
-	return (m_chip_type == CHIP_TYPE_TMS32032) ? 13 : 12;
+	return 14;
 }
 
 
@@ -702,15 +741,37 @@ uint32_t tms3203x_device::execute_input_lines() const
 
 void tms3203x_device::execute_set_input(int inputnum, int state)
 {
-	// ignore anything out of range
-	if (inputnum >= 13)
-		return;
-
 	if (inputnum == TMS3203X_MCBL)
 	{
 		// switch between microcomputer/boot loader and microprocessor modes
 		m_mcbl_mode = (state == ASSERT_LINE);
-		m_direct->force_update();
+		return;
+	}
+
+	if (inputnum == TMS3203X_HOLD)
+	{
+		m_hold_state = (state == ASSERT_LINE);
+
+		// FIXME: "there is a minimum of one cycle delay from the time when
+		// the processor recognises /HOLD = 0 until /HOLDA = 0"
+		if (m_hold_state)
+		{
+			// assert hold acknowledge if external hold enabled
+			if (!(m_primary_bus_control & NOHOLD))
+			{
+				m_primary_bus_control |= HOLDST;
+				m_holda_cb(ASSERT_LINE);
+			}
+		}
+		else
+		{
+			// clear hold acknowledge if port is held externally
+			if ((m_primary_bus_control & HOLDST) && !(m_primary_bus_control & HIZ))
+			{
+				m_primary_bus_control &= ~HOLDST;
+				m_holda_cb(CLEAR_LINE);
+			}
+		}
 		return;
 	}
 
@@ -727,7 +788,7 @@ void tms3203x_device::execute_set_input(int inputnum, int state)
 	// external interrupts are level-sensitive on the '31 and can be
 	// configured as such on the '32; in that case, if the external
 	// signal is high, we need to update the value in IF accordingly
-	if (m_chip_type == CHIP_TYPE_TMS32031 || (IREG(TMR_ST) & 0x4000) == 0)
+	if (m_chip_type != CHIP_TYPE_TMS32032 || (IREG(TMR_ST) & 0x4000) == 0)
 		IREG(TMR_IF) |= m_irq_state & 0x0f;
 }
 
@@ -805,10 +866,34 @@ void tms3203x_device::execute_run()
 				continue;
 			}
 
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 			execute_one();
 		}
 	}
+}
+
+// internal peripherals
+WRITE32_MEMBER(tms3203x_device::primary_bus_control_w)
+{
+	// change in internal hold state
+	if ((m_primary_bus_control ^ data) & HIZ)
+	{
+		if (m_primary_bus_control & HOLDST)
+			m_primary_bus_control &= ~HOLDST;
+		else
+			m_primary_bus_control |= HOLDST;
+		m_holda_cb(data & HIZ ? ASSERT_LINE : CLEAR_LINE);
+	}
+
+	// enable of external hold with hold pending
+	if ((m_primary_bus_control & NOHOLD) && !(data & NOHOLD) && m_hold_state)
+	{
+		m_primary_bus_control |= HOLDST;
+		m_holda_cb(ASSERT_LINE);
+	}
+
+	// update register
+	m_primary_bus_control = (m_primary_bus_control & ~(mem_mask | WMASK)) | (data & mem_mask & WMASK);
 }
 
 

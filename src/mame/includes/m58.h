@@ -6,6 +6,7 @@
     Irem M58 hardware
 
 ****************************************************************************/
+#include "emupal.h"
 #include "screen.h"
 
 class m58_state : public driver_device
@@ -25,6 +26,9 @@ public:
 		m_score_panel_disabled(*this, "score_disable")
 	{ }
 
+	void yard(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -56,6 +60,5 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_panel( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void yard(machine_config &config);
 	void yard_map(address_map &map);
 };

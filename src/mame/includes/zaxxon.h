@@ -7,7 +7,9 @@
 ***************************************************************************/
 
 #include "machine/74259.h"
+#include "machine/i8255.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 class zaxxon_state : public driver_device
 {
@@ -16,6 +18,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainlatch(*this, "mainlatch%u", 1),
+		m_ppi(*this, "ppi8255"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -25,8 +28,29 @@ public:
 		m_colorram(*this, "colorram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
+	void root(machine_config &config);
+	void ixion(machine_config &config);
+	void futspye(machine_config &config);
+	void congo(machine_config &config);
+	void szaxxon(machine_config &config);
+	void razmataze(machine_config &config);
+	void szaxxone(machine_config &config);
+	void zaxxon(machine_config &config);
+	void zaxxon_samples(machine_config &config);
+	void congo_samples(machine_config &config);
+
+	void init_razmataz();
+	void init_zaxxonj();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
+	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<ls259_device, 2> m_mainlatch;
+	optional_device<i8255_device> m_ppi;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -74,12 +98,7 @@ public:
 	DECLARE_WRITE8_MEMBER(zaxxon_videoram_w);
 	DECLARE_WRITE8_MEMBER(congo_colorram_w);
 	DECLARE_WRITE8_MEMBER(congo_sprite_custom_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
-	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
-	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
-	DECLARE_DRIVER_INIT(razmataz);
-	DECLARE_DRIVER_INIT(zaxxonj);
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(zaxxon_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(razmataz_get_fg_tile_info);
@@ -104,16 +123,7 @@ public:
 	inline int find_minimum_y(uint8_t value, int flip);
 	inline int find_minimum_x(uint8_t value, int flip);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t flipxmask, uint16_t flipymask);
-	void root(machine_config &config);
-	void ixion(machine_config &config);
-	void futspye(machine_config &config);
-	void congo(machine_config &config);
-	void szaxxon(machine_config &config);
-	void razmataze(machine_config &config);
-	void szaxxone(machine_config &config);
-	void zaxxon(machine_config &config);
-	void zaxxon_samples(machine_config &config);
-	void congo_samples(machine_config &config);
+
 	void congo_map(address_map &map);
 	void congo_sound_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);

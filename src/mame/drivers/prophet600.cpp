@@ -79,16 +79,17 @@ public:
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_acia(*this, UART_TAG),
+		m_digits(*this, "digit%u", 0U),
 		m_dac(0),
 		m_scanrow(0),
 		m_comparitor(0),
 		m_nmi_gate(false)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<acia6850_device> m_acia;
+	void prophet600(machine_config &config);
 
-	DECLARE_DRIVER_INIT(prophet600);
+private:
+	virtual void machine_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER( pit_ch0_tick_w );
 	DECLARE_WRITE_LINE_MEMBER( pit_ch2_tick_w );
@@ -105,10 +106,14 @@ public:
 	DECLARE_WRITE8_MEMBER(cv_w);
 	DECLARE_WRITE8_MEMBER(gate_w);
 
-	void prophet600(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
-private:
+
+	required_device<cpu_device> m_maincpu;
+	required_device<acia6850_device> m_acia;
+
+	output_finder<2> m_digits;
+
 	uint16_t m_dac;
 	uint8_t m_scanrow;
 	uint8_t m_comparitor;
@@ -175,11 +180,11 @@ WRITE8_MEMBER(prophet600_state::led_w)
 	}
 	else if (m_scanrow & 0x20)
 	{
-		output().set_digit_value(0, data);
+		m_digits[0] = data;
 	}
 	else if (m_scanrow & 0x40)
 	{
-		output().set_digit_value(1, data);
+		m_digits[1] = data;
 	}
 }
 
@@ -239,55 +244,58 @@ READ8_MEMBER(prophet600_state::comparitor_r)
 	return m_comparitor;
 }
 
-ADDRESS_MAP_START(prophet600_state::cpu_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(MAINCPU_TAG, 0)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_WRITE(dac_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(UART_TAG, acia6850_device, write)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREAD(UART_TAG, acia6850_device, read)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(prophet600_state::io_map)
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE(PIT_TAG, pit8253_device, read, write)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(scanrow_w)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_READWRITE(comparitor_r, led_w)
-	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_READWRITE(scan_r, potmux_w)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xff00) AM_WRITE(gate_w)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0xff00) AM_WRITE(cv_w)
-	AM_RANGE(0x0e, 0x0e) AM_MIRROR(0xff00) AM_WRITE(mask_w)
-ADDRESS_MAP_END
-
-DRIVER_INIT_MEMBER(prophet600_state, prophet600)
+void prophet600_state::cpu_map(address_map &map)
 {
+	map(0x0000, 0x1fff).rom().region(MAINCPU_TAG, 0);
+	map(0x2000, 0x27ff).ram();
+	map(0x3000, 0x37ff).ram();
+	map(0x4000, 0x4001).w(FUNC(prophet600_state::dac_w));
+	map(0x6000, 0x6001).w(m_acia, FUNC(acia6850_device::write));
+	map(0xe000, 0xe001).r(m_acia, FUNC(acia6850_device::read));
+}
+
+void prophet600_state::io_map(address_map &map)
+{
+	map(0x00, 0x07).mirror(0xff00).rw(PIT_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x08, 0x08).mirror(0xff00).w(FUNC(prophet600_state::scanrow_w));
+	map(0x09, 0x09).mirror(0xff00).rw(FUNC(prophet600_state::comparitor_r), FUNC(prophet600_state::led_w));
+	map(0x0a, 0x0a).mirror(0xff00).rw(FUNC(prophet600_state::scan_r), FUNC(prophet600_state::potmux_w));
+	map(0x0b, 0x0b).mirror(0xff00).w(FUNC(prophet600_state::gate_w));
+	map(0x0d, 0x0d).mirror(0xff00).w(FUNC(prophet600_state::cv_w));
+	map(0x0e, 0x0e).mirror(0xff00).w(FUNC(prophet600_state::mask_w));
+}
+
+void prophet600_state::machine_start()
+{
+	m_digits.resolve();
 }
 
 // master crystal is 8 MHz, all clocks derived from there
 MACHINE_CONFIG_START(prophet600_state::prophet600)
-	MCFG_CPU_ADD(MAINCPU_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD(MAINCPU_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEFAULT_LAYOUT( layout_prophet600 )
+	config.set_default_layout(layout_prophet600);
 
 	MCFG_DEVICE_ADD(PIT_TAG, PIT8253, XTAL(8'000'000)/4)
 	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)
 	MCFG_PIT8253_CLK1(XTAL(8'000'000)/4)
 	MCFG_PIT8253_CLK2(XTAL(8'000'000)/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(prophet600_state, pit_ch0_tick_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(prophet600_state, pit_ch2_tick_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, prophet600_state, pit_ch0_tick_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, prophet600_state, pit_ch2_tick_w))
 
-	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(prophet600_state, acia_irq_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia->irq_handler().set(FUNC(prophet600_state::acia_irq_w));
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(UART_TAG, acia6850_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(UART_TAG, acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(8'000'000)/16)  // 500kHz = 16 times the MIDI rate
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(prophet600_state, acia_clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, prophet600_state, acia_clock_w))
 
 MACHINE_CONFIG_END
 
@@ -299,4 +307,4 @@ ROM_START( prpht600 )
 	ROM_LOAD( "p600.bin",     0x000000, 0x002000, CRC(78e3f048) SHA1(61548b6de3d9b5c0ae76f8e751ece0b57de17118) )
 ROM_END
 
-CONS( 1983, prpht600, 0, 0, prophet600, prophet600, prophet600_state, prophet600, "Sequential Circuits", "Prophet-600", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1983, prpht600, 0, 0, prophet600, prophet600, prophet600_state, empty_init, "Sequential Circuits", "Prophet-600", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

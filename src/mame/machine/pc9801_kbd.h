@@ -17,7 +17,7 @@
 //**************************************************************************
 
 #define MCFG_PC9801_KBD_IRQ_CALLBACK(_write) \
-	devcb = &downcast<pc9801_kbd_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<pc9801_kbd_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 
 //**************************************************************************

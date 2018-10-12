@@ -6,106 +6,146 @@
 #include "screen.h"
 
 
-int voodoo_pci_device::m_type = 0;
-
-MACHINE_CONFIG_START(voodoo_pci_device::device_add_mconfig)
-	switch (m_type) {
-		case TYPE_VOODOO_1:
-				MCFG_DEVICE_ADD("voodoo", VOODOO_1, STD_VOODOO_1_CLOCK)
-				MCFG_VOODOO_FBMEM(4)
-				MCFG_VOODOO_TMUMEM(1, 0)
-				MCFG_VOODOO_SCREEN_TAG("screen")
-			break;
-		case TYPE_VOODOO_2:
-				MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
-				MCFG_VOODOO_FBMEM(4)
-				MCFG_VOODOO_TMUMEM(1, 0)
-				MCFG_VOODOO_SCREEN_TAG("screen")
-			break;
-		case TYPE_VOODOO_BANSHEE:
-				MCFG_DEVICE_ADD("voodoo", VOODOO_BANSHEE, STD_VOODOO_BANSHEE_CLOCK)
-				MCFG_VOODOO_FBMEM(16)
-				MCFG_VOODOO_SCREEN_TAG("screen")
-			break;
-		//case TYPE_VOODOO_3
-		default:
-				MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
-				MCFG_VOODOO_FBMEM(16)
-				MCFG_VOODOO_SCREEN_TAG("screen")
-			break;}
+MACHINE_CONFIG_START(voodoo_1_pci_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(4)
+	MCFG_VOODOO_TMUMEM(1, 0)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(voodoo_2_pci_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
+	MCFG_VOODOO_FBMEM(4)
+	MCFG_VOODOO_TMUMEM(1, 0)
+MACHINE_CONFIG_END
 
-DEFINE_DEVICE_TYPE(VOODOO_PCI, voodoo_pci_device, "voodoo_pci", "Voodoo PCI")
+MACHINE_CONFIG_START(voodoo_banshee_pci_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_BANSHEE, STD_VOODOO_BANSHEE_CLOCK)
+	MCFG_VOODOO_FBMEM(16)
+MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(voodoo_pci_device::config_map)
-	AM_IMPORT_FROM(pci_device::config_map)
-	AM_RANGE(0x40, 0x5f) AM_READWRITE  (pcictrl_r,  pcictrl_w)
-ADDRESS_MAP_END
+MACHINE_CONFIG_START(voodoo_3_pci_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
+	MCFG_VOODOO_FBMEM(16)
+MACHINE_CONFIG_END
+
+DEFINE_DEVICE_TYPE(VOODOO_1_PCI, voodoo_1_pci_device, "voodoo_1_pci", "Voodoo 1 PCI")
+DEFINE_DEVICE_TYPE(VOODOO_2_PCI, voodoo_2_pci_device, "voodoo_2_pci", "Voodoo 2 PCI")
+DEFINE_DEVICE_TYPE(VOODOO_BANSHEE_PCI, voodoo_banshee_pci_device, "voodoo_banshee_pci", "Voodoo Banshee PCI")
+DEFINE_DEVICE_TYPE(VOODOO_3_PCI, voodoo_3_pci_device, "voodoo_3_pci", "Voodoo 3 PCI")
+
+void voodoo_pci_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x40, 0x5f).rw(FUNC(voodoo_pci_device::pcictrl_r), FUNC(voodoo_pci_device::pcictrl_w));
+}
 
 // VOODOO_1 & VOODOO_2 map
-ADDRESS_MAP_START(voodoo_pci_device::voodoo_reg_map)
-	AM_RANGE(0x0, 0x00ffffff) AM_DEVREADWRITE("voodoo", voodoo_device, voodoo_r, voodoo_w)
-ADDRESS_MAP_END
+void voodoo_pci_device::voodoo_reg_map(address_map &map)
+{
+	map(0x0, 0x00ffffff).rw("voodoo", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+}
 // VOODOO_BANSHEE and VOODOO_3 maps
-ADDRESS_MAP_START(voodoo_pci_device::banshee_reg_map)
-	AM_RANGE(0x0, 0x01ffffff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_r, banshee_w)
-ADDRESS_MAP_END
+void voodoo_pci_device::banshee_reg_map(address_map &map)
+{
+	map(0x0, 0x01ffffff).rw("voodoo", FUNC(voodoo_banshee_device::banshee_r), FUNC(voodoo_banshee_device::banshee_w));
+}
 
-ADDRESS_MAP_START(voodoo_pci_device::lfb_map)
-	AM_RANGE(0x0, 0x01ffffff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_fb_r, banshee_fb_w)
-ADDRESS_MAP_END
+void voodoo_pci_device::lfb_map(address_map &map)
+{
+	map(0x0, 0x01ffffff).rw("voodoo", FUNC(voodoo_banshee_device::banshee_fb_r), FUNC(voodoo_banshee_device::banshee_fb_w));
+}
 
-ADDRESS_MAP_START(voodoo_pci_device::io_map)
-	AM_RANGE(0x000, 0x0ff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_io_r, banshee_io_w)
-ADDRESS_MAP_END
+void voodoo_pci_device::io_map(address_map &map)
+{
+	map(0x000, 0x0ff).rw("voodoo", FUNC(voodoo_banshee_device::banshee_io_r), FUNC(voodoo_banshee_device::banshee_io_w));
+}
 
-voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, VOODOO_PCI, tag, owner, clock),
-		m_voodoo(*this, "voodoo"), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
+voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, type, tag, owner, clock),
+	  m_voodoo(*this, "voodoo"), m_cpu(*this, finder_base::DUMMY_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
 {
 }
 
-void voodoo_pci_device::set_cpu_tag(const char *_cpu_tag)
+voodoo_1_pci_device::voodoo_1_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: voodoo_pci_device(mconfig, VOODOO_1_PCI, tag, owner, clock)
 {
-	m_cpu_tag = _cpu_tag;
+}
+
+voodoo_2_pci_device::voodoo_2_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: voodoo_pci_device(mconfig, VOODOO_2_PCI, tag, owner, clock)
+{
+}
+
+voodoo_banshee_pci_device::voodoo_banshee_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: voodoo_pci_device(mconfig, VOODOO_BANSHEE_PCI, tag, owner, clock)
+{
+}
+
+voodoo_3_pci_device::voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: voodoo_pci_device(mconfig, VOODOO_3_PCI, tag, owner, clock)
+{
 }
 
 void voodoo_pci_device::device_start()
 {
-	m_voodoo->set_cpu_tag(m_cpu_tag);
+	if (m_cpu)
+		m_voodoo->set_cpu(*m_cpu);
+	if (m_screen)
+		m_voodoo->set_screen(*m_screen);
 	m_voodoo->set_fbmem(m_fbmem);
 	m_voodoo->set_tmumem(m_tmumem0, m_tmumem1);
-	switch (m_type) {
-		//void set_ids(uint32_t main_id, uint8_t revision, uint32_t pclass, uint32_t subsystem_id);
-		case TYPE_VOODOO_1:
-			set_ids(0x121a0001, 0x02, 0x030000, 0x000000);
-			break;
-		case TYPE_VOODOO_2:
-			set_ids(0x121a0002, 0x02, 0x038000, 0x000000);
-			break;
-		case TYPE_VOODOO_BANSHEE:
-			set_ids(0x121a0003, 0x02, 0x030000, 0x000000);
-			break;
-		//case TYPE_VOODOO_3
-		default:
-			set_ids(0x121a0005, 0x02, 0x030000, 0x000000);
-			break;
-	}
 	pci_device::device_start();
-	if (m_type<=TYPE_VOODOO_2) {
-		add_map(16*1024*1024, M_MEM | M_PREF, FUNC(voodoo_pci_device::voodoo_reg_map));
-		bank_infos[0].adr = 0xff000000;
-	} else {
-		add_map(32*1024*1024, M_MEM, FUNC(voodoo_pci_device::banshee_reg_map));
-		add_map(32*1024*1024, M_MEM, FUNC(voodoo_pci_device::lfb_map));
-		add_map(256, M_IO, FUNC(voodoo_pci_device::io_map));
-		bank_infos[0].adr = 0xf8000000;
-		bank_infos[1].adr = 0xf8000008;
-		bank_infos[2].adr = 0xfffffff0;
-	}
 	save_item(NAME(m_pcictrl_reg));
 	machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_pci_device::postload), this));
+}
+
+//void set_ids(uint32_t main_id, uint8_t revision, uint32_t pclass, uint32_t subsystem_id);
+void voodoo_1_pci_device::device_start()
+{
+	set_ids(0x121a0001, 0x02, 0x030000, 0x000000);
+
+	voodoo_pci_device::device_start();
+
+	add_map(16 * 1024 * 1024, M_MEM | M_PREF, FUNC(voodoo_pci_device::voodoo_reg_map));
+	bank_infos[0].adr = 0xff000000;
+}
+
+void voodoo_2_pci_device::device_start()
+{
+	set_ids(0x121a0002, 0x02, 0x038000, 0x000000);
+
+	voodoo_pci_device::device_start();
+
+	add_map(16 * 1024 * 1024, M_MEM | M_PREF, FUNC(voodoo_pci_device::voodoo_reg_map));
+	bank_infos[0].adr = 0xff000000;
+}
+
+void voodoo_banshee_pci_device::device_start()
+{
+	set_ids(0x121a0003, 0x02, 0x030000, 0x000000);
+
+	voodoo_pci_device::device_start();
+
+	add_map(32 * 1024 * 1024, M_MEM, FUNC(voodoo_pci_device::banshee_reg_map));
+	add_map(32 * 1024 * 1024, M_MEM, FUNC(voodoo_pci_device::lfb_map));
+	add_map(256, M_IO, FUNC(voodoo_pci_device::io_map));
+	bank_infos[0].adr = 0xf8000000;
+	bank_infos[1].adr = 0xf8000008;
+	bank_infos[2].adr = 0xfffffff0;
+}
+
+void voodoo_3_pci_device::device_start()
+{
+	set_ids(0x121a0005, 0x02, 0x030000, 0x000000);
+
+	voodoo_pci_device::device_start();
+
+	add_map(32 * 1024 * 1024, M_MEM, FUNC(voodoo_pci_device::banshee_reg_map));
+	add_map(32 * 1024 * 1024, M_MEM, FUNC(voodoo_pci_device::lfb_map));
+	add_map(256, M_IO, FUNC(voodoo_pci_device::io_map));
+	bank_infos[0].adr = 0xf8000000;
+	bank_infos[1].adr = 0xf8000008;
+	bank_infos[2].adr = 0xfffffff0;
 }
 
 void voodoo_pci_device::postload()
@@ -123,14 +163,32 @@ void voodoo_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	logerror("%s: map_extra\n", this->tag());
+}
+
+void voodoo_banshee_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	logerror("%s: map_extra\n", this->tag());
+
 	// Map VGA legacy access
 	// Should really be dependent on voodoo VGAINIT0 bit 8 and IO base + 0xc3 bit 0
-	if (m_type>=TYPE_VOODOO_BANSHEE) {
-		uint64_t start = io_offset + 0x3b0;
-		uint64_t end = io_offset + 0x3df;
-		io_space->install_readwrite_handler(start, end, read32_delegate(FUNC(voodoo_pci_device::vga_r), this), write32_delegate(FUNC(voodoo_pci_device::vga_w), this));
-		logerror("%s: map %s at %0*x-%0*x\n", this->tag(), "vga_r/w", 4, uint32_t(start), 4, uint32_t(end));
-	}
+	uint64_t start = io_offset + 0x3b0;
+	uint64_t end = io_offset + 0x3df;
+	io_space->install_readwrite_handler(start, end, read32_delegate(FUNC(voodoo_pci_device::vga_r), this), write32_delegate(FUNC(voodoo_pci_device::vga_w), this));
+	logerror("%s: map %s at %0*x-%0*x\n", this->tag(), "vga_r/w", 4, uint32_t(start), 4, uint32_t(end));
+}
+
+void voodoo_3_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	logerror("%s: map_extra\n", this->tag());
+
+	// Map VGA legacy access
+	// Should really be dependent on voodoo VGAINIT0 bit 8 and IO base + 0xc3 bit 0
+	uint64_t start = io_offset + 0x3b0;
+	uint64_t end = io_offset + 0x3df;
+	io_space->install_readwrite_handler(start, end, read32_delegate(FUNC(voodoo_pci_device::vga_r), this), write32_delegate(FUNC(voodoo_pci_device::vga_w), this));
+	logerror("%s: map %s at %0*x-%0*x\n", this->tag(), "vga_r/w", 4, uint32_t(start), 4, uint32_t(end));
 }
 
 uint32_t voodoo_pci_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -145,9 +203,13 @@ READ32_MEMBER (voodoo_pci_device::pcictrl_r)
 	// The address map starts at 0x40
 	switch (offset + 0x40 / 4) {
 	case 0x40/4:
-		// V2: Init Enable: 19:16=Fab ID, 15:12=Graphics Rev
-		// Vegas driver needs this value at PCI 0x40
-		result = 0x00044000;
+		// V1: initEnable: 11:0
+		// V2: initEnable: Fab ID=19:16, Graphics Rev=15:12
+		// Banshee/V3: fabID: ScratchPad=31:4 fabID=3:0
+		if (m_voodoo->vd_type== TYPE_VOODOO_2)
+			result = (result & ~0xff000) | 0x00044000; // Vegas driver needs this value
+		else if (m_voodoo->vd_type >= TYPE_VOODOO_BANSHEE)
+			result = (result & ~0xf) | 0x1;
 		break;
 	case 0x54/4:
 		// V2: SiProcess Register: Osc Force On, Osc Ring Sel, Osc Count Reset, 12 bit PCI Counter, 16 bit Oscillator Counter

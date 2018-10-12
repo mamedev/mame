@@ -26,6 +26,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "lbeach.lh"
@@ -49,6 +50,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void lbeach(machine_config &config);
+
+private:
 	/* devices / memory pointers */
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_bg_vram;
@@ -79,7 +83,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lbeach);
 	uint32_t screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void lbeach(machine_config &config);
 	void lbeach_map(address_map &map);
 };
 
@@ -216,25 +219,26 @@ READ8_MEMBER(lbeach_state::lbeach_in2_r)
 	return (ioport("IN2")->read() & 0x3f) | d6 | d7;
 }
 
-ADDRESS_MAP_START(lbeach_state::lbeach_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0x41ff) AM_RAM_WRITE(lbeach_bg_vram_w) AM_SHARE("bg_vram")
-	AM_RANGE(0x4000, 0x4000) AM_READ(lbeach_in1_r)
-	AM_RANGE(0x4200, 0x43ff) AM_RAM
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(lbeach_fg_vram_w) AM_SHARE("fg_vram")
-	AM_RANGE(0x8000, 0x8000) AM_READ(lbeach_in2_r)
-	AM_RANGE(0x8000, 0x8000) AM_WRITEONLY AM_SHARE("scroll_y")
-	AM_RANGE(0x8001, 0x8001) AM_WRITEONLY AM_SHARE("sprite_x")
-	AM_RANGE(0x8002, 0x8002) AM_WRITEONLY AM_SHARE("sprite_code")
+void lbeach_state::lbeach_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("nvram");
+	map(0x4000, 0x41ff).ram().w(FUNC(lbeach_state::lbeach_bg_vram_w)).share("bg_vram");
+	map(0x4000, 0x4000).r(FUNC(lbeach_state::lbeach_in1_r));
+	map(0x4200, 0x43ff).ram();
+	map(0x4400, 0x47ff).ram().w(FUNC(lbeach_state::lbeach_fg_vram_w)).share("fg_vram");
+	map(0x8000, 0x8000).r(FUNC(lbeach_state::lbeach_in2_r));
+	map(0x8000, 0x8000).writeonly().share("scroll_y");
+	map(0x8001, 0x8001).writeonly().share("sprite_x");
+	map(0x8002, 0x8002).writeonly().share("sprite_code");
 //  AM_RANGE(0x8003, 0x8003) AM_WRITENOP // ?
 //  AM_RANGE(0x8004, 0x8004) AM_WRITENOP // ?
 //  AM_RANGE(0x8005, 0x8005) AM_WRITENOP // ?
-	AM_RANGE(0x8007, 0x8007) AM_WRITENOP // probably watchdog
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	map(0x8007, 0x8007).nopw(); // probably watchdog
+	map(0xa000, 0xa000).portr("IN0");
 //  AM_RANGE(0xa003, 0xa003) AM_READNOP // ? tests d7 at game over
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xc000, 0xcfff).rom();
+	map(0xf000, 0xffff).rom();
+}
 
 
 
@@ -276,7 +280,7 @@ static INPUT_PORTS_START( lbeach )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "4" ) // fast
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -309,7 +313,7 @@ static const gfx_layout tile_layout_16x16 =
 	16*16
 };
 
-static GFXDECODE_START( lbeach )
+static GFXDECODE_START( gfx_lbeach )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_16x8, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout_16x16, 2, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout_16x16, 10, 1 )
@@ -329,11 +333,10 @@ void lbeach_state::machine_reset()
 MACHINE_CONFIG_START(lbeach_state::lbeach)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(16'000'000) / 32) // Motorola MC6800P, 500kHz
-	MCFG_CPU_PROGRAM_MAP(lbeach_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lbeach_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'000'000) / 32) // Motorola MC6800P, 500kHz
+	MCFG_DEVICE_PROGRAM_MAP(lbeach_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -343,8 +346,9 @@ MACHINE_CONFIG_START(lbeach_state::lbeach)
 	MCFG_SCREEN_UPDATE_DRIVER(lbeach_state, screen_update_lbeach)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lbeach)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lbeach)
 	MCFG_PALETTE_ADD("palette", 2+8+2)
 	MCFG_PALETTE_INIT_OWNER(lbeach_state, lbeach)
 	/* sound hardware */
@@ -378,4 +382,4 @@ ROM_START( lbeach )
 ROM_END
 
 
-GAMEL(1979, lbeach, 0, lbeach, lbeach, lbeach_state, 0, ROT0, "Olympia / Seletron", "Long Beach", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lbeach )
+GAMEL( 1979, lbeach, 0, lbeach, lbeach, lbeach_state, empty_init, ROT0, "Olympia / Seletron", "Long Beach", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lbeach )

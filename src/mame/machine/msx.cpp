@@ -58,7 +58,14 @@ void msx_state::machine_reset()
 
 void msx_state::machine_start()
 {
+	m_leds.resolve();
 	m_port_c_old = 0xff;
+}
+
+
+void msx2_state::machine_start()
+{
+	msx_state::machine_start();
 
 	for (device_t &device : device_iterator(*this))
 	{
@@ -68,6 +75,8 @@ void msx_state::machine_start()
 			m_switched.push_back(switched);
 		}
 	}
+
+	save_item(NAME(m_rtc_latch));
 }
 
 
@@ -198,7 +207,6 @@ void msx_state::driver_start()
 	save_item(NAME(m_psg_b));
 	save_item(NAME(m_mouse));
 	save_item(NAME(m_mouse_stat));
-	save_item(NAME(m_rtc_latch));
 	save_item(NAME(m_kanji_latch));
 	save_item(NAME(m_slot_expanded));
 	save_item(NAME(m_primary_slot));
@@ -206,11 +214,9 @@ void msx_state::driver_start()
 	save_item(NAME(m_port_c_old));
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_irq_state));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_state::post_load), this));
 }
 
-void msx_state::post_load()
+void msx_state::device_post_load()
 {
 	for (int page = 0; page < 4; page++)
 	{
@@ -295,7 +301,7 @@ WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
 {
 	/* Arabic or kana mode led */
 	if ( (data ^ m_psg_b) & 0x80)
-		output().set_led_value(2, !(data & 0x80) );
+		m_leds[1] = BIT(~data, 7);
 
 	if ( (m_psg_b ^ data) & 0x10)
 	{
@@ -314,17 +320,17 @@ WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
 ** RTC functions
 */
 
-WRITE8_MEMBER( msx_state::msx_rtc_latch_w )
+WRITE8_MEMBER( msx2_state::msx_rtc_latch_w )
 {
 	m_rtc_latch = data & 15;
 }
 
-WRITE8_MEMBER( msx_state::msx_rtc_reg_w )
+WRITE8_MEMBER( msx2_state::msx_rtc_reg_w )
 {
 	m_rtc->write(space, m_rtc_latch, data);
 }
 
-READ8_MEMBER( msx_state::msx_rtc_reg_r )
+READ8_MEMBER( msx2_state::msx_rtc_reg_r )
 {
 	return m_rtc->read(space, m_rtc_latch);
 }
@@ -349,7 +355,7 @@ WRITE8_MEMBER( msx_state::msx_ppi_port_c_w )
 
 	/* caps lock */
 	if ( BIT(m_port_c_old ^ data, 6) )
-		output().set_led_value(1, !BIT(data, 6) );
+		m_leds[0] = BIT(~data, 6);
 
 	/* key click */
 	if ( BIT(m_port_c_old ^ data, 7) )
@@ -389,18 +395,17 @@ READ8_MEMBER( msx_state::msx_ppi_port_b_r )
  *
  ***********************************************************************/
 
-void msx_state::install_slot_pages(device_t &owner, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, device_t *device)
+void msx_state::install_slot_pages(uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, device_t *device)
 {
-	msx_state &msx = downcast<msx_state &>(owner);
 	msx_internal_slot_interface *internal_slot = dynamic_cast<msx_internal_slot_interface *>(device);
 
 	for ( int i = page; i < std::min(page + numpages, 4); i++ )
 	{
-		msx.m_all_slots[prim][sec][i] = internal_slot;
+		m_all_slots[prim][sec][i] = internal_slot;
 	}
 	if ( sec )
 	{
-		msx.m_slot_expanded[prim] = true;
+		m_slot_expanded[prim] = true;
 	}
 }
 
@@ -518,7 +523,7 @@ WRITE8_MEMBER( msx_state::msx_kanji_w )
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
-READ8_MEMBER( msx_state::msx_switched_r )
+READ8_MEMBER( msx2_state::msx_switched_r )
 {
 	uint8_t data = 0xff;
 
@@ -530,7 +535,7 @@ READ8_MEMBER( msx_state::msx_switched_r )
 	return data;
 }
 
-WRITE8_MEMBER( msx_state::msx_switched_w )
+WRITE8_MEMBER( msx2_state::msx_switched_w )
 {
 	for (int i = 0; i < m_switched.size(); i++)
 	{

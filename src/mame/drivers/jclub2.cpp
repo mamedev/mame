@@ -106,6 +106,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "speaker.h"
 #include "video/st0020.h"
 #include "jclub2o.lh"
@@ -171,7 +172,7 @@ public:
 
 	void jclub2(machine_config &config);
 	void jclub2_map(address_map &map);
-private:
+protected:
 	required_device<st0020_device> m_st0020;
 };
 
@@ -205,7 +206,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cmd2_word_w);
 	DECLARE_READ32_MEMBER(cmd_stat_word_r);
 
-	DECLARE_DRIVER_INIT(jclub2o);
+	void init_jclub2o();
 
 	void jclub2o(machine_config &config);
 	void jclub2o_map(address_map &map);
@@ -245,7 +246,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(darkhors);
+	void init_darkhors();
 	DECLARE_VIDEO_START(darkhors);
 
 	void darkhors(machine_config &config);
@@ -579,50 +580,51 @@ WRITE32_MEMBER(jclub2o_state::cmd2_word_w)
 	}
 }
 
-ADDRESS_MAP_START(jclub2o_state::jclub2o_map)
-	AM_RANGE(0x000000, 0x27ffff) AM_ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
+void jclub2o_state::jclub2o_map(address_map &map)
+{
+	map(0x000000, 0x27ffff).rom();
+	map(0x400000, 0x41ffff).ram().share("nvram"); // battery
 
-	AM_RANGE(0x490000, 0x490003) AM_WRITE(eeprom_s29290_w)
+	map(0x490000, 0x490003).w(FUNC(jclub2o_state::eeprom_s29290_w));
 
-	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(out2_w)
+	map(0x4a0000, 0x4a0003).w(FUNC(jclub2o_state::out2_w));
 //  AM_RANGE(0x4a0010, 0x4a0013) AM_WRITE
 //  AM_RANGE(0x4a0020, 0x4a0023) AM_WRITE
 //  AM_RANGE(0x4a0030, 0x4a0033) AM_WRITE
 
 	// ST-0016
-	AM_RANGE(0x4b0000, 0x4b0003) AM_READWRITE(cmd1_word_r, cmd1_word_w)
-	AM_RANGE(0x4b0004, 0x4b0007) AM_READWRITE(cmd2_word_r, cmd2_word_w)
-	AM_RANGE(0x4b0008, 0x4b000b) AM_READ(cmd_stat_word_r)
+	map(0x4b0000, 0x4b0003).rw(FUNC(jclub2o_state::cmd1_word_r), FUNC(jclub2o_state::cmd1_word_w));
+	map(0x4b0004, 0x4b0007).rw(FUNC(jclub2o_state::cmd2_word_r), FUNC(jclub2o_state::cmd2_word_w));
+	map(0x4b0008, 0x4b000b).r(FUNC(jclub2o_state::cmd_stat_word_r));
 
-	AM_RANGE(0x4d0000, 0x4d0003) AM_READNOP AM_WRITENOP // reads seem unused? this write would go to two 7-segs (but the code is never called)
-	AM_RANGE(0x4d0004, 0x4d0007) AM_READNOP
-	AM_RANGE(0x4d0008, 0x4d000b) AM_READNOP
-	AM_RANGE(0x4d000c, 0x4d000f) AM_READNOP
+	map(0x4d0000, 0x4d0003).nopr().nopw(); // reads seem unused? this write would go to two 7-segs (but the code is never called)
+	map(0x4d0004, 0x4d0007).nopr();
+	map(0x4d0008, 0x4d000b).nopr();
+	map(0x4d000c, 0x4d000f).nopr();
 
-	AM_RANGE(0x4e0000, 0x4e0003) AM_READ(p2_r) AM_WRITE(input_sel2_w)
+	map(0x4e0000, 0x4e0003).r(FUNC(jclub2o_state::p2_r)).w(FUNC(jclub2o_state::input_sel2_w));
 
-	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x580004, 0x580007) AM_READ(p1_r)
-	AM_RANGE(0x580008, 0x58000b) AM_READ_PORT("COIN")
-	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(input_sel1_out3_w)
-	AM_RANGE(0x580010, 0x580013) AM_WRITE(out1_w)
+	map(0x580000, 0x580003).portr("EEPROM");
+	map(0x580004, 0x580007).r(FUNC(jclub2o_state::p1_r));
+	map(0x580008, 0x58000b).portr("COIN");
+	map(0x58000c, 0x58000f).w(FUNC(jclub2o_state::input_sel1_out3_w));
+	map(0x580010, 0x580013).w(FUNC(jclub2o_state::out1_w));
 //  AM_RANGE(0x580018, 0x58001b) AM_WRITE
 //  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
 
-	AM_RANGE(0x580200, 0x580203) AM_DEVREAD16("watchdog", watchdog_timer_device, reset16_r, 0xffff0000)
+	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
-	AM_RANGE(0x580400, 0x580403) AM_READWRITE8(console_r, console_w, 0x00ff0000)
-	AM_RANGE(0x580420, 0x580423) AM_READ8(console_status_r, 0x00ff0000) //AM_WRITE
+	map(0x580401, 0x580401).rw(FUNC(jclub2o_state::console_r), FUNC(jclub2o_state::console_w));
+	map(0x580421, 0x580421).r(FUNC(jclub2o_state::console_status_r)); //AM_WRITE
 //  AM_RANGE(0x580440, 0x580443) AM_WRITE
 
 	// ST-0020
-	AM_RANGE(0x600000, 0x67ffff) AM_DEVREADWRITE16( "st0020", st0020_device, sprram_r, sprram_w, 0xffffffff );
-	AM_RANGE(0x680000, 0x69ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x6a0000, 0x6bffff) AM_RAM
-	AM_RANGE(0x6c0000, 0x6c00ff) AM_DEVREADWRITE16( "st0020", st0020_device, regs_r,   regs_w,   0xffffffff );
-	AM_RANGE(0x700000, 0x7fffff) AM_DEVREADWRITE16( "st0020", st0020_device, gfxram_r, gfxram_w, 0xffffffff );
-ADDRESS_MAP_END
+	map(0x600000, 0x67ffff).rw(m_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
+	map(0x680000, 0x69ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x6a0000, 0x6bffff).ram();
+	map(0x6c0000, 0x6c00ff).rw(m_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
+	map(0x700000, 0x7fffff).rw(m_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
+}
 
 
 // ST-0016 map
@@ -661,25 +663,27 @@ WRITE8_MEMBER(jclub2o_state::cmd2_w)
 	logerror("%s: cmd2_w %02x\n", machine().describe_context(), m_cmd2);
 }
 
-ADDRESS_MAP_START(jclub2o_state::st0016_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM
+void jclub2o_state::st0016_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");
+	map(0xe800, 0xe8ff).ram();
 	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
 	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(jclub2o_state::st0016_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void jclub2o_state::st0016_io(address_map &map)
+{
+	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(cmd1_r, cmd1_w)
-	AM_RANGE(0xc1, 0xc1) AM_READWRITE(cmd2_r, cmd2_w)
-	AM_RANGE(0xc2, 0xc2) AM_READ(cmd_stat_r)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
-	AM_RANGE(0xe7, 0xe7) AM_WRITENOP // watchdog?
+	map(0xc0, 0xc0).rw(FUNC(jclub2o_state::cmd1_r), FUNC(jclub2o_state::cmd1_w));
+	map(0xc1, 0xc1).rw(FUNC(jclub2o_state::cmd2_r), FUNC(jclub2o_state::cmd2_w));
+	map(0xc2, 0xc2).r(FUNC(jclub2o_state::cmd_stat_r));
+	map(0xe1, 0xe1).w(FUNC(jclub2o_state::st0016_rom_bank_w));
+	map(0xe7, 0xe7).nopw(); // watchdog?
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
-ADDRESS_MAP_END
+}
 
 
 // Newer hardware (ST-0032) only
@@ -702,45 +706,46 @@ WRITE32_MEMBER(common_state::eeprom_93c46_w)
 	}
 }
 
-ADDRESS_MAP_START(jclub2_state::jclub2_map)
-	AM_RANGE(0x000000, 0x27ffff) AM_ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
+void jclub2_state::jclub2_map(address_map &map)
+{
+	map(0x000000, 0x27ffff).rom();
+	map(0x400000, 0x41ffff).ram().share("nvram"); // battery
 
-	AM_RANGE(0x490000, 0x490003) AM_WRITE(eeprom_93c46_w)
+	map(0x490000, 0x490003).w(FUNC(jclub2_state::eeprom_93c46_w));
 
-	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(out2_w)
+	map(0x4a0000, 0x4a0003).w(FUNC(jclub2_state::out2_w));
 
-	AM_RANGE(0x4d0000, 0x4d0003) AM_READNOP AM_WRITENOP // reads seem unused? this write would go to two 7-segs (but the code is never called)
-	AM_RANGE(0x4d0004, 0x4d0007) AM_READNOP
-	AM_RANGE(0x4d0008, 0x4d000b) AM_READNOP
-	AM_RANGE(0x4d000c, 0x4d000f) AM_READNOP
+	map(0x4d0000, 0x4d0003).nopr().nopw(); // reads seem unused? this write would go to two 7-segs (but the code is never called)
+	map(0x4d0004, 0x4d0007).nopr();
+	map(0x4d0008, 0x4d000b).nopr();
+	map(0x4d000c, 0x4d000f).nopr();
 
-	AM_RANGE(0x4e0000, 0x4e0003) AM_READ(p2_r) AM_WRITE(input_sel2_w)
+	map(0x4e0000, 0x4e0003).r(FUNC(jclub2_state::p2_r)).w(FUNC(jclub2_state::input_sel2_w));
 
-	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x580004, 0x580007) AM_READ(p1_r)
-	AM_RANGE(0x580008, 0x58000b) AM_READ_PORT("COIN")
-	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(input_sel1_out3_w)
-	AM_RANGE(0x580010, 0x580013) AM_WRITE(out1_w)
+	map(0x580000, 0x580003).portr("EEPROM");
+	map(0x580004, 0x580007).r(FUNC(jclub2_state::p1_r));
+	map(0x580008, 0x58000b).portr("COIN");
+	map(0x58000c, 0x58000f).w(FUNC(jclub2_state::input_sel1_out3_w));
+	map(0x580010, 0x580013).w(FUNC(jclub2_state::out1_w));
 //  AM_RANGE(0x580018, 0x58001b) AM_WRITE
 //  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
 
-	AM_RANGE(0x580200, 0x580203) AM_DEVREAD16("watchdog", watchdog_timer_device, reset16_r, 0xffff0000)
+	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
-	AM_RANGE(0x580400, 0x580403) AM_READWRITE8(console_r, console_w, 0x00ff0000)
-	AM_RANGE(0x580420, 0x580423) AM_READ8(console_status_r, 0x00ff0000) //AM_WRITE
+	map(0x580401, 0x580401).rw(FUNC(jclub2_state::console_r), FUNC(jclub2_state::console_w));
+	map(0x580421, 0x580421).r(FUNC(jclub2_state::console_status_r)); //AM_WRITE
 //  AM_RANGE(0x580440, 0x580443) AM_WRITE
 
 	// ST-0032
-	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020", st0020_device, sprram_r, sprram_w, 0xffffffff );
-	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
-	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE16( "st0020", st0020_device, regs_r,   regs_w,   0xffffffff );
-	AM_RANGE(0x8e0000, 0x8e01ff) AM_RAM // sound?
-	AM_RANGE(0x8e0200, 0x8e0203) AM_RAM
-	AM_RANGE(0x8e0210, 0x8e0213) AM_RAM
-	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE16( "st0020", st0020_device, gfxram_r, gfxram_w, 0xffffffff );
-ADDRESS_MAP_END
+	map(0x800000, 0x87ffff).rw(m_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
+	map(0x880000, 0x89ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x8a0000, 0x8bffff).ram();   // this should still be palette ram!
+	map(0x8c0000, 0x8c00ff).rw(m_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
+	map(0x8e0000, 0x8e01ff).ram(); // sound?
+	map(0x8e0200, 0x8e0203).ram();
+	map(0x8e0210, 0x8e0213).ram();
+	map(0x900000, 0x9fffff).rw(m_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
+}
 
 
 // bootleg darkhors hardware
@@ -791,37 +796,38 @@ WRITE32_MEMBER(darkhors_state::out1_w)
 	}
 }
 
-ADDRESS_MAP_START(darkhors_state::darkhors_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
+void darkhors_state::darkhors_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x41ffff).ram().share("nvram"); // battery
 
-	AM_RANGE(0x490040, 0x490043) AM_WRITE(eeprom_93c46_w)
-	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("SERVICE") AM_WRITE(out1_w)
+	map(0x490040, 0x490043).w(FUNC(darkhors_state::eeprom_93c46_w));
+	map(0x4e0080, 0x4e0083).portr("SERVICE").w(FUNC(darkhors_state::out1_w));
 
-	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("UNKNOWN")
-	AM_RANGE(0x580004, 0x580007) AM_READ_PORT("COIN")
-	AM_RANGE(0x580008, 0x58000b) AM_READ(input_r)
-	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(input_sel_w)
+	map(0x580000, 0x580003).portr("UNKNOWN");
+	map(0x580004, 0x580007).portr("COIN");
+	map(0x580008, 0x58000b).r(FUNC(darkhors_state::input_r));
+	map(0x58000c, 0x58000f).w(FUNC(darkhors_state::input_sel_w));
 //  AM_RANGE(0x580010, 0x580013) AM_WRITE
 //  AM_RANGE(0x580018, 0x58001b) AM_WRITE
 //  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
-	AM_RANGE(0x580084, 0x580087) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff000000)
+	map(0x580084, 0x580084).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  AM_RANGE(0x58008c, 0x58008f) AM_WRITE
-	AM_RANGE(0x580200, 0x580203) AM_DEVREAD16("watchdog", watchdog_timer_device, reset16_r, 0xffff0000)
+	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
-	AM_RANGE(0x580400, 0x580403) AM_READWRITE8(console_r, console_w, 0x00ff0000)
-	AM_RANGE(0x580420, 0x580423) AM_READ8(console_status_r, 0x00ff0000)
+	map(0x580401, 0x580401).rw(FUNC(darkhors_state::console_r), FUNC(darkhors_state::console_w));
+	map(0x580421, 0x580421).r(FUNC(darkhors_state::console_status_r));
 
-	AM_RANGE(0x800000, 0x86bfff) AM_RAM
-	AM_RANGE(0x86c000, 0x86ffff) AM_RAM_WRITE(tmapram_w)  AM_SHARE("tmapram")
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(tmapram2_w) AM_SHARE("tmapram2")
-	AM_RANGE(0x874000, 0x87dfff) AM_RAM
-	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
-	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_SHARE("tmapscroll")
-	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_SHARE("tmapscroll2")
-ADDRESS_MAP_END
+	map(0x800000, 0x86bfff).ram();
+	map(0x86c000, 0x86ffff).ram().w(FUNC(darkhors_state::tmapram_w)).share("tmapram");
+	map(0x870000, 0x873fff).ram().w(FUNC(darkhors_state::tmapram2_w)).share("tmapram2");
+	map(0x874000, 0x87dfff).ram();
+	map(0x87e000, 0x87ffff).ram().share("spriteram");
+	map(0x880000, 0x89ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x8a0000, 0x8bffff).ram();   // this should still be palette ram!
+	map(0x8c0120, 0x8c012f).writeonly().share("tmapscroll");
+	map(0x8c0130, 0x8c013f).writeonly().share("tmapscroll2");
+}
 
 
 /***************************************************************************
@@ -972,7 +978,7 @@ static INPUT_PORTS_START( jclub2v100 )
 	PORT_CONFNAME(0x08000000, 0x08000000, "System Int Down")
 	PORT_CONFSETTING(         0x08000000, DEF_STR( Off ) )
 	PORT_CONFSETTING(         0x00000000, DEF_STR( On )  ) // Emergency Error 0002
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("COIN") // 580008.w
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)
@@ -981,8 +987,8 @@ static INPUT_PORTS_START( jclub2v100 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW,  IPT_START1  )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", ticket_dispenser_device, line_r) // P2 coin out
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", ticket_dispenser_device, line_r) // P1 coin out
+	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", ticket_dispenser_device, line_r) // P2 coin out
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", ticket_dispenser_device, line_r) // P1 coin out
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(15) // P1 coin drop
@@ -999,8 +1005,8 @@ static INPUT_PORTS_START( jclub2v100 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)
 	PORT_SERVICE_NO_TOGGLE( 0x00100000, IP_ACTIVE_LOW ) // test switch (on during boot: service mode, but make sure Config Key is off!)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SPECIAL  ) // P2 hopper full
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_SPECIAL  ) // P1 hopper full
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM  ) // P2 hopper full
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_CUSTOM  ) // P1 hopper full
 
 	PORT_START("P2LOW") // 4e0000.w (low byte)
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Payout") PORT_CODE(KEYCODE_RCONTROL)
@@ -1027,7 +1033,7 @@ static INPUT_PORTS_START( jclub2v112 )
 	PORT_CONFNAME(0x08000000, 0x08000000, "Disable Coins?") // causes lockout and coins to not register (same as an hardware error)
 	PORT_CONFSETTING(         0x08000000, DEF_STR( Off ))
 	PORT_CONFSETTING(         0x00000000, DEF_STR( On ))
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 
@@ -1046,7 +1052,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE( 5) // P1 coin in s1
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10) // P1 coin in s2
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(15) // P1 coin drop
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SPECIAL )                  // P1 hopper full
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_CUSTOM )                  // P1 hopper full
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_OTHER   )                  // P1 coin out sensor
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1054,7 +1060,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2   ) PORT_IMPULSE( 5) // P2 coin in s1
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_COIN2   ) PORT_IMPULSE(10) // P2 coin in s2
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_COIN2   ) PORT_IMPULSE(15) // P2 coin drop
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_SPECIAL )                  // P2 hopper full
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_CUSTOM )                  // P2 hopper full
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_OTHER   )                  // P2 coin out sensor
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1067,7 +1073,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_SERVICE_NO_TOGGLE( 0x00100000, IP_ACTIVE_LOW  ) // test switch (on during boot: service mode, but make sure Config Key is off!)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("Door 1") PORT_CODE(KEYCODE_OPENBRACE)  PORT_TOGGLE
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("Door 2") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_TOGGLE
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // door 3 in service mode!
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // door 3 in service mode!
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_START1   )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)
@@ -1100,7 +1106,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*2
 };
 
-static GFXDECODE_START( darkhors )
+static GFXDECODE_START( gfx_darkhors )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0, 0x10000/64 ) // color codes should be doubled
 GFXDECODE_END
 
@@ -1126,18 +1132,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(common_state::scanline_irq)
 
 // Older hardware (ST-0020 + ST-0016)
 MACHINE_CONFIG_START(jclub2o_state::jclub2o)
-	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
-	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(jclub2o_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu",ST0016_CPU, 8000000)
-	MCFG_CPU_PROGRAM_MAP(st0016_mem)
-	MCFG_CPU_IO_MAP(st0016_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jclub2o_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("soundcpu",ST0016_CPU, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
+	MCFG_DEVICE_IO_MAP(st0016_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jclub2o_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_EEPROM_SERIAL_S29290_ADD("eeprom") // S-29290 (16 bits)
-	MCFG_WATCHDOG_ADD("watchdog")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	EEPROM_S29290_16BIT(config, "eeprom");
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1159,19 +1165,19 @@ MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jclub2o)
+	config.set_default_layout(layout_jclub2o);
 MACHINE_CONFIG_END
 
 
 // Newer hardware (ST-0032)
 MACHINE_CONFIG_START(jclub2_state::jclub2)
-	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
-	MCFG_CPU_PROGRAM_MAP(jclub2_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(jclub2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom") // 93C46 ( 8 bits)
-	MCFG_WATCHDOG_ADD("watchdog")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	EEPROM_93C46_8BIT(config, "eeprom");
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1195,18 +1201,18 @@ MACHINE_CONFIG_START(jclub2_state::jclub2)
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jclub2o)
+	config.set_default_layout(layout_jclub2o);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(darkhors_state::darkhors)
-	MCFG_CPU_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
-	MCFG_CPU_PROGRAM_MAP(darkhors_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
+	MCFG_DEVICE_PROGRAM_MAP(darkhors_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
-	MCFG_WATCHDOG_ADD("watchdog")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	EEPROM_93C46_8BIT(config, "eeprom");
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1223,16 +1229,16 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkhors)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darkhors)
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state, darkhors)
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jclub2)
+	config.set_default_layout(layout_jclub2);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 528000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 528000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1501,12 +1507,12 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(jclub2o_state,jclub2o)
+void jclub2o_state::init_jclub2o()
 {
 	m_soundbank->configure_entries(0, 32, memregion("soundcpu")->base(), 0x4000);
 }
 
-DRIVER_INIT_MEMBER(darkhors_state,darkhors)
+void darkhors_state::init_darkhors()
 {
 	// the dumped eeprom bytes are in a different order to how MAME expects them to be!?
 	// (offset 0x00, 0x40, 0x01, 0x41, 0x02, 0x42 ..... )
@@ -1526,16 +1532,16 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 
 
 // Older hardware (ST-0020 + ST-0016)
-GAME( 1994, jclub2v100, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.00, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, jclub2v101, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.01, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.10X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, jclub2v100, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.00, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, jclub2v101, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.01, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.10X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 // Newer hardware (ST-0032)
-GAME( 1996, jclub2v200, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.00, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1996, jclub2v201, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.01X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1997, jclub2v204, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.04, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.05, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1996, jclub2v200, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.00, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1996, jclub2v201, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.01X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1997, jclub2v204, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.04, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.05, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 // Bootleg hardware
-GAME( 2001, darkhors,   jclub2v112, darkhors, darkhors,   darkhors_state, darkhors, ROT0, "bootleg", "Dark Horse (USA v4.00, bootleg of Jockey Club II)",     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, darkhors,   jclub2v112, darkhors, darkhors,   darkhors_state, init_darkhors, ROT0, "bootleg", "Dark Horse (USA v4.00, bootleg of Jockey Club II)",     MACHINE_IMPERFECT_GRAPHICS )

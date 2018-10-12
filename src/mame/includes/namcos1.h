@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+#include "cpu/m6800/m6801.h"
 #include "machine/c117.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
 #include "video/namco_c116.h"
 #include "machine/74157.h"
+#include "emupal.h"
 
 class namcos1_state : public driver_device
 {
@@ -32,10 +34,37 @@ public:
 		m_dsw_sel(*this, "dsw_sel")
 	{ }
 
+	void ns1(machine_config &config);
+
+	void init_pacmania();
+	void init_ws();
+	void init_wldcourt();
+	void init_tankfrc4();
+	void init_blazer();
+	void init_dangseed();
+	void init_splatter();
+	void init_alice();
+	void init_faceoff();
+	void init_puzlclub();
+	void init_bakutotu();
+	void init_rompers();
+	void init_ws90();
+	void init_tankfrce();
+	void init_soukobdx();
+	void init_shadowld();
+	void init_berabohm();
+	void init_galaga88();
+	void init_blastoff();
+	void init_quester();
+	void init_ws89();
+	void init_dspirit();
+	void init_pistoldm();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_mcu;
+	required_device<hd63701_cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
 	required_device<namco_c117_device> m_c117;
 	required_device<dac_8bit_r2r_device> m_dac0;
@@ -101,33 +130,10 @@ public:
 	DECLARE_READ8_MEMBER(key_type3_r);
 	DECLARE_WRITE8_MEMBER(key_type3_w);
 
-	DECLARE_DRIVER_INIT(pacmania);
-	DECLARE_DRIVER_INIT(ws);
-	DECLARE_DRIVER_INIT(wldcourt);
-	DECLARE_DRIVER_INIT(tankfrc4);
-	DECLARE_DRIVER_INIT(blazer);
-	DECLARE_DRIVER_INIT(dangseed);
-	DECLARE_DRIVER_INIT(splatter);
-	DECLARE_DRIVER_INIT(alice);
-	DECLARE_DRIVER_INIT(faceoff);
-	DECLARE_DRIVER_INIT(puzlclub);
-	DECLARE_DRIVER_INIT(bakutotu);
-	DECLARE_DRIVER_INIT(rompers);
-	DECLARE_DRIVER_INIT(ws90);
-	DECLARE_DRIVER_INIT(tankfrce);
-	DECLARE_DRIVER_INIT(soukobdx);
-	DECLARE_DRIVER_INIT(shadowld);
-	DECLARE_DRIVER_INIT(berabohm);
-	DECLARE_DRIVER_INIT(galaga88);
-	DECLARE_DRIVER_INIT(blastoff);
-	DECLARE_DRIVER_INIT(quester);
-	DECLARE_DRIVER_INIT(ws89);
-	DECLARE_DRIVER_INIT(dspirit);
-	DECLARE_DRIVER_INIT(pistoldm);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void driver_init();
+	void driver_init() override;
 
 	TILE_GET_INFO_MEMBER(bg_get_info0);
 	TILE_GET_INFO_MEMBER(bg_get_info1);
@@ -140,13 +146,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
-	void ns1(machine_config &config);
 	void main_map(address_map &map);
 	void mcu_map(address_map &map);
 	void mcu_port_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 	void virtual_map(address_map &map);
-private:
+
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *info_vram);
 };

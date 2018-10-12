@@ -22,7 +22,7 @@
 #include "speaker.h"
 
 
-static GFXDECODE_START( galeb )
+static GFXDECODE_START( gfx_galeb )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galeb_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -64,20 +64,21 @@ READ8_MEMBER(galeb_state::tape_data_r)
 }
 
 /* Address maps */
-ADDRESS_MAP_START(galeb_state::galeb_mem)
-	AM_RANGE( 0x0000, 0x1fff ) AM_RAM  // RAM
-	AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ(keyboard_r )
-	AM_RANGE( 0xbfe0, 0xbfe0 ) AM_WRITE(dac_w)
-	AM_RANGE( 0xbffe, 0xbffe ) AM_READ(tape_status_r)
-	AM_RANGE( 0xbfff, 0xbfff ) AM_READWRITE(tape_data_r, tape_data_w)
-	AM_RANGE( 0xb000, 0xb3ff ) AM_RAM  AM_SHARE("video_ram") // video ram
-	AM_RANGE( 0xc000, 0xc7ff ) AM_ROM  // BASIC 01 ROM
-	AM_RANGE( 0xc800, 0xcfff ) AM_ROM  // BASIC 02 ROM
-	AM_RANGE( 0xd000, 0xd7ff ) AM_ROM  // BASIC 03 ROM
-	AM_RANGE( 0xd800, 0xdfff ) AM_ROM  // BASIC 04 ROM
-	AM_RANGE( 0xf000, 0xf7ff ) AM_ROM  // Monitor ROM
-	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+void galeb_state::galeb_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();  // RAM
+	map(0xbfe0, 0xbfe7).r(FUNC(galeb_state::keyboard_r));
+	map(0xbfe0, 0xbfe0).w(FUNC(galeb_state::dac_w));
+	map(0xbffe, 0xbffe).r(FUNC(galeb_state::tape_status_r));
+	map(0xbfff, 0xbfff).rw(FUNC(galeb_state::tape_data_r), FUNC(galeb_state::tape_data_w));
+	map(0xb000, 0xb3ff).ram().share("video_ram"); // video ram
+	map(0xc000, 0xc7ff).rom();  // BASIC 01 ROM
+	map(0xc800, 0xcfff).rom();  // BASIC 02 ROM
+	map(0xd000, 0xd7ff).rom();  // BASIC 03 ROM
+	map(0xd800, 0xdfff).rom();  // BASIC 04 ROM
+	map(0xf000, 0xf7ff).rom();  // Monitor ROM
+	map(0xf800, 0xffff).rom();  // System ROM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( galeb )
@@ -165,8 +166,8 @@ INPUT_PORTS_END
 /* Machine driver */
 MACHINE_CONFIG_START(galeb_state::galeb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(galeb_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(galeb_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -177,16 +178,16 @@ MACHINE_CONFIG_START(galeb_state::galeb)
 	MCFG_SCREEN_UPDATE_DRIVER(galeb_state, screen_update_galeb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galeb )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galeb )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -204,5 +205,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY         FULLNAME   FLAGS
-COMP( 1981, galeb, 0,      0,      galeb,   galeb, galeb_state,  0,    "PEL Varazdin", "Galeb",   0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY         FULLNAME  FLAGS
+COMP( 1981, galeb, 0,      0,      galeb,   galeb, galeb_state, empty_init, "PEL Varazdin", "Galeb",  0 )

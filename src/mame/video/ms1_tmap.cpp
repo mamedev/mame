@@ -129,6 +129,18 @@ void megasys1_tilemap_device::device_start()
 	save_item(NAME(m_scroll_flag));
 }
 
+void megasys1_tilemap_device::device_reset()
+{
+	// Big Run never sets up scrollram past 0x1000
+	// this causes its opaque pen to show up when the game scrolls vertically after a bump.
+	// we initialize the device VRAM to a sane default so that this doesn't occur.
+	// TODO: might be something else (smaller VRAM size?)
+	for(int i=0;i<m_scrollram.bytes()/2;i++)
+		m_scrollram[i] = 0xffff;
+
+	m_tile_bank = 0;
+}
+
 void megasys1_tilemap_device::device_post_load()
 {
 	m_tmap = m_tilemap[(m_scroll_flag >> 4) & 1][m_scroll_flag & 3];
@@ -215,13 +227,17 @@ TILEMAP_MAPPER_MEMBER(megasys1_tilemap_device::scan_16x16)
 TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_8x8)
 {
 	uint16_t code = m_scrollram[tile_index];
-	SET_TILE_INFO_MEMBER(0, (code & 0xfff) * m_8x8_scroll_factor, code >> (16 - m_bits_per_color_code), 0);
+	uint16_t tile = ((code & 0xfff) + m_tile_bank) * m_8x8_scroll_factor;
+	SET_TILE_INFO_MEMBER(0, tile, code >> (16 - m_bits_per_color_code), 0);
 }
 
 TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_16x16)
 {
 	uint16_t code = m_scrollram[tile_index/4];
-	SET_TILE_INFO_MEMBER(0, (code & 0xfff) * m_16x16_scroll_factor + (tile_index & 3), code >> (16 - m_bits_per_color_code), 0);
+	uint16_t tile = ((code & 0xfff) + m_tile_bank) * m_16x16_scroll_factor;
+	tile+= tile_index & 3;
+
+	SET_TILE_INFO_MEMBER(0, tile, code >> (16 - m_bits_per_color_code), 0);
 }
 
 READ16_MEMBER(megasys1_tilemap_device::scroll_r)
@@ -291,4 +307,10 @@ void megasys1_tilemap_device::enable(bool enable)
 void megasys1_tilemap_device::set_flip(uint32_t attributes)
 {
 	m_tmap->set_flip(attributes);
+}
+
+void megasys1_tilemap_device::set_tilebank(uint8_t bank)
+{
+	m_tile_bank = bank << 12;
+	m_tmap->mark_all_dirty();
 }

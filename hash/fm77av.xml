@@ -1208,7 +1208,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1986</year>
 		<publisher>Kyoto Media</publisher>
 		<!--combined image (with hfe1->8)-->
-		<!--rom name="tfm-hfe.d77" size="3488480" crc="1D635297" sha1="BA40C6BC4D51BF33A657B53B7BAE201C95D2769B" offset="0" /-->
+		<!--rom name="tfm-hfe.d77" size="3488480" crc="1d635297" sha1="ba40c6bc4d51bf33a657b53b7bae201c95d2769b" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">

@@ -77,55 +77,55 @@
 
 
 #define MCFG_S100_IRQ_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_NMI_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI0_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi0_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi0_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI1_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi1_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi1_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI2_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi2_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi2_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI3_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi3_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi3_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI4_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi4_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi4_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI5_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi5_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi5_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI6_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi6_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi6_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI7_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi7_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi7_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_DMA0_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma0_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_dma0_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_DMA1_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma1_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_dma1_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_DMA2_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma2_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_dma2_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_DMA3_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma3_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_dma3_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_RDY_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_rdy_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_rdy_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_HOLD_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_ERROR_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_error_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_error_wr_callback(DEVCB_##_write);
 
 
 

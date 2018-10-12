@@ -5,7 +5,7 @@
     Hazeltine 1500
     original machine (c) 1977 Hazeltine Corporation
 
-    perliminary driver by Ryan Holtz
+    preliminary driver by Ryan Holtz
 
 TODO (roughly in order of importance):
     - Figure out the correct keyboard decoding.
@@ -35,6 +35,7 @@ References:
 #include "machine/nl_hazelvid.h"
 #include "netlist/devices/net_lib.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -135,6 +136,9 @@ public:
 	{
 	}
 
+	void hazl1500(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -165,10 +169,9 @@ public:
 	NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
 	NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
 
-	void hazl1500(machine_config &config);
 	void hazl1500_io(address_map &map);
 	void hazl1500_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<netlist_mame_device> m_video_board;
 	required_device<netlist_mame_ram_pointer_device> m_u9;
@@ -474,21 +477,23 @@ WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 	m_cpu_db7->write((data >> 7) & 1);
 }
 
-ADDRESS_MAP_START(hazl1500_state::hazl1500_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x3000, 0x377f) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0x3780, 0x37ff) AM_RAM
-ADDRESS_MAP_END
+void hazl1500_state::hazl1500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom().region(CPU_TAG, 0);
+	map(0x3000, 0x377f).rw(FUNC(hazl1500_state::ram_r), FUNC(hazl1500_state::ram_w));
+	map(0x3780, 0x37ff).ram();
+}
 
-ADDRESS_MAP_START(hazl1500_state::hazl1500_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_READWRITE(status_reg_2_r, status_reg_3_w)
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE(uart_r, uart_w)
-	AM_RANGE(0xdf, 0xdf) AM_READ(kbd_encoder_r)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(system_test_r, refresh_address_w)
-	AM_RANGE(0xf7, 0xf7) AM_READ(kbd_status_latch_r)
-ADDRESS_MAP_END
+void hazl1500_state::hazl1500_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).rw(FUNC(hazl1500_state::status_reg_2_r), FUNC(hazl1500_state::status_reg_3_w));
+	map(0xbf, 0xbf).rw(FUNC(hazl1500_state::uart_r), FUNC(hazl1500_state::uart_w));
+	map(0xdf, 0xdf).r(FUNC(hazl1500_state::kbd_encoder_r));
+	map(0xef, 0xef).rw(FUNC(hazl1500_state::system_test_r), FUNC(hazl1500_state::refresh_address_w));
+	map(0xf7, 0xf7).r(FUNC(hazl1500_state::kbd_status_latch_r));
+}
 
 	/*
 	  Hazeltine 1500 key matrix (from ref[1])
@@ -684,15 +689,15 @@ static const gfx_layout hazl1500_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( hazl1500 )
+static GFXDECODE_START( gfx_hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL(18'000'000)/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
-	MCFG_CPU_PROGRAM_MAP(hazl1500_mem)
-	MCFG_CPU_IO_MAP(hazl1500_io)
+	MCFG_DEVICE_ADD(CPU_TAG, I8080, XTAL(18'000'000)/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
+	MCFG_DEVICE_PROGRAM_MAP(hazl1500_mem)
+	MCFG_DEVICE_IO_MAP(hazl1500_io)
 	MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
@@ -709,14 +714,14 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hazl1500)
 
-	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart", ay51013_device, write_tcp))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", ay51013_device, write_rcp))
+	com8116_device &baudgen(COM8116(config, BAUDGEN_TAG, XTAL(5'068'800)));
+	baudgen.fr_handler().set(m_uart, FUNC(ay51013_device::write_tcp));
+	baudgen.fr_handler().append(m_uart, FUNC(ay51013_device::write_rcp));
 
-	MCFG_DEVICE_ADD(UART_TAG, AY51013, 0)
-	MCFG_AY51013_WRITE_DAV_CB(DEVWRITELINE("mainint", input_merger_device, in_w<0>))
+	AY51013(config, m_uart);
+	m_uart->write_dav_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
 	MCFG_NETLIST_SETUP(hazelvid)
@@ -757,27 +762,27 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "tvinterq", "tvinterq", hazl1500_state, tvinterq_cb, "")
 
 	/* keyboard controller */
-	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(hazl1500_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(hazl1500_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(hazl1500_state, ay3600_data_ready_w))
+	AY3600(config, m_kbdc, 0);
+	m_kbdc->x0().set_ioport("X0");
+	m_kbdc->x1().set_ioport("X1");
+	m_kbdc->x2().set_ioport("X2");
+	m_kbdc->x3().set_ioport("X3");
+	m_kbdc->x4().set_ioport("X4");
+	m_kbdc->x5().set_ioport("X5");
+	m_kbdc->x6().set_ioport("X6");
+	m_kbdc->x7().set_ioport("X7");
+	m_kbdc->x8().set_ioport("X8");
+	m_kbdc->shift().set(FUNC(hazl1500_state::ay3600_shift_r));
+	m_kbdc->control().set(FUNC(hazl1500_state::ay3600_control_r));
+	m_kbdc->data_ready().set(FUNC(hazl1500_state::ay3600_data_ready_w));
 MACHINE_CONFIG_END
 
 
 ROM_START( hazl1500 )
 	ROM_REGION( 0x10000, NETLIST_TAG, ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x10000, CPU_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "h15s-00I-10-3.bin", 0x0000, 0x0800, CRC(a2015f72) SHA1(357cde517c3dcf693de580881add058c7b26dfaa))
+	ROM_REGION( 0x1000, CPU_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "h15s-00i-10-3.bin", 0x0000, 0x0800, CRC(a2015f72) SHA1(357cde517c3dcf693de580881add058c7b26dfaa))
 
 	ROM_REGION( 0x800, CHAR_EPROM_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "u83_chr.bin", 0x0000, 0x0800, CRC(e0c6b734) SHA1(7c42947235c66c41059fd4384e09f4f3a17c9857))
@@ -789,7 +794,25 @@ ROM_START( hazl1500 )
 	ROM_LOAD( "u90_702128_82s129.bin", 0x0000, 0x0100, CRC(277bc424) SHA1(528a0de3b54d159bc14411961961706bf9ec41bf))
 ROM_END
 
+ROM_START( hazl1552 )
+	ROM_REGION( 0x10000, NETLIST_TAG, ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x1000, CPU_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "h200-009-11-0_vt52_u22.bin", 0x0000, 0x0800, CRC(622e3fe1) SHA1(886cea7315c4945f4dced7ee45b695ae0bd004aa))
+	ROM_LOAD( "h200-009-21-0_vt52_u23.bin", 0x0800, 0x0800, CRC(25494fea) SHA1(89059ec76b386114208f2e589046f230502577f4))
+
+	ROM_REGION( 0x800, CHAR_EPROM_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "h200-010-0.bin", 0x0000, 0x0800, CRC(80a58198) SHA1(ae37adbceedd7de22770f5831e32d8749c6ef3b8))
+
+	ROM_REGION( 0x100, BAUD_PROM_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "u49.bin", 0x0000, 0x0100, CRC(b35aea2b) SHA1(4702620cdef72b32a397580c22b75df36e24ac74))
+
+	ROM_REGION( 0x100, VIDEO_PROM_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "u90.bin", 0x0000, 0x0100, CRC(277bc424) SHA1(528a0de3b54d159bc14411961961706bf9ec41bf))
+ROM_END
+
 /* Driver */
 
-//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     CLASS           INIT    COMPANY                     FULLNAME            FLAGS
-COMP( 1977, hazl1500, 0,        0,       hazl1500, hazl1500, hazl1500_state, 0,      "Hazeltine Corporation",    "Hazeltine 1500",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                  FULLNAME          FLAGS
+COMP( 1977, hazl1500, 0,      0,      hazl1500, hazl1500, hazl1500_state, empty_init, "Hazeltine Corporation", "Hazeltine 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1979, hazl1552, 0,      0,      hazl1500, hazl1500, hazl1500_state, empty_init, "Hazeltine Corporation", "Hazeltine 1552", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

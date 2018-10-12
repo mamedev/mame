@@ -95,6 +95,7 @@ Note
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -112,6 +113,12 @@ public:
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram") { }
 
+	void vcarn(machine_config &config);
+	void spool99(machine_config &config);
+
+	void init_spool99();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_oki;
@@ -131,13 +138,10 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
 
-	DECLARE_DRIVER_INIT(spool99);
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void vcarn(machine_config &config);
-	void spool99(machine_config &config);
 	void spool99_map(address_map &map);
 	void vcarn_map(address_map &map);
 };
@@ -229,21 +233,22 @@ WRITE8_MEMBER(spool99_state::eeprom_dataline_w)
 	m_eeprom->di_write(data & 0x01);
 }
 
-ADDRESS_MAP_START(spool99_state::spool99_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
-	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
-	AM_RANGE(0xafed, 0xafed) AM_WRITE(eeprom_resetline_w )
-	AM_RANGE(0xafee, 0xafee) AM_WRITE(eeprom_clockline_w )
-	AM_RANGE(0xafef, 0xafef) AM_WRITE(eeprom_dataline_w )
-	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_device, write)
+void spool99_state::spool99_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("mainram");
+	map(0x0100, 0xaeff).rom().region("maincpu", 0x100).nopw();
+	map(0xaf00, 0xafff).r(FUNC(spool99_state::spool99_io_r));
+	map(0xafed, 0xafed).w(FUNC(spool99_state::eeprom_resetline_w));
+	map(0xafee, 0xafee).w(FUNC(spool99_state::eeprom_clockline_w));
+	map(0xafef, 0xafef).w(FUNC(spool99_state::eeprom_dataline_w));
+	map(0xaff8, 0xaff8).w(m_oki, FUNC(okim6295_device::write));
 
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0xb000, 0xb3ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE(0xb800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(cram_w) AM_SHARE("cram")
-ADDRESS_MAP_END
+	map(0xb800, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().w(FUNC(spool99_state::vram_w)).share("vram");
+	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share("cram");
+}
 
 READ8_MEMBER(spool99_state::vcarn_io_r)
 {
@@ -275,22 +280,23 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 	return ROM[0xa700+offset];
 }
 
-ADDRESS_MAP_START(spool99_state::vcarn_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
-	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)
-	AM_RANGE(0xa745, 0xa745) AM_WRITE(eeprom_resetline_w )
-	AM_RANGE(0xa746, 0xa746) AM_WRITE(eeprom_clockline_w )
-	AM_RANGE(0xa747, 0xa747) AM_WRITE(eeprom_dataline_w )
-	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE("oki", okim6295_device, write)
+void spool99_state::vcarn_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("mainram");
+	map(0x0100, 0xa6ff).rom().region("maincpu", 0x100).nopw();
+	map(0xa700, 0xa7ff).r(FUNC(spool99_state::vcarn_io_r));
+	map(0xa745, 0xa745).w(FUNC(spool99_state::eeprom_resetline_w));
+	map(0xa746, 0xa746).w(FUNC(spool99_state::eeprom_clockline_w));
+	map(0xa747, 0xa747).w(FUNC(spool99_state::eeprom_dataline_w));
+	map(0xa780, 0xa780).w(m_oki, FUNC(okim6295_device::write));
 
-	AM_RANGE(0xa800, 0xabff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0xa800, 0xabff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE(0xb000, 0xdfff) AM_RAM
+	map(0xb000, 0xdfff).ram();
 //  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_SHARE("vcarn_io")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(cram_w) AM_SHARE("cram")
-ADDRESS_MAP_END
+	map(0xe000, 0xefff).ram().w(FUNC(spool99_state::vram_w)).share("vram");
+	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share("cram");
+}
 
 
 
@@ -305,7 +311,7 @@ static const gfx_layout spool99_layout =
 	8*32
 };
 
-static GFXDECODE_START( spool99 )
+static GFXDECODE_START( gfx_spool99 )
 	GFXDECODE_ENTRY( "gfx", 0, spool99_layout,   0x00, 0x20  )
 GFXDECODE_END
 
@@ -361,11 +367,11 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(spool99_state::spool99)
 
-	MCFG_CPU_ADD("maincpu", Z80, 24000000/8)
-	MCFG_CPU_PROGRAM_MAP(spool99_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/8)
+	MCFG_DEVICE_PROGRAM_MAP(spool99_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spool99)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spool99)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -378,20 +384,21 @@ MACHINE_CONFIG_START(spool99_state::spool99)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(spool99_state::vcarn)
 	spool99(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(vcarn_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(vcarn_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1) //512x240, raw guess
@@ -459,7 +466,7 @@ ROM_START( vcarn )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(spool99_state,spool99)
+void spool99_state::init_spool99()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 //  vram = std::make_unique<uint8_t[]>(0x2000);
@@ -468,8 +475,8 @@ DRIVER_INIT_MEMBER(spool99_state,spool99)
 
 
 
-GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.36)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, spool99a,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.33)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, spool99b,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.31)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, spool99c,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.26)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, vcarn,      0,        vcarn,      spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", MACHINE_SUPPORTS_SAVE ) //MAME screen says '98, PCB screen says '99?
+GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.36)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, spool99a,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.33)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, spool99b,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.31)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, spool99c,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.26)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, vcarn,      0,        vcarn,      spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", MACHINE_SUPPORTS_SAVE ) //MAME screen says '98, PCB screen says '99?

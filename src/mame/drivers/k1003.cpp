@@ -51,34 +51,41 @@ class k1003_state : public driver_device
 public:
 	k1003_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu") { }
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
+	void k1003(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(disp_1_w);
 	DECLARE_WRITE8_MEMBER(disp_2_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 
-	void k1003(machine_config &config);
 	void k1003_io(address_map &map);
 	void k1003_mem(address_map &map);
-private:
+
 	uint8_t m_disp_1;
 	uint8_t m_disp_2;
 	uint8_t bit_to_dec(uint8_t val);
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
+	output_finder<16> m_digits;
 };
 
 
-ADDRESS_MAP_START(k1003_state::k1003_mem)
-	AM_RANGE(0x0000,0x07ff) AM_ROM
-	AM_RANGE(0x0800,0x17ff) AM_RAM
-	AM_RANGE(0x1800,0x1fff) AM_ROM
-	AM_RANGE(0x2000,0x27ff) AM_ROM
-	AM_RANGE(0x2800,0x2fff) AM_RAM
-	AM_RANGE(0x3000,0x3aff) AM_ROM
-ADDRESS_MAP_END
+void k1003_state::k1003_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x17ff).ram();
+	map(0x1800, 0x1fff).rom();
+	map(0x2000, 0x27ff).rom();
+	map(0x2800, 0x2fff).ram();
+	map(0x3000, 0x3aff).rom();
+}
 
 READ8_MEMBER( k1003_state::port2_r )
 {
@@ -116,19 +123,20 @@ uint8_t k1003_state::bit_to_dec(uint8_t val)
 
 WRITE8_MEMBER( k1003_state::disp_w )
 {
-	output().set_digit_value(bit_to_dec(data)*2,   m_disp_1);
-	output().set_digit_value(bit_to_dec(data)*2+1, m_disp_2);
+	m_digits[bit_to_dec(data)*2] = m_disp_1;
+	m_digits[bit_to_dec(data)*2+1] = m_disp_2;
 }
 
-ADDRESS_MAP_START(k1003_state::k1003_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00,0x00) AM_READ(key_r)
-	AM_RANGE(0x02,0x02) AM_READ(port2_r)
+void k1003_state::k1003_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).r(FUNC(k1003_state::key_r));
+	map(0x02, 0x02).r(FUNC(k1003_state::port2_r));
 
-	AM_RANGE(0x08,0x08) AM_WRITE(disp_w)
-	AM_RANGE(0x09,0x09) AM_WRITE(disp_2_w)
-	AM_RANGE(0x10,0x10) AM_WRITE(disp_1_w)
-ADDRESS_MAP_END
+	map(0x08, 0x08).w(FUNC(k1003_state::disp_w));
+	map(0x09, 0x09).w(FUNC(k1003_state::disp_2_w));
+	map(0x10, 0x10).w(FUNC(k1003_state::disp_1_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( k1003 )
@@ -141,12 +149,12 @@ void k1003_state::machine_reset()
 
 MACHINE_CONFIG_START(k1003_state::k1003)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8008, 800000)
-	MCFG_CPU_PROGRAM_MAP(k1003_mem)
-	MCFG_CPU_IO_MAP(k1003_io)
+	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(k1003_mem)
+	MCFG_DEVICE_IO_MAP(k1003_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_k1003)
+	config.set_default_layout(layout_k1003);
 MACHINE_CONFIG_END
 
 
@@ -214,5 +222,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY     FULLNAME  FLAGS
-COMP( 1978, k1003,  0,      0,       k1003,     k1003, k1003_state, 0,    "Robotron", "K1003",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1978, k1003, 0,      0,      k1003,   k1003, k1003_state, empty_init, "Robotron", "K1003",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

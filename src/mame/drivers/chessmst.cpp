@@ -64,13 +64,13 @@ protected:
 
 	void chessmst_io(address_map &map);
 	void chessmst_mem(address_map &map);
-	void chessmstdm(address_map &map);
+	void chessmstdm_mem(address_map &map);
 	void chessmstdm_io(address_map &map);
 
 private:
 	void update_display();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pia2;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<beep_device> m_beeper;
@@ -88,32 +88,36 @@ private:
 };
 
 
-ADDRESS_MAP_START(chessmst_state::chessmst_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected
-	AM_RANGE( 0x0000, 0x27ff ) AM_ROM
-	AM_RANGE( 0x3400, 0x3bff ) AM_RAM
-ADDRESS_MAP_END
+void chessmst_state::chessmst_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x7fff); // A15 not connected
+	map(0x0000, 0x27ff).rom();
+	map(0x3400, 0x3bff).ram();
+}
 
-ADDRESS_MAP_START(chessmst_state::chessmstdm)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff ) AM_DEVREAD("cartslot", generic_slot_device, read_rom)
-	AM_RANGE( 0x8000, 0x8bff ) AM_RAM
-ADDRESS_MAP_END
+void chessmst_state::chessmstdm_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	map(0x8000, 0x8bff).ram();
+}
 
-ADDRESS_MAP_START(chessmst_state::chessmst_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void chessmst_state::chessmst_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0x03) AM_MIRROR(0xf0) read/write in both, not used by the software
-	AM_RANGE(0x04, 0x07) AM_MIRROR(0xf0) AM_DEVREADWRITE("z80pio1", z80pio_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xf0) AM_DEVREADWRITE("z80pio2", z80pio_device, read, write)
-ADDRESS_MAP_END
+	map(0x04, 0x07).mirror(0xf0).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x08, 0x0b).mirror(0xf0).rw(m_pia2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
-ADDRESS_MAP_START(chessmst_state::chessmstdm_io)
-	AM_IMPORT_FROM(chessmst_io)
-	AM_RANGE(0x4c, 0x4c) AM_WRITE(digits_w)
-ADDRESS_MAP_END
+void chessmst_state::chessmstdm_io(address_map &map)
+{
+	chessmst_io(map);
+	map(0x4c, 0x4c).w(FUNC(chessmst_state::digits_w));
+}
 
 WRITE_LINE_MEMBER( chessmst_state::timer_555_w )
 {
@@ -132,7 +136,7 @@ INPUT_CHANGED_MEMBER(chessmst_state::view_monitor_button)
 	// pressing both VIEW and MONITOR buttons causes a reset
 	if ((m_extra->read() & 0x03) == 0x03)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		machine_reset();
 	}
 }
@@ -377,79 +381,79 @@ static const z80_daisy_config chessmstdm_daisy_chain[] =
 MACHINE_CONFIG_START(chessmst_state::chessmst)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 9.8304_MHz_XTAL/4) // U880 Z80 clone
-	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
-	MCFG_CPU_IO_MAP(chessmst_io)
-	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
+	Z80(config, m_maincpu, 9.8304_MHz_XTAL/4); // U880 Z80 clone
+	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmst_mem);
+	m_maincpu->set_addrmap(AS_IO, &chessmst_state::chessmst_io);
+	m_maincpu->set_daisy_config(chessmst_daisy_chain);
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 9.8304_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", 9.8304_MHz_XTAL/4));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 9.8304_MHz_XTAL/4)
-	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
+	Z80PIO(config, m_pia2, 9.8304_MHz_XTAL/4);
+	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_chessmst)
+	config.set_default_layout(layout_chessmst);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(chessmst_state::chessmsta)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL/4) // U880 Z80 clone
-	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
-	MCFG_CPU_IO_MAP(chessmst_io)
-	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
+	Z80(config, m_maincpu, 8_MHz_XTAL/4); // U880 Z80 clone
+	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmst_mem);
+	m_maincpu->set_addrmap(AS_IO, &chessmst_state::chessmst_io);
+	m_maincpu->set_daisy_config(chessmst_daisy_chain);
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", 8_MHz_XTAL/4));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
+	Z80PIO(config, m_pia2, 8_MHz_XTAL/4);
+	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_chessmst)
+	config.set_default_layout(layout_chessmst);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL/2) // U880 Z80 clone
-	MCFG_CPU_PROGRAM_MAP(chessmstdm)
-	MCFG_CPU_IO_MAP(chessmstdm_io)
-	MCFG_Z80_DAISY_CHAIN(chessmstdm_daisy_chain)
+	Z80(config, m_maincpu, 8_MHz_XTAL/2); // U880 Z80 clone
+	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmstdm_mem);
+	m_maincpu->set_addrmap(AS_IO, &chessmst_state::chessmstdm_io);
+	m_maincpu->set_daisy_config(chessmstdm_daisy_chain);
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_dm_w))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("EXTRA"))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", 8_MHz_XTAL/4));
+	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_dm_w));
+	pio1.in_pb_callback().set_ioport("EXTRA");
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
+	Z80PIO(config, m_pia2, 8_MHz_XTAL/4);
+	m_pia2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_chessmstdm)
+	config.set_default_layout(layout_chessmstdm);
 
 	MCFG_DEVICE_ADD("555_timer", CLOCK, 500) // from 555 timer
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(chessmst_state, timer_555_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, chessmst_state, timer_555_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1000)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "chessmstdm_cart")
@@ -480,13 +484,13 @@ ROM_END
 
 ROM_START( chessmstdm )
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("CMD_bm002_bm201.bin", 0x0000, 0x4000, CRC(47858079) SHA1(eeae1126b514e4853d056690e72e7f5c6dfb3008))
+	ROM_LOAD("cmd_bm002_bm201.bin", 0x0000, 0x4000, CRC(47858079) SHA1(eeae1126b514e4853d056690e72e7f5c6dfb3008))
 ROM_END
 
 
 /* Driver */
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       STATE           INIT  COMPANY                       FULLNAME                FLAGS
-COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, 0,    "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, 0,    "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, 0,    "VEB Mikroelektronik Erfurt", "Chess-Master Diamond", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY                       FULLNAME                FLAGS
+COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master Diamond", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )

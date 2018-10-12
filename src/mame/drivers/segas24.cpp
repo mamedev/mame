@@ -346,6 +346,7 @@ Notes:
 #include "machine/nvram.h"
 #include "machine/upd4701.h"
 #include "machine/315_5296.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "video/segaic24.h"
@@ -375,43 +376,57 @@ enum {
 
 void segas24_state::fdc_init()
 {
-	fdc_status = 0;
-	fdc_track = 0;
-	fdc_sector = 0;
-	fdc_data = 0;
-	fdc_phys_track = 0;
-	fdc_irq = 0;
-	fdc_drq = 0;
-	fdc_index_count = 0;
+	m_fdc_track_side = 0;
+	m_fdc_mode = 0;
+	m_fdc_status = 0;
+	m_fdc_track = 0;
+	m_fdc_sector = 0;
+	m_fdc_data = 0;
+	m_fdc_phys_track = 0;
+	m_fdc_irq = false;
+	m_fdc_drq = false;
+	m_fdc_index_count = 0;
+}
+
+void segas24_state::device_post_load()
+{
+	switch(m_fdc_mode) {
+	case 0x9:
+	case 0xb:
+		m_fdc_pt = &m_floppy[m_track_size*(2*m_fdc_phys_track+m_fdc_track_side) + (m_track_size - m_fdc_span)];
+		break;
+	default:
+		break;
+	}
 }
 
 READ16_MEMBER( segas24_state::fdc_r )
 {
-	if(!track_size)
+	if(!m_track_size)
 		return 0xffff;
 
 	switch(offset) {
 	case 0:
-		fdc_irq = 0;
-		return fdc_status;
+		m_fdc_irq = false;
+		return m_fdc_status;
 	case 1:
-		return fdc_track;
+		return m_fdc_track;
 	case 2:
-		return fdc_sector;
+		return m_fdc_sector;
 	case 3:
 	default: {
-		int res = fdc_data;
-		if(fdc_drq) {
-			fdc_span--;
-			// FDC_LOG(("Read %02x (%d)\n", res, fdc_span));
-			if(fdc_span) {
-				fdc_pt++;
-				fdc_data = *fdc_pt;
+		int res = m_fdc_data;
+		if(m_fdc_drq) {
+			m_fdc_span--;
+			// FDC_LOG(("Read %02x (%d)\n", res, m_fdc_span));
+			if(m_fdc_span) {
+				m_fdc_pt++;
+				m_fdc_data = *m_fdc_pt;
 			} else {
 				FDC_LOG(("FDC: transfert complete\n"));
-				fdc_drq = 0;
-				fdc_status = 0;
-				fdc_irq = 1;
+				m_fdc_drq = false;
+				m_fdc_status = 0;
+				m_fdc_irq = true;
 			}
 		} else
 			FDC_LOG(("FDC: data read with drq down\n"));
@@ -422,54 +437,59 @@ READ16_MEMBER( segas24_state::fdc_r )
 
 WRITE16_MEMBER( segas24_state::fdc_w )
 {
-	if(!track_size)
+	if(!m_track_size)
 		return;
 
 	if(ACCESSING_BITS_0_7) {
 		data &= 0xff;
 		switch(offset) {
 		case 0:
-			fdc_irq = 0;
+			m_fdc_irq = false;
 			switch(data >> 4) {
 			case 0x0:
 				FDC_LOG(("FDC: Restore\n"));
-				fdc_phys_track = fdc_track = 0;
-				fdc_irq = 1;
-				fdc_status = 4;
+				m_fdc_phys_track = m_fdc_track = 0;
+				m_fdc_irq = true;
+				m_fdc_status = 4;
 				break;
 			case 0x1:
-				FDC_LOG(("FDC: Seek %d\n", fdc_data));
-				fdc_phys_track = fdc_track = fdc_data;
-				fdc_irq = 1;
-				fdc_status = fdc_track ? 0 : 4;
+				FDC_LOG(("FDC: Seek %d\n", m_fdc_data));
+				m_fdc_phys_track = m_fdc_track = m_fdc_data;
+				m_fdc_irq = true;
+				m_fdc_status = m_fdc_track ? 0 : 4;
 				break;
 			case 0x9:
-				FDC_LOG(("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track));
-				fdc_pt = memregion("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
-				fdc_span = track_size;
-				fdc_status = 3;
-				fdc_drq = 1;
-				fdc_data = *fdc_pt;
+				m_fdc_track_side = (data & 8 ? 1 : 0);
+				m_fdc_mode = 0x9;
+				FDC_LOG(("Read multiple [%02x] %d..%d side %d track %d\n", data, m_fdc_sector, m_fdc_sector+m_fdc_data-1, m_fdc_track_side, m_fdc_phys_track));
+				m_fdc_pt = &m_floppy[m_track_size*(2*m_fdc_phys_track+m_fdc_track_side)];
+				m_fdc_span = m_track_size;
+				m_fdc_status = 3;
+				m_fdc_drq = true;
+				m_fdc_data = *m_fdc_pt;
 				break;
 			case 0xb:
-				FDC_LOG(("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track));
-				fdc_pt = memregion("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
-				fdc_span = track_size;
-				fdc_status = 3;
-				fdc_drq = 1;
+				m_fdc_track_side = (data & 8 ? 1 : 0);
+				m_fdc_mode = 0xb;
+				FDC_LOG(("Write multiple [%02x] %d..%d side %d track %d\n", data, m_fdc_sector, m_fdc_sector+m_fdc_data-1, m_fdc_track_side, m_fdc_phys_track));
+				m_fdc_pt = &m_floppy[m_track_size*(2*m_fdc_phys_track+m_fdc_track_side)];
+				m_fdc_span = m_track_size;
+				m_fdc_status = 3;
+				m_fdc_drq = true;
 				break;
 			case 0xd:
+				m_fdc_mode = 0xd;
 				FDC_LOG(("FDC: Forced interrupt\n"));
-				fdc_span = 0;
-				fdc_drq = 0;
-				fdc_irq = data & 1;
-				fdc_status = 0;
+				m_fdc_span = 0;
+				m_fdc_drq = false;
+				m_fdc_irq = BIT(data, 0);
+				m_fdc_status = 0;
 				break;
 			case 0xf:
 				if(data == 0xfe)
-					FDC_LOG(("FDC: Assign mode %02x\n", fdc_data));
+					FDC_LOG(("FDC: Assign mode %02x\n", m_fdc_data));
 				else if(data == 0xfd)
-					FDC_LOG(("FDC: Assign parameter %02x\n", fdc_data));
+					FDC_LOG(("FDC: Assign parameter %02x\n", m_fdc_data));
 				else
 					FDC_LOG(("FDC: Unknown command %02x\n", data));
 				break;
@@ -480,26 +500,26 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 			break;
 		case 1:
 			FDC_LOG(("FDC: Track register %02x\n", data));
-			fdc_track = data;
+			m_fdc_track = data;
 			break;
 		case 2:
 			FDC_LOG(("FDC: Sector register %02x\n", data));
-			fdc_sector = data;
+			m_fdc_sector = data;
 			break;
 		case 3:
-			if(fdc_drq) {
-				//              FDC_LOG("Write %02x (%d)\n", data, fdc_span);
-				*fdc_pt++ = data;
-				fdc_span--;
-				if(!fdc_span) {
+			if(m_fdc_drq) {
+				//              FDC_LOG("Write %02x (%d)\n", data, m_fdc_span);
+				*m_fdc_pt++ = data;
+				m_fdc_span--;
+				if(!m_fdc_span) {
 					FDC_LOG(("FDC: transfert complete\n"));
-					fdc_drq = 0;
-					fdc_status = 0;
-					fdc_irq = 1;
+					m_fdc_drq = false;
+					m_fdc_status = 0;
+					m_fdc_irq = true;
 				}
 			} else
 				FDC_LOG(("FDC: Data register %02x\n", data));
-			fdc_data = data;
+			m_fdc_data = data;
 			break;
 		}
 	}
@@ -507,10 +527,10 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 
 READ16_MEMBER( segas24_state::fdc_status_r )
 {
-	if(!track_size)
+	if(!m_track_size)
 		return 0xffff;
 
-	return 0x90 | (fdc_irq ? 2 : 0) | (fdc_drq ? 1 : 0) | (fdc_phys_track ? 0x40 : 0) | (fdc_index_count ? 0x20 : 0);
+	return 0x90 | (m_fdc_irq ? 2 : 0) | (m_fdc_drq ? 1 : 0) | (m_fdc_phys_track ? 0x40 : 0) | (m_fdc_index_count ? 0x20 : 0);
 }
 
 WRITE16_MEMBER( segas24_state::fdc_ctrl_w )
@@ -537,18 +557,18 @@ READ8_MEMBER(segas24_state::dcclub_p3_r)
 
 READ8_MEMBER(segas24_state::mahmajn_input_line_r)
 {
-	return ~(1 << cur_input_line);
+	return ~(1 << m_cur_input_line);
 }
 
 READ8_MEMBER(segas24_state::mahmajn_inputs_r)
 {
-	return m_mj_inputs[cur_input_line].read_safe(0xff);
+	return m_mj_inputs[m_cur_input_line].read_safe(0xff);
 }
 
 WRITE8_MEMBER(segas24_state::mahmajn_mux_w)
 {
 	if(data & 4)
-		cur_input_line = (cur_input_line + 1) & 7;
+		m_cur_input_line = (m_cur_input_line + 1) & 7;
 }
 
 WRITE8_MEMBER(segas24_state::hotrod_lamps_w)
@@ -636,7 +656,7 @@ WRITE_LINE_MEMBER(segas24_state::cnt1)
 		if (state)
 		{
 			m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			//osd_printf_debug("enable 2nd cpu!\n");
 			//machine().debug_break();
 			if (m_gground_hack_timer)
@@ -660,41 +680,39 @@ void segas24_state::reset_bank()
 {
 	if (m_romboard != nullptr)
 	{
-		membank("bank1")->set_entry(curbank & 15);
-		membank("bank2")->set_entry(curbank & 15);
+		m_rombank[0]->set_entry(m_curbank & 15);
+		m_rombank[1]->set_entry(m_curbank & 15);
 	}
 }
 
-READ16_MEMBER( segas24_state::curbank_r )
+READ8_MEMBER( segas24_state::curbank_r )
 {
-	return curbank;
+	return m_curbank;
 }
 
-WRITE16_MEMBER( segas24_state::curbank_w )
+WRITE8_MEMBER( segas24_state::curbank_w )
 {
-	if(ACCESSING_BITS_0_7) {
-		curbank = data & 0xff;
-		reset_bank();
-	}
+	m_curbank = data;
+	reset_bank();
 }
 
 READ8_MEMBER( segas24_state::frc_mode_r )
 {
-	return frc_mode & 1;
+	return m_frc_mode & 1;
 }
 
 WRITE8_MEMBER( segas24_state::frc_mode_w )
 {
 	/* reset frc if a write happens here */
-	frc_cnt_timer->reset();
-	frc_mode = data & 1;
+	m_frc_cnt_timer->reset();
+	m_frc_mode = data & 1;
 }
 
 READ8_MEMBER( segas24_state::frc_r )
 {
-	int32_t result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0).dvalue()).as_double();
+	int32_t result = (m_frc_cnt_timer->time_elapsed() * (m_frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0).dvalue()).as_double();
 
-	result %= ((frc_mode) ? 0x67 : 0x100);
+	result %= ((m_frc_mode) ? 0x67 : 0x100);
 
 	return result;
 }
@@ -709,42 +727,38 @@ WRITE8_MEMBER( segas24_state::frc_w )
 
 // Protection magic latch
 
-const uint8_t  segas24_state::mahmajn_mlt[8] = { 5, 1, 6, 2, 3, 7, 4, 0 };
-const uint8_t segas24_state::mahmajn2_mlt[8] = { 6, 0, 5, 3, 1, 4, 2, 7 };
-const uint8_t      segas24_state::qgh_mlt[8] = { 3, 7, 4, 0, 2, 6, 5, 1 };
-const uint8_t segas24_state::bnzabros_mlt[8] = { 2, 4, 0, 5, 7, 3, 1, 6 };
-const uint8_t   segas24_state::qrouka_mlt[8] = { 1, 6, 4, 7, 0, 5, 3, 2 };
-const uint8_t segas24_state::quizmeku_mlt[8] = { 0, 3, 2, 4, 6, 1, 7, 5 };
-const uint8_t   segas24_state::dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
+const uint8_t  segas24_state::s_mahmajn_mlt[8] = { 5, 1, 6, 2, 3, 7, 4, 0 };
+const uint8_t segas24_state::s_mahmajn2_mlt[8] = { 6, 0, 5, 3, 1, 4, 2, 7 };
+const uint8_t      segas24_state::s_qgh_mlt[8] = { 3, 7, 4, 0, 2, 6, 5, 1 };
+const uint8_t segas24_state::s_bnzabros_mlt[8] = { 2, 4, 0, 5, 7, 3, 1, 6 };
+const uint8_t   segas24_state::s_qrouka_mlt[8] = { 1, 6, 4, 7, 0, 5, 3, 2 };
+const uint8_t segas24_state::s_quizmeku_mlt[8] = { 0, 3, 2, 4, 6, 1, 7, 5 };
+const uint8_t   segas24_state::s_dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
 
 
-READ16_MEMBER( segas24_state::mlatch_r )
+READ8_MEMBER( segas24_state::mlatch_r )
 {
-	return mlatch;
+	return m_mlatch;
 }
 
-WRITE16_MEMBER( segas24_state::mlatch_w )
+WRITE8_MEMBER( segas24_state::mlatch_w )
 {
-	if(ACCESSING_BITS_0_7) {
-		int i;
-		uint8_t mxor = 0;
-		if(!mlatch_table) {
-			logerror("Protection: magic latch accessed but no table loaded %s\n", machine().describe_context());
-			return;
-		}
+	int i;
+	uint8_t mxor = 0;
+	if(!m_mlatch_table) {
+		logerror("Protection: magic latch accessed but no table loaded %s\n", machine().describe_context());
+		return;
+	}
 
-		data &= 0xff;
-
-		if(data != 0xff) {
-			for(i=0; i<8; i++)
-				if(mlatch & (1<<i))
-					mxor |= 1 << mlatch_table[i];
-			mlatch = data ^ mxor;
-			logerror("Magic latching %02x ^ %02x as %02x %s\n", data & 0xff, mxor, mlatch, machine().describe_context());
-		} else {
-			logerror("Magic latch reset %s\n", machine().describe_context());
-			mlatch = 0x00;
-		}
+	if(data != 0xff) {
+		for(i=0; i<8; i++)
+			if(m_mlatch & (1<<i))
+				mxor |= 1 << m_mlatch_table[i];
+		m_mlatch = data ^ mxor;
+		logerror("Magic latching %02x ^ %02x as %02x %s\n", data & 0xff, mxor, m_mlatch, machine().describe_context());
+	} else {
+		logerror("Magic latch reset %s\n", machine().describe_context());
+		m_mlatch = 0x00;
 	}
 }
 
@@ -755,52 +769,52 @@ void segas24_state::irq_timer_sync()
 {
 	attotime ctime = machine().time();
 
-	switch(irq_tmode) {
+	switch(m_irq_tmode) {
 	case 0:
 		break;
 	case 1: {
 		// Don't remove the floor(), the value may be slightly negative
-		int ppos = floor((irq_synctime - irq_vsynctime).as_double() * HSYNC_CLOCK.dvalue());
-		int cpos = floor((ctime - irq_vsynctime).as_double() * HSYNC_CLOCK.dvalue());
-		irq_tval += cpos-ppos;
+		int ppos = floor((m_irq_synctime - m_irq_vsynctime).as_double() * HSYNC_CLOCK.dvalue());
+		int cpos = floor((ctime - m_irq_vsynctime).as_double() * HSYNC_CLOCK.dvalue());
+		m_irq_tval += cpos-ppos;
 		break;
 	}
 	case 2: {
 		fatalerror("segas24_state::irq_timer_sync - case 2\n");
 	}
 	case 3: {
-		int ppos = floor((irq_synctime - irq_vsynctime).as_double() * TIMER_CLOCK.dvalue());
-		int cpos = floor((ctime - irq_vsynctime).as_double() * TIMER_CLOCK.dvalue());
-		irq_tval += cpos-ppos;
+		int ppos = floor((m_irq_synctime - m_irq_vsynctime).as_double() * TIMER_CLOCK.dvalue());
+		int cpos = floor((ctime - m_irq_vsynctime).as_double() * TIMER_CLOCK.dvalue());
+		m_irq_tval += cpos-ppos;
 		break;
 	}
 	}
 
-	irq_synctime = ctime;
+	m_irq_synctime = ctime;
 }
 
 void segas24_state::irq_timer_start(int old_tmode)
 {
-	switch(irq_tmode) {
+	switch(m_irq_tmode) {
 	case 0:
 		if(old_tmode) {
-			irq_tval++;
-			if(irq_tval == 0x1000)
-				irq_timer->adjust(attotime::zero);
+			m_irq_tval++;
+			if(m_irq_tval == 0x1000)
+				m_irq_timer->adjust(attotime::zero);
 			else
-				irq_timer->enable(false);
+				m_irq_timer->enable(false);
 		}
 		break;
 	case 1: {
-		int count = 0x1000 - irq_tval;
-		irq_timer->adjust(attotime::from_hz(HSYNC_CLOCK)*count);
+		int count = 0x1000 - m_irq_tval;
+		m_irq_timer->adjust(attotime::from_hz(HSYNC_CLOCK)*count);
 		break;
 	}
 	case 2:
 		fatalerror("segas24_state::irq_timer_start - case 2\n");
 	case 3: {
-		int count = 0x1000 - irq_tval;
-		irq_timer->adjust(attotime::from_hz(TIMER_CLOCK)*count);
+		int count = 0x1000 - m_irq_tval;
+		m_irq_timer->adjust(attotime::from_hz(TIMER_CLOCK)*count);
 		break;
 	}
 	}
@@ -810,19 +824,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
 {
 	irq_timer_sync();
 
-	if(irq_tval != 0x1000)
-		fprintf(stderr, "Error: timer desync %x != 1000\n", irq_tval);
+	if(m_irq_tval != 0x1000)
+		fprintf(stderr, "Error: timer desync %x != 1000\n", m_irq_tval);
 
-	irq_tval = irq_tdata;
-	irq_timer_start(irq_tmode);
+	m_irq_tval = m_irq_tdata;
+	irq_timer_start(m_irq_tmode);
 
-	irq_timer_pend0 = irq_timer_pend1 = 1;
-	if(irq_allow0 & (1 << IRQ_TIMER))
+	m_irq_timer_pend0 = m_irq_timer_pend1 = true;
+	if(m_irq_allow0 & (1 << IRQ_TIMER))
 		m_maincpu->set_input_line(IRQ_TIMER+1, ASSERT_LINE);
-	if(irq_allow1 & (1 << IRQ_TIMER))
+	if(m_irq_allow1 & (1 << IRQ_TIMER))
 		m_subcpu->set_input_line(IRQ_TIMER+1, ASSERT_LINE);
 
-	if (irq_tmode == 1 || irq_tmode == 2)
+	if (m_irq_tmode == 1 || m_irq_tmode == 2)
 	{
 	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
@@ -831,7 +845,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
 
 TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_clear_cb)
 {
-	irq_sprite = irq_vblank = 0;
+	m_irq_sprite = m_irq_vblank = false;
 	m_maincpu->set_input_line(IRQ_VBLANK+1, CLEAR_LINE);
 	m_maincpu->set_input_line(IRQ_SPRITE+1, CLEAR_LINE);
 	m_subcpu->set_input_line(IRQ_VBLANK+1, CLEAR_LINE);
@@ -840,28 +854,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_clear_cb)
 
 TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_frc_cb)
 {
-	if(irq_allow0 & (1 << IRQ_FRC) && frc_mode == 1)
+	if(m_irq_allow0 & (1 << IRQ_FRC) && m_frc_mode == 1)
 		m_maincpu->set_input_line(IRQ_FRC+1, ASSERT_LINE);
 
-	if(irq_allow1 & (1 << IRQ_FRC) && frc_mode == 1)
+	if(m_irq_allow1 & (1 << IRQ_FRC) && m_frc_mode == 1)
 		m_subcpu->set_input_line(IRQ_FRC+1, ASSERT_LINE);
 }
 
 void segas24_state::irq_init()
 {
-	irq_tdata = 0;
-	irq_tmode = 0;
-	irq_allow0 = 0;
-	irq_allow1 = 0;
-	irq_timer_pend0 = 0;
-	irq_timer_pend1 = 0;
-	irq_vblank = 0;
-	irq_sprite = 0;
-	irq_timer = machine().device<timer_device>("irq_timer");
-	irq_timer_clear = machine().device<timer_device>("irq_timer_clear");
-	irq_tval = 0;
-	irq_synctime = attotime::zero;
-	irq_vsynctime = attotime::zero;
+	m_irq_tdata = 0;
+	m_irq_tmode = 0;
+	m_irq_allow0 = 0;
+	m_irq_allow1 = 0;
+	m_irq_timer_pend0 = false;
+	m_irq_timer_pend1 = false;
+	m_irq_vblank = false;
+	m_irq_sprite = false;
+	m_irq_tval = 0;
+	m_irq_synctime = attotime::zero;
+	m_irq_vsynctime = attotime::zero;
 }
 
 WRITE16_MEMBER(segas24_state::irq_w)
@@ -869,36 +881,36 @@ WRITE16_MEMBER(segas24_state::irq_w)
 	switch(offset) {
 	case 0: {
 		irq_timer_sync();
-		COMBINE_DATA(&irq_tdata);
-		irq_tdata &= 0xfff;
-		irq_timer_start(irq_tmode);
+		COMBINE_DATA(&m_irq_tdata);
+		m_irq_tdata &= 0xfff;
+		irq_timer_start(m_irq_tmode);
 		break;
 	}
 	case 1:
 		if(ACCESSING_BITS_0_7) {
-			uint8_t old_tmode = irq_tmode;
+			uint8_t old_tmode = m_irq_tmode;
 			irq_timer_sync();
-			irq_tmode = data & 3;
+			m_irq_tmode = data & 3;
 			irq_timer_start(old_tmode);
 		}
 		break;
 	case 2:
-		irq_allow0 = data & 0x3f;
-		irq_timer_pend0 = 0;
+		m_irq_allow0 = data & 0x3f;
+		m_irq_timer_pend0 = false;
 		m_maincpu->set_input_line(IRQ_TIMER+1, CLEAR_LINE);
-		m_maincpu->set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		m_maincpu->set_input_line(IRQ_VBLANK+1, irq_vblank && (irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		m_maincpu->set_input_line(IRQ_SPRITE+1, irq_sprite && (irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
-		//m_maincpu->set_input_line(IRQ_FRC+1, irq_frc && (irq_allow0 & (1 << IRQ_FRC)) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(IRQ_YM2151+1, m_irq_yms && (m_irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(IRQ_VBLANK+1, m_irq_vblank && (m_irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(IRQ_SPRITE+1, m_irq_sprite && (m_irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		//m_maincpu->set_input_line(IRQ_FRC+1, m_irq_frc && (m_irq_allow0 & (1 << IRQ_FRC)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	case 3:
-		irq_allow1 = data & 0x3f;
-		irq_timer_pend1 = 0;
+		m_irq_allow1 = data & 0x3f;
+		m_irq_timer_pend1 = false;
 		m_subcpu->set_input_line(IRQ_TIMER+1, CLEAR_LINE);
-		m_subcpu->set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		m_subcpu->set_input_line(IRQ_VBLANK+1, irq_vblank && (irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		m_subcpu->set_input_line(IRQ_SPRITE+1, irq_sprite && (irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
-		//m_subcpu->set_input_line(IRQ_FRC+1, irq_frc && (irq_allow1 & (1 << IRQ_FRC)) ? ASSERT_LINE : CLEAR_LINE);
+		m_subcpu->set_input_line(IRQ_YM2151+1, m_irq_yms && (m_irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		m_subcpu->set_input_line(IRQ_VBLANK+1, m_irq_vblank && (m_irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		m_subcpu->set_input_line(IRQ_SPRITE+1, m_irq_sprite && (m_irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		//m_subcpu->set_input_line(IRQ_FRC+1, m_irq_frc && (m_irq_allow1 & (1 << IRQ_FRC)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
@@ -917,16 +929,16 @@ READ16_MEMBER(segas24_state::irq_r)
 {
 	switch(offset) {
 	case 2:
-		irq_timer_pend0 = 0;
+		m_irq_timer_pend0 = false;
 		m_maincpu->set_input_line(IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	case 3:
-		irq_timer_pend1 = 0;
+		m_irq_timer_pend1 = false;
 		m_subcpu->set_input_line(IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	}
 	irq_timer_sync();
-	return irq_tval & 0xfff;
+	return m_irq_tval & 0xfff;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
@@ -935,54 +947,54 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
 	int scanline = param;
 
 	/* TODO: perhaps vblank irq happens at 400, sprite IRQ certainly don't at 0! */
-	if(scanline == 0) { irq = IRQ_SPRITE; irq_sprite = 1; }
-	else if(scanline == 384) { irq = IRQ_VBLANK; irq_vblank = 1; }
+	if(scanline == 0) { irq = IRQ_SPRITE; m_irq_sprite = true; }
+	else if(scanline == 384) { irq = IRQ_VBLANK; m_irq_vblank = true; }
 	else
 		return;
 
-	irq_timer_clear->adjust(attotime::from_hz(HSYNC_CLOCK));
+	m_irq_timer_clear->adjust(attotime::from_hz(HSYNC_CLOCK));
 
 	mask = 1 << irq;
 
-	if(irq_allow0 & mask)
+	if(m_irq_allow0 & mask)
 		m_maincpu->set_input_line(1+irq, ASSERT_LINE);
 
-	if(irq_allow1 & mask)
+	if(m_irq_allow1 & mask)
 		m_subcpu->set_input_line(1+irq, ASSERT_LINE);
 
 	if(scanline == 384) {
 		// Ensure one index pulse every 20 frames
 		// The is some code in bnzabros at 0x852 that makes it crash
 		// if the pulse train is too fast
-		fdc_index_count++;
-		if(fdc_index_count >= 20)
-			fdc_index_count = 0;
+		m_fdc_index_count++;
+		if(m_fdc_index_count >= 20)
+			m_fdc_index_count = 0;
 	}
 
 	irq_timer_sync();
-	irq_vsynctime = machine().time();
+	m_irq_vsynctime = machine().time();
 }
 
 WRITE_LINE_MEMBER(segas24_state::irq_ym)
 {
-	irq_yms = state;
-	m_maincpu->set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-	m_subcpu->set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	m_irq_yms = state;
+	m_maincpu->set_input_line(IRQ_YM2151+1, m_irq_yms && (m_irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu->set_input_line(IRQ_YM2151+1, m_irq_yms && (m_irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 // 315-5242
 
-READ16_MEMBER( segas24_state::sys16_paletteram_r )
+READ16_MEMBER( segas24_state::paletteram_r )
 {
-	return m_generic_paletteram_16[offset];
+	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER( segas24_state::sys16_paletteram_w )
+WRITE16_MEMBER( segas24_state::paletteram_w )
 {
 	int r, g, b;
-	COMBINE_DATA (m_generic_paletteram_16 + offset);
-	data = m_generic_paletteram_16[offset];
+	COMBINE_DATA (m_paletteram + offset);
+	data = m_paletteram[offset];
 
 	r = (data & 0x00f) << 4;
 	if(data & 0x1000)
@@ -1037,7 +1049,7 @@ fc-ff ramhi
 
 /*************************************
  *
- *  CPU 1 memory handlers
+ *  Shared memory handlers
  *
  *************************************/
 
@@ -1064,52 +1076,86 @@ fc-ff ramhi
 */
 
 
-ADDRESS_MAP_START(segas24_state::system24_cpu1_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
-	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Horizontal split position (ABSEL) */
-	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Scanline trigger position (XHOUT) */
-	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Frame trigger position (XVOUT) */
-	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Synchronization mode */
-	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer_device, read, write)
-	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_DEVREADWRITE("sprite", segas24_sprite_device, read, write)
-	AM_RANGE(0x800000, 0x80003f) AM_MIRROR(0x1ffe00) AM_DEVREADWRITE8("io", sega_315_5296_device, read, write, 0x00ff)
-	AM_RANGE(0x800040, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(iod_r, iod_w)
-	AM_RANGE(0x800100, 0x800103) AM_MIRROR(0x1ffe00) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00007) AM_MIRROR(0x0ffff8) AM_READWRITE(irq_r, irq_w)
-	AM_RANGE(0xb00000, 0xb00007) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xb00008, 0xb0000f) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_status_r, fdc_ctrl_w)
-	AM_RANGE(0xb80000, 0xbbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xbc0000, 0xbc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
-	AM_RANGE(0xbc0002, 0xbc0003) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_mode_r, frc_mode_w,0x00ff)
-	AM_RANGE(0xbc0004, 0xbc0005) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_r, frc_w,0x00ff)
-	AM_RANGE(0xbc0006, 0xbc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
-	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK("bank2")
-	AM_RANGE(0xcc0000, 0xcc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
-	AM_RANGE(0xcc0002, 0xcc0003) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_mode_r, frc_mode_w,0x00ff)
-	AM_RANGE(0xcc0004, 0xcc0005) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_r, frc_w,0x00ff)
-	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
-	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("subcpu")
-	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void segas24_state::common_map(address_map &map)
+{
+	map(0x080000, 0x0bffff).mirror(0x040000).ram().share("share1");
+	map(0x100000, 0x13ffff).mirror(0x0c0000).rom().region("maincpu", 0);
+	map(0x200000, 0x20ffff).mirror(0x110000).rw("tile", FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
+	map(0x220000, 0x220001).mirror(0x11fffe).nopw();        /* Horizontal split position (ABSEL) */
+	map(0x240000, 0x240001).mirror(0x11fffe).nopw();        /* Scanline trigger position (XHOUT) */
+	map(0x260000, 0x260001).mirror(0x10fffe).nopw();        /* Frame trigger position (XVOUT) */
+	map(0x270000, 0x270001).mirror(0x10fffe).nopw();        /* Synchronization mode */
+	map(0x280000, 0x29ffff).mirror(0x160000).rw("tile", FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
+	map(0x400000, 0x403fff).mirror(0x1f8000).rw(FUNC(segas24_state::paletteram_r), FUNC(segas24_state::paletteram_w)).share("paletteram");
+	map(0x404000, 0x40401f).mirror(0x1fbfe0).rw("mixer", FUNC(segas24_mixer_device::read), FUNC(segas24_mixer_device::write));
+	map(0x600000, 0x63ffff).mirror(0x180000).rw("sprite", FUNC(segas24_sprite_device::read), FUNC(segas24_sprite_device::write));
+	map(0x800000, 0x80003f).mirror(0x1ffe00).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
+	map(0x800040, 0x80007f).mirror(0x1ffe00).rw(FUNC(segas24_state::iod_r), FUNC(segas24_state::iod_w));
+	map(0x800100, 0x800103).mirror(0x1ffe00).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0xa00000, 0xa00007).mirror(0x0ffff8).rw(FUNC(segas24_state::irq_r), FUNC(segas24_state::irq_w));
+	map(0xb00000, 0xb00007).mirror(0x07fff0).rw(FUNC(segas24_state::fdc_r), FUNC(segas24_state::fdc_w));
+	map(0xb00008, 0xb0000f).mirror(0x07fff0).rw(FUNC(segas24_state::fdc_status_r), FUNC(segas24_state::fdc_ctrl_w));
+	map(0xbc0003, 0xbc0003).mirror(0x03fff8).rw(FUNC(segas24_state::frc_mode_r), FUNC(segas24_state::frc_mode_w));
+	map(0xbc0005, 0xbc0005).mirror(0x03fff8).rw(FUNC(segas24_state::frc_r), FUNC(segas24_state::frc_w));
+	map(0xbc0007, 0xbc0007).mirror(0x03fff8).rw(FUNC(segas24_state::mlatch_r), FUNC(segas24_state::mlatch_w));
+	map(0xcc0003, 0xcc0003).mirror(0x03fff8).rw(FUNC(segas24_state::frc_mode_r), FUNC(segas24_state::frc_mode_w));
+	map(0xcc0005, 0xcc0005).mirror(0x03fff8).rw(FUNC(segas24_state::frc_r), FUNC(segas24_state::frc_w));
+	map(0xcc0007, 0xcc0007).mirror(0x03fff8).rw(FUNC(segas24_state::mlatch_r), FUNC(segas24_state::mlatch_w));
+	map(0xf00000, 0xf3ffff).mirror(0x040000).ram().share("subcpu");
+	map(0xf80000, 0xfbffff).mirror(0x040000).ram().share("share1");
+}
 
-ADDRESS_MAP_START(segas24_state::roughrac_cpu1_map)
-	AM_IMPORT_FROM(system24_cpu1_map)
-	AM_RANGE(0xc00000, 0xc00007) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd4701", upd4701_device, read_xy, 0x00ff)
-ADDRESS_MAP_END
+void segas24_state::rombd_common_map(address_map &map)
+{
+	map(0xb80000, 0xbbffff).bankr("rombank1");
+	map(0xbc0001, 0xbc0001).mirror(0x03fff8).rw(FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
+	map(0xc80000, 0xcbffff).bankr("rombank2");
+	map(0xcc0001, 0xcc0001).mirror(0x03fff8).rw(FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
+}
 
-ADDRESS_MAP_START(segas24_state::hotrod_cpu1_map)
-	AM_IMPORT_FROM(system24_cpu1_map)
-	AM_RANGE(0xc00000, 0xc00007) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd1", upd4701_device, read_xy, 0x00ff)
-	AM_RANGE(0xc00008, 0xc0000f) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd2", upd4701_device, read_xy, 0x00ff)
-	AM_RANGE(0xc00010, 0xc00011) AM_MIRROR(0x07ffec) AM_DEVREADWRITE8("adc1", msm6253_device, d7_r, select_w, 0x00ff)
-	AM_RANGE(0xc00012, 0xc00013) AM_MIRROR(0x07ffec) AM_DEVREADWRITE8("adc2", msm6253_device, d7_r, select_w, 0x00ff)
-ADDRESS_MAP_END
+void segas24_state::roughrac_common_map(address_map &map)
+{
+	map(0xc00000, 0xc00007).mirror(0x07ffe0).r("upd4701", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+}
 
+void segas24_state::hotrod_common_map(address_map &map)
+{
+	map(0xc00000, 0xc00007).mirror(0x07ffe0).r("upd1", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0xc00008, 0xc0000f).mirror(0x07ffe0).r("upd2", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0xc00011, 0xc00011).mirror(0x07ffec).rw("adc1", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::select_w));
+	map(0xc00013, 0xc00013).mirror(0x07ffec).rw("adc2", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::select_w));
+}
+
+
+/*************************************
+ *
+ *  CPU 1 memory handlers
+ *
+ *************************************/
+
+void segas24_state::cpu1_map(address_map &map)
+{
+	common_map(map);
+	map(0x000000, 0x03ffff).mirror(0x040000).rom().region("maincpu", 0);
+}
+
+void segas24_state::rombd_cpu1_map(address_map &map)
+{
+	cpu1_map(map);
+	rombd_common_map(map);
+}
+
+void segas24_state::roughrac_cpu1_map(address_map &map)
+{
+	cpu1_map(map);
+	roughrac_common_map(map);
+}
+
+void segas24_state::hotrod_cpu1_map(address_map &map)
+{
+	cpu1_map(map);
+	hotrod_common_map(map);
+}
 
 
 /*************************************
@@ -1118,55 +1164,34 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(segas24_state::system24_cpu2_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("subcpu")
-	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
-	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Horizontal split position (ABSEL) */
-	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Scanline trigger position (XHOUT) */
-	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Frame trigger position (XVOUT) */
-	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Synchronization mode */
-	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer_device, read, write)
-	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_DEVREADWRITE("sprite", segas24_sprite_device, read, write)
-	AM_RANGE(0x800000, 0x80003f) AM_MIRROR(0x1ffe00) AM_DEVREADWRITE8("io", sega_315_5296_device, read, write, 0x00ff)
-	AM_RANGE(0x800040, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(iod_r, iod_w)
-	AM_RANGE(0x800100, 0x800103) AM_MIRROR(0x1ffe00) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00007) AM_MIRROR(0x0ffff8) AM_READWRITE(irq_r, irq_w)
-	AM_RANGE(0xb00000, 0xb00007) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xb00008, 0xb0000f) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_status_r, fdc_ctrl_w)
-	AM_RANGE(0xb80000, 0xbbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xbc0000, 0xbc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
-	AM_RANGE(0xbc0002, 0xbc0003) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_mode_r, frc_mode_w,0x00ff)
-	AM_RANGE(0xbc0004, 0xbc0005) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_r, frc_w,0x00ff)
-	AM_RANGE(0xbc0006, 0xbc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
-	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK("bank2")
-	AM_RANGE(0xcc0000, 0xcc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
-	AM_RANGE(0xcc0002, 0xcc0003) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_mode_r, frc_mode_w,0x00ff)
-	AM_RANGE(0xcc0004, 0xcc0005) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_r, frc_w,0x00ff)
-	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
-	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("subcpu")
-	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void segas24_state::cpu2_map(address_map &map)
+{
+	common_map(map);
+	map(0x000000, 0x03ffff).mirror(0x040000).ram().share("subcpu");
+}
 
-ADDRESS_MAP_START(segas24_state::roughrac_cpu2_map)
-	AM_IMPORT_FROM(system24_cpu2_map)
-	AM_RANGE(0xc00000, 0xc00007) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd4701", upd4701_device, read_xy, 0x00ff)
-ADDRESS_MAP_END
+void segas24_state::rombd_cpu2_map(address_map &map)
+{
+	cpu2_map(map);
+	rombd_common_map(map);
+}
 
-ADDRESS_MAP_START(segas24_state::hotrod_cpu2_map)
-	AM_IMPORT_FROM(system24_cpu2_map)
-	AM_RANGE(0xc00000, 0xc00007) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd1", upd4701_device, read_xy, 0x00ff)
-	AM_RANGE(0xc00008, 0xc0000f) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd2", upd4701_device, read_xy, 0x00ff)
-	AM_RANGE(0xc00010, 0xc00011) AM_MIRROR(0x07ffec) AM_DEVREADWRITE8("adc1", msm6253_device, d7_r, select_w, 0x00ff)
-	AM_RANGE(0xc00012, 0xc00013) AM_MIRROR(0x07ffec) AM_DEVREADWRITE8("adc2", msm6253_device, d7_r, select_w, 0x00ff)
-ADDRESS_MAP_END
+void segas24_state::roughrac_cpu2_map(address_map &map)
+{
+	cpu2_map(map);
+	roughrac_common_map(map);
+}
 
-ADDRESS_MAP_START(segas24_state::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segas24_state::hotrod_cpu2_map(address_map &map)
+{
+	cpu2_map(map);
+	hotrod_common_map(map);
+}
+
+void segas24_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
 /*************************************
  *
@@ -1176,19 +1201,48 @@ ADDRESS_MAP_END
 
 void segas24_state::machine_start()
 {
-	if (track_size)
-		machine().device<nvram_device>("floppy_nvram")->set_base(memregion("floppy")->base(), 2*track_size);
-
-	if (m_romboard != nullptr)
+	if ((m_romboard != nullptr) && (m_rombank[0] != nullptr) && (m_rombank[1] != nullptr))
 	{
 		uint8_t *usr1 = m_romboard->base();
-		membank("bank1")->configure_entries(0, 16, usr1, 0x40000);
-		membank("bank2")->configure_entries(0, 16, usr1, 0x40000);
+		m_rombank[0]->configure_entries(0, 16, usr1, 0x40000);
+		m_rombank[1]->configure_entries(0, 16, usr1, 0x40000);
+
+		save_item(NAME(m_curbank));
 	}
 
-	vtile = machine().device<segas24_tile_device>("tile");
-	vsprite = machine().device<segas24_sprite_device>("sprite");
-	vmixer = machine().device<segas24_mixer_device>("mixer");
+	if (m_track_size)
+	{
+		subdevice<nvram_device>("floppy_nvram")->set_base(&m_floppy[0], 2*m_track_size);
+
+		save_item(NAME(m_fdc_track_side));
+		save_item(NAME(m_fdc_mode));
+		save_item(NAME(m_fdc_status));
+		save_item(NAME(m_fdc_track));
+		save_item(NAME(m_fdc_sector));
+		save_item(NAME(m_fdc_data));
+		save_item(NAME(m_fdc_phys_track));
+		save_item(NAME(m_fdc_irq));
+		save_item(NAME(m_fdc_drq));
+		save_item(NAME(m_fdc_span));
+		save_item(NAME(m_fdc_index_count));
+	}
+
+	save_item(NAME(m_mlatch));
+
+	save_item(NAME(m_irq_tdata));
+	save_item(NAME(m_irq_tval));
+	save_item(NAME(m_irq_tmode));
+	save_item(NAME(m_irq_allow0));
+	save_item(NAME(m_irq_allow1));
+	save_item(NAME(m_irq_timer_pend0));
+	save_item(NAME(m_irq_timer_pend1));
+	save_item(NAME(m_irq_yms));
+	save_item(NAME(m_irq_vblank));
+	save_item(NAME(m_irq_sprite));
+
+	save_item(NAME(m_frc_mode));
+
+	save_item(NAME(m_cnt1));
 }
 
 void segas24_state::machine_reset()
@@ -1196,13 +1250,15 @@ void segas24_state::machine_reset()
 	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_cnt1 = true;
 	fdc_init();
-	curbank = 0;
-	reset_bank();
 	irq_init();
-	mlatch = 0x00;
-	frc_mode = 0;
-	frc_cnt_timer = machine().device<timer_device>("frc_timer");
-	frc_cnt_timer->reset();
+	m_mlatch = 0x00;
+	m_frc_mode = 0;
+	m_frc_cnt_timer->reset();
+	if ((m_romboard != nullptr) && (m_rombank[0] != nullptr) && (m_rombank[1] != nullptr))
+	{
+		m_curbank = 0;
+		reset_bank();
+	}
 }
 
 /*************************************
@@ -1863,84 +1919,99 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(segas24_state::system24)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(system24_cpu1_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas24_state::cpu1_map);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", segas24_state, irq_vbl, "screen", 0, 1)
 
-	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
+	M68000(config, m_subcpu, MASTER_CLOCK/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::cpu2_map);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5296, VIDEO_CLOCK/2)
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas24_state, hotrod_lamps_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
-	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
-	MCFG_315_5296_OUT_PORTH_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(segas24_state, cnt1))
-	MCFG_315_5296_OUT_CNT2_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w))
+	sega_315_5296_device &io(SEGA_315_5296(config, "io", VIDEO_CLOCK/2));
+	io.in_pa_callback().set_ioport("P1");
+	io.in_pb_callback().set_ioport("P2");
+	io.in_pc_callback().set_ioport("P3");
+	io.out_pd_callback().set(FUNC(segas24_state::hotrod_lamps_w));
+	io.in_pe_callback().set_ioport("SERVICE");
+	io.in_pf_callback().set_ioport("COINAGE");
+	io.in_pg_callback().set_ioport("DSW");
+	io.out_ph_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	io.out_cnt1_callback().set(FUNC(segas24_state::cnt1));
+	io.out_cnt2_callback().set("ymsnd", FUNC(ym2151_device::reset_w));
 
 	MCFG_TIMER_DRIVER_ADD("irq_timer", segas24_state, irq_timer_cb)
 	MCFG_TIMER_DRIVER_ADD("irq_timer_clear", segas24_state, irq_timer_clear_cb)
 	MCFG_TIMER_ADD_NONE("frc_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_frc", segas24_state, irq_frc_cb, attotime::from_hz(FRC_CLOCK_MODE1))
 
-	MCFG_S24TILE_DEVICE_ADD("tile", 0xfff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-	MCFG_S24SPRITE_DEVICE_ADD("sprite")
-	MCFG_S24MIXER_DEVICE_ADD("mixer")
+	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0xfff)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_ADD("sprite", S24SPRITE, 0)
+	MCFG_DEVICE_ADD("mixer", S24MIXER, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
-	MCFG_SCREEN_UPDATE_DRIVER(segas24_state, screen_update_system24)
+	MCFG_SCREEN_UPDATE_DRIVER(segas24_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8192*2)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(segas24_state,irq_ym))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, segas24_state,irq_ym))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(segas24_state::mahmajn)
+void segas24_state::system24_rom(machine_config &config)
+{
 	system24(config);
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_IN_PORTA_CB(READ8(segas24_state, mahmajn_input_line_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(segas24_state, mahmajn_inputs_r))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas24_state, mahmajn_mux_w))
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas24_state::rombd_cpu1_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::rombd_cpu2_map);
+}
 
-MACHINE_CONFIG_START(segas24_state::system24_floppy)
+void segas24_state::mahmajn(machine_config &config)
+{
+	system24_rom(config);
+	sega_315_5296_device &io(*subdevice<sega_315_5296_device>("io"));
+	io.in_pa_callback().set(FUNC(segas24_state::mahmajn_input_line_r));
+	io.in_pc_callback().set(FUNC(segas24_state::mahmajn_inputs_r));
+	io.out_pd_callback().set(FUNC(segas24_state::mahmajn_mux_w));
+}
+
+void segas24_state::system24_floppy(machine_config &config)
+{
 	system24(config);
-	MCFG_NVRAM_ADD_NO_FILL("floppy_nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "floppy_nvram", nvram_device::DEFAULT_NONE);
+}
+
+void segas24_state::system24_floppy_rom(machine_config &config)
+{
+	system24_floppy(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas24_state::rombd_cpu1_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::rombd_cpu2_map);
+}
 
 MACHINE_CONFIG_START(segas24_state::system24_floppy_hotrod)
 	system24_floppy(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hotrod_cpu1_map)
-	MCFG_CPU_MODIFY("subcpu")
-	MCFG_CPU_PROGRAM_MAP(hotrod_cpu2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas24_state::hotrod_cpu1_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::hotrod_cpu2_map);
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0) // IC4 on 834-6510 I/O board
-	MCFG_UPD4701_PORTX("DIAL1")
-	MCFG_UPD4701_PORTY("DIAL2")
+	upd4701_device &upd1(UPD4701A(config, "upd1")); // IC4 on 834-6510 I/O board
+	upd1.set_portx_tag("DIAL1");
+	upd1.set_porty_tag("DIAL2");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0) // IC1
-	MCFG_UPD4701_PORTX("DIAL3")
-	MCFG_UPD4701_PORTY("DIAL4")
+	upd4701_device &upd2(UPD4701A(config, "upd2")); // IC1
+	upd2.set_portx_tag("DIAL3");
+	upd2.set_porty_tag("DIAL4");
 
 	MCFG_DEVICE_ADD("adc1", MSM6253, 0) // IC5 - 33k/33p R/C clock
 	MCFG_MSM6253_IN0_ANALOG_PORT("PEDAL1")
@@ -1951,38 +2022,39 @@ MACHINE_CONFIG_START(segas24_state::system24_floppy_hotrod)
 	MCFG_DEVICE_ADD("adc2", MSM6253, 0) // IC2 - 33k/33p R/C clock
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(segas24_state::system24_floppy_fd1094)
+void segas24_state::system24_floppy_fd1094(machine_config &config)
+{
 	system24_floppy(config);
-	MCFG_CPU_REPLACE("subcpu", FD1094, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	FD1094(config.replace(), m_subcpu, MASTER_CLOCK/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::cpu2_map);
+	m_subcpu->set_addrmap(AS_OPCODES, &segas24_state::decrypted_opcodes_map);
+}
 
 MACHINE_CONFIG_START(segas24_state::system24_floppy_fd_upd)
 	system24_floppy_fd1094(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(roughrac_cpu1_map)
-	MCFG_CPU_MODIFY("subcpu")
-	MCFG_CPU_PROGRAM_MAP(roughrac_cpu2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas24_state::roughrac_cpu1_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::roughrac_cpu2_map);
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0) // IC4 on 834-6510-01 I/O board
-	MCFG_UPD4701_PORTX("DIAL1")
-	MCFG_UPD4701_PORTY("DIAL2")
+	upd4701_device &upd4701(UPD4701A(config, "upd4701")); // IC4 on 834-6510 I/O board
+	upd4701.set_portx_tag("DIAL1");
+	upd4701.set_porty_tag("DIAL2");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(segas24_state::dcclub)
-	system24(config);
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_IN_PORTA_CB(READ8(segas24_state, dcclub_p1_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(segas24_state, dcclub_p3_r))
-MACHINE_CONFIG_END
+void segas24_state::dcclub(machine_config &config)
+{
+	system24_rom(config);
+	sega_315_5296_device &io(*subdevice<sega_315_5296_device>("io"));
+	io.in_pa_callback().set(FUNC(segas24_state::dcclub_p1_r));
+	io.in_pc_callback().set(FUNC(segas24_state::dcclub_p3_r));
+}
 
-MACHINE_CONFIG_START(segas24_state::system24_floppy_dcclub)
+void segas24_state::system24_floppy_dcclub(machine_config &config)
+{
 	system24_floppy_fd1094(config);
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_IN_PORTA_CB(READ8(segas24_state, dcclub_p1_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(segas24_state, dcclub_p3_r))
-MACHINE_CONFIG_END
+	sega_315_5296_device &io(*subdevice<sega_315_5296_device>("io"));
+	io.in_pa_callback().set(FUNC(segas24_state::dcclub_p1_r));
+	io.in_pc_callback().set(FUNC(segas24_state::dcclub_p3_r));
+}
 
 
 /*************************************
@@ -2333,47 +2405,49 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segas24_state,qgh)
+void segas24_state::init_qgh()
 {
-	mlatch_table = segas24_state::qgh_mlt;
-	track_size = 0;
+	m_mlatch_table = s_qgh_mlt;
+	m_track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclub)
+void segas24_state::init_dcclub()
 {
-	mlatch_table = segas24_state::dcclub_mlt;
-	track_size = 0;
+	m_mlatch_table = s_dcclub_mlt;
+	m_track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qrouka)
+void segas24_state::init_qrouka()
 {
-	mlatch_table = segas24_state::qrouka_mlt;
-	track_size = 0;
+	m_mlatch_table = s_qrouka_mlt;
+	m_track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,quizmeku)
+void segas24_state::init_quizmeku()
 {
-	mlatch_table = segas24_state::quizmeku_mlt;
-	track_size = 0;
+	m_mlatch_table = s_quizmeku_mlt;
+	m_track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn)
+void segas24_state::init_mahmajn()
 {
-	mlatch_table = segas24_state::mahmajn_mlt;
-	track_size = 0;
-	cur_input_line = 0;
+	m_mlatch_table = s_mahmajn_mlt;
+	m_track_size = 0;
+	m_cur_input_line = 0;
+	save_item(NAME(m_cur_input_line));
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn2)
+void segas24_state::init_mahmajn2()
 {
-	mlatch_table = segas24_state::mahmajn2_mlt;
-	track_size = 0;
-	cur_input_line = 0;
+	m_mlatch_table = s_mahmajn2_mlt;
+	m_track_size = 0;
+	m_cur_input_line = 0;
+	save_item(NAME(m_cur_input_line));
 }
 
-DRIVER_INIT_MEMBER(segas24_state,hotrod)
+void segas24_state::init_hotrod()
 {
-	mlatch_table = nullptr;
+	m_mlatch_table = nullptr;
 
 	// Sector  Size
 	// 1       8192
@@ -2383,12 +2457,12 @@ DRIVER_INIT_MEMBER(segas24_state,hotrod)
 	// 5        512
 	// 6        256
 
-	track_size = 0x2f00;
+	m_track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,bnzabros)
+void segas24_state::init_bnzabros()
 {
-	mlatch_table = segas24_state::bnzabros_mlt;
+	m_mlatch_table = s_bnzabros_mlt;
 
 	// Sector  Size
 	// 1       2048
@@ -2399,58 +2473,58 @@ DRIVER_INIT_MEMBER(segas24_state,bnzabros)
 	// 6       1024
 	// 7        256
 
-	track_size = 0x2d00;
+	m_track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspirits)
+void segas24_state::init_sspirits()
 {
-	mlatch_table = nullptr;
-	track_size = 0x2d00;
+	m_mlatch_table = nullptr;
+	m_track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspiritj)
+void segas24_state::init_sspiritj()
 {
-	mlatch_table = nullptr;
-	track_size = 0x2f00;
+	m_mlatch_table = nullptr;
+	m_track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclubfd)
+void segas24_state::init_dcclubfd()
 {
-	mlatch_table = segas24_state::dcclub_mlt;
-	track_size = 0x2d00;
+	m_mlatch_table = s_dcclub_mlt;
+	m_track_size = 0x2d00;
 }
 
 
-DRIVER_INIT_MEMBER(segas24_state,sgmast)
+void segas24_state::init_sgmast()
 {
-	mlatch_table = nullptr;
-	track_size = 0x2d00;
+	m_mlatch_table = nullptr;
+	m_track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qsww)
+void segas24_state::init_qsww()
 {
-	mlatch_table = nullptr;
-	track_size = 0x2d00;
+	m_mlatch_table = nullptr;
+	m_track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,gground)
+void segas24_state::init_gground()
 {
-	mlatch_table = nullptr;
-	track_size = 0x2d00;
+	m_mlatch_table = nullptr;
+	m_track_size = 0x2d00;
 
 	m_gground_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas24_state::gground_hack_timer_callback), this));
 }
 
-DRIVER_INIT_MEMBER(segas24_state,crkdown)
+void segas24_state::init_crkdown()
 {
-	mlatch_table = nullptr;
-	track_size = 0x2d00;
+	m_mlatch_table = nullptr;
+	m_track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,roughrac)
+void segas24_state::init_roughrac()
 {
-	mlatch_table = nullptr;
-	track_size = 0x2d00;
+	m_mlatch_table = nullptr;
+	m_track_size = 0x2d00;
 }
 
 
@@ -2460,35 +2534,35 @@ DRIVER_INIT_MEMBER(segas24_state,roughrac)
  *
  *************************************/
 
-//            YEAR, NAME,      PARENT,   MACHINE,                INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
+//            YEAR  NAME       PARENT    MACHINE                 INPUT     CLASS          INIT           MONITOR COMPANY FULLNAME FLAGS
 /* Disk Based Games */
-/* 01 */GAME( 1988, hotrod,    0,        system24_floppy_hotrod, hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy_hotrod, hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev C)", 0 )
-/* 01 */GAME( 1988, hotrodja,  hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev B)", 0 )
-/* 02 */GAME( 1988, sspirits,  0,        system24_floppy,        sspirits, segas24_state, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
-/* 02 */GAME( 1988, sspiritj,  sspirits, system24_floppy,        sspirits, segas24_state, sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
-/* 02 */GAME( 1988, sspirtfc,  sspirits, system24_floppy_fd1094, sspirits, segas24_state, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)", MACHINE_NOT_WORKING ) /* MISSING disk image */
-/* 03 */GAME( 1988, gground,   0,        system24_floppy_fd1094, gground,  segas24_state, gground,  ROT270, "Sega", "Gain Ground (World, 3 Players, Floppy Based, FD1094 317-0058-03d Rev A)", 0 )
-/* 03 */GAME( 1988, ggroundj,  gground,  system24_floppy_fd1094, gground,  segas24_state, gground,  ROT270, "Sega", "Gain Ground (Japan, 2 Players, Floppy Based, FD1094 317-0058-03b)", 0 )
-/* 04 */GAME( 1989, crkdown,   0,        system24_floppy_fd1094, crkdown,  segas24_state, crkdown,  ROT0,   "Sega", "Crack Down (World, Floppy Based, FD1094 317-0058-04c)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 04 */GAME( 1989, crkdownu,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, crkdown,  ROT0,   "Sega", "Crack Down (US, Floppy Based, FD1094 317-0058-04d)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 04 */GAME( 1989, crkdownj,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b Rev A)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 05 */GAME( 1989, sgmast,    0,        system24_floppy_fd1094, sgmast,   segas24_state, sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", 0 )
-/* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy_fd1094, sgmast,   segas24_state, sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
-/* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy_fd_upd, sgmastj,  segas24_state, sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
-/* 06 */GAME( 1990, roughrac,  0,        system24_floppy_fd_upd, roughrac, segas24_state, roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
-/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy,        bnzabros, segas24_state, bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
-/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy,        bnzabros, segas24_state, bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
-/* 08 */GAME( 1991, qsww,      0,        system24_floppy_fd1094, qsww,     segas24_state, qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", MACHINE_IMPERFECT_GRAPHICS ) // wrong bg colour on title
-/* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy_dcclub, dcclub,   segas24_state, dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
+/* 01 */GAME( 1988, hotrod,    0,        system24_floppy_hotrod, hotrod,   segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy_hotrod, hotrod,   segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev C)", 0 )
+/* 01 */GAME( 1988, hotrodja,  hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev B)", 0 )
+/* 02 */GAME( 1988, sspirits,  0,        system24_floppy,        sspirits, segas24_state, init_sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
+/* 02 */GAME( 1988, sspiritj,  sspirits, system24_floppy,        sspirits, segas24_state, init_sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
+/* 02 */GAME( 1988, sspirtfc,  sspirits, system24_floppy_fd1094, sspirits, segas24_state, init_sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)", MACHINE_NOT_WORKING ) /* MISSING disk image */
+/* 03 */GAME( 1988, gground,   0,        system24_floppy_fd1094, gground,  segas24_state, init_gground,  ROT270, "Sega", "Gain Ground (World, 3 Players, Floppy Based, FD1094 317-0058-03d Rev A)", 0 )
+/* 03 */GAME( 1988, ggroundj,  gground,  system24_floppy_fd1094, gground,  segas24_state, init_gground,  ROT270, "Sega", "Gain Ground (Japan, 2 Players, Floppy Based, FD1094 317-0058-03b)", 0 )
+/* 04 */GAME( 1989, crkdown,   0,        system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (World, Floppy Based, FD1094 317-0058-04c)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 04 */GAME( 1989, crkdownu,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (US, Floppy Based, FD1094 317-0058-04d)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 04 */GAME( 1989, crkdownj,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b Rev A)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 05 */GAME( 1989, sgmast,    0,        system24_floppy_fd1094, sgmast,   segas24_state, init_sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", 0 )
+/* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy_fd1094, sgmast,   segas24_state, init_sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
+/* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy_fd_upd, sgmastj,  segas24_state, init_sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
+/* 06 */GAME( 1990, roughrac,  0,        system24_floppy_fd_upd, roughrac, segas24_state, init_roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
+/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy_rom,    bnzabros, segas24_state, init_bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
+/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy_rom,    bnzabros, segas24_state, init_bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
+/* 08 */GAME( 1991, qsww,      0,        system24_floppy_fd1094, qsww,     segas24_state, init_qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", MACHINE_IMPERFECT_GRAPHICS ) // wrong bg colour on title
+/* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy_dcclub, dcclub,   segas24_state, init_dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
 
-//    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
+//    YEAR  NAME      PARENT    MACHINE       INPUT     CLASS          INIT           MONITOR COMPANY FULLNAME FLAGS
 /* ROM Based */
-GAME( 1991, dcclub,   0,        dcclub,   dcclub,   segas24_state, dcclub,   ROT0,   "Sega", "Dynamic Country Club (World, ROM Based)", 0 )
-GAME( 1991, dcclubj,  dcclub,   dcclub,   dcclub,   segas24_state, dcclub,   ROT0,   "Sega", "Dynamic Country Club (Japan, ROM Based)", 0 )
-GAME( 1991, qrouka,   0,        system24, qrouka,   segas24_state, qrouka,   ROT0,   "Sega", "Quiz Rouka Ni Tattenasai (Japan, ROM Based)", 0 )
-GAME( 1992, quizmeku, 0,        system24, quizmeku, segas24_state, quizmeku, ROT0,   "Sega", "Quiz Mekurumeku Story (Japan, ROM Based)", 0 ) /* Released in 05.1993 */
-GAME( 1992, mahmajn,  0,        mahmajn,  mahmajn,  segas24_state, mahmajn,  ROT0,   "Sega", "Tokoro San no MahMahjan (Japan, ROM Based)", 0 )
-GAME( 1994, qgh,      0,        system24, qgh,      segas24_state, qgh,      ROT0,   "Sega", "Quiz Ghost Hunter (Japan, ROM Based)", 0 )
-GAME( 1994, mahmajn2, 0,        mahmajn,  mahmajn,  segas24_state, mahmajn2, ROT0,   "Sega", "Tokoro San no MahMahjan 2 (Japan, ROM Based)", 0 )
+GAME( 1991, dcclub,   0,        dcclub,       dcclub,   segas24_state, init_dcclub,   ROT0,   "Sega", "Dynamic Country Club (World, ROM Based)", 0 )
+GAME( 1991, dcclubj,  dcclub,   dcclub,       dcclub,   segas24_state, init_dcclub,   ROT0,   "Sega", "Dynamic Country Club (Japan, ROM Based)", 0 )
+GAME( 1991, qrouka,   0,        system24_rom, qrouka,   segas24_state, init_qrouka,   ROT0,   "Sega", "Quiz Rouka Ni Tattenasai (Japan, ROM Based)", 0 )
+GAME( 1992, quizmeku, 0,        system24_rom, quizmeku, segas24_state, init_quizmeku, ROT0,   "Sega", "Quiz Mekurumeku Story (Japan, ROM Based)", 0 ) /* Released in 05.1993 */
+GAME( 1992, mahmajn,  0,        mahmajn,      mahmajn,  segas24_state, init_mahmajn,  ROT0,   "Sega", "Tokoro San no MahMahjan (Japan, ROM Based)", 0 )
+GAME( 1994, qgh,      0,        system24_rom, qgh,      segas24_state, init_qgh,      ROT0,   "Sega", "Quiz Ghost Hunter (Japan, ROM Based)", 0 )
+GAME( 1994, mahmajn2, 0,        mahmajn,      mahmajn,  segas24_state, init_mahmajn2, ROT0,   "Sega", "Tokoro San no MahMahjan 2 (Japan, ROM Based)", 0 )

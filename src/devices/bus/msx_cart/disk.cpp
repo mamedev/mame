@@ -116,10 +116,11 @@ FLOPPY_FORMATS_MEMBER( msx_cart_disk_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 
-static SLOT_INTERFACE_START( msx_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-	SLOT_INTERFACE( "35ssdd", FLOPPY_35_SSDD )
-SLOT_INTERFACE_END
+static void msx_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35ssdd", FLOPPY_35_SSDD);
+}
 
 
 msx_cart_disk_device::msx_cart_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -141,6 +142,7 @@ msx_cart_disk_wd_device::msx_cart_disk_wd_device(const machine_config &mconfig, 
 
 msx_cart_disk_type1_device::msx_cart_disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: msx_cart_disk_wd_device(mconfig, type, tag, owner, clock)
+	, m_led(*this, "led0")
 	, m_side_control(0)
 	, m_control(0)
 {
@@ -149,6 +151,7 @@ msx_cart_disk_type1_device::msx_cart_disk_type1_device(const machine_config &mco
 
 msx_cart_disk_type2_device::msx_cart_disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: msx_cart_disk_wd_device(mconfig, type, tag, owner, clock)
+	, m_led(*this, "led0")
 	, m_control(0)
 {
 }
@@ -199,8 +202,8 @@ MACHINE_CONFIG_START(msx_cart_vy0010_device::device_add_mconfig)
 	// HLT pulled high
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
 	// READY inverted in VY-0010 cartridge and pulled low on VY-0010/VY-0011 floppy drive
-	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 4)
-	MCFG_WD_FDC_FORCE_READY
+	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->set_force_ready(true);
 
 	// Single sided 3.5" floppy drive
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35ssdd", msx_cart_disk_device::floppy_formats)
@@ -214,7 +217,7 @@ MACHINE_CONFIG_START(msx_cart_vy0010_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_cart_fsfd1_device::device_add_mconfig)
-	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 4)
+	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
 
 	// Double sided 3.5" floppy drive
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats)
@@ -229,7 +232,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(msx_cart_fsfd1a_device::device_add_mconfig)
-	MCFG_TC8566AF_ADD("fdc")
+	TC8566AF(config, m_fdc);
 
 	// Double sided 3.5" floppy drive
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats)
@@ -244,8 +247,8 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(msx_cart_fscf351_device::device_add_mconfig)
-	MCFG_MB8877_ADD("fdc", XTAL(4'000'000) / 4)
-	MCFG_WD_FDC_FORCE_READY
+	MB8877(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->set_force_ready(true);
 
 	// Double sided 3.5" floppy drive
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats)
@@ -261,6 +264,8 @@ MACHINE_CONFIG_END
 
 void msx_cart_disk_type1_device::device_start()
 {
+	m_led.resolve();
+
 	save_item(NAME(m_side_control));
 	save_item(NAME(m_control));
 
@@ -311,7 +316,7 @@ void msx_cart_disk_type1_device::set_control(uint8_t data)
 
 	if ((old_m_control ^ m_control) & 0x40)
 	{
-		machine().output().set_led_value(0, !(m_control & 0x40));
+		m_led = BIT(~m_control, 6);
 	}
 }
 
@@ -417,6 +422,8 @@ WRITE8_MEMBER(msx_cart_disk_type1_device::write_cart)
 
 void msx_cart_disk_type2_device::device_start()
 {
+	m_led.resolve();
+
 	save_item(NAME(m_control));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_disk_type2_device::post_load), this));
@@ -471,7 +478,7 @@ void msx_cart_disk_type2_device::set_control(uint8_t data)
 
 	if ((old_m_control ^ m_control) & 0x40)
 	{
-		machine().output().set_led_value(0, !(m_control & 0x40));
+		m_led = BIT(~m_control, 6);
 	}
 }
 

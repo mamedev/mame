@@ -69,20 +69,21 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(m57_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(m57_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_SHARE("scrollram")
-	AM_RANGE(0xc820, 0xc8ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(m57_flipscreen_w) /* + coin counters */
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void m57_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(FUNC(m57_state::m57_videoram_w)).share("videoram");
+	map(0x9000, 0x91ff).ram().share("scrollram");
+	map(0xc820, 0xc8ff).writeonly().share("spriteram");
+	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
+	map(0xd001, 0xd001).w(FUNC(m57_state::m57_flipscreen_w)); /* + coin counters */
+	map(0xd000, 0xd000).portr("IN0");
+	map(0xd001, 0xd001).portr("IN1");
+	map(0xd002, 0xd002).portr("IN2");
+	map(0xd003, 0xd003).portr("DSW1");
+	map(0xd004, 0xd004).portr("DSW2");
+	map(0xe000, 0xe7ff).ram();
+}
 
 
 
@@ -212,7 +213,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( m57 )
+static GFXDECODE_START( gfx_m57 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x3_planar,    0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout, 32*8, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x1000, spritelayout, 32*8, 32 )
@@ -231,9 +232,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(m57_state::m57)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m57_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m57_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -246,7 +247,7 @@ MACHINE_CONFIG_START(m57_state::m57)
 	MCFG_SCREEN_UPDATE_DRIVER(m57_state, screen_update_m57)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m57)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m57)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+16)
 	MCFG_PALETTE_INIT_OWNER(m57_state, m57)
@@ -333,5 +334,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, troangel, 0,        m57,   troangel, m57_state, 0, ROT0, "Irem", "Tropical Angel", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, newtangl, troangel, m57,   troangel, m57_state, 0, ROT0, "Irem", "New Tropical Angel", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, troangel, 0,        m57, troangel, m57_state, empty_init, ROT0, "Irem", "Tropical Angel", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, newtangl, troangel, m57, troangel, m57_state, empty_init, ROT0, "Irem", "New Tropical Angel", MACHINE_SUPPORTS_SAVE )

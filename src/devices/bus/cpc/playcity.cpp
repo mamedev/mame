@@ -15,7 +15,7 @@
 #include "speaker.h"
 
 
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
+void cpc_exp_cards(device_slot_interface &device);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -25,23 +25,24 @@ DEFINE_DEVICE_TYPE(CPC_PLAYCITY, cpc_playcity_device, "cpc_playcity", "PlayCity"
 
 // device machine config
 MACHINE_CONFIG_START(cpc_playcity_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(cpc_playcity_device, ctc_zc1_cb))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc",z80ctc_device, trg3))
-	MCFG_Z80CTC_INTR_CB(WRITELINE(cpc_playcity_device, ctc_intr_cb))
+	Z80CTC(config, m_ctc, XTAL(4'000'000));
+	m_ctc->zc_callback<1>().set(FUNC(cpc_playcity_device::ctc_zc1_cb));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
+	m_ctc->intr_callback().set(FUNC(cpc_playcity_device::ctc_intr_cb));
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("ymz_1",YMZ294,XTAL(4'000'000))  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ymz_1",YMZ294,XTAL(4'000'000))  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
-	MCFG_SOUND_ADD("ymz_2",YMZ294,XTAL(4'000'000))
+	MCFG_DEVICE_ADD("ymz_2",YMZ294,XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(WRITELINE("^", cpc_expansion_slot_device, irq_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
 
 MACHINE_CONFIG_END
 

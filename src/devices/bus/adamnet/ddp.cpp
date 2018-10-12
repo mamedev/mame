@@ -50,24 +50,26 @@ const tiny_rom_entry *adam_digital_data_pack_device::device_rom_region() const
 //  ADDRESS_MAP( adam_ddp_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(adam_digital_data_pack_device::adam_ddp_mem)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_TAG, 0)
-ADDRESS_MAP_END
+void adam_digital_data_pack_device::adam_ddp_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(M6801_TAG, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0080, 0x00ff).ram();
+	map(0x0400, 0x07ff).ram();
+	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( adam_ddp_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(adam_digital_data_pack_device::adam_ddp_io)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(p1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(p2_r, p2_w)
-	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_NOP // Multiplexed Address/Data
-	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_READ(p4_r) AM_WRITENOP
-ADDRESS_MAP_END
+void adam_digital_data_pack_device::adam_ddp_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).w(FUNC(adam_digital_data_pack_device::p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_digital_data_pack_device::p2_r), FUNC(adam_digital_data_pack_device::p2_w));
+	map(M6801_PORT3, M6801_PORT3).noprw(); // Multiplexed Address/Data
+	map(M6801_PORT4, M6801_PORT4).r(FUNC(adam_digital_data_pack_device::p4_r)).nopw();
+}
 
 static const struct CassetteOptions adam_cassette_options =
 {
@@ -82,9 +84,9 @@ static const struct CassetteOptions adam_cassette_options =
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(adam_digital_data_pack_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(adam_ddp_mem)
-	MCFG_CPU_IO_MAP(adam_ddp_io)
+	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(adam_ddp_mem)
+	MCFG_DEVICE_IO_MAP(adam_ddp_io)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coleco_adam_cassette_formats)

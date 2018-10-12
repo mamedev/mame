@@ -58,21 +58,22 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 #include "screen.h"
 
 
-ADDRESS_MAP_START(travrusa_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(travrusa_scroll_x_high_w)
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)    /* + coin counters - not written by shtrider */
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("SYSTEM")     /* IN0 */
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P1")         /* IN1 */
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("P2")         /* IN2 */
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW1")       /* DSW1 */
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW2")       /* DSW2 */
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void travrusa_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().w(FUNC(travrusa_state::travrusa_videoram_w)).share("videoram");
+	map(0x9000, 0x9000).w(FUNC(travrusa_state::travrusa_scroll_x_low_w));
+	map(0xa000, 0xa000).w(FUNC(travrusa_state::travrusa_scroll_x_high_w));
+	map(0xc800, 0xc9ff).writeonly().share("spriteram");
+	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
+	map(0xd001, 0xd001).w(FUNC(travrusa_state::travrusa_flipscreen_w));    /* + coin counters - not written by shtrider */
+	map(0xd000, 0xd000).portr("SYSTEM");     /* IN0 */
+	map(0xd001, 0xd001).portr("P1");         /* IN1 */
+	map(0xd002, 0xd002).portr("P2");         /* IN2 */
+	map(0xd003, 0xd003).portr("DSW1");       /* DSW1 */
+	map(0xd004, 0xd004).portr("DSW2");       /* DSW2 */
+	map(0xe000, 0xefff).ram();
+}
 
 static INPUT_PORTS_START( travrusa )
 	PORT_START("SYSTEM")
@@ -287,12 +288,12 @@ static const gfx_layout shtrider_spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( travrusa )
+static GFXDECODE_START( gfx_travrusa )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*8, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( shtrider )
+static GFXDECODE_START( gfx_shtrider )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,               0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, shtrider_spritelayout, 16*8, 16 )
 GFXDECODE_END
@@ -306,9 +307,9 @@ void travrusa_state::machine_reset()
 MACHINE_CONFIG_START(travrusa_state::travrusa)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", travrusa_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", travrusa_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -322,7 +323,7 @@ MACHINE_CONFIG_START(travrusa_state::travrusa)
 	MCFG_SCREEN_UPDATE_DRIVER(travrusa_state, screen_update_travrusa)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", travrusa)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_travrusa)
 
 	MCFG_PALETTE_ADD("palette", 16*8+16*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)
@@ -338,7 +339,7 @@ MACHINE_CONFIG_START(travrusa_state::shtrider)
 	travrusa(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shtrider)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
 MACHINE_CONFIG_END
@@ -347,7 +348,7 @@ MACHINE_CONFIG_START(travrusa_state::shtriderb)
 	travrusa(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shtrider)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -578,29 +579,26 @@ ROM_START( shtriderb )
 	ROM_LOAD( "prom2.12.h2",  0x0220, 0x0100, CRC(5db47092) SHA1(8e234ee88143755a4fd5ec86a03b55be5f9c5db8) )
 ROM_END
 
-DRIVER_INIT_MEMBER(travrusa_state,motorace)
+void travrusa_state::init_motorace()
 {
-	int A, j;
 	uint8_t *rom = memregion("maincpu")->base();
-	std::vector<uint8_t> buffer(0x2000);
-
+	uint8_t buffer[0x2000];
 	memcpy(&buffer[0], rom, 0x2000);
 
 	/* The first CPU ROM has the address and data lines scrambled */
-	for (A = 0; A < 0x2000; A++)
+	for (int A = 0; A < 0x2000; A++)
 	{
-		j = bitswap<16>(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
+		int j = bitswap<16>(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
 		rom[j] = bitswap<8>(buffer[A],2,7,4,1,6,3,0,5);
 	}
 }
 
-DRIVER_INIT_MEMBER(travrusa_state,shtridra)
+void travrusa_state::init_shtridra()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
 
 	/* D3/D4  and  D5/D6 swapped */
-	for (A = 0; A < 0x2000; A++)
+	for (int A = 0; A < 0x2000; A++)
 		rom[A] = bitswap<8>(rom[A],7,5,6,3,4,2,1,0);
 }
 
@@ -612,17 +610,17 @@ READ8_MEMBER(travrusa_state::shtridrb_port11_r)
 }
 
 
-DRIVER_INIT_MEMBER(travrusa_state, shtridrb)
+void travrusa_state::init_shtridrb()
 {
 	m_maincpu->space(AS_IO).install_read_handler(0x11, 0x11, 0, 0xff00, 0, read8_delegate(FUNC(travrusa_state::shtridrb_port11_r),this));
 }
 
 
-GAME( 1983, travrusa, 0,        travrusa, travrusa, travrusa_state, 0,        ROT270,                    "Irem",                           "Traverse USA / Zippy Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, travrusab,travrusa, travrusa, travrusa, travrusa_state, 0,        ROT270,                    "bootleg (I.P.)",                 "Traverse USA (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mototour, travrusa, travrusa, travrusa, travrusa_state, 0,        ROT270,                    "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, motorace, travrusa, travrusa, motorace, travrusa_state, motorace, ROT270,                    "Irem (Williams license)",        "MotoRace USA", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusa, 0,        travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem",                           "Traverse USA / Zippy Race", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab,travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "bootleg (I.P.)",                 "Traverse USA (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mototour, travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, motorace, travrusa, travrusa, motorace, travrusa_state, init_motorace, ROT270,                    "Irem (Williams license)",        "MotoRace USA", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, shtrider, 0,        shtrider, shtrider, travrusa_state, 0,        ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", MACHINE_SUPPORTS_SAVE ) // possible bootleg
-GAME( 1984, shtridera,shtrider, shtrider, shtrider, travrusa_state, shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shtriderb,shtrider, shtriderb,shtrider, travrusa_state, shtridrb, ROT270|ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)", MACHINE_SUPPORTS_SAVE ) // resets when you attempt to start a game?
+GAME( 1985, shtrider, 0,        shtrider, shtrider, travrusa_state, empty_init,    ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", MACHINE_SUPPORTS_SAVE ) // possible bootleg
+GAME( 1984, shtridera,shtrider, shtrider, shtrider, travrusa_state, init_shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtriderb,shtrider, shtriderb,shtrider, travrusa_state, init_shtridrb, ROT270|ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)", MACHINE_SUPPORTS_SAVE ) // resets when you attempt to start a game?

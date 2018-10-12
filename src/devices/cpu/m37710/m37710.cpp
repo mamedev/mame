@@ -62,41 +62,45 @@
 #define M37710_DEBUG    (0) // enables verbose logging for peripherals, etc.
 
 
-DEFINE_DEVICE_TYPE(M37702M2, m37702m2_device, "m37702m2", "M37702M2")
-DEFINE_DEVICE_TYPE(M37702S1, m37702s1_device, "m37702s1", "M37702S1")
-DEFINE_DEVICE_TYPE(M37710S4, m37710s4_device, "m37710s4", "M37710S4")
-DEFINE_DEVICE_TYPE(M37720S1, m37720s1_device, "m37720s1", "M37720S1")
+DEFINE_DEVICE_TYPE(M37702M2, m37702m2_device, "m37702m2", "Mitsubishi M37702M2")
+DEFINE_DEVICE_TYPE(M37702S1, m37702s1_device, "m37702s1", "Mitsubishi M37702S1")
+DEFINE_DEVICE_TYPE(M37710S4, m37710s4_device, "m37710s4", "Mitsubishi M37710S4")
+DEFINE_DEVICE_TYPE(M37720S1, m37720s1_device, "m37720s1", "Mitsubishi M37720S1")
 
 
 // On-board RAM, ROM, and peripherals
 
 // M37702M2: 512 bytes internal RAM, 16K internal mask ROM
 // (M37702E2: same with EPROM instead of mask ROM)
-ADDRESS_MAP_START(m37702m2_device::map)
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00027f) AM_RAM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION(M37710_INTERNAL_ROM_REGION, 0)
-ADDRESS_MAP_END
+void m37702m2_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(FUNC(m37702m2_device::m37710_internal_r), FUNC(m37702m2_device::m37710_internal_w));
+	map(0x000080, 0x00027f).ram();
+	map(0x00c000, 0x00ffff).rom().region(M37710_INTERNAL_ROM_REGION, 0);
+}
 
 
 // M37702S1: 512 bytes internal RAM, no internal ROM
-ADDRESS_MAP_START(m37702s1_device::map)
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00027f) AM_RAM
-ADDRESS_MAP_END
+void m37702s1_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(FUNC(m37702s1_device::m37710_internal_r), FUNC(m37702s1_device::m37710_internal_w));
+	map(0x000080, 0x00027f).ram();
+}
 
 
 // M37710S4: 2048 bytes internal RAM, no internal ROM
-ADDRESS_MAP_START(m37710s4_device::map)
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00087f) AM_RAM
-ADDRESS_MAP_END
+void m37710s4_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(FUNC(m37710s4_device::m37710_internal_r), FUNC(m37710s4_device::m37710_internal_w));
+	map(0x000080, 0x00087f).ram();
+}
 
 // M37720S1: 512 bytes internal RAM, no internal ROM, built-in DMA
-ADDRESS_MAP_START(m37720s1_device::map)
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00027f) AM_RAM
-ADDRESS_MAP_END
+void m37720s1_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(FUNC(m37720s1_device::m37710_internal_r), FUNC(m37720s1_device::m37710_internal_w));
+	map(0x000080, 0x00027f).ram();
+}
 
 // many other combinations of RAM and ROM size exist
 
@@ -167,7 +171,7 @@ const int m37710_cpu_device::m37710_irq_levels[M37710_LINE_MAX] =
 	0x77,   // Timer A2     14
 	0x76,   // Timer A1     15
 	0x75,   // Timer A0     16
-	0x7f,                                                                                                                                                                                          // IRQ 2         13
+	0x7f,   // IRQ 2        13
 	0x7e,   // IRQ 1        18
 	0x7d,   // IRQ 0        19
 
@@ -688,7 +692,7 @@ WRITE8_MEMBER(m37710_cpu_device::m37710_internal_w)
 	}
 }
 
-const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes[4] =
+const m37710_cpu_device::opcode_func *const m37710_cpu_device::m37710i_opcodes[4] =
 {
 	m37710i_opcodes_M0X0,
 	m37710i_opcodes_M0X1,
@@ -696,7 +700,7 @@ const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes[4] =
 	m37710i_opcodes_M1X1,
 };
 
-const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes2[4] =
+const m37710_cpu_device::opcode_func *const m37710_cpu_device::m37710i_opcodes2[4] =
 {
 	m37710i_opcodes42_M0X0,
 	m37710i_opcodes42_M0X1,
@@ -704,7 +708,7 @@ const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes2[4] =
 	m37710i_opcodes42_M1X1,
 };
 
-const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes3[4] =
+const m37710_cpu_device::opcode_func *const m37710_cpu_device::m37710i_opcodes3[4] =
 {
 	m37710i_opcodes89_M0X0,
 	m37710i_opcodes89_M0X1,
@@ -949,9 +953,9 @@ bool m37710_cpu_device::get_x_flag() const
 	return FLAG_X;
 }
 
-util::disasm_interface *m37710_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m37710_cpu_device::create_disassembler()
 {
-	return new m7700_disassembler(this);
+	return std::make_unique<m7700_disassembler>(this);
 }
 
 void m37710_cpu_device::m37710_restore_state()
@@ -998,7 +1002,7 @@ void m37710_cpu_device::device_start()
 	memset(m_m37710_regs, 0, sizeof(m_m37710_regs));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	m_ICount = 0;
@@ -1074,7 +1078,7 @@ void m37710_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_p ).formatstr("%8s").noshow();
 
-	m_icountptr = &m_ICount;
+	set_icountptr(m_ICount);
 }
 
 

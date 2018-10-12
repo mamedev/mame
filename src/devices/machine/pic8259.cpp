@@ -137,7 +137,7 @@ IRQ_CALLBACK_MEMBER(pic8259_device::inta_cb)
 }
 
 
-READ8_MEMBER( pic8259_device::read )
+uint8_t pic8259_device::read(offs_t offset)
 {
 	/* NPW 18-May-2003 - Changing 0xFF to 0x00 as per Ruslan */
 	uint8_t data = 0x00;
@@ -187,7 +187,7 @@ READ8_MEMBER( pic8259_device::read )
 }
 
 
-WRITE8_MEMBER( pic8259_device::write )
+void pic8259_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -333,16 +333,26 @@ WRITE8_MEMBER( pic8259_device::write )
 
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
 //-------------------------------------------------
 
-void pic8259_device::device_start()
+void pic8259_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_out_int_func.resolve_safe();
 	m_in_sp_func.resolve_safe(1);
 	m_read_slave_ack_func.resolve_safe(0);
+}
 
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pic8259_device::device_start()
+{
 	// Register save state items
 	save_item(NAME(m_state));
 	save_item(NAME(m_isr));

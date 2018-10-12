@@ -146,6 +146,8 @@ void jpmimpct_state::update_irqs()
 
 MACHINE_START_MEMBER(jpmimpct_state,jpmimpct)
 {
+	m_digits.resolve();
+
 	save_item(NAME(m_tms_irq));
 	save_item(NAME(m_duart_1_irq));
 	save_item(NAME(m_touch_cnt));
@@ -257,8 +259,7 @@ READ16_MEMBER(jpmimpct_state::duart_1_r)
 		case 0xe:
 		{
 			attotime rate = attotime::from_hz(MC68681_1_CLOCK) * (16 * duart_1.CT);
-			timer_device *duart_timer = machine().device<timer_device>("duart_1_timer");
-			duart_timer->adjust(rate, 0, rate);
+			m_duart_1_timer->adjust(rate, 0, rate);
 			break;
 		}
 		case 0xf:
@@ -468,8 +469,8 @@ WRITE16_MEMBER(jpmimpct_state::volume_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->set_bank_base(0x20000 * ((data >> 1) & 3));
-		m_upd7759->reset_w(data & 0x01);
+		m_upd7759->set_rom_bank((data >> 1) & 3);
+		m_upd7759->reset_w(BIT(data, 0));
 	}
 }
 
@@ -477,7 +478,7 @@ WRITE16_MEMBER(jpmimpct_state::upd7759_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->port_w(space, 0, data);
+		m_upd7759->port_w(data);
 		m_upd7759->start_w(0);
 		m_upd7759->start_w(1);
 	}
@@ -514,7 +515,7 @@ void jpmimpct_state::jpm_draw_lamps(int data, int lamp_strobe)
 	for (i=0; i<16; i++)
 	{
 		m_Lamps[16*(m_lamp_strobe+i)] = data & 1;
-		output().set_lamp_value((16*lamp_strobe)+i, (m_Lamps[(16*lamp_strobe)+i]));
+		m_lamp_output[(16*lamp_strobe)+i] = m_Lamps[(16*lamp_strobe)+i];
 		data = data >> 1;
 	}
 }
@@ -566,7 +567,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmio_w)
 
 		case 0x0b:
 		{
-			output().set_digit_value(m_lamp_strobe,data);
+			m_digits[m_lamp_strobe] = data;
 			break;
 		}
 		case 0x0f:
@@ -585,54 +586,56 @@ WRITE16_MEMBER(jpmimpct_state::jpmio_w)
  *  Main CPU memory handlers
  *
  *************************************/
-ADDRESS_MAP_START(jpmimpct_state::m68k_program_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
-	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
-	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
-	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1_r)
-	AM_RANGE(0x00480034, 0x00480035) AM_READ(unk_r)
-	AM_RANGE(0x00480060, 0x00480067) AM_READWRITE(unk_r, unk_w)//PPI
-	AM_RANGE(0x00480080, 0x00480081) AM_WRITE(upd7759_w)
-	AM_RANGE(0x00480082, 0x00480083) AM_WRITE(volume_w)
-	AM_RANGE(0x00480084, 0x00480085) AM_READ(upd7759_r)
-	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmio_w)
-	AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
-	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
-	AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
-	AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
-	AM_RANGE(0x00800000, 0x00800007) AM_DEVREADWRITE("dsp", tms34010_device, host_r, host_w)
-	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
-	AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
-	AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
-	AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
-ADDRESS_MAP_END
+void jpmimpct_state::m68k_program_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom();
+	map(0x00100000, 0x001fffff).rom();
+	map(0x00400000, 0x00403fff).ram().share("nvram");
+	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
+	map(0x00480020, 0x00480033).r(FUNC(jpmimpct_state::inputs1_r));
+	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::unk_r));
+	map(0x00480060, 0x00480067).rw(FUNC(jpmimpct_state::unk_r), FUNC(jpmimpct_state::unk_w));//PPI
+	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
+	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
+	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
+	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmio_w));
+	map(0x004800e0, 0x004800e1).w(FUNC(jpmimpct_state::unk_w));
+	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::unk_r));
+	map(0x004801de, 0x004801df).r(FUNC(jpmimpct_state::unk_r));
+	map(0x004801e0, 0x004801ff).rw(FUNC(jpmimpct_state::duart_2_r), FUNC(jpmimpct_state::duart_2_w));
+	map(0x00800000, 0x00800007).rw(m_dsp, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
+	map(0x00c00000, 0x00cfffff).rom();
+	map(0x00d00000, 0x00dfffff).rom();
+	map(0x00e00000, 0x00efffff).rom();
+	map(0x00f00000, 0x00ffffff).rom();
+}
 
 /*************************************
  *
  *  Main CPU memory handlers
  *
  *************************************/
-ADDRESS_MAP_START(jpmimpct_state::awp68k_program_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // most games are 0x00000000 - 0x0003ffff, but some QPS ones go up to fffff, check for any mirroring etc.
-	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
-	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1awp_r)
-	AM_RANGE(0x00480034, 0x00480035) AM_READ(ump_r)
-	AM_RANGE(0x00480040, 0x00480041) AM_READ(optos_r)
-	AM_RANGE(0x00480060, 0x00480067) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write,0x00ff)
-	AM_RANGE(0x00480080, 0x00480081) AM_WRITE(upd7759_w)
-	AM_RANGE(0x00480082, 0x00480083) AM_WRITE(volume_w)
-	AM_RANGE(0x00480084, 0x00480085) AM_READ(upd7759_r)
-	AM_RANGE(0x00480086, 0x0048009f) AM_READ(prot_1_r)
-	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmioawp_w)
+void jpmimpct_state::awp68k_program_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom(); // most games are 0x00000000 - 0x0003ffff, but some QPS ones go up to fffff, check for any mirroring etc.
+	map(0x00400000, 0x00403fff).ram().share("nvram");
+	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
+	map(0x00480020, 0x00480033).r(FUNC(jpmimpct_state::inputs1awp_r));
+	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
+	map(0x00480040, 0x00480041).r(FUNC(jpmimpct_state::optos_r));
+	map(0x00480060, 0x00480067).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
+	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
+	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
+	map(0x00480086, 0x0048009f).r(FUNC(jpmimpct_state::prot_1_r));
+	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmioawp_w));
 //  AM_RANGE(0x004800b0, 0x004800df) AM_READ(prot_1_r)
 //  AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
 //  AM_RANGE(0x00480086, 0x006576ff) AM_READ(prot_1_r)
-	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(prot_1_r)
-	AM_RANGE(0x004801de, 0x006575ff) AM_READ(prot_1_r)
-	AM_RANGE(0x00657600, 0x00657601) AM_READ(prot_0_r)
-	AM_RANGE(0x00657602, 0x00ffffff) AM_READ(prot_1_r)
+	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::prot_1_r));
+	map(0x004801de, 0x006575ff).r(FUNC(jpmimpct_state::prot_1_r));
+	map(0x00657600, 0x00657601).r(FUNC(jpmimpct_state::prot_0_r));
+	map(0x00657602, 0x00ffffff).r(FUNC(jpmimpct_state::prot_1_r));
 
 //  AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
 //  AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
@@ -642,7 +645,7 @@ ADDRESS_MAP_START(jpmimpct_state::awp68k_program_map)
 //  AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
 //  AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
 //  AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
-ADDRESS_MAP_END
+}
 
 
 /*************************************
@@ -651,15 +654,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(jpmimpct_state::tms_program_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0xf8000000) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0x100000)
-	AM_RANGE(0x02000000, 0x027fffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0)
+void jpmimpct_state::tms_program_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).mirror(0xf8000000).ram().share("vram");
+	map(0x00800000, 0x00ffffff).mirror(0xf8000000).rom().region("user1", 0x100000);
+	map(0x02000000, 0x027fffff).mirror(0xf8000000).rom().region("user1", 0);
 //  AM_RANGE(0x01000000, 0x0100003f) AM_MIRROR(0xf87fffc0) AM_READWRITE(jpmimpct_bt477_r, jpmimpct_bt477_w)
-	AM_RANGE(0x01000000, 0x017fffff) AM_MIRROR(0xf8000000) AM_MASK(0x1f) AM_READWRITE(jpmimpct_bt477_r, jpmimpct_bt477_w)
-	AM_RANGE(0x07800000, 0x07bfffff) AM_MIRROR(0xf8400000) AM_RAM
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("dsp", tms34010_device, io_register_r, io_register_w)
-ADDRESS_MAP_END
+	map(0x01000000, 0x017fffff).mirror(0xf8000000).mask(0x1f).rw(FUNC(jpmimpct_state::jpmimpct_bt477_r), FUNC(jpmimpct_state::jpmimpct_bt477_w));
+	map(0x07800000, 0x07bfffff).mirror(0xf8400000).ram();
+	map(0xc0000000, 0xc00001ff).rw(m_dsp, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+}
 
 
 /*************************************
@@ -836,23 +840,23 @@ WRITE_LINE_MEMBER(jpmimpct_state::tms_irq)
  *************************************/
 
 MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(m68k_program_map)
 
-	MCFG_CPU_ADD("dsp", TMS34010, 40000000)
-	MCFG_CPU_PROGRAM_MAP(tms_program_map)
+	MCFG_DEVICE_ADD("dsp", TMS34010, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(40000000/16) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(jpmimpct_state, scanline_update)   /* scanline updater (rgb32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(jpmimpct_state, tms_irq))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, jpmimpct_state, tms_irq))
 	MCFG_TMS340X0_TO_SHIFTREG_CB(jpmimpct_state, to_shiftreg)       /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(jpmimpct_state, from_shiftreg)      /* read from shiftreg function */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD("duart_1_timer", jpmimpct_state, duart_1_timer_event)
 
@@ -861,8 +865,8 @@ MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 	MCFG_SCREEN_UPDATE_DEVICE("dsp", tms34010_device, tms340x0_rgb32)
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_VIDEO_START_OVERRIDE(jpmimpct_state,jpmimpct)
@@ -1160,7 +1164,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 
 		case 0x0b:
 		{
-			output().set_digit_value(m_lamp_strobe,data);
+			m_digits[m_lamp_strobe] = data;
 			break;
 		}
 		case 0x0f:
@@ -1308,41 +1312,41 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(jpmimpct_state::impctawp)
-	MCFG_CPU_ADD("maincpu",M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(awp68k_program_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(awp68k_program_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 	MCFG_S16LF01_ADD("vfd",0)
 
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,impctawp)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,impctawp)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(jpmimpct_state, payen_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(jpmimpct_state, hopper_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(jpmimpct_state, hopper_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jpmimpct_state, display_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(jpmimpct_state::payen_a_w));
+	ppi.in_pb_callback().set(FUNC(jpmimpct_state::hopper_b_r));
+	ppi.in_pc_callback().set(FUNC(jpmimpct_state::hopper_c_r));
+	ppi.out_pc_callback().set(FUNC(jpmimpct_state::display_c_w));
 
 	MCFG_TIMER_DRIVER_ADD("duart_1_timer", jpmimpct_state, duart_1_timer_event)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEFAULT_LAYOUT(layout_jpmimpct)
+	config.set_default_layout(layout_jpmimpct);
 
-	MCFG_STARPOINT_48STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel0_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel1_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel2_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel3_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel4_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel5_optic_cb))
+	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel0_optic_cb))
+	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel1_optic_cb))
+	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel2_optic_cb))
+	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel3_optic_cb))
+	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel4_optic_cb))
+	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel5_optic_cb))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(5)
@@ -1745,20 +1749,20 @@ ROM_END
 
 /* Video */
 
-GAME( 1995, cluedo,   0,       jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedod,  cluedo,  jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2c, cluedo,  jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2,  cluedo,  jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialp, 0,       jpmimpct, trivialp, jpmimpct_state, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpd,trivialp,jpmimpct, trivialp, jpmimpct_state, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpo,trivialp,jpmimpct, trivialp, jpmimpct_state, 0, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabble, 0,       jpmimpct, scrabble, jpmimpct_state, 0, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabbled,scrabble,jpmimpct, scrabble, jpmimpct_state, 0, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hngmnjpm, 0,       jpmimpct, hngmnjpm, jpmimpct_state, 0, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hngmnjpmd,hngmnjpm,jpmimpct, hngmnjpm, jpmimpct_state, 0, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coronatn, 0,       jpmimpct, coronatn, jpmimpct_state, 0, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coronatnd,coronatn,jpmimpct, coronatn, jpmimpct_state, 0, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, tqst,     0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
-GAME( 199?, snlad,    0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
-GAME( 199?, buzzundr, 0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
-GAME( 199?, monspdr , 0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )
+GAME( 1995, cluedo,    0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedod,   cluedo,   jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2c,  cluedo,   jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2,   cluedo,   jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialp,  0,        jpmimpct, trivialp, jpmimpct_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialpd, trivialp, jpmimpct, trivialp, jpmimpct_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialpo, trivialp, jpmimpct, trivialp, jpmimpct_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scrabble,  0,        jpmimpct, scrabble, jpmimpct_state, empty_init, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scrabbled, scrabble, jpmimpct, scrabble, jpmimpct_state, empty_init, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hngmnjpm,  0,        jpmimpct, hngmnjpm, jpmimpct_state, empty_init, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hngmnjpmd, hngmnjpm, jpmimpct, hngmnjpm, jpmimpct_state, empty_init, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coronatn,  0,        jpmimpct, coronatn, jpmimpct_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coronatnd, coronatn, jpmimpct, coronatn, jpmimpct_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, tqst,      0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
+GAME( 199?, snlad,     0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
+GAME( 199?, buzzundr,  0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
+GAME( 199?, monspdr ,  0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )

@@ -52,16 +52,20 @@
 class mtxl_state : public driver_device
 {
 public:
-	mtxl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+	mtxl_state(const machine_config &mconfig, device_type type, const char *tag) :
+			driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 #ifndef REAL_PCI_CHIPSET
-		m_mb(*this, "mb"),
+			m_mb(*this, "mb"),
 #endif
-		m_ram(*this, RAM_TAG),
-		m_iocard(*this, "dbank"),
-		m_multikey(*this, "multikey")
+			m_ram(*this, RAM_TAG),
+			m_iocard(*this, "dbank"),
+			m_multikey(*this, "multikey")
 		{ }
+
+	void at486(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 #ifndef REAL_PCI_CHIPSET
 	required_device<at_mb_device> m_mb;
@@ -75,7 +79,6 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(coin_r);
-	void at486(machine_config &config);
 	static void cdrom(device_t *device);
 	void at32_io(address_map &map);
 	void at32_map(address_map &map);
@@ -104,44 +107,47 @@ WRITE8_MEMBER(mtxl_state::key_w)
 	m_multikey->write_dq((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(mtxl_state::at32_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	#ifndef REAL_PCI_CHIPSET
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x000d0000, 0x000dffff) AM_DEVICE("dbank", address_map_bank_device, amap32)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
-	#endif
-ADDRESS_MAP_END
+void mtxl_state::at32_map(address_map &map)
+{
+	map.unmap_value_high();
+#ifndef REAL_PCI_CHIPSET
+	map(0x00000000, 0x0009ffff).bankrw("bank10");
+	map(0x000c8000, 0x000cffff).ram().share("nvram");
+	map(0x000d0000, 0x000dffff).m(m_iocard, FUNC(address_map_bank_device::amap32));
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+#endif
+}
 
-ADDRESS_MAP_START(mtxl_state::at32_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	#ifndef REAL_PCI_CHIPSET
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("mb:dma8237_1", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("mb:pic8259_master", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("mb:pit8254", pit8254_device, read, write, 0xffffffff)
-	AM_RANGE(0x0060, 0x0067) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("mb", at_mb_device, portb_r, portb_w, 0x0000ff00)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("mb:rtc", mc146818_device, read, write, 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("mb", at_mb_device, page8_r, page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("mb:dma8237_2", am9517a_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x0224, 0x0227) AM_DEVREADWRITE8("cs4231", ad1848_device, read, write, 0xffffffff)
-	#endif
-	AM_RANGE(0x0228, 0x022b) AM_READ_PORT("Unknown")
-	AM_RANGE(0x022c, 0x022f) AM_WRITE8(bank_w, 0xff000000)
-	AM_RANGE(0x022c, 0x022f) AM_READWRITE8(key_r, key_w, 0x0000ff00)
-	AM_RANGE(0x022c, 0x022f) AM_READ8(coin_r, 0x000000ff)
-	#ifndef REAL_PCI_CHIPSET
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16550", ns16550_device, ins8250_r, ins8250_w, 0xffffffff)
-	#endif
-ADDRESS_MAP_END
+void mtxl_state::at32_io(address_map &map)
+{
+	map.unmap_value_high();
+#ifndef REAL_PCI_CHIPSET
+	map(0x0000, 0x001f).rw("mb:dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0020, 0x003f).rw("mb:pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x005f).rw("mb:pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x0060, 0x0067).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
+	map(0x0061, 0x0061).rw("mb", FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
+	map(0x0070, 0x007f).rw("mb:rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0080, 0x009f).rw("mb", FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w));
+	map(0x00a0, 0x00bf).rw("mb:pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00c0, 0x00df).rw("mb:dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
+	map(0x0224, 0x0227).rw("cs4231", FUNC(ad1848_device::read), FUNC(ad1848_device::write));
+#endif
+	map(0x0228, 0x022b).portr("Unknown");
+	map(0x022f, 0x022f).w(FUNC(mtxl_state::bank_w));
+	map(0x022d, 0x022d).rw(FUNC(mtxl_state::key_r), FUNC(mtxl_state::key_w));
+	map(0x022c, 0x022c).r(FUNC(mtxl_state::coin_r));
+#ifndef REAL_PCI_CHIPSET
+	map(0x03f8, 0x03ff).rw("ns16550", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+#endif
+}
 
-ADDRESS_MAP_START(mtxl_state::dbank_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("ioboard", 0)
-	AM_RANGE(0x100000, 0x17ffff) AM_DEVREADWRITE8("flash", intelfsh8_device, read, write, 0xffffffff)
-ADDRESS_MAP_END
+void mtxl_state::dbank_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom().region("ioboard", 0);
+	map(0x100000, 0x17ffff).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+}
 
 static INPUT_PORTS_START(mtouchxl)
 	PORT_START("Coin")
@@ -186,84 +192,80 @@ void mtxl_state::machine_reset()
 }
 
 #ifndef REAL_PCI_CHIPSET
-static SLOT_INTERFACE_START(mt6k_ata_devices)
-	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
-SLOT_INTERFACE_END
+static void mt6k_ata_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+}
 
 void mtxl_state::cdrom(device_t *device)
 {
 	auto ide0 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:0"));
 	ide0->option_reset();
-	SLOT_INTERFACE_NAME(mt6k_ata_devices)(device->subdevice("ide:0"));
+	mt6k_ata_devices(*ide0);
 	ide0->set_default_option("cdrom");
 	ide0->set_fixed(true);
 
 	auto ide1 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:1"));
 	ide1->set_default_option("");
 	ide1->set_fixed(true);
-MACHINE_CONFIG_END
+}
 #endif
 
 MACHINE_CONFIG_START(mtxl_state::at486)
-	MCFG_CPU_ADD("maincpu", I486DX4, 33000000)
-	MCFG_CPU_PROGRAM_MAP(at32_map)
-	MCFG_CPU_IO_MAP(at32_io)
+	MCFG_DEVICE_ADD(m_maincpu, I486DX4, 33000000)
+	MCFG_DEVICE_PROGRAM_MAP(at32_map)
+	MCFG_DEVICE_IO_MAP(at32_io)
 #ifndef REAL_PCI_CHIPSET
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "ide", true)
+	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", true) // FIXME: determine ISA bus clock
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
 
-	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	uart.out_int_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir4_w));
 
-	MCFG_SOUND_ADD("cs4231", AD1848, 0)
-	MCFG_AD1848_IRQ_CALLBACK(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
-	MCFG_AD1848_DRQ_CALLBACK(DEVWRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE(uart, ins8250_uart_device, rx_w))
 
-	MCFG_DEVICE_MODIFY("mb:dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("^cs4231", ad1848_device, dack_w))
+	MCFG_DEVICE_ADD("cs4231", AD1848, 0)
+	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
+	MCFG_AD1848_DRQ_CALLBACK(WRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
+
+	subdevice<am9517a_device>("mb:dma8237_1")->out_iow_callback<1>().set("cs4231", FUNC(ad1848_device::dack_w));
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	MCFG_DEVICE_REMOVE("mb:keybc");
 	MCFG_DEVICE_REMOVE("mb:pc_kbdc");
-	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
-	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
-	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
-	MCFG_KBDC8042_GATE_A20_CB(INPUTLINE("maincpu", INPUT_LINE_A20))
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
-	MCFG_DEVICE_REMOVE("mb:rtc")
-	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
+	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	kbdc.gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
+	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
+
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
 #endif
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32M")    // Early XL games had 8 MB RAM, 6000 and later require 32MB
+	RAM(config, RAM_TAG).set_default_size("32M"); // Early XL games had 8 MB RAM, 6000 and later require 32MB
 
 	/* bankdev for dxxxx */
-	MCFG_DEVICE_ADD("dbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(dbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "dbank").set_map(&mtxl_state::dbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* Flash ROM */
-	MCFG_AMD_29F040_ADD("flash")
+	AMD_29F040(config, "flash");
 
 	/* Security key */
 	MCFG_DS1205_ADD("multikey")
 
 #ifdef REAL_PCI_CHIPSET
 	/* PCI root */
-	MCFG_PCI_ROOT_ADD( ":pci")
+	MCFG_PCI_ROOT_ADD(":pci")
 	MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
 MACHINE_CONFIG_END
@@ -409,14 +411,14 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT           DEVICE              INIT    COMPANY              FULLNAME */
+/*    YEAR  NAME        PARENT     COMPAT  MACHINE  INPUT     CLASS       INIT        COMPANY             FULLNAME */
 // Any indicates this is from a CD-R at a trade show that was claimed to be a prototype, but R1 is several versions in?
-COMP ( 1997, mtouchxl,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL (Version R1, prototype?)", 0 )
-COMP ( 1998, mtchxl5k,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Super 5000 (Version R5I)", MACHINE_NOT_WORKING )
-COMP ( 1998, mtchxl5ko,  mtchxl5k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Super 5000 (Version R5B)", MACHINE_NOT_WORKING )
-COMP ( 1998, mtchxl5ko2, mtchxl5k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Super 5000 (Version R5E)", MACHINE_NOT_WORKING )
-COMP ( 1999, mtchxl6k,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL 6000 (Version r07)",       0 )
-COMP ( 1999, mtchxl6ko4, mtchxl6k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL 6000 (Version r04)",       0 )
-COMP ( 1999, mtchxl6ko,  mtchxl6k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL 6000 (Version r02)",       0 )
-COMP ( 2000, mtchxlgld,  0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Gold (Version r01)",       MACHINE_NOT_WORKING )
-COMP ( 2000, mtchxlgldo, mtchxlgld, 0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Gold (Version r00)",       MACHINE_NOT_WORKING )
+COMP( 1997, mtouchxl,   0,         0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL (Version R1, prototype?)", 0 )
+COMP( 1998, mtchxl5k,   0,         0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Super 5000 (Version R5I)", MACHINE_NOT_WORKING )
+COMP( 1998, mtchxl5ko,  mtchxl5k,  0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Super 5000 (Version R5B)", MACHINE_NOT_WORKING )
+COMP( 1998, mtchxl5ko2, mtchxl5k,  0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Super 5000 (Version R5E)", MACHINE_NOT_WORKING )
+COMP( 1999, mtchxl6k,   0,         0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL 6000 (Version r07)",       0 )
+COMP( 1999, mtchxl6ko4, mtchxl6k,  0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL 6000 (Version r04)",       0 )
+COMP( 1999, mtchxl6ko,  mtchxl6k,  0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL 6000 (Version r02)",       0 )
+COMP( 2000, mtchxlgld,  0,         0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Gold (Version r01)",       MACHINE_NOT_WORKING )
+COMP( 2000, mtchxlgldo, mtchxlgld, 0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Gold (Version r00)",       MACHINE_NOT_WORKING )

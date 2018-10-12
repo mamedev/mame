@@ -233,6 +233,35 @@ public:
 	{
 	}
 
+	void mpu4_vid(machine_config &config);
+	void bwbvid(machine_config &config);
+	void crmaze(machine_config &config);
+	void bwbvid5(machine_config &config);
+	void mating(machine_config &config);
+
+	void init_crmazea();
+	void init_v4barqst2();
+	void init_quidgrid();
+	void init_v4barqst();
+	void init_timemchn();
+	void init_crmaze2a();
+	void init_v4opt3();
+	void init_eyesdown();
+	void init_v4cmazeb();
+	void init_crmaze2();
+	void init_crmaze();
+	void init_prizeinv();
+	void init_strikeit();
+	void init_v4wize();
+	void init_turnover();
+	void init_adders();
+	void init_mating();
+	void init_crmaze3a();
+	void init_skiltrek();
+	void init_crmaze3();
+	void init_cybcas();
+
+private:
 	required_device<m68000_base_device> m_videocpu;
 	optional_device<scn2674_device> m_scn2674;
 	optional_shared_ptr<uint16_t> m_vid_vidram;
@@ -252,28 +281,6 @@ public:
 	int m_gfx_index;
 	int8_t m_cur[2];
 
-
-	DECLARE_DRIVER_INIT(crmazea);
-	DECLARE_DRIVER_INIT(v4barqst2);
-	DECLARE_DRIVER_INIT(quidgrid);
-	DECLARE_DRIVER_INIT(v4barqst);
-	DECLARE_DRIVER_INIT(timemchn);
-	DECLARE_DRIVER_INIT(crmaze2a);
-	DECLARE_DRIVER_INIT(v4opt3);
-	DECLARE_DRIVER_INIT(eyesdown);
-	DECLARE_DRIVER_INIT(v4cmazeb);
-	DECLARE_DRIVER_INIT(crmaze2);
-	DECLARE_DRIVER_INIT(crmaze);
-	DECLARE_DRIVER_INIT(prizeinv);
-	DECLARE_DRIVER_INIT(strikeit);
-	DECLARE_DRIVER_INIT(v4wize);
-	DECLARE_DRIVER_INIT(turnover);
-	DECLARE_DRIVER_INIT(adders);
-	DECLARE_DRIVER_INIT(mating);
-	DECLARE_DRIVER_INIT(crmaze3a);
-	DECLARE_DRIVER_INIT(skiltrek);
-	DECLARE_DRIVER_INIT(crmaze3);
-	DECLARE_DRIVER_INIT(cybcas);
 	DECLARE_MACHINE_START(mpu4_vid);
 	DECLARE_MACHINE_RESET(mpu4_vid);
 	DECLARE_VIDEO_START(mpu4_vid);
@@ -297,11 +304,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
 	DECLARE_WRITE8_MEMBER( vram_w );
 	DECLARE_READ8_MEMBER( vram_r );
-	void mpu4_vid(machine_config &config);
-	void bwbvid(machine_config &config);
-	void crmaze(machine_config &config);
-	void bwbvid5(machine_config &config);
-	void mating(machine_config &config);
+
 	void bwbvid5_68k_map(address_map &map);
 	void bwbvid_68k_map(address_map &map);
 	void mpu4_68k_map(address_map &map);
@@ -403,9 +406,10 @@ READ8_MEMBER(mpu4vid_state::vram_r)
 	return m_vid_mainram[offset];
 }
 
-ADDRESS_MAP_START(mpu4vid_state::mpu4_vram)
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void mpu4vid_state::mpu4_vram(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(FUNC(mpu4vid_state::vram_r), FUNC(mpu4vid_state::vram_w));
+}
 
 SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 {
@@ -652,20 +656,20 @@ static INPUT_PORTS_START( crmaze )
 	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL)//XA
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL)//YA
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL)//XB
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL)//YB
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM)//XA
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM)//YA
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM)//XB
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM)//YB
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")
@@ -771,20 +775,20 @@ static INPUT_PORTS_START( mating )
 	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL)//XA
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL)//YA
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL)//XB
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL)//YB
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM)//XA
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM)//YA
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM)//XB
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM)//YB
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")
@@ -903,10 +907,10 @@ static INPUT_PORTS_START( skiltrek )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
@@ -1017,10 +1021,10 @@ static INPUT_PORTS_START( turnover )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
@@ -1131,10 +1135,10 @@ static INPUT_PORTS_START( adders )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
@@ -1180,121 +1184,124 @@ MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
 	m_chr_value     = 0;
 }
 
-ADDRESS_MAP_START(mpu4vid_state::mpu4_68k_map)
-	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-//  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xff8000, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE8(vidcharacteriser_r, vidcharacteriser_w,0x00ff)
-ADDRESS_MAP_END
+void mpu4vid_state::mpu4_68k_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rom();
+	map(0x800000, 0x80ffff).ram().share("vid_mainram");
+//  map(0x810000, 0x81ffff) AM_RAM /* ? */
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
+	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
+	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0xff9000, 0xff900f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(mpu4vid_state::mpu4oki_68k_map)
-	AM_RANGE(0x000000, 0x5fffff) AM_ROM //AM_WRITENOP
-	AM_RANGE(0x600000, 0x63ffff) AM_RAM /* The Mating Game has an extra 256kB RAM on the program card */
-//  AM_RANGE(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xff8000, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0xffa040, 0xffa04f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0x00ff)  // 6840PTM on sampled sound board
-	AM_RANGE(0xffa040, 0xffa04f) AM_WRITE8(ic3ss_w,0x00ff)  // 6840PTM on sampled sound board
-	AM_RANGE(0xffa060, 0xffa067) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write,0x00ff)    // PIA6821 on sampled sound board
-	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE8(vidcharacteriser_r, vidcharacteriser_w, 0x00ff)
-//  AM_RANGE(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
-ADDRESS_MAP_END
+void mpu4vid_state::mpu4oki_68k_map(address_map &map)
+{
+	map(0x000000, 0x5fffff).rom(); //AM_WRITENOP
+	map(0x600000, 0x63ffff).ram(); /* The Mating Game has an extra 256kB RAM on the program card */
+//  map(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
+	map(0x800000, 0x80ffff).ram().share("vid_mainram");
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
+	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
+	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0xff9000, 0xff900f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0xffa040, 0xffa04f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0x00ff);  // 6840PTM on sampled sound board
+	map(0xffa040, 0xffa04f).w(FUNC(mpu4vid_state::ic3ss_w)).umask16(0x00ff);  // 6840PTM on sampled sound board
+	map(0xffa060, 0xffa067).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);    // PIA6821 on sampled sound board
+	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
+//  map(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
+}
 
-ADDRESS_MAP_START(mpu4vid_state::bwbvid_68k_map)
-	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-//  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xe00000, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
-	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
-ADDRESS_MAP_END
+void mpu4vid_state::bwbvid_68k_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rom();
+	map(0x800000, 0x80ffff).ram().share("vid_mainram");
+	map(0x810000, 0x81ffff).ram(); /* ? */
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+//  map(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
+/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
+	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
+	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	//map(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+}
 
-ADDRESS_MAP_START(mpu4vid_state::bwbvid5_68k_map)
-	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xe00000, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write, 0xff00) //Seems odd...
-	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff00)  // 6840PTM on sampled sound board
-	AM_RANGE(0xe03000, 0xe0300f) AM_WRITE8(ic3ss_w,0xff00)  // 6840PTM on sampled sound board
-	AM_RANGE(0xe04000, 0xe0400f) AM_READWRITE8(bwb_characteriser_r, bwb_characteriser_w, 0x00ff)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
-ADDRESS_MAP_END
+void mpu4vid_state::bwbvid5_68k_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rom();
+	map(0x800000, 0x80ffff).ram().share("vid_mainram");
+	map(0x810000, 0x81ffff).ram(); /* ? */
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	//map(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
+/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
+	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
+	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0xe02000, 0xe02007).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00); //Seems odd...
+	map(0xe03000, 0xe0300f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0xff00);  // 6840PTM on sampled sound board
+	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_w)).umask16(0xff00);  // 6840PTM on sampled sound board
+	map(0xe04000, 0xe0400f).rw(FUNC(mpu4vid_state::bwb_characteriser_r), FUNC(mpu4vid_state::bwb_characteriser_w)).umask16(0x00ff);//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+}
 
 /* TODO: Fix up MPU4 map*/
-ADDRESS_MAP_START(mpu4_state::mpu4_6809_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_device, read, write)
-	AM_RANGE(0x0880, 0x0881) AM_NOP //Read/write here
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0)  /* 64k EPROM on board, only this region read */
-ADDRESS_MAP_END
+void mpu4_state::mpu4_6809_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0801).rw("acia6850_0", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0880, 0x0881).noprw(); //Read/write here
+	map(0x0900, 0x0907).rw("ptm_ic2", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x0a00, 0x0a03).rw("pia_ic3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0b00, 0x0b03).rw("pia_ic4", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c03).rw("pia_ic5", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0d00, 0x0d03).rw("pia_ic6", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0e00, 0x0e03).rw("pia_ic7", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0f00, 0x0f03).rw("pia_ic8", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4000, 0x7fff).ram();
+	map(0xbe00, 0xbfff).ram();
+	map(0xc000, 0xffff).rom().region("maincpu",0);  /* 64k EPROM on board, only this region read */
+}
 
 
 
 MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
-	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
-	MCFG_CPU_PROGRAM_MAP(mpu4_6809_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, MPU4_MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mpu4_6809_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")               /* confirm */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
 
 	mpu4_common(config);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE((63*8)+(17*8), (37*8)+17) // note this directly affects the scanline counters used below, and thus the timing of everything
-	MCFG_SCREEN_VISIBLE_AREA(0, (63*8)+(0)-1, 0, (37*8)+0-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(VIDEO_MASTER_CLOCK, (63*8)+(17*8), 0, (63*8), (37*8)+17, 0, (37*8));
+	// note this directly affects the scanline counters used below, and thus the timing of everything
+	screen.set_screen_update("scn2674_vid", FUNC(scn2674_device::screen_update));
 
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("scn2674_vid", scn2674_device, screen_update)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
-	MCFG_DEVICE_ADD("scn2674_vid", SCN2674, 0)
-	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("video", M68K_IRQ_3))
-	MCFG_SCN2674_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(mpu4vid_state, display_pixels)
-	MCFG_DEVICE_ADDRESS_MAP(0, mpu4_vram)
+	SCN2674(config, m_scn2674, VIDEO_MASTER_CLOCK / 8);
+	m_scn2674->intr_callback().set_inputline("video", M68K_IRQ_3);
+	m_scn2674->set_character_width(8);
+	m_scn2674->set_display_callback(FUNC(mpu4vid_state::display_pixels));
+	m_scn2674->set_addrmap(0, &mpu4vid_state::mpu4_vram);
 
 
-	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
-	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)
+	MCFG_DEVICE_ADD("video", M68000, VIDEO_MASTER_CLOCK )
+	MCFG_DEVICE_PROGRAM_MAP(mpu4_68k_map)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(960))
 
@@ -1307,63 +1314,64 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_EF9369_ADD("ef9369")
 	MCFG_EF9369_COLOR_UPDATE_CB(mpu4vid_state, ef9369_color_update)
 
-	MCFG_DEVICE_ADD("6840ptm_68k", PTM6840, VIDEO_MASTER_CLOCK / 10) /* 68k E clock */
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(mpu4vid_state, vid_o1_callback))
-	MCFG_PTM6840_O2_CB(WRITELINE(mpu4vid_state, vid_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(mpu4vid_state, vid_o3_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4vid_state, cpu1_ptm_irq))
+	PTM6840(config, m_ptm, VIDEO_MASTER_CLOCK / 10); /* 68k E clock */
+	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->o1_callback().set(FUNC(mpu4vid_state::vid_o1_callback));
+	m_ptm->o2_callback().set(FUNC(mpu4vid_state::vid_o2_callback));
+	m_ptm->o3_callback().set(FUNC(mpu4vid_state::vid_o3_callback));
+	m_ptm->irq_callback().set(FUNC(mpu4vid_state::cpu1_ptm_irq));
+
 	/* Present on all video cards */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_SAA1099_ADD("saa", 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_rxd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_dcd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m6809_acia_irq))
+	ACIA6850(config, m_acia_0, 0);
+	m_acia_0->txd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
+	m_acia_0->rts_handler().set("acia6850_1", FUNC(acia6850_device::write_dcd));
+	m_acia_0->irq_handler().set(FUNC(mpu4vid_state::m6809_acia_irq));
 
-	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_rxd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_dcd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m68k_acia_irq))
+	ACIA6850(config, m_acia_1, 0);
+	m_acia_1->txd_handler().set("acia6850_0", FUNC(acia6850_device::write_rxd));
+	m_acia_1->rts_handler().set("acia6850_0", FUNC(acia6850_device::write_dcd));
+	m_acia_1->irq_handler().set(FUNC(mpu4vid_state::m68k_acia_irq));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::crmaze)
 	mpu4_vid(config);
-	MCFG_DEVICE_MODIFY("pia_ic5")
-	MCFG_PIA_READPA_HANDLER(READ8(mpu4vid_state, pia_ic5_porta_track_r))
-	MCFG_PIA_WRITEPA_HANDLER(NOOP)
-	MCFG_PIA_WRITEPB_HANDLER(NOOP)
+	m_pia5->readpa_handler().set(FUNC(mpu4vid_state::pia_ic5_porta_track_r));
+	m_pia5->writepa_handler().set_nop();
+	m_pia5->writepb_handler().set_nop();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::mating)
 	crmaze(config);
-	MCFG_CPU_MODIFY("video")
-	MCFG_CPU_PROGRAM_MAP(mpu4oki_68k_map)
+	MCFG_DEVICE_MODIFY("video")
+	MCFG_DEVICE_PROGRAM_MAP(mpu4oki_68k_map)
 
 	mpu4_common2(config);
 
-	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000) //?
+	MCFG_DEVICE_ADD("msm6376", OKIM6376, 128000) //?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::bwbvid)
 	mpu4_vid(config);
-	MCFG_CPU_MODIFY("video")
-	MCFG_CPU_PROGRAM_MAP(bwbvid_68k_map)
+	MCFG_DEVICE_MODIFY("video")
+	MCFG_DEVICE_PROGRAM_MAP(bwbvid_68k_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::bwbvid5)
 	bwbvid(config);
-	MCFG_CPU_MODIFY("video")
-	MCFG_CPU_PROGRAM_MAP(bwbvid5_68k_map)
+	MCFG_DEVICE_MODIFY("video")
+	MCFG_DEVICE_PROGRAM_MAP(bwbvid5_68k_map)
 
 	mpu4_common2(config);
 
-	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000) //?
+	MCFG_DEVICE_ADD("msm6376", OKIM6376, 128000) //?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END
@@ -1608,93 +1616,93 @@ static mpu4_chr_table prizeinv_data[8] = {
 {0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
 
-DRIVER_INIT_MEMBER(mpu4vid_state,adders)
+void mpu4vid_state::init_adders()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = adders_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze)
+void mpu4vid_state::init_crmaze()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = crmaze_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmazea)
+void mpu4vid_state::init_crmazea()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = crmazea_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze2)
+void mpu4vid_state::init_crmaze2()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = crmaze2_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze2a)
+void mpu4vid_state::init_crmaze2a()
 {
 	m_reels = 0;//currently no hybrid games
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze3)
+void mpu4vid_state::init_crmaze3()
 {
 	m_reels = 0;//currently no hybrid games
 	m_reel_mux = FLUTTERBOX;
 	m_current_chr_table = crmaze3_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze3a)
+void mpu4vid_state::init_crmaze3a()
 {
 	m_reels = 0;//currently no hybrid games
 	m_reel_mux = FLUTTERBOX;
 	m_current_chr_table = crmaze3a_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,mating)
+void mpu4vid_state::init_mating()
 {
 	m_reels = 0;//currently no hybrid games
 
 	m_current_chr_table = mating_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,skiltrek)
+void mpu4vid_state::init_skiltrek()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = skiltrek_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,timemchn)
+void mpu4vid_state::init_timemchn()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = timemchn_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,strikeit)
+void mpu4vid_state::init_strikeit()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = strikeit_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,turnover)
+void mpu4vid_state::init_turnover()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = turnover_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,eyesdown)
+void mpu4vid_state::init_eyesdown()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = eyesdown_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,quidgrid)
+void mpu4vid_state::init_quidgrid()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = quidgrid_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,prizeinv)
+void mpu4vid_state::init_prizeinv()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = prizeinv_data;
@@ -1715,7 +1723,7 @@ static mpu4_chr_table cybcas_data[8] = {
 {0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
 
-DRIVER_INIT_MEMBER(mpu4vid_state,cybcas)
+void mpu4vid_state::init_cybcas()
 {
 	//no idea what this should be, use blues boys table for now
 	m_bwb_chr_table1 = cybcas_data1;
@@ -1734,27 +1742,27 @@ void mpu4vid_state::mpu4vid_char_cheat( int address)
 	}
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4barqst)
+void mpu4vid_state::init_v4barqst()
 {
 	mpu4vid_char_cheat(0x154);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4barqst2)
+void mpu4vid_state::init_v4barqst2()
 {
 	mpu4vid_char_cheat(0x15c);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4wize)
+void mpu4vid_state::init_v4wize()
 {
 	mpu4vid_char_cheat(0x16c);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4cmazeb)
+void mpu4vid_state::init_v4cmazeb()
 {
 	mpu4vid_char_cheat(0x4c6);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4opt3)
+void mpu4vid_state::init_v4opt3()
 {
 	mpu4vid_char_cheat(0x164);
 }
@@ -2677,12 +2685,12 @@ ROM_START( v4wizea )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "wzm1&2p1", 0x000000, 0x010000, CRC(629e38d0) SHA1(bbc2688635c4cb9a1712a0a0d28017d1867417a4) )
-	ROM_LOAD16_BYTE( "wzm1&2p2", 0x000001, 0x010000, CRC(96b9c484) SHA1(b02595ba5a5c7d673bdc7675708a4d8f6d907779) )
-	ROM_LOAD16_BYTE( "wzm1&2p3", 0x020000, 0x010000, CRC(e545fac0) SHA1(4a3f9e5522bd666d5a1e9ac7878d3d78f3756762) )
-	ROM_LOAD16_BYTE( "wzm1&2p4", 0x020001, 0x010000, CRC(df7d4dba) SHA1(b892cfb807421c99ba98bfd9b34d717e17345d83) )
-	ROM_LOAD16_BYTE( "wzm1&2p5", 0x040000, 0x010000, NO_DUMP )
-	ROM_LOAD16_BYTE( "wzm1&2p6", 0x040001, 0x010000, CRC(3eecbdf8) SHA1(9ecc4fe25e1c1e167aaa413eaf601b55e1a432fb) )
+	ROM_LOAD16_BYTE( "wzm1+2p1", 0x000000, 0x010000, CRC(629e38d0) SHA1(bbc2688635c4cb9a1712a0a0d28017d1867417a4) )
+	ROM_LOAD16_BYTE( "wzm1+2p2", 0x000001, 0x010000, CRC(96b9c484) SHA1(b02595ba5a5c7d673bdc7675708a4d8f6d907779) )
+	ROM_LOAD16_BYTE( "wzm1+2p3", 0x020000, 0x010000, CRC(e545fac0) SHA1(4a3f9e5522bd666d5a1e9ac7878d3d78f3756762) )
+	ROM_LOAD16_BYTE( "wzm1+2p4", 0x020001, 0x010000, CRC(df7d4dba) SHA1(b892cfb807421c99ba98bfd9b34d717e17345d83) )
+	ROM_LOAD16_BYTE( "wzm1+2p5", 0x040000, 0x010000, NO_DUMP )
+	ROM_LOAD16_BYTE( "wzm1+2p6", 0x040001, 0x010000, CRC(3eecbdf8) SHA1(9ecc4fe25e1c1e167aaa413eaf601b55e1a432fb) )
 
 	ROM_LOAD( "wizemove_questions",  0x080000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
 
@@ -3232,7 +3240,7 @@ ROM_START( v4monte )
 	// Monte Carlo Or Bust Release D (c)1996
 	ROM_LOAD( "mcob2025", 0x0000, 0x010000, CRC(0fe6ec1e) SHA1(de5b7edb40b9ab3fc9111eb83061d55ce569afdd) )
 	ROM_LOAD( "mcob5vd", 0x0000, 0x010000, CRC(44967b33) SHA1(92d35d1b0edcc2eef1062468722c80ef8208b437) )
-	ROM_LOAD( "mcobvd~1", 0x0000, 0x010000, CRC(e0b4bbab) SHA1(bd806a286464d36ff0cbff214ed60ccf81fd2db9) )
+	ROM_LOAD( "mcobvd-1", 0x0000, 0x010000, CRC(e0b4bbab) SHA1(bd806a286464d36ff0cbff214ed60ccf81fd2db9) )
 	ROM_LOAD( "mcovd10", 0x0000, 0x010000, CRC(3f5adbd5) SHA1(f1876afd345e8398c1dc00b63be7d5a91f57519f) )
 	ROM_LOAD( "mn_xes__.d_0", 0x0000, 0x010000, CRC(25ee14a5) SHA1(2eba1b5b68a9f7ad6aacbdf6b93f6b4569164258) )
 	ROM_LOAD( "mnixes__.d_0", 0x0000, 0x010000, CRC(44967b33) SHA1(92d35d1b0edcc2eef1062468722c80ef8208b437) )
@@ -3581,115 +3589,115 @@ ROM_END
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
 The AMLD Crystal Maze versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
 
-GAME(  199?,v4bios,     0,          mod2,       mpu4,     mpu4_state,       0,          ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
+GAME(  199?, v4bios,     0,        mod2,       mpu4,     mpu4_state,    empty_init,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
 
 #define GAME_FLAGS MACHINE_NOT_WORKING
 
-GAMEL( 1993,v4cmaze,    v4bios,     crmaze,     crmaze,   mpu4vid_state,    crmaze,     ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993,v4cmazedat, v4cmaze,    crmaze,     crmaze,   mpu4vid_state,    crmaze,     ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D
-GAMEL( 1993,v4cmazea,   v4cmaze,    crmaze,     crmaze,   mpu4vid_state,    crmazea,    ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
-GAMEL( 1993,v4cmazeb,   v4cmaze,    crmaze,     crmaze,   mpu4vid_state,    v4cmazeb,   ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993,v4cmazec,   v4cmaze,    crmaze,     crmaze,   mpu4vid_state,    v4cmazeb,   ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993,v4cmazed,   v4cmaze,    crmaze,     crmaze,   mpu4vid_state,    v4cmazeb,   ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.6
+GAMEL( 1993, v4cmaze,    v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993, v4cmazedat, v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D
+GAMEL( 1993, v4cmazea,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmazea,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
+GAMEL( 1993, v4cmazeb,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993, v4cmazec,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993, v4cmazed,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.6
 
-GAMEL( 1993,v4cmaze2,   v4bios,     crmaze,     crmaze,   mpu4vid_state,    crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993,v4cmaze2d,  v4cmaze2,   crmaze,     crmaze,   mpu4vid_state,    crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
-GAMEL( 1993,v4cmaze2a,  v4cmaze2,   crmaze,     crmaze,   mpu4vid_state,    crmaze2a,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
-GAMEL( 1993,v4cmaze2b,  v4cmaze2,   crmaze,     crmaze,   mpu4vid_state,    crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993,v4cmaze2c,  v4cmaze2,   crmaze,     crmaze,   mpu4vid_state,    crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
+GAMEL( 1993, v4cmaze2,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
+GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
+GAMEL( 1993, v4cmaze2a,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2a,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
+GAMEL( 1993, v4cmaze2b,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
+GAMEL( 1993, v4cmaze2c,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
 
-GAMEL( 1994,v4cmaze3,   v4bios,     crmaze,     crmaze,   mpu4vid_state,    crmaze3,    ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994,v4cmaze3d,  v4cmaze3,   crmaze,     crmaze,   mpu4vid_state,    crmaze3,    ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
-GAMEL( 1994,v4cmaze3a,  v4cmaze3,   crmaze,     crmaze,   mpu4vid_state,    crmaze3a,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994,v4cmaze3b,  v4cmaze3,   crmaze,     crmaze,   mpu4vid_state,    v4cmazeb,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994,v4cmaze3c,  v4cmaze3,   crmaze,     crmaze,   mpu4vid_state,    v4cmazeb,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
+GAMEL( 1994, v4cmaze3,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
+GAMEL( 1994, v4cmaze3a,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3a,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994, v4cmaze3b,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
 
-GAME(  199?,v4turnov,   v4bios,     mpu4_vid,   turnover, mpu4vid_state,    turnover,   ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnov,   v4bios,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  1990,v4skltrk,   v4bios,     mpu4_vid,   skiltrek, mpu4vid_state,    skiltrek,   ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
-GAME(  1990,v4skltrka,  v4skltrk,   mpu4_vid,   skiltrek, mpu4vid_state,    skiltrek,   ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
-GAME(  1990,v4sklcsh,   v4bios,     mpu4_vid,   skiltrek, mpu4vid_state,    v4barqst,   ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1990, v4skltrk,   v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
+GAME(  1990, v4skltrka,  v4skltrk, mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
+GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  1989,v4addlad,   v4bios,     mpu4_vid,   adders,   mpu4vid_state,    adders,     ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989,v4addlad20, v4addlad,   mpu4_vid,   adders,   mpu4vid_state,    adders,     ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4addlad,   v4bios,   mpu4_vid,   adders,   mpu4vid_state, init_adders,    ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4addlad20, v4addlad, mpu4_vid,   adders,   mpu4vid_state, init_adders,    ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  1989,v4time,     v4bios,     mpu4_vid,   skiltrek, mpu4vid_state,    timemchn,   ROT0, "Barcrest","Time Machine (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4time,     v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (MPU4 Video)",GAME_FLAGS )
 
 //Year is a guess, based on the use of the 'Coin Man' logo
-GAME(  1996?,v4mate,    v4bios,     mating,     mating,   mpu4vid_state,    mating,     ROT0, "Barcrest","The Mating Game (v0.4) (MPU4 Video)",GAME_FLAGS )//SWP 0.2 /* Using crmaze controls for now, cabinet has trackball */
-GAME(  1996?,v4mated,   v4mate,     mating,     mating,   mpu4vid_state,    mating,     ROT0, "Barcrest","The Mating Game (v0.4, Datapak) (MPU4 Video)",GAME_FLAGS )//SWP 0.2D
+GAME(  1996?,v4mate,     v4bios,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4) (MPU4 Video)",GAME_FLAGS )//SWP 0.2 /* Using crmaze controls for now, cabinet has trackball */
+GAME(  1996?,v4mated,    v4mate,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4, Datapak) (MPU4 Video)",GAME_FLAGS )//SWP 0.2D
 
 /* Games below are missing question ROMs */
 
-GAME(  199?,v4strike,   v4bios,     mpu4_vid,   mpu4, mpu4vid_state,        strikeit,   ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4striked,  v4strike,   mpu4_vid,   mpu4, mpu4vid_state,        strikeit,   ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4strike2,  v4strike,   mpu4_vid,   mpu4, mpu4vid_state,        strikeit,   ROT0, "Barcrest","Strike it Lucky (v0.53) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4strike2d, v4strike,   mpu4_vid,   mpu4, mpu4vid_state,        strikeit,   ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4strike,   v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4striked,  v4strike, mpu4_vid,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4strike2,  v4strike, mpu4_vid,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4strike2d, v4strike, mpu4_vid,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4eyedwn,   v4bios,     mpu4_vid,   mpu4, mpu4vid_state,        eyesdown,   ROT0, "Barcrest","Eyes Down (v1.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4eyedwnd,  v4eyedwn,   mpu4_vid,   mpu4, mpu4vid_state,        eyesdown,   ROT0, "Barcrest","Eyes Down (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4eyedwn,   v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4eyedwnd,  v4eyedwn, mpu4_vid,   mpu4,     mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4quidgr,   v4bios,     mpu4_vid,   mpu4, mpu4vid_state,        quidgrid,   ROT0, "Barcrest","Ten Quid Grid (v1.2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4quidgrd,  v4quidgr,   mpu4_vid,   mpu4, mpu4vid_state,        quidgrid,   ROT0, "Barcrest","Ten Quid Grid (v1.2, Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4quidgr2,  v4quidgr,   mpu4_vid,   mpu4, mpu4vid_state,        quidgrid,   ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4quidgr2d, v4quidgr,   mpu4_vid,   mpu4, mpu4vid_state,        quidgrid,   ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr,   v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgrd,  v4quidgr, mpu4_vid,   mpu4,     mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr2,  v4quidgr, mpu4_vid,   mpu4,     mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr2d, v4quidgr, mpu4_vid,   mpu4,     mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4barqst,   v4bios,     mpu4_vid,   mpu4, mpu4vid_state,        v4barqst,   ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4barqs2,   v4bios,     mpu4_vid,   mpu4, mpu4vid_state,        v4barqst2,  ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4barqst,   v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4barqs2,   v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4barqst2, ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4wize,     v4bios,     mpu4_vid,   mpu4, mpu4vid_state,        v4wize,     ROT0, "Barcrest","Wize Move (v1.3d) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4wizea,    v4bios,     mpu4_vid,   mpu4, mpu4vid_state,        v4wize,     ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wize,     v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizea,    v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  1991,v4opt3,     v4bios,     mpu4_vid,   mpu4, mpu4vid_state,        v4opt3,     ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
-GAME(  1991,v4opt3d,    v4opt3,     mpu4_vid,   mpu4, mpu4vid_state,        v4opt3,     ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4opt3,     v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
 
 
 
 /* Games below are newer BwB games and use their own BIOS ROMs and hardware setups*/
 
-GAME(  199?,v4vgpok,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4psi,      0,          bwbvid,     mpu4, mpu4vid_state,        prizeinv,   ROT0, "BwB","Prize Space Invaders (v1.1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4psia,     0,          bwbvid,     mpu4, mpu4vid_state,        prizeinv,   ROT0, "BwB","Prize Space Invaders (v1.2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4psib,     0,          bwbvid,     mpu4, mpu4vid_state,        prizeinv,   ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS ) // bad dump
-GAME(  199?,v4blox,     0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4bloxd,    v4blox,     bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996,v4reno,     0,          bwbvid5,    mpu4, mpu4vid_state,        prizeinv,   ROT0, "BwB","Reno Reels (20p/10GBP Cash, release A) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4vgpok,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psi,      0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psia,     0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psib,     0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS ) // bad dump
+GAME(  199?, v4blox,     0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bloxd,    v4blox,   bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4reno,     0,        bwbvid5,    mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Reno Reels (20p/10GBP Cash, release A) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4bigfrt,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4bubbnk,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4mazbel,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4mazbla,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4shpwnd,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bigfrt,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bubbnk,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4mazbel,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4mazbla,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4shpwnd,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4redhtp,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Red Hot Poker (20p/10GBP Cash, release 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4tetrs,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","BwB Tetris v 2.2 (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtp,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Red Hot Poker (20p/10GBP Cash, release 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4tetrs,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","BwB Tetris v 2.2 (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4big40,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Big 40 Poker (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4bulblx,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox?
-GAME(  199?,v4cshinf,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Cash Inferno (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4dbltak,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Double Take (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4gldrsh,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Gold Rush (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4mdice,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?
-GAME(  199?,v4monte,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4ovrmn3,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Over Moon Pt3 (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4pztet,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 1)",GAME_FLAGS ) // is this the same as v4tetrs?
-GAME(  199?,v4pzteta,   v4pztet,    bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 2)",GAME_FLAGS )
-GAME(  199?,v4rhmaz,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Red Hot Mazooma Belle (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4sunbst,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Sunburst (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4timebn,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Time Bandit (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4sixx,     0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","6-X (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4megbuk,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Megabucks Poker (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
-GAME(  199?,v4rencas,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Reno Casino (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+GAME(  199?, v4big40,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Big 40 Poker (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bulblx,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox?
+GAME(  199?, v4cshinf,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Cash Inferno (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4dbltak,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Double Take (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrsh,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Gold Rush (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4mdice,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?
+GAME(  199?, v4monte,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4ovrmn3,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Over Moon Pt3 (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4pztet,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 1)",GAME_FLAGS ) // is this the same as v4tetrs?
+GAME(  199?, v4pzteta,   v4pztet,  bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 2)",GAME_FLAGS )
+GAME(  199?, v4rhmaz,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Red Hot Mazooma Belle (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sunbst,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Sunburst (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4timebn,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Time Bandit (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sixx,     0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","6-X (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4megbuk,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Megabucks Poker (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+GAME(  199?, v4rencas,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Reno Casino (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
 
 
 /* Uncertain BIOS */
-GAME(  199?,v4frfact,   v4bios,     crmaze,     crmaze, mpu4vid_state,      crmaze,     ROT0, "Bwb","Fruit Factory (Bwb) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Bwb","Fruit Factory (Bwb) (MPU4 Video)", GAME_FLAGS )
 
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BwB video in the BIOS rom tho */
-GAME(  199?,v4cybcas,   0,          bwbvid5,    mpu4, mpu4vid_state,        cybcas,     ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4miami,    0,          bwbvid5,    mpu4, mpu4vid_state,        0,          ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4missis,   0,          bwbvid5,    mpu4, mpu4vid_state,        0,          ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4picdil,   0,          bwbvid5,    mpu4, mpu4vid_state,        0,          ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cybcas,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_cybcas,    ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4miami,    0,        bwbvid5,    mpu4,     mpu4vid_state, empty_init,     ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4missis,   0,        bwbvid5,    mpu4,     mpu4vid_state, empty_init,     ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4picdil,   0,        bwbvid5,    mpu4,     mpu4vid_state, empty_init,     ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )

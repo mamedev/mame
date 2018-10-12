@@ -7,60 +7,62 @@ DEFINE_DEVICE_TYPE(PCI_ROOT,   pci_root_device,   "pci_root",   "PCI virtual roo
 DEFINE_DEVICE_TYPE(PCI_BRIDGE, pci_bridge_device, "pci_bridge", "PCI-PCI Bridge")
 
 
-ADDRESS_MAP_START(pci_device::config_map)
-	AM_RANGE(0x00, 0x03) AM_READ16     (vendor_r,                                 0x0000ffff)
-	AM_RANGE(0x00, 0x03) AM_READ16     (device_r,                                 0xffff0000)
-	AM_RANGE(0x04, 0x07) AM_READWRITE16(command_r,           command_w,           0x0000ffff)
-	AM_RANGE(0x04, 0x07) AM_READ16     (status_r,                                 0xffff0000)
-	AM_RANGE(0x08, 0x0b) AM_READ       (class_rev_r)
-	AM_RANGE(0x0c, 0x0f) AM_READ8      (cache_line_size_r,                        0x000000ff)
-	AM_RANGE(0x0c, 0x0f) AM_READ8      (latency_timer_r,                          0x0000ff00)
-	AM_RANGE(0x0c, 0x0f) AM_READ8      (header_type_r,                            0x00ff0000)
-	AM_RANGE(0x0c, 0x0f) AM_READ8      (bist_r,                                   0xff000000)
-	AM_RANGE(0x0c, 0x0f) AM_WRITENOP
-	AM_RANGE(0x10, 0x27) AM_READWRITE  (address_base_r,      address_base_w)
+void pci_device::config_map(address_map &map)
+{
+	map(0x00, 0x01).r(FUNC(pci_device::vendor_r));
+	map(0x02, 0x03).r(FUNC(pci_device::device_r));
+	map(0x04, 0x05).rw(FUNC(pci_device::command_r), FUNC(pci_device::command_w));
+	map(0x06, 0x07).r(FUNC(pci_device::status_r));
+	map(0x08, 0x0b).r(FUNC(pci_device::class_rev_r));
+	map(0x0c, 0x0c).r(FUNC(pci_device::cache_line_size_r));
+	map(0x0d, 0x0d).r(FUNC(pci_device::latency_timer_r));
+	map(0x0e, 0x0e).r(FUNC(pci_device::header_type_r));
+	map(0x0f, 0x0f).r(FUNC(pci_device::bist_r));
+	map(0x0c, 0x0f).nopw();
+	map(0x10, 0x27).rw(FUNC(pci_device::address_base_r), FUNC(pci_device::address_base_w));
 	// Cardbus CIS pointer at 28
-	AM_RANGE(0x2c, 0x2f) AM_READ16     (subvendor_r,                              0x0000ffff)
-	AM_RANGE(0x2c, 0x2f) AM_READ16     (subsystem_r,                              0xffff0000)
-	AM_RANGE(0x2c, 0x2f) AM_WRITENOP
-	AM_RANGE(0x30, 0x33) AM_READWRITE  (expansion_base_r,    expansion_base_w)
-	AM_RANGE(0x34, 0x37) AM_READ8      (capptr_r,                                 0x000000ff)
-	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(interrupt_line_r,     interrupt_line_w,    0x000000ff)
-	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(interrupt_pin_r,      interrupt_pin_w,     0x0000ff00)
-ADDRESS_MAP_END
+	map(0x2c, 0x2d).r(FUNC(pci_device::subvendor_r));
+	map(0x2e, 0x2f).r(FUNC(pci_device::subsystem_r));
+	map(0x2c, 0x2f).nopw();
+	map(0x30, 0x33).rw(FUNC(pci_device::expansion_base_r), FUNC(pci_device::expansion_base_w));
+	map(0x34, 0x34).r(FUNC(pci_device::capptr_r));
+	map(0x3c, 0x3c).rw(FUNC(pci_device::interrupt_line_r), FUNC(pci_device::interrupt_line_w));
+	map(0x3d, 0x3d).rw(FUNC(pci_device::interrupt_pin_r), FUNC(pci_device::interrupt_pin_w));
+}
 
-ADDRESS_MAP_START(pci_bridge_device::config_map)
-	AM_RANGE(0x00, 0x03) AM_READ16     (vendor_r,                                 0x0000ffff)
-	AM_RANGE(0x00, 0x03) AM_READ16     (device_r,                                 0xffff0000)
-	AM_RANGE(0x04, 0x07) AM_READWRITE16(command_r,           command_w,           0x0000ffff)
-	AM_RANGE(0x04, 0x07) AM_READ16     (status_r,                                 0xffff0000)
-	AM_RANGE(0x08, 0x0b) AM_READ       (class_rev_r)
-	AM_RANGE(0x0c, 0x0f) AM_READ8      (cache_line_size_r,                        0x000000ff)
-	AM_RANGE(0x0c, 0x0f) AM_READ8      (latency_timer_r,                          0x0000ff00)
-	AM_RANGE(0x0c, 0x0f) AM_READ8      (header_type_r,                            0x00ff0000)
-	AM_RANGE(0x0c, 0x0f) AM_READ8      (bist_r,                                   0xff000000)
-	AM_RANGE(0x10, 0x17) AM_READWRITE  (b_address_base_r,    b_address_base_w)
-	AM_RANGE(0x18, 0x1b) AM_READWRITE8 (primary_bus_r,       primary_bus_w,       0x000000ff)
-	AM_RANGE(0x18, 0x1b) AM_READWRITE8 (secondary_bus_r,     secondary_bus_w,     0x0000ff00)
-	AM_RANGE(0x18, 0x1b) AM_READWRITE8 (subordinate_bus_r,   subordinate_bus_w,   0x00ff0000)
-	AM_RANGE(0x18, 0x1b) AM_READWRITE8 (secondary_latency_r, secondary_latency_w, 0xff000000)
-	AM_RANGE(0x1c, 0x1f) AM_READWRITE8 (iobase_r,            iobase_w,            0x000000ff)
-	AM_RANGE(0x1c, 0x1f) AM_READWRITE8 (iolimit_r,           iolimit_w,           0x0000ff00)
-	AM_RANGE(0x1c, 0x1f) AM_READWRITE16(secondary_status_r,  secondary_status_w,  0xffff0000)
-	AM_RANGE(0x20, 0x23) AM_READWRITE16(memory_base_r,       memory_base_w,       0x0000ffff)
-	AM_RANGE(0x20, 0x23) AM_READWRITE16(memory_limit_r,      memory_limit_w,      0xffff0000)
-	AM_RANGE(0x24, 0x27) AM_READWRITE16(prefetch_base_r,     prefetch_base_w,     0x0000ffff)
-	AM_RANGE(0x24, 0x27) AM_READWRITE16(prefetch_limit_r,    prefetch_limit_w,    0xffff0000)
-	AM_RANGE(0x28, 0x2b) AM_READWRITE  (prefetch_baseu_r,    prefetch_baseu_w)
-	AM_RANGE(0x2c, 0x2f) AM_READWRITE  (prefetch_limitu_r,   prefetch_limitu_w)
-	AM_RANGE(0x30, 0x33) AM_READWRITE16(iobaseu_r,           iobaseu_w,           0x0000ffff)
-	AM_RANGE(0x30, 0x33) AM_READWRITE16(iolimitu_r,          iolimitu_w,          0xffff0000)
-	AM_RANGE(0x34, 0x37) AM_READ8      (capptr_r,                                 0x000000ff)
-	AM_RANGE(0x38, 0x3b) AM_READWRITE  (expansion_base_r,    expansion_base_w)
-	AM_RANGE(0x3c, 0x3f) AM_READWRITE8 (interrupt_line_r,    interrupt_line_w,    0x000000ff)
-	AM_RANGE(0x3c, 0x3f) AM_READWRITE8 (interrupt_pin_r,     interrupt_pin_w,     0x0000ff00)
-	AM_RANGE(0x3c, 0x3f) AM_READWRITE16(bridge_control_r,    bridge_control_w,    0xffff0000)
-ADDRESS_MAP_END
+void pci_bridge_device::config_map(address_map &map)
+{
+	map(0x00, 0x01).r(FUNC(pci_bridge_device::vendor_r));
+	map(0x02, 0x03).r(FUNC(pci_bridge_device::device_r));
+	map(0x04, 0x05).rw(FUNC(pci_bridge_device::command_r), FUNC(pci_bridge_device::command_w));
+	map(0x06, 0x07).r(FUNC(pci_bridge_device::status_r));
+	map(0x08, 0x0b).r(FUNC(pci_bridge_device::class_rev_r));
+	map(0x0c, 0x0c).r(FUNC(pci_bridge_device::cache_line_size_r));
+	map(0x0d, 0x0d).r(FUNC(pci_bridge_device::latency_timer_r));
+	map(0x0e, 0x0e).r(FUNC(pci_bridge_device::header_type_r));
+	map(0x0f, 0x0f).r(FUNC(pci_bridge_device::bist_r));
+	map(0x10, 0x17).rw(FUNC(pci_bridge_device::b_address_base_r), FUNC(pci_bridge_device::b_address_base_w));
+	map(0x18, 0x18).rw(FUNC(pci_bridge_device::primary_bus_r), FUNC(pci_bridge_device::primary_bus_w));
+	map(0x19, 0x19).rw(FUNC(pci_bridge_device::secondary_bus_r), FUNC(pci_bridge_device::secondary_bus_w));
+	map(0x1a, 0x1a).rw(FUNC(pci_bridge_device::subordinate_bus_r), FUNC(pci_bridge_device::subordinate_bus_w));
+	map(0x1b, 0x1b).rw(FUNC(pci_bridge_device::secondary_latency_r), FUNC(pci_bridge_device::secondary_latency_w));
+	map(0x1c, 0x1c).rw(FUNC(pci_bridge_device::iobase_r), FUNC(pci_bridge_device::iobase_w));
+	map(0x1d, 0x1d).rw(FUNC(pci_bridge_device::iolimit_r), FUNC(pci_bridge_device::iolimit_w));
+	map(0x1e, 0x1f).rw(FUNC(pci_bridge_device::secondary_status_r), FUNC(pci_bridge_device::secondary_status_w));
+	map(0x20, 0x21).rw(FUNC(pci_bridge_device::memory_base_r), FUNC(pci_bridge_device::memory_base_w));
+	map(0x22, 0x23).rw(FUNC(pci_bridge_device::memory_limit_r), FUNC(pci_bridge_device::memory_limit_w));
+	map(0x24, 0x25).rw(FUNC(pci_bridge_device::prefetch_base_r), FUNC(pci_bridge_device::prefetch_base_w));
+	map(0x26, 0x27).rw(FUNC(pci_bridge_device::prefetch_limit_r), FUNC(pci_bridge_device::prefetch_limit_w));
+	map(0x28, 0x2b).rw(FUNC(pci_bridge_device::prefetch_baseu_r), FUNC(pci_bridge_device::prefetch_baseu_w));
+	map(0x2c, 0x2f).rw(FUNC(pci_bridge_device::prefetch_limitu_r), FUNC(pci_bridge_device::prefetch_limitu_w));
+	map(0x30, 0x31).rw(FUNC(pci_bridge_device::iobaseu_r), FUNC(pci_bridge_device::iobaseu_w));
+	map(0x32, 0x33).rw(FUNC(pci_bridge_device::iolimitu_r), FUNC(pci_bridge_device::iolimitu_w));
+	map(0x34, 0x34).r(FUNC(pci_bridge_device::capptr_r));
+	map(0x38, 0x3b).rw(FUNC(pci_bridge_device::expansion_base_r), FUNC(pci_bridge_device::expansion_base_w));
+	map(0x3c, 0x3c).rw(FUNC(pci_bridge_device::interrupt_line_r), FUNC(pci_bridge_device::interrupt_line_w));
+	map(0x3d, 0x3d).rw(FUNC(pci_bridge_device::interrupt_pin_r), FUNC(pci_bridge_device::interrupt_pin_w));
+	map(0x3e, 0x3f).rw(FUNC(pci_bridge_device::bridge_control_r), FUNC(pci_bridge_device::bridge_control_w));
+}
 
 pci_device::pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -538,10 +540,18 @@ void pci_bridge_device::reset_all_mappings()
 void pci_bridge_device::map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	for(int i = int(all_devices.size())-1; i>=0; i--)
+	const int count = int(all_devices.size()) - 1;
+
+	for(int i = count; i >= 0; i--)
+		if (all_devices[i] != this)
+			if (all_devices[i]->map_first())
+				all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
+											io_window_start, io_window_end, io_offset, io_space);
+	for(int i = count; i>=0; i--)
 		if(all_devices[i] != this)
-			all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
-										io_window_start, io_window_end, io_offset, io_space);
+			if (!all_devices[i]->map_first())
+				all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
+					io_window_start, io_window_end, io_offset, io_space);
 
 	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
 				io_window_start, io_window_end, io_offset, io_space);
@@ -817,10 +827,11 @@ void agp_bridge_device::device_reset()
 
 
 
-ADDRESS_MAP_START(pci_host_device::io_configuration_access_map)
-	AM_RANGE(0xcf8, 0xcfb) AM_READWRITE(config_address_r, config_address_w)
-	AM_RANGE(0xcfc, 0xcff) AM_READWRITE(config_data_r,    config_data_w)
-ADDRESS_MAP_END
+void pci_host_device::io_configuration_access_map(address_map &map)
+{
+	map(0xcf8, 0xcfb).rw(FUNC(pci_host_device::config_address_r), FUNC(pci_host_device::config_address_w));
+	map(0xcfc, 0xcff).rw(FUNC(pci_host_device::config_data_r), FUNC(pci_host_device::config_data_w));
+}
 
 
 pci_host_device::pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

@@ -17,24 +17,39 @@
 #include "cpu/i86/i86.h"
 #include "machine/am9517a.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
-
 
 
 class b16_state : public driver_device
 {
 public:
-	b16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	b16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
+		m_mc6845(*this, "crtc"),
 		m_dma8237(*this, "8237dma"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_char_rom(*this, "pcg")
+	{ }
 
-	uint8_t *m_char_rom;
+	void b16(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	uint8_t m_crtc_vreg[0x100], m_crtc_index;
+
 	required_shared_ptr<uint16_t> m_vram;
-	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	required_device<mc6845_device> m_mc6845;
+	required_device<am9517a_device> m_dma8237;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_region_ptr<uint8_t> m_char_rom;
 
 	DECLARE_READ16_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(b16_pcg_w);
@@ -45,17 +60,8 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	mc6845_device *m_mc6845;
-	required_device<am9517a_device> m_dma8237;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void b16(machine_config &config);
 	void b16_io(address_map &map);
 	void b16_map(address_map &map);
 };
@@ -80,30 +86,26 @@ public:
 
 void b16_state::video_start()
 {
-	// find memory regions
-	m_char_rom = memregion("pcg")->base();
+	save_item(NAME(m_crtc_vreg));
+	save_item(NAME(m_crtc_index));
 }
 
 
 uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	int xi,yi;
-	uint8_t *gfx_rom = memregion("pcg")->base();
-
-	for(y=0;y<mc6845_v_display;y++)
+	for(int y=0;y<mc6845_v_display;y++)
 	{
-		for(x=0;x<mc6845_h_display;x++)
+		for(int x=0;x<mc6845_h_display;x++)
 		{
 			int tile = m_vram[x+y*mc6845_h_display] & 0xff;
 			int color = (m_vram[x+y*mc6845_h_display] & 0x700) >> 8;
 			int pen;
 
-			for(yi=0;yi<mc6845_tile_height;yi++)
+			for(int yi=0;yi<mc6845_tile_height;yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					pen = (gfx_rom[tile*16+yi] >> (7-xi) & 1) ? color : 0;
+					pen = (m_char_rom[tile*16+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(y*mc6845_tile_height < 400 && x*8+xi < 640) /* TODO: safety check */
 						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(pen);
@@ -122,14 +124,15 @@ WRITE8_MEMBER( b16_state::b16_pcg_w )
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
 }
 
-ADDRESS_MAP_START(b16_state::b16_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00000, 0x9ffff ) AM_RAM // probably not all of it.
-	AM_RANGE( 0xa0000, 0xaffff ) AM_RAM // bitmap?
-	AM_RANGE( 0xb0000, 0xb7fff ) AM_RAM AM_SHARE("vram") // tvram
-	AM_RANGE( 0xb8000, 0xbbfff ) AM_WRITE8(b16_pcg_w,0x00ff) // pcg
-	AM_RANGE( 0xfc000, 0xfffff ) AM_ROM AM_REGION("ipl",0)
-ADDRESS_MAP_END
+void b16_state::b16_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x9ffff).ram(); // probably not all of it.
+	map(0xa0000, 0xaffff).ram(); // bitmap?
+	map(0xb0000, 0xb7fff).ram().share("vram"); // tvram
+	map(0xb8000, 0xbbfff).w(FUNC(b16_state::b16_pcg_w)).umask16(0x00ff); // pcg
+	map(0xfc000, 0xfffff).rom().region("ipl", 0);
+}
 
 READ16_MEMBER( b16_state::vblank_r )
 {
@@ -215,14 +218,15 @@ WRITE8_MEMBER( b16_state::unk_dev_w )
 
 }
 
-ADDRESS_MAP_START(b16_state::b16_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x0f) AM_READWRITE8(unk_dev_r,unk_dev_w,0x00ff) // DMA device?
-	AM_RANGE(0x20, 0x21) AM_WRITE8(b16_6845_address_w,0x00ff)
-	AM_RANGE(0x22, 0x23) AM_WRITE8(b16_6845_data_w,0x00ff)
+void b16_state::b16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x0f).rw(FUNC(b16_state::unk_dev_r), FUNC(b16_state::unk_dev_w)).umask16(0x00ff); // DMA device?
+	map(0x20, 0x20).w(FUNC(b16_state::b16_6845_address_w));
+	map(0x22, 0x22).w(FUNC(b16_state::b16_6845_data_w));
 	//0x79 bit 0 DSW?
-	AM_RANGE(0x80, 0x81) AM_READ(vblank_r) // TODO
-ADDRESS_MAP_END
+	map(0x80, 0x81).r(FUNC(b16_state::vblank_r)); // TODO
+}
 
 
 /* Input ports */
@@ -245,19 +249,9 @@ static const gfx_layout b16_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( b16 )
+static GFXDECODE_START( gfx_b16 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, b16_charlayout, 0, 1 )
 GFXDECODE_END
-
-void b16_state::machine_start()
-{
-	m_mc6845 = machine().device<mc6845_device>("crtc");
-}
-
-void b16_state::machine_reset()
-{
-}
-
 
 READ8_MEMBER(b16_state::memory_read_byte)
 {
@@ -274,10 +268,9 @@ WRITE8_MEMBER(b16_state::memory_write_byte)
 
 MACHINE_CONFIG_START(b16_state::b16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8086, XTAL(14'318'181)/2) //unknown xtal
-	MCFG_CPU_PROGRAM_MAP(b16_map)
-	MCFG_CPU_IO_MAP(b16_io)
-
+	MCFG_DEVICE_ADD(m_maincpu, I8086, XTAL(14'318'181)/2) //unknown xtal
+	MCFG_DEVICE_PROGRAM_MAP(b16_map)
+	MCFG_DEVICE_IO_MAP(b16_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -288,16 +281,16 @@ MACHINE_CONFIG_START(b16_state::b16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181)/5)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD(m_mc6845, H46505, "screen", XTAL(14'318'181)/5)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_DEVICE_ADD("8237dma", AM9517A, XTAL(14'318'181)/2)
-	MCFG_I8237_IN_MEMR_CB(READ8(b16_state, memory_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(b16_state, memory_write_byte))
+	AM9517A(config, m_dma8237, XTAL(14'318'181)/2);
+	m_dma8237->in_memr_callback().set(FUNC(b16_state::memory_read_byte));
+	m_dma8237->out_memw_callback().set(FUNC(b16_state::memory_write_byte));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", b16)
-	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_b16)
+	MCFG_PALETTE_ADD(m_palette, 8)
 //  MCFG_PALETTE_INIT_STANDARD(black_and_white) // TODO
 
 MACHINE_CONFIG_END
@@ -312,5 +305,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT   MACHINE   INPUT  STATE      INIT  COMPANY    FULLNAME  FLAGS */
-COMP( 1983, b16,  0,      0,       b16,      b16,   b16_state, 0,    "Hitachi", "B16",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY    FULLNAME  FLAGS */
+COMP( 1983, b16,  0,      0,      b16,     b16,   b16_state, empty_init, "Hitachi", "B16",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -46,11 +46,10 @@ Test Paste:
 
 void poly880_state::update_display()
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_digit, i)) output().set_digit_value(7 - i, m_segment);
+		if (BIT(m_digit, i))
+			m_digits[7 - i] = m_segment;
 	}
 }
 
@@ -63,22 +62,24 @@ WRITE8_MEMBER( poly880_state::cldig_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(poly880_state::poly880_mem)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x3c00) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
+void poly880_state::poly880_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x0c00).rom();
+	map(0x1000, 0x13ff).mirror(0x0c00).rom();
+	map(0x2000, 0x23ff).mirror(0x0c00).rom();
+	map(0x3000, 0x33ff).mirror(0x0c00).rom();
+	map(0x4000, 0x43ff).mirror(0x3c00).ram();
+	map(0x8000, 0xffff).bankrw("bank1");
+}
 
-ADDRESS_MAP_START(poly880_state::poly880_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xaf)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(cldig_w)
-ADDRESS_MAP_END
+void poly880_state::poly880_io(address_map &map)
+{
+	map.global_mask(0xaf);
+	map(0x80, 0x83).rw(Z80PIO1_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x84, 0x87).rw(Z80PIO2_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x88, 0x8b).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0xa0, 0xa0).mirror(0x0f).w(FUNC(poly880_state::cldig_w));
+}
 
 /* Input Ports */
 
@@ -189,9 +190,9 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 	{
 		if (BIT(m_digit, i))
 		{
-			if (!BIT(m_ki1->read(), i)) data &= ~0x10;
-			if (!BIT(m_ki2->read(), i)) data &= ~0x20;
-			if (!BIT(m_ki3->read(), i)) data &= ~0x80;
+			if (!BIT(m_ki[0]->read(), i)) data &= ~0x10;
+			if (!BIT(m_ki[1]->read(), i)) data &= ~0x20;
+			if (!BIT(m_ki[2]->read(), i)) data &= ~0x80;
 		}
 	}
 
@@ -235,6 +236,8 @@ static const z80_daisy_config poly880_daisy_chain[] =
 
 void poly880_state::machine_start()
 {
+	m_digits.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));
@@ -244,35 +247,34 @@ void poly880_state::machine_start()
 
 MACHINE_CONFIG_START(poly880_state::poly880)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(7'372'800)/8)
-	MCFG_CPU_PROGRAM_MAP(poly880_mem)
-	MCFG_CPU_IO_MAP(poly880_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(7'372'800)/8)
+	MCFG_DEVICE_PROGRAM_MAP(poly880_mem)
+	MCFG_DEVICE_IO_MAP(poly880_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_poly880 )
+	config.set_default_layout(layout_poly880);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(7'372'800)/16)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(poly880_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(poly880_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(7'372'800)/16));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(poly880_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(poly880_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(Z80CTC_TAG, FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, XTAL(7'372'800)/16)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(poly880_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(poly880_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(poly880_state, pio1_pb_w))
+	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, XTAL(7'372'800)/16));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(poly880_state::pio1_pa_w));
+	pio1.in_pb_callback().set(FUNC(poly880_state::pio1_pb_r));
+	pio1.out_pb_callback().set(FUNC(poly880_state::pio1_pb_w));
 
-	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, XTAL(7'372'800)/16)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(7'372'800)/16));
+	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, RAM_TAG).set_default_size("1K");
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -285,5 +287,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY            FULLNAME             FLAGS
-COMP( 1983, poly880,    0,      0,      poly880,  poly880, poly880_state, 0,    "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME             FLAGS
+COMP( 1983, poly880, 0,      0,      poly880, poly880, poly880_state, empty_init, "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

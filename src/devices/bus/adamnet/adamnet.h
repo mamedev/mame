@@ -127,8 +127,6 @@ DECLARE_DEVICE_TYPE(ADAMNET,      adamnet_device)
 DECLARE_DEVICE_TYPE(ADAMNET_SLOT, adamnet_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( adamnet_devices );
-
-
+void adamnet_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_ADAMNET_ADAMNET_H

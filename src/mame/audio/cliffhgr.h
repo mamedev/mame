@@ -7,6 +7,6 @@
 
 #include "sound/discrete.h"
 
-DISCRETE_SOUND_EXTERN( cliffhgr );
+DISCRETE_SOUND_EXTERN( cliffhgr_discrete );
 
 #endif // MAME_AUDIO_CLIFFHGR_H

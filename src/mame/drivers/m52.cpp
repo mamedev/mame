@@ -60,47 +60,50 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(m52_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(m52_protection_r)
-	AM_RANGE(0xc800, 0xcbff) AM_MIRROR(0x0400) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07fc) AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07fc) AM_WRITE(m52_flipscreen_w)   /* + coin counters */
-	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07f8) AM_READ_PORT("IN0")
-	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07f8) AM_READ_PORT("IN1")
-	AM_RANGE(0xd002, 0xd002) AM_MIRROR(0x07f8) AM_READ_PORT("IN2")
-	AM_RANGE(0xd003, 0xd003) AM_MIRROR(0x07f8) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd004, 0xd004) AM_MIRROR(0x07f8) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void m52_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x83ff).ram().w(FUNC(m52_state::m52_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(m52_state::m52_colorram_w)).share("colorram");
+	map(0x8800, 0x8800).mirror(0x07ff).r(FUNC(m52_state::m52_protection_r));
+	map(0xc800, 0xcbff).mirror(0x0400).writeonly().share("spriteram");
+	map(0xd000, 0xd000).mirror(0x07fc).w("irem_audio", FUNC(irem_audio_device::cmd_w));
+	map(0xd001, 0xd001).mirror(0x07fc).w(FUNC(m52_state::m52_flipscreen_w));   /* + coin counters */
+	map(0xd000, 0xd000).mirror(0x07f8).portr("IN0");
+	map(0xd001, 0xd001).mirror(0x07f8).portr("IN1");
+	map(0xd002, 0xd002).mirror(0x07f8).portr("IN2");
+	map(0xd003, 0xd003).mirror(0x07f8).portr("DSW1");
+	map(0xd004, 0xd004).mirror(0x07f8).portr("DSW2");
+	map(0xe000, 0xe7ff).ram();
+}
 
 
-ADDRESS_MAP_START(m52_state::alpha1v_map)
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(m52_protection_r) // result is ignored
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_SHARE("spriteram") // bigger or mirrored?
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1") AM_WRITE(alpha1v_flipscreen_w)
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe000, 0xefff) AM_RAM // bigger or mirrored?
-ADDRESS_MAP_END
+void m52_state::alpha1v_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x8000, 0x83ff).ram().w(FUNC(m52_state::m52_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(m52_state::m52_colorram_w)).share("colorram");
+	map(0x8800, 0x8800).mirror(0x07ff).r(FUNC(m52_state::m52_protection_r)); // result is ignored
+	map(0xc800, 0xc9ff).writeonly().share("spriteram"); // bigger or mirrored?
+	map(0xd000, 0xd000).portr("IN0").w("irem_audio", FUNC(irem_audio_device::cmd_w));
+	map(0xd001, 0xd001).portr("IN1").w(FUNC(m52_state::alpha1v_flipscreen_w));
+	map(0xd002, 0xd002).portr("IN2");
+	map(0xd003, 0xd003).portr("DSW1");
+	map(0xd004, 0xd004).portr("DSW2");
+	map(0xe000, 0xefff).ram(); // bigger or mirrored?
+}
 
 
-ADDRESS_MAP_START(m52_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_WRITE(m52_scroll_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x1f) AM_WRITE(m52_bg1xpos_w)
-	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1f) AM_WRITE(m52_bg1ypos_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(m52_bg2xpos_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(m52_bg2ypos_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(m52_bgcontrol_w)
-ADDRESS_MAP_END
+void m52_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x1f).w(FUNC(m52_state::m52_scroll_w));
+	map(0x40, 0x40).mirror(0x1f).w(FUNC(m52_state::m52_bg1xpos_w));
+	map(0x60, 0x60).mirror(0x1f).w(FUNC(m52_state::m52_bg1ypos_w));
+	map(0x80, 0x80).mirror(0x1f).w(FUNC(m52_state::m52_bg2xpos_w));
+	map(0xa0, 0xa0).mirror(0x1f).w(FUNC(m52_state::m52_bg2ypos_w));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(m52_state::m52_bgcontrol_w));
+}
 
 
 
@@ -367,7 +370,7 @@ static const gfx_layout bgcharlayout =
 };
 
 
-static GFXDECODE_START( m52 )
+static GFXDECODE_START( gfx_m52 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,                0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,          128*4,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, bgcharlayout, 128*4+16*4+0*4,   1 )
@@ -395,13 +398,13 @@ void m52_state::machine_reset()
 MACHINE_CONFIG_START(m52_state::m52)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m52_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m52_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m52)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m52)
 	MCFG_PALETTE_ADD("palette", 128*4+16*4+3*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(512+32+32)
 	MCFG_PALETTE_INIT_OWNER(m52_state, m52)
@@ -422,8 +425,8 @@ MACHINE_CONFIG_START(m52_state::alpha1v)
 	m52(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(alpha1v_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(alpha1v_map)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 16, 272)
 MACHINE_CONFIG_END
@@ -587,7 +590,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mpatrol,  0,        m52,      mpatrol,  m52_state,  0, ROT0, "Irem", "Moon Patrol",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mpatrolw, mpatrol,  m52,      mpatrolw, m52_state,  0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)",    MACHINE_SUPPORTS_SAVE ) // USA
-GAME( 1982, mranger,  mpatrol,  m52,      mpatrol,  m52_state,  0, ROT0, "bootleg", "Moon Ranger (bootleg of Moon Patrol)",      MACHINE_SUPPORTS_SAVE ) // Italy
-GAME( 1988, alpha1v,  0,        alpha1v,  alpha1v,  m52_state,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mpatrol,  0,       m52,     mpatrol,  m52_state, empty_init, ROT0, "Irem", "Moon Patrol",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mpatrolw, mpatrol, m52,     mpatrolw, m52_state, empty_init, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)",    MACHINE_SUPPORTS_SAVE ) // USA
+GAME( 1982, mranger,  mpatrol, m52,     mpatrol,  m52_state, empty_init, ROT0, "bootleg", "Moon Ranger (bootleg of Moon Patrol)",      MACHINE_SUPPORTS_SAVE ) // Italy
+GAME( 1988, alpha1v,  0,       alpha1v, alpha1v,  m52_state, empty_init, ROT0, "Vision Electronics", "Alpha One (Vision Electronics)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

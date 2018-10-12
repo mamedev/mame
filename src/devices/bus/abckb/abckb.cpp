@@ -142,9 +142,10 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::keydown_w )
 #include "abc77.h"
 #include "abc99.h"
 
-SLOT_INTERFACE_START( abc_keyboard_devices )
-	SLOT_INTERFACE("abc800", ABC800_KEYBOARD)
-	SLOT_INTERFACE("abc55", ABC55)
-	SLOT_INTERFACE("abc77", ABC77)
-	SLOT_INTERFACE("abc99", ABC99)
-SLOT_INTERFACE_END
+void abc_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("abc800", ABC800_KEYBOARD);
+	device.option_add("abc55", ABC55);
+	device.option_add("abc77", ABC77);
+	device.option_add("abc99", ABC99);
+}

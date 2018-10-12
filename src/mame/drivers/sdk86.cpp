@@ -45,33 +45,39 @@ public:
 	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sdk86(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 
-	void sdk86(machine_config &config);
 	void sdk86_io(address_map &map);
 	void sdk86_mem(address_map &map);
-private:
+
 	uint8_t m_digit;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
+	output_finder<8> m_digits;
 };
 
-ADDRESS_MAP_START(sdk86_state::sdk86_mem)
-	AM_RANGE(0x00000, 0x00fff) AM_RAM //2K standard, or 4k (board fully populated)
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void sdk86_state::sdk86_mem(address_map &map)
+{
+	map(0x00000, 0x00fff).ram(); //2K standard, or 4k (board fully populated)
+	map(0xfe000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(sdk86_state::sdk86_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfff0, 0xfff1) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, data_r, data_w, 0xff)
-	AM_RANGE(0xfff2, 0xfff3) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, status_r, control_w, 0xff)
-	AM_RANGE(0xffe8, 0xffeb) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, read, write, 0xff)
-	AM_RANGE(0xfff8, 0xffff) AM_DEVREADWRITE8("port1", i8255_device, read, write, 0xff00)
-	AM_RANGE(0xfff8, 0xffff) AM_DEVREADWRITE8("port2", i8255_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void sdk86_state::sdk86_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xfff0, 0xfff3).mirror(4).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xffe8, 0xffeb).mirror(4).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write)).umask16(0x00ff);
+	map(0xfff8, 0xffff).rw("port1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0xfff8, 0xffff).rw("port2", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sdk86 )
@@ -114,7 +120,7 @@ WRITE8_MEMBER( sdk86_state::scanlines_w )
 WRITE8_MEMBER( sdk86_state::digit_w )
 {
 	if (m_digit < 8)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 }
 
 READ8_MEMBER( sdk86_state::kbd_r )
@@ -141,34 +147,34 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sdk86_state::sdk86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(14'745'600)/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
-	MCFG_CPU_PROGRAM_MAP(sdk86_mem)
-	MCFG_CPU_IO_MAP(sdk86_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(14'745'600)/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
+	MCFG_DEVICE_PROGRAM_MAP(sdk86_mem)
+	MCFG_DEVICE_IO_MAP(sdk86_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sdk86)
+	config.set_default_layout(layout_sdk86);
 
 	/* Devices */
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_cts))
+	i8251_device &i8251(I8251(config, I8251_TAG, 0));
+	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	i8251.rts_handler().set(I8251_TAG, FUNC(i8251_device::write_cts));
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(14'745'600)/3/16)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_TAG, i8251_device, write_rxc))
+	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(14'745'600)/3/16));
+	usart_clock.signal_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
+	usart_clock.signal_handler().append(I8251_TAG, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("i8279", I8279, 2500000) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(sdk86_state, scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk86_state, digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(sdk86_state, kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(GND)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(GND)
+	i8279_device &kbdc(I8279(config, "i8279", 2500000));        // based on divider
+	kbdc.out_sl_callback().set(FUNC(sdk86_state::scanlines_w)); // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(sdk86_state::digit_w));   // display A&B
+	kbdc.in_rl_callback().set(FUNC(sdk86_state::kbd_r));        // kbd RL lines
+	kbdc.in_shift_callback().set_constant(0);                   // Shift key
+	kbdc.in_ctrl_callback().set_constant(0);
 
 	MCFG_DEVICE_ADD("port1", I8255A, 0)
 	MCFG_DEVICE_ADD("port2", I8255A, 0)
@@ -186,16 +192,16 @@ ROM_START( sdk86 )
 	   the opposite arrangement (Serial primary). */
 	// Keypad Monitor Version 1.1 (says "- 86   1.1" on LED display at startup)
 	ROM_SYSTEM_BIOS( 0, "keypad", "Keypad Monitor" )
-	ROMX_LOAD( "0456_104531-001.a36", 0xfe000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
-	ROMX_LOAD( "0457_104532-001.a37", 0xfe001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
-	ROMX_LOAD( "0169_102042-001.a27", 0xff000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
-	ROMX_LOAD( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
+	ROMX_LOAD( "0456_104531-001.a36", 0xfe000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
+	ROMX_LOAD( "0457_104532-001.a37", 0xfe001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
+	ROMX_LOAD( "0169_102042-001.a27", 0xff000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
+	ROMX_LOAD( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
 	// Serial Monitor Version 1.2 (says "  86   1.2" on LED display at startup, and sends a data prompt over serial)
 	ROM_SYSTEM_BIOS( 1, "serial", "Serial Monitor" )
-	ROMX_LOAD( "0169_102042-001.a36", 0xfe000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
-	ROMX_LOAD( "0170_102043-001.a37", 0xfe001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
-	ROMX_LOAD( "0456_104531-001.a27", 0xff000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
-	ROMX_LOAD( "0457_104532-001.a30", 0xff001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
+	ROMX_LOAD( "0169_102042-001.a36", 0xfe000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
+	ROMX_LOAD( "0170_102043-001.a37", 0xfe001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
+	ROMX_LOAD( "0456_104531-001.a27", 0xff000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
+	ROMX_LOAD( "0457_104532-001.a30", 0xff001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
 
 	/* proms:
 	 * dumped 11/21/09 through 11/29/09 by LN
@@ -214,5 +220,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS */
-COMP( 1979, sdk86,  0,      0,      sdk86,   sdk86, sdk86_state, 0,    "Intel",  "MCS-86 System Design Kit", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME  FLAGS */
+COMP( 1979, sdk86, 0,      0,      sdk86,   sdk86, sdk86_state, empty_init, "Intel",  "MCS-86 System Design Kit", MACHINE_NO_SOUND_HW)

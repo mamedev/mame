@@ -2,7 +2,9 @@
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
 
 #include "machine/ds2401.h"
+#include "machine/i8255.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 
 
 class goldstar_state : public driver_device
@@ -21,10 +23,11 @@ public:
 		m_reel2_scroll(*this, "reel2_scroll"),
 		m_reel3_scroll(*this, "reel3_scroll"),
 		m_maincpu(*this, "maincpu"),
+		m_ppi(*this, "ppi8255_%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{
-	}
+		m_palette(*this, "palette"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_READ8_MEMBER(protection_r);
@@ -40,10 +43,10 @@ public:
 	DECLARE_WRITE8_MEMBER(goldstar_fa00_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
-	DECLARE_DRIVER_INIT(goldstar);
-	DECLARE_DRIVER_INIT(cmast91);
-	DECLARE_DRIVER_INIT(wcherry);
-	DECLARE_DRIVER_INIT(super9);
+	void init_goldstar();
+	void init_cmast91();
+	void init_wcherry();
+	void init_super9();
 	DECLARE_VIDEO_START(goldstar);
 	DECLARE_PALETTE_INIT(cm);
 	DECLARE_VIDEO_START(cherrym);
@@ -63,6 +66,7 @@ public:
 	void goldstar(machine_config &config);
 	void goldstbl(machine_config &config);
 	void bonusch_portmap(address_map &map);
+	void feverch_portmap(address_map &map);
 	void cm_map(address_map &map);
 	void cmast91_portmap(address_map &map);
 	void flaming7_map(address_map &map);
@@ -80,7 +84,9 @@ public:
 	void wcat3_map(address_map &map);
 	void wcherry_map(address_map &map);
 	void wcherry_readwriteport(address_map &map);
+
 protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
 	TILE_GET_INFO_MEMBER(get_goldstar_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_goldstar_reel1_tile_info);
@@ -116,8 +122,10 @@ protected:
 	uint8_t m_cm_girl_scroll;
 
 	required_device<cpu_device> m_maincpu;
+	optional_device_array<i8255_device, 3> m_ppi;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	output_finder<16> m_lamps;
 };
 
 
@@ -133,24 +141,26 @@ public:
 	DECLARE_WRITE8_MEMBER(girl_scroll_w);
 	DECLARE_WRITE8_MEMBER(background_col_w);
 
-	DECLARE_DRIVER_INIT(cm);
-	DECLARE_DRIVER_INIT(cmv4);
-	DECLARE_DRIVER_INIT(tonypok);
-	DECLARE_DRIVER_INIT(schery97);
-	DECLARE_DRIVER_INIT(schery97a);
-	DECLARE_DRIVER_INIT(skill98);
-	DECLARE_DRIVER_INIT(po33);
-	DECLARE_DRIVER_INIT(match133);
-	DECLARE_DRIVER_INIT(nfb96_dk);
-	DECLARE_DRIVER_INIT(nfb96_c2);
-	DECLARE_DRIVER_INIT(nfb96_d);
-	DECLARE_DRIVER_INIT(nfb96_c1);
-	DECLARE_DRIVER_INIT(nfb96sea);
-	DECLARE_DRIVER_INIT(fb2010);
-	DECLARE_DRIVER_INIT(rp35);
-	DECLARE_DRIVER_INIT(rp36);
-	DECLARE_DRIVER_INIT(rp36c3);
-	DECLARE_DRIVER_INIT(rp96sub);
+	void init_cm();
+	void init_cmv4();
+	void init_tonypok();
+	void init_schery97();
+	void init_schery97a();
+	void init_skill98();
+	void init_po33();
+	void init_match133();
+	void init_nfb96_dk();
+	void init_nfb96_c2();
+	void init_nfb96_d();
+	void init_nfb96_c1();
+	void init_nfb96sea();
+	void init_fb2010();
+	void init_rp35();
+	void init_rp36();
+	void init_rp36c3();
+	void init_rp96sub();
+	void init_tcl();
+	void init_super7();
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -203,10 +213,10 @@ public:
 	DECLARE_WRITE8_MEMBER(system_outputb_w);
 	DECLARE_WRITE8_MEMBER(system_outputc_w);
 
-	DECLARE_DRIVER_INIT(lucky8a);
-	DECLARE_DRIVER_INIT(magoddsc);
-	DECLARE_DRIVER_INIT(flaming7);
-	DECLARE_DRIVER_INIT(flam7_tw);
+	void init_lucky8a();
+	void init_magoddsc();
+	void init_flaming7();
+	void init_flam7_tw();
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);
@@ -215,7 +225,7 @@ public:
 	uint32_t screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(masked_irq);
+	DECLARE_WRITE_LINE_MEMBER(masked_irq);
 
 	void bingowng(machine_config &config);
 	void flaming7(machine_config &config);
@@ -248,11 +258,11 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(cb3);
-	DECLARE_DRIVER_INIT(cb3e);
-	DECLARE_DRIVER_INIT(cherrys);
-	DECLARE_DRIVER_INIT(chrygld);
-	DECLARE_DRIVER_INIT(chry10);
+	void init_cb3();
+	void init_cb3e();
+	void init_cherrys();
+	void init_chrygld();
+	void init_chry10();
 
 	void cherrys(machine_config &config);
 	void chrygld(machine_config &config);
@@ -334,19 +344,21 @@ public:
 	DECLARE_WRITE8_MEMBER(reel2_attrram_w);
 	DECLARE_WRITE8_MEMBER(reel3_attrram_w);
 
-	DECLARE_DRIVER_INIT(unkch1);
-	DECLARE_DRIVER_INIT(unkch3);
-	DECLARE_DRIVER_INIT(unkch4);
+	void init_unkch1();
+	void init_unkch3();
+	void init_unkch4();
 
 	DECLARE_VIDEO_START(unkch);
 	uint32_t screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void megaline(machine_config &config);
 	void unkch(machine_config &config);
 	void bonusch(machine_config &config);
+	void feverch(machine_config &config);
 	void bonusch_map(address_map &map);
+	void feverch_map(address_map &map);
 	void megaline_map(address_map &map);
 	void unkch_map(address_map &map);
 	void unkch_portmap(address_map &map);

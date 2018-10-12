@@ -5,16 +5,21 @@
     Punch Out / Super Punch Out / Arm Wrestling
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_PUNCHOUT_H
+#define MAME_INCLUDES_PUNCHOUT_H
+
+#pragma once
 
 #include "machine/rp5c01.h"
 #include "machine/rp5h01.h"
 #include "sound/vlm5030.h"
+#include "emupal.h"
 
 class punchout_state : public driver_device
 {
 public:
-	punchout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	punchout_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_rtc(*this, "rtc"),
@@ -32,6 +37,11 @@ public:
 		m_armwrest_fg_videoram(*this, "armwrest_fgram")
 	{ }
 
+	void spnchout(machine_config &config);
+	void armwrest(machine_config &config);
+	void punchout(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<rp5c01_device> m_rtc;
@@ -56,7 +66,7 @@ public:
 	tilemap_t *m_spr1_tilemap_flipx;
 	tilemap_t *m_spr2_tilemap;
 
-	uint8_t m_nmi_mask;
+	bool m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(punchout_2a03_reset_w);
 	DECLARE_READ8_MEMBER(spunchout_exp_r);
 	DECLARE_WRITE8_MEMBER(spunchout_exp_w);
@@ -84,15 +94,12 @@ public:
 	uint32_t screen_update_punchout_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_armwrest_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_armwrest_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
 	void armwrest_draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
 	void drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void punchout_copy_top_palette(int bank);
 	void punchout_copy_bot_palette(int bank);
-	void spnchout(machine_config &config);
-	void armwrest(machine_config &config);
-	void punchout(machine_config &config);
 	void armwrest_map(address_map &map);
 	void punchout_io_map(address_map &map);
 	void punchout_map(address_map &map);
@@ -100,3 +107,5 @@ public:
 	void punchout_vlm_map(address_map &map);
 	void spnchout_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PUNCHOUT_H

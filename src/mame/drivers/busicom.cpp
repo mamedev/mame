@@ -99,32 +99,37 @@ WRITE8_MEMBER(busicom_state::printer_ctrl_w)
 {
 }
 
-ADDRESS_MAP_START(busicom_state::busicom_rom)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x04FF) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void busicom_state::busicom_rom(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x04FF).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(busicom_state::busicom_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07F) AM_RAM
-ADDRESS_MAP_END
+void busicom_state::busicom_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07F).ram();
+}
 
-ADDRESS_MAP_START(busicom_state::busicom_stat)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x01F) AM_RAM
-ADDRESS_MAP_END
+void busicom_state::busicom_stat(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x01F).ram();
+}
 
-ADDRESS_MAP_START(busicom_state::busicom_rp)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_WRITE(shifter_w) // ROM0 I/O
-	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x0700) AM_READWRITE(keyboard_r,printer_ctrl_w) // ROM1 I/O
-	AM_RANGE(0x0020, 0x002f) AM_MIRROR(0x0700) AM_READ(printer_r)  // ROM2 I/O
-ADDRESS_MAP_END
+void busicom_state::busicom_rp(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x000f).mirror(0x0700).w(FUNC(busicom_state::shifter_w)); // ROM0 I/O
+	map(0x0010, 0x001f).mirror(0x0700).rw(FUNC(busicom_state::keyboard_r), FUNC(busicom_state::printer_ctrl_w)); // ROM1 I/O
+	map(0x0020, 0x002f).mirror(0x0700).r(FUNC(busicom_state::printer_r));  // ROM2 I/O
+}
 
-ADDRESS_MAP_START(busicom_state::busicom_mp)
-	AM_RANGE(0x00, 0x00) AM_WRITE(printer_w) // RAM0 output
-	AM_RANGE(0x01, 0x01) AM_WRITE(status_w)  // RAM1 output
-ADDRESS_MAP_END
+void busicom_state::busicom_mp(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(busicom_state::printer_w)); // RAM0 output
+	map(0x01, 0x01).w(FUNC(busicom_state::status_w));  // RAM1 output
+}
 
 /* Input ports */
 static INPUT_PORTS_START( busicom )
@@ -221,12 +226,12 @@ void busicom_state::machine_reset()
 
 MACHINE_CONFIG_START(busicom_state::busicom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I4004, 750000)
-	MCFG_I4004_ROM_MAP(busicom_rom)
-	MCFG_I4004_RAM_MEMORY_MAP(busicom_mem)
-	MCFG_I4004_ROM_PORTS_MAP(busicom_rp)
-	MCFG_I4004_RAM_STATUS_MAP(busicom_stat)
-	MCFG_I4004_RAM_PORTS_MAP(busicom_mp)
+	I4004(config, m_maincpu, 750000);
+	m_maincpu->set_rom_map(&busicom_state::busicom_rom);
+	m_maincpu->set_ram_memory_map(&busicom_state::busicom_mem);
+	m_maincpu->set_rom_ports_map(&busicom_state::busicom_rp);
+	m_maincpu->set_ram_status_map(&busicom_state::busicom_stat);
+	m_maincpu->set_ram_ports_map(&busicom_state::busicom_mp);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -255,5 +260,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT COMPANY                          FULLNAME          FLAGS
-COMP( 1974, busicom,  0,       0,   busicom,    busicom, busicom_state, 0,   "Business Computer Corporation", "Busicom 141-PF", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS
+COMP( 1974, busicom, 0,      0,      busicom, busicom, busicom_state, empty_init, "Business Computer Corporation", "Busicom 141-PF", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

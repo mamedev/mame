@@ -90,6 +90,7 @@ Technology = NMOS
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -106,6 +107,9 @@ public:
 		m_palette(*this, "palette"),
 		m_generic_paletteram_8(*this, "paletteram") { }
 
+	void trvmadns(machine_config &config);
+
+private:
 	tilemap_t *m_bg_tilemap;
 	required_shared_ptr<uint8_t> m_gfxram;
 	required_shared_ptr<uint8_t> m_tileram;
@@ -124,7 +128,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
-	void trvmadns(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -256,24 +259,26 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 }
 
 
-ADDRESS_MAP_START(trvmadns_state::cpu_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_SHARE("gfxram")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(trvmadns_tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(trvmadns_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(w2)//NOP
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP
-ADDRESS_MAP_END
+void trvmadns_state::cpu_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).bankr("bank1");
+	map(0x7000, 0x7fff).bankr("bank2");
+	map(0x6000, 0x7fff).w(FUNC(trvmadns_state::trvmadns_gfxram_w)).share("gfxram");
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa7ff).ram().w(FUNC(trvmadns_state::trvmadns_tileram_w)).share("tileram");
+	map(0xc000, 0xc01f).ram().w(FUNC(trvmadns_state::trvmadns_palette_w)).share("paletteram");
+	map(0xe000, 0xe000).w(FUNC(trvmadns_state::w2));//NOP
+	map(0xe004, 0xe004).w(FUNC(trvmadns_state::w3));//NOP
+}
 
-ADDRESS_MAP_START(trvmadns_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x80, 0x80) AM_WRITE(trvmadns_banking_w)
-ADDRESS_MAP_END
+void trvmadns_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).portr("IN0");
+	map(0x80, 0x80).w(FUNC(trvmadns_state::trvmadns_banking_w));
+}
 
 static INPUT_PORTS_START( trvmadns )
 	PORT_START("IN0")
@@ -298,7 +303,7 @@ static const gfx_layout charlayout =
 	8*16
 };
 
-static GFXDECODE_START( trvmadns )
+static GFXDECODE_START( gfx_trvmadns )
 	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
 GFXDECODE_END
 
@@ -383,10 +388,9 @@ void trvmadns_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(trvmadns_state::trvmadns)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", trvmadns_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 
 	/* video hardware */
@@ -397,15 +401,16 @@ MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trvmadns)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trvmadns)
 	MCFG_PALETTE_ADD("palette", 16)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'000'000)/2/4) //?
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'000'000)/2/4) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -466,5 +471,5 @@ ROM_START( trvmadnsa )
 	// empty space, for 3 roms (each one max 0x8000 bytes long)
 ROM_END
 
-GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
-GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0, "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0, "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

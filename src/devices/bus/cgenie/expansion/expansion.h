@@ -50,13 +50,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(cg_exp_slot_carts, nullptr, false)
 
 #define MCFG_CG_EXP_SLOT_INT_HANDLER(_devcb) \
-	devcb = &downcast<cg_exp_slot_device &>(*device).set_int_handler(DEVCB_##_devcb);
+	downcast<cg_exp_slot_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 #define MCFG_CG_EXP_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &downcast<cg_exp_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
+	downcast<cg_exp_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 #define MCFG_CG_EXP_SLOT_RESET_HANDLER(_devcb) \
-	devcb = &downcast<cg_exp_slot_device &>(*device).set_reset_handler(DEVCB_##_devcb);
+	downcast<cg_exp_slot_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -115,7 +115,7 @@ protected:
 };
 
 // device type definition
-extern const device_type CG_EXP_SLOT;
+DECLARE_DEVICE_TYPE(CG_EXP_SLOT, cg_exp_slot_device)
 
 // include here so drivers don't need to
 #include "carts.h"

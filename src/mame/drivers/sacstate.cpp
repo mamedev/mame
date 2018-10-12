@@ -48,15 +48,17 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void sacstate(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	void kbd_put(u8 data);
-	void sacstate(machine_config &config);
 	void sacstate_io(address_map &map);
 	void sacstate_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_val;
 	virtual void machine_reset() override;
@@ -94,22 +96,24 @@ WRITE8_MEMBER( sacstate_state::port08_w )
 		m_val = 0;
 }
 
-ADDRESS_MAP_START(sacstate_state::sacstate_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000,0x7ff) AM_ROM
-	AM_RANGE(0x800,0xfff) AM_RAM
-ADDRESS_MAP_END
+void sacstate_state::sacstate_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x7ff).rom();
+	map(0x800, 0xfff).ram();
+}
 
-ADDRESS_MAP_START(sacstate_state::sacstate_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READ(port00_r)
-	AM_RANGE(0x01,0x01) AM_READ(port01_r)
-	AM_RANGE(0x04,0x04) AM_READ(port04_r)
-	AM_RANGE(0x08,0x08) AM_WRITE(port08_w)
-	AM_RANGE(0x16,0x16) AM_DEVWRITE("terminal", generic_terminal_device, write)
-	AM_RANGE(0x17,0x1f) AM_WRITENOP
-ADDRESS_MAP_END
+void sacstate_state::sacstate_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(sacstate_state::port00_r));
+	map(0x01, 0x01).r(FUNC(sacstate_state::port01_r));
+	map(0x04, 0x04).r(FUNC(sacstate_state::port04_r));
+	map(0x08, 0x08).w(FUNC(sacstate_state::port08_w));
+	map(0x16, 0x16).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x17, 0x1f).nopw();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sacstate )
@@ -132,12 +136,12 @@ void sacstate_state::machine_reset()
 
 MACHINE_CONFIG_START(sacstate_state::sacstate)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8008, 800000)
-	MCFG_CPU_PROGRAM_MAP(sacstate_mem)
-	MCFG_CPU_IO_MAP(sacstate_io)
+	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(sacstate_mem)
+	MCFG_DEVICE_IO_MAP(sacstate_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sacstate_state, kbd_put))
 MACHINE_CONFIG_END
 
@@ -156,5 +160,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY     FULLNAME         FLAGS
-COMP( 1973, sacstate, 0,      0,      sacstate, sacstate, sacstate_state, 0,    "SacState", "SacState 8008", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME         FLAGS
+COMP( 1973, sacstate, 0,      0,      sacstate, sacstate, sacstate_state, empty_init, "SacState", "SacState 8008", MACHINE_NO_SOUND_HW )

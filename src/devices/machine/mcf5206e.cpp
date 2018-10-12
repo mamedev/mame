@@ -13,59 +13,60 @@
 
 #include "logmacro.h"
 
-ADDRESS_MAP_START(mcf5206e_peripheral_device::coldfire_regs_map)
+void mcf5206e_peripheral_device::coldfire_regs_map(address_map &map)
+{
 
 
-	AM_RANGE(0x014, 0x017) AM_READWRITE8(ICR1_ICR2_ICR3_ICR4_r,    ICR1_ICR2_ICR3_ICR4_w,    0xffffffff)
+	map(0x014, 0x017).rw(FUNC(mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_r), FUNC(mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_w));
 
-	AM_RANGE(0x01c, 0x01f) AM_READWRITE8(ICR9_ICR10_ICR11_ICR12_r, ICR9_ICR10_ICR11_ICR12_w, 0xffffffff)
-	AM_RANGE(0x020, 0x023) AM_READWRITE8(ICR13_r,                  ICR13_w,                  0xffffffff)
+	map(0x01c, 0x01f).rw(FUNC(mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_r), FUNC(mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_w));
+	map(0x020, 0x023).rw(FUNC(mcf5206e_peripheral_device::ICR13_r), FUNC(mcf5206e_peripheral_device::ICR13_w));
 
-	AM_RANGE(0x034, 0x037) AM_READWRITE16(IMR_r, IMR_w, 0xffffffff)
+	map(0x034, 0x037).rw(FUNC(mcf5206e_peripheral_device::IMR_r), FUNC(mcf5206e_peripheral_device::IMR_w));
 
 	/* Chip Select registers */
-	AM_RANGE(0x064, 0x067) AM_READWRITE16(CSAR0_r, CSAR0_w, 0xffffffff)
-	AM_RANGE(0x068, 0x06b) AM_READWRITE  (CSMR0_r, CSMR0_w)
-	AM_RANGE(0x06c, 0x06f) AM_READWRITE16(CSCR0_r, CSCR0_w, 0xffffffff)
-	AM_RANGE(0x070, 0x073) AM_READWRITE16(CSAR1_r, CSAR1_w, 0xffffffff)
-	AM_RANGE(0x074, 0x077) AM_READWRITE  (CSMR1_r, CSMR1_w)
-	AM_RANGE(0x078, 0x07b) AM_READWRITE16(CSCR1_r, CSCR1_w, 0xffffffff)
-	AM_RANGE(0x07c, 0x07f) AM_READWRITE16(CSAR2_r, CSAR2_w, 0xffffffff)
-	AM_RANGE(0x080, 0x083) AM_READWRITE  (CSMR2_r, CSMR2_w)
-	AM_RANGE(0x084, 0x087) AM_READWRITE16(CSCR2_r, CSCR2_w, 0xffffffff)
-	AM_RANGE(0x088, 0x08b) AM_READWRITE16(CSAR3_r, CSAR3_w, 0xffffffff)
-	AM_RANGE(0x08c, 0x08f) AM_READWRITE  (CSMR3_r, CSMR3_w)
-	AM_RANGE(0x090, 0x093) AM_READWRITE16(CSCR3_r, CSCR3_w, 0xffffffff)
-	AM_RANGE(0x094, 0x097) AM_READWRITE16(CSAR4_r, CSAR4_w, 0xffffffff)
-	AM_RANGE(0x098, 0x09b) AM_READWRITE  (CSMR4_r, CSMR4_w)
-	AM_RANGE(0x09c, 0x09f) AM_READWRITE16(CSCR4_r, CSCR4_w, 0xffffffff)
-	AM_RANGE(0x0a0, 0x0a3) AM_READWRITE16(CSAR5_r, CSAR5_w, 0xffffffff)
-	AM_RANGE(0x0a4, 0x0a7) AM_READWRITE  (CSMR5_r, CSMR5_w)
-	AM_RANGE(0x0a8, 0x0ab) AM_READWRITE16(CSCR5_r, CSCR5_w, 0xffffffff)
-	AM_RANGE(0x0ac, 0x0af) AM_READWRITE16(CSAR6_r, CSAR6_w, 0xffffffff)
-	AM_RANGE(0x0b0, 0x0b3) AM_READWRITE  (CSMR6_r, CSMR6_w)
-	AM_RANGE(0x0b4, 0x0b7) AM_READWRITE16(CSCR6_r, CSCR6_w, 0xffffffff)
-	AM_RANGE(0x0b8, 0x0bb) AM_READWRITE16(CSAR7_r, CSAR7_w, 0xffffffff)
-	AM_RANGE(0x0bc, 0x0bf) AM_READWRITE  (CSMR7_r, CSMR7_w)
-	AM_RANGE(0x0c0, 0x0c3) AM_READWRITE16(CSCR7_r, CSCR7_w, 0xffffffff)
+	map(0x064, 0x067).rw(FUNC(mcf5206e_peripheral_device::CSAR0_r), FUNC(mcf5206e_peripheral_device::CSAR0_w));
+	map(0x068, 0x06b).rw(FUNC(mcf5206e_peripheral_device::CSMR0_r), FUNC(mcf5206e_peripheral_device::CSMR0_w));
+	map(0x06c, 0x06f).rw(FUNC(mcf5206e_peripheral_device::CSCR0_r), FUNC(mcf5206e_peripheral_device::CSCR0_w));
+	map(0x070, 0x073).rw(FUNC(mcf5206e_peripheral_device::CSAR1_r), FUNC(mcf5206e_peripheral_device::CSAR1_w));
+	map(0x074, 0x077).rw(FUNC(mcf5206e_peripheral_device::CSMR1_r), FUNC(mcf5206e_peripheral_device::CSMR1_w));
+	map(0x078, 0x07b).rw(FUNC(mcf5206e_peripheral_device::CSCR1_r), FUNC(mcf5206e_peripheral_device::CSCR1_w));
+	map(0x07c, 0x07f).rw(FUNC(mcf5206e_peripheral_device::CSAR2_r), FUNC(mcf5206e_peripheral_device::CSAR2_w));
+	map(0x080, 0x083).rw(FUNC(mcf5206e_peripheral_device::CSMR2_r), FUNC(mcf5206e_peripheral_device::CSMR2_w));
+	map(0x084, 0x087).rw(FUNC(mcf5206e_peripheral_device::CSCR2_r), FUNC(mcf5206e_peripheral_device::CSCR2_w));
+	map(0x088, 0x08b).rw(FUNC(mcf5206e_peripheral_device::CSAR3_r), FUNC(mcf5206e_peripheral_device::CSAR3_w));
+	map(0x08c, 0x08f).rw(FUNC(mcf5206e_peripheral_device::CSMR3_r), FUNC(mcf5206e_peripheral_device::CSMR3_w));
+	map(0x090, 0x093).rw(FUNC(mcf5206e_peripheral_device::CSCR3_r), FUNC(mcf5206e_peripheral_device::CSCR3_w));
+	map(0x094, 0x097).rw(FUNC(mcf5206e_peripheral_device::CSAR4_r), FUNC(mcf5206e_peripheral_device::CSAR4_w));
+	map(0x098, 0x09b).rw(FUNC(mcf5206e_peripheral_device::CSMR4_r), FUNC(mcf5206e_peripheral_device::CSMR4_w));
+	map(0x09c, 0x09f).rw(FUNC(mcf5206e_peripheral_device::CSCR4_r), FUNC(mcf5206e_peripheral_device::CSCR4_w));
+	map(0x0a0, 0x0a3).rw(FUNC(mcf5206e_peripheral_device::CSAR5_r), FUNC(mcf5206e_peripheral_device::CSAR5_w));
+	map(0x0a4, 0x0a7).rw(FUNC(mcf5206e_peripheral_device::CSMR5_r), FUNC(mcf5206e_peripheral_device::CSMR5_w));
+	map(0x0a8, 0x0ab).rw(FUNC(mcf5206e_peripheral_device::CSCR5_r), FUNC(mcf5206e_peripheral_device::CSCR5_w));
+	map(0x0ac, 0x0af).rw(FUNC(mcf5206e_peripheral_device::CSAR6_r), FUNC(mcf5206e_peripheral_device::CSAR6_w));
+	map(0x0b0, 0x0b3).rw(FUNC(mcf5206e_peripheral_device::CSMR6_r), FUNC(mcf5206e_peripheral_device::CSMR6_w));
+	map(0x0b4, 0x0b7).rw(FUNC(mcf5206e_peripheral_device::CSCR6_r), FUNC(mcf5206e_peripheral_device::CSCR6_w));
+	map(0x0b8, 0x0bb).rw(FUNC(mcf5206e_peripheral_device::CSAR7_r), FUNC(mcf5206e_peripheral_device::CSAR7_w));
+	map(0x0bc, 0x0bf).rw(FUNC(mcf5206e_peripheral_device::CSMR7_r), FUNC(mcf5206e_peripheral_device::CSMR7_w));
+	map(0x0c0, 0x0c3).rw(FUNC(mcf5206e_peripheral_device::CSCR7_r), FUNC(mcf5206e_peripheral_device::CSCR7_w));
 
-	AM_RANGE(0x0c4, 0x0c7) AM_READWRITE16(DMCR_r, DMCR_w, 0xffffffff)
-	AM_RANGE(0x0c8, 0x0cb) AM_READWRITE16(PAR_r, PAR_w, 0xffffffff)
+	map(0x0c4, 0x0c7).rw(FUNC(mcf5206e_peripheral_device::DMCR_r), FUNC(mcf5206e_peripheral_device::DMCR_w));
+	map(0x0c8, 0x0cb).rw(FUNC(mcf5206e_peripheral_device::PAR_r), FUNC(mcf5206e_peripheral_device::PAR_w));
 
-	AM_RANGE(0x100, 0x103) AM_READWRITE16(TMR1_r, TMR1_w, 0xffffffff)
-	AM_RANGE(0x104, 0x107) AM_READWRITE16(TRR1_r, TRR1_w, 0xffffffff)
-	AM_RANGE(0x10c, 0x10f) AM_READWRITE16(TCN1_r, TCN1_w, 0xffffffff)
-	AM_RANGE(0x110, 0x113) AM_READWRITE8(TER1_r, TER1_w, 0xffffffff)
+	map(0x100, 0x103).rw(FUNC(mcf5206e_peripheral_device::TMR1_r), FUNC(mcf5206e_peripheral_device::TMR1_w));
+	map(0x104, 0x107).rw(FUNC(mcf5206e_peripheral_device::TRR1_r), FUNC(mcf5206e_peripheral_device::TRR1_w));
+	map(0x10c, 0x10f).rw(FUNC(mcf5206e_peripheral_device::TCN1_r), FUNC(mcf5206e_peripheral_device::TCN1_w));
+	map(0x110, 0x113).rw(FUNC(mcf5206e_peripheral_device::TER1_r), FUNC(mcf5206e_peripheral_device::TER1_w));
 
 
-	AM_RANGE(0x1c4, 0x1c7) AM_READWRITE8(PPDDR_r, PPDDR_w, 0xffffffff)
-	AM_RANGE(0x1c8, 0x1cb) AM_READWRITE8(PPDAT_r, PPDAT_w, 0xffffffff)
+	map(0x1c4, 0x1c7).rw(FUNC(mcf5206e_peripheral_device::PPDDR_r), FUNC(mcf5206e_peripheral_device::PPDDR_w));
+	map(0x1c8, 0x1cb).rw(FUNC(mcf5206e_peripheral_device::PPDAT_r), FUNC(mcf5206e_peripheral_device::PPDAT_w));
 
-	AM_RANGE(0x1e4, 0x1e7) AM_READWRITE8(MFDR_r, MFDR_w, 0xffffffff)
-	AM_RANGE(0x1e8, 0x1eb) AM_READWRITE8(MBCR_r, MBCR_w, 0xffffffff)
-	AM_RANGE(0x1ec, 0x1ef) AM_READWRITE8(MBSR_r, MBSR_w, 0xffffffff)
-	AM_RANGE(0x1f0, 0x1f3) AM_READWRITE8(MBDR_r, MBDR_w, 0xffffffff)
-ADDRESS_MAP_END
+	map(0x1e4, 0x1e7).rw(FUNC(mcf5206e_peripheral_device::MFDR_r), FUNC(mcf5206e_peripheral_device::MFDR_w));
+	map(0x1e8, 0x1eb).rw(FUNC(mcf5206e_peripheral_device::MBCR_r), FUNC(mcf5206e_peripheral_device::MBCR_w));
+	map(0x1ec, 0x1ef).rw(FUNC(mcf5206e_peripheral_device::MBSR_r), FUNC(mcf5206e_peripheral_device::MBSR_w));
+	map(0x1f0, 0x1f3).rw(FUNC(mcf5206e_peripheral_device::MBDR_r), FUNC(mcf5206e_peripheral_device::MBDR_w));
+}
 
 
 

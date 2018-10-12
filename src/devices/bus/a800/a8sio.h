@@ -46,7 +46,7 @@
 	downcast<a8sio_slot_device &>(*device).set_a8sio_slot(_nbtag, _tag);
 
 #define MCFG_A8SIO_DATA_IN_CB(_devcb) \
-	devcb = &downcast<a8sio_device &>(*device).set_data_in_callback(DEVCB_##_devcb);
+	downcast<a8sio_device &>(*device).set_data_in_callback(DEVCB_##_devcb);
 
 
 class a8sio_slot_device : public device_t,
@@ -116,7 +116,7 @@ protected:
 
 
 // device type definition
-extern const device_type A8SIO;
+DECLARE_DEVICE_TYPE(A8SIO, a8sio_device)
 
 
 class device_a8sio_card_interface : public device_slot_card_interface
@@ -142,6 +142,6 @@ public:
 };
 
 
-SLOT_INTERFACE_EXTERN(a8sio_cards);
+void a8sio_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_A800_A8SIO_H

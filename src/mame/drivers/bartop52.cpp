@@ -47,14 +47,15 @@ protected:
 };
 
 
-ADDRESS_MAP_START(bartop52_state::a5200_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd400, 0xd5ff) AM_DEVREADWRITE("antic", antic_device, read, write)
-	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void bartop52_state::a5200_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0xbfff).rom();
+	map(0xc000, 0xc0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0xd400, 0xd5ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0xe800, 0xe8ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xf800, 0xffff).rom();
+}
 
 #define JOYSTICK_DELTA          10
 #define JOYSTICK_SENSITIVITY    200
@@ -117,8 +118,7 @@ void bartop52_state::machine_reset()
 {
 	atari_common_state::machine_reset();
 
-	pokey_device *pokey = machine().device<pokey_device>("pokey");
-	pokey->write(15,0);
+	subdevice<pokey_device>("pokey")->write(machine().dummy_space(), 15, 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )
@@ -128,8 +128,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )
 
 MACHINE_CONFIG_START(bartop52_state::a5200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
-	MCFG_CPU_PROGRAM_MAP(a5200_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
+	MCFG_DEVICE_PROGRAM_MAP(a5200_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bartop52_state, bartop_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
@@ -151,9 +151,9 @@ MACHINE_CONFIG_START(bartop52_state::a5200)
 	MCFG_PALETTE_INIT_OWNER(bartop52_state, atari)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
+	MCFG_DEVICE_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
 	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
 	MCFG_POKEY_POT2_R_CB(IOPORT("analog_2"))
@@ -162,7 +162,6 @@ MACHINE_CONFIG_START(bartop52_state::a5200)
 	MCFG_POKEY_INTERRUPT_CB(bartop52_state, interrupt_cb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
 MACHINE_CONFIG_END
 
 ROM_START(barbball)
@@ -171,4 +170,4 @@ ROM_START(barbball)
 	ROM_LOAD( "5200.rom",     0xf800, 0x0800, BAD_DUMP CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530) )
 ROM_END
 
-GAME( 1983, barbball, 0, a5200, bartop52, bartop52_state, 0, ROT0, "Atari", "Barroom Baseball (prototype)", MACHINE_NOT_WORKING )
+GAME( 1983, barbball, 0, a5200, bartop52, bartop52_state, empty_init, ROT0, "Atari", "Barroom Baseball (prototype)", MACHINE_NOT_WORKING )

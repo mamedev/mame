@@ -10,6 +10,7 @@
 #include "video/vsystem_spr.h"
 #include "video/mb60553.h"
 #include "video/vs920a.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -35,6 +36,17 @@ public:
 		m_mixerregs(*this, "mixerregs")
 	{ }
 
+	void base(machine_config &config);
+	void twc94(machine_config &config);
+	void gstriker(machine_config &config);
+	void vgoal(machine_config &config);
+
+	void init_vgoalsoc();
+	void init_twcup94();
+	void init_twcup94a();
+	void init_twcup94b();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<vsystem_spr_device> m_spr;
@@ -74,18 +86,11 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(vgoalsoc);
-	DECLARE_DRIVER_INIT(twcup94);
-	DECLARE_DRIVER_INIT(twcup94a);
-	DECLARE_DRIVER_INIT(twcup94b);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void mcu_init();
-	void twc94(machine_config &config);
-	void gstriker(machine_config &config);
-	void vgoal(machine_config &config);
 	void gstriker_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);

@@ -10,19 +10,6 @@
 #include "includes/vertigo.h"
 
 
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-/* Timestamp of last INTL4 change. The vector CPU runs for
-   the delta between this and now.
-*/
-
-/* State of the priority encoder output */
-
-/* Result of the last ADC channel sampled */
 
 /*************************************
  *
@@ -32,12 +19,12 @@
  *
  *************************************/
 
-TTL74148_OUTPUT_CB(vertigo_state::update_irq)
+WRITE8_MEMBER(vertigo_state::update_irq)
 {
 	if (m_irq_state < 7)
 		m_maincpu->set_input_line(m_irq_state ^ 7, CLEAR_LINE);
 
-	m_irq_state = m_ttl74148->output_r();
+	m_irq_state = data;
 
 	if (m_irq_state < 7)
 		m_maincpu->set_input_line(m_irq_state ^ 7, ASSERT_LINE);
@@ -61,8 +48,7 @@ WRITE_LINE_MEMBER(vertigo_state::v_irq4_w)
 
 WRITE_LINE_MEMBER(vertigo_state::v_irq3_w)
 {
-	if (state)
-		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_custom->sound_interrupt_w(state);
 
 	update_irq_encoder(INPUT_LINE_IRQ3, state);
 }
@@ -75,24 +61,16 @@ WRITE_LINE_MEMBER(vertigo_state::v_irq3_w)
  *
  *************************************/
 
-READ16_MEMBER(vertigo_state::vertigo_io_convert)
+WRITE_LINE_MEMBER( vertigo_state::adc_eoc_w )
 {
-	static const char *const adcnames[] = { "P1X", "P1Y", "PADDLE" };
-
-	if (offset > 2)
-		m_adc_result = 0;
-	else
-		m_adc_result = ioport(adcnames[offset])->read();
-
-	update_irq_encoder(INPUT_LINE_IRQ2, ASSERT_LINE);
-	return 0;
+	update_irq_encoder(INPUT_LINE_IRQ2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-READ16_MEMBER(vertigo_state::vertigo_io_adc)
+READ16_MEMBER(vertigo_state::vertigo_io_convert)
 {
-	update_irq_encoder(INPUT_LINE_IRQ2, CLEAR_LINE);
-	return m_adc_result;
+	m_adc->address_offset_start_w(space, offset, 0);
+	return 0;
 }
 
 
@@ -122,9 +100,9 @@ WRITE16_MEMBER(vertigo_state::vertigo_wsot_w)
 {
 	/* Reset sound cpu */
 	if ((data & 2) == 0)
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_custom->sound_reset_w(ASSERT_LINE);
 	else
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_custom->sound_reset_w(CLEAR_LINE);
 }
 
 
@@ -163,7 +141,6 @@ READ16_MEMBER(vertigo_state::vertigo_sio_r)
 void vertigo_state::machine_start()
 {
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_adc_result));
 	save_item(NAME(m_irq4_time));
 
 	vertigo_vproc_init();

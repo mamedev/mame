@@ -1,17 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_F1GP_H
+#define MAME_INCLUDES_F1GP_H
+
+#pragma once
 
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
 #include "video/vsystem_spr.h"
 #include "video/vsystem_spr2.h"
 #include "video/k053936.h"
+#include "emupal.h"
 
 class f1gp_state : public driver_device
 {
 public:
-	f1gp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	f1gp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_sharedram(*this, "sharedram"),
 		m_spr1vram(*this, "spr1vram"),
 		m_spr2vram(*this, "spr2vram"),
@@ -34,8 +39,14 @@ public:
 		m_k053936(*this, "k053936"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_acia(*this, "acia") { }
+		m_acia(*this, "acia")
+	{ }
 
+	void f1gp2(machine_config &config);
+	void f1gpb(machine_config &config);
+	void f1gp(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_sharedram;
 	optional_shared_ptr<uint16_t> m_spr1vram;
@@ -101,9 +112,6 @@ public:
 	uint32_t screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void f1gpb_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect );
-	void f1gp2(machine_config &config);
-	void f1gpb(machine_config &config);
-	void f1gp(machine_config &config);
 	void f1gp2_cpu1_map(address_map &map);
 	void f1gp_cpu1_map(address_map &map);
 	void f1gp_cpu2_map(address_map &map);
@@ -112,3 +120,5 @@ public:
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_F1GP_H

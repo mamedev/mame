@@ -92,10 +92,20 @@ okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag,
 		m_region(*this, DEVICE_SELF),
 		m_command(-1),
 		m_stream(nullptr),
-		m_pin7_state(0)
+		m_pin7_state(~uint8_t(0))
 {
 }
 
+
+//-------------------------------------------------
+//  device_validity_check - device-specific checks
+//-------------------------------------------------
+
+void okim6295_device::device_validity_check(validity_checker &valid) const
+{
+	if ((PIN7_LOW != m_pin7_state) && (PIN7_HIGH != m_pin7_state))
+		osd_printf_error("Initial pin 7 state not configured\n");
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -103,6 +113,9 @@ okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag,
 
 void okim6295_device::device_start()
 {
+	if ((PIN7_LOW != m_pin7_state) && (PIN7_HIGH != m_pin7_state))
+		m_pin7_state = 0;
+
 	// create the stream
 	int divisor = m_pin7_state ? 132 : 165;
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
@@ -190,7 +203,8 @@ void okim6295_device::rom_bank_updated()
 
 void okim6295_device::set_pin7(int pin7)
 {
-	m_pin7_state = pin7;
+	assert(started());
+	m_pin7_state = pin7 ? 1 : 0;
 	device_clock_changed();
 }
 

@@ -18,12 +18,12 @@ class perq_state : public driver_device
 public:
 	perq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		//      , m_maincpu(*this, "maincpu")
 	{ }
 
-void perq(machine_config &config);
+	void perq(machine_config &config);
 private:
-//  required_device<cpu_device> m_maincpu;
+	//  required_device<cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( perq )
@@ -42,4 +42,4 @@ ROM_START( perq )
 	ROM_LOAD( "rsh00.rom",     0x0000, 0x0400, CRC(815d92bf) SHA1(b87bdea13de391e5615c474ba96af4b28b7f8f38) )
 ROM_END
 
-COMP( 1979, perq, 0, 0, perq, perq, perq_state, 0, "Three Rivers Company Corporation", "PERQ 1A", MACHINE_IS_SKELETON )
+COMP( 1979, perq, 0, 0, perq, perq, perq_state, empty_init, "Three Rivers Company Corporation", "PERQ 1A", MACHINE_IS_SKELETON )

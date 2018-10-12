@@ -51,15 +51,16 @@ const tiny_rom_entry *apricot_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 #ifdef UPD7507_EMULATED
-ADDRESS_MAP_START(apricot_keyboard_device::apricot_keyboard_io)
-	AM_RANGE(0x00, 0x00) AM_READ(kb_lo_r)
-	AM_RANGE(0x01, 0x01) AM_READ(kb_hi_r)
-	AM_RANGE(0x03, 0x03) AM_WRITE(kb_p3_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(kb_y0_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(kb_y4_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(kb_p6_r, kb_yc_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(kb_y8_w)
-ADDRESS_MAP_END
+void apricot_keyboard_device::apricot_keyboard_io(address_map &map)
+{
+	map(0x00, 0x00).r(FUNC(apricot_keyboard_device::kb_lo_r));
+	map(0x01, 0x01).r(FUNC(apricot_keyboard_device::kb_hi_r));
+	map(0x03, 0x03).w(FUNC(apricot_keyboard_device::kb_p3_w));
+	map(0x04, 0x04).w(FUNC(apricot_keyboard_device::kb_y0_w));
+	map(0x05, 0x05).w(FUNC(apricot_keyboard_device::kb_y4_w));
+	map(0x06, 0x06).rw(FUNC(apricot_keyboard_device::kb_p6_r), FUNC(apricot_keyboard_device::kb_yc_w));
+	map(0x07, 0x07).w(FUNC(apricot_keyboard_device::kb_y8_w));
+}
 #endif
 
 
@@ -69,8 +70,8 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(apricot_keyboard_device::device_add_mconfig)
 #ifdef UPD7507_EMULATED
-	MCFG_CPU_ADD(UPD7507C_TAG, UPD7507, XTAL(32'768))
-	MCFG_CPU_IO_MAP(apricot_keyboard_io)
+	MCFG_DEVICE_ADD(UPD7507C_TAG, UPD7507, XTAL(32'768))
+	MCFG_DEVICE_IO_MAP(apricot_keyboard_io)
 #endif
 MACHINE_CONFIG_END
 

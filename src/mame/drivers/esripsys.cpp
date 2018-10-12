@@ -512,7 +512,7 @@ READ8_MEMBER(esripsys_state::tms5220_r)
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		uint8_t status = m_tms->status_r(space, 0);
+		uint8_t status = m_tms->status_r();
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
 		return (m_tms->readyq_r() << 7) | (m_tms->intq_r() << 6) | status;
@@ -527,7 +527,7 @@ WRITE8_MEMBER(esripsys_state::tms5220_w)
 	if (offset == 0)
 	{
 		m_tms_data = data;
-		m_tms->data_w(space, 0, m_tms_data);
+		m_tms->data_w(m_tms_data);
 	}
 #if 0
 	if (offset == 1)
@@ -564,50 +564,54 @@ WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(esripsys_state::game_cpu_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_SHARE("pal_ram")
-	AM_RANGE(0x4300, 0x4300) AM_WRITE(esripsys_bg_intensity_w)
-	AM_RANGE(0x4400, 0x47ff) AM_NOP // Collision detection RAM
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(g_status_r, g_status_w)
-	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(g_iobus_r, g_iobus_w)
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(g_ioadd_w)
-	AM_RANGE(0x5400, 0x57ff) AM_NOP
-	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(uart_r, uart_w)
-	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void esripsys_state::game_cpu_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("share1");
+	map(0x4000, 0x42ff).ram().share("pal_ram");
+	map(0x4300, 0x4300).w(FUNC(esripsys_state::esripsys_bg_intensity_w));
+	map(0x4400, 0x47ff).noprw(); // Collision detection RAM
+	map(0x4800, 0x4bff).rw(FUNC(esripsys_state::g_status_r), FUNC(esripsys_state::g_status_w));
+	map(0x4c00, 0x4fff).rw(FUNC(esripsys_state::g_iobus_r), FUNC(esripsys_state::g_iobus_w));
+	map(0x5000, 0x53ff).w(FUNC(esripsys_state::g_ioadd_w));
+	map(0x5400, 0x57ff).noprw();
+	map(0x5c00, 0x5fff).rw(FUNC(esripsys_state::uart_r), FUNC(esripsys_state::uart_w));
+	map(0x6000, 0xdfff).bankr("bank1");
+	map(0xe000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(esripsys_state::frame_cpu_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(fdt_r, fdt_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(f_status_r, f_status_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(frame_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void esripsys_state::frame_cpu_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("share1");
+	map(0x4000, 0x4fff).rw(FUNC(esripsys_state::fdt_r), FUNC(esripsys_state::fdt_w));
+	map(0x6000, 0x6000).rw(FUNC(esripsys_state::f_status_r), FUNC(esripsys_state::f_status_w));
+	map(0x8000, 0x8000).w(FUNC(esripsys_state::frame_w));
+	map(0xc000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(esripsys_state::sound_cpu_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM // Not installed on later PCBs
-	AM_RANGE(0x2008, 0x2009) AM_READWRITE(tms5220_r, tms5220_w)
-	AM_RANGE(0x200a, 0x200b) AM_WRITE(esripsys_dac_w)
-	AM_RANGE(0x200c, 0x200c) AM_DEVWRITE("dacvol", dac_byte_interface, write)
-	AM_RANGE(0x200d, 0x200d) AM_WRITE(control_w)
-	AM_RANGE(0x200e, 0x200e) AM_READWRITE(s_200e_r, s_200e_w)
-	AM_RANGE(0x200f, 0x200f) AM_READWRITE(s_200f_r, s_200f_w)
-	AM_RANGE(0x2020, 0x2027) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void esripsys_state::sound_cpu_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0fff).ram(); // Not installed on later PCBs
+	map(0x2008, 0x2009).rw(FUNC(esripsys_state::tms5220_r), FUNC(esripsys_state::tms5220_w));
+	map(0x200a, 0x200b).w(FUNC(esripsys_state::esripsys_dac_w));
+	map(0x200c, 0x200c).w("dacvol", FUNC(dac_byte_interface::data_w));
+	map(0x200d, 0x200d).w(FUNC(esripsys_state::control_w));
+	map(0x200e, 0x200e).rw(FUNC(esripsys_state::s_200e_r), FUNC(esripsys_state::s_200e_w));
+	map(0x200f, 0x200f).rw(FUNC(esripsys_state::s_200f_r), FUNC(esripsys_state::s_200f_w));
+	map(0x2020, 0x2027).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x8000, 0x9fff).bankr("bank2");
+	map(0xa000, 0xbfff).bankr("bank3");
+	map(0xc000, 0xdfff).bankr("bank4");
+	map(0xe000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(esripsys_state::video_cpu_map)
-	AM_RANGE(0x000, 0x1ff) AM_ROM
-ADDRESS_MAP_END
+void esripsys_state::video_cpu_map(address_map &map)
+{
+	map(0x000, 0x1ff).rom();
+}
 
 
 /*************************************
@@ -616,7 +620,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(esripsys_state,esripsys)
+void esripsys_state::init_esripsys()
 {
 	uint8_t *rom = memregion("sound_data")->base();
 
@@ -624,16 +628,16 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 	m_fdt_b = std::make_unique<uint8_t[]>(FDT_RAM_SIZE);
 	m_cmos_ram = std::make_unique<uint8_t[]>(CMOS_RAM_SIZE);
 
-	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
+	subdevice<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
 
 	membank("bank2")->set_base(&rom[0x0000]);
 	membank("bank3")->set_base(&rom[0x4000]);
 	membank("bank4")->set_base(&rom[0x8000]);
 
 	/* Register stuff for state saving */
-	save_pointer(NAME(m_fdt_a.get()), FDT_RAM_SIZE);
-	save_pointer(NAME(m_fdt_b.get()), FDT_RAM_SIZE);
-	save_pointer(NAME(m_cmos_ram.get()), CMOS_RAM_SIZE);
+	save_pointer(NAME(m_fdt_a), FDT_RAM_SIZE);
+	save_pointer(NAME(m_fdt_b), FDT_RAM_SIZE);
+	save_pointer(NAME(m_cmos_ram), CMOS_RAM_SIZE);
 
 	save_item(NAME(m_g_iodata));
 	save_item(NAME(m_g_ioaddr));
@@ -661,26 +665,27 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 }
 
 MACHINE_CONFIG_START(esripsys_state::esripsys)
-	MCFG_CPU_ADD("game_cpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)
+	MCFG_DEVICE_ADD("game_cpu", MC6809E, XTAL(8'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(game_cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)
 	MCFG_QUANTUM_PERFECT_CPU("game_cpu")
 
-	MCFG_CPU_ADD("frame_cpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(frame_cpu_map)
+	MCFG_DEVICE_ADD("frame_cpu", MC6809E, XTAL(8'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(frame_cpu_map)
 
-	MCFG_CPU_ADD("video_cpu", ESRIP, XTAL(40'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(video_cpu_map)
-	MCFG_ESRIP_FDT_R_CALLBACK(READ16(esripsys_state, fdt_rip_r))
-	MCFG_ESRIP_FDT_W_CALLBACK(WRITE16(esripsys_state, fdt_rip_w))
-	MCFG_ESRIP_STATUS_IN_CALLBACK(READ8(esripsys_state, rip_status_in))
+	MCFG_DEVICE_ADD("video_cpu", ESRIP, XTAL(40'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(video_cpu_map)
+	MCFG_ESRIP_FDT_R_CALLBACK(READ16(*this, esripsys_state, fdt_rip_r))
+	MCFG_ESRIP_FDT_W_CALLBACK(WRITE16(*this, esripsys_state, fdt_rip_w))
+	MCFG_ESRIP_STATUS_IN_CALLBACK(READ8(*this, esripsys_state, rip_status_in))
 	MCFG_ESRIP_DRAW_CALLBACK_OWNER(esripsys_state, esripsys_draw)
 	MCFG_ESRIP_LBRM_PROM("proms")
+	MCFG_ESRIP_SCREEN("screen")
 
-	MCFG_CPU_ADD("sound_cpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
+	MCFG_DEVICE_ADD("sound_cpu", MC6809E, XTAL(8'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -689,21 +694,21 @@ MACHINE_CONFIG_START(esripsys_state::esripsys)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	/* Sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", MC3410, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("dacvol", MC3408, 0) // unknown DAC
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("dac", MC3410, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dacvol", MC3408, 0) // unknown DAC
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_ADD("tms5220nl", TMS5220, 640000)
+	MCFG_DEVICE_ADD("tms5220nl", TMS5220, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL(8'000'000) / 4)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(esripsys_state, ptm_irq))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(8'000'000) / 4));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.irq_callback().set(FUNC(esripsys_state::ptm_irq));
 MACHINE_CONFIG_END
 
 
@@ -1062,6 +1067,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, turbosub,  0,        esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub7, turbosub, esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub6, turbosub, esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub,  0,        esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub7, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub6, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", MACHINE_SUPPORTS_SAVE )

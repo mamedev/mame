@@ -21,12 +21,13 @@ DEFINE_DEVICE_TYPE(TK02_80COL, tk02_device, "tk02", "TK02 80 Column Monochrome U
 //  device_address_map
 //-------------------------------------------------
 
-ADDRESS_MAP_START(tk02_device::map)
+void tk02_device::map(address_map &map)
+{
 //  AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(ram_r, ram_w) // no AM_SELECT (or AM_MASK) support here
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_READ(status_r)
-ADDRESS_MAP_END
+	map(0x08, 0x08).mirror(0xff00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x09, 0x09).mirror(0xff00).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x0c, 0x0c).mirror(0xff00).r(FUNC(tk02_device::status_r));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -86,7 +87,7 @@ static const gfx_layout tk02_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( tk02 )
+static GFXDECODE_START( gfx_tk02 )
 	GFXDECODE_ENTRY("gfx", 0x0000, tk02_charlayout, 0, 1)
 	GFXDECODE_ENTRY("gfx", 0x1000, tk02_charlayout, 0, 1)
 GFXDECODE_END
@@ -102,13 +103,13 @@ MACHINE_CONFIG_START(tk02_device::device_add_mconfig)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tk02)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk02)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "mono", XTAL(8'000'000) / 4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(tk02_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(tk02_device, de_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, tk02_device, de_w))
 
 	MCFG_TATUNG_PIPE_ADD("pipe")
 MACHINE_CONFIG_END
@@ -145,7 +146,7 @@ void tk02_device::device_start()
 	memset(m_ram.get(), 0xff, 0x800);
 
 	// register for save states
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 	save_item(NAME(m_de));
 }
 

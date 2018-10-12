@@ -109,13 +109,14 @@ const tiny_rom_entry *interpod_device::device_rom_region() const
 //  ADDRESS_MAP( interpod_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(interpod_device::interpod_mem)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x3b80) AM_DEVICE(R6532_TAG, mos6532_new_device, ram_map)
-	AM_RANGE(0x0400, 0x041f) AM_MIRROR(0x3be0) AM_DEVICE(R6532_TAG, mos6532_new_device, io_map)
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x9ffe) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, read, write)
-	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0xb800) AM_ROM AM_REGION(R6502_TAG, 0)
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x5ff0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-ADDRESS_MAP_END
+void interpod_device::interpod_mem(address_map &map)
+{
+	map(0x0000, 0x007f).mirror(0x3b80).m(R6532_TAG, FUNC(mos6532_new_device::ram_map));
+	map(0x0400, 0x041f).mirror(0x3be0).m(R6532_TAG, FUNC(mos6532_new_device::io_map));
+	map(0x2000, 0x2001).mirror(0x9ffe).rw(MC6850_TAG, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x4000, 0x47ff).mirror(0xb800).rom().region(R6502_TAG, 0);
+	map(0x8000, 0x800f).mirror(0x5ff0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+}
 
 
 //-------------------------------------------------
@@ -123,8 +124,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(interpod_device::device_add_mconfig)
-	MCFG_CPU_ADD(R6502_TAG, M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(interpod_mem)
+	MCFG_DEVICE_ADD(R6502_TAG, M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(interpod_mem)
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, 1000000)
 	MCFG_DEVICE_ADD(R6532_TAG, MOS6532_NEW, 1000000)

@@ -65,19 +65,22 @@ WRITE8_MEMBER( vcs80_state::pio_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(vcs80_state::vcs80_bd_mem)
-	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM
-ADDRESS_MAP_END
+void vcs80_state::vcs80_bd_mem(address_map &map)
+{
+	map(0x0000, 0x01ff).rom().region(Z80_TAG, 0);
+	map(0x0400, 0x07ff).ram();
+}
 
-ADDRESS_MAP_START(vcs80_state::vcs80_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void vcs80_state::vcs80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(vcs80_state::mem_r), FUNC(vcs80_state::mem_w));
+}
 
-ADDRESS_MAP_START(vcs80_state::vcs80_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void vcs80_state::vcs80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(FUNC(vcs80_state::io_r), FUNC(vcs80_state::io_w));
+}
 
 /* Input Ports */
 
@@ -178,13 +181,12 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 
 	*/
 
-	uint8_t led_data = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = m_keylatch;
 
 	/* skip middle digit */
 	if (digit > 3) digit++;
 
-	output().set_digit_value(8 - digit, led_data);
+	m_digits[8 - digit] = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 }
 
 /* Z80 Daisy Chain */
@@ -199,6 +201,8 @@ static const z80_daisy_config vcs80_daisy_chain[] =
 
 void vcs80_state::machine_start()
 {
+	m_digits.resolve();
+
 	m_pio->strobe_a(1);
 	m_pio->strobe_b(1);
 
@@ -211,33 +215,28 @@ void vcs80_state::machine_start()
 
 MACHINE_CONFIG_START(vcs80_state::vcs80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(5'000'000)/2) /* U880D */
-	MCFG_CPU_PROGRAM_MAP(vcs80_mem)
-	MCFG_CPU_IO_MAP(vcs80_io)
-	MCFG_Z80_DAISY_CHAIN(vcs80_daisy_chain)
+	Z80(config, m_maincpu, XTAL(5'000'000)/2); /* U880D */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcs80_state::vcs80_mem);
+	m_maincpu->set_addrmap(AS_IO, &vcs80_state::vcs80_io);
+	m_maincpu->set_daisy_config(vcs80_daisy_chain);
 
 	/* keyboard timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", vcs80_state, vcs80_keyboard_tick, attotime::from_hz(1000))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_vcs80 )
+	config.set_default_layout(layout_vcs80);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(5'000'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(vcs80_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(vcs80_state, pio_pb_w))
+	Z80PIO(config, m_pio, XTAL(5'000'000)/2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(vcs80_state::pio_pa_r));
+	m_pio->out_pb_callback().set(FUNC(vcs80_state::pio_pb_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, RAM_TAG).set_default_size("1K");
 
 	/* bankdev */
-	MCFG_DEVICE_ADD("bdmem", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vcs80_bd_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bdmem").set_map(&vcs80_state::vcs80_bd_mem).set_options(ENDIANNESS_BIG, 8, 32, 0x10000);
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -249,5 +248,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   STATE         INIT  COMPANY             FULLNAME  FLAGS */
-COMP( 1983, vcs80,  0,      0,      vcs80,  vcs80,  vcs80_state,  0,    "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY             FULLNAME  FLAGS */
+COMP( 1983, vcs80, 0,      0,      vcs80,   vcs80, vcs80_state, empty_init, "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

@@ -59,10 +59,11 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 //  ADDRESS_MAP( mm1_upd7220_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(mm1_state::mm1_upd7220_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void mm1_state::mm1_upd7220_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x7fff).ram().share("video_ram");
+}
 
 
 //-------------------------------------------------
@@ -112,7 +113,7 @@ static const gfx_layout charlayout =
 //  GFXDECODE( mm1 )
 //-------------------------------------------------
 
-static GFXDECODE_START( mm1 )
+static GFXDECODE_START( gfx_mm1 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -136,15 +137,15 @@ MACHINE_CONFIG_START(mm1_state::mm1m6_video)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 375-1 )
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(18'720'000), ...)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mm1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mm1)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(mm1_state, mm1)
 
 	MCFG_DEVICE_ADD(I8275_TAG, I8275, XTAL(18'720'000)/8)
 	MCFG_I8275_CHARACTER_WIDTH(HORIZONTAL_CHARACTER_PIXELS)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mm1_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq0_w))
-	MCFG_I8275_VRTC_CALLBACK(DEVWRITELINE(UPD7220_TAG, upd7220_device, ext_sync_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE(I8237_TAG, am9517a_device, dreq0_w))
+	MCFG_I8275_VRTC_CALLBACK(WRITELINE(UPD7220_TAG, upd7220_device, ext_sync_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, XTAL(18'720'000)/8)

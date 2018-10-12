@@ -67,142 +67,152 @@ WRITE8_MEMBER(lasso_state::sound_select_w)
 	uint8_t to_write = bitswap<8>(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)   /* chip #0 */
-		m_sn_1->write(space, 0, to_write);
+		m_sn_1->write(to_write);
 
 	if (~data & 0x02)   /* chip #1 */
-		m_sn_2->write(space, 0, to_write);
+		m_sn_2->write(to_write);
 }
 
 
-ADDRESS_MAP_START(lasso_state::lasso_main_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x0c00, 0x0c7f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_SHARE("back_color")
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(lasso_video_control_w)
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
-	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
-	AM_RANGE(0x1806, 0x1806) AM_READ_PORT("1806") AM_WRITENOP   /* game uses 'lsr' to read port */
-	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
-	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM
-ADDRESS_MAP_END
+void lasso_state::lasso_main_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(FUNC(lasso_state::lasso_videoram_w)).share("videoram");
+	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
+	map(0x0c00, 0x0c7f).ram().share("spriteram");
+	map(0x1000, 0x17ff).ram().share("share1");
+	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
+	map(0x1801, 0x1801).writeonly().share("back_color");
+	map(0x1802, 0x1802).w(FUNC(lasso_state::lasso_video_control_w));
+	map(0x1804, 0x1804).portr("1804");
+	map(0x1805, 0x1805).portr("1805");
+	map(0x1806, 0x1806).portr("1806").nopw();   /* game uses 'lsr' to read port */
+	map(0x1807, 0x1807).portr("1807");
+	map(0x8000, 0xbfff).mirror(0x4000).rom();
+}
 
 
-ADDRESS_MAP_START(lasso_state::lasso_audio_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x5000, 0x7fff) AM_ROM
-	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_SHARE("chip_data")
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
-	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x7000)
-ADDRESS_MAP_END
+void lasso_state::lasso_audio_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x5000, 0x7fff).rom();
+	map(0xb000, 0xb000).writeonly().share("chip_data");
+	map(0xb001, 0xb001).w(FUNC(lasso_state::sound_select_w));
+	map(0xb004, 0xb004).r(FUNC(lasso_state::sound_status_r));
+	map(0xb005, 0xb005).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf000, 0xffff).rom().region("audiocpu", 0x7000);
+}
 
 
-ADDRESS_MAP_START(lasso_state::lasso_coprocessor_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("bitmap_ram")
-	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x7000) AM_ROM
-ADDRESS_MAP_END
+void lasso_state::lasso_coprocessor_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("share1");
+	map(0x2000, 0x3fff).ram().share("bitmap_ram");
+	map(0x8000, 0x8fff).mirror(0x7000).rom();
+}
 
 
-ADDRESS_MAP_START(lasso_state::chameleo_main_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x107f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1080, 0x10ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_SHARE("back_color")
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(lasso_video_control_w)
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
-	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
-	AM_RANGE(0x1806, 0x1806) AM_READ_PORT("1806")
-	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0xa000)
-ADDRESS_MAP_END
+void lasso_state::chameleo_main_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(FUNC(lasso_state::lasso_videoram_w)).share("videoram");
+	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
+	map(0x0c00, 0x0fff).ram();
+	map(0x1000, 0x107f).ram().share("spriteram");
+	map(0x1080, 0x10ff).ram();
+	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
+	map(0x1801, 0x1801).writeonly().share("back_color");
+	map(0x1802, 0x1802).w(FUNC(lasso_state::lasso_video_control_w));
+	map(0x1804, 0x1804).portr("1804");
+	map(0x1805, 0x1805).portr("1805");
+	map(0x1806, 0x1806).portr("1806");
+	map(0x1807, 0x1807).portr("1807");
+	map(0x4000, 0xbfff).rom();
+	map(0xe000, 0xffff).rom().region("maincpu", 0xa000);
+}
 
 
-ADDRESS_MAP_START(lasso_state::chameleo_audio_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_SHARE("chip_data")
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
-	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x7000)
-ADDRESS_MAP_END
+void lasso_state::chameleo_audio_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x1000, 0x1fff).rom();
+	map(0x6000, 0x7fff).rom();
+	map(0xb000, 0xb000).writeonly().share("chip_data");
+	map(0xb001, 0xb001).w(FUNC(lasso_state::sound_select_w));
+	map(0xb004, 0xb004).r(FUNC(lasso_state::sound_status_r));
+	map(0xb005, 0xb005).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf000, 0xffff).rom().region("audiocpu", 0x7000);
+}
 
 
-ADDRESS_MAP_START(lasso_state::wwjgtin_main_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(lasso_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_SHARE("back_color")
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(wwjgtin_video_control_w)
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
-	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
-	AM_RANGE(0x1806, 0x1806) AM_READ_PORT("1806")
-	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
-	AM_RANGE(0x1c00, 0x1c02) AM_WRITEONLY AM_SHARE("last_colors")
-	AM_RANGE(0x1c04, 0x1c07) AM_WRITEONLY AM_SHARE("track_scroll")
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
-ADDRESS_MAP_END
+void lasso_state::wwjgtin_main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
+	map(0x1000, 0x10ff).ram().share("spriteram");
+	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
+	map(0x1801, 0x1801).writeonly().share("back_color");
+	map(0x1802, 0x1802).w(FUNC(lasso_state::wwjgtin_video_control_w));
+	map(0x1804, 0x1804).portr("1804");
+	map(0x1805, 0x1805).portr("1805");
+	map(0x1806, 0x1806).portr("1806");
+	map(0x1807, 0x1807).portr("1807");
+	map(0x1c00, 0x1c02).writeonly().share("last_colors");
+	map(0x1c04, 0x1c07).writeonly().share("track_scroll");
+	map(0x4000, 0xbfff).rom();
+	map(0xc000, 0xffff).rom().region("maincpu", 0x8000);
+}
 
 
-ADDRESS_MAP_START(lasso_state::wwjgtin_audio_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_SHARE("chip_data")
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
-	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void lasso_state::wwjgtin_audio_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x4000, 0x7fff).mirror(0x8000).rom();
+	map(0xb000, 0xb000).writeonly().share("chip_data");
+	map(0xb001, 0xb001).w(FUNC(lasso_state::sound_select_w));
+	map(0xb003, 0xb003).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0xb004, 0xb004).r(FUNC(lasso_state::sound_status_r));
+	map(0xb005, 0xb005).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
-ADDRESS_MAP_START(lasso_state::pinbo_main_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_SHARE("back_color")
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(pinbo_video_control_w)
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
-	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
-	AM_RANGE(0x1806, 0x1806) AM_READ_PORT("1806")
-	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-	AM_RANGE(0x6000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0xa000)
-ADDRESS_MAP_END
+void lasso_state::pinbo_main_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(FUNC(lasso_state::lasso_videoram_w)).share("videoram");
+	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
+	map(0x1000, 0x10ff).ram().share("spriteram");
+	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
+	map(0x1801, 0x1801).writeonly().share("back_color");
+	map(0x1802, 0x1802).w(FUNC(lasso_state::pinbo_video_control_w));
+	map(0x1804, 0x1804).portr("1804");
+	map(0x1805, 0x1805).portr("1805");
+	map(0x1806, 0x1806).portr("1806");
+	map(0x1807, 0x1807).portr("1807");
+	map(0x2000, 0x3fff).rom();
+	map(0x6000, 0xbfff).rom();
+	map(0xe000, 0xffff).rom().region("maincpu", 0xa000);
+}
 
 
-ADDRESS_MAP_START(lasso_state::pinbo_audio_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void lasso_state::pinbo_audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(lasso_state::pinbo_audio_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x08, 0x08) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP /* ??? */
-	AM_RANGE(0x14, 0x14) AM_WRITENOP    /* ??? */
-ADDRESS_MAP_END
+void lasso_state::pinbo_audio_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x04, 0x05).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x06, 0x06).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x08, 0x08).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); /* ??? */
+	map(0x14, 0x14).nopw();    /* ??? */
+}
 
 
 
@@ -440,18 +450,18 @@ static const gfx_layout pinbo_spritelayout =
 };
 
 
-static GFXDECODE_START( lasso )
+static GFXDECODE_START( gfx_lasso )
 	GFXDECODE_ENTRY( "gfx1", 0, lasso_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, lasso_spritelayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( wwjgtin )
+static GFXDECODE_START( gfx_wwjgtin )
 	GFXDECODE_ENTRY( "gfx1", 0, lasso_charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, lasso_spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, wwjgtin_tracklayout, 4*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( pinbo )
+static GFXDECODE_START( gfx_pinbo )
 	GFXDECODE_ENTRY( "gfx1", 0, pinbo_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pinbo_spritelayout, 0, 16 )
 GFXDECODE_END
@@ -484,12 +494,12 @@ MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
 MACHINE_CONFIG_START(lasso_state::base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 11289000/16) /* guess */
-	MCFG_CPU_PROGRAM_MAP(lasso_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, 11289000/16) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(lasso_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 600000)
-	MCFG_CPU_PROGRAM_MAP(lasso_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 600000)
+	MCFG_DEVICE_PROGRAM_MAP(lasso_audio_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -502,17 +512,17 @@ MACHINE_CONFIG_START(lasso_state::base)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_lasso)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lasso)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lasso)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn76489.1", SN76489, 2000000)
+	MCFG_DEVICE_ADD("sn76489.1", SN76489, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("sn76489.2", SN76489, 2000000)
+	MCFG_DEVICE_ADD("sn76489.2", SN76489, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -520,8 +530,8 @@ MACHINE_CONFIG_START(lasso_state::lasso)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("blitter", M6502, 11289000/16) /* guess */
-	MCFG_CPU_PROGRAM_MAP(lasso_coprocessor_map)
+	MCFG_DEVICE_ADD("blitter", M6502, 11289000/16) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(lasso_coprocessor_map)
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
@@ -531,11 +541,11 @@ MACHINE_CONFIG_START(lasso_state::chameleo)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(chameleo_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(chameleo_main_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(chameleo_audio_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(chameleo_audio_map)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 0x40)
@@ -549,11 +559,11 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wwjgtin_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wwjgtin_main_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(wwjgtin_audio_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(wwjgtin_audio_map)
 
 	MCFG_MACHINE_START_OVERRIDE(lasso_state,wwjgtin)
 	MCFG_MACHINE_RESET_OVERRIDE(lasso_state,wwjgtin)
@@ -562,7 +572,7 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_wwjgtin)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wwjgtin) // Has 1 additional layer
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wwjgtin) // Has 1 additional layer
 
 	MCFG_PALETTE_ADD("palette", 0x40 + 16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
@@ -570,25 +580,25 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lasso_state::pinbo)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M6502, XTAL(18'000'000)/24)
-	MCFG_CPU_PROGRAM_MAP(pinbo_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M6502, XTAL(18'000'000)/24)
+	MCFG_DEVICE_PROGRAM_MAP(pinbo_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
 
-	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL(18'000'000)/6)
-	MCFG_CPU_PROGRAM_MAP(pinbo_audio_map)
-	MCFG_CPU_IO_MAP(pinbo_audio_io_map)
+	MCFG_DEVICE_REPLACE("audiocpu", Z80, XTAL(18'000'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(pinbo_audio_map)
+	MCFG_DEVICE_IO_MAP(pinbo_audio_io_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pinbo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pinbo)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
@@ -599,10 +609,10 @@ MACHINE_CONFIG_START(lasso_state::pinbo)
 	MCFG_DEVICE_REMOVE("sn76489.1")
 	MCFG_DEVICE_REMOVE("sn76489.2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'000'000)/12)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.55)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'000'000)/12)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.55)
 MACHINE_CONFIG_END
 
@@ -874,10 +884,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1982, lasso,    0,       lasso,    lasso,    lasso_state,  0, ROT90, "SNK",              "Lasso",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, chameleo, 0,       chameleo, chameleo, lasso_state,  0, ROT0,  "Jaleco",           "Chameleon",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wwjgtin,  0,       wwjgtin,  wwjgtin,  lasso_state,  0, ROT0,  "Jaleco / Casio",   "Wai Wai Jockey Gate-In!", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, photof,   wwjgtin, wwjgtin,  wwjgtin,  lasso_state,  0, ROT0,  "Jaleco / Casio",   "Photo Finish (bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pinbo,    0,       pinbo,    pinbo,    lasso_state,  0, ROT90, "Jaleco",           "Pinbo (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pinboa,   pinbo,   pinbo,    pinboa,   lasso_state,  0, ROT90, "Jaleco",           "Pinbo (set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pinbos,   pinbo,   pinbo,    pinboa,   lasso_state,  0, ROT90, "bootleg (Strike)", "Pinbo (bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, lasso,    0,       lasso,    lasso,    lasso_state, empty_init, ROT90, "SNK",              "Lasso",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, chameleo, 0,       chameleo, chameleo, lasso_state, empty_init, ROT0,  "Jaleco",           "Chameleon",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wwjgtin,  0,       wwjgtin,  wwjgtin,  lasso_state, empty_init, ROT0,  "Jaleco / Casio",   "Wai Wai Jockey Gate-In!", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, photof,   wwjgtin, wwjgtin,  wwjgtin,  lasso_state, empty_init, ROT0,  "Jaleco / Casio",   "Photo Finish (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pinbo,    0,       pinbo,    pinbo,    lasso_state, empty_init, ROT90, "Jaleco",           "Pinbo (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pinboa,   pinbo,   pinbo,    pinboa,   lasso_state, empty_init, ROT90, "Jaleco",           "Pinbo (set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pinbos,   pinbo,   pinbo,    pinboa,   lasso_state, empty_init, ROT90, "bootleg (Strike)", "Pinbo (bootleg)",         MACHINE_SUPPORTS_SAVE )

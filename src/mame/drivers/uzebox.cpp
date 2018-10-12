@@ -43,6 +43,9 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
+	void uzebox(machine_config &config);
+
+private:
 	required_device<avr8_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
@@ -65,11 +68,10 @@ public:
 	uint32_t screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
 
-	void uzebox(machine_config &config);
 	void uzebox_data_map(address_map &map);
 	void uzebox_io_map(address_map &map);
 	void uzebox_prg_map(address_map &map);
-private:
+
 	int             m_vpos;
 	uint64_t          m_line_start_cycles;
 	uint32_t          m_line_pos_cycles;
@@ -199,20 +201,23 @@ READ8_MEMBER(uzebox_state::port_d_r)
 * Address maps                                       *
 \****************************************************/
 
-ADDRESS_MAP_START(uzebox_state::uzebox_prg_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM // 64 KB internal eprom  ATmega644
-ADDRESS_MAP_END
+void uzebox_state::uzebox_prg_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom(); // 64 KB internal eprom  ATmega644
+}
 
-ADDRESS_MAP_START(uzebox_state::uzebox_data_map)
-	AM_RANGE(0x0100, 0x10ff) AM_RAM //  4KB RAM
-ADDRESS_MAP_END
+void uzebox_state::uzebox_data_map(address_map &map)
+{
+	map(0x0100, 0x10ff).ram(); //  4KB RAM
+}
 
-ADDRESS_MAP_START(uzebox_state::uzebox_io_map)
-	AM_RANGE(AVR8_REG_A, AVR8_REG_A) AM_READWRITE( port_a_r, port_a_w )
-	AM_RANGE(AVR8_REG_B, AVR8_REG_B) AM_READWRITE( port_b_r, port_b_w )
-	AM_RANGE(AVR8_REG_C, AVR8_REG_C) AM_READWRITE( port_c_r, port_c_w )
-	AM_RANGE(AVR8_REG_D, AVR8_REG_D) AM_READWRITE( port_d_r, port_d_w )
-ADDRESS_MAP_END
+void uzebox_state::uzebox_io_map(address_map &map)
+{
+	map(AVR8_REG_A, AVR8_REG_A).rw(FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
+	map(AVR8_REG_B, AVR8_REG_B).rw(FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
+	map(AVR8_REG_C, AVR8_REG_C).rw(FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
+	map(AVR8_REG_D, AVR8_REG_D).rw(FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
+}
 
 /****************************************************\
 * Input ports                                        *
@@ -282,10 +287,10 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 MACHINE_CONFIG_START(uzebox_state::uzebox)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(uzebox_prg_map)
-	MCFG_CPU_DATA_MAP(uzebox_data_map)
-	MCFG_CPU_IO_MAP(uzebox_io_map)
+	MCFG_DEVICE_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(uzebox_prg_map)
+	MCFG_DEVICE_DATA_MAP(uzebox_data_map)
+	MCFG_DEVICE_IO_MAP(uzebox_io_map)
 	MCFG_CPU_AVR8_EEPROM("eeprom")
 
 	/* video hardware */
@@ -297,8 +302,8 @@ MACHINE_CONFIG_START(uzebox_state::uzebox)
 	MCFG_SCREEN_UPDATE_DRIVER(uzebox_state, screen_update_uzebox)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(0, "mono", 1.00)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "uzebox")
@@ -318,5 +323,5 @@ ROM_START( uzebox )
 	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )  /* on-die eeprom */
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   STATE          INIT  COMPANY    FULLNAME */
-CONS(2010, uzebox,   0,        0,        uzebox,   uzebox, uzebox_state,  0,    "Belogic", "Uzebox", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)
+/*   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME */
+CONS(2010, uzebox, 0,      0,      uzebox,  uzebox, uzebox_state, empty_init, "Belogic", "Uzebox", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)

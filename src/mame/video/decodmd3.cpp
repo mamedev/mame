@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "decodmd3.h"
-#include "rendlay.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(DECODMD3, decodmd_type3_device, "decodmd3", "Data East Pinball Dot Matrix Display Type 3")
@@ -42,7 +41,7 @@ WRITE8_MEMBER( decodmd_type3_device::ctrl_w )
 	}
 	if((m_ctrl & 0x02) && !(data & 0x02))
 	{
-		m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		logerror("DMD3: Reset\n");
 	}
 	m_ctrl = data;
@@ -122,18 +121,19 @@ MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 	}
 }
 
-ADDRESS_MAP_START(decodmd_type3_device::decodmd3_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROMBANK("dmdrom")
-	AM_RANGE(0x00800000, 0x0080ffff) AM_RAMBANK("dmdram")
-	AM_RANGE(0x00c00010, 0x00c00011) AM_READWRITE(crtc_status_r,crtc_address_w)
-	AM_RANGE(0x00c00012, 0x00c00013) AM_WRITE(crtc_register_w)
-	AM_RANGE(0x00c00020, 0x00c00021) AM_READWRITE(latch_r,status_w)
-ADDRESS_MAP_END
+void decodmd_type3_device::decodmd3_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).bankr("dmdrom");
+	map(0x00800000, 0x0080ffff).bankrw("dmdram");
+	map(0x00c00010, 0x00c00011).rw(FUNC(decodmd_type3_device::crtc_status_r), FUNC(decodmd_type3_device::crtc_address_w));
+	map(0x00c00012, 0x00c00013).w(FUNC(decodmd_type3_device::crtc_register_w));
+	map(0x00c00020, 0x00c00021).rw(FUNC(decodmd_type3_device::latch_r), FUNC(decodmd_type3_device::status_w));
+}
 
 MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(decodmd3_map)
+	MCFG_DEVICE_ADD("dmdcpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(decodmd3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -144,27 +144,26 @@ MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type3_device, crtc_update_row)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	screen_device &screen(SCREEN(config, "dmd", SCREEN_TYPE_RASTER));
+	screen.set_native_aspect();
+	screen.set_size(192, 64);
+	screen.set_visarea(0, 192-1, 0, 64-1);
+	screen.set_screen_update("dmd6845", FUNC(mc6845_device::screen_update));
+	screen.set_refresh_hz(60);
 
-	MCFG_SCREEN_ADD("dmd",RASTER)
-	MCFG_SCREEN_SIZE(192, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 64-1)
-	MCFG_SCREEN_UPDATE_DEVICE("dmd6845", mc6845_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
 decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECODMD3, tag, owner, clock),
-		m_cpu(*this,"dmdcpu"),
-		m_mc6845(*this,"dmd6845"),
-		m_ram(*this,RAM_TAG),
-		m_rambank(*this,"dmdram"),
-		m_rombank(*this,"dmdrom")
-{}
+	: device_t(mconfig, DECODMD3, tag, owner, clock)
+	, m_cpu(*this,"dmdcpu")
+	, m_mc6845(*this,"dmd6845")
+	, m_ram(*this,RAM_TAG)
+	, m_rambank(*this,"dmdram")
+	, m_rombank(*this,"dmdrom")
+{
+}
 
 void decodmd_type3_device::device_start()
 {

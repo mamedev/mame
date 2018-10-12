@@ -47,19 +47,20 @@ WRITE8_MEMBER(tagteam_state::irq_clear_w)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(tagteam_state::main_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P2") AM_WRITE(flipscreen_w)
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE(control_w)
-	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW2") AM_WRITE(irq_clear_w)
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
-	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
-	AM_RANGE(0x4800, 0x4fff) AM_READONLY
-	AM_RANGE(0x4800, 0x4bff) AM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tagteam_state::main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x2000).portr("P2").w(FUNC(tagteam_state::flipscreen_w));
+	map(0x2001, 0x2001).portr("P1").w(FUNC(tagteam_state::control_w));
+	map(0x2002, 0x2002).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x2003, 0x2003).portr("DSW2").w(FUNC(tagteam_state::irq_clear_w));
+	map(0x4000, 0x43ff).rw(FUNC(tagteam_state::mirrorvideoram_r), FUNC(tagteam_state::mirrorvideoram_w));
+	map(0x4400, 0x47ff).rw(FUNC(tagteam_state::mirrorcolorram_r), FUNC(tagteam_state::mirrorcolorram_w));
+	map(0x4800, 0x4fff).readonly();
+	map(0x4800, 0x4bff).w(FUNC(tagteam_state::videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).w(FUNC(tagteam_state::colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
 WRITE8_MEMBER(tagteam_state::sound_nmi_mask_w)
 {
@@ -67,15 +68,16 @@ WRITE8_MEMBER(tagteam_state::sound_nmi_mask_w)
 }
 
 /* Same as Syusse Oozumou */
-ADDRESS_MAP_START(tagteam_state::sound_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
-	AM_RANGE(0x2007, 0x2007) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tagteam_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2005, 0x2005).w(FUNC(tagteam_state::sound_nmi_mask_w));
+	map(0x2007, 0x2007).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x4000, 0xffff).rom();
+}
 
 
 INPUT_CHANGED_MEMBER(tagteam_state::coin_inserted)
@@ -194,7 +196,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( tagteam )
+static GFXDECODE_START( gfx_tagteam )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 4 ) /* chars */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 4 ) /* sprites */
 GFXDECODE_END
@@ -203,20 +205,20 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 MACHINE_CONFIG_START(tagteam_state::tagteam)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tagteam_state, irq0_line_assert, 272/16*57) // connected to bit 4 of vcount (basically once every 16 scanlines)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tagteam_state, irq0_line_assert, 272/16*57) // connected to bit 4 of vcount (basically once every 16 scanlines)
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000)/2/6) // daughterboard gets 12mhz/2 from mainboard, but how it's divided further is a guess
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tagteam_state, sound_timer_irq, 272/16*57) // same source as maincpu irq
+	MCFG_DEVICE_ADD("audiocpu", M6502, XTAL(12'000'000)/2/6) // daughterboard gets 12mhz/2 from mainboard, but how it's divided further is a guess
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tagteam_state, sound_timer_irq, 272/16*57) // same source as maincpu irq
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -227,25 +229,25 @@ MACHINE_CONFIG_START(tagteam_state::tagteam)
 	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tagteam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tagteam)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -314,5 +316,5 @@ ROM_END
 
 
 
-GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, 0, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, 0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, empty_init, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, empty_init, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )

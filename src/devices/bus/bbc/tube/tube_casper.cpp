@@ -23,11 +23,12 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_CASPER, bbc_tube_casper_device, "bbc_tube_casper", "
 //  ADDRESS_MAP( tube_casper_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(bbc_tube_casper_device::tube_casper_mem)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_REGION("casper_rom", 0)
-	AM_RANGE(0x10000, 0x1001f) AM_DEVREADWRITE8("via6522_1",via6522_device, read, write, 0xff)
-	AM_RANGE(0x20000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
+void bbc_tube_casper_device::tube_casper_mem(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().region("casper_rom", 0);
+	map(0x10000, 0x1001f).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
+	map(0x20000, 0x3ffff).ram();
+}
 
 //-------------------------------------------------
 //  ROM( tube_casper )
@@ -47,25 +48,26 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_tube_casper_device::device_add_mconfig)
-	MCFG_CPU_ADD("m68000", M68000, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(tube_casper_mem)
+void bbc_tube_casper_device::device_add_mconfig(machine_config &config)
+{
+	M68000(config, m_m68000, 4_MHz_XTAL);
+	m_m68000->set_addrmap(AS_PROGRAM, &bbc_tube_casper_device::tube_casper_mem);
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(4'000'000) / 2)
-	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITE8("via6522_1", via6522_device, write_pa))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_cb1))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_ca1))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
+	VIA6522(config, m_via6522_0, 4_MHz_XTAL / 2);
+	m_via6522_0->writepb_handler().set(m_via6522_1, FUNC(via6522_device::write_pa));
+	m_via6522_0->ca2_handler().set(m_via6522_1, FUNC(via6522_device::write_cb1));
+	m_via6522_0->cb2_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1));
+	m_via6522_0->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL(4'000'000) / 2)
-	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITE8("via6522_0", via6522_device, write_pa))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("via6522_0", via6522_device, write_ca1))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
+	VIA6522(config, m_via6522_1, 4_MHz_XTAL / 2);
+	m_via6522_1->writepb_handler().set(m_via6522_0, FUNC(via6522_device::write_pa));
+	m_via6522_1->ca2_handler().set(m_via6522_0, FUNC(via6522_device::write_cb1));
+	m_via6522_1->cb2_handler().set(m_via6522_0, FUNC(via6522_device::write_ca1));
+	m_via6522_1->irq_handler().set_inputline(m_m68000, M68K_IRQ_1);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_casper", "bbc_flop_68000")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_ls_casper").set_original("bbc_flop_68000");
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -121,10 +123,10 @@ void bbc_tube_casper_device::device_reset()
 
 READ8_MEMBER(bbc_tube_casper_device::host_r)
 {
-	return m_via6522_0->read(space, offset & 0xf);
+	return m_via6522_0->read(offset & 0xf);
 }
 
 WRITE8_MEMBER(bbc_tube_casper_device::host_w)
 {
-	m_via6522_0->write(space, offset & 0xf, data);
+	m_via6522_0->write(offset & 0xf, data);
 }

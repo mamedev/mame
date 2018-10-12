@@ -74,24 +74,26 @@ public:
 	{ }
 
 	void m6805evs(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void mem_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 };
 
 
-ADDRESS_MAP_START(m6805evs_state::mem_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	ADDRESS_MAP_UNMAP_HIGH
+void m6805evs_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
 
 	// AM_RANGE(0x0000, 0x001f) I/O registers live here
-	AM_RANGE(0x0020, 0x004f) AM_ROM AM_REGION("eprom", 0x0020)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x0900) AM_ROM AM_REGION("eprom", 0x0100)
+	map(0x0020, 0x004f).rom().region("eprom", 0x0020);
+	map(0x0080, 0x00ff).ram();
+	map(0x0100, 0x0900).rom().region("eprom", 0x0100);
 	// AM_RANGE(0x1f00, 0x1fef) bootloader ROM lives here
-	AM_RANGE(0x1ff8, 0x1fff) AM_ROM AM_REGION("eprom", 0x1ff0)
-ADDRESS_MAP_END
+	map(0x1ff8, 0x1fff).rom().region("eprom", 0x1ff0);
+}
 
 static INPUT_PORTS_START( m6805evs )
 INPUT_PORTS_END
@@ -102,8 +104,10 @@ void m6805evs_state::machine_reset()
 
 MACHINE_CONFIG_START(m6805evs_state::m6805evs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6805, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M6805, XTAL(4'000'000))
+
+//  Needs a 13-bits address bus wide version of the cpu
+//  MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START(m6805evs)
@@ -118,5 +122,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY      FULLNAME      FLAGS
-COMP( 1990, m6805evs, 0,        0,      m6805evs, m6805evs, m6805evs_state, 0,    "Motorola",  "M68HC05EVS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1990, m6805evs, 0,      0,      m6805evs, m6805evs, m6805evs_state, empty_init, "Motorola", "M68HC05EVS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

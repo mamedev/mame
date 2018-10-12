@@ -10,7 +10,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "sound/dac.h"
 
 
@@ -50,7 +50,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<cpu_device> m_audiocpu;
+	required_device<z80_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;
 	required_region_ptr<uint8_t> m_audiocpu_rom;
 	required_memory_bank m_sounddata_bank;

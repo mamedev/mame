@@ -33,19 +33,19 @@ const tiny_rom_entry *dw_fdc_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(dw_fdc_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", I8048, XTAL(24'000'000)/4)    // divisor is unverified
-//  MCFG_MCS48_PORT_BUS_IN_CB(READ8(dw_fdc_device, bus_r))
-//  MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(dw_fdc_device, bus_w))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(dw_fdc_device, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dw_fdc_device, p2_w))
-//  MCFG_MCS48_PORT_T0_IN_CB(READLINE(dw_fdc_device, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(dw_fdc_device, t1_r))
+	MCFG_DEVICE_ADD("mcu", I8048, XTAL(24'000'000)/4)    // divisor is unverified
+//  MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, dw_fdc_device, bus_r))
+//  MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, dw_fdc_device, bus_w))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dw_fdc_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, dw_fdc_device, p2_w))
+//  MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, dw_fdc_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, dw_fdc_device, t1_r))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
-	MCFG_UPD765A_ADD("upd765", false, false)
-//  MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
-//  MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8257", dma8257_device, XXX))
+	UPD765A(config, "upd765", false, false);
+//	m_upd_fdc->intrq_wr_callback().set("pic8259", FUNC(pic8259_device::ir4_w));
+//	m_upd_fdc->drq_wr_callback().set("dma8257", FUNC(dma8257_device::XXX));
 //  MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 //  MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 MACHINE_CONFIG_END

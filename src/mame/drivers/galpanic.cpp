@@ -133,33 +133,36 @@ WRITE16_MEMBER(galpanic_state::coin_w)
 
 
 
-ADDRESS_MAP_START(galpanic_state::galpanic_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")  /* + work RAM */
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")  /* 1024 colors, but only 512 seem to be used */
-	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
-	AM_RANGE(0x702000, 0x704fff) AM_RAM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(m6295_bankswitch_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(coin_w)  /* coin counters */
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP    /* ??? */
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP    /* ??? */
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP    /* ??? */
-ADDRESS_MAP_END
+void galpanic_state::galpanic_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x400001, 0x400001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x500000, 0x51ffff).ram().share("fgvideoram");
+	map(0x520000, 0x53ffff).ram().w(FUNC(galpanic_state::bgvideoram_w)).share("bgvideoram");  /* + work RAM */
+	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  /* 1024 colors, but only 512 seem to be used */
+	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
+	map(0x702000, 0x704fff).ram();
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x900000, 0x900001).w(FUNC(galpanic_state::m6295_bankswitch_w));
+	map(0xa00000, 0xa00001).w(FUNC(galpanic_state::coin_w));  /* coin counters */
+	map(0xb00000, 0xb00001).nopw();    /* ??? */
+	map(0xc00000, 0xc00001).nopw();    /* ??? */
+	map(0xd00000, 0xd00001).nopw();    /* ??? */
+}
 
-ADDRESS_MAP_START(galpanic_state::galpanica_map)
-	AM_IMPORT_FROM(galpanic_map)
-	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
-ADDRESS_MAP_END
+void galpanic_state::galpanica_map(address_map &map)
+{
+	galpanic_map(map);
+	map(0xe00000, 0xe00015).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
+}
 
-ADDRESS_MAP_START(galpanic_state::galpanic_oki_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void galpanic_state::galpanic_oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
 
 
 static INPUT_PORTS_START( galpanic )
@@ -224,7 +227,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( galpanic )
+static GFXDECODE_START( gfx_galpanic )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  256, 16 )
 GFXDECODE_END
 
@@ -232,11 +235,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(galpanic_state::galpanic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(galpanic_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(galpanic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, scanline, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -245,10 +248,10 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galpanic_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galpanic_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpanic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galpanic)
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx) // fg palette ram, bit 0 seems to be a transparency flag for the front bitmap
 	MCFG_PALETTE_INIT_OWNER(galpanic_state, galpanic)
@@ -258,9 +261,9 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/6, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/6, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, galpanic_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -268,16 +271,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galpanic_state::galpanica)
 	galpanic(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(galpanica_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(galpanica_map)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
 	MCFG_KANEKO_HIT_TYPE(0)
 
 	/* arm watchdog */
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
 
@@ -349,6 +351,6 @@ ROM_START( galpanicb ) /* PAMERA-04 PCB with the CALC1 MCU used */
 	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, 0, ROT90, "Kaneko", "Gals Panic (Unprotected)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanica, galpanic, galpanica, galpanica, galpanic_state, 0, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, 0, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (Unprotected)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanica, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

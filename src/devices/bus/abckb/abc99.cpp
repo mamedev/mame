@@ -79,16 +79,17 @@ DEFINE_DEVICE_TYPE(ABC99, abc99_device, "abc99", "Luxor ABC 99")
 //-------------------------------------------------
 
 ROM_START( abc99 )
-	ROM_REGION( 0x1000, I8035_Z2_TAG, 0 )
-	ROM_DEFAULT_BIOS("107268")
 	ROM_SYSTEM_BIOS( 0, "107268", "107268-17" )
-	ROMX_LOAD( "107268-17.z3", 0x0000, 0x0800, CRC(2f60cc35) SHA1(ebc6af9cd0a49a0d01698589370e628eebb6221c), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "106819", "106819-09" )
-	ROMX_LOAD( "106819-09.z3", 0x0000, 0x1000, CRC(ffe32a71) SHA1(fa2ce8e0216a433f9bbad0bdd6e3dc0b540f03b7), ROM_BIOS(2) ) // ABC 99 6490423-01
+	ROM_DEFAULT_BIOS("107268")
+
+	ROM_REGION( 0x1000, I8035_Z2_TAG, 0 )
+	ROMX_LOAD( "107268-17.z3", 0x0000, 0x0800, CRC(2f60cc35) SHA1(ebc6af9cd0a49a0d01698589370e628eebb6221c), ROM_BIOS(0) )
+	ROMX_LOAD( "106819-09.z3", 0x0000, 0x1000, CRC(ffe32a71) SHA1(fa2ce8e0216a433f9bbad0bdd6e3dc0b540f03b7), ROM_BIOS(1) ) // ABC 99 6490423-01
 
 	ROM_REGION( 0x800, I8035_Z5_TAG, 0 )
-	ROMX_LOAD( "107268-16.z6", 0x0000, 0x0800, CRC(785ec0c6) SHA1(0b261beae20dbc06fdfccc50b19ea48b5b6e22eb), ROM_BIOS(1) )
-	ROMX_LOAD( "107268-64.z6", 0x0000, 0x0800, CRC(e33683ae) SHA1(0c1d9e320f82df05f4804992ef6f6f6cd20623f3), ROM_BIOS(2) )
+	ROMX_LOAD( "107268-16.z6", 0x0000, 0x0800, CRC(785ec0c6) SHA1(0b261beae20dbc06fdfccc50b19ea48b5b6e22eb), ROM_BIOS(0) )
+	ROMX_LOAD( "107268-64.z6", 0x0000, 0x0800, CRC(e33683ae) SHA1(0c1d9e320f82df05f4804992ef6f6f6cd20623f3), ROM_BIOS(1) )
 ROM_END
 
 
@@ -106,43 +107,46 @@ const tiny_rom_entry *abc99_device::device_rom_region() const
 //  ADDRESS_MAP( abc99_z2_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc99_device::abc99_z2_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(I8035_Z2_TAG, 0)
-ADDRESS_MAP_END
+void abc99_device::abc99_z2_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region(I8035_Z2_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc99_z2_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc99_device::abc99_z2_io)
-	AM_RANGE(0x21, 0x21) AM_WRITE(z2_led_w)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("X0") AM_WRITENOP
-	AM_RANGE(0x31, 0x31) AM_READ_PORT("X1") AM_WRITENOP
-	AM_RANGE(0x32, 0x32) AM_READ_PORT("X2") AM_WRITENOP
-	AM_RANGE(0x33, 0x33) AM_READ_PORT("X3") AM_WRITENOP
-	AM_RANGE(0x34, 0x34) AM_READ_PORT("X4") AM_WRITENOP
-	AM_RANGE(0x35, 0x35) AM_READ_PORT("X5") AM_WRITENOP
-	AM_RANGE(0x36, 0x36) AM_READ_PORT("X6") AM_WRITENOP
-	AM_RANGE(0x37, 0x37) AM_READ_PORT("X7") AM_WRITENOP
-	AM_RANGE(0x38, 0x38) AM_READ_PORT("X8") AM_WRITENOP
-	AM_RANGE(0x39, 0x39) AM_READ_PORT("X9") AM_WRITENOP
-	AM_RANGE(0x3a, 0x3a) AM_READ_PORT("X10") AM_WRITENOP
-	AM_RANGE(0x3b, 0x3b) AM_READ_PORT("X11") AM_WRITENOP
-	AM_RANGE(0x3c, 0x3c) AM_READ_PORT("X12") AM_WRITENOP
-	AM_RANGE(0x3d, 0x3d) AM_READ_PORT("X13") AM_WRITENOP
-	AM_RANGE(0x3e, 0x3e) AM_READ_PORT("X14") AM_WRITENOP
-	AM_RANGE(0x3f, 0x3f) AM_READ_PORT("X15") AM_WRITENOP
-ADDRESS_MAP_END
+void abc99_device::abc99_z2_io(address_map &map)
+{
+	map(0x21, 0x21).w(FUNC(abc99_device::z2_led_w));
+	map(0x30, 0x30).portr("X0").nopw();
+	map(0x31, 0x31).portr("X1").nopw();
+	map(0x32, 0x32).portr("X2").nopw();
+	map(0x33, 0x33).portr("X3").nopw();
+	map(0x34, 0x34).portr("X4").nopw();
+	map(0x35, 0x35).portr("X5").nopw();
+	map(0x36, 0x36).portr("X6").nopw();
+	map(0x37, 0x37).portr("X7").nopw();
+	map(0x38, 0x38).portr("X8").nopw();
+	map(0x39, 0x39).portr("X9").nopw();
+	map(0x3a, 0x3a).portr("X10").nopw();
+	map(0x3b, 0x3b).portr("X11").nopw();
+	map(0x3c, 0x3c).portr("X12").nopw();
+	map(0x3d, 0x3d).portr("X13").nopw();
+	map(0x3e, 0x3e).portr("X14").nopw();
+	map(0x3f, 0x3f).portr("X15").nopw();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc99_z5_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc99_device::abc99_z5_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION(I8035_Z5_TAG, 0)
-ADDRESS_MAP_END
+void abc99_device::abc99_z5_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom().region(I8035_Z5_TAG, 0);
+}
 
 
 //-------------------------------------------------
@@ -151,26 +155,26 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(abc99_device::device_add_mconfig)
 	// keyboard CPU
-	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL(6'000'000)/3) // from Z5 T0 output
-	MCFG_CPU_PROGRAM_MAP(abc99_z2_mem)
-	MCFG_CPU_IO_MAP(abc99_z2_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(abc99_device, z2_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(abc99_device, z2_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(abc99_device, z2_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(abc99_device, z2_t1_r))
+	MCFG_DEVICE_ADD(I8035_Z2_TAG, I8035, XTAL(6'000'000)/3) // from Z5 T0 output
+	MCFG_DEVICE_PROGRAM_MAP(abc99_z2_mem)
+	MCFG_DEVICE_IO_MAP(abc99_z2_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, abc99_device, z2_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, abc99_device, z2_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, abc99_device, z2_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, abc99_device, z2_t1_r))
 
 	// mouse CPU
-	MCFG_CPU_ADD(I8035_Z5_TAG, I8035, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(abc99_z5_mem)
-	//MCFG_MCS48_PORT_P1_IN_CB(READ8(abc99_device, z5_p1_r))
-	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc99_device, z5_p2_w))
+	MCFG_DEVICE_ADD(I8035_Z5_TAG, I8035, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(abc99_z5_mem)
+	//MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, abc99_device, z5_p1_r))
+	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, abc99_device, z5_p2_w))
 	//MCFG_MCS48_PORT_T0_CLK_CUSTOM() // Z2 CLK
-	//MCFG_MCS48_PORT_T1_IN_CB(READ8(abc99_device, z5_t1_r))
+	//MCFG_MCS48_PORT_T1_IN_CB(READ8(*this, abc99_device, z5_t1_r))
 	MCFG_DEVICE_DISABLE() // HACK fix for broken serial I/O
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -368,9 +372,9 @@ INPUT_PORTS_START( abc99 )
 	PORT_DIPSETTING(    0x08, "External PROM" )
 
 	PORT_START("MOUSEB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Middle Mouse Button") PORT_CODE(MOUSECODE_BUTTON3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Middle Mouse Button") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2)
 
 	PORT_START("MOUSEX")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
@@ -379,7 +383,7 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START("J4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc99_device, keyboard_reset, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc99_device, keyboard_reset, nullptr)
 INPUT_PORTS_END
 
 
@@ -475,6 +479,7 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	m_speaker(*this, "speaker"),
 	m_z14(*this, "Z14"),
 	m_mouseb(*this, "MOUSEB"),
+	m_leds(*this, "led%u", 0U),
 	m_si(1),
 	m_si_en(1),
 	m_so_z2(1),
@@ -495,6 +500,7 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 
 void abc99_device::device_start()
 {
+	m_leds.resolve();
 	// allocate timers
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
 	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL(6'000'000)/3), 0, MCS48_ALE_CLOCK(XTAL(6'000'000)/3));
@@ -570,14 +576,14 @@ WRITE8_MEMBER( abc99_device::z2_led_w )
 {
 	if (m_led_en) return;
 
-	machine().output().set_led_value(LED_1, BIT(data, 0));
-	machine().output().set_led_value(LED_2, BIT(data, 1));
-	machine().output().set_led_value(LED_3, BIT(data, 2));
-	machine().output().set_led_value(LED_4, BIT(data, 3));
-	machine().output().set_led_value(LED_5, BIT(data, 4));
-	machine().output().set_led_value(LED_6, BIT(data, 5));
-	machine().output().set_led_value(LED_7, BIT(data, 6));
-	machine().output().set_led_value(LED_8, BIT(data, 7));
+	m_leds[LED_1] = BIT(data, 0);
+	m_leds[LED_2] = BIT(data, 1);
+	m_leds[LED_3] = BIT(data, 2);
+	m_leds[LED_4] = BIT(data, 3);
+	m_leds[LED_5] = BIT(data, 4);
+	m_leds[LED_6] = BIT(data, 5);
+	m_leds[LED_7] = BIT(data, 6);
+	m_leds[LED_8] = BIT(data, 7);
 }
 
 
@@ -613,9 +619,9 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 	m_t1_z5 = BIT(data, 2);
 
 	// key LEDs
-	machine().output().set_led_value(LED_INS, BIT(data, 3));
-	machine().output().set_led_value(LED_ALT, BIT(data, 4));
-	machine().output().set_led_value(LED_CAPS_LOCK, BIT(data, 5));
+	m_leds[LED_INS] = BIT(data, 3);
+	m_leds[LED_ALT] = BIT(data, 4);
+	m_leds[LED_CAPS_LOCK] = BIT(data, 5);
 
 	// speaker output
 	m_speaker->level_w(!BIT(data, 6));

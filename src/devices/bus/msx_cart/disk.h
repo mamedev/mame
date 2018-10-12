@@ -58,6 +58,7 @@ protected:
 
 	void post_load();
 
+	output_finder<> m_led;
 	uint8_t m_side_control;
 	uint8_t m_control;
 
@@ -81,6 +82,7 @@ protected:
 
 	void post_load();
 
+	output_finder<> m_led;
 	uint8_t m_control;
 
 	void set_control(uint8_t data);

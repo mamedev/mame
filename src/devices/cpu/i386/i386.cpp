@@ -14,6 +14,7 @@
         Intel Pentium Pro
         Intel Pentium II
         Intel Pentium III
+        Amd Athlon XP
         Intel Pentium 4
 */
 
@@ -28,17 +29,18 @@
 /* seems to be defined on mingw-gcc */
 #undef i386
 
-DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "I386")
-DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "I386SX")
-DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "I486")
-DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "I486DX4")
-DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Pentium")
+DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "Intel I386")
+DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "Intel I386SX")
+DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "Intel I486")
+DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX4")
+DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
 DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
-DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Pentium Pro")
-DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Pentium MMX")
-DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Pentium II")
-DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Pentium III")
-DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Pentium 4")
+DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Intel Pentium Pro")
+DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
+DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Intel Pentium II")
+DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentium III")
+DEFINE_DEVICE_TYPE(ATHLONXP,    athlonxp_device,    "athlonxp",    "Amd Athlon XP")
+DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Intel Pentium 4")
 
 
 i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -50,14 +52,11 @@ i386_device::i386_device(const machine_config &mconfig, const char *tag, device_
 i386_device::i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
-	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
+	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0, 32, 12)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
 {
-	m_program_config.m_logaddr_width = 32;
-	m_program_config.m_page_shift = 12;
-
 	// 32 unified
 	set_vtlb_dynamic_entries(32);
 }
@@ -123,6 +122,13 @@ pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag,
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
+}
+
+athlonxp_device::athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pentium_device(mconfig, ATHLONXP, tag, owner, clock)
+{
+	// TODO: put correct value
+	set_vtlb_dynamic_entries(256);
 }
 
 pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -273,7 +279,7 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		{
 			if( !m_performed_intersegment_jump )
 				m_sreg[segment].base |= 0xfff00000;
-			if(m_cpu_version < 0x5000)
+			if(m_cpu_version < 0x500)
 				m_sreg[segment].flags = 0x93;
 		}
 	}
@@ -335,6 +341,7 @@ uint32_t i386_device::get_flags() const
 
 void i386_device::set_flags(uint32_t f )
 {
+	f &= m_eflags_mask;
 	m_CF = (f & 0x1) ? 1 : 0;
 	m_PF = (f & 0x4) ? 1 : 0;
 	m_AF = (f & 0x10) ? 1 : 0;
@@ -353,7 +360,7 @@ void i386_device::set_flags(uint32_t f )
 	m_VIF = (f & 0x80000) ? 1 : 0;
 	m_VIP = (f & 0x100000) ? 1 : 0;
 	m_ID = (f & 0x200000) ? 1 : 0;
-	m_eflags = f & m_eflags_mask;
+	m_eflags = f;
 }
 
 void i386_device::sib_byte(uint8_t mod, uint32_t* out_ea, uint8_t* out_segment)
@@ -773,7 +780,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 		if(trap_level >= 3)
 		{
 			logerror("IRQ: Triple fault. CPU reset.\n");
-			set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			return;
 		}
 
@@ -1720,7 +1727,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 		}
 		if (operand32 != 0)  // if 32-bit
 		{
-			if(i386_limit_check(SS, REG32(ESP) - 8))
+			uint32_t offset = (STACK_32BIT ? REG32(ESP) - 8 : (REG16(SP) - 8) & 0xffff);
+			if(i386_limit_check(SS, offset))
 			{
 				logerror("CALL (%08x): Stack has no room for return address.\n",m_pc);
 				FAULT(FAULT_SS,0)  // #SS(0)
@@ -1728,7 +1736,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 		}
 		else
 		{
-			if(i386_limit_check(SS, (REG16(SP) - 4) & 0xffff))
+			uint32_t offset = (STACK_32BIT ? REG32(ESP) - 4 : (REG16(SP) - 4) & 0xffff);
+			if(i386_limit_check(SS, offset))
 			{
 				logerror("CALL (%08x): Stack has no room for return address.\n",m_pc);
 				FAULT(FAULT_SS,0)  // #SS(0)
@@ -1978,7 +1987,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 					/* same privilege */
 					if (operand32 != 0)  // if 32-bit
 					{
-						if(i386_limit_check(SS, REG32(ESP) - 8))
+						uint32_t stkoff = (STACK_32BIT ? REG32(ESP) - 8 : (REG16(SP) - 8) & 0xffff);
+						if(i386_limit_check(SS, stkoff))
 						{
 							logerror("CALL: Stack has no room for return address.\n");
 							FAULT(FAULT_SS,0) // #SS(0)
@@ -1988,7 +1998,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 					}
 					else
 					{
-						if(i386_limit_check(SS, (REG16(SP) - 4) & 0xffff))
+						uint32_t stkoff = (STACK_32BIT ? REG32(ESP) - 4 : (REG16(SP) - 4) & 0xffff);
+						if(i386_limit_check(SS, stkoff))
 						{
 							logerror("CALL: Stack has no room for return address.\n");
 							FAULT(FAULT_SS,0) // #SS(0)
@@ -3227,7 +3238,18 @@ void i386_device::i386_common_init()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if(m_program->data_width() == 16) {
+		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address);  };
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address);  };
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+	} else {
+		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address);  };
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address);  };
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+	}
+
 	m_io = &space(AS_IO);
 	m_smi = false;
 	m_debugger_temp = 0;
@@ -3329,7 +3351,7 @@ void i386_device::i386_common_init()
 	m_ferr_handler.resolve_safe();
 	m_ferr_handler(0);
 
-	m_icountptr = &m_cycles;
+	set_icountptr(m_cycles);
 }
 
 void i386_device::device_start()
@@ -3964,7 +3986,7 @@ void i386_device::execute_run()
 		m_segment_prefix = 0;
 		m_prev_eip = m_eip;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if(m_delayed_interrupt_enable != 0)
 		{
@@ -4012,9 +4034,9 @@ int i386_device::get_mode() const
 	return m_sreg[CS].d ? 32 : 16;
 }
 
-util::disasm_interface *i386_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i386_device::create_disassembler()
 {
-	return new i386_disassembler(this);
+	return std::make_unique<i386_disassembler>(this);
 }
 
 /*****************************************************************************/
@@ -4492,6 +4514,76 @@ void pentium3_device::device_reset()
 	// [ 4:4] Time Stamp Counter
 	// [ D:D] PTE Global Bit
 	m_feature_flags = 0x00002011;       // TODO: enable relevant flags here
+
+	CHANGE_PC(m_eip);
+}
+
+/*****************************************************************************/
+/* AMD Athlon XP
+   Model: Athlon XP 2400+
+   Part number: AXDA2400DKV3C
+   Stepping code: AIUCP
+   Date code: 0240MPMW
+*/
+
+void athlonxp_device::device_start()
+{
+	i386_common_init();
+	register_state_i386_x87_xmm();
+
+	build_x87_opcode_table();
+	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+}
+
+void athlonxp_device::device_reset()
+{
+	zero_state();
+
+	m_sreg[CS].selector = 0xf000;
+	m_sreg[CS].base = 0xffff0000;
+	m_sreg[CS].limit = 0xffff;
+	m_sreg[CS].flags = 0x0093;
+
+	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
+	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
+
+	m_idtr.base = 0;
+	m_idtr.limit = 0x3ff;
+
+	m_a20_mask = ~0;
+
+	m_cr[0] = 0x60000010;
+	m_eflags = 0x00200000;
+	m_eflags_mask = 0x00277fd7; /* TODO: is this correct? */
+	m_eip = 0xfff0;
+	m_mxcsr = 0x1f80;
+	m_smm = false;
+	m_smi_latched = false;
+	m_smbase = 0x30000;
+	m_nmi_masked = false;
+	m_nmi_latched = false;
+
+	x87_reset();
+
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 6, Model 8, Stepping 1
+	REG32(EAX) = 0;
+	REG32(EDX) = (6 << 8) | (8 << 4) | (1);
+
+	m_cpuid_id0 = ('h' << 24) | ('t' << 16) | ('u' << 8) | 'A';   // Auth
+	m_cpuid_id1 = ('i' << 24) | ('t' << 16) | ('n' << 8) | 'e';   // enti
+	m_cpuid_id2 = ('D' << 24) | ('M' << 16) | ('A' << 8) | 'c';   // cAMD
+
+	m_cpuid_max_input_value_eax = 0x01;
+	m_cpu_version = REG32(EDX);
+
+	// see FEATURE_FLAGS enum for bit names
+	m_feature_flags = 0x0383fbff;
 
 	CHANGE_PC(m_eip);
 }

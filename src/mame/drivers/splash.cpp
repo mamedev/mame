@@ -73,22 +73,26 @@ WRITE_LINE_MEMBER(splash_state::coin2_counter_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-ADDRESS_MAP_START(splash_state::splash_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM                                                 /* ROM */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("pixelram")                        /* Pixel Layer */
-	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
-	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
-	;map(0x84000a, 0x84000b).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 3, data, mem_mask); }).umask16(0xff00);
-	AM_RANGE(0x84000e, 0x84000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
-	AM_RANGE(0x881804, 0x881fff) AM_RAM                                                 /* Work RAM */
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_SHARE("spriteram")                       /* Sprite RAM */
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM                                                 /* Work RAM */
-ADDRESS_MAP_END
+void splash_state::splash_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();                                                 /* ROM */
+	map(0x800000, 0x83ffff).ram().share("pixelram");                        /* Pixel Layer */
+	map(0x840000, 0x840001).portr("DSW1");
+	map(0x840002, 0x840003).portr("DSW2");
+	map(0x840004, 0x840005).portr("P1");
+	map(0x840006, 0x840007).portr("P2");
+	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w",
+												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
+												 });
+	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x880000, 0x8817ff).ram().w(FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
+	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
+	map(0x881804, 0x881fff).ram();                                                 /* Work RAM */
+	map(0x8c0000, 0x8c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* Palette is xRRRRxGGGGxBBBBx */
+	map(0x900000, 0x900fff).ram().share("spriteram");                       /* Sprite RAM */
+	map(0xffc000, 0xffffff).ram();                                                 /* Work RAM */
+}
 
 WRITE8_MEMBER(splash_state::splash_adpcm_data_w)
 {
@@ -102,18 +106,19 @@ WRITE8_MEMBER(splash_state::splash_adpcm_control_w)
 
 WRITE_LINE_MEMBER(splash_state::splash_msm5205_int)
 {
-	m_msm->data_w(m_adpcm_data >> 4);
+	m_msm->write_data(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
 }
 
-ADDRESS_MAP_START(splash_state::splash_sound_map)
-	AM_RANGE(0x0000, 0xd7ff) AM_ROM                                     /* ROM */
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)              /* ADPCM data for the MSM5205 chip */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(splash_adpcm_control_w)
-	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)  /* Sound latch */
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write) /* YM3812 */
-	AM_RANGE(0xf800, 0xffff) AM_RAM                                     /* RAM */
-ADDRESS_MAP_END
+void splash_state::splash_sound_map(address_map &map)
+{
+	map(0x0000, 0xd7ff).rom();                                     /* ROM */
+	map(0xd800, 0xd800).w(FUNC(splash_state::splash_adpcm_data_w));              /* ADPCM data for the MSM5205 chip */
+	map(0xe000, 0xe000).w(FUNC(splash_state::splash_adpcm_control_w));
+	map(0xe800, 0xe800).r(m_soundlatch, FUNC(generic_latch_8_device::read));  /* Sound latch */
+	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write)); /* YM3812 */
+	map(0xf800, 0xffff).ram();                                     /* RAM */
+}
 
 /* Return of Lady Frog Maps */
 /* note, sprite ram has moved, extra protection ram, and extra write for the pixel layer */
@@ -149,32 +154,37 @@ WRITE_LINE_MEMBER(splash_state::ym_irq)
 	roldfrog_update_irq();
 }
 
-ADDRESS_MAP_START(splash_state::roldfrog_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM                                                 /* ROM */
-	AM_RANGE(0x400000, 0x407fff) AM_ROM AM_SHARE("protdata")                        /* Protection Data */
-	AM_RANGE(0x408000, 0x4087ff) AM_RAM                                                 /* Extra Ram */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("pixelram")                        /* Pixel Layer */
-	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
-	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
-	;map(0x84000a, 0x84000b).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 3, data, mem_mask); }).umask16(0xff00);
-	AM_RANGE(0x84000e, 0x84000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
-	AM_RANGE(0x881804, 0x881fff) AM_RAM                                                 /* Work RAM */
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(roldfrog_bombs_r)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_SHARE("spriteram")                       /* Sprite RAM */
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITEONLY AM_SHARE("bitmap_mode")           /* Bitmap Mode? */
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM                                                 /* Work RAM */
-ADDRESS_MAP_END
+void splash_state::roldfrog_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();                                                 /* ROM */
+	map(0x400000, 0x407fff).rom().share("protdata");                        /* Protection Data */
+	map(0x408000, 0x4087ff).ram();                                                 /* Extra Ram */
+	map(0x800000, 0x83ffff).ram().share("pixelram");                        /* Pixel Layer */
+	map(0x840000, 0x840001).portr("DSW1");
+	map(0x840002, 0x840003).portr("DSW2");
+	map(0x840004, 0x840005).portr("P1");
+	map(0x840006, 0x840007).portr("P2");
+	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w",
+												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
+												 });
+	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x880000, 0x8817ff).ram().w(FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
+	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
+	map(0x881804, 0x881fff).ram();                                                 /* Work RAM */
+	map(0x8c0000, 0x8c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* Palette is xRRRRxGGGGxBBBBx */
+	map(0xa00000, 0xa00001).r(FUNC(splash_state::roldfrog_bombs_r));
+	map(0xd00000, 0xd00fff).ram().share("spriteram");                       /* Sprite RAM */
+	map(0xe00000, 0xe00001).writeonly().share("bitmap_mode");           /* Bitmap Mode? */
+	map(0xffc000, 0xffffff).ram();                                                 /* Work RAM */
+}
 
-ADDRESS_MAP_START(splash_state::roldfrog_sound_map)
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_ROMBANK("sound_bank")
-ADDRESS_MAP_END
+void splash_state::roldfrog_sound_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().bankr("sound_bank");
+}
 
 READ8_MEMBER(splash_state::roldfrog_unk_r)
 {
@@ -182,16 +192,17 @@ READ8_MEMBER(splash_state::roldfrog_unk_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(splash_state::roldfrog_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x31, 0x31) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x37, 0x37) AM_WRITE(roldfrog_vblank_ack_w )
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0x70, 0x70) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+void splash_state::roldfrog_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x11).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x31, 0x31).w(FUNC(splash_state::sound_bank_w));
+	map(0x37, 0x37).w(FUNC(splash_state::roldfrog_vblank_ack_w));
+	map(0x40, 0x40).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x70, 0x70).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
-	AM_RANGE(0x20, 0x23) AM_READ(roldfrog_unk_r)
-ADDRESS_MAP_END
+	map(0x20, 0x23).r(FUNC(splash_state::roldfrog_unk_r));
+}
 
 READ16_MEMBER(funystrp_state::spr_read)
 {
@@ -211,30 +222,33 @@ WRITE8_MEMBER(funystrp_state::eeprom_w)
 	m_eeprom->clk_write(BIT(data, 5));
 }
 
-ADDRESS_MAP_START(funystrp_state::funystrp_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                 /* ROM */
-	AM_RANGE(0x100000, 0x1fffff) AM_RAM                                                 /* protection? RAM */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("pixelram")                        /* Pixel Layer */
-	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
-	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
-	AM_RANGE(0x840008, 0x840009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x84000a, 0x84000b) AM_WRITE8(eeprom_w, 0xff00) AM_READNOP
-	AM_RANGE(0x84000e, 0x84000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
-	AM_RANGE(0x881804, 0x881fff) AM_RAM
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(spr_read, spr_write) AM_SHARE("spriteram")        /* Sprite RAM */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_MIRROR(0x10000) /* there's fe0000 <-> ff0000 compare */                /* Work RAM */
-ADDRESS_MAP_END
+void funystrp_state::funystrp_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                 /* ROM */
+	map(0x100000, 0x1fffff).ram();                                                 /* protection? RAM */
+	map(0x800000, 0x83ffff).ram().share("pixelram");                        /* Pixel Layer */
+	map(0x840000, 0x840001).portr("DSW1");
+	map(0x840002, 0x840003).portr("DSW2");
+	map(0x840004, 0x840005).portr("P1");
+	map(0x840006, 0x840007).portr("P2");
+	map(0x840008, 0x840009).portr("SYSTEM");
+	map(0x84000a, 0x84000b).nopr();
+	map(0x84000a, 0x84000a).w(FUNC(funystrp_state::eeprom_w));
+	map(0x84000e, 0x84000e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x880000, 0x8817ff).ram().w(FUNC(funystrp_state::vram_w)).share("videoram");   /* Video RAM */
+	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
+	map(0x881804, 0x881fff).ram();
+	map(0x8c0000, 0x8c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* Palette is xRRRRxGGGGxBBBBx */
+	map(0xd00000, 0xd01fff).rw(FUNC(funystrp_state::spr_read), FUNC(funystrp_state::spr_write)).share("spriteram");        /* Sprite RAM */
+	map(0xfe0000, 0xfeffff).ram().mirror(0x10000); /* there's fe0000 <-> ff0000 compare */                /* Work RAM */
+}
 
-ADDRESS_MAP_START(splash_state::funystrp_sound_map)
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_ROMBANK("sound_bank")
-ADDRESS_MAP_END
+void splash_state::funystrp_sound_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().bankr("sound_bank");
+}
 
 READ8_MEMBER(funystrp_state::int_source_r)
 {
@@ -265,16 +279,17 @@ WRITE8_MEMBER(funystrp_state::msm2_data_w)
 	m_msm_toggle2=0;
 }
 
-ADDRESS_MAP_START(funystrp_state::funystrp_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(msm1_data_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(msm2_data_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x04, 0x04) AM_READ(int_source_r)
-	AM_RANGE(0x06, 0x06) AM_WRITE(msm1_interrupt_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(msm2_interrupt_w)
-ADDRESS_MAP_END
+void funystrp_state::funystrp_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(funystrp_state::msm1_data_w));
+	map(0x01, 0x01).w(FUNC(funystrp_state::msm2_data_w));
+	map(0x02, 0x02).w(FUNC(funystrp_state::sound_bank_w));
+	map(0x03, 0x03).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x04, 0x04).r(FUNC(funystrp_state::int_source_r));
+	map(0x06, 0x06).w(FUNC(funystrp_state::msm1_interrupt_w));
+	map(0x07, 0x07).w(FUNC(funystrp_state::msm2_interrupt_w));
+}
 
 
 static INPUT_PORTS_START( splash )
@@ -423,7 +438,7 @@ static INPUT_PORTS_START( funystrp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_DIPNAME( 0x02, 0x02, "Clear EEPROM" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -453,7 +468,7 @@ static const gfx_layout tilelayout16 =
 	32*8
 };
 
-static GFXDECODE_START( splash )
+static GFXDECODE_START( gfx_splash )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout8 ,0,128 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16,0,128 )
 GFXDECODE_END
@@ -473,19 +488,19 @@ MACHINE_RESET_MEMBER(splash_state,splash)
 MACHINE_CONFIG_START(splash_state::splash)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12MHz (24/2) */
-	MCFG_CPU_PROGRAM_MAP(splash_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", splash_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12MHz (24/2) */
+	MCFG_DEVICE_PROGRAM_MAP(splash_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", splash_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(30'000'000)/8)     /* 3.75MHz (30/8) */
-	MCFG_CPU_PROGRAM_MAP(splash_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(splash_state, nmi_line_pulse, 60*64)   /* needed for the msm5205 to play the samples */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(30'000'000)/8)     /* 3.75MHz (30/8) */
+	MCFG_DEVICE_PROGRAM_MAP(splash_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(splash_state, nmi_line_pulse, 60*64)   /* needed for the msm5205 to play the samples */
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // A8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(splash_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(splash_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(splash_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(splash_state, coin2_counter_w))
+	LS259(config, m_outlatch); // A8
+	m_outlatch->q_out_cb<0>().set(FUNC(splash_state::coin1_lockout_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(splash_state::coin2_lockout_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(splash_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(splash_state::coin2_counter_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -496,7 +511,7 @@ MACHINE_CONFIG_START(splash_state::splash)
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -504,16 +519,16 @@ MACHINE_CONFIG_START(splash_state::splash)
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(30'000'000)/8)       /* 3.75MHz (30/8) */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(30'000'000)/8)       /* 3.75MHz (30/8) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(splash_state, splash_msm5205_int)) /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, splash_state, splash_msm5205_int)) /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz */     /* Sample rate = 384kHz/48 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -535,20 +550,20 @@ INTERRUPT_GEN_MEMBER(splash_state::roldfrog_interrupt)
 MACHINE_CONFIG_START(splash_state::roldfrog)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12 MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(roldfrog_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", splash_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12 MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(roldfrog_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", splash_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)     /* 3 MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(roldfrog_sound_map)
-	MCFG_CPU_IO_MAP(roldfrog_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", splash_state,  roldfrog_interrupt)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/8)     /* 3 MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(roldfrog_sound_map)
+	MCFG_DEVICE_IO_MAP(roldfrog_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", splash_state,  roldfrog_interrupt)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(splash_state, coin1_lockout_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(splash_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(splash_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(splash_state, coin2_counter_w))
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<1>().set(FUNC(splash_state::coin1_lockout_w));
+	m_outlatch->q_out_cb<1>().append(FUNC(splash_state::coin2_lockout_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(splash_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(splash_state::coin2_counter_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -559,7 +574,7 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -567,14 +582,14 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(splash_state, ym_irq))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, splash_state, ym_irq))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -585,7 +600,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int1)
 {
 	if (m_snd_interrupt_enable1  || m_msm_toggle1 == 1)
 	{
-		m_msm1->data_w(m_msm_data1 >> 4);
+		m_msm1->write_data(m_msm_data1 >> 4);
 		m_msm_data1 <<= 4;
 		m_msm_toggle1 ^= 1;
 		if (m_msm_toggle1 == 0)
@@ -600,7 +615,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int2)
 {
 	if (m_snd_interrupt_enable2 || m_msm_toggle2 == 1)
 	{
-		m_msm2->data_w(m_msm_data2 >> 4);
+		m_msm2->write_data(m_msm_data2 >> 4);
 		m_msm_data2 <<= 4;
 		m_msm_toggle2 ^= 1;
 		if (m_msm_toggle2 == 0)
@@ -629,15 +644,15 @@ void funystrp_state::machine_start()
 MACHINE_CONFIG_START(funystrp_state::funystrp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12 MHz (24/2) */
-	MCFG_CPU_PROGRAM_MAP(funystrp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funystrp_state, irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12 MHz (24/2) */
+	MCFG_DEVICE_PROGRAM_MAP(funystrp_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funystrp_state, irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4)     /* 6MHz (24/4) */
-	MCFG_CPU_PROGRAM_MAP(funystrp_sound_map)
-	MCFG_CPU_IO_MAP(funystrp_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/4)     /* 6MHz (24/4) */
+	MCFG_DEVICE_PROGRAM_MAP(funystrp_sound_map)
+	MCFG_DEVICE_IO_MAP(funystrp_sound_io_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -648,23 +663,23 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	MCFG_SCREEN_UPDATE_DRIVER(funystrp_state, screen_update_funystrp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(funystrp_state, adpcm_int1))         /* interrupt function */
+	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(400'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, funystrp_state, adpcm_int1))         /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 1 / 48 */       /* Sample rate = 400kHz/64 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(funystrp_state, adpcm_int2))         /* interrupt function */
+	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(400'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, funystrp_state, adpcm_int2))         /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 */       /* Sample rate = 400kHz/96 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -822,6 +837,17 @@ ROM_START( rebus )
 	ROM_LOAD( "11.u103", 0x20000, 0x20000, CRC(0af65b78) SHA1(9522ad17d26d866e5b11b4fec47781a00a297977) )
 	ROM_LOAD( "12.u104", 0x40000, 0x20000, CRC(3ed6ce19) SHA1(0d574071053157e4ef973a844795e48ec69dc7c4) )
 	ROM_LOAD( "13.u105", 0x60000, 0x20000, CRC(8b54553d) SHA1(5cb776e551527b0e717fe0d76296f5f895523de5) )
+
+	ROM_REGION( 0x1200, "plds", 0 ) // all protected
+	ROM_LOAD( "hy18cv8s",   0x0000, 0x200, NO_DUMP ) // not actual size
+	ROM_LOAD( "gal16v8.0",  0x0200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.1",  0x0400, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.2",  0x0600, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.3",  0x0800, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.4",  0x0a00, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8h.0", 0x0c00, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8h.1", 0x0e00, 0x117, NO_DUMP )
+	ROM_LOAD( "pal20v8h",   0x1000, 0x157, NO_DUMP )
 ROM_END
 
 
@@ -844,6 +870,12 @@ ROM_START( splash )
 	ROM_LOAD( "15i", 0x020000, 0x020000, CRC(2a8cb830) SHA1(bc54dfb03fade154085aa2f66784e07664a7a3d8) )
 	ROM_LOAD( "16i", 0x040000, 0x020000, CRC(21aeff2c) SHA1(0c307e94f4a814c674ba0ab471a6bdd57e43c265) )
 	ROM_LOAD( "13i", 0x060000, 0x020000, CRC(febb9893) SHA1(bb607a608c6c1658748a17a62431e8c30323c7ec) )
+
+	ROM_REGION( 0x800, "plds", 0 ) // all protected
+	ROM_LOAD( "a1020a-pl84c.g14",  0x000, 0x200, NO_DUMP ) // not actual size
+	ROM_LOAD( "gal16v8a-25lp.c13", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.d5",  0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.f4",  0x600, 0x157, NO_DUMP )
 ROM_END
 
 ROM_START( splash10 )
@@ -865,6 +897,12 @@ ROM_START( splash10 )
 	ROM_LOAD( "15i", 0x020000, 0x020000, CRC(2a8cb830) SHA1(bc54dfb03fade154085aa2f66784e07664a7a3d8) )
 	ROM_LOAD( "16i", 0x040000, 0x020000, CRC(21aeff2c) SHA1(0c307e94f4a814c674ba0ab471a6bdd57e43c265) )
 	ROM_LOAD( "13i", 0x060000, 0x020000, CRC(febb9893) SHA1(bb607a608c6c1658748a17a62431e8c30323c7ec) )
+
+	ROM_REGION( 0x800, "plds", 0 ) // all protected
+	ROM_LOAD( "a1020a-pl84c.g14",  0x000, 0x200, NO_DUMP ) // not actual size
+	ROM_LOAD( "gal16v8a-25lp.c13", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.d5",  0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.f4",  0x600, 0x157, NO_DUMP )
 ROM_END
 
 /***************************************************************************
@@ -930,6 +968,12 @@ ROM_START( paintlad )
 	ROM_LOAD( "11.15i", 0x020000, 0x020000, CRC(6e4d598f) SHA1(b5b0d65c50ec469b5ffcd6187ca3aacddd97a477) )
 	ROM_LOAD( "12.16i", 0x040000, 0x020000, CRC(15761eb5) SHA1(61a47dad0e70ff4f1ae7f56ee529d2987eab1997) )
 	ROM_LOAD( "10.13i", 0x060000, 0x020000, CRC(92a0eff8) SHA1(e27a73791d499b0449251ea0678d9a34040e9883) )
+
+	ROM_REGION( 0x800, "plds", 0 ) // all protected
+	ROM_LOAD( "a1020a-pl84c.g14",  0x000, 0x200, NO_DUMP ) // not actual size
+	ROM_LOAD( "gal16v8a-25lp.c13", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.d5",  0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.f4",  0x600, 0x157, NO_DUMP )
 ROM_END
 
 /*
@@ -1031,28 +1075,28 @@ ROM_END
 
 /* DRIVER INITs */
 
-DRIVER_INIT_MEMBER(splash_state,splash)
+void splash_state::init_splash()
 {
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 8;
 }
 
-DRIVER_INIT_MEMBER(splash_state,splash10)
+void splash_state::init_splash10()
 {
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 0;
 }
 
-DRIVER_INIT_MEMBER(splash_state,roldfrog)
+void splash_state::init_roldfrog()
 {
-	uint8_t * ROM = (uint8_t *)memregion("audiocpu")->base();
+	uint8_t *ROM = (uint8_t*)memregion("audiocpu")->base();
 	membank("sound_bank")->configure_entries(0, 16, &ROM[0x10000], 0x8000);
 
 	m_bitmap_type = 1;
 	m_sprite_attr2_shift = 8;
 }
 
-DRIVER_INIT_MEMBER(splash_state,rebus)
+void splash_state::init_rebus()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1393,7 +1437,7 @@ WRITE16_MEMBER(funystrp_state::protection_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(funystrp_state,funystrp)
+void funystrp_state::init_funystrp()
 {
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 0;
@@ -1406,13 +1450,13 @@ DRIVER_INIT_MEMBER(funystrp_state,funystrp)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x1fffff, read16_delegate(FUNC(funystrp_state::protection_r),this));
 }
 
-GAME( 1992, splash,   0,        splash,   splash,   splash_state, splash,   ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.2 World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, splash10, splash,   splash,   splash,   splash_state, splash10, ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.0 World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, paintlad, splash,   splash,   splash,   splash_state, splash,   ROT0, "Gaelco / OMK Software",  "Painted Lady (Splash) (Ver. 1.3 US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, splash,   0,        splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.2 World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, splash10, splash,   splash,   splash,   splash_state,   init_splash10, ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.0 World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, paintlad, splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",  "Painted Lady (Splash) (Ver. 1.3 US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, roldfrog, 0,        roldfrog, splash,   splash_state, roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, roldfroga,roldfrog, roldfrog, splash,   splash_state, roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, rebus,    0,        roldfrog, splash,   splash_state, rebus,    ROT0, "Microhard",              "Rebus", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, funystrp, 0,        funystrp, funystrp, funystrp_state, funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, puckpepl, funystrp, funystrp, funystrp, funystrp_state, funystrp, ROT0, "Microhard",              "Puck People", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, ringball, funystrp, funystrp, funystrp, funystrp_state, funystrp, ROT0, "Microhard",              "Ring & Ball (unknown title)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Wouldn't surprise me if in-game is actually called King & Bell ...
+GAME( 1993, roldfrog, 0,        roldfrog, splash,   splash_state,   init_roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, roldfroga,roldfrog, roldfrog, splash,   splash_state,   init_roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, rebus,    0,        roldfrog, splash,   splash_state,   init_rebus,    ROT0, "Microhard",              "Rebus", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, funystrp, 0,        funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, puckpepl, funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Puck People", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, ringball, funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Ring & Ball (unknown title)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Wouldn't surprise me if in-game is actually called King & Bell ...

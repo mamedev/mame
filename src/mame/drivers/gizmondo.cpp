@@ -34,7 +34,6 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 #include "machine/docg3.h"
 #include "machine/s3c2440.h"
 #include "video/gf4500.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -53,12 +52,17 @@ public:
 		m_gf4500(*this, "gf4500")
 		{ }
 
+	void gizmondo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+
+	void init_gizmondo();
+
+private:
 	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
-	DECLARE_DRIVER_INIT(gizmondo);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<cpu_device> m_maincpu;
 	required_device<gf4500_device> m_gf4500;
@@ -66,7 +70,6 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
 
 	bitmap_rgb32 m_bitmap;
-	void gizmondo(machine_config &config);
 	void gizmondo_map(address_map &map);
 };
 
@@ -167,27 +170,28 @@ void gizmondo_state::machine_reset()
     ADDRESS MAPS
 *******************************************************************************/
 
-ADDRESS_MAP_START(gizmondo_state::gizmondo_map)
-	AM_RANGE(0x00000000, 0x000007ff) AM_ROM
-	AM_RANGE(0x00000800, 0x00000fff) AM_DEVREADWRITE16("diskonchip", diskonchip_g3_device, sec_1_r, sec_1_w, 0xffffffff)
-	AM_RANGE(0x00001000, 0x000017ff) AM_DEVREADWRITE16("diskonchip", diskonchip_g3_device, sec_2_r, sec_2_w, 0xffffffff)
-	AM_RANGE(0x00001800, 0x00001fff) AM_DEVREADWRITE16("diskonchip", diskonchip_g3_device, sec_3_r, sec_3_w, 0xffffffff)
-	AM_RANGE(0x30000000, 0x33ffffff) AM_RAM
-	AM_RANGE(0x34000000, 0x3413ffff) AM_DEVREADWRITE("gf4500", gf4500_device, read, write)
-ADDRESS_MAP_END
+void gizmondo_state::gizmondo_map(address_map &map)
+{
+	map(0x00000000, 0x000007ff).rom();
+	map(0x00000800, 0x00000fff).rw("diskonchip", FUNC(diskonchip_g3_device::sec_1_r), FUNC(diskonchip_g3_device::sec_1_w));
+	map(0x00001000, 0x000017ff).rw("diskonchip", FUNC(diskonchip_g3_device::sec_2_r), FUNC(diskonchip_g3_device::sec_2_w));
+	map(0x00001800, 0x00001fff).rw("diskonchip", FUNC(diskonchip_g3_device::sec_3_r), FUNC(diskonchip_g3_device::sec_3_w));
+	map(0x30000000, 0x33ffffff).ram();
+	map(0x34000000, 0x3413ffff).rw(m_gf4500, FUNC(gf4500_device::read), FUNC(gf4500_device::write));
+}
 
 /*******************************************************************************
     MACHINE DRIVERS
 *******************************************************************************/
 
-DRIVER_INIT_MEMBER(gizmondo_state,gizmondo)
+void gizmondo_state::init_gizmondo()
 {
 	// do nothing
 }
 
 MACHINE_CONFIG_START(gizmondo_state::gizmondo)
-	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
-	MCFG_CPU_PROGRAM_MAP(gizmondo_map)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(gizmondo_map)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
@@ -198,15 +202,13 @@ MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 240 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("gf4500", gf4500_device, screen_update)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 	MCFG_GF4500_ADD("gf4500")
 
 	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
 	MCFG_S3C2440_PALETTE("palette")
 	MCFG_S3C2440_SCREEN("screen")
-	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(gizmondo_state, s3c2440_gpio_port_r))
-	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(gizmondo_state, s3c2440_gpio_port_w))
+	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(*this, gizmondo_state, s3c2440_gpio_port_r))
+	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(*this, gizmondo_state, s3c2440_gpio_port_w))
 
 	MCFG_DISKONCHIP_G3_ADD("diskonchip", 64)
 
@@ -247,7 +249,7 @@ INPUT_PORTS_END
 ROM_START( gizmondo )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "fboot", "fboot" )
-	ROMX_LOAD( "fboot.bin", 0, 0x800, CRC(28887c29) SHA1(e625caaa63b9db74cb6d7499dce12ac758c5fe76), ROM_BIOS(1) )
+	ROMX_LOAD( "fboot.bin", 0, 0x800, CRC(28887c29) SHA1(e625caaa63b9db74cb6d7499dce12ac758c5fe76), ROM_BIOS(0) )
 ROM_END
 
-CONS(2005, gizmondo, 0, 0, gizmondo, gizmondo, gizmondo_state, gizmondo, "Tiger Telematics", "Gizmondo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+CONS(2005, gizmondo, 0, 0, gizmondo, gizmondo, gizmondo_state, init_gizmondo, "Tiger Telematics", "Gizmondo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

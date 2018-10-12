@@ -69,10 +69,9 @@ nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, de
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
-	m_assembled_tag(util::string_format("%s:%s", tag, XCEEDMC30_SCREEN_NAME))
+	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
 {
-	set_screen(m_assembled_tag.c_str());
+	set_screen(*this, XCEEDMC30_SCREEN_NAME);
 }
 
 //-------------------------------------------------
@@ -264,18 +263,18 @@ WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
 			break;
 
 		case 0x100000:
-//            logerror("%08x to DAC control %s\n", data, machine().describe_context());
+//            logerror("%s %08x to DAC control\n", machine().describe_context(), data);
 			m_clutoffs = (data&0xff);
 			m_count = 0;
 			break;
 
 		case 0x100001:
-//            printf("%08x to DAC data %s\n", data, machine().describe_context());
+//            printf("%s %08x to DAC data\n", machine().describe_context().c_str(), data);
 			m_colors[m_count++] = ((data>>24) & 0xff);
 
 			if (m_count == 3)
 			{
-//                printf("RAMDAC: color %02x = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
+//                printf("%s RAMDAC: color %02x = %02x %02x %02x\n", machine().describe_context().c_str(), m_clutoffs, m_colors[0], m_colors[1], m_colors[2]);
 				m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
@@ -299,7 +298,7 @@ WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
 			break;
 
 		default:
-//            printf("xceedmc30_w: %08x @ %x, mask %08x %s\n", data, offset, mem_mask, machine().describe_context());
+//            printf("%s xceedmc30_w: %08x @ %x, mask %08x\n", machine().describe_context().c_str(), data, offset, mem_mask);
 			break;
 	}
 }

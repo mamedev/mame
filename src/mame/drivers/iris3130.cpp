@@ -43,9 +43,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h" /* TOD clock */
 #include "machine/mc68681.h" /* DUART0, DUART1 */
-#include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class sgi_ip2_state : public driver_device
 {
@@ -62,6 +60,11 @@ public:
 	{
 	}
 
+	void sgi_ip2(machine_config &config);
+
+	void init_sgi_ip2();
+
+private:
 	DECLARE_READ8_MEMBER(sgi_ip2_m_but_r);
 	DECLARE_WRITE8_MEMBER(sgi_ip2_m_but_w);
 	DECLARE_READ16_MEMBER(sgi_ip2_m_quad_r);
@@ -89,20 +92,18 @@ public:
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stkbase_w);
 	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
-	DECLARE_DRIVER_INIT(sgi_ip2);
 	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 	required_device<cpu_device> m_maincpu;
-	void sgi_ip2(machine_config &config);
 	void sgi_ip2_map(address_map &map);
-protected:
+
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<mc68681_device> m_duarta;
 	required_device<mc68681_device> m_duartb;
 	required_shared_ptr<uint32_t> m_bss;
 	required_shared_ptr<uint32_t> m_ptmap;
 	required_device<mc146818_device> m_rtc;
-private:
+
 	uint8_t m_mbut;
 	uint16_t m_mquad;
 	uint16_t m_tdbase;
@@ -131,7 +132,7 @@ inline void ATTR_PRINTF(3,4) sgi_ip2_state::verboselog( int n_level, const char 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", machine().device("maincpu")->safe_pc(), buf);
+		logerror("%s: %s", machine().describe_context(), buf);
 	}
 #endif
 }
@@ -374,28 +375,29 @@ void sgi_ip2_state::machine_reset()
 ***************************************************************************/
 
 
-ADDRESS_MAP_START(sgi_ip2_state::sgi_ip2_map)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x02100000, 0x0210ffff) AM_RAM AM_SHARE("bss") // ??? I don't understand the need for this...
-	AM_RANGE(0x30000000, 0x30017fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8(sgi_ip2_m_but_r,         sgi_ip2_m_but_w,        0xffffffff)
-	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16(sgi_ip2_m_quad_r,       sgi_ip2_m_quad_w,       0xffffffff)
-	AM_RANGE(0x31800000, 0x31800003) AM_READ16(sgi_ip2_swtch_r,                                     0xffffffff)
-	AM_RANGE(0x32000000, 0x3200000f) AM_DEVREADWRITE8("duart68681a", mc68681_device, read, write,   0xffffffff)
-	AM_RANGE(0x32800000, 0x3280000f) AM_DEVREADWRITE8("duart68681b", mc68681_device, read, write,   0xffffffff)
-	AM_RANGE(0x33000000, 0x330007ff) AM_RAM
-	AM_RANGE(0x34000000, 0x34000003) AM_READWRITE8(sgi_ip2_clock_ctl_r,     sgi_ip2_clock_ctl_w,    0xffffffff)
-	AM_RANGE(0x35000000, 0x35000003) AM_READWRITE8(sgi_ip2_clock_data_r,    sgi_ip2_clock_data_w,   0xffffffff)
-	AM_RANGE(0x36000000, 0x36000003) AM_READWRITE8(sgi_ip2_os_base_r,       sgi_ip2_os_base_w,      0xffffffff)
-	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE16(sgi_ip2_status_r,       sgi_ip2_status_w,       0xffffffff)
-	AM_RANGE(0x39000000, 0x39000003) AM_READWRITE8(sgi_ip2_parctl_r,        sgi_ip2_parctl_w,       0xffffffff)
-	AM_RANGE(0x3a000000, 0x3a000003) AM_READWRITE8(sgi_ip2_mbp_r,           sgi_ip2_mbp_w,          0xffffffff)
-	AM_RANGE(0x3b000000, 0x3b003fff) AM_READWRITE(sgi_ip2_ptmap_r, sgi_ip2_ptmap_w) AM_SHARE("ptmap")
-	AM_RANGE(0x3c000000, 0x3c000003) AM_READWRITE16(sgi_ip2_tdbase_r,       sgi_ip2_tdbase_w,       0xffffffff)
-	AM_RANGE(0x3d000000, 0x3d000003) AM_READWRITE16(sgi_ip2_tdlmt_r,        sgi_ip2_tdlmt_w,        0xffffffff)
-	AM_RANGE(0x3e000000, 0x3e000003) AM_READWRITE16(sgi_ip2_stkbase_r,      sgi_ip2_stkbase_w,      0xffffffff)
-	AM_RANGE(0x3f000000, 0x3f000003) AM_READWRITE16(sgi_ip2_stklmt_r,       sgi_ip2_stklmt_w,       0xffffffff)
-ADDRESS_MAP_END
+void sgi_ip2_state::sgi_ip2_map(address_map &map)
+{
+	map(0x00000000, 0x00ffffff).ram().share("mainram");
+	map(0x02100000, 0x0210ffff).ram().share("bss"); // ??? I don't understand the need for this...
+	map(0x30000000, 0x30017fff).rom().region("maincpu", 0);
+	map(0x30800000, 0x30800003).rw(FUNC(sgi_ip2_state::sgi_ip2_m_but_r), FUNC(sgi_ip2_state::sgi_ip2_m_but_w));
+	map(0x31000000, 0x31000003).rw(FUNC(sgi_ip2_state::sgi_ip2_m_quad_r), FUNC(sgi_ip2_state::sgi_ip2_m_quad_w));
+	map(0x31800000, 0x31800003).r(FUNC(sgi_ip2_state::sgi_ip2_swtch_r));
+	map(0x32000000, 0x3200000f).rw(m_duarta, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
+	map(0x32800000, 0x3280000f).rw(m_duartb, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
+	map(0x33000000, 0x330007ff).ram();
+	map(0x34000000, 0x34000003).rw(FUNC(sgi_ip2_state::sgi_ip2_clock_ctl_r), FUNC(sgi_ip2_state::sgi_ip2_clock_ctl_w));
+	map(0x35000000, 0x35000003).rw(FUNC(sgi_ip2_state::sgi_ip2_clock_data_r), FUNC(sgi_ip2_state::sgi_ip2_clock_data_w));
+	map(0x36000000, 0x36000003).rw(FUNC(sgi_ip2_state::sgi_ip2_os_base_r), FUNC(sgi_ip2_state::sgi_ip2_os_base_w));
+	map(0x38000000, 0x38000003).rw(FUNC(sgi_ip2_state::sgi_ip2_status_r), FUNC(sgi_ip2_state::sgi_ip2_status_w));
+	map(0x39000000, 0x39000003).rw(FUNC(sgi_ip2_state::sgi_ip2_parctl_r), FUNC(sgi_ip2_state::sgi_ip2_parctl_w));
+	map(0x3a000000, 0x3a000003).rw(FUNC(sgi_ip2_state::sgi_ip2_mbp_r), FUNC(sgi_ip2_state::sgi_ip2_mbp_w));
+	map(0x3b000000, 0x3b003fff).rw(FUNC(sgi_ip2_state::sgi_ip2_ptmap_r), FUNC(sgi_ip2_state::sgi_ip2_ptmap_w)).share("ptmap");
+	map(0x3c000000, 0x3c000003).rw(FUNC(sgi_ip2_state::sgi_ip2_tdbase_r), FUNC(sgi_ip2_state::sgi_ip2_tdbase_w));
+	map(0x3d000000, 0x3d000003).rw(FUNC(sgi_ip2_state::sgi_ip2_tdlmt_r), FUNC(sgi_ip2_state::sgi_ip2_tdlmt_w));
+	map(0x3e000000, 0x3e000003).rw(FUNC(sgi_ip2_state::sgi_ip2_stkbase_r), FUNC(sgi_ip2_state::sgi_ip2_stkbase_w));
+	map(0x3f000000, 0x3f000003).rw(FUNC(sgi_ip2_state::sgi_ip2_stklmt_r), FUNC(sgi_ip2_state::sgi_ip2_stklmt_w));
+}
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -422,21 +424,21 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sgi_ip2_state::sgi_ip2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020, 16000000)
-	MCFG_CPU_PROGRAM_MAP(sgi_ip2_map)
+	MCFG_DEVICE_ADD("maincpu", M68020, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(sgi_ip2_map)
 
-	MCFG_DEVICE_ADD( "duart68681a", MC68681, XTAL(3'686'400) ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duarta_irq_handler))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("duart68681a", MC68681, 3.6864_MHz_XTAL) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, sgi_ip2_state, duarta_irq_handler))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD( "duart68681b", MC68681, XTAL(3'686'400) ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duartb_irq_handler))
+	MCFG_DEVICE_ADD("duart68681b", MC68681, 3.6864_MHz_XTAL) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, sgi_ip2_state, duartb_irq_handler))
 
-	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
+	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681a", mc68681_device, rx_b_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", ip2_terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart68681a", mc68681_device, rx_b_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", ip2_terminal)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip2 )
@@ -487,7 +489,7 @@ static INPUT_PORTS_START( sgi_ip2 )
 
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(sgi_ip2_state,sgi_ip2)
+void sgi_ip2_state::init_sgi_ip2()
 {
 	uint32_t *src = (uint32_t*)(memregion("maincpu")->base());
 	uint32_t *dst = m_mainram;
@@ -509,5 +511,5 @@ ROM_START( sgi_ip2 )
 	ROM_LOAD( "sgi-ip2-u93.ip2.2-008.od",  0x10000, 0x8000, CRC(bf967590) SHA1(1aac48e4f5531a25c5482f64de5cd3c7a9931f11) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT    STATE           INIT     COMPANY                 FULLNAME           FLAGS
-COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2, sgi_ip2_state,  sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME           FLAGS
+COMP( 1985, sgi_ip2, 0,      0,      sgi_ip2, sgi_ip2, sgi_ip2_state, init_sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NOT_WORKING )

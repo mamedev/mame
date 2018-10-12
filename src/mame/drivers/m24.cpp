@@ -33,6 +33,10 @@ public:
 		m_keyboard(*this, "keyboard"),
 		m_z8000_apb(*this, "z8000_apb")
 	{ }
+
+	void olivetti(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<cpu_device> m_kbc;
@@ -56,7 +60,6 @@ public:
 	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 	static void cfg_m20_format(device_t *device);
-	void olivetti(machine_config &config);
 	void kbc_map(address_map &map);
 	void m24_io(address_map &map);
 	void m24_map(address_map &map);
@@ -175,25 +178,28 @@ WRITE_LINE_MEMBER(m24_state::halt_i86_w)
 	m_i86_halt = state ? true : false;
 }
 
-ADDRESS_MAP_START(m24_state::m24_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void m24_state::m24_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf8000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(m24_state::m24_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
-	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(keyboard_r, keyboard_w, 0xffff)
-	AM_RANGE(0x0066, 0x0067) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("mm58174an", mm58274c_device, read, write, 0xffff)
-	AM_RANGE(0x80c0, 0x80c1) AM_DEVREADWRITE8("z8000_apb", m24_z8000_device, handshake_r, handshake_w, 0xff00)
-ADDRESS_MAP_END
+void m24_state::m24_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x0060, 0x0065).rw(FUNC(m24_state::keyboard_r), FUNC(m24_state::keyboard_w));
+	map(0x0066, 0x0067).portr("DSW0");
+	map(0x0070, 0x007f).rw("mm58174an", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
+	map(0x80c1, 0x80c1).rw(m_z8000_apb, FUNC(m24_z8000_device::handshake_r), FUNC(m24_z8000_device::handshake_w));
+}
 
-ADDRESS_MAP_START(m24_state::kbc_map)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(kbcdata_r)
-	AM_RANGE(0xa000, 0xafff) AM_WRITE(kbcdata_w)
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("kbc", 0)
-ADDRESS_MAP_END
+void m24_state::kbc_map(address_map &map)
+{
+	map(0x8000, 0x8fff).r(FUNC(m24_state::kbcdata_r));
+	map(0xa000, 0xafff).w(FUNC(m24_state::kbcdata_w));
+	map(0xf800, 0xffff).rom().region("kbc", 0);
+}
 
 static INPUT_PORTS_START( m24 )
 	PORT_START("DSW0")
@@ -251,46 +257,43 @@ void m24_state::cfg_m20_format(device_t *device)
 
 MACHINE_CONFIG_START(m24_state::olivetti)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(m24_map)
-	MCFG_CPU_IO_MAP(m24_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(m24_map)
+	MCFG_DEVICE_IO_MAP(m24_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "mb1", pc_isa8_cards, "cga_m24", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "mb2", pc_isa8_cards, "fdc_xt", true)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("mb1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga_m24", true)
+	MCFG_DEVICE_ADD("mb2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_m20_format)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "mb3", pc_isa8_cards, "lpt", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "mb4", pc_isa8_cards, "com", true)
+	MCFG_DEVICE_ADD("mb3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", true)
+	MCFG_DEVICE_ADD("mb4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", true)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
-	MCFG_CPU_ADD("kbc", TMS7000, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(kbc_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(m24_state, pa_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(m24_state, pb_w))
+	MCFG_DEVICE_ADD("kbc", TMS7000, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(kbc_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, m24_state, pa_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, m24_state, pb_w))
 
 	MCFG_DEVICE_ADD("keyboard", M24_KEYBOARD, 0)
-	MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(m24_state, kbcin_w))
+	MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(*this, m24_state, kbcin_w))
 
 	MCFG_DEVICE_ADD("mm58174an", MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // ?
 	MCFG_MM58274C_DAY1(1)   // ?
 
 	MCFG_DEVICE_ADD("z8000_apb", M24_Z8000, 0)
-	MCFG_M24_Z8000_HALT(WRITELINE(m24_state, halt_i86_w))
-	MCFG_DEVICE_MODIFY("mb:dma8237")
-	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE(":", m24_state, dma_hrq_w))
-	MCFG_DEVICE_MODIFY("mb:pic8259")
-	devcb = &downcast<pic8259_device &>(*device).set_out_int_callback(DEVCB_DEVWRITELINE(":", m24_state, int_w));
+	MCFG_M24_Z8000_HALT(WRITELINE(*this, m24_state, halt_i86_w))
+	subdevice<am9517a_device>("mb:dma8237")->out_hreq_callback().set(FUNC(m24_state::dma_hrq_w));
+	subdevice<pic8259_device>("mb:pic8259")->out_int_callback().set(FUNC(m24_state::int_w));
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
@@ -315,5 +318,5 @@ ROM_START( m240 )
 	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
 
-COMP( 1983, m24,        ibm5150,    0,          olivetti,   m24, m24_state,      0,      "Olivetti", "M24",  MACHINE_NOT_WORKING )
-COMP( 1987, m240,       ibm5150,    0,          olivetti,   m24, m24_state,      0,      "Olivetti", "M240", MACHINE_NOT_WORKING )
+COMP( 1983, m24,  ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M24",  MACHINE_NOT_WORKING )
+COMP( 1987, m240, ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M240", MACHINE_NOT_WORKING )

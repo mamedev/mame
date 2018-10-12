@@ -7,10 +7,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tx1.h"
 
-#include "sound/ay8910.h"
+#include "audio/tx1.h"
+#include "cpu/z80/z80.h"
+#include "includes/tx1.h"
 #include "video/resnet.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -21,7 +23,7 @@
 
 /* RC oscillator: 1785Hz */
 #define TX1_NOISE_CLOCK     (1/(1000.0e-12 * 560000.0))
-#define TX1_PIT_CLOCK       (TX1_PIXEL_CLOCK / 16)
+#define TX1_PIT_CLOCK       (clock() / 16)
 #define TX1_FRAC            30
 
 #define TX1_SHUNT           (250.0)
@@ -52,16 +54,25 @@ static const double tx1_engine_gains[16] =
 };
 
 
-DEFINE_DEVICE_TYPE(TX1, tx1_sound_device, "tx1_sound", "TX-1 Custom Sound")
+DEFINE_DEVICE_TYPE(TX1_SOUND, tx1_sound_device, "tx1_sound", "TX-1 Custom Sound")
+DEFINE_DEVICE_TYPE(TX1J_SOUND, tx1j_sound_device, "tx1j_sound", "TX-1 Custom Sound (Japan)")
 
 tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tx1_sound_device(mconfig, TX1, tag, owner, clock)
+	: tx1_sound_device(mconfig, TX1_SOUND, tag, owner, clock)
 {
 }
 
 tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		m_audiocpu(*this, "audio_cpu"),
+		m_z80_ram(*this, "z80_ram"),
+		m_ppi(*this, "ppi8255"),
+		m_dsw(*this, "DSW"),
+		m_steering(*this, "AN_STEERING"),
+		m_accelerator(*this, "AN_ACCELERATOR"),
+		m_brake(*this, "AN_BRAKE"),
+		m_ppi_portd(*this, "PPI_PORTD"),
 		m_stream(nullptr),
 		m_freq_to_step(0),
 		m_step0(0),
@@ -80,6 +91,11 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type ty
 		m_ym1_outputa(0),
 		m_ym2_outputa(0),
 		m_ym2_outputb(0)
+{
+}
+
+tx1j_sound_device::tx1j_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tx1_sound_device(mconfig, TX1J_SOUND, tag, owner, clock)
 {
 }
 
@@ -114,6 +130,104 @@ void tx1_sound_device::device_reset()
 	m_step0 = m_step1 = m_step2 = 0;
 }
 
+/* Main CPU and Z80 synchronisation */
+WRITE16_MEMBER( tx1_sound_device::z80_busreq_w )
+{
+	m_audiocpu->set_input_line(INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+/* Z80 can trigger its own interrupts */
+WRITE8_MEMBER( tx1_sound_device::z80_intreq_w )
+{
+	m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
+READ16_MEMBER( tx1_sound_device::z80_shared_r )
+{
+	return m_audiocpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+WRITE16_MEMBER( tx1_sound_device::z80_shared_w )
+{
+	m_audiocpu->space(AS_PROGRAM).write_byte(offset, data & 0xff);
+}
+
+/*
+    (TODO) TS: Connected in place of dipswitch A bit 0
+    Accessed on startup as some sort of acknowledgement
+*/
+WRITE8_MEMBER( tx1_sound_device::ts_w )
+{
+//  TS = 1;
+	m_z80_ram[offset] = data;
+}
+
+READ8_MEMBER( tx1_sound_device::ts_r )
+{
+//  TS = 1;
+	return m_z80_ram[offset];
+}
+
+static uint8_t bit_reverse8(uint8_t val)
+{
+	val = ((val & 0xF0) >>  4) | ((val & 0x0F) <<  4);
+	val = ((val & 0xCC) >>  2) | ((val & 0x33) <<  2);
+	val = ((val & 0xAA) >>  1) | ((val & 0x55) <<  1);
+
+	return val;
+}
+
+READ16_MEMBER( tx1_sound_device::dipswitches_r )
+{
+	return (m_dsw->read() & 0xfffe) | m_ts;
+}
+
+// Tazmi TZ2103 custom 4-channel A/D converter @ 7.5 MHz
+READ8_MEMBER( buggyboy_sound_device::bb_analog_r )
+{
+	if (offset == 0)
+		return bit_reverse8(((m_accelerator->read() & 0xf) << 4) | m_steering->read());
+	else
+		return bit_reverse8((m_brake->read() & 0xf) << 4);
+}
+
+READ8_MEMBER( buggyboyjr_sound_device::bbjr_analog_r )
+{
+	if (offset == 0)
+		return ((m_accelerator->read() & 0xf) << 4) | m_steering->read();
+	else
+		return (m_brake->read() & 0xf) << 4;
+}
+
+WRITE8_MEMBER( tx1_sound_device::tx1_coin_cnt_w )
+{
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
+//  machine().bookkeeping().coin_counter_w(2, data & 0x40);
+}
+
+WRITE8_MEMBER( buggyboy_sound_device::bb_coin_cnt_w )
+{
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+//  machine().bookkeeping().coin_counter_w(2, data & 0x04);
+}
+
+WRITE8_MEMBER( tx1_sound_device::tx1_ppi_latch_w )
+{
+	m_ppi_latch_a = ((m_brake->read() & 0xf) << 4) | (m_accelerator->read() & 0xf);
+	m_ppi_latch_b = m_steering->read();
+}
+
+READ8_MEMBER( tx1_sound_device::tx1_ppi_porta_r )
+{
+	return m_ppi_latch_a;
+}
+
+READ8_MEMBER( tx1_sound_device::tx1_ppi_portb_r )
+{
+	return m_ppi_portd->read() | m_ppi_latch_b;
+}
 
 WRITE8_MEMBER( tx1_sound_device::pit8253_w )
 {
@@ -153,6 +267,12 @@ READ8_MEMBER( tx1_sound_device::pit8253_r )
 	return 0;
 }
 
+/* Periodic Z80 interrupt */
+INTERRUPT_GEN_MEMBER(tx1_sound_device::z80_irq)
+{
+	m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
 /***************************************************************************
 
     AY-8910 port mappings:
@@ -181,14 +301,13 @@ WRITE8_MEMBER( tx1_sound_device::ay8910_a_w )
 
 WRITE8_MEMBER( tx1_sound_device::ay8910_b_w )
 {
-	double gain;
-
 	m_stream->update();
+
 	/* Only B3-0 are inverted */
 	m_ay_outputb = data ^ 0xf;
 
 	/* It'll do until we get quadrophonic speaker support! */
-	gain = BIT(m_ay_outputb, 4) ? 1.5 : 2.0;
+	double gain = BIT(m_ay_outputb, 4) ? 1.5 : 2.0;
 	device_sound_interface *sound;
 	interface(sound);
 	sound->set_output_gain(0, gain);
@@ -253,9 +372,9 @@ void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	/* 8253 outputs for the player/opponent engine sounds. */
-	step_0 = m_pit8253.counts[0].val ? (TX1_PIT_CLOCK / m_pit8253.counts[0].val * m_freq_to_step).value() : 0;
-	step_1 = m_pit8253.counts[1].val ? (TX1_PIT_CLOCK / m_pit8253.counts[1].val * m_freq_to_step).value() : 0;
-	step_2 = m_pit8253.counts[2].val ? (TX1_PIT_CLOCK / m_pit8253.counts[2].val * m_freq_to_step).value() : 0;
+	step_0 = m_pit8253.counts[0].val ? (TX1_PIT_CLOCK / m_pit8253.counts[0].val * m_freq_to_step) : 0;
+	step_1 = m_pit8253.counts[1].val ? (TX1_PIT_CLOCK / m_pit8253.counts[1].val * m_freq_to_step) : 0;
+	step_2 = m_pit8253.counts[2].val ? (TX1_PIT_CLOCK / m_pit8253.counts[2].val * m_freq_to_step) : 0;
 
 	//gain_0 = tx1_engine_gains[m_ay_outputa & 0xf];
 	//gain_1 = tx1_engine_gains[m_ay_outputa >> 4];
@@ -294,6 +413,172 @@ void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	}
 }
 
+void tx1_sound_device::tx1_sound_prg(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x3000, 0x37ff).ram().mirror(0x800).share("z80_ram");
+	map(0x4000, 0x4000).w(FUNC(tx1_sound_device::z80_intreq_w));
+	map(0x5000, 0x5003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6000, 0x6003).rw(FUNC(tx1_sound_device::pit8253_r), FUNC(tx1_sound_device::pit8253_w));
+	map(0x7000, 0x7fff).w(FUNC(tx1_sound_device::tx1_ppi_latch_w));
+	map(0xb000, 0xbfff).rw(FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
+}
+
+void tx1_sound_device::tx1_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
+
+INPUT_PORTS_START( tx1_inputs )
+	PORT_START("DSW")
+	/* Dipswitch DS.2 is 6 switches but "maps" to switches 2 to 8 (at 6P according to the manual)  */
+	PORT_DIPNAME( 0x000c, 0x0000, "Game Cost" )         PORT_DIPLOCATION("DS.2:1,2")
+	PORT_DIPSETTING(      0x0000, "1 Coin Unit for 1 Credit" )
+	PORT_DIPSETTING(      0x0004, "2 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x0008, "3 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x000c, "4 Coin Units for 1 Credit" )
+
+	PORT_DIPNAME( 0x0010, 0x0000, "Left Coin Mechanism" )       PORT_DIPLOCATION("DS.2:3")
+	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
+	PORT_DIPSETTING(      0x0010, "1 Coin for 2 Coin Units" )
+
+	PORT_DIPNAME( 0x0060, 0x0000, "Right Coin Mechanism" )      PORT_DIPLOCATION("DS.2:4,5")
+	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
+	PORT_DIPSETTING(      0x0020, "1 Coin for 4 Coin Units" )
+	PORT_DIPSETTING(      0x0040, "1 Coin for 5 Coin Units" )
+	PORT_DIPSETTING(      0x0060, "1 Coin for 6 Coin Units" )
+
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DS.2:6") /* Manual states switches 6 to 8 unused (physically it's only 6 switches) */
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	/* Dipswitch DS.1 is 8 switches (at 8P according to the manual) */
+	PORT_DIPNAME( 0x0700, 0x0300, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("DS.1:1,2,3")
+	PORT_DIPSETTING(      0x0000, "A (Easiest)" )
+	PORT_DIPSETTING(      0x0100, "B" )
+	PORT_DIPSETTING(      0x0200, "C" )
+	PORT_DIPSETTING(      0x0300, "D" )
+	PORT_DIPSETTING(      0x0400, "E" )
+	PORT_DIPSETTING(      0x0500, "F" )
+	PORT_DIPSETTING(      0x0600, "G" )
+	PORT_DIPSETTING(      0x0700, "H (Hardest)" )
+
+	PORT_DIPNAME( 0x1800, 0x1000, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("DS.1:4,5")
+	PORT_DIPSETTING(      0x0000, "A (Longest)" )
+	PORT_DIPSETTING(      0x0800, "B" )
+	PORT_DIPSETTING(      0x1000, "C" )
+	PORT_DIPSETTING(      0x1800, "D (Shortest)" )
+
+	PORT_DIPNAME( 0xe000, 0xe000, "Bonus Adder" )       PORT_DIPLOCATION("DS.1:6,7,8")
+	PORT_DIPSETTING(      0x0000, "No Bonus" )
+	PORT_DIPSETTING(      0x2000, "2 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x4000, "3 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x6000, "4 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x8000, "5 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0xa000, "4 Coin Units for 2 Credit" )
+	PORT_DIPSETTING(      0xc000, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(      0xe000, "No Bonus" )
+
+	PORT_START("AN_STEERING")
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+
+	PORT_START("AN_ACCELERATOR")
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+
+	PORT_START("AN_BRAKE")
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+
+	PORT_START("PPI_PORTC")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
+
+	PORT_START("PPI_PORTD")
+	/* Wire jumper setting on sound PCB - actually unpopulated 4 switch DS.3 */
+	PORT_DIPNAME( 0xf0, 0x80, "Sound PCB Jumper (DS.3)" )
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+INPUT_PORTS_END
+
+ioport_constructor tx1_sound_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(tx1_inputs);
+}
+
+INPUT_PORTS_START( tx1j_inputs )
+	PORT_INCLUDE(tx1_inputs)
+
+	PORT_MODIFY("DSW")
+	/* Dipswitch DS.2 is 6 switches but "maps" to switches 2 to 8 (at 6P according to the manual)  */
+	PORT_DIPNAME( 0x001c, 0x0000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("DS.2:1,2,3") /* As silkscreened on the PCB */
+	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_6C ) )
+
+	PORT_DIPNAME( 0x00e0, 0x0000, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("DS.2:4,5,6") /* As silkscreened on the PCB */
+	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x00e0, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_6C ) )
+
+	/* Dipswitch DS.1 is 8 switches (at 8P according to the manual) */
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DS.1:6,7,8")
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x2000, "1" )
+	PORT_DIPSETTING(      0x4000, "2" )
+	PORT_DIPSETTING(      0x6000, "3" )
+	PORT_DIPSETTING(      0x8000, "4" )
+	PORT_DIPSETTING(      0xa000, "5" )
+	PORT_DIPSETTING(      0xc000, "6" )
+	PORT_DIPSETTING(      0xe000, "7" )
+INPUT_PORTS_END
+
+ioport_constructor tx1j_sound_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(tx1j_inputs);
+}
+
+MACHINE_CONFIG_START(tx1_sound_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, TX1_PIXEL_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tx1_sound_prg)
+	MCFG_DEVICE_IO_MAP(tx1_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, tx1_sound_device, z80_irq,  TX1_PIXEL_CLOCK / 4 / 2048 / 2)
+
+	I8255A(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(tx1_sound_device::tx1_ppi_porta_r));
+	m_ppi->in_pb_callback().set(FUNC(tx1_sound_device::tx1_ppi_portb_r));
+	m_ppi->in_pc_callback().set_ioport("PPI_PORTC");
+	m_ppi->out_pc_callback().set(FUNC(tx1_sound_device::tx1_coin_cnt_w));
+
+	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
+	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
+//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
+//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
+
+	MCFG_DEVICE_ADD("aysnd", AY8910, TX1_PIXEL_CLOCK / 8)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tx1_sound_device, ay8910_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tx1_sound_device, ay8910_b_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.1)
+
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
+	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
+	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -301,7 +586,7 @@ void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
  *
  *************************************/
 
-#define BUGGYBOY_PIT_CLOCK      (BUGGYBOY_ZCLK / 8)
+#define BUGGYBOY_PIT_CLOCK      (clock() / 8)
 #define BUGGYBOY_NOISE_CLOCK    (BUGGYBOY_PIT_CLOCK / 4)
 
 #define BUGGYBOY_R1     47000.0
@@ -335,10 +620,22 @@ static const double bb_engine_gains[16] =
 	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
 };
 
-DEFINE_DEVICE_TYPE(BUGGYBOY, buggyboy_sound_device, "buggyboy_sound", "Buggy Boy Custom Sound")
+DEFINE_DEVICE_TYPE(BUGGYBOY_SOUND, buggyboy_sound_device, "buggyboy_sound", "Buggy Boy Custom Sound")
+DEFINE_DEVICE_TYPE(BUGGYBOYJR_SOUND, buggyboyjr_sound_device, "buggyboyjr_sound", "Buggy Boy Jr. Custom Sound")
 
 buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tx1_sound_device(mconfig, BUGGYBOY, tag, owner, clock)
+	: buggyboy_sound_device(mconfig, BUGGYBOY_SOUND, tag, owner, clock)
+{
+}
+
+buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: tx1_sound_device(mconfig, type, tag, owner, clock)
+	, m_ym(*this, "ym%u", 1U)
+{
+}
+
+buggyboyjr_sound_device::buggyboyjr_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: buggyboy_sound_device(mconfig, BUGGYBOYJR_SOUND, tag, owner, clock)
 {
 }
 
@@ -435,15 +732,11 @@ WRITE8_MEMBER( buggyboy_sound_device::ym2_a_w )
 
 WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
 {
-	device_t *ym1 = machine().device("ym1");
-	device_t *ym2 = machine().device("ym2");
-	double gain;
-
 	m_stream->update();
 
 	m_ym2_outputb = data ^ 0xff;
 
-	if (!strcmp(machine().system().name, "buggyboyjr"))
+	if (has_coin_counters())
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 		machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -456,19 +749,16 @@ WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
 	*/
 
 	/* Rear left speaker */
-	device_sound_interface *sound;
-	ym1->interface(sound);
-	gain = data & 0x80 ? 1.0 : 2.0;
-	sound->set_output_gain(0, gain);
-	sound->set_output_gain(1, gain);
-	sound->set_output_gain(2, gain);
+	double gain = data & 0x80 ? 1.0 : 2.0;
+	m_ym[0]->set_output_gain(0, gain);
+	m_ym[0]->set_output_gain(1, gain);
+	m_ym[0]->set_output_gain(2, gain);
 
 	/* Rear right speaker */
-	ym2->interface(sound);
 	gain = data & 0x40 ? 1.0 : 2.0;
-	sound->set_output_gain(0, gain);
-	sound->set_output_gain(1, gain);
-	sound->set_output_gain(2, gain);
+	m_ym[1]->set_output_gain(0, gain);
+	m_ym[1]->set_output_gain(1, gain);
+	m_ym[1]->set_output_gain(2, gain);
 }
 
 
@@ -492,8 +782,8 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	/* 8253 outputs for the player/opponent buggy engine sounds. */
-	step_0 = m_pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / m_pit8253.counts[0].val * m_freq_to_step).value() : 0;
-	step_1 = m_pit8253.counts[1].val ? (BUGGYBOY_PIT_CLOCK / m_pit8253.counts[1].val * m_freq_to_step).value() : 0;
+	step_0 = m_pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / m_pit8253.counts[0].val * m_freq_to_step) : 0;
+	step_1 = m_pit8253.counts[1].val ? (BUGGYBOY_PIT_CLOCK / m_pit8253.counts[1].val * m_freq_to_step) : 0;
 
 	if (!strcmp(machine().system().name, "buggyboyjr"))
 		gain0 = BIT(m_ym2_outputb, 3) ? 1.0 : 2.0;
@@ -514,7 +804,7 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 		pit1 = m_eng_voltages[(m_step1 >> 24) & 0xf];
 
 		/* Calculate the tyre screech noise source */
-		for (i = 0; i < BUGGYBOY_NOISE_CLOCK.value() / machine().sample_rate(); ++i)
+		for (i = 0; i < BUGGYBOY_NOISE_CLOCK / machine().sample_rate(); ++i)
 		{
 			/* CD4006 is a 4-4-1-4-4-1 shift register */
 			int p13 = BIT(m_noise_lfsra, 3);
@@ -556,3 +846,272 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 		m_step1 += step_1;
 	}
 }
+
+/* Buggy Boy Sound PCB TC033A */
+void buggyboy_sound_device::buggyboy_sound_prg(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().share("z80_ram");
+	map(0x6000, 0x6001).r(FUNC(buggyboy_sound_device::bb_analog_r));
+	map(0x6800, 0x6803).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7000, 0x7003).rw(FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
+	map(0x7800, 0x7800).w(FUNC(tx1_sound_device::z80_intreq_w));
+	map(0xc000, 0xc7ff).rw(FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
+}
+
+/* Buggy Boy Jr Sound PCB TC043 */
+void buggyboyjr_sound_device::buggybjr_sound_prg(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().share("z80_ram");
+	map(0x5000, 0x5003).rw(FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
+	map(0x6000, 0x6001).r(FUNC(buggyboyjr_sound_device::bbjr_analog_r));
+	map(0x7000, 0x7000).w(FUNC(tx1_sound_device::z80_intreq_w));
+	map(0xc000, 0xc7ff).rw(FUNC(tx1_sound_device::ts_r), FUNC(tx1_sound_device::ts_w));
+}
+
+/* Common */
+void buggyboy_sound_device::buggyboy_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).r(m_ym[0], FUNC(ay8910_device::data_r));
+	map(0x40, 0x41).w(m_ym[0], FUNC(ay8910_device::data_address_w));
+	map(0x80, 0x80).r(m_ym[1], FUNC(ay8910_device::data_r));
+	map(0x80, 0x81).w(m_ym[1], FUNC(ay8910_device::data_address_w));
+}
+
+INPUT_PORTS_START( buggyboy_inputs )
+	PORT_START("DSW")
+	/* Dipswitch 0 is unconnected */
+	PORT_DIPNAME( 0x0003, 0x0003, "Do not change DSW2 1&2" )    PORT_DIPLOCATION("SW2:1,2") /* Listed in manual as "Do Not Change" */
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0001, "1" )
+	PORT_DIPSETTING(      0x0002, "2" )
+	PORT_DIPSETTING(      0x0003, "3" )
+
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:3") /* Language of game instructions */
+	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
+
+	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change DSW2 4" )  PORT_DIPLOCATION("SW2:4") /* Listed in manual as "Do Not Change" */
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )     PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(      0x0000, "A (Longest)" )
+	PORT_DIPSETTING(      0x0010, "B" )
+	PORT_DIPSETTING(      0x0020, "C" )
+	PORT_DIPSETTING(      0x0030, "D (Shortest)" )
+
+	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )     PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(      0x0000, "A (Easy)")
+	PORT_DIPSETTING(      0x0040, "B" )
+	PORT_DIPSETTING(      0x0080, "C" )
+	PORT_DIPSETTING(      0x00c0, "D (Difficult)" )
+
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:8,7,6")
+	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0xe000, "Free-Play" )
+
+	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:5,4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_5C ) )
+
+	PORT_DIPNAME( 0x0700, 0x0700, "Do not change DSW1 1-3" )    PORT_DIPLOCATION("SW1:3,2,1") /* Listed in manual as "Do Not Change" */
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0100, "1" )
+	PORT_DIPSETTING(      0x0200, "2" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0400, "4" )
+	PORT_DIPSETTING(      0x0500, "5" )
+	PORT_DIPSETTING(      0x0600, "6" )
+	PORT_DIPSETTING(      0x0700, "7" )
+
+	PORT_START("PPI_PORTA")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
+
+	PORT_START("PPI_PORTC")
+	PORT_DIPNAME( 0xff, 0x80, "Sound PCB Jumper" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x20, "Speed Buggy/Data East" )
+	PORT_DIPSETTING(    0x40, "Buggy Boy/Taito" )
+	PORT_DIPSETTING(    0x80, "Buggy Boy/Tatsumi" )
+
+	PORT_START("AN_STEERING")
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
+
+	PORT_START("AN_ACCELERATOR")
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+
+	PORT_START("AN_BRAKE")
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+INPUT_PORTS_END
+
+ioport_constructor buggyboy_sound_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(buggyboy_inputs);
+}
+
+INPUT_PORTS_START( buggyboyjr_inputs )
+	PORT_START("DSW")
+	/* Dipswitch 0 is unconnected */
+	PORT_DIPNAME( 0x0003, 0x0003, "Do not change DSW2 1&2" )    PORT_DIPLOCATION("SW2:1,2") /* Listed in manual as "Do Not Change" */
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0001, "1" )
+	PORT_DIPSETTING(      0x0002, "2" )
+	PORT_DIPSETTING(      0x0003, "3" )
+
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:3") /* Language of game instructions */
+	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
+
+	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change DSW2 4" )  PORT_DIPLOCATION("SW2:4") /* Listed in manual as "Do Not Change" */
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )     PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(      0x0000, "A (Longest)" )
+	PORT_DIPSETTING(      0x0010, "B" )
+	PORT_DIPSETTING(      0x0020, "C" )
+	PORT_DIPSETTING(      0x0030, "D (Shortest)" )
+
+	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )     PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(      0x0000, "A (Easy)")
+	PORT_DIPSETTING(      0x0040, "B" )
+	PORT_DIPSETTING(      0x0080, "C" )
+	PORT_DIPSETTING(      0x00c0, "D (Difficult)" )
+
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:8,7,6")
+	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0xe000, "Free-Play" )
+
+	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:5,4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_6C ) )
+
+	PORT_DIPNAME( 0x0700, 0x0700, "Do not change DSW1 1-3" )    PORT_DIPLOCATION("SW1:3,2,1") /* Listed in manual as "Do Not Change" */
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0100, "1" )
+	PORT_DIPSETTING(      0x0200, "2" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0400, "4" )
+	PORT_DIPSETTING(      0x0500, "5" )
+	PORT_DIPSETTING(      0x0600, "6" )
+	PORT_DIPSETTING(      0x0700, "7" )
+
+	PORT_START("YM2149_IC19_A")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
+
+	/* Wire jumper setting on sound PCB */
+	PORT_START("YM2149_IC19_B")
+	PORT_DIPNAME( 0xff, 0x80, "Sound PCB Jumper" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x20, "Speed Buggy/Data East" )
+	PORT_DIPSETTING(    0x40, "Buggy Boy/Taito" )
+	PORT_DIPSETTING(    0x80, "Buggy Boy/Tatsumi" )
+
+	PORT_START("AN_STEERING")
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
+
+	PORT_START("AN_ACCELERATOR")
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+
+	PORT_START("AN_BRAKE")
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+INPUT_PORTS_END
+
+ioport_constructor buggyboyjr_sound_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(buggyboyjr_inputs);
+}
+
+MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, BUGGYBOY_ZCLK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(buggyboy_sound_prg)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, buggyboy_sound_device, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
+	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
+
+	I8255A(config, m_ppi);
+	/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
+	m_ppi->in_pa_callback().set_ioport("PPI_PORTA");
+	m_ppi->out_pb_callback().set(FUNC(buggyboy_sound_device::bb_coin_cnt_w));
+	m_ppi->in_pc_callback().set_ioport("PPI_PORTC");
+
+	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
+	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
+//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
+//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
+
+	MCFG_DEVICE_ADD(m_ym[0], YM2149, BUGGYBOY_ZCLK / 4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym1_a_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
+
+	MCFG_DEVICE_ADD(m_ym[1], YM2149, BUGGYBOY_ZCLK / 4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_b_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
+
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
+	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
+	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(buggyboyjr_sound_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, BUGGYBOY_ZCLK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(buggybjr_sound_prg)
+	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, buggyboy_sound_device, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
+
+	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
+	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
+//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5);
+//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
+
+	MCFG_DEVICE_ADD(m_ym[0], YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC19 */
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2149_IC19_A"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM2149_IC19_B"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
+
+	MCFG_DEVICE_ADD(m_ym[1], YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC24 */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_b_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
+
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
+	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
+	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
+MACHINE_CONFIG_END

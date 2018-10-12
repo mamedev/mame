@@ -75,13 +75,13 @@ WRITE8_MEMBER(exzisus_state::coincounter_w)
 // is it ok that cpub_reset refers to cpuc?
 WRITE8_MEMBER(exzisus_state::cpub_reset_w)
 {
-	m_cpuc->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_cpuc->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 #if 0
 // without cpub_reset_w, the following patch would be needed for
 // the RAM check to work
-DRIVER_INIT_MEMBER(exzisus_state,exzisus)
+void exzisus_state::init_exzisus()
 {
 	uint8_t *RAM = memregion("cpua")->base();
 
@@ -100,51 +100,55 @@ DRIVER_INIT_MEMBER(exzisus_state,exzisus)
 
 **************************************************************************/
 
-ADDRESS_MAP_START(exzisus_state::cpua_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpuabank")
-	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram1")
-	AM_RANGE(0xc600, 0xdfff) AM_RAM AM_SHARE("videoram1")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("sharedram_ac")
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(cpua_bankswitch_w)
-	AM_RANGE(0xf404, 0xf404) AM_WRITE(cpub_reset_w) // ??
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("sharedram_ab")
-ADDRESS_MAP_END
+void exzisus_state::cpua_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("cpuabank");
+	map(0xc000, 0xc5ff).ram().share("objectram1");
+	map(0xc600, 0xdfff).ram().share("videoram1");
+	map(0xe000, 0xefff).ram().share("sharedram_ac");
+	map(0xf400, 0xf400).w(FUNC(exzisus_state::cpua_bankswitch_w));
+	map(0xf404, 0xf404).w(FUNC(exzisus_state::cpub_reset_w)); // ??
+	map(0xf800, 0xffff).ram().share("sharedram_ab");
+}
 
-ADDRESS_MAP_START(exzisus_state::cpub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpubbank")
-	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram0")
-	AM_RANGE(0xc600, 0xdfff) AM_RAM AM_SHARE("videoram0")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, master_port_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("ciu", pc060ha_device, master_comm_r, master_comm_w)
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("P1")
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(cpub_bankswitch_w)
-	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P2")
-	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf402, 0xf402) AM_WRITE(coincounter_w)
-	AM_RANGE(0xf404, 0xf404) AM_READ_PORT("DSWA")
-	AM_RANGE(0xf404, 0xf404) AM_WRITENOP // ??
-	AM_RANGE(0xf405, 0xf405) AM_READ_PORT("DSWB")
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("sharedram_ab")
-ADDRESS_MAP_END
+void exzisus_state::cpub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("cpubbank");
+	map(0xc000, 0xc5ff).ram().share("objectram0");
+	map(0xc600, 0xdfff).ram().share("videoram0");
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xf000).nopr().w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0xf001, 0xf001).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0xf400, 0xf400).portr("P1");
+	map(0xf400, 0xf400).w(FUNC(exzisus_state::cpub_bankswitch_w));
+	map(0xf401, 0xf401).portr("P2");
+	map(0xf402, 0xf402).portr("SYSTEM");
+	map(0xf402, 0xf402).w(FUNC(exzisus_state::coincounter_w));
+	map(0xf404, 0xf404).portr("DSWA");
+	map(0xf404, 0xf404).nopw(); // ??
+	map(0xf405, 0xf405).portr("DSWB");
+	map(0xf800, 0xffff).ram().share("sharedram_ab");
+}
 
-ADDRESS_MAP_START(exzisus_state::cpuc_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_SHARE("objectram1")
-	AM_RANGE(0x8600, 0x9fff) AM_RAM AM_SHARE("videoram1")
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("sharedram_ac")
-	AM_RANGE(0xb000, 0xbfff) AM_RAM
-ADDRESS_MAP_END
+void exzisus_state::cpuc_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x85ff).ram().share("objectram1");
+	map(0x8600, 0x9fff).ram().share("videoram1");
+	map(0xa000, 0xafff).ram().share("sharedram_ac");
+	map(0xb000, 0xbfff).ram();
+}
 
-ADDRESS_MAP_START(exzisus_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-ADDRESS_MAP_END
+void exzisus_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xa000, 0xa000).nopr().w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+}
 
 
 /***************************************************************************
@@ -217,7 +221,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( exzisus )
+static GFXDECODE_START( gfx_exzisus )
 	GFXDECODE_ENTRY( "bg0", 0, charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "bg1", 0, charlayout, 256, 256 )
 GFXDECODE_END
@@ -228,20 +232,20 @@ GFXDECODE_END
 MACHINE_CONFIG_START(exzisus_state::exzisus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpua", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(cpua_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("cpua", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(cpua_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("cpub", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("cpub", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("cpuc", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(cpuc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("cpuc", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(cpuc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -254,13 +258,13 @@ MACHINE_CONFIG_START(exzisus_state::exzisus)
 	MCFG_SCREEN_UPDATE_DRIVER(exzisus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exzisus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exzisus)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -390,6 +394,6 @@ ROM_START( exzisust )
 	ROM_LOAD( "b23-05.16l", 0x00800, 0x00400, CRC(87f0f69a) SHA1(37df6fd56245fab9beaabfd86fd8f95d7c42c2a5) )
 ROM_END
 
-GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation",               "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation",               "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation",               "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation",               "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)",       MACHINE_SUPPORTS_SAVE )

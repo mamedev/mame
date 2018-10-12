@@ -20,10 +20,11 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SILICON_DISC, einstein_silicon_disc_device, "einstei
 //  device_address_map
 //-------------------------------------------------
 
-ADDRESS_MAP_START(einstein_silicon_disc_device::map)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(sector_low_w)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_WRITE(sector_high_w)
-ADDRESS_MAP_END
+void einstein_silicon_disc_device::map(address_map &map)
+{
+	map(0x08, 0x08).mirror(0xff00).w(FUNC(einstein_silicon_disc_device::sector_low_w));
+	map(0x09, 0x09).mirror(0xff00).w(FUNC(einstein_silicon_disc_device::sector_high_w));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -68,7 +69,7 @@ void einstein_silicon_disc_device::device_start()
 	memset(m_ram.get(), 0xff, 0x40000);
 
 	// register for save states
-	save_pointer(NAME(m_ram.get()), 0x40000);
+	save_pointer(NAME(m_ram), 0x40000);
 	save_item(NAME(m_sector));
 }
 

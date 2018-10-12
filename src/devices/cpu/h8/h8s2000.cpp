@@ -10,9 +10,9 @@ h8s2000_device::h8s2000_device(const machine_config &mconfig, device_type type, 
 	has_exr = true;
 }
 
-util::disasm_interface *h8s2000_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> h8s2000_device::create_disassembler()
 {
-	return new h8s2000_disassembler;
+	return std::make_unique<h8s2000_disassembler>();
 }
 
 #include "cpu/h8/h8s2000.hxx"

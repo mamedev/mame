@@ -24,47 +24,47 @@
 	MCFG_DEVICE_ADD((tag), SMPC_HLE, (clock))
 
 #define MCFG_SMPC_HLE_SCREEN(screen_tag) \
-	downcast<smpc_hle_device &>(*device).set_screen_tag(("^" screen_tag));
+	downcast<smpc_hle_device &>(*device).set_screen_tag(screen_tag);
 
 #define MCFG_SMPC_HLE_CONTROL_PORTS(ctrl1_tag, ctrl2_tag) \
 	downcast<smpc_hle_device &>(*device).set_control_port_tags(ctrl1_tag, ctrl2_tag);
 
 #define MCFG_SMPC_HLE_PDR1_IN_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_pdr1_in_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_pdr1_in_handler(DEVCB_##_devcb);
 
 #define MCFG_SMPC_HLE_PDR2_IN_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_pdr2_in_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_pdr2_in_handler(DEVCB_##_devcb);
 
 #define MCFG_SMPC_HLE_PDR1_OUT_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_pdr1_out_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_pdr1_out_handler(DEVCB_##_devcb);
 
 #define MCFG_SMPC_HLE_PDR2_OUT_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_pdr2_out_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_pdr2_out_handler(DEVCB_##_devcb);
 
 #define MCFG_SMPC_HLE_MASTER_RESET_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_master_reset_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_master_reset_handler(DEVCB_##_devcb);
 
 #define MCFG_SMPC_HLE_MASTER_NMI_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_master_nmi_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_master_nmi_handler(DEVCB_##_devcb);
 
 #define MCFG_SMPC_HLE_SLAVE_RESET_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_slave_reset_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_slave_reset_handler(DEVCB_##_devcb);
 
 #define MCFG_SMPC_HLE_SOUND_RESET_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_sound_reset_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_sound_reset_handler(DEVCB_##_devcb);
 
 #define MCFG_SMPC_HLE_SYSTEM_RESET_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_system_reset_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_system_reset_handler(DEVCB_##_devcb);
 
 #define MCFG_SMPC_HLE_SYSTEM_HALT_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_system_halt_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_system_halt_handler(DEVCB_##_devcb);
 
 #define MCFG_SMPC_HLE_DOT_SELECT_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_dot_select_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_dot_select_handler(DEVCB_##_devcb);
 
 // set_irq_handler doesn't work in Saturn driver???
 #define MCFG_SMPC_HLE_IRQ_HANDLER_CB(_devcb) \
-	devcb = &downcast<smpc_hle_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
+	downcast<smpc_hle_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

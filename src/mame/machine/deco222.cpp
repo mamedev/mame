@@ -31,12 +31,12 @@ void deco_222_device::device_reset()
 
 uint8_t deco_222_device::mi_decrypt::read_sync(uint16_t adr)
 {
-	return bitswap<8>(direct->read_byte(adr) ,7,5,6,4,3,2,1,0);
+	return bitswap<8>(cache->read_byte(adr) ,7,5,6,4,3,2,1,0);
 }
 
-util::disasm_interface *deco_222_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> deco_222_device::create_disassembler()
 {
-	return new disassembler;
+	return std::make_unique<disassembler>();
 }
 
 u32 deco_222_device::disassembler::interface_flags() const
@@ -68,12 +68,12 @@ void deco_c10707_device::device_reset()
 
 uint8_t deco_c10707_device::mi_decrypt::read_sync(uint16_t adr)
 {
-	return bitswap<8>(direct->read_byte(adr) ,7,5,6,4,3,2,1,0);
+	return bitswap<8>(cache->read_byte(adr) ,7,5,6,4,3,2,1,0);
 }
 
-util::disasm_interface *deco_c10707_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> deco_c10707_device::create_disassembler()
 {
-	return new disassembler;
+	return std::make_unique<disassembler>();
 }
 
 u32 deco_c10707_device::disassembler::interface_flags() const

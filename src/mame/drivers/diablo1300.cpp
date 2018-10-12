@@ -6,7 +6,7 @@
 
  - Microprocessor based control logic for increased capacity and flexibility, plus provision for implementation of additional features.
  - Advanced servo design for improved efficiency and performance.
- - Rigid one piece cast aluminum frame to better maintain print quality, and reduce maintenance requirements.
+ - Rigid one piece cast aluminium frame to better maintain print quality, and reduce maintenance requirements.
  - Rugged highly stable carriage assembly for enhanced print position accuracy and reduced maintenance.
  - Plug-in interchangeable printed pircuit boards (PCB's), readily accessible for ease and simplicity of service, and implementation
    of options and interfaces.
@@ -37,10 +37,10 @@ Configurations
 --------------
 There are many options that comes with the Diablo 1300 series and while many are mechanical the electronics are built up with cards
 interconnected by a backplane. The backplane has well defined slots for each type of cards and there are also many external cables
-between the cards, sensors and motors of the printer. The backplane consists of up to 8 female connectors for 56 signals card edge 
-connectors numbered A-H ordered in two rows, D,C,B,A on top with the fans to the left and H,G,F,E bellow. The signals are routed as 
+between the cards, sensors and motors of the printer. The backplane consists of up to 8 female connectors for 56 signals card edge
+connectors numbered A-H ordered in two rows, D,C,B,A on top with the fans to the left and H,G,F,E bellow. The signals are routed as
 needed and the slots are NOT generic, a specific card goes in at a specific slot but can be interchanged to accomodate improved
-performance or replaced for repair. Slots E and F are used for feature expansions such as serial, network cards etc. 
+performance or replaced for repair. Slots E and F are used for feature expansions such as serial, network cards etc.
 
 The slots are populated as follows:
 
@@ -53,12 +53,12 @@ F: Optional slot with all signals of slot F
 G: Transducer
 H: Print Wheel Power Amp
 
-In case the serial/IEEE488/network interface card is missing in the printer the host computer is supposed to drive which 
+In case the serial/IEEE488/network interface card is missing in the printer the host computer is supposed to drive which
 connects to the printer over the 50 pin ribbon cable instead of the printer hosted interface card.
 
 Logic #1 Card - printer command management
 ------------------------------------------
-The board is marked 40505 and has an option field at the top and a J7 connector for the 50 pin ribbon cable. It produces the 
+The board is marked 40505 and has an option field at the top and a J7 connector for the 50 pin ribbon cable. It produces the
 system clock of 5 MHz that is used by the TTL CPU at Logic #2 Card,
 
  Identified IC:s
@@ -69,7 +69,7 @@ system clock of 5 MHz that is used by the TTL CPU at Logic #2 Card,
  1 7451     7849 Dual AND+OR invert gates
  1 7486     7849 Quad XOR gates
  3 74LS170  7906 4 by 4 register file
- 4 8837     7736 
+ 4 8837     7736
  2 7408     7906 Quad AND gales
  2 74LS42   7906 BCD to decimal decoder
  1 7426     7906 Quad NAND gates
@@ -96,7 +96,7 @@ The board is marked 40510 and has no connectors except the 56 signal bus edge co
  4 74S289        4x16 bit RAM
  1 74107         Dual J-K M/S flip flops w clear
  1 74LS155  7731 1/2/3 to 4/8 lines decoder nwih totem pole ouputs
- 2 74161    7904 synchronous binary 4 bit counter 
+ 2 74161    7904 Synchronous binary 4 bit counter
  4 74LS259  7906 8 bit addressable latches
  4 74298    7849 Quad 2 input mux with storage
  1 74367    7840 Non inverted 3 state outputs, 2 and 4 line enabled inputs
@@ -114,10 +114,10 @@ The serial interface card is z80 based and marked DIABLO-1300-V24
  2 Z80-PIO 7852 Zilog Paralell IO interface
 10 74367   7845 Non inverted 3 state outputs, 2 and 4 line enabled inputs
  2 UPB7400 7845 Quad NAND gates
- 3 7432N   7832 QUAD OR gates 
+ 3 7432N   7832 QUAD OR gates
  1 1489    7841 Quad line receivers
  1 1488    7823 Quad line tranceivers
- 1 74163   7827 Synchrounous 4 bit counters
+ 1 74163   7827 Synchronous 4 bit counters
  2 7493    7822 4 bit binary counters
  2 7404    7849 Hex inverters
  1 7410    7849 Tripple 3-input NAND gates
@@ -143,24 +143,27 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
   { }
-  
+
+	void diablo1300(machine_config &config);
+
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-public:
-	void diablo1300(machine_config &config);
+
 	void diablo1300_map(address_map &map);
 	void diablo1300_data_map(address_map &map);
 };
 
-ADDRESS_MAP_START( diablo1300_state::diablo1300_map) //, AS_PROGRAM, 16, diablo1300_state )
-	AM_RANGE(0x0000, 0x01ff) AM_ROM
-ADDRESS_MAP_END
+void diablo1300_state::diablo1300_map(address_map &map)
+{ //, AS_PROGRAM, 16, diablo1300_state )
+	map(0x0000, 0x01ff).rom();
+}
 
-ADDRESS_MAP_START( diablo1300_state::diablo1300_data_map ) // , AS_DATA, 8, diablo1300_state )
-	AM_RANGE(0x00, 0x1f) AM_RAM
-ADDRESS_MAP_END
+void diablo1300_state::diablo1300_data_map(address_map &map)
+{ // , AS_DATA, 8, diablo1300_state )
+	map(0x00, 0x1f).ram();
+}
 
 static INPUT_PORTS_START( diablo1300 )
 INPUT_PORTS_END
@@ -175,9 +178,9 @@ void diablo1300_state::machine_reset()
 
 MACHINE_CONFIG_START( diablo1300_state::diablo1300 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DIABLO1300, XTAL(1'689'600))
-	MCFG_CPU_PROGRAM_MAP(diablo1300_map)
-	MCFG_CPU_DATA_MAP(diablo1300_data_map)
+	MCFG_DEVICE_ADD("maincpu", DIABLO1300, XTAL(1'689'600))
+	MCFG_DEVICE_PROGRAM_MAP(diablo1300_map)
+	MCFG_DEVICE_DATA_MAP(diablo1300_data_map)
 MACHINE_CONFIG_END
 
 ROM_START( diablo )
@@ -185,9 +188,9 @@ ROM_START( diablo )
 	ROM_DEFAULT_BIOS("diablo1300")
 
 	ROM_SYSTEM_BIOS(0, "diablo1300", "Diablo Printer Series 1300 14510-xx CPU microcode")
-	ROMX_LOAD ("diablo1300.odd",  0x0001, 0x200, CRC (5e295350) SHA1 (6ea9a22b23b8bab93ae57671541d65dba698c722), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD ("diablo1300.even", 0x0000, 0x200, CRC (85562eb1) SHA1 (9335eeeabdd37255d6ffee153a027944a4519126), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("diablo1300.odd",  0x0001, 0x200, CRC (5e295350) SHA1 (6ea9a22b23b8bab93ae57671541d65dba698c722), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD ("diablo1300.even", 0x0000, 0x200, CRC (85562eb1) SHA1 (9335eeeabdd37255d6ffee153a027944a4519126), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
-//   YEAR  NAME     PARENT    COMPAT   MACHINE      INPUT   STATE              INIT  COMPANY               FULLNAME
-COMP(1976, diablo,  0,        0,       diablo1300,  diablo1300, diablo1300_state,  0,    "Diablo Systems Inc", "Diablo HyType II Series 1300 CPU", MACHINE_IS_SKELETON)
+//   YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY               FULLNAME
+COMP(1976, diablo, 0,      0,      diablo1300, diablo1300, diablo1300_state, empty_init, "Diablo Systems Inc", "Diablo HyType II Series 1300 CPU", MACHINE_IS_SKELETON)

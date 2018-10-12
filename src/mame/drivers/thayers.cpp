@@ -40,20 +40,27 @@ struct ssi263_t
 class thayers_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTRQ_TICK,
-		TIMER_SSI263_PHONEME_TICK
-	};
-
 	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_pr7820(*this, "laserdisc")
 		, m_ldv1000(*this, "ldv1000")
 		, m_maincpu(*this, "maincpu")
 		, m_row(*this, "ROW.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{
 	}
+
+	void thayers(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+
+private:
+	enum
+	{
+		TIMER_INTRQ_TICK,
+		TIMER_SSI263_PHONEME_TICK
+	};
 
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
@@ -96,18 +103,17 @@ public:
 	DECLARE_WRITE8_MEMBER(den2_w);
 	DECLARE_WRITE8_MEMBER(ssi263_register_w);
 	DECLARE_READ8_MEMBER(ssi263_register_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void check_interrupt();
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<10> m_row;
+	output_finder<16> m_digits;
 
-	void thayers(machine_config &config);
 	void thayers_io_map(address_map &map);
 	void thayers_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -464,7 +470,7 @@ WRITE8_MEMBER(thayers_state::den1_w)
 
 	*/
 
-	output().set_digit_value(data >> 4, led_map[data & 0x0f]);
+	m_digits[data >> 4] = led_map[data & 0x0f];
 }
 
 WRITE8_MEMBER(thayers_state::den2_w)
@@ -484,7 +490,7 @@ WRITE8_MEMBER(thayers_state::den2_w)
 
 	*/
 
-	output().set_digit_value(8 + (data >> 4), led_map[data & 0x0f]);
+	m_digits[8 + (data >> 4)] = led_map[data & 0x0f];
 }
 
 /* SSI-263 */
@@ -617,29 +623,31 @@ READ8_MEMBER(thayers_state::ssi263_register_r)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(thayers_state::thayers_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-ADDRESS_MAP_END
+void thayers_state::thayers_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).ram();
+	map(0xc000, 0xdfff).rom();
+}
 
-ADDRESS_MAP_START(thayers_state::thayers_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_READWRITE(ssi263_register_r, ssi263_register_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(control_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(irqstate_r, control2_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(cop_data_r, cop_data_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(timer_int_ack_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(data_rdy_int_ack_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ(laserdsc_data_r)
-	AM_RANGE(0xf1, 0xf1) AM_READ(dsw_b_r)
-	AM_RANGE(0xf2, 0xf2) AM_READ_PORT("DSWA")
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(intrq_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(laserdsc_data_w)
-	AM_RANGE(0xf5, 0xf5) AM_WRITE(laserdsc_control_w)
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(den1_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(den2_w)
-ADDRESS_MAP_END
+void thayers_state::thayers_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).rw(FUNC(thayers_state::ssi263_register_r), FUNC(thayers_state::ssi263_register_w));
+	map(0x20, 0x20).w(FUNC(thayers_state::control_w));
+	map(0x40, 0x40).rw(FUNC(thayers_state::irqstate_r), FUNC(thayers_state::control2_w));
+	map(0x80, 0x80).rw(FUNC(thayers_state::cop_data_r), FUNC(thayers_state::cop_data_w));
+	map(0xa0, 0xa0).w(FUNC(thayers_state::timer_int_ack_w));
+	map(0xc0, 0xc0).w(FUNC(thayers_state::data_rdy_int_ack_w));
+	map(0xf0, 0xf0).r(FUNC(thayers_state::laserdsc_data_r));
+	map(0xf1, 0xf1).r(FUNC(thayers_state::dsw_b_r));
+	map(0xf2, 0xf2).portr("DSWA");
+	map(0xf3, 0xf3).w(FUNC(thayers_state::intrq_w));
+	map(0xf4, 0xf4).w(FUNC(thayers_state::laserdsc_data_w));
+	map(0xf5, 0xf5).w(FUNC(thayers_state::laserdsc_control_w));
+	map(0xf6, 0xf6).w(FUNC(thayers_state::den1_w));
+	map(0xf7, 0xf7).w(FUNC(thayers_state::den2_w));
+}
 
 /* Input Ports */
 
@@ -694,8 +702,8 @@ static INPUT_PORTS_START( thayers )
 	PORT_START("COIN")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, nullptr)
 
 	PORT_START("ROW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 YES") PORT_CODE(KEYCODE_1)
@@ -762,6 +770,7 @@ INPUT_PORTS_END
 
 void thayers_state::machine_start()
 {
+	m_digits.resolve();
 	memset(&m_ssi263, 0, sizeof(m_ssi263));
 }
 
@@ -792,19 +801,19 @@ void thayers_state::machine_reset()
 MACHINE_CONFIG_START(thayers_state::thayers)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(thayers_map)
-	MCFG_CPU_IO_MAP(thayers_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(thayers_map)
+	MCFG_DEVICE_IO_MAP(thayers_io_map)
 
-	MCFG_CPU_ADD("mcu", COP421, XTAL(4'000'000)/2) // COP421L-PCA/N
+	MCFG_DEVICE_ADD("mcu", COP421, XTAL(4'000'000)/2) // COP421L-PCA/N
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_READ_L_CB(READ8(thayers_state, cop_l_r))
-	MCFG_COP400_WRITE_L_CB(WRITE8(thayers_state, cop_l_w))
-	MCFG_COP400_READ_G_CB(READ8(thayers_state, cop_g_r))
-	MCFG_COP400_WRITE_G_CB(WRITE8(thayers_state, cop_g_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(thayers_state, cop_d_w))
-	MCFG_COP400_READ_SI_CB(READLINE(thayers_state, kbdata_r))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(thayers_state, kbclk_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, thayers_state, cop_l_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, thayers_state, cop_l_w))
+	MCFG_COP400_READ_G_CB(READ8(*this, thayers_state, cop_g_r))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, thayers_state, cop_g_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, thayers_state, cop_d_w))
+	MCFG_COP400_READ_SI_CB(READLINE(*this, thayers_state, kbdata_r))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, thayers_state, kbclk_w))
 
 	MCFG_LASERDISC_PR7820_ADD("laserdisc")
 
@@ -814,10 +823,11 @@ MACHINE_CONFIG_START(thayers_state::thayers)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	// SSI 263 @ 2MHz
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -850,6 +860,6 @@ ROM_END
 
 /* Game Drivers */
 
-//     YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT  MONITOR  COMPANY               FULLNAME                   FLAGS                                   LAYOUT
-GAMEL( 1984, thayers,  0,       thayers, thayers, thayers_state, 0,    ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
-GAMEL( 1984, thayersa, thayers, thayers, thayers, thayers_state, 0,    ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
+//     YEAR  NAME      PARENT   MACHINE  INPUT    CLASS          INIT        MONITOR  COMPANY               FULLNAME                   FLAGS                                   LAYOUT
+GAMEL( 1984, thayers,  0,       thayers, thayers, thayers_state, empty_init, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
+GAMEL( 1984, thayersa, thayers, thayers, thayers, thayers_state, empty_init, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)

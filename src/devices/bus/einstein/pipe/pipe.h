@@ -54,13 +54,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(tatung_pipe_cards, nullptr, false)
 
 #define MCFG_TATUNG_PIPE_INT_HANDLER(_devcb) \
-	devcb = &downcast<tatung_pipe_device &>(*device).set_int_handler(DEVCB_##_devcb);
+	downcast<tatung_pipe_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 #define MCFG_TATUNG_PIPE_NMI_HANDLER(_devcb) \
-	devcb = &downcast<tatung_pipe_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
+	downcast<tatung_pipe_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 #define MCFG_TATUNG_PIPE_RESET_HANDLER(_devcb) \
-	devcb = &downcast<tatung_pipe_device &>(*device).set_reset_handler(DEVCB_##_devcb);
+	downcast<tatung_pipe_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -131,6 +131,6 @@ protected:
 DECLARE_DEVICE_TYPE(TATUNG_PIPE, tatung_pipe_device)
 
 // supported devices
-SLOT_INTERFACE_EXTERN(tatung_pipe_cards);
+void tatung_pipe_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_EINSTEIN_PIPE_PIPE_H

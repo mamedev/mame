@@ -51,16 +51,16 @@
 	downcast<upd7220_device &>(*device).set_draw_text_callback(upd7220_device::draw_text_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_UPD7220_DRQ_CALLBACK(_write) \
-	devcb = &downcast<upd7220_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
+	downcast<upd7220_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_UPD7220_HSYNC_CALLBACK(_write) \
-	devcb = &downcast<upd7220_device &>(*device).set_hsync_wr_callback(DEVCB_##_write);
+	downcast<upd7220_device &>(*device).set_hsync_wr_callback(DEVCB_##_write);
 
 #define MCFG_UPD7220_VSYNC_CALLBACK(_write) \
-	devcb = &downcast<upd7220_device &>(*device).set_vsync_wr_callback(DEVCB_##_write);
+	downcast<upd7220_device &>(*device).set_vsync_wr_callback(DEVCB_##_write);
 
 #define MCFG_UPD7220_BLANK_CALLBACK(_write) \
-	devcb = &downcast<upd7220_device &>(*device).set_blank_wr_callback(DEVCB_##_write);
+	downcast<upd7220_device &>(*device).set_blank_wr_callback(DEVCB_##_write);
 
 
 

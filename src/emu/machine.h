@@ -197,7 +197,6 @@ public:
 	const char *basename() const { return m_basename.c_str(); }
 	int sample_rate() const { return m_sample_rate; }
 	bool save_or_load_pending() const { return !m_saveload_pending_file.empty(); }
-	[[deprecated("don't rely on this, use an object finder instead")]] screen_device *first_screen() const { return primary_screen; }
 
 	// RAII-based side effect disable
 	// NOP-ed when passed false, to make it more easily conditional
@@ -211,8 +210,8 @@ public:
 	bool allow_logging() const { return !m_logerror_list.empty(); }
 
 	// fetch items by name
-	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
-	template <class DeviceClass> inline DeviceClass *device(const char *tag) { return downcast<DeviceClass *>(device(tag)); }
+	[[deprecated("absolute tag lookup; use subdevice or finder instead")]] inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
+	template <class DeviceClass> [[deprecated("absolute tag lookup; use subdevice or finder instead")]] inline DeviceClass *device(const char *tag) { return downcast<DeviceClass *>(device(tag)); }
 
 	// immediate operations
 	int run(bool quiet);
@@ -259,9 +258,6 @@ public:
 	std::string get_statename(const char *statename_opt) const;
 
 private:
-	// video-related information
-	screen_device *         primary_screen;     // the primary screen device, or nullptr if screenless
-
 	// side effect disable counter
 	u32                     m_side_effects_disabled;
 

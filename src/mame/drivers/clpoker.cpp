@@ -79,28 +79,31 @@ private:
 	bool m_nmi_enable;
 };
 
-ADDRESS_MAP_START(clpoker_state::prg_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE(0xf002, 0xf002) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
-ADDRESS_MAP_END
+void clpoker_state::prg_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram().w(FUNC(clpoker_state::videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().share("nvram");
+	map(0xf000, 0xf000).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0xf001, 0xf001).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0xf002, 0xf002).w("ramdac", FUNC(ramdac_device::mask_w));
+}
 
-ADDRESS_MAP_START(clpoker_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi_outputs", i8255_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi_inputs", i8255_device, read, write)
-	AM_RANGE(0x30, 0x30) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x32, 0x32) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x34, 0x34) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xc0, 0xc0) AM_READNOP // mystery read at startup
-ADDRESS_MAP_END
+void clpoker_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi_outputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw("ppi_inputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x30, 0x30).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x32, 0x32).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x34, 0x34).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xc0, 0xc0).nopr(); // mystery read at startup
+}
 
-ADDRESS_MAP_START(clpoker_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void clpoker_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 WRITE8_MEMBER(clpoker_state::output_a_w)
 {
@@ -127,7 +130,7 @@ static INPUT_PORTS_START( clpoker )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -245,28 +248,28 @@ static const gfx_layout gfx_layout =
 };
 
 
-static GFXDECODE_START( clpoker )
+static GFXDECODE_START( gfx_clpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_layout,   0x0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(clpoker_state::clpoker)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 3) // Z0840004PSC, divider not verified
-	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 3) // Z0840004PSC, divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // HY6116ALP-12
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HY6116ALP-12
 
-	MCFG_DEVICE_ADD("ppi_outputs", I8255, 0) // M5L8255AP-5
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(clpoker_state, output_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(clpoker_state, output_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(clpoker_state, output_c_w))
+	i8255_device &ppi_outputs(I8255(config, "ppi_outputs")); // M5L8255AP-5
+	ppi_outputs.out_pa_callback().set(FUNC(clpoker_state::output_a_w));
+	ppi_outputs.out_pb_callback().set(FUNC(clpoker_state::output_b_w));
+	ppi_outputs.out_pc_callback().set(FUNC(clpoker_state::output_c_w));
 
-	MCFG_DEVICE_ADD("ppi_inputs", I8255, 0) // M5L8255AP-5
-	MCFG_I8255_IN_PORTA_CB(IOPORT("INA"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("INB"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("INC"))
+	i8255_device &ppi_inputs(I8255(config, "ppi_inputs")); // M5L8255AP-5
+	ppi_inputs.in_pa_callback().set_ioport("INA");
+	ppi_inputs.in_pb_callback().set_ioport("INB");
+	ppi_inputs.in_pc_callback().set_ioport("INC");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -277,16 +280,16 @@ MACHINE_CONFIG_START(clpoker_state::clpoker)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1) // probably right
 	MCFG_SCREEN_UPDATE_DRIVER(clpoker_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(clpoker_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, clpoker_state, vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HM86171
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clpoker)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000) / 8) // AY38910A/P, divider not verified
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000) / 8) // AY38910A/P, divider not verified
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -312,4 +315,4 @@ ROM_START( clpoker )
 ROM_END
 
 
-GAME( 1994, clpoker,  0, clpoker, clpoker, clpoker_state, 0, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM
+GAME( 1994, clpoker, 0, clpoker, clpoker, clpoker_state, empty_init, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM

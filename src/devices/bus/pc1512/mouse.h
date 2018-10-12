@@ -37,16 +37,16 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_PC1512_MOUSE_PORT_X_CB(_write) \
-	devcb = &downcast<pc1512_mouse_port_device &>(*device).set_x_wr_callback(DEVCB_##_write);
+	downcast<pc1512_mouse_port_device &>(*device).set_x_wr_callback(DEVCB_##_write);
 
 #define MCFG_PC1512_MOUSE_PORT_Y_CB(_write) \
-	devcb = &downcast<pc1512_mouse_port_device &>(*device).set_y_wr_callback(DEVCB_##_write);
+	downcast<pc1512_mouse_port_device &>(*device).set_y_wr_callback(DEVCB_##_write);
 
 #define MCFG_PC1512_MOUSE_PORT_M1_CB(_write) \
-	devcb = &downcast<pc1512_mouse_port_device &>(*device).set_m1_wr_callback(DEVCB_##_write);
+	downcast<pc1512_mouse_port_device &>(*device).set_m1_wr_callback(DEVCB_##_write);
 
 #define MCFG_PC1512_MOUSE_PORT_M2_CB(_write) \
-	devcb = &downcast<pc1512_mouse_port_device &>(*device).set_m2_wr_callback(DEVCB_##_write);
+	downcast<pc1512_mouse_port_device &>(*device).set_m2_wr_callback(DEVCB_##_write);
 
 
 
@@ -133,6 +133,6 @@ DECLARE_DEVICE_TYPE(PC1512_MOUSE,      pc1512_mouse_device)
 
 
 // slot devices
-SLOT_INTERFACE_EXTERN( pc1512_mouse_port_devices );
+void pc1512_mouse_port_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_PC1512_MOUSE_H

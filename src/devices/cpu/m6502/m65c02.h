@@ -4,8 +4,8 @@
 
     m65c02.h
 
-    Mostek 6502, CMOS variant with some additional instructions (but
-    not the bitwise ones)
+    MOS Technology 6502, CMOS variant with some additional instructions
+    (but not the bitwise ones)
 
 ***************************************************************************/
 #ifndef MAME_CPU_M6502_M65C02_H
@@ -19,7 +19,7 @@ class m65c02_device : public m6502_device {
 public:
 	m65c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 

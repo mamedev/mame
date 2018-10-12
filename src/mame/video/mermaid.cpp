@@ -230,8 +230,8 @@ uint8_t mermaid_state::collision_check( rectangle& rect )
 	int x;
 	int y;
 
-	for (y = rect.min_y; y <= rect.max_y; y++)
-		for (x = rect.min_x; x <= rect.max_x; x++)
+	for (y = rect.top(); y <= rect.bottom(); y++)
+		for (x = rect.left(); x <= rect.right(); x++)
 		{
 			uint16_t a = m_palette->pen_indirect(m_helper.pix16(y, x)) & 0x3f;
 			uint16_t b = m_palette->pen_indirect(m_helper2.pix16(y, x)) & 0x3f;
@@ -244,285 +244,287 @@ uint8_t mermaid_state::collision_check( rectangle& rect )
 	return data;
 }
 
+void mermaid_state::collision_update()
+{
+	const rectangle &visarea = m_screen->visible_area();
+	uint8_t *spriteram = m_spriteram;
+
+	int offs, offs2;
+
+	m_coll_bit0 = 0;
+	m_coll_bit1 = 0;
+	m_coll_bit2 = 0;
+	m_coll_bit3 = 0;
+	m_coll_bit6 = 0;
+
+	// check for bit 0 (sprite-sprite), 1 (sprite-foreground), 2 (sprite-background)
+
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int attr = spriteram[offs + 2];
+		int bank = (attr & 0x30) >> 4;
+		int coll = (attr & 0xc0) >> 6;
+		int code = (spriteram[offs] & 0x3f) | (bank << 6);
+		int flipx = spriteram[offs] & 0x40;
+		int flipy = spriteram[offs] & 0x80;
+		int sx = spriteram[offs + 3] + 1;
+		int sy = 240 - spriteram[offs + 1];
+
+		rectangle rect;
+
+		if (coll != 1) continue;
+
+		code |= m_rougien_gfxbank1 * 0x2800;
+		code |= m_rougien_gfxbank2 * 0x2400;
+
+		if (flip_screen_x())
+		{
+			flipx = !flipx;
+			sx = 240 - sx;
+		}
+
+		if (flip_screen_y())
+		{
+			flipy = !flipy;
+			sy = 240 - sy;
+		}
+
+		rect.set(
+				sx, sx + m_gfxdecode->gfx(1)->width() - 1,
+				sy, sy + m_gfxdecode->gfx(1)->height() - 1);
+		rect &= visarea;
+
+		// check collision sprite - background
+
+		m_helper.fill(0, rect);
+		m_helper2.fill(0, rect);
+
+		m_bg_tilemap->draw(*m_screen, m_helper, rect, 0, 0);
+
+		m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+
+		m_coll_bit2 |= collision_check(rect);
+
+		// check collision sprite - foreground
+
+		m_helper.fill(0, rect);
+		m_helper2.fill(0, rect);
+
+		m_fg_tilemap->draw(*m_screen, m_helper, rect, 0, 0);
+
+		m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+
+		m_coll_bit1 |= collision_check(rect);
+
+		// check collision sprite - sprite
+
+		m_helper.fill(0, rect);
+		m_helper2.fill(0, rect);
+
+		for (offs2 = m_spriteram.bytes() - 4; offs2 >= 0; offs2 -= 4)
+			if (offs != offs2)
+			{
+				int attr2 = spriteram[offs2 + 2];
+				int bank2 = (attr2 & 0x30) >> 4;
+				int coll2 = (attr2 & 0xc0) >> 6;
+				int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
+				int flipx2 = spriteram[offs2] & 0x40;
+				int flipy2 = spriteram[offs2] & 0x80;
+				int sx2 = spriteram[offs2 + 3] + 1;
+				int sy2 = 240 - spriteram[offs2 + 1];
+
+				if (coll2 != 0) continue;
+
+				code2 |= m_rougien_gfxbank1 * 0x2800;
+				code2 |= m_rougien_gfxbank2 * 0x2400;
+
+				if (flip_screen_x())
+				{
+					flipx2 = !flipx2;
+					sx2 = 240 - sx2;
+				}
+
+				if (flip_screen_y())
+				{
+					flipy2 = !flipy2;
+					sy2 = 240 - sy2;
+				}
+
+				m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
+			}
+
+		m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+
+		m_coll_bit0 |= collision_check(rect);
+	}
+
+	// check for bit 3 (sprite-sprite)
+
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int attr = spriteram[offs + 2];
+		int bank = (attr & 0x30) >> 4;
+		int coll = (attr & 0xc0) >> 6;
+		int code = (spriteram[offs] & 0x3f) | (bank << 6);
+		int flipx = spriteram[offs] & 0x40;
+		int flipy = spriteram[offs] & 0x80;
+		int sx = spriteram[offs + 3] + 1;
+		int sy = 240 - spriteram[offs + 1];
+
+		rectangle rect;
+
+		if (coll != 2) continue;
+
+		code |= m_rougien_gfxbank1 * 0x2800;
+		code |= m_rougien_gfxbank2 * 0x2400;
+
+		if (flip_screen_x())
+		{
+			flipx = !flipx;
+			sx = 240 - sx;
+		}
+
+		if (flip_screen_y())
+		{
+			flipy = !flipy;
+			sy = 240 - sy;
+		}
+
+		rect.set(
+				sx, sx + m_gfxdecode->gfx(1)->width() - 1,
+				sy, sy + m_gfxdecode->gfx(1)->height() - 1);
+		rect &= visarea;
+
+		// check collision sprite - sprite
+
+		m_helper.fill(0, rect);
+		m_helper2.fill(0, rect);
+
+		for (offs2 = m_spriteram.bytes() - 4; offs2 >= 0; offs2 -= 4)
+			if (offs != offs2)
+			{
+				int attr2 = spriteram[offs2 + 2];
+				int bank2 = (attr2 & 0x30) >> 4;
+				int coll2 = (attr2 & 0xc0) >> 6;
+				int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
+				int flipx2 = spriteram[offs2] & 0x40;
+				int flipy2 = spriteram[offs2] & 0x80;
+				int sx2 = spriteram[offs2 + 3] + 1;
+				int sy2 = 240 - spriteram[offs2 + 1];
+
+				if (coll2 != 0) continue;
+
+				code2 |= m_rougien_gfxbank1 * 0x2800;
+				code2 |= m_rougien_gfxbank2 * 0x2400;
+
+				if (flip_screen_x())
+				{
+					flipx2 = !flipx2;
+					sx2 = 240 - sx2;
+				}
+
+				if (flip_screen_y())
+				{
+					flipy2 = !flipy2;
+					sy2 = 240 - sy2;
+				}
+
+				m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
+			}
+
+		m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+
+		m_coll_bit3 |= collision_check(rect);
+	}
+
+	// check for bit 6
+
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int attr = spriteram[offs + 2];
+		int bank = (attr & 0x30) >> 4;
+		int coll = (attr & 0xc0) >> 6;
+		int code = (spriteram[offs] & 0x3f) | (bank << 6);
+		int flipx = spriteram[offs] & 0x40;
+		int flipy = spriteram[offs] & 0x80;
+		int sx = spriteram[offs + 3] + 1;
+		int sy = 240 - spriteram[offs + 1];
+
+		rectangle rect;
+
+		if (coll != 1) continue;
+
+		code |= m_rougien_gfxbank1 * 0x2800;
+		code |= m_rougien_gfxbank2 * 0x2400;
+
+		if (flip_screen_x())
+		{
+			flipx = !flipx;
+			sx = 240 - sx;
+		}
+
+		if (flip_screen_y())
+		{
+			flipy = !flipy;
+			sy = 240 - sy;
+		}
+
+		rect.set(
+				sx, sx + m_gfxdecode->gfx(1)->width() - 1,
+				sy, sy + m_gfxdecode->gfx(1)->height() - 1);
+		rect &= visarea;
+
+		// check collision sprite - sprite
+
+		m_helper.fill(0, rect);
+		m_helper2.fill(0, rect);
+
+		for (offs2 = m_spriteram.bytes() - 4; offs2 >= 0; offs2 -= 4)
+			if (offs != offs2)
+			{
+				int attr2 = spriteram[offs2 + 2];
+				int bank2 = (attr2 & 0x30) >> 4;
+				int coll2 = (attr2 & 0xc0) >> 6;
+				int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
+				int flipx2 = spriteram[offs2] & 0x40;
+				int flipy2 = spriteram[offs2] & 0x80;
+				int sx2 = spriteram[offs2 + 3] + 1;
+				int sy2 = 240 - spriteram[offs2 + 1];
+
+				if (coll2 != 2) continue;
+
+				code2 |= m_rougien_gfxbank1 * 0x2800;
+				code2 |= m_rougien_gfxbank2 * 0x2400;
+
+				if (flip_screen_x())
+				{
+					flipx2 = !flipx2;
+					sx2 = 240 - sx2;
+				}
+
+				if (flip_screen_y())
+				{
+					flipy2 = !flipy2;
+					sy2 = 240 - sy2;
+				}
+
+				m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
+			}
+
+		m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+
+		m_coll_bit6 |= collision_check(rect);
+	}
+}
+
 WRITE_LINE_MEMBER(mermaid_state::screen_vblank_mermaid)
 {
 	// rising edge
 	if (state)
 	{
-		const rectangle &visarea = m_screen->visible_area();
-		uint8_t *spriteram = m_spriteram;
+		collision_update();
 
-		int offs, offs2;
-
-		m_coll_bit0 = 0;
-		m_coll_bit1 = 0;
-		m_coll_bit2 = 0;
-		m_coll_bit3 = 0;
-		m_coll_bit6 = 0;
-
-		// check for bit 0 (sprite-sprite), 1 (sprite-foreground), 2 (sprite-background)
-
-		for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
-		{
-			int attr = spriteram[offs + 2];
-			int bank = (attr & 0x30) >> 4;
-			int coll = (attr & 0xc0) >> 6;
-			int code = (spriteram[offs] & 0x3f) | (bank << 6);
-			int flipx = spriteram[offs] & 0x40;
-			int flipy = spriteram[offs] & 0x80;
-			int sx = spriteram[offs + 3] + 1;
-			int sy = 240 - spriteram[offs + 1];
-
-			rectangle rect;
-
-			if (coll != 1) continue;
-
-			code |= m_rougien_gfxbank1 * 0x2800;
-			code |= m_rougien_gfxbank2 * 0x2400;
-
-			if (flip_screen_x())
-			{
-				flipx = !flipx;
-				sx = 240 - sx;
-			}
-
-			if (flip_screen_y())
-			{
-				flipy = !flipy;
-				sy = 240 - sy;
-			}
-
-			rect.min_x = sx;
-			rect.min_y = sy;
-			rect.max_x = sx + m_gfxdecode->gfx(1)->width() - 1;
-			rect.max_y = sy + m_gfxdecode->gfx(1)->height() - 1;
-
-			rect &= visarea;
-
-			// check collision sprite - background
-
-			m_helper.fill(0, rect);
-			m_helper2.fill(0, rect);
-
-			m_bg_tilemap->draw(*m_screen, m_helper, rect, 0, 0);
-
-			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
-
-			m_coll_bit2 |= collision_check(rect);
-
-			// check collision sprite - foreground
-
-			m_helper.fill(0, rect);
-			m_helper2.fill(0, rect);
-
-			m_fg_tilemap->draw(*m_screen, m_helper, rect, 0, 0);
-
-			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
-
-			m_coll_bit1 |= collision_check(rect);
-
-			// check collision sprite - sprite
-
-			m_helper.fill(0, rect);
-			m_helper2.fill(0, rect);
-
-			for (offs2 = m_spriteram.bytes() - 4; offs2 >= 0; offs2 -= 4)
-				if (offs != offs2)
-				{
-					int attr2 = spriteram[offs2 + 2];
-					int bank2 = (attr2 & 0x30) >> 4;
-					int coll2 = (attr2 & 0xc0) >> 6;
-					int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
-					int flipx2 = spriteram[offs2] & 0x40;
-					int flipy2 = spriteram[offs2] & 0x80;
-					int sx2 = spriteram[offs2 + 3] + 1;
-					int sy2 = 240 - spriteram[offs2 + 1];
-
-					if (coll2 != 0) continue;
-
-					code2 |= m_rougien_gfxbank1 * 0x2800;
-					code2 |= m_rougien_gfxbank2 * 0x2400;
-
-					if (flip_screen_x())
-					{
-						flipx2 = !flipx2;
-						sx2 = 240 - sx2;
-					}
-
-					if (flip_screen_y())
-					{
-						flipy2 = !flipy2;
-						sy2 = 240 - sy2;
-					}
-
-					m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
-				}
-
-			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
-
-			m_coll_bit0 |= collision_check(rect);
-		}
-
-		// check for bit 3 (sprite-sprite)
-
-		for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
-		{
-			int attr = spriteram[offs + 2];
-			int bank = (attr & 0x30) >> 4;
-			int coll = (attr & 0xc0) >> 6;
-			int code = (spriteram[offs] & 0x3f) | (bank << 6);
-			int flipx = spriteram[offs] & 0x40;
-			int flipy = spriteram[offs] & 0x80;
-			int sx = spriteram[offs + 3] + 1;
-			int sy = 240 - spriteram[offs + 1];
-
-			rectangle rect;
-
-			if (coll != 2) continue;
-
-			code |= m_rougien_gfxbank1 * 0x2800;
-			code |= m_rougien_gfxbank2 * 0x2400;
-
-			if (flip_screen_x())
-			{
-				flipx = !flipx;
-				sx = 240 - sx;
-			}
-
-			if (flip_screen_y())
-			{
-				flipy = !flipy;
-				sy = 240 - sy;
-			}
-
-			rect.min_x = sx;
-			rect.min_y = sy;
-			rect.max_x = sx + m_gfxdecode->gfx(1)->width() - 1;
-			rect.max_y = sy + m_gfxdecode->gfx(1)->height() - 1;
-
-			rect &= visarea;
-
-			// check collision sprite - sprite
-
-			m_helper.fill(0, rect);
-			m_helper2.fill(0, rect);
-
-			for (offs2 = m_spriteram.bytes() - 4; offs2 >= 0; offs2 -= 4)
-				if (offs != offs2)
-				{
-					int attr2 = spriteram[offs2 + 2];
-					int bank2 = (attr2 & 0x30) >> 4;
-					int coll2 = (attr2 & 0xc0) >> 6;
-					int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
-					int flipx2 = spriteram[offs2] & 0x40;
-					int flipy2 = spriteram[offs2] & 0x80;
-					int sx2 = spriteram[offs2 + 3] + 1;
-					int sy2 = 240 - spriteram[offs2 + 1];
-
-					if (coll2 != 0) continue;
-
-					code2 |= m_rougien_gfxbank1 * 0x2800;
-					code2 |= m_rougien_gfxbank2 * 0x2400;
-
-					if (flip_screen_x())
-					{
-						flipx2 = !flipx2;
-						sx2 = 240 - sx2;
-					}
-
-					if (flip_screen_y())
-					{
-						flipy2 = !flipy2;
-						sy2 = 240 - sy2;
-					}
-
-					m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
-				}
-
-			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
-
-			m_coll_bit3 |= collision_check(rect);
-		}
-
-		// check for bit 6
-
-		for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
-		{
-			int attr = spriteram[offs + 2];
-			int bank = (attr & 0x30) >> 4;
-			int coll = (attr & 0xc0) >> 6;
-			int code = (spriteram[offs] & 0x3f) | (bank << 6);
-			int flipx = spriteram[offs] & 0x40;
-			int flipy = spriteram[offs] & 0x80;
-			int sx = spriteram[offs + 3] + 1;
-			int sy = 240 - spriteram[offs + 1];
-
-			rectangle rect;
-
-			if (coll != 1) continue;
-
-			code |= m_rougien_gfxbank1 * 0x2800;
-			code |= m_rougien_gfxbank2 * 0x2400;
-
-			if (flip_screen_x())
-			{
-				flipx = !flipx;
-				sx = 240 - sx;
-			}
-
-			if (flip_screen_y())
-			{
-				flipy = !flipy;
-				sy = 240 - sy;
-			}
-
-			rect.min_x = sx;
-			rect.min_y = sy;
-			rect.max_x = sx + m_gfxdecode->gfx(1)->width() - 1;
-			rect.max_y = sy + m_gfxdecode->gfx(1)->height() - 1;
-
-			rect &= visarea;
-
-			// check collision sprite - sprite
-
-			m_helper.fill(0, rect);
-			m_helper2.fill(0, rect);
-
-			for (offs2 = m_spriteram.bytes() - 4; offs2 >= 0; offs2 -= 4)
-				if (offs != offs2)
-				{
-					int attr2 = spriteram[offs2 + 2];
-					int bank2 = (attr2 & 0x30) >> 4;
-					int coll2 = (attr2 & 0xc0) >> 6;
-					int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
-					int flipx2 = spriteram[offs2] & 0x40;
-					int flipy2 = spriteram[offs2] & 0x80;
-					int sx2 = spriteram[offs2 + 3] + 1;
-					int sy2 = 240 - spriteram[offs2 + 1];
-
-					if (coll2 != 2) continue;
-
-					code2 |= m_rougien_gfxbank1 * 0x2800;
-					code2 |= m_rougien_gfxbank2 * 0x2400;
-
-					if (flip_screen_x())
-					{
-						flipx2 = !flipx2;
-						sx2 = 240 - sx2;
-					}
-
-					if (flip_screen_y())
-					{
-						flipy2 = !flipy2;
-						sy2 = 240 - sy2;
-					}
-
-					m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
-				}
-
-			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
-
-			m_coll_bit6 |= collision_check(rect);
-		}
+		if (m_nmi_mask)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }

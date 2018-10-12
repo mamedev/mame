@@ -68,6 +68,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -76,58 +77,50 @@ Notes:
 
 WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
 {
-	machine().output().set_value("lamp_p1_r", BIT(data,  0));
-	machine().output().set_value("lamp_p1_g", BIT(data,  1));
-	machine().output().set_value("lamp_p1_b", BIT(data,  2));
-	machine().output().set_value("lamp_p1_s", BIT(data,  3));
-
-	machine().output().set_value("lamp_p2_r", BIT(data,  4));
-	machine().output().set_value("lamp_p2_g", BIT(data,  5));
-	machine().output().set_value("lamp_p2_b", BIT(data,  6));
-	machine().output().set_value("lamp_p2_s", BIT(data,  7));
-
-	machine().output().set_value("lamp_p3_r", BIT(data,  8));
-	machine().output().set_value("lamp_p3_g", BIT(data,  9));
-	machine().output().set_value("lamp_p3_b", BIT(data, 10));
-	machine().output().set_value("lamp_p3_s", BIT(data, 11));
-}
-
-WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
-{
-	if (ACCESSING_BITS_8_15)
+	for (int p = 0; p < 3; p++)
 	{
-		m_oki->set_rom_bank((~data & 0x0100) >> 8);
+		m_lamp_r[p] = BIT(data, 4 * p);
+		m_lamp_g[p] = BIT(data, 4 * p + 1);
+		m_lamp_b[p] = BIT(data, 4 * p + 2);
+		m_lamp_s[p] = BIT(data, 4 * p + 3);
 	}
 }
 
+WRITE8_MEMBER(gotcha_state::gotcha_oki_bank_w)
+{
+	m_oki->set_rom_bank(!BIT(data, 0));
+}
 
-ADDRESS_MAP_START(gotcha_state::gotcha_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(gotcha_oki_bank_w)
-	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("DSW")
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(gotcha_gfxbank_select_w)
-	AM_RANGE(0x300002, 0x300009) AM_WRITE(gotcha_scroll_w)
+
+void gotcha_state::gotcha_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x100002, 0x100003).w(FUNC(gotcha_state::gotcha_lamps_w));
+	map(0x100004, 0x100004).w(FUNC(gotcha_state::gotcha_oki_bank_w));
+	map(0x120000, 0x12ffff).ram();
+	map(0x140000, 0x1405ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x160000, 0x1607ff).ram().share("spriteram");
+	map(0x180000, 0x180001).portr("INPUTS");
+	map(0x180002, 0x180003).portr("SYSTEM");
+	map(0x180004, 0x180005).portr("DSW");
+	map(0x300000, 0x300001).w(FUNC(gotcha_state::gotcha_gfxbank_select_w));
+	map(0x300002, 0x300009).w(FUNC(gotcha_state::gotcha_scroll_w));
 //  { 0x30000c, 0x30000d,
-	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(gotcha_gfxbank_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(gotcha_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(gotcha_bgvideoram_w) AM_SHARE("bgvideoram")
-ADDRESS_MAP_END
+	map(0x30000e, 0x30000f).w(FUNC(gotcha_state::gotcha_gfxbank_w));
+	map(0x320000, 0x320fff).w(FUNC(gotcha_state::gotcha_fgvideoram_w)).share("fgvideoram");
+	map(0x322000, 0x322fff).w(FUNC(gotcha_state::gotcha_bgvideoram_w)).share("bgvideoram");
+}
 
 
-ADDRESS_MAP_START(gotcha_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
-	AM_RANGE(0xc006, 0xc006) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-ADDRESS_MAP_END
+void gotcha_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc002, 0xc002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).mirror(1);
+	map(0xc006, 0xc006).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xd000, 0xd7ff).ram();
+}
 
 
 
@@ -235,7 +228,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( gotcha )
+static GFXDECODE_START( gfx_gotcha )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0x100, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x000, 16 )
 GFXDECODE_END
@@ -244,6 +237,11 @@ GFXDECODE_END
 
 void gotcha_state::machine_start()
 {
+	m_lamp_r.resolve();
+	m_lamp_g.resolve();
+	m_lamp_b.resolve();
+	m_lamp_s.resolve();
+
 	save_item(NAME(m_banksel));
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_scroll));
@@ -265,28 +263,26 @@ void gotcha_state::machine_reset()
 MACHINE_CONFIG_START(gotcha_state::gotcha)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */
-	MCFG_CPU_PROGRAM_MAP(gotcha_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gotcha_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(gotcha_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80,6000000)   /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gotcha_state,  nmi_line_pulse)
-
+	MCFG_DEVICE_ADD("audiocpu", Z80,6000000)   /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gotcha_state, screen_update_gotcha)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(gotcha_state::screen_update_gotcha));
+	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
+	screen.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI); // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotcha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotcha)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(1)
@@ -295,16 +291,16 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
 	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -388,5 +384,5 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAMEL( 1997, gotcha,  0,      gotcha, gotcha, gotcha_state, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
-GAMEL( 1997, ppchamp, gotcha, gotcha, gotcha, gotcha_state, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, gotcha,  0,      gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, ppchamp, gotcha, gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE, layout_gotcha )

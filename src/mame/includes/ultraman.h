@@ -16,26 +16,25 @@ class ultraman_state : public driver_device
 {
 public:
 	ultraman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_k051316_1(*this, "k051316_1"),
-		m_k051316_2(*this, "k051316_2"),
-		m_k051316_3(*this, "k051316_3"),
-		m_k051960(*this, "k051960"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundnmi(*this, "soundnmi") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_k051316(*this, "k051316_%u", 1)
+		, m_k051960(*this, "k051960")
+		, m_soundlatch(*this, "soundlatch")
+		, m_soundnmi(*this, "soundnmi")
+	{
+	}
 
-	int        m_bank0;
-	int        m_bank1;
-	int        m_bank2;
+	void ultraman(machine_config &config);
+
+private:
+	int        m_bank[3];
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k051316_device> m_k051316_1;
-	required_device<k051316_device> m_k051316_2;
-	required_device<k051316_device> m_k051316_3;
+	required_device_array<k051316_device, 3> m_k051316;
 	required_device<k051960_device> m_k051960;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<input_merger_device> m_soundnmi;
@@ -49,7 +48,6 @@ public:
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051316_CB_MEMBER(zoom_callback_3);
 	K051960_CB_MEMBER(sprite_callback);
-	void ultraman(machine_config &config);
 	void main_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);

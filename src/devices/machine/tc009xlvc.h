@@ -85,6 +85,6 @@ DECLARE_DEVICE_TYPE(TC0091LVC, tc0091lvc_device)
 
 
 #define MCFG_TC0091LVC_GFXDECODE(gfxtag) \
-	downcast<tc0091lvc_device &>(*device).set_gfxdecode_tag(("^" gfxtag));
+	downcast<tc0091lvc_device &>(*device).set_gfxdecode_tag(gfxtag);
 
 #endif // MAME_MACHINE_TL009XLVC_H

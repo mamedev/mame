@@ -44,15 +44,18 @@ ioport_constructor spectrum_fuller_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(spectrum_fuller_device::device_add_mconfig)
+void spectrum_fuller_device::device_add_mconfig(machine_config &config)
+{
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8912", AY8912, XTAL(3'579'545) / 2) // unverified clock
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	AY8912(config, m_psg, 3.579545_MHz_XTAL / 2); // unverified clock
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* passthru */
-	MCFG_SPECTRUM_PASSTHRU_EXPANSION_SLOT_ADD()
-MACHINE_CONFIG_END
+	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
+	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
+	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -78,12 +81,6 @@ spectrum_fuller_device::spectrum_fuller_device(const machine_config &mconfig, co
 
 void spectrum_fuller_device::device_start()
 {
-	address_space& spaceio = machine().device("maincpu")->memory().space(AS_IO);
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
-
-	spaceio.install_write_handler(0x3f, 0x3f, 0, 0xff00, 0, write8_delegate(FUNC(ay8910_device::address_w), (ay8910_device*)m_psg));
-	spaceio.install_readwrite_handler(0x5f, 0x5f, 0, 0xff00, 0, read8_delegate(FUNC(ay8910_device::data_r), (ay8910_device*)m_psg), write8_delegate(FUNC(ay8910_device::data_w), (ay8910_device*)m_psg));
-	spaceio.install_read_handler(0x7f, 0x7f, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_fuller_device::joystick_r), this));
 }
 
 
@@ -93,6 +90,11 @@ void spectrum_fuller_device::device_start()
 
 void spectrum_fuller_device::device_reset()
 {
+	m_exp->set_io_space(&io_space());
+
+	io_space().install_write_handler(0x3f, 0x3f, 0, 0xff00, 0, write8_delegate(FUNC(ay8910_device::address_w), m_psg.target()));
+	io_space().install_readwrite_handler(0x5f, 0x5f, 0, 0xff00, 0, read8_delegate(FUNC(ay8910_device::data_r), m_psg.target()), write8_delegate(FUNC(ay8910_device::data_w), m_psg.target()));
+	io_space().install_read_handler(0x7f, 0x7f, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_fuller_device::joystick_r), this));
 }
 
 

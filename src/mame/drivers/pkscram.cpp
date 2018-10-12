@@ -18,6 +18,7 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -27,21 +28,24 @@ class pkscram_state : public driver_device
 public:
 	pkscram_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_pkscramble_fgtilemap_ram(*this, "fgtilemap_ram"),
-		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
-		m_pkscramble_bgtilemap_ram(*this, "bgtilemap_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_scan_timer(*this, "scan_timer"),
+		m_pkscramble_fgtilemap_ram(*this, "fgtilemap_ram"),
+		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
+		m_pkscramble_bgtilemap_ram(*this, "bgtilemap_ram")
+	{ }
 
-	uint16_t m_out;
-	uint8_t m_interrupt_line_active;
-	required_shared_ptr<uint16_t> m_pkscramble_fgtilemap_ram;
-	required_shared_ptr<uint16_t> m_pkscramble_mdtilemap_ram;
-	required_shared_ptr<uint16_t> m_pkscramble_bgtilemap_ram;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_md_tilemap;
-	tilemap_t *m_bg_tilemap;
+	void pkscramble(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void pkscramble_map(address_map &map);
+
 	DECLARE_WRITE16_MEMBER(pkscramble_fgtilemap_w);
 	DECLARE_WRITE16_MEMBER(pkscramble_mdtilemap_w);
 	DECLARE_WRITE16_MEMBER(pkscramble_bgtilemap_w);
@@ -49,17 +53,24 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+	uint32_t screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	void pkscramble(machine_config &config);
-	void pkscramble_map(address_map &map);
+	required_device<timer_device> m_scan_timer;
+	required_shared_ptr<uint16_t> m_pkscramble_fgtilemap_ram;
+	required_shared_ptr<uint16_t> m_pkscramble_mdtilemap_ram;
+	required_shared_ptr<uint16_t> m_pkscramble_bgtilemap_ram;
+
+	uint16_t m_out;
+	uint8_t m_interrupt_line_active;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_md_tilemap;
+	tilemap_t *m_bg_tilemap;
 };
 
 
@@ -119,27 +130,28 @@ WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
-ADDRESS_MAP_START(pkscram_state::pkscramble_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x0400ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x041000, 0x043fff) AM_RAM // main ram
-	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(pkscramble_fgtilemap_w) AM_SHARE("fgtilemap_ram") // fg tilemap
-	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(pkscramble_mdtilemap_w) AM_SHARE("mdtilemap_ram") // md tilemap (just a copy of fg?)
-	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(pkscramble_bgtilemap_w) AM_SHARE("bgtilemap_ram") // bg tilemap
-	AM_RANGE(0x047000, 0x047fff) AM_RAM // unused
-	AM_RANGE(0x048000, 0x048fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x049000, 0x049001) AM_READ_PORT("DSW")
-	AM_RANGE(0x049004, 0x049005) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x049008, 0x049009) AM_WRITE(pkscramble_output_w)
-	AM_RANGE(0x049010, 0x049011) AM_WRITENOP
-	AM_RANGE(0x049014, 0x049015) AM_WRITENOP
-	AM_RANGE(0x049018, 0x049019) AM_WRITENOP
-	AM_RANGE(0x04901c, 0x04901d) AM_WRITENOP
-	AM_RANGE(0x049020, 0x049021) AM_WRITENOP
-	AM_RANGE(0x04900c, 0x04900f) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
-	AM_RANGE(0x052086, 0x052087) AM_WRITENOP
-ADDRESS_MAP_END
+void pkscram_state::pkscramble_map(address_map &map)
+{
+	map.global_mask(0x7ffff);
+	map(0x000000, 0x01ffff).rom();
+	map(0x040000, 0x0400ff).ram().share("nvram");
+	map(0x041000, 0x043fff).ram(); // main ram
+	map(0x044000, 0x044fff).ram().w(FUNC(pkscram_state::pkscramble_fgtilemap_w)).share("fgtilemap_ram"); // fg tilemap
+	map(0x045000, 0x045fff).ram().w(FUNC(pkscram_state::pkscramble_mdtilemap_w)).share("mdtilemap_ram"); // md tilemap (just a copy of fg?)
+	map(0x046000, 0x046fff).ram().w(FUNC(pkscram_state::pkscramble_bgtilemap_w)).share("bgtilemap_ram"); // bg tilemap
+	map(0x047000, 0x047fff).ram(); // unused
+	map(0x048000, 0x048fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x049000, 0x049001).portr("DSW");
+	map(0x049004, 0x049005).portr("INPUTS");
+	map(0x049008, 0x049009).w(FUNC(pkscram_state::pkscramble_output_w));
+	map(0x049010, 0x049011).nopw();
+	map(0x049014, 0x049015).nopw();
+	map(0x049018, 0x049019).nopw();
+	map(0x04901c, 0x04901d).nopw();
+	map(0x049020, 0x049021).nopw();
+	map(0x04900c, 0x04900f).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
+	map(0x052086, 0x052087).nopw();
+}
 
 
 static INPUT_PORTS_START( pkscramble )
@@ -197,7 +209,7 @@ static INPUT_PORTS_START( pkscramble )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Center
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // Right
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_SPECIAL ) // Hopper status
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_CUSTOM ) // Hopper status
 	PORT_DIPNAME( 0x0040, 0x0000, "Coin Test" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
@@ -236,14 +248,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
 	{
 		if (m_out & 0x2000)
 			m_maincpu->set_input_line(1, ASSERT_LINE);
-		timer.adjust(m_screen->time_until_pos(param + 1), param+1);
+		m_scan_timer->adjust(m_screen->time_until_pos(param + 1), param+1);
 		m_interrupt_line_active = 1;
 	}
 	else
 	{
 		if (m_interrupt_line_active)
 			m_maincpu->set_input_line(1, CLEAR_LINE);
-		timer.adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
+		m_scan_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 		m_interrupt_line_active = 0;
 	}
 }
@@ -278,7 +290,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( pkscram )
+static GFXDECODE_START( gfx_pkscram )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
@@ -298,17 +310,16 @@ void pkscram_state::machine_reset()
 {
 	m_out = 0;
 	m_interrupt_line_active=0;
-	timer_device *scanline_timer = machine().device<timer_device>("scan_timer");
-	scanline_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
+	m_scan_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
 MACHINE_CONFIG_START(pkscram_state::pkscramble)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000 )
-	MCFG_CPU_PROGRAM_MAP(pkscramble_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", pkscram_state,  irq1_line_hold) /* only valid irq */
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000 )
+	MCFG_DEVICE_PROGRAM_MAP(pkscramble_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pkscram_state,  irq1_line_hold) /* only valid irq */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", pkscram_state, scanline_callback)
@@ -324,14 +335,14 @@ MACHINE_CONFIG_START(pkscram_state::pkscramble)
 
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkscram)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkscram)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(pkscram_state, irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 12000000/4)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pkscram_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -347,4 +358,4 @@ ROM_START( pkscram )
 ROM_END
 
 
-GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, empty_init, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )

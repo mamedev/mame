@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro - 68000 Co-Processor Discs -->
+<!-- Acorn BBC Micro - Casper 68000 Co-Processor discs -->
 
 <!-- Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_flop_68000" description="Casper 68000 2nd Processor Discs">
+<softwarelist name="bbc_flop_68000" description="Casper 68000 2nd Processor discs">
 
 	<software name="casper">
 		<description>Casper Support Discs</description>

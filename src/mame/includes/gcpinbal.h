@@ -6,15 +6,11 @@
 #include "sound/es8712.h"
 #include "sound/okim6295.h"
 #include "video/excellent_spr.h"
+#include "emupal.h"
 
 class gcpinbal_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_GCPINBAL_INTERRUPT1
-	};
-
 	gcpinbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -29,6 +25,14 @@ public:
 		, m_palette(*this, "palette")
 		, m_sprgen(*this, "spritegen")
 	{ }
+
+	void gcpinbal(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_GCPINBAL_INTERRUPT1
+	};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -80,8 +84,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gcp_adpcm_int);
 	required_device<excellent_spr_device> m_sprgen;
 
-	void gcpinbal(machine_config &config);
 	void gcpinbal_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

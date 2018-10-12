@@ -27,7 +27,7 @@ Debugging information:
 
 #include "emu.h"
 #include "cpu/hcd62121/hcd62121.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 
 class cfx9850_state : public driver_device
@@ -68,16 +68,17 @@ private:
 };
 
 
-ADDRESS_MAP_START(cfx9850_state::cfx9850)
-	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
-	AM_RANGE( 0x080000, 0x0807ff ) AM_RAM AM_SHARE("video_ram")
+void cfx9850_state::cfx9850(address_map &map)
+{
+	map(0x000000, 0x007fff).rom();
+	map(0x080000, 0x0807ff).ram().share("video_ram");
 //  AM_RANGE( 0x100000, 0x10ffff ) // some memory mapped i/o???
 //  AM_RANGE( 0x110000, 0x11ffff ) // some memory mapped i/o???
-	AM_RANGE( 0x200000, 0x27ffff ) AM_ROM AM_REGION( "bios", 0 )
-	AM_RANGE( 0x400000, 0x40ffff ) AM_RAM
-	AM_RANGE( 0x600000, 0x6007ff ) AM_MIRROR(0xf800) AM_RAM AM_SHARE("display_ram")
+	map(0x200000, 0x27ffff).rom().region("bios", 0);
+	map(0x400000, 0x40ffff).ram();
+	map(0x600000, 0x6007ff).mirror(0xf800).ram().share("display_ram");
 //  AM_RANGE( 0xe10000, 0xe1ffff ) // some memory mapped i/o???
-ADDRESS_MAP_END
+}
 
 
 WRITE8_MEMBER(cfx9850_state::kol_w)
@@ -282,14 +283,14 @@ u32 cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bi
 
 
 MACHINE_CONFIG_START(cfx9850_state::cfx9850)
-	MCFG_CPU_ADD("maincpu", HCD62121, 4300000)    /* X1 - 4.3 MHz */
-	MCFG_CPU_PROGRAM_MAP(cfx9850)
-	MCFG_HCD62121_KOL_CB(WRITE8(cfx9850_state, kol_w))
-	MCFG_HCD62121_KOH_CB(WRITE8(cfx9850_state, koh_w))
-	MCFG_HCD62121_PORT_CB(WRITE8(cfx9850_state, port_w))
-	MCFG_HCD62121_OPT_CB(WRITE8(cfx9850_state, opt_w))
-	MCFG_HCD62121_KI_CB(READ8(cfx9850_state, ki_r))
-	MCFG_HCD62121_IN0_CB(READ8(cfx9850_state, in0_r))
+	MCFG_DEVICE_ADD("maincpu", HCD62121, 4300000)    /* X1 - 4.3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cfx9850)
+	MCFG_HCD62121_KOL_CB(WRITE8(*this, cfx9850_state, kol_w))
+	MCFG_HCD62121_KOH_CB(WRITE8(*this, cfx9850_state, koh_w))
+	MCFG_HCD62121_PORT_CB(WRITE8(*this, cfx9850_state, port_w))
+	MCFG_HCD62121_OPT_CB(WRITE8(*this, cfx9850_state, opt_w))
+	MCFG_HCD62121_KI_CB(READ8(*this, cfx9850_state, ki_r))
+	MCFG_HCD62121_IN0_CB(READ8(*this, cfx9850_state, in0_r))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -297,8 +298,6 @@ MACHINE_CONFIG_START(cfx9850_state::cfx9850)
 	MCFG_SCREEN_VISIBLE_AREA(0, 127, 0, 63)
 	MCFG_SCREEN_UPDATE_DRIVER(cfx9850_state, screen_update_cfx9850)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	// TODO: Verify amount of colors and palette. Colors can be changed by changing the contrast.
 	MCFG_PALETTE_ADD("palette", 4)
@@ -313,10 +312,10 @@ ROM_START(cfx9850)
 	ROM_REGION(0x80000, "bios", 0)
 	// Unknown yet which rom is which version.
 	ROM_SYSTEM_BIOS(0, "rom1", "rom1, version unknown")
-	ROMX_LOAD("cfx9850.bin", 0x00000, 0x80000, CRC(6c9bd903) SHA1(d5b6677ab4e0d3f84e5769e89e8f3d101f98f848), ROM_BIOS(1))
+	ROMX_LOAD("cfx9850.bin", 0x00000, 0x80000, CRC(6c9bd903) SHA1(d5b6677ab4e0d3f84e5769e89e8f3d101f98f848), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rom2", "rom2, version unknown")
-	ROMX_LOAD("cfx9850b.bin", 0x00000, 0x80000, CRC(cd3c497f) SHA1(1d1aa38205eec7aba3ed6bef7389767e38afe075), ROM_BIOS(2))
+	ROMX_LOAD("cfx9850b.bin", 0x00000, 0x80000, CRC(cd3c497f) SHA1(1d1aa38205eec7aba3ed6bef7389767e38afe075), ROM_BIOS(1))
 ROM_END
 
 
-COMP(1996, cfx9850, 0, 0, cfx9850, cfx9850, cfx9850_state, 0, "Casio", "CFX-9850G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1996, cfx9850, 0, 0, cfx9850, cfx9850, cfx9850_state, empty_init, "Casio", "CFX-9850G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

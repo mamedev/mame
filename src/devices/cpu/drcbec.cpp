@@ -519,7 +519,8 @@ int drcbe_c::execute(code_handle &entry)
 				fatalerror("Unexpected opcode\n");
 
 			case MAKE_OPCODE_SHORT(OP_DEBUG, 4, 0):     // DEBUG   pc
-				debugger_instruction_hook(&m_device, PARAM0);
+				if (m_device.machine().debug_flags & DEBUG_FLAG_CALL_HOOK)
+					m_device.debug()->instruction_hook(PARAM0);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_HASHJMP, 4, 0):   // HASHJMP mode,pc,handle

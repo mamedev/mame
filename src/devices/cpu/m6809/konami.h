@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_KONAMICPU_LINE_CB(_devcb) \
-	devcb = &downcast<konami_cpu_device &>(*device).set_line_callback(DEVCB_##_devcb);
+	downcast<konami_cpu_device &>(*device).set_line_callback(DEVCB_##_devcb);
 
 
 // device type definition
@@ -46,7 +46,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	typedef m6809_base_device super;

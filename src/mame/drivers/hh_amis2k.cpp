@@ -39,31 +39,26 @@
 class wildfire_state : public driver_device
 {
 public:
-	wildfire_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wildfire_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_a12_decay_timer(*this, "a12_decay")
+		m_a12_decay_timer(*this, "a12_decay"),
+		m_digits(*this, "digit%u", 0U),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<timer_device> m_a12_decay_timer;
+	void wildfire(machine_config &config);
 
-	u8 m_d;
-	u16 m_a;
-	u8 m_q2;
-	u8 m_q3;
-
-	u16 m_display_state[0x10];
-	u16 m_display_cache[0x10];
-	u8 m_display_decay[0x100];
+private:
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE16_MEMBER(write_a);
 	DECLARE_WRITE_LINE_MEMBER(write_f);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+
 	bool index_is_7segled(int index);
 	void display_update();
 
@@ -71,8 +66,20 @@ public:
 	void write_a12(int state);
 	void sound_update();
 
-	virtual void machine_start() override;
-	void wildfire(machine_config &config);
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<timer_device> m_a12_decay_timer;
+
+	output_finder<3> m_digits;
+	output_finder<16 * 10> m_lamps; // only ones ending in 0-7 are used, 8-9 are unused
+
+	u8 m_d;
+	u16 m_a;
+	u8 m_q2;
+	u8 m_q3;
+
+	u16 m_display_state[0x10];
+	u8 m_display_decay[0x100];
 };
 
 
@@ -138,16 +145,13 @@ void wildfire_state::display_update()
 
 	// on difference, send to output
 	for (int i = 0; i < 0x10; i++)
-		if (m_display_cache[i] != active_state[i])
-		{
-			if (index_is_7segled(i))
-				output().set_digit_value(i, bitswap<8>(active_state[i],7,0,1,2,3,4,5,6) & 0x7f);
+	{
+		if (index_is_7segled(i))
+			m_digits[i] = bitswap<7>(active_state[i],0,1,2,3,4,5,6);
 
-			for (int j = 0; j < 8; j++)
-				output().set_lamp_value(i*10 + j, active_state[i] >> j & 1);
-		}
-
-	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
+		for (int j = 0; j < 8; j++)
+			m_lamps[(i * 10) + j] = BIT(active_state[i], j);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::display_decay_tick)
@@ -262,9 +266,11 @@ INPUT_PORTS_END
 
 void wildfire_state::machine_start()
 {
+	m_digits.resolve();
+	m_lamps.resolve();
+
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 
 	m_d = 0;
@@ -274,7 +280,6 @@ void wildfire_state::machine_start()
 
 	// register for savestates
 	save_item(NAME(m_display_state));
-	/* save_item(NAME(m_display_cache)); */ // don't save!
 	save_item(NAME(m_display_decay));
 
 	save_item(NAME(m_d));
@@ -310,23 +315,23 @@ static const u8 wildfire_7seg_table[0x10] =
 MACHINE_CONFIG_START(wildfire_state::wildfire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", AMI_S2152, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", AMI_S2152, MASTER_CLOCK)
 	MCFG_AMI_S2000_7SEG_DECODER(wildfire_7seg_table)
 	MCFG_AMI_S2000_READ_I_CB(IOPORT("IN1"))
-	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(wildfire_state, write_d))
-	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(wildfire_state, write_a))
-	MCFG_AMI_S2152_FOUT_CB(WRITELINE(wildfire_state, write_f))
+	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(*this, wildfire_state, write_d))
+	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(*this, wildfire_state, write_a))
+	MCFG_AMI_S2152_FOUT_CB(WRITELINE(*this, wildfire_state, write_f))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", wildfire_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD("a12_decay", wildfire_state, reset_q2)
 
-	MCFG_DEFAULT_LAYOUT(layout_wildfire)
+	config.set_default_layout(layout_wildfire);
 
 	/* no video! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -345,5 +350,5 @@ ROM_START( wildfire )
 ROM_END
 
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1979, wildfire, 0,      0, wildfire, wildfire, wildfire_state, 0, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release
+//    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, wildfire, 0,      0, wildfire, wildfire, wildfire_state, empty_init, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release

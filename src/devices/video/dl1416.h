@@ -21,9 +21,9 @@
     DEVICE TYPES
 ***************************************************************************/
 
-extern device_type const DL1414T;
-extern device_type const DL1416B;
-extern device_type const DL1416T;
+DECLARE_DEVICE_TYPE(DL1414T, dl1414_device)
+DECLARE_DEVICE_TYPE(DL1416B, dl1416_device)
+DECLARE_DEVICE_TYPE(DL1416T, dl1416_device)
 
 
 /***************************************************************************
@@ -31,10 +31,10 @@ extern device_type const DL1416T;
 ***************************************************************************/
 
 #define MCFG_DL1414_UPDATE_HANDLER(_devcb) \
-	devcb = &downcast<dl1414_device &>(*device).set_update_handler(DEVCB_##_devcb);
+	downcast<dl1414_device &>(*device).set_update_handler(DEVCB_##_devcb);
 
 #define MCFG_DL1416_UPDATE_HANDLER(_devcb) \
-	devcb = &downcast<dl1414_device &>(*device).set_update_handler(DEVCB_##_devcb);
+	downcast<dl1414_device &>(*device).set_update_handler(DEVCB_##_devcb);
 
 
 /***************************************************************************

@@ -59,6 +59,21 @@
 #include "formats/mfm_hd.h"
 #include "formats/ti99_dsk.h"       // Format
 
+#define LOG_WARN        (1U<<1)    // Warnings
+#define LOG_EMU         (1U<<2)
+#define LOG_COMP        (1U<<3)
+#define LOG_RAM         (1U<<4)
+#define LOG_ROM         (1U<<5)
+#define LOG_LINES       (1U<<6)
+#define LOG_DMA         (1U<<7)
+#define LOG_MOTOR       (1U<<8)
+#define LOG_INT         (1U<<9)
+#define LOG_CRU         (1U<<10)
+#define LOG_CONFIG      (1U<<15)    // Configuration
+
+#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE_NS(TI99_HFDC, bus::ti99::peb, myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
 
 namespace bus { namespace ti99 { namespace peb {
@@ -74,16 +89,6 @@ namespace bus { namespace ti99 { namespace peb {
 #define HDC_W_ADDR  0x0fd2
 #define CLK_ADDR    0x0fe0
 #define RAM_ADDR    0x1000
-
-#define TRACE_EMU 0
-#define TRACE_CRU 0
-#define TRACE_COMP 0
-#define TRACE_RAM 0
-#define TRACE_ROM 0
-#define TRACE_LINES 0
-#define TRACE_MOTOR 0
-#define TRACE_DMA 0
-#define TRACE_INT 0
 
 // =========================================================================
 
@@ -212,21 +217,21 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 	{
 		if (m_tapesel)
 		{
-			logerror("Tape support not available on this HFDC version (access to address %04x)\n", m_address & 0xffff);
+			LOGMASKED(LOG_WARN, "Tape support not available on this HFDC version (access to address %04x)\n", m_address & 0xffff);
 			return;
 		}
 
 		if (m_HDCsel)
 		{
 			*value = m_hdc9234->read(space, (m_address>>2)&1, 0xff);
-			if (TRACE_COMP) logerror("%04x[HDC] -> %02x\n", m_address & 0xffff, *value);
+			LOGMASKED(LOG_COMP, "%04x[HDC] -> %02x\n", m_address & 0xffff, *value);
 			return;
 		}
 
 		if (m_RTCsel)
 		{
 			*value = m_clock->read(space, (m_address & 0x001e) >> 1);
-			if (TRACE_COMP) logerror("%04x[CLK] -> %02x\n", m_address & 0xffff, *value);
+			LOGMASKED(LOG_COMP, "%04x[CLK] -> %02x\n", m_address & 0xffff, *value);
 			return;
 		}
 
@@ -240,13 +245,10 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 
 			// If a DMA is in progress, do not respond
 			if (m_dip == CLEAR_LINE) *value = m_buffer_ram->pointer()[(m_ram_page[bank]<<10) | (m_address & 0x03ff)];
-			if (TRACE_RAM)
+			if (WORD_ALIGNED(m_address))
 			{
-				if (WORD_ALIGNED(m_address))
-				{
-					int valword = (((*value) << 8) | m_buffer_ram->pointer()[(m_ram_page[bank]<<10) | ((m_address+1) & 0x03ff)])&0xffff;
-					logerror("%04x[%02x] -> %04x\n", m_address & 0xffff, m_ram_page[bank], valword);
-				}
+				int valword = (((*value) << 8) | m_buffer_ram->pointer()[(m_ram_page[bank]<<10) | ((m_address+1) & 0x03ff)])&0xffff;
+				LOGMASKED(LOG_RAM, "%04x[%02x] -> %04x\n", m_address & 0xffff, m_ram_page[bank], valword);
 			}
 			return;
 		}
@@ -254,13 +256,10 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 		if (m_ROMsel)
 		{
 			*value = m_dsrrom[(m_rom_page << 12) | (m_address & 0x0fff)];
-			if (TRACE_ROM)
+			if (WORD_ALIGNED(m_address))
 			{
-				if (WORD_ALIGNED(m_address))
-				{
-					int valword = (((*value) << 8) | m_dsrrom[(m_rom_page << 12) | ((m_address + 1) & 0x0fff)])&0xffff;
-					logerror("%04x[%02x] -> %04x\n", m_address & 0xffff, m_rom_page, valword);
-				}
+				int valword = (((*value) << 8) | m_dsrrom[(m_rom_page << 12) | ((m_address + 1) & 0x0fff)])&0xffff;
+				LOGMASKED(LOG_ROM, "%04x[%02x] -> %04x\n", m_address & 0xffff, m_rom_page, valword);
 			}
 			return;
 		}
@@ -291,20 +290,20 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 	{
 		if (m_tapesel)
 		{
-			logerror("Tape support not available on this HFDC version (write access to address %04x: %02x)\n", m_address & 0xffff, data);
+			LOGMASKED(LOG_WARN, "Tape support not available on this HFDC version (write access to address %04x: %02x)\n", m_address & 0xffff, data);
 			return;
 		}
 
 		if (m_HDCsel)
 		{
-			if (TRACE_COMP) logerror("%04x[HDC] <- %02x\n", m_address & 0xffff, data);
+			LOGMASKED(LOG_COMP, "%04x[HDC] <- %02x\n", m_address & 0xffff, data);
 			m_hdc9234->write(space, (m_address>>2)&1, data, 0xff);
 			return;
 		}
 
 		if (m_RTCsel)
 		{
-			if (TRACE_COMP) logerror("%04x[CLK] <- %02x\n", m_address & 0xffff, data);
+			LOGMASKED(LOG_COMP, "%04x[CLK] <- %02x\n", m_address & 0xffff, data);
 			m_clock->write(space, (m_address & 0x001e) >> 1, data);
 			return;
 		}
@@ -316,7 +315,7 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 			// 0101 10xx xxxx xxxx  bank 2
 			// 0101 11xx xxxx xxxx  bank 3
 			int bank = (m_address & 0x0c00) >> 10;
-			if (TRACE_RAM) logerror("%04x[%02x] <- %02x\n", m_address & 0xffff, m_ram_page[bank], data);
+			LOGMASKED(LOG_RAM, "%04x[%02x] <- %02x\n", m_address & 0xffff, m_ram_page[bank], data);
 
 			// When a DMA is in progress, do not change anything
 			if (m_dip == CLEAR_LINE) m_buffer_ram->pointer()[(m_ram_page[bank]<<10) | (m_address & 0x03ff)] = data;
@@ -325,7 +324,7 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 		// The rest is ROM
 		if (m_ROMsel)
 		{
-			if (TRACE_ROM) logerror("Ignoring write ROM %04x[%02x]: %02x\n", m_address & 0xffff, m_rom_page, data);
+			LOGMASKED(LOG_ROM, "Ignoring write ROM %04x[%02x]: %02x\n", m_address & 0xffff, m_rom_page, data);
 		}
 	}
 }
@@ -398,7 +397,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 			*value = 0;
 		}
 
-		if (TRACE_CRU) logerror("CRU %04x -> %02x\n", offset & 0xffff, *value);
+		LOGMASKED(LOG_CRU, "CRU %04x -> %02x\n", offset & 0xffff, *value);
 	}
 }
 
@@ -430,7 +429,7 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		if (TRACE_CRU) logerror("CRU %04x <- %d\n", offset & 0xffff, data);
+		LOGMASKED(LOG_CRU, "CRU %04x <- %d\n", offset & 0xffff, data);
 
 		int bit = (offset >> 1) & 0x1f;
 
@@ -443,12 +442,9 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 			else
 				m_ram_page[(bit-4)/5] &= ~(1 << ((bit-9)%5));
 
-			if (TRACE_CRU)
-			{
-				if (bit==0x0d) logerror("RAM page @5400 = %d\n", m_ram_page[1]);
-				if (bit==0x12) logerror("RAM page @5800 = %d\n", m_ram_page[2]);
-				if (bit==0x17) logerror("RAM page @5C00 = %d\n", m_ram_page[3]);
-			}
+			if (bit==0x0d) LOGMASKED(LOG_CRU, "RAM page @5400 = %d\n", m_ram_page[1]);
+			if (bit==0x12) LOGMASKED(LOG_CRU, "RAM page @5800 = %d\n", m_ram_page[2]);
+			if (bit==0x17) LOGMASKED(LOG_CRU, "RAM page @5C00 = %d\n", m_ram_page[3]);
 			return;
 		}
 
@@ -458,12 +454,12 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 			{
 				bool turnOn = (data!=0);
 				// Avoid too many meaningless log outputs
-				if (TRACE_CRU) if (m_selected != turnOn) logerror("card %s\n", turnOn? "selected" : "unselected");
+				if (m_selected != turnOn) LOGMASKED(LOG_CRU, "card %s\n", turnOn? "selected" : "unselected");
 				m_selected = turnOn;
 				break;
 			}
 		case 1:
-			if (TRACE_CRU) if (data==0) logerror("trigger HDC reset\n");
+			if (data==0) LOGMASKED(LOG_CRU, "trigger HDC reset\n");
 			m_hdc9234->reset((data == 0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 
@@ -487,17 +483,17 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 		case 3:
 			m_hdc9234->set_clock_divider(1, data);
 			m_rom_page = (data != 0)? (m_rom_page | 2) : (m_rom_page & 0xfd);
-			if (TRACE_CRU) logerror("ROM page = %d\n", m_rom_page);
+			LOGMASKED(LOG_CRU, "ROM page = %d\n", m_rom_page);
 			break;
 
 		case 4:
 			m_see_switches = (data != 0);
 			m_rom_page = (data != 0)? (m_rom_page | 1) : (m_rom_page & 0xfe);
-			if (TRACE_CRU) logerror("ROM page = %d, see_switches = %d\n", m_rom_page, m_see_switches);
+			LOGMASKED(LOG_CRU, "ROM page = %d, see_switches = %d\n", m_rom_page, m_see_switches);
 			break;
 
 		default:
-			logerror("Attempt to set undefined CRU bit %d\n", bit);
+			LOGMASKED(LOG_WARN, "Attempt to set undefined CRU bit %d\n", bit);
 		}
 	}
 }
@@ -515,7 +511,7 @@ void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int p
 */
 void myarc_hfdc_device::floppy_index_callback(floppy_image_device *floppy, int state)
 {
-	if (TRACE_LINES) if (state==1) logerror("Floppy index pulse\n");
+	if (state==1) LOGMASKED(LOG_LINES, "Floppy index pulse\n");
 	// m_status_latch = (state==ASSERT_LINE)? (m_status_latch | hdc92x4_device::DS_INDEX) :  (m_status_latch & ~hdc92x4_device::DS_INDEX);
 	set_bits(m_status_latch, hdc92x4_device::DS_INDEX, (state==ASSERT_LINE));
 	signal_drive_status();
@@ -526,7 +522,7 @@ void myarc_hfdc_device::floppy_index_callback(floppy_image_device *floppy, int s
 */
 void myarc_hfdc_device::harddisk_index_callback(mfm_harddisk_device *harddisk, int state)
 {
-	if (TRACE_LINES) if (state==1) logerror("HD index pulse\n");
+	if (state==1) LOGMASKED(LOG_LINES, "HD index pulse\n");
 	set_bits(m_status_latch, hdc92x4_device::DS_INDEX, (state==ASSERT_LINE));
 	signal_drive_status();
 }
@@ -536,7 +532,7 @@ void myarc_hfdc_device::harddisk_index_callback(mfm_harddisk_device *harddisk, i
 */
 void myarc_hfdc_device::harddisk_ready_callback(mfm_harddisk_device *harddisk, int state)
 {
-	if (TRACE_LINES) logerror("HD READY = %d\n", state);
+	LOGMASKED(LOG_LINES, "HD READY = %d\n", state);
 	set_bits(m_status_latch, hdc92x4_device::DS_READY, (state==ASSERT_LINE));
 	signal_drive_status();
 }
@@ -546,7 +542,7 @@ void myarc_hfdc_device::harddisk_ready_callback(mfm_harddisk_device *harddisk, i
 */
 void myarc_hfdc_device::harddisk_skcom_callback(mfm_harddisk_device *harddisk, int state)
 {
-	if (TRACE_LINES) logerror("HD seek complete = %d\n", state);
+	LOGMASKED(LOG_LINES, "HD seek complete = %d\n", state);
 	set_bits(m_status_latch, hdc92x4_device::DS_SKCOM, (state==ASSERT_LINE));
 	signal_drive_status();
 }
@@ -637,14 +633,14 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 	switch (offset)
 	{
 	case hdc92x4_device::INPUT_STATUS:
-		logerror("Invalid operation: S0=S1=0, but tried to write (expected: read drive status)\n");
+		LOGMASKED(LOG_WARN, "Invalid operation: S0=S1=0, but tried to write (expected: read drive status)\n");
 		break;
 
 	case hdc92x4_device::OUTPUT_DMA_ADDR:
 		// Value is dma address byte. Shift previous contents to the left.
 		// The value is latched inside the Gate Array.
 		m_dma_address = ((m_dma_address << 8) + (data&0xff))&0xffffff;
-		if (TRACE_DMA) logerror("Setting DMA address; current value = %06x\n", m_dma_address);
+		LOGMASKED(LOG_DMA, "Setting DMA address; current value = %06x\n", m_dma_address);
 		break;
 
 	case hdc92x4_device::OUTPUT_1:
@@ -723,7 +719,7 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 		// Clear all latched flags from other drives
 		m_status_latch = 0;
 		disconnect_floppy_drives();
-		if (TRACE_LINES) logerror("Select floppy drive DSK%d\n", index+1);
+		LOGMASKED(LOG_LINES, "Select floppy drive DSK%d\n", index+1);
 
 		// Connect new drive
 		m_current_floppy = m_floppy_unit[index];
@@ -731,11 +727,11 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 		// We don't use the READY line of floppy drives.
 		// READY is asserted when DSKx = 1
 		// The controller fetches the state with the auxbus access
-		if (TRACE_LINES) logerror("Connect index callback DSK%d\n", index+1);
+		LOGMASKED(LOG_LINES, "Connect index callback DSK%d\n", index+1);
 		if (m_current_floppy != nullptr)
 			m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&myarc_hfdc_device::floppy_index_callback, this));
 		else
-			logerror("Connection to DSK%d failed because no drive is connected\n", index+1);
+			LOGMASKED(LOG_WARN, "Connection to DSK%d failed because no drive is connected\n", index+1);
 		m_hdc9234->connect_floppy_drive(m_floppy_unit[index]);
 	}
 
@@ -750,12 +746,12 @@ void myarc_hfdc_device::connect_harddisk_unit(int index)
 		// Clear all latched flags form other drives
 		m_status_latch = 0;
 		disconnect_hard_drives();
-		if (TRACE_LINES) logerror("Select hard disk WDS%d\n", index+1);
+		LOGMASKED(LOG_LINES, "Select hard disk WDS%d\n", index+1);
 
 		// Connect new drive
 		m_current_harddisk = m_harddisk_unit[index];
 
-		if (TRACE_LINES) logerror("Connect index callback WDS%d\n", index+1);
+		LOGMASKED(LOG_LINES, "Connect index callback WDS%d\n", index+1);
 		if (m_current_harddisk != nullptr)
 		{
 			m_current_harddisk->setup_index_pulse_cb(mfm_harddisk_device::index_pulse_cb(&myarc_hfdc_device::harddisk_index_callback, this));
@@ -763,7 +759,7 @@ void myarc_hfdc_device::connect_harddisk_unit(int index)
 			m_current_harddisk->setup_seek_complete_cb(mfm_harddisk_device::seek_complete_cb(&myarc_hfdc_device::harddisk_skcom_callback, this));
 		}
 		else
-			logerror("Connection to WDS%d failed because no drive is connected\n", index+1);
+			LOGMASKED(LOG_WARN, "Connection to WDS%d failed because no drive is connected\n", index+1);
 		m_hdc9234->connect_hard_drive(m_current_harddisk);
 	}
 
@@ -773,7 +769,7 @@ void myarc_hfdc_device::connect_harddisk_unit(int index)
 
 void myarc_hfdc_device::disconnect_floppy_drives()
 {
-	if (TRACE_LINES) logerror("Unselect floppy drives\n");
+	LOGMASKED(LOG_LINES, "Unselect floppy drives\n");
 	// Disconnect current floppy
 	if (m_current_floppy != nullptr)
 	{
@@ -784,7 +780,7 @@ void myarc_hfdc_device::disconnect_floppy_drives()
 
 void myarc_hfdc_device::disconnect_hard_drives()
 {
-	if (TRACE_LINES) logerror("Unselect hard drives\n");
+	LOGMASKED(LOG_LINES, "Unselect hard drives\n");
 	if (m_current_harddisk != nullptr)
 	{
 		m_current_harddisk->setup_index_pulse_cb(mfm_harddisk_device::index_pulse_cb());
@@ -800,14 +796,12 @@ void myarc_hfdc_device::set_floppy_motors_running(bool run)
 {
 	if (run)
 	{
-		if (TRACE_MOTOR)
-			if (m_MOTOR_ON==CLEAR_LINE) logerror("Motor START\n");
+		if (m_MOTOR_ON==CLEAR_LINE) LOGMASKED(LOG_MOTOR, "Motor START\n");
 		m_MOTOR_ON = ASSERT_LINE;
 	}
 	else
 	{
-		if (TRACE_MOTOR)
-			if (m_MOTOR_ON==ASSERT_LINE) logerror("Motor STOP\n");
+		if (m_MOTOR_ON==ASSERT_LINE) LOGMASKED(LOG_MOTOR, "Motor STOP\n");
 		m_MOTOR_ON = CLEAR_LINE;
 	}
 
@@ -822,7 +816,7 @@ void myarc_hfdc_device::set_floppy_motors_running(bool run)
 WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
 {
 	m_irq = (line_state)state;
-	if (TRACE_INT) logerror("INT pin from controller = %d, propagating to INTA*\n", state);
+	LOGMASKED(LOG_INT, "INT pin from controller = %d, propagating to INTA*\n", state);
 
 	// Set INTA*
 	// Signal from SMC is active high, INTA* is active low; board inverts signal
@@ -836,7 +830,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
 */
 WRITE_LINE_MEMBER( myarc_hfdc_device::dmarq_w )
 {
-	if (TRACE_DMA) logerror("DMARQ pin from controller = %d\n", state);
+	LOGMASKED(LOG_DMA, "DMARQ pin from controller = %d\n", state);
 	if (state == ASSERT_LINE)
 	{
 		m_hdc9234->dmaack(ASSERT_LINE);
@@ -856,8 +850,8 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
 */
 READ8_MEMBER( myarc_hfdc_device::read_buffer )
 {
-	if (TRACE_DMA) logerror("Read access to onboard SRAM at %04x\n", m_dma_address);
-	if (m_dma_address > 0x8000) logerror("Read access beyond RAM size: %06x\n", m_dma_address);
+	LOGMASKED(LOG_DMA, "Read access to onboard SRAM at %04x\n", m_dma_address);
+	if (m_dma_address > 0x8000) LOGMASKED(LOG_WARN, "Read access beyond RAM size: %06x\n", m_dma_address);
 	uint8_t value = m_buffer_ram->pointer()[m_dma_address & 0x7fff];
 	m_dma_address = (m_dma_address+1) & 0x7fff;
 	return value;
@@ -868,8 +862,8 @@ READ8_MEMBER( myarc_hfdc_device::read_buffer )
 */
 WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
 {
-	if (TRACE_DMA) logerror("Write access to onboard SRAM at %04x: %02x\n", m_dma_address, data);
-	if (m_dma_address > 0x8000) logerror("Write access beyond RAM size: %06x\n", m_dma_address);
+	LOGMASKED(LOG_DMA, "Write access to onboard SRAM at %04x: %02x\n", m_dma_address, data);
+	if (m_dma_address > 0x8000) LOGMASKED(LOG_WARN, "Write access beyond RAM size: %06x\n", m_dma_address);
 	m_buffer_ram->pointer()[m_dma_address & 0x7fff] = data;
 	m_dma_address = (m_dma_address+1) & 0x7fff;
 }
@@ -952,17 +946,17 @@ void myarc_hfdc_device::device_reset()
 	for (int i=0; i < 4; i++)
 	{
 		if (m_floppy_unit[i] != nullptr)
-			logerror("FD connector %d with %s\n", i+1, m_floppy_unit[i]->name());
+			LOGMASKED(LOG_CONFIG, "FD connector %d with %s\n", i+1, m_floppy_unit[i]->name());
 		else
-			logerror("FD connector %d has no floppy attached\n", i+1);
+			LOGMASKED(LOG_CONFIG, "FD connector %d has no floppy attached\n", i+1);
 	}
 
 	for (int i=0; i < 3; i++)
 	{
 		if (m_harddisk_unit[i] != nullptr)
-			logerror("HD connector %d with %s\n", i+1, m_harddisk_unit[i]->name());
+			LOGMASKED(LOG_CONFIG, "HD connector %d with %s\n", i+1, m_harddisk_unit[i]->name());
 		else
-			logerror("HD connector %d has no drive attached\n", i+1);
+			LOGMASKED(LOG_CONFIG, "HD connector %d has no drive attached\n", i+1);
 	}
 
 	// Disconnect all units
@@ -1051,19 +1045,21 @@ FLOPPY_FORMATS_MEMBER(myarc_hfdc_device::floppy_formats)
 	FLOPPY_TI99_TDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( hfdc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )        // 40 tracks
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )        // 80 tracks
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )          // 80 tracks
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )          // 80 tracks 1.4 MiB
-SLOT_INTERFACE_END
+static void hfdc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);        // 40 tracks
+	device.option_add("525qd", FLOPPY_525_QD);        // 80 tracks
+	device.option_add("35dd", FLOPPY_35_DD);          // 80 tracks
+	device.option_add("35hd", FLOPPY_35_HD);          // 80 tracks 1.4 MiB
+}
 
-static SLOT_INTERFACE_START( hfdc_harddisks )
-	SLOT_INTERFACE( "generic", MFMHD_GENERIC )    // Generic hard disk (self-adapting to image)
-	SLOT_INTERFACE( "st213", MFMHD_ST213 )        // Seagate ST-213 (10 MB)
-	SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 (20 MB)
-	SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
-SLOT_INTERFACE_END
+static void hfdc_harddisks(device_slot_interface &device)
+{
+	device.option_add("generic", MFMHD_GENERIC);      // Generic hard disk (self-adapting to image)
+	device.option_add("st213", MFMHD_ST213);          // Seagate ST-213 (10 MB)
+	device.option_add("st225", MFMHD_ST225);          // Seagate ST-225 (20 MB)
+	device.option_add("st251", MFMHD_ST251);          // Seagate ST-251 (40 MB)
+}
 
 ROM_START( ti99_hfdc )
 	ROM_REGION(0x4000, TI99_DSRROM, 0)
@@ -1071,37 +1067,31 @@ ROM_START( ti99_hfdc )
 ROM_END
 
 
-MACHINE_CONFIG_START(myarc_hfdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
-	MCFG_HDC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
-	MCFG_HDC92X4_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
-	MCFG_HDC92X4_AUXBUS_OUT_CALLBACK(WRITE8(myarc_hfdc_device, auxbus_out))
-	MCFG_HDC92X4_DMARQ_CALLBACK(WRITELINE(myarc_hfdc_device, dmarq_w))
-	MCFG_HDC92X4_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
-	MCFG_HDC92X4_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
+void myarc_hfdc_device::device_add_mconfig(machine_config& config)
+{
+	HDC9234(config, m_hdc9234, 0);
+	m_hdc9234->intrq_cb().set(FUNC(myarc_hfdc_device::intrq_w));
+	m_hdc9234->dmarq_cb().set(FUNC(myarc_hfdc_device::dmarq_w));
+	m_hdc9234->dip_cb().set(FUNC(myarc_hfdc_device::dip_w));
+	m_hdc9234->auxbus_cb().set(FUNC(myarc_hfdc_device::auxbus_out));
+	m_hdc9234->dmain_cb().set(FUNC(myarc_hfdc_device::read_buffer));
+	m_hdc9234->dmaout_cb().set(FUNC(myarc_hfdc_device::write_buffer));
 
-	MCFG_FLOPPY_DRIVE_ADD("f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("f2", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("f3", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("f4", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	// First two floppy drives shall be connected by default
+	FLOPPY_CONNECTOR(config, "f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "f2", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "f3", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "f4", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
 
-	// NB: Hard disks don't go without image (other than floppy drives)
-	MCFG_MFM_HARDDISK_CONN_ADD("h1", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
-	MCFG_MFM_HARDDISK_CONN_ADD("h2", hfdc_harddisks, nullptr, MFM_BYTE, 2000, 20, MFMHD_GEN_FORMAT)
-	MCFG_MFM_HARDDISK_CONN_ADD("h3", hfdc_harddisks, nullptr, MFM_BYTE, 2000, 20, MFMHD_GEN_FORMAT)
+	// Hard disks don't go without image (other than floppy drives)
+	MFM_HD_CONNECTOR(config, "h1", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+	MFM_HD_CONNECTOR(config, "h2", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+	MFM_HD_CONNECTOR(config, "h3", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 
-	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
-	MCFG_MM58274C_MODE24(1) // 24 hour
-	MCFG_MM58274C_DAY1(0)   // sunday
+	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
 
-	MCFG_RAM_ADD(BUFFER)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+	RAM(config, BUFFER).set_default_size("32K").set_default_value(0);
+}
 
 const tiny_rom_entry *myarc_hfdc_device::device_rom_region() const
 {

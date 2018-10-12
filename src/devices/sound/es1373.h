@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ted Green
 // Creative Labs Ensonic AudioPCI97 ES1373
-
 #ifndef MAME_SOUND_ES1373_H
 #define MAME_SOUND_ES1373_H
 
@@ -9,12 +8,8 @@
 
 #include "machine/pci.h"
 
-// No interrupts
-#define MCFG_ES1373_ADD(_tag) \
-	MCFG_PCI_DEVICE_ADD(_tag, ES1373, 0x12741371, 0x04, 0x040100, 0x12741371)
-
-#define MCFG_ES1373_IRQ_ADD(_cpu_tag, _irq_num) \
-	downcast<es1373_device *>(device)->set_irq_info(_cpu_tag, _irq_num);
+#define MCFG_ES1373_IRQ_HANDLER(cb) \
+	downcast<es1373_device &>(*device).set_irq_handler(DEVCB_##cb);
 
 class es1373_device : public pci_device, public device_sound_interface
 {
@@ -24,18 +19,20 @@ public:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	void set_irq_info(const char *tag, const int irq_num);
-	void postload(void);
+	template <typename T> devcb_base &set_irq_handler(T &&cb) { return m_irq_handler.set_callback(std::forward<T>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	DECLARE_READ32_MEMBER (reg_r);
 	DECLARE_WRITE32_MEMBER(reg_w);
 
 protected:
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_post_load() override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// Sound stream
@@ -67,8 +64,7 @@ private:
 	uint32_t m_tempCount;
 	emu_timer *m_timer;
 	address_space *m_memory_space;
-	const char *m_cpu_tag;
-	cpu_device *m_cpu;
+	devcb_write_line m_irq_handler;
 	int m_irq_num;
 	void map(address_map &map);
 	uint16_t m_ac97_regs[0x80];

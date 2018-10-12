@@ -44,6 +44,11 @@ public:
 	m_ppi(*this, "ppi")
 	{ }
 
+	void upscope(machine_config &config);
+
+	void init_upscope();
+
+private:
 	uint8_t m_nvram[0x100];
 	uint8_t m_prev_cia1_porta;
 	uint8_t m_parallel_data;
@@ -58,16 +63,13 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 
-	DECLARE_DRIVER_INIT(upscope);
 
-	void upscope(machine_config &config);
 	void a500_mem(address_map &map);
 	void main_map(address_map &map);
 	void overlay_512kb_map(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
-private:
 	required_device<i8255_device> m_ppi;
 };
 
@@ -144,7 +146,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		/* if SEL == 1 && BUSY == 1, we write data to internal registers */
 		else if ((data & 5) == 5)
 		{
-			m_ppi->write(space, m_nvram_address_latch & 0x03, m_parallel_data);
+			m_ppi->write(m_nvram_address_latch & 0x03, m_parallel_data);
 		}
 
 		/* if SEL == 0 && BUSY == 1, we write data to NVRAM */
@@ -168,7 +170,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", m_nvram_address_latch);
-			m_nvram_data_latch = m_ppi->read(space, m_nvram_address_latch & 0x03);
+			m_nvram_data_latch = m_ppi->read(m_nvram_address_latch & 0x03);
 		}
 
 		/* if SEL == 0, we read NVRAM */
@@ -207,29 +209,32 @@ WRITE8_MEMBER( upscope_state::coin_counter_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(upscope_state::overlay_512kb_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void upscope_state::overlay_512kb_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).mirror(0x180000).ram().share("chip_ram");
+	map(0x200000, 0x27ffff).rom().region("kickstart", 0);
+}
 
-ADDRESS_MAP_START(upscope_state::a500_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
-	AM_RANGE(0xc00000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xd80000, 0xddffff) AM_NOP
-	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
-	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void upscope_state::a500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
+	map(0xa00000, 0xbfffff).rw(FUNC(upscope_state::cia_r), FUNC(upscope_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xd80000, 0xddffff).noprw();
+	map(0xde0000, 0xdeffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(upscope_state::rom_mirror_r));
+	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
-ADDRESS_MAP_START(upscope_state::main_map)
-	AM_IMPORT_FROM(a500_mem)
-	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user2", 0)
-ADDRESS_MAP_END
+void upscope_state::main_map(address_map &map)
+{
+	a500_mem(map);
+	map(0xf00000, 0xf7ffff).rom().region("user2", 0);
+}
 
 
 
@@ -263,17 +268,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(upscope_state::upscope)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	ntsc_video(config);
@@ -284,40 +284,41 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	MCFG_VIDEO_START_OVERRIDE(upscope_state,amiga)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
-	MCFG_PAULA_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
-	MCFG_PAULA_INT_CB(WRITELINE(amiga_state, paula_int_w))
+	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_NTSC));
+	paula.add_route(0, "rspeaker", 0.50);
+	paula.add_route(1, "lspeaker", 0.50);
+	paula.add_route(2, "lspeaker", 0.50);
+	paula.add_route(3, "rspeaker", 0.50);
+	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	/* cia */
 	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(upscope_state, upscope_cia_0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(upscope_state, upscope_cia_0_portb_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, upscope_state, upscope_cia_0_portb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, upscope_state, upscope_cia_0_portb_w))
 	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(upscope_state, upscope_cia_1_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(upscope_state, upscope_cia_1_porta_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, upscope_state, upscope_cia_1_porta_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, upscope_state, upscope_cia_1_porta_w))
 
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
-	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
-	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
-	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
-	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
-	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
+	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
+	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
+	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
+	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
+	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
+	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
 
 	// i/o extension
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IO0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(upscope_state, lamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(upscope_state, coin_counter_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("IO0");
+	m_ppi->out_pb_callback().set(FUNC(upscope_state::lamps_w));
+	m_ppi->out_pc_callback().set(FUNC(upscope_state::coin_counter_w));
 MACHINE_CONFIG_END
 
 
@@ -358,13 +359,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(upscope_state, upscope)
+void upscope_state::init_upscope()
 {
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;
 
 	// allocate nvram
-	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
+	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
 
 
@@ -375,4 +376,4 @@ DRIVER_INIT_MEMBER(upscope_state, upscope)
  *
  *************************************/
 
-GAME( 1986, upscope, 0, upscope, upscope, upscope_state, upscope, ORIENTATION_FLIP_X, "Grand Products", "Up Scope", MACHINE_IMPERFECT_SOUND )
+GAME( 1986, upscope, 0, upscope, upscope, upscope_state, init_upscope, ORIENTATION_FLIP_X, "Grand Products", "Up Scope", MACHINE_IMPERFECT_SOUND )

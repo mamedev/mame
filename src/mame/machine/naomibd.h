@@ -18,7 +18,7 @@ public:
 	void set_eeprom_tag(const char *_eeprom_tag) { eeprom_tag = _eeprom_tag; }
 
 	// Can be patched in the underlying class
-	virtual void submap(address_map &map);
+	virtual void submap(address_map &map) override;
 
 	DECLARE_WRITE16_MEMBER(rom_offseth_w);          // 5f7000
 	DECLARE_WRITE16_MEMBER(rom_offsetl_w);          // 5f7004

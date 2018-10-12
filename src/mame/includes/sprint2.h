@@ -5,10 +5,15 @@
     Atari Sprint hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SPRINT2_H
+#define MAME_INCLUDES_SPRINT2_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Discrete Sound Input Nodes */
@@ -40,6 +45,17 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void sprint1(machine_config &config);
+	void sprint2(machine_config &config);
+	void dominos4(machine_config &config);
+	void dominos(machine_config &config);
+
+	void init_sprint1();
+	void init_sprint2();
+	void init_dominos();
+	void init_dominos4();
+
+private:
 	int m_steering[2];
 	int m_gear[2];
 	int m_game;
@@ -59,20 +75,12 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint2_steering_reset2_w);
 	DECLARE_WRITE8_MEMBER(sprint2_wram_w);
 	DECLARE_WRITE8_MEMBER(output_latch_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp1_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp2_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp3_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp4_w);
 	DECLARE_READ8_MEMBER(sprint2_collision1_r);
 	DECLARE_READ8_MEMBER(sprint2_collision2_r);
 	DECLARE_WRITE8_MEMBER(sprint2_collision_reset1_w);
 	DECLARE_WRITE8_MEMBER(sprint2_collision_reset2_w);
 	DECLARE_WRITE8_MEMBER(sprint2_video_ram_w);
 	DECLARE_WRITE8_MEMBER(sprint2_noise_reset_w);
-	DECLARE_DRIVER_INIT(sprint1);
-	DECLARE_DRIVER_INIT(sprint2);
-	DECLARE_DRIVER_INIT(dominos);
-	DECLARE_DRIVER_INIT(dominos4);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprint2);
@@ -91,14 +99,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void sprint1(machine_config &config);
-	void sprint2(machine_config &config);
-	void dominos4(machine_config &config);
-	void dominos(machine_config &config);
+
 	void sprint2_map(address_map &map);
 };
 
 /*----------- defined in audio/sprint2.c -----------*/
-DISCRETE_SOUND_EXTERN( sprint2 );
-DISCRETE_SOUND_EXTERN( sprint1 );
-DISCRETE_SOUND_EXTERN( dominos );
+DISCRETE_SOUND_EXTERN( sprint2_discrete );
+DISCRETE_SOUND_EXTERN( sprint1_discrete );
+DISCRETE_SOUND_EXTERN( dominos_discrete );
+
+#endif // MAME_INCLUDES_SPRINT2_H

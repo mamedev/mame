@@ -10,14 +10,14 @@
 //**************************************************************************
 
 #define MCFG_SPU_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<spu_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<spu_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_SPU_ADD(_tag, _clock) \
 	MCFG_DEVICE_MODIFY( "maincpu" ) \
-	MCFG_PSX_SPU_READ_HANDLER(DEVREAD16(_tag, spu_device, read)) \
-	MCFG_PSX_SPU_WRITE_HANDLER(DEVWRITE16(_tag, spu_device, write)) \
+	MCFG_PSX_SPU_READ_HANDLER(READ16(_tag, spu_device, read)) \
+	MCFG_PSX_SPU_WRITE_HANDLER(WRITE16(_tag, spu_device, write)) \
 	MCFG_DEVICE_ADD(_tag, SPU, _clock) \
-	MCFG_SPU_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin9)) \
+	MCFG_SPU_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin9)) \
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 4, psxdma_device::read_delegate(&spu_device::dma_read, (spu_device *) device ) ) \
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 4, psxdma_device::write_delegate(&spu_device::dma_write, (spu_device *) device ) )
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-28 14:01+1100\n"
+"POT-Creation-Date: 2018-04-28 15:32+1000\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -587,70 +587,6 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: src/frontend/mame/ui/cheatopt.cpp:92 plugins/cheat/init.lua:653
-#, c-format, lua-format
-msgid ""
-"Cheat Comment:\n"
-"%s"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:105
-msgid "All cheats reloaded"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:136
-msgid "Autofire Settings"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:157 plugins/cheat/init.lua:581
-msgid "Reset All"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:160 plugins/cheat/init.lua:582
-msgid "Reload All"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:273
-msgid "Autofire Status"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:273 src/frontend/mame/ui/videoopt.cpp:208
-#: src/frontend/mame/ui/videoopt.cpp:212 src/frontend/mame/ui/videoopt.cpp:216
-#: src/frontend/mame/ui/videoopt.cpp:220 src/frontend/mame/ui/videoopt.cpp:224
-#: src/frontend/mame/ui/ui.cpp:1251
-msgid "Disabled"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:273 src/frontend/mame/ui/videoopt.cpp:208
-#: src/frontend/mame/ui/videoopt.cpp:212 src/frontend/mame/ui/videoopt.cpp:216
-#: src/frontend/mame/ui/videoopt.cpp:220 src/frontend/mame/ui/videoopt.cpp:224
-#: src/frontend/mame/ui/ui.cpp:1251
-msgid "Enabled"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
-#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/sndmenu.cpp:135
-#: src/frontend/mame/ui/sndmenu.cpp:137 src/frontend/mame/ui/menu.cpp:736
-#: plugins/cheat/init.lua:551 plugins/cheatfind/init.lua:589
-msgid "On"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
-#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/sndmenu.cpp:135
-#: src/frontend/mame/ui/sndmenu.cpp:137 src/frontend/mame/ui/menu.cpp:739
-#: plugins/cheat/init.lua:554 plugins/cheat/init.lua:563
-#: plugins/cheatfind/init.lua:586
-msgid "Off"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:316
-msgid "No buttons found on this machine!"
-msgstr ""
-
-#: src/frontend/mame/ui/cheatopt.cpp:327 src/frontend/mame/ui/cheatopt.cpp:331
-msgid "Autofire Delay"
-msgstr ""
-
 #: src/frontend/mame/ui/tapectrl.cpp:85
 msgid "stopped"
 msgstr ""
@@ -810,6 +746,20 @@ msgstr ""
 msgid "Backdrops"
 msgstr ""
 
+#: src/frontend/mame/ui/videoopt.cpp:208 src/frontend/mame/ui/videoopt.cpp:212
+#: src/frontend/mame/ui/videoopt.cpp:216 src/frontend/mame/ui/videoopt.cpp:220
+#: src/frontend/mame/ui/videoopt.cpp:224 src/frontend/mame/ui/cheatopt.cpp:273
+#: src/frontend/mame/ui/ui.cpp:1255
+msgid "Enabled"
+msgstr ""
+
+#: src/frontend/mame/ui/videoopt.cpp:208 src/frontend/mame/ui/videoopt.cpp:212
+#: src/frontend/mame/ui/videoopt.cpp:216 src/frontend/mame/ui/videoopt.cpp:220
+#: src/frontend/mame/ui/videoopt.cpp:224 src/frontend/mame/ui/cheatopt.cpp:273
+#: src/frontend/mame/ui/ui.cpp:1255
+msgid "Disabled"
+msgstr ""
+
 #: src/frontend/mame/ui/videoopt.cpp:212
 msgid "Overlays"
 msgstr ""
@@ -942,7 +892,7 @@ msgstr ""
 msgid "Export list in TXT format (like -listfull)"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:710 src/frontend/mame/ui/ui.cpp:2225
+#: src/frontend/mame/ui/miscmenu.cpp:710 src/frontend/mame/ui/ui.cpp:2230
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -975,6 +925,21 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:792
 msgid "Configure machine:"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/sndmenu.cpp:135
+#: src/frontend/mame/ui/sndmenu.cpp:137 src/frontend/mame/ui/menu.cpp:736
+#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
+#: plugins/cheat/init.lua:551 plugins/cheatfind/init.lua:619
+msgid "On"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/sndmenu.cpp:135
+#: src/frontend/mame/ui/sndmenu.cpp:137 src/frontend/mame/ui/menu.cpp:739
+#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
+#: plugins/cheat/init.lua:554 plugins/cheat/init.lua:563
+#: plugins/cheatfind/init.lua:616
+msgid "Off"
 msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:909 src/frontend/mame/ui/selgame.cpp:441
@@ -1087,233 +1052,6 @@ msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:154
 msgid "Select New Machine"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:337
-msgid "This driver requires images to be loaded in the following device(s): "
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
-msgid "Keyboard Emulation Status"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1086
-msgid "Mode: PARTIAL Emulation"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1087
-msgid "UI:   Enabled"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1089 src/frontend/mame/ui/ui.cpp:1099
-msgid "**Use ScrLock to toggle**"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1096
-msgid "Mode: FULL Emulation"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1097
-msgid "UI:   Disabled"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1245
-msgid "Autofire can't be enabled"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1298
-#, c-format
-msgid ""
-"Are you sure you want to quit?\n"
-"\n"
-"Press ''%1$s'' to quit,\n"
-"Press ''%2$s'' to return to emulation."
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1370
-msgid "Master Volume"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1379
-#, c-format
-msgid "%1$s Volume"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1403
-#, c-format
-msgid "Overclock CPU %1$s"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1412
-#, c-format
-msgid "Overclock %1$s sound"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1433
-#, c-format
-msgid "%1$s Refresh Rate"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1438
-#, c-format
-msgid "%1$s Brightness"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1440
-#, c-format
-msgid "%1$s Contrast"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1442
-#, c-format
-msgid "%1$s Gamma"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1446
-#, c-format
-msgid "%1$s Horiz Stretch"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1448
-#, c-format
-msgid "%1$s Horiz Position"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1450
-#, c-format
-msgid "%1$s Vert Stretch"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1452
-#, c-format
-msgid "%1$s Vert Position"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1471
-#, c-format
-msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1473
-#, c-format
-msgid "Laserdisc '%1$s' Horiz Position"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1475
-#, c-format
-msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1477
-#, c-format
-msgid "Laserdisc '%1$s' Vert Position"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1489
-msgid "Vector Flicker"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1490
-msgid "Beam Width Minimum"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1491
-msgid "Beam Width Maximum"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1492
-msgid "Beam Intensity Weight"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1507
-#, c-format
-msgid "Crosshair Scale %1$s"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1507 src/frontend/mame/ui/ui.cpp:1509
-msgid "X"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1507 src/frontend/mame/ui/ui.cpp:1509
-msgid "Y"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1509
-#, c-format
-msgid "Crosshair Offset %1$s"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1597
-#, c-format
-msgid "%1$3ddB"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1641
-#, c-format
-msgid "%1$d%%"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1657
-#, c-format
-msgid "%1$3.0f%%"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1680
-#, c-format
-msgid "%1$.3ffps"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1703 src/frontend/mame/ui/ui.cpp:1725
-#: src/frontend/mame/ui/ui.cpp:1746 src/frontend/mame/ui/ui.cpp:1768
-#: src/frontend/mame/ui/ui.cpp:1790 src/frontend/mame/ui/ui.cpp:1812
-#: src/frontend/mame/ui/ui.cpp:1834 src/frontend/mame/ui/ui.cpp:1856
-#: src/frontend/mame/ui/ui.cpp:1878 src/frontend/mame/ui/ui.cpp:1900
-#: src/frontend/mame/ui/ui.cpp:1922
-#, c-format
-msgid "%1$.3f"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:1937 src/frontend/mame/ui/ui.cpp:1952
-#: src/frontend/mame/ui/ui.cpp:1967 src/frontend/mame/ui/ui.cpp:1982
-#, c-format
-msgid "%1$1.2f"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:2000
-#, c-format
-msgid "Crosshair Scale X %1$1.3f"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:2000
-#, c-format
-msgid "Crosshair Scale Y %1$1.3f"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:2019
-#, c-format
-msgid "Crosshair Offset X %1$1.3f"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:2019
-#, c-format
-msgid "Crosshair Offset Y %1$1.3f"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:2162
-msgid "**Error saving ui.ini**"
-msgstr ""
-
-#: src/frontend/mame/ui/ui.cpp:2221
-#, c-format
-msgid "**Error saving %s.ini**"
-msgstr ""
-
-#: src/frontend/mame/ui/viewgfx.cpp:406
-msgid " COLORS"
-msgstr ""
-
-#: src/frontend/mame/ui/viewgfx.cpp:406
-msgid " PENS"
 msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:31
@@ -2411,6 +2149,430 @@ msgstr ""
 msgid "Auto"
 msgstr ""
 
+#: src/frontend/mame/ui/cheatopt.cpp:92 plugins/cheat/init.lua:653
+#, c-format, lua-format
+msgid ""
+"Cheat Comment:\n"
+"%s"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:105
+msgid "All cheats reloaded"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:136
+msgid "Autofire Settings"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:157 plugins/cheat/init.lua:581
+msgid "Reset All"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:160 plugins/cheat/init.lua:582
+msgid "Reload All"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:273
+msgid "Autofire Status"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:316
+msgid "No buttons found on this machine!"
+msgstr ""
+
+#: src/frontend/mame/ui/cheatopt.cpp:327 src/frontend/mame/ui/cheatopt.cpp:331
+msgid "Autofire Delay"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:337
+msgid "This driver requires images to be loaded in the following device(s): "
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
+msgid "Keyboard Emulation Status"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1086
+msgid "Mode: PARTIAL Emulation"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1087
+msgid "UI:   Enabled"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1089 src/frontend/mame/ui/ui.cpp:1099
+msgid "**Use ScrLock to toggle**"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1096
+msgid "Mode: FULL Emulation"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1097
+msgid "UI:   Disabled"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1249
+msgid "Autofire can't be enabled"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1302
+#, c-format
+msgid ""
+"Are you sure you want to quit?\n"
+"\n"
+"Press ''%1$s'' to quit,\n"
+"Press ''%2$s'' to return to emulation."
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1374
+msgid "Master Volume"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1383
+#, c-format
+msgid "%1$s Volume"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1407
+#, c-format
+msgid "Overclock CPU %1$s"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1416
+#, c-format
+msgid "Overclock %1$s sound"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1437
+#, c-format
+msgid "%1$s Refresh Rate"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1442
+#, c-format
+msgid "%1$s Brightness"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1444
+#, c-format
+msgid "%1$s Contrast"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1446
+#, c-format
+msgid "%1$s Gamma"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1450
+#, c-format
+msgid "%1$s Horiz Stretch"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1452
+#, c-format
+msgid "%1$s Horiz Position"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1454
+#, c-format
+msgid "%1$s Vert Stretch"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1456
+#, c-format
+msgid "%1$s Vert Position"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1475
+#, c-format
+msgid "Laserdisc '%1$s' Horiz Stretch"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1477
+#, c-format
+msgid "Laserdisc '%1$s' Horiz Position"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1479
+#, c-format
+msgid "Laserdisc '%1$s' Vert Stretch"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1481
+#, c-format
+msgid "Laserdisc '%1$s' Vert Position"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1493
+msgid "Vector Flicker"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1494
+msgid "Beam Width Minimum"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1495
+msgid "Beam Width Maximum"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1496
+msgid "Beam Intensity Weight"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1511
+#, c-format
+msgid "Crosshair Scale %1$s"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1511 src/frontend/mame/ui/ui.cpp:1513
+msgid "X"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1511 src/frontend/mame/ui/ui.cpp:1513
+msgid "Y"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1513
+#, c-format
+msgid "Crosshair Offset %1$s"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1601
+#, c-format
+msgid "%1$3ddB"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1645
+#, c-format
+msgid "%1$d%%"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1661
+#, c-format
+msgid "%1$3.0f%%"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1685
+#, c-format
+msgid "%1$.3ffps"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1708 src/frontend/mame/ui/ui.cpp:1730
+#: src/frontend/mame/ui/ui.cpp:1751 src/frontend/mame/ui/ui.cpp:1773
+#: src/frontend/mame/ui/ui.cpp:1795 src/frontend/mame/ui/ui.cpp:1817
+#: src/frontend/mame/ui/ui.cpp:1839 src/frontend/mame/ui/ui.cpp:1861
+#: src/frontend/mame/ui/ui.cpp:1883 src/frontend/mame/ui/ui.cpp:1905
+#: src/frontend/mame/ui/ui.cpp:1927
+#, c-format
+msgid "%1$.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:1942 src/frontend/mame/ui/ui.cpp:1957
+#: src/frontend/mame/ui/ui.cpp:1972 src/frontend/mame/ui/ui.cpp:1987
+#, c-format
+msgid "%1$1.2f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2005
+#, c-format
+msgid "Crosshair Scale X %1$1.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2005
+#, c-format
+msgid "Crosshair Scale Y %1$1.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2024
+#, c-format
+msgid "Crosshair Offset X %1$1.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2024
+#, c-format
+msgid "Crosshair Offset Y %1$1.3f"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2167
+msgid "**Error saving ui.ini**"
+msgstr ""
+
+#: src/frontend/mame/ui/ui.cpp:2226
+#, c-format
+msgid "**Error saving %s.ini**"
+msgstr ""
+
+#: src/frontend/mame/ui/viewgfx.cpp:406
+msgid " COLORS"
+msgstr ""
+
+#: src/frontend/mame/ui/viewgfx.cpp:406
+msgid " PENS"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:39
+#, c-format
+msgid ""
+"[This option is currently mounted in the running system]\n"
+"\n"
+"Option: %1$s\n"
+"Device: %2$s\n"
+"\n"
+"The selected option enables the following items:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:40
+#, c-format
+msgid ""
+"[This option is NOT currently mounted in the running system]\n"
+"\n"
+"Option: %1$s\n"
+"Device: %2$s\n"
+"\n"
+"If you select this option, the following items will be enabled:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:48
+msgid "* CPU:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:72 src/frontend/mame/ui/devopt.cpp:133
+#, c-format
+msgid "  %1$d×%2$s %3$d.%4$06d MHz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:72 src/frontend/mame/ui/devopt.cpp:133
+msgid "  %1$d×%2$s %5$d.%6$03d kHz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:73 src/frontend/mame/ui/devopt.cpp:134
+msgid "  %2$s %3$d.%4$06d MHz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:73 src/frontend/mame/ui/devopt.cpp:134
+msgid "  %2$s %5$d.%6$03d kHz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:85
+msgid "* Video:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:90
+#, c-format
+msgid "  Screen '%1$s': Vector\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:99
+#, c-format
+msgid "  Screen '%1$s': %2$d × %3$d (V) %4$f Hz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:100
+#, c-format
+msgid "  Screen '%1$s': %2$d × %3$d (H) %4$f Hz\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:113
+msgid "* Sound:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:133
+#, c-format
+msgid "  %1$d×%2$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:134
+msgid "  %2$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:164
+#, c-format
+msgid ""
+"* BIOS settings:\n"
+"  %1$d options    [default: %2$s]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:204 src/frontend/mame/ui/devopt.cpp:220
+#: src/frontend/mame/ui/devopt.cpp:265
+#, c-format
+msgid "  %1$s    [default: %2$s]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:209 src/frontend/mame/ui/devopt.cpp:225
+#, c-format
+msgid "  %1$s\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:230
+msgid "* DIP switch settings:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:232
+msgid "* Configuration settings:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:234
+msgid "* Input device(s):\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:236
+#, c-format
+msgid "  User inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:238
+#, c-format
+msgid "  Mahjong inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:240
+#, c-format
+msgid "  Hanafuda inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:242
+#, c-format
+msgid "  Gambling inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:244
+#, c-format
+msgid "  Analog inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:246
+#, c-format
+msgid "  Adjuster inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:248
+#, c-format
+msgid "  Keypad inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:250
+#, c-format
+msgid "  Keyboard inputs    [%1$d inputs]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:255
+msgid "* Media Options:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:257
+#, c-format
+msgid "  %1$s    [tag: %2$s]\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:263
+msgid "* Slot Options:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/devopt.cpp:270
+msgid "[None]\n"
+msgstr ""
+
 #: plugins/timer/init.lua:94
 msgid "Current time"
 msgstr ""
@@ -2520,217 +2682,218 @@ msgstr ""
 msgid "MARPScore"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:344
+#: plugins/cheatfind/init.lua:373
 msgid "Save Cheat"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:347
+#: plugins/cheatfind/init.lua:376
 msgid "Default"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:347
+#: plugins/cheatfind/init.lua:376
 msgid "Custom"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:348
+#: plugins/cheatfind/init.lua:377
 msgid "Cheat Name"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:354 plugins/cheatfind/init.lua:718
+#: plugins/cheatfind/init.lua:383 plugins/cheatfind/init.lua:748
 #, lua-format
 msgid "Default name is %s"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:362
+#: plugins/cheatfind/init.lua:391
 msgid "Player"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:367
+#: plugins/cheatfind/init.lua:396
 msgid "Type"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:373
+#: plugins/cheatfind/init.lua:402
 msgid "Save"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:399
+#: plugins/cheatfind/init.lua:429
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:407
+#: plugins/cheatfind/init.lua:437
 msgid "Cheat added to cheat.simple"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:412
+#: plugins/cheatfind/init.lua:442
 msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:421
+#: plugins/cheatfind/init.lua:451
 msgid "Cancel"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:426
+#: plugins/cheatfind/init.lua:456
 msgid "CPU or RAM"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:430
+#: plugins/cheatfind/init.lua:460
 msgid "Changes to this only take effect when \"Start new search\" is selected"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:449
+#: plugins/cheatfind/init.lua:479
 msgid "Data cleared and current state saved"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:457
+#: plugins/cheatfind/init.lua:487
 msgid "Start new search"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:467
+#: plugins/cheatfind/init.lua:497
 msgid "Current state saved"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:474
+#: plugins/cheatfind/init.lua:504
 msgid "Save current -- #"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:506
-msgid " total matches found"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:513
-msgid "Compare"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:516
-msgid "Left operand"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:519
-msgid "Current"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:524
-msgid "Operator"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:531
-msgid "Left less than right, value is difference"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:533
-msgid "Left greater than right, value is difference"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:535
-msgid "Left equal to right"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:537
-msgid "Left not equal to right, value is difference"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:539
-msgid "Left equal to right with bitmask"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:541
-msgid "Left not equal to right with bitmask"
+#: plugins/cheatfind/init.lua:536
+#, lua-format
+msgid "%d total matches found"
 msgstr ""
 
 #: plugins/cheatfind/init.lua:543
-msgid "Left less than value"
+msgid "Compare"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:545
-msgid "Left greater than value"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:547
-msgid "Left equal to value"
+#: plugins/cheatfind/init.lua:546
+msgid "Left operand"
 msgstr ""
 
 #: plugins/cheatfind/init.lua:549
+msgid "Current"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:554
+msgid "Operator"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:561
+msgid "Left less than right, value is difference"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:563
+msgid "Left greater than right, value is difference"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:565
+msgid "Left equal to right"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:567
+msgid "Left not equal to right, value is difference"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:569
+msgid "Left equal to right with bitmask"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:571
+msgid "Left not equal to right with bitmask"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:573
+msgid "Left less than value"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:575
+msgid "Left greater than value"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:577
+msgid "Left equal to value"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:579
 msgid "Left not equal to value"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:560
+#: plugins/cheatfind/init.lua:590
 msgid "Right operand"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:568
+#: plugins/cheatfind/init.lua:598
 msgid "Value"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:572
+#: plugins/cheatfind/init.lua:602
 msgid "Any"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:578
+#: plugins/cheatfind/init.lua:608
 msgid "Data Format"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:602
+#: plugins/cheatfind/init.lua:632
 msgid "Undo last search -- #"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:606
+#: plugins/cheatfind/init.lua:636
 msgid "Match block"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:609
+#: plugins/cheatfind/init.lua:639
 msgid "All"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:660
+#: plugins/cheatfind/init.lua:690
 #, lua-format
 msgid "Test cheat at addr %08X"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:692
+#: plugins/cheatfind/init.lua:722
 msgid "Cheat engine not available"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:741
+#: plugins/cheatfind/init.lua:771
 msgid "Test"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:741
+#: plugins/cheatfind/init.lua:771
 msgid "Write"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:741
+#: plugins/cheatfind/init.lua:771
 msgid "Watch"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:758
+#: plugins/cheatfind/init.lua:788
 msgid "Page"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:776
+#: plugins/cheatfind/init.lua:806
 msgid "Clear Watches"
 msgstr ""
 
-#: plugins/cheatfind/init.lua:786
+#: plugins/cheatfind/init.lua:816
 msgid "Cheat Finder"
 msgstr ""
 
-#: plugins/portname/init.lua:89
+#: plugins/portname/init.lua:69
 msgid "Save input names to file"
 msgstr ""
 
-#: plugins/portname/init.lua:115 plugins/portname/init.lua:120
-#: plugins/portname/init.lua:136
+#: plugins/portname/init.lua:100 plugins/portname/init.lua:105
+#: plugins/portname/init.lua:121
 msgid "Failed to save input name file"
 msgstr ""
 
-#: plugins/portname/init.lua:153
+#: plugins/portname/init.lua:133
 #, lua-format
 msgid "Input port name file saved to %s"
 msgstr ""
 
-#: plugins/portname/init.lua:158
+#: plugins/portname/init.lua:138
 msgid "Input ports"
 msgstr ""

@@ -66,6 +66,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "sound/tms5220.h"
 #include "sound/volt_reg.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -113,6 +114,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_aysnd(*this, "aysnd"),
+		m_tms(*this, "tms"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -120,10 +123,11 @@ public:
 		m_watchdog(*this, "watchdog")
 	{ }
 
-	DECLARE_DRIVER_INIT(looping);
 	void looping(machine_config &config);
 
-protected:
+	void init_looping();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(looping_videoram_w);
@@ -161,7 +165,6 @@ protected:
 	void looping_sound_io_map(address_map &map);
 	void looping_sound_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -171,8 +174,10 @@ private:
 	/* tilemaps */
 	tilemap_t * m_bg_tilemap;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9995_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<ay8910_device> m_aysnd;
+	required_device<tms5220_device> m_tms;
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -360,9 +365,8 @@ void looping_state::machine_start()
 void looping_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(ASSERT_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 /*************************************
@@ -450,22 +454,14 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
 
 WRITE_LINE_MEMBER(looping_state::ay_enable_w)
 {
-	device_t *device = machine().device("aysnd");
-	int output;
-
-	device_sound_interface *sound;
-	device->interface(sound);
-	for (output = 0; output < 3; output++)
-		sound->set_output_gain(output, state ? 1.0 : 0.0);
+	for (int output = 0; output < 3; output++)
+		m_aysnd->set_output_gain(output, state ? 1.0 : 0.0);
 }
 
 
 WRITE_LINE_MEMBER(looping_state::speech_enable_w)
 {
-	device_t *device = machine().device("tms");
-	device_sound_interface *sound;
-	device->interface(sound);
-	sound->set_output_gain(0, state ? 1.0 : 0.0);
+	m_tms->set_output_gain(0, state ? 1.0 : 0.0);
 }
 
 
@@ -549,46 +545,50 @@ READ8_MEMBER(looping_state::protection_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(looping_state::looping_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void looping_state::looping_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(looping_videoram_w) AM_SHARE("videoram")
+	map(0x9000, 0x93ff).ram().w(FUNC(looping_state::looping_videoram_w)).share("videoram");
 
-	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM_WRITE(looping_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9840, 0x987f) AM_MIRROR(0x0700) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9880, 0x98ff) AM_MIRROR(0x0700) AM_RAM
+	map(0x9800, 0x983f).mirror(0x0700).ram().w(FUNC(looping_state::looping_colorram_w)).share("colorram");
+	map(0x9840, 0x987f).mirror(0x0700).ram().share("spriteram");
+	map(0x9880, 0x98ff).mirror(0x0700).ram();
 
-	AM_RANGE(0xb000, 0xb007) AM_MIRROR(0x07f8) AM_DEVWRITE("videolatch", ls259_device, write_d0)
+	map(0xb000, 0xb007).mirror(0x07f8).w("videolatch", FUNC(ls259_device::write_d0));
 
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03fc) AM_READ_PORT("P1") AM_WRITE(out_0_w)                 /* /OUT0 */
-	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x03fc) AM_READ_PORT("P2") AM_WRITE(looping_soundlatch_w)    /* /OUT1 */
-	AM_RANGE(0xf802, 0xf802) AM_MIRROR(0x03fc) AM_READ_PORT("DSW") AM_WRITE(out_2_w)                /* /OUT2 */
-	AM_RANGE(0xf803, 0xf803) AM_MIRROR(0x03fc) AM_READWRITE(adc_r, adc_w)
-ADDRESS_MAP_END
+	map(0xe000, 0xefff).ram();
+	map(0xf800, 0xf800).mirror(0x03fc).portr("P1").w(FUNC(looping_state::out_0_w));                 /* /OUT0 */
+	map(0xf801, 0xf801).mirror(0x03fc).portr("P2").w(FUNC(looping_state::looping_soundlatch_w));    /* /OUT1 */
+	map(0xf802, 0xf802).mirror(0x03fc).portr("DSW").w(FUNC(looping_state::out_2_w));                /* /OUT2 */
+	map(0xf803, 0xf803).mirror(0x03fc).rw(FUNC(looping_state::adc_r), FUNC(looping_state::adc_w));
+}
 
-ADDRESS_MAP_START(looping_state::looping_io_map)
-	AM_RANGE(0x400, 0x407) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void looping_state::looping_io_map(address_map &map)
+{
+	map(0x400, 0x407).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(looping_state::looping_sound_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM
-	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_w)
-	AM_RANGE(0x3c01, 0x3c01) AM_MIRROR(0x00f6) AM_NOP
-	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("tms", tms5220_device, data_w)
-	AM_RANGE(0x3e01, 0x3e01) AM_MIRROR(0x00f6) AM_NOP
-	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_DEVREAD("tms", tms5220_device, status_r) AM_WRITENOP
-ADDRESS_MAP_END
+void looping_state::looping_sound_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x37ff).rom();
+	map(0x3800, 0x3bff).ram();
+	map(0x3c00, 0x3c00).mirror(0x00f4).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x3c01, 0x3c01).mirror(0x00f6).noprw();
+	map(0x3c02, 0x3c02).mirror(0x00f4).nopr().w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x3e00, 0x3e00).mirror(0x00f4).nopr().w("tms", FUNC(tms5220_device::data_w));
+	map(0x3e01, 0x3e01).mirror(0x00f6).noprw();
+	map(0x3e02, 0x3e02).mirror(0x00f4).r("tms", FUNC(tms5220_device::status_r)).nopw();
+}
 
-ADDRESS_MAP_START(looping_state::looping_sound_io_map)
-	AM_RANGE(0x000, 0x007) AM_DEVWRITE("sen0", ls259_device, write_d0)
-	AM_RANGE(0x008, 0x00f) AM_DEVWRITE("sen1", ls259_device, write_d0)
-ADDRESS_MAP_END
+void looping_state::looping_sound_io_map(address_map &map)
+{
+	map(0x000, 0x007).w("sen0", FUNC(ls259_device::write_d0));
+	map(0x008, 0x00f).w("sen1", FUNC(ls259_device::write_d0));
+}
 
 
 /*************************************
@@ -609,7 +609,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( looping )
+static GFXDECODE_START( gfx_looping )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,    0, 8 )
 GFXDECODE_END
@@ -624,31 +624,35 @@ GFXDECODE_END
 MACHINE_CONFIG_START(looping_state::looping)
 
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK, looping_map, looping_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", looping_state,  looping_interrupt)
+	TMS9995(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &looping_state::looping_map);
+	m_maincpu->set_addrmap(AS_IO, &looping_state::looping_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(looping_state::looping_interrupt));
 
 	// CPU TMS9980A for audio subsystem; no line connections
-	MCFG_TMS99xx_ADD("audiocpu", TMS9980A,  SOUND_CLOCK/4, looping_sound_map, looping_sound_io_map)
+	TMS9980A(config, m_audiocpu, SOUND_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::looping_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &looping_state::looping_sound_io_map);
 
-	MCFG_CPU_ADD("mcu", COP420, COP_CLOCK)
+	MCFG_DEVICE_ADD("mcu", COP420, COP_CLOCK)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_WRITE_L_CB(WRITE8(looping_state, cop_l_w))
-	MCFG_COP400_READ_L_CB(READ8(looping_state, cop_unk_r))
-	MCFG_COP400_READ_G_CB(READ8(looping_state, cop_unk_r))
-	MCFG_COP400_READ_IN_CB(READ8(looping_state, cop_unk_r))
-	MCFG_COP400_READ_SI_CB(READLINE(looping_state, cop_serial_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, looping_state, cop_l_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, looping_state, cop_unk_r))
+	MCFG_COP400_READ_G_CB(READ8(*this, looping_state, cop_unk_r))
+	MCFG_COP400_READ_IN_CB(READ8(*this, looping_state, cop_unk_r))
+	MCFG_COP400_READ_SI_CB(READLINE(*this, looping_state, cop_serial_r))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // C9 on CPU board
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // C9 on CPU board
 	// Q0 = A16
 	// Q1 = A17
 	// Q2 = COLOR 9
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(looping_state, plr2_w))
+	mainlatch.q_out_cb<3>().set(FUNC(looping_state::plr2_w));
 	// Q4 = C0
 	// Q5 = C1
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(looping_state, main_irq_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(looping_state, watchdog_w))
+	mainlatch.q_out_cb<6>().set(FUNC(looping_state::main_irq_ack_w));
+	mainlatch.q_out_cb<7>().set(FUNC(looping_state::watchdog_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -656,41 +660,41 @@ MACHINE_CONFIG_START(looping_state::looping)
 	MCFG_SCREEN_UPDATE_DRIVER(looping_state, screen_update_looping)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", looping)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_looping)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(looping_state, looping)
 
-	MCFG_DEVICE_ADD("videolatch", LS259, 0) // E2 on video board
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(looping_state, level2_irq_set))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(looping_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(looping_state, flip_screen_y_w))
+	ls259_device &videolatch(LS259(config, "videolatch")); // E2 on video board
+	videolatch.q_out_cb<1>().set(FUNC(looping_state::level2_irq_set));
+	videolatch.q_out_cb<6>().set(FUNC(looping_state::flip_screen_x_w));
+	videolatch.q_out_cb<7>().set(FUNC(looping_state::flip_screen_y_w));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK/4)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
-	MCFG_SOUND_ADD("tms", TMS5220, TMS_CLOCK)
-	MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(looping_state, looping_spcint))
+	MCFG_DEVICE_ADD("tms", TMS5220, TMS_CLOCK)
+	MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(*this, looping_state, looping_spcint))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_ADD("sen0", LS259, 0) // B3 on sound board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(looping_state, looping_souint_clr))
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(looping_state, looping_sound_sw))
+	ls259_device &sen0(LS259(config, "sen0")); // B3 on sound board
+	sen0.q_out_cb<0>().set(FUNC(looping_state::looping_souint_clr));
+	sen0.parallel_out_cb().set(FUNC(looping_state::looping_sound_sw));
 
-	MCFG_DEVICE_ADD("sen1", LS259, 0) // A1 on sound board with outputs connected to 4016 at B1
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(looping_state, ay_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(looping_state, speech_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(looping_state, ballon_enable_w))
+	ls259_device &sen1(LS259(config, "sen1")); // A1 on sound board with outputs connected to 4016 at B1
+	sen1.q_out_cb<0>().set(FUNC(looping_state::ay_enable_w));
+	sen1.q_out_cb<1>().set(FUNC(looping_state::speech_enable_w));
+	sen1.q_out_cb<2>().set(FUNC(looping_state::ballon_enable_w));
 MACHINE_CONFIG_END
 
 
@@ -916,16 +920,15 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(looping_state,looping)
+void looping_state::init_looping()
 {
 	int length = memregion("maincpu")->bytes();
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
 
 	m_cop_port_l = 0;
 
 	/* bitswap the TMS9995 ROMs */
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
@@ -940,7 +943,7 @@ DRIVER_INIT_MEMBER(looping_state,looping)
  *
  *************************************/
 
-GAME( 1982, looping,   0,        looping, looping, looping_state, looping, ROT90, "Video Games GmbH", "Looping", MACHINE_IMPERFECT_SOUND /*| MACHINE_SUPPORTS_SAVE */)
-GAME( 1982, loopingv,  looping,  looping, looping, looping_state, looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */)
-GAME( 1982, loopingva, looping,  looping, looping, looping_state, looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */ )
-GAME( 1982, skybump,   0,        looping, skybump, looping_state, looping, ROT90, "Venture Line", "Sky Bumper", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE  */)
+GAME( 1982, looping,   0,        looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH", "Looping", MACHINE_IMPERFECT_SOUND /*| MACHINE_SUPPORTS_SAVE */)
+GAME( 1982, loopingv,  looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */)
+GAME( 1982, loopingva, looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */ )
+GAME( 1982, skybump,   0,        looping, skybump, looping_state, init_looping, ROT90, "Venture Line", "Sky Bumper", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE  */)

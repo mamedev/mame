@@ -55,6 +55,7 @@
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -69,8 +70,6 @@
 #define RS232_K_TAG "rs232kbd"
 #define RS232_D_TAG "rs232debug"
 #define RS232_M_TAG "rs232mouse"
-#define COM8116_A_TAG "com8116_a"
-#define COM8116_B_TAG "com8116_b"
 #define ADLC_TAG "adlc"
 #define PIA_TAG "pia"
 #define PSG_TAG "psg"
@@ -100,8 +99,8 @@ public:
 		, m_acia2(*this, ACIA2_TAG)
 		, m_acia3(*this, ACIA3_TAG)
 		, m_adlc(*this, ADLC_TAG)
-		, m_dbrga(*this, COM8116_A_TAG)
-		, m_dbrgb(*this, COM8116_B_TAG)
+		, m_dbrga(*this, "com8116_a")
+		, m_dbrgb(*this, "com8116_b")
 		, m_pia(*this, PIA_TAG)
 		, m_psg(*this, PSG_TAG)
 		, m_earom(*this, EAROM_TAG)
@@ -170,40 +169,42 @@ private:
 	uint8_t m_ppu[4];
 };
 
-ADDRESS_MAP_START(bitgraph_state::bitgrapha_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x007fff) AM_ROM
-	AM_RANGE(0x010000, 0x010001) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, data_r, data_w, 0xff00)   // HOST
-	AM_RANGE(0x010002, 0x010003) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0x010008, 0x010009) AM_DEVREADWRITE8(ACIA1_TAG, acia6850_device, data_r, data_w, 0x00ff)   // KEYBOARD
-	AM_RANGE(0x01000a, 0x01000b) AM_DEVREADWRITE8(ACIA1_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x010010, 0x010011) AM_DEVREADWRITE8(ACIA2_TAG, acia6850_device, data_r, data_w, 0x00ff)   // DEBUGGER
-	AM_RANGE(0x010012, 0x010013) AM_DEVREADWRITE8(ACIA2_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x010018, 0x010019) AM_DEVREADWRITE8(ACIA3_TAG, acia6850_device, data_r, data_w, 0x00ff)   // POINTER
-	AM_RANGE(0x01001a, 0x01001b) AM_DEVREADWRITE8(ACIA3_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x010020, 0x010027) AM_READWRITE8(adlc_r, adlc_w, 0xff00)
-	AM_RANGE(0x010028, 0x01002f) AM_READWRITE8(pia_r, pia_w, 0xff00)    // EAROM, PSG
-	AM_RANGE(0x010030, 0x010031) AM_WRITE(baud_write)
-	AM_RANGE(0x3e0000, 0x3fffff) AM_RAM
-ADDRESS_MAP_END
+void bitgraph_state::bitgrapha_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x007fff).rom();
+	map(0x010000, 0x010000).rw(m_acia0, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));   // HOST
+	map(0x010002, 0x010002).rw(m_acia0, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
+	map(0x010009, 0x010009).rw(m_acia1, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));   // KEYBOARD
+	map(0x01000b, 0x01000b).rw(m_acia1, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
+	map(0x010011, 0x010011).rw(m_acia2, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));   // DEBUGGER
+	map(0x010013, 0x010013).rw(m_acia2, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
+	map(0x010019, 0x010019).rw(m_acia3, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));   // POINTER
+	map(0x01001b, 0x01001b).rw(m_acia3, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
+	map(0x010020, 0x010027).rw(FUNC(bitgraph_state::adlc_r), FUNC(bitgraph_state::adlc_w)).umask16(0xff00);
+	map(0x010028, 0x01002f).rw(FUNC(bitgraph_state::pia_r), FUNC(bitgraph_state::pia_w)).umask16(0xff00);    // EAROM, PSG
+	map(0x010030, 0x010031).w(FUNC(bitgraph_state::baud_write));
+	map(0x3e0000, 0x3fffff).ram();
+}
 
-ADDRESS_MAP_START(bitgraph_state::bitgraphb_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x007fff) AM_ROM
-	AM_RANGE(0x010000, 0x010001) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, data_r, data_w, 0xff00)   // HOST
-	AM_RANGE(0x010002, 0x010003) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0x010008, 0x010009) AM_DEVREADWRITE8(ACIA1_TAG, acia6850_device, data_r, data_w, 0x00ff)   // KEYBOARD
-	AM_RANGE(0x01000a, 0x01000b) AM_DEVREADWRITE8(ACIA1_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x010010, 0x010011) AM_DEVREADWRITE8(ACIA2_TAG, acia6850_device, data_r, data_w, 0x00ff)   // DEBUGGER
-	AM_RANGE(0x010012, 0x010013) AM_DEVREADWRITE8(ACIA2_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x01001a, 0x01001b) AM_WRITE8(misccr_write, 0x00ff)
-	AM_RANGE(0x010020, 0x010027) AM_READWRITE8(adlc_r, adlc_w, 0xff00)
-	AM_RANGE(0x010028, 0x01002f) AM_READWRITE8(pia_r, pia_w, 0xff00)    // EAROM, PSG
-	AM_RANGE(0x010030, 0x010031) AM_WRITE(baud_write)
+void bitgraph_state::bitgraphb_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x007fff).rom();
+	map(0x010000, 0x010000).rw(m_acia0, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));   // HOST
+	map(0x010002, 0x010002).rw(m_acia0, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
+	map(0x010009, 0x010009).rw(m_acia1, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));   // KEYBOARD
+	map(0x01000b, 0x01000b).rw(m_acia1, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
+	map(0x010011, 0x010011).rw(m_acia2, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));   // DEBUGGER
+	map(0x010013, 0x010013).rw(m_acia2, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
+	map(0x01001b, 0x01001b).w(FUNC(bitgraph_state::misccr_write));
+	map(0x010020, 0x010027).rw(FUNC(bitgraph_state::adlc_r), FUNC(bitgraph_state::adlc_w)).umask16(0xff00);
+	map(0x010028, 0x01002f).rw(FUNC(bitgraph_state::pia_r), FUNC(bitgraph_state::pia_w)).umask16(0xff00);    // EAROM, PSG
+	map(0x010030, 0x010031).w(FUNC(bitgraph_state::baud_write));
 //  AM_RANGE(0x010030, 0x010037) AM_READ8(ppu_read, 0x00ff)
-	AM_RANGE(0x010038, 0x01003f) AM_WRITE8(ppu_write, 0x00ff)
-	AM_RANGE(0x380000, 0x3fffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x010038, 0x01003f).w(FUNC(bitgraph_state::ppu_write)).umask16(0x00ff);
+	map(0x380000, 0x3fffff).ram();
+}
 
 static INPUT_PORTS_START(bitgraph)
 INPUT_PORTS_END
@@ -290,8 +291,9 @@ WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 		DBG_LOG(2, "EAROM", ("data <- %02X\n", m_pia_a));
 		m_earom->set_data(m_pia_a);
 	}
-	// CS1, ~CS2, C1, C2, CK
-	m_earom->set_control(BIT(m_pia_b, 3), BIT(m_pia_b, 3), BIT(m_pia_a, 6), BIT(m_pia_a, 7), BIT(m_pia_b, 2));
+	// CS1, ~CS2, C1, C2
+	m_earom->set_control(BIT(m_pia_b, 3), BIT(m_pia_b, 3), BIT(m_pia_a, 6), BIT(m_pia_a, 7));
+	m_earom->set_clk(BIT(m_pia_b, 2));
 
 	if (!BIT(m_pia_b, 6))
 	{
@@ -334,10 +336,10 @@ WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 WRITE16_MEMBER(bitgraph_state::baud_write)
 {
 	DBG_LOG(1,"Baud", ("%04X\n", data));
-	m_dbrgb->str_w(data & 15);      // 2 DBG
-	m_dbrga->stt_w((data >> 4) & 15);   // 1 KBD
-	m_dbrgb->stt_w((data >> 8) & 15);   // 3 PNT
-	m_dbrga->str_w((data >> 12) & 15);  // 0 HOST
+	m_dbrgb->write_str(data & 15);      // 2 DBG
+	m_dbrga->write_stt((data >> 4) & 15);   // 1 KBD
+	m_dbrgb->write_stt((data >> 8) & 15);   // 3 PNT
+	m_dbrga->write_str((data >> 12) & 15);  // 0 HOST
 }
 
 WRITE_LINE_MEMBER(bitgraph_state::com8116_a_fr_w)
@@ -430,9 +432,10 @@ WRITE8_MEMBER(bitgraph_state::ppu_write)
 }
 
 #ifdef UNUSED_FUNCTION
-ADDRESS_MAP_START(bitgraph_state::ppu_io)
-//  AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
-ADDRESS_MAP_END
+void bitgraph_state::ppu_io(address_map &map)
+{
+//  map(0x00, 0x00).r(FUNC(bitgraph_state::ppu_irq));
+}
 #endif
 
 /*
@@ -499,76 +502,78 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(ACIA0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_H_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_H_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia0->rts_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia0->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
 
-	MCFG_RS232_PORT_ADD(RS232_H_TAG, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA0_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA0_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA0_TAG, acia6850_device, write_cts))
+	MCFG_DEVICE_ADD(RS232_H_TAG, RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA0_TAG, acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA0_TAG, acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA0_TAG, acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD(ACIA1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_K_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_K_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia1->rts_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia1->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
 
-	MCFG_RS232_PORT_ADD(RS232_K_TAG, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA1_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA1_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA1_TAG, acia6850_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
+	MCFG_DEVICE_ADD(RS232_K_TAG, RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA1_TAG, acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA1_TAG, acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA1_TAG, acia6850_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
 
-	MCFG_DEVICE_ADD(ACIA2_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
+	ACIA6850(config, m_acia2, 0);
+	m_acia2->txd_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia2->rts_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia2->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
 
-	MCFG_RS232_PORT_ADD(RS232_D_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA2_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA2_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA2_TAG, acia6850_device, write_cts))
+	MCFG_DEVICE_ADD(RS232_D_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA2_TAG, acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA2_TAG, acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA2_TAG, acia6850_device, write_cts))
 
 	// XXX actual part may be something else
-	MCFG_DEVICE_ADD(COM8116_A_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(bitgraph_state, com8116_a_fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(bitgraph_state, com8116_a_ft_w))
+	COM8116(config, m_dbrga, 5.0688_MHz_XTAL);
+	m_dbrga->fr_handler().set(FUNC(bitgraph_state::com8116_a_fr_w));
+	m_dbrga->ft_handler().set(FUNC(bitgraph_state::com8116_a_ft_w));
 
-	MCFG_DEVICE_ADD(COM8116_B_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(bitgraph_state, com8116_b_fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(bitgraph_state, com8116_b_ft_w))
+	COM8116(config, m_dbrgb, 5.0688_MHz_XTAL);
+	m_dbrgb->fr_handler().set(FUNC(bitgraph_state::com8116_b_fr_w));
+	m_dbrgb->ft_handler().set(FUNC(bitgraph_state::com8116_b_ft_w));
 
-	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
-	MCFG_PIA_READCA1_HANDLER(READLINE(bitgraph_state, pia_ca1_r))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(bitgraph_state, pia_cb2_w))
-	MCFG_PIA_READPA_HANDLER(READ8(bitgraph_state, pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(bitgraph_state, pia_pa_w))
-	MCFG_PIA_READPB_HANDLER(READ8(bitgraph_state, pia_pb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(bitgraph_state, pia_pb_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readca1_handler().set(FUNC(bitgraph_state::pia_ca1_r));
+	m_pia->cb2_handler().set(FUNC(bitgraph_state::pia_cb2_w));
+	m_pia->readpa_handler().set(FUNC(bitgraph_state::pia_pa_r));
+	m_pia->writepa_handler().set(FUNC(bitgraph_state::pia_pa_w));
+	m_pia->readpb_handler().set(FUNC(bitgraph_state::pia_pb_r));
+	m_pia->writepb_handler().set(FUNC(bitgraph_state::pia_pb_w));
 
-	MCFG_ER2055_ADD(EAROM_TAG)
+	MCFG_DEVICE_ADD(EAROM_TAG, ER2055, 0)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(PSG_TAG, AY8912, XTAL(1'294'400))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(bitgraph_state, earom_write))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(PSG_TAG, AY8912, XTAL(1'294'400))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, bitgraph_state, earom_write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_FUNCTION
 MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
-	MCFG_CPU_ADD(PPU_TAG, I8035, XTAL(6'900'000))
-	MCFG_CPU_IO_MAP(ppu_io)
-//  MCFG_MCS48_PORT_T0_IN_CB(READLINE(bitgraph_state, ppu_t0_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
+	MCFG_DEVICE_ADD(PPU_TAG, I8035, XTAL(6'900'000))
+	MCFG_DEVICE_IO_MAP(ppu_io)
+//  MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, bitgraph_state, ppu_t0_r))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(bitgraph_state, ppu_i8243_w))
+	i8243_device &i8243(I8243(config, "i8243"));
+	i8243.read_handler().set_nop();
+	i8243.write_handler().set(FUNC(bitgraph_state::ppu_i8243_w));
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit6))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
-	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
@@ -577,40 +582,38 @@ MACHINE_CONFIG_END
 #endif
 
 MACHINE_CONFIG_START(bitgraph_state::bitgrpha)
-	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(6'900'000))
-	MCFG_CPU_PROGRAM_MAP(bitgrapha_mem)
+	MCFG_DEVICE_ADD(M68K_TAG, M68000, XTAL(6'900'000))
+	MCFG_DEVICE_PROGRAM_MAP(bitgrapha_mem)
 
 	bg_motherboard(config);
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 40)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bitgraph_state, system_clock_write))
 
-	MCFG_DEVICE_ADD(ACIA3_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_M_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_M_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
+	ACIA6850(config, m_acia3, 0);
+	m_acia3->txd_handler().set(RS232_M_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia3->rts_handler().set(RS232_M_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia3->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
 
-	MCFG_RS232_PORT_ADD(RS232_M_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_cts))
+	MCFG_DEVICE_ADD(RS232_M_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_cts))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bitgraph_state::bitgrphb)
-	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(6'900'000))
-	MCFG_CPU_PROGRAM_MAP(bitgraphb_mem)
+	MCFG_DEVICE_ADD(M68K_TAG, M68000, XTAL(6'900'000))
+	MCFG_DEVICE_PROGRAM_MAP(bitgraphb_mem)
 
 	bg_motherboard(config);
 //  bg_ppu(config);
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 1040)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bitgraph_state, system_clock_write))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -626,25 +629,25 @@ ROM_START( bitgrphb )
 	ROM_DEFAULT_BIOS("2.33a")
 
 	ROM_SYSTEM_BIOS(0, "2.33a", "rev 2.33 Alpha' ROM")
-	ROMX_LOAD( "bg2.32lo_u10.bin", 0x004001, 0x002000, CRC(6a702a96) SHA1(acdf1ba34038b4ccafb5b8069e70ae57a3b8a7e0), ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD( "bg2.32hi_u12.bin", 0x004000, 0x002000, CRC(a282a2c8) SHA1(ea7e4d4e197201c8944acef54479d5c2b26d409f), ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD( "bg2.32lo_u11.bin", 0x000001, 0x002000, CRC(46912afd) SHA1(c1f771adc1ef62b1fb1b904ed1d2a61009e24f55), ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD( "bg2.32hi_u13.bin", 0x000000, 0x002000, CRC(731df44f) SHA1(8c238b5943b8864e539f92891a0ffa6ddd4fc779), ROM_BIOS(1)|ROM_SKIP(1))
+	ROMX_LOAD( "bg2.32lo_u10.bin", 0x004001, 0x002000, CRC(6a702a96) SHA1(acdf1ba34038b4ccafb5b8069e70ae57a3b8a7e0), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD( "bg2.32hi_u12.bin", 0x004000, 0x002000, CRC(a282a2c8) SHA1(ea7e4d4e197201c8944acef54479d5c2b26d409f), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD( "bg2.32lo_u11.bin", 0x000001, 0x002000, CRC(46912afd) SHA1(c1f771adc1ef62b1fb1b904ed1d2a61009e24f55), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD( "bg2.32hi_u13.bin", 0x000000, 0x002000, CRC(731df44f) SHA1(8c238b5943b8864e539f92891a0ffa6ddd4fc779), ROM_BIOS(0) | ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(1, "3.0p", "rev 3.0P ROM")
-	ROMX_LOAD( "bg5173_u10.bin", 0x004001, 0x002000, CRC(40014850) SHA1(ef0b7da58a5183391a3a03947882197f25694518), ROM_BIOS(2)|ROM_SKIP(1))
-	ROMX_LOAD( "bg5175_u12.bin", 0x004000, 0x002000, CRC(c2c4cc6c) SHA1(dbbce7cb58b4cef1557a834cbb07b3ace298cb8b), ROM_BIOS(2)|ROM_SKIP(1))
-	ROMX_LOAD( "bg5174_u11.bin", 0x000001, 0x002000, CRC(639768b9) SHA1(68f623bcf3bb75390ba2b17efc067cf25f915ec0), ROM_BIOS(2)|ROM_SKIP(1))
-	ROMX_LOAD( "bg5176_u13.bin", 0x000000, 0x002000, CRC(984e7e8c) SHA1(dd13cbaff96a8b9936ae8cb07205c6abe8b27b6e), ROM_BIOS(2)|ROM_SKIP(1))
+	ROMX_LOAD( "bg5173_u10.bin", 0x004001, 0x002000, CRC(40014850) SHA1(ef0b7da58a5183391a3a03947882197f25694518), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD( "bg5175_u12.bin", 0x004000, 0x002000, CRC(c2c4cc6c) SHA1(dbbce7cb58b4cef1557a834cbb07b3ace298cb8b), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD( "bg5174_u11.bin", 0x000001, 0x002000, CRC(639768b9) SHA1(68f623bcf3bb75390ba2b17efc067cf25f915ec0), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD( "bg5176_u13.bin", 0x000000, 0x002000, CRC(984e7e8c) SHA1(dd13cbaff96a8b9936ae8cb07205c6abe8b27b6e), ROM_BIOS(1) | ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(2, "ramtest", "RAM test")
-	ROMX_LOAD( "ramtest.rom", 0x000000, 0x004000, CRC(fabe3b34) SHA1(4d892a2ed2b7ea12d83843609981be9069611d43), ROM_BIOS(3))
+	ROMX_LOAD( "ramtest.rom", 0x000000, 0x004000, CRC(fabe3b34) SHA1(4d892a2ed2b7ea12d83843609981be9069611d43), ROM_BIOS(2))
 
 	ROM_REGION( 0x800, PPU_TAG, 0 )
 	ROM_LOAD( "bg_mouse_u9.bin", 0x0000, 0x0800, CRC(fd827ff5) SHA1(6d4a8e9b18c7610c5cfde40464826d144d387601))
 ROM_END
 
 /* Driver */
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY  FULLNAME          FLAGS
-COMP( 1981, bitgrpha, 0,      0,      bitgrpha, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev A", ROT90 )
-COMP( 1982, bitgrphb, 0,      0,      bitgrphb, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME          FLAGS
+COMP( 1981, bitgrpha, 0,      0,      bitgrpha, bitgraph, bitgraph_state, empty_init, "BBN",   "BitGraph rev A", ROT90 )
+COMP( 1982, bitgrphb, 0,      0,      bitgrphb, bitgraph, bitgraph_state, empty_init, "BBN",   "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING )

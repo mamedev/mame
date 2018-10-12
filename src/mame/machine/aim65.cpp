@@ -73,7 +73,7 @@ WRITE8_MEMBER( aim65_state::aim65_pia_b_w )
 
 template <unsigned D> WRITE16_MEMBER( aim65_state::aim65_update_ds )
 {
-	output().set_digit_value(((D - 1) << 2) | (offset ^ 3), data);
+	m_digits[((D - 1) << 2) | (offset ^ 3)] = data;
 }
 
 template WRITE16_MEMBER( aim65_state::aim65_update_ds<1> );
@@ -122,8 +122,9 @@ WRITE8_MEMBER( aim65_state::aim65_riot_a_w )
 
 void aim65_state::machine_start()
 {
-	ram_device *ram = m_ram;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	m_digits.resolve();
 
 	// Init ROM sockets
 	if (m_z24->exists())
@@ -144,7 +145,7 @@ void aim65_state::machine_start()
 		space.install_read_handler(0x7000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z15));
 
 	// Init RAM
-	space.install_ram(0x0000, ram->size() - 1, ram->pointer());
+	space.install_ram(0x0000, m_ram->size() - 1, m_ram->pointer());
 
 	m_pb_save = 0;
 

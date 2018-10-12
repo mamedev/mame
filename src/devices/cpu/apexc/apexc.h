@@ -7,10 +7,10 @@
 #pragma once
 
 #define MCFG_APEXC_TAPE_READ_CB(_devcb) \
-	devcb = &downcast<apexc_cpu_device &>(*device).set_tape_read_cb(DEVCB_##_devcb);
+	downcast<apexc_cpu_device &>(*device).set_tape_read_cb(DEVCB_##_devcb);
 
 #define MCFG_APEXC_TAPE_PUNCH_CB(_devcb) \
-	devcb = &downcast<apexc_cpu_device &>(*device).set_tape_punch_cb(DEVCB_##_devcb);
+	downcast<apexc_cpu_device &>(*device).set_tape_punch_cb(DEVCB_##_devcb);
 
 enum
 {
@@ -50,7 +50,7 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	inline uint32_t apexc_readmem(uint32_t address) { return m_program->read_dword((address)<<2); }
 	inline void apexc_writemem(uint32_t address, uint32_t data) { m_program->write_dword((address)<<2, (data)); }

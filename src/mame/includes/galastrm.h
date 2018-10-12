@@ -1,11 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau
+#ifndef MAME_INCLUDES_GALASTRM_H
+#define MAME_INCLUDES_GALASTRM_H
+
+#pragma once
+
 #include "machine/eepromser.h"
 
 #include "video/poly.h"
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -44,14 +50,10 @@ struct gs_tempsprite
 
 class galastrm_state : public driver_device
 {
+	friend class galastrm_renderer;
 public:
-	enum
-	{
-		TIMER_GALASTRM_INTERRUPT6
-	};
-
-	galastrm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galastrm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram") ,
 		m_maincpu(*this, "maincpu"),
@@ -60,8 +62,16 @@ public:
 		m_tc0480scp(*this, "tc0480scp"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	void galastrm(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint32_t> m_ram;
 	required_shared_ptr<uint32_t> m_spriteram;
 
@@ -83,7 +93,6 @@ public:
 	struct gs_tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
 	std::unique_ptr<galastrm_renderer> m_poly;
-	emu_timer *m_interrupt6_timer;
 
 	int m_rsxb;
 	int m_rsyb;
@@ -93,19 +102,13 @@ public:
 	DECLARE_WRITE32_MEMBER(galastrm_palette_w);
 	DECLARE_WRITE32_MEMBER(galastrm_tc0610_0_w);
 	DECLARE_WRITE32_MEMBER(galastrm_tc0610_1_w);
-	DECLARE_READ32_MEMBER(galastrm_adstick_ctrl_r);
-	DECLARE_WRITE32_MEMBER(galastrm_adstick_ctrl_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_WRITE8_MEMBER(coin_word_w);
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	uint32_t screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
 
-	void galastrm(machine_config &config);
 	void galastrm_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_GALASTRM_H

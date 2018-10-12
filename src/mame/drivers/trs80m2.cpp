@@ -234,7 +234,7 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 
 	// 80/40 character mode
 	m_80_40_char_en = BIT(data, 4);
-	m_crtc->set_clock(m_80_40_char_en ? XTAL(12'480'000)/16 : XTAL(12'480'000)/8);
+	m_crtc->set_clock(12.48_MHz_XTAL / (m_80_40_char_en ? 16 : 8));
 
 	// RTC interrupt enable
 	m_enable_rtc_int = BIT(data, 5);
@@ -254,12 +254,12 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 
 READ8_MEMBER( trs80m2_state::fdc_r )
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER( trs80m2_state::fdc_w )
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER( trs80m16_state::tcl_w )
@@ -319,52 +319,56 @@ WRITE8_MEMBER( trs80m16_state::ual_w )
 //  ADDRESS_MAP( z80_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(trs80m2_state::z80_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void trs80m2_state::z80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(trs80m2_state::read), FUNC(trs80m2_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( z80_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(trs80m2_state::z80_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-	AM_RANGE(0xe4, 0xe7) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xef, 0xef) AM_WRITE(drvslt_w)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(rom_enable_w)
-	AM_RANGE(0xfc, 0xfc) AM_READ(keyboard_r) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-	AM_RANGE(0xfd, 0xfd) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0xfe, 0xfe) AM_READ(rtc_r)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(nmi_r, nmi_w)
-ADDRESS_MAP_END
+void trs80m2_state::z80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xe0, 0xe3).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0xe4, 0xe7).rw(FUNC(trs80m2_state::fdc_r), FUNC(trs80m2_state::fdc_w));
+	map(0xef, 0xef).w(FUNC(trs80m2_state::drvslt_w));
+	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0xf4, 0xf7).rw(Z80SIO_TAG, FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
+	map(0xf8, 0xf8).rw(m_dmac, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0xf9, 0xf9).w(FUNC(trs80m2_state::rom_enable_w));
+	map(0xfc, 0xfc).r(FUNC(trs80m2_state::keyboard_r)).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0xfd, 0xfd).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xfe, 0xfe).r(FUNC(trs80m2_state::rtc_r));
+	map(0xff, 0xff).rw(FUNC(trs80m2_state::nmi_r), FUNC(trs80m2_state::nmi_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( m16_z80_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(trs80m16_state::m16_z80_io)
-	AM_IMPORT_FROM(z80_io)
-	AM_RANGE(0xde, 0xde) AM_WRITE(tcl_w)
-	AM_RANGE(0xdf, 0xdf) AM_WRITE(ual_w)
-ADDRESS_MAP_END
+void trs80m16_state::m16_z80_io(address_map &map)
+{
+	z80_io(map);
+	map(0xde, 0xde).w(FUNC(trs80m16_state::tcl_w));
+	map(0xdf, 0xdf).w(FUNC(trs80m16_state::ual_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( m68000_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(trs80m2_state::m68000_mem)
+void trs80m2_state::m68000_mem(address_map &map)
+{
 //  AM_RANGE(0x7800d0, 0x7800d1) 9519A (C/D = UDS)
 //  AM_RANGE(0x7800d2, 0x7800d3) limit/offset 2
 //  AM_RANGE(0x7800d4, 0x7800d5) limit/offset 1
 //  AM_RANGE(0x7800d6, 0x7800d7) Z80 IRQ
-ADDRESS_MAP_END
+}
 
 
 
@@ -617,10 +621,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
 	m_ctc->trg2(0);
 }
 
-static SLOT_INTERFACE_START( trs80m2_floppies )
-	SLOT_INTERFACE( "8ssdd", FLOPPY_8_SSDD ) // Shugart SA-800
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD ) // Shugart SA-850
-SLOT_INTERFACE_END
+static void trs80m2_floppies(device_slot_interface &device)
+{
+	device.option_add("8ssdd", FLOPPY_8_SSDD); // Shugart SA-800
+	device.option_add("8dsdd", FLOPPY_8_DSDD); // Shugart SA-850
+}
 
 
 //-------------------------------------------------
@@ -704,10 +709,10 @@ void trs80m2_state::machine_reset()
 
 MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_daisy_config(trs80m2_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m2_state::z80_mem);
+	m_maincpu->set_addrmap(AS_IO, &trs80m2_state::z80_io);
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
@@ -719,64 +724,62 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(12'480'000)/8)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, 12.48_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(trs80m2_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(trs80m2_state, de_w))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(trs80m2_state, vsync_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, trs80m2_state, de_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, trs80m2_state, vsync_w))
 
 	// devices
-	MCFG_FD1791_ADD(FD1791_TAG, XTAL(8'000'000)/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITE8(Z80PIO_TAG, z80pio_device, pa_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
+	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pa_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000)/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80dart_device::rxca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
+	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL(8'000'000)/2/2))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(8'000'000)/2)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(trs80m2_state, read))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(trs80m2_state, write))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(trs80m2_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(trs80m2_state, io_write_byte))
+	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dmac->in_mreq_callback().set(FUNC(trs80m2_state::read));
+	m_dmac->out_mreq_callback().set(FUNC(trs80m2_state::write));
+	m_dmac->in_iorq_callback().set(FUNC(trs80m2_state::io_read_byte));
+	m_dmac->out_iorq_callback().set(FUNC(trs80m2_state::io_write_byte));
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(8'000'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(trs80m2_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(trs80m2_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
+	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(8'000'000)/2)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80sio0_device& sio(Z80SIO0(config, Z80SIO_TAG, 8_MHz_XTAL / 2));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(trs80m2_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(trs80m2_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(trs80m2_state, write_centronics_perror))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_b))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
-	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
+	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(*this, trs80m2_state, kb_clock_w))
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
@@ -789,14 +792,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(m16_z80_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(AM9519A_TAG, am9519_device, iack_cb)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_daisy_config(trs80m2_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m16_state::z80_mem);
+	m_maincpu->set_addrmap(AS_IO, &trs80m16_state::m16_z80_io);
+	m_maincpu->set_irq_acknowledge_callback(AM9519A_TAG, FUNC(am9519_device::iack_cb));
 
-	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL(24'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(m68000_mem)
+	MCFG_DEVICE_ADD(M68000_TAG, M68000, 24_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(m68000_mem)
 	MCFG_DEVICE_DISABLE()
 
 	// video hardware
@@ -809,67 +812,65 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(12'480'000)/8)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, 12.48_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(trs80m2_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(trs80m2_state, de_w))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(trs80m2_state, vsync_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, trs80m2_state, de_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, trs80m2_state, vsync_w))
 
 	// devices
-	MCFG_FD1791_ADD(FD1791_TAG, XTAL(8'000'000)/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITE8(Z80PIO_TAG, z80pio_device, pa_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
+	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pa_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000)/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80dart_device::rxca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
+	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL(8'000'000)/2/2))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(8'000'000)/2)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(trs80m2_state, read))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(trs80m2_state, write))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(trs80m2_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(trs80m2_state, io_write_byte))
+	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dmac->in_mreq_callback().set(FUNC(trs80m2_state::read));
+	m_dmac->out_mreq_callback().set(FUNC(trs80m2_state::write));
+	m_dmac->in_iorq_callback().set(FUNC(trs80m2_state::io_read_byte));
+	m_dmac->out_iorq_callback().set(FUNC(trs80m2_state::io_write_byte));
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(8'000'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(trs80m2_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(trs80m2_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
+	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(8'000'000)/2)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80sio0_device& sio(Z80SIO0(config, Z80SIO_TAG, 8_MHz_XTAL / 2));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(AM9519A_TAG, AM9519, 0)
-	MCFG_AM9519_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_5))
+	AM9519(config, m_uic, 0);
+	m_uic->out_int_callback().set_inputline(M68000_TAG, M68K_IRQ_5);
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(trs80m2_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(trs80m2_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(trs80m2_state, write_centronics_perror))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_b))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
-	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
+	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(*this, trs80m2_state, kb_clock_w))
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,768K,1M")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,768K,1M");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
@@ -922,17 +923,17 @@ ROM_START( trs80m2 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "9733" )
 	ROM_SYSTEM_BIOS( 0, "c8ff", "Version 1" )
-	ROMX_LOAD( "8043216.u11", 0x0000, 0x0800, CRC(7017a373) SHA1(1c7127fcc99fc351a40d3a3199ba478e783c452e), ROM_BIOS(1) )
+	ROMX_LOAD( "8043216.u11", 0x0000, 0x0800, CRC(7017a373) SHA1(1c7127fcc99fc351a40d3a3199ba478e783c452e), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "2bff", "Version 2 (1981-07-29)" )
-	ROMX_LOAD( "8047316.u11", 0x0000, 0x0800, CRC(c6c71d8b) SHA1(7107e2cbbe769851a4460680c2deff8e76a101b5), ROM_BIOS(2) )
+	ROMX_LOAD( "8047316.u11", 0x0000, 0x0800, CRC(c6c71d8b) SHA1(7107e2cbbe769851a4460680c2deff8e76a101b5), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "2119", "Version 3 (1982-05-07)" )
-	ROMX_LOAD( "cpu_2119.u11", 0x0000, 0x0800, CRC(7a663049) SHA1(f308439ce266df717bfe79adcdad6024b4faa141), ROM_BIOS(3) )
+	ROMX_LOAD( "cpu_2119.u11", 0x0000, 0x0800, CRC(7a663049) SHA1(f308439ce266df717bfe79adcdad6024b4faa141), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "1bbe", "Version 3 (1982-05-07, Alt)" )
-	ROMX_LOAD( "cpu_11be.u11", 0x0000, 0x0800, CRC(8edceea7) SHA1(3d797acedd8a71a82c695129ca764f85aa9022b2), ROM_BIOS(4) )
+	ROMX_LOAD( "cpu_11be.u11", 0x0000, 0x0800, CRC(8edceea7) SHA1(3d797acedd8a71a82c695129ca764f85aa9022b2), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "fc86", "Version 4 (1982-11-18)" )
-	ROMX_LOAD( "cpu_fc86.u11", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(5) )
+	ROMX_LOAD( "cpu_fc86.u11", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 5, "9733", "Version 5 (1983-07-29)" )
-	ROMX_LOAD( "u54.u11", 0x0000, 0x0800, CRC(823924b1) SHA1(aee0625bcbd8620b28ab705e15ad9bea804c8476), ROM_BIOS(6) )
+	ROMX_LOAD( "u54.u11", 0x0000, 0x0800, CRC(823924b1) SHA1(aee0625bcbd8620b28ab705e15ad9bea804c8476), ROM_BIOS(5) )
 
 	ROM_REGION( 0x800, MC6845_TAG, 0 )
 	ROM_LOAD( "8043316.u9", 0x0000, 0x0800, CRC(04425b03) SHA1(32a29dc202b7fcf21838289cc3bffc51ef943dab) )
@@ -951,9 +952,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE           INIT  COMPANY              FULLNAME            FLAGS
-COMP( 1979, trs80m2,    0,       0,      trs80m2,    trs80m2, trs80m2_state,  0,    "Tandy Radio Shack", "TRS-80 Model II",  MACHINE_NO_SOUND_HW )
-COMP( 1982, trs80m16,   trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-//COMP( 1983, trs80m12, trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-//COMP( 1984, trs80m16b,trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-//COMP( 1985, tandy6k,  trs80m2, 0,      tandy6k,    trs80m2, tandy6k_state,  0,    "Tandy Radio Shack", "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT        COMPANY              FULLNAME            FLAGS
+COMP( 1979, trs80m2,    0,       0,      trs80m2,  trs80m2, trs80m2_state,  empty_init, "Tandy Radio Shack", "TRS-80 Model II",  MACHINE_NO_SOUND_HW )
+COMP( 1982, trs80m16,   trs80m2, 0,      trs80m16, trs80m2, trs80m16_state, empty_init, "Tandy Radio Shack", "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1983, trs80m12, trs80m2, 0,      trs80m16, trs80m2, trs80m16_state, empty_init, "Tandy Radio Shack", "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1984, trs80m16b,trs80m2, 0,      trs80m16, trs80m2, trs80m16_state, empty_init, "Tandy Radio Shack", "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1985, tandy6k,  trs80m2, 0,      tandy6k,  trs80m2, tandy6k_state,  empty_init, "Tandy Radio Shack", "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

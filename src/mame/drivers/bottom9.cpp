@@ -25,10 +25,10 @@
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_interrupt)
+WRITE_LINE_MEMBER(bottom9_state::vblank_irq)
 {
-	if (m_k052109->is_irq_enabled())
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_k052109->is_irq_enabled())
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(bottom9_state::k052109_051960_r)
@@ -137,7 +137,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_sh_irqtrigger_w)
 INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_sound_interrupt)
 {
 	if (m_nmienable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(bottom9_state::nmi_enable_w)
@@ -159,35 +159,37 @@ WRITE8_MEMBER(bottom9_state::sound_bank_w)
 }
 
 
-ADDRESS_MAP_START(bottom9_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bottom9_bankedram1_r, bottom9_bankedram1_w)
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(bottom9_1f90_w)
-	AM_RANGE(0x1fa0, 0x1fa0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1fb0, 0x1fb0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(bottom9_sh_irqtrigger_w)
-	AM_RANGE(0x1fd0, 0x1fd0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1fd1, 0x1fd1) AM_READ_PORT("P1")
-	AM_RANGE(0x1fd2, 0x1fd2) AM_READ_PORT("P2")
-	AM_RANGE(0x1fd3, 0x1fd3) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1fe0, 0x1fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1ff0, 0x1fff) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_SHARE("palette")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void bottom9_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rw(FUNC(bottom9_state::k052109_051960_r), FUNC(bottom9_state::k052109_051960_w));
+	map(0x0000, 0x07ff).rw(FUNC(bottom9_state::bottom9_bankedram1_r), FUNC(bottom9_state::bottom9_bankedram1_w));
+	map(0x1f80, 0x1f80).w(FUNC(bottom9_state::bankswitch_w));
+	map(0x1f90, 0x1f90).w(FUNC(bottom9_state::bottom9_1f90_w));
+	map(0x1fa0, 0x1fa0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1fb0, 0x1fb0).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x1fc0, 0x1fc0).w(FUNC(bottom9_state::bottom9_sh_irqtrigger_w));
+	map(0x1fd0, 0x1fd0).portr("SYSTEM");
+	map(0x1fd1, 0x1fd1).portr("P1");
+	map(0x1fd2, 0x1fd2).portr("P2");
+	map(0x1fd3, 0x1fd3).portr("DSW1");
+	map(0x1fe0, 0x1fe0).portr("DSW2");
+	map(0x1ff0, 0x1fff).w(m_k051316, FUNC(k051316_device::ctrl_w));
+	map(0x2000, 0x27ff).rw(FUNC(bottom9_state::bottom9_bankedram2_r), FUNC(bottom9_state::bottom9_bankedram2_w)).share("palette");
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(bottom9_state::audio_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_enable_w)
-ADDRESS_MAP_END
+void bottom9_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(FUNC(bottom9_state::sound_bank_w));
+	map(0xa000, 0xa00d).rw(m_k007232_1, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xb000, 0xb00d).rw(m_k007232_2, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xf000, 0xf000).w(FUNC(bottom9_state::nmi_enable_w));
+}
 
 
 static INPUT_PORTS_START( bottom9 )
@@ -301,15 +303,14 @@ void bottom9_state::machine_reset()
 MACHINE_CONFIG_START(bottom9_state::bottom9)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // 63C09E
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bottom9_state,  bottom9_interrupt)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // 63C09E
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -319,6 +320,7 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(bottom9_state, screen_update_bottom9)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bottom9_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -338,17 +340,17 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	MCFG_K051316_CB(bottom9_state, zoom_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("k007232_1", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback0))
+	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, bottom9_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback1))
+	MCFG_DEVICE_ADD("k007232_2", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, bottom9_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END
@@ -534,6 +536,6 @@ ROM_END
 
 
 
-GAME( 1989, bottom9,  0,       bottom9, bottom9,  bottom9_state, 0, ROT0, "Konami", "Bottom of the Ninth (version T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bottom9n, bottom9, bottom9, bottom9,  bottom9_state, 0, ROT0, "Konami", "Bottom of the Ninth (version N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mstadium, bottom9, bottom9, mstadium, bottom9_state, 0, ROT0, "Konami", "Main Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bottom9,  0,       bottom9, bottom9,  bottom9_state, empty_init, ROT0, "Konami", "Bottom of the Ninth (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bottom9n, bottom9, bottom9, bottom9,  bottom9_state, empty_init, ROT0, "Konami", "Bottom of the Ninth (version N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mstadium, bottom9, bottom9, mstadium, bottom9_state, empty_init, ROT0, "Konami", "Main Stadium (Japan)", MACHINE_SUPPORTS_SAVE )

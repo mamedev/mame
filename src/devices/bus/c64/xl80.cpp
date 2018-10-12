@@ -114,7 +114,7 @@ MC6845_UPDATE_ROW( c64_xl80_device::crtc_update_row )
 //  GFXDECODE( c64_xl80 )
 //-------------------------------------------------
 
-static GFXDECODE_START( c64_xl80 )
+static GFXDECODE_START( gfx_c64_xl80 )
 	GFXDECODE_ENTRY(HD46505SP_TAG, 0x0000, gfx_8x8x1, 0, 1)
 GFXDECODE_END
 
@@ -130,7 +130,7 @@ MACHINE_CONFIG_START(c64_xl80_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c64_xl80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c64_xl80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(HD46505SP_TAG, H46505, MC6845_SCREEN_TAG, XTAL(14'318'181) / 8)

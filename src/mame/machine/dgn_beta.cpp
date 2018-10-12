@@ -149,7 +149,7 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 	int                 MapPage;
 	char                page_num[10];
 
-	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,space_0.device().safe_pc()));
+	LOG_BANK_UPDATE(("\n\n%s Updating banks %d to %d\n", machine().describe_context(), first, last));
 	for(Page=first;Page<=last;Page++)
 	{
 		sprintf(page_num,"bank%d",Page+1);
@@ -811,13 +811,13 @@ WRITE_LINE_MEMBER( dgn_beta_state::dgnbeta_fdc_drq_w )
 
 READ8_MEMBER( dgn_beta_state::dgnbeta_wd2797_r )
 {
-	return m_fdc->read(space, offset & 0x03);
+	return m_fdc->read(offset & 0x03);
 }
 
 WRITE8_MEMBER( dgn_beta_state::dgnbeta_wd2797_w )
 {
 	m_wd2797_written = 1;
-	m_fdc->write(space, offset & 0x03, data);
+	m_fdc->write(offset & 0x03, data);
 }
 
 /* Scan physical keyboard into Keyboard array */

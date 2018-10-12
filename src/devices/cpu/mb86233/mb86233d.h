@@ -19,7 +19,7 @@ private:
 	static const char *const regnames[0x40];
 	static std::string condition(unsigned int cond, bool invert);
 	static std::string regs(u32 reg);
-	static std::string memory(u32 reg, bool x1);
+	static std::string memory(u32 reg, bool x1, bool bank);
 	static std::string alu0_func(u32 alu);
 };
 

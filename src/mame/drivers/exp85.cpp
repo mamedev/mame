@@ -40,21 +40,23 @@
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(exp85_state::exp85_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xf8ff) AM_RAM
-ADDRESS_MAP_END
+void exp85_state::exp85_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankr("bank1");
+	map(0xc000, 0xdfff).rom();
+	map(0xf000, 0xf7ff).rom();
+	map(0xf800, 0xf8ff).ram();
+}
 
-ADDRESS_MAP_START(exp85_state::exp85_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(I8355_TAG, i8355_device, io_r, io_w)
-	AM_RANGE(0xf8, 0xfd) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
+void exp85_state::exp85_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf0, 0xf3).rw(I8355_TAG, FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
+	map(0xf8, 0xfd).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 //  AM_RANGE(0xfe, 0xff) AM_DEVREADWRITE(I8279_TAG, i8279_r, i8279_w)
-ADDRESS_MAP_END
+}
 
 /* Input Ports */
 
@@ -180,33 +182,32 @@ void exp85_state::machine_start()
 
 MACHINE_CONFIG_START(exp85_state::exp85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8085A_TAG, I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(exp85_mem)
-	MCFG_CPU_IO_MAP(exp85_io)
-	MCFG_I8085A_SID(READLINE(exp85_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(exp85_state, sod_w))
+	MCFG_DEVICE_ADD(I8085A_TAG, I8085A, 6.144_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(exp85_mem)
+	MCFG_DEVICE_IO_MAP(exp85_io)
+	MCFG_I8085A_SID(READLINE(*this, exp85_state, sid_r))
+	MCFG_I8085A_SOD(WRITELINE(*this, exp85_state, sod_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8155_TAG, I8155, 6.144_MHz_XTAL/2)
+	I8155(config, I8155_TAG, 6.144_MHz_XTAL/2);
 
-	MCFG_DEVICE_ADD(I8355_TAG, I8355, 6.144_MHz_XTAL/2)
-	MCFG_I8355_IN_PA_CB(READ8(exp85_state, i8355_a_r))
-	MCFG_I8355_OUT_PA_CB(WRITE8(exp85_state, i8355_a_w))
+	i8355_device &i8355(I8355(config, I8355_TAG, 6.144_MHz_XTAL/2));
+	i8355.in_pa().set(FUNC(exp85_state::i8355_a_r));
+	i8355.out_pa().set(FUNC(exp85_state::i8355_a_w));
+
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256")
-	MCFG_RAM_EXTRA_OPTIONS("4K")
+	RAM(config, RAM_TAG).set_default_size("256").set_extra_options("4K");
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -219,19 +220,19 @@ ROM_START( exp85 )
 	ROM_LOAD( "d000.bin", 0xd000, 0x0800, CRC(c10c4a22) SHA1(30588ba0b27a775d85f8c581ad54400c8521225d) )
 	ROM_LOAD( "d800.bin", 0xd800, 0x0800, CRC(dfa43ef4) SHA1(56a7e7a64928bdd1d5f0519023d1594cacef49b3) )
 	ROM_SYSTEM_BIOS( 0, "eia", "EIA Terminal" )
-	ROMX_LOAD( "ex 85.u105", 0xf000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(1) )
+	ROMX_LOAD( "ex 85.u105", 0xf000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "hex", "Hex Keyboard" )
-	ROMX_LOAD( "1kbd.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "1kbd.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, I8355_TAG, ROMREGION_ERASE00 )
 
 /*  ROM_DEFAULT_BIOS("terminal")
     ROM_SYSTEM_BIOS( 0, "terminal", "Terminal" )
-    ROMX_LOAD( "eia.u105", 0xf000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(1) )
+    ROMX_LOAD( "eia.u105", 0xf000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(0) )
     ROM_SYSTEM_BIOS( 1, "hexkbd", "Hex Keyboard" )
-    ROMX_LOAD( "hex.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(2) )*/
+    ROMX_LOAD( "hex.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(1) )*/
 ROM_END
 
 /* System Drivers */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY         FULLNAME       FLAGS
-COMP( 1979, exp85,  0,      0,      exp85,   exp85, exp85_state, 0,    "Netronics",    "Explorer/85", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME       FLAGS
+COMP( 1979, exp85, 0,      0,      exp85,   exp85, exp85_state, empty_init, "Netronics", "Explorer/85", 0 )

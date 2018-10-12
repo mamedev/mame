@@ -40,14 +40,15 @@ K051649 (sound)
 #include "video/k054156_k054157_k056832.h"
 #include "video/k052109.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class konmedal_state : public driver_device
 {
 public:
-	konmedal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	konmedal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_k052109(*this, "k052109"),
@@ -56,6 +57,11 @@ public:
 		m_oki(*this, "oki")
 	{ }
 
+	void shuriboy(machine_config &config);
+	void ddboy(machine_config &config);
+	void tsukande(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(konmedal);
 	DECLARE_MACHINE_START(shuriboy);
 
@@ -85,18 +91,14 @@ public:
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
 
-	void shuriboy(machine_config &config);
-	void ddboy(machine_config &config);
-	void tsukande(machine_config &config);
 	void ddboy_main(address_map &map);
 	void medal_main(address_map &map);
 	void shuriboy_main(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<k056832_device> m_k056832;
 	optional_device<k052109_device> m_k052109;
@@ -225,69 +227,64 @@ WRITE8_MEMBER(konmedal_state::bankswitch_w)
 	m_control = data & 0xf;
 }
 
-ADDRESS_MAP_START(konmedal_state::medal_main)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xafff) AM_RAM // work RAM?
-	AM_RANGE(0xb800, 0xbfff) AM_RAM // stack goes here
-	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
-	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc500, 0xc500) AM_NOP // read to reset watchdog
-	AM_RANGE(0xc700, 0xc700) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc701, 0xc701) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc702, 0xc702) AM_READ_PORT("IN1")
-	AM_RANGE(0xc703, 0xc703) AM_READ_PORT("IN2")
-	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
-	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
-	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void konmedal_state::medal_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xafff).ram(); // work RAM?
+	map(0xb800, 0xbfff).ram(); // stack goes here
+	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
+	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
+	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
+	map(0xc500, 0xc500).noprw(); // read to reset watchdog
+	map(0xc700, 0xc700).portr("DSW2");
+	map(0xc701, 0xc701).portr("DSW1");
+	map(0xc702, 0xc702).portr("IN1");
+	map(0xc703, 0xc703).portr("IN2");
+	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
+	map(0xc80f, 0xc80f).r(FUNC(konmedal_state::magic_r));
+	map(0xd000, 0xd001).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+	map(0xe000, 0xffff).rw(FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+}
 
-ADDRESS_MAP_START(konmedal_state::ddboy_main)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM // work RAM
-	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
-	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc500, 0xc500) AM_NOP // read to reset watchdog
-	AM_RANGE(0xc702, 0xc702) AM_READ_PORT("IN1")
-	AM_RANGE(0xc703, 0xc703) AM_READ_PORT("IN2")
-	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
-	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
-	AM_RANGE(0xcc00, 0xcc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP    // ???  writes 00 and 3f every frame
-	AM_RANGE(0xd800, 0xd87f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0xd880, 0xd889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
-	AM_RANGE(0xd88a, 0xd88e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
-	AM_RANGE(0xd88f, 0xd88f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
-	AM_RANGE(0xd8e0, 0xd8ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void konmedal_state::ddboy_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram(); // work RAM
+	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
+	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
+	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
+	map(0xc500, 0xc500).noprw(); // read to reset watchdog
+	map(0xc702, 0xc702).portr("IN1");
+	map(0xc703, 0xc703).portr("IN2");
+	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
+	map(0xc80f, 0xc80f).r(FUNC(konmedal_state::magic_r));
+	map(0xcc00, 0xcc00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xd000, 0xd000).nopw();    // ???  writes 00 and 3f every frame
+	map(0xd800, 0xd8ff).m("k051649", FUNC(k051649_device::scc_map));
+	map(0xe000, 0xffff).rw(FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+}
 
-ADDRESS_MAP_START(konmedal_state::shuriboy_main)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("IN2")
-	AM_RANGE(0x8801, 0x8801) AM_READ_PORT("IN1")
-	AM_RANGE(0x8802, 0x8802) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8803, 0x8803) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8b00, 0x8b00) AM_WRITENOP    // watchdog?
-	AM_RANGE(0x8c00, 0x8c00) AM_WRITE(shuri_bank_w)
-	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
-	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdbff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0xdd00, 0xdd00) AM_READWRITE(shuri_irq_r, shuri_irq_w)
-	AM_RANGE(0xdd80, 0xdd80) AM_WRITE(shuri_control_w)
-	AM_RANGE(0xde00, 0xde00) AM_WRITE(shuri_vrom_addr_w)
-	AM_RANGE(0xdf00, 0xdf00) AM_WRITE(shuri_vrom_bank_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(shuri_video_r, shuri_video_w)
-ADDRESS_MAP_END
+void konmedal_state::shuriboy_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8800).portr("IN2");
+	map(0x8801, 0x8801).portr("IN1");
+	map(0x8802, 0x8802).portr("DSW1");
+	map(0x8803, 0x8803).portr("DSW2");
+	map(0x8b00, 0x8b00).nopw();    // watchdog?
+	map(0x8c00, 0x8c00).w(FUNC(konmedal_state::shuri_bank_w));
+	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
+	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdbff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0xdd00, 0xdd00).rw(FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
+	map(0xdd80, 0xdd80).w(FUNC(konmedal_state::shuri_control_w));
+	map(0xde00, 0xde00).w(FUNC(konmedal_state::shuri_vrom_addr_w));
+	map(0xdf00, 0xdf00).w(FUNC(konmedal_state::shuri_vrom_bank_w));
+	map(0xe000, 0xffff).rw(FUNC(konmedal_state::shuri_video_r), FUNC(konmedal_state::shuri_video_w));
+}
 
 static INPUT_PORTS_START( konmedal )
 	PORT_START("DSW1")
@@ -386,9 +383,9 @@ void konmedal_state::machine_reset()
 
 MACHINE_CONFIG_START(konmedal_state::tsukande)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
-	MCFG_CPU_PROGRAM_MAP(medal_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	MCFG_DEVICE_PROGRAM_MAP(medal_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -406,11 +403,12 @@ MACHINE_CONFIG_START(konmedal_state::tsukande)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // 16.9344MHz xtal verified on PCB
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -419,9 +417,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konmedal_state::ddboy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
-	MCFG_CPU_PROGRAM_MAP(ddboy_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	MCFG_DEVICE_PROGRAM_MAP(ddboy_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -439,12 +437,12 @@ MACHINE_CONFIG_START(konmedal_state::ddboy)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/14, PIN7_HIGH)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
@@ -546,8 +544,8 @@ WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
 
 MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 3) // divisor unknown
-	MCFG_CPU_PROGRAM_MAP(shuriboy_main)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 3) // divisor unknown
+	MCFG_DEVICE_PROGRAM_MAP(shuriboy_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal_state, scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -571,7 +569,7 @@ MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_K051649_ADD("k051649", XTAL(24'000'000) / 12) // divisor unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
@@ -631,7 +629,7 @@ ROM_END
 // this is a slightly different version on the same PCB as tsukande
 ROM_START( ddboya )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
-	ROM_LOAD( "342-f02-4g-(p).bin", 0x000000, 0x020000, CRC(563dfd4f) SHA1(a50544735a9d6f448b969b9fd84e6cdca303d7a0) )
+	ROM_LOAD( "342-f02-4g-=p=.bin", 0x000000, 0x020000, CRC(563dfd4f) SHA1(a50544735a9d6f448b969b9fd84e6cdca303d7a0) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
 	ROM_LOAD32_BYTE( "342_a03.27c010.4f", 0x000002, 0x020000, CRC(424f80dd) SHA1(fb7648960ce0951aebcf5cf4465a9acb3ab49cd8) )
@@ -640,8 +638,8 @@ ROM_START( ddboya )
 	ROM_LOAD32_BYTE( "342_a06.27c010.4j", 0x000001, 0x020000, CRC(49f35d66) SHA1(3d5cf3b6eb6a3497609117acd002169a31130418) )
 
 	ROM_REGION( 0x100000, "oki", 0 )
-	ROM_LOAD( "342-a11-10d-(s1).bin", 0x000000, 0x080000, CRC(b523bced) SHA1(87a814035af4dcf24454667d4346d301303d697e) )
-	ROM_LOAD( "342-a12-10e-(s2).bin", 0x080000, 0x080000, CRC(6febafe7) SHA1(69e550dd067f326b4d20a859345f193b43a5af99) )
+	ROM_LOAD( "342-a11-10d-=s1=.bin", 0x000000, 0x080000, CRC(b523bced) SHA1(87a814035af4dcf24454667d4346d301303d697e) )
+	ROM_LOAD( "342-a12-10e-=s2=.bin", 0x080000, 0x080000, CRC(6febafe7) SHA1(69e550dd067f326b4d20a859345f193b43a5af99) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	// R
@@ -659,17 +657,17 @@ ROM_START( shuriboy )
 	ROM_LOAD( "gs-341-b01.13g", 0x000000, 0x010000, CRC(3c0f36b6) SHA1(1d3838f45969228a8b2054cd5baf8892db68b644) )
 
 	ROM_REGION( 0x40000, "k052109", 0 )   /* tilemaps */
-	ROM_LOAD32_BYTE( "341-A03.2H", 0x000000, 0x010000, CRC(8e9e9835) SHA1(f8dc4579f238d91c0aef59167be7e5de87dc4ba7) )
-	ROM_LOAD32_BYTE( "341-A04.4H", 0x000001, 0x010000, CRC(ac82d67b) SHA1(65869adfbb67cf10c92e50239fd747fc5ad4714d) )
-	ROM_LOAD32_BYTE( "341-A05.5H", 0x000002, 0x010000, CRC(31403832) SHA1(d13c54d3768a0c2d60a3751db8980199f60db243) )
-	ROM_LOAD32_BYTE( "341-A06.7H", 0x000003, 0x010000, CRC(361e26eb) SHA1(7b5ad6a6067afb3350d85a3f2026e4d685429e20) )
+	ROM_LOAD32_BYTE( "341-a03.2h", 0x000000, 0x010000, CRC(8e9e9835) SHA1(f8dc4579f238d91c0aef59167be7e5de87dc4ba7) )
+	ROM_LOAD32_BYTE( "341-a04.4h", 0x000001, 0x010000, CRC(ac82d67b) SHA1(65869adfbb67cf10c92e50239fd747fc5ad4714d) )
+	ROM_LOAD32_BYTE( "341-a05.5h", 0x000002, 0x010000, CRC(31403832) SHA1(d13c54d3768a0c2d60a3751db8980199f60db243) )
+	ROM_LOAD32_BYTE( "341-a06.7h", 0x000003, 0x010000, CRC(361e26eb) SHA1(7b5ad6a6067afb3350d85a3f2026e4d685429e20) )
 
 	ROM_REGION( 0x200000, "upd", 0 )
-	ROM_LOAD( "341-A02.13C", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
+	ROM_LOAD( "341-a02.13c", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
 ROM_END
 
-GAME( 1995, tsukande,    0, tsukande, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
-GAME( 1995, ddboy,       0, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
-GAME( 1995, ddboya,  ddboy, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
-GAME( 1993, shuriboy,    0, shuriboy, konmedal,  konmedal_state, 0, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
+GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
+GAME( 1995, ddboy,    0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
+GAME( 1995, ddboya,   ddboy, ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
+GAME( 1993, shuriboy, 0,     shuriboy, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
 

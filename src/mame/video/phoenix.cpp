@@ -186,8 +186,8 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 
 	m_fg_tilemap->set_transparent_pen(0);
 
-	save_pointer(NAME(m_videoram_pg[0].get()), 0x1000);
-	save_pointer(NAME(m_videoram_pg[1].get()), 0x1000);
+	save_pointer(NAME(m_videoram_pg[0]), 0x1000);
+	save_pointer(NAME(m_videoram_pg[1]), 0x1000);
 	save_item(NAME(m_videoram_pg_index));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_cocktail_mode));

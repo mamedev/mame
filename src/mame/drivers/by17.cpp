@@ -37,6 +37,8 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_pia_u10(*this, "pia_u10")
 		, m_pia_u11(*this, "pia_u11")
+		, m_zero_crossing_active_timer(*this, "timer_z_pulse")
+		, m_display_refresh_timer(*this, "timer_d_pulse")
 		, m_io_test(*this, "TEST")
 		, m_io_dsw0(*this, "DSW0")
 		, m_io_dsw1(*this, "DSW1")
@@ -52,9 +54,9 @@ public:
 		, m_solenoids(*this, "solenoid%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(by17);
-	DECLARE_DRIVER_INIT(matahari);
-	DECLARE_DRIVER_INIT(pwerplay);
+	void init_by17();
+	void init_matahari();
+	void init_pwerplay();
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -65,31 +67,8 @@ public:
 	void by17(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
-	DECLARE_READ8_MEMBER(nibble_nvram_r);
-	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
-	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
-	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
-
-	void by17_map(address_map &map);
 
 private:
 	uint8_t m_u10a;
@@ -109,6 +88,8 @@ private:
 	required_shared_ptr<uint8_t> m_nvram;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
+	required_device<timer_device> m_zero_crossing_active_timer;
+	required_device<timer_device> m_display_refresh_timer;
 	required_ioport m_io_test;
 	required_ioport m_io_dsw0;
 	required_ioport m_io_dsw1;
@@ -122,17 +103,43 @@ private:
 	output_finder<15 * 4> m_lamps;
 	output_finder<5, 8> m_digits;
 	output_finder<20> m_solenoids;
+
+	DECLARE_READ8_MEMBER(u10_a_r);
+	DECLARE_WRITE8_MEMBER(u10_a_w);
+	DECLARE_READ8_MEMBER(u10_b_r);
+	DECLARE_WRITE8_MEMBER(u10_b_w);
+	DECLARE_READ8_MEMBER(u11_a_r);
+	DECLARE_WRITE8_MEMBER(u11_a_w);
+	DECLARE_WRITE8_MEMBER(u11_b_w);
+	DECLARE_READ8_MEMBER(nibble_nvram_r);
+	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
+	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
+	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
+	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
+	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
+	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
+	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
+	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
+
+	void by17_map(address_map &map);
 };
 
 
-ADDRESS_MAP_START(by17_state::by17_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x0200, 0x02ff) AM_RAM AM_READWRITE(nibble_nvram_r, nibble_nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0 )
-ADDRESS_MAP_END
+void by17_state::by17_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x007f).ram();
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0200, 0x02ff).ram().rw(FUNC(by17_state::nibble_nvram_r), FUNC(by17_state::nibble_nvram_w)).share("nvram");
+	map(0x1000, 0x1fff).rom().region("roms", 0);
+}
 
 
 static INPUT_PORTS_START( by17 )
@@ -802,9 +809,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_freq )
      +--------------------------+   +-----
 */
 
-	timer_device *zero_crossing_active_timer = machine().device<timer_device>("timer_z_pulse");
-
-	zero_crossing_active_timer->adjust(attotime::from_usec(700));
+	m_zero_crossing_active_timer->adjust(attotime::from_usec(700));
 
 	m_u10_cb1 = true;
 	m_pia_u10->cb1_w(m_u10_cb1);
@@ -832,9 +837,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::u11_timer )
     -+                          +---+
 */
 
-	timer_device *display_refresh_timer = machine().device<timer_device>("timer_d_pulse");
-
-	display_refresh_timer->adjust(attotime::from_msec(2.85));
+	m_display_refresh_timer->adjust(attotime::from_msec(2.85));
 
 	m_u11_ca1 = true;
 	m_pia_u11->ca1_w(m_u11_ca1);
@@ -848,7 +851,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
 
 
 
-DRIVER_INIT_MEMBER( by17_state, by17 )
+void by17_state::init_by17()
 {
 	static const uint8_t solenoid_features_default[20][4] =
 	{
@@ -888,7 +891,7 @@ DRIVER_INIT_MEMBER( by17_state, by17 )
 }
 
 
-DRIVER_INIT_MEMBER( by17_state, matahari )
+void by17_state::init_matahari()
 {
 	static const uint8_t solenoid_features_matahari[20][4] =
 	{
@@ -924,7 +927,7 @@ DRIVER_INIT_MEMBER( by17_state, matahari )
 }
 
 
-DRIVER_INIT_MEMBER( by17_state, pwerplay )
+void by17_state::init_pwerplay()
 {
 	static const uint8_t solenoid_features_pwerplay[20][4] =
 	{
@@ -992,44 +995,44 @@ void by17_state::machine_reset()
 
 MACHINE_CONFIG_START(by17_state::by17)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 530000)  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
-	MCFG_CPU_PROGRAM_MAP(by17_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 530000)  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
+	MCFG_DEVICE_PROGRAM_MAP(by17_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")   // 'F' filled causes Credit Display to be blank on first startup
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // 'F' filled causes Credit Display to be blank on first startup
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_by17)
+	config.set_default_layout(layout_by17);
 
 	/* Sound */
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by17_state, u10_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by17_state, u10_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(by17_state, u10_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by17_state, u10_b_w))
-	MCFG_PIA_READCA1_HANDLER(READLINE(by17_state, u10_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(by17_state, u10_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(by17_state, u10_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by17_state, u10_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia_u10, 0);
+	m_pia_u10->readpa_handler().set(FUNC(by17_state::u10_a_r));
+	m_pia_u10->writepa_handler().set(FUNC(by17_state::u10_a_w));
+	m_pia_u10->readpb_handler().set(FUNC(by17_state::u10_b_r));
+	m_pia_u10->writepb_handler().set(FUNC(by17_state::u10_b_w));
+	m_pia_u10->readca1_handler().set(FUNC(by17_state::u10_ca1_r));
+	m_pia_u10->readcb1_handler().set(FUNC(by17_state::u10_cb1_r));
+	m_pia_u10->ca2_handler().set(FUNC(by17_state::u10_ca2_w));
+	m_pia_u10->cb2_handler().set(FUNC(by17_state::u10_cb2_w));
+	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z_freq", by17_state, timer_z_freq, attotime::from_hz(100)) // Mains Line Frequency * 2
-	MCFG_TIMER_DRIVER_ADD("timer_z_pulse", by17_state, timer_z_pulse)                                // Active pulse length from Zero Crossing detector
+	MCFG_TIMER_DRIVER_ADD(m_zero_crossing_active_timer, by17_state, timer_z_pulse)  // Active pulse length from Zero Crossing detector
 
-	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by17_state, u11_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by17_state, u11_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by17_state, u11_b_w))
-	MCFG_PIA_READCA1_HANDLER(READLINE(by17_state, u11_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(by17_state, u11_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(by17_state, u11_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by17_state, u11_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia_u11, 0);
+	m_pia_u11->readpa_handler().set(FUNC(by17_state::u11_a_r));
+	m_pia_u11->writepa_handler().set(FUNC(by17_state::u11_a_w));
+	m_pia_u11->writepb_handler().set(FUNC(by17_state::u11_b_w));
+	m_pia_u11->readca1_handler().set(FUNC(by17_state::u11_ca1_r));
+	m_pia_u11->readcb1_handler().set(FUNC(by17_state::u11_cb1_r));
+	m_pia_u11->ca2_handler().set(FUNC(by17_state::u11_ca2_w));
+	m_pia_u11->cb2_handler().set(FUNC(by17_state::u11_cb2_w));
+	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d_freq", by17_state, u11_timer, attotime::from_hz(317)) // 555 timer
-	MCFG_TIMER_DRIVER_ADD("timer_d_pulse", by17_state, timer_d_pulse)                             // 555 Active pulse length
+	MCFG_TIMER_DRIVER_ADD(m_display_refresh_timer, by17_state, timer_d_pulse)   // 555 Active pulse length
 MACHINE_CONFIG_END
 
 
@@ -1047,6 +1050,16 @@ ROM_START(bowarrow)
 	ROM_LOAD("b1a.bin", 0x0a00, 0x0200, CRC(6f083ce6) SHA1(624b00e72e223c6b9fbf38b831200c9a7aa0d8f7))
 	ROM_LOAD("b1c.bin", 0x0c00, 0x0200, CRC(6ed4d39e) SHA1(1f6c57c7274c76246dd2f0b70ec459857a5cf1eb))
 	ROM_LOAD("b1e.bin", 0x0e00, 0x0200, CRC(ff2f97de) SHA1(28a8fdeccb1382d3a1153c97466426459c9fa075))
+ROM_END
+
+ROM_START(bowarrowa)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("u42704", 0x0400, 0x0200, CRC(b2ccd455) SHA1(07ba19ce2bcd0d2d0d27cab5aafd510423d2e8fe))
+	ROM_LOAD("u32704", 0x0600, 0x0200, CRC(ec673d77) SHA1(f350df32182da4958b4607db6952ffce89cda18f))
+	ROM_LOAD("u22704", 0x0800, 0x0200, CRC(4b4512da) SHA1(b427c504667769bd3b5c78ad3866c750cb7b1ed4))
+	ROM_LOAD("u12704", 0x0a00, 0x0200, CRC(a35e7473) SHA1(d5cadd968cad931dfe92d6ba4f013844f5b5d244))
+	ROM_LOAD("u62704", 0x0c00, 0x0200, CRC(8c421ae4) SHA1(93fcf26667308467215d35685c1acb04b0555d6b))
+	ROM_LOAD("u52704", 0x0e00, 0x0200, CRC(a6644eee) SHA1(8afa941d1dd94308272bbc1874603d3ed41d3b89))
 ROM_END
 
 /*--------------------------------
@@ -1106,14 +1119,14 @@ ROM_END
 /-------------------------------*/
 ROM_START(eightbll)   // Fixes tilt exploit in previous version - if tilt is held closed, next ball will not be served until the tilt switch is released
 	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "E723-20.U2", 0x0000, 0x0800, CRC(33559e7b) SHA1(49008db95c8f012e7e3b613e6eee811512207fa9))
-	ROM_LOAD( "E720-20.U6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+	ROM_LOAD( "e723-20.u2", 0x0000, 0x0800, CRC(33559e7b) SHA1(49008db95c8f012e7e3b613e6eee811512207fa9))
+	ROM_LOAD( "e720-20.u6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
 ROM_END
 
 ROM_START(eightblo)   // Has an exploit if you tilt the ball in play and hold tilt active, after the ball enters the outhole the next ball will be served with tilt state flagged off and the tilt switch is ignored until it's released
 	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "E723-17.U2", 0x0000, 0x0800, CRC(7e7554ae) SHA1(e03c47c4a7a7352293f246ae5bff970fb53fcd88))
-	ROM_LOAD( "E720-20.U6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+	ROM_LOAD( "e723-17.u2", 0x0000, 0x0800, CRC(7e7554ae) SHA1(e03c47c4a7a7352293f246ae5bff970fb53fcd88))
+	ROM_LOAD( "e720-20.u6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
 ROM_END
 
 /*--------------------------------
@@ -1139,14 +1152,15 @@ ROM_END
 /---------------------------------------------------------------*/
 
 
-GAME(  1976, bowarrow, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Bow & Arrow (Prototype)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, freedom,  0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Freedom",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightrdr, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 21)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightr20, nightrdr, by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 20)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1978, blackjck, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Black Jack (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, evelknie, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Evel Knievel",            MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, matahari, 0,        by17, matahari, by17_state, matahari, ROT0, "Bally", "Mata Hari",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
-GAME(  1977, eightbll, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball (rev. 20)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, eightblo, eightbll, by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball (rev. 17)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, pwerplay, 0,        by17, pwerplay, by17_state, pwerplay, ROT0, "Bally", "Power Play (Pinball)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
-GAME(  1978, stk_sprs, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Strikes and Spares",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1976, bowarrow,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 23)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1976, bowarrowa, bowarrow, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 22)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, freedom,   0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Freedom",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, nightrdr,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 21)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, nightr20,  nightrdr, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 20)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1978, blackjck,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Black Jack (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, evelknie,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Evel Knievel",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL( 1978, matahari,  0,        by17, matahari, by17_state, init_matahari, ROT0, "Bally", "Mata Hari",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
+GAME(  1977, eightbll,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 20)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, eightblo,  eightbll, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 17)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL( 1978, pwerplay,  0,        by17, pwerplay, by17_state, init_pwerplay, ROT0, "Bally", "Power Play (Pinball)",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
+GAME(  1978, stk_sprs,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Strikes and Spares",               MACHINE_IS_SKELETON_MECHANICAL)

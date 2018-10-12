@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(champbas_state,champbas)
 }
 
 
-PALETTE_INIT_MEMBER(champbas_state,exctsccr)
+PALETTE_INIT_MEMBER(exctsccr_state,exctsccr)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -137,16 +137,16 @@ PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 
 TILE_GET_INFO_MEMBER(champbas_state::champbas_get_bg_tile_info)
 {
-	int code = m_vram[tile_index] | (m_gfx_bank << 8);
-	int color = (m_vram[tile_index + 0x400] & 0x1f) | 0x20;
+	int const code = m_vram[tile_index] | (m_gfx_bank << 8);
+	int const color = (m_vram[tile_index + 0x400] & 0x1f) | 0x20;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
+TILE_GET_INFO_MEMBER(exctsccr_state::exctsccr_get_bg_tile_info)
 {
-	int code = m_vram[tile_index] | (m_gfx_bank << 8);
-	int color = m_vram[tile_index + 0x400] & 0x0f;
+	int const code = m_vram[tile_index] | (m_gfx_bank << 8);
+	int const color = m_vram[tile_index + 0x400] & 0x0f;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -159,14 +159,14 @@ TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(champbas_state,champbas)
+void champbas_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(champbas_state::champbas_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-VIDEO_START_MEMBER(champbas_state,exctsccr)
+void exctsccr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(champbas_state::exctsccr_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(exctsccr_state::exctsccr_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -241,7 +241,7 @@ void champbas_state::champbas_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-void champbas_state::exctsccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void exctsccr_state::exctsccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element* const gfx1 = m_gfxdecode->gfx(1);
 	gfx_element* const gfx2 = m_gfxdecode->gfx(2);
@@ -293,7 +293,7 @@ uint32_t champbas_state::screen_update_champbas(screen_device &screen, bitmap_in
 	return 0;
 }
 
-uint32_t champbas_state::screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t exctsccr_state::screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	exctsccr_draw_sprites(bitmap, cliprect);

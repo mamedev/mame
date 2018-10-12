@@ -31,13 +31,13 @@
 //**************************************************************************
 
 #define MCFG_MCCS1850_INT_CALLBACK(_write) \
-	devcb = &downcast<mccs1850_device &>(*device).set_int_wr_callback(DEVCB_##_write);
+	downcast<mccs1850_device &>(*device).set_int_wr_callback(DEVCB_##_write);
 
 #define MCFG_MCCS1850_PSE_CALLBACK(_write) \
-	devcb = &downcast<mccs1850_device &>(*device).set_pse_wr_callback(DEVCB_##_write);
+	downcast<mccs1850_device &>(*device).set_pse_wr_callback(DEVCB_##_write);
 
 #define MCFG_MCCS1850_NUC_CALLBACK(_write) \
-	devcb = &downcast<mccs1850_device &>(*device).set_nuc_wr_callback(DEVCB_##_write);
+	downcast<mccs1850_device &>(*device).set_nuc_wr_callback(DEVCB_##_write);
 
 
 

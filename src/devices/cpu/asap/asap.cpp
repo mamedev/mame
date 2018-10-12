@@ -131,7 +131,7 @@ const asap_device::ophandler asap_device::s_conditiontable[16] =
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(ASAP, asap_device, "asap", "ASAP")
+DEFINE_DEVICE_TYPE(ASAP, asap_device, "asap", "Atari ASAP")
 
 //-------------------------------------------------
 //  asap_device - constructor
@@ -153,7 +153,7 @@ asap_device::asap_device(const machine_config &mconfig, const char *tag, device_
 		m_irq_state(0),
 		m_icount(0),
 		m_program(nullptr),
-		m_direct(nullptr)
+		m_cache(nullptr)
 {
 	// initialize the src2val table to contain immediates for low values
 	for (int i = 0; i < REGBASE; i++)
@@ -184,7 +184,7 @@ void asap_device::device_start()
 {
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
@@ -209,7 +209,7 @@ void asap_device::device_start()
 	save_item(NAME(m_irq_state));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -305,9 +305,9 @@ void asap_device::state_string_export(const device_state_entry &entry, std::stri
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *asap_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> asap_device::create_disassembler()
 {
-	return new asap_disassembler;
+	return std::make_unique<asap_disassembler>();
 }
 
 
@@ -321,7 +321,7 @@ util::disasm_interface *asap_device::create_disassembler()
 
 inline uint32_t asap_device::readop(offs_t pc)
 {
-	return m_direct->read_dword(pc);
+	return m_cache->read_dword(pc);
 }
 
 
@@ -484,7 +484,7 @@ inline void asap_device::fetch_instruction_debug()
 {
 	// debugging
 	m_ppc = m_pc;
-	debugger_instruction_hook(this, m_pc);
+	debugger_instruction_hook(m_pc);
 
 	// instruction fetch
 	m_op = readop(m_pc);

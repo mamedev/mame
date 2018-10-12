@@ -145,17 +145,13 @@ DEFINE_DEVICE_TYPE(SCSP, scsp_device, "scsp", "YMF292-F SCSP")
 scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SCSP, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		m_roffset(0),
+		device_rom_interface(mconfig, *this, 20, ENDIANNESS_BIG, 16),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
 		m_exts_cb(*this),
 		m_BUFPTR(0),
-		m_SCSPRAM(nullptr),
-		m_SCSPRAM_LENGTH(0),
 		m_Master(0),
 		m_stream(nullptr),
-		m_buffertmpl(nullptr),
-		m_buffertmpr(nullptr),
 		m_IrqTimA(0),
 		m_IrqTimBC(0),
 		m_IrqMidi(0),
@@ -212,7 +208,17 @@ void scsp_device::device_start()
 	m_main_irq_cb.resolve_safe();
 	m_exts_cb.resolve_safe(0);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 512);
+}
+
+void scsp_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 512);
+}
+
+void scsp_device::rom_bank_updated()
+{
+	m_stream->update();
 }
 
 //-------------------------------------------------
@@ -462,11 +468,7 @@ void scsp_device::Compute_LFO(SCSP_SLOT *slot)
 
 void scsp_device::StartSlot(SCSP_SLOT *slot)
 {
-	uint32_t start_offset;
-
 	slot->active=1;
-	start_offset = PCM8B(slot) ? SA(slot) : SA(slot) & 0x7FFFE;
-	slot->base=m_SCSPRAM + start_offset;
 	slot->cur_addr=0;
 	slot->nxt_addr=1<<SHIFT;
 	slot->step=Step(slot);
@@ -516,18 +518,7 @@ void scsp_device::init()
 		m_Master = 0;
 	}
 
-	memory_region* ram_region = memregion(tag());
-
-	// coolridr.c defines a region for the RAM, stv.c doesn't (uses set_ram_base instead, which seems to be more correct anyway?)
-	if (ram_region != nullptr)
-	{
-		m_SCSPRAM = ram_region->base();
-		m_SCSPRAM_LENGTH = ram_region->bytes();
-		m_DSP.SCSPRAM = (uint16_t *)m_SCSPRAM;
-		m_DSP.SCSPRAM_LENGTH = m_SCSPRAM_LENGTH / 2;
-		m_SCSPRAM += m_roffset;
-	}
-
+	m_DSP.space = &this->space();
 	m_timerA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scsp_device::timerA_cb), this));
 	m_timerB = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scsp_device::timerB_cb), this));
 	m_timerC = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scsp_device::timerC_cb), this));
@@ -598,7 +589,7 @@ void scsp_device::init()
 		t=ARTimes[i];   //In ms
 		if(t!=0.0)
 		{
-			step=(1023*1000.0)/( 44100.0*t);
+			step=(1023*1000.0)/( double(22'579'200 / 512)*t);
 			scale=(double) (1<<EG_SHIFT);
 			m_ARTABLE[i]=(int) (step*scale);
 		}
@@ -606,7 +597,7 @@ void scsp_device::init()
 			m_ARTABLE[i]=1024<<EG_SHIFT;
 
 		t=DRTimes[i];   //In ms
-		step=(1023*1000.0)/( 44100.0*t);
+		step=(1023*1000.0)/( double(22'579'200 / 512)*t);
 		scale=(double) (1<<EG_SHIFT);
 		m_DRTABLE[i]=(int) (step*scale);
 	}
@@ -616,13 +607,10 @@ void scsp_device::init()
 	{
 		m_Slots[i].slot=i;
 		m_Slots[i].active=0;
-		m_Slots[i].base=nullptr;
 		m_Slots[i].EG.state=SCSP_RELEASE;
 	}
 
 	LFO_Init();
-	m_buffertmpl=make_unique_clear<int32_t[]>(44100);
-	m_buffertmpr=make_unique_clear<int32_t[]>(44100);
 
 	// no "pend"
 	m_udata.data[0x20/2] = 0;
@@ -674,7 +662,7 @@ void scsp_device::UpdateSlotReg(int s,int r)
 	}
 }
 
-void scsp_device::UpdateReg(address_space &space, int reg)
+void scsp_device::UpdateReg(int reg)
 {
 	switch(reg&0x3f)
 	{
@@ -699,7 +687,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			midi_in(space, 0, m_udata.data[0x6/2]&0xff, 0);
+			midi_in(m_udata.data[0x6/2]&0xff);
 			break;
 		case 8:
 		case 9:
@@ -721,7 +709,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 			m_dma.ddir = (m_udata.data[0x16/2] & 0x2000) >> 13;
 			m_dma.dgate = (m_udata.data[0x16/2] & 0x4000) >> 14;
 			if(m_udata.data[0x16/2] & 0x1000) // dexe
-				exec_dma(space);
+				exec_dma();
 			break;
 		case 0x18:
 		case 0x19:
@@ -734,7 +722,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 
 				if ((m_udata.data[0x18/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[0]) / (255-(m_udata.data[0x18/2]&0xff));
+					time = (clock() / 512 / m_TimPris[0]) / (255-(m_udata.data[0x18/2]&0xff));
 					if (time)
 					{
 						m_timerA->adjust(attotime::from_hz(time));
@@ -753,7 +741,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 
 				if ((m_udata.data[0x1A/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[1]) / (255-(m_udata.data[0x1A/2]&0xff));
+					time = (clock() / 512 / m_TimPris[1]) / (255-(m_udata.data[0x1A/2]&0xff));
 					if (time)
 					{
 						m_timerB->adjust(attotime::from_hz(time));
@@ -772,7 +760,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 
 				if ((m_udata.data[0x1C/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[2]) / (255-(m_udata.data[0x1C/2]&0xff));
+					time = (clock() / 512 / m_TimPris[2]) / (255-(m_udata.data[0x1C/2]&0xff));
 					if (time)
 					{
 						m_timerC->adjust(attotime::from_hz(time));
@@ -861,7 +849,7 @@ void scsp_device::UpdateSlotRegR(int slot,int reg)
 {
 }
 
-void scsp_device::UpdateRegR(address_space &space, int reg)
+void scsp_device::UpdateRegR(int reg)
 {
 	switch(reg&0x3f)
 	{
@@ -920,7 +908,7 @@ void scsp_device::UpdateRegR(address_space &space, int reg)
 	}
 }
 
-void scsp_device::w16(address_space &space,unsigned int addr,unsigned short val)
+void scsp_device::w16(unsigned int addr,unsigned short val)
 {
 	addr&=0xffff;
 	if(addr<0x400)
@@ -935,7 +923,7 @@ void scsp_device::w16(address_space &space,unsigned int addr,unsigned short val)
 		if (addr < 0x430)
 		{
 			*((unsigned short *) (m_udata.datab+((addr&0x3f)))) = val;
-			UpdateReg(space, addr&0x3f);
+			UpdateReg(addr&0x3f);
 		}
 	}
 	else if(addr<0x700)
@@ -961,7 +949,7 @@ void scsp_device::w16(address_space &space,unsigned int addr,unsigned short val)
 	}
 }
 
-unsigned short scsp_device::r16(address_space &space, unsigned int addr)
+unsigned short scsp_device::r16(unsigned int addr)
 {
 	unsigned short v=0;
 	addr&=0xffff;
@@ -976,7 +964,7 @@ unsigned short scsp_device::r16(address_space &space, unsigned int addr)
 	{
 		if (addr < 0x430)
 		{
-			UpdateRegR(space, addr&0x3f);
+			UpdateRegR(addr&0x3f);
 			v= *((unsigned short *) (m_udata.datab+((addr&0x3f))));
 		}
 	}
@@ -1091,8 +1079,8 @@ inline int32_t scsp_device::UpdateSlot(SCSP_SLOT *slot)
 	}
 	else
 	{
-		addr1=(slot->cur_addr>>(SHIFT-1))&0x7fffe;
-		addr2=(slot->nxt_addr>>(SHIFT-1))&0x7fffe;
+		addr1=(slot->cur_addr>>(SHIFT-1)) & ~1;
+		addr2=(slot->nxt_addr>>(SHIFT-1)) & ~1;
 	}
 
 	if(MDL(slot)!=0 || MDXSL(slot)!=0 || MDYSL(slot)!=0)
@@ -1108,21 +1096,20 @@ inline int32_t scsp_device::UpdateSlot(SCSP_SLOT *slot)
 
 	if(PCM8B(slot)) //8 bit signed
 	{
-		int8_t *p1=(signed char *) (m_SCSPRAM+BYTE_XOR_BE(((SA(slot)+addr1))&0x7FFFF));
-		int8_t *p2=(signed char *) (m_SCSPRAM+BYTE_XOR_BE(((SA(slot)+addr2))&0x7FFFF));
-		//sample=(p[0])<<8;
+		int8_t p1=read_byte(SA(slot)+addr1);
+		int8_t p2=read_byte(SA(slot)+addr2);
 		int32_t s;
 		int32_t fpart=slot->cur_addr&((1<<SHIFT)-1);
-		s=(int) (p1[0]<<8)*((1<<SHIFT)-fpart)+(int) (p2[0]<<8)*fpart;
+		s=(int) (p1<<8)*((1<<SHIFT)-fpart)+(int) (p2<<8)*fpart;
 		sample=(s>>SHIFT);
 	}
 	else    //16 bit signed (endianness?)
 	{
-		int16_t *p1=(signed short *) (m_SCSPRAM+((SA(slot)+addr1)&0x7FFFE));
-		int16_t *p2=(signed short *) (m_SCSPRAM+((SA(slot)+addr2)&0x7FFFE));
+		int16_t p1=read_word(SA(slot)+addr1);
+		int16_t p2=read_word(SA(slot)+addr2);
 		int32_t s;
 		int32_t fpart=slot->cur_addr&((1<<SHIFT)-1);
-		s=(int)(p1[0])*((1<<SHIFT)-fpart)+(int)(p2[0])*fpart;
+		s=(int)(p1)*((1<<SHIFT)-fpart)+(int)(p2)*fpart;
 		sample=(s>>SHIFT);
 	}
 
@@ -1294,7 +1281,7 @@ void scsp_device::DoMasterSamples(int nsamples)
 }
 
 /* TODO: this needs to be timer-ized */
-void scsp_device::exec_dma(address_space &space)
+void scsp_device::exec_dma()
 {
 	static uint16_t tmp_dma[3];
 	int i;
@@ -1320,8 +1307,7 @@ void scsp_device::exec_dma(address_space &space)
 			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
 			for(i=0;i < m_dma.dtlg;i+=2)
 			{
-				m_SCSPRAM[m_dma.dmea] = 0;
-				m_SCSPRAM[m_dma.dmea+1] = 0;
+				this->space().write_word(m_dma.dmea, 0);
 				m_dma.dmea+=2;
 			}
 		}
@@ -1330,9 +1316,8 @@ void scsp_device::exec_dma(address_space &space)
 			for(i=0;i < m_dma.dtlg;i+=2)
 			{
 				uint16_t tmp;
-				tmp = r16(space, m_dma.drga);
-				m_SCSPRAM[m_dma.dmea] = tmp & 0xff;
-				m_SCSPRAM[m_dma.dmea+1] = tmp>>8;
+				tmp = r16(m_dma.drga);
+				this->space().write_word(m_dma.dmea, tmp);
 				m_dma.dmea+=2;
 				m_dma.drga+=2;
 			}
@@ -1345,7 +1330,7 @@ void scsp_device::exec_dma(address_space &space)
 			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
 			for(i=0;i < m_dma.dtlg;i+=2)
 			{
-				w16(space, m_dma.drga, 0);
+				w16(m_dma.drga, 0);
 				m_dma.drga+=2;
 			}
 		}
@@ -1353,10 +1338,8 @@ void scsp_device::exec_dma(address_space &space)
 		{
 			for(i=0;i < m_dma.dtlg;i+=2)
 			{
-				uint16_t tmp;
-				tmp = m_SCSPRAM[m_dma.dmea];
-				tmp|= m_SCSPRAM[m_dma.dmea+1]<<8;
-				w16(space, m_dma.drga, tmp);
+				uint16_t tmp = read_word(m_dma.dmea);
+				w16(m_dma.drga, tmp);
 				m_dma.dmea+=2;
 				m_dma.drga+=2;
 			}
@@ -1389,19 +1372,10 @@ int IRQCB(void *param)
 #endif
 
 
-void scsp_device::set_ram_base(void *base)
-{
-	m_SCSPRAM = (unsigned char *)base;
-	m_DSP.SCSPRAM = (uint16_t *)base;
-	m_SCSPRAM_LENGTH = 0x80000;
-	m_DSP.SCSPRAM_LENGTH = 0x80000/2;
-}
-
-
 READ16_MEMBER( scsp_device::read )
 {
 	m_stream->update();
-	return r16(space, offset*2);
+	return r16(offset*2);
 }
 
 WRITE16_MEMBER( scsp_device::write )
@@ -1410,12 +1384,12 @@ WRITE16_MEMBER( scsp_device::write )
 
 	m_stream->update();
 
-	tmp = r16(space, offset*2);
+	tmp = r16(offset*2);
 	COMBINE_DATA(&tmp);
-	w16(space,offset*2, tmp);
+	w16(offset*2, tmp);
 }
 
-WRITE16_MEMBER( scsp_device::midi_in )
+void scsp_device::midi_in(u8 data)
 {
 	//    printf("scsp_midi_in: %02x\n", data);
 
@@ -1549,7 +1523,7 @@ signed int scsp_device::ALFO_Step(SCSP_LFO_t *LFO)
 
 void scsp_device::LFO_ComputeStep(SCSP_LFO_t *LFO,uint32_t LFOF,uint32_t LFOWS,uint32_t LFOS,int ALFO)
 {
-	float step=(float) LFOFreq[LFOF]*256.0f/(float)44100;
+	float step=(float) LFOFreq[LFOF]*256.0f/float(22'579'200 / 512);
 	LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
 	if(ALFO)
 	{

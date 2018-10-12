@@ -1,84 +1,177 @@
 // license:BSD-3-Clause
-// copyright-holders:Paul Leaman, Miguel Angel Horna
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
-  Capcom System QSound(tm)
-  ========================
+    Capcom System QSound™
 
-  Driver by Paul Leaman and Miguel Angel Horna
+    Sixteen-channel sample player.  Previous HLE implementation by Paul
+    Leaman and Miguel Angel Horna, with thanks to CAB (author of Amuse).
 
-  A 16 channel stereo sample player.
+    The key components are a DSP16A, a TDA1543 dual 16-bit DAC with I2S
+    input, and a TC9185P electronic volume control.  The TDA1543 is
+    simulated here; no attempt is being made to emulate theTC9185P.
 
-  QSpace position is simulated by panning the sound in the stereo space.
+    Commands work by writing an address/data word pair to be written to
+    DSP's internal RAM.  In theory it's possible to write anywhere in
+    DSP RAM, but the glue logic only allows writing to the first 256
+    words.  The host writes the high and low bytes the data word to
+    offsets 0 and 1, respectively, and the address to offset 2.  Writing
+    the address also asserts the DSP's INT pin.  The host can read back
+    a single bit, which I've assumed reflects the current state of the
+    DSP's INT pin (low when asserted).  The host won't send further
+    commands until this bit goes high.
 
-  Many thanks to CAB (the author of Amuse), without whom this probably would
-  never have been finished.
+    On servicing an external interrupt, the DSP reads pdx0 three times,
+    expecting to get the address and data in that order (the third read
+    is needed because DSP16 has latent PIO reads in active mode).  I've
+    assumed that reading PIO with PSEL low when INT is asserted will
+    return the address and cause INT to be de-asserted, and reading PIO
+    with PSEL low when int is not asserted will return the data word.
+    The DSP program will only respond to one external interrupt per
+    sample interval (i.e. the maximum command rate is the same as the
+    sample rate).
 
-  TODO:
-  - hook up the DSP!
-  - is master volume really linear?
-  - understand higher bits of reg 0
-  - understand reg 9
-  - understand other writes to $90-$ff area
+    The DSP program uses 2 kilowords of internal RAM and reads data from
+    external ROM while executing from internal ROM.  As such, it
+    requires a DSP16A core (the original DSP16 only has 512 words of
+    internal RAM and can't read external ROM with internal ROM enabled).
 
-  Links:
-  https://siliconpr0n.org/map/capcom/dl-1425
+    To read external ROM, the DSP writes the desired sample offset to
+    PDX0, then reads external ROM at address (bank | 0x8000), for a
+    theoretical maximum of 2 gigasamples.  The bank applies to the next
+    read, not the current read.  A dummy read is required to set the
+    bank for the very first read.  This latency could just be a quirk of
+    how Capcom hooks the DSP up to the sample ROMs.  In theory, samples
+    are 16-bit signed values, but Capcom only has 8-bit ROMs connected.
+    I'm assuming byte smearing, but it may be zero-padded in the LSBs.
+
+    The DSP sends out 16-bit samples on its SIO port clocked at 5 MHz.
+    The stereo samples aren't loaded fast enough for consecutive frames
+    so there's an empty frame between them.  Sample pairs are loaded
+    every 1,248 machine cycles, giving a sample rate of 24.03846 kHz
+    (60 MHz / 2 / 1248).  The glue logic seems to generate the WS signal
+    for the DAC from the PSEL line and the SIO control lines, but it
+    isn't clear exactly how this is achieved.
+
+    The DSP writes values to pdx1 every sample cycle (alternating
+    between zero and non-zero values).  This may be for the volume
+    control chip or something else.
+
+    The photographs of the DL-1425 die (WEDSP16A-M14) show 12 kilowords
+    of internal ROM compared to 4 kilowords as documented.  It's unknown
+    if/how the additional ROM is mapped in the DSP's internal ROM space.
+    The internal program only uses internal ROM from 0x0000 to 0x0fff
+    and external space from 0x8000 onwards.  The additional ROM could
+    be anywhere in between.
+
+    Meanings for known command words:
+    (((ch - 1) << 3) & 0x78     sample bank
+    (ch << 3) | 0x01            channel sample offset within bank
+    (ch << 3) | 0x02            channel playback rate
+    (ch << 3) | 0x03            channel sample period counter
+    (ch << 3) | 0x04            channel loop offset (relative to end)
+    (ch << 3) | 0x05            channel end sample offset
+    (ch << 3) | 0x06            channel volume
+    ch | 0x80                   left/right position on sound stage
+    0x93                        delayed reverb volume
+    ch + 0xba                   channel reverb contribution
+    0xd9                        reverb delay (need to add 0x0554)
+    0xde                        left output filtered component delay
+    0xdf                        left output unfiltered component delay
+    0xe0                        right output filtered component delay
+    0xe1                        right output unfiltered component delay
+    0xe2                        write non-zero to set delays
+    0xe4                        left output filtered component volume
+    0xe5                        left output unfiltered component volume
+    0xe6                        right output filtered component volume
+    0xe7                        right output unfiltered component volume
+
+    The weird way of setting the sample bank is due to the one-read
+    latency described above.  Since the bank applies to the next read,
+    you need to set it on the channel before the desired channel.
+
+    Links:
+    * https://siliconpr0n.org/map/capcom/dl-1425
 
 ***************************************************************************/
 
 #include "emu.h"
+#define QSOUND_LLE
 #include "qsound.h"
 
+#include <algorithm>
+#include <fstream>
+
+#define LOG_GENERAL     (1U << 0)
+#define LOG_COMMAND     (1U << 1)
+#define LOG_SAMPLE      (1U << 2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_COMMAND | LOG_SAMPLE)
+//#define LOG_OUTPUT_STREAM std::cout
+#include "logmacro.h"
+
+#define LOGCOMMAND(...)     LOGMASKED(LOG_COMMAND, __VA_ARGS__)
+#define LOGSAMPLE(...)      LOGMASKED(LOG_SAMPLE, __VA_ARGS__)
+
+
 // device type definition
-DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "Q-Sound")
+DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "QSound")
 
 
-// program map for the DSP16A; note that apparently Western Electric/AT&T
-// expanded the size of the available mask ROM on the DSP16A over time after
-// it was released.
-// As originally released, the DSP16A had 4096 words of ROM, but the DL-1425
-// chip decapped by siliconpr0n clearly shows 3x as much ROM as that, a total
-// of 12288 words of internal ROM.
-// The older DSP16 non-a part has 2048 words of ROM.
-ADDRESS_MAP_START(qsound_device::dsp16_program_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-ADDRESS_MAP_END
-
-
-// data map for the DSP16A; again, Western Electric/AT&T expanded the size of
-// the ram over time.
-// As originally released, the DSP16A had 1024 words of internal RAM,
-// but this was expanded to 2048 words in the DL-1425 decap.
-// The older DSP16 non-a part has 512 words of RAM.
-ADDRESS_MAP_START(qsound_device::dsp16_data_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-ADDRESS_MAP_END
-
-
-// ROM definition for the Qsound program ROM
+// DSP internal ROM region
 ROM_START( qsound )
-	ROM_REGION( 0x6000, "qsound", 0 )
-	ROM_LOAD16_WORD( "dl-1425.bin", 0x0000, 0x6000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
+	ROM_REGION16_BE( 0x2000, "dsp", 0 )
+	ROM_LOAD16_WORD_SWAP( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
+	ROM_IGNORE( 0x4000 )
 ROM_END
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
 
 //-------------------------------------------------
 //  qsound_device - constructor
 //-------------------------------------------------
 
-qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, QSOUND, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 24),
-		m_cpu(*this, "qsound"),
-		m_data(0),
-		m_stream(nullptr)
+qsound_device::qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, QSOUND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 24)
+	, m_dsp(*this, "dsp"), m_stream(nullptr)
+	, m_rom_bank(0U), m_rom_offset(0U), m_cmd_addr(0U), m_cmd_data(0U), m_new_data(0U), m_cmd_pending(0U), m_dsp_ready(1U)
+	, m_samples{ 0, 0 }, m_sr(0U), m_fsr(0U), m_ock(1U), m_old(1U), m_ready(0U), m_channel(0U)
 {
+}
+
+
+WRITE8_MEMBER(qsound_device::qsound_w)
+{
+	switch (offset)
+	{
+	case 0:
+		LOGCOMMAND(
+				"QSound: set command data[h] = %02X (%04X -> %04X)\n",
+				data, m_new_data, (m_new_data & 0x00ffU) | (u16(data) << 8));
+		m_new_data = (m_new_data & 0x00ffU) | (u16(data) << 8);
+		break;
+	case 1:
+		LOGCOMMAND(
+				"QSound: set command data[l] = %02X (%04X -> %04X)\n",
+				data, m_new_data, (m_new_data & 0xff00U) | data);
+		m_new_data = (m_new_data & 0xff00U) | data;
+		break;
+	case 2:
+		m_dsp_ready = 0U;
+		machine().scheduler().synchronize(
+				timer_expired_delegate(FUNC(qsound_device::set_cmd), this),
+				(unsigned(data) << 16) | m_new_data);
+		break;
+	default:
+		logerror("QSound: host write to unknown register %01X = %02X (%s)\n", offset, data, machine().describe_context());
+	}
+}
+
+
+READ8_MEMBER(qsound_device::qsound_r)
+{
+	return m_dsp_ready ? 0x80 : 0x00;
 }
 
 
@@ -98,20 +191,12 @@ const tiny_rom_entry *qsound_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(qsound_device::device_add_mconfig)
-	MCFG_CPU_ADD("qsound", DSP16, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
-	MCFG_CPU_DATA_MAP(dsp16_data_map)
+	MCFG_DEVICE_ADD("dsp", DSP16A, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_IO_MAP(dsp_io_map)
+	MCFG_DSP16_OCK_CB(WRITELINE(*this, qsound_device, dsp_ock_w))
+	MCFG_DSP16_PIO_R_CB(READ16(*this, qsound_device, dsp_pio_r))
+	MCFG_DSP16_PIO_W_CB(WRITE16(*this, qsound_device, dsp_pio_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
-//-------------------------------------------------
-
-void qsound_device::rom_bank_updated()
-{
-	m_stream->update();
-}
 
 
 //-------------------------------------------------
@@ -120,34 +205,47 @@ void qsound_device::rom_bank_updated()
 
 void qsound_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, clock() / 166); // /166 clock divider?
+	// hope we get good synchronisation between the DSP and the sound system
+	m_stream = stream_alloc(0, 2, clock() / 2 / 1248);
 
-	// create pan table
-	for (int i = 0; i < 33; i++)
-		m_pan_table[i] = (int)((256 / sqrt(32.0)) * sqrt((double)i));
+	// save DSP communication state
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_rom_offset));
+	save_item(NAME(m_cmd_addr));
+	save_item(NAME(m_cmd_data));
+	save_item(NAME(m_new_data));
+	save_item(NAME(m_cmd_pending));
+	save_item(NAME(m_dsp_ready));
 
-	// init sound regs
-	memset(m_channel, 0, sizeof(m_channel));
+	// save serial sample recovery state
+	save_item(NAME(m_samples));
+	save_item(NAME(m_sr));
+	save_item(NAME(m_fsr));
+	save_item(NAME(m_ock));
+	save_item(NAME(m_old));
+	save_item(NAME(m_ready));
+	save_item(NAME(m_channel));
+}
 
-	for (int adr = 0x7f; adr >= 0; adr--)
-		write_data(adr, 0);
-	for (int adr = 0x80; adr < 0x90; adr++)
-		write_data(adr, 0x120);
+//-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
 
-	// state save
-	for (int i = 0; i < 16; i++)
-	{
-		save_item(NAME(m_channel[i].bank), i);
-		save_item(NAME(m_channel[i].address), i);
-		save_item(NAME(m_channel[i].freq), i);
-		save_item(NAME(m_channel[i].loop), i);
-		save_item(NAME(m_channel[i].end), i);
-		save_item(NAME(m_channel[i].vol), i);
-		save_item(NAME(m_channel[i].enabled), i);
-		save_item(NAME(m_channel[i].lvol), i);
-		save_item(NAME(m_channel[i].rvol), i);
-		save_item(NAME(m_channel[i].step_ptr), i);
-	}
+void qsound_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 2 / 1248);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void qsound_device::device_reset()
+{
+	// TODO: does this get automatically cleared on reset or not?
+	m_cmd_pending = 0U;
+	m_dsp_ready = 1U;
+	m_dsp->set_input_line(DSP16_INT_LINE, CLEAR_LINE);
 }
 
 
@@ -157,182 +255,136 @@ void qsound_device::device_start()
 
 void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// Clear the buffers
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
+	std::fill_n(outputs[0], samples, m_samples[0]);
+	std::fill_n(outputs[1], samples, m_samples[1]);
+}
 
-	for (auto & elem : m_channel)
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void qsound_device::rom_bank_updated()
+{
+	machine().scheduler().synchronize();
+}
+
+
+// DSP external ROM space
+void qsound_device::dsp_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(qsound_device::dsp_sample_r));
+}
+
+
+READ16_MEMBER(qsound_device::dsp_sample_r)
+{
+	// on CPS2, bit 0-7 of external ROM data is tied to ground
+	u8 const byte(read_byte((u32(m_rom_bank) << 16) | m_rom_offset));
+	if (!machine().side_effects_disabled())
+		m_rom_bank = (m_rom_bank & 0x8000U) | offset;
+	return u16(byte) << 8;
+}
+
+WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
+{
+	// detect active edge
+	if (bool(state) == bool(m_ock))
+		return;
+	m_ock = state;
+	if (!state)
+		return;
+
+	// detect start of word
+	if (m_ready && !m_fsr && !m_dsp->ose_r())
 	{
-		if (elem.enabled)
+		// FIXME: PSEL at beginning of word seems to select channel, but how does the logic derive WS from the DSP outputs?
+		m_channel = m_dsp->psel_r();
+		m_fsr = 0xffffU;
+	}
+
+	// shift in data
+	if (m_fsr)
+	{
+		m_sr = (m_sr << 1) | (m_dsp->do_r() ? 0x0001U : 0x0000U);
+		m_fsr >>= 1;
+		if (!m_fsr)
 		{
-			stream_sample_t *lmix=outputs[0];
-			stream_sample_t *rmix=outputs[1];
-
-			// Go through the buffer and add voice contributions
-			for (int i = 0; i < samples; i++)
-			{
-				elem.address += (elem.step_ptr >> 12);
-				elem.step_ptr &= 0xfff;
-				elem.step_ptr += elem.freq;
-
-				if (elem.address >= elem.end)
-				{
-					if (elem.loop)
-					{
-						// Reached the end, restart the loop
-						elem.address -= elem.loop;
-
-						// Make sure we don't overflow (what does the real chip do in this case?)
-						if (elem.address >= elem.end)
-							elem.address = elem.end - elem.loop;
-
-						elem.address &= 0xffff;
-					}
-					else
-					{
-						// Reached the end of a non-looped sample
-						elem.enabled = false;
-						break;
-					}
-				}
-
-				int8_t sample = read_sample(elem.bank | elem.address);
-				*lmix++ += ((sample * elem.lvol * elem.vol) >> 14);
-				*rmix++ += ((sample * elem.rvol * elem.vol) >> 14);
-			}
+			LOGSAMPLE("QSound: recovered channel %u sample %04X\n", m_channel, m_sr);
+			if (!m_channel)
+				m_stream->update();
+			m_samples[m_channel] = m_sr;
+#if 0 // enable to log PCM to a file - can be imported with "ffmpeg -f s16be -ar 24038 -ac 2 -i qsound.pcm qsound.wav"
+			static std::ofstream logfile("qsound.pcm", std::ios::binary);
+			logfile.put(u8(m_sr >> 8));
+			logfile.put(u8(m_sr));
+#endif
 		}
 	}
+
+	// detect falling OLD - indicates next bit could be start of a word
+	u8 const old(m_dsp->old_r());
+	m_ready = (m_old && !old);
+	m_old = old;
+}
+
+WRITE16_MEMBER(qsound_device::dsp_pio_w)
+{
+	// PDX0 is used for QSound ROM offset, and PDX1 is used for ADPCM ROM offset
+	// this prevents spurious PSEL transitions between sending samples to the DAC
+	// it could still be used to have separate QSound/ADPCM ROM banks
+	m_rom_bank = (m_rom_bank & 0x7fffU) | u16(offset << 15);
+	m_rom_offset = data;
 }
 
 
-WRITE8_MEMBER(qsound_device::qsound_w)
+READ16_MEMBER(qsound_device::dsp_pio_r)
 {
-	switch (offset)
+	LOGCOMMAND(
+			"QSound: DSP PIO read returning %s = %04X\n",
+			m_cmd_pending ? "addr" : "data", m_cmd_pending ? m_cmd_addr : m_cmd_data);
+	if (m_cmd_pending)
 	{
-		case 0:
-			m_data = (m_data & 0x00ff) | (data << 8);
-			break;
-
-		case 1:
-			m_data = (m_data & 0xff00) | data;
-			break;
-
-		case 2:
-			m_stream->update();
-			write_data(data, m_data);
-			break;
-
-		default:
-			logerror("%s: qsound_w %d = %02x\n", machine().describe_context(), offset, data);
-			break;
-	}
-}
-
-
-READ8_MEMBER(qsound_device::qsound_r)
-{
-	/* Port ready bit (0x80 if ready) */
-	return 0x80;
-}
-
-
-void qsound_device::write_data(uint8_t address, uint16_t data)
-{
-	int ch = 0, reg;
-
-	// direct sound reg
-	if (address < 0x80)
-	{
-		ch = address >> 3;
-		reg = address & 7;
-	}
-
-	// >= 0x80 is probably for the dsp?
-	else if (address < 0x90)
-	{
-		ch = address & 0xf;
-		reg = 8;
-	}
-	else if (address >= 0xba && address < 0xca)
-	{
-		ch = address - 0xba;
-		reg = 9;
+		m_cmd_pending = 0U;
+		m_dsp->set_input_line(DSP16_INT_LINE, CLEAR_LINE);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(qsound_device::set_dsp_ready), this));
+		return m_cmd_addr;
 	}
 	else
 	{
-		// unknown
-		reg = address;
+		return m_cmd_data;
 	}
+}
 
-	switch (reg)
-	{
-		case 0:
-			// bank, high bits unknown
-			ch = (ch + 1) & 0xf; // strange ...
-			m_channel[ch].bank = data << 16;
-			break;
+void qsound_device::set_dsp_ready(void *ptr, s32 param)
+{
+	m_dsp_ready = 1U;
+}
 
-		case 1:
-			// start/cur address
-			m_channel[ch].address = data;
-			break;
-
-		case 2:
-			// frequency
-			m_channel[ch].freq = data;
-			if (data == 0)
-			{
-				// key off
-				m_channel[ch].enabled = false;
-			}
-			break;
-
-		case 3:
-			// key on (does the value matter? it always writes 0x8000)
-			m_channel[ch].enabled = true;
-			m_channel[ch].step_ptr = 0;
-			break;
-
-		case 4:
-			// loop address
-			m_channel[ch].loop = data;
-			break;
-
-		case 5:
-			// end address
-			m_channel[ch].end = data;
-			break;
-
-		case 6:
-			// master volume
-			m_channel[ch].vol = data;
-			break;
-
-		case 7:
-			// unused?
-			break;
-
-		case 8:
-		{
-			// panning (left=0x0110, centre=0x0120, right=0x0130)
-			// looks like it doesn't write other values than that
-			int pan = (data & 0x3f) - 0x10;
-			if (pan > 0x20)
-				pan = 0x20;
-			if (pan < 0)
-				pan = 0;
-
-			m_channel[ch].rvol = m_pan_table[pan];
-			m_channel[ch].lvol = m_pan_table[0x20 - pan];
-			break;
-		}
-
-		case 9:
-			// unknown
-			break;
-
-		default:
-			//logerror("%s: write_data %02x = %04x\n", machine().describe_context(), address, data);
-			break;
-	}
+void qsound_device::set_cmd(void *ptr, s32 param)
+{
+	/*
+	 *  I don't believe the data word is actually double-buffered in
+	 *  real life.  In practice it works because the DSP's instruction
+	 *  throughput is so much higher than the Z80's that it can always
+	 *  read the data word before the Z80 can realise it's read the
+	 *  address.
+	 *
+	 *  In MAME, there's a scheduler synchronisation barrier when the
+	 *  DSP reads the address but before it reads the data.  When this
+	 *  happens, MAME may give the Z80 enough time to see that the DSP
+	 *  has read the address and write more data before scheduling the
+	 *  DSP again.  The DSP then reads the new data and stores it at
+	 *  the old command address.
+	 *
+	 *  You can see this happening in megaman2 test mode by playing
+	 *  command 0x11 (Gyro Man's theme).  Within two minutes, some
+	 *  channels' sample banks/offsets will likely be overwritten.
+	 */
+	LOGCOMMAND("QSound: DSP command @%02X = %04X\n", u32(param) >> 16, u16(u32(param)));
+	m_cmd_addr = u16(u32(param) >> 16);
+	m_cmd_data = u16(u32(param));
+	m_cmd_pending = 1U;
+	m_dsp->set_input_line(DSP16_INT_LINE, ASSERT_LINE);
 }

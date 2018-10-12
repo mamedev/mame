@@ -625,7 +625,7 @@ mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, d
 void mos6526_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_flag = 1;
 	m_cnt = 1;

@@ -503,7 +503,7 @@ Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 #include "emu.h"
 #include "includes/williams.h"
 
-#include "machine/74157.h"
+#include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -521,25 +521,27 @@ Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
  *
  *************************************/
 
-ADDRESS_MAP_START(williams_state::defender_map)
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVICE("bankc000", address_map_bank_device, amap8)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(defender_bank_select_w)
-	AM_RANGE(0xd000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void williams_state::defender_map(address_map &map)
+{
+	map(0x0000, 0xbfff).ram().share("videoram");
+	map(0xc000, 0xcfff).m(m_bankc000, FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xdfff).w(FUNC(williams_state::defender_bank_select_w));
+	map(0xd000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(williams_state::defender_bankc000_map)
-	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x03e0) AM_WRITEONLY AM_SHARE("paletteram")
-	AM_RANGE(0x03ff, 0x03ff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x03e0) AM_WRITE(defender_video_control_w)
-	AM_RANGE(0x0400, 0x04ff) AM_MIRROR(0x0300) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0bff) AM_READ(williams_video_counter_r)
-	AM_RANGE(0x0c00, 0x0c03) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
-	AM_RANGE(0x0c04, 0x0c07) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x9fff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0xa000, 0xffff) AM_NOP
-ADDRESS_MAP_END
+void williams_state::defender_bankc000_map(address_map &map)
+{
+	map(0x0000, 0x000f).mirror(0x03e0).writeonly().share("paletteram");
+	map(0x03ff, 0x03ff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0x0010, 0x001f).mirror(0x03e0).w(FUNC(williams_state::defender_video_control_w));
+	map(0x0400, 0x04ff).mirror(0x0300).ram().w(FUNC(williams_state::williams_cmos_w)).share("nvram");
+	map(0x0800, 0x0bff).r(FUNC(williams_state::williams_video_counter_r));
+	map(0x0c00, 0x0c03).mirror(0x03e0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c04, 0x0c07).mirror(0x03e0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x9fff).rom().region("maincpu", 0x10000);
+	map(0xa000, 0xffff).noprw();
+}
 
 
 
@@ -549,19 +551,20 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(williams_state::williams_map)
-	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_SHARE("paletteram")
-	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
-	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
-	AM_RANGE(0xc900, 0xc9ff) AM_WRITE(williams_vram_select_w)
-	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
-	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
-	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0xd000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void williams_state::williams_map(address_map &map)
+{
+	map(0x0000, 0x8fff).bankr("mainbank").writeonly().share("videoram");
+	map(0x9000, 0xbfff).ram();
+	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
+	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc900, 0xc9ff).w(FUNC(williams_state::williams_vram_select_w));
+	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(williams_state::williams_blitter_w));
+	map(0xcb00, 0xcbff).r(FUNC(williams_state::williams_video_counter_r));
+	map(0xcbff, 0xcbff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams_state::williams_cmos_w)).share("nvram");
+	map(0xd000, 0xffff).rom();
+}
 
 
 
@@ -571,20 +574,41 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(williams_state::sinistar_map)
-	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_SHARE("paletteram")
-	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
-	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
-	AM_RANGE(0xc900, 0xc9ff) AM_WRITE(sinistar_vram_select_w)
-	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
-	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
-	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void williams_state::sinistar_map(address_map &map)
+{
+	map(0x0000, 0x8fff).bankr("mainbank").writeonly().share("videoram");
+	map(0x9000, 0xbfff).ram();
+	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
+	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc900, 0xc9ff).w(FUNC(williams_state::sinistar_vram_select_w));
+	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(williams_state::williams_blitter_w));
+	map(0xcb00, 0xcbff).r(FUNC(williams_state::williams_video_counter_r));
+	map(0xcbff, 0xcbff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams_state::williams_cmos_w)).share("nvram");
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xffff).rom();
+}
+
+
+
+/*************************************
+ *
+ *  Speed Ball memory handlers
+ *
+ *************************************/
+
+void spdball_state::spdball_map(address_map &map)
+{
+	williams_map(map);
+	/* install extra input handlers */
+	map(0xc800, 0xc800).portr("AN0");
+	map(0xc801, 0xc801).portr("AN1");
+	map(0xc802, 0xc802).portr("AN2");
+	map(0xc803, 0xc803).portr("AN3");
+	/* add a third PIA */
+	map(0xc808, 0xc80b).mirror(0x00f0).rw(m_pia[3], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+}
 
 
 
@@ -594,26 +618,27 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(blaster_state::blaster_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x8fff) AM_READ_BANK("bank2") AM_WRITEONLY
-	AM_RANGE(0x9000, 0xbaff) AM_RAM
-	AM_RANGE(0xbb00, 0xbbff) AM_RAM AM_SHARE("blaster_pal0")
-	AM_RANGE(0xbc00, 0xbcff) AM_RAM AM_SHARE("blaster_scan")
-	AM_RANGE(0xbd00, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_SHARE("paletteram")
-	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
-	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
-	AM_RANGE(0xc900, 0xc93f) AM_WRITE(blaster_vram_select_w)
-	AM_RANGE(0xc940, 0xc97f) AM_WRITE(blaster_remap_select_w)
-	AM_RANGE(0xc980, 0xc9bf) AM_WRITE(blaster_bank_select_w)
-	AM_RANGE(0xc9c0, 0xc9ff) AM_WRITE(blaster_video_control_w)
-	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
-	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
-	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0xd000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void blaster_state::blaster_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("mainbank").writeonly().share("videoram");
+	map(0x4000, 0x8fff).bankr("blaster_bankb").writeonly();
+	map(0x9000, 0xbaff).ram();
+	map(0xbb00, 0xbbff).ram().share("blaster_pal0");
+	map(0xbc00, 0xbcff).ram().share("blaster_scan");
+	map(0xbd00, 0xbfff).ram();
+	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
+	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc900, 0xc93f).w(FUNC(blaster_state::blaster_vram_select_w));
+	map(0xc940, 0xc97f).w(FUNC(blaster_state::blaster_remap_select_w));
+	map(0xc980, 0xc9bf).w(FUNC(blaster_state::blaster_bank_select_w));
+	map(0xc9c0, 0xc9ff).w(FUNC(blaster_state::blaster_video_control_w));
+	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(blaster_state::williams_blitter_w));
+	map(0xcb00, 0xcbff).r(FUNC(blaster_state::williams_video_counter_r));
+	map(0xcbff, 0xcbff).w(FUNC(blaster_state::williams_watchdog_reset_w));
+	map(0xcc00, 0xcfff).ram().w(FUNC(blaster_state::williams_cmos_w)).share("nvram");
+	map(0xd000, 0xffff).rom();
+}
 
 
 
@@ -623,46 +648,50 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(williams2_state::williams2_common_map)
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1")
-	AM_RANGE(0x8000, 0x87ff) AM_DEVICE("bank8000", address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_SHARE("williams2_tile")
-	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
-	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE(williams_blitter_w)
-	AM_RANGE(0xc900, 0xc97f) AM_WRITE(williams2_watchdog_reset_w)
-	AM_RANGE(0xc980, 0xc983) AM_MIRROR(0x0070) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
-	AM_RANGE(0xc984, 0xc987) AM_MIRROR(0x0070) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
-	AM_RANGE(0xc98c, 0xc98f) AM_MIRROR(0x0070) AM_WRITE(williams2_7segment_w)
-	AM_RANGE(0xcb00, 0xcb1f) AM_WRITE(williams2_fg_select_w)
-	AM_RANGE(0xcb20, 0xcb3f) AM_WRITE(williams2_bg_select_w)
-	AM_RANGE(0xcb40, 0xcb5f) AM_WRITE(williams2_xscroll_low_w)
-	AM_RANGE(0xcb60, 0xcb7f) AM_WRITE(williams2_xscroll_high_w)
-	AM_RANGE(0xcb80, 0xcb9f) AM_WRITE(defender_video_control_w)
-	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE(williams2_blit_window_enable_w)
-	AM_RANGE(0xcbe0, 0xcbef) AM_READ(williams_video_counter_r)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
-ADDRESS_MAP_END
+void williams2_state::williams2_common_map(address_map &map)
+{
+	map(0x0000, 0xbfff).ram().share("videoram");
+	map(0x0000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0x87ff).m(m_bank8000, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xc7ff).ram().w(FUNC(williams2_state::williams2_tileram_w)).share("williams2_tile");
+	map(0xc800, 0xc87f).w(FUNC(williams2_state::williams2_bank_select_w));
+	map(0xc880, 0xc887).mirror(0x0078).w(FUNC(williams2_state::williams_blitter_w));
+	map(0xc900, 0xc97f).w(FUNC(williams2_state::williams2_watchdog_reset_w));
+	map(0xc980, 0xc983).mirror(0x0070).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc984, 0xc987).mirror(0x0070).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc98c, 0xc98f).mirror(0x0070).w(FUNC(williams2_state::williams2_7segment_w));
+	map(0xcb00, 0xcb1f).w(FUNC(williams2_state::williams2_fg_select_w));
+	map(0xcb20, 0xcb3f).w(FUNC(williams2_state::williams2_bg_select_w));
+	map(0xcb40, 0xcb5f).w(FUNC(williams2_state::williams2_xscroll_low_w));
+	map(0xcb60, 0xcb7f).w(FUNC(williams2_state::williams2_xscroll_high_w));
+	map(0xcb80, 0xcb9f).w(FUNC(williams2_state::defender_video_control_w));
+	map(0xcba0, 0xcbbf).w(FUNC(williams2_state::williams2_blit_window_enable_w));
+	map(0xcbe0, 0xcbef).r(FUNC(williams2_state::williams_video_counter_r));
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams2_state::williams_cmos_w)).share("nvram");
+}
 
-ADDRESS_MAP_START(williams2_state::williams2_bank8000_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("vram8000")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(williams2_paletteram_w) AM_SHARE("paletteram")
-ADDRESS_MAP_END
+void williams2_state::williams2_bank8000_map(address_map &map)
+{
+	map(0x0000, 0x07ff).bankrw("vram8000");
+	map(0x0800, 0x0fff).ram().w(FUNC(williams2_state::williams2_paletteram_w)).share("paletteram");
+}
 
 
 /* mysticm and inferno: D000-DFFF is RAM */
-ADDRESS_MAP_START(williams2_state::williams2_d000_ram_map)
-	AM_IMPORT_FROM(williams2_common_map)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void williams2_state::williams2_d000_ram_map(address_map &map)
+{
+	williams2_common_map(map);
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xffff).rom();
+}
 
 
 /* tshoot and joust2: D000-DFFF is ROM */
-ADDRESS_MAP_START(williams2_state::williams2_d000_rom_map)
-	AM_IMPORT_FROM(williams2_common_map)
-	AM_RANGE(0xd000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void williams2_state::williams2_d000_rom_map(address_map &map)
+{
+	williams2_common_map(map);
+	map(0xd000, 0xffff).rom();
+}
 
 
 
@@ -672,27 +701,30 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(williams_state::defender_sound_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
-	AM_RANGE(0xb000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void williams_state::defender_sound_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();     /* internal RAM */
+	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xb000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(williams_state::sound_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
-	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
-	AM_RANGE(0xb000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void williams_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();     /* internal RAM */
+	map(0x0080, 0x00ff).ram();     /* MC6810 RAM */
+	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xb000, 0xffff).rom();
+}
 
 /* Same as above, but for second sound board */
-ADDRESS_MAP_START(blaster_state::sound_map_b)
-	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
-	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2b", pia6821_device, read, write)
-	AM_RANGE(0xb000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void blaster_state::sound_map_b(address_map &map)
+{
+	map(0x0000, 0x007f).ram();     /* internal RAM */
+	map(0x0080, 0x00ff).ram();     /* MC6810 RAM */
+	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia[3], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xb000, 0xffff).rom();
+}
 
 
 
@@ -702,12 +734,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(williams2_state::williams2_sound_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
-	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void williams2_state::williams2_sound_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();     /* internal RAM */
+	map(0x0080, 0x00ff).ram();     /* MC6810 RAM */
+	map(0x2000, 0x2003).mirror(0x1ffc).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xe000, 0xffff).rom();
+}
 
 
 
@@ -733,10 +766,10 @@ static INPUT_PORTS_START( defender )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -760,9 +793,9 @@ static INPUT_PORTS_START( mayday )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1) /* ? */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2) /* ? */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE /* Default to Auto Up */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance") /* ? */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Test Credit")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -885,10 +918,10 @@ static INPUT_PORTS_START( stargate )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -913,10 +946,10 @@ static INPUT_PORTS_START( robotron )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -936,10 +969,10 @@ static INPUT_PORTS_START( joust )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -979,10 +1012,10 @@ static INPUT_PORTS_START( bubbles )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1002,10 +1035,10 @@ static INPUT_PORTS_START( splat )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1048,10 +1081,10 @@ static INPUT_PORTS_START( sinistar )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1077,10 +1110,10 @@ static INPUT_PORTS_START( playball )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1098,10 +1131,10 @@ static INPUT_PORTS_START( blaster )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1136,10 +1169,10 @@ static INPUT_PORTS_START( blastkit )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1168,10 +1201,10 @@ static INPUT_PORTS_START( spdball )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1223,10 +1256,10 @@ static INPUT_PORTS_START( alienar )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1262,20 +1295,20 @@ static INPUT_PORTS_START( lottofun )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Memory Protect") PORT_CODE(KEYCODE_F1) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Memory Protect") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // COIN1.5? :)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) // Sound board handshake
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) // Sound board handshake
 INPUT_PORTS_END
 
 
@@ -1294,9 +1327,9 @@ static INPUT_PORTS_START( mysticm )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -1314,9 +1347,9 @@ static INPUT_PORTS_START( tshoot )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -1324,12 +1357,12 @@ static INPUT_PORTS_START( tshoot )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("INP1")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tshoot_state, gun_r, (uintptr_t)0)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tshoot_state, gun_r, (uintptr_t)0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Fire")
 
 	PORT_START("INP2")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tshoot_state, gun_r, (uintptr_t)1)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tshoot_state, gun_r, (uintptr_t)1)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("GUNX")
@@ -1349,9 +1382,9 @@ static INPUT_PORTS_START( inferno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -1391,9 +1424,9 @@ static INPUT_PORTS_START( joust2 )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -1432,12 +1465,12 @@ static const gfx_layout williams2_layout =
 		0+2*8+RGN_FRAC(0,3), 4+2*8+RGN_FRAC(0,3), 0+2*8+RGN_FRAC(1,3), 4+2*8+RGN_FRAC(1,3), 0+2*8+RGN_FRAC(2,3), 4+2*8+RGN_FRAC(2,3),
 		0+3*8+RGN_FRAC(0,3), 4+3*8+RGN_FRAC(0,3), 0+3*8+RGN_FRAC(1,3), 4+3*8+RGN_FRAC(1,3), 0+3*8+RGN_FRAC(2,3), 4+3*8+RGN_FRAC(2,3)
 	},
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8, 32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8 },
+	{ STEP16(0,4*8) },
 	4*16*8
 };
 
 
-static GFXDECODE_START( williams2 )
+static GFXDECODE_START( gfx_williams2 )
 	GFXDECODE_ENTRY( "gfx1", 0, williams2_layout, 0, 8 )
 GFXDECODE_END
 
@@ -1452,20 +1485,22 @@ GFXDECODE_END
 MACHINE_CONFIG_START(williams_state::williams)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
-	MCFG_CPU_PROGRAM_MAP(williams_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
+	MCFG_DEVICE_PROGRAM_MAP(williams_map)
 
-	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
-	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (Defender), 5114 or 6514 (later games) + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5101 (Defender), 5114 or 6514 (later games) + battery
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	// also set a timer to go off on scanline 240
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
+
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1475,27 +1510,36 @@ MACHINE_CONFIG_START(williams_state::williams)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(williams_state,williams)
+
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic6
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic6
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state, williams_snd_cmd_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state, williams_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state, williams_main_irq))
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->readpa_handler().set_ioport("IN0");
+	m_pia[0]->readpb_handler().set_ioport("IN1");
+
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("IN2");
+	m_pia[1]->writepb_handler().set(FUNC(williams_state::williams_snd_cmd_w));
+	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
+
+	PIA6821(config, m_pia[2], 0);
+	m_pia[2]->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pia[2]->irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 MACHINE_CONFIG_END
 
 
@@ -1504,18 +1548,13 @@ MACHINE_CONFIG_START(williams_state::defender)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(defender_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(defender_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(defender_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(defender_sound_map)
 
-	MCFG_DEVICE_ADD("bankc000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(defender_bankc000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "bankc000").set_map(&williams_state::defender_bankc000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,defender)
 	MCFG_MACHINE_RESET_OVERRIDE(williams_state,defender)
@@ -1539,34 +1578,35 @@ MACHINE_CONFIG_START(williams_state::williams_muxed)
 	/* basic machine hardware */
 
 	/* pia */
-	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0")) MCFG_DEVCB_MASK(0x30)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux_0", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux_1", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(-6) MCFG_DEVCB_MASK(0xc0)
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1")) MCFG_DEVCB_MASK(0xfc)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux_1", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(2) MCFG_DEVCB_MASK(0x03)
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("mux_0", ls157_device, select_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mux_1", ls157_device, select_w))
+	m_pia[0]->readpa_handler().set_ioport("IN0").mask(0x30);
+	m_pia[0]->readpa_handler().append("mux_0", FUNC(ls157_device::output_r)).mask(0x0f);
+	m_pia[0]->readpa_handler().append("mux_1", FUNC(ls157_device::output_r)).lshift(6).mask(0xc0);
+	m_pia[0]->readpb_handler().set_ioport("IN1").mask(0xfc);
+	m_pia[0]->readpb_handler().append("mux_1", FUNC(ls157_device::output_r)).rshift(2).mask(0x03);
+	m_pia[0]->cb2_handler().set("mux_0", FUNC(ls157_device::select_w));
+	m_pia[0]->cb2_handler().append("mux_1", FUNC(ls157_device::select_w));
 
-	MCFG_DEVICE_ADD("mux_0", LS157, 0) // IC3 on interface board (actually LS257 with OC tied low)
-	MCFG_74157_A_IN_CB(IOPORT("INP2"))
-	MCFG_74157_B_IN_CB(IOPORT("INP1"))
+	LS157(config, m_mux0, 0); // IC3 on interface board (actually LS257 with OC tied low)
+	m_mux0->a_in_callback().set_ioport("INP2");
+	m_mux0->b_in_callback().set_ioport("INP1");
 
-	MCFG_DEVICE_ADD("mux_1", LS157, 0) // IC4 on interface board (actually LS257 with OC tied low)
-	MCFG_74157_A_IN_CB(IOPORT("INP2A"))
-	MCFG_74157_B_IN_CB(IOPORT("INP1A"))
+	LS157(config, m_mux1, 0); // IC4 on interface board (actually LS257 with OC tied low)
+	m_mux1->a_in_callback().set_ioport("INP2A");
+	m_mux1->b_in_callback().set_ioport("INP1A");
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(williams_state::spdball)
+MACHINE_CONFIG_START(spdball_state::spdball)
 	williams(config);
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spdball_map)
 
 	/* pia */
-	MCFG_DEVICE_ADD("pia_3", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN3"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN4"))
+	PIA6821(config, m_pia[3], 0);
+	m_pia[3]->readpa_handler().set_ioport("IN3");
+	m_pia[3]->readpb_handler().set_ioport("IN4");
 MACHINE_CONFIG_END
 
 
@@ -1576,9 +1616,8 @@ MACHINE_CONFIG_START(williams_state::lottofun)
 	/* basic machine hardware */
 
 	/* pia */
-	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)
-	MCFG_PIA_CA2_HANDLER(WRITELINE(williams_state, lottofun_coin_lock_w))
+	m_pia[0]->writepa_handler().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7);
+	m_pia[0]->ca2_handler().set(FUNC(williams_state::lottofun_coin_lock_w));
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
@@ -1588,20 +1627,18 @@ MACHINE_CONFIG_START(williams_state::sinistar)
 	williams(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sinistar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sinistar_map)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("cvsd", HC55516, 0)
+	MCFG_DEVICE_ADD("cvsd", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
-	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(READ8(williams_state, williams_49way_port_0_r))
+	m_pia[0]->readpa_handler().set(FUNC(williams_state::williams_49way_port_0_r));
 
-	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, digit_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, clock_w))
+	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
+	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
 MACHINE_CONFIG_END
 
 
@@ -1615,16 +1652,14 @@ MACHINE_CONFIG_START(williams_state::playball)
 	MCFG_SCREEN_VISIBLE_AREA(6, 298-1, 8, 240-1)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("cvsd", HC55516, 0)
+	MCFG_DEVICE_ADD("cvsd", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
-	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state, playball_snd_cmd_w))
+	m_pia[1]->writepb_handler().set(FUNC(williams_state::playball_snd_cmd_w));
 
-	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, digit_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, clock_w))
+	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
+	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
 MACHINE_CONFIG_END
 
 
@@ -1632,11 +1667,10 @@ MACHINE_CONFIG_START(blaster_state::blastkit)
 	williams(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(blaster_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(blaster_map)
 
 	MCFG_MACHINE_START_OVERRIDE(blaster_state,blaster)
-	MCFG_MACHINE_RESET_OVERRIDE(blaster_state,blaster)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(blaster_state,blaster)
@@ -1644,15 +1678,14 @@ MACHINE_CONFIG_START(blaster_state::blastkit)
 	MCFG_SCREEN_UPDATE_DRIVER(blaster_state, screen_update_blaster)
 
 	/* pia */
-	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux_a", ls157_x2_device, output_r))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("mux_a", ls157_x2_device, select_w))
+	m_pia[0]->readpa_handler().set("mux_a", FUNC(ls157_x2_device::output_r));
+	m_pia[0]->cb2_handler().set("mux_a", FUNC(ls157_x2_device::select_w));
 
 	// All multiplexers on Blaster interface board are really LS257 with OC tied to GND (which is equivalent to LS157)
 
-	MCFG_DEVICE_ADD("mux_a", LS157_X2, 0)
-	MCFG_74157_A_IN_CB(IOPORT("IN3"))
-	MCFG_74157_B_IN_CB(READ8(williams_state, williams_49way_port_0_r))
+	LS157_X2(config, m_muxa, 0);
+	m_muxa->a_in_callback().set_ioport("IN3");
+	m_muxa->b_in_callback().set(FUNC(williams_state::williams_49way_port_0_r));
 MACHINE_CONFIG_END
 
 
@@ -1660,77 +1693,76 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	blastkit(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu_b", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
-	MCFG_CPU_PROGRAM_MAP(sound_map_b)
+	MCFG_DEVICE_ADD("soundcpu_b", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map_b)
 
 	/* pia */
-	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPB_HANDLER(DEVREAD8("mux_b", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
-	MCFG_DEVCB_CHAIN_INPUT(IOPORT("IN1")) MCFG_DEVCB_MASK(0xf0)
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("mux_a", ls157_x2_device, select_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mux_b", ls157_device, select_w))
+	m_pia[0]->readpb_handler().set("mux_b", FUNC(ls157_device::output_r)).mask(0x0f);
+	m_pia[0]->readpb_handler().append_ioport("IN1").mask(0xf0);
+	m_pia[0]->cb2_handler().set("mux_a", FUNC(ls157_x2_device::select_w));
+	m_pia[0]->cb2_handler().append("mux_b", FUNC(ls157_device::select_w));
 
-	MCFG_DEVICE_MODIFY("mux_a") // IC7 (for PA0-PA3) + IC5 (for PA4-PA7)
-	MCFG_74157_A_IN_CB(READ8(williams_state, williams_49way_port_0_r))
-	MCFG_74157_B_IN_CB(IOPORT("IN3"))
+	// IC7 (for PA0-PA3) + IC5 (for PA4-PA7)
+	m_muxa->a_in_callback().set(FUNC(williams_state::williams_49way_port_0_r));
+	m_muxa->b_in_callback().set_ioport("IN3");
 
-	MCFG_DEVICE_ADD("mux_b", LS157, 0) // IC3
-	MCFG_74157_A_IN_CB(IOPORT("INP1"))
-	MCFG_74157_B_IN_CB(IOPORT("INP2"))
+	LS157(config, m_muxb, 0); // IC3
+	m_muxb->a_in_callback().set_ioport("INP1");
+	m_muxb->b_in_callback().set_ioport("INP2");
 
-	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blaster_state, blaster_snd_cmd_w))
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq_b")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu_b", M6808_IRQ_LINE))
 
-	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("ldac", dac_byte_interface, write))
+	m_pia[1]->writepb_handler().set(FUNC(blaster_state::blaster_snd_cmd_w));
 
-	MCFG_DEVICE_ADD("pia_2b", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("rdac", dac_byte_interface, write))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(blaster_state,williams_snd_irq_b))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(blaster_state,williams_snd_irq_b))
+	m_pia[2]->writepa_handler().set("ldac", FUNC(dac_byte_interface::data_w));
+
+	PIA6821(config, m_pia[3], 0);
+	m_pia[3]->writepa_handler().set("rdac", FUNC(dac_byte_interface::data_w));
+	m_pia[3]->irqa_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia[3]->irqb_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<1>));
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("speaker")
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(williams2_state::williams2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
-	MCFG_CPU_PROGRAM_MAP(williams2_d000_ram_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
+	MCFG_DEVICE_PROGRAM_MAP(williams2_d000_ram_map)
 
-	MCFG_CPU_ADD("soundcpu", M6808, MASTER_CLOCK/3) /* yes, this is different from the older games */
-	MCFG_CPU_PROGRAM_MAP(williams2_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", M6808, MASTER_CLOCK/3) /* yes, this is different from the older games */
+	MCFG_DEVICE_PROGRAM_MAP(williams2_sound_map)
 
-	MCFG_DEVICE_ADD("bank8000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(williams2_bank8000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+	ADDRESS_MAP_BANK(config, "bank8000").set_map(&williams2_state::williams2_bank8000_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
 
 	MCFG_MACHINE_START_OVERRIDE(williams2_state,williams2)
 	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5114 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5114 + battery
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams2_state, williams2_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("254_timer", williams2_state, williams2_endscreen_callback)
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams2_state, williams2_va11_callback, "screen", 0, 32)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	// also set a timer to go off on scanline 254
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("254_timer", williams2_state, williams2_endscreen_callback, "screen", 8, 246)
+
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", williams2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_williams2)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
@@ -1740,41 +1772,46 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	MCFG_VIDEO_START_OVERRIDE(williams2_state,williams2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams2_state,williams2_snd_cmd_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("pia_2", pia6821_device, ca1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_main_irq))
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("pia_1", pia6821_device, portb_w))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->readpa_handler().set_ioport("IN0");
+	m_pia[0]->readpb_handler().set_ioport("IN1");
+
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("IN2");
+	m_pia[1]->writepb_handler().set(FUNC(williams2_state::williams2_snd_cmd_w));
+	m_pia[1]->cb2_handler().set(m_pia[2], FUNC(pia6821_device::ca1_w));
+	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
+
+	PIA6821(config, m_pia[2], 0);
+	m_pia[2]->writepa_handler().set(m_pia[1], FUNC(pia6821_device::portb_w));
+	m_pia[2]->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pia[2]->ca2_handler().set(m_pia[1], FUNC(pia6821_device::cb1_w));
+	m_pia[2]->irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(williams2_state::inferno)
 	williams2(config);
-	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux", ls157_x2_device, output_r))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_x2_device, select_w))
+	m_pia[0]->readpa_handler().set("mux", FUNC(ls157_x2_device::output_r));
+	m_pia[0]->ca2_handler().set("mux", FUNC(ls157_x2_device::select_w));
 
-	MCFG_DEVICE_ADD("mux", LS157_X2, 0) // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
-	MCFG_74157_A_IN_CB(IOPORT("INP1"))
-	MCFG_74157_B_IN_CB(IOPORT("INP2"))
+	LS157_X2(config, m_mux, 0); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
+	m_mux->a_in_callback().set_ioport("INP1");
+	m_mux->b_in_callback().set_ioport("INP2");
 MACHINE_CONFIG_END
 
 
@@ -1784,13 +1821,11 @@ MACHINE_CONFIG_START(williams2_state::mysticm)
 	/* basic machine hardware */
 
 	/* pia */
-	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_firq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
+	m_pia[0]->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
+	m_pia[0]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 
-	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
+	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
+	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<2>));
 MACHINE_CONFIG_END
 
 
@@ -1798,27 +1833,27 @@ MACHINE_CONFIG_START(tshoot_state::tshoot)
 	williams2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(williams2_d000_rom_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(williams2_d000_rom_map)
+
+	MCFG_MACHINE_START_OVERRIDE(tshoot_state,tshoot)
 
 	/* pia */
-	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux", ls157_x2_device, output_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tshoot_state, lamp_w))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_x2_device, select_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
+	m_pia[0]->readpa_handler().set("mux", FUNC(ls157_x2_device::output_r));
+	m_pia[0]->writepb_handler().set(FUNC(tshoot_state::lamp_w));
+	m_pia[0]->ca2_handler().set("mux", FUNC(ls157_x2_device::select_w));
+	m_pia[0]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia[0]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
+	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<2>));
+	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<3>));
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_CB2_HANDLER(WRITELINE(tshoot_state, maxvol_w))
+	m_pia[2]->cb2_handler().set(FUNC(tshoot_state::maxvol_w));
 
-	MCFG_DEVICE_ADD("mux", LS157_X2, 0) // U2 + U3 on interface board
-	MCFG_74157_A_IN_CB(IOPORT("INP1"))
-	MCFG_74157_B_IN_CB(IOPORT("INP2"))
+	LS157_X2(config, m_mux, 0); // U2 + U3 on interface board
+	m_mux->a_in_callback().set_ioport("INP1");
+	m_mux->b_in_callback().set_ioport("INP2");
 MACHINE_CONFIG_END
 
 
@@ -1826,32 +1861,30 @@ MACHINE_CONFIG_START(joust2_state::joust2)
 	williams2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(williams2_d000_rom_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(williams2_d000_rom_map)
 
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_MACHINE_START_OVERRIDE(joust2_state,joust2)
 	MCFG_MACHINE_RESET_OVERRIDE(joust2_state,joust2)
 
 	/* pia */
-	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0")) MCFG_DEVCB_MASK(0xf0)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_device, select_w))
+	m_pia[0]->readpa_handler().set_ioport("IN0").mask(0xf0);
+	m_pia[0]->readpa_handler().append("mux", FUNC(ls157_device::output_r)).mask(0x0f);
+	m_pia[0]->ca2_handler().set("mux", FUNC(ls157_device::select_w));
 
-	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(joust2_state,joust2_snd_cmd_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(joust2_state,joust2_pia_3_cb1_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("pia_2", pia6821_device, ca1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_main_irq))
+	m_pia[1]->readpa_handler().set_ioport("IN2");
+	m_pia[1]->writepb_handler().set(FUNC(joust2_state::joust2_snd_cmd_w));
+	m_pia[1]->ca2_handler().set(FUNC(joust2_state::joust2_pia_3_cb1_w));
+	m_pia[1]->cb2_handler().set(m_pia[2], FUNC(pia6821_device::ca1_w));
+	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("mux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("INP1"))
-	MCFG_74157_B_IN_CB(IOPORT("INP2"))
+	LS157(config, m_mux, 0);
+	m_mux->a_in_callback().set_ioport("INP1");
+	m_mux->b_in_callback().set_ioport("INP2");
 MACHINE_CONFIG_END
 
 
@@ -1948,19 +1981,19 @@ ROM_END
 
 ROM_START( defenderj )
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "DF1-1.E3",     0x0d000, 0x1000, CRC(8c04602b) SHA1(a8ed5afd0b276cebb479b1717666eaabbf75c6a5) ) //2532
-	ROM_LOAD( "DF2-1.E2",     0x0e000, 0x1000, CRC(89b75984) SHA1(a9481478da38f99efb67f0ecf82d084e14b93b42) ) //2532
-	ROM_LOAD( "DF3-1.E1",     0x0f000, 0x1000, CRC(94f51e9b) SHA1(a24cfc55de56a72758c76fe2a55f1ec6c353b16f) ) //2532
-	ROM_LOAD( "DF10-1.A1",    0x10000, 0x0800, CRC(12e2bd1c) SHA1(c2fdf2fced003a0acf037aa6fab141b04c1c81bd) ) //2716
-	ROM_LOAD( "DF7-1.B1",     0x10800, 0x0800, CRC(f1f88938) SHA1(26e48dfeefa0766837b1e762695b9532dbc8bc5e) ) //2716
-	ROM_LOAD( "DF9-1.A2",     0x11000, 0x0800, CRC(b649e306) SHA1(9d7bc3c89e5a53c575946f06702c722b864b1ff0) ) //2716
-	ROM_LOAD( "DF6-1.B2",     0x11800, 0x0800, CRC(9deaf6d9) SHA1(59b018ba0f3fe6eadfd387dc180ac281460358bc) ) //2716
-	ROM_LOAD( "DF8-1.A3",     0x12000, 0x0800, CRC(339e092e) SHA1(2f89951dbe55d80df43df8dcf497171f73e726d3) ) //2716
-	ROM_LOAD( "DF5-1.B3",     0x12800, 0x0800, CRC(a543b167) SHA1(9292b94b0d74e57e03aada4852ad1997c34122ff) ) //2716
-	ROM_LOAD( "DF4-1.C1",     0x16000, 0x0800, CRC(65f4efd1) SHA1(a960fd1559ed74b81deba434391e49fc6ec389ca) ) //2716
+	ROM_LOAD( "df1-1.e3",     0x0d000, 0x1000, CRC(8c04602b) SHA1(a8ed5afd0b276cebb479b1717666eaabbf75c6a5) ) //2532
+	ROM_LOAD( "df2-1.e2",     0x0e000, 0x1000, CRC(89b75984) SHA1(a9481478da38f99efb67f0ecf82d084e14b93b42) ) //2532
+	ROM_LOAD( "df3-1.e1",     0x0f000, 0x1000, CRC(94f51e9b) SHA1(a24cfc55de56a72758c76fe2a55f1ec6c353b16f) ) //2532
+	ROM_LOAD( "df10-1.a1",    0x10000, 0x0800, CRC(12e2bd1c) SHA1(c2fdf2fced003a0acf037aa6fab141b04c1c81bd) ) //2716
+	ROM_LOAD( "df7-1.b1",     0x10800, 0x0800, CRC(f1f88938) SHA1(26e48dfeefa0766837b1e762695b9532dbc8bc5e) ) //2716
+	ROM_LOAD( "df9-1.a2",     0x11000, 0x0800, CRC(b649e306) SHA1(9d7bc3c89e5a53c575946f06702c722b864b1ff0) ) //2716
+	ROM_LOAD( "df6-1.b2",     0x11800, 0x0800, CRC(9deaf6d9) SHA1(59b018ba0f3fe6eadfd387dc180ac281460358bc) ) //2716
+	ROM_LOAD( "df8-1.a3",     0x12000, 0x0800, CRC(339e092e) SHA1(2f89951dbe55d80df43df8dcf497171f73e726d3) ) //2716
+	ROM_LOAD( "df5-1.b3",     0x12800, 0x0800, CRC(a543b167) SHA1(9292b94b0d74e57e03aada4852ad1997c34122ff) ) //2716
+	ROM_LOAD( "df4-1.c1",     0x16000, 0x0800, CRC(65f4efd1) SHA1(a960fd1559ed74b81deba434391e49fc6ec389ca) ) //2716
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "DF12.I3",   0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) ) //2716
+	ROM_LOAD( "df12.i3",   0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) ) //2716
 ROM_END
 
 ROM_START( defndjeu )
@@ -2116,6 +2149,27 @@ ROM_START( attackf )
 	ROM_LOAD( "decoder.1",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) ) // not dumped from this PCB, believed to match
 ROM_END
 
+ROM_START( galwars2 ) // 2 board stack: CPU and ROM boards
+	ROM_REGION( 0x19000, "maincpu", 0 )
+	ROM_LOAD( "9d-1-2532.bin",  0x0d000, 0x1000, CRC(ebc93622) SHA1(bd1c098e91b24409925d01aa25de013451dba8e6) )
+	ROM_LOAD( "9c-2-2532.bin",  0x0e000, 0x1000, CRC(2a4f4f44) SHA1(8c0519fcb631e05e967cf0953ab2749183655594) )
+	ROM_LOAD( "8d-3-2532.bin",  0x0f000, 0x1000, CRC(a4112f91) SHA1(aad7ae81da7c20c7f4c1ef41697c8900a0c81f8e) )
+	ROM_LOAD( "4c-10-2716.bin", 0x10000, 0x0800, CRC(7a1e5998) SHA1(c133f43427540b39a383db7f46298942420d138a) )
+	ROM_LOAD( "5d-7-2716.bin",  0x10800, 0x0800, CRC(a9bdacdc) SHA1(aa6f31a127c5e744c1267705fffa659c03c38329) )
+	ROM_LOAD( "4d-9-2716.bin",  0x11000, 0x0800, CRC(906dca8f) SHA1(ae77945f1628f5c60040dcc3fa650ace3bbe8720) )
+	ROM_LOAD( "6c-6-2716.bin",  0x11800, 0x0800, CRC(6d748030) SHA1(060ddf95eeb1318695a25c8c082a670fcdf117e7) )
+	ROM_LOAD( "5c-8-2716.bin",  0x12000, 0x0800, CRC(52d5438b) SHA1(087268ca30a42c00dbeceb4df901ddf80ae50125) )
+	ROM_LOAD( "6d-5-2716.bin",  0x12800, 0x0800, CRC(4a270340) SHA1(317fcc3156a099dbe48a0658757a9d6c4c54b23a) )
+	ROM_LOAD( "7c-4-2716.bin",  0x16000, 0x0800, CRC(e13f457c) SHA1(c706babc0005dfeb3c1b880047da6ec04bce407d) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "3f-11-2716.bin", 0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) )
+
+	ROM_REGION( 0x1000, "user1", 0 ) // these are on the main CPU board. What are they used for?
+	ROM_LOAD( "1l-13-8516.bin",   0x0000, 0x0800, CRC(7e113979) SHA1(ac908afb6aa756fc4db1ffddbd3688aa07080693) ) // 11xxxxxxxxx = 0x00, identical to rom11.bin in maydayb
+	ROM_LOAD( "1a-12-8516.bin",   0x0800, 0x0800, CRC(a562c506) SHA1(a0bae41732f05caa80b9c13fba6ae4f01647e680) ) // 11xxxxxxxxx = 0x00, identical to rom12.bin in maydayb
+ROM_END
+
 ROM_START( mayday )
 	ROM_REGION( 0x19000, "maincpu", 0 )
 	ROM_LOAD( "ic03-3.bin",  0x0d000, 0x1000, CRC(a1ff6e62) SHA1(c3c60ce94c6bdc4b07e45f386eff9a4aa4816953) )
@@ -2157,7 +2211,7 @@ ROM_START( maydayb )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic28-8.bin",  0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 
-	ROM_REGION( 0x2000, "user1", 0 ) // what are these? alt (bad?) roms?
+	ROM_REGION( 0x2000, "user1", 0 ) // what are these? alt (bad?) roms? rom11.bin and rom12.bin were also found on galwars2 PCB
 	ROM_LOAD( "rom11.bin",   0x0000, 0x0800, CRC(7e113979) SHA1(ac908afb6aa756fc4db1ffddbd3688aa07080693) ) // 11xxxxxxxxx = 0x00
 	ROM_LOAD( "rom12.bin",   0x0800, 0x0800, CRC(a562c506) SHA1(a0bae41732f05caa80b9c13fba6ae4f01647e680) ) // 11xxxxxxxxx = 0x00
 	ROM_LOAD( "rom6a.bin",   0x1000, 0x0800, CRC(8e4e981f) SHA1(685c1fca9373f4129c7c6b86f18900a1bd324019) )
@@ -3115,26 +3169,24 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(williams_state,defender)
+void williams_state::init_defender()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,defndjeu)
+void williams_state::init_defndjeu()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
 	/* apply simple decryption by swapping bits 0 and 7 */
-	for (i = 0xd000; i < 0x19000; i++)
+	for (int i = 0xd000; i < 0x19000; i++)
 		rom[i] = bitswap<8>(rom[i],0,6,5,4,3,2,1,7);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,mayday)
+void williams_state::init_mayday()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
@@ -3151,25 +3203,25 @@ DRIVER_INIT_MEMBER(williams_state,mayday)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(williams_state,stargate)
+void williams_state::init_stargate()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,robotron)
+void williams_state::init_robotron()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,joust)
+void williams_state::init_joust()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,bubbles)
+void williams_state::init_bubbles()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 
@@ -3178,62 +3230,51 @@ DRIVER_INIT_MEMBER(williams_state,bubbles)
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,splat)
+void williams_state::init_splat()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0xc000);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,sinistar)
+void williams_state::init_sinistar()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0x7400);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,playball)
+void williams_state::init_playball()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 }
 
 
-DRIVER_INIT_MEMBER(blaster_state,blaster)
+void blaster_state::init_blaster()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0x9700);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,spdball)
+void spdball_state::driver_init()
 {
-	pia6821_device *pia_3 = machine().device<pia6821_device>("pia_3");
-
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
-
-	/* add a third PIA */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc808, 0xc80b, read8_delegate(FUNC(pia6821_device::read), pia_3), write8_delegate(FUNC(pia6821_device::write), pia_3));
-
-	/* install extra input handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0xc800, 0xc800, "AN0");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0xc801, 0xc801, "AN1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0xc802, 0xc802, "AN2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0xc803, 0xc803, "AN3");
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,alienar)
+void williams_state::init_alienar()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 	m_maincpu->space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,alienaru)
+void williams_state::init_alienaru()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 	m_maincpu->space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,lottofun)
+void williams_state::init_lottofun()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 }
@@ -3246,28 +3287,28 @@ DRIVER_INIT_MEMBER(williams_state,lottofun)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(williams2_state,mysticm)
+void williams2_state::init_mysticm()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_MYSTICM);
 }
 
 
-DRIVER_INIT_MEMBER(williams2_state,tshoot)
+void williams2_state::init_tshoot()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_TSHOOT);
 }
 
 
-DRIVER_INIT_MEMBER(williams2_state,inferno)
+void williams2_state::init_inferno()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_TSHOOT);
 }
 
 
-DRIVER_INIT_MEMBER(joust2_state,joust2)
+void joust2_state::init_joust2()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_JOUST2);
@@ -3282,79 +3323,80 @@ DRIVER_INIT_MEMBER(joust2_state,joust2)
  *************************************/
 
 /* Defender hardware games */
-GAME( 1980, defender,   0,        defender,       defender, williams_state, defender, ROT0,   "Williams", "Defender (Red label)", MACHINE_SUPPORTS_SAVE ) // developers left Williams in 1981 and formed Vid Kidz
-GAME( 1980, defenderg,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams", "Defender (Green label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderb,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams", "Defender (Blue label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderw,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams", "Defender (White label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderj,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams (Taito Corporation license)", "T.T Defender", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defndjeu,   defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Jeutel)", "Defender (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tornado1,   defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (set 1, Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tornado2,   defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (set 2, Defender bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?
-GAME( 1980, zero,       defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Jeutel)", "Zero (set 1, Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zero2,      defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Amtec)", "Zero (set 2, Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defcmnd,    defender, defender,       defender, williams_state, defender, ROT0,   "bootleg", "Defense Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, defence,    defender, defender,       defender, williams_state, defender, ROT0,   "bootleg (Outer Limits)", "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, startrkd,   defender, defender,       defender, williams_state, defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, attackf,    defender, defender,       defender, williams_state, defender, ROT0,   "bootleg (Famare SA)", "Attack (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defender,   0,        defender,       defender, williams_state, init_defender, ROT0,   "Williams", "Defender (Red label)", MACHINE_SUPPORTS_SAVE ) // developers left Williams in 1981 and formed Vid Kidz
+GAME( 1980, defenderg,  defender, defender,       defender, williams_state, init_defender, ROT0,   "Williams", "Defender (Green label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderb,  defender, defender,       defender, williams_state, init_defender, ROT0,   "Williams", "Defender (Blue label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderw,  defender, defender,       defender, williams_state, init_defender, ROT0,   "Williams", "Defender (White label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderj,  defender, defender,       defender, williams_state, init_defender, ROT0,   "Williams (Taito Corporation license)", "T.T Defender", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defndjeu,   defender, defender,       defender, williams_state, init_defndjeu, ROT0,   "bootleg (Jeutel)", "Defender (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tornado1,   defender, defender,       defender, williams_state, init_defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (set 1, Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tornado2,   defender, defender,       defender, williams_state, init_defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (set 2, Defender bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?
+GAME( 1980, zero,       defender, defender,       defender, williams_state, init_defndjeu, ROT0,   "bootleg (Jeutel)", "Zero (set 1, Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zero2,      defender, defender,       defender, williams_state, init_defndjeu, ROT0,   "bootleg (Amtec)", "Zero (set 2, Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defcmnd,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg", "Defense Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, defence,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Outer Limits)", "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, startrkd,   defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, attackf,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Famare SA)", "Attack (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galwars2,   defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Sonic)", "Galaxy Wars II (Defender bootleg)", MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega Sa, only displays Sonic on title screen
 
-GAME( 1980, mayday,     0,        defender,       mayday,   williams_state, mayday,   ROT0,   "Hoei", "Mayday (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
-GAME( 1980, maydaya,    mayday,   defender,       mayday,   williams_state, mayday,   ROT0,   "Hoei", "Mayday (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "mayday_protection_r" function
-GAME( 1980, maydayb,    mayday,   defender,       mayday,   williams_state, mayday,   ROT0,   "Hoei", "Mayday (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // /
-GAME( 1980, batlzone,   mayday,   defender,       mayday,   williams_state, mayday,   ROT0,   "bootleg (Video Game)", "Battle Zone (bootleg of Mayday)", MACHINE_SUPPORTS_SAVE )//    the bootleg may or may not use the same protection chip, or some hack around it.
+GAME( 1980, mayday,     0,        defender,       mayday,   williams_state, init_mayday,   ROT0,   "Hoei", "Mayday (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
+GAME( 1980, maydaya,    mayday,   defender,       mayday,   williams_state, init_mayday,   ROT0,   "Hoei", "Mayday (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "mayday_protection_r" function
+GAME( 1980, maydayb,    mayday,   defender,       mayday,   williams_state, init_mayday,   ROT0,   "Hoei", "Mayday (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // /
+GAME( 1980, batlzone,   mayday,   defender,       mayday,   williams_state, init_mayday,   ROT0,   "bootleg (Video Game)", "Battle Zone (bootleg of Mayday)", MACHINE_SUPPORTS_SAVE )//    the bootleg may or may not use the same protection chip, or some hack around it.
 
-GAME( 1981, colony7,    0,        defender,       colony7,  williams_state, defender, ROT270, "Taito", "Colony 7 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, colony7a,   colony7,  defender,       colony7,  williams_state, defender, ROT270, "Taito", "Colony 7 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, colony7,    0,        defender,       colony7,  williams_state, init_defender, ROT270, "Taito", "Colony 7 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, colony7a,   colony7,  defender,       colony7,  williams_state, init_defender, ROT270, "Taito", "Colony 7 (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, jin,        0,        jin,            jin,      williams_state, defender, ROT90,  "Falcon", "Jin", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jin,        0,        jin,            jin,      williams_state, init_defender, ROT90,  "Falcon", "Jin", MACHINE_SUPPORTS_SAVE )
 
 
 
 /* Standard Williams hardware */
-GAME( 1981, stargate,   0,        williams,       stargate, williams_state, stargate, ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, stargate,   0,        williams,       stargate, williams_state, init_stargate, ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, robotron,   0,        williams,       robotron, williams_state, robotron, ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Solid Blue label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, robotronyo, robotron, williams,       robotron, williams_state, robotron, ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotron,   0,        williams,       robotron, williams_state, init_robotron, ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Solid Blue label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronyo, robotron, williams,       robotron, williams_state, init_robotron, ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
 // the 3 below are all noteworthy hacks of the Solid BLue set
-GAME( 1987, robotron87, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
-GAME( 2012, robotron12, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)", MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
-GAME( 2015, robotrontd, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)", MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
+GAME( 1987, robotron87, robotron, williams,       robotron, williams_state, init_robotron, ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
+GAME( 2012, robotron12, robotron, williams,       robotron, williams_state, init_robotron, ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)", MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
+GAME( 2015, robotrontd, robotron, williams,       robotron, williams_state, init_robotron, ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)", MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
 
-GAME( 1982, joust,      0,        williams_muxed, joust,    williams_state, joust,    ROT0,   "Williams", "Joust (White/Green label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, joustr,     joust,    williams_muxed, joust,    williams_state, joust,    ROT0,   "Williams", "Joust (Solid Red label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, joustwr,    joust,    williams_muxed, joust,    williams_state, joust,    ROT0,   "Williams", "Joust (White/Red label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joust,      0,        williams_muxed, joust,    williams_state, init_joust,    ROT0,   "Williams", "Joust (White/Green label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joustr,     joust,    williams_muxed, joust,    williams_state, init_joust,    ROT0,   "Williams", "Joust (Solid Red label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joustwr,    joust,    williams_muxed, joust,    williams_state, init_joust,    ROT0,   "Williams", "Joust (White/Red label)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, bubbles,    0,        williams,       bubbles,  williams_state, bubbles,  ROT0,   "Williams", "Bubbles", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bubblesr,   bubbles,  williams,       bubbles,  williams_state, bubbles,  ROT0,   "Williams", "Bubbles (Solid Red label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bubblesp,   bubbles,  williams,       bubbles,  williams_state, bubbles,  ROT0,   "Williams", "Bubbles (prototype version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubbles,    0,        williams,       bubbles,  williams_state, init_bubbles,  ROT0,   "Williams", "Bubbles", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubblesr,   bubbles,  williams,       bubbles,  williams_state, init_bubbles,  ROT0,   "Williams", "Bubbles (Solid Red label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubblesp,   bubbles,  williams,       bubbles,  williams_state, init_bubbles,  ROT0,   "Williams", "Bubbles (prototype version)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, splat,      0,        williams_muxed, splat,    williams_state, splat,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, splat,      0,        williams_muxed, splat,    williams_state, init_splat,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, sinistar,   0,        sinistar,       sinistar, williams_state, sinistar, ROT270, "Williams", "Sinistar (revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistar1,  sinistar, sinistar,       sinistar, williams_state, sinistar, ROT270, "Williams", "Sinistar (prototype version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistar2,  sinistar, sinistar,       sinistar, williams_state, sinistar, ROT270, "Williams", "Sinistar (revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistar,   0,        sinistar,       sinistar, williams_state, init_sinistar, ROT270, "Williams", "Sinistar (revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistar1,  sinistar, sinistar,       sinistar, williams_state, init_sinistar, ROT270, "Williams", "Sinistar (prototype version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistar2,  sinistar, sinistar,       sinistar, williams_state, init_sinistar, ROT270, "Williams", "Sinistar (revision 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, playball,   0,        playball,       playball, williams_state, playball, ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, playball,   0,        playball,       playball, williams_state, init_playball, ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, blaster,    0,        blaster,        blaster,  blaster_state,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, blastero,   blaster,  blaster,        blaster,  blaster_state,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (location test)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // mono sound
+GAME( 1983, blaster,    0,        blaster,        blaster,  blaster_state,  init_blaster,  ROT0,   "Williams / Vid Kidz", "Blaster", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, blastero,   blaster,  blaster,        blaster,  blaster_state,  init_blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (location test)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,  init_blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // mono sound
 
-GAME( 1985, spdball,    0,        spdball,        spdball,  williams_state, spdball,  ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdball,    0,        spdball,        spdball,  spdball_state,  driver_init,   ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, alienar,    0,        williams_muxed, alienar,  williams_state, alienar,  ROT0,   "Duncan Brown", "Alien Arena", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, alienaru,   alienar,  williams_muxed, alienar,  williams_state, alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienar,    0,        williams_muxed, alienar,  williams_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienaru,   alienar,  williams_muxed, alienar,  williams_state, init_alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state, lottofun, ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state, init_lottofun, ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
 
 
 
 /* 2nd Generation Williams hardware with tilemaps */
-GAME( 1983, mysticm,    0,        mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE)
-GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
+GAME( 1983, mysticm,    0,        mysticm,        mysticm, williams2_state, init_mysticm,  ROT0,   "Williams", "Mystic Marathon", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, williams2_state, init_mysticm,  ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
 
-GAME( 1984, tshoot,     0,        tshoot,         tshoot,  tshoot_state,    tshoot,   ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tshoot,     0,        tshoot,         tshoot,  tshoot_state,    init_tshoot,   ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, inferno,    0,        inferno,        inferno, williams2_state, inferno,  ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, inferno,    0,        inferno,        inferno, williams2_state, init_inferno,  ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, joust2,     0,        joust2,         joust2,  joust2_state,    joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, joust2r1,   joust2,   joust2,         joust2,  joust2_state,    joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, joust2,     0,        joust2,         joust2,  joust2_state,    init_joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, joust2r1,   joust2,   joust2,         joust2,  joust2_state,    init_joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 1)", MACHINE_SUPPORTS_SAVE )

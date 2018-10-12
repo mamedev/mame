@@ -41,6 +41,7 @@ uses s24 style tilemaps (ram based?)
 #include "machine/mb8421.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -60,6 +61,10 @@ public:
 		, m_ymsnd(*this, "ymsnd")
 	{ }
 
+	void unkm1(machine_config &config);
+	void segam1(machine_config &config);
+
+private:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(sound_a0_bank_w);
 
@@ -74,8 +79,6 @@ public:
 	required_device<segas24_tile_device> m_tile;
 	required_device<segas24_mixer_device> m_mixer;
 	required_device<ym3438_device> m_ymsnd;
-	void unkm1(machine_config &config);
-	void segam1(machine_config &config);
 	void segam1_comms_map(address_map &map);
 	void segam1_map(address_map &map);
 	void segam1_sound_io_map(address_map &map);
@@ -184,53 +187,57 @@ uint32_t segam1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 
 
-ADDRESS_MAP_START(segam1_state::segam1_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x340000, 0x340fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0x00ff)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
-	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP        /* Horizontal split position (ABSEL) */
-	AM_RANGE(0xb40000, 0xb40001) AM_WRITENOP        /* Scanline trigger position (XHOUT) */
-	AM_RANGE(0xb60000, 0xb60001) AM_WRITENOP        /* Frame trigger position (XVOUT) */
-	AM_RANGE(0xb70000, 0xb70001) AM_WRITENOP        /* Synchronization mode */
-	AM_RANGE(0xb80000, 0xbfffff) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc04000, 0xc0401f) AM_DEVREADWRITE("mixer", segas24_mixer_device, read, write)
-	AM_RANGE(0xe00000, 0xe0001f) AM_DEVREADWRITE8("io1", sega_315_5296_device, read, write, 0x00ff)
-	AM_RANGE(0xe40000, 0xe40001) AM_READ_PORT("INX")
-	AM_RANGE(0xe40002, 0xe40003) AM_READ_PORT("INY")
-	AM_RANGE(0xe40004, 0xe40005) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xe40006, 0xe40007) AM_WRITENOP
-	AM_RANGE(0xe40008, 0xe40009) AM_READ_PORT("INZ")
-	AM_RANGE(0xe80000, 0xe8001f) AM_DEVREADWRITE8("io2", sega_315_5296_device, read, write, 0x00ff)
-	AM_RANGE(0xf00000, 0xf03fff) AM_MIRROR(0x0fc000) AM_RAM // NVRAM?
-ADDRESS_MAP_END
+void segam1_state::segam1_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x340000, 0x340fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask16(0x00ff);
+	map(0xb00000, 0xb0ffff).rw(m_tile, FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
+	map(0xb20000, 0xb20001).nopw();        /* Horizontal split position (ABSEL) */
+	map(0xb40000, 0xb40001).nopw();        /* Scanline trigger position (XHOUT) */
+	map(0xb60000, 0xb60001).nopw();        /* Frame trigger position (XVOUT) */
+	map(0xb70000, 0xb70001).nopw();        /* Synchronization mode */
+	map(0xb80000, 0xbfffff).rw(m_tile, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
+	map(0xc00000, 0xc03fff).ram().w(FUNC(segam1_state::paletteram_w)).share("paletteram");
+	map(0xc04000, 0xc0401f).rw(m_mixer, FUNC(segas24_mixer_device::read), FUNC(segas24_mixer_device::write));
+	map(0xe00000, 0xe0001f).rw("io1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
+	map(0xe40000, 0xe40001).portr("INX");
+	map(0xe40002, 0xe40003).portr("INY");
+	map(0xe40005, 0xe40005).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xe40006, 0xe40007).nopw();
+	map(0xe40008, 0xe40009).portr("INZ");
+	map(0xe80000, 0xe8001f).rw("io2", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
+	map(0xf00000, 0xf03fff).mirror(0x0fc000).ram(); // NVRAM?
+}
 
-ADDRESS_MAP_START(segam1_state::segam1_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segam1_state::segam1_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xbfff).bankr("soundbank");
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segam1_state::unkm1_sound_map)
-	AM_IMPORT_FROM(segam1_sound_map)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void segam1_state::unkm1_sound_map(address_map &map)
+{
+	segam1_sound_map(map);
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(segam1_state::segam1_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(sound_a0_bank_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP
-ADDRESS_MAP_END
+void segam1_state::segam1_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw(m_ymsnd, FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0xa0, 0xa0).w(FUNC(segam1_state::sound_a0_bank_w));
+	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read)).nopw();
+}
 
-ADDRESS_MAP_START(segam1_state::segam1_comms_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITENOP // ???
-ADDRESS_MAP_END
+void segam1_state::segam1_comms_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xa7ff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0xc000, 0xc001).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xe003, 0xe003).nopw(); // ???
+}
 
 
 static INPUT_PORTS_START( segam1 )
@@ -343,36 +350,36 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(segam1_state::segam1)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(segam1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(segam1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segam1_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(segam1_sound_map)
-	MCFG_CPU_IO_MAP(segam1_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(segam1_sound_map)
+	MCFG_DEVICE_IO_MAP(segam1_sound_io_map)
 
-	MCFG_CPU_ADD("m1comm", Z80, 4000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(segam1_comms_map)
+	MCFG_DEVICE_ADD("m1comm", Z80, 4000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(segam1_comms_map)
 
-	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("INA"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("INB"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("INC"))
-	MCFG_315_5296_IN_PORTD_CB(IOPORT("IND"))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("INE"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("INF"))
+	sega_315_5296_device &io1(SEGA_315_5296(config, "io1", 0)); // unknown clock
+	io1.in_pa_callback().set_ioport("INA");
+	io1.in_pb_callback().set_ioport("INB");
+	io1.in_pc_callback().set_ioport("INC");
+	io1.in_pd_callback().set_ioport("IND");
+	io1.in_pe_callback().set_ioport("INE");
+	io1.in_pf_callback().set_ioport("INF");
 
-	MCFG_DEVICE_ADD("io2", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTG_CB(IOPORT("ING"))
+	sega_315_5296_device &io2(SEGA_315_5296(config, "io2", 0)); // unknown clock
+	io2.in_pg_callback().set_ioport("ING");
 
 	MCFG_DEVICE_ADD("uart", I8251, 4000000) // unknown clock
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(INPUTLINE("m1comm", 0))
+	mb8421_device &dpram(MB8421(config, "dpram"));
+	dpram.intl_callback().set_inputline("m1comm", 0);
 
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-	MCFG_S24MIXER_DEVICE_ADD("mixer")
+	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_ADD("mixer", S24MIXER, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -383,22 +390,22 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	MCFG_PALETTE_ADD("palette", 8192*2)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(segam1_state, ym3438_irq_handler))
+	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segam1_state, ym3438_irq_handler))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segam1_state::unkm1)
 	segam1(config);
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(unkm1_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(unkm1_sound_map)
 
-	MCFG_CPU_MODIFY("m1comm")
+	MCFG_DEVICE_MODIFY("m1comm")
 	MCFG_DEVICE_DISABLE() // not dumped yet
 MACHINE_CONFIG_END
 
@@ -433,5 +440,5 @@ ROM_START( unkm1 ) // 1992.01.31 string
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
-GAME( 1994, bingpty,    0,        segam1,    segam1, segam1_state,    0, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING )
-GAME( 1992, unkm1,      0,        unkm1,     segam1, segam1_state,    0, ROT0,  "Sega", "unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, bingpty,    0,        segam1,    segam1, segam1_state, empty_init, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING )
+GAME( 1992, unkm1,      0,        unkm1,     segam1, segam1_state, empty_init, ROT0,  "Sega", "unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

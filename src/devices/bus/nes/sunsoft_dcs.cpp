@@ -169,7 +169,7 @@ void nes_sunsoft_dcs_device::device_start()
 	common_start();
 	ntb_enable_timer = timer_alloc(TIMER_PROTECT);
 	ntb_enable_timer->reset();
-	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(107520);
+	timer_freq = clocks_to_attotime(107520);
 
 	save_item(NAME(m_latch1));
 	save_item(NAME(m_latch2));
@@ -273,9 +273,10 @@ READ8_MEMBER(nes_sunsoft_dcs_device::read_m)
 }
 
 
-static SLOT_INTERFACE_START(ntb_cart)
-	SLOT_INTERFACE_INTERNAL("ntbrom", NES_NTB_ROM)
-SLOT_INTERFACE_END
+static void ntb_cart(device_slot_interface &device)
+{
+	device.option_add_internal("ntbrom", NES_NTB_ROM);
+}
 
 
 

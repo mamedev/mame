@@ -34,18 +34,19 @@ WRITE8_MEMBER(m68307_cpu_device::m68307_internal_serial_w)
 
 
 
-ADDRESS_MAP_START(m68307_cpu_device::m68307_internal_map)
-	AM_RANGE(0x000000f0, 0x000000ff) AM_READWRITE(m68307_internal_base_r, m68307_internal_base_w)
-ADDRESS_MAP_END
+void m68307_cpu_device::m68307_internal_map(address_map &map)
+{
+	map(0x000000f0, 0x000000ff).rw(FUNC(m68307_cpu_device::m68307_internal_base_r), FUNC(m68307_cpu_device::m68307_internal_base_w));
+}
 
 
 MACHINE_CONFIG_START(m68307_cpu_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("internal68681", MC68681, 16000000/4) // ?? Mhz - should be specified in inline config
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_txb))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(m68307_cpu_device, m68307_duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(m68307_cpu_device, m68307_duart_output_w))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, m68307_cpu_device, m68307_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, m68307_cpu_device, m68307_duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, m68307_cpu_device, m68307_duart_txb))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, m68307_cpu_device, m68307_duart_input_r))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, m68307_cpu_device, m68307_duart_output_w))
 MACHINE_CONFIG_END
 
 
@@ -104,66 +105,18 @@ inline int m68307_cpu_device::calc_cs(offs_t address) const
 	return 0;
 }
 
-
-
-uint16_t m68307_cpu_device::simple_read_immediate_16_m68307(offs_t address)
-{
-//  m_m68307_currentcs = calc_cs(address);
-	return m_direct->read_word(address);
-}
-
-uint8_t m68307_cpu_device::read_byte_m68307(offs_t address)
-{
-//  m_m68307_currentcs = calc_cs(address);
-	return m_space->read_byte(address);
-}
-
-uint16_t m68307_cpu_device::read_word_m68307(offs_t address)
-{
-//  m_m68307_currentcs = calc_cs(address);
-	return m_space->read_word(address);
-}
-
-uint32_t m68307_cpu_device::read_dword_m68307(offs_t address)
-{
-//  m_m68307_currentcs = calc_cs(address);
-	return m_space->read_dword(address);
-}
-
-void m68307_cpu_device::write_byte_m68307(offs_t address, uint8_t data)
-{
-//  m_m68307_currentcs = calc_cs(address);
-	m_space->write_byte(address, data);
-}
-
-void m68307_cpu_device::write_word_m68307(offs_t address, uint16_t data)
-{
-//  m_m68307_currentcs = calc_cs(address);
-	m_space->write_word(address, data);
-}
-
-void m68307_cpu_device::write_dword_m68307(offs_t address, uint32_t data)
-{
-//  m_m68307_currentcs = calc_cs(address);
-	m_space->write_dword(address, data);
-}
-
-
-
-
 void m68307_cpu_device::init16_m68307(address_space &space)
 {
 	m_space = &space;
-	m_direct = space.direct<0>();
-	m_opcode_xor = 0;
+	auto cache = space.cache<1, 0, ENDIANNESS_BIG>();
 
-	m_readimm16 = m68k_readimm16_delegate(&m68307_cpu_device::simple_read_immediate_16_m68307, this);
-	m_read8 = m68k_read8_delegate(&m68307_cpu_device::read_byte_m68307, this);
-	m_read16 = m68k_read16_delegate(&m68307_cpu_device::read_word_m68307, this);
-	m_read32 = m68k_read32_delegate(&m68307_cpu_device::read_dword_m68307, this);
-	m_write8 = m68k_write8_delegate(&m68307_cpu_device::write_byte_m68307, this);
-	m_write16 = m68k_write16_delegate(&m68307_cpu_device::write_word_m68307, this);
-	m_write32 = m68k_write32_delegate(&m68307_cpu_device::write_dword_m68307, this);
+	m_readimm16 = [cache](offs_t address) -> u16 { /* m_m68307_currentcs = calc_cs(address); */ return cache->read_word(address); };
+	m_read8   = [this](offs_t address) -> u8     { /* m_m68307_currentcs = calc_cs(address); */ return m_space->read_byte(address); };
+	m_read16  = [this](offs_t address) -> u16    { /* m_m68307_currentcs = calc_cs(address); */ return m_space->read_word(address); };
+	m_read32  = [this](offs_t address) -> u32    { /* m_m68307_currentcs = calc_cs(address); */ return m_space->read_dword(address); };
+	m_write8  = [this](offs_t address, u8 data)  { /* m_m68307_currentcs = calc_cs(address); */ m_space->write_byte(address, data); };
+	m_write16 = [this](offs_t address, u16 data) { /* m_m68307_currentcs = calc_cs(address); */ m_space->write_word(address, data); };
+	m_write32 = [this](offs_t address, u32 data) { /* m_m68307_currentcs = calc_cs(address); */ m_space->write_dword(address, data); };
 }
 
 

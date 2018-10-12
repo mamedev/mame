@@ -6,14 +6,18 @@
 
         2009-12-09 Skeleton driver.
 
-        Chips used: i8275, AM9513, i8085, i8237, i8255, 2x 2651. XTAL 20MHz
+        Chips used: i8275, AM9513, AM8085A-2, i8237, i8255, 2x 2651. XTAL 20MHz
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/am9513.h"
+#include "machine/am9517a.h"
 #include "machine/i8255.h"
+#include "machine/input_merger.h"
+#include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -26,36 +30,60 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	DECLARE_PALETTE_INIT(unistar);
-	uint32_t screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void unistar(machine_config &config);
+private:
+	u8 dma_mem_r(offs_t offset);
+	void dma_mem_w(offs_t offset, u8 data);
+
+	DECLARE_PALETTE_INIT(unistar);
+	I8275_DRAW_CHARACTER_MEMBER(draw_character);
+
 	void unistar_io(address_map &map);
 	void unistar_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
 
 
-ADDRESS_MAP_START(unistar_state::unistar_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-ADDRESS_MAP_END
+u8 unistar_state::dma_mem_r(offs_t offset)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
 
-ADDRESS_MAP_START(unistar_state::unistar_io)
+void unistar_state::dma_mem_w(offs_t offset, u8 data)
+{
+	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+}
+
+void unistar_state::unistar_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x2fff).rom();
+	map(0x8000, 0x97ff).ram();
+}
+
+void unistar_state::unistar_io(address_map &map)
+{
 	//ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE("stc", am9513_device, read8, write8)
-	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	map.global_mask(0xff);
+	map(0x00, 0x0f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x84, 0x84).portr("CONFIG");
+	map(0x8c, 0x8d).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
+	map(0x94, 0x97).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x98, 0x99).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
 	// ports used: 00,02,03(W),08(RW),09,0A,0B,0D,0F(W),80,81(R),82,83(W),84(R),8C,8D(W),94(R),97,98(W),99(RW)
 	// if nonzero returned from port 94, it goes into test mode.
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( unistar )
+	PORT_START("CONFIG")
+	PORT_DIPNAME(0x01, 0x01, "Screen Refresh Rate")
+	PORT_DIPSETTING(0x01, "50 Hz")
+	PORT_DIPSETTING(0x00, "60 Hz")
+	PORT_BIT(0xfe, 0xfe, IPT_UNKNOWN)
 INPUT_PORTS_END
 
 
@@ -70,9 +98,8 @@ PALETTE_INIT_MEMBER( unistar_state, unistar )
 	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
 }
 
-uint32_t unistar_state::screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+I8275_DRAW_CHARACTER_MEMBER(unistar_state::draw_character)
 {
-	return 0;
 }
 
 /* F4 Character Displayer */
@@ -89,34 +116,49 @@ static const gfx_layout unistar_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( unistar )
+static GFXDECODE_START( gfx_unistar )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unistar_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(unistar_state::unistar)
+void unistar_state::unistar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(unistar_mem)
-	MCFG_CPU_IO_MAP(unistar_io)
+	I8085A(config, m_maincpu, 20_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unistar_state::unistar_mem);
+	m_maincpu->set_addrmap(AS_IO, &unistar_state::unistar_io);
 
-	MCFG_DEVICE_ADD("stc", AM9513, XTAL(8'000'000))
-	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("stc", am9513_device, source1_w))
+	INPUT_MERGER_ANY_HIGH(config, "rst75").output_handler().set_inputline(m_maincpu, I8085_RST75_LINE);
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	am9517a_device &dmac(AM9517A(config, "dmac", 20_MHz_XTAL / 4)); // Intel P8237A-5
+	dmac.out_hreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	dmac.out_hreq_callback().append("dmac", FUNC(am9517a_device::hack_w));
+	dmac.out_eop_callback().set("rst75", FUNC(input_merger_device::in_w<1>));
+	dmac.in_memr_callback().set(FUNC(unistar_state::dma_mem_r));
+	dmac.out_memw_callback().set(FUNC(unistar_state::dma_mem_w));
+	dmac.out_iow_callback<2>().set("crtc", FUNC(i8275_device::dack_w));
+
+	am9513_device &stc(AM9513(config, "stc", 8_MHz_XTAL));
+	stc.fout_cb().set("stc", FUNC(am9513_device::source1_w));
+	// TODO: figure out what OUT1-OUT4 should do (timer 5 is unused)
+
+	I8255A(config, "ppi");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unistar_state, screen_update_unistar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(20_MHz_XTAL, 954, 0, 720, 351, 0, 325);
+	//screen.set_raw(20_MHz_XTAL, 990, 0, 720, 405, 0, 375);
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unistar)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(unistar_state, unistar)
-MACHINE_CONFIG_END
+	i8275_device &crtc(I8275(config, "crtc", 20_MHz_XTAL / 9));
+	crtc.set_character_width(9);
+	crtc.set_display_callback(FUNC(unistar_state::draw_character), this);
+	crtc.set_screen("screen");
+	crtc.drq_wr_callback().set("dmac", FUNC(am9517a_device::dreq2_w));
+	crtc.irq_wr_callback().set("rst75", FUNC(input_merger_device::in_w<0>));
+
+	GFXDECODE(config, "gfxdecode", "palette", gfx_unistar);
+	PALETTE(config, "palette", 3).set_init(FUNC(unistar_state::palette_init_unistar));
+}
 
 /* ROM definition */
 ROM_START( unistar )
@@ -131,5 +173,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                FULLNAME                FLAGS
-COMP( 198?, unistar, 0,      0,       unistar,   unistar, unistar_state, 0,    "Callan Data Systems", "Unistar 200 Terminal", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                FULLNAME                FLAGS
+COMP( 198?, unistar, 0,      0,      unistar, unistar, unistar_state, empty_init, "Callan Data Systems", "Unistar 200 Terminal", MACHINE_IS_SKELETON )

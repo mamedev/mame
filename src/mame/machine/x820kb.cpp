@@ -85,13 +85,13 @@ const tiny_rom_entry *xerox_820_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(xerox_820_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8748_TAG, I8048, XTAL(6'000'000))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(xerox_820_keyboard_device, kb_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(xerox_820_keyboard_device, kb_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(xerox_820_keyboard_device, kb_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(xerox_820_keyboard_device, kb_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(xerox_820_keyboard_device, kb_t1_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(xerox_820_keyboard_device, kb_bus_w))
+	MCFG_DEVICE_ADD(I8748_TAG, I8048, XTAL(6'000'000))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, xerox_820_keyboard_device, kb_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, xerox_820_keyboard_device, kb_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, xerox_820_keyboard_device, kb_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, xerox_820_keyboard_device, kb_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, xerox_820_keyboard_device, kb_t1_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, xerox_820_keyboard_device, kb_bus_w))
 MACHINE_CONFIG_END
 
 

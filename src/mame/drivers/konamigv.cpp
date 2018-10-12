@@ -135,6 +135,7 @@ Notes:
 #include "sound/cdda.h"
 #include "sound/spu.h"
 #include "video/psx.h"
+#include "screen.h"
 #include "speaker.h"
 #include "cdrom.h"
 
@@ -143,94 +144,117 @@ class konamigv_state : public driver_device
 {
 public:
 	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_am53cf96(*this, "am53cf96"),
-		m_btc_trackball(*this, "upd%u", 1),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_am53cf96(*this, "am53cf96")
+		, m_btc_trackball(*this, "upd%u", 1)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
-	DECLARE_READ16_MEMBER(flash_r);
-	DECLARE_WRITE16_MEMBER(flash_w);
-	DECLARE_WRITE16_MEMBER(btc_trackball_w);
-	DECLARE_READ16_MEMBER(tokimeki_serial_r);
-	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
-	DECLARE_DRIVER_INIT(simpbowl);
-	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-
-	static void cdrom_config(device_t *device);
 	void tmosh(machine_config &config);
-	void simpbowl(machine_config &config);
 	void kdeadeye(machine_config &config);
 	void btchamp(machine_config &config);
 	void konamigv(machine_config &config);
+
+protected:
+	void konamigv_map(address_map &map);
+
+	virtual void machine_start() override;
+
+	DECLARE_WRITE16_MEMBER(btc_trackball_w);
+	DECLARE_READ16_MEMBER(tokimeki_serial_r);
+	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
+	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+
 	void btchamp_map(address_map &map);
 	void kdeadeye_map(address_map &map);
-	void konamigv_map(address_map &map);
-	void simpbowl_map(address_map &map);
 	void tmosh_map(address_map &map);
-protected:
-	virtual void driver_start() override;
 
-private:
+	static void cdrom_config(device_t *device);
+
 	required_device<am53cf96_device> m_am53cf96;
 	optional_device_array<upd4701_device, 2> m_btc_trackball;
-
-	uint32_t m_flash_address;
-
-	fujitsu_29f016a_device *m_flash8[4];
 
 	uint8_t m_sector_buffer[ 4096 ];
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(konamigv_state::konamigv_map)
-	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
-	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
-	AM_RANGE(0x1f100008, 0x1f10000b) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x1f680000, 0x1f68001f) AM_DEVREADWRITE8("mb89371", mb89371_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
-ADDRESS_MAP_END
+class simpbowl_state : public konamigv_state
+{
+public:
+	simpbowl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: konamigv_state(mconfig, type, tag)
+		, m_flash8(*this, "flash%u", 0)
+	{
+	}
 
-ADDRESS_MAP_START(konamigv_state::simpbowl_map)
-	AM_IMPORT_FROM( konamigv_map )
+	void simpbowl(machine_config &config);
 
-	AM_RANGE(0x1f680080, 0x1f68008f) AM_READWRITE16(flash_r, flash_w, 0xffffffff)
-	AM_RANGE(0x1f6800c0, 0x1f6800c7) AM_DEVREAD8("upd", upd4701_device, read_xy, 0xff00ff00)
-	AM_RANGE(0x1f6800c8, 0x1f6800cb) AM_DEVREAD8("upd", upd4701_device, reset_xy, 0x0000ff00)
-ADDRESS_MAP_END
+private:
+	virtual void machine_start() override;
 
-ADDRESS_MAP_START(konamigv_state::btchamp_map)
-	AM_IMPORT_FROM( konamigv_map )
+	DECLARE_READ16_MEMBER(flash_r);
+	DECLARE_WRITE16_MEMBER(flash_w);
 
-	AM_RANGE(0x1f380000, 0x1f3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
-	AM_RANGE(0x1f680080, 0x1f680087) AM_DEVREAD8("upd1", upd4701_device, read_xy, 0xff00ff00)
-	AM_RANGE(0x1f680080, 0x1f680087) AM_DEVREAD8("upd2", upd4701_device, read_xy, 0x00ff00ff)
-	AM_RANGE(0x1f680088, 0x1f68008b) AM_WRITE16(btc_trackball_w, 0x0000ffff)
-	AM_RANGE(0x1f6800e0, 0x1f6800e3) AM_WRITENOP
-ADDRESS_MAP_END
+	void simpbowl_map(address_map &map);
 
-ADDRESS_MAP_START(konamigv_state::kdeadeye_map)
-	AM_IMPORT_FROM( konamigv_map )
+	required_device_array<fujitsu_29f016a_device, 4> m_flash8;
 
-	AM_RANGE(0x1f380000, 0x1f3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
-	AM_RANGE(0x1f680080, 0x1f680083) AM_READ_PORT("GUNX1")
-	AM_RANGE(0x1f680090, 0x1f680093) AM_READ_PORT("GUNY1")
-	AM_RANGE(0x1f6800a0, 0x1f6800a3) AM_READ_PORT("GUNX2")
-	AM_RANGE(0x1f6800b0, 0x1f6800b3) AM_READ_PORT("GUNY2")
-	AM_RANGE(0x1f6800c0, 0x1f6800c3) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0x1f6800e0, 0x1f6800e3) AM_WRITENOP
-ADDRESS_MAP_END
+	uint32_t m_flash_address;
+};
 
-ADDRESS_MAP_START(konamigv_state::tmosh_map)
-	AM_IMPORT_FROM( konamigv_map )
+void konamigv_state::konamigv_map(address_map &map)
+{
+	map(0x1f000000, 0x1f00001f).rw(m_am53cf96, FUNC(am53cf96_device::read), FUNC(am53cf96_device::write)).umask32(0x00ff00ff);
+	map(0x1f100000, 0x1f100003).portr("P1");
+	map(0x1f100004, 0x1f100007).portr("P2");
+	map(0x1f100008, 0x1f10000b).portr("P3_P4");
+	map(0x1f180000, 0x1f180003).portw("EEPROMOUT");
+	map(0x1f680000, 0x1f68001f).rw("mb89371", FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
+	map(0x1f780000, 0x1f780003).nopw(); /* watchdog? */
+}
 
-	AM_RANGE(0x1f680080, 0x1f680083) AM_READ16(tokimeki_serial_r, 0x0000ffff)
-	AM_RANGE(0x1f680090, 0x1f680093) AM_WRITE16(tokimeki_serial_w, 0x0000ffff)
-ADDRESS_MAP_END
+void simpbowl_state::simpbowl_map(address_map &map)
+{
+	konamigv_map(map);
+
+	map(0x1f680080, 0x1f68008f).rw(FUNC(simpbowl_state::flash_r), FUNC(simpbowl_state::flash_w));
+	map(0x1f6800c0, 0x1f6800c7).r("upd", FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
+	map(0x1f6800c9, 0x1f6800c9).r("upd", FUNC(upd4701_device::reset_xy_r));
+}
+
+void konamigv_state::btchamp_map(address_map &map)
+{
+	konamigv_map(map);
+
+	map(0x1f380000, 0x1f3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0x1f680080, 0x1f680087).r(m_btc_trackball[0], FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
+	map(0x1f680080, 0x1f680087).r(m_btc_trackball[1], FUNC(upd4701_device::read_xy)).umask32(0x00ff00ff);
+	map(0x1f680088, 0x1f680089).w(FUNC(konamigv_state::btc_trackball_w));
+	map(0x1f6800e0, 0x1f6800e3).nopw();
+}
+
+void konamigv_state::kdeadeye_map(address_map &map)
+{
+	konamigv_map(map);
+
+	map(0x1f380000, 0x1f3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0x1f680080, 0x1f680083).portr("GUNX1");
+	map(0x1f680090, 0x1f680093).portr("GUNY1");
+	map(0x1f6800a0, 0x1f6800a3).portr("GUNX2");
+	map(0x1f6800b0, 0x1f6800b3).portr("GUNY2");
+	map(0x1f6800c0, 0x1f6800c3).portr("BUTTONS");
+	map(0x1f6800e0, 0x1f6800e3).nopw();
+}
+
+void konamigv_state::tmosh_map(address_map &map)
+{
+	konamigv_map(map);
+
+	map(0x1f680080, 0x1f680081).r(FUNC(konamigv_state::tokimeki_serial_r));
+	map(0x1f680090, 0x1f680091).w(FUNC(konamigv_state::tokimeki_serial_w));
+}
 
 /* SCSI */
 
@@ -312,46 +336,54 @@ void konamigv_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, i
 	}
 }
 
-void konamigv_state::driver_start()
+void konamigv_state::machine_start()
 {
 	save_item(NAME(m_sector_buffer));
+}
+
+void simpbowl_state::machine_start()
+{
+	konamigv_state::machine_start();
 	save_item(NAME(m_flash_address));
 }
 
 void konamigv_state::cdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
 MACHINE_CONFIG_START(konamigv_state::konamigv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( konamigv_map )
+	MCFG_DEVICE_ADD( "maincpu", CXD8530BQ, XTAL(67'737'600) )
+	MCFG_DEVICE_PROGRAM_MAP( konamigv_map )
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this ) )
 
 	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
-	MCFG_DEVICE_ADD("am53cf96", AM53CF96, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
+	AM53CF96(config, m_am53cf96, 0);
+	m_am53cf96->set_scsi_port("scsi");
+	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.75 )
@@ -374,7 +406,7 @@ static INPUT_PORTS_START( konamigv )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00001000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "eeprom", eeprom_serial_93cxx_device, do_read )
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "eeprom", eeprom_serial_93cxx_device, do_read )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -425,7 +457,7 @@ INPUT_PORTS_END
 
 /* Simpsons Bowling */
 
-READ16_MEMBER(konamigv_state::flash_r)
+READ16_MEMBER(simpbowl_state::flash_r)
 {
 	if (offset == 4)   // set odd address
 	{
@@ -436,8 +468,8 @@ READ16_MEMBER(konamigv_state::flash_r)
 	{
 		int chip = (m_flash_address >= 0x200000) ? 2 : 0;
 
-		int ret = ( m_flash8[chip]->read(m_flash_address & 0x1fffff) & 0xff ) |
-			( m_flash8[chip+1]->read(m_flash_address & 0x1fffff) << 8 );
+		int ret = ( m_flash8[chip]->read(space, m_flash_address & 0x1fffff) & 0xff ) |
+			( m_flash8[chip+1]->read(space, m_flash_address & 0x1fffff) << 8 );
 
 		m_flash_address++;
 
@@ -447,7 +479,7 @@ READ16_MEMBER(konamigv_state::flash_r)
 	return 0;
 }
 
-WRITE16_MEMBER(konamigv_state::flash_w)
+WRITE16_MEMBER(simpbowl_state::flash_w)
 {
 	int chip;
 
@@ -455,8 +487,8 @@ WRITE16_MEMBER(konamigv_state::flash_w)
 	{
 		case 0:
 			chip = (m_flash_address >= 0x200000) ? 2 : 0;
-			m_flash8[chip]->write(m_flash_address & 0x1fffff, data&0xff);
-			m_flash8[chip+1]->write(m_flash_address & 0x1fffff, (data>>8)&0xff);
+			m_flash8[chip]->write(space, m_flash_address & 0x1fffff, data&0xff);
+			m_flash8[chip+1]->write(space, m_flash_address & 0x1fffff, (data>>8)&0xff);
 			break;
 
 		case 1:
@@ -476,27 +508,19 @@ WRITE16_MEMBER(konamigv_state::flash_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
-{
-	m_flash8[0] = machine().device<fujitsu_29f016a_device>("flash0");
-	m_flash8[1] = machine().device<fujitsu_29f016a_device>("flash1");
-	m_flash8[2] = machine().device<fujitsu_29f016a_device>("flash2");
-	m_flash8[3] = machine().device<fujitsu_29f016a_device>("flash3");
-}
-
-MACHINE_CONFIG_START(konamigv_state::simpbowl)
+MACHINE_CONFIG_START(simpbowl_state::simpbowl)
 	konamigv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( simpbowl_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( simpbowl_map )
 
-	MCFG_FUJITSU_29F016A_ADD("flash0")
-	MCFG_FUJITSU_29F016A_ADD("flash1")
-	MCFG_FUJITSU_29F016A_ADD("flash2")
-	MCFG_FUJITSU_29F016A_ADD("flash3")
+	FUJITSU_29F016A(config, "flash0");
+	FUJITSU_29F016A(config, "flash1");
+	FUJITSU_29F016A(config, "flash2");
+	FUJITSU_29F016A(config, "flash3");
 
-	MCFG_DEVICE_ADD("upd", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK0_X")
-	MCFG_UPD4701_PORTY("TRACK0_Y")
+	upd4701_device &upd(UPD4701A(config, "upd"));
+	upd.set_portx_tag("TRACK0_X");
+	upd.set_porty_tag("TRACK0_Y");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( simpbowl )
@@ -526,18 +550,18 @@ WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 
 MACHINE_CONFIG_START(konamigv_state::btchamp)
 	konamigv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( btchamp_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( btchamp_map )
 
-	MCFG_SHARP_LH28F400_ADD("flash")
+	SHARP_LH28F400(config, "flash");
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK0_X")
-	MCFG_UPD4701_PORTY("TRACK0_Y")
+	UPD4701A(config, m_btc_trackball[0]);
+	m_btc_trackball[0]->set_portx_tag("TRACK0_X");
+	m_btc_trackball[0]->set_porty_tag("TRACK0_Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	UPD4701A(config, m_btc_trackball[1]);
+	m_btc_trackball[1]->set_portx_tag("TRACK1_X");
+	m_btc_trackball[1]->set_porty_tag("TRACK1_Y");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( btchamp )
@@ -584,8 +608,8 @@ WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
 
 MACHINE_CONFIG_START(konamigv_state::tmosh)
 	konamigv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( tmosh_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( tmosh_map )
 MACHINE_CONFIG_END
 
 /*
@@ -600,10 +624,10 @@ CD:
 
 MACHINE_CONFIG_START(konamigv_state::kdeadeye)
 	konamigv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( kdeadeye_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( kdeadeye_map )
 
-	MCFG_SHARP_LH28F400_ADD("flash")
+	SHARP_LH28F400(config, "flash");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kdeadeye )
@@ -825,19 +849,19 @@ ROM_START( tmoshspa )
 ROM_END
 
 /* BIOS placeholder */
-GAME( 1995, konamigv, 0,        konamigv, konamigv, konamigv_state, 0,        ROT0, "Konami", "Baby Phoenix/GV System", MACHINE_IS_BIOS_ROOT )
+GAME( 1995, konamigv, 0,        konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Baby Phoenix/GV System", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, powyak96, konamigv, konamigv, konamigv, konamigv_state, 0,        ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu '96 (GV017 Japan 1.03)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv_state, 0,        ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, konamigv_state, 0,        ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, 0,        ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  konamigv_state, 0,        ROT0, "Konami", "Beat the Champ (GV053 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, konamigv_state, 0,        ROT0, "Konami", "Dead Eye (GV054 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, weddingr, konamigv, konamigv, weddingr, konamigv_state, 0,        ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, tmosh,    konamigv, tmosh,    konamigv, konamigv_state, 0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GQ673 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, tmoshs,   konamigv, tmosh,    konamigv, konamigv_state, 0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version (GE755 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, tmoshsp,  konamigv, tmosh,    konamigv, konamigv_state, 0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, tmoshspa, tmoshsp,  tmosh,    konamigv, konamigv_state, 0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, 0,        ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, 0,        ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, konamigv_state, simpbowl, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1996, powyak96, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu '96 (GV017 Japan 1.03)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  konamigv_state, empty_init, ROT0, "Konami", "Beat the Champ (GV053 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, konamigv_state, empty_init, ROT0, "Konami", "Dead Eye (GV054 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, weddingr, konamigv, konamigv, weddingr, konamigv_state, empty_init, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, tmosh,    konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GQ673 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, tmoshs,   konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version (GE755 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, tmoshsp,  konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, tmoshspa, tmoshsp,  tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl_state, empty_init, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

@@ -9,7 +9,7 @@
 #include "video/vector.h"
 
 #define MCFG_AVGDVG_VECTOR(_tag) \
-	downcast<avgdvg_device &>(*device).set_vector_tag("^" _tag);
+	downcast<avgdvg_device &>(*device).set_vector_tag(_tag);
 
 // ======================> avgdvg_device
 

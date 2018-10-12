@@ -70,26 +70,10 @@
 #include "machine/taitoio.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "screen.h"
-
-
-/***********************************************************
-                INTERRUPTS
-***********************************************************/
-
-void groundfx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_GROUNDFX_INTERRUPT5:
-		m_maincpu->set_input_line(5, HOLD_LINE); //from 5... ADC port
-		break;
-	default:
-		assert_always(false, "Unknown id in groundfx_state::device_timer");
-	}
-}
 
 
 /**********************************************************
@@ -109,18 +93,6 @@ WRITE8_MEMBER(groundfx_state::coin_word_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-READ32_MEMBER(groundfx_state::adc_r)
-{
-	return (ioport("AN0")->read() << 8) | ioport("AN1")->read();
-}
-
-WRITE32_MEMBER(groundfx_state::adc_w)
-{
-	/* One interrupt per input port (4 per frame, though only 2 used).
-	    1000 cycle delay is arbitrary */
-	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(1000));
-}
-
 WRITE32_MEMBER(groundfx_state::rotate_control_w)/* only a guess that it's rotation */
 {
 		if (ACCESSING_BITS_0_15)
@@ -134,7 +106,6 @@ WRITE32_MEMBER(groundfx_state::rotate_control_w)/* only a guess that it's rotati
 			m_port_sel = (data &0x70000) >> 16;
 		}
 }
-
 
 WRITE32_MEMBER(groundfx_state::motor_control_w)
 {
@@ -152,28 +123,30 @@ WRITE32_MEMBER(groundfx_state::motor_control_w)
 */
 }
 
+
 /***********************************************************
              MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(groundfx_state::groundfx_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram") /* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
-	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)  /* gun vibration */
-	AM_RANGE(0x500000, 0x500007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
-	AM_RANGE(0x600000, 0x600003) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)      /* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)  // debugging
-	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)    /* 6bpp tilemaps */
-	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM                     // ?? single bytes, blending ??
-	AM_RANGE(0xc00000, 0xc00007) AM_READNOP /* Network? */
-	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w) /* perhaps port based rotate control? */
+void groundfx_state::groundfx_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x21ffff).ram().share("ram"); /* main CPUA ram */
+	map(0x300000, 0x303fff).ram().share("spriteram"); /* sprite ram */
+	map(0x400000, 0x400003).w(FUNC(groundfx_state::motor_control_w));  /* gun vibration */
+	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
+	map(0x600000, 0x600007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
+	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));      /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));  // debugging
+	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));    /* 6bpp tilemaps */
+	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
+	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xb00000, 0xb003ff).ram();                     // ?? single bytes, blending ??
+	map(0xc00000, 0xc00007).nopr(); /* Network? */
+	map(0xd00000, 0xd00003).w(FUNC(groundfx_state::rotate_control_w)); /* perhaps port based rotate control? */
 	/* f00000 is seat control? */
-ADDRESS_MAP_END
+}
 
 /***********************************************************
              INPUT PORTS (dips in eprom)
@@ -181,11 +154,11 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( groundfx )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )      /* shift hi */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )      /* brake */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shift Hi")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Brake")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )      /* shift low */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Low")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -200,17 +173,11 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN0")   /* IN 2, steering wheel */
+	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("AN1")   /* IN 3, accel */
+	PORT_START("ACCEL")
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("AN2")   /* IN 4, sound volume */
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
-
-	PORT_START("AN3")   /* IN 5, unknown */
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 /**********************************************************
@@ -251,7 +218,7 @@ static const gfx_layout scclayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( groundfx )
+static GFXDECODE_START( gfx_groundfx )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  4096, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
 	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
@@ -271,21 +238,28 @@ INTERRUPT_GEN_MEMBER(groundfx_state::interrupt)
 MACHINE_CONFIG_START(groundfx_state::groundfx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(groundfx_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", groundfx_state, interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(groundfx_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", groundfx_state, interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("BUTTONS"))
-	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_INPUT(READLINE(groundfx_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
-	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(groundfx_state, coin_word_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
+	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set_inputline("maincpu", 5);
+	adc.in_callback<0>().set_constant(0); // unknown
+	adc.in_callback<1>().set_constant(0); // unknown (used to be labeled 'volume' - but doesn't seem to affect it
+	adc.in_callback<2>().set_ioport("WHEEL");
+	adc.in_callback<3>().set_ioport("ACCEL");
+
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_2_callback().set_ioport("BUTTONS");
+	tc0510nio.read_3_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
+	tc0510nio.read_3_callback().append(FUNC(groundfx_state::frame_counter_r)).lshift(0);
+	tc0510nio.write_3_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
+	tc0510nio.write_3_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	tc0510nio.write_3_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
+	tc0510nio.write_4_callback().set(FUNC(groundfx_state::coin_word_w));
+	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -296,7 +270,7 @@ MACHINE_CONFIG_START(groundfx_state::groundfx)
 	MCFG_SCREEN_UPDATE_DRIVER(groundfx_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", groundfx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_groundfx)
 	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -382,19 +356,17 @@ READ32_MEMBER(groundfx_state::irq_speedup_r)
 }
 
 
-DRIVER_INIT_MEMBER(groundfx_state,groundfx)
+void groundfx_state::init_groundfx()
 {
 	uint8_t *gfx = memregion("gfx3")->base();
-	int size=memregion("gfx3")->bytes();
-
-	m_interrupt5_timer = timer_alloc(TIMER_GROUNDFX_INTERRUPT5);
+	int size = memregion("gfx3")->bytes();
 
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r),this));
 
 	/* make SCC tile GFX format suitable for gfxdecode */
 	uint32_t offset = size/2;
-	for (uint32_t i = size/2+size/4; i<size; i++)
+	for (uint32_t i = size/2 + size/4; i < size; i++)
 	{
 		/* Expand 2bits into 4bits format */
 		int data = gfx[i];
@@ -412,4 +384,4 @@ DRIVER_INIT_MEMBER(groundfx_state,groundfx)
 }
 
 
-GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx_state, groundfx, ROT0, "Taito Corporation", "Ground Effects / Super Ground Effects (Japan)", MACHINE_NODEVICE_LAN )
+GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx_state, init_groundfx, ROT0, "Taito Corporation", "Ground Effects / Super Ground Effects (Japan)", MACHINE_NODEVICE_LAN )

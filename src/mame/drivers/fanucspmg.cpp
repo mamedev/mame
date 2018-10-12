@@ -585,6 +585,12 @@ public:
 		, m_chargen(*this, CHARGEN_TAG)
 	{ }
 
+	void fanucspmgm(machine_config &config);
+	void fanucspmg(machine_config &config);
+
+	void init_fanucspmg();
+
+private:
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i8085a_cpu_device> m_subcpu;
 	required_device<i8251_device> m_usart0;
@@ -631,17 +637,13 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_mono);
 
-	DECLARE_DRIVER_INIT(fanucspmg);
-
 	uint8_t m_vram[24576];
 	uint8_t m_video_ctrl;
 
-	void fanucspmgm(machine_config &config);
-	void fanucspmg(machine_config &config);
 	void maincpu_io(address_map &map);
 	void maincpu_mem(address_map &map);
 	void subcpu_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	int32_t m_vram_bank;
 	uint8_t m_vbl_ctrl;
@@ -650,7 +652,7 @@ private:
 	uint8_t m_dma_page;
 };
 
-DRIVER_INIT_MEMBER(fanucspmg_state, fanucspmg)
+void fanucspmg_state::init_fanucspmg()
 {
 	memset(m_vram, 0, sizeof(m_vram));
 
@@ -716,35 +718,33 @@ READ16_MEMBER(fanucspmg_state::magic_r)
 	return 0x0041;  // 31 = memory error
 }
 
-ADDRESS_MAP_START(fanucspmg_state::maincpu_mem)
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM   // main RAM
+void fanucspmg_state::maincpu_mem(address_map &map)
+{
+	map(0x00000, 0x7ffff).ram();   // main RAM
 
-	AM_RANGE(0x80000, 0x81fff) AM_RAM   // believed to be shared RAM with a CPU inside the Program File
-	AM_RANGE(0x88000, 0x88001) AM_NOP   // Program File "ready" bit
+	map(0x80000, 0x81fff).ram();   // believed to be shared RAM with a CPU inside the Program File
+	map(0x88000, 0x88001).noprw();   // Program File "ready" bit
 
-	AM_RANGE(0xf0000, 0xf0003) AM_DEVREADWRITE8(PIC0_TAG, pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0xf0004, 0xf0007) AM_DEVICE8(FDC_TAG, upd765a_device, map, 0x00ff)
-	AM_RANGE(0xf0008, 0xf000f) AM_DEVREADWRITE8(PIT0_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0xf0010, 0xf0011) AM_DEVREADWRITE8(USART0_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf0012, 0xf0013) AM_DEVREADWRITE8(USART0_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xf0014, 0xf0015) AM_DEVREADWRITE8(USART1_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf0016, 0xf0017) AM_DEVREADWRITE8(USART1_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xf0018, 0xf0019) AM_DEVREADWRITE8(USART2_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf001a, 0xf001b) AM_DEVREADWRITE8(USART2_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xf001c, 0xf001d) AM_DEVREADWRITE8(USART3_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf001e, 0xf001f) AM_DEVREADWRITE8(USART3_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xf0020, 0xf0029) AM_DEVREADWRITE8(DMAC_TAG, i8257_device, read, write, 0xffff)
-	AM_RANGE(0xf0042, 0xf0043) AM_READ(magic_r)
-	AM_RANGE(0xf0046, 0xf0047) AM_WRITE8(dma_page_w, 0x00ff)
-	AM_RANGE(0xf0048, 0xf004f) AM_DEVREADWRITE8(PIT1_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0xf2000, 0xf2003) AM_DEVREADWRITE8(PIC1_TAG, pic8259_device, read, write, 0x00ff)
+	map(0xf0000, 0xf0003).rw(m_pic0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0xf0004, 0xf0007).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0xf0008, 0xf000f).rw(m_pit0, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xf0010, 0xf0013).rw(m_usart0, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf0014, 0xf0017).rw(m_usart1, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf0018, 0xf001b).rw(m_usart2, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf001c, 0xf001f).rw(m_usart3, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf0020, 0xf0029).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0xf0042, 0xf0043).r(FUNC(fanucspmg_state::magic_r));
+	map(0xf0046, 0xf0046).w(FUNC(fanucspmg_state::dma_page_w));
+	map(0xf0048, 0xf004f).rw(m_pit1, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xf2000, 0xf2003).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xf8000, 0xf9fff) AM_READWRITE8(shared_r, shared_w, 0xffff)
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(MAINCPU_TAG, 0)
-ADDRESS_MAP_END
+	map(0xf8000, 0xf9fff).rw(FUNC(fanucspmg_state::shared_r), FUNC(fanucspmg_state::shared_w));
+	map(0xfc000, 0xfffff).rom().region(MAINCPU_TAG, 0);
+}
 
-ADDRESS_MAP_START(fanucspmg_state::maincpu_io)
-ADDRESS_MAP_END
+void fanucspmg_state::maincpu_io(address_map &map)
+{
+}
 
 WRITE_LINE_MEMBER(fanucspmg_state::vsync_w)
 {
@@ -817,24 +817,25 @@ WRITE8_MEMBER(fanucspmg_state::video_ctrl_w)
 	m_video_ctrl = data;
 }
 
-ADDRESS_MAP_START(fanucspmg_state::subcpu_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(SUBCPU_TAG, 0)
+void fanucspmg_state::subcpu_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region(SUBCPU_TAG, 0);
 
-	AM_RANGE(0x4000, 0x45ff) AM_READWRITE(vram1_r, vram1_w)
-	AM_RANGE(0x4800, 0x4dff) AM_READWRITE(vram2_r, vram2_w)
+	map(0x4000, 0x45ff).rw(FUNC(fanucspmg_state::vram1_r), FUNC(fanucspmg_state::vram1_w));
+	map(0x4800, 0x4dff).rw(FUNC(fanucspmg_state::vram2_r), FUNC(fanucspmg_state::vram2_w));
 
-	AM_RANGE(0x5000, 0x5000) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, status_r, address_w)
-	AM_RANGE(0x5001, 0x5001) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0x5008, 0x5008) AM_WRITE(keyboard_row_w)
-	AM_RANGE(0x5009, 0x5009) AM_READ(keyboard_r)
-	AM_RANGE(0x500a, 0x500b) AM_WRITENOP    // keyboard rows 2 and 3 control what's written here.  dip switches?
-	AM_RANGE(0x500c, 0x500c) AM_WRITE(vbl_ctrl_w)
-	AM_RANGE(0x500d, 0x500d) AM_WRITE(vram_bank_w)
-	AM_RANGE(0x500e, 0x500e) AM_READ(vblank_ack_r)
-	AM_RANGE(0x5018, 0x5018) AM_WRITE(video_ctrl_w)
+	map(0x5000, 0x5000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x5001, 0x5001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x5008, 0x5008).w(FUNC(fanucspmg_state::keyboard_row_w));
+	map(0x5009, 0x5009).r(FUNC(fanucspmg_state::keyboard_r));
+	map(0x500a, 0x500b).nopw();    // keyboard rows 2 and 3 control what's written here.  dip switches?
+	map(0x500c, 0x500c).w(FUNC(fanucspmg_state::vbl_ctrl_w));
+	map(0x500d, 0x500d).w(FUNC(fanucspmg_state::vram_bank_w));
+	map(0x500e, 0x500e).r(FUNC(fanucspmg_state::vblank_ack_r));
+	map(0x5018, 0x5018).w(FUNC(fanucspmg_state::video_ctrl_w));
 
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE(SHARED_TAG) // shared RAM
-ADDRESS_MAP_END
+	map(0xe000, 0xffff).ram().share(SHARED_TAG); // shared RAM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( fanucspmg )
@@ -952,9 +953,10 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
 	}
 }
 
-static SLOT_INTERFACE_START( fanuc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void fanuc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
@@ -962,21 +964,21 @@ FLOPPY_FORMATS_END
 
 MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL(15'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
-	MCFG_CPU_IO_MAP(maincpu_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(PIC0_TAG, pic8259_device, inta_cb)
-	MCFG_I8086_ESC_OPCODE_HANDLER(DEVWRITE32("i8087", i8087_device, insn_w))
-	MCFG_I8086_ESC_DATA_HANDLER(DEVWRITE32("i8087", i8087_device, addr_w))
-
-	MCFG_DEVICE_ADD("i8087", I8087, XTAL(15'000'000)/3)
+	MCFG_DEVICE_ADD(MAINCPU_TAG, I8086, XTAL(15'000'000)/3)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
-	MCFG_I8087_DATA_WIDTH(16)
-	//MCFG_I8087_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))  // TODO: presumably this is connected to the pic
-	MCFG_I8087_BUSY_HANDLER(INPUTLINE("maincpu", INPUT_LINE_TEST))
+	MCFG_DEVICE_IO_MAP(maincpu_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(PIC0_TAG, pic8259_device, inta_cb)
+	MCFG_I8086_ESC_OPCODE_HANDLER(WRITE32("i8087", i8087_device, insn_w))
+	MCFG_I8086_ESC_DATA_HANDLER(WRITE32("i8087", i8087_device, addr_w))
 
-	MCFG_CPU_ADD(SUBCPU_TAG, I8085A, XTAL(16'000'000)/2/2)
-	MCFG_CPU_PROGRAM_MAP(subcpu_mem)
+	i8087_device &i8087(I8087(config, "i8087", XTAL(15'000'000)/3));
+	i8087.set_addrmap(AS_PROGRAM, &fanucspmg_state::maincpu_mem);
+	i8087.set_data_width(16);
+	//i8087.irq().set_inputline("maincpu", INPUT_LINE_NMI);  // TODO: presumably this is connected to the pic
+	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
+
+	MCFG_DEVICE_ADD(SUBCPU_TAG, I8085A, XTAL(16'000'000)/2/2)
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem)
 
 	MCFG_DEVICE_ADD(USART0_TAG, I8251, 0)
 	MCFG_DEVICE_ADD(USART1_TAG, I8251, 0)
@@ -992,26 +994,26 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12)
 	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12)
 
-	MCFG_DEVICE_ADD(DMAC_TAG, I8257, XTAL(15'000'000) / 5)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(fanucspmg_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(fanucspmg_state, tc_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(fanucspmg_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(fanucspmg_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8(fanucspmg_state, fdcdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(fanucspmg_state, fdcdma_w))
+	I8257(config, m_dmac, XTAL(15'000'000) / 5);
+	m_dmac->out_hrq_cb().set(FUNC(fanucspmg_state::hrq_w));
+	m_dmac->out_tc_cb().set(FUNC(fanucspmg_state::tc_w));
+	m_dmac->in_memr_cb().set(FUNC(fanucspmg_state::memory_read_byte));
+	m_dmac->out_memw_cb().set(FUNC(fanucspmg_state::memory_write_byte));
+	m_dmac->in_ior_cb<0>().set(FUNC(fanucspmg_state::fdcdma_r));
+	m_dmac->out_iow_cb<0>().set(FUNC(fanucspmg_state::fdcdma_w));
 
 	MCFG_DEVICE_ADD(PIC0_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(fanucspmg_state, get_slave_ack))
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, fanucspmg_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD(PIC1_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(PIC0_TAG, pic8259_device, ir7_w))
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
-	MCFG_UPD765A_ADD(FDC_TAG, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(PIC0_TAG, pic8259_device, ir3_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(DMAC_TAG, i8257_device, dreq0_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(m_pic0, FUNC(pic8259_device::ir3_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 
@@ -1023,7 +1025,7 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fanucspmg_state::fanucspmgm)
@@ -1034,7 +1036,7 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmgm)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row_mono)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -1063,6 +1065,6 @@ ROM_START( fanucspgm )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT       COMPANY  FULLNAME                         FLAGS
-COMP( 1983, fanucspg,  0,        0,      fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1983, fanucspgm, fanucspg, 0,      fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT            COMPANY  FULLNAME                         FLAGS
+COMP( 1983, fanucspg,  0,        0,      fanucspmg,  fanucspmg, fanucspmg_state, init_fanucspmg, "Fanuc", "System P Model G",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, fanucspgm, fanucspg, 0,      fanucspmgm, fanucspmg, fanucspmg_state, init_fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

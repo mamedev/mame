@@ -45,15 +45,18 @@ public:
 		: novagbase_state(mconfig, type, tag)
 	{ }
 
+	void presto(machine_config &config);
+	void octo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq);
+
+private:
 	// Presto/Octo
 	DECLARE_WRITE8_MEMBER(presto_mux_w);
 	DECLARE_WRITE8_MEMBER(presto_control_w);
 	DECLARE_READ8_MEMBER(presto_input_r);
 	DECLARE_MACHINE_RESET(octo);
-	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq);
 	void octo_set_cpu_freq();
-	void presto(machine_config &config);
-	void octo(machine_config &config);
 };
 
 
@@ -147,26 +150,26 @@ INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
 MACHINE_CONFIG_START(novagmcs48_state::presto)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8049, 6000000) // LC circuit, measured 6MHz
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(novagmcs48_state, presto_input_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(novagmcs48_state, presto_control_w))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(novagmcs48_state, presto_mux_w))
+	MCFG_DEVICE_ADD("maincpu", I8049, 6000000) // LC circuit, measured 6MHz
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, novagmcs48_state, presto_input_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, novagmcs48_state, presto_control_w))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, novagmcs48_state, presto_mux_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_presto)
+	config.set_default_layout(layout_novag_presto);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(novagmcs48_state::octo)
 	presto(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(12000000) // LC circuit, measured, see octo_set_cpu_freq
 
 	MCFG_MACHINE_RESET_OVERRIDE(novagmcs48_state, octo)
@@ -194,6 +197,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT  CMP MACHINE  INPUT    STATE          INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1984, npresto,  0,       0, presto,  presto,  novagmcs48_state, 0, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, nocto,    npresto, 0, octo,    octo,    novagmcs48_state, 0, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS             INIT        COMPANY  FULLNAME          FLAGS
+CONS( 1984, npresto, 0,       0,      presto,  presto, novagmcs48_state, empty_init, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, nocto,   npresto, 0,      octo,    octo,   novagmcs48_state, empty_init, "Novag", "Octo (Novag)",   MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

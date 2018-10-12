@@ -163,6 +163,7 @@
 
 static const int clock_divisors[3] = {1, DIV_64, DIV_15};
 
+constexpr unsigned pokey_device::FREQ_17_EXACT;
 
 
 
@@ -200,8 +201,6 @@ void pokey_device::device_start()
 {
 	//int sample_rate = clock();
 	int i;
-
-	m_clock_period = attotime::from_hz(clock());
 
 	/* Setup channels */
 	for (i=0; i<POKEY_CHANNELS; i++)
@@ -291,16 +290,11 @@ void pokey_device::device_start()
 		save_item(NAME(m_channel[i].m_AUDC), i);
 	}
 
-	save_item(NAME(m_divisor));
 	save_item(NAME(m_clock_cnt));
 	save_item(NAME(m_p4));
 	save_item(NAME(m_p5));
 	save_item(NAME(m_p9));
 	save_item(NAME(m_p17));
-	save_item(NAME(m_pot_counter));
-	save_item(NAME(m_kbd_cnt));
-	save_item(NAME(m_kbd_latch));
-	save_item(NAME(m_kbd_state));
 
 	save_item(NAME(m_POTx));
 	save_item(NAME(m_AUDCTL));
@@ -312,6 +306,11 @@ void pokey_device::device_start()
 	save_item(NAME(m_IRQEN));
 	save_item(NAME(m_SKSTAT));
 	save_item(NAME(m_SKCTL));
+
+	save_item(NAME(m_pot_counter));
+	save_item(NAME(m_kbd_cnt));
+	save_item(NAME(m_kbd_latch));
+	save_item(NAME(m_kbd_state));
 
 	// State support
 
@@ -334,8 +333,7 @@ void pokey_device::device_start()
 	state_add(SKCTL_C, "SKCTL", m_SKCTL);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
-
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -364,12 +362,15 @@ void pokey_device::device_post_load()
 
 void pokey_device::device_clock_changed()
 {
-	m_clock_period = attotime::from_hz(clock());
+	m_clock_period = clocks_to_attotime(1);
 
-	if (m_stream != nullptr)
-		m_stream->set_sample_rate(clock());
-	else
-		m_stream = stream_alloc(0, 1, clock());
+	if (clock() != 0)
+	{
+		if (m_stream != nullptr)
+			m_stream->set_sample_rate(clock());
+		else
+			m_stream = stream_alloc(0, 1, clock());
+	}
 }
 
 //-------------------------------------------------
@@ -779,11 +780,6 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 
 READ8_MEMBER( pokey_device::read )
 {
-	return read(offset);
-}
-
-uint8_t pokey_device::read(offs_t offset)
-{
 	int data, pot;
 
 	synchronize(SYNC_NOOP); /* force resync */
@@ -871,7 +867,6 @@ uint8_t pokey_device::read(offs_t offset)
 		break;
 	}
 	return data;
-
 }
 
 
@@ -879,14 +874,9 @@ uint8_t pokey_device::read(offs_t offset)
 //  write - memory interface for write
 //-------------------------------------------------
 
-void pokey_device::write(offs_t offset, uint8_t data)
-{
-	synchronize(SYNC_WRITE, (offset<<8) | data);
-}
-
 WRITE8_MEMBER( pokey_device::write )
 {
-	write(offset, data);
+	synchronize(SYNC_WRITE, (offset<<8) | data);
 }
 
 void pokey_device::write_internal(offs_t offset, uint8_t data)
@@ -1270,7 +1260,6 @@ pokey_device::pokey_channel::pokey_channel()
 		m_borrow_cnt(0),
 		m_counter(0),
 		m_output(0),
-		m_filter_sample(0),
-		m_div2(0)
+		m_filter_sample(0)
 {
 }

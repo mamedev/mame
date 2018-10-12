@@ -89,7 +89,7 @@ static const discrete_dac_r1_ladder desc_crbaloon_music_dac =
 
 
 
-static DISCRETE_SOUND_START(crbaloon)
+static DISCRETE_SOUND_START(crbaloon_discrete)
 
 	/************************************************
 	* Input register mapping
@@ -140,9 +140,9 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(crbaloon_state::crbaloon_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(470)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(220))                   // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(4.7))   // attack_decay_cap + attack_res
@@ -158,7 +158,6 @@ MACHINE_CONFIG_START(crbaloon_state::crbaloon_audio)
 	MCFG_SN76477_ENABLE(0)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(crbaloon)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, crbaloon_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

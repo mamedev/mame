@@ -22,282 +22,251 @@
 #include "imagedev/cassette.h"
 
 
-/*************************
-Model A memory handling functions
-*************************/
+/****************************************
+  BBC Model A memory handling functions
+****************************************/
 
-/* for the model A just address the 4 on board ROM sockets */
-WRITE8_MEMBER(bbc_state::bbc_page_selecta_w)
+WRITE8_MEMBER(bbc_state::page_selecta_w)
 {
-	m_bank4->set_entry(data & 0x03);
+	/* for the Model A just address the 4 on board ROM sockets */
+	m_swrbank = data & 0x03;
+	m_swrbank_ram = false;
+
+	m_bank4->set_entry(m_swrbank);
 }
 
 
-WRITE8_MEMBER(bbc_state::bbc_memorya1_w)
+/****************************************
+  BBC Model B memory handling functions
+****************************************/
+
+WRITE8_MEMBER(bbc_state::page_selectb_w)
 {
-	m_region_maincpu->base()[offset]=data;
+	static const unsigned short swramtype[4][16] = {
+		// TODO: move sideways RAM boards to slot devices
+		{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // 0: none
+		{ 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1 }, // 1: 128K (bank 8 to 15) Solidisk sideways ram userport bank latch (not implemented)
+		{ 0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0 }, // 2: 64K (banks 4 to 7) for Acorn sideways ram FE30 bank latch
+		{ 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1 }, // 3: 128K (banks 8 to 15) for Acorn sideways ram FE30 bank latch
+	};
+
+	/* the Model B address all 16 of the ROM sockets */
+	m_swrbank = data & 0x0f;
+	m_swrbank_ram = swramtype[m_swramtype][m_swrbank] ? true : false;
+
+	m_bank4->set_entry(m_swrbank);
 }
-
-/*************************
-Model B memory handling functions
-*************************/
-
-/* the model B address all 16 of the ROM sockets */
-WRITE8_MEMBER(bbc_state::bbc_page_selectb_w)
-{
-	m_rombank = data & 0x0f;
-	m_bank4->set_entry(m_rombank);
-}
-
-
-WRITE8_MEMBER(bbc_state::bbc_memoryb3_w)
-{
-	if (m_ram->size() == 32*1024)
-	{
-		m_region_maincpu->base()[offset + 0x4000] = data;
-	}
-	else
-	{
-		m_region_maincpu->base()[offset] = data;
-	}
-}
-
-/* I have setup 3 types of sideways ram:
-0: none
-1: 128K (bank 8 to 15) Solidisc sideways ram userport bank latch
-2: 64K (banks 4 to 7) for Acorn sideways ram FE30 bank latch
-3: 128K (banks 8 to 15) for Acorn sideways ram FE30 bank latch
-*/
-static const unsigned short bbc_SWRAMtype1[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
-static const unsigned short bbc_SWRAMtype2[16]={0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0};
-static const unsigned short bbc_SWRAMtype3[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
 
 WRITE8_MEMBER(bbc_state::bbc_memoryb4_w)
 {
-	switch (m_SWRAMtype)
+	if (m_swrbank_ram)
 	{
-		case 1: if (bbc_SWRAMtype1[m_userport]) m_region_opt->base()[(m_userport << 14) + offset] = data;
-		case 2: if (bbc_SWRAMtype2[m_rombank])  m_region_opt->base()[(m_rombank << 14) + offset] = data;
-		case 3: if (bbc_SWRAMtype3[m_rombank])  m_region_opt->base()[(m_rombank << 14) + offset] = data;
+		m_region_opt->base()[(m_swrbank << 14) + offset] = data;
 	}
 }
 
-/****************************************/
-/* BBC B Plus memory handling function */
-/****************************************/
 
+/****************************************
+  BBC Model B+ memory handling functions
+****************************************/
 
-/*  this function should return true if
-    the instruction is in the VDU driver address ranged
-    these are set when:
-    PC is in the range c000 to dfff
-    or if pagedRAM set and PC is in the range a000 to afff
-*/
-int bbc_state::vdudriverset()
+READ8_MEMBER(bbc_state::bbcbp_fetch_r)
 {
-	int PC;
-	PC = machine().device("maincpu")->safe_pc(); // this needs to be set to the 6502 program counter
-	return (((PC >= 0xc000) && (PC <= 0xdfff)) || ((m_pagedRAM) && ((PC >= 0xa000) && (PC <= 0xafff))));
+	switch (offset & 0xf000)
+	{
+	case 0xa000:
+		/* Code executing from sideways RAM between 0xa000-0xafff will access the shadow RAM (if selected) */
+		if (m_vdusel && m_paged_ram)
+		{
+			m_bank2->set_base(m_region_maincpu->base() + 0xb000);
+		}
+		else
+		{
+			m_bank2->set_base(m_region_maincpu->base() + 0x3000);
+		}
+		break;
+
+	case 0xc000:
+	case 0xd000:
+		/* Access shadow RAM if VDU drivers and shadow RAM selected */
+		if (m_vdusel)
+		{
+			m_bank2->set_base(m_region_maincpu->base() + 0xb000);
+		}
+		else
+		{
+			m_bank2->set_base(m_region_maincpu->base() + 0x3000);
+		}
+		break;
+
+	default:
+		m_bank2->set_base(m_region_maincpu->base() + 0x3000);
+		break;
+	}
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-
-/* the model B Plus addresses all 16 of the ROM sockets plus the extra 12K of ram at 0x8000
-   and 20K of shadow ram at 0x3000 */
-WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
+WRITE8_MEMBER(bbc_state::page_selectbp_w)
 {
-	if ((offset&0x04)==0)
+	/* the Model B+ addresses all 16 ROM sockets and extra 12K of RAM at 0x8000 and 20K of shadow RAM at 0x3000 */
+	switch (offset & 0x07)
 	{
-		m_pagedRAM = BIT(data,7);
-		m_rombank =  data & 0x0f;
+	case 0x00:
+		m_paged_ram = BIT(data,7);
 
-		if (m_pagedRAM)
+		m_swrbank =  data & 0x0f;
+		m_swrbank_ram = false;
+
+		if (m_paged_ram)
 		{
-			/* if paged ram then set 8000 to afff to read from the ram 8000 to afff */
+			/* if paged RAM then set 0x8000 to 0xafff to read from the RAM 8000 to 0xafff */
 			m_bank4->set_entry(0x10);
 		}
 		else
 		{
-			/* if paged rom then set the rom to be read from 8000 to afff */
-			m_bank4->set_entry(m_rombank);
+			/* if paged ROM then set the ROM to be read from 0x8000 to 0xafff */
+			m_bank4->set_entry(m_swrbank);
 		};
 
-		/* set the rom to be read from b000 to bfff */
-		m_bank6->set_entry(m_rombank);
-	}
-	else
-	{
-		//the video display should now use this flag to display the shadow ram memory
-		m_vdusel=BIT(data,7);
-		bbc_setvideoshadow(m_vdusel);
-		//need to make the video display do a full screen refresh for the new memory area
-		m_bank2->set_base(m_region_maincpu->base() + 0x3000);
+		/* set the ROM to be read from 0xb000 to 0xbfff */
+		m_bank6->set_entry(m_swrbank);
+		break;
+
+	case 0x04:
+		/* the video display should now use this flag to display the shadow RAM memory */
+		m_vdusel = BIT(data,7);
+		setvideoshadow(m_vdusel);
+		break;
 	}
 }
 
-
-/* write to the normal memory from 0x0000 to 0x2fff
-   the writes to this memory are just done the normal
-   way */
-
-WRITE8_MEMBER(bbc_state::bbc_memorybp1_w)
+WRITE8_MEMBER(bbc_state::page_selectbp128_w)
 {
-	m_region_maincpu->base()[offset]=data;
-}
+	/* the BBC B+ 128K has extra RAM mapped in replacing the ROM banks 0,1,c and d. */
+	static const unsigned short swram_banks[16] = { 1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0 };
 
+	switch (offset & 0x07)
+	{
+	case 0x00:
+		m_paged_ram = BIT(data, 7);
 
-WRITE8_MEMBER(bbc_state::bbc_memorybp2_w)
-{
-	uint8_t *RAM = m_region_maincpu->base();
-	if (m_vdusel==0)
-	{
-		// not in shadow ram mode so just write to normal ram
-		RAM[offset + 0x3000] = data;
-	}
-	else
-	{
-		if (vdudriverset())
+		m_swrbank = data & 0x0f;
+		m_swrbank_ram = swram_banks[m_swrbank] ? true : false;
+
+		if (m_paged_ram)
 		{
-			// if VDUDriver set then write to shadow ram
-			RAM[offset + 0xb000] = data;
+			/* if paged RAM then set 0x8000 to 0xafff to read from the RAM 8000 to 0xafff */
+			m_bank4->set_entry(0x10);
 		}
 		else
 		{
-			// else write to normal ram
-			RAM[offset + 0x3000] = data;
+			/* if paged ROM then set the ROM to be read from 0x8000 to 0xafff */
+			m_bank4->set_entry(m_swrbank);
 		}
+
+		/* set the ROM to be read from 0xb000 to 0xbfff */
+		m_bank6->set_entry(m_swrbank);
+		break;
+
+	case 0x04:
+		/* the video display should now use this flag to display the shadow RAM memory */
+		m_vdusel = BIT(data, 7);
+		setvideoshadow(m_vdusel);
+		break;
 	}
 }
 
-
-/* if the pagedRAM is set write to RAM between 0x8000 to 0xafff
-otherwise this area contains ROM so no write is required */
 WRITE8_MEMBER(bbc_state::bbc_memorybp4_w)
 {
-	if (m_pagedRAM)
+	if (m_paged_ram)
 	{
-		m_region_maincpu->base()[offset+0x8000]=data;
+		m_region_maincpu->base()[offset + 0x8000] = data;
+	}
+	else if (m_swrbank_ram)
+	{
+		m_region_opt->base()[offset + (m_swrbank << 14)] = data;
+	}
+}
+
+WRITE8_MEMBER(bbc_state::bbc_memorybp6_w)
+{
+	if (m_swrbank_ram)
+	{
+		m_region_opt->base()[offset + (m_swrbank << 14) + 0x3000] = data;
 	}
 }
 
 
-/* the BBC B plus 128K had extra ram mapped in replacing the
-rom bank 0,1,c and d.
-The function memorybp3_128_w handles memory writes from 0x8000 to 0xafff
-which could either be sideways ROM, paged RAM, or sideways RAM.
-The function memorybp4_128_w handles memory writes from 0xb000 to 0xbfff
-which could either be sideways ROM or sideways RAM */
+/****************************************
+  BBC Master memory handling functions
+****************************************/
 
+/*
+  ROMSEL - &FE30 write only
+    b7 RAM 1 = Page in ANDY &8000-&8FFF
+           0 = Page in ROM  &8000-&8FFF
+    b6     Not Used
+    b5     Not Used
+    b4     Not Used
+    b3-b0  ROM/RAM Bank Select
 
-static const unsigned short bbc_b_plus_sideways_ram_banks[16]={ 1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0 };
+  ACCCON - &FE34 read/write register
+    b7 IRR 1 = Causes an IRQ to the processor
+    b6 TST 1 = Selects &FC00-&FEFF read from OS-ROM
+    b5 IFJ 1 = Internal 1MHz bus
+           0 = External 1MHz bus
+    b4 ITU 1 = Internal Tube
+           0 = External Tube
+    b3 Y   1 = Read/Write HAZEL &C000-&DFFF RAM
+           0 = Read/Write ROM &C000-&DFFF OS-ROM
+    b2 X   1 = Read/Write LYNNE
+           0 = Read/Write main memory &3000-&8000
+    b1 E   1 = Causes shadow if VDU code
+           0 = Main all the time
+    b0 D   1 = Display LYNNE as screen
+           0 = Display main RAM screen
 
+  HAZEL is the 8K of RAM used by the MOS, filing system, and other ROMs at &C000-&DFFF
 
-WRITE8_MEMBER(bbc_state::bbc_memorybp4_128_w)
+  ANDY is the name of the 4K of RAM used by the MOS at &8000-&8FFF
+*/
+
+READ8_MEMBER(bbc_state::bbcm_fetch_r)
 {
-	if (m_pagedRAM)
+	if (m_acccon_x || (m_acccon_e && offset >= 0xc000 && offset <= 0xdfff))
 	{
-		m_region_maincpu->base()[offset+0x8000]=data;
+		m_bank2->set_base(m_region_maincpu->base() + 0xb000);
 	}
 	else
 	{
-		if (bbc_b_plus_sideways_ram_banks[m_rombank])
-		{
-			m_region_opt->base()[offset+(m_rombank<<14)]=data;
-		}
+		m_bank2->set_base(m_region_maincpu->base() + 0x3000);
 	}
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(bbc_state::bbc_memorybp6_128_w)
+READ8_MEMBER(bbc_state::bbcm_acccon_r)
 {
-	if (bbc_b_plus_sideways_ram_banks[m_rombank])
-	{
-		m_region_opt->base()[offset+(m_rombank<<14)+0x3000]=data;
-	}
+	return m_acccon;
 }
 
-
-
-/****************************************/
-/* BBC Master functions                 */
-/****************************************/
-
-/*
-ROMSEL - &FE30 write Only
-B7 RAM 1=Page in ANDY &8000-&8FFF
-       0=Page in ROM  &8000-&8FFF
-B6 Not Used
-B5 Not Used
-B4 Not Used
-B3-B0  Rom/Ram Bank Select
-
-ACCCON
-
-b7 IRR  1=Causes an IRQ to the processor
-b6 TST  1=Selects &FC00-&FEFF read from OS-ROM
-b5 IFJ  1=Internal 1MHz bus
-        0=External 1MHz bus
-b4 ITU  1=Internal Tube
-        0=External Tube
-b3 Y    1=Read/Write HAZEL &C000-&DFFF RAM
-        0=Read/Write ROM &C000-&DFFF OS-ROM
-b2 X    1=Read/Write LYNNE
-        0=Read/WRITE main memory &3000-&8000
-b1 E    1=Causes shadow if VDU code
-        0=Main all the time
-b0 D    1=Display LYNNE as screen
-        0=Display main RAM screen
-
-ACCCON is a read/write register
-
-HAZEL is the 8K of RAM used by the MOS, filing system, and other ROMs at &C000-&DFFF
-
-ANDY is the name of the 4K of RAM used by the MOS at &8000-&8FFF
-
-b7:This causes an IRQ to occur. If you set this bit, you must write a routine on IRQ2V to clear it.
-
-b6:If set, this switches in the ROM at &FD00-&FEFF for reading, writes to these addresses are still directed to the I/O
-The MOS will not work properly with this but set. the Masters OS uses this feature to place some of the reset code in this area,
-which is run at powerup.
-
-b3:If set, access to &C000-&DFFF are directed to HAZEL, an 8K bank of RAM. IF clear, then operating system ROM is read.
-
-b2:If set, read/write access to &3000-&7FFF are directed to the LYNNE, the shadow screen RAM. If clear access is made to the main RAM.
-
-b1:If set, when the program counter is between &C000 and &DFFF, read/write access is directed to the LYNNE shadow RAM.
-if the program counter is anywhere else main ram is accessed.
-
-*/
-
-
-READ8_MEMBER(bbc_state::bbcm_ACCCON_read)
+WRITE8_MEMBER(bbc_state::bbcm_acccon_w)
 {
-	logerror("ACCCON read %d\n",offset);
-	return m_ACCCON;
-}
+	m_acccon = data;
 
-WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
-{
-	int tempIRR;
-	m_ACCCON=data;
+	m_acccon_irr = BIT(data,7);
+	m_acccon_tst = BIT(data,6);
+	m_acccon_ifj = BIT(data,5);
+	m_acccon_itu = BIT(data,4);
+	m_acccon_y   = BIT(data,3);
+	m_acccon_x   = BIT(data,2);
+	m_acccon_e   = BIT(data,1);
+	m_acccon_d   = BIT(data,0);
 
-	logerror("ACCCON write  %d %d \n",offset,data);
+	/* Bit IRR causes Interrupt Request. */
+	m_irqs->in_w<6>(m_acccon_irr);
 
-	tempIRR=m_ACCCON_IRR;
-
-	m_ACCCON_IRR = BIT(data,7);
-	m_ACCCON_TST = BIT(data,6);
-	m_ACCCON_IFJ = BIT(data,5);
-	m_ACCCON_ITU = BIT(data,4);
-	m_ACCCON_Y   = BIT(data,3);
-	m_ACCCON_X   = BIT(data,2);
-	m_ACCCON_E   = BIT(data,1);
-	m_ACCCON_D   = BIT(data,0);
-
-	if (tempIRR!=m_ACCCON_IRR)
-	{
-		m_irqs->in_w<3>(m_ACCCON_IRR);
-	}
-
-	if (m_ACCCON_Y)
+	/* Bit Y causes 8K of RAM (HAZEL) to be overlayed on the MOS VDU drivers. */
+	if (m_acccon_y)
 	{
 		m_bank7->set_base(m_region_maincpu->base() + 0x9000);
 	}
@@ -306,10 +275,11 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 		m_bank7->set_base(m_region_os->base());
 	}
 
-	bbc_setvideoshadow(m_ACCCON_D);
+	/* Bit D causes the CRT controller to display the contents of LYNNE. */
+	setvideoshadow(m_acccon_d);
 
-
-	if (m_ACCCON_X)
+	/* Bit X causes all accesses to 0x3000-0x7fff to be re-directed to LYNNE.*/
+	if (m_acccon_x)
 	{
 		m_bank2->set_base(m_region_maincpu->base() + 0xb000);
 	}
@@ -318,110 +288,76 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 		m_bank2->set_base(m_region_maincpu->base() + 0x3000);
 	}
 
-	/* ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF region */
+	/* Bit TST controls paging of ROM reads in the 0xfc00-0xfeff region */
 	/* if 0 the I/O is paged for both reads and writes */
 	/* if 1 the ROM is paged in for reads but writes still go to I/O */
-	if (m_ACCCON_TST)
+	if (m_acccon_tst)
 	{
 		m_bank8->set_base(m_region_os->base() + 0x3c00);
 		space.install_read_bank(0xfc00, 0xfeff, "bank8");
 	}
 	else
 	{
-		space.install_read_handler(0xfc00, 0xfeff, read8_delegate(FUNC(bbc_state::bbcm_r),this));
+		space.install_read_handler(0xfc00, 0xfeff, read8_delegate(FUNC(bbc_state::bbcm_r), this));
 	}
 }
-
-
-int bbc_state::bbcm_vdudriverset()
-{
-	int PC;
-	PC = machine().device("maincpu")->safe_pc();
-	return ((PC >= 0xc000) && (PC <= 0xdfff));
-}
-
 
 WRITE8_MEMBER(bbc_state::page_selectbm_w)
 {
-	m_pagedRAM = (data & 0x80) >> 7;
-	m_rombank = data & 0x0f;
+	m_paged_ram = (data & 0x80) >> 7;
+	m_swrbank = data & 0x0f;
 
-	if (m_lk19_ic37_paged_rom && (m_rombank == 4 || m_rombank == 5)) m_pagedRAM = 0;
-	if (m_lk18_ic41_paged_rom && (m_rombank == 6 || m_rombank == 7)) m_pagedRAM = 0;
+	if ((!m_lk19_ic37_paged_rom && (m_swrbank == 4 || m_swrbank == 5)) || (!m_lk18_ic41_paged_rom && (m_swrbank == 6 || m_swrbank == 7)))
+	{
+		/* links are set for RAM so make read/write */
+		m_swrbank_ram = true;
+	}
+	else
+	{
+		/* links are set for ROM so make read-only */
+		m_swrbank_ram = false;
+	}
 
-	if (m_pagedRAM)
+	if (m_paged_ram)
 	{
 		m_bank4->set_entry(0x10);
-		m_bank5->set_entry(m_rombank);
+		m_bank5->set_entry(m_swrbank);
 	}
 	else
 	{
-		m_bank4->set_entry(m_rombank);
-		m_bank5->set_entry(m_rombank);
+		m_bank4->set_entry(m_swrbank);
+		m_bank5->set_entry(m_swrbank);
 	}
 }
-
-
-WRITE8_MEMBER(bbc_state::bbc_memorybm1_w)
-{
-	m_region_maincpu->base()[offset] = data;
-}
-
-
-WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
-{
-	uint8_t *RAM = m_region_maincpu->base();
-	if (m_ACCCON_X)
-	{
-		RAM[offset + 0xb000] = data;
-	}
-	else
-	{
-		if (m_ACCCON_E && bbcm_vdudriverset())
-		{
-			RAM[offset + 0xb000] = data;
-		}
-		else
-		{
-			RAM[offset + 0x3000] = data;
-		}
-	}
-}
-
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 {
-	if (m_pagedRAM)
+	if (m_paged_ram)
 	{
-		m_region_maincpu->base()[offset+0x8000] = data;
+		m_region_maincpu->base()[offset + 0x8000] = data;
 	}
-	else
+	else if (m_swrbank_ram)
 	{
-		if ((!m_lk18_ic41_paged_rom && (m_rombank == 6 || m_rombank == 7)) || (!m_lk19_ic37_paged_rom && (m_rombank == 4 || m_rombank == 5)))
-		{
-			m_region_opt->base()[offset+(m_rombank<<14)] = data;
-		}
+		m_region_opt->base()[offset + (m_swrbank << 14)] = data;
 	}
 }
 
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm5_w)
 {
-	if ((!m_lk18_ic41_paged_rom && (m_rombank == 6 || m_rombank == 7)) || (!m_lk19_ic37_paged_rom && (m_rombank == 4 || m_rombank == 5)))
+	if (m_swrbank_ram)
 	{
-		m_region_opt->base()[offset+(m_rombank<<14) + 0x1000] = data;
+		m_region_opt->base()[offset + (m_swrbank << 14) + 0x1000] = data;
 	}
 }
-
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm7_w)
 {
-	if (m_ACCCON_Y)
+	if (m_acccon_y)
 	{
-		m_region_maincpu->base()[offset+0x9000] = data;
+		m_region_maincpu->base()[offset + 0x9000] = data;
 	}
 }
-
 
 
 /******************************************************************************
@@ -467,21 +403,22 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm7_w)
 
 READ8_MEMBER(bbc_state::bbcm_r)
 {
-	long myo;
+	uint8_t data = 0xff;
+	uint8_t myo;
 
-	if (offset<=0x0ff) /* FRED */
+	switch (offset >> 8)
 	{
-		return 0xff;
-	};
+	case 0x00: /* FRED */
+		if (m_1mhzbus) return m_1mhzbus->fred_r(space, offset & 0xff);
+		break;
 
-	if ((offset>=0x100) && (offset<=0x1ff)) /* JIM */
-	{
-		return 0xff;
-	};
+	case 0x01: /* JIM */
+		if (m_1mhzbus) return m_1mhzbus->jim_r(space, offset & 0xff);
+		break;
 
-	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
-	{
-		myo = offset-0x200;
+	case 0x02: /* SHEILA */
+		data = 0xfe;
+		myo = offset & 0xff;
 		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) return m_hd6845->status_r(space, myo-0x00);                     /* Video controller */
 		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      return m_hd6845->register_r(space, myo-0x01);
 		if ((myo>=0x08) && (myo<=0x0f))                   return m_acia ? m_acia->read(space, myo & 0x01) : 0xfe;         /* Serial controller */
@@ -489,33 +426,39 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x18) && (myo<=0x1f))                   return m_upd7002 ? m_upd7002->read(space, myo-0x18) : 0xfe;     /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   return 0xfe;                                                    /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27))                   return bbcm_wd177xl_read(space, myo-0x24);                      /* 177x Control Latch */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     return m_wd1770->read(space, myo-0x28);                         /* 1770 Controller */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     return m_wd1772->read(space, myo-0x28);                         /* 1772 Controller */
-		if ((myo>=0x28) && (myo<=0x2f))                   return 0xfe;                                                    /* No Controller */
-		if ((myo>=0x30) && (myo<=0x33))                   return 0xfe;
-		if ((myo>=0x34) && (myo<=0x37))                   return bbcm_ACCCON_read(space, myo-0x34);                       /* ACCCON */
-		if ((myo>=0x38) && (myo<=0x3f))                   return 0xfe;                                                    /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f))                   return m_via6522_0->read(space, myo-0x40);
-		if ((myo>=0x60) && (myo<=0x7f))                   return m_via6522_1 ? m_via6522_1->read(space, myo-0x60) : 0xfe;
-		if ((myo>=0x80) && (myo<=0x9f))                   return 0xfe;
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     return m_wd1770->read(myo-0x28);                                /* 1770 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     return m_wd1772->read(myo-0x28);                                /* 1772 Controller */
+		if ((myo>=0x34) && (myo<=0x37))                   return bbcm_acccon_r(space, myo-0x34);                          /* ACCCON */
+		if ((myo>=0x40) && (myo<=0x5f))                   return m_via6522_0->read(myo-0x40);
+		if ((myo>=0x60) && (myo<=0x7f))                   return m_via6522_1 ? m_via6522_1->read(myo-0x60) : 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf))                   return m_adlc ? m_adlc->read(space, myo & 0x03) : 0xfe;
 		if ((myo>=0xc0) && (myo<=0xdf))                   return 0xff;
 		if ((myo>=0xe0) && (myo<=0xff))
 		{
-			if (m_intube &&  m_ACCCON_ITU)                  return m_intube->host_r(space, myo-0xe0);                       /* Internal TUBE */
-			if (m_extube && !m_ACCCON_ITU)                  return m_extube->host_r(space, myo-0xe0);                       /* External TUBE */
+			if (m_intube &&  m_acccon_itu)                  return m_intube->host_r(space, myo-0xe0);                       /* Internal TUBE */
+			if (m_extube && !m_acccon_itu)                  return m_extube->host_r(space, myo-0xe0);                       /* External TUBE */
 		}
+		break;
 	}
-	return 0xfe;
+	return data;
 }
 
 WRITE8_MEMBER(bbc_state::bbcm_w)
 {
-	long myo;
+	uint8_t myo;
 
-	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
+	switch (offset >> 8)
 	{
-		myo=offset-0x200;
+	case 0x00: /* FRED */
+		if (m_1mhzbus) m_1mhzbus->fred_w(space, offset & 0xff, data);
+		break;
+
+	case 0x01: /* JIM */
+		if (m_1mhzbus) m_1mhzbus->jim_w(space, offset & 0xff, data);
+		break;
+
+	case 0x02: /* SHEILA */
+		myo = offset & 0xff;
 		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) m_hd6845->address_w(space, myo-0x00, data);                     /* Video Controller */
 		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      m_hd6845->register_w(space, myo-0x01, data);
 		if ((myo>=0x08) && (myo<=0x0f))                   if (m_acia) m_acia->write(space, myo & 0x01, data);             /* Serial controller */
@@ -523,22 +466,20 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		if ((myo>=0x18) && (myo<=0x1f) && (m_upd7002))    m_upd7002->write(space, myo-0x18, data);                        /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   bbc_videoULA_w(space, myo-0x20, data);                          /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27) && (m_wd1770))     bbcm_wd1770l_write(space, myo-0x24, data);                      /* disc control latch */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     m_wd1770->write(space, myo-0x28, data);                         /* 1770 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     m_wd1770->write(myo-0x28, data);                                /* 1770 Controller */
 		if ((myo>=0x24) && (myo<=0x27) && (m_wd1772))     bbcm_wd1772l_write(space, myo-0x24, data);                      /* disc control latch */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     m_wd1772->write(space, myo-0x28, data);                         /* 1772 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     m_wd1772->write(myo-0x28, data);                                /* 1772 Controller */
 		if ((myo>=0x30) && (myo<=0x33))                   page_selectbm_w(space, myo-0x30, data);                         /* ROMSEL */
-		if ((myo>=0x34) && (myo<=0x37))                   bbcm_ACCCON_write(space, myo-0x34, data);                       /* ACCCON */
-		//if ((myo>=0x38) && (myo<=0x3f))                                                                                 /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f))                   m_via6522_0->write(space, myo-0x40, data);
-		if ((myo>=0x60) && (myo<=0x7f) && (m_via6522_1))  m_via6522_1->write(space, myo-0x60, data);
-		//if ((myo>=0x80) && (myo<=0x9f))
+		if ((myo>=0x34) && (myo<=0x37))                   bbcm_acccon_w(space, myo-0x34, data);                           /* ACCCON */
+		if ((myo>=0x40) && (myo<=0x5f))                   m_via6522_0->write(myo-0x40, data);
+		if ((myo>=0x60) && (myo<=0x7f) && (m_via6522_1))  m_via6522_1->write(myo-0x60, data);
 		if ((myo>=0xa0) && (myo<=0xbf) && (m_adlc))       m_adlc->write(space, myo & 0x03, data);
-		//if ((myo>=0xc0) && (myo<=0xdf))
 		if ((myo>=0xe0) && (myo<=0xff))
 		{
-			if (m_intube &&  m_ACCCON_ITU)                  m_intube->host_w(space, myo-0xe0, data);                        /* Internal TUBE */
-			if (m_extube && !m_ACCCON_ITU)                  m_extube->host_w(space, myo-0xe0, data);                        /* External TUBE */
+			if (m_intube &&  m_acccon_itu)                  m_intube->host_w(space, myo-0xe0, data);                        /* Internal TUBE */
+			if (m_extube && !m_acccon_itu)                  m_extube->host_w(space, myo-0xe0, data);                        /* External TUBE */
 		}
+		break;
 	}
 }
 
@@ -741,7 +682,6 @@ void bbc_state::bbcb_IC32_initialise(bbc_state *state)
 void bbc_state::MC146818_set(address_space &space)
 {
 	//logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",m_MC146818_WR,m_MC146818_DS,m_MC146818_AS,m_MC146818_CE);
-	//mc146818_device *rtc = machine().device<mc146818_device>("rtc");
 
 	// if chip enabled
 	if (m_MC146818_CE)
@@ -779,17 +719,17 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_porta)
 	if (m_b0_sound == 0)
 	{
 		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		if (m_sn) m_sn->write(space, 0, m_via_system_porta);
+		if (m_sn) m_sn->write(m_via_system_porta);
 	}
 	if (m_b1_speech_read == 0)
 	{
-		if (m_tms) m_via_system_porta = m_tms->status_r(space, 0);
+		if (m_tms) m_via_system_porta = m_tms->status_r();
 		//logerror("Doing an unsafe read to the speech chip %d \n",m_via_system_porta);
 	}
 	if (m_b2_speech_write == 0)
 	{
 		//logerror("Doing an unsafe write to the speech chip %d \n",data);
-		if (m_tms) m_tms->data_w(space, 0, m_via_system_porta);
+		if (m_tms) m_tms->data_w(m_via_system_porta);
 	}
 	if (m_b3_keyboard == 0)
 	{
@@ -898,7 +838,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			if (m_b0_sound == 1)
 			{
 				m_b0_sound = 0;
-				if (m_sn) m_sn->write(space, 0, m_via_system_porta);
+				if (m_sn) m_sn->write(m_via_system_porta);
 			}
 			break;
 		case 1:
@@ -1017,37 +957,18 @@ READ8_MEMBER(bbc_state::bbcb_via_system_read_portb)
 }
 
 
-/**********************************************************************
-USER VIA
-Port A output is buffered before being connected to the printer connector.
-This means that they can only be operated as output lines.
-CA1 is pulled high by a 4K7 resistor. CA1 normally acts as an acknowledge
-line when a printer is used. CA2 is buffered so that it has become an open
-collector output only. It usually acts as the printer strobe line.
-***********************************************************************/
-
-/* USER VIA 6522 port B is connected to the BBC user port */
-READ8_MEMBER(bbc_state::bbcb_via_user_read_portb)
+WRITE_LINE_MEMBER(bbc_state::lpstb_w)
 {
-	// D0 of portb is joystick FIRE (Compact)
-	// D1 of portb is joystick LEFT (Compact)
-	// D2 of portb is joystick DOWN (Compact)
-	// D3 of portb is joystick UP (Compact)
-	// D4 of portb is joystick RIGHT (Compact)
-	return ((m_joyport ? m_joyport->pb_r() : 0x1f) | 0xe0);
+	m_via6522_0->write_cb2(state);
+	if (!state)
+		m_hd6845->assert_light_pen_input();
 }
-
-WRITE8_MEMBER(bbc_state::bbcb_via_user_write_portb)
-{
-	m_userport = data;
-}
-
 
 /**************************************
-BBC Joystick Support
+  BBC Joystick Support
 **************************************/
 
-UPD7002_GET_ANALOGUE(bbc_state::BBC_get_analogue_input)
+int bbc_state::BBC_get_analogue_input(int channel_number)
 {
 	if (m_analog)
 		return ((0xff - m_analog->ch_r(channel_number)) << 8);
@@ -1055,7 +976,7 @@ UPD7002_GET_ANALOGUE(bbc_state::BBC_get_analogue_input)
 		return 0xff;
 }
 
-UPD7002_EOC(bbc_state::BBC_uPD7002_EOC)
+void bbc_state::BBC_uPD7002_EOC(int data)
 {
 	m_via6522_0->write_cb1(data);
 }
@@ -1255,9 +1176,15 @@ WRITE_LINE_MEMBER( bbc_state::bbc_txd_w )
 }
 
 
-void bbc_state::BBC_Cassette_motor(unsigned char status)
+void bbc_state::cassette_motor(bool motor_state)
 {
-	if (status)
+	const bool prev_state = ((m_cassette->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED) ? true : false;
+
+	/* cassette relay sound */
+	if (prev_state != motor_state)
+		m_samples->start(0, motor_state ? 1 : 0);
+
+	if (motor_state)
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
@@ -1274,7 +1201,7 @@ void bbc_state::BBC_Cassette_motor(unsigned char status)
 		m_cass_out_phase = 0;
 		m_cass_out_samples_to_go = 4;
 	}
-	output().set_value("motor_led", !status);
+	output().set_value("motor_led", !motor_state);
 }
 
 
@@ -1313,7 +1240,7 @@ WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 	update_acia_rxd();
 	update_acia_dcd();
 	update_acia_cts();
-	if (m_cassette) BBC_Cassette_motor(m_serproc_data & 0x80);
+	if (m_cassette) cassette_motor(BIT(m_serproc_data, 7));
 
 	// Set transmit clock rate
 	m_acia_clock->set_clock_scale( (double) 1 / serial_clocks[ data & 0x07 ] );
@@ -1355,6 +1282,7 @@ WRITE_LINE_MEMBER(bbc_state::motor_w)
 			con->get_device()->mon_w(!state);
 		}
 	}
+	m_i8271->ready_w(!state);
 }
 
 WRITE_LINE_MEMBER(bbc_state::side_w)
@@ -1546,7 +1474,7 @@ image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, gener
 	{
 		uint32_t filesize = image.length();
 
-		if (filesize != 0x8000)
+		if (filesize > 0x8000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return image_init_result::FAIL;
@@ -1561,15 +1489,15 @@ image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, gener
 		uint32_t size_lo = image.get_software_region_length("lorom");
 		uint32_t size_hi = image.get_software_region_length("uprom");
 
-		if (size_lo + size_hi != 0x8000)
+		if (size_lo + size_hi > 0x8000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return image_init_result::FAIL;
 		}
 
-		slot->rom_alloc(size_lo + size_hi, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-		memcpy(slot->get_rom_base() + 0,       image.get_software_region("uprom"), size_hi);
-		memcpy(slot->get_rom_base() + size_hi, image.get_software_region("lorom"), size_lo);
+		slot->rom_alloc(0x8000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		memcpy(slot->get_rom_base() + 0x0000, image.get_software_region("lorom"), size_lo);
+		memcpy(slot->get_rom_base() + 0x4000, image.get_software_region("uprom"), size_hi);
 	}
 
 	return image_init_result::PASS;
@@ -1580,7 +1508,7 @@ image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, gener
    Machine Initialisation functions
 ***************************************/
 
-DRIVER_INIT_MEMBER(bbc_state,bbc)
+void bbc_state::init_bbc()
 {
 	m_os01 = false;
 
@@ -1669,23 +1597,18 @@ MACHINE_START_MEMBER(bbc_state, bbca)
 MACHINE_RESET_MEMBER(bbc_state, bbca)
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
-	m_Speech      = m_bbcconfig.read_safe(0) & 0x04;
-	m_SWRAMtype   = m_bbcconfig.read_safe(0) & 0x18;
+	m_swramtype = (m_bbcconfig.read_safe(0) & 0x0c) >> 2;
 
-	uint8_t *RAM = m_region_maincpu->base();
-
-	m_bank1->set_base(RAM);
+	m_bank1->set_base(m_region_maincpu->base());
 	if (m_ram->size() == 32*1024)
 	{
 		/* 32K Model A */
-		m_bank3->set_base(RAM + 0x4000);
-		m_memorySize=32;
+		m_bank3->set_base(m_region_maincpu->base() + 0x4000);
 	}
 	else
 	{
 		/* 16K just repeat the lower 16K*/
-		m_bank3->set_base(RAM);
-		m_memorySize=16;
+		m_bank3->set_base(m_region_maincpu->base());
 	}
 
 	m_bank4->set_entry(0);
@@ -1704,14 +1627,10 @@ MACHINE_START_MEMBER(bbc_state, bbcb)
 MACHINE_RESET_MEMBER(bbc_state, bbcb)
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
-	m_Speech      = m_bbcconfig.read_safe(1) & 0x04;
-	m_SWRAMtype   = m_bbcconfig.read_safe(0) & 0x18;
+	m_swramtype = (m_bbcconfig.read_safe(0) & 0x0c) >> 2;
 
-	uint8_t *RAM = m_region_maincpu->base();
-
-	m_bank1->set_base(RAM);
-	m_bank3->set_base(RAM + 0x4000);
-	m_memorySize=32;
+	m_bank1->set_base(m_region_maincpu->base());
+	m_bank3->set_base(m_region_maincpu->base() + 0x4000);
 
 	m_bank4->set_entry(0);
 	m_bank7->set_base(m_region_os->base());  /* bank 7 points at the OS rom  from c000 to ffff */
@@ -1725,8 +1644,7 @@ MACHINE_RESET_MEMBER(bbc_state, torch)
 	MACHINE_RESET_CALL_MEMBER(bbcb);
 
 	m_monitortype = monitor_type_t::COLOUR;
-	m_Speech      = 1;
-	m_SWRAMtype   = 0;
+	m_swramtype = 0;
 }
 
 
@@ -1743,8 +1661,7 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 MACHINE_RESET_MEMBER(bbc_state, bbcbp)
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
-	m_Speech      = m_bbcconfig.read_safe(1) & 0x04;
-	m_SWRAMtype   = 0;
+	m_swramtype = 0;
 
 	m_bank1->set_base(m_region_maincpu->base());
 	m_bank2->set_base(m_region_maincpu->base() + 0x3000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
@@ -1778,11 +1695,10 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 MACHINE_RESET_MEMBER(bbc_state, bbcm)
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
-	m_Speech      = 0;
-	m_SWRAMtype   = 0;
+	m_swramtype = 0;
 
-	m_bank1->set_base(m_region_maincpu->base());           /* bank 1 regular lower ram     from 0000 to 2fff */
-	m_bank2->set_base(m_region_maincpu->base() + 0x3000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
+	m_bank1->set_base(m_region_maincpu->base());           /* bank 1 regular lower RAM     from 0000 to 2fff */
+	m_bank2->set_base(m_region_maincpu->base() + 0x3000);  /* bank 2 screen/shadow RAM     from 3000 to 7fff */
 	m_bank4->set_entry(0);
 	m_bank5->set_entry(0);
 	m_bank7->set_base(m_region_os->base());                /* bank 6 OS rom of RAM         from c000 to dfff */
@@ -1809,8 +1725,7 @@ MACHINE_RESET_MEMBER(bbc_state, ltmpbp)
 	MACHINE_RESET_CALL_MEMBER(bbcbp);
 
 	m_monitortype = monitor_type_t::GREEN;
-	m_Speech      = 1;
-	m_SWRAMtype   = 0;
+	m_swramtype = 0;
 }
 
 MACHINE_RESET_MEMBER(bbc_state, ltmpm)
@@ -1818,8 +1733,7 @@ MACHINE_RESET_MEMBER(bbc_state, ltmpm)
 	MACHINE_RESET_CALL_MEMBER(bbcm);
 
 	m_monitortype = monitor_type_t::GREEN;
-	m_Speech      = 0;
-	m_SWRAMtype   = 0;
+	m_swramtype = 0;
 }
 
 

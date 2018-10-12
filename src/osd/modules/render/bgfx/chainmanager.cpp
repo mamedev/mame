@@ -185,6 +185,9 @@ void chain_manager::parse_chain_selections(std::string chain_str)
 {
 	std::vector<std::string> chain_names = split_option_string(chain_str);
 
+	if (chain_names.empty())
+		chain_names.push_back("default");
+
 	while (m_current_chain.size() != chain_names.size())
 	{
 		m_screen_chains.push_back(nullptr);

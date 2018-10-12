@@ -19,9 +19,10 @@ FLOPPY_FORMATS_MEMBER( iq151_disc2_device::floppy_formats )
 	FLOPPY_IQ151_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( iq151_disc2_floppies )
-	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
-SLOT_INTERFACE_END
+static void iq151_disc2_floppies(device_slot_interface &device)
+{
+	device.option_add("8sssd", FLOPPY_8_SSSD);
+}
 
 ROM_START( iq151_disc2 )
 	ROM_REGION(0x0800, "disc2", 0)
@@ -71,11 +72,12 @@ void iq151_disc2_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(iq151_disc2_device::device_add_mconfig)
-	MCFG_UPD765A_ADD("fdc", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", iq151_disc2_floppies, "8sssd", iq151_disc2_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", iq151_disc2_floppies, "8sssd", iq151_disc2_device::floppy_formats)
-MACHINE_CONFIG_END
+void iq151_disc2_device::device_add_mconfig(machine_config &config)
+{
+	UPD765A(config, m_fdc, false, true);
+	FLOPPY_CONNECTOR(config, "fdc:1", iq151_disc2_floppies, "8sssd", iq151_disc2_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", iq151_disc2_floppies, "8sssd", iq151_disc2_device::floppy_formats);
+}
 
 
 //-------------------------------------------------

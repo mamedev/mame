@@ -13,7 +13,7 @@
 
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "formats/abc800_dsk.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
@@ -78,6 +78,9 @@ protected:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
 
@@ -98,11 +101,9 @@ private:
 	void luxor_55_21046_io(address_map &map);
 	void luxor_55_21046_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
 	required_device<fd1793_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
 	required_ioport m_sw1;
 	required_ioport m_sw2;

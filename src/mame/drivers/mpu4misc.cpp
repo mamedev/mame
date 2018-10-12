@@ -154,7 +154,7 @@ ROM_END
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DCRLS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4dcrls,         0,          "70000116.bin",                 0x0000, 0x040000, CRC(27e5ad77) SHA1(83cabd8b52efc6c0d5530b55683295208f64abb6), "Qps","Double Crazy Reels (Qps) (MPU4) (set 1)" ) // dcr_std_340.bin
@@ -192,7 +192,7 @@ GAME_CUSTOM( 199?, m4dcrls__r,      m4dcrls,    "dcr_data_340.bin",             
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JUNGJK_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 
 
 
@@ -217,7 +217,7 @@ GAME_CUSTOM( 199?, m4jungjk__e,    m4jungjk,   "jungle.p1",                    0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHNOTE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 GAME_CUSTOM( 199?, m4rhnote,       0,          "70000120.bin",                 0x0000, 0x040000, CRC(d1ce1e1c) SHA1(2fc2b041b4e9fcade4b2ce6a0bc709f4174e2d88), "Qps","Red Hot Notes (Qps) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rhnote__a,    m4rhnote,   "70000121.bin",                 0x0000, 0x040000, CRC(1e1a26c0) SHA1(8a80a94d280c82887a0f7da607988597df23e1fb), "Qps","Red Hot Notes (Qps) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4rhnote__b,    m4rhnote,   "70000125.bin",                 0x0000, 0x080000, CRC(67a617a2) SHA1(3900c0cc3f8e4d52105096c1e21903cb83b8c1b7), "Qps","Red Hot Notes (Qps) (MPU4) (set 3)" )
@@ -257,7 +257,7 @@ GAME_CUSTOM( 199?, m4rhnote__y,    m4rhnote,   "rhn_std_110_lv.bin",           0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHROCK_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4rhrock,       0,          "rhr_v200_1625_da8c_nlv.bin", 0x0000, 0x040000, CRC(dd67f5b3) SHA1(19b7b57ef20a2ad7997cf748396b246fda87db70), "Qps","Red Hot Rocks (Qps) (MPU4) (set 1)" )
@@ -278,7 +278,7 @@ GAME_CUSTOM( 199?, m4rhrock__a,    m4rhrock,   "rhr_v300_1216_ce52_nlv.bin", 0x0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHWHL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 GAME_CUSTOM( 199?, m4rhwhl,     0,          "70001184.bin",                 0x0000, 0x080000, CRC(8792d95b) SHA1(24b4f78728db7ee95d1fcd3ba38b49a20baaae6b), "Qps","Red Hot Wheels (Qps) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rhwhl__a,  m4rhwhl,    "rhw_v100_1333_6d40_lv.bin",    0x0000, 0x080000, CRC(9ef7b655) SHA1(605822eaee44bebf554218ef7346192a6a84077e), "Qps","Red Hot Wheels (Qps) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4rhwhl__b,  m4rhwhl,    "rhw_v310_0925_0773_lv_p.bin",  0x0000, 0x080000, CRC(11880908) SHA1(0165bacf73dd54959975b3f186e256fd8d690d34), "Qps","Red Hot Wheels (Qps) (MPU4) (set 3)" )
@@ -296,7 +296,7 @@ GAME_CUSTOM( 199?, m4rhwhl__c,  m4rhwhl,    "rhw_v310_0931_fa02_lv.bin",    0x00
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RDEAL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4rdeal,     0,          "70000703.bin", 0x0000, 0x080000, CRC(11e51311) SHA1(71a4327fa01cd7e899d423adc34c732ed56118d8), "Qps","Reel Deal (Qps) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rdeal__a,  m4rdeal,    "70000704.bin", 0x0000, 0x080000, CRC(b161c08b) SHA1(bb914eb900aff0f6eeec33ff8a595a288306e073), "Qps","Reel Deal (Qps) (MPU4) (set 2)" )
@@ -322,7 +322,7 @@ GAME_CUSTOM( 199?, m4rdeal__i,  m4rdeal,    "70001745.bin", 0x0000, 0x080000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SHOKNR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4shoknr,       0,          "snr_v300_1218_3019_lv.bin",    0x0000, 0x040000, CRC(bec80497) SHA1(08de5e29a063b01fb904a156170a3063633115ab), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4shoknr__a,    m4shoknr,   "snr_v300_1221_c8ff_nlv.bin",   0x0000, 0x040000, CRC(d191b361) SHA1(4146e509e77878a51e32de877768504b3c85e6f8), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 2)" )
@@ -342,7 +342,7 @@ GAME_CUSTOM( 199?, m4shoknr__c,    m4shoknr,   "snr_v200_1655_5a69_nlv.bin",   0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TORNAD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4tornad,       0,          "torn_v110_1146_979d_lv.bin",       0x0000, 0x040000, CRC(3160bddd) SHA1(4f36b081c8f6859a3fe55e1f177a0406c2480987), "Qps","Tornado (Qps) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4tornad__a,    m4tornad,   "torn_v110_1153_955f_nlv.bin",      0x0000, 0x040000, CRC(c437040d) SHA1(50c5ba655989b7f6a2ee61af0ad007ce825f4364), "Qps","Tornado (Qps) (MPU4) (set 2)" )
@@ -367,7 +367,7 @@ GAME_CUSTOM( 199?, m4tornad__g,    m4tornad,   "tornsp_v200_1626_ec93_lv.bin",  
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SHKWAV_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 GAME_CUSTOM( 199?, m4shkwav,       0,          "swave_v210_1135_08dd_lv.bin",      0x0000, 0x040000, CRC(ca9d40a3) SHA1(65c9e4aa022eb6fe70d619f67638c37ad578ddbf), "Qps","Shockwave (Qps) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4shkwav__a,    m4shkwav,   "swave_v210_11376_0bb3_nlv.bin",    0x0000, 0x040000, CRC(3fcaf973) SHA1(28258c8c60e6b542e1789cd8a4cfd530d1ed6084), "Qps","Shockwave (Qps) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4shkwav__b,    m4shkwav,   "swsplv.bin",                       0x0000, 0x040000, CRC(1e33e93f) SHA1(3e87f8ed35da776e1968c9574c140cc3984ea8de), "Qps","Shockwave (Qps) (MPU4) (set 3)" )
@@ -377,7 +377,7 @@ GAME_CUSTOM( 199?, m4shkwav__b,    m4shkwav,   "swsplv.bin",                    
 		ROM_LOAD( "sho1_0lv.bin", 0x0000, 0x080000, BAD_DUMP CRC(a76d8544) SHA1(8277a2ce311840b8405a087d3dc0bbf97054ad87) )
 		M4SHKWAV_EXTRA_ROMS
 	ROM_END
-GAME(199?, m4shkwav__c, m4shkwav ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,"Qps","Shockwave (Qps) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4shkwav__c, m4shkwav, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, "Qps", "Shockwave (Qps) (MPU4) (set 4)", GAME_FLAGS )
 GAME_CUSTOM( 199?, m4shkwav__d,    m4shkwav,   "swave_v300_1552_13ed_nlv.bin",     0x0000, 0x040000, CRC(b0e03f04) SHA1(fdd113af30fd9e87b171ecdf3be7e720366476b3), "Qps","Shockwave (Qps) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4shkwav__e,    m4shkwav,   "swave_v300_1555_119d_lv.bin",      0x0000, 0x040000, CRC(45b786d4) SHA1(24fd4fdea684103334385ca329f384796b496e2c), "Qps","Shockwave (Qps) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4shkwav__f,    m4shkwav,   "swsp_v300_1602_e1b2_nlv.bin",      0x0000, 0x040000, CRC(4ed74015) SHA1(0ab2167ba0ce6f1a1317c2087091187b9fa94c27), "Qps","Shockwave (Qps) (MPU4) (set 7)" )
@@ -397,7 +397,7 @@ GAME_CUSTOM( 199?, m4shkwav__g,    m4shkwav,   "swsp_v300_1606_ded8_lv.bin",    
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CLAB_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4clab,       0,      "70000019.bin",                     0x0000, 0x040000, CRC(23a12863) SHA1(4047cb8cbc03f96f2b8681b6276e100e8e9194a5), "Qps","Cash Lab (Qps) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4clab__a,    m4clab, "70000020.bin",                     0x0000, 0x040000, CRC(88af7368) SHA1(14dea4267a4365286eea1e02b9b44d4053618cbe), "Qps","Cash Lab (Qps) (MPU4) (set 2)" )
@@ -420,7 +420,7 @@ GAME_CUSTOM( 199?, m4clab__j,    m4clab, "clabrom",                          0x0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SDQUID_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sdquid,       0,          "70000352.bin", 0x0000, 0x040000, CRC(303d6177) SHA1(aadff8a81244bfd62d1cc088caf01496e1ff61db), "Qps","Sundance Quid (Qps) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sdquid__a,    m4sdquid,   "70000353.bin", 0x0000, 0x040000, CRC(6e3a9dfc) SHA1(1d5d04140811e17267102c0618ffdaf70f71f717), "Qps","Sundance Quid (Qps) (MPU4) (set 2)" )
@@ -447,7 +447,7 @@ GAME_CUSTOM( 199?, m4sdquid__k,    m4sdquid,   "70001461.bin", 0x0000, 0x080000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LOOPLT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4,  mpu4_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4looplt,       0,          "70000500.bin",     0x0000, 0x080000, CRC(040699a5) SHA1(e1ebc23684c5bc1faaac7409d2179488c3022872), "Qps","Loop The Loot (Qps) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4looplt__a,    m4looplt,   "70000500a.bin",    0x0000, 0x080000, CRC(0668f52d) SHA1(6560309facf0022e3c14421b848f212b18be7550), "Qps","Loop The Loot (Qps) (MPU4) (set 2)" )
@@ -468,16 +468,16 @@ GAME_CUSTOM( 199?, m4looplt__m,    m4looplt,   "70001505.bin",     0x0000, 0x080
 
 /* Global */
 // boot to "Percent Change" then "*initializing*"
-GAME(199?, m4bangin,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bangina, m4bangin, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4banginb, m4bangin, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4wwc,     0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4wwca,    m4wwc,    mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 2)" ,   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4wwcb,    m4wwc,    mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4screw,   0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4screwp,  m4screw,  mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8) (Protocol)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4screwa,  m4screw,  mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.7)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4screwb,  m4screw,  mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.5)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4vfm,     0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Value For Money (Global) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4jiggin,  0,        mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4) (set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4jiggina, m4jiggin, mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4) (set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bangin,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bangina, m4bangin, mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4banginb, m4bangin, mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4wwc,     0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4wwca,    m4wwc,    mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 2)" ,   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4wwcb,    m4wwc,    mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4screw,   0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4screwp,  m4screw,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8) (Protocol)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4screwa,  m4screw,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.7)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4screwb,  m4screw,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.5)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4vfm,     0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Value For Money (Global) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4jiggin,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4) (set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4jiggina, m4jiggin, mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4) (set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )

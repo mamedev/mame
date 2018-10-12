@@ -67,16 +67,28 @@ class macs_state : public driver_device
 {
 public:
 	macs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_cart_bank(0),
-			m_ram2(*this, "ram2"),
-			m_maincpu(*this,"maincpu"),
-			m_cart1(*this, "slot_a"),
-			m_cart2(*this, "slot_b"),
-			m_rombank(*this, "rombank%u", 1),
-			m_rambank(*this, "rambank%u", 1)
-			{ }
+		: driver_device(mconfig, type, tag)
+		, m_cart_bank(0)
+		, m_ram2(*this, "ram2")
+		, m_maincpu(*this,"maincpu")
+		, m_cart1(*this, "slot_a")
+		, m_cart2(*this, "slot_b")
+		, m_rombank(*this, "rombank%u", 1)
+		, m_rambank(*this, "rambank%u", 1)
+	{ }
 
+	void macs(machine_config &config);
+
+	void init_macs();
+	void init_kisekaeh();
+	void init_kisekaem();
+	void init_macs2();
+
+protected:
+	void machine_reset() override;
+	void machine_start() override;
+
+private:
 	uint8_t m_mux_data;
 	uint8_t m_rev;
 	uint8_t m_cart_bank;
@@ -86,13 +98,7 @@ public:
 	DECLARE_READ8_MEMBER(macs_input_r);
 	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
 	DECLARE_WRITE8_MEMBER(macs_output_w);
-	DECLARE_DRIVER_INIT(macs);
-	DECLARE_DRIVER_INIT(kisekaeh);
-	DECLARE_DRIVER_INIT(kisekaem);
-	DECLARE_DRIVER_INIT(macs2);
-	DECLARE_MACHINE_RESET(macs);
-	DECLARE_MACHINE_START(macs);
-	ST0016_DMA_OFFS_CB(dma_offset);
+	uint8_t dma_offset();
 
 	uint32_t screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -103,26 +109,26 @@ public:
 	required_memory_bank_array<2> m_rombank;
 	required_memory_bank_array<2> m_rambank;
 
-	void macs(machine_config &config);
 	void macs_io(address_map &map);
 	void macs_mem(address_map &map);
 };
 
 
 
-ADDRESS_MAP_START(macs_state::macs_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("rombank1")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank2")
+void macs_state::macs_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("rombank1");
+	map(0x8000, 0xbfff).bankr("rombank2");
 	//AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
 	//AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram ? */
-	AM_RANGE(0xe800, 0xe87f) AM_RAM AM_SHARE("ram2")
+	map(0xe000, 0xe7ff).ram(); /* work ram ? */
+	map(0xe800, 0xe87f).ram().share("ram2");
 	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
 	//AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
 	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK("rambank1") /* common /backup ram ?*/
-	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("rambank2") /* common /backup ram ?*/
-ADDRESS_MAP_END
+	map(0xf000, 0xf7ff).bankrw("rambank1"); /* common /backup ram ?*/
+	map(0xf800, 0xffff).bankrw("rambank2"); /* common /backup ram ?*/
+}
 
 WRITE8_MEMBER(macs_state::rambank_w)
 {
@@ -196,19 +202,20 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 	}
 }
 
-ADDRESS_MAP_START(macs_state::macs_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void macs_state::macs_io(address_map &map)
+{
+	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
-	AM_RANGE(0xc0, 0xc7) AM_READWRITE(macs_input_r,macs_output_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* renju = $40, neratte = 0 */
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(macs_rom_bank_w)
+	map(0xc0, 0xc7).rw(FUNC(macs_state::macs_input_r), FUNC(macs_state::macs_output_w));
+	map(0xe0, 0xe0).nopw(); /* renju = $40, neratte = 0 */
+	map(0xe1, 0xe1).w(FUNC(macs_state::macs_rom_bank_w));
 	//AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
 	//AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
 	//AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(rambank_w) /* banking ? ram bank ? shared rambank ? */
-	AM_RANGE(0xe7, 0xe7) AM_WRITENOP /* watchdog */
+	map(0xe6, 0xe6).w(FUNC(macs_state::rambank_w)); /* banking ? ram bank ? shared rambank ? */
+	map(0xe7, 0xe7).nopw(); /* watchdog */
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
-ADDRESS_MAP_END
+}
 
 //static GFXDECODE_START( macs )
 //  GFXDECODE_ENTRY( nullptr, 0, charlayout,      0, 16*4  )
@@ -489,31 +496,27 @@ uint32_t macs_state::screen_update_macs(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-ST0016_DMA_OFFS_CB(macs_state::dma_offset)
+uint8_t macs_state::dma_offset()
 {
 	return m_cart_bank;
 }
 
 MACHINE_CONFIG_START(macs_state::macs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(macs_mem)
-	MCFG_CPU_IO_MAP(macs_io)
-	MCFG_ST0016_DMA_OFFS_CB(macs_state, dma_offset)
-
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", macs_state, irq0_line_hold)
-
-	MCFG_MACHINE_START_OVERRIDE(macs_state, macs)
-	MCFG_MACHINE_RESET_OVERRIDE(macs_state, macs)
+	ST0016_CPU(config, m_maincpu, 8000000); // 8 MHz ?
+	m_maincpu->set_memory_map(&macs_state::macs_mem);
+	m_maincpu->set_io_map(&macs_state::macs_io);
+	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(128*8, 128*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(macs_state, screen_update_macs)
-	MCFG_SCREEN_PALETTE("maincpu:palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(128*8, 128*8);
+	screen.set_visarea(0*8, 128*8-1, 0*8, 128*8-1);
+	screen.set_screen_update(FUNC(macs_state::screen_update_macs));
+	screen.set_palette("maincpu:palette");
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE); // FIXME: HOLD_LINE is bad juju
 
 	MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_a", generic_plain_slot, "macs_cart", "rom")
 	MCFG_SET_IMAGE_LOADABLE(false)
@@ -652,7 +655,7 @@ static const uint8_t ramdata[160]=
 };
 #endif
 
-MACHINE_START_MEMBER(macs_state,macs)
+void macs_state::machine_start()
 {
 	m_rombank[0]->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
 	m_rombank[0]->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
@@ -671,9 +674,9 @@ MACHINE_START_MEMBER(macs_state,macs)
 	m_rambank[1]->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(macs_state,macs)
+void macs_state::machine_reset()
 {
-	#if 0
+#if 0
 	uint8_t *macs_ram1 = m_ram1.get();
 	uint8_t *macs_ram2 = m_ram2;
 /*
@@ -704,70 +707,67 @@ MACHINE_RESET_MEMBER(macs_state,macs)
         730E: ED B0         ldir
         ...
 */
-		memcpy(macs_ram1 + 0x0e9f, memregion("bios")->base()+0x7327, 0xc7);
-		memcpy(macs_ram1 + 0x1e9f, memregion("bios")->base()+0x7327, 0xc7);
+	memcpy(macs_ram1 + 0x0e9f, memregion("bios")->base()+0x7327, 0xc7);
+	memcpy(macs_ram1 + 0x1e9f, memregion("bios")->base()+0x7327, 0xc7);
 
-		memcpy(macs_ram1 + 0x0800, memregion("bios")->base()+0x73fa, 0x507);
-		memcpy(macs_ram1 + 0x1800, memregion("bios")->base()+0x73fa, 0x507);
+	memcpy(macs_ram1 + 0x0800, memregion("bios")->base()+0x73fa, 0x507);
+	memcpy(macs_ram1 + 0x1800, memregion("bios")->base()+0x73fa, 0x507);
 
 #define MAKEJMP(n,m)    macs_ram2[(n) - 0xe800 + 0]=0xc3;\
 						macs_ram2[(n) - 0xe800 + 1]=(m)&0xff;\
 						macs_ram2[(n) - 0xe800 + 2]=((m)>>8)&0xff;
 
-		MAKEJMP(0xe810, 0xfe4b);
-		MAKEJMP(0xe816, 0xfe9f);
-		MAKEJMP(0xe81a, 0xfee0);
+	MAKEJMP(0xe810, 0xfe4b);
+	MAKEJMP(0xe816, 0xfe9f);
+	MAKEJMP(0xe81a, 0xfee0);
 
 #undef MAKEJMP
 
-		{
-			int i;
-			for(i=0;i<160;i++)
-			{
-				macs_ram1[0xe00+i]=ramdata[i];
-				macs_ram1[0x1e00+i]=ramdata[i];
-			}
-		}
-		macs_ram1[0x0f67]=0xff;
-		macs_ram1[0x1f67]=0xff;
+	for(int i=0;i<160;i++)
+	{
+		macs_ram1[0xe00+i]=ramdata[i];
+		macs_ram1[0x1e00+i]=ramdata[i];
+	}
+	macs_ram1[0x0f67]=0xff;
+	macs_ram1[0x1f67]=0xff;
 
-		macs_ram1[0x0ff6]=0x02;
-		macs_ram1[0x1ff6]=0x02;
+	macs_ram1[0x0ff6]=0x02;
+	macs_ram1[0x1ff6]=0x02;
 
-		macs_ram1[0x0ff7]=0x08;
-		macs_ram1[0x1ff7]=0x08;
+	macs_ram1[0x0ff7]=0x08;
+	macs_ram1[0x1ff7]=0x08;
 
-		macs_ram1[0x0ff8]=0x6c;
-		macs_ram1[0x1ff8]=0x6c;
+	macs_ram1[0x0ff8]=0x6c;
+	macs_ram1[0x1ff8]=0x6c;
 
-		macs_ram1[0x0ff9]=0x07;
-		macs_ram1[0x1ff9]=0x07;
-		#endif
+	macs_ram1[0x0ff9]=0x07;
+	macs_ram1[0x1ff9]=0x07;
+#endif
 }
 
 
-DRIVER_INIT_MEMBER(macs_state,macs)
+void macs_state::init_macs()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((10 | 0x80));
 	m_rev = 1;
 }
 
-DRIVER_INIT_MEMBER(macs_state,macs2)
+void macs_state::init_macs2()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((10 | 0x80));
 	m_rev = 2;
 }
 
-DRIVER_INIT_MEMBER(macs_state,kisekaeh)
+void macs_state::init_kisekaeh()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((11 | 0x180));
 	m_rev = 1;
 }
 
-DRIVER_INIT_MEMBER(macs_state,kisekaem)
+void macs_state::init_kisekaem()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((10 | 0x180));
@@ -775,11 +775,11 @@ DRIVER_INIT_MEMBER(macs_state,kisekaem)
 }
 
 
-GAME( 1995, macsbios, 0,        macs, macs_m,   macs_state, macs,     ROT0, "I'Max",            "Multi Amenity Cassette System BIOS",   MACHINE_IS_BIOS_ROOT | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1995, mac2bios, 0,        macs, macs_m,   macs_state, macs2,    ROT0, "I'Max",            "Multi Amenity Cassette System 2 BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1995, macsbios, 0,        macs, macs_m,   macs_state, init_macs,     ROT0, "I'Max",            "Multi Amenity Cassette System BIOS",   MACHINE_IS_BIOS_ROOT | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1995, mac2bios, 0,        macs, macs_m,   macs_state, init_macs2,    ROT0, "I'Max",            "Multi Amenity Cassette System 2 BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 1995, kisekaem, macsbios, macs, kisekaem, macs_state, kisekaem, ROT0, "I'Max",            "Kisekae Mahjong",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, kisekaeh, macsbios, macs, macs_h,   macs_state, kisekaeh, ROT0, "I'Max",            "Kisekae Hanafuda",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, cultname, macsbios, macs, macs_m,   macs_state, macs,     ROT0, "I'Max",            "Seimei-Kantei-Meimei-Ki Cult Name",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, yuka,     macsbios, macs, macs_h,   macs_state, macs2,    ROT0, "Yubis / T.System", "Yu-Ka",                                0 )
-GAME( 1999, yujan,    macsbios, macs, macs_m,   macs_state, macs2,    ROT0, "Yubis / T.System", "Yu-Jan",                               0 )
+GAME( 1995, kisekaem, macsbios, macs, kisekaem, macs_state, init_kisekaem, ROT0, "I'Max",            "Kisekae Mahjong",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, kisekaeh, macsbios, macs, macs_h,   macs_state, init_kisekaeh, ROT0, "I'Max",            "Kisekae Hanafuda",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, cultname, macsbios, macs, macs_m,   macs_state, init_macs,     ROT0, "I'Max",            "Seimei-Kantei-Meimei-Ki Cult Name",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, yuka,     macsbios, macs, macs_h,   macs_state, init_macs2,    ROT0, "Yubis / T.System", "Yu-Ka",                                0 )
+GAME( 1999, yujan,    macsbios, macs, macs_m,   macs_state, init_macs2,    ROT0, "Yubis / T.System", "Yu-Jan",                               0 )

@@ -34,21 +34,22 @@ Game Status:
 #include "gamecom.lh"
 
 
-ADDRESS_MAP_START(gamecom_state::gamecom_mem_map)
-	AM_RANGE( 0x0000, 0x0013 )  AM_RAM AM_REGION("maincpu", 0x00)
-	AM_RANGE( 0x0014, 0x0017 )  AM_READWRITE( gamecom_pio_r, gamecom_pio_w )        // buttons
-	AM_RANGE( 0x0018, 0x001F )  AM_RAM AM_REGION("maincpu", 0x18)
-	AM_RANGE( 0x0020, 0x007F )  AM_READWRITE( gamecom_internal_r, gamecom_internal_w )/* CPU internal register file */
-	AM_RANGE( 0x0080, 0x03FF )  AM_RAM AM_REGION("maincpu", 0x80)                     /* RAM */
-	AM_RANGE( 0x0400, 0x0FFF )  AM_NOP                                                /* Nothing */
-	AM_RANGE( 0x1000, 0x1FFF )  AM_ROM                                                /* Internal ROM (initially), or External ROM/Flash. Controlled by MMU0 (never swapped out in game.com) */
-	AM_RANGE( 0x2000, 0x3FFF )  AM_ROMBANK("bank1")                                   /* External ROM/Flash. Controlled by MMU1 */
-	AM_RANGE( 0x4000, 0x5FFF )  AM_ROMBANK("bank2")                                   /* External ROM/Flash. Controlled by MMU2 */
-	AM_RANGE( 0x6000, 0x7FFF )  AM_ROMBANK("bank3")                                   /* External ROM/Flash. Controlled by MMU3 */
-	AM_RANGE( 0x8000, 0x9FFF )  AM_ROMBANK("bank4")                                   /* External ROM/Flash. Controlled by MMU4 */
-	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_SHARE("videoram")             /* VRAM */
-	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM AM_SHARE("nvram")           /* Extended I/O, Extended RAM */
-ADDRESS_MAP_END
+void gamecom_state::gamecom_mem_map(address_map &map)
+{
+	map(0x0000, 0x0013).ram().region("maincpu", 0x00);
+	map(0x0014, 0x0017).rw(FUNC(gamecom_state::gamecom_pio_r), FUNC(gamecom_state::gamecom_pio_w));        // buttons
+	map(0x0018, 0x001F).ram().region("maincpu", 0x18);
+	map(0x0020, 0x007F).rw(FUNC(gamecom_state::gamecom_internal_r), FUNC(gamecom_state::gamecom_internal_w));/* CPU internal register file */
+	map(0x0080, 0x03FF).ram().region("maincpu", 0x80);                     /* RAM */
+	map(0x0400, 0x0FFF).noprw();                                                /* Nothing */
+	map(0x1000, 0x1FFF).rom();                                                /* Internal ROM (initially), or External ROM/Flash. Controlled by MMU0 (never swapped out in game.com) */
+	map(0x2000, 0x3FFF).bankr("bank1");                                   /* External ROM/Flash. Controlled by MMU1 */
+	map(0x4000, 0x5FFF).bankr("bank2");                                   /* External ROM/Flash. Controlled by MMU2 */
+	map(0x6000, 0x7FFF).bankr("bank3");                                   /* External ROM/Flash. Controlled by MMU3 */
+	map(0x8000, 0x9FFF).bankr("bank4");                                   /* External ROM/Flash. Controlled by MMU4 */
+	map(0xA000, 0xDFFF).ram().share("videoram");             /* VRAM */
+	map(0xE000, 0xFFFF).ram().share("nvram");           /* Extended I/O, Extended RAM */
+}
 
 static INPUT_PORTS_START( gamecom )
 	PORT_START("IN0")
@@ -249,15 +250,15 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 
 MACHINE_CONFIG_START(gamecom_state::gamecom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", SM8500, XTAL(11'059'200)/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
-	MCFG_CPU_PROGRAM_MAP( gamecom_mem_map)
-	MCFG_SM8500_DMA_CB( WRITE8( gamecom_state, gamecom_handle_dma ) )
-	MCFG_SM8500_TIMER_CB( WRITE8( gamecom_state, gamecom_update_timers ) )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gamecom_state,  gamecom_interrupt)
+	MCFG_DEVICE_ADD( "maincpu", SM8500, XTAL(11'059'200)/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
+	MCFG_DEVICE_PROGRAM_MAP( gamecom_mem_map)
+	MCFG_SM8500_DMA_CB( WRITE8( *this, gamecom_state, gamecom_handle_dma ) )
+	MCFG_SM8500_TIMER_CB( WRITE8( *this, gamecom_state, gamecom_update_timers ) )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gamecom_state,  gamecom_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -268,20 +269,20 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_gamecom)
+	config.set_default_layout(layout_gamecom);
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(gamecom_state, gamecom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "speaker" )
+	SPEAKER(config, "speaker").front_center();
 	/* TODO: much more complex than this */
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (Digital audio)
-	MCFG_SOUND_ADD("dac0", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
-	MCFG_SOUND_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (Digital audio)
+	MCFG_DEVICE_ADD("dac0", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
+	MCFG_DEVICE_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_linear_slot, "gamecom_cart")
@@ -303,5 +304,5 @@ ROM_START( gamecom )
 	ROM_LOAD( "external.bin", 0x00000, 0x40000, CRC(e235a589) SHA1(97f782e72d738f4d7b861363266bf46b438d9b50) )
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT     COMPANY  FULLNAME    FLAGS
-CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, gamecom, "Tiger", "Game.com", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY  FULLNAME    FLAGS
+CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

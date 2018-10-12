@@ -29,37 +29,42 @@
 INPUT_PORTS_EXTERN(badlands);
 
 
-class badlands_state : public atarigen_state
+class badlands_state : public driver_device
 {
 public:
 	badlands_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_soundcomm(*this, "soundcomm"),
+			m_screen(*this, "screen"),
+			m_gfxdecode(*this, "gfxdecode"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_mob(*this, "mob")
 			{ }
 
+	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<atari_sound_comm_device> m_soundcomm;
 
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<tilemap_device> m_playfield_tilemap;
 	optional_device<atari_motion_objects_device> m_mob;
 
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(sound_busy_r);
 	DECLARE_READ16_MEMBER(pedal_0_r);
 	DECLARE_READ16_MEMBER(pedal_1_r);
 	DECLARE_READ8_MEMBER(audio_io_r);
 	DECLARE_WRITE8_MEMBER(audio_io_w);
-	DECLARE_DRIVER_INIT(badlands);
+	void init_badlands();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(badlands);
 	DECLARE_MACHINE_RESET(badlands);
 	DECLARE_VIDEO_START(badlands);
 	uint32_t screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
+	DECLARE_WRITE16_MEMBER(video_int_ack_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_scanline);
 	DECLARE_WRITE16_MEMBER( badlands_pf_bank_w );
 

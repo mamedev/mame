@@ -21,29 +21,31 @@ DEFINE_DEVICE_TYPE(DECOCPU2,  decocpu_type2_device,  "decocpu2",  "Data East Pin
 DEFINE_DEVICE_TYPE(DECOCPU3,  decocpu_type3_device,  "decocpu3",  "Data East Pinball CPU Board Type 3")
 DEFINE_DEVICE_TYPE(DECOCPU3B, decocpu_type3b_device, "decocpu3b", "Data East Pinball CPU Board Type 3B")
 
-ADDRESS_MAP_START(decocpu_type1_device::decocpu1_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
-	AM_RANGE(0x2200, 0x2200) AM_WRITE(solenoid2_w) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
-	AM_RANGE(0x2c00, 0x2c03) AM_DEVREADWRITE("pia2c", pia6821_device, read, write) // alphanumeric display
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia34", pia6821_device, read, write) // widget
+void decocpu_type1_device::decocpu1_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
+	map(0x2200, 0x2200).w(FUNC(decocpu_type1_device::solenoid2_w)); // solenoids
+	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
+	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
+	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
+	map(0x3000, 0x3003).rw("pia30", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
+	map(0x3400, 0x3403).rw("pia34", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // widget
 	//AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(decocpu_type2_device::decocpu2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
-	AM_RANGE(0x2200, 0x2200) AM_WRITE(solenoid2_w) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
-	AM_RANGE(0x2c00, 0x2c03) AM_DEVREADWRITE("pia2c", pia6821_device, read, write) // alphanumeric display
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia34", pia6821_device, read, write) // widget
+void decocpu_type2_device::decocpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("nvram");
+	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
+	map(0x2200, 0x2200).w(FUNC(decocpu_type2_device::solenoid2_w)); // solenoids
+	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
+	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
+	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
+	map(0x3000, 0x3003).rw("pia30", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
+	map(0x3400, 0x3403).rw("pia34", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // widget
 	//AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( decocpu1 )
 	PORT_START("DIAGS")
@@ -85,7 +87,7 @@ INPUT_CHANGED_MEMBER( decocpu_type1_device::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( decocpu_type1_device::audio_nmi )
@@ -199,50 +201,50 @@ WRITE8_MEMBER( decocpu_type1_device::solenoid2_w )
 
 MACHINE_CONFIG_START(decocpu_type1_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(decocpu1_map)
+	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(decocpu1_map)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia21", PIA6821, 0) // 5F - PIA at 0x2100
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, solenoid1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(decocpu_type1_device, pia21_ca2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	PIA6821(config, m_pia21, 0); // 5F - PIA at 0x2100
+	m_pia21->writepa_handler().set(FUNC(decocpu_type1_device::solenoid1_w));
+	m_pia21->ca2_handler().set(FUNC(decocpu_type1_device::pia21_ca2_w));
+	m_pia21->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
+	m_pia21->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	MCFG_DEVICE_ADD("pia24", PIA6821, 0) // 11D - PIA at 0x2400
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, lamp1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	PIA6821(config, m_pia24, 0); // 11D - PIA at 0x2400
+	m_pia24->writepa_handler().set(FUNC(decocpu_type1_device::lamp0_w));
+	m_pia24->writepb_handler().set(FUNC(decocpu_type1_device::lamp1_w));
+	m_pia24->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
+	m_pia24->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	MCFG_DEVICE_ADD("pia28", PIA6821, 0) // 11B - PIA at 0x2800
-	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, display_strobe_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_strobe_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, display_out1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	PIA6821(config, m_pia28, 0); // 11B - PIA at 0x2800
+	m_pia28->readpa_handler().set(FUNC(decocpu_type1_device::display_strobe_r));
+	m_pia28->writepa_handler().set(FUNC(decocpu_type1_device::display_strobe_w));
+	m_pia28->writepb_handler().set(FUNC(decocpu_type1_device::display_out1_w));
+	m_pia28->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
+	m_pia28->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	MCFG_DEVICE_ADD("pia2c", PIA6821, 0) // 9B - PIA at 0x2c00
-	MCFG_PIA_READPB_HANDLER(READ8(decocpu_type1_device, display_in3_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_out2_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, display_out3_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	PIA6821(config, m_pia2c, 0); // 9B - PIA at 0x2c00
+	m_pia2c->readpb_handler().set(FUNC(decocpu_type1_device::display_in3_r));
+	m_pia2c->writepa_handler().set(FUNC(decocpu_type1_device::display_out2_w));
+	m_pia2c->writepb_handler().set(FUNC(decocpu_type1_device::display_out3_w));
+	m_pia2c->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
+	m_pia2c->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	MCFG_DEVICE_ADD("pia30", PIA6821, 0) // 8H - PIA at 0x3000
-	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, switch_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	PIA6821(config, m_pia30, 0); // 8H - PIA at 0x3000
+	m_pia30->readpa_handler().set(FUNC(decocpu_type1_device::switch_r));
+	m_pia30->writepb_handler().set(FUNC(decocpu_type1_device::switch_w));
+	m_pia30->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
+	m_pia30->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	MCFG_DEVICE_ADD("pia34", PIA6821, 0) // 7B - PIA at 0x3400
-	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, dmdstatus_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_out4_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, sound_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	PIA6821(config, m_pia34, 0); // 7B - PIA at 0x3400
+	m_pia34->readpa_handler().set(FUNC(decocpu_type1_device::dmdstatus_r));
+	m_pia34->writepa_handler().set(FUNC(decocpu_type1_device::display_out4_w));
+	m_pia34->writepb_handler().set(FUNC(decocpu_type1_device::sound_w));
+	m_pia34->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
+	m_pia34->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 MACHINE_CONFIG_END
 
 ioport_constructor decocpu_type1_device::device_input_ports() const
@@ -306,8 +308,8 @@ MACHINE_CONFIG_START(decocpu_type2_device::device_add_mconfig)
 	decocpu_type1_device::device_add_mconfig(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(decocpu2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(decocpu2_map)
 MACHINE_CONFIG_END
 
 void decocpu_type2_device::device_start()

@@ -12,6 +12,7 @@
 #include "sound/dac.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 
 #define SCREEN_TAG  "screen"
 #define I8048_TAG   "i8048"

@@ -34,6 +34,11 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
+	void sgi_ip6(machine_config &config);
+
+	void init_sgi_ip6();
+
+private:
 	ip6_regs_t m_ip6_regs;
 	DECLARE_READ32_MEMBER(ip6_unk1_r);
 	DECLARE_WRITE32_MEMBER(ip6_unk1_w);
@@ -41,7 +46,6 @@ public:
 	DECLARE_WRITE32_MEMBER(ip6_unk2_w);
 	DECLARE_READ32_MEMBER(ip6_unk3_r);
 	DECLARE_WRITE32_MEMBER(ip6_unk3_w);
-	DECLARE_DRIVER_INIT(sgi_ip6);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -49,7 +53,6 @@ public:
 	INTERRUPT_GEN_MEMBER(sgi_ip6_vbl);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
-	void sgi_ip6(machine_config &config);
 	void sgi_ip6_map(address_map &map);
 };
 
@@ -68,7 +71,7 @@ inline void ATTR_PRINTF(3,4) sgi_ip6_state::verboselog( int n_level, const char 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", machine().device("maincpu")->safe_pc(), buf);
+		logerror("%s: %s", machine().describe_context(), buf);
 	}
 #endif
 }
@@ -218,22 +221,23 @@ void sgi_ip6_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(sgi_ip6_state::sgi_ip6_map)
-	AM_RANGE( 0x1f880000, 0x1f880003 ) AM_READWRITE(ip6_unk1_r, ip6_unk1_w)
-	AM_RANGE( 0x1fb00000, 0x1fb00003 ) AM_READWRITE(ip6_unk3_r, ip6_unk3_w)
-	AM_RANGE( 0x1fbc004c, 0x1fbc004f ) AM_READWRITE(ip6_unk2_r, ip6_unk2_w)
-	AM_RANGE( 0x1fc00000, 0x1fc3ffff ) AM_ROM AM_REGION( "user1", 0 )
-ADDRESS_MAP_END
+void sgi_ip6_state::sgi_ip6_map(address_map &map)
+{
+	map(0x1f880000, 0x1f880003).rw(FUNC(sgi_ip6_state::ip6_unk1_r), FUNC(sgi_ip6_state::ip6_unk1_w));
+	map(0x1fb00000, 0x1fb00003).rw(FUNC(sgi_ip6_state::ip6_unk3_r), FUNC(sgi_ip6_state::ip6_unk3_w));
+	map(0x1fbc004c, 0x1fbc004f).rw(FUNC(sgi_ip6_state::ip6_unk2_r), FUNC(sgi_ip6_state::ip6_unk2_w));
+	map(0x1fc00000, 0x1fc3ffff).rom().region("user1", 0);
+}
 
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
 MACHINE_CONFIG_START(sgi_ip6_state::sgi_ip6)
-	MCFG_CPU_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
+	MCFG_DEVICE_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP( sgi_ip6_map )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
+	MCFG_DEVICE_PROGRAM_MAP( sgi_ip6_map )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
 
 
 	/* video hardware */
@@ -252,7 +256,7 @@ static INPUT_PORTS_START( sgi_ip6 )
 	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(sgi_ip6_state,sgi_ip6)
+void sgi_ip6_state::init_sgi_ip6()
 {
 }
 
@@ -267,5 +271,5 @@ ROM_START( sgi_ip6 )
 	ROM_LOAD( "4d202031.bin", 0x000000, 0x040000, CRC(065a290a) SHA1(6f5738e79643f94901e6efe3612468d14177f65b) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT    STATE           INIT      COMPANY                 FULLNAME                FLAGS
-COMP( 1988, sgi_ip6,  0,        0,        sgi_ip6,  sgi_ip6, sgi_ip6_state,  sgi_ip6,  "Silicon Graphics Inc", "4D/PI (R2000, 20MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME                FLAGS
+COMP( 1988, sgi_ip6, 0,      0,      sgi_ip6, sgi_ip6, sgi_ip6_state, init_sgi_ip6, "Silicon Graphics Inc", "4D/PI (R2000, 20MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

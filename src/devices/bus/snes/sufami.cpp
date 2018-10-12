@@ -46,9 +46,10 @@ void sns_rom_strom_device::device_start()
 }
 
 
-static SLOT_INTERFACE_START(sufamiturbo_cart)
-	SLOT_INTERFACE_INTERNAL("strom",  SNS_STROM)
-SLOT_INTERFACE_END
+static void sufamiturbo_cart(device_slot_interface &device)
+{
+	device.option_add_internal("strom",  SNS_STROM);
+}
 
 
 //-------------------------------------------------

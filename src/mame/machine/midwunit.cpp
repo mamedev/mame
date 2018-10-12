@@ -202,29 +202,29 @@ void midwunit_state::init_mk3_common()
 	//midway_serial_pic_init(machine(), 528);
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,mk3)
+void midwunit_state::init_mk3()
 {
 	init_mk3_common();
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,mk3r20)
+void midwunit_state::init_mk3r20()
 {
 	init_mk3_common();
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,mk3r10)
+void midwunit_state::init_mk3r10()
 {
 	init_mk3_common();
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,umk3)
+void midwunit_state::init_umk3()
 {
 	init_mk3_common();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
 	m_umk3_palette = m_mainram + (0x6a060>>4);
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,umk3r11)
+void midwunit_state::init_umk3r11()
 {
 	init_mk3_common();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f,write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
@@ -234,7 +234,7 @@ DRIVER_INIT_MEMBER(midwunit_state,umk3r11)
 
 /********************** 2 On 2 Open Ice Challenge **********************/
 
-DRIVER_INIT_MEMBER(midwunit_state,openice)
+void midwunit_state::init_openice()
 {
 	/* common init */
 	init_wunit_generic();
@@ -246,7 +246,7 @@ DRIVER_INIT_MEMBER(midwunit_state,openice)
 
 /********************** NBA Hangtime & NBA Maximum Hangtime **********************/
 
-DRIVER_INIT_MEMBER(midwunit_state,nbahangt)
+void midwunit_state::init_nbahangt()
 {
 	/* common init */
 	init_wunit_generic();
@@ -307,7 +307,7 @@ WRITE16_MEMBER(midwunit_state::wwfmania_io_0_w)
 	logerror("Changed I/O swiching to %d\n", data);
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,wwfmania)
+void midwunit_state::init_wwfmania()
 {
 	/* common init */
 	init_wunit_generic();
@@ -322,7 +322,7 @@ DRIVER_INIT_MEMBER(midwunit_state,wwfmania)
 
 /********************** Rampage World Tour **********************/
 
-DRIVER_INIT_MEMBER(midwunit_state,rmpgwt)
+void midwunit_state::init_rmpgwt()
 {
 	/* common init */
 	init_wunit_generic();

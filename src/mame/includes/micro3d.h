@@ -13,8 +13,10 @@
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/upd7759.h"
+#include "machine/adc0844.h"
 #include "machine/mc2661.h"
 #include "machine/mc68681.h"
+#include "emupal.h"
 
 
 #define HOST_MONITOR_DISPLAY        0
@@ -42,13 +44,8 @@ class micro3d_sound_device;
 class micro3d_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_MAC_DONE
-	};
-
-	micro3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	micro3d_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_upd7759(*this, "upd7759"),
@@ -58,6 +55,7 @@ public:
 		m_duart(*this, "duart"),
 		m_noise_1(*this, "noise_1"),
 		m_noise_2(*this, "noise_2"),
+		m_adc(*this, "adc"),
 		m_vertex(*this, "vertex"),
 		m_sound_sw(*this, "SOUND_SW"),
 		m_volume(*this, "VOLUME"),
@@ -69,6 +67,20 @@ public:
 		m_vgb_uart(*this, "uart")
 	{ }
 
+	void micro3d(machine_config &config);
+	void botss11(machine_config &config);
+
+	void init_micro3d();
+	void init_botss();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
+
+private:
+	enum
+	{
+		TIMER_MAC_DONE
+	};
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8051_device> m_audiocpu;
 	required_device<upd7759_device> m_upd7759;
@@ -78,6 +90,7 @@ public:
 	required_device<mc68681_device> m_duart;
 	required_device<micro3d_sound_device> m_noise_1;
 	required_device<micro3d_sound_device> m_noise_2;
+	optional_device<adc0844_device> m_adc;
 	required_memory_region m_vertex;
 
 	required_ioport m_sound_sw;
@@ -151,15 +164,12 @@ public:
 	DECLARE_WRITE32_MEMBER(micro3d_fifo_w);
 	DECLARE_WRITE32_MEMBER(micro3d_alt_fifo_w);
 	DECLARE_READ32_MEMBER(micro3d_pipe_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_a);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
 	DECLARE_WRITE8_MEMBER(micro3d_sound_p1_w);
 	DECLARE_WRITE8_MEMBER(micro3d_sound_p3_w);
 	DECLARE_READ8_MEMBER(micro3d_sound_p1_r);
 	DECLARE_READ8_MEMBER(micro3d_sound_p3_r);
-	DECLARE_DRIVER_INIT(micro3d);
-	DECLARE_DRIVER_INIT(botss);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
@@ -184,19 +194,15 @@ public:
 	int clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vertices, enum planes plane);
 	void draw_triangles(uint32_t attr);
 
-
-	void micro3d(machine_config &config);
-	void botss11(machine_config &config);
 	void drmath_data(address_map &map);
 	void drmath_prg(address_map &map);
 	void hostmem(address_map &map);
 	void soundmem_io(address_map &map);
 	void soundmem_prg(address_map &map);
 	void vgbmem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<mc2661_device> m_vgb_uart;
 };
 

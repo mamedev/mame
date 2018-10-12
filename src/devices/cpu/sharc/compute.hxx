@@ -1270,7 +1270,7 @@ void adsp21062_device::compute_fmul_avg(int fm, int fxm, int fym, int fa, int fx
 	int32_t alu_i;
 	SHARC_REG r_mul, r_alu;
 	r_mul.f = FREG(fxm) * FREG(fym);
-	r_alu.f = (FREG(fxa) * FREG(fya))/((float) 2.0);
+	r_alu.f = (FREG(fxa) + FREG(fya))/((float) 2.0);
 
 	// TODO: are flags right for this?
 	if (m_core->mode1 & MODE1_TRUNCATE)

@@ -19,6 +19,7 @@
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -44,7 +45,7 @@ public:
 	DECLARE_READ8_MEMBER(tape_stop_r);
 	DECLARE_READ8_MEMBER(tape_start_r);
 	DECLARE_WRITE8_MEMBER(xor_display_w);
-	DECLARE_DRIVER_INIT(bmjr);
+	void init_bmjr();
 	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bmjr(machine_config &config);
@@ -164,28 +165,29 @@ WRITE8_MEMBER( bmjr_state::xor_display_w )
 	m_xor_display = data;
 }
 
-ADDRESS_MAP_START(bmjr_state::bmjr_mem)
-	ADDRESS_MAP_UNMAP_HIGH
+void bmjr_state::bmjr_mem(address_map &map)
+{
+	map.unmap_value_high();
 	//0x0100, 0x03ff basic vram
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0
 	//0x2100, 0x38ff vram, modes 0x44 / 0xcc
-	AM_RANGE(0x0000, 0xafff) AM_RAM AM_SHARE("wram")
-	AM_RANGE(0xb000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_ROM
+	map(0x0000, 0xafff).ram().share("wram");
+	map(0xb000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).rom();
 //  AM_RANGE(0xe890, 0xe890) W MP-1710 tile color
 //  AM_RANGE(0xe891, 0xe891) W MP-1710 background color
 //  AM_RANGE(0xe892, 0xe892) W MP-1710 monochrome / color setting
-	AM_RANGE(0xee00, 0xee00) AM_READ(tape_stop_r) //R stop tape
-	AM_RANGE(0xee20, 0xee20) AM_READ(tape_start_r) //R start tape
-	AM_RANGE(0xee40, 0xee40) AM_WRITE(xor_display_w) //W Picture reverse
-	AM_RANGE(0xee80, 0xee80) AM_READWRITE(tape_r,tape_w)//RW tape input / output
-	AM_RANGE(0xeec0, 0xeec0) AM_READWRITE(key_r,key_w)//RW keyboard
-	AM_RANGE(0xef00, 0xef00) AM_READ(ff_r) //R timer
-	AM_RANGE(0xef40, 0xef40) AM_READ(ff_r) //R unknown
-	AM_RANGE(0xef80, 0xef80) AM_READ(unk_r) //R unknown
+	map(0xee00, 0xee00).r(FUNC(bmjr_state::tape_stop_r)); //R stop tape
+	map(0xee20, 0xee20).r(FUNC(bmjr_state::tape_start_r)); //R start tape
+	map(0xee40, 0xee40).w(FUNC(bmjr_state::xor_display_w)); //W Picture reverse
+	map(0xee80, 0xee80).rw(FUNC(bmjr_state::tape_r), FUNC(bmjr_state::tape_w));//RW tape input / output
+	map(0xeec0, 0xeec0).rw(FUNC(bmjr_state::key_r), FUNC(bmjr_state::key_w));//RW keyboard
+	map(0xef00, 0xef00).r(FUNC(bmjr_state::ff_r)); //R timer
+	map(0xef40, 0xef40).r(FUNC(bmjr_state::ff_r)); //R unknown
+	map(0xef80, 0xef80).r(FUNC(bmjr_state::unk_r)); //R unknown
 //  AM_RANGE(0xefe0, 0xefe0) W screen mode
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).rom();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( bmjr )
@@ -320,7 +322,7 @@ static const gfx_layout bmjr_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( bmjr )
+static GFXDECODE_START( gfx_bmjr )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bmjr_charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -337,9 +339,9 @@ void bmjr_state::machine_reset()
 
 MACHINE_CONFIG_START(bmjr_state::bmjr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6800, XTAL(4'000'000)/4) //unknown clock / divider
-	MCFG_CPU_PROGRAM_MAP(bmjr_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(4'000'000)/4) //unknown clock / divider
+	MCFG_DEVICE_PROGRAM_MAP(bmjr_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -352,14 +354,12 @@ MACHINE_CONFIG_START(bmjr_state::bmjr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmjr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmjr)
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200) // guesswork
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50); // guesswork
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -377,9 +377,9 @@ ROM_START( bmjr )
 ROM_END
 
 /* Driver */
-DRIVER_INIT_MEMBER(bmjr_state,bmjr)
+void bmjr_state::init_bmjr()
 {
 }
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY    FULLNAME           FLAGS */
-COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr,  bmjr_state,  bmjr,  "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME           FLAGS */
+COMP( 1982, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, init_bmjr, "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)

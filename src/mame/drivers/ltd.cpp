@@ -58,12 +58,20 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "nvram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(atla_ltd);
-	DECLARE_DRIVER_INIT(bhol_ltd);
-	DECLARE_DRIVER_INIT(zephy);
-	DECLARE_DRIVER_INIT(ltd);
+	void ltd4(machine_config &config);
+	void ltd3(machine_config &config);
+
+	void init_atla_ltd();
+	void init_bhol_ltd();
+	void init_zephy();
+	void init_ltd();
+
+	DECLARE_INPUT_CHANGED_MEMBER(ficha);
+
+private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(port1_r);
@@ -71,14 +79,11 @@ public:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_WRITE8_MEMBER(count_reset_w);
-	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
-	void ltd4(machine_config &config);
-	void ltd3(machine_config &config);
 	void ltd3_map(address_map &map);
 	void ltd4_io(address_map &map);
 	void ltd4_map(address_map &map);
-private:
+
 	bool m_timer_r;
 	bool m_clear;
 	uint8_t m_counter;
@@ -87,37 +92,42 @@ private:
 	uint8_t m_out_offs;
 	uint8_t m_port2;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
+	output_finder<50> m_digits;
 };
 
 
-ADDRESS_MAP_START(ltd_state::ltd3_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("nvram") // internal to the cpu
-	AM_RANGE(0x0080, 0x0087) AM_MIRROR(0x78) AM_READ(io_r)
-	AM_RANGE(0x0800, 0x2fff) AM_WRITE(io_w)
-	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_MIRROR(0x3000) AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void ltd_state::ltd3_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram().share("nvram"); // internal to the cpu
+	map(0x0080, 0x0087).mirror(0x78).r(FUNC(ltd_state::io_r));
+	map(0x0800, 0x2fff).w(FUNC(ltd_state::io_w));
+	map(0xc000, 0xcfff).rom().mirror(0x3000).region("roms", 0);
+}
 
-ADDRESS_MAP_START(ltd_state::ltd4_map)
-	AM_RANGE(0x0000, 0x001f) AM_RAM // internal to the cpu
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(count_reset_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVWRITE("aysnd_1", ay8910_device, reset_w)
-	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("aysnd_0", ay8910_device, address_w)
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("aysnd_0", ay8910_device, reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("aysnd_1", ay8910_device, address_w)
+void ltd_state::ltd4_map(address_map &map)
+{
+	map(0x0000, 0x001f).ram(); // internal to the cpu
+	map(0x0080, 0x00ff).ram();
+	map(0x0100, 0x01ff).ram().share("nvram");
+	map(0x0800, 0x0800).w(FUNC(ltd_state::count_reset_w));
+	map(0x0c00, 0x0c00).w("aysnd_1", FUNC(ay8910_device::reset_w));
+	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
+	map(0x1400, 0x1400).w("aysnd_0", FUNC(ay8910_device::reset_w));
+	map(0x1800, 0x1800).w("aysnd_1", FUNC(ay8910_device::address_w));
 	//AM_RANGE(0x2800, 0x2800) AM_WRITE(auxlamps_w)
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("aysnd_0", ay8910_device, data_w)
-	AM_RANGE(0x3800, 0x3800) AM_DEVWRITE("aysnd_1", ay8910_device, data_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_MIRROR(0x2000) AM_REGION("roms", 0)
-ADDRESS_MAP_END
+	map(0x3000, 0x3000).w("aysnd_0", FUNC(ay8910_device::data_w));
+	map(0x3800, 0x3800).w("aysnd_1", FUNC(ay8910_device::data_w));
+	map(0xc000, 0xdfff).rom().mirror(0x2000).region("roms", 0);
+}
 
-ADDRESS_MAP_START(ltd_state::ltd4_io)
-	AM_RANGE(0x0100, 0x0100) AM_READWRITE(port1_r,port1_w)
-	AM_RANGE(0x0101, 0x0101) AM_READWRITE(port2_r,port2_w)
-ADDRESS_MAP_END
+void ltd_state::ltd4_io(address_map &map)
+{
+	map(0x0100, 0x0100).rw(FUNC(ltd_state::port1_r), FUNC(ltd_state::port1_w));
+	map(0x0101, 0x0101).rw(FUNC(ltd_state::port2_r), FUNC(ltd_state::port2_w));
+}
 
 // bits 6,7 not connected to data bus
 // 1=does something in Atlantis; 2=does something in Black Hole; note that sometimes pressing G or H will reboot the machine.
@@ -243,7 +253,7 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER( ltd_state::ficha )
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 // switches
@@ -326,21 +336,21 @@ WRITE8_MEMBER( ltd_state::port1_w )
 				if (m_clear)
 				{
 					if (row>7)
-						output().set_digit_value(row+2, segment); // P2
+						m_digits[row+2] = segment; // P2
 					else
-						output().set_digit_value(row, segment); // P1
+						m_digits[row] = segment; // P1
 				}
 				break;
 			case 8:
 				if (m_clear)
 				{
 					if (row>13)
-						output().set_digit_value(row+26, segment); // credits / ball
+						m_digits[row+26] = segment; // credits / ball
 					else
 					if (row>7)
-						output().set_digit_value(row+22, segment); // P4
+						m_digits[row+22] = segment; // P4
 					else
-						output().set_digit_value(row+20, segment); // P3
+						m_digits[row+20] = segment; // P3
 				}
 				break;
 		}
@@ -373,24 +383,22 @@ void ltd_state::machine_reset()
 	m_timer_r = 0;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, ltd )
+void ltd_state::init_ltd()
 {
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, atla_ltd )
+void ltd_state::init_atla_ltd()
 {
 	m_game = 1;
-	output().set_digit_value(0, 0x3f);
-	output().set_digit_value(10, 0x3f);
 }
 
-DRIVER_INIT_MEMBER( ltd_state, bhol_ltd )
+void ltd_state::init_bhol_ltd()
 {
 	m_game = 2;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, zephy )
+void ltd_state::init_zephy()
 {
 	m_game = 3;
 }
@@ -409,27 +417,29 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 		{
 			case 1: // atlantis (2-player, 5-digit)
 			{
+				m_digits[0] = 0x3f;
+				m_digits[10] = 0x3f;
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[1] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[2] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 1:
-						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[11] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[12] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 2:
-						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[3] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[4] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 3:
-						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[13] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[14] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 8:
-						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[41] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[40] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 				}
 				break;
@@ -439,32 +449,32 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output().set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[0] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[1] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 1:
-						output().set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[10] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[11] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 2:
-						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[2] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[3] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 3:
-						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[12] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[13] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 4:
-						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[4] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[5] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 5:
-						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[14] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[15] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 8:
-						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[41] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[40] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 				}
 				break;
@@ -474,62 +484,61 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output().set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[0] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[1] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 1:
-						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[2] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[3] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 2:
-						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[4] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[5] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 3:
-						output().set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[10] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[11] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 4:
-						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[12] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[13] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 5:
-						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[14] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[15] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 6:
-						output().set_digit_value(20, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(21, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[20] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[21] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 7:
-						output().set_digit_value(22, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(23, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[22] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[23] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 8:
-						output().set_digit_value(24, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(25, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[24] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[25] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 9:
-						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[40] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[41] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 				}
 				break;
 			}
-
 		}
 	}
 }
 
 MACHINE_CONFIG_START(ltd_state::ltd3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(ltd3_map)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(ltd3_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_ltd)
+	config.set_default_layout(layout_ltd);
 
 	/* Sound */
 	genpin_audio(config);
@@ -539,22 +548,22 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ltd_state::ltd4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL(3'579'545)) // guess, no details available
-	MCFG_CPU_PROGRAM_MAP(ltd4_map)
-	MCFG_CPU_IO_MAP(ltd4_io)
+	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545)) // guess, no details available
+	MCFG_DEVICE_PROGRAM_MAP(ltd4_map)
+	MCFG_DEVICE_IO_MAP(ltd4_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_ltd)
+	config.set_default_layout(layout_ltd);
 
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
-	MCFG_SOUND_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */
+	MCFG_DEVICE_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
 MACHINE_CONFIG_END
 
@@ -745,24 +754,24 @@ ROM_START(tricksht)
 ROM_END
 
 // system 3
-GAME(1981, arizona,          0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, atla_ltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1981, discodan,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hustlerp,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, kkongltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?, vikngkng,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, force,            0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, bhol_ltd,         0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1981, cowboy,           0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Cowboy Eight Ball",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, zephy,            0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, zephya,       zephy,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy (alternate set)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, arizona,  0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, discodan, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hustlerp, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, kkongltd, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?, vikngkng, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, force,    0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd_state, init_bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, cowboy,   0,        ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Cowboy Eight Ball",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, zephy,    0,        ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Zephy",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, zephya,   zephy,    ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Zephy (alternate set)",             MACHINE_IS_SKELETON_MECHANICAL)
 
 // system 4
-GAME(1982, cowboy2,          0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hhotel,           0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, pecmen,           0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, alcapone,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, columbia,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, tmacltd4,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, tmacltd2,  tmacltd4,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, tricksht,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, cowboy2,  0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hhotel,   0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, pecmen,   0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, alcapone, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, columbia, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, tmacltd4, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, tmacltd2, tmacltd4, ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, tricksht, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL)

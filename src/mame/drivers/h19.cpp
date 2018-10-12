@@ -56,6 +56,7 @@ Address   Description
 #include "machine/mm5740.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -98,6 +99,9 @@ public:
 	{
 	}
 
+	void h19(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(h19_keyclick_w);
 	DECLARE_WRITE8_MEMBER(h19_bell_w);
 	DECLARE_READ8_MEMBER(kbd_key_r);
@@ -108,10 +112,9 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void h19(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
 
@@ -156,26 +159,28 @@ void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 
 
-ADDRESS_MAP_START(h19_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_ROM
-	AM_RANGE(0x4000, 0x4100) AM_MIRROR(0x3e00) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void h19_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).mirror(0x2000).rom();
+	map(0x4000, 0x4100).mirror(0x3e00).ram();
+	map(0xc000, 0xc7ff).mirror(0x3800).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(h19_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_READ_PORT("SW401")
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1f) AM_READ_PORT("SW402")
-	AM_RANGE(0x40, 0x47) AM_MIRROR(0x18) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w )
-	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1E) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x61, 0x61) AM_MIRROR(0x1E) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_READ(kbd_key_r)
-	AM_RANGE(0xA0, 0xA0) AM_MIRROR(0x1f) AM_READ(kbd_flags_r)
-	AM_RANGE(0xC0, 0xC0) AM_MIRROR(0x1f) AM_WRITE(h19_keyclick_w)
-	AM_RANGE(0xE0, 0xE0) AM_MIRROR(0x1f) AM_WRITE(h19_bell_w)
-ADDRESS_MAP_END
+void h19_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x1f).portr("SW401");
+	map(0x20, 0x20).mirror(0x1f).portr("SW402");
+	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x60, 0x60).mirror(0x1E).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x61, 0x61).mirror(0x1E).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x80, 0x80).mirror(0x1f).r(FUNC(h19_state::kbd_key_r));
+	map(0xA0, 0xA0).mirror(0x1f).r(FUNC(h19_state::kbd_flags_r));
+	map(0xC0, 0xC0).mirror(0x1f).w(FUNC(h19_state::h19_keyclick_w));
+	map(0xE0, 0xE0).mirror(0x1f).w(FUNC(h19_state::h19_bell_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( h19 )
@@ -511,15 +516,15 @@ static const gfx_layout h19_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( h19 )
+static GFXDECODE_START( gfx_h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(h19_state::h19)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, H19_CLOCK) // From schematics
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, H19_CLOCK) // From schematics
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	// TODO: make configurable, Heath offered 3 different CRTs - White, Green, Amber.
@@ -530,7 +535,7 @@ MACHINE_CONFIG_START(h19_state::h19)
 
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", h19)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_h19)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)
@@ -539,8 +544,8 @@ MACHINE_CONFIG_START(h19_state::h19)
 	MCFG_MC6845_UPDATE_ROW_CB(h19_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
 
-	MCFG_DEVICE_ADD("ins8250", INS8250, INS8250_CLOCK)
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
+	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(KBDC_TAG, MM5740, MM5740_CLOCK)
 	MCFG_MM5740_MATRIX_X1(IOPORT("X1"))
@@ -552,13 +557,13 @@ MACHINE_CONFIG_START(h19_state::h19)
 	MCFG_MM5740_MATRIX_X7(IOPORT("X7"))
 	MCFG_MM5740_MATRIX_X8(IOPORT("X8"))
 	MCFG_MM5740_MATRIX_X9(IOPORT("X9"))
-	MCFG_MM5740_SHIFT_CB(READLINE(h19_state, mm5740_shift_r))
-	MCFG_MM5740_CONTROL_CB(READLINE(h19_state, mm5740_control_r))
-	MCFG_MM5740_DATA_READY_CB(WRITELINE(h19_state, mm5740_data_ready_w))
+	MCFG_MM5740_SHIFT_CB(READLINE(*this, h19_state, mm5740_shift_r))
+	MCFG_MM5740_CONTROL_CB(READLINE(*this, h19_state, mm5740_control_r))
+	MCFG_MM5740_DATA_READY_CB(WRITELINE(*this, h19_state, mm5740_data_ready_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, H19_BEEP_FRQ)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, H19_BEEP_FRQ)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -618,12 +623,12 @@ ROM_START( ultra19 )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY      FULLNAME                         FLAGS
-COMP( 1979, h19,     0,      0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19",                 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME                         FLAGS
+COMP( 1979, h19,     0,      0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19",                 0 )
 //Super-19 ROM - ATG Systems, Inc - Adv in Sextant Issue 4, Winter 1983. With the magazine lead-time, likely released late 1982.
-COMP( 1982, super19, h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
+COMP( 1982, super19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
 // Watzman ROM - HUG p/n 885-1121, announced in REMark Issue 33, Oct. 1982
-COMP( 1982, watz19,  h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM",  0 )
+COMP( 1982, watz19,  h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ Watzman ROM",  0 )
 // ULTRA ROM - Software Wizardry, Inc., (c) 1983 William G. Parrott, III
-COMP( 1983, ultra19, h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ ULTRA ROM",    0 )
+COMP( 1983, ultra19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ ULTRA ROM",    0 )
 

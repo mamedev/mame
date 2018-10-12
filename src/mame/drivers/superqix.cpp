@@ -291,7 +291,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::mcu_port3_w_cb)
 
 TIMER_CALLBACK_MEMBER(superqix_state::z80_ay1_sync_address_w_cb)
 {
-	m_ay1->address_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, param, 0xff);
+	m_ay1->address_w(m_maincpu->space(AS_PROGRAM), 0, param, 0xff);
 }
 
 
@@ -357,7 +357,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::bootleg_mcu_port1_w_cb)
 		//already after a synchronize, and doing another one would be redundant
 	}
 
-	mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff); // finally write to port 2, which will do another synchronize
+	mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff); // finally write to port 2, which will do another synchronize
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_mcu_port1_w)
@@ -957,8 +957,8 @@ MACHINE_RESET_MEMBER(superqix_state, superqix)
 		// the act of clearing this latch asserts the z80 reset, and the mcu must clear it itself by writing
 		// to the p2 latch with bit 5 set.
 		m_port2_raw = 0x01; // force the following function into latching a zero write by having bit 0 falling edge
-		mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xff);
-		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, 0x00, 0xff);
+		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 }
 
@@ -979,48 +979,52 @@ MACHINE_START_MEMBER(hotsmash_state, pbillian)
 }
 
 
-ADDRESS_MAP_START(superqix_state_base::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+void superqix_state_base::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
 	// the following four ranges are part of a single 6264 64Kibit SRAM chip, called 'VRAM' in POST
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe100, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(superqix_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xe000, 0xe0ff).ram().share("spriteram");
+	map(0xe100, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().w(FUNC(superqix_state_base::superqix_videoram_w)).share("videoram");
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(hotsmash_state::pbillian_port_map) // used by both pbillian and hotsmash
-	AM_RANGE(0x0000, 0x01ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // 6116 sram near the jamma connector, "COLOR RAM" during POST
+void hotsmash_state::pbillian_port_map(address_map &map)
+{ // used by both pbillian and hotsmash
+	map(0x0000, 0x01ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // 6116 sram near the jamma connector, "COLOR RAM" during POST
 	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
-	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_device, data_r) // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
-	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x0408, 0x0408) AM_READWRITE(hotsmash_Z80_mcu_r, hotsmash_Z80_mcu_w)
-	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w) /* Coin Counters, ROM bank, NMI enable, Flipscreen */
-	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)
-	AM_RANGE(0x0419, 0x0419) AM_WRITENOP // ??? is this a watchdog, or something else? manual reset of mcu semaphores? manual nmi TRIGGER? used by prebillian
-	AM_RANGE(0x041a, 0x041a) AM_WRITE(pbillian_sample_trigger_w)
-	AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used, may be 'sample has stopped playing' flag? used by prebillian
-ADDRESS_MAP_END
+	map(0x0401, 0x0401).r(m_ay1, FUNC(ay8910_device::data_r)); // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
+	map(0x0402, 0x0403).w(m_ay1, FUNC(ay8910_device::data_address_w));
+	map(0x0408, 0x0408).rw(FUNC(hotsmash_state::hotsmash_Z80_mcu_r), FUNC(hotsmash_state::hotsmash_Z80_mcu_w));
+	map(0x0410, 0x0410).w(FUNC(hotsmash_state::pbillian_0410_w)); /* Coin Counters, ROM bank, NMI enable, Flipscreen */
+	map(0x0418, 0x0418).r(FUNC(hotsmash_state::nmi_ack_r));
+	map(0x0419, 0x0419).nopw(); // ??? is this a watchdog, or something else? manual reset of mcu semaphores? manual nmi TRIGGER? used by prebillian
+	map(0x041a, 0x041a).w(FUNC(hotsmash_state::pbillian_sample_trigger_w));
+	map(0x041b, 0x041b).nopr();  // input related? but probably not used, may be 'sample has stopped playing' flag? used by prebillian
+}
 
-ADDRESS_MAP_START(superqix_state::sqix_port_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x0402, 0x0402) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x0403, 0x0403) AM_WRITE(z80_ay1_sync_address_w) // sync on address write, so semaphores are accurately read
-	AM_RANGE(0x0405, 0x0405) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x0406, 0x0407) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x0408, 0x0408) AM_READ(z80_semaphore_assert_r)
-	AM_RANGE(0x0410, 0x0410) AM_WRITE(superqix_0410_w)  /* ROM bank, NMI enable, tile bank, bitmap bank */
-	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)
+void superqix_state::sqix_port_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x0401, 0x0401).r(m_ay1, FUNC(ay8910_device::data_r));
+	map(0x0402, 0x0402).w(m_ay1, FUNC(ay8910_device::data_w));
+	map(0x0403, 0x0403).w(FUNC(superqix_state::z80_ay1_sync_address_w)); // sync on address write, so semaphores are accurately read
+	map(0x0405, 0x0405).r(m_ay2, FUNC(ay8910_device::data_r));
+	map(0x0406, 0x0407).w(m_ay2, FUNC(ay8910_device::data_address_w));
+	map(0x0408, 0x0408).r(FUNC(superqix_state::z80_semaphore_assert_r));
+	map(0x0410, 0x0410).w(FUNC(superqix_state::superqix_0410_w));  /* ROM bank, NMI enable, tile bank, bitmap bank */
+	map(0x0418, 0x0418).r(FUNC(superqix_state::nmi_ack_r));
 	// following two ranges are made of two 64kx4 4464 DRAM chips at 9L and 9M, "GRAPHICS RAM" or "GRP BIT" if there is an error in POST
-	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE(superqix_bitmapram_w) AM_SHARE("bitmapram")
-	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE(superqix_bitmapram2_w) AM_SHARE("bitmapram2")
+	map(0x0800, 0x77ff).ram().w(FUNC(superqix_state::superqix_bitmapram_w)).share("bitmapram");
+	map(0x8800, 0xf7ff).ram().w(FUNC(superqix_state::superqix_bitmapram2_w)).share("bitmapram2");
 	//AM_RANGE(0xf970, 0xfa6f) AM_RAM // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(superqix_state::sqix_8031_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("mcu", 0) // external program ROM
-ADDRESS_MAP_END
+void superqix_state::sqix_8031_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("mcu", 0); // external program ROM
+}
 
 
 
@@ -1091,7 +1095,7 @@ static INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // P2 fire (M powerup) + high score initials
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hotsmash_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hotsmash_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
 
 	PORT_START("PLUNGER1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -1181,7 +1185,7 @@ static INPUT_PORTS_START( hotsmash )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // p2 button 2, unused on this game?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hotsmash_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hotsmash_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
 
 	PORT_START("PLUNGER1")  // plunger isn't present on hotsmash though the pins exist for it
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
@@ -1259,7 +1263,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) // JAMMA #R ("Service")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT ) // JAMMA #S ("Tilt")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) // JAMMA #15 ("Test")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, fromz80_semaphore_input_r, nullptr)  // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, fromz80_semaphore_input_r, nullptr)  // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
 
 	PORT_START("P1") /* AY-3-8910 #1 @3P Port A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY // JAMMA #18
@@ -1278,8 +1282,8 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL // JAMMA #Y
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // JAMMA #Z
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL // JAMMA #a
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, frommcu_semaphore_input_r, nullptr) // 74ls174 @1J pin 5 (Q1), this is the mcu->z80 semaphore
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, fromz80_semaphore_input_r, nullptr) // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, frommcu_semaphore_input_r, nullptr) // 74ls174 @1J pin 5 (Q1), this is the mcu->z80 semaphore
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, fromz80_semaphore_input_r, nullptr) // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
 
 INPUT_PORTS_END
 
@@ -1321,22 +1325,22 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( pbillian )
+static GFXDECODE_START( gfx_pbillian )
 	GFXDECODE_ENTRY( "gfx1", 0, pbillian_charlayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,            0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( sqix )
+static GFXDECODE_START( gfx_sqix )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, sqix_charlayout,   0, 16 )    /* Chars */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sqix_charlayout,   0, 16 )    /* Background tiles */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout,      0, 16 )    /* Sprites */
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(hotsmash_state::vblank_irq)
+WRITE_LINE_MEMBER(hotsmash_state::vblank_irq)
 {
-	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(superqix_state::sqix_timer_irq)
@@ -1348,15 +1352,14 @@ INTERRUPT_GEN_MEMBER(superqix_state::sqix_timer_irq)
 
 
 MACHINE_CONFIG_START(hotsmash_state::pbillian)
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(12'000'000)/2)      /* 6 MHz, ROHM Z80B */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(pbillian_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hotsmash_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(12'000'000)/2)      /* 6 MHz, ROHM Z80B */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(pbillian_port_map)
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL(12'000'000)/4) /* 3mhz???? */
-	MCFG_M68705_PORTA_R_CB(READ8(hotsmash_state, hotsmash_68705_portA_r))
-	MCFG_M68705_PORTB_W_CB(WRITE8(hotsmash_state, hotsmash_68705_portB_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(hotsmash_state, hotsmash_68705_portC_w))
+	MCFG_DEVICE_ADD("mcu", M68705P5, XTAL(12'000'000)/4) /* 3mhz???? */
+	MCFG_M68705_PORTA_R_CB(READ8(*this, hotsmash_state, hotsmash_68705_portA_r))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, hotsmash_state, hotsmash_68705_portB_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, hotsmash_state, hotsmash_68705_portC_w))
 
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_MACHINE_START_OVERRIDE(hotsmash_state, pbillian)
@@ -1369,21 +1372,22 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hotsmash_state, screen_update_pbillian)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hotsmash_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
+	MCFG_PALETTE_FORMAT_CLASS(1, hotsmash_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(hotsmash_state, pbillian)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SYSTEM"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(hotsmash_state, pbillian_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1392,17 +1396,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(superqix_state::sqix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* Z80B, 12 MHz / 2 (6 MHz), verified from pcb tracing */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(sqix_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* Z80B, 12 MHz / 2 (6 MHz), verified from pcb tracing */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(sqix_port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(12'000'000)/2) /* i8751-88, 12 MHz / 2 (6 MHz), verified from pcb tracing */
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(12'000'000)/2) /* i8751-88, 12 MHz / 2 (6 MHz), verified from pcb tracing */
 	MCFG_MCS51_PORT_P0_IN_CB(IOPORT("SYSTEM"))
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("DSW1"))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(superqix_state, mcu_port2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(superqix_state, mcu_port3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(superqix_state, mcu_port3_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, superqix_state, mcu_port2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, superqix_state, mcu_port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, superqix_state, mcu_port3_w))
 
 	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
 
@@ -1415,47 +1419,47 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_superqix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sqix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3P, analog outputs directly tied together
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3P, analog outputs directly tied together
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2")) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3M, analog outputs directly tied together
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3M, analog outputs directly tied together
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, z80_ay2_iob_r)) /* port Bread */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(superqix_state, z80_ay2_iob_w)) /* port Bwrite */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, superqix_state, z80_ay2_iob_r)) /* port Bread */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, superqix_state, z80_ay2_iob_w)) /* port Bwrite */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(superqix_state::sqix_8031)
 	sqix(config);
-	MCFG_CPU_REPLACE("mcu", I8031, XTAL(12'000'000)/2) /* p8031ah, clock not verified */
-	MCFG_CPU_PROGRAM_MAP(sqix_8031_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(superqix_state, bootleg_mcu_port1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(superqix_state, bootleg_mcu_port3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(superqix_state, bootleg_mcu_port3_w))
+	MCFG_DEVICE_REPLACE("mcu", I8031, XTAL(12'000'000)/2) /* p8031ah, clock not verified */
+	MCFG_DEVICE_PROGRAM_MAP(sqix_8031_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, superqix_state, bootleg_mcu_port1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, superqix_state, bootleg_mcu_port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, superqix_state, bootleg_mcu_port3_w))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)    /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(sqix_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
+	MCFG_DEVICE_ADD("maincpu", Z80, 12000000/2)    /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(sqix_port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
 	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
 
@@ -1468,25 +1472,25 @@ MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_superqix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sqix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, 12000000/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, bootleg_in0_r)) /* port Bread */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, superqix_state, bootleg_in0_r)) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1679,17 +1683,17 @@ ROM_START( perestro )
 	ROM_LOAD( "rom3a.bin",       0x00000, 0x10000, CRC(7a2a563f) SHA1(e3654091b858cc80ec1991281447fc3622a0d4f9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(superqix_state_base, sqix)
+void superqix_state_base::init_sqix()
 {
 	m_invert_coin_lockout = true;
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, sqixr0)
+void superqix_state_base::init_sqixr0()
 {
 	m_invert_coin_lockout = false;
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, perestro)
+void superqix_state_base::init_perestro()
 {
 	uint8_t *src;
 	int len;
@@ -1751,24 +1755,24 @@ DRIVER_INIT_MEMBER(superqix_state_base, perestro)
 	}
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, pbillian)
+void superqix_state_base::init_pbillian()
 {
 	m_invert_p2_spinner = false;
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, hotsmash)
+void superqix_state_base::init_hotsmash()
 {
 	m_invert_p2_spinner = true;
 }
 
 
-GAME( 1986, pbillian, 0,        pbillian,   pbillian, hotsmash_state, pbillian, ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hotsmash, 0,        pbillian,   hotsmash, hotsmash_state, hotsmash, ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqix,     0,        sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr1,   sqix,     sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr0,   sqix,     sqix,       superqix, superqix_state, sqixr0,   ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixu,    sqix,     sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, sqixr0,   ROT90, "bootleg", "Super Qix (bootleg of V1.0, 8031 MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
-GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, superqix_state, sqix,     ROT90, "bootleg", "Super Qix (bootleg, No MCU)", MACHINE_SUPPORTS_SAVE ) // bootleg of World, Rev 1
-GAME( 1994, perestro, 0,        sqix_nomcu, superqix, superqix_state, perestro, ROT90, "Promat", "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, perestrof,perestro, sqix_nomcu, superqix, superqix_state, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, pbillian, 0,        pbillian,   pbillian, hotsmash_state, init_pbillian, ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hotsmash, 0,        pbillian,   hotsmash, hotsmash_state, init_hotsmash, ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqix,     0,        sqix,       superqix, superqix_state, init_sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,   sqix,     sqix,       superqix, superqix_state, init_sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr0,   sqix,     sqix,       superqix, superqix_state, init_sqixr0,   ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixu,    sqix,     sqix,       superqix, superqix_state, init_sqix,     ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, init_sqixr0,   ROT90, "bootleg", "Super Qix (bootleg of V1.0, 8031 MCU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, superqix_state, init_sqix,     ROT90, "bootleg", "Super Qix (bootleg, No MCU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, perestro, 0,        sqix_nomcu, superqix, superqix_state, init_perestro, ROT90, "Promat", "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, perestrof,perestro, sqix_nomcu, superqix, superqix_state, init_perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )

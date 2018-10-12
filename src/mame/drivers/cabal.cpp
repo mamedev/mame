@@ -86,10 +86,10 @@ WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
 
 
 
-WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
+void cabal_state::sound_irq_trigger_word_w(offs_t, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_seibu_sound->main_w(space, 4, data & 0x00ff);
+		m_seibu_sound->main_w(4, data & 0x00ff);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
 	m_maincpu->spin_until_time(attotime::from_usec(50));
@@ -97,59 +97,62 @@ WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
 
 WRITE16_MEMBER(cabal_state::cabalbl_sound_irq_trigger_word_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 
-ADDRESS_MAP_START(cabal_state::main_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x40000, 0x437ff) AM_RAM
-	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x44000, 0x4ffff) AM_RAM
-	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("colorram")
-	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x80200, 0x803ff) AM_RAM
-	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
-	AM_RANGE(0xa0008, 0xa0009) AM_READ_PORT("IN2")
-	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
-	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
-	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
-ADDRESS_MAP_END
+void cabal_state::main_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom();
+	map(0x40000, 0x437ff).ram();
+	map(0x43800, 0x43fff).ram().share("spriteram");
+	map(0x44000, 0x4ffff).ram();
+	map(0x60000, 0x607ff).ram().w(FUNC(cabal_state::text_videoram_w)).share("colorram");
+	map(0x80000, 0x801ff).ram().w(FUNC(cabal_state::background_videoram_w)).share("videoram");
+	map(0x80200, 0x803ff).ram();
+	map(0xa0000, 0xa0001).portr("DSW");
+	map(0xa0008, 0xa0009).portr("IN2");
+	map(0xa0010, 0xa0011).portr("INPUTS");
+	map(0xc0040, 0xc0041).nopw(); /* ??? */
+	map(0xc0080, 0xc0081).w(FUNC(cabal_state::flipscreen_w));
+	map(0xe0000, 0xe07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xe8000, 0xe800d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
+	map(0xe8008, 0xe8009).w(FUNC(cabal_state::sound_irq_trigger_word_w)); // fix coin insertion
+}
 
 
 
-ADDRESS_MAP_START(cabal_state::trackball_main_map)
-	AM_IMPORT_FROM(main_map)
-	AM_RANGE(0xa0008, 0xa000f) AM_DEVREAD8("upd4701l", upd4701_device, read_xy, 0x00ff)
-	AM_RANGE(0xa0008, 0xa000f) AM_DEVREAD8("upd4701h", upd4701_device, read_xy, 0xff00)
-	AM_RANGE(0xc0000, 0xc0001) AM_DEVWRITE8("upd4701l", upd4701_device, reset_xy, 0x00ff)
-	AM_RANGE(0xc0000, 0xc0001) AM_DEVWRITE8("upd4701h", upd4701_device, reset_xy, 0xff00)
-ADDRESS_MAP_END
+void cabal_state::trackball_main_map(address_map &map)
+{
+	main_map(map);
+	map(0xa0008, 0xa000f).r("upd4701l", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0xa0008, 0xa000f).r("upd4701h", FUNC(upd4701_device::read_xy)).umask16(0xff00);
+	map(0xc0001, 0xc0001).w("upd4701l", FUNC(upd4701_device::reset_xy_w));
+	map(0xc0000, 0xc0000).w("upd4701h", FUNC(upd4701_device::reset_xy_w));
+}
 
 
 
-ADDRESS_MAP_START(cabal_state::cabalbl_main_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x40000, 0x437ff) AM_RAM
-	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x44000, 0x4ffff) AM_RAM
-	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("colorram")
-	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x80200, 0x803ff) AM_RAM
-	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
-	AM_RANGE(0xa0008, 0xa0009) AM_READ_PORT("JOY")
-	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
-	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(cabalbl_sndcmd_w)
-	AM_RANGE(0xe8004, 0xe8005) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff)
-	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabalbl_sound_irq_trigger_word_w)
-ADDRESS_MAP_END
+void cabal_state::cabalbl_main_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom();
+	map(0x40000, 0x437ff).ram();
+	map(0x43800, 0x43fff).ram().share("spriteram");
+	map(0x44000, 0x4ffff).ram();
+	map(0x60000, 0x607ff).ram().w(FUNC(cabal_state::text_videoram_w)).share("colorram");
+	map(0x80000, 0x801ff).ram().w(FUNC(cabal_state::background_videoram_w)).share("videoram");
+	map(0x80200, 0x803ff).ram();
+	map(0xa0000, 0xa0001).portr("DSW");
+	map(0xa0008, 0xa0009).portr("JOY");
+	map(0xa0010, 0xa0011).portr("INPUTS");
+	map(0xc0040, 0xc0041).nopw(); /* ??? */
+	map(0xc0080, 0xc0081).w(FUNC(cabal_state::flipscreen_w));
+	map(0xe0000, 0xe07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xe8000, 0xe8003).w(FUNC(cabal_state::cabalbl_sndcmd_w));
+	map(0xe8005, 0xe8005).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xe8008, 0xe8009).w(FUNC(cabal_state::cabalbl_sound_irq_trigger_word_w));
+}
 
 /*********************************************************************/
 
@@ -172,68 +175,73 @@ WRITE8_MEMBER(cabal_state::cabalbl_coin_w)
 	//data & 0x40? video enable?
 }
 
-ADDRESS_MAP_START(cabal_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
-	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm1", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cabal_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::data_r));
+	map(0x2000, 0x27ff).ram();
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4005, 0x4006).w(m_adpcm1, FUNC(seibu_adpcm_device::adr_w));
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401a, 0x401a).w(m_adpcm1, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x6005, 0x6006).w(m_adpcm2, FUNC(seibu_adpcm_device::adr_w));
+	map(0x601a, 0x601a).w(m_adpcm2, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(cabal_state::sound_decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
-ADDRESS_MAP_END
+void cabal_state::sound_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::opcode_r));
+	map(0x8000, 0xffff).rom().region("audiocpu", 0x8000);
+}
 
-ADDRESS_MAP_START(cabal_state::cabalbl_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
-	AM_RANGE(0x4004, 0x4004) AM_WRITE(cabalbl_coin_w)
-	AM_RANGE(0x4006, 0x4006) AM_READ_PORT("COIN")
-	AM_RANGE(0x4008, 0x4008) AM_READ(cabalbl_snd2_r)
-	AM_RANGE(0x400a, 0x400a) AM_READ(cabalbl_snd1_r)
-	AM_RANGE(0x400c, 0x400c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x400e, 0x400f) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x6000, 0x6000) AM_WRITENOP  /* ??? */
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cabal_state::cabalbl_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x2fff).ram();
+	map(0x4000, 0x4000).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x4002, 0x4002).w("soundlatch3", FUNC(generic_latch_8_device::write));
+	map(0x4004, 0x4004).w(FUNC(cabal_state::cabalbl_coin_w));
+	map(0x4006, 0x4006).portr("COIN");
+	map(0x4008, 0x4008).r(FUNC(cabal_state::cabalbl_snd2_r));
+	map(0x400a, 0x400a).r(FUNC(cabal_state::cabalbl_snd1_r));
+	map(0x400c, 0x400c).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x400e, 0x400f).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x6000, 0x6000).nopw();  /* ??? */
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(cabal_state::cabalbl2_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
-	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm1", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cabal_state::cabalbl2_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4005, 0x4006).w(m_adpcm1, FUNC(seibu_adpcm_device::adr_w));
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401a, 0x401a).w(m_adpcm1, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x6005, 0x6006).w(m_adpcm2, FUNC(seibu_adpcm_device::adr_w));
+	map(0x601a, 0x601a).w(m_adpcm2, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(cabal_state::cabalbl2_predecrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiocpu", 0x2000)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
-ADDRESS_MAP_END
+void cabal_state::cabalbl2_predecrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("audiocpu", 0x2000);
+	map(0x8000, 0xffff).rom().region("audiocpu", 0x8000);
+}
 
 /* the bootleg has 2x z80 sample players */
 
@@ -241,7 +249,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_1_adpcm_w)
 {
 	m_msm1->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm1->data_w(data);
+	m_msm1->write_data(data);
 	m_msm1->vclk_w(1);
 	m_msm1->vclk_w(0);
 }
@@ -249,29 +257,33 @@ WRITE8_MEMBER(cabal_state::cabalbl_2_adpcm_w)
 {
 	m_msm2->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm2->data_w(data);
+	m_msm2->write_data(data);
 	m_msm2->vclk_w(1);
 	m_msm2->vclk_w(0);
 }
-ADDRESS_MAP_START(cabal_state::cabalbl_talk1_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
-ADDRESS_MAP_END
+void cabal_state::cabalbl_talk1_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().nopw();
+}
 
-ADDRESS_MAP_START(cabal_state::cabalbl_talk1_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x01, 0x01) AM_WRITE(cabalbl_1_adpcm_w)
-ADDRESS_MAP_END
+void cabal_state::cabalbl_talk1_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x01, 0x01).w(FUNC(cabal_state::cabalbl_1_adpcm_w));
+}
 
-ADDRESS_MAP_START(cabal_state::cabalbl_talk2_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
-ADDRESS_MAP_END
+void cabal_state::cabalbl_talk2_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().nopw();
+}
 
-ADDRESS_MAP_START(cabal_state::cabalbl_talk2_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch3", generic_latch_8_device, read)
-	AM_RANGE(0x01, 0x01) AM_WRITE(cabalbl_2_adpcm_w)
-ADDRESS_MAP_END
+void cabal_state::cabalbl_talk2_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch3", FUNC(generic_latch_8_device::read));
+	map(0x01, 0x01).w(FUNC(cabal_state::cabalbl_2_adpcm_w));
+}
 
 /***************************************************************************/
 
@@ -482,7 +494,7 @@ static const gfx_layout sprite_layout =
 
 
 
-static GFXDECODE_START( cabal )
+static GFXDECODE_START( gfx_cabal )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, text_layout,   0, 1024/4 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,   32*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0x000000, sprite_layout, 16*16, 16 )
@@ -492,13 +504,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(cabal_state::cabal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")
@@ -512,41 +525,41 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
+	MCFG_DEVICE_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
+	MCFG_DEVICE_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cabal_state::cabalt)
 	cabal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trackball_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trackball_main_map)
 
-	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("IN0")
-	MCFG_UPD4701_PORTY("IN1")
+	upd4701_device &upd4701l(UPD4701A(config, "upd4701l"));
+	upd4701l.set_portx_tag("IN0");
+	upd4701l.set_porty_tag("IN1");
 
-	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("IN2")
-	MCFG_UPD4701_PORTY("IN3")
+	upd4701_device &upd4701h(UPD4701A(config, "upd4701h"));
+	upd4701h.set_portx_tag("IN2");
+	upd4701h.set_porty_tag("IN3");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cabal_state::cabalbl2)
@@ -554,8 +567,8 @@ MACHINE_CONFIG_START(cabal_state::cabalbl2)
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(cabalbl2_sound_map)
-	MCFG_CPU_OPCODES_MAP(cabalbl2_predecrypted_opcodes_map)
+	MCFG_DEVICE_PROGRAM_MAP(cabalbl2_sound_map)
+	MCFG_DEVICE_OPCODES_MAP(cabalbl2_predecrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -563,23 +576,23 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cabal_state::cabalbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cabalbl_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cabalbl_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cabalbl_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cabalbl_sound_map)
 
 	/* there are 2x z80s for the ADPCM */
-	MCFG_CPU_ADD("adpcm_1", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cabalbl_talk1_map)
-	MCFG_CPU_IO_MAP(cabalbl_talk1_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
+	MCFG_DEVICE_ADD("adpcm_1", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cabalbl_talk1_map)
+	MCFG_DEVICE_IO_MAP(cabalbl_talk1_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
 
-	MCFG_CPU_ADD("adpcm_2", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cabalbl_talk2_map)
-	MCFG_CPU_IO_MAP(cabalbl_talk2_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
+	MCFG_DEVICE_ADD("adpcm_2", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cabalbl_talk2_map)
+	MCFG_DEVICE_IO_MAP(cabalbl_talk2_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -595,26 +608,26 @@ MACHINE_CONFIG_START(cabal_state::cabalbl)
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator) */
+	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator) */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator)*/
+	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator)*/
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -695,10 +708,10 @@ ROM_END
 
 ROM_START( cabaluk )
 	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for cpu code */
-	ROM_LOAD16_BYTE( "9-7H.BIN",    0x00000, 0x10000, CRC(f66378e5) SHA1(b3802f24863f857506ae1aeddc4e5c2908810695) )
-	ROM_LOAD16_BYTE( "7-6H.BIN",    0x00001, 0x10000, CRC(960991ac) SHA1(7e3ab0673585424206d791e8b0ed6af38e2ae8a9) )
-	ROM_LOAD16_BYTE( "8-7K.BIN",    0x20000, 0x10000, CRC(82160ab0) SHA1(a486f30ec3068025b690da4c1ae7295e79e7cd74) )
-	ROM_LOAD16_BYTE( "6-6K.BIN",    0x20001, 0x10000, CRC(7ef2ecc7) SHA1(43d621e2e7cfea8d906a968047817e23a3e4d047) )
+	ROM_LOAD16_BYTE( "9-7h.bin",    0x00000, 0x10000, CRC(f66378e5) SHA1(b3802f24863f857506ae1aeddc4e5c2908810695) )
+	ROM_LOAD16_BYTE( "7-6h.bin",    0x00001, 0x10000, CRC(960991ac) SHA1(7e3ab0673585424206d791e8b0ed6af38e2ae8a9) )
+	ROM_LOAD16_BYTE( "8-7k.bin",    0x20000, 0x10000, CRC(82160ab0) SHA1(a486f30ec3068025b690da4c1ae7295e79e7cd74) )
+	ROM_LOAD16_BYTE( "6-6k.bin",    0x20001, 0x10000, CRC(7ef2ecc7) SHA1(43d621e2e7cfea8d906a968047817e23a3e4d047) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "4-3n",         0x0000, 0x2000, CRC(4038eff2) SHA1(0bcafc1b78c3bef9a0e9b822c482ea4a942fd180) )
@@ -955,19 +968,19 @@ ROM_START( cabalbl2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cabal_state,cabal)
+void cabal_state::init_cabal()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 }
 
 
-GAME( 1988, cabal,    0,     cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabala,   cabal, cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // korea?
-GAME( 1989, cabalukj, cabal, cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalbl,  cabal, cabalbl, cabalbl, cabal_state,  0,      ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalbl2, cabal, cabalbl2,cabalj,  cabal_state,  cabal,  ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabal,    0,     cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabala,   cabal, cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // korea?
+GAME( 1989, cabalukj, cabal, cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl,  cabal, cabalbl,  cabalbl, cabal_state, empty_init, ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl2, cabal, cabalbl2, cabalj,  cabal_state, init_cabal, ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, cabalus,  cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalus2, cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabaluk,  cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus,  cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus2, cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabaluk,  cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )

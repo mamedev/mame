@@ -35,26 +35,31 @@ public:
 	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, M68K_TAG) { }
-	DECLARE_DRIVER_INIT(indiana);
+
+	void indiana(machine_config &config);
+
+	void init_indiana();
+
+private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	void indiana(machine_config &config);
 	void indiana_mem(address_map &map);
 };
 
 
-ADDRESS_MAP_START(indiana_state::indiana_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0000ffff) AM_MIRROR(0x7f800000) AM_ROM AM_REGION("user1", 0) // 64Kb of EPROM
-	AM_RANGE(0x00100000, 0x00107fff) AM_MIRROR(0x7f8f8000) AM_RAM // SRAM 32Kb of SRAM
-	AM_RANGE(0x00200000, 0x002fffff) AM_DEVREADWRITE8(MFP_TAG, mc68901_device, read, write, 0xffffffff) AM_MIRROR(0x7f800000) // MFP
-	AM_RANGE(0x00400000, 0x004fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, io16_swap_r, io16_swap_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC IO
-	AM_RANGE(0x00500000, 0x005fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, mem16_swap_r, mem16_swap_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC MEM
-	AM_RANGE(0x00600000, 0x006fffff) AM_DEVREADWRITE8(ISABUS_TAG, isa16_device, io_r, io_w, 0xffffffff) AM_MIRROR(0x7f800000) // 8 bit PC IO
-	AM_RANGE(0x00700000, 0x007fffff) AM_DEVREADWRITE8(ISABUS_TAG, isa16_device, mem_r, mem_w, 0xffffffff) AM_MIRROR(0x7f800000) // 8 bit PC MEM
-	AM_RANGE(0x80000000, 0x803fffff) AM_RAM // 4 MB RAM
-	AM_RANGE(0xfffe0000, 0xfffe7fff) AM_RAM // SRAM mirror?
-ADDRESS_MAP_END
+void indiana_state::indiana_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0000ffff).mirror(0x7f800000).rom().region("user1", 0); // 64Kb of EPROM
+	map(0x00100000, 0x00107fff).mirror(0x7f8f8000).ram(); // SRAM 32Kb of SRAM
+	map(0x00200000, 0x002fffff).rw(MFP_TAG, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x7f800000); // MFP
+	map(0x00400000, 0x004fffff).rw(ISABUS_TAG, FUNC(isa16_device::io16_swap_r), FUNC(isa16_device::io16_swap_w)).mirror(0x7f800000); // 16 bit PC IO
+	map(0x00500000, 0x005fffff).rw(ISABUS_TAG, FUNC(isa16_device::mem16_swap_r), FUNC(isa16_device::mem16_swap_w)).mirror(0x7f800000); // 16 bit PC MEM
+	map(0x00600000, 0x006fffff).rw(ISABUS_TAG, FUNC(isa16_device::io_r), FUNC(isa16_device::io_w)).mirror(0x7f800000); // 8 bit PC IO
+	map(0x00700000, 0x007fffff).rw(ISABUS_TAG, FUNC(isa16_device::mem_r), FUNC(isa16_device::mem_w)).mirror(0x7f800000); // 8 bit PC MEM
+	map(0x80000000, 0x803fffff).ram(); // 4 MB RAM
+	map(0xfffe0000, 0xfffe7fff).ram(); // SRAM mirror?
+}
 
 
 /* Input ports */
@@ -66,19 +71,20 @@ void indiana_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(indiana_state,indiana)
+void indiana_state::init_indiana()
 {
 }
 
-SLOT_INTERFACE_START( indiana_isa_cards )
+void indiana_isa_cards(device_slot_interface &device)
+{
 	// 8-bit
-	SLOT_INTERFACE("fdc_at", ISA8_FDC_AT)
-	SLOT_INTERFACE("comat", ISA8_COM_AT)
-	SLOT_INTERFACE("vga", ISA8_VGA)
+	device.option_add("fdc_at", ISA8_FDC_AT);
+	device.option_add("comat", ISA8_COM_AT);
+	device.option_add("vga", ISA8_VGA);
 
 	// 16-bit
-	SLOT_INTERFACE("ide", ISA16_IDE)
-SLOT_INTERFACE_END
+	device.option_add("ide", ISA16_IDE);
+}
 
 static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
@@ -90,40 +96,41 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(indiana_state::indiana)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M68K_TAG, M68030, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(indiana_mem)
+	MCFG_DEVICE_ADD(M68K_TAG, M68030, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(indiana_mem)
 
+	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD(ISABUS_TAG, ISA16, 0)
-	MCFG_ISA16_CPU(":" M68K_TAG)
+	MCFG_ISA16_CPU(M68K_TAG)
 	MCFG_ISA16_BUS_CUSTOM_SPACES()
-	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa1", indiana_isa_cards, "vga", false)
-	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa2", indiana_isa_cards, "fdc_at", false)
-	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa3", indiana_isa_cards, "comat", false)
-	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa4", indiana_isa_cards, "ide", false)
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "vga", false)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "fdc_at", false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "comat", false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "ide", false)
 
-	MCFG_DEVICE_ADD(MFP_TAG, MC68901, XTAL(16'000'000)/4)
-	MCFG_MC68901_TIMER_CLOCK(XTAL(16'000'000)/4)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
+	mc68901_device &mfp(MC68901(config, MFP_TAG, XTAL(16'000'000)/4));
+	mfp.set_timer_clock(XTAL(16'000'000)/4);
+	mfp.set_rx_clock(0);
+	mfp.set_tx_clock(0);
+	mfp.out_so_cb().set("keyboard", FUNC(rs232_port_device::write_txd));
 
-	MCFG_RS232_PORT_ADD("keyboard", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MFP_TAG, mc68901_device, write_rx))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MFP_TAG, mc68901_device, write_rx))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( indiana )
 	ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v9", "ver 0.9" )
-	ROMX_LOAD( "prom0_9.bin", 0x0000, 0x10000, CRC(746ad75e) SHA1(7d5c123c8568b1e02ab683e8f3188d0fef78d740), ROM_BIOS(1))
+	ROMX_LOAD( "prom0_9.bin", 0x0000, 0x10000, CRC(746ad75e) SHA1(7d5c123c8568b1e02ab683e8f3188d0fef78d740), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v8", "ver 0.8" )
-	ROMX_LOAD( "prom0_8.bin", 0x0000, 0x10000, CRC(9d8dafee) SHA1(c824e5fe6eec08f51ef287c651a5034fe3c8b718), ROM_BIOS(2))
+	ROMX_LOAD( "prom0_8.bin", 0x0000, 0x10000, CRC(9d8dafee) SHA1(c824e5fe6eec08f51ef287c651a5034fe3c8b718), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v7", "ver 0.7" )
-	ROMX_LOAD( "prom0_7.bin", 0x0000, 0x10000, CRC(d6a3b6bc) SHA1(01d8cee989ab29646d9d3f8b7262b10055653d41), ROM_BIOS(3))
+	ROMX_LOAD( "prom0_7.bin", 0x0000, 0x10000, CRC(d6a3b6bc) SHA1(01d8cee989ab29646d9d3f8b7262b10055653d41), ROM_BIOS(2))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE           INIT      COMPANY               FULLNAME                          FLAGS
-COMP( 1993, indiana, 0,      0,      indiana,   indiana, indiana_state,  indiana,  "Indiana University", "Indiana University 68030 board", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY               FULLNAME                          FLAGS
+COMP( 1993, indiana, 0,      0,      indiana, indiana, indiana_state, init_indiana, "Indiana University", "Indiana University 68030 board", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

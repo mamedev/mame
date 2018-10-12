@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class sslam_state : public driver_device
 {
@@ -21,7 +22,13 @@ public:
 		m_regs(*this, "regs"),
 		m_spriteram(*this, "spriteram") { }
 
+	void sslam(machine_config &config);
+	void powerbls(machine_config &config);
 
+	void init_sslam();
+	void init_powerbls();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
@@ -61,8 +68,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sslam_bg_tileram_w);
 	DECLARE_WRITE16_MEMBER(powerbls_bg_tileram_w);
 	DECLARE_WRITE8_MEMBER(sslam_snd_w);
-	DECLARE_DRIVER_INIT(sslam);
-	DECLARE_DRIVER_INIT(powerbls);
+
 	TILE_GET_INFO_MEMBER(get_sslam_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_bg_tile_info);
@@ -74,8 +80,7 @@ public:
 	TIMER_CALLBACK_MEMBER(music_playback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sslam_play(int track, int data);
-	void sslam(machine_config &config);
-	void powerbls(machine_config &config);
+
 	void powerbls_map(address_map &map);
 	void sslam_program_map(address_map &map);
 };

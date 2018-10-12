@@ -28,6 +28,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,6 +46,9 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram") { }
 
+	void skyarmy(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -73,7 +77,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(nmi_source);
-	void skyarmy(machine_config &config);
 	void skyarmy_io_map(address_map &map);
 	void skyarmy_map(address_map &map);
 };
@@ -210,27 +213,29 @@ WRITE_LINE_MEMBER(skyarmy_state::nmi_enable_w)
 }
 
 
-ADDRESS_MAP_START(skyarmy_state::skyarmy_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram") /* Video RAM */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram") /* Color RAM */
-	AM_RANGE(0x9800, 0x983f) AM_RAM AM_SHARE("spriteram") /* Sprites */
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("scrollram")  /* Scroll RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P1")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("P2")
-	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void skyarmy_state::skyarmy_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8fff).ram().w(FUNC(skyarmy_state::videoram_w)).share("videoram"); /* Video RAM */
+	map(0x9000, 0x93ff).ram().w(FUNC(skyarmy_state::colorram_w)).share("colorram"); /* Color RAM */
+	map(0x9800, 0x983f).ram().share("spriteram"); /* Sprites */
+	map(0x9840, 0x985f).ram().share("scrollram");  /* Scroll RAM */
+	map(0xa000, 0xa000).portr("DSW");
+	map(0xa001, 0xa001).portr("P1");
+	map(0xa002, 0xa002).portr("P2");
+	map(0xa003, 0xa003).portr("SYSTEM");
+	map(0xa000, 0xa007).w("latch", FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(skyarmy_state::skyarmy_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay0", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay0", ay8910_device, data_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay1", ay8910_device, data_r)
-ADDRESS_MAP_END
+void skyarmy_state::skyarmy_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay0", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r("ay0", FUNC(ay8910_device::data_r));
+	map(0x04, 0x05).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x06, 0x06).r("ay1", FUNC(ay8910_device::data_r));
+}
 
 
 /* verified from Z80 code */
@@ -313,25 +318,25 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( skyarmy )
+static GFXDECODE_START( gfx_skyarmy )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 
-	MCFG_CPU_ADD("maincpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(skyarmy_map)
-	MCFG_CPU_IO_MAP(skyarmy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyarmy_state,  irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(skyarmy_state, nmi_source, 650)    /* Hz */
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(skyarmy_map)
+	MCFG_DEVICE_IO_MAP(skyarmy_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyarmy_state,  irq0_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(skyarmy_state, nmi_source, 650)    /* Hz */
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 11C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(skyarmy_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(skyarmy_state, nmi_enable_w)) // ???
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(skyarmy_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(skyarmy_state, flip_screen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // video RAM buffering?
+	ls259_device &latch(LS259(config, "latch")); // 11C
+	latch.q_out_cb<0>().set(FUNC(skyarmy_state::coin_counter_w));
+	latch.q_out_cb<4>().set(FUNC(skyarmy_state::nmi_enable_w)); // ???
+	latch.q_out_cb<5>().set(FUNC(skyarmy_state::flip_screen_x_w));
+	latch.q_out_cb<6>().set(FUNC(skyarmy_state::flip_screen_y_w));
+	latch.q_out_cb<7>().set_nop(); // video RAM buffering?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -342,15 +347,15 @@ MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 	MCFG_SCREEN_UPDATE_DRIVER(skyarmy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyarmy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyarmy)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(skyarmy_state, skyarmy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay0", AY8910, 2500000)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay0", AY8910, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("ay1", AY8910, 2500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
@@ -374,4 +379,4 @@ ROM_START( skyarmy )
 	ROM_LOAD( "a6.bin",  0x0000, 0x0020, CRC(c721220b) SHA1(61b3320fb616c0600d56840cb6438616c7e0c6eb) )
 ROM_END
 
-GAME( 1982, skyarmy, 0, skyarmy, skyarmy, skyarmy_state, 0, ROT90, "Shoei", "Sky Army", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, skyarmy, 0, skyarmy, skyarmy, skyarmy_state, empty_init, ROT90, "Shoei", "Sky Army", MACHINE_SUPPORTS_SAVE )

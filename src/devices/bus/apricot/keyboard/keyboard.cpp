@@ -101,6 +101,7 @@ device_apricot_keyboard_interface::~device_apricot_keyboard_interface()
 //  SLOT INTERFACE
 //**************************************************************************
 
-SLOT_INTERFACE_START( apricot_keyboard_devices )
-	SLOT_INTERFACE("hle", APRICOT_KEYBOARD_HLE)
-SLOT_INTERFACE_END
+void apricot_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("hle", APRICOT_KEYBOARD_HLE);
+}

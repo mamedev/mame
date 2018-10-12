@@ -36,7 +36,7 @@ static const discrete_dac_r1_ladder grchamp_sound_dac2 =
 
 /* Nodes - Sounds */
 
-DISCRETE_SOUND_START(grchamp)
+DISCRETE_SOUND_START(grchamp_discrete)
 
 	/************************************************/
 	/* Input register mapping for grand champion    */

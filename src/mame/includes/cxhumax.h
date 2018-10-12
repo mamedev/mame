@@ -27,7 +27,6 @@ struct cx_timer_regs_t
 	uint32_t timer_irq;
 };
 
-#define TERMINAL_TAG "terminal"
 
 class cxhumax_state : public driver_device
 {
@@ -37,7 +36,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_flash(*this, "flash"),
 		m_ram(*this, "ram"),
-		m_terminal(*this, TERMINAL_TAG),
+		m_terminal(*this, "terminal"),
 		m_i2cmem(*this, "eeprom")
 	{
 	}

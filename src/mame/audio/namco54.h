@@ -11,7 +11,7 @@
 	MCFG_DEVICE_ADD(_tag, NAMCO_54XX, _clock)
 
 #define MCFG_NAMCO_54XX_DISCRETE(_tag) \
-	downcast<namco_54xx_device &>(*device).set_discrete("^" _tag);
+	downcast<namco_54xx_device &>(*device).set_discrete(_tag);
 
 #define MCFG_NAMCO_54XX_BASENODE(_node) \
 	downcast<namco_54xx_device &>(*device).set_basenote(_node);

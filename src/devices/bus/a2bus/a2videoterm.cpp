@@ -126,7 +126,7 @@ MACHINE_CONFIG_START(a2bus_videx80_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(a2bus_videx80_device, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(a2bus_videx80_device, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, a2bus_videx80_device, vsync_changed))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -239,7 +239,7 @@ uint8_t a2bus_videx80_device::read_c0nx(uint8_t offset)
 
 	if (offset == 1)
 	{
-		return m_crtc->register_r();   // status_r?
+		return m_crtc->read_register();   // status_r?
 	}
 
 	return 0xff;
@@ -254,11 +254,11 @@ void a2bus_videx80_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		m_crtc->address_w(data);
+		m_crtc->write_address(data);
 	}
 	else if (offset == 1)
 	{
-		m_crtc->register_w(data);
+		m_crtc->write_register(data);
 	}
 
 	m_rambank = ((offset>>2) & 3) * 512;

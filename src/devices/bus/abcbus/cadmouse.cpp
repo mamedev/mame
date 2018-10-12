@@ -78,17 +78,17 @@ ROM_START( abc_cadmouse )
 	ROM_LOAD( "eprom1.bin", 0x0000, 0x2000, CRC(e71c9141) SHA1(07a6fae4e3fff3d7a4f67ad0791e4e297c1763aa) )
 
 	ROM_REGION( 0x20, "cadmouse_prom2", 0 )
-	ROM_LOAD( "prom2.bin", 0x0000, 0x0020, CRC(C6C3BC9B) SHA1(5944cce355657b7bdc693f47a72f6b01decdc02a) ) // 32x8
+	ROM_LOAD( "prom2.bin", 0x0000, 0x0020, CRC(c6c3bc9b) SHA1(5944cce355657b7bdc693f47a72f6b01decdc02a) ) // 32x8
 	ROM_REGION( 0x20, "cadmouse_prom3", 0 )
-	ROM_LOAD( "prom3.bin", 0x0000, 0x0020, CRC(862FC73A) SHA1(8a5391cd2ab61e5c3e22bb8805ace48566f5f57d) ) // 32x8
+	ROM_LOAD( "prom3.bin", 0x0000, 0x0020, CRC(862fc73a) SHA1(8a5391cd2ab61e5c3e22bb8805ace48566f5f57d) ) // 32x8
 	ROM_REGION( 0x100, "cadmouse_prom4", 0 )
-	ROM_LOAD( "prom4.bin", 0x0000, 0x0100, CRC(DF58AAA9) SHA1(a2ab3b19a85ba3da6d78d1b0d44e2c33b44de5bc) ) // 256x4
+	ROM_LOAD( "prom4.bin", 0x0000, 0x0100, CRC(df58aaa9) SHA1(a2ab3b19a85ba3da6d78d1b0d44e2c33b44de5bc) ) // 256x4
 	ROM_REGION( 0x20, "cadmouse_prom5", 0 )
-	ROM_LOAD( "prom5.bin", 0x0000, 0x0020, CRC(5EFD8B94) SHA1(cbfd6ebee815b02667ae886bb0820efa29311d37) ) // 32x8
+	ROM_LOAD( "prom5.bin", 0x0000, 0x0020, CRC(5efd8b94) SHA1(cbfd6ebee815b02667ae886bb0820efa29311d37) ) // 32x8
 	ROM_REGION( 0x100, "cadmouse_prom6", 0 )
-	ROM_LOAD( "prom6.bin", 0x0000, 0x0100, CRC(EE3D8B75) SHA1(1afb22e3cff6e36f49228f63d0c7830bc48cf3cf) ) // 256x4
+	ROM_LOAD( "prom6.bin", 0x0000, 0x0100, CRC(ee3d8b75) SHA1(1afb22e3cff6e36f49228f63d0c7830bc48cf3cf) ) // 256x4
 	ROM_REGION( 0x100, "cadmouse_prom7", 0 )
-	ROM_LOAD( "prom7.bin", 0x0000, 0x0100, CRC(395110BD) SHA1(54720d155b4990d9879b95c0d13592bb7534da09) ) // 256x4
+	ROM_LOAD( "prom7.bin", 0x0000, 0x0100, CRC(395110bd) SHA1(54720d155b4990d9879b95c0d13592bb7534da09) ) // 256x4
 ROM_END
 
 
@@ -105,28 +105,30 @@ const tiny_rom_entry *abc_cadmouse_device::device_rom_region() const
 //  ADDRESS_MAP( abc_cadmouse_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START( abc_cadmouse_device::abc_cadmouse_mem )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(Z80_TAG, 0)
-ADDRESS_MAP_END
+void abc_cadmouse_device::abc_cadmouse_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).rom().region(Z80_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc_cadmouse_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START( abc_cadmouse_device::abc_cadmouse_io )
-ADDRESS_MAP_END
+void abc_cadmouse_device::abc_cadmouse_io(address_map &map)
+{
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc_cadmouse_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(abc_cadmouse_mem)
-	MCFG_CPU_IO_MAP(abc_cadmouse_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(abc_cadmouse_mem)
+	MCFG_DEVICE_IO_MAP(abc_cadmouse_io)
 MACHINE_CONFIG_END
 
 //**************************************************************************

@@ -44,14 +44,17 @@ For BIOS CRC confirmation
 class pv2000_state : public driver_device
 {
 public:
-	pv2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pv2000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
 		m_cart(*this, "cartslot"),
 		m_last_state(0)
-		{ }
+	{ }
 
+	void pv2000(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
@@ -70,7 +73,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
-	void pv2000(machine_config &config);
 	void pv2000_io_map(address_map &map);
 	void pv2000_map(address_map &map);
 };
@@ -178,34 +180,36 @@ WRITE8_MEMBER( pv2000_state::cass_out )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(pv2000_state::pv2000_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+void pv2000_state::pv2000_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
 
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
+	map(0x4000, 0x4000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x4001, 0x4001).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
+	map(0x7000, 0x7fff).ram();
 	//AM_RANGE(0x8000, 0xbfff) ext ram?
 	//AM_RANGE(0xc000, 0xffff)      // mapped by the cartslot
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(pv2000_state::pv2000_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void pv2000_state::pv2000_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 
 	//theres also printer and tape I/O (TODO)
-	AM_RANGE(0x00, 0x00) AM_WRITE(cass_conf_w)
+	map(0x00, 0x00).w(FUNC(pv2000_state::cass_conf_w));
 
 	//keyboard/joystick
-	AM_RANGE(0x10, 0x10) AM_READ(keys_hi_r)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(keys_lo_r, keys_w)
+	map(0x10, 0x10).r(FUNC(pv2000_state::keys_hi_r));
+	map(0x20, 0x20).rw(FUNC(pv2000_state::keys_lo_r), FUNC(pv2000_state::keys_w));
 
 	//sn76489a
-	AM_RANGE(0x40, 0x40) AM_READ(keys_mod_r) AM_DEVWRITE("sn76489a", sn76489a_device, write)
+	map(0x40, 0x40).r(FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::command_w));
 
 	/* Cassette input. Gets hit a lot after a GLOAD command */
-	AM_RANGE(0x60, 0x60) AM_READWRITE(cass_in,cass_out)
-ADDRESS_MAP_END
+	map(0x60, 0x60).rw(FUNC(pv2000_state::cass_in), FUNC(pv2000_state::cass_out));
+}
 
 
 static INPUT_PORTS_START( pv2000 )
@@ -318,7 +322,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 {
 	// only if it goes up
 	if (state && !m_last_state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_last_state = state;
 
@@ -385,25 +389,24 @@ DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 MACHINE_CONFIG_START(pv2000_state::pv2000)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(7'159'090)/2) // 3.579545 MHz
-	MCFG_CPU_PROGRAM_MAP(pv2000_map)
-	MCFG_CPU_IO_MAP(pv2000_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'159'090)/2) // 3.579545 MHz
+	MCFG_DEVICE_PROGRAM_MAP(pv2000_map)
+	MCFG_DEVICE_IO_MAP(pv2000_io_map)
 
 	// video hardware
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(pv2000_state, pv2000_vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(pv2000_state::pv2000_vdp_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -429,5 +432,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE           INIT COMPANY   FULLNAME    FLAGS
-CONS( 1983, pv2000,  0,      0,      pv2000,  pv2000, pv2000_state,   0,   "Casio",  "PV-2000",  MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY   FULLNAME    FLAGS
+CONS( 1983, pv2000, 0,      0,      pv2000,  pv2000, pv2000_state, empty_init, "Casio",  "PV-2000",  MACHINE_NOT_WORKING )

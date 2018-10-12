@@ -12,6 +12,7 @@
 #include "cpu/mcs51/mcs51.h"
 //#include "machine/mc68681.h"
 #include "machine/ram.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -23,22 +24,25 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "maincpu") { }
 
+	void vt520(machine_config &config);
+	void vt420(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(vt520_some_r);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint8_t> m_rom;
-	void vt520(machine_config &config);
-	void vt420(machine_config &config);
 	void vt520_io(address_map &map);
 	void vt520_mem(address_map &map);
 };
 
 
-ADDRESS_MAP_START(vt520_state::vt520_mem)
-	AM_RANGE(0x0000, 0xffff) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
+void vt520_state::vt520_mem(address_map &map)
+{
+	map(0x0000, 0xffff).bankrw("bank1");
+}
 
 /*
     On the board there is TC160G41AF (1222) custom chip
@@ -53,10 +57,11 @@ READ8_MEMBER( vt520_state::vt520_some_r )
 	return 0x40;
 }
 
-ADDRESS_MAP_START(vt520_state::vt520_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x7ffb, 0x7ffb) AM_READ(vt520_some_r)
-ADDRESS_MAP_END
+void vt520_state::vt520_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x7ffb, 0x7ffb).r(FUNC(vt520_state::vt520_some_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vt520 )
@@ -81,9 +86,9 @@ uint32_t vt520_state::screen_update_vt520(screen_device &screen, bitmap_ind16 &b
 
 MACHINE_CONFIG_START(vt520_state::vt420)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL(43'320'000) / 3) // SCN8031HCFN40 (divider not verified)
-	MCFG_CPU_PROGRAM_MAP(vt520_mem)
-	MCFG_CPU_IO_MAP(vt520_io)
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(43'320'000) / 3) // SCN8031HCFN40 (divider not verified)
+	MCFG_DEVICE_PROGRAM_MAP(vt520_mem)
+	MCFG_DEVICE_IO_MAP(vt520_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -99,9 +104,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt520_state::vt520)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL(20'000'000)) // Philips P80C32IBPN
-	MCFG_CPU_PROGRAM_MAP(vt520_mem)
-	MCFG_CPU_IO_MAP(vt520_io)
+	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(20'000'000)) // Philips P80C32IBPN
+	MCFG_DEVICE_PROGRAM_MAP(vt520_mem)
+	MCFG_DEVICE_IO_MAP(vt520_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -117,8 +122,7 @@ MACHINE_CONFIG_START(vt520_state::vt520)
 	// On the board there are two M5M44256BJ-7 chips
 	// Which are DRAM 256K x 4bit
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, RAM_TAG).set_default_size("256K");
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************
@@ -141,7 +145,7 @@ ROM_END
 
 /* Driver */
 
-COMP( 1990, vt420,  0,      0,       vt420,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT420 Video Terminal", MACHINE_IS_SKELETON )
-//COMP( 1993, vt510,  0,      0,       vt520,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT510 Video Terminal",  MACHINE_IS_SKELETON)
-COMP( 1994, vt520,  0,      0,       vt520,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT520 Video Terminal",  MACHINE_IS_SKELETON)
-//COMP( 1994, vt525,  0,      0,       vt520,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT525 Video Terminal",  MACHINE_IS_SKELETON)
+COMP( 1990, vt420, 0, 0, vt420, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT420 Video Terminal", MACHINE_IS_SKELETON )
+//COMP( 1993, vt510, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT510 Video Terminal",  MACHINE_IS_SKELETON)
+COMP( 1994, vt520, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT520 Video Terminal",  MACHINE_IS_SKELETON)
+//COMP( 1994, vt525, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT525 Video Terminal",  MACHINE_IS_SKELETON)

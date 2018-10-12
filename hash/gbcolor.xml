@@ -147,7 +147,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="102dalmas" cloneof="102dalma">
 		<!-- Notes: GBC only -->
-		<description>102 Dalmatas de Disney: Cachorros al Rescate (Spa)</description>
+		<description>102 Dálmatas de Disney: Cachorros al Rescate (Spa)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-B99S-ESP"/>
@@ -16191,7 +16191,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="powrpfpns" cloneof="powrpfpn">
 		<!-- Notes: GBC only -->
-		<description>Las Super Nenas - Panico en Townsville (Spa)</description>
+		<description>Las Super Nenas - Pánico en Townsville (Spa)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BPTS-ESP"/>

@@ -220,7 +220,6 @@ void ccastles_state::machine_start()
 
 	/* setup for save states */
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_nvram_store));
 }
 
 
@@ -245,24 +244,6 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		m_irq_state = 0;
 	}
-}
-
-
-WRITE8_MEMBER(ccastles_state::led_w)
-{
-	output().set_led_value(offset, ~data & 1);
-}
-
-
-WRITE8_MEMBER(ccastles_state::ccounter_w)
-{
-	machine().bookkeeping().coin_counter_w(offset, data & 1);
-}
-
-
-WRITE8_MEMBER(ccastles_state::bankswitch_w)
-{
-	membank("bank1")->set_entry(data & 1);
 }
 
 
@@ -292,11 +273,10 @@ WRITE8_MEMBER(ccastles_state::nvram_recall_w)
 }
 
 
-WRITE8_MEMBER(ccastles_state::nvram_store_w)
+WRITE_LINE_MEMBER(ccastles_state::nvram_store_w)
 {
-	m_nvram_store[offset] = data & 1;
-	m_nvram_4b->store(~m_nvram_store[0] & m_nvram_store[1]);
-	m_nvram_4a->store(~m_nvram_store[0] & m_nvram_store[1]);
+	m_nvram_4b->store(!m_outlatch[0]->q2_r() && m_outlatch[0]->q3_r());
+	m_nvram_4a->store(!m_outlatch[0]->q2_r() && m_outlatch[0]->q3_r());
 }
 
 
@@ -321,31 +301,29 @@ WRITE8_MEMBER(ccastles_state::nvram_w)
  *************************************/
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(ccastles_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM_WRITE(ccastles_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(ccastles_bitmode_addr_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ccastles_bitmode_r, ccastles_bitmode_w)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x8e00, 0x8fff) AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_READWRITE(nvram_r, nvram_w)
-	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x01fc) AM_READ(leta_r)
-	AM_RANGE(0x9600, 0x97ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x9a00, 0x9a0f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x9c00, 0x9c7f) AM_WRITE(nvram_recall_w)
-	AM_RANGE(0x9c80, 0x9cff) AM_WRITE(ccastles_hscroll_w)
-	AM_RANGE(0x9d00, 0x9d7f) AM_WRITE(ccastles_vscroll_w)
-	AM_RANGE(0x9d80, 0x9dff) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x9e00, 0x9e7f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9e80, 0x9e81) AM_MIRROR(0x0078) AM_WRITE(led_w)
-	AM_RANGE(0x9e82, 0x9e83) AM_MIRROR(0x0078) AM_WRITE(nvram_store_w)
-	AM_RANGE(0x9e85, 0x9e86) AM_MIRROR(0x0078) AM_WRITE(ccounter_w)
-	AM_RANGE(0x9e87, 0x9e87) AM_MIRROR(0x0078) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x9f00, 0x9f07) AM_MIRROR(0x0078) AM_WRITE(ccastles_video_control_w)
-	AM_RANGE(0x9f80, 0x9fbf) AM_MIRROR(0x0040) AM_WRITE(ccastles_paletteram_w)
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ccastles_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).ram().w(FUNC(ccastles_state::ccastles_videoram_w)).share("videoram");
+	map(0x0000, 0x0001).w(FUNC(ccastles_state::ccastles_bitmode_addr_w));
+	map(0x0002, 0x0002).rw(FUNC(ccastles_state::ccastles_bitmode_r), FUNC(ccastles_state::ccastles_bitmode_w));
+	map(0x8000, 0x8fff).ram();
+	map(0x8e00, 0x8fff).share("spriteram");
+	map(0x9000, 0x90ff).mirror(0x0300).rw(FUNC(ccastles_state::nvram_r), FUNC(ccastles_state::nvram_w));
+	map(0x9400, 0x9403).mirror(0x01fc).r(FUNC(ccastles_state::leta_r));
+	map(0x9600, 0x97ff).portr("IN0");
+	map(0x9800, 0x980f).mirror(0x01f0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x9a00, 0x9a0f).mirror(0x01f0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x9c00, 0x9c7f).w(FUNC(ccastles_state::nvram_recall_w));
+	map(0x9c80, 0x9cff).w(FUNC(ccastles_state::ccastles_hscroll_w));
+	map(0x9d00, 0x9d7f).w(FUNC(ccastles_state::ccastles_vscroll_w));
+	map(0x9d80, 0x9dff).w(FUNC(ccastles_state::irq_ack_w));
+	map(0x9e00, 0x9e7f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x9e80, 0x9e87).mirror(0x0078).w("outlatch0", FUNC(ls259_device::write_d0));
+	map(0x9f00, 0x9f07).mirror(0x0078).w(FUNC(ccastles_state::ccastles_video_control_w));
+	map(0x9f80, 0x9fbf).mirror(0x0040).w(FUNC(ccastles_state::ccastles_paletteram_w));
+	map(0xa000, 0xdfff).bankr("bank1");
+	map(0xe000, 0xffff).rom();
+}
 
 
 
@@ -362,7 +340,7 @@ static INPUT_PORTS_START( ccastles )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Jump/1P Start Upright")    PORT_CONDITION("IN1",0x20,EQUALS,0x00)  /* left Jump, non-cocktail start1 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Jump")           PORT_CONDITION("IN1",0x20,EQUALS,0x20)  /* 1p Jump, cocktail */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Jump/2P Start Upright")   PORT_CONDITION("IN1",0x20,EQUALS,0x00)  /* right Jump, non-cocktail start2 */
@@ -442,7 +420,7 @@ static const gfx_layout ccastles_spritelayout =
 };
 
 
-static GFXDECODE_START( ccastles )
+static GFXDECODE_START( gfx_ccastles )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ccastles_spritelayout,  0, 2 )
 GFXDECODE_END
 
@@ -456,17 +434,27 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ccastles_state::ccastles)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccastles_state::main_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	LS259(config, m_outlatch[0]); // 8N
+	m_outlatch[0]->q_out_cb<0>().set_output("led0").invert();
+	m_outlatch[0]->q_out_cb<1>().set_output("led1").invert();
+	m_outlatch[0]->q_out_cb<2>().set(FUNC(ccastles_state::nvram_store_w));
+	m_outlatch[0]->q_out_cb<3>().set(FUNC(ccastles_state::nvram_store_w));
+	m_outlatch[0]->q_out_cb<5>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
+	m_outlatch[0]->q_out_cb<6>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
+	m_outlatch[0]->q_out_cb<7>().set_membank("bank1");
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram_4b")
-	MCFG_X2212_ADD_AUTOSAVE("nvram_4a")
+	LS259(config, m_outlatch[1]); // 6P
+
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
+
+	X2212(config, "nvram_4b").set_auto_save(true);
+	X2212(config, "nvram_4a").set_auto_save(true);
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ccastles)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ccastles)
 	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -475,14 +463,14 @@ MACHINE_CONFIG_START(ccastles_state::ccastles)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/8)
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN1"))
@@ -510,10 +498,10 @@ ROM_START( ccastles )
 	ROM_LOAD( "136022-107.8b", 0x2000, 0x2000, CRC(39960b7d) SHA1(82bdf764ac23e72598883283c5e957169387abd4) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) )
-	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) )
-	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) )
-	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) )
+	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) ) // vertical sync generation
+	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
+	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
+	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
 ROM_END
 
 
@@ -664,11 +652,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, ccastles,  0,        ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesg, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3, German)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesp, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesf, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3, French)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastles3, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastles2, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastles1, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesj, ccastles, ccastles, ccastlesj,ccastles_state, 0, ROT0, "Atari", "Crystal Castles (joystick version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles,  0,        ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesg, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, German)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesp, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesf, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, French)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles3, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles2, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles1, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesj, ccastles, ccastles, ccastlesj, ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (joystick version)", MACHINE_SUPPORTS_SAVE )

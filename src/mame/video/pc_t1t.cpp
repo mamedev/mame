@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "pc_t1t.h"
 
-#include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "screen.h"
 
@@ -65,6 +64,7 @@ pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, const 
 
 pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock),
+	m_pic8259(*this, ":pic8259"),
 	m_jxkanji(nullptr)
 {
 }
@@ -110,10 +110,11 @@ void pcvideo_pcjr_device::device_start()
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(pc_t1t_device::vram_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x20000, 0x3ffff) AM_NOP
-ADDRESS_MAP_END
+void pc_t1t_device::vram_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x20000, 0x3ffff).noprw();
+}
 
 MACHINE_CONFIG_START(pcvideo_t1000_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
@@ -127,15 +128,10 @@ MACHINE_CONFIG_START(pcvideo_t1000_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pc_t1t_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(pc_t1t_device, t1000_de_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(pcvideo_t1000_device, t1000_vsync_changed))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, pc_t1t_device, t1000_de_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, pcvideo_t1000_device, t1000_vsync_changed))
 
-	MCFG_DEVICE_ADD("vram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, m_vram).set_map(&pc_t1t_device::vram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 MACHINE_CONFIG_END
 
 
@@ -151,14 +147,10 @@ MACHINE_CONFIG_START(pcvideo_pcjr_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pcvideo_pcjr_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(pc_t1t_device, t1000_de_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(pcvideo_pcjr_device, pcjr_vsync_changed))
-	MCFG_DEVICE_ADD("vram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, pc_t1t_device, t1000_de_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, pcvideo_pcjr_device, pcjr_vsync_changed))
+
+	ADDRESS_MAP_BANK(config, m_vram).set_map(&pc_t1t_device::vram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 MACHINE_CONFIG_END
 
 
@@ -1033,5 +1025,5 @@ WRITE_LINE_MEMBER( pcvideo_pcjr_device::pcjr_vsync_changed )
 	{
 		m_pc_framecnt++;
 	}
-	machine().device<pic8259_device>("pic8259")->ir5_w(state);
+	m_pic8259->ir5_w(state);
 }

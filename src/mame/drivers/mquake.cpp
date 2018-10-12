@@ -53,19 +53,21 @@ public:
 		m_es5503_rom(*this, "es5503")
 	{ }
 
-	DECLARE_DRIVER_INIT(mquake);
+	void mquake(machine_config &config);
 
+	void init_mquake();
+
+private:
 	DECLARE_READ8_MEMBER( es5503_sample_r );
 	DECLARE_WRITE16_MEMBER( output_w );
 	DECLARE_READ16_MEMBER( coin_chip_r );
 	DECLARE_WRITE16_MEMBER( coin_chip_w );
 
-	void mquake(machine_config &config);
 	void a500_mem(address_map &map);
 	void main_map(address_map &map);
 	void mquake_es5503_map(address_map &map);
 	void overlay_512kb_map(address_map &map);
-private:
+
 	required_device<es5503_device> m_es5503;
 	required_region_ptr<uint8_t> m_es5503_rom;
 };
@@ -84,9 +86,10 @@ READ8_MEMBER( mquake_state::es5503_sample_r )
 	return m_es5503_rom[offset + (m_es5503->get_channel_strobe() * 0x10000)];
 }
 
-ADDRESS_MAP_START(mquake_state::mquake_es5503_map)
-	AM_RANGE(0x000000, 0x1ffff) AM_READ(es5503_sample_r)
-ADDRESS_MAP_END
+void mquake_state::mquake_es5503_map(address_map &map)
+{
+	map(0x000000, 0x1ffff).r(FUNC(mquake_state::es5503_sample_r));
+}
 
 WRITE16_MEMBER( mquake_state::output_w )
 {
@@ -122,36 +125,39 @@ WRITE16_MEMBER( mquake_state::coin_chip_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(mquake_state::overlay_512kb_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void mquake_state::overlay_512kb_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).mirror(0x180000).ram().share("chip_ram");
+	map(0x200000, 0x27ffff).rom().region("kickstart", 0);
+}
 
-ADDRESS_MAP_START(mquake_state::a500_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
-	AM_RANGE(0xc00000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xd80000, 0xddffff) AM_NOP
-	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
-	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void mquake_state::a500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
+	map(0xa00000, 0xbfffff).rw(FUNC(mquake_state::cia_r), FUNC(mquake_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
+	map(0xd80000, 0xddffff).noprw();
+	map(0xde0000, 0xdeffff).rw(FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(mquake_state::rom_mirror_r));
+	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
-ADDRESS_MAP_START(mquake_state::main_map)
-	AM_IMPORT_FROM(a500_mem)
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8("es5503", es5503_device, read, write, 0x00ff)
-	AM_RANGE(0x282000, 0x282001) AM_READ_PORT("SW.LO")
-	AM_RANGE(0x282002, 0x282003) AM_READ_PORT("SW.HI")
-	AM_RANGE(0x284000, 0x28400f) AM_WRITE(output_w)
-	AM_RANGE(0x286000, 0x28600f) AM_READWRITE(coin_chip_r, coin_chip_w)
-	AM_RANGE(0x300000, 0x3bffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0xf00000, 0xfbffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
-ADDRESS_MAP_END
+void mquake_state::main_map(address_map &map)
+{
+	a500_mem(map);
+	map(0x200000, 0x203fff).ram().share("nvram");
+	map(0x204000, 0x2041ff).rw(m_es5503, FUNC(es5503_device::read), FUNC(es5503_device::write)).umask16(0x00ff);
+	map(0x282000, 0x282001).portr("SW.LO");
+	map(0x282002, 0x282003).portr("SW.HI");
+	map(0x284000, 0x28400f).w(FUNC(mquake_state::output_w));
+	map(0x286000, 0x28600f).rw(FUNC(mquake_state::coin_chip_r), FUNC(mquake_state::coin_chip_w));
+	map(0x300000, 0x3bffff).rom().region("user2", 0);
+	map(0xf00000, 0xfbffff).rom().region("user2", 0);           /* Custom ROM */
+}
 
 
 
@@ -168,11 +174,11 @@ static INPUT_PORTS_START( mquake )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)         /* JS1SW */
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mquake_state,amiga_joystick_convert, (void *)0)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mquake_state,amiga_joystick_convert, (void *)0)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mquake_state,amiga_joystick_convert, (void *)1)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mquake_state,amiga_joystick_convert, (void *)1)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("p1_joy")
@@ -310,17 +316,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mquake_state::mquake)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	ntsc_video(config);
@@ -331,15 +332,16 @@ MACHINE_CONFIG_START(mquake_state::mquake)
 	MCFG_VIDEO_START_OVERRIDE(mquake_state,amiga)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
-	MCFG_PAULA_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
-	MCFG_PAULA_INT_CB(WRITELINE(amiga_state, paula_int_w))
+	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_NTSC));
+	paula.add_route(0, "lspeaker", 0.50);
+	paula.add_route(1, "rspeaker", 0.50);
+	paula.add_route(2, "rspeaker", 0.50);
+	paula.add_route(3, "lspeaker", 0.50);
+	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	MCFG_ES5503_ADD("es5503", amiga_state::CLK_7M_NTSC)       /* ES5503 is likely mono due to channel strobe used as bank select */
 	MCFG_ES5503_OUTPUT_CHANNELS(1)
@@ -349,19 +351,19 @@ MACHINE_CONFIG_START(mquake_state::mquake)
 
 	/* cia */
 	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("CIA0PORTA"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
 	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
 
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
-	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
-	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
-	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
-	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
-	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
+	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
+	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
+	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
+	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
+	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
+	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
 MACHINE_CONFIG_END
 
 
@@ -410,7 +412,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER( mquake_state, mquake )
+void mquake_state::init_mquake()
 {
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;
@@ -425,4 +427,4 @@ DRIVER_INIT_MEMBER( mquake_state, mquake )
  *
  *************************************/
 
-GAME( 1987, mquake, 0, mquake, mquake, mquake_state, mquake, 0, "Sente", "Moonquake", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, mquake, 0, mquake, mquake, mquake_state, init_mquake, 0, "Sente", "Moonquake", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

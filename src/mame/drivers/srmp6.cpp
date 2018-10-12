@@ -71,6 +71,7 @@ Dumped 06/15/2000
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/nile.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -88,6 +89,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void srmp6(machine_config &config);
+private:
 	std::unique_ptr<uint16_t[]> m_tileram;
 	required_shared_ptr<uint16_t> m_sprram;
 	required_shared_ptr<uint16_t> m_chrram;
@@ -102,6 +105,9 @@ public:
 	unsigned short m_lastb;
 	unsigned short m_lastb2;
 	int m_destl;
+
+	void init_INIT();
+
 	DECLARE_WRITE16_MEMBER(srmp6_input_select_w);
 	DECLARE_READ16_MEMBER(srmp6_inputs_r);
 	DECLARE_WRITE16_MEMBER(video_regs_w);
@@ -111,7 +117,6 @@ public:
 	DECLARE_WRITE16_MEMBER(tileram_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(srmp6_irq_ack_r);
-	DECLARE_DRIVER_INIT(INIT);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -120,7 +125,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void srmp6(machine_config &config);
 	void srmp6_map(address_map &map);
 };
 
@@ -553,33 +557,34 @@ READ16_MEMBER(srmp6_state::srmp6_irq_ack_r)
 	return 0; // value read doesn't matter
 }
 
-ADDRESS_MAP_START(srmp6_state::srmp6_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM                 // work RAM
-	AM_RANGE(0x600000, 0x7fffff) AM_ROMBANK("bank1")    // banked ROM (used by ROM check)
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0)
+void srmp6_state::srmp6_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x23ffff).ram();                 // work RAM
+	map(0x600000, 0x7fffff).bankr("bank1");    // banked ROM (used by ROM check)
+	map(0x800000, 0x9fffff).rom().region("user1", 0);
 
-	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)     // inputs
-	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0x4d0000, 0x4d0001) AM_READ(srmp6_irq_ack_r)
+	map(0x300000, 0x300005).rw(FUNC(srmp6_state::srmp6_inputs_r), FUNC(srmp6_state::srmp6_input_select_w));     // inputs
+	map(0x480000, 0x480fff).ram().w(FUNC(srmp6_state::paletteram_w)).share("palette");
+	map(0x4d0000, 0x4d0001).r(FUNC(srmp6_state::srmp6_irq_ack_r));
 
 	// OBJ RAM: checked [$400000-$47dfff]
-	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_SHARE("sprram")
+	map(0x400000, 0x47ffff).ram().share("sprram");
 
 	// CHR RAM: checked [$500000-$5fffff]
-	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(tileram_r,tileram_w) AM_SHARE("chrram")
+	map(0x500000, 0x5fffff).rw(FUNC(srmp6_state::tileram_r), FUNC(srmp6_state::tileram_w)).share("chrram");
 	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_SHARE("dmaram")
 
-	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_SHARE("video_regs")    // ? gfx regs ST-0026 NiLe
-	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE("nile", nile_device, nile_snd_r, nile_snd_w)
-	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE("nile", nile_device, nile_sndctrl_r, nile_sndctrl_w)
+	map(0x4c0000, 0x4c006f).rw(FUNC(srmp6_state::video_regs_r), FUNC(srmp6_state::video_regs_w)).share("video_regs");    // ? gfx regs ST-0026 NiLe
+	map(0x4e0000, 0x4e00ff).rw("nile", FUNC(nile_device::nile_snd_r), FUNC(nile_device::nile_snd_w));
+	map(0x4e0100, 0x4e0101).rw("nile", FUNC(nile_device::nile_sndctrl_r), FUNC(nile_device::nile_sndctrl_w));
 	//AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)
 	//AM_RANGE(0x5fff00, 0x5fff1f) AM_RAM // ? see routine $5ca8, video_regs related ???
 
 	//AM_RANGE(0xf00004, 0xf00005) AM_RAM // ?
 	//AM_RANGE(0xf00006, 0xf00007) AM_RAM // ?
 
-ADDRESS_MAP_END
+}
 
 
 /***************************************************************************
@@ -680,9 +685,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(srmp6_state::srmp6)
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(srmp6_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp6_state, irq4_line_assert) // irq3 is a timer irq, but it's never enabled
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(srmp6_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp6_state, irq4_line_assert) // irq3 is a timer irq, but it's never enabled
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -694,10 +699,11 @@ MACHINE_CONFIG_START(srmp6_state::srmp6)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_NILE_ADD("nile", 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -735,4 +741,4 @@ ROM_END
     Game driver(s)
 ***************************************************************************/
 
-GAME( 1995, srmp6, 0, srmp6, srmp6, srmp6_state, 0, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+GAME( 1995, srmp6, 0, srmp6, srmp6, srmp6_state, empty_init, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

@@ -15,6 +15,7 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -30,16 +31,19 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void intrscti(machine_config &config);
+
+	void init_intrscti();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_DRIVER_INIT(intrscti);
 	virtual void video_start() override;
 	uint32_t screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void intrscti(machine_config &config);
 	void intrscti_io_map(address_map &map);
 	void intrscti_map(address_map &map);
 	void intrscti_sub_io_map(address_map &map);
@@ -85,30 +89,34 @@ uint32_t intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_in
 }
 
 
-ADDRESS_MAP_START(intrscti_state::intrscti_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x8000, 0x8fff) AM_ROM
-ADDRESS_MAP_END
+void intrscti_state::intrscti_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x6000, 0x67ff).ram();
+	map(0x7000, 0x77ff).ram().share("vram");
+	map(0x8000, 0x8fff).rom();
+}
 
-ADDRESS_MAP_START(intrscti_state::intrscti_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
+void intrscti_state::intrscti_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+}
 
 
-ADDRESS_MAP_START(intrscti_state::intrscti_sub_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
+void intrscti_state::intrscti_sub_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x2000, 0x23ff).ram();
 //  AM_RANGE(0x0000, 0xffff) AM_WRITENOP
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(intrscti_state::intrscti_sub_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void intrscti_state::intrscti_sub_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0xff) AM_NOP
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( intrscti )
@@ -176,7 +184,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( intrscti )
+static GFXDECODE_START( gfx_intrscti )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -184,14 +192,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(intrscti_state::intrscti)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(intrscti_map)
-	MCFG_CPU_IO_MAP(intrscti_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", intrscti_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)        /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(intrscti_map)
+	MCFG_DEVICE_IO_MAP(intrscti_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intrscti_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, 4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(intrscti_sub_map)
-	MCFG_CPU_IO_MAP(intrscti_sub_io_map)
+	MCFG_DEVICE_ADD("subcpu", Z80, 4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(intrscti_sub_map)
+	MCFG_DEVICE_IO_MAP(intrscti_sub_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -202,7 +210,7 @@ MACHINE_CONFIG_START(intrscti_state::intrscti)
 	MCFG_SCREEN_UPDATE_DRIVER(intrscti_state, screen_update_intrscti)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", intrscti)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_intrscti)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
@@ -222,11 +230,10 @@ ROM_START( intrscti )
 	ROM_LOAD( "b.5a", 0x2000, 0x1000, CRC(8951fb7e) SHA1(c423bf0536e3a09453814172e31b47f9c3c3324c) )
 ROM_END
 
-DRIVER_INIT_MEMBER(intrscti_state,intrscti)
+void intrscti_state::init_intrscti()
 {
 	uint8_t *cpu = memregion( "maincpu" )->base();
-	int i;
-	for (i=0;i<0x1000;i++)
+	for (int i = 0; i < 0x1000; i++)
 		cpu[i+0x8000]=0xc9; // ret
 
 	/*
@@ -235,11 +242,11 @@ DRIVER_INIT_MEMBER(intrscti_state,intrscti)
 	*/
 
 	/* one of the protection sub-routines does this */
-	for (i=0;i<0x400;i++)
+	for (int i = 0; i < 0x400; i++)
 	{
 		m_vram[i+0x000] = 0x0e;
 		m_vram[i+0x400] = 0xff;
 	}
 }
 
-GAME( 19??, intrscti,  0,    intrscti, intrscti, intrscti_state, intrscti, ROT0, "<unknown>", "Intersecti", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
+GAME( 19??, intrscti, 0, intrscti, intrscti, intrscti_state, init_intrscti, ROT0, "<unknown>", "Intersecti", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

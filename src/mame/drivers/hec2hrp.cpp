@@ -33,23 +33,23 @@
                 => add BR/HR switching
                 => add bank switch for HRX
                 => add device MX80c and bank switching for the ROM
-    Importante note : the keyboard function add been piked from
+    Importante note : Keyboard emulation code obtained from
                     DChector project : http://dchector.free.fr/ made by DanielCoulom
-                    (thank's Daniel)
-        03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
+                    (thanks Daniel)
+        03/01/2010 Update and cleanup  by yo_fr       (jj.stac@aliceadsl.fr)
                 => add the port mapping for keyboard
         20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
-        11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino
+        11/11/2011 : add minidisk (3.5") support  JJStacino
 
-        don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-        (and thanks to Daniel!) and Yves site : http://hectorvictor.free.fr/ (thank's too Yves!)
+        for more information about these machines, see the DChector project : http://dchector.free.fr/ made by DanielCoulom
+        (thanks to Daniel) and Yves site : http://hectorvictor.free.fr/ (thanks too Yves!)
 
-    TODO :  Add the cartridge function,
-            Add diskette support, (done !)
-            Adjust the one shot and A/D timing (sn76477)
+    TODO :  Add cartridge functionality
+            Adjust the one-shot and A/D timing (sn76477)
+
 ****************************************************************************/
 /* Joystick 1 :
- clavier numerique :
+ Numpad :
                 (UP)5
   (left)1                     (right)3
                (down)2
@@ -77,7 +77,6 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
-#include "machine/upd765.h" /* for floppy disc controller */
 #include "sound/discrete.h"  /* for 1 Bit sound*/
 #include "sound/wave.h"      /* for K7 sound*/
 
@@ -89,119 +88,119 @@
 #include "formats/hector_minidisc.h"
 
 
-/*****************************************************************************/
-ADDRESS_MAP_START(hec2hrp_state::hecdisc2_mem)
-/*****************************************************************************/
-	ADDRESS_MAP_UNMAP_HIGH
+void hec2hrp_state::hecdisc2_mem(address_map &map)
+{
+	map.unmap_value_high();
 
-	/* Hardward address mapping*/
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank3") /*zone with ROM at start up, RAM later*/
+	map(0x0000, 0x3fff).bankrw("bank3"); /* ROM at start up, RAM later */
+	map(0x4000, 0xffff).ram();
+}
 
-	AM_RANGE( 0x4000, 0xffff ) AM_RAM
+void hec2hrp_state::hecdisc2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	// ROM page handling
+	map(0x000, 0x00f).rw(FUNC(hec2hrp_state::disc2_io00_port_r), FUNC(hec2hrp_state::disc2_io00_port_w));
+	// RS232 - 8251 comms handling
+	map(0x020, 0x02f).rw(FUNC(hec2hrp_state::disc2_io20_port_r), FUNC(hec2hrp_state::disc2_io20_port_w));
+	// Hector comms handling
+	map(0x030, 0x03f).rw(FUNC(hec2hrp_state::disc2_io30_port_r), FUNC(hec2hrp_state::disc2_io30_port_w));
+	map(0x040, 0x04f).rw(FUNC(hec2hrp_state::disc2_io40_port_r), FUNC(hec2hrp_state::disc2_io40_port_w));
+	map(0x050, 0x05f).rw(FUNC(hec2hrp_state::disc2_io50_port_r), FUNC(hec2hrp_state::disc2_io50_port_w));
+	// uPD765 link
+	map(0x060, 0x061).m(m_upd_fdc, FUNC(upd765a_device::map));
+	map(0x070, 0x07f).rw(m_upd_fdc, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+}
 
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(hec2hrp_state::hecdisc2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	// ROM Page managing
-	AM_RANGE(0x000,0x00f) AM_READWRITE(hector_disc2_io00_port_r, hector_disc2_io00_port_w )
-	// RS232 - 8251 managing
-	AM_RANGE(0x020,0x02f) AM_READWRITE(hector_disc2_io20_port_r, hector_disc2_io20_port_w )
-	// Hector communication managing
-	AM_RANGE(0x030,0x03f) AM_READWRITE(hector_disc2_io30_port_r, hector_disc2_io30_port_w )
-	AM_RANGE(0x040,0x04f) AM_READWRITE(hector_disc2_io40_port_r, hector_disc2_io40_port_w )
-	AM_RANGE(0x050,0x05f) AM_READWRITE(hector_disc2_io50_port_r, hector_disc2_io50_port_w )
-	// uPD765 link:
-	AM_RANGE(0x060,0x061) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765", upd765a_device, mdma_r, mdma_w)
-ADDRESS_MAP_END
-
-/*****************************************************************************/
-ADDRESS_MAP_START(hec2hrp_state::hec2hrp_mem)
-/*****************************************************************************/
-	ADDRESS_MAP_UNMAP_HIGH
+void hec2hrp_state::hec2hrp_mem(address_map &map)
+{
+	map.unmap_value_high();
 	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROM
+	map(0x0000, 0x3fff).rom();
+
+	/* Hardware address mapping */
+	map(0x0800, 0x0808).w(FUNC(hec2hrp_state::switch_bank_w));/* Bank handling */
+	map(0x1000, 0x1000).w(FUNC(hec2hrp_state::color_a_w));  /* Color c0/c1 */
+	map(0x1800, 0x1800).w(FUNC(hec2hrp_state::color_b_w));  /* Color c2/c3 */
+	map(0x2000, 0x2003).w(FUNC(hec2hrp_state::sn_2000_w));  /* Sound */
+	map(0x2800, 0x2803).w(FUNC(hec2hrp_state::sn_2800_w));  /* Sound */
+	map(0x3000, 0x3000).rw(FUNC(hec2hrp_state::cassette_r), FUNC(hec2hrp_state::sn_3000_w));  /* Write necessary */
+	map(0x3800, 0x3807).rw(FUNC(hec2hrp_state::keyboard_r), FUNC(hec2hrp_state::keyboard_w)); /* Keyboard */
+
+	/* Video br mapping */
+	map(0x4000, 0x49ff).ram().share("videoram");
+	/* contiguous RAM */
+	map(0x4A00, 0xbfff).ram();
+	/* from 0xC000 to 0xFFFF => Bank Ram for video and data */
+	map(0xc000, 0xffff).ram().share("hector_videoram");
+}
+
+void hec2hrp_state::hec2hrx_mem(address_map &map)
+{
+	map.unmap_value_high();
+	/* Main ROM page*/
+	map(0x0000, 0x3fff).bankr("bank2");
 
 	/* Hardware address mapping*/
-	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
+	map(0x0800, 0x0808).w(FUNC(hec2hrp_state::switch_bank_w));/* Bank handling */
+	map(0x1000, 0x1000).w(FUNC(hec2hrp_state::color_a_w));  /* Color c0/c1 */
+	map(0x1800, 0x1800).w(FUNC(hec2hrp_state::color_b_w));  /* Color c2/c3 */
+	map(0x2000, 0x2003).w(FUNC(hec2hrp_state::sn_2000_w));  /* Sound */
+	map(0x2800, 0x2803).w(FUNC(hec2hrp_state::sn_2800_w));  /* Sound */
+	map(0x3000, 0x3000).rw(FUNC(hec2hrp_state::cassette_r), FUNC(hec2hrp_state::sn_3000_w));  /* Write necessary */
+	map(0x3800, 0x3807).rw(FUNC(hec2hrp_state::keyboard_r), FUNC(hec2hrp_state::keyboard_w)); /* Keyboard */
 
-	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
-	/* continous RAM*/
-	AM_RANGE(0x4A00,0xbfff) AM_RAM
-	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAM AM_SHARE("hector_videoram")
-ADDRESS_MAP_END
+	/* Video br mapping */
+	map(0x4000, 0x49ff).ram().share("videoram");
+	/* contiguous RAM */
+	map(0x4A00, 0xbfff).ram();
+	/* from 0xC000 to 0xFFFF => Bank Ram for video and data */
+	map(0xc000, 0xffff).bankrw("bank1").share("hector_videoram");
+}
 
-/*****************************************************************************/
-ADDRESS_MAP_START(hec2hrp_state::hec2hrx_mem)
-/*****************************************************************************/
-	ADDRESS_MAP_UNMAP_HIGH
-	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
+void hec2hrp_state::hec2hrp_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x000, 0x0ff).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+}
 
-	/* Hardware address mapping*/
-	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
+void hec2hrp_state::hec2hrx_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x0f0, 0x0ff).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+}
 
-	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
-	/* continous RAM*/
-	AM_RANGE(0x4A00,0xbfff) AM_RAM
-	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_SHARE("hector_videoram")
-ADDRESS_MAP_END
+void hec2hrp_state::hec2mdhrx_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 
-ADDRESS_MAP_START(hec2hrp_state::hec2hrp_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
-ADDRESS_MAP_END
+	// Minidisc commands and changing the rom page */
+	map(0x04, 0x07).rw(m_minidisc_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x08, 0x08).w(FUNC(hec2hrp_state::minidisc_control_w));
+	map(0x0f0, 0x0ff).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+}
 
-ADDRESS_MAP_START(hec2hrp_state::hec2hrx_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
-ADDRESS_MAP_END
+void hec2hrp_state::hec2mx40_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x000, 0x0ef).w(FUNC(hec2hrp_state::mx40_io_port_w));
+	map(0x0f0, 0x0f3).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+}
 
-ADDRESS_MAP_START(hec2hrp_state::hec2mdhrx_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-	// Minidisc commands and changing the rom page !*/
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("wd179x", fd1793_device, read, write)
-	AM_RANGE(0x08, 0x08) AM_WRITE(minidisc_control_w)
-	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(hec2hrp_state::hec2mx40_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ef) AM_WRITE(hector_mx40_io_port_w )
-	AM_RANGE(0x0f0,0x0f3) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(hec2hrp_state::hec2mx80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ef) AM_WRITE(hector_mx80_io_port_w )
-	AM_RANGE(0x0f0,0x0f3) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
+void hec2hrp_state::hec2mx80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x000, 0x0ef).w(FUNC(hec2hrp_state::mx80_io_port_w));
+	map(0x0f0, 0x0f3).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
 
 
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( hec2hrp )
@@ -215,7 +214,7 @@ static INPUT_PORTS_START( hec2hrp )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")      PORT_CODE(KEYCODE_CAPSLOCK)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl")           PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift")          PORT_CODE(KEYCODE_LSHIFT)     PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_START("KEY.1") /* [1] - port 3000 @ 1 */    /* touches => 2  1  0  /  .  -  ,  +     */
+	PORT_START("KEY.1") /* [1] - port 3000 @ 1 */    /* buttons => 2  1  0  /  .  -  ,  +     */
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 \"")           PORT_CODE(KEYCODE_2)    PORT_CHAR('2')
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 >")            PORT_CODE(KEYCODE_1)    PORT_CHAR('1')
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 <")            PORT_CODE(KEYCODE_0)    PORT_CHAR('0')
@@ -225,7 +224,7 @@ static INPUT_PORTS_START( hec2hrp )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)   PORT_CHAR('=') PORT_CHAR('+')
 
-	PORT_START("KEY.2") /* [1] - port 3000 @ 2 */     /* touches => .. 9  8  7  6  5  4  3  */
+	PORT_START("KEY.2") /* [1] - port 3000 @ 2 */     /* buttons => .. 9  8  7  6  5  4  3  */
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 )")            PORT_CODE(KEYCODE_9)    PORT_CHAR('9')
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 (")            PORT_CODE(KEYCODE_8)    PORT_CHAR('8')
@@ -234,7 +233,7 @@ static INPUT_PORTS_START( hec2hrp )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %")            PORT_CODE(KEYCODE_5)    PORT_CHAR('5')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $")            PORT_CODE(KEYCODE_4)    PORT_CHAR('4')
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 /")            PORT_CODE(KEYCODE_3)    PORT_CHAR('3')
-	PORT_START("KEY.3") /* [1] - port 3000 @ 3 */    /* touches =>  B  A  ..  ? .. =   ..  ;       */
+	PORT_START("KEY.3") /* [1] - port 3000 @ 3 */    /* buttons =>  B  A  ..  ? .. =   ..  ;       */
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)     PORT_CHAR('B')
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")           PORT_CODE(KEYCODE_Q)   PORT_CHAR('Q')
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -294,9 +293,7 @@ static INPUT_PORTS_START( hec2hrp )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-/*****************************************************************************/
 MACHINE_START_MEMBER(hec2hrp_state,hec2hrp)
-/*****************************************************************************/
 {
 	hector_init();
 }
@@ -306,35 +303,32 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrp)
 	// Machines init
 	hector_reset(1, 0);
 }
-/*****************************************************************************/
+
 MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
-/*****************************************************************************/
 {
-	uint8_t *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
+	uint8_t *RAM   = memregion("maincpu")->base();
 	//Patch rom possible !
-	//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
+	//RAMD2[0xff6b] = 0x0ff; // force verbose mode
 
 	// Memory install for bank switching
-	membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
-	membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, m_hector_videoram_hrx); // Video ram
+	membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   );
+	membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, m_hector_videoram_hrx); // Video RAM
 
 	// Set bank HECTOR_BANK_PROG as basic bank
 	membank("bank1")->set_entry(HECTOR_BANK_PROG);
 
-/******************************************************SPECIFIQUE MX ***************************/
-	membank("bank2")->configure_entry(HECTORMX_BANK_PAGE0 , &RAM[0x0000]                    ); // Mess ram
-	membank("bank2")->configure_entry(HECTORMX_BANK_PAGE1 , memregion("page1")->base() ); // Rom page 1
-	membank("bank2")->configure_entry(HECTORMX_BANK_PAGE2 , memregion("page2")->base() ); // Rom page 2
+	// MX-specific
+	membank("bank2")->configure_entry(HECTORMX_BANK_PAGE0 , &RAM[0x0000]);
+	membank("bank2")->configure_entry(HECTORMX_BANK_PAGE1 , memregion("page1")->base() ); // ROM page 1
+	membank("bank2")->configure_entry(HECTORMX_BANK_PAGE2 , memregion("page2")->base() ); // ROM page 2
 	membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
-/******************************************************SPECIFIQUE MX ***************************/
 
-/*************************************************SPECIFIQUE DISK II ***************************/
+	// Disk II-specific
 	membank("bank3")->configure_entry(DISCII_BANK_ROM , memregion("rom_disc2")->base() ); // ROM
 	membank("bank3")->configure_entry(DISCII_BANK_RAM , memregion("disc2mem" )->base() ); // RAM
 	membank("bank3")->set_entry(DISCII_BANK_ROM);
-/*************************************************SPECIFIQUE DISK II ***************************/
 
-	// As video HR ram is in bank, use extern memory
+	// As video HR ram is in bank, use external memory
 	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
 
 	hector_init();
@@ -344,74 +338,70 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 /*****************************************************************************/
 //minidisc
 {
-	uint8_t *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
+	uint8_t *RAM   = memregion("maincpu")->base();
 
 	// Memory install for bank switching
-	membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
-	membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, m_hector_videoram_hrx); // Video ram
+	membank("bank1")->configure_entry(HECTOR_BANK_PROG, &RAM[0xc000]);
+	membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, m_hector_videoram_hrx); // Video RAM
 
-	// Set bank HECTOR_BANK_PROG as basic bank
+	// Set HECTOR_BANK_PROG as basic bank
 	membank("bank1")->set_entry(HECTOR_BANK_PROG);
-	//Here the bank 5 is not used for the language switch but for the floppy ROM.....
-	/******************************************************SPECIFIQUE Mini disque ***************************/
-	membank("bank2")->configure_entry(HECTOR_BANK_BASE , &RAM[0x0000]                    ); // Rom base page
-	membank("bank2")->configure_entry(HECTOR_BANK_DISC , memregion("page2")->base() ); // Rom page mini disc
-	membank("bank2")->set_entry(HECTOR_BANK_BASE);
-	/******************************************************SPECIFIQUE Mini disque ***************************/
+	//Here, bank 5 is not used for the language switch but for the floppy ROM
 
-	// As video HR ram is in bank, use extern memory
+	// Mini disk-specific
+	membank("bank2")->configure_entry(HECTOR_BANK_BASE, &RAM[0x0000]); // ROM base page
+	membank("bank2")->configure_entry(HECTOR_BANK_DISC, memregion("page2")->base() ); // ROM mini disc page
+	membank("bank2")->set_entry(HECTOR_BANK_BASE);
+
+	// As video HR ram is in bank, use external memory
 	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
 
 	hector_init();
 }
+
 MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrx)
 {
-	//Hector Memory
+	// Hector Memory
 	membank("bank1")->set_entry(HECTOR_BANK_PROG);
 	membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
-	//DISK II Memory
+
+	// DISK II Memory
 	membank("bank3")->set_entry(DISCII_BANK_ROM);
 
-	// Machines init
 	hector_reset(1, 1);
 	hector_disc2_reset();
 }
-//minidisc
+
+// Mini disk
 MACHINE_RESET_MEMBER(hec2hrp_state,hec2mdhrx)
 {
-	//Hector Memory
+	// Hector Memory
 	membank("bank1")->set_entry(HECTOR_BANK_PROG);
 	membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 
-	// Machines init
 	hector_reset(1, 0);
 }
 
-/***********************************************************/
-/********* mini disque interface ***************************/
-/***********************************************************/
+// mini disk interface
 
 FLOPPY_FORMATS_MEMBER( hec2hrp_state::minidisc_formats )
 	FLOPPY_HMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( minidisc_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void minidisc_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 
-/******************************************************************************/
 MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
-/******************************************************************************/
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrp_mem)
-	MCFG_CPU_IO_MAP(hec2hrp_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrp_mem)
+	MCFG_DEVICE_IO_MAP(hec2hrp_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
@@ -425,28 +415,21 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
 
 	hector_audio(config);
 
-	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
-
 MACHINE_CONFIG_END
 
-/*****************************************************************************/
 MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
-/*****************************************************************************/
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrp_mem)
-	MCFG_CPU_IO_MAP(hec2hrp_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrp_mem)
+	MCFG_DEVICE_IO_MAP(hec2hrp_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
@@ -460,42 +443,35 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 
 	hector_audio(config);
 
-	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
-
 MACHINE_CONFIG_END
 
-static SLOT_INTERFACE_START( hector_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void hector_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
-/*****************************************************************************/
 MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
-/*****************************************************************************/
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_CPU_IO_MAP(hec2mx40_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_DEVICE_IO_MAP(hec2mx40_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
 
-	/* Disc II unit */
-	MCFG_CPU_ADD("disc2cpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
-	MCFG_CPU_IO_MAP(hecdisc2_io)
-	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_dma_irq))
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
+	MCFG_DEVICE_IO_MAP(hecdisc2_io)
+	UPD765A(config, m_upd_fdc, false, true);
+	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
+	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
+	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
-	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
@@ -509,37 +485,31 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
 
 	hector_audio(config);
 
-	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
-
 MACHINE_CONFIG_END
-/*****************************************************************************/
+
+
 MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
-/*****************************************************************************/
-/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_CPU_IO_MAP(hec2hrx_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_DEVICE_IO_MAP(hec2hrx_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
-	/* Disc II unit */
-	MCFG_CPU_ADD("disc2cpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
-	MCFG_CPU_IO_MAP(hecdisc2_io)
-	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_dma_irq))
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
+	MCFG_DEVICE_IO_MAP(hecdisc2_io)
+	UPD765A(config, m_upd_fdc, false, true);
+	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
+	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
+	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
-	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
@@ -553,33 +523,25 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 
 	hector_audio(config);
 
-	// Gestion cassette
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
-
 MACHINE_CONFIG_END
-/*****************************************************************************/
+
 MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
-/*****************************************************************************/
-// minidisc
-/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_CPU_IO_MAP(hec2mdhrx_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_DEVICE_IO_MAP(hec2mdhrx_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2mdhrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
-	/* Mini Disc */
-	MCFG_FD1793_ADD("wd179x", XTAL(1'000'000))
-
+	/* 3.5" ("mini") disc */
+	FD1793(config, m_minidisc_fdc, 1_MHz_XTAL);
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", minidisc_floppies, "dd", hec2hrp_state::minidisc_formats)
 
-	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
@@ -594,38 +556,31 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 
 	hector_audio(config);
 
-	// Gestion cassette
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
-
 MACHINE_CONFIG_END
 
-/*****************************************************************************/
+
 MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
-/*****************************************************************************/
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_CPU_IO_MAP(hec2mx80_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_DEVICE_IO_MAP(hec2mx80_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
-	/* Disc II unit */
-	MCFG_CPU_ADD("disc2cpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
-	MCFG_CPU_IO_MAP(hecdisc2_io)
-	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_dma_irq))
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
+	MCFG_DEVICE_IO_MAP(hecdisc2_io)
+	UPD765A(config, m_upd_fdc, false, true);
+	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
+	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
+	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
-	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
@@ -639,17 +594,13 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 
 	hector_audio(config);
 
-	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+MACHINE_CONFIG_END
 
-	MACHINE_CONFIG_END
-
-/* ROM definition */
 ROM_START( hec2hr )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "2hr.bin", 0x0000, 0x1000, CRC(84b9e672) SHA1(8c8b089166122eee565addaed10f84c5ce6d849b))
@@ -684,6 +635,7 @@ ROM_START( hec2hrx )
 	ROM_LOAD( "d800k.bin" , 0x0000,0x1000, CRC(831bd584) SHA1(9782ee58f570042608d9d568b2c3fc4c6d87d8b9))
 	ROM_REGION( 0x10000,  "disc2mem", ROMREGION_ERASE00 )
 ROM_END
+
 // minidisc
 ROM_START( hec2mdhrx )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -726,11 +678,11 @@ ROM_END
 
 /* Driver */
 
-/*  YEAR    NAME    PARENT      COMPAT      MACHINE     INPUT    STATE          INIT  COMPANY        FULLNAME                  FLAGS */
-COMP(1983,  hec2hrp,    0,      interact,   hec2hrp,    hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector 2HR+",            MACHINE_IMPERFECT_SOUND)
-COMP(1980,  victor,     hec2hrp, 0,         hec2hrp,    hec2hrp, hec2hrp_state, 0,    "Micronique",  "Victor",                 MACHINE_IMPERFECT_SOUND)
-COMP(1983,  hec2hr,     hec2hrp, 0,         hec2hr,     hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector 2HR",             MACHINE_IMPERFECT_SOUND)
-COMP(1984,  hec2hrx,    hec2hrp, 0,         hec2hrx,    hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector HRX + Disc2",     MACHINE_IMPERFECT_SOUND)
-COMP(1985,  hec2mdhrx,  hec2hrp, 0,         hec2mdhrx,  hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector HRX + mini Disc", MACHINE_IMPERFECT_SOUND)
-COMP(1985,  hec2mx80,   hec2hrp, 0,         hec2mx80,   hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector MX 80c + Disc2",  MACHINE_IMPERFECT_SOUND)
-COMP(1985,  hec2mx40,   hec2hrp, 0,         hec2mx40,   hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector MX 40c + Disc2",  MACHINE_IMPERFECT_SOUND)
+/*  YEAR   NAME       PARENT   COMPAT    MACHINE    INPUT    CLASS          INIT        COMPANY       FULLNAME                  FLAGS */
+COMP(1983, hec2hrp,   0,       interact, hec2hrp,   hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector 2HR+",            MACHINE_IMPERFECT_SOUND)
+COMP(1980, victor,    hec2hrp, 0,        hec2hrp,   hec2hrp, hec2hrp_state, empty_init, "Micronique", "Victor",                 MACHINE_IMPERFECT_SOUND)
+COMP(1983, hec2hr,    hec2hrp, 0,        hec2hr,    hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector 2HR",             MACHINE_IMPERFECT_SOUND)
+COMP(1984, hec2hrx,   hec2hrp, 0,        hec2hrx,   hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector HRX + Disc2",     MACHINE_IMPERFECT_SOUND)
+COMP(1985, hec2mdhrx, hec2hrp, 0,        hec2mdhrx, hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector HRX + mini Disc", MACHINE_IMPERFECT_SOUND)
+COMP(1985, hec2mx80,  hec2hrp, 0,        hec2mx80,  hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector MX 80c + Disc2",  MACHINE_IMPERFECT_SOUND)
+COMP(1985, hec2mx40,  hec2hrp, 0,        hec2mx40,  hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector MX 40c + Disc2",  MACHINE_IMPERFECT_SOUND)

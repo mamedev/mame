@@ -20,12 +20,12 @@
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
 
 
-DEFINE_DEVICE_TYPE(TMP90840,  tmp90840_device,  "tmp90840",  "TMP90840")
-DEFINE_DEVICE_TYPE(TMP90841,  tmp90841_device,  "tmp90841",  "TMP90841")
-DEFINE_DEVICE_TYPE(TMP90845,  tmp90845_device,  "tmp90845",  "TMP90845")
-DEFINE_DEVICE_TYPE(TMP91640,  tmp91640_device,  "tmp91640",  "TMP91640")
-DEFINE_DEVICE_TYPE(TMP91641,  tmp91641_device,  "tmp91641",  "TMP91641")
-DEFINE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device, "tmp90ph44", "TMP90PH44")
+DEFINE_DEVICE_TYPE(TMP90840,  tmp90840_device,  "tmp90840",  "Toshiba TMP90840")
+DEFINE_DEVICE_TYPE(TMP90841,  tmp90841_device,  "tmp90841",  "Toshiba TMP90841")
+DEFINE_DEVICE_TYPE(TMP90845,  tmp90845_device,  "tmp90845",  "Toshiba TMP90845")
+DEFINE_DEVICE_TYPE(TMP91640,  tmp91640_device,  "tmp91640",  "Toshiba TMP91640")
+DEFINE_DEVICE_TYPE(TMP91641,  tmp91641_device,  "tmp91641",  "Toshiba TMP91641")
+DEFINE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device, "tmp90ph44", "Toshiba TMP90PH44")
 
 
 #define T90_IOBASE  0xffc0
@@ -41,35 +41,40 @@ enum e_ir
 };
 
 
-ADDRESS_MAP_START(tlcs90_device::tmp90840_mem)
-	AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // 8KB ROM (internal)
-	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+void tlcs90_device::tmp90840_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();  // 8KB ROM (internal)
+	map(0xfec0, 0xffbf).ram();  // 256b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-ADDRESS_MAP_START(tlcs90_device::tmp90841_mem)
+void tlcs90_device::tmp90841_mem(address_map &map)
+{
 //  AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // rom-less
-	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+	map(0xfec0, 0xffbf).ram();  // 256b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-ADDRESS_MAP_START(tlcs90_device::tmp91640_mem)
-	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB ROM (internal)
-	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+void tlcs90_device::tmp91640_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();    // 16KB ROM (internal)
+	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-ADDRESS_MAP_START(tlcs90_device::tmp91641_mem)
+void tlcs90_device::tmp91641_mem(address_map &map)
+{
 //  AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // rom-less
-	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-ADDRESS_MAP_START(tlcs90_device::tmp90ph44_mem)
-	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB PROM (internal)
-	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+55   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w ) // TODO: has 8 more registers
-ADDRESS_MAP_END
+void tlcs90_device::tmp90ph44_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();    // 16KB PROM (internal)
+	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+55).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w)); // TODO: has 8 more registers
+}
 
 
 tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
@@ -1268,9 +1273,20 @@ void tlcs90_device::leave_halt()
 	}
 }
 
-void tlcs90_device::take_interrupt(tlcs90_e_irq irq)
+void tlcs90_device::raise_irq(int irq)
+{
+	m_irq_state |= 1 << irq;
+}
+
+void tlcs90_device::clear_irq(int irq)
 {
 	m_irq_state &= ~(1 << irq);
+}
+
+void tlcs90_device::take_interrupt(tlcs90_e_irq irq)
+{
+	if (irq != INT0 || (m_p8cr & 1) == 1)
+		clear_irq(irq);
 
 	leave_halt();
 
@@ -1296,7 +1312,7 @@ void tlcs90_device::check_interrupts()
 	{
 		mask = (1 << irq);
 		if(irq >= INT0) mask &= m_irq_mask;
-		if ( m_irq_state & mask )
+		if (m_irq_state & mask)
 		{
 			take_interrupt( irq );
 			return;
@@ -1324,16 +1340,18 @@ void tlcs90_device::execute_set_input(int inputnum, int state)
 
 void tlcs90_device::set_irq_line(int irq, int state)
 {
-	if ( ((m_irq_state >> irq)&1) == state ) return;
+	if ( ((m_irq_line_state >> irq)&1) == state ) return;
 
 	if (state)
 	{
-		m_irq_state |= 1 << irq;
-		check_interrupts();
+		raise_irq(irq);
+		m_irq_line_state |= 1 << irq;
 	}
 	else
 	{
-		m_irq_state &= ~(1 << irq);
+		if (irq == INT0 && (m_p8cr & 1) == 0)
+			clear_irq(irq);
+		m_irq_line_state &= ~(1 << irq);
 	}
 }
 
@@ -1353,7 +1371,7 @@ void tlcs90_device::execute_run()
 	do
 	{
 		m_prvpc.d = m_pc.d;
-		debugger_instruction_hook(this, m_pc.d);
+		debugger_instruction_hook(m_pc.d);
 
 		check_interrupts();
 
@@ -2458,12 +2476,12 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 		break;
 		case 0x01: // 16bit, only can happen for i=0,2
 		m_timer_value[i+1] = 0;
-		set_irq_line(INTT0 + i+1, 1);
+		raise_irq(INTT0 + i+1);
 		break;
 	}
 	// regular handling
 	m_timer_value[i] = 0;
-	set_irq_line(INTT0 + i, 1);
+	raise_irq(INTT0 + i);
 	}
 }
 
@@ -2478,12 +2496,12 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 	if ( m_timer4_value == m_treg_16bit[0] )
 	{
 //      logerror("CPU Timer 4 matches TREG4\n");
-		set_irq_line(INTT4, 1);
+		raise_irq(INTT4);
 	}
 	if ( m_timer4_value == m_treg_16bit[1] )
 	{
 //      logerror("CPU Timer 4 matches TREG5\n");
-		set_irq_line(INTT5, 1);
+		raise_irq(INTT5);
 		if (m_t4mod & 0x04)
 			m_timer4_value = 0;
 	}
@@ -2606,7 +2624,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 		case T90_IRFH:
 			if (data >= int(INTSWI) + 2 && data < int(INTMAX) + 2)
-				m_irq_state &= ~(1 << (data - 2));
+				clear_irq(data - 2);
 			break;
 
 		case T90_P3:
@@ -2730,6 +2748,7 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_halt));
 	save_item(NAME(m_after_EI));
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_line_state));
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_extra_cycles));
 
@@ -2790,7 +2809,7 @@ void tlcs90_device::device_start()
 	m_prvpc.d = m_pc.d = m_sp.d = m_af.d = m_bc.d = m_de.d = m_hl.d = m_ix.d = m_iy.d = 0;
 	m_af2.d = m_bc2.d = m_de2.d = m_hl2.d = 0;
 	m_halt = m_after_EI = 0;
-	m_irq_state = m_irq_mask = 0;
+	m_irq_state = m_irq_line_state = m_irq_mask = 0;
 	m_extra_cycles = 0;
 	m_ixbase = m_iybase = 0;
 	m_timer_value[0] = m_timer_value[1] = m_timer_value[2] = m_timer_value[3] = 0;
@@ -2835,7 +2854,7 @@ void tlcs90_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_sp.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", F ).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -2858,7 +2877,7 @@ void tlcs90_device::state_string_export(const device_state_entry &entry, std::st
 	}
 }
 
-util::disasm_interface *tlcs90_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tlcs90_device::create_disassembler()
 {
-	return new tlcs90_disassembler;
+	return std::make_unique<tlcs90_disassembler>();
 }

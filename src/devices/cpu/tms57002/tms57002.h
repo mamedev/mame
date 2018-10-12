@@ -16,6 +16,10 @@ class tms57002_device : public cpu_device, public device_sound_interface {
 public:
 	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto dready_callback() { return m_dready_callback.bind(); }
+	auto pc0_callback() { return m_pc0_callback.bind(); }
+	auto empty_callback() { return m_empty_callback.bind(); }
+
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 
@@ -28,6 +32,7 @@ public:
 
 	void internal_pgm(address_map &map);
 protected:
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -36,7 +41,7 @@ protected:
 	virtual uint32_t execute_max_cycles() const override;
 	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	enum {
@@ -48,7 +53,8 @@ private:
 		S_READ   = 0x00000040,
 		S_WRITE  = 0x00000080,
 		S_BRANCH = 0x00000100,
-		S_HOST   = 0x00000200
+		S_HOST   = 0x00000200,
+		S_UPDATE = 0x00000400,
 	};
 
 	enum {
@@ -72,6 +78,7 @@ private:
 		ST1_AOV  = 0x000001,
 		ST1_SFAI = 0x000002,
 		ST1_SFAO = 0x000004,
+		ST1_AOVM = 0x000008, // undocumented!
 		ST1_MOVM = 0x000020,
 		ST1_MOV  = 0x000040,
 		ST1_SFMA = 0x000180, ST1_SFMA_SHIFT = 7,
@@ -117,7 +124,8 @@ private:
 		short ipc;
 	};
 
-	int64_t macc;
+	// macc_read and macc_write are used by non-pipelined instructions
+	int64_t macc, macc_read, macc_write;
 
 	uint32_t cmem[256];
 	uint32_t dmem0[256];
@@ -134,7 +142,14 @@ private:
 
 	uint8_t host[4], hidx, allow_update;
 
+	uint32_t update[16];
+	uint8_t update_counter_head, update_counter_tail;
+
 	cd cache;
+
+	devcb_write_line m_dready_callback;
+	devcb_write_line m_pc0_callback;
+	devcb_write_line m_empty_callback;
 
 	const address_space_config program_config, data_config;
 
@@ -157,6 +172,10 @@ private:
 	inline int rnd(uint32_t st1);
 	inline int movm(uint32_t st1);
 	inline int sfma(uint32_t st1);
+
+	void update_dready();
+	void update_pc0();
+	void update_empty();
 
 	void xm_init();
 	void xm_step_read();
@@ -183,6 +202,11 @@ private:
 	short get_hash(unsigned char adr, uint32_t st1, short *pnode);
 	short get_hashnode(unsigned char adr, uint32_t st1, short pnode);
 	int decode_get_pc();
+	uint32_t get_cmem(uint8_t addr);
+
+#define CINTRPDECL
+#include "../../emu/cpu/tms57002/tms57002.hxx"
+#undef CINTRPDECL
 };
 
 enum {

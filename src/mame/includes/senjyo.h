@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
 #include "sound/dac.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
+#include "emupal.h"
 
 class senjyo_state : public driver_device
 {
@@ -33,6 +34,17 @@ public:
 		m_bgstripesram(*this, "bgstripesram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
+	void senjyox_e(machine_config &config);
+	void senjyo(machine_config &config);
+	void starforb(machine_config &config);
+	void senjyox_a(machine_config &config);
+
+	void init_starfora();
+	void init_senjyo();
+	void init_starfore();
+	void init_starforc();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
@@ -89,11 +101,6 @@ public:
 	DECLARE_PALETTE_DECODER(IIBBGGRR);
 	DECLARE_PALETTE_INIT(radar);
 
-	DECLARE_DRIVER_INIT(starfora);
-	DECLARE_DRIVER_INIT(senjyo);
-	DECLARE_DRIVER_INIT(starfore);
-	DECLARE_DRIVER_INIT(starforc);
-
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(senjyo_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(starforc_bg1_tile_info);
@@ -107,10 +114,7 @@ public:
 	void draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,int priority);
-	void senjyox_e(machine_config &config);
-	void senjyo(machine_config &config);
-	void starforb(machine_config &config);
-	void senjyox_a(machine_config &config);
+
 	void decrypted_opcodes_map(address_map &map);
 	void senjyo_map(address_map &map);
 	void senjyo_sound_io_map(address_map &map);

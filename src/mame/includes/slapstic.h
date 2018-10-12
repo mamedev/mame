@@ -19,10 +19,8 @@
 
 DECLARE_DEVICE_TYPE(SLAPSTIC, atari_slapstic_device)
 
-#define MCFG_SLAPSTIC_ADD(_tag, _chip) \
-	MCFG_DEVICE_ADD(_tag, SLAPSTIC, 0) \
-	MCFG_SLAPSTIC_NUM(_chip)
-
+#define MCFG_SLAPSTIC_NUM(_chipnum) \
+	downcast<atari_slapstic_device &>(*device).set_chipnum(_chipnum);
 
 /*************************************
  *
@@ -110,18 +108,17 @@ enum
 };
 
 
-#define MCFG_SLAPSTIC_NUM(_chipnum) \
-	downcast<atari_slapstic_device &>(*device).set_chipnum(_chipnum);
-
-#define MCFG_SLAPSTIC_68K_ACCESS(_type) \
-	downcast<atari_slapstic_device &>(*device).set_access68k(_type);
-
-
-
 class atari_slapstic_device :  public device_t
 {
 public:
 	// construction/destruction
+	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, int chipnum, bool m68k_mode)
+		: atari_slapstic_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_chipnum(chipnum);
+		set_access68k(m68k_mode ? 1 : 0);
+	}
+
 	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void slapstic_init();

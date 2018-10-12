@@ -33,6 +33,9 @@ public:
 		: radio86_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
+	void apogee(machine_config &config);
+
+private:
 	uint8_t m_out0;
 	uint8_t m_out1;
 	uint8_t m_out2;
@@ -42,22 +45,22 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	required_device<speaker_sound_device> m_speaker;
-	void apogee(machine_config &config);
 	void apogee_mem(address_map &map);
 };
 
 
 /* Address maps */
-ADDRESS_MAP_START(apogee_state::apogee_mem)
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x1000, 0xebff ) AM_RAM  // RAM
-	AM_RANGE( 0xec00, 0xec03 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write) AM_MIRROR(0x00fc)
-	AM_RANGE( 0xed00, 0xed03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
+void apogee_state::apogee_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
+	map(0x1000, 0xebff).ram();  // RAM
+	map(0xec00, 0xec03).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).mirror(0x00fc);
+	map(0xed00, 0xed03).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
 	//AM_RANGE( 0xee00, 0xee03 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x00fc)
-	AM_RANGE( 0xef00, 0xef01 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x00fe) // video
-	AM_RANGE( 0xf000, 0xf0ff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+	map(0xef00, 0xef01).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x00fe); // video
+	map(0xf000, 0xf0ff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom();  // System ROM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( apogee )
@@ -178,8 +181,6 @@ I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	const uint8_t *charmap = m_charmap + (gpa & 1) * 0x400;
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if(linecount == 8)
-		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}
@@ -208,7 +209,7 @@ static const gfx_layout apogee_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apogee )
+static GFXDECODE_START( gfx_apogee )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apogee_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -216,30 +217,29 @@ GFXDECODE_END
 /* Machine driver */
 MACHINE_CONFIG_START(apogee_state::apogee)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(apogee_mem)
-	MCFG_MACHINE_RESET_OVERRIDE(apogee_state, radio86 )
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(apogee_mem)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'000'000)/9)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(apogee_state,pit8253_out0_changed))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, apogee_state,pit8253_out0_changed))
 	MCFG_PIT8253_CLK1(XTAL(16'000'000)/9)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(apogee_state,pit8253_out1_changed))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, apogee_state,pit8253_out1_changed))
 	MCFG_PIT8253_CLK2(XTAL(16'000'000)/9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(apogee_state,pit8253_out2_changed))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, apogee_state,pit8253_out2_changed))
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	I8255(config, m_ppi8255_1);
+	m_ppi8255_1->out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	m_ppi8255_1->in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
 	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(apogee_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma8257, i8257_device, dreq2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -248,23 +248,22 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apogee)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apogee)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(apogee_state,radio86)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(radio86_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
-	MCFG_I8257_REVERSE_RW_MODE(1)
+	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(radio86_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(radio86_state::memory_write_byte));
+	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
+	m_dma8257->set_reverse_rw_mode(1);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rka_cassette_formats)
@@ -284,5 +283,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT   COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY      FULLNAME        FLAGS
-COMP( 1989, apogee, radio86, 0,      apogee,    apogee, apogee_state, radio86, "Zavod BRA", "Apogee BK-01", 0 )
+//    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT          COMPANY      FULLNAME        FLAGS
+COMP( 1989, apogee, radio86, 0,      apogee,  apogee, apogee_state, init_radio86, "Zavod BRA", "Apogee BK-01", 0 )

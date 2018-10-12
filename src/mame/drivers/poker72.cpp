@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -36,13 +37,17 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void poker72(machine_config &config);
+
+	void init_poker72();
+
+private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_pal;
 	uint8_t m_tile_bank;
 	DECLARE_WRITE8_MEMBER(poker72_paletteram_w);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(tile_bank_w);
-	DECLARE_DRIVER_INIT(poker72);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(poker72);
@@ -50,7 +55,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void poker72(machine_config &config);
 	void poker72_map(address_map &map);
 };
 
@@ -115,26 +119,27 @@ WRITE8_MEMBER(poker72_state::tile_bank_w)
 	m_tile_bank = (data & 4) >> 2;
 }
 
-ADDRESS_MAP_START(poker72_state::poker72_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM //work ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE(poker72_paletteram_w) AM_SHARE("pal")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM //???
-	AM_RANGE(0xfe08, 0xfe08) AM_READ_PORT("SW1")
-	AM_RANGE(0xfe09, 0xfe09) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe0a, 0xfe0a) AM_READ_PORT("IN2")
-	AM_RANGE(0xfe0c, 0xfe0c) AM_READ_PORT("SW4")
-	AM_RANGE(0xfe0d, 0xfe0d) AM_READ_PORT("SW5")
-	AM_RANGE(0xfe0e, 0xfe0e) AM_READ_PORT("SW6")
+void poker72_state::poker72_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank1");
+	map(0xc000, 0xdfff).ram(); //work ram
+	map(0xe000, 0xefff).ram().share("vram");
+	map(0xf000, 0xfbff).ram().w(FUNC(poker72_state::poker72_paletteram_w)).share("pal");
+	map(0xfc00, 0xfdff).ram(); //???
+	map(0xfe08, 0xfe08).portr("SW1");
+	map(0xfe09, 0xfe09).portr("IN1");
+	map(0xfe0a, 0xfe0a).portr("IN2");
+	map(0xfe0c, 0xfe0c).portr("SW4");
+	map(0xfe0d, 0xfe0d).portr("SW5");
+	map(0xfe0e, 0xfe0e).portr("SW6");
 
-	AM_RANGE(0xfe17, 0xfe17) AM_READNOP //irq ack
-	AM_RANGE(0xfe20, 0xfe20) AM_WRITE(output_w) //output, irq enable?
-	AM_RANGE(0xfe22, 0xfe22) AM_WRITE(tile_bank_w)
-	AM_RANGE(0xfe40, 0xfe40) AM_DEVREADWRITE("ay", ay8910_device, data_r, data_w)
-	AM_RANGE(0xfe60, 0xfe60) AM_DEVWRITE("ay", ay8910_device, address_w)
+	map(0xfe17, 0xfe17).nopr(); //irq ack
+	map(0xfe20, 0xfe20).w(FUNC(poker72_state::output_w)); //output, irq enable?
+	map(0xfe22, 0xfe22).w(FUNC(poker72_state::tile_bank_w));
+	map(0xfe40, 0xfe40).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xfe60, 0xfe60).w("ay", FUNC(ay8910_device::address_w));
 
-	AM_RANGE(0xff00, 0xffff) AM_RAM //??
+	map(0xff00, 0xffff).ram(); //??
 /*
 bp 13a
 
@@ -146,7 +151,7 @@ fe24 w
 01f9 : call 6399 --> cls
 
 */
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( poker72 )
@@ -342,7 +347,7 @@ static const gfx_layout tiles8x8_layout =
 
 
 
-static GFXDECODE_START( poker72 )
+static GFXDECODE_START( gfx_poker72 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -369,9 +374,9 @@ MACHINE_CONFIG_START(poker72_state::poker72)
 
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(poker72_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", poker72_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(poker72_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poker72_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -383,13 +388,13 @@ MACHINE_CONFIG_START(poker72_state::poker72)
 	MCFG_SCREEN_UPDATE_DRIVER(poker72_state, screen_update_poker72)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", poker72)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poker72)
 	MCFG_PALETTE_ADD("palette", 0xe00)
 	MCFG_PALETTE_INIT_OWNER(poker72_state, poker72)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay", AY8910, 8000000/8) /* ? Mhz */
+	MCFG_DEVICE_ADD("ay", AY8910, 8000000/8) /* ? Mhz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -411,7 +416,7 @@ ROM_START( poker72 )
 	ROM_LOAD( "270138.bin", 0x60000, 0x20000, CRC(d689313d) SHA1(8b9661b3af0e2ced7fe9fa487641e445ce7835b8) )
 ROM_END
 
-DRIVER_INIT_MEMBER(poker72_state,poker72)
+void poker72_state::init_poker72()
 {
 	uint8_t *rom = memregion("roms")->base();
 
@@ -423,4 +428,4 @@ DRIVER_INIT_MEMBER(poker72_state,poker72)
 	rom[0x4aa] = 0x00;
 }
 
-GAME( 1995, poker72,  0,    poker72, poker72, poker72_state,  poker72, ROT0, "Extrema Systems International Ltd.", "Poker Monarch (v2.50)", MACHINE_NOT_WORKING )
+GAME( 1995, poker72,  0,    poker72, poker72, poker72_state, init_poker72, ROT0, "Extrema Systems International Ltd.", "Poker Monarch (v2.50)", MACHINE_NOT_WORKING )

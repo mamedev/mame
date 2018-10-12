@@ -28,27 +28,32 @@ lamps?
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class dreambal_state : public driver_device
 {
 public:
-	dreambal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dreambal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_deco104(*this, "ioprot104"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_eeprom(*this, "eeprom")
 	{ }
 
+	void dreambal(machine_config &config);
+
+	void init_dreambal();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<deco104_device> m_deco104;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_DRIVER_INIT(dreambal);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -72,7 +77,6 @@ public:
 			m_eeprom->cs_write(data&0x4 ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
-	void dreambal(machine_config &config);
 	void dreambal_map(address_map &map);
 };
 
@@ -111,33 +115,34 @@ WRITE16_MEMBER( dreambal_state::dreambal_protection_region_0_104_w )
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
-ADDRESS_MAP_START(dreambal_state::dreambal_map)
+void dreambal_state::dreambal_map(address_map &map)
+{
 //ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x103000, 0x103fff) AM_RAM
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x101000, 0x101fff).ram();
+	map(0x102000, 0x102fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x103000, 0x103fff).ram();
 
-	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x140000, 0x1403ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x120000, 0x123fff).ram();
+	map(0x140000, 0x1403ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x160000, 0x163fff) AM_READWRITE(dreambal_protection_region_0_104_r,dreambal_protection_region_0_104_w)AM_SHARE("prot16ram") /* Protection device */
+	map(0x160000, 0x163fff).rw(FUNC(dreambal_state::dreambal_protection_region_0_104_r), FUNC(dreambal_state::dreambal_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
-	AM_RANGE(0x161000, 0x16100f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
+	map(0x161000, 0x16100f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
 
 
-	AM_RANGE(0x180000, 0x180001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x180001, 0x180001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x162000, 0x162001) AM_WRITENOP // writes 0003 on startup
-	AM_RANGE(0x163000, 0x163001) AM_WRITENOP // something on bit 1
-	AM_RANGE(0x164000, 0x164001) AM_WRITENOP // something on bit 1
+	map(0x162000, 0x162001).nopw(); // writes 0003 on startup
+	map(0x163000, 0x163001).nopw(); // something on bit 1
+	map(0x164000, 0x164001).nopw(); // something on bit 1
 
-	AM_RANGE(0x165000, 0x165001) AM_WRITE( dreambal_eeprom_w ) // EEP Write?
+	map(0x165000, 0x165001).w(FUNC(dreambal_state::dreambal_eeprom_w)); // EEP Write?
 
-	AM_RANGE(0x16c002, 0x16c00d) AM_WRITENOP // writes 0000 to 0005 on startup
-	AM_RANGE(0x1a0000, 0x1a0003) AM_WRITENOP // RS-232C status / data ports (byte access)
-ADDRESS_MAP_END
+	map(0x16c002, 0x16c00d).nopw(); // writes 0000 to 0005 on startup
+	map(0x1a0000, 0x1a0003).nopw(); // RS-232C status / data ports (byte access)
+}
 
 
 static const gfx_layout tile_8x8_layout =
@@ -163,7 +168,7 @@ static const gfx_layout tile_16x16_layout =
 };
 
 
-static GFXDECODE_START( dreambal )
+static GFXDECODE_START( gfx_dreambal )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0x000, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0x000, 32 )    /* Tiles (16x16) */
 GFXDECODE_END
@@ -198,7 +203,7 @@ static INPUT_PORTS_START( dreambal )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -309,9 +314,9 @@ void dreambal_state::machine_reset()
 MACHINE_CONFIG_START(dreambal_state::dreambal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
-	MCFG_CPU_PROGRAM_MAP(dreambal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold) // 5 valid too?
+	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(dreambal_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold) // 5 valid too?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -324,14 +329,14 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 
 	MCFG_PALETTE_ADD("palette", 0x400/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreambal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreambal)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93lc46b
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93lc46b
 
-	MCFG_DECO104_ADD("ioprot104")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	DECO104PROT(config, m_deco104, 0);
+	m_deco104->port_a_cb().set_ioport("INPUTS");
+	m_deco104->port_b_cb().set_ioport("SYSTEM");
+	m_deco104->port_c_cb().set_ioport("DSW");
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -350,9 +355,9 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 9830400/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 9830400/8, okim6295_device::PIN7_HIGH)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -370,10 +375,10 @@ ROM_START( dreambal )
 	ROM_LOAD( "mm_01-1.12f",    0x00000, 0x20000, CRC(4f134be7) SHA1(b83230cc62bde55be736fd604af23f927706a770) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dreambal_state,dreambal)
+void dreambal_state::init_dreambal()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
 
 // Ver 2.4 JPN 93.12.02
-GAME( 1993, dreambal, 0,     dreambal, dreambal, dreambal_state,  dreambal,  ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", MACHINE_SUPPORTS_SAVE ) // copyright shows NDK, board is Data East, code seems Data East-like too
+GAME( 1993, dreambal, 0, dreambal, dreambal, dreambal_state, init_dreambal, ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", MACHINE_SUPPORTS_SAVE ) // copyright shows NDK, board is Data East, code seems Data East-like too

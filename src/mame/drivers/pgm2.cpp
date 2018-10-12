@@ -91,6 +91,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/pgm2.h"
 
 // checked on startup, or doesn't boot
@@ -513,88 +514,92 @@ READ32_MEMBER(pgm2_state::pio_pdsr_r)
 	return (module_data_r() == ASSERT_LINE ? 1 : 0) << 8; // fpga data read and status (bit 7, must be 0)
 }
 
-ADDRESS_MAP_START(pgm2_state::pgm2_map)
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM //AM_REGION("user1", 0x00000) // internal ROM
+void pgm2_state::pgm2_map(address_map &map)
+{
+	map(0x00000000, 0x00003fff).rom(); //AM_REGION("user1", 0x00000) // internal ROM
 
-	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM AM_SHARE("sram") // 'battery ram' (in CPU?)
+	map(0x02000000, 0x0200ffff).ram().share("sram"); // 'battery ram' (in CPU?)
 
-	AM_RANGE(0x03600000, 0x036bffff) AM_READWRITE(mcu_r, mcu_w)
+	map(0x03600000, 0x036bffff).rw(FUNC(pgm2_state::mcu_r), FUNC(pgm2_state::mcu_w));
 
-	AM_RANGE(0x03900000, 0x03900003) AM_READ_PORT("INPUTS0")
-	AM_RANGE(0x03a00000, 0x03a00003) AM_READ_PORT("INPUTS1")
+	map(0x03900000, 0x03900003).portr("INPUTS0");
+	map(0x03a00000, 0x03a00003).portr("INPUTS1");
 
-	AM_RANGE(0x20000000, 0x2007ffff) AM_RAM AM_SHARE("mainram")
+	map(0x20000000, 0x2007ffff).ram().share("mainram");
 
-	AM_RANGE(0x30000000, 0x30001fff) AM_RAM AM_SHARE("sp_videoram") // spriteram ('move' ram in test mode)
+	map(0x30000000, 0x30001fff).ram().share("sp_videoram"); // spriteram ('move' ram in test mode)
 
-	AM_RANGE(0x30020000, 0x30021fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x30040000, 0x30045fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
+	map(0x30020000, 0x30021fff).ram().w(FUNC(pgm2_state::bg_videoram_w)).share("bg_videoram");
+	map(0x30040000, 0x30045fff).ram().w(FUNC(pgm2_state::fg_videoram_w)).share("fg_videoram");
 
-	AM_RANGE(0x30060000, 0x30063fff) AM_RAM_DEVWRITE("sp_palette", palette_device, write32) AM_SHARE("sp_palette")
+	map(0x30060000, 0x30063fff).ram().w(m_sp_palette, FUNC(palette_device::write32)).share("sp_palette");
 
-	AM_RANGE(0x30080000, 0x30081fff) AM_RAM_DEVWRITE("bg_palette", palette_device, write32) AM_SHARE("bg_palette")
+	map(0x30080000, 0x30081fff).ram().w(m_bg_palette, FUNC(palette_device::write32)).share("bg_palette");
 
-	AM_RANGE(0x300a0000, 0x300a07ff) AM_RAM_DEVWRITE("tx_palette", palette_device, write32) AM_SHARE("tx_palette")
+	map(0x300a0000, 0x300a07ff).ram().w(m_tx_palette, FUNC(palette_device::write32)).share("tx_palette");
 
-	AM_RANGE(0x300c0000, 0x300c01ff) AM_RAM AM_SHARE("sp_zoom") // sprite zoom table - it uploads the same data 4x, maybe xshrink,xgrow,yshrink,ygrow or just redundant mirrors
+	map(0x300c0000, 0x300c01ff).ram().share("sp_zoom"); // sprite zoom table - it uploads the same data 4x, maybe xshrink,xgrow,yshrink,ygrow or just redundant mirrors
 
 	/* linescroll ram - it clears to 0x3bf on startup which is enough bytes for 240 lines if each rowscroll value was 8 bytes, but each row is 4,
 	so only half of this is used? or tx can do it too (unlikely, as orl2 writes 256 lines of data) maybe just bad mem check bounds on orleg2.
 	It reports pass even if it fails the first byte but if the first byte passes it attempts to test 0x10000 bytes, which is far too big so
 	what is the real size? */
-	AM_RANGE(0x300e0000, 0x300e03ff) AM_RAM AM_SHARE("lineram") AM_MIRROR(0x000fc00)
+	map(0x300e0000, 0x300e03ff).ram().share("lineram").mirror(0x000fc00);
 
-	AM_RANGE(0x30100000, 0x301000ff) AM_READWRITE8(shareram_r, shareram_w, 0x00ff00ff)
+	map(0x30100000, 0x301000ff).rw(FUNC(pgm2_state::shareram_r), FUNC(pgm2_state::shareram_w)).umask32(0x00ff00ff);
 
-	AM_RANGE(0x30120000, 0x30120003) AM_RAM AM_SHARE("bgscroll") // scroll
-	AM_RANGE(0x30120008, 0x3012000b) AM_RAM AM_SHARE("fgscroll")
-	AM_RANGE(0x3012000c, 0x3012000f) AM_RAM AM_SHARE("vidmode")
-	AM_RANGE(0x30120014, 0x30120017) AM_WRITE16(unk30120014_w, 0xffffffff)
-	AM_RANGE(0x30120018, 0x3012001b) AM_WRITE16(vbl_ack_w, 0x0000ffff)
-	AM_RANGE(0x30120030, 0x30120033) AM_WRITE16(share_bank_w, 0xffff0000)
-	AM_RANGE(0x30120038, 0x3012003b) AM_WRITE(sprite_encryption_w)
+	map(0x30120000, 0x30120003).ram().share("bgscroll"); // scroll
+	map(0x30120008, 0x3012000b).ram().share("fgscroll");
+	map(0x3012000c, 0x3012000f).ram().share("vidmode");
+	map(0x30120014, 0x30120017).w(FUNC(pgm2_state::unk30120014_w));
+	map(0x30120018, 0x30120019).w(FUNC(pgm2_state::vbl_ack_w));
+	map(0x30120032, 0x30120033).w(FUNC(pgm2_state::share_bank_w));
+	map(0x30120038, 0x3012003b).w(FUNC(pgm2_state::sprite_encryption_w));
 	// there are other 0x301200xx regs
 
-	AM_RANGE(0x40000000, 0x40000003) AM_DEVREAD8("ymz774", ymz774_device, read, 0xffffffff)  AM_DEVWRITE8("ymz774", ymz774_device, write, 0xffffffff)
+	map(0x40000000, 0x40000003).r("ymz774", FUNC(ymz774_device::read)).w("ymz774", FUNC(ymz774_device::write));
 
 	// internal IGS036 - most of them is standard ATMEL peripherals followed by custom bits
 	// AM_RANGE(0xfffa0000, 0xfffa00ff) TC (Timer Counter) not used, mentioned in disabled / unused code
 	// AM_RANGE(0xffffec00, 0xffffec7f) SMC (Static Memory Controller)
 	// AM_RANGE(0xffffee00, 0xffffee57) MATRIX (Bus Matrix)
-	AM_RANGE(0xfffff000, 0xfffff14b) AM_DEVICE("arm_aic", arm_aic_device, regs_map)
+	map(0xfffff000, 0xfffff14b).m(m_arm_aic, FUNC(arm_aic_device::regs_map));
 	// AM_RANGE(0xfffff200, 0xfffff247) DBGU (Debug Unit)
 	// AM_RANGE(0xfffff400, 0xfffff4af) PIO (Parallel Input Output Controller)
-	AM_RANGE(0xfffff430, 0xfffff437) AM_WRITENOP // often
+	map(0xfffff430, 0xfffff437).nopw(); // often
 	// AM_RANGE(0xfffffd00, 0xfffffd0b) RSTC (Reset Controller)
 	// AM_RANGE(0xfffffd20, 0xfffffd2f) RTTC (Real Time Timer)
-	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READ(rtc_r)
+	map(0xfffffd28, 0xfffffd2b).r(FUNC(pgm2_state::rtc_r));
 	// AM_RANGE(0xfffffd40, 0xfffffd4b) WDTC (Watch Dog Timer)
 	// custom IGS036 stuff starts here
-	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(encryption_do_w) // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
-	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r) // written 0, then 0x1c, then expected to return (result&0x180)==0x180, then written 0x7c
-	AM_RANGE(0xfffffc00, 0xfffffcff) AM_READWRITE8(encryption_r, encryption_w, 0xffffffff)
-ADDRESS_MAP_END
+	map(0xfffffa08, 0xfffffa0b).w(FUNC(pgm2_state::encryption_do_w)); // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
+	map(0xfffffa0c, 0xfffffa0f).r(FUNC(pgm2_state::unk_startup_r)); // written 0, then 0x1c, then expected to return (result&0x180)==0x180, then written 0x7c
+	map(0xfffffc00, 0xfffffcff).rw(FUNC(pgm2_state::encryption_r), FUNC(pgm2_state::encryption_w));
+}
 
 
-ADDRESS_MAP_START(pgm2_state::pgm2_rom_map)
-	AM_IMPORT_FROM(pgm2_map)
-	AM_RANGE(0x10000000, 0x10ffffff) AM_ROM AM_REGION("user1", 0) // external ROM
-ADDRESS_MAP_END
+void pgm2_state::pgm2_rom_map(address_map &map)
+{
+	pgm2_map(map);
+	map(0x10000000, 0x10ffffff).rom().region("user1", 0); // external ROM
+}
 
-ADDRESS_MAP_START(pgm2_state::pgm2_ram_rom_map)
-	AM_IMPORT_FROM(pgm2_map)
-	AM_RANGE(0x10000000, 0x101fffff) AM_RAM AM_SHARE("romboard_ram") // we should also probably decrypt writes once the encryption is enabled, but the game never writes with it turned on anyway
-	AM_RANGE(0x10200000, 0x103fffff) AM_ROM AM_REGION("user1", 0) // external ROM
-ADDRESS_MAP_END
+void pgm2_state::pgm2_ram_rom_map(address_map &map)
+{
+	pgm2_map(map);
+	map(0x10000000, 0x101fffff).ram().share("romboard_ram"); // we should also probably decrypt writes once the encryption is enabled, but the game never writes with it turned on anyway
+	map(0x10200000, 0x103fffff).rom().region("user1", 0); // external ROM
+}
 
-ADDRESS_MAP_START(pgm2_state::pgm2_module_rom_map)
-	AM_IMPORT_FROM(pgm2_rom_map)
-	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE16(module_rom_w, 0xffffffff)
-	AM_RANGE(0x10000000, 0x1000000f) AM_READ16(module_rom_r, 0xffffffff)
-	AM_RANGE(0xfffff430, 0xfffff433) AM_WRITE(pio_sodr_w)
-	AM_RANGE(0xfffff434, 0xfffff437) AM_WRITE(pio_codr_w)
-	AM_RANGE(0xfffff43c, 0xfffff43f) AM_READ(pio_pdsr_r)
-ADDRESS_MAP_END
+void pgm2_state::pgm2_module_rom_map(address_map &map)
+{
+	pgm2_rom_map(map);
+	map(0x10000000, 0x107fffff).w(FUNC(pgm2_state::module_rom_w));
+	map(0x10000000, 0x1000000f).r(FUNC(pgm2_state::module_rom_r));
+	map(0xfffff430, 0xfffff433).w(FUNC(pgm2_state::pio_sodr_w));
+	map(0xfffff434, 0xfffff437).w(FUNC(pgm2_state::pio_codr_w));
+	map(0xfffff43c, 0xfffff43f).r(FUNC(pgm2_state::pio_pdsr_r));
+}
 
 static INPUT_PORTS_START( pgm2 )
 	PORT_START("INPUTS0")
@@ -769,14 +774,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(pgm2_state::pgm2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", IGS036, 100000000) // ?? ARM based CPU, has internal ROM.
-	MCFG_CPU_PROGRAM_MAP(pgm2_rom_map)
+	MCFG_DEVICE_ADD("maincpu", IGS036, 100000000) // ?? ARM based CPU, has internal ROM.
+	MCFG_DEVICE_PROGRAM_MAP(pgm2_rom_map)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
 	MCFG_TIMER_DRIVER_ADD("mcu_timer", pgm2_state, igs_interrupt2)
 
-	MCFG_ARM_AIC_ADD("arm_aic")
-	MCFG_IRQ_LINE_CB(WRITELINE(pgm2_state, irq))
+	ARM_AIC(config, "arm_aic", 0).irq_callback().set(FUNC(pgm2_state::irq));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -785,11 +789,11 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 448-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm2_state, screen_vblank_pgm2))
 
-	MCFG_GFXDECODE_ADD("gfxdecode2", "tx_palette", pgm2_tx)
+	MCFG_DEVICE_ADD("gfxdecode2", GFXDECODE, "tx_palette", pgm2_tx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode3", "bg_palette", pgm2_bg)
+	MCFG_DEVICE_ADD("gfxdecode3", GFXDECODE, "bg_palette", pgm2_bg)
 
 	MCFG_PALETTE_ADD("sp_palette", 0x4000/4) // sprites
 	MCFG_PALETTE_FORMAT(XRGB)
@@ -800,10 +804,11 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 	MCFG_PALETTE_ADD("bg_palette", 0x2000/4) // bg
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_NVRAM_ADD_0FILL("sram")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YMZ774_ADD("ymz774", 16384000) // is clock correct ?
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ymz774", YMZ774, 16384000) // is clock correct ?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -822,16 +827,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pgm2_state::pgm2_hires)
 	pgm2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pgm2_module_rom_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pgm2_module_rom_map)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pgm2_state::pgm2_ramrom)
 	pgm2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pgm2_ram_rom_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pgm2_ram_rom_map)
 MACHINE_CONFIG_END
 
 /* using macros for the video / sound roms because the locations never change between sets, and
@@ -875,15 +880,15 @@ MACHINE_CONFIG_END
 
 #define ORLEG2_PROGRAM_104(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v104" #extension ".u7",  0x000000, 0x800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
+	ROM_LOAD( #prefix "_v104" #extension ".u7",  0x000000, 0x800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) ) // V104 08-03-03 13:25:37
 
 #define ORLEG2_PROGRAM_103(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v103" #extension ".u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) )
+	ROM_LOAD( #prefix "_v103" #extension ".u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) ) // V103 08-01-30 14:45:17
 
 #define ORLEG2_PROGRAM_101(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v101" #extension ".u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
+	ROM_LOAD( #prefix "_v101" #extension ".u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) ) // V101 07-12-24 09:32:32
 
 /*
    Internal ROMs for CHINA, JAPAN and OVERSEA are confirmed to differ by just the region byte, other regions not yet verified.
@@ -986,15 +991,15 @@ ROM_END
 
 #define KOV2NL_PROGRAM_302(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v302" #extension ".u7", 0x00000000, 0x0800000, CRC(b19cf540) SHA1(25da5804bbfd7ef2cdf5cc5aabaa803d18b98929) )
+	ROM_LOAD( #prefix "_v302" #extension ".u7", 0x00000000, 0x0800000, CRC(b19cf540) SHA1(25da5804bbfd7ef2cdf5cc5aabaa803d18b98929) ) // V302 08-12-03 15:27:34
 
 #define KOV2NL_PROGRAM_301(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v301" #extension ".u7", 0x000000, 0x800000, CRC(c4595c2c) SHA1(09e379556ef76f81a63664f46d3f1415b315f384) )
+	ROM_LOAD( #prefix "_v301" #extension ".u7", 0x000000, 0x800000, CRC(c4595c2c) SHA1(09e379556ef76f81a63664f46d3f1415b315f384) ) // V301 08-09-09 09:44:53
 
 #define KOV2NL_PROGRAM_300(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v300" #extension ".u7", 0x000000, 0x800000, CRC(08da7552) SHA1(303b97d7694405474c8133a259303ccb49db48b1) )
+	ROM_LOAD( #prefix "_v300" #extension ".u7", 0x000000, 0x800000, CRC(08da7552) SHA1(303b97d7694405474c8133a259303ccb49db48b1) ) // V300 08-08-06 18:21:23
 
 
 // Region 0x00 - China
@@ -1091,7 +1096,7 @@ ROM_START( ddpdojt )
 	ROM_LOAD( "ddpdoj_igs036_china.rom",       0x00000000, 0x0004000, CRC(5db91464) SHA1(723d8086285805bd815e62120dfa9a4269bcd932) )
 
 	ROM_REGION( 0x0200000, "user1", 0 )
-	ROM_LOAD( "ddpdoj_v201cn.u4",        0x00000000, 0x0200000, CRC(89e4b760) SHA1(9fad1309da31d12a413731b416a8bbfdb304ed9e) )
+	ROM_LOAD( "ddpdoj_v201cn.u4",        0x00000000, 0x0200000, CRC(89e4b760) SHA1(9fad1309da31d12a413731b416a8bbfdb304ed9e) ) // V201 10-03-27 17:45:12
 
 	DDPDOJT_VIDEO_SOUND_ROMS
 ROM_END
@@ -1138,7 +1143,7 @@ ROM_START( kov3 )
 	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "kov3_v104cn_raw.bin",         0x00000000, 0x0800000, CRC(1b5cbd24) SHA1(6471d4842a08f404420dea2bd1c8b88798c80fd5) )
+	ROM_LOAD( "kov3_v104cn_raw.bin",         0x00000000, 0x0800000, CRC(1b5cbd24) SHA1(6471d4842a08f404420dea2bd1c8b88798c80fd5) ) // V104 11-12-09 14:29:14
 
 	KOV3_VIDEO_SOUND_ROMS
 ROM_END
@@ -1147,7 +1152,7 @@ ROM_START( kov3_102 )
 	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "kov3_v102cn_raw.bin",         0x00000000, 0x0800000, CRC(61d0dabd) SHA1(959b22ef4e342ca39c2386549ac7274f9d580ab8) )
+	ROM_LOAD( "kov3_v102cn_raw.bin",         0x00000000, 0x0800000, CRC(61d0dabd) SHA1(959b22ef4e342ca39c2386549ac7274f9d580ab8) ) // V102 11-11-01 18:56:07
 
 	KOV3_VIDEO_SOUND_ROMS
 ROM_END
@@ -1156,7 +1161,7 @@ ROM_START( kov3_101 )
 	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "kov3_v101.bin",         0x00000000, 0x0800000, BAD_DUMP CRC(d6664449) SHA1(64d912425f018c3531951019b33e909657724547) ) // dump was not raw, manually xored with fake value
+	ROM_LOAD( "kov3_v101.bin",         0x00000000, 0x0800000, BAD_DUMP CRC(d6664449) SHA1(64d912425f018c3531951019b33e909657724547) ) // V101 11-10-03 14:37:29; dump was not raw, manually xored with fake value
 
 	KOV3_VIDEO_SOUND_ROMS
 ROM_END
@@ -1165,7 +1170,7 @@ ROM_START( kov3_100 )
 	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "kov3_v100cn_raw.bin",         0x00000000, 0x0800000, CRC(93bca924) SHA1(ecaf2c4676eb3d9f5e4fdbd9388be41e51afa0e4) )
+	ROM_LOAD( "kov3_v100cn_raw.bin",         0x00000000, 0x0800000, CRC(93bca924) SHA1(ecaf2c4676eb3d9f5e4fdbd9388be41e51afa0e4) ) // V100 11-09-14 15:13:14
 
 	KOV3_VIDEO_SOUND_ROMS
 ROM_END
@@ -1212,7 +1217,7 @@ ROM_START( kof98umh )
 	ROM_LOAD( "kof98umh_internal_rom.bin",       0x00000000, 0x0004000, CRC(3ed2e50f) SHA1(35310045d375d9dda36c325e35257123a7b5b8c7) )
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "kof98umh_v100cn.u4",        0x00000000, 0x1000000, CRC(2ea91e3b) SHA1(5a586bb99cc4f1b02e0db462d5aff721512e0640) )
+	ROM_LOAD( "kof98umh_v100cn.u4",        0x00000000, 0x1000000, CRC(2ea91e3b) SHA1(5a586bb99cc4f1b02e0db462d5aff721512e0640) ) // V100 09-08-23 17:52:03
 
 	KOF98UMH_VIDEO_SOUND_ROMS
 ROM_END
@@ -1416,19 +1421,19 @@ void pgm2_state::common_encryption_init()
 	m_has_decrypted = 0;
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,orleg2)
+void pgm2_state::init_orleg2()
 {
 	common_encryption_init();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
+void pgm2_state::init_kov2nl()
 {
 	common_encryption_init();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(FUNC(pgm2_state::kov2nl_speedup_r), this));
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,ddpdojt)
+void pgm2_state::init_ddpdojt()
 {
 	common_encryption_init();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::ddpdojt_speedup_r), this));
@@ -1441,7 +1446,7 @@ static const kov3_module_key kov3_102_key = { { 0x49,0xac,0xb0,0xec,0x47,0x49,0x
 static const kov3_module_key kov3_101_key = { { 0xc1,0x2c,0xc1,0xe5,0x3c,0xc1,0x59,0x9e } ,{ 0xf2,0xb2,0xf0,0x89,0x37,0xf2,0xc7,0x0b }, 0, 0xffff }; // real xor values is unknown
 static const kov3_module_key kov3_100_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 } ,{ 0x96,0xf0,0x91,0xe1,0xb3,0xf1,0xef,0x90 }, 0x3e8aa8, 0xc530 }; // fake zero-key
 
-DRIVER_INIT_MEMBER(pgm2_state,kov3)
+void pgm2_state::init_kov3()
 {
 	common_encryption_init();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32_delegate(FUNC(pgm2_state::kov3_speedup_r),this));
@@ -1462,34 +1467,34 @@ void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
 	m_has_decrypted_kov3_module = 1;
 }
 
-DRIVER_INIT_MEMBER(pgm2_state, kov3_104)
+void pgm2_state::init_kov3_104()
 {
 	module_key = &kov3_104_key;
-	DRIVER_INIT_CALL(kov3);
+	init_kov3();
 }
 
-DRIVER_INIT_MEMBER(pgm2_state, kov3_102)
+void pgm2_state::init_kov3_102()
 {
 	module_key = &kov3_102_key;
-	DRIVER_INIT_CALL(kov3);
+	init_kov3();
 }
 
-DRIVER_INIT_MEMBER(pgm2_state, kov3_101)
+void pgm2_state::init_kov3_101()
 {
 	module_key = &kov3_101_key;
-	DRIVER_INIT_CALL(kov3);
+	init_kov3();
 }
 
-DRIVER_INIT_MEMBER(pgm2_state, kov3_100)
+void pgm2_state::init_kov3_100()
 {
 	module_key = &kov3_100_key;
-	DRIVER_INIT_CALL(kov3);
+	init_kov3();
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
+void pgm2_state::init_kof98umh()
 {
 	common_encryption_init();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::kof98umh_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::kof98umh_speedup_r),this));
 }
 
 
@@ -1498,41 +1503,50 @@ DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 
 /* PGM2 */
 
+//华通电子/Huatong Electronics (distributor of orleg2, kov2nl in china) = 华通科技/Huatong Technology (distributor of kov3 in china),
+//Same company but they changed name.
+
 // Oriental Legend 2 - should be a V102 and V100 too
-GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) /* Overseas sets of OL2 do not use the card reader */
-GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
+//西游释厄传2/Xīyóu shì è chuán 2 (China; Simplified Chinese)
+//西遊釋厄傳2/Saiyū Shakuyakuden 2 (Japan; Traditional Chinese - Taiwan(undumped) too?)
+GAME( 2007, orleg2,       0,      pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) /* Overseas sets of OL2 do not use the card reader */
+GAME( 2007, orleg2_103,   orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101,   orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 2 New Legend
-GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Oversea)", MACHINE_SUPPORTS_SAVE )
+//三國戰紀2撗掃于軍 New Legend/Sānguó zhàn jì 2 Guàng sǎo yú jūn New Legend (Oversea; Mixed Traditional and Simplified Chinese)
+//三國戰紀2盖世英雄/Sānguó zhàn jì 2 Gàishì yīngxióng (China; Mixed Traditional and Simplified Chinese)
+//三國戰紀2乱世英雄/Sangoku-Senki 2 Ranse Eiyū (Japan; Mixed Traditional and Simplified Chinese - Undumped)
+GAME( 2008, kov2nl,       0,      pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Guang Sao Yu Jun (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_301,   kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Guang Sao Yu Jun (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_300,   kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Guang Sao Yu Jun (V300, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2008, kov2nl_302cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_301cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_300cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_302cn, kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V302, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_301cn, kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V301, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_300cn, kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V300, China)", MACHINE_SUPPORTS_SAVE )
 
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
-GAME( 2010, ddpdojt,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojt,    ROT270, "IGS / Cave", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2010, ddpdojt,      0,      pgm2_ramrom, pgm2, pgm2_state, init_ddpdojt,  ROT270, "IGS / Cave (Tong Li Animation license)", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 3 - should be a V103 and V101 too
-GAME( 2011, kov3,         0,    pgm2_hires, pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2011, kov3_102,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2011, kov3_101,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_101,   ROT0, "IGS", "Knights of Valour 3 (V101, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2011, kov3_100,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+//三国战纪3/Sānguó zhàn jì 3 (Simplified Chinese)
+GAME( 2011, kov3,         0,      pgm2_hires,  pgm2, pgm2_state, init_kov3_104, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V104, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_102,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_102, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V102, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_101,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_101, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V101, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_100,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_100, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V100, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 
 // King of Fighters '98: Ultimate Match Hero
-GAME( 2009, kof98umh,     0,    pgm2_lores, pgm2, pgm2_state,  kof98umh,   ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
+GAME( 2009, kof98umh,     0,      pgm2_lores,  pgm2, pgm2_state, init_kof98umh, ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
 
 // Jigsaw World Arena
 
-// Puzzle of Ocha / Ochainu No Pazuru
+// お茶犬のパズル/Ochaken no Puzzle (V101JP exists but undumped, Puzzle game of Japanese お茶犬/Ochaken franchises)

@@ -66,8 +66,8 @@ void namco_c117_device::device_start()
 
 	m_cpuexec[0] = maincpu;
 	m_cpuexec[1] = subcpu;
-	m_cpudirect[0] = maincpu->space(AS_PROGRAM).direct<0>();
-	m_cpudirect[1] = subcpu->space(AS_PROGRAM).direct<0>();
+	m_cpucache[0] = maincpu->space(AS_PROGRAM).cache<0, 0, ENDIANNESS_BIG>();
+	m_cpucache[1] = subcpu->space(AS_PROGRAM).cache<0, 0, ENDIANNESS_BIG>();
 
 	memset(&m_offsets, 0, sizeof(m_offsets));
 	m_subres = m_wdog = 0;
@@ -92,14 +92,11 @@ void namco_c117_device::device_reset()
 	m_offsets[1][0] = 0x0180 * 0x2000; // bank0 = 0x180(RAM) - evidence: wldcourt
 	m_offsets[1][7] = 0x03ff * 0x2000; // bank7 = 0x3ff(PRG7)
 
-	m_cpudirect[0]->force_update();
-	m_cpudirect[1]->force_update();
-
 	m_subres = m_wdog = 0;
 	m_subres_cb(ASSERT_LINE);
 
 	// reset the main CPU so it picks up the reset vector from the correct bank
-	m_cpuexec[0]->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_cpuexec[0]->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -107,9 +104,10 @@ void namco_c117_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(namco_c117_device::device_add_mconfig)
-	MCFG_WATCHDOG_ADD("watchdog")
-MACHINE_CONFIG_END
+void namco_c117_device::device_add_mconfig(machine_config &config)
+{
+	WATCHDOG_TIMER(config, m_watchdog);
+}
 
 
 READ8_MEMBER(namco_c117_device::main_r)
@@ -192,10 +190,7 @@ void namco_c117_device::register_w(int whichcpu, offs_t offset, uint8_t data)
 			break;
 		case 14: // FC00 - set initial ROM bank for sub CPU
 			if (whichcpu == 0)
-			{
 				m_offsets[1][7] = 0x600000 | (data * 0x2000);
-				m_cpudirect[1]->force_update();
-			}
 			else
 				unknown_reg = true;
 			break;
@@ -215,8 +210,6 @@ void namco_c117_device::bankswitch(int whichcpu, int whichbank, int a0, uint8_t 
 		bank = (bank & 0x1fe000) | ((data & 0x03) * 0x200000);
 	else
 		bank = (bank & 0x600000) | (data * 0x2000);
-
-	m_cpudirect[whichcpu]->force_update();
 }
 
 void namco_c117_device::kick_watchdog(int whichcpu)

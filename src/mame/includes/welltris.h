@@ -18,7 +18,13 @@ public:
 		m_pixelram(*this, "pixelram"),
 		m_charvideoram(*this, "charvideoram") { }
 
+	void quiz18k(machine_config &config);
+	void welltris(machine_config &config);
 
+	void init_quiz18k();
+	void init_welltris();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<vsystem_spr2_device> m_spr_old;
@@ -43,8 +49,6 @@ public:
 	DECLARE_WRITE16_MEMBER(scrollreg_w);
 	DECLARE_WRITE16_MEMBER(charvideoram_w);
 
-	DECLARE_DRIVER_INIT(quiz18k);
-	DECLARE_DRIVER_INIT(welltris);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -52,8 +56,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void setbank(int num, int bank);
-	void quiz18k(machine_config &config);
-	void welltris(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_port_map(address_map &map);

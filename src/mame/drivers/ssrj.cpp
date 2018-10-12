@@ -62,23 +62,24 @@ READ8_MEMBER(ssrj_state::wheel_r)
 	return retval;
 }
 
-ADDRESS_MAP_START(ssrj_state::ssrj_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram1_w) AM_SHARE("vram1")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vram2_w) AM_SHARE("vram2")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("vram3")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(vram4_w) AM_SHARE("vram4")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("scrollram")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
-	AM_RANGE(0xf001, 0xf001) AM_READ(wheel_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")
-	AM_RANGE(0xf003, 0xf003) AM_WRITENOP /* unknown */
-	AM_RANGE(0xf401, 0xf401) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xf400, 0xf401) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xf800, 0xf800) AM_WRITENOP /* wheel ? */
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITENOP /* unknown */
-ADDRESS_MAP_END
+void ssrj_state::ssrj_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().w(FUNC(ssrj_state::vram1_w)).share("vram1");
+	map(0xc800, 0xcfff).ram().w(FUNC(ssrj_state::vram2_w)).share("vram2");
+	map(0xd000, 0xd7ff).ram().share("vram3");
+	map(0xd800, 0xdfff).ram().w(FUNC(ssrj_state::vram4_w)).share("vram4");
+	map(0xe000, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().share("scrollram");
+	map(0xf000, 0xf000).portr("IN0");
+	map(0xf001, 0xf001).r(FUNC(ssrj_state::wheel_r));
+	map(0xf002, 0xf002).portr("IN2");
+	map(0xf003, 0xf003).nopw(); /* unknown */
+	map(0xf401, 0xf401).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xf400, 0xf401).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xf800, 0xf800).nopw(); /* wheel ? */
+	map(0xfc00, 0xfc00).nopw(); /* unknown */
+}
 
 static INPUT_PORTS_START( ssrj )
 	PORT_START("IN0")
@@ -135,16 +136,16 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( ssrj )
+static GFXDECODE_START( gfx_ssrj )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(ssrj_state::ssrj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(ssrj_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssrj_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(ssrj_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ssrj_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -153,18 +154,18 @@ MACHINE_CONFIG_START(ssrj_state::ssrj)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 1*8, 31*8-1) // unknown res
 	MCFG_SCREEN_UPDATE_DRIVER(ssrj_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ssrj_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ssrj_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssrj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssrj)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_INIT_OWNER(ssrj_state, ssrj)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 8000000/5)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/5)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -190,4 +191,4 @@ ROM_START( ssrj )
 
 ROM_END
 
-GAME( 1985, ssrj,  0,       ssrj,  ssrj, ssrj_state,  0, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ssrj,  0,       ssrj,  ssrj, ssrj_state, empty_init, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -46,6 +46,7 @@
 #include "machine/taitoio.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "screen.h"
@@ -90,7 +91,6 @@ WRITE32_MEMBER(superchs_state::cpua_ctrl_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_subcpu->set_input_line(INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
-		if (data&0x8000) m_maincpu->set_input_line(3, HOLD_LINE); /* Guess */
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -107,59 +107,49 @@ WRITE8_MEMBER(superchs_state::coin_word_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-READ32_MEMBER(superchs_state::superchs_stick_r)
+READ8_MEMBER( superchs_state::volume_r )
 {
-	uint8_t b0 = ioport("UNKNOWN")->read();
-	uint8_t b1 = ((ioport("SOUND")->read() * 255) / 100) ^ 0xff; // 00 = full, ff = silent
-	uint8_t b2 = ioport("ACCEL")->read() ^ 0xff;
-	uint8_t b3 = ioport("WHEEL")->read();
-
-	return b3 << 24 | b2 << 16 | b1 << 8 | b0;
+	return ((m_volume->read() * 255) / 100) ^ 0xff; // 00 = full, ff = silent
 }
 
-WRITE32_MEMBER(superchs_state::superchs_stick_w)
-{
-	/* This is guess work - the interrupts are in groups of 4, with each writing to a
-	    different byte in this long word before the RTE.  I assume all but the last
-	    (top) byte cause an IRQ with the final one being an ACK.  (Total guess but it works). */
-	if (mem_mask != 0xff000000)
-		m_maincpu->set_input_line(3, HOLD_LINE);
-}
 
 /***********************************************************
              MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(superchs_state::superchs_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x180000, 0x18ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)
-	AM_RANGE(0x1b0000, 0x1b002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
-	AM_RANGE(0x300000, 0x300007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
-	AM_RANGE(0x340000, 0x340003) AM_READWRITE(superchs_stick_r, superchs_stick_w)   /* stick int request */
-ADDRESS_MAP_END
+void superchs_state::superchs_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x11ffff).ram().share("ram");
+	map(0x140000, 0x141fff).ram().share("spriteram");
+	map(0x180000, 0x18ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));
+	map(0x1b0000, 0x1b002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x200000, 0x20ffff).ram().share("shared_ram");
+	map(0x240000, 0x240003).w(FUNC(superchs_state::cpua_ctrl_w));
+	map(0x280000, 0x287fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x2c0000, 0x2c07ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0x300000, 0x300007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
+	map(0x340000, 0x340007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
+}
 
-ADDRESS_MAP_START(superchs_state::superchs_cpub_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_device, word_w) /* Only written upon errors */
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
-	AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
-ADDRESS_MAP_END
+void superchs_state::superchs_cpub_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::word_w)); /* Only written upon errors */
+	map(0x800000, 0x80ffff).rw(FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
+	map(0xa00000, 0xa001ff).ram(); /* Extra road control?? */
+}
 
-ADDRESS_MAP_START(superchs_state::chase3_cpub_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_device, word_w) /* Only written upon errors */
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
-	AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
-ADDRESS_MAP_END
+void superchs_state::chase3_cpub_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x400000, 0x40ffff).ram();
+	map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::word_w)); /* Only written upon errors */
+	map(0x800000, 0x80ffff).rw(FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
+	map(0xa00000, 0xa001ff).ram(); /* Extra road control?? */
+}
 
 /***********************************************************/
 
@@ -186,18 +176,14 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch")   /* upright doesn't have brake? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )
 
-	// 4 analog ports
 	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE PORT_NAME("Steering Wheel")
 
 	PORT_START("ACCEL")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_NAME("Gas Pedal")    /* in upright cab, it is a digital (1 bit) switch instead */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_REVERSE PORT_NAME("Gas Pedal")    /* in upright cab, it is a digital (1 bit) switch instead */
 
 	PORT_START("SOUND")
 	PORT_ADJUSTER( 75, "PCB - Sound Volume" )
-
-	PORT_START("UNKNOWN") // unused?
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /***********************************************************
@@ -227,7 +213,7 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( superchs )
+static GFXDECODE_START( gfx_superchs )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
 GFXDECODE_END
@@ -240,26 +226,32 @@ GFXDECODE_END
 MACHINE_CONFIG_START(superchs_state::superchs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(superchs_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(superchs_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2) /* 16MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(superchs_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(32'000'000)/2) /* 16MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(superchs_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_1_CB(IOPORT("COINS"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("SWITCHES"))
-	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(superchs_state, coin_word_w))
+	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set_inputline("maincpu", 3);
+	adc.in_callback<0>().set_ioport("WHEEL");
+	adc.in_callback<1>().set_ioport("ACCEL");
+	adc.in_callback<2>().set(FUNC(superchs_state::volume_r));
+
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_1_callback().set_ioport("COINS");
+	tc0510nio.read_2_callback().set_ioport("SWITCHES");
+	tc0510nio.read_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
+	tc0510nio.write_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
+	tc0510nio.write_3_callback().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	tc0510nio.write_3_callback().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
+	tc0510nio.write_4_callback().set(FUNC(superchs_state::coin_word_w));
 	// there are 'vibration' control bits somewhere!
 
 	/* video hardware */
@@ -271,7 +263,7 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_SCREEN_UPDATE_DRIVER(superchs_state, screen_update_superchs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superchs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superchs)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -289,9 +281,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(superchs_state::chase3)
 	superchs(config);
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(chase3_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(chase3_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -583,15 +575,15 @@ READ16_MEMBER(superchs_state::sub_cycle_r)
 	return m_ram[2]&0xffff;
 }
 
-DRIVER_INIT_MEMBER(superchs_state,superchs)
+void superchs_state::init_superchs()
 {
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100003, read32_delegate(FUNC(superchs_state::main_cycle_r),this));
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16_delegate(FUNC(superchs_state::sub_cycle_r),this));
 }
 
-GAMEL( 1992, superchs,         0, superchs, superchs, superchs_state, superchs, ROT0,               "Taito Corporation Japan",   "Super Chase - Criminal Termination (World)", 0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2O
-GAMEL( 1992, superchsu, superchs, superchs, superchs, superchs_state, superchs, ROT0,               "Taito America Corporation", "Super Chase - Criminal Termination (US)",    0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2A
-GAMEL( 1992, superchsj, superchs, superchs, superchs, superchs_state, superchs, ROT0,               "Taito Corporation",         "Super Chase - Criminal Termination (Japan)", 0, layout_superchs ) // 1993/02/16 11:29:18 SUPER CHASE VER 1.2J
-GAMEL( 1992, superchsp, superchs, chase3,   superchs, superchs_state, 0,        ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/10/26 20:24:29 CHASE 3 VER 1.1, prototype)", 0, layout_superchs ) // has CHASE 3 as the internal description
-GAMEL( 1992, superchsp2,superchs, chase3,   superchs, superchs_state, 0,        ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/01/18 18:29:18 CHASE 3 VER 1.3O, prototype)", 0, layout_superchs )
+GAMEL( 1992, superchs,   0,        superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito Corporation Japan",   "Super Chase - Criminal Termination (World)", 0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2O
+GAMEL( 1992, superchsu,  superchs, superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito America Corporation", "Super Chase - Criminal Termination (US)",    0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2A
+GAMEL( 1992, superchsj,  superchs, superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito Corporation",         "Super Chase - Criminal Termination (Japan)", 0, layout_superchs ) // 1993/02/16 11:29:18 SUPER CHASE VER 1.2J
+GAMEL( 1992, superchsp,  superchs, chase3,   superchs, superchs_state, empty_init,    ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/10/26 20:24:29 CHASE 3 VER 1.1, prototype)", 0, layout_superchs ) // has CHASE 3 as the internal description
+GAMEL( 1992, superchsp2, superchs, chase3,   superchs, superchs_state, empty_init,    ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/01/18 18:29:18 CHASE 3 VER 1.3O, prototype)", 0, layout_superchs )

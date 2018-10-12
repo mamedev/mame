@@ -80,25 +80,27 @@ READ8_MEMBER(mexico86_state::kiki_ym2203_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(mexico86_state::mexico86_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                /* banked roms */
-	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE("mainram")         /* shared with sound cpu */
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_SHARE("protection_ram")  /* shared with mcu */
-	AM_RANGE(0xe900, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)    /* program and gfx ROM banks */
-	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)          /* cpu reset lines + other unknown stuff */
-	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN3")
-	AM_RANGE(0xf018, 0xf018) AM_WRITENOP                        /* watchdog? */
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("subram")          /* communication ram - to connect 4 players's subboard */
-ADDRESS_MAP_END
+void mexico86_state::mexico86_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");                /* banked roms */
+	map(0xc000, 0xe7ff).ram().share("mainram");         /* shared with sound cpu */
+	map(0xe800, 0xe8ff).ram().share("protection_ram");  /* shared with mcu */
+	map(0xe900, 0xefff).ram();
+	map(0xf000, 0xf000).w(FUNC(mexico86_state::mexico86_bankswitch_w));    /* program and gfx ROM banks */
+	map(0xf008, 0xf008).w(FUNC(mexico86_state::mexico86_f008_w));          /* cpu reset lines + other unknown stuff */
+	map(0xf010, 0xf010).portr("IN3");
+	map(0xf018, 0xf018).nopw();                        /* watchdog? */
+	map(0xf800, 0xffff).ram().share("subram");          /* communication ram - to connect 4 players's subboard */
+}
 
-ADDRESS_MAP_START(mexico86_state::mexico86_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xa7ff) AM_RAM AM_SHARE("mainram")  /* shared with main */
-	AM_RANGE(0xa800, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_READ(kiki_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
-ADDRESS_MAP_END
+void mexico86_state::mexico86_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xa7ff).ram().share("mainram");  /* shared with main */
+	map(0xa800, 0xbfff).ram();
+	map(0xc000, 0xc001).r(FUNC(mexico86_state::kiki_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+}
 
 WRITE8_MEMBER(mexico86_state::mexico86_sub_output_w)
 {
@@ -108,16 +110,17 @@ WRITE8_MEMBER(mexico86_state::mexico86_sub_output_w)
 	/*---- --x- <unknown, always high, irq ack?>*/
 }
 
-ADDRESS_MAP_START(mexico86_state::mexico86_sub_cpu_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM /* sub cpu ram */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("subram")  /* shared with main */
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN4")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN5")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN6")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("IN7")
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(mexico86_sub_output_w)
-ADDRESS_MAP_END
+void mexico86_state::mexico86_sub_cpu_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram(); /* sub cpu ram */
+	map(0x8000, 0x87ff).ram().share("subram");  /* shared with main */
+	map(0xc000, 0xc000).portr("IN4");
+	map(0xc001, 0xc001).portr("IN5");
+	map(0xc002, 0xc002).portr("IN6");
+	map(0xc003, 0xc003).portr("IN7");
+	map(0xc004, 0xc004).w(FUNC(mexico86_state::mexico86_sub_output_w));
+}
 
 /*************************************
  *
@@ -370,7 +373,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( mexico86 )
+static GFXDECODE_START( gfx_mexico86 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 GFXDECODE_END
 
@@ -424,22 +427,22 @@ void mexico86_state::machine_reset()
 MACHINE_CONFIG_START(mexico86_state::mexico86)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
-	MCFG_CPU_PROGRAM_MAP(mexico86_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
+	MCFG_DEVICE_PROGRAM_MAP(mexico86_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
-	MCFG_CPU_PROGRAM_MAP(mexico86_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mexico86_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
+	MCFG_DEVICE_PROGRAM_MAP(mexico86_sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mexico86_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("mcu", M68705P3, 4000000) /* xtal is 4MHz, divided by 4 internally */
+	MCFG_DEVICE_ADD("mcu", M68705P3, 4000000) /* xtal is 4MHz, divided by 4 internally */
 	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"));
-	MCFG_M68705_PORTA_W_CB(WRITE8(mexico86_state, mexico86_68705_port_a_w));
-	MCFG_M68705_PORTB_W_CB(WRITE8(mexico86_state, mexico86_68705_port_b_w));
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mexico86_state, mexico86_m68705_interrupt)
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, mexico86_state, mexico86_68705_port_a_w));
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, mexico86_state, mexico86_68705_port_b_w));
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mexico86_state, mexico86_m68705_interrupt)
 
-	MCFG_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
-	MCFG_CPU_PROGRAM_MAP(mexico86_sub_cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mexico86_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
+	MCFG_DEVICE_PROGRAM_MAP(mexico86_sub_cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mexico86_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
@@ -453,13 +456,13 @@ MACHINE_CONFIG_START(mexico86_state::mexico86)
 	MCFG_SCREEN_UPDATE_DRIVER(mexico86_state, screen_update_mexico86)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mexico86)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mexico86)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
@@ -487,8 +490,8 @@ MACHINE_CONFIG_START(mexico86_state::kikikai)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mexico86_state,  kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mexico86_state,  kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
 
 	MCFG_DEVICE_REMOVE("mcu")   // we don't have code for the MC6801U4
 
@@ -699,9 +702,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,  0,        kikikai,  kikikai,  mexico86_state, 0, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  mexico86_state, 0, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrun, 0,        mexico86, mexico86, mexico86_state, 0, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, mexico86_state, 0, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86, kicknrun, mexico86, mexico86, mexico86_state, 0, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86a,kicknrun, mexico86, mexico86, mexico86_state, 0, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kikikai,  0,        kikikai,  kikikai,  mexico86_state, empty_init, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  mexico86_state, empty_init, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrun, 0,        mexico86, mexico86, mexico86_state, empty_init, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86, kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86a,kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

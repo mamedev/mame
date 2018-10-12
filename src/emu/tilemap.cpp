@@ -953,8 +953,8 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 	// flip the tilemap around the center of the visible area
 	rectangle visarea = screen.visible_area();
-	u32 width = visarea.min_x + visarea.max_x + 1;
-	u32 height = visarea.min_y + visarea.max_y + 1;
+	u32 width = visarea.left() + visarea.right() + 1;
+	u32 height = visarea.top() + visarea.bottom() + 1;
 
 	// XY scrolling playfield
 	if (m_scrollrows == 1 && m_scrollcols == 1)
@@ -962,8 +962,8 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 		// iterate to handle wraparound
 		int scrollx = effective_rowscroll(0, width);
 		int scrolly = effective_colscroll(0, height);
-		for (int ypos = scrolly - m_height; ypos <= blit.cliprect.max_y; ypos += m_height)
-			for (int xpos = scrollx - m_width; xpos <= blit.cliprect.max_x; xpos += m_width)
+		for (int ypos = scrolly - m_height; ypos <= blit.cliprect.bottom(); ypos += m_height)
+			for (int xpos = scrollx - m_width; xpos <= blit.cliprect.right(); xpos += m_width)
 				draw_instance(screen, dest, blit, xpos, ypos);
 	}
 
@@ -975,10 +975,10 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 		// iterate over Y to handle wraparound
 		int rowheight = m_height / m_scrollrows;
 		int scrolly = effective_colscroll(0, height);
-		for (int ypos = scrolly - m_height; ypos <= original_cliprect.max_y; ypos += m_height)
+		for (int ypos = scrolly - m_height; ypos <= original_cliprect.bottom(); ypos += m_height)
 		{
-			int const firstrow = std::max((original_cliprect.min_y - ypos) / rowheight, 0);
-			int const lastrow = std::min((original_cliprect.max_y - ypos) / rowheight, s32(m_scrollrows) - 1);
+			int const firstrow = std::max((original_cliprect.top() - ypos) / rowheight, 0);
+			int const lastrow = std::min((original_cliprect.bottom() - ypos) / rowheight, s32(m_scrollrows) - 1);
 
 			// iterate over rows in the tilemap
 			int nextrow;
@@ -995,12 +995,11 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 					continue;
 
 				// update the cliprect just for this set of rows
-				blit.cliprect.min_y = currow * rowheight + ypos;
-				blit.cliprect.max_y = nextrow * rowheight - 1 + ypos;
+				blit.cliprect.sety(currow * rowheight + ypos, nextrow * rowheight - 1 + ypos);
 				blit.cliprect &= original_cliprect;
 
 				// iterate over X to handle wraparound
-				for (int xpos = scrollx - m_width; xpos <= original_cliprect.max_x; xpos += m_width)
+				for (int xpos = scrollx - m_width; xpos <= original_cliprect.right(); xpos += m_width)
 					draw_instance(screen, dest, blit, xpos, ypos);
 			}
 		}
@@ -1028,15 +1027,14 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 				continue;
 
 			// iterate over X to handle wraparound
-			for (int xpos = scrollx - m_width; xpos <= original_cliprect.max_x; xpos += m_width)
+			for (int xpos = scrollx - m_width; xpos <= original_cliprect.right(); xpos += m_width)
 			{
 				// update the cliprect just for this set of columns
-				blit.cliprect.min_x = curcol * colwidth + xpos;
-				blit.cliprect.max_x = nextcol * colwidth - 1 + xpos;
+				blit.cliprect.setx(curcol * colwidth + xpos, nextcol * colwidth - 1 + xpos);
 				blit.cliprect &= original_cliprect;
 
 				// iterate over Y to handle wraparound
-				for (int ypos = scrolly - m_height; ypos <= original_cliprect.max_y; ypos += m_height)
+				for (int ypos = scrolly - m_height; ypos <= original_cliprect.bottom(); ypos += m_height)
 					draw_instance(screen, dest, blit, xpos, ypos);
 			}
 		}
@@ -1115,10 +1113,10 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 {
 	// clip destination coordinates to the tilemap
 	// note that x2/y2 are exclusive, not inclusive
-	int x1 = std::max(xpos, blit.cliprect.min_x);
-	int x2 = std::min(xpos + (int)m_width, blit.cliprect.max_x + 1);
-	int y1 = std::max(ypos, blit.cliprect.min_y);
-	int y2 = std::min(ypos + (int)m_height, blit.cliprect.max_y + 1);
+	int x1 = (std::max)(xpos, blit.cliprect.left());
+	int x2 = (std::min)(xpos + int(m_width), blit.cliprect.right() + 1);
+	int y1 = (std::max)(ypos, blit.cliprect.top());
+	int y2 = (std::min)(ypos + int(m_height), blit.cliprect.bottom() + 1);
 
 	// if totally clipped, stop here
 	if (x1 >= x2 || y1 >= y2)
@@ -1305,14 +1303,14 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 	u8 alpha = blit.alpha;
 
 	// pre-advance based on the cliprect
-	startx += blit.cliprect.min_x * incxx + blit.cliprect.min_y * incyx;
-	starty += blit.cliprect.min_x * incxy + blit.cliprect.min_y * incyy;
+	startx += blit.cliprect.left() * incxx + blit.cliprect.top() * incyx;
+	starty += blit.cliprect.left() * incxy + blit.cliprect.top() * incyy;
 
 	// extract start/end points
-	int sx = blit.cliprect.min_x;
-	int sy = blit.cliprect.min_y;
-	int ex = blit.cliprect.max_x;
-	int ey = blit.cliprect.max_y;
+	int sx = blit.cliprect.left();
+	int sy = blit.cliprect.top();
+	int ex = blit.cliprect.right();
+	int ey = blit.cliprect.bottom();
 
 	// optimized loop for the not rotated case
 	if (incxy == 0 && incyx == 0 && !wraparound)
@@ -1476,8 +1474,8 @@ void tilemap_t::draw_debug(screen_device &screen, bitmap_rgb32 &dest, u32 scroll
 	realize_all_dirty_tiles();
 
 	// iterate to handle wraparound
-	for (int ypos = scrolly - m_height; ypos <= blit.cliprect.max_y; ypos += m_height)
-		for (int xpos = scrollx - m_width; xpos <= blit.cliprect.max_x; xpos += m_width)
+	for (int ypos = scrolly - m_height; ypos <= blit.cliprect.bottom(); ypos += m_height)
+		for (int xpos = scrollx - m_width; xpos <= blit.cliprect.right(); xpos += m_width)
 			draw_instance(screen, dest, blit, xpos, ypos);
 }
 

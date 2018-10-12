@@ -5,6 +5,10 @@
     Hitme hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_HITME_H
+#define MAME_INCLUDES_HITME_H
+
+#pragma once
 
 #include "sound/discrete.h"
 #include "screen.h"
@@ -26,6 +30,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen") { }
 
+	void hitme(machine_config &config);
+	void barricad(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -54,12 +62,12 @@ public:
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	void hitme(machine_config &config);
-	void barricad(machine_config &config);
 	void hitme_map(address_map &map);
 	void hitme_portmap(address_map &map);
 };
 
 
 /*----------- defined in audio/hitme.c -----------*/
-DISCRETE_SOUND_EXTERN( hitme );
+DISCRETE_SOUND_EXTERN( hitme_discrete );
+
+#endif // MAME_INCLUDES_HITME_H

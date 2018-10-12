@@ -99,9 +99,9 @@ VIDEO_START_MEMBER(twincobr_state,toaplan0)
 
 	m_display_on = 0;
 
-	save_pointer(NAME(m_txvideoram16.get()), m_txvideoram_size);
-	save_pointer(NAME(m_fgvideoram16.get()), m_fgvideoram_size);
-	save_pointer(NAME(m_bgvideoram16.get()), m_bgvideoram_size);
+	save_pointer(NAME(m_txvideoram16), m_txvideoram_size);
+	save_pointer(NAME(m_fgvideoram16), m_fgvideoram_size);
+	save_pointer(NAME(m_bgvideoram16), m_bgvideoram_size);
 	save_item(NAME(m_txoffs));
 	save_item(NAME(m_fgoffs));
 	save_item(NAME(m_bgoffs));

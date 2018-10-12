@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_MM1_KEYBOARD_KBST_CALLBACK(_write) \
-	devcb = &downcast<mm1_keyboard_device &>(*device).set_kbst_wr_callback(DEVCB_##_write);
+	downcast<mm1_keyboard_device &>(*device).set_kbst_wr_callback(DEVCB_##_write);
 
 
 

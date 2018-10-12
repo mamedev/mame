@@ -10,6 +10,7 @@
 
 
 #include "machine/74259.h"
+#include "emupal.h"
 
 class stactics_state : public driver_device
 {
@@ -29,8 +30,15 @@ public:
 		m_score_digits(*this, "digit%u", 0U),
 		m_credit_leds(*this, "credit_led%u", 0U),
 		m_barrier_leds(*this, "barrier_led%u", 0U),
-		m_round_leds(*this, "round_led%u", 0U)
+		m_round_leds(*this, "round_led%u", 0U),
+		m_barrier_lamp(*this, "barrier_lamp"),
+		m_start_lamp(*this, "start_lamp"),
+		m_sight_led(*this, "sight_led"),
+		m_in3(*this, "IN3"),
+		m_fake(*this, "FAKE")
 	{ }
+
+	void stactics(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(get_frame_count_d3);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_shot_standby);
@@ -38,9 +46,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(get_motor_not_ready);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
 
-	void stactics(machine_config &config);
-
-protected:
+private:
 	DECLARE_READ8_MEMBER(vert_pos_r);
 	DECLARE_READ8_MEMBER(horiz_pos_r);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
@@ -77,7 +83,6 @@ protected:
 	void stactics_video(machine_config &config);
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_outlatch;
 
@@ -94,6 +99,12 @@ private:
 	output_finder<8> m_credit_leds;
 	output_finder<12> m_barrier_leds;
 	output_finder<16> m_round_leds;
+	output_finder<> m_barrier_lamp;
+	output_finder<> m_start_lamp;
+	output_finder<> m_sight_led;
+
+	required_ioport m_in3;
+	required_ioport m_fake;
 
 	/* machine state */
 	int    m_vert_pos;

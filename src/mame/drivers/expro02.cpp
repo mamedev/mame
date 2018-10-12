@@ -214,6 +214,7 @@ TODO:
 #include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -234,6 +235,19 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
+	void supmodel(machine_config &config);
+	void zipzap(machine_config &config);
+	void fantasia(machine_config &config);
+	void fantsia2(machine_config &config);
+	void comad(machine_config &config);
+	void comad_noview2(machine_config &config);
+	void smissw(machine_config &config);
+	void galhustl(machine_config &config);
+	void expro02(machine_config &config);
+
+	void init_expro02();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -247,7 +261,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(expro02_6295_bankswitch_w);
 
-	DECLARE_DRIVER_INIT(expro02);
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(expro02);
 
@@ -259,15 +272,6 @@ public:
 	// comad
 	READ16_MEMBER(comad_timer_r);
 	READ8_MEMBER(comad_okim6295_r);
-	void supmodel(machine_config &config);
-	void zipzap(machine_config &config);
-	void fantasia(machine_config &config);
-	void fantsia2(machine_config &config);
-	void comad(machine_config &config);
-	void comad_noview2(machine_config &config);
-	void smissw(machine_config &config);
-	void galhustl(machine_config &config);
-	void expro02(machine_config &config);
 	void comad_map(address_map &map);
 	void expro02_map(address_map &map);
 	void expro02_video_base_map(address_map &map);
@@ -661,167 +665,178 @@ WRITE8_MEMBER( expro02_state::expro02_6295_bankswitch_w )
  *************************************/
 
 
-ADDRESS_MAP_START(expro02_state::expro02_video_base_map)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fg_ind8ram")
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("bg_rgb555ram")
-	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette?
-	AM_RANGE(0x680000, 0x68001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")    // sprites? 0x72f words tested
-	AM_RANGE(0x780000, 0x78001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0xd80000, 0xd80001) AM_DEVWRITE("view2_0",kaneko_view2_tilemap_device,galsnew_vram_1_tilebank_w)   /* ??? */
-	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE("view2_0",kaneko_view2_tilemap_device,galsnew_vram_0_tilebank_w)   /* ??? */
-ADDRESS_MAP_END
+void expro02_state::expro02_video_base_map(address_map &map)
+{
+	map(0x500000, 0x51ffff).ram().share("fg_ind8ram");
+	map(0x520000, 0x53ffff).ram().share("bg_rgb555ram");
+	map(0x580000, 0x583fff).rw(m_view2_0, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette?
+	map(0x680000, 0x68001f).rw(m_view2_0, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x700000, 0x700fff).ram().share("spriteram");    // sprites? 0x72f words tested
+	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0xd80000, 0xd80001).w(m_view2_0, FUNC(kaneko_view2_tilemap_device::galsnew_vram_1_tilebank_w));   /* ??? */
+	map(0xe80000, 0xe80001).w(m_view2_0, FUNC(kaneko_view2_tilemap_device::galsnew_vram_0_tilebank_w));   /* ??? */
+}
 
-ADDRESS_MAP_START(expro02_state::expro02_video_base_map_noview2)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fg_ind8ram")
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("bg_rgb555ram")
-	AM_RANGE(0x580000, 0x583fff) AM_NOP // games still makes leftover accesses
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette?
-	AM_RANGE(0x680000, 0x68001f) AM_NOP // games still makes leftover accesses
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")    // sprites? 0x72f words tested
-	AM_RANGE(0x780000, 0x78001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0xd80000, 0xd80001) AM_NOP // games still makes leftover accesses
-	AM_RANGE(0xe80000, 0xe80001) AM_NOP // games still makes leftover accesses
-ADDRESS_MAP_END
+void expro02_state::expro02_video_base_map_noview2(address_map &map)
+{
+	map(0x500000, 0x51ffff).ram().share("fg_ind8ram");
+	map(0x520000, 0x53ffff).ram().share("bg_rgb555ram");
+	map(0x580000, 0x583fff).noprw(); // games still makes leftover accesses
+	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette?
+	map(0x680000, 0x68001f).noprw(); // games still makes leftover accesses
+	map(0x700000, 0x700fff).ram().share("spriteram");    // sprites? 0x72f words tested
+	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0xd80000, 0xd80001).noprw(); // games still makes leftover accesses
+	map(0xe80000, 0xe80001).noprw(); // games still makes leftover accesses
+}
 
-ADDRESS_MAP_START(expro02_state::expro02_map)
-	AM_IMPORT_FROM(expro02_video_base_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM // main program
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user2",0) // other data
-	AM_RANGE(0x100000, 0x3fffff) AM_ROM AM_REGION("user1",0) // main data
-	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* ??? */
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
-	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
-ADDRESS_MAP_END
+void expro02_state::expro02_map(address_map &map)
+{
+	expro02_video_base_map(map);
+	map(0x000000, 0x03ffff).rom(); // main program
+	map(0x080000, 0x0fffff).rom().region("user2", 0); // other data
+	map(0x100000, 0x3fffff).rom().region("user1", 0); // main data
+	map(0x400001, 0x400001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0xa00000, 0xa00001).nopw();    /* ??? */
+	map(0xc80000, 0xc8ffff).ram();
+	map(0xe00000, 0xe00015).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
+}
 
 
 // bigger ROM space, OKI commands moved, no CALC mcu
-ADDRESS_MAP_START(expro02_state::fantasia_map)
-	AM_IMPORT_FROM(expro02_video_base_map)
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x800006, 0x800007) AM_NOP // ? used ?
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* ??? */
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-ADDRESS_MAP_END
+void expro02_state::fantasia_map(address_map &map)
+{
+	expro02_video_base_map(map);
+	map(0x000000, 0x4fffff).rom();
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x800006, 0x800007).noprw(); // ? used ?
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0xa00000, 0xa00001).nopw();    /* ??? */
+	map(0xc80000, 0xc8ffff).ram();
+	map(0xf00000, 0xf00000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 
-ADDRESS_MAP_START(expro02_state::comad_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x800006, 0x800007)    ??
-	AM_RANGE(0x80000a, 0x80000b) AM_READ(comad_timer_r) /* bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x80000c, 0x80000d) AM_READ(comad_timer_r) /* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
-	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
-	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
-	AM_RANGE(0xf80000, 0xf80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* newfant */
-ADDRESS_MAP_END
+void expro02_state::comad_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
+	map(0x000000, 0x4fffff).rom();
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+//  map(0x800006, 0x800007);    ??
+	map(0x80000a, 0x80000b).r(FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
+	map(0x80000c, 0x80000d).r(FUNC(expro02_state::comad_timer_r)); /* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0xc00000, 0xc0ffff).ram();
+	map(0xc80000, 0xc8ffff).ram();
+	map(0xf00000, 0xf00000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
+	map(0xf80000, 0xf80000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* newfant */
+}
 
-ADDRESS_MAP_START(expro02_state::fantsia2_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x800006, 0x800007)    ??
-	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r) /* bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* coin counters, + ? */
-	AM_RANGE(0xc80000, 0xc80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
-	AM_RANGE(0xf80000, 0xf8ffff) AM_RAM
-ADDRESS_MAP_END
+void expro02_state::fantsia2_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
+	map(0x000000, 0x4fffff).rom();
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+//  map(0x800006, 0x800007);    ??
+	map(0x800008, 0x800009).r(FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0xa00000, 0xa00001).nopw();    /* coin counters, + ? */
+	map(0xc80000, 0xc80000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write));
+	map(0xf80000, 0xf8ffff).ram();
+}
 
 
 
 
-ADDRESS_MAP_START(expro02_state::galhustl_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
+void expro02_state::galhustl_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
 
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("maincpudata", 0)
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x2fffff).rom().region("maincpudata", 0);
 
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP // ?
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0xe80000, 0xe8ffff) AM_RAM
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0xa00000, 0xa00001).nopw(); // ?
+	map(0xd00000, 0xd00000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe80000, 0xe8ffff).ram();
 
-	AM_RANGE(0x780000, 0x78001f) AM_NOP // prevent sprites being flipped
-ADDRESS_MAP_END
+	map(0x780000, 0x78001f).noprw(); // prevent sprites being flipped
+}
 
-ADDRESS_MAP_START(expro02_state::zipzap_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
+void expro02_state::zipzap_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
 
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x701000, 0x71ffff) AM_RAM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
-	AM_RANGE(0xc00000, 0xc00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM     // main ram
+	map(0x000000, 0x4fffff).rom();
+	map(0x701000, 0x71ffff).ram();
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0xc00000, 0xc00000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
+	map(0xc80000, 0xc8ffff).ram();     // main ram
 
-	AM_RANGE(0x780000, 0x78001f) AM_NOP // prevent sprites being flipped
-ADDRESS_MAP_END
+	map(0x780000, 0x78001f).noprw(); // prevent sprites being flipped
+}
 
-ADDRESS_MAP_START(expro02_state::supmodel_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
-	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
-	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
-	AM_RANGE(0xe00012, 0xe00013) AM_WRITENOP
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITENOP
-	AM_RANGE(0xf80000, 0xf80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
-ADDRESS_MAP_END
+void expro02_state::supmodel_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
+	map(0x000000, 0x4fffff).rom();
+	map(0x500000, 0x51ffff).ram().share("fgvideoram");
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x800006, 0x800007).r(FUNC(expro02_state::comad_timer_r));
+	map(0x800008, 0x800009).r(FUNC(expro02_state::comad_timer_r));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0xa00000, 0xa00001).nopw();
+	map(0xc80000, 0xc8ffff).ram();
+	map(0xd80000, 0xd80001).nopw();
+	map(0xe00012, 0xe00013).nopw();
+	map(0xe80000, 0xe80001).nopw();
+	map(0xf80000, 0xf80000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
+}
 
-ADDRESS_MAP_START(expro02_state::smissw_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
-	AM_RANGE(0x80000e, 0x80000f) AM_READ(comad_timer_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
-	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM
-	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
-	AM_RANGE(0xe00012, 0xe00013) AM_WRITENOP
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITENOP
-	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
-ADDRESS_MAP_END
+void expro02_state::smissw_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
+	map(0x000000, 0x4fffff).rom();
+	map(0x500000, 0x51ffff).ram().share("fgvideoram");
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x800006, 0x800007).r(FUNC(expro02_state::comad_timer_r));
+	map(0x80000e, 0x80000f).r(FUNC(expro02_state::comad_timer_r));
+	map(0x900000, 0x900000).w(FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0xa00000, 0xa00001).nopw();
+	map(0xc00000, 0xc0ffff).ram();
+	map(0xd80000, 0xd80001).nopw();
+	map(0xe00012, 0xe00013).nopw();
+	map(0xe80000, 0xe80001).nopw();
+	map(0xf00000, 0xf00000).r(FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
+}
 
-ADDRESS_MAP_START(expro02_state::oki_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void expro02_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
 
 /*************************************
  *
@@ -881,12 +896,12 @@ static const gfx_layout layout_16x16x4 =
 };
 
 
-static GFXDECODE_START( expro02 )
+static GFXDECODE_START( gfx_expro02 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x100,      0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x400,      0x40 ) // [0] View2 tiles
 GFXDECODE_END
 
-static GFXDECODE_START( expro02_noview2 )
+static GFXDECODE_START( gfx_expro02_noview2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x100,      0x40 ) // [0] Sprites
 GFXDECODE_END
 
@@ -899,8 +914,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(expro02_state::expro02)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(expro02_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(expro02_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", expro02_state, scanline, "screen", 0, 1)
 
 	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
@@ -914,7 +929,7 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", expro02)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_expro02)
 	MCFG_PALETTE_ADD("palette", 2048 + 32768)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 	MCFG_PALETTE_INIT_OWNER(expro02_state, expro02)
@@ -935,13 +950,12 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 
 
 	/* arm watchdog */
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/6, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -951,8 +965,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(expro02_state::comad)
 	expro02(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fantasia_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fantasia_map)
 
 	MCFG_DEVICE_REMOVE("calc1_mcu")
 
@@ -961,51 +975,50 @@ MACHINE_CONFIG_START(expro02_state::comad)
 	MCFG_KANEKO_TMAP_INVERT_FLIP(1)
 	MCFG_KANEKO_TMAP_OFFSET(-256, -216, 256, 224)
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::comad_noview2)
 	comad(config);
 	MCFG_DEVICE_REMOVE("view2_0")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", expro02_noview2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_expro02_noview2)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(expro02_state::fantasia)
 	comad_noview2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(10000000)
-	MCFG_CPU_PROGRAM_MAP(comad_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(10000000)
+	MCFG_DEVICE_PROGRAM_MAP(comad_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::supmodel)
 	comad_noview2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(supmodel_map)
-	MCFG_OKIM6295_REPLACE("oki", 1584000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(supmodel_map)
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, 1584000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::smissw) // 951127 PCB, 12 & 16 clocks
 	comad_noview2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(smissw_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(smissw_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::fantsia2)
 	comad_noview2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fantsia2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fantsia2_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::galhustl)
 	comad_noview2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(galhustl_map)
-	MCFG_OKIM6295_REPLACE("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(galhustl_map)
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1016,9 +1029,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(expro02_state::zipzap)
 	comad_noview2(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(zipzap_map)
-	MCFG_OKIM6295_REPLACE("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(zipzap_map)
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1523,22 +1536,22 @@ ROM_END
 
 ROM_START( missw96c )
 	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "10_PROG2.UE17", 0x000000, 0x80000, CRC(36a7beb6) SHA1(11f6aef506a4e357442207fef760401757deaaeb) )
-	ROM_LOAD16_BYTE( "6_PROG1.UD17",  0x000001, 0x80000, CRC(e70b562f) SHA1(4affd40ab7f962824d1c7be22ea6819cf06d6347) )
-	ROM_LOAD16_BYTE( "9_IM1-B.UE16B",  0x100000, 0x80000, CRC(eedc24f8) SHA1(cef822c1e3f09c484d03964f02d761139aac9d76) )
-	ROM_LOAD16_BYTE( "5_IM1-A.UE16A",  0x100001, 0x80000, CRC(bb0eb7d7) SHA1(6952d153afa90924754c11872497ec83ae650220) )
-	ROM_LOAD16_BYTE( "8_IM2-B.UE15B",  0x200000, 0x80000, CRC(68dd67b2) SHA1(322f3eb84277568356ae0a09f71337bd525f379a) )
-	ROM_LOAD16_BYTE( "4_IM2-A.UE15A",  0x200001, 0x80000, CRC(2b39ec56) SHA1(8ea1483050287c68063e54c4de27bd82ad942c53) )
-	ROM_LOAD16_BYTE( "7_IM3_B.UE14B",  0x300000, 0x80000, CRC(7fd5ca2c) SHA1(7733bd0529953bdae718bf28053d173e5ec3ca92) )
-	ROM_LOAD16_BYTE( "3_IM3-A.UE14A",  0x300001, 0x80000, CRC(4ba5dab7) SHA1(81d7b6fde6d9405793f60ee7d15a15a511396332) )
+	ROM_LOAD16_BYTE( "10_prog2.ue17", 0x000000, 0x80000, CRC(36a7beb6) SHA1(11f6aef506a4e357442207fef760401757deaaeb) )
+	ROM_LOAD16_BYTE( "6_prog1.ud17",  0x000001, 0x80000, CRC(e70b562f) SHA1(4affd40ab7f962824d1c7be22ea6819cf06d6347) )
+	ROM_LOAD16_BYTE( "9_im1-b.ue16b",  0x100000, 0x80000, CRC(eedc24f8) SHA1(cef822c1e3f09c484d03964f02d761139aac9d76) )
+	ROM_LOAD16_BYTE( "5_im1-a.ue16a",  0x100001, 0x80000, CRC(bb0eb7d7) SHA1(6952d153afa90924754c11872497ec83ae650220) )
+	ROM_LOAD16_BYTE( "8_im2-b.ue15b",  0x200000, 0x80000, CRC(68dd67b2) SHA1(322f3eb84277568356ae0a09f71337bd525f379a) )
+	ROM_LOAD16_BYTE( "4_im2-a.ue15a",  0x200001, 0x80000, CRC(2b39ec56) SHA1(8ea1483050287c68063e54c4de27bd82ad942c53) )
+	ROM_LOAD16_BYTE( "7_im3_b.ue14b",  0x300000, 0x80000, CRC(7fd5ca2c) SHA1(7733bd0529953bdae718bf28053d173e5ec3ca92) )
+	ROM_LOAD16_BYTE( "3_im3-a.ue14a",  0x300001, 0x80000, CRC(4ba5dab7) SHA1(81d7b6fde6d9405793f60ee7d15a15a511396332) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-	ROM_LOAD( "20_OBJ1.U5",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
+	ROM_LOAD( "20_obj1.u5",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
-	ROM_LOAD( "1_MUSIC1.UB6",  0x00000, 0x80000, CRC(e78a659e) SHA1(d209184c70e0d7e6d17034c6f536535cda782d42) )
-	ROM_LOAD( "2_MUSIC2.UC6",  0x80000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
+	ROM_LOAD( "1_music1.ub6",  0x00000, 0x80000, CRC(e78a659e) SHA1(d209184c70e0d7e6d17034c6f536535cda782d42) )
+	ROM_LOAD( "2_music2.uc6",  0x80000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
 ROM_END
 
 
@@ -1564,22 +1577,22 @@ ROM_END
 
 ROM_START( smissw )
 	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "10_PROG2.UE17",  0x000000, 0x80000, CRC(e99e520f) SHA1(edd06a3b0f8d30a4020e6ea452abb0afd79d426a) )
-	ROM_LOAD16_BYTE( "6_PROG1.UD17",   0x000001, 0x80000, CRC(22831657) SHA1(eeabcdef543048ccceabc4c3b4b288aec959a14f) )
-	ROM_LOAD16_BYTE( "9_IM1-B.UE16B",  0x100000, 0x80000, CRC(fff1eee4) SHA1(1b88d45b5cc0b5a03296d4dc950e570fa4dc19c2) )
-	ROM_LOAD16_BYTE( "5_IM1-A.UE16A",  0x100001, 0x80000, CRC(2134a72d) SHA1(f907ec8a1d6e5755a821e69564074ff05e426bb1) )
-	ROM_LOAD16_BYTE( "8_IM2-B.UE15B",  0x200000, 0x80000, CRC(cf44b638) SHA1(0fe5bdb62492c31c3efffa6d85f5d6a3b4ddb2e0) )
-	ROM_LOAD16_BYTE( "4_IM2-A.UE15A",  0x200001, 0x80000, CRC(d22b270f) SHA1(21bd2ced1b5fb3c08687addaa890ee621a56fff0) )
-	ROM_LOAD16_BYTE( "7_IM3-B.UE14B",  0x300000, 0x80000, CRC(12a9441d) SHA1(d9cd51e0c3ffac5fc561e0927c419bce0157337e) )
-	ROM_LOAD16_BYTE( "3_IM3-A.UE14A",  0x300001, 0x80000, CRC(8c656fc9) SHA1(c3fe5de7cd6cd520bbd205ec62ac0dda51f71eeb) )
+	ROM_LOAD16_BYTE( "10_prog2.ue17",  0x000000, 0x80000, CRC(e99e520f) SHA1(edd06a3b0f8d30a4020e6ea452abb0afd79d426a) )
+	ROM_LOAD16_BYTE( "6_prog1.ud17",   0x000001, 0x80000, CRC(22831657) SHA1(eeabcdef543048ccceabc4c3b4b288aec959a14f) )
+	ROM_LOAD16_BYTE( "9_im1-b.ue16b",  0x100000, 0x80000, CRC(fff1eee4) SHA1(1b88d45b5cc0b5a03296d4dc950e570fa4dc19c2) )
+	ROM_LOAD16_BYTE( "5_im1-a.ue16a",  0x100001, 0x80000, CRC(2134a72d) SHA1(f907ec8a1d6e5755a821e69564074ff05e426bb1) )
+	ROM_LOAD16_BYTE( "8_im2-b.ue15b",  0x200000, 0x80000, CRC(cf44b638) SHA1(0fe5bdb62492c31c3efffa6d85f5d6a3b4ddb2e0) )
+	ROM_LOAD16_BYTE( "4_im2-a.ue15a",  0x200001, 0x80000, CRC(d22b270f) SHA1(21bd2ced1b5fb3c08687addaa890ee621a56fff0) )
+	ROM_LOAD16_BYTE( "7_im3-b.ue14b",  0x300000, 0x80000, CRC(12a9441d) SHA1(d9cd51e0c3ffac5fc561e0927c419bce0157337e) )
+	ROM_LOAD16_BYTE( "3_im3-a.ue14a",  0x300001, 0x80000, CRC(8c656fc9) SHA1(c3fe5de7cd6cd520bbd205ec62ac0dda51f71eeb) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-	ROM_LOAD( "15_OBJ11.U5",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
+	ROM_LOAD( "15_obj11.u5",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
-	ROM_LOAD( "1_MUSIC1.UB6",  0x00000, 0x80000, CRC(e78a659e) SHA1(d209184c70e0d7e6d17034c6f536535cda782d42) )
-	ROM_LOAD( "2_MUSIC2.UC6",  0x80000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
+	ROM_LOAD( "1_music1.ub6",  0x00000, 0x80000, CRC(e78a659e) SHA1(d209184c70e0d7e6d17034c6f536535cda782d42) )
+	ROM_LOAD( "2_music2.uc6",  0x80000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
 ROM_END
 
 
@@ -1631,26 +1644,26 @@ ROM_END
 
 /* sole change seems to be copyright date, PCB has chip references instead of grid references.  Not correcting all labels in other sets in case these are legitimate labels */
 ROM_START( fantsia2n )
-		ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
-		ROM_LOAD16_BYTE( "prog2.g17",    0x000000, 0x80000, CRC(57c59972) SHA1(4b1da928b537cf340a67026d07bc3dfc078b0d0f) )
-		ROM_LOAD16_BYTE( "prog1.f17",    0x000001, 0x80000, CRC(bf2d9a26) SHA1(92f0c1bd32f1e5e0ede3ba847242a212dfae4986) )
-		ROM_LOAD16_BYTE( "scr2.g16",     0x100000, 0x80000, CRC(887b1bc5) SHA1(b6fcdc8a56ea25758f363224d256e9b6c8e30244) )
-		ROM_LOAD16_BYTE( "scr1.f16",     0x100001, 0x80000, CRC(cbba3182) SHA1(a484819940fa1ef18ce679465c31075798748bac) )
-		ROM_LOAD16_BYTE( "scr4.g15",     0x200000, 0x80000, CRC(ce97e411) SHA1(be0ed41362db03f384229c708f2ba4146e5cb501) )
-		ROM_LOAD16_BYTE( "scr3.f15",     0x200001, 0x80000, CRC(480cc2e8) SHA1(38fe57ba1e34537f8be65fcc023ccd43369a5d94) )
-		ROM_LOAD16_BYTE( "scr6.g14",     0x300000, 0x80000, CRC(b29d49de) SHA1(854b76755acf58fb8a4648a0ce72ea6bdf26c555) )
-		ROM_LOAD16_BYTE( "scr5.f14",     0x300001, 0x80000, CRC(d5f88b83) SHA1(518a1f6732149f2851bbedca61f7313c39beb91b) )
-		ROM_LOAD16_BYTE( "scr8.g20",     0x400000, 0x80000, CRC(694ae2b3) SHA1(82b7a565290fce07c8393af4718fd1e6136928e9) )
-		ROM_LOAD16_BYTE( "scr7.f20",     0x400001, 0x80000, CRC(6068712c) SHA1(80a136d76dca566772e34d832ac11b8c7d6ce9ab) )
+	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "prog2.g17",    0x000000, 0x80000, CRC(57c59972) SHA1(4b1da928b537cf340a67026d07bc3dfc078b0d0f) )
+	ROM_LOAD16_BYTE( "prog1.f17",    0x000001, 0x80000, CRC(bf2d9a26) SHA1(92f0c1bd32f1e5e0ede3ba847242a212dfae4986) )
+	ROM_LOAD16_BYTE( "scr2.g16",     0x100000, 0x80000, CRC(887b1bc5) SHA1(b6fcdc8a56ea25758f363224d256e9b6c8e30244) )
+	ROM_LOAD16_BYTE( "scr1.f16",     0x100001, 0x80000, CRC(cbba3182) SHA1(a484819940fa1ef18ce679465c31075798748bac) )
+	ROM_LOAD16_BYTE( "scr4.g15",     0x200000, 0x80000, CRC(ce97e411) SHA1(be0ed41362db03f384229c708f2ba4146e5cb501) )
+	ROM_LOAD16_BYTE( "scr3.f15",     0x200001, 0x80000, CRC(480cc2e8) SHA1(38fe57ba1e34537f8be65fcc023ccd43369a5d94) )
+	ROM_LOAD16_BYTE( "scr6.g14",     0x300000, 0x80000, CRC(b29d49de) SHA1(854b76755acf58fb8a4648a0ce72ea6bdf26c555) )
+	ROM_LOAD16_BYTE( "scr5.f14",     0x300001, 0x80000, CRC(d5f88b83) SHA1(518a1f6732149f2851bbedca61f7313c39beb91b) )
+	ROM_LOAD16_BYTE( "scr8.g20",     0x400000, 0x80000, CRC(694ae2b3) SHA1(82b7a565290fce07c8393af4718fd1e6136928e9) )
+	ROM_LOAD16_BYTE( "scr7.f20",     0x400001, 0x80000, CRC(6068712c) SHA1(80a136d76dca566772e34d832ac11b8c7d6ce9ab) )
 
-		ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
-		ROM_LOAD( "23_OBJ1.U5",      0x00000, 0x80000, CRC(b45c9234) SHA1(b5eeec91b9c6952b338130458405997e1a51bf2f) )
-		ROM_LOAD( "obj2.2i",      0x80000, 0x80000, CRC(ea6e3861) SHA1(463b40f5441231a0451571a0b8afe1ed0fd4b164) )
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_LOAD( "23_obj1.u5",      0x00000, 0x80000, CRC(b45c9234) SHA1(b5eeec91b9c6952b338130458405997e1a51bf2f) )
+	ROM_LOAD( "obj2.2i",      0x80000, 0x80000, CRC(ea6e3861) SHA1(463b40f5441231a0451571a0b8afe1ed0fd4b164) )
 
-		ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
-		/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
-		ROM_LOAD( "music2.1b",    0x00000, 0x80000, CRC(23cc4f9c) SHA1(06b5342c25de966ce590917c571e5b19af1fef7d) )
-		ROM_LOAD( "music1.1a",    0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "music2.1b",    0x00000, 0x80000, CRC(23cc4f9c) SHA1(06b5342c25de966ce590917c571e5b19af1fef7d) )
+	ROM_LOAD( "music1.1a",    0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
 ROM_END
 
 ROM_START( wownfant)
@@ -1810,18 +1823,17 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(expro02_state,expro02)
+void expro02_state::init_expro02()
 {
 	uint32_t *src = (uint32_t *)memregion("gfx3" )->base();
 	uint32_t *dst = (uint32_t *)memregion("gfx2" )->base();
-	int x, offset;
 
 	// the VIEW2 tiledata is scrambled
 	if (src)
 	{
-		for (x = 0; x < 0x80000; x++)
+		for (int x = 0; x < 0x80000; x++)
 		{
-			offset = x;
+			int offset = x;
 
 			// swap bits around to simplify further processing
 			offset = bitswap<24>(offset, 23, 22, 21, 20, 19, 18, 15, 9, 10, 8, 7, 12, 13, 16, 17, 6, 5, 4, 3, 14, 11, 2, 1, 0);
@@ -1850,42 +1862,42 @@ DRIVER_INIT_MEMBER(expro02_state,expro02)
  *
  *************************************/
 
-GAME( 1990, galsnew,   0,        expro02,  expro02,   expro02_state, expro02, ROT90, "Kaneko",                   "Gals Panic (US, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galsnewa,  galsnew,  expro02,  galsnewa,  expro02_state, expro02, ROT90, "Kaneko",                   "Gals Panic (Export, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galsnewj,  galsnew,  expro02,  galsnewj,  expro02_state, expro02, ROT90, "Kaneko (Taito license)",   "Gals Panic (Japan, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galsnewk,  galsnew,  expro02,  galsnewj,  expro02_state, expro02, ROT90, "Kaneko (Inter license)",   "Gals Panic (Korea, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnew,   0,        expro02,  expro02,   expro02_state, init_expro02, ROT90, "Kaneko",                   "Gals Panic (US, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnewa,  galsnew,  expro02,  galsnewa,  expro02_state, init_expro02, ROT90, "Kaneko",                   "Gals Panic (Export, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnewj,  galsnew,  expro02,  galsnewj,  expro02_state, init_expro02, ROT90, "Kaneko (Taito license)",   "Gals Panic (Japan, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnewk,  galsnew,  expro02,  galsnewj,  expro02_state, init_expro02, ROT90, "Kaneko (Inter license)",   "Gals Panic (Korea, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 /* the first version of Fantasia clones the EXPRO02 almost exactly, including the encrypted tiles*/
-GAME( 1994, fantasia,  0,        comad,    fantasia,  expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fantasiab, fantasia, comad,    fantasia,  expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fantasiaa, fantasia, comad,    fantasia,  expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fantasia,  0,        comad,    fantasia,  expro02_state, init_expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fantasiab, fantasia, comad,    fantasia,  expro02_state, init_expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fantasiaa, fantasia, comad,    fantasia,  expro02_state, init_expro02, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* subsequent releases remove the encrypted tile (View2 layer) but leave the unused writes to it in the program code */
-GAME( 1994, fantasian,fantasia,  fantasia, fantasiaa, expro02_state, 0,       ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fantasian, fantasia, fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, supmodel, 0,         supmodel, fantasiaa, expro02_state, 0,       ROT90, "Comad & New Japan System", "Super Model",MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
+GAME( 1994, supmodel,  0,        supmodel, fantasiaa, expro02_state, empty_init,   ROT90, "Comad & New Japan System", "Super Model",MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 
-GAME( 1995, newfant,  0,         fantasia, fantasiaa, expro02_state, 0,       ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the only difference between the two is the gfx rom containing the copyright
-GAME( 1994, newfanta, newfant,   fantasia, fantasiaa, expro02_state, 0,       ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fantsy95, newfant,   fantasia, fantasiaa, expro02_state, 0,       ROT90, "Hi-max Technology Inc.",   "Fantasy '95", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
+GAME( 1995, newfant,   0,        fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the only difference between the two is the gfx rom containing the copyright
+GAME( 1994, newfanta,  newfant,  fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fantsy95,  newfant,  fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Hi-max Technology Inc.",   "Fantasy '95", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 
 // the PCB label (A/B) could be related to the 3 different levels of nudity Comad offered
-GAME( 1996, missw96,  0,         fantasia, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
-GAME( 1996, missw96a, missw96,   fantasia, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
-GAME( 1996, missw96b, missw96,   fantasia, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
-GAME( 1996, missw96c, missw96,   fantasia, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000B PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )        // "B" nudity level
+GAME( 1996, missw96,   0,        fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1996, missw96a,  missw96,  fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1996, missw96b,  missw96,  fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1996, missw96c,  missw96,  fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000B PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )        // "B" nudity level
 
-GAME( 1996, missmw96, missw96,   fantasia, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, missmw96,  missw96,  fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, smissw,   0,         smissw,   missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Super Miss World", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // 951127 PCB
+GAME( 1996, smissw,    0,        smissw,   missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Super Miss World", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // 951127 PCB
 
-GAME( 1997, fantsia2, 0,         fantsia2, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Fantasia II (Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // "A" nudity level
-GAME( 1997, fantsia2a,fantsia2,  fantsia2, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Fantasia II (Less Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
-GAME( 1998, fantsia2n,fantsia2,  fantsia2, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Fantasia II (1998)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )          // "A" nudity level
+GAME( 1997, fantsia2,  0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // "A" nudity level
+GAME( 1997, fantsia2a, fantsia2, fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (Less Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
+GAME( 1998, fantsia2n, fantsia2, fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (1998)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )          // "A" nudity level
 
-GAME( 2002, wownfant, 0,         fantsia2, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
-GAME( 2002, missw02,  0,         fantsia2, missw96,   expro02_state, 0,       ROT0,  "Daigom",                   "Miss World 2002", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )  // "A" nudity level
+GAME( 2002, wownfant,  0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
+GAME( 2002, missw02,   0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Daigom",                   "Miss World 2002", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )  // "A" nudity level
 
-GAME( 1996, pgalvip,  0,         galhustl, galhustl,  expro02_state, 0,       ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
-GAME( 1997, pgalvipa, pgalvip,   galhustl, galhustl,  expro02_state, 0,       ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, galhustl, pgalvip,   galhustl, galhustl,  expro02_state, 0,       ROT0,  "ACE International",        "Gals Hustler", MACHINE_SUPPORTS_SAVE ) // hack of the above?
+GAME( 1996, pgalvip,   0,        galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
+GAME( 1997, pgalvipa,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, galhustl,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International",        "Gals Hustler", MACHINE_SUPPORTS_SAVE ) // hack of the above?
 
-GAME( 1995, zipzap,   0,         zipzap,   zipzap,    expro02_state, 0,       ROT90, "Barko Corp",               "Zip & Zap", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, zipzap,    0,        zipzap,   zipzap,    expro02_state, empty_init,   ROT90, "Barko Corp",               "Zip & Zap", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

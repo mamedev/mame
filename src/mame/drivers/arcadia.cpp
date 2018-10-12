@@ -124,10 +124,11 @@ anything in hardware. No cartridge has been found which uses them.
 #include "softlist.h"
 #include "speaker.h"
 
-ADDRESS_MAP_START(arcadia_state::arcadia_mem)
-	AM_RANGE( 0x0000, 0x0fff) AM_DEVREAD("cartslot", arcadia_cart_slot_device, read_rom)
-	AM_RANGE( 0x1800, 0x1aff) AM_READWRITE(video_r, video_w)
-ADDRESS_MAP_END
+void arcadia_state::arcadia_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).r(m_cart, FUNC(arcadia_cart_slot_device::read_rom));
+	map(0x1800, 0x1aff).rw(FUNC(arcadia_state::video_r), FUNC(arcadia_state::video_w));
+}
 
 /* The Emerson Arcadia 2001 controllers have 2 fire buttons on the side,
    but actually they are wired to keypad button #2. The following definitions
@@ -408,7 +409,7 @@ static const gfx_layout arcadia_charlayout =
 	1*8
 };
 
-static GFXDECODE_START( arcadia )
+static GFXDECODE_START( gfx_arcadia )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, arcadia_charlayout, 0, 68 )
 GFXDECODE_END
 
@@ -463,18 +464,19 @@ void arcadia_state::machine_start()
 	}
 }
 
-static SLOT_INTERFACE_START(arcadia_cart)
-	SLOT_INTERFACE_INTERNAL("std",      ARCADIA_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("golf",     ARCADIA_ROM_GOLF)
-SLOT_INTERFACE_END
+static void arcadia_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",      ARCADIA_ROM_STD);
+	device.option_add_internal("golf",     ARCADIA_ROM_GOLF);
+}
 
 
 MACHINE_CONFIG_START(arcadia_state::arcadia)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
-	MCFG_CPU_PROGRAM_MAP(arcadia_mem)
-	MCFG_S2650_SENSE_INPUT(READLINE(arcadia_state, vsync_r))
-	MCFG_CPU_PERIODIC_INT_DRIVER(arcadia_state, video_line,  262*60)
+	MCFG_DEVICE_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(arcadia_mem)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, arcadia_state, vsync_r))
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(arcadia_state, video_line,  262*60)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -486,14 +488,14 @@ MACHINE_CONFIG_START(arcadia_state::arcadia)
 	MCFG_SCREEN_UPDATE_DRIVER(arcadia_state, screen_update_arcadia)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadia )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arcadia)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(arcadia_palette))
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(arcadia_state, arcadia)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_ARCADIA_SOUND_ADD("custom")
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("custom", ARCADIA_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
@@ -671,11 +673,10 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(arcadia_state,arcadia)
+void arcadia_state::init_arcadia()
 {
-	int i;
 	uint8_t *gfx=memregion("gfx1")->base();
-	for (i=0; i<256; i++) gfx[i]=i;
+	for (int i = 0; i < 256; i++) gfx[i]=i;
 #if 0
 	// this is here to allow developement of some simple testroutines
 	// for a real console
@@ -794,48 +795,47 @@ DRIVER_INIT_MEMBER(arcadia_state,arcadia)
 		// bxa causes trap
 		};
 #if 1
-		FILE *f;
-		f=fopen("chartest.bin","wb");
+		FILE *f = fopen("chartest.bin","wb");
 		fwrite(prog, ARRAY_LENGTH(prog), sizeof(prog[0]), f);
 		fclose(f);
 #endif
-		for (i=0; i<ARRAY_LENGTH(prog); i++) rom[i]=prog[i];
+		for (int i = 0; i < ARRAY_LENGTH(prog); i++) rom[i] = prog[i];
 
 	}
 #endif
 }
 
 
-/*   YEAR  NAME       PARENT     COMPAT    MACHINE       INPUT    STATE           INIT          COMPANY               FULLNAME */
-CONS(1983, advsnha,   arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Advision",           "Advision Home Arcade", MACHINE_IMPERFECT_SOUND )    /* France */
-CONS(1982, bndarc,    arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Bandai",             "Arcadia", MACHINE_IMPERFECT_SOUND )                 /* Japan */
-CONS(1982, arcadia,   0,         0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Emerson",            "Arcadia 2001", MACHINE_IMPERFECT_SOUND )            /* U.S.A. */
-CONS(198?, tccosmos,  arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Mobilar?",           "Tele-Computer Cosmos", MACHINE_IMPERFECT_SOUND )    /* Spain? I have only found pictures of a German Cosmos ( http://www.pong-picture-page.de/catalog/product_info.php?products_id=2170 ) */
-CONS(1982, dynavisn,  intmpt03,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Yamagiwa",           "Dynavision", MACHINE_IMPERFECT_SOUND )              /* Japan */
-CONS(1982, ekusera,   intmpt03,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "P.I.C",              "Ekusera", MACHINE_IMPERFECT_SOUND )                 /* Japan */
-CONS(1982, hanihac,   arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Hanimex",            "Hanimex Home Arcade Centre", MACHINE_IMPERFECT_SOUND )  /* UK */
-CONS(1982, hmg2650,   arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Hanimex",            "HMG-2650", MACHINE_IMPERFECT_SOUND )                 /* Germany */
-CONS(198?, intmpt03,  0,         arcadia,  arcadia,      arcadia, arcadia_state,  arcadia,      "Intelligent Game",   "Intelligent Game MPT-03", MACHINE_IMPERFECT_SOUND )  /* U.S.A */
-CONS(198?, ixl2000,   arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Intercord",          "Intercord XL 2000 System", MACHINE_IMPERFECT_SOUND ) /* Germany */
-CONS(198?, intervsn,  ormatu,    0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Intervision",        "Intervision 2001", MACHINE_IMPERFECT_SOUND )         /* Switzerland */
-CONS(198?, itmcmtp3,  intmpt03,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "ITMC",               "ITMC MPT-03", MACHINE_IMPERFECT_SOUND )              /* France */
-CONS(1982, lvision,   arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Leisure-Dynamics",   "Leisure-Vision", MACHINE_IMPERFECT_SOUND )           /* Canada */
-CONS(1982, leonardo,  arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "GiG Electronics",    "Leonardo", MACHINE_IMPERFECT_SOUND )                 /* Italy */
-CONS(1983, mratlus,   plldium,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "H.G.S.",             "Mr. Altus Tele Brain", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )    /* Germany */
-CONS(198?, ormatu,    0,         arcadia,  arcadia,      arcadia, arcadia_state,  arcadia,      "Ormatu Electronics", "Ormatu 2001", MACHINE_IMPERFECT_SOUND )              /* Netherlands */
-CONS(198?, plldium,   0,         arcadia,  arcadia,      plldium, arcadia_state,  arcadia,      "Neckermann",         "Palladium Video-Computer-Game", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )      /* Germany, 16 keys instead of 12 */
-CONS(1983, polyvcg,   plldium,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Polybrain",          "Polybrain Video Computer Game", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )      /* Germany */
-CONS(198?, poppympt,  intmpt03,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Transonic",          "Poppy MPT-03 Tele Computer Spiel", MACHINE_IMPERFECT_SOUND )           /* Germany */
-CONS(198?, prestmpt,  intmpt03,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Prestige",           "Prestige Video Computer Game MPT-03", MACHINE_IMPERFECT_SOUND )        /* France */
-CONS(198?, rowtrn2k,  intmpt03,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Rowtron",            "Rowtron 2000", MACHINE_IMPERFECT_SOUND )               /* UK */
-CONS(1982, tvg2000,   arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Schmid",             "Schmid TVG 2000", MACHINE_IMPERFECT_SOUND )            /* Germany */
-CONS(198?, sheenhvc,  ormatu,    0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Sheen",              "Sheen Home Video Centre 2001", MACHINE_IMPERFECT_SOUND )     /* Australia */
-CONS(198?, soundic,   intmpt03,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Soundic",            "Soundic MPT-03", MACHINE_IMPERFECT_SOUND )             /* Finland */
-CONS(198?, telefevr,  arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Tchibo",             "Tele-Fever", MACHINE_IMPERFECT_SOUND )                 /* Germany */
-CONS(198?, tempestm,  intmpt03,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Tempest",            "Tempest MPT-03", MACHINE_IMPERFECT_SOUND )             /* Australia */
-CONS(198?, tbbympt3,  intmpt03,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Tobby",              "Tobby MPT-03", MACHINE_IMPERFECT_SOUND )               /* ? */
-CONS(198?, trakcvg,   plldium,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Trakton",            "Trakton Computer Video Game", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )      /* Australia */
-CONS(1982, tunixha,   arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Monaco Leisure",     "Tunix Home Arcade", MACHINE_IMPERFECT_SOUND )          /* New Zealand */
-CONS(198?, tryomvgc,  intmpt03,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Tryom",              "Tryom Video Game Center", MACHINE_IMPERFECT_SOUND )    /* U.S.A */
-CONS(198?, orbituvi,  0,         arcadia,  arcadia,      arcadia, arcadia_state,  arcadia,      "Orbit Electronics",  "UVI Compu-Game", MACHINE_IMPERFECT_SOUND )             /* New Zealand */
-CONS(198?, vdmaster,  orbituvi,  0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Grandstand",         "Video Master", MACHINE_IMPERFECT_SOUND )               /* New Zealand */
+/*   YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT    CLASS          INIT          COMPANY               FULLNAME */
+CONS(1983, advsnha,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Advision",           "Advision Home Arcade", MACHINE_IMPERFECT_SOUND )    /* France */
+CONS(1982, bndarc,   arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Bandai",             "Arcadia", MACHINE_IMPERFECT_SOUND )                 /* Japan */
+CONS(1982, arcadia,  0,        0,        arcadia, arcadia, arcadia_state, init_arcadia, "Emerson",            "Arcadia 2001", MACHINE_IMPERFECT_SOUND )            /* U.S.A. */
+CONS(198?, tccosmos, arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Mobilar?",           "Tele-Computer Cosmos", MACHINE_IMPERFECT_SOUND )    /* Spain? I have only found pictures of a German Cosmos ( http://www.pong-picture-page.de/catalog/product_info.php?products_id=2170 ) */
+CONS(1982, dynavisn, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Yamagiwa",           "Dynavision", MACHINE_IMPERFECT_SOUND )              /* Japan */
+CONS(1982, ekusera,  intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "P.I.C",              "Ekusera", MACHINE_IMPERFECT_SOUND )                 /* Japan */
+CONS(1982, hanihac,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Hanimex",            "Hanimex Home Arcade Centre", MACHINE_IMPERFECT_SOUND )  /* UK */
+CONS(1982, hmg2650,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Hanimex",            "HMG-2650", MACHINE_IMPERFECT_SOUND )                 /* Germany */
+CONS(198?, intmpt03, 0,        arcadia,  arcadia, arcadia, arcadia_state, init_arcadia, "Intelligent Game",   "Intelligent Game MPT-03", MACHINE_IMPERFECT_SOUND )  /* U.S.A */
+CONS(198?, ixl2000,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Intercord",          "Intercord XL 2000 System", MACHINE_IMPERFECT_SOUND ) /* Germany */
+CONS(198?, intervsn, ormatu,   0,        arcadia, arcadia, arcadia_state, init_arcadia, "Intervision",        "Intervision 2001", MACHINE_IMPERFECT_SOUND )         /* Switzerland */
+CONS(198?, itmcmtp3, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "ITMC",               "ITMC MPT-03", MACHINE_IMPERFECT_SOUND )              /* France */
+CONS(1982, lvision,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Leisure-Dynamics",   "Leisure-Vision", MACHINE_IMPERFECT_SOUND )           /* Canada */
+CONS(1982, leonardo, arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "GiG Electronics",    "Leonardo", MACHINE_IMPERFECT_SOUND )                 /* Italy */
+CONS(1983, mratlus,  plldium,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "H.G.S.",             "Mr. Altus Tele Brain", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )    /* Germany */
+CONS(198?, ormatu,   0,        arcadia,  arcadia, arcadia, arcadia_state, init_arcadia, "Ormatu Electronics", "Ormatu 2001", MACHINE_IMPERFECT_SOUND )              /* Netherlands */
+CONS(198?, plldium,  0,        arcadia,  arcadia, plldium, arcadia_state, init_arcadia, "Neckermann",         "Palladium Video-Computer-Game", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )      /* Germany, 16 keys instead of 12 */
+CONS(1983, polyvcg,  plldium,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Polybrain",          "Polybrain Video Computer Game", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )      /* Germany */
+CONS(198?, poppympt, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Transonic",          "Poppy MPT-03 Tele Computer Spiel", MACHINE_IMPERFECT_SOUND )           /* Germany */
+CONS(198?, prestmpt, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Prestige",           "Prestige Video Computer Game MPT-03", MACHINE_IMPERFECT_SOUND )        /* France */
+CONS(198?, rowtrn2k, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Rowtron",            "Rowtron 2000", MACHINE_IMPERFECT_SOUND )               /* UK */
+CONS(1982, tvg2000,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Schmid",             "Schmid TVG 2000", MACHINE_IMPERFECT_SOUND )            /* Germany */
+CONS(198?, sheenhvc, ormatu,   0,        arcadia, arcadia, arcadia_state, init_arcadia, "Sheen",              "Sheen Home Video Centre 2001", MACHINE_IMPERFECT_SOUND )     /* Australia */
+CONS(198?, soundic,  intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Soundic",            "Soundic MPT-03", MACHINE_IMPERFECT_SOUND )             /* Finland */
+CONS(198?, telefevr, arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Tchibo",             "Tele-Fever", MACHINE_IMPERFECT_SOUND )                 /* Germany */
+CONS(198?, tempestm, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Tempest",            "Tempest MPT-03", MACHINE_IMPERFECT_SOUND )             /* Australia */
+CONS(198?, tbbympt3, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Tobby",              "Tobby MPT-03", MACHINE_IMPERFECT_SOUND )               /* ? */
+CONS(198?, trakcvg,  plldium,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Trakton",            "Trakton Computer Video Game", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )      /* Australia */
+CONS(1982, tunixha,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Monaco Leisure",     "Tunix Home Arcade", MACHINE_IMPERFECT_SOUND )          /* New Zealand */
+CONS(198?, tryomvgc, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Tryom",              "Tryom Video Game Center", MACHINE_IMPERFECT_SOUND )    /* U.S.A */
+CONS(198?, orbituvi, 0,        arcadia,  arcadia, arcadia, arcadia_state, init_arcadia, "Orbit Electronics",  "UVI Compu-Game", MACHINE_IMPERFECT_SOUND )             /* New Zealand */
+CONS(198?, vdmaster, orbituvi, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Grandstand",         "Video Master", MACHINE_IMPERFECT_SOUND )               /* New Zealand */

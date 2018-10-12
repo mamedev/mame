@@ -31,15 +31,16 @@ public:
 	void clowndwn_map(address_map &map);
 };
 
-ADDRESS_MAP_START(clowndwn_state::clowndwn_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4100, 0x4103) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x4200, 0x4203) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x4400, 0x4403) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("pia3", pia6821_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia4", pia6821_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void clowndwn_state::clowndwn_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x4100, 0x4103).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4200, 0x4203).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4400, 0x4403).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4800, 0x4803).rw("pia3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x5000, 0x5003).rw("pia4", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xe000, 0xffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START( clowndwn )
 INPUT_PORTS_END
@@ -58,8 +59,8 @@ void clowndwn_state::machine_reset()
 MACHINE_CONFIG_START(clowndwn_state::clowndwn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 8000000) // unknown type and clock
-	MCFG_CPU_PROGRAM_MAP(clowndwn_map)
+	MCFG_DEVICE_ADD("maincpu", M6802, 8000000) // unknown type and clock
+	MCFG_DEVICE_PROGRAM_MAP(clowndwn_map)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
@@ -68,7 +69,7 @@ MACHINE_CONFIG_START(clowndwn_state::clowndwn)
 	MCFG_DEVICE_ADD("pia4", PIA6821, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 
@@ -78,8 +79,8 @@ MACHINE_CONFIG_END
 
 ROM_START( clowndwn )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "CLWNROLL.Z8", 0x0000, 0x1000, CRC(ec655745) SHA1(e38de904f30530f8971eb4a9d7796da345bf81ad) )
-	ROM_LOAD( "CLWNROLL.Z9", 0x1000, 0x1000, CRC(aeef885e) SHA1(bc6805b638625a347e1288a927ce30e030afe9e3) )
+	ROM_LOAD( "clwnroll.z8", 0x0000, 0x1000, CRC(ec655745) SHA1(e38de904f30530f8971eb4a9d7796da345bf81ad) )
+	ROM_LOAD( "clwnroll.z9", 0x1000, 0x1000, CRC(aeef885e) SHA1(bc6805b638625a347e1288a927ce30e030afe9e3) )
 ROM_END
 
-GAME( 1987, clowndwn,  0,    clowndwn, clowndwn, clowndwn_state,  0, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, clowndwn, 0, clowndwn, clowndwn, clowndwn_state, empty_init, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )

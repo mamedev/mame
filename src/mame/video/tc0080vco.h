@@ -34,11 +34,11 @@ public:
 	uint16_t scrram_r(int offset);
 	DECLARE_WRITE16_MEMBER( scrollram_w );
 	READ_LINE_MEMBER( flipscreen_r );
-	void postload();
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state
@@ -97,6 +97,6 @@ DECLARE_DEVICE_TYPE(TC0080VCO, tc0080vco_device)
 	downcast<tc0080vco_device &>(*device).set_bgflip_yoffs(_offs);
 
 #define MCFG_TC0080VCO_GFXDECODE(_gfxtag) \
-	downcast<tc0080vco_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<tc0080vco_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_TC0080VCO_H

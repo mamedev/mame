@@ -27,7 +27,7 @@
 	MCFG_DEVICE_ADD(_tag, PIONEER_LDV1000, 0)
 
 #define MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(_cb) \
-	devcb = &downcast<pioneer_ldv1000_device *>(device)->set_command_strobe_callback(DEVCB_##_cb);
+	downcast<pioneer_ldv1000_device *>(device)->set_command_strobe_callback(DEVCB_##_cb);
 
 
 

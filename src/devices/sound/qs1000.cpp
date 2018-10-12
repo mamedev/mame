@@ -137,15 +137,17 @@ DEFINE_DEVICE_TYPE(QS1000, qs1000_device, "qs1000", "QS1000")
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-ADDRESS_MAP_START(qs1000_device::qs1000_prg_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void qs1000_device::qs1000_prg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 
-ADDRESS_MAP_START(qs1000_device::qs1000_io_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0200, 0x0211) AM_WRITE(wave_w)
-ADDRESS_MAP_END
+void qs1000_device::qs1000_io_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x0200, 0x0211).w(FUNC(qs1000_device::wave_w));
+}
 
 
 // ROM definition for the QS1000 internal program ROM
@@ -194,16 +196,16 @@ const tiny_rom_entry *qs1000_device::device_rom_region() const
 //  device_add_mconfig - add machine configuration
 //-------------------------------------------------
 MACHINE_CONFIG_START(qs1000_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", I8052, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(qs1000_prg_map)
-	MCFG_CPU_IO_MAP(qs1000_io_map)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(qs1000_device, p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(qs1000_device, p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(qs1000_device, p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(qs1000_device, p2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(qs1000_device, p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(qs1000_device, p3_w))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(qs1000_device, data_to_i8052))
+	MCFG_DEVICE_ADD("cpu", I8052, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(qs1000_prg_map)
+	MCFG_DEVICE_IO_MAP(qs1000_io_map)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, qs1000_device, p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, qs1000_device, p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, qs1000_device, p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, qs1000_device, p2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, qs1000_device, p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, qs1000_device, p3_w))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, qs1000_device, data_to_i8052))
 MACHINE_CONFIG_END
 
 

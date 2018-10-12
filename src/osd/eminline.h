@@ -273,6 +273,7 @@ inline float recip_approx(float value)
 #ifndef count_leading_zeros
 inline uint8_t count_leading_zeros(uint32_t val)
 {
+	if (!val) return 32U;
 	uint8_t count;
 	for (count = 0; int32_t(val) >= 0; count++) val <<= 1;
 	return count;
@@ -289,7 +290,7 @@ inline uint8_t count_leading_zeros(uint32_t val)
 inline uint8_t count_leading_ones(uint32_t val)
 {
 	uint8_t count;
-	for (count = 0; (int32_t)val < 0; count++) val <<= 1;
+	for (count = 0; int32_t(val) < 0; count++) val <<= 1;
 	return count;
 }
 #endif

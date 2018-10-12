@@ -201,18 +201,20 @@ READ16_MEMBER( sns_pfest94_device::necdsp_data_r )
 //  ADDRESS_MAP( dsp_prg_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(sns_pfest94_device::dsp_prg_map_lorom)
-	AM_RANGE(0x0000, 0x07ff) AM_READ(necdsp_prg_r)
-ADDRESS_MAP_END
+void sns_pfest94_device::dsp_prg_map_lorom(address_map &map)
+{
+	map(0x0000, 0x07ff).r(FUNC(sns_pfest94_device::necdsp_prg_r));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( dsp_data_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(sns_pfest94_device::dsp_data_map_lorom)
-	AM_RANGE(0x0000, 0x03ff) AM_READ(necdsp_data_r)
-ADDRESS_MAP_END
+void sns_pfest94_device::dsp_data_map_lorom(address_map &map)
+{
+	map(0x0000, 0x03ff).r(FUNC(sns_pfest94_device::necdsp_data_r));
+}
 
 
 //-------------------------------------------------
@@ -220,9 +222,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sns_pfest94_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
-	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

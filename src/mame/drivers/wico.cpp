@@ -27,6 +27,8 @@
     The game has 2 balls, for multiball feature, so the outhole doesn't
     work because it thinks the 2nd ball is in play somewhere.
 
+    To activate the end-of-ball, hold down X then hold down num-9.
+
 
 ToDo:
 - Add outhole/saucer sound
@@ -55,8 +57,12 @@ public:
 		, m_ccpu(*this, "ccpu")
 		, m_hcpu(*this, "hcpu")
 		, m_shared_ram(*this, "sharedram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void wico(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(lampst_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(muxen_w);
@@ -70,10 +76,9 @@ public:
 	DECLARE_READ8_MEMBER(gentmrcl_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
-	void wico(machine_config &config);
 	void ccpu_map(address_map &map);
 	void hcpu_map(address_map &map);
-private:
+
 	bool m_zcen;
 	bool m_gten;
 	bool m_disp_on;
@@ -81,56 +86,60 @@ private:
 	uint8_t m_firqtimer;
 	uint8_t m_diag_segments;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_ccpu;
 	required_device<cpu_device> m_hcpu;
 	required_shared_ptr<uint8_t> m_shared_ram;
+	output_finder<48> m_digits;
 };
 
 // housekeeping cpu
-ADDRESS_MAP_START(wico_state::hcpu_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w)
+void wico_state::hcpu_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("sharedram");
+	map(0x1fe0, 0x1fe0).w(FUNC(wico_state::muxld_w));
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w)
-	AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w)
+	map(0x1fe2, 0x1fe2).w(FUNC(wico_state::muxen_w));
 	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w)
-	AM_RANGE(0x1fe4, 0x1fe4) AM_NOP
-	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_device, write)
-	AM_RANGE(0x1fe6, 0x1fe6) AM_WRITE(wdogcl_w)
-	AM_RANGE(0x1fe7, 0x1fe7) AM_WRITE(zcres_w)
-	AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w)
-	AM_RANGE(0x1fe9, 0x1fe9) AM_WRITE(dled1_w)
-	AM_RANGE(0x1fea, 0x1fea) AM_READ(gentmrcl_r)
-	AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r)
+	map(0x1fe4, 0x1fe4).noprw();
+	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::command_w));
+	map(0x1fe6, 0x1fe6).w(FUNC(wico_state::wdogcl_w));
+	map(0x1fe7, 0x1fe7).w(FUNC(wico_state::zcres_w));
+	map(0x1fe8, 0x1fe8).w(FUNC(wico_state::dled0_w));
+	map(0x1fe9, 0x1fe9).w(FUNC(wico_state::dled1_w));
+	map(0x1fea, 0x1fea).r(FUNC(wico_state::gentmrcl_r));
+	map(0x1feb, 0x1feb).r(FUNC(wico_state::lampst_r));
 	//AM_RANGE(0x1fec, 0x1fec) AM_READ(sast_r)
 	//AM_RANGE(0x1fed, 0x1fed) AM_READ(solst1_r)
 	//AM_RANGE(0x1fee, 0x1fee) AM_READ(solst0_r)
-	AM_RANGE(0x1fef, 0x1fef) AM_READ(switch_r)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x1fef, 0x1fef).r(FUNC(wico_state::switch_r));
+	map(0xf000, 0xffff).rom();
+}
 
 // command cpu
-ADDRESS_MAP_START(wico_state::ccpu_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram") // 2128  2k RAM
+void wico_state::ccpu_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("sharedram"); // 2128  2k RAM
 	//AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w) // to display module
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w) // enable save to nvram
-	AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w) // digit to display on diagnostic LED; d0=L will disable main displays
-	AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w) // solenoid column
-	AM_RANGE(0x1fe4, 0x1fe4) AM_WRITE(msols_w) // solenoid row
-	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_device, write)
-	AM_RANGE(0x1fe6, 0x1fe6) AM_WRITE(wdogcl_w) // watchdog clear
-	AM_RANGE(0x1fe7, 0x1fe7) AM_WRITE(zcres_w) // enable IRQ on hcpu
-	AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w) // turn off diagnostic LED
-	AM_RANGE(0x1fe9, 0x1fe9) AM_WRITE(dled1_w) // turn on diagnostic LED
-	AM_RANGE(0x1fea, 0x1fea) AM_READ(gentmrcl_r) // enable IRQ on ccpu
+	map(0x1fe2, 0x1fe2).w(FUNC(wico_state::muxen_w)); // digit to display on diagnostic LED; d0=L will disable main displays
+	map(0x1fe3, 0x1fe3).w(FUNC(wico_state::csols_w)); // solenoid column
+	map(0x1fe4, 0x1fe4).w(FUNC(wico_state::msols_w)); // solenoid row
+	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::command_w));
+	map(0x1fe6, 0x1fe6).w(FUNC(wico_state::wdogcl_w)); // watchdog clear
+	map(0x1fe7, 0x1fe7).w(FUNC(wico_state::zcres_w)); // enable IRQ on hcpu
+	map(0x1fe8, 0x1fe8).w(FUNC(wico_state::dled0_w)); // turn off diagnostic LED
+	map(0x1fe9, 0x1fe9).w(FUNC(wico_state::dled1_w)); // turn on diagnostic LED
+	map(0x1fea, 0x1fea).r(FUNC(wico_state::gentmrcl_r)); // enable IRQ on ccpu
 	//AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r) // lamps?
 	//AM_RANGE(0x1fec, 0x1fec) AM_READ(sast_r) // a pwron pulse to d0 L->H
 	//AM_RANGE(0x1fed, 0x1fed) AM_READ(solst1_r) // switches
 	//AM_RANGE(0x1fee, 0x1fee) AM_READ(solst0_r) // switches
 	//AM_RANGE(0x1fef, 0x1fef) AM_READ(switch_r) // switches
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram") // X2212 4bit x 256 NVRAM, stores only when store_w is active
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x4000, 0x40ff).ram().share("nvram"); // X2212 4bit x 256 NVRAM, stores only when store_w is active
+	map(0x8000, 0x9fff).rom();
+	map(0xe000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( wico )
 	PORT_START("X0")
@@ -309,14 +318,14 @@ INPUT_PORTS_END
 WRITE8_MEMBER( wico_state::dled0_w )
 {
 	m_diag_on = 0;
-	output().set_digit_value(9, 0);
+	m_digits[9] = 0;
 }
 
 // diagnostic display on
 WRITE8_MEMBER( wico_state::dled1_w )
 {
 	m_diag_on = 1;
-	output().set_digit_value(9, m_diag_segments);
+	m_digits[9] = m_diag_segments;
 }
 
 WRITE8_MEMBER( wico_state::csols_w )
@@ -335,9 +344,9 @@ WRITE8_MEMBER( wico_state::muxen_w )
 	m_diag_segments = patterns[data>>4];
 
 	if (m_diag_on)
-		output().set_digit_value(9, m_diag_segments);
+		m_digits[9] = m_diag_segments;
 	else
-		output().set_digit_value(9, 0);
+		m_digits[9] = 0;
 
 	m_disp_on = BIT(data, 0);
 }
@@ -388,7 +397,7 @@ READ8_MEMBER( wico_state::lampst_r )
 			j = m_shared_ram[0x7f9 + i];
 		else
 			j = 0;
-		output().set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), bitswap<16>(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
+		m_digits[i * 10 + (m_shared_ram[0x96] & 7)] = bitswap<16>(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
 	}
 	return 0xff;
 }
@@ -433,21 +442,21 @@ void wico_state::machine_reset()
 
 MACHINE_CONFIG_START(wico_state::wico)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("ccpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U51
-	MCFG_CPU_PROGRAM_MAP(ccpu_map)
-	MCFG_CPU_ADD("hcpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U24
-	MCFG_CPU_PROGRAM_MAP(hcpu_map)
+	MCFG_DEVICE_ADD("ccpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U51
+	MCFG_DEVICE_PROGRAM_MAP(ccpu_map)
+	MCFG_DEVICE_ADD("hcpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U24
+	MCFG_DEVICE_PROGRAM_MAP(hcpu_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", wico_state, irq_housekeeping, attotime::from_hz(120)) // zero crossing
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq", wico_state, firq_housekeeping, attotime::from_hz(750)) // time generator
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_wico)
+	config.set_default_layout(layout_wico);
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76494", SN76494, XTAL(10'000'000) / 64)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sn76494", SN76494, XTAL(10'000'000) / 64)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -467,4 +476,4 @@ ROM_END
 / Big Top  (1977)
 /-------------------------------------------------------------------*/
 
-GAME(1984,  aftor,  0,  wico,  wico, wico_state,  0,  ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1984,  aftor,  0,  wico,  wico, wico_state, empty_init, ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

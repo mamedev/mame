@@ -220,6 +220,7 @@ U145        1Brown          PAL14H4CN
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -227,15 +228,17 @@ U145        1Brown          PAL14H4CN
 class smsmfg_state : public driver_device
 {
 public:
-	smsmfg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	smsmfg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	uint8_t m_communication_port[4];
-	uint8_t m_communication_port_status;
-	bitmap_ind16 m_bitmap;
-	uint8_t m_vid_regs[7];
+	void sureshot(machine_config &config);
+	void sms(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(link_r);
 	DECLARE_WRITE8_MEMBER(link_w);
@@ -246,18 +249,23 @@ public:
 	DECLARE_READ8_MEMBER(ppi0_c_r);
 	DECLARE_WRITE8_MEMBER(ppi0_a_w);
 	DECLARE_WRITE8_MEMBER(ppi0_b_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_MACHINE_START(sureshot);
 	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	void sureshot(machine_config &config);
-	void sms(machine_config &config);
 	void sms_map(address_map &map);
 	void sub_map(address_map &map);
 	void sureshot_map(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	uint8_t m_communication_port[4];
+	uint8_t m_communication_port_status;
+	bitmap_ind16 m_bitmap;
+	uint8_t m_vid_regs[7];
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	output_finder<10> m_lamps;
 };
 
 
@@ -409,20 +417,20 @@ READ8_MEMBER(smsmfg_state::ppi0_c_r)
 WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
-	output().set_lamp_value(0, !BIT(data,7)); /* Display Light 1 */
-	output().set_lamp_value(1, !BIT(data,6)); /* Display Light 2 */
-	output().set_lamp_value(2, !BIT(data,5)); /* Display Light 3 */
-	output().set_lamp_value(3, !BIT(data,4)); /* Display Light 4 */
-	output().set_lamp_value(4, !BIT(data,3)); /* Display Light 5 */
-	output().set_lamp_value(5, !BIT(data,2)); /* Bet Light */
-	output().set_lamp_value(6, !BIT(data,1)); /* Deal Light */
-	output().set_lamp_value(7, !BIT(data,0)); /* Draw Light */
+	m_lamps[0] = BIT(~data, 7); /* Display Light 1 */
+	m_lamps[1] = BIT(~data, 6); /* Display Light 2 */
+	m_lamps[2] = BIT(~data, 5); /* Display Light 3 */
+	m_lamps[3] = BIT(~data, 4); /* Display Light 4 */
+	m_lamps[4] = BIT(~data, 3); /* Display Light 5 */
+	m_lamps[5] = BIT(~data, 2); /* Bet Light */
+	m_lamps[6] = BIT(~data, 1); /* Deal Light */
+	m_lamps[7] = BIT(~data, 0); /* Draw Light */
 }
 
 WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
 {
-	output().set_lamp_value(8, !BIT(data,7)); /* Stand Light */
-	output().set_lamp_value(9, !BIT(data,6)); /* Cancel Light */
+	m_lamps[8] = BIT(~data, 7); /* Stand Light */
+	m_lamps[9] = BIT(~data, 6); /* Cancel Light */
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data,1));
 	machine().bookkeeping().coin_lockout_w(0, BIT(data,5));
@@ -484,34 +492,37 @@ uint32_t smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bi
  *
  *************************************/
 
-ADDRESS_MAP_START(smsmfg_state::sms_map)
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x01000, 0x01007) AM_WRITE(video_w)
-	AM_RANGE(0x01800, 0x01803) AM_READWRITE(link_r, link_w)
-	AM_RANGE(0x04000, 0x07fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x04000, 0x04000) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x08000, 0x0ffff) AM_ROM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
-ADDRESS_MAP_END
+void smsmfg_state::sms_map(address_map &map)
+{
+	map(0x00000, 0x007ff).ram().share("nvram");
+	map(0x00800, 0x00803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x01000, 0x01007).w(FUNC(smsmfg_state::video_w));
+	map(0x01800, 0x01803).rw(FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
+	map(0x04000, 0x07fff).bankr("bank1");
+	map(0x04000, 0x04000).w(FUNC(smsmfg_state::bankswitch_w));
+	map(0x08000, 0x0ffff).rom();
+	map(0xf8000, 0xfffff).rom(); // mirror for vectors
+}
 
-ADDRESS_MAP_START(smsmfg_state::sureshot_map)
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x02000, 0x02007) AM_WRITE(video_w)
-	AM_RANGE(0x03000, 0x03003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x03800, 0x03803) AM_READWRITE(link_r, link_w)
-	AM_RANGE(0x08000, 0x0ffff) AM_ROM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
-ADDRESS_MAP_END
+void smsmfg_state::sureshot_map(address_map &map)
+{
+	map(0x00000, 0x007ff).ram().share("nvram");
+	map(0x02000, 0x02007).w(FUNC(smsmfg_state::video_w));
+	map(0x03000, 0x03003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x03800, 0x03803).rw(FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
+	map(0x08000, 0x0ffff).rom();
+	map(0xf8000, 0xfffff).rom(); // mirror for vectors
+}
 
-ADDRESS_MAP_START(smsmfg_state::sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x3100, 0x3103) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x3381, 0x3382) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x3400, 0x3400) AM_READ(z80_8088_r)
-	AM_RANGE(0x3500, 0x3501) AM_READWRITE(p03_r, p03_w)
-ADDRESS_MAP_END
+void smsmfg_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x3100, 0x3103).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x3381, 0x3382).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x3400, 0x3400).r(FUNC(smsmfg_state::z80_8088_r));
+	map(0x3500, 0x3501).rw(FUNC(smsmfg_state::p03_r), FUNC(smsmfg_state::p03_w));
+}
 
 /*************************************
  *
@@ -521,6 +532,7 @@ ADDRESS_MAP_END
 
 void smsmfg_state::machine_start()
 {
+	m_lamps.resolve();
 	membank("bank1")->configure_entries(0, 16, memregion("questions")->base(), 0x4000);
 
 	save_item(NAME(m_communication_port_status));
@@ -529,6 +541,7 @@ void smsmfg_state::machine_start()
 
 MACHINE_START_MEMBER(smsmfg_state,sureshot)
 {
+	m_lamps.resolve();
 	save_item(NAME(m_communication_port_status));
 	save_item(NAME(m_communication_port));
 }
@@ -539,25 +552,25 @@ void smsmfg_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(smsmfg_state::sms)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sms_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sms_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(smsmfg_state, ppi0_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(smsmfg_state, ppi0_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(smsmfg_state, ppi0_c_r))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.out_pa_callback().set(FUNC(smsmfg_state::ppi0_a_w));
+	ppi0.out_pb_callback().set(FUNC(smsmfg_state::ppi0_b_w));
+	ppi0.in_pc_callback().set(FUNC(smsmfg_state::ppi0_c_r));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("IN0");
+	ppi1.in_pb_callback().set_ioport("IN1");
+	ppi1.in_pc_callback().set_ioport("IN2");
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -571,17 +584,17 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(16'000'000)/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(16'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(smsmfg_state::sureshot)
 	sms(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sureshot_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sureshot_map)
 
 	MCFG_MACHINE_START_OVERRIDE(smsmfg_state,sureshot)
 MACHINE_CONFIG_END
@@ -937,16 +950,16 @@ ROM_START( secondch )
 	ROM_LOAD( "u18.18", 0xfa000, 0x02000, CRC(941a1401) SHA1(92934d40bb256e18b996582c1af253d06732462f) )
 	ROM_LOAD( "u17.17", 0xfc000, 0x02000, CRC(88717e9f) SHA1(01b78f3ddd78e74e799d5f8ffe2f3cbcf5e6b7a2) )
 	ROM_LOAD( "u16.16", 0xfe000, 0x02000, CRC(6c9a0224) SHA1(01152024b48461c3b9ac63a9265129dabacd0462) )
-	ROM_COPY( "maincpu",  0xf8000, 0x08000, 0x8000 )
+	ROM_COPY( "maincpu",0xf8000, 0x08000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "#26.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
-	ROM_RELOAD(           0x1000, 0x1000 )
+	ROM_LOAD( "@26.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+	ROM_RELOAD(         0x1000, 0x1000 )
 ROM_END
 
-GAME( 1984, trvhang,  0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
-GAME( 1984, trvhanga, 0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)",   MACHINE_NOT_WORKING ) /* Version Trivia-2-011586 */
-GAME( 1984, sms4in1,  0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "4-in-1",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, smsjoker, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sureshot, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, secondch, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Second Chance",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvhang,  0, sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
+GAME( 1984, trvhanga, 0, sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)",   MACHINE_NOT_WORKING ) /* Version Trivia-2-011586 */
+GAME( 1984, sms4in1,  0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, smsjoker, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sureshot, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, secondch, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Second Chance",                    MACHINE_SUPPORTS_SAVE )

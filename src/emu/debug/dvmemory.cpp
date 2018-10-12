@@ -14,7 +14,9 @@
 #include "debugcpu.h"
 #include "debugger.h"
 
+#include <algorithm>
 #include <ctype.h>
+#include <tuple>
 
 
 //**************************************************************************
@@ -153,24 +155,26 @@ void debug_view_memory::enumerate_sources()
 		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region.second.get())));
 	}
 
-	// finally add all global array symbols
-	for (int itemnum = 0; itemnum < 10000; itemnum++)
+	// finally add all global array symbols in alphabetical order
+	std::vector<std::tuple<std::string, void *, u32, u32> > itemnames;
+	itemnames.reserve(machine().save().registration_count());
+
+	for (int itemnum = 0; itemnum < machine().save().registration_count(); itemnum++)
 	{
-		// stop when we run out of items
 		u32 valsize, valcount;
 		void *base;
-		const char *itemname = machine().save().indexed_item(itemnum, base, valsize, valcount);
-		if (itemname == nullptr)
-			break;
+		std::string name_string(machine().save().indexed_item(itemnum, base, valsize, valcount));
 
 		// add pretty much anything that's not a timer (we may wish to cull other items later)
 		// also, don't trim the front of the name, it's important to know which VIA6522 we're looking at, e.g.
-		if (strncmp(itemname, "timer/", 6))
-		{
-			name.assign(itemname);
-			m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), base, valsize, valcount)));
-		}
+		if (strncmp(name_string.c_str(), "timer/", 6))
+			itemnames.emplace_back(std::move(name_string), base, valsize, valcount);
 	}
+
+	std::sort(itemnames.begin(), itemnames.end(), [] (auto const &x, auto const &y) { return std::get<0>(x) < std::get<0>(y); });
+
+	for (auto const &item : itemnames)
+		m_source_list.append(*global_alloc(debug_view_memory_source(std::get<0>(item).c_str(), std::get<1>(item), std::get<2>(item), std::get<3>(item))));
 
 	// reset the source to a known good entry
 	set_source(*m_source_list.first());
@@ -460,14 +464,16 @@ void debug_view_memory::view_char(int chval)
 			if (hexchar == nullptr)
 				break;
 
+			const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
+			offs_t address = (source.m_space != nullptr) ? source.m_space->byte_to_address(pos.m_address) : pos.m_address;
 			u64 data;
-			bool ismapped = read(m_bytes_per_chunk, pos.m_address, data);
+			bool ismapped = read(m_bytes_per_chunk, address, data);
 			if (!ismapped)
 				break;
 
 			data &= ~(u64(0x0f) << pos.m_shift);
 			data |= u64(hexchar - hexvals) << pos.m_shift;
-			write(m_bytes_per_chunk, pos.m_address, data);
+			write(m_bytes_per_chunk, address, data);
 			// fall through to the right-arrow press
 		}
 
@@ -540,14 +546,16 @@ void debug_view_memory::recompute()
 
 	// determine the maximum address and address format string from the raw information
 	int addrchars;
+	u64 maxbyte;
 	if (source.m_space != nullptr)
 	{
 		m_maxaddr = m_no_translation ? source.m_space->addrmask() : source.m_space->logaddrmask();
+		maxbyte = source.m_space->address_to_byte_end(m_maxaddr);
 		addrchars = m_no_translation ? source.m_space->addrchars() : source.m_space->logaddrchars();
 	}
 	else
 	{
-		m_maxaddr = source.m_length - 1;
+		maxbyte = m_maxaddr = source.m_length - 1;
 		addrchars = string_format("%X", m_maxaddr).size();
 	}
 
@@ -607,7 +615,7 @@ void debug_view_memory::recompute()
 	}
 
 	// derive total sizes from that
-	m_total.y = (u64(m_maxaddr) - u64(m_byte_offset) + u64(m_bytes_per_row) /*- 1*/) / m_bytes_per_row;
+	m_total.y = (maxbyte - u64(m_byte_offset) + u64(m_bytes_per_row) /*- 1*/) / m_bytes_per_row;
 
 	// reset the current cursor position
 	set_cursor_pos(pos);
@@ -629,19 +637,13 @@ bool debug_view_memory::needs_recompute()
 		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 		offs_t val = m_expression.value();
 		if (source.m_space)
-			val = source.m_space->address_to_byte(val);
+			val = source.m_space->address_to_byte(val & (m_no_translation ? source.m_space->addrmask() : source.m_space->logaddrmask()));
 		recompute = true;
-		m_topleft.y = (val - m_byte_offset) / m_bytes_per_row;
-		m_topleft.y = std::max(m_topleft.y, 0);
-		m_topleft.y = std::min(m_topleft.y, m_total.y - 1);
 
-		offs_t resultbyte;
-		if (source.m_space != nullptr)
-			resultbyte = val & source.m_space->logaddrmask();
-		else
-			resultbyte = val;
+		m_byte_offset = val % m_bytes_per_row;
+		m_topleft.y = std::min(s32(val / m_bytes_per_row), m_total.y - 1);
 
-		set_cursor_pos(cursor_pos(resultbyte, m_bytes_per_chunk * 8 - 4));
+		set_cursor_pos(cursor_pos(val, m_bytes_per_chunk * 8 - 4));
 	}
 
 	// expression is clean at this point, and future recomputation is not necessary

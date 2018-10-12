@@ -1,30 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/**************************\
-*
-*   SunPlus u'nSP disassembler
-*
-*    by Ryan Holtz
-*
-\**************************/
+/*****************************************************************************
+
+	SunPlus micro'nSP disassembler
+
+*****************************************************************************/
 
 #include "emu.h"
 #include "unspdasm.h"
 
-/*****************************************************************************/
-
-const char *unsp_disassembler::reg[] =
+char const *const unsp_disassembler::reg[] =
 {
 	"sp", "r1", "r2", "r3", "r4", "bp", "sr", "pc"
 };
 
-const char *unsp_disassembler::jmp[] =
+char const *const unsp_disassembler::jmp[] =
 {
 	"jb", "jae", "jge", "jl", "jne", "je", "jpl", "jmi",
 	"jbe", "ja", "jle", "jg", "jvc", "jvs", "jmp", "<inv>"
 };
 
-const char *unsp_disassembler::alu[] =
+char const *const unsp_disassembler::alu[] =
 {
 	"add",  "adc",   "sub",   "sbc",
 	"cmp",  "<inv>", "neg",   "<inv>",
@@ -187,7 +183,7 @@ offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		// Call
 		case 0x1f:
 			if(OPA == 0)
-				util::stream_format(stream, "call %06x", ((OPIMM << 16) | imm16) << 1);
+				util::stream_format(stream, "call %06x", (OPIMM << 16) | imm16);
 			else
 				util::stream_format(stream, "<inv>");
 			return UNSP_DASM_OK;
@@ -195,7 +191,7 @@ offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		// Far Jump
 		case 0x2f: case 0x3f: case 0x6f: case 0x7f:
 			if (OPA == 7 && OP1 == 2)
-				util::stream_format(stream, "goto %06x", ((OPIMM << 16) | imm16) << 1);
+				util::stream_format(stream, "goto %06x", (OPIMM << 16) | imm16);
 			else
 				util::stream_format(stream, "<inv>");
 			return UNSP_DASM_OK;

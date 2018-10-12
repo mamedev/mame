@@ -35,7 +35,7 @@ protected:
 private:
 	// internal state
 	uint8_t m_lfo_val;
-	discrete_device *m_discrete;
+	required_device<discrete_device> m_discrete;
 };
 
 DECLARE_DEVICE_TYPE(GALAXIAN, galaxian_sound_device)

@@ -8,47 +8,74 @@
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
+
+#include <algorithm>
 
 class psikyo_state : public driver_device
 {
 public:
 	psikyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_vram_0(*this, "vram_0"),
-		m_vram_1(*this, "vram_1"),
-		m_vregs(*this, "vregs"),
-		m_bootleg_spritebuffer(*this, "boot_spritebuf"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki"),
-		m_soundlatch(*this, "soundlatch"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram")
+		, m_vram(*this, "vram_%u", 0)
+		, m_vregs(*this, "vregs")
+		, m_bootleg_spritebuffer(*this, "boot_spritebuf")
+		, m_spritelut(*this, "spritelut")
+		, m_audiobank(*this, "audiobank")
+		, m_okibank(*this, "okibank")
+		, m_in_dsw(*this, "DSW")
+		, m_in_p1_p2(*this, "P1_P2")
+		, m_in_coin(*this, "COIN")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_oki(*this, "oki")
+		, m_soundlatch(*this, "soundlatch")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+	{
+		std::fill(std::begin(m_old_linescroll), std::end(m_old_linescroll), 0);
+	}
 
+	void sngkace(machine_config &config);
+	void s1945jn(machine_config &config);
+	void gunbird(machine_config &config);
+	void s1945(machine_config &config);
+	void s1945bl(machine_config &config);
+
+	void init_s1945a();
+	void init_s1945j();
+	void init_sngkace();
+	void init_s1945();
+	void init_s1945bl();
+	void init_tengai();
+	void init_gunbird();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(z80_nmi_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_spriteram;
-	required_shared_ptr<uint32_t> m_vram_0;
-	required_shared_ptr<uint32_t> m_vram_1;
+	required_shared_ptr_array<uint32_t, 2> m_vram;
 	required_shared_ptr<uint32_t> m_vregs;
 	optional_shared_ptr<uint32_t> m_bootleg_spritebuffer;
-	std::unique_ptr<uint32_t[]>       m_spritebuf1;
-	std::unique_ptr<uint32_t[]>       m_spritebuf2;
+	std::unique_ptr<uint32_t[]>       m_spritebuf[2];
+
+	required_memory_region m_spritelut;
+	optional_memory_bank m_audiobank;
+	optional_memory_bank m_okibank;
+	optional_ioport m_in_dsw;
+	optional_ioport m_in_p1_p2;
+	optional_ioport m_in_coin;
 
 	/* video-related */
-	tilemap_t        *m_tilemap_0_size0;
-	tilemap_t        *m_tilemap_0_size1;
-	tilemap_t        *m_tilemap_0_size2;
-	tilemap_t        *m_tilemap_0_size3;
-	tilemap_t        *m_tilemap_1_size0;
-	tilemap_t        *m_tilemap_1_size1;
-	tilemap_t        *m_tilemap_1_size2;
-	tilemap_t        *m_tilemap_1_size3;
-	int            m_tilemap_0_bank;
-	int            m_tilemap_1_bank;
+	tilemap_t        *m_tilemap[2][4];
+	int            m_tilemap_bank[2];
 	int            m_ka302c_banking;
+	int            m_old_linescroll[2];
 
 	/* game-specific */
 	// 1945 MCU
@@ -71,21 +98,10 @@ public:
 	DECLARE_READ32_MEMBER(s1945_input_r);
 	DECLARE_READ32_MEMBER(s1945bl_oki_r);
 	DECLARE_WRITE32_MEMBER(s1945bl_oki_w);
-	DECLARE_WRITE8_MEMBER(sngkace_sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(gunbird_sound_bankswitch_w);
-	DECLARE_WRITE32_MEMBER(psikyo_vram_0_w);
-	DECLARE_WRITE32_MEMBER(psikyo_vram_1_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(z80_nmi_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
-	DECLARE_DRIVER_INIT(s1945a);
-	DECLARE_DRIVER_INIT(s1945j);
-	DECLARE_DRIVER_INIT(sngkace);
-	DECLARE_DRIVER_INIT(s1945);
-	DECLARE_DRIVER_INIT(s1945bl);
-	DECLARE_DRIVER_INIT(tengai);
-	DECLARE_DRIVER_INIT(gunbird);
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	template<int Shift> DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
+
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(sngkace);
@@ -107,11 +123,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void sngkace(machine_config &config);
-	void s1945jn(machine_config &config);
-	void gunbird(machine_config &config);
-	void s1945(machine_config &config);
-	void s1945bl(machine_config &config);
+
 	void gunbird_map(address_map &map);
 	void gunbird_sound_io_map(address_map &map);
 	void gunbird_sound_map(address_map &map);

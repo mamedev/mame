@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 
 class cloak_state : public driver_device
@@ -29,8 +30,6 @@ public:
 	void cloak(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(start_led_1_w);
-	DECLARE_WRITE_LINE_MEMBER(start_led_2_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_l_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_r_w);
 	DECLARE_WRITE8_MEMBER(cloak_custom_w);

@@ -15,6 +15,8 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "emupal.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -81,19 +83,21 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(blockade_state::main_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x6000) AM_ROM
-	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x6000) AM_ROM // comotion, blasto, hustle
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x6f00) AM_RAM
-ADDRESS_MAP_END
+void blockade_state::main_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x6000).rom();
+	map(0x0400, 0x07ff).mirror(0x6000).rom(); // comotion, blasto, hustle
+	map(0x8000, 0x83ff).mirror(0x6c00).ram().w(FUNC(blockade_state::videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).mirror(0x6f00).ram();
+}
 
-ADDRESS_MAP_START(blockade_state::main_io_map)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(coin_latch_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE(sound_freq_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(env_on_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(env_off_w)
-ADDRESS_MAP_END
+void blockade_state::main_io_map(address_map &map)
+{
+	map(0x01, 0x01).portr("IN0").w(FUNC(blockade_state::coin_latch_w));
+	map(0x02, 0x02).portr("IN1").w(FUNC(blockade_state::sound_freq_w));
+	map(0x04, 0x04).portr("IN2").w(FUNC(blockade_state::env_on_w));
+	map(0x08, 0x08).w(FUNC(blockade_state::env_off_w));
+}
 
 
 //**************************************************************************
@@ -324,7 +328,7 @@ INPUT_CHANGED_MEMBER( blockade_state::coin_inserted )
 	m_coin_inserted = newval;
 
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 CUSTOM_INPUT_MEMBER( blockade_state::coin_r )
@@ -365,7 +369,7 @@ uint32_t blockade_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static GFXDECODE_START( blockade )
+static GFXDECODE_START( gfx_blockade )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 1 )
 GFXDECODE_END
 
@@ -385,7 +389,7 @@ TILE_GET_INFO_MEMBER( blockade_state::tile_info )
 #define BLOCKADE_NOTE_DATA      NODE_01
 #define BLOCKADE_NOTE           NODE_02
 
-DISCRETE_SOUND_START( blockade )
+DISCRETE_SOUND_START( blockade_discrete )
 	DISCRETE_INPUT_DATA  (BLOCKADE_NOTE_DATA)
 
 	/************************************************/
@@ -465,9 +469,9 @@ void blockade_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //**************************************************************************
 
 MACHINE_CONFIG_START(blockade_state::blockade)
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(20'790'000) / 10)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(20'790'000) / 10)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -475,20 +479,19 @@ MACHINE_CONFIG_START(blockade_state::blockade)
 	MCFG_SCREEN_UPDATE_DRIVER(blockade_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blockade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blockade)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(blockade_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(blockade)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, blockade_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -568,10 +571,10 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT  ROTATION  COMPANY    FULLNAME                  FLAGS                                            LAYOUT
-GAMEL(1976, blockade,  0,        blockade, blockade,  blockade_state, 0,    ROT0,     "Gremlin", "Blockade",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
-GAMEL(1976, comotion,  0,        blockade, comotion,  blockade_state, 0,    ROT0,     "Gremlin", "CoMOTION",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
-GAME( 1978, blasto,    0,        blockade, blasto,    blockade_state, 0,    ROT0,     "Gremlin", "Blasto",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // b/w, no overlay
-GAMEL(1977, hustle,    0,        blockade, hustle,    blockade_state, 0,    ROT0,     "Gremlin", "Hustle",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
-GAME( 1977, mineswpr,  0,        blockade, mineswpr,  blockade_state, 0,    ROT0,     "Amutech", "Minesweeper",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1977, mineswpr4, mineswpr, blockade, mineswpr4, blockade_state, 0,    ROT0,     "Amutech", "Minesweeper (4-Player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROTATION  COMPANY    FULLNAME                  FLAGS                                            LAYOUT
+GAMEL(1976, blockade,  0,        blockade, blockade,  blockade_state, empty_init, ROT0,     "Gremlin", "Blockade",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1976, comotion,  0,        blockade, comotion,  blockade_state, empty_init, ROT0,     "Gremlin", "CoMOTION",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAME( 1978, blasto,    0,        blockade, blasto,    blockade_state, empty_init, ROT0,     "Gremlin", "Blasto",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // b/w, no overlay
+GAMEL(1977, hustle,    0,        blockade, hustle,    blockade_state, empty_init, ROT0,     "Gremlin", "Hustle",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAME( 1977, mineswpr,  0,        blockade, mineswpr,  blockade_state, empty_init, ROT0,     "Amutech", "Minesweeper",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, mineswpr4, mineswpr, blockade, mineswpr4, blockade_state, empty_init, ROT0,     "Amutech", "Minesweeper (4-Player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

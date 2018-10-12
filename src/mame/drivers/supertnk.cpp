@@ -118,10 +118,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(supertnk);
 	void supertnk(machine_config &config);
 
-protected:
+	void init_supertnk();
+
+private:
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_1_w);
 	DECLARE_WRITE8_MEMBER(supertnk_interrupt_ack_w);
@@ -138,7 +139,6 @@ protected:
 	void supertnk_io_map(address_map &map);
 	void supertnk_map(address_map &map);
 
-private:
 	std::unique_ptr<uint8_t[]> m_videoram[3];
 	uint8_t m_rom_bank;
 	uint8_t m_bitplane_select;
@@ -312,17 +312,18 @@ void supertnk_state::machine_reset()
  *
  *************************************/
 
-ADDRESS_MAP_START(supertnk_state::supertnk_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x17ff) AM_ROMBANK("bank1")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM
-	AM_RANGE(0x1efc, 0x1efc) AM_READ_PORT("JOYS")
-	AM_RANGE(0x1efd, 0x1efd) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x1efe, 0x1eff) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x1efe, 0x1efe) AM_READ_PORT("DSW")
-	AM_RANGE(0x1eff, 0x1eff) AM_READ_PORT("UNK")
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(supertnk_videoram_r, supertnk_videoram_w)
-ADDRESS_MAP_END
+void supertnk_state::supertnk_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x17ff).bankr("bank1");
+	map(0x1800, 0x1bff).ram();
+	map(0x1efc, 0x1efc).portr("JOYS");
+	map(0x1efd, 0x1efd).portr("INPUTS");
+	map(0x1efe, 0x1eff).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x1efe, 0x1efe).portr("DSW");
+	map(0x1eff, 0x1eff).portr("UNK");
+	map(0x2000, 0x3fff).rw(FUNC(supertnk_state::supertnk_videoram_r), FUNC(supertnk_state::supertnk_videoram_w));
+}
 
 
 
@@ -332,15 +333,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(supertnk_state::supertnk_io_map)
-	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
-	AM_RANGE(0x0400, 0x0400) AM_WRITE(supertnk_bitplane_select_0_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE(supertnk_bitplane_select_1_w)
-	AM_RANGE(0x0402, 0x0402) AM_WRITE(supertnk_bankswitch_0_w)
-	AM_RANGE(0x0404, 0x0404) AM_WRITE(supertnk_bankswitch_1_w)
-	AM_RANGE(0x0406, 0x0406) AM_WRITE(supertnk_interrupt_ack_w)
-	AM_RANGE(0x0407, 0x0407) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void supertnk_state::supertnk_io_map(address_map &map)
+{
+	map(0x0000, 0x0000).nopw();
+	map(0x0400, 0x0400).w(FUNC(supertnk_state::supertnk_bitplane_select_0_w));
+	map(0x0401, 0x0401).w(FUNC(supertnk_state::supertnk_bitplane_select_1_w));
+	map(0x0402, 0x0402).w(FUNC(supertnk_state::supertnk_bankswitch_0_w));
+	map(0x0404, 0x0404).w(FUNC(supertnk_state::supertnk_bankswitch_1_w));
+	map(0x0406, 0x0406).w(FUNC(supertnk_state::supertnk_interrupt_ack_w));
+	map(0x0407, 0x0407).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
 
 
@@ -434,10 +436,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(supertnk_state::supertnk)
 
 	// CPU TMS9980A; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2598750, supertnk_map, supertnk_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supertnk_state,  supertnk_interrupt)
+	TMS9980A(config, m_maincpu, 2598750);
+	m_maincpu->set_addrmap(AS_PROGRAM, &supertnk_state::supertnk_map);
+	m_maincpu->set_addrmap(AS_IO, &supertnk_state::supertnk_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(supertnk_state::supertnk_interrupt));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 
@@ -449,9 +453,9 @@ MACHINE_CONFIG_START(supertnk_state::supertnk)
 	MCFG_SCREEN_UPDATE_DRIVER(supertnk_state, screen_update_supertnk)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -489,18 +493,17 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(supertnk_state,supertnk)
+void supertnk_state::init_supertnk()
 {
 	/* decode the TMS9980 ROMs */
-	offs_t offs;
 	uint8_t *rom = memregion("maincpu")->base();
 	size_t len = memregion("maincpu")->bytes();
 
-	for (offs = 0; offs < len; offs++)
+	for (offs_t offs = 0; offs < len; offs++)
 	{
 		rom[offs] = bitswap<8>(rom[offs],0,1,2,3,4,5,6,7);
 	}
 }
 
 
-GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )
+GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, init_supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )

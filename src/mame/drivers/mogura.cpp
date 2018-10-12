@@ -8,6 +8,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -25,6 +26,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void mogura(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
@@ -41,7 +45,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mogura);
 	uint32_t screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mogura(machine_config &config);
 	void mogura_io_map(address_map &map);
 	void mogura_map(address_map &map);
 };
@@ -137,24 +140,26 @@ WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
 }
 
 
-ADDRESS_MAP_START(mogura_state::mogura_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM // main ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_SHARE("gfxram") // ram based characters
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_SHARE("tileram") // tilemap
-ADDRESS_MAP_END
+void mogura_state::mogura_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xdfff).ram(); // main ram
+	map(0xe000, 0xefff).ram().w(FUNC(mogura_state::mogura_gfxram_w)).share("gfxram"); // ram based characters
+	map(0xf000, 0xffff).ram().w(FUNC(mogura_state::mogura_tileram_w)).share("tileram"); // tilemap
+}
 
-ADDRESS_MAP_START(mogura_state::mogura_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP    // ??
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("P1")
-	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("P2")
-	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("P3")
-	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("P4")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x14, 0x14) AM_WRITE(mogura_dac_w) /* 4 bit DAC x 2. MSB = left, LSB = right */
-ADDRESS_MAP_END
+void mogura_state::mogura_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw();    // ??
+	map(0x08, 0x08).portr("SYSTEM");
+	map(0x0c, 0x0c).portr("P1");
+	map(0x0d, 0x0d).portr("P2");
+	map(0x0e, 0x0e).portr("P3");
+	map(0x0f, 0x0f).portr("P4");
+	map(0x10, 0x10).portr("SERVICE");
+	map(0x14, 0x14).w(FUNC(mogura_state::mogura_dac_w)); /* 4 bit DAC x 2. MSB = left, LSB = right */
+}
 
 static INPUT_PORTS_START( mogura )
 	PORT_START("SYSTEM")
@@ -197,7 +202,7 @@ static const gfx_layout tiles8x8_layout =
 	16*8
 };
 
-static GFXDECODE_START( mogura )
+static GFXDECODE_START( gfx_mogura )
 	GFXDECODE_ENTRY( nullptr, 0, tiles8x8_layout, 0, 8 )
 GFXDECODE_END
 
@@ -208,10 +213,10 @@ void mogura_state::machine_start()
 MACHINE_CONFIG_START(mogura_state::mogura)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,3000000)         /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(mogura_map)
-	MCFG_CPU_IO_MAP(mogura_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mogura_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,3000000)         /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mogura_map)
+	MCFG_DEVICE_IO_MAP(mogura_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mogura_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -222,17 +227,18 @@ MACHINE_CONFIG_START(mogura_state::mogura)
 	MCFG_SCREEN_UPDATE_DRIVER(mogura_state, screen_update_mogura)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mogura)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mogura)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(mogura_state, mogura)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 	MACHINE_CONFIG_END
 
 
@@ -244,4 +250,4 @@ ROM_START( mogura )
 	ROM_LOAD( "gx141.7j", 0x00, 0x20,  CRC(b21c5d5f) SHA1(6913c840dd69a7d4687f4c4cbe3ff12300f62bc2) )
 ROM_END
 
-GAME( 1991, mogura, 0, mogura, mogura, mogura_state, 0, ROT0, "Konami", "Mogura Desse (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mogura, 0, mogura, mogura, mogura_state, empty_init, ROT0, "Konami", "Mogura Desse (Japan)", MACHINE_SUPPORTS_SAVE )

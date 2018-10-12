@@ -2014,8 +2014,7 @@ static inline void copyscrollbitmap_trans_common(_BitmapClass &dest, const _Bitm
 			for (s32 sx = xscroll - src.width(); sx < dest.width(); sx += src.width())
 			{
 				// compute the cliprect for this group
-				subclip.min_x = col * colwidth + sx;
-				subclip.max_x = (col + groupcols) * colwidth - 1 + sx;
+				subclip.setx(col * colwidth + sx, (col + groupcols) * colwidth - 1 + sx);
 				subclip &= cliprect;
 
 				// iterate over all portions of the scroll that overlap the destination
@@ -2051,8 +2050,7 @@ static inline void copyscrollbitmap_trans_common(_BitmapClass &dest, const _Bitm
 			for (s32 sy = yscroll - src.height(); sy < dest.height(); sy += src.height())
 			{
 				// compute the cliprect for this group
-				subclip.min_y = row * rowheight + sy;
-				subclip.max_y = (row + grouprows) * rowheight - 1 + sy;
+				subclip.sety(row * rowheight + sy, (row + grouprows) * rowheight - 1 + sy);
 				subclip &= cliprect;
 
 				// iterate over all portions of the scroll that overlap the destination
@@ -2112,6 +2110,3 @@ void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bi
 	DECLARE_NO_PRIORITY;
 	COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
 }
-
-GFXDECODE_START( empty )
-GFXDECODE_END

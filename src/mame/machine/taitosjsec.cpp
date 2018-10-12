@@ -122,11 +122,11 @@ void taito_sj_security_mcu_device::device_reset()
 }
 
 MACHINE_CONFIG_START(taito_sj_security_mcu_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTA_R_CB(READ8(taito_sj_security_mcu_device, mcu_pa_r))
-	MCFG_M68705_PORTC_R_CB(READ8(taito_sj_security_mcu_device, mcu_pc_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(taito_sj_security_mcu_device, mcu_pa_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(taito_sj_security_mcu_device, mcu_pb_w))
+	MCFG_DEVICE_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
+	MCFG_M68705_PORTA_R_CB(READ8(*this, taito_sj_security_mcu_device, mcu_pa_r))
+	MCFG_M68705_PORTC_R_CB(READ8(*this, taito_sj_security_mcu_device, mcu_pc_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, taito_sj_security_mcu_device, mcu_pa_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, taito_sj_security_mcu_device, mcu_pb_w))
 MACHINE_CONFIG_END
 
 READ8_MEMBER(taito_sj_security_mcu_device::mcu_pa_r)

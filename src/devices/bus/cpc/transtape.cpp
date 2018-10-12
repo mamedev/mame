@@ -103,7 +103,7 @@ INPUT_CHANGED_MEMBER(cpc_transtape_device::button_red_w)
 	{
 		m_output |= 0x1f;
 		map_enable();
-		m_cpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

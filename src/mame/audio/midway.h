@@ -45,7 +45,10 @@ class midway_ssio_device :  public device_t,
 {
 public:
 	// construction/destruction
-	midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 16'000'000);
+
+	// helpers
+	void suspend_cpu();
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -64,6 +67,8 @@ public:
 	DECLARE_READ8_MEMBER(data_r);
 
 	void ssio_map(address_map &map);
+	static void ssio_input_ports(address_map &map, const char *ssio);
+
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -117,7 +122,7 @@ class midway_sounds_good_device :   public device_t,
 {
 public:
 	// construction/destruction
-	midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 16'000'000);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -156,7 +161,7 @@ class midway_turbo_cheap_squeak_device : public device_t,
 {
 public:
 	// construction/destruction
-	midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 8'000'000);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -195,7 +200,7 @@ class midway_squawk_n_talk_device : public device_t,
 {
 public:
 	// construction/destruction
-	midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 3'579'545);
 
 	// read/write
 	DECLARE_WRITE8_MEMBER(write);
@@ -230,15 +235,5 @@ private:
 	DECLARE_WRITE8_MEMBER(portb2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
-
-
-/************ SSIO input ports ***************/
-
-#define SSIO_INPUT_PORTS(ssio) \
-	AM_RANGE(0x00, 0x04) AM_MIRROR(0x18) AM_DEVREAD(ssio, midway_ssio_device, ioport_read) \
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ssio, midway_ssio_device, read) \
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE(ssio, midway_ssio_device, ioport_write) \
-	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE(ssio, midway_ssio_device, write)
-
 
 #endif // MAME_AUDIO_MIDWAY_H

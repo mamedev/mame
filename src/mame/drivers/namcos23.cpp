@@ -1264,6 +1264,7 @@ Notes:
 #include "machine/rtc4543.h"
 #include "sound/c352.h"
 #include "video/poly.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include <float.h>
@@ -1406,8 +1407,8 @@ struct render_t
 class namcos23_state : public driver_device
 {
 public:
-	namcos23_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	namcos23_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_adc(*this, "subcpu:adc"),
@@ -1430,83 +1431,28 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_adc_ports(*this, "ADC.%u", 0)
+		m_adc_ports(*this, "ADC.%u", 0),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	required_device<mips3_device> m_maincpu;
-	required_device<h83002_device> m_subcpu;
-	required_device<h8_adc_device> m_adc;
-	optional_device<h83334_device> m_iocpu;
-	required_device<rtc4543_device> m_rtc;
-	required_device<namco_settings_device> m_settings;
-	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_shared_ram;
-	required_shared_ptr<uint32_t> m_gammaram;
-	required_shared_ptr<uint32_t> m_charram;
-	required_shared_ptr<uint32_t> m_textram;
-	optional_shared_ptr<uint32_t> m_czattr;
-	optional_device<cpu_device> m_gmen_sh2;
-	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
-	required_device<gfxdecode_device> m_gfxdecode;
-	optional_ioport m_lightx;
-	optional_ioport m_lighty;
-	required_ioport m_p1;
-	required_ioport m_p2;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-	optional_ioport_array<4> m_adc_ports;
+	void timecrs2v4a(machine_config &config);
+	void ss23e2(machine_config &config);
+	void gorgon(machine_config &config);
+	void ss23(machine_config &config);
+	void s23(machine_config &config);
+	void gmen(machine_config &config);
+	void timecrs2(machine_config &config);
 
-	c404_t m_c404;
-	c361_t m_c361;
-	c417_t m_c417;
-	c412_t m_c412;
-	c421_t m_c421;
-	c422_t m_c422;
+	void init_s23();
+
 	render_t m_render;
-
-	tilemap_t *m_bgtilemap;
-	uint8_t m_jvssense;
-	int32_t m_has_jvsio;
-	uint32_t m_main_irqcause;
-	bool m_ctl_vbl_active;
-	uint8_t m_ctl_led;
-	uint16_t m_ctl_inp_buffer[2];
-	bool m_subcpu_running;
-	uint32_t m_c435_address;
-	uint32_t m_c435_size;
-	const uint32_t *m_ptrom;
 	const uint16_t *m_tmlrom;
 	const uint8_t *m_tmhrom;
 	const uint8_t *m_texrom;
 	uint32_t m_tileid_mask;
 	uint32_t m_tile_mask;
-	uint32_t m_ptrom_limit;
 
-	int m_vblank_count;
-
-// It may only be 128
-// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
-// That fits pretty much anywhere, including inside a IC
-// No idea at that point if it's CPU-reachable.  DMA's probably more efficient anyway.
-
-// Matrices are stored in signed 2.14 fixed point
-// Vectors are stored in signed 10.14 fixed point
-
-	int16_t m_matrices[256][9];
-	int32_t m_vectors[256][3];
-	int32_t m_light_vector[3];
-	uint16_t m_scaling;
-	int32_t m_spv[3];
-	int16_t m_spm[3];
-
-	uint16_t m_c435_buffer[256];
-	int m_c435_buffer_pos;
-
-	uint8_t m_sub_porta;
-	uint8_t m_sub_portb;
-	uint8_t m_tssio_port_4;
-
+private:
 	void update_main_interrupts(uint32_t cause);
 	void update_mixer();
 
@@ -1556,12 +1502,10 @@ public:
 	DECLARE_READ16_MEMBER(iob_analog_r);
 	DECLARE_WRITE16_MEMBER(c435_state_pio_w);
 	DECLARE_WRITE16_MEMBER(c435_state_reset_w);
-	DECLARE_DRIVER_INIT(s23);
+
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	DECLARE_VIDEO_START(s23);
 	DECLARE_MACHINE_RESET(gmen);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
@@ -1597,13 +1541,7 @@ public:
 	void render_project(poly_vertex &pv);
 	void render_one_model(const namcos23_render_entry *re);
 	void render_run(bitmap_rgb32 &bitmap);
-	void timecrs2v4a(machine_config &config);
-	void ss23e2(machine_config &config);
-	void gorgon(machine_config &config);
-	void ss23(machine_config &config);
-	void s23(machine_config &config);
-	void gmen(machine_config &config);
-	void timecrs2(machine_config &config);
+
 	void gmen_mips_map(address_map &map);
 	void gmen_sh2_map(address_map &map);
 	void gorgon_map(address_map &map);
@@ -1613,6 +1551,78 @@ public:
 	void s23iobrdiomap(address_map &map);
 	void s23iobrdmap(address_map &map);
 	void timecrs2iobrdmap(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<mips3_device> m_maincpu;
+	required_device<h83002_device> m_subcpu;
+	required_device<h8_adc_device> m_adc;
+	optional_device<h83334_device> m_iocpu;
+	required_device<rtc4543_device> m_rtc;
+	required_device<namco_settings_device> m_settings;
+	required_shared_ptr<uint32_t> m_mainram;
+	required_shared_ptr<uint32_t> m_shared_ram;
+	required_shared_ptr<uint32_t> m_gammaram;
+	required_shared_ptr<uint32_t> m_charram;
+	required_shared_ptr<uint32_t> m_textram;
+	optional_shared_ptr<uint32_t> m_czattr;
+	optional_device<cpu_device> m_gmen_sh2;
+	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_ioport m_lightx;
+	optional_ioport m_lighty;
+	required_ioport m_p1;
+	required_ioport m_p2;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	optional_ioport_array<4> m_adc_ports;
+
+	c404_t m_c404;
+	c361_t m_c361;
+	c417_t m_c417;
+	c412_t m_c412;
+	c421_t m_c421;
+	c422_t m_c422;
+
+	tilemap_t *m_bgtilemap;
+	uint8_t m_jvssense;
+	int32_t m_has_jvsio;
+	uint32_t m_main_irqcause;
+	bool m_ctl_vbl_active;
+	uint8_t m_ctl_led;
+	uint16_t m_ctl_inp_buffer[2];
+	bool m_subcpu_running;
+	uint32_t m_c435_address;
+	uint32_t m_c435_size;
+	const uint32_t *m_ptrom;
+	uint32_t m_ptrom_limit;
+
+	int m_vblank_count;
+
+// It may only be 128
+// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
+// That fits pretty much anywhere, including inside a IC
+// No idea at that point if it's CPU-reachable.  DMA's probably more efficient anyway.
+
+// Matrices are stored in signed 2.14 fixed point
+// Vectors are stored in signed 10.14 fixed point
+
+	int16_t m_matrices[256][9];
+	int32_t m_vectors[256][3];
+	int32_t m_light_vector[3];
+	uint16_t m_scaling;
+	int32_t m_spv[3];
+	int16_t m_spm[3];
+
+	uint16_t m_c435_buffer[256];
+	int m_c435_buffer_pos;
+
+	uint8_t m_sub_porta;
+	uint8_t m_sub_portb;
+	uint8_t m_tssio_port_4;
+	output_finder<8> m_lamps;
 };
 
 
@@ -2792,7 +2802,7 @@ WRITE16_MEMBER(namcos23_state::ctl_w)
 		if(m_ctl_led != (data & 0xff)) {
 			m_ctl_led = data & 0xff;
 			for(int i = 0; i < 8; i++)
-				output().set_lamp_value(i, (~data<<i & 0x80) ? 0 : 1);
+				m_lamps[i] = BIT(data, 7 - i);
 		}
 		break;
 
@@ -2890,56 +2900,58 @@ WRITE16_MEMBER(namcos23_state::sub_comm_w)
 
 
 // System Gorgon
-ADDRESS_MAP_START(namcos23_state::gorgon_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(c435_r, c435_w)
-	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(c417_r, c417_w, 0xffffffff)
-	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
-	AM_RANGE(0x04c3ff00, 0x04c3ff0f) AM_WRITE16(mcuen_w, 0xffffffff)
-	AM_RANGE(0x06080000, 0x0608000f) AM_RAM AM_SHARE("czattr")
-	AM_RANGE(0x06080200, 0x060803ff) AM_RAM // PCZ Convert RAM (C406) (should be banked)
-	AM_RANGE(0x06108000, 0x061087ff) AM_RAM AM_SHARE("gammaram") // Gamma RAM (C404)
-	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
-	AM_RANGE(0x06400000, 0x0641dfff) AM_RAM_WRITE(textchar_w) AM_SHARE("charram") // Text CGRAM (C361)
-	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(textram_w) AM_SHARE("textram") // Text VRAM (C361)
-	AM_RANGE(0x06420000, 0x0642000f) AM_READWRITE16(c361_r, c361_w, 0xffffffff) // C361
-	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0) // data ROMs
-	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM AM_SHARE("nvram") // Backup RAM
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(ctl_r, ctl_w, 0xffffffff) // write for LEDs at d000000, watchdog at d000004
-	AM_RANGE(0x0e000000, 0x0e007fff) AM_RAM // C405 RAM - what is this?
-	AM_RANGE(0x0f000000, 0x0f000003) AM_READWRITE16(sub_comm_r, sub_comm_w, 0xffffffff) // not sure
-	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM
-	AM_RANGE(0x0f300000, 0x0f30000f) AM_READWRITE16(c422_r, c422_w, 0xffffffff) // C422 registers
-	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void namcos23_state::gorgon_map(address_map &map)
+{
+	map.global_mask(0xfffffff);
+	map(0x00000000, 0x003fffff).ram().share("mainram");
+	map(0x01000000, 0x010000ff).rw(FUNC(namcos23_state::c435_r), FUNC(namcos23_state::c435_w));
+	map(0x02000000, 0x0200000f).rw(FUNC(namcos23_state::c417_r), FUNC(namcos23_state::c417_w));
+	map(0x04400000, 0x0440ffff).ram().share("shared_ram"); // Communication RAM (C416)
+	map(0x04c3ff00, 0x04c3ff0f).w(FUNC(namcos23_state::mcuen_w));
+	map(0x06080000, 0x0608000f).ram().share("czattr");
+	map(0x06080200, 0x060803ff).ram(); // PCZ Convert RAM (C406) (should be banked)
+	map(0x06108000, 0x061087ff).ram().share("gammaram"); // Gamma RAM (C404)
+	map(0x06110000, 0x0613ffff).ram().w(FUNC(namcos23_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
+	map(0x06400000, 0x0641dfff).ram().w(FUNC(namcos23_state::textchar_w)).share("charram"); // Text CGRAM (C361)
+	map(0x0641e000, 0x0641ffff).ram().w(FUNC(namcos23_state::textram_w)).share("textram"); // Text VRAM (C361)
+	map(0x06420000, 0x0642000f).rw(FUNC(namcos23_state::c361_r), FUNC(namcos23_state::c361_w)); // C361
+	map(0x08000000, 0x087fffff).rom().region("data", 0); // data ROMs
+	map(0x0c000000, 0x0c00ffff).ram().share("nvram"); // Backup RAM
+	map(0x0d000000, 0x0d00000f).rw(FUNC(namcos23_state::ctl_r), FUNC(namcos23_state::ctl_w)); // write for LEDs at d000000, watchdog at d000004
+	map(0x0e000000, 0x0e007fff).ram(); // C405 RAM - what is this?
+	map(0x0f000000, 0x0f000003).rw(FUNC(namcos23_state::sub_comm_r), FUNC(namcos23_state::sub_comm_w)); // not sure
+	map(0x0f200000, 0x0f203fff).ram(); // C422 RAM
+	map(0x0f300000, 0x0f30000f).rw(FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
+	map(0x0fc00000, 0x0fffffff).nopw().rom().region("user1", 0);
+}
 
 // (Super) System 23
-ADDRESS_MAP_START(namcos23_state::s23_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(c435_r, c435_w)
-	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(c417_r, c417_w, 0xffffffff)
-	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
-	AM_RANGE(0x04c3ff00, 0x04c3ff0f) AM_WRITE16(mcuen_w, 0xffffffff)
-	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup RAM
-	AM_RANGE(0x06200000, 0x06203fff) AM_RAM // C422 RAM
-	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16(c422_r, c422_w, 0xffffffff) // C422 registers
-	AM_RANGE(0x06800000, 0x0681dfff) AM_RAM_WRITE(textchar_w) AM_SHARE("charram") // Text CGRAM (C361)
-	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(textram_w) AM_SHARE("textram") // Text VRAM (C361)
-	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16(c361_r, c361_w, 0xffffffff) // C361
-	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM AM_SHARE("gammaram") // Gamma RAM (C404)
-	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
-	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x1000000) // data ROMs
-	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x1000000)
-	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16(c412_r, c412_w, 0xffffffff)
-	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16(c421_r, c421_w, 0xffffffff)
-	AM_RANGE(0x0c800010, 0x0c800013) AM_WRITE16(c435_state_reset_w, 0xffff0000)
-	AM_RANGE(0x0c800014, 0x0c800017) AM_WRITE16(c435_state_pio_w, 0x0000ffff)
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(ctl_r, ctl_w, 0xffffffff)
-	AM_RANGE(0x0e800000, 0x0e800003) AM_READWRITE16(sub_comm_r, sub_comm_w, 0xffffffff) // not sure
-	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void namcos23_state::s23_map(address_map &map)
+{
+	map.global_mask(0xfffffff);
+	map(0x00000000, 0x00ffffff).ram().share("mainram");
+	map(0x01000000, 0x010000ff).rw(FUNC(namcos23_state::c435_r), FUNC(namcos23_state::c435_w));
+	map(0x02000000, 0x0200000f).rw(FUNC(namcos23_state::c417_r), FUNC(namcos23_state::c417_w));
+	map(0x04400000, 0x0440ffff).ram().share("shared_ram"); // Communication RAM (C416)
+	map(0x04c3ff00, 0x04c3ff0f).w(FUNC(namcos23_state::mcuen_w));
+	map(0x06000000, 0x0600ffff).ram().share("nvram"); // Backup RAM
+	map(0x06200000, 0x06203fff).ram(); // C422 RAM
+	map(0x06400000, 0x0640000f).rw(FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
+	map(0x06800000, 0x0681dfff).ram().w(FUNC(namcos23_state::textchar_w)).share("charram"); // Text CGRAM (C361)
+	map(0x0681e000, 0x0681ffff).ram().w(FUNC(namcos23_state::textram_w)).share("textram"); // Text VRAM (C361)
+	map(0x06820000, 0x0682000f).rw(FUNC(namcos23_state::c361_r), FUNC(namcos23_state::c361_w)); // C361
+	map(0x06a08000, 0x06a087ff).ram().share("gammaram"); // Gamma RAM (C404)
+	map(0x06a10000, 0x06a3ffff).ram().w(FUNC(namcos23_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
+	map(0x08000000, 0x08ffffff).rom().region("data", 0x0000000).mirror(0x1000000); // data ROMs
+	map(0x0a000000, 0x0affffff).rom().region("data", 0x1000000).mirror(0x1000000);
+	map(0x0c000000, 0x0c00001f).rw(FUNC(namcos23_state::c412_r), FUNC(namcos23_state::c412_w));
+	map(0x0c400000, 0x0c400007).rw(FUNC(namcos23_state::c421_r), FUNC(namcos23_state::c421_w));
+	map(0x0c800010, 0x0c800011).w(FUNC(namcos23_state::c435_state_reset_w));
+	map(0x0c800016, 0x0c800017).w(FUNC(namcos23_state::c435_state_pio_w));
+	map(0x0d000000, 0x0d00000f).rw(FUNC(namcos23_state::ctl_r), FUNC(namcos23_state::ctl_w));
+	map(0x0e800000, 0x0e800003).rw(FUNC(namcos23_state::sub_comm_r), FUNC(namcos23_state::sub_comm_w)); // not sure
+	map(0x0fc00000, 0x0fffffff).nopw().rom().region("user1", 0);
+}
 
 
 
@@ -2963,23 +2975,25 @@ WRITE32_MEMBER(namcos23_state::sh2_shared_w)
 	COMBINE_DATA(&m_gmen_sh2_shared[offset]);
 }
 
-ADDRESS_MAP_START(namcos23_state::gmen_mips_map)
-	AM_IMPORT_FROM(s23_map)
-	AM_RANGE(0x0e400000, 0x0e400003) AM_READ(gmen_trigger_sh2)
-	AM_RANGE(0x0e700000, 0x0e70ffff) AM_READWRITE(sh2_shared_r, sh2_shared_w)
-ADDRESS_MAP_END
+void namcos23_state::gmen_mips_map(address_map &map)
+{
+	s23_map(map);
+	map(0x0e400000, 0x0e400003).r(FUNC(namcos23_state::gmen_trigger_sh2));
+	map(0x0e700000, 0x0e70ffff).rw(FUNC(namcos23_state::sh2_shared_r), FUNC(namcos23_state::sh2_shared_w));
+}
 
 
 // SH2 memmap
 /* TODO: of course, I believe that area 0x008***** is actually a bank of some sort ... */
-ADDRESS_MAP_START(namcos23_state::gmen_sh2_map)
-	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("gmen_sh2_shared")
-	AM_RANGE(0x00800000, 0x008fffff) AM_ROM AM_REGION("data", 0xc00000) //c00000 "data" for final furlong 2. 0x1b6bc0 "user1" for gunmen wars
-	AM_RANGE(0x01800000, 0x0183ffff) AM_RAM // ???
+void namcos23_state::gmen_sh2_map(address_map &map)
+{
+	map(0x00000000, 0x0000ffff).ram().share("gmen_sh2_shared");
+	map(0x00800000, 0x008fffff).rom().region("data", 0xc00000); //c00000 "data" for final furlong 2. 0x1b6bc0 "user1" for gunmen wars
+	map(0x01800000, 0x0183ffff).ram(); // ???
 	//AM_RANGE(0x02800000, 0x02800003) AM_RAM // probably transfer status related, reads/writes after each end of flash transfer, TBD
-	AM_RANGE(0x04000000, 0x043fffff) AM_RAM // SH-2 main work RAM (SDRAM)
-	AM_RANGE(0x06000000, 0x06000003) AM_NOP // serial port for camera?
-ADDRESS_MAP_END
+	map(0x04000000, 0x043fffff).ram(); // SH-2 main work RAM (SDRAM)
+	map(0x06000000, 0x06000003).noprw(); // serial port for camera?
+}
 
 
 
@@ -3085,27 +3099,29 @@ WRITE16_MEMBER(namcos23_state::mcu_pb_w)
 }
 
 
-ADDRESS_MAP_START(namcos23_state::s23h8rwmap)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(sharedram_sub_r, sharedram_sub_w )
-	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x300000, 0x300003) AM_NOP // seems to be more inputs, maybe false leftover code from System 12?
-	AM_RANGE(0x300010, 0x300011) AM_NOP
-	AM_RANGE(0x300020, 0x300021) AM_WRITE(sub_interrupt_main_w )
-	AM_RANGE(0x300030, 0x300031) AM_WRITENOP    // timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
-ADDRESS_MAP_END
+void namcos23_state::s23h8rwmap(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08ffff).rw(FUNC(namcos23_state::sharedram_sub_r), FUNC(namcos23_state::sharedram_sub_w));
+	map(0x280000, 0x287fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
+	map(0x300000, 0x300003).noprw(); // seems to be more inputs, maybe false leftover code from System 12?
+	map(0x300010, 0x300011).noprw();
+	map(0x300020, 0x300021).w(FUNC(namcos23_state::sub_interrupt_main_w));
+	map(0x300030, 0x300031).nopw();    // timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
+}
 
 
-ADDRESS_MAP_START(namcos23_state::s23h8iomap)
-	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READWRITE(mcu_p6_r, mcu_p6_w )
-	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READWRITE(mcu_p8_r, mcu_p8_w )
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_r, mcu_pa_w )
-	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(mcu_pb_r, mcu_pb_w )
-	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_NOP
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
-	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
-ADDRESS_MAP_END
+void namcos23_state::s23h8iomap(address_map &map)
+{
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos23_state::mcu_p6_r), FUNC(namcos23_state::mcu_p6_w));
+	map(h8_device::PORT_8, h8_device::PORT_8).rw(FUNC(namcos23_state::mcu_p8_r), FUNC(namcos23_state::mcu_p8_w));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcos23_state::mcu_pa_r), FUNC(namcos23_state::mcu_pa_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(namcos23_state::mcu_pb_r), FUNC(namcos23_state::mcu_pb_w));
+	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
+	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
+	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
+	map(h8_device::ADC_3, h8_device::ADC_3).noprw();
+}
 
 
 
@@ -3159,23 +3175,25 @@ READ16_MEMBER(namcos23_state::iob_analog_r)
 }
 
 
-ADDRESS_MAP_START(namcos23_state::s23iobrdmap)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
-	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
-	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
-	AM_RANGE(0x6006, 0x6007) AM_NOP
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void namcos23_state::s23iobrdmap(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("iocpu", 0);
+	map(0x6000, 0x6001).portr("IN01");
+	map(0x6002, 0x6003).portr("IN23");
+	map(0x6004, 0x6005).nopw();
+	map(0x6006, 0x6007).noprw();
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(namcos23_state::s23iobrdiomap)
-	AM_RANGE(h8_device::PORT_4,  h8_device::PORT_4)  AM_READWRITE(iob_p4_r, iob_p4_w)
-	AM_RANGE(h8_device::PORT_5,  h8_device::PORT_5)  AM_NOP   // bit 2 = status LED to indicate transmitting packet to main
-	AM_RANGE(h8_device::PORT_6,  h8_device::PORT_6)  AM_READWRITE(iob_p6_r, iob_p6_w)
-	AM_RANGE(h8_device::PORT_8,  h8_device::PORT_8)  AM_NOP   // unknown - used on ASCA-5 only
-	AM_RANGE(h8_device::PORT_9,  h8_device::PORT_9)  AM_NOP   // unknown - used on ASCA-5 only
-	AM_RANGE(h8_device::ADC_0,   h8_device::ADC_3)   AM_READ(iob_analog_r)
-ADDRESS_MAP_END
+void namcos23_state::s23iobrdiomap(address_map &map)
+{
+	map(h8_device::PORT_4, h8_device::PORT_4).rw(FUNC(namcos23_state::iob_p4_r), FUNC(namcos23_state::iob_p4_w));
+	map(h8_device::PORT_5, h8_device::PORT_5).noprw();   // bit 2 = status LED to indicate transmitting packet to main
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos23_state::iob_p6_r), FUNC(namcos23_state::iob_p6_w));
+	map(h8_device::PORT_8, h8_device::PORT_8).noprw();   // unknown - used on ASCA-5 only
+	map(h8_device::PORT_9, h8_device::PORT_9).noprw();   // unknown - used on ASCA-5 only
+	map(h8_device::ADC_0, h8_device::ADC_3).r(FUNC(namcos23_state::iob_analog_r));
+}
 
 
 // Time Crisis lightgun
@@ -3198,10 +3216,11 @@ READ8_MEMBER(namcos23_state::iob_gun_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(namcos23_state::timecrs2iobrdmap)
-	AM_IMPORT_FROM( s23iobrdmap )
-	AM_RANGE(0x7000, 0x700f) AM_READ8(iob_gun_r, 0xffff)
-ADDRESS_MAP_END
+void namcos23_state::timecrs2iobrdmap(address_map &map)
+{
+	s23iobrdmap(map);
+	map(0x7000, 0x700f).r(FUNC(namcos23_state::iob_gun_r));
+}
 
 
 
@@ -3458,6 +3477,8 @@ INPUT_PORTS_END
 
 void namcos23_state::machine_start()
 {
+	m_lamps.resolve();
+
 	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	m_c361.timer->adjust(attotime::never);
 
@@ -3482,7 +3503,7 @@ MACHINE_RESET_MEMBER(namcos23_state,gmen)
 
 
 
-DRIVER_INIT_MEMBER(namcos23_state,s23)
+void namcos23_state::init_s23()
 {
 	m_ptrom  = (const uint32_t *)memregion("pointrom")->base();
 	m_tmlrom = (const uint16_t *)memregion("textilemapl")->base();
@@ -3547,7 +3568,7 @@ static const gfx_layout namcos23_cg_layout =
 	64*16
 }; /* cg_layout */
 
-static GFXDECODE_START( namcos23 )
+static GFXDECODE_START( gfx_namcos23 )
 	GFXDECODE_ENTRY( nullptr, 0, namcos23_cg_layout, 0, 0x800 )
 GFXDECODE_END
 
@@ -3555,42 +3576,43 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
+	MCFG_DEVICE_ADD(m_maincpu, R4650BE, BUSCLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
 	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
-	MCFG_CPU_PROGRAM_MAP(gorgon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
+	MCFG_DEVICE_PROGRAM_MAP(gorgon_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
 
-	MCFG_CPU_ADD("subcpu", H83002, H8CLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
-	MCFG_CPU_IO_MAP( s23h8iomap )
+	MCFG_DEVICE_ADD(m_subcpu, H83002, H8CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
+	MCFG_DEVICE_IO_MAP( s23h8iomap )
 
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY(":subcpu:sci0")
+	MCFG_DEVICE_MODIFY("subcpu:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
-	MCFG_CPU_IO_MAP( s23iobrdiomap )
+	MCFG_DEVICE_ADD(m_iocpu, H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
+	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
+	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
-	MCFG_DEVICE_MODIFY("subcpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	// FIXME: need better syntax for configuring H8 onboard devices
+	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
+	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
+	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3599,18 +3621,19 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
@@ -3621,42 +3644,43 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos23_state::s23)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
+	MCFG_DEVICE_ADD(m_maincpu, R4650BE, BUSCLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
 	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
-	MCFG_CPU_PROGRAM_MAP(s23_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
+	MCFG_DEVICE_PROGRAM_MAP(s23_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
 
-	MCFG_CPU_ADD("subcpu", H83002, H8CLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
-	MCFG_CPU_IO_MAP( s23h8iomap )
+	MCFG_DEVICE_ADD(m_subcpu, H83002, H8CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
+	MCFG_DEVICE_IO_MAP( s23h8iomap )
 
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY(":subcpu:sci0")
+	MCFG_DEVICE_MODIFY("subcpu:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
-	MCFG_CPU_IO_MAP( s23iobrdiomap )
+	MCFG_DEVICE_ADD(m_iocpu, H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
+	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
+	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
-	MCFG_DEVICE_MODIFY("subcpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	// FIXME: need better syntax for configuring H8 onboard devices
+	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
+	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
+	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3665,18 +3689,19 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -3687,20 +3712,20 @@ MACHINE_CONFIG_START(namcos23_state::timecrs2)
 	s23(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("iocpu")
-	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
+	MCFG_DEVICE_MODIFY("iocpu")
+	MCFG_DEVICE_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos23_state::gmen)
 	s23(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(BUSCLOCK*5)
-	MCFG_CPU_PROGRAM_MAP(gmen_mips_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(BUSCLOCK*5)
+	MCFG_DEVICE_PROGRAM_MAP(gmen_mips_map)
 
-	MCFG_CPU_ADD("gmen_sh2", SH2, XTAL(28'700'000))
-	MCFG_CPU_PROGRAM_MAP(gmen_sh2_map)
+	MCFG_DEVICE_ADD("gmen_sh2", SH2, XTAL(28'700'000))
+	MCFG_DEVICE_PROGRAM_MAP(gmen_sh2_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
 MACHINE_CONFIG_END
@@ -3709,33 +3734,34 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*5)
+	MCFG_DEVICE_ADD(m_maincpu, R4650BE, BUSCLOCK*5)
 	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
 	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
-	MCFG_CPU_PROGRAM_MAP(s23_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
+	MCFG_DEVICE_PROGRAM_MAP(s23_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
 
-	MCFG_CPU_ADD("subcpu", H83002, H8CLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
-	MCFG_CPU_IO_MAP( s23h8iomap )
+	MCFG_DEVICE_ADD(m_subcpu, H83002, H8CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
+	MCFG_DEVICE_IO_MAP( s23h8iomap )
 
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY(":subcpu:sci0")
+	MCFG_DEVICE_MODIFY("subcpu:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
+	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
-	MCFG_DEVICE_MODIFY("subcpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	// FIXME: need better syntax for configuring H8 onboard devices
+	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
+	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
+	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3744,18 +3770,19 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -3765,31 +3792,31 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos23_state::timecrs2v4a)
 	ss23(config);
 	/* basic machine hardware */
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
-	MCFG_CPU_IO_MAP( s23iobrdiomap )
+	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( timecrs2iobrdmap )
+	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos23_state::ss23e2)
 	ss23(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(BUSCLOCK*6)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(BUSCLOCK*6)
 
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
-	MCFG_CPU_IO_MAP( s23iobrdiomap )
+	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
+	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
 
@@ -5274,34 +5301,34 @@ ROM_END
 
 /* Games */
 #define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-//    YEAR, NAME,        PARENT,   MACHINE,     INPUT,     INIT,                MNTR,  COMPANY, FULLNAME,                      FLAGS
-GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (US, RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
-GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (World, RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
-GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
-GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, s23, ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",   GAME_FLAGS )
-GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, s23, ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)", GAME_FLAGS )
-GAME( 1997, motoxgo,     0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",   GAME_FLAGS )
-GAME( 1997, motoxgov2a,  motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)",   GAME_FLAGS )
-GAME( 1997, motoxgov2a2, motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)",   GAME_FLAGS )
-GAME( 1997, motoxgov1a,  motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 1)", GAME_FLAGS )
-GAME( 1997, motoxgov1a2, motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 2)", GAME_FLAGS )
-GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)", GAME_FLAGS )
-GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)", GAME_FLAGS )
-GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS )
-GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)", GAME_FLAGS )
-GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)", GAME_FLAGS )
-GAME( 1997, panicprk,    0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",     GAME_FLAGS )
-GAME( 1997, panicprkj,   panicprk, s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B)",     GAME_FLAGS )
-GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS )
-GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS )
-GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS )
-GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, s23, ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",         GAME_FLAGS )
-GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, s23, ROT0, "Namco", "Angler King (Japan, AG1 Ver. A)",     GAME_FLAGS )
-GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
-GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
-GAME( 1999, crszone,     0,        ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. B)",   GAME_FLAGS )
-GAME( 1999, crszonev4a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",   GAME_FLAGS )
-GAME( 1999, crszonev3b,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)", GAME_FLAGS )
-GAME( 1999, crszonev3b2, crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 2)", GAME_FLAGS )
-GAME( 1999, crszonev3a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. A)",   GAME_FLAGS )
-GAME( 1999, crszonev2a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (World, CSZO2 Ver. A)",   GAME_FLAGS )
+//    YEAR, NAME,        PARENT,   MACHINE,     INPUT,     CLASS,          INIT,     MNTR, COMPANY, FULLNAME,                      FLAGS
+GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (US, RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
+GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (World, RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
+GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, init_s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
+GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, init_s23, ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",   GAME_FLAGS )
+GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)", GAME_FLAGS )
+GAME( 1997, motoxgo,     0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",   GAME_FLAGS )
+GAME( 1997, motoxgov2a,  motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)",   GAME_FLAGS )
+GAME( 1997, motoxgov2a2, motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)",   GAME_FLAGS )
+GAME( 1997, motoxgov1a,  motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 1)", GAME_FLAGS )
+GAME( 1997, motoxgov1a2, motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 2)", GAME_FLAGS )
+GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)", GAME_FLAGS )
+GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)", GAME_FLAGS )
+GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS )
+GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)", GAME_FLAGS )
+GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)", GAME_FLAGS )
+GAME( 1997, panicprk,    0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",     GAME_FLAGS )
+GAME( 1997, panicprkj,   panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B)",     GAME_FLAGS )
+GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS )
+GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS )
+GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS )
+GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",         GAME_FLAGS )
+GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Angler King (Japan, AG1 Ver. A)",     GAME_FLAGS )
+GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
+GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
+GAME( 1999, crszone,     0,        ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. B)",   GAME_FLAGS )
+GAME( 1999, crszonev4a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",   GAME_FLAGS )
+GAME( 1999, crszonev3b,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)", GAME_FLAGS )
+GAME( 1999, crszonev3b2, crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 2)", GAME_FLAGS )
+GAME( 1999, crszonev3a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. A)",   GAME_FLAGS )
+GAME( 1999, crszonev2a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO2 Ver. A)",   GAME_FLAGS )

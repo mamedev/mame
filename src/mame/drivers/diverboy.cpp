@@ -53,6 +53,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -72,6 +73,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void diverboy(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 
@@ -90,7 +94,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void diverboy(machine_config &config);
 	void diverboy_map(address_map &map);
 	void snd_map(address_map &map);
 };
@@ -161,30 +164,32 @@ WRITE8_MEMBER(diverboy_state::okibank_w)
 
 
 
-ADDRESS_MAP_START(diverboy_state::diverboy_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04ffff) AM_RAM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundcmd_w)
-	AM_RANGE(0x140000, 0x1407ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("COINS")
+void diverboy_state::diverboy_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x04ffff).ram();
+	map(0x080000, 0x083fff).ram().share("spriteram");
+	map(0x100000, 0x100001).w(FUNC(diverboy_state::soundcmd_w));
+	map(0x140000, 0x1407ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x180001).portr("P1_P2");
+	map(0x180002, 0x180003).portr("DSW");
+	map(0x180008, 0x180009).portr("COINS");
 //  AM_RANGE(0x18000a, 0x18000b) AM_READNOP
 //  AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x320000, 0x3207ff) AM_WRITEONLY /* ?? */
-	AM_RANGE(0x322000, 0x3227ff) AM_WRITEONLY /* ?? */
+	map(0x320000, 0x3207ff).writeonly(); /* ?? */
+	map(0x322000, 0x3227ff).writeonly(); /* ?? */
 //  AM_RANGE(0x340000, 0x340001) AM_WRITENOP
 //  AM_RANGE(0x340002, 0x340003) AM_WRITENOP
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(diverboy_state::snd_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void diverboy_state::snd_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(FUNC(diverboy_state::okibank_w));
+	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 
@@ -258,7 +263,7 @@ static const gfx_layout diverboy_spritelayout =
 	16*64
 };
 
-static GFXDECODE_START( diverboy )
+static GFXDECODE_START( gfx_diverboy )
 	GFXDECODE_ENTRY( "gfx1", 0, diverboy_spritelayout, 0, 4*16 )
 	GFXDECODE_ENTRY( "gfx2", 0, diverboy_spritelayout, 0, 4*16 )
 GFXDECODE_END
@@ -270,15 +275,15 @@ void diverboy_state::machine_start()
 
 MACHINE_CONFIG_START(diverboy_state::diverboy)
 
-	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* guess */
-	MCFG_CPU_PROGRAM_MAP(diverboy_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", diverboy_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(diverboy_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", diverboy_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(snd_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(snd_map)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", diverboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_diverboy)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -292,11 +297,11 @@ MACHINE_CONFIG_START(diverboy_state::diverboy)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -343,4 +348,4 @@ ROM_END
 
 
 
-GAME( 1992, diverboy, 0, diverboy, diverboy, diverboy_state, 0, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, diverboy, 0, diverboy, diverboy, diverboy_state, empty_init, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", MACHINE_SUPPORTS_SAVE )

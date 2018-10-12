@@ -26,7 +26,7 @@ void deco_cpu7_device::device_reset()
 
 uint8_t deco_cpu7_device::mi_decrypt::read_sync(uint16_t adr)
 {
-	uint8_t res = direct->read_byte(adr);
+	uint8_t res = cache->read_byte(adr);
 	if(had_written) {
 		had_written = false;
 		if((adr & 0x0104) == 0x0104)
@@ -41,9 +41,9 @@ void deco_cpu7_device::mi_decrypt::write(uint16_t adr, uint8_t val)
 	had_written = true;
 }
 
-util::disasm_interface *deco_cpu7_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> deco_cpu7_device::create_disassembler()
 {
-	return new disassembler(downcast<mi_decrypt *>(mintf.get()));
+	return std::make_unique<disassembler>(downcast<mi_decrypt *>(mintf.get()));
 }
 
 deco_cpu7_device::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)

@@ -209,7 +209,7 @@ public:
 
 	void mpu5(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ32_MEMBER(mpu5_mem_r);
 	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
 
@@ -224,7 +224,6 @@ protected:
 	virtual void machine_start() override;
 	void mpu5_map(address_map &map);
 
-private:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 	SEC sec;
@@ -530,9 +529,10 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 
 }
 
-ADDRESS_MAP_START(mpu5_state::mpu5_map)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(mpu5_mem_r, mpu5_mem_w)
-ADDRESS_MAP_END
+void mpu5_state::mpu5_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(mpu5_state::mpu5_mem_r), FUNC(mpu5_state::mpu5_mem_w));
+}
 
 INPUT_PORTS_START(  mpu5 )
 INPUT_PORTS_END
@@ -547,12 +547,13 @@ void mpu5_state::machine_start()
 
 
 MACHINE_CONFIG_START(mpu5_state::mpu5)
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // ?
-	MCFG_CPU_PROGRAM_MAP(mpu5_map)
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)    // ?
+	MCFG_DEVICE_PROGRAM_MAP(mpu5_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_mpu5)
+	config.set_default_layout(layout_mpu5);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
 MACHINE_CONFIG_END
 

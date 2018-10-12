@@ -21,10 +21,11 @@
 DEFINE_DEVICE_TYPE(UPD7227, upd7227_device, "upd7227", "NEC uPD7227")
 
 
-ADDRESS_MAP_START(upd7227_device::upd7227_map)
-	AM_RANGE(0x00, 0x27) AM_RAM
-	AM_RANGE(0x40, 0x67) AM_RAM
-ADDRESS_MAP_END
+void upd7227_device::upd7227_map(address_map &map)
+{
+	map(0x00, 0x27).ram();
+	map(0x40, 0x67).ram();
+}
 
 
 

@@ -37,6 +37,7 @@
 
 void harddriv_state::device_start()
 {
+	m_lamps.resolve();
 	//atarigen_state::machine_start();
 
 	/* predetermine memory regions */
@@ -221,7 +222,7 @@ READ16_MEMBER( harddriv_state::hd68k_port0_r )
 
 	int temp = (m_sw1.read_safe(0xff) << 8) | m_in0->read();
 	if (get_hblank(scr)) temp ^= 0x0002;
-	temp ^= 0x0018;     /* both EOCs always high for now */
+	temp ^= 0x0008;     /* 12-bit EOC always high for now */
 	return temp;
 }
 
@@ -285,12 +286,6 @@ READ16_MEMBER( harddriv_state::hdc68k_wheel_r )
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_adc8_r )
-{
-	return m_adc8_data;
-}
-
-
 READ16_MEMBER( harddriv_state::hd68k_adc12_r )
 {
 	return m_adc12_byte ? ((m_adc12_data >> 8) & 0x0f) : (m_adc12_data & 0xff);
@@ -317,11 +312,8 @@ WRITE16_MEMBER( harddriv_state::hd68k_adc_control_w )
 	COMBINE_DATA(&m_adc_control);
 
 	/* handle a write to the 8-bit ADC address select */
-	if (m_adc_control & 0x08)
-	{
-		m_adc8_select = m_adc_control & 0x07;
-		m_adc8_data = m_8badc[m_adc8_select].read_safe(0xffff);
-	}
+	m_adc8->address_w(space, 0, m_adc_control & 0x07);
+	m_adc8->start_w(BIT(m_adc_control, 3));
 
 	/* handle a write to the 12-bit ADC address select */
 	if (m_adc_control & 0x40)
@@ -424,11 +416,11 @@ WRITE16_MEMBER( harddriv_state::hd68k_nwr_w )
 			break;
 		case 2: /* LC1 */
 			// used for seat locking on harddriv
-			machine().output().set_led_value(1, data);
+			m_lamps[0] = data;
 			break;
 		case 3: /* LC2 */
 			// used for "abort" button lamp
-			machine().output().set_led_value(2, data);
+			m_lamps[1] = data;
 			break;
 		case 4: /* ZP1 */
 			m_m68k_zp1 = data;
@@ -1226,7 +1218,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_control_w )
 			{
 				uint32_t page = (data >> 6) & 7;
 				m_ds3sdsp->load_boot_data(m_ds3sdsp_region->base() + (0x2000 * page), m_ds3sdsp_pgm_memory);
-				m_ds3sdsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+				m_ds3sdsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 				data &= ~0x200;
 			}
 

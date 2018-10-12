@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 class skyfox_state : public driver_device
@@ -23,6 +24,13 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
+	void skyfox(machine_config &config);
+
+	void init_skyfox();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	/* devices/memory pointers */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -36,8 +44,6 @@ public:
 	int m_bg_ctrl;
 
 	DECLARE_WRITE8_MEMBER(skyfox_vregs_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(skyfox);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(skyfox);
@@ -45,7 +51,7 @@ public:
 	INTERRUPT_GEN_MEMBER(skyfox_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void skyfox(machine_config &config);
+
 	void skyfox_map(address_map &map);
 	void skyfox_sound_map(address_map &map);
 };

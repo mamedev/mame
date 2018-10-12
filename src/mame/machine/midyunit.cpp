@@ -176,7 +176,7 @@ WRITE16_MEMBER(midyunit_state::term2_sound_w)
 
 WRITE16_MEMBER(midyunit_state::term2_hack_w)
 {
-	if (offset == 1 && space.device().safe_pc() == 0xffce6520)
+	if (offset == 1 && m_maincpu->pc() == 0xffce6520)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -186,7 +186,7 @@ WRITE16_MEMBER(midyunit_state::term2_hack_w)
 
 WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
 {
-	if (offset == 0 && space.device().safe_pc() == 0xffce5230)
+	if (offset == 0 && m_maincpu->pc() == 0xffce5230)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -196,7 +196,7 @@ WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
 
 WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
 {
-	if (offset == 0 && space.device().safe_pc() == 0xffce4b80)
+	if (offset == 0 && m_maincpu->pc() == 0xffce4b80)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -206,7 +206,7 @@ WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
 
 WRITE16_MEMBER(midyunit_state::term2la1_hack_w)
 {
-	if (offset == 0 && space.device().safe_pc() == 0xffce33f0)
+	if (offset == 0 && m_maincpu->pc() == 0xffce33f0)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -236,11 +236,10 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 {
 	offs_t gfx_chunk = m_gfx_rom.bytes() / 4;
 	uint8_t d1, d2, d3, d4, d5, d6;
-	uint8_t *base;
 	int i;
 
 	/* load graphics ROMs */
-	base = memregion("gfx1")->base();
+	uint8_t *base = memregion("gfx1")->base();
 	switch (bpp)
 	{
 		case 4:
@@ -287,20 +286,20 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 	switch (sound)
 	{
 		case SOUND_CVSD_SMALL:
-			machine().device("cvsd:cpu")->memory().space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w), this));
+			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w), this));
 			m_cvsd_protection_base = memregion("cvsd:cpu")->base() + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
-			machine().device("cvsd:cpu")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_ADPCM:
-			machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_NARC:
-			machine().device("narcsnd:cpu0")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			m_narc_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_YAWDIM:
@@ -319,7 +318,7 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(midyunit_state,narc)
+void midyunit_state::init_narc()
 {
 	/* common init */
 	init_generic(8, SOUND_NARC, 0xcdff, 0xce29);
@@ -338,7 +337,7 @@ DRIVER_INIT_MEMBER(midyunit_state,narc)
 
 /********************** Trog **************************/
 
-DRIVER_INIT_MEMBER(midyunit_state,trog)
+void midyunit_state::init_trog()
 {
 	/* protection */
 	static const struct protection_data trog_protection_data =
@@ -358,7 +357,7 @@ DRIVER_INIT_MEMBER(midyunit_state,trog)
 
 /********************** Smash TV **********************/
 
-DRIVER_INIT_MEMBER(midyunit_state,smashtv)
+void midyunit_state::init_smashtv()
 {
 	/* common init */
 	init_generic(6, SOUND_CVSD_SMALL, 0x9cf6, 0x9d21);
@@ -367,7 +366,7 @@ DRIVER_INIT_MEMBER(midyunit_state,smashtv)
 
 /********************** High Impact Football **********************/
 
-DRIVER_INIT_MEMBER(midyunit_state,hiimpact)
+void midyunit_state::init_hiimpact()
 {
 	/* protection */
 	static const struct protection_data hiimpact_protection_data =
@@ -385,7 +384,7 @@ DRIVER_INIT_MEMBER(midyunit_state,hiimpact)
 
 /********************** Super High Impact Football **********************/
 
-DRIVER_INIT_MEMBER(midyunit_state,shimpact)
+void midyunit_state::init_shimpact()
 {
 	/* protection */
 	static const struct protection_data shimpact_protection_data =
@@ -403,7 +402,7 @@ DRIVER_INIT_MEMBER(midyunit_state,shimpact)
 
 /********************** Strike Force **********************/
 
-DRIVER_INIT_MEMBER(midyunit_state,strkforc)
+void midyunit_state::init_strkforc()
 {
 	/* protection */
 	static const struct protection_data strkforc_protection_data =
@@ -429,7 +428,7 @@ DRIVER_INIT_MEMBER(midyunit_state,strkforc)
 
 /********************** Mortal Kombat **********************/
 
-DRIVER_INIT_MEMBER(midyunit_state,mkyunit)
+void midyunit_state::init_mkyunit()
 {
 	/* protection */
 	static const struct protection_data mk_protection_data =
@@ -445,7 +444,7 @@ DRIVER_INIT_MEMBER(midyunit_state,mkyunit)
 	init_generic(6, SOUND_ADPCM, 0xfb9c, 0xfbc6);
 }
 
-DRIVER_INIT_MEMBER(midyunit_state,mkyawdim)
+void midyunit_state::init_mkyawdim()
 {
 	/* common init */
 	init_generic(6, SOUND_YAWDIM, 0, 0);
@@ -465,12 +464,12 @@ READ16_MEMBER(midyunit_state::mkturbo_prot_r)
 	return machine().rand();
 }
 
-DRIVER_INIT_MEMBER(midyunit_state,mkyturbo)
+void midyunit_state::init_mkyturbo()
 {
 	/* protection */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midyunit_state::mkturbo_prot_r),this));
 
-	DRIVER_INIT_CALL(mkyunit);
+	init_mkyunit();
 }
 
 /********************** Terminator 2 **********************/
@@ -498,16 +497,16 @@ void midyunit_state::term2_init_common(write16_delegate hack_w)
 	m_t2_hack_mem = m_mainram + (0xaa0e0>>4);
 }
 
-DRIVER_INIT_MEMBER(midyunit_state,term2)    { term2_init_common(write16_delegate(FUNC(midyunit_state::term2_hack_w),this)); }
-DRIVER_INIT_MEMBER(midyunit_state,term2la3) { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la3_hack_w),this)); }
-DRIVER_INIT_MEMBER(midyunit_state,term2la2) { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la2_hack_w),this)); }
-DRIVER_INIT_MEMBER(midyunit_state,term2la1) { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la1_hack_w),this)); }
+void midyunit_state::init_term2()    { term2_init_common(write16_delegate(FUNC(midyunit_state::term2_hack_w),this)); }
+void midyunit_state::init_term2la3() { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la3_hack_w),this)); }
+void midyunit_state::init_term2la2() { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la2_hack_w),this)); }
+void midyunit_state::init_term2la1() { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la1_hack_w),this)); }
 
 
 
 /********************** Total Carnage **********************/
 
-DRIVER_INIT_MEMBER(midyunit_state,totcarn)
+void midyunit_state::init_totcarn()
 {
 	/* protection */
 	static const struct protection_data totcarn_protection_data =
@@ -594,7 +593,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
 
 			case SOUND_YAWDIM:
 				m_soundlatch->write(space, 0, data);
-				m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+				m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 				break;
 		}
 }

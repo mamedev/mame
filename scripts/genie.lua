@@ -414,14 +414,6 @@ if not _OPTIONS["BIGENDIAN"] then
 	_OPTIONS["BIGENDIAN"] = "0"
 end
 
-if not _OPTIONS["NOASM"] then
-	if _OPTIONS["targetos"]=="emscripten" then
-		_OPTIONS["NOASM"] = "1"
-	else
-		_OPTIONS["NOASM"] = "0"
-	end
-end
-
 if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 	_OPTIONS["FORCE_DRC_C_BACKEND"] = "1"
 end
@@ -476,7 +468,6 @@ configuration { "vs*" }
 	flags {
 		"NoPCH",
 		"ExtraWarnings",
-		"NoEditAndContinue",
 	}
 	if not _OPTIONS["NOWERROR"] then
 		flags{
@@ -488,12 +479,14 @@ configuration { "vs*" }
 configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
-		"NoIncrementalLink",
+		"NoMultiProcessorCompilation",
 	}
 
 configuration { "Release", "vs*" }
 	flags {
 		"Optimize",
+		"NoEditAndContinue",
+		"NoIncrementalLink",
 	}
 
 -- Force VS2015/17 targets to use bundled SDL2
@@ -575,7 +568,8 @@ configuration { "Debug" }
 
 if _OPTIONS["FASTDEBUG"]=="1" then
 	defines {
-		"MAME_DEBUG_FAST"
+		"MAME_DEBUG_FAST",
+		"NDEBUG",
 	}
 end
 
@@ -668,6 +662,16 @@ end
 if not _OPTIONS["with-system-flac"]~=nil then
 	defines {
 		"FLAC__NO_DLL",
+	}
+end
+
+if not _OPTIONS["with-system-pugixml"] then
+	defines {
+		"PUGIXML_HEADER_ONLY",
+	}
+else
+	links {
+		ext_lib("pugixml"),
 	}
 end
 
@@ -1014,6 +1018,11 @@ end
 					"-Wno-ignored-qualifiers"
 				}
 			end
+			if (version >= 60000) then
+				buildoptions {
+					"-Wno-pragma-pack" -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
+				}
+			end
 		else
 			if (version < 50000) then
 				print("GCC version 5.0 or later needed")
@@ -1024,6 +1033,16 @@ end
 					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 					"-Wno-array-bounds",
 				}
+			if (version >= 80000) then
+				buildoptions {
+					"-Wno-format-overflow", -- try machine/bfm_sc45_helper.cpp in GCC 8.0.1, among others
+					"-Wno-stringop-truncation", -- ImGui again
+					"-Wno-stringop-overflow",   -- formats/victor9k_dsk.cpp bugs the compiler
+				}
+				buildoptions_cpp {
+					"-Wno-class-memaccess", -- many instances in ImGui and BGFX
+				}
+			end
 		end
 	end
 
@@ -1043,6 +1062,12 @@ if (_OPTIONS["PLATFORM"]=="arm64") then
 	buildoptions {
 		"-Wno-cast-align",
 	}
+	defines {
+		"PTR64=1",
+	}
+end
+
+if (_OPTIONS["PLATFORM"]=="riscv64") then
 	defines {
 		"PTR64=1",
 	}
@@ -1253,6 +1278,7 @@ end
 			"/wd4510", -- warning C4510: 'xxx' : default constructor could not be generated
 			"/wd4512", -- warning C4512: 'xxx' : assignment operator could not be generated
 			"/wd4514", -- warning C4514: 'xxx' : unreferenced inline function has been removed
+			"/wd4521", -- warning C4521: 'xxx' : multiple copy constructors specified
 			"/wd4571", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 			"/wd4610", -- warning C4619: #pragma warning : there is no warning number 'xxx'
 			"/wd4611", -- warning C4571: Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught

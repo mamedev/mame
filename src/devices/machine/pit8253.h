@@ -44,13 +44,13 @@
 	downcast<pit8253_device &>(*device).set_clk<2>(_clk);
 
 #define MCFG_PIT8253_OUT0_HANDLER(_devcb) \
-	devcb = &downcast<pit8253_device &>(*device).set_out_handler<0>(DEVCB_##_devcb);
+	downcast<pit8253_device &>(*device).set_out_handler<0>(DEVCB_##_devcb);
 
 #define MCFG_PIT8253_OUT1_HANDLER(_devcb) \
-	devcb = &downcast<pit8253_device &>(*device).set_out_handler<1>(DEVCB_##_devcb);
+	downcast<pit8253_device &>(*device).set_out_handler<1>(DEVCB_##_devcb);
 
 #define MCFG_PIT8253_OUT2_HANDLER(_devcb) \
-	devcb = &downcast<pit8253_device &>(*device).set_out_handler<2>(DEVCB_##_devcb);
+	downcast<pit8253_device &>(*device).set_out_handler<2>(DEVCB_##_devcb);
 
 
 enum class pit_type
@@ -133,9 +133,10 @@ public:
 	template <unsigned N> void set_clk(double clk) { m_clk[N] = clk; }
 	template <unsigned N> void set_clk(const XTAL &xtal) { set_clk<N>(xtal.dvalue()); }
 	template <unsigned N, class Object> devcb_base &set_out_handler(Object &&cb) { return m_out_handler[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto out_handler() { return m_out_handler[N].bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	WRITE_LINE_MEMBER(write_gate0) { m_counter[0]->gate_w(state); }
 	WRITE_LINE_MEMBER(write_gate1) { m_counter[1]->gate_w(state); }

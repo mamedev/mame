@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emupal.h"
 
 
 //**************************************************************************
@@ -17,8 +18,8 @@
 
 DEFINE_DEVICE_TYPE(PALETTE, palette_device, "palette", "palette")
 
-palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, PALETTE, tag, owner, clock),
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 entries)
+	: device_t(mconfig, PALETTE, tag, owner, (uint32_t)0),
 		device_palette_interface(mconfig, *this),
 		m_entries(0),
 		m_indirect_entries(0),
@@ -32,6 +33,7 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 		m_init(palette_init_delegate()),
 		m_raw_to_rgb(raw_to_rgb_converter())
 {
+	set_entries(entries);
 }
 
 
@@ -115,11 +117,20 @@ WRITE8_MEMBER(palette_device::write8_ext)
 	update_for_write(offset, 1);
 }
 
-
 WRITE16_MEMBER(palette_device::write16_ext)
 {
 	m_paletteram_ext.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
+}
+
+READ8_MEMBER(palette_device::read8_ext)
+{
+	return m_paletteram_ext.read8(offset);
+}
+
+READ16_MEMBER(palette_device::read16_ext)
+{
+	return m_paletteram_ext.read16(offset);
 }
 
 
@@ -399,7 +410,7 @@ void palette_device::palette_init_BBBBBGGGGGRRRRR(palette_device &palette)
 
 
 /*-------------------------------------------------
-    RRRRR_GGGGGG_BBBBB -
+    RRRRR_GGGGGG_BBBBB/BBBBB_GGGGGG_RRRRR -
     standard 5-6-5 palette for games using a
     16-bit color space
 -------------------------------------------------*/
@@ -410,6 +421,14 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 
 	for (i = 0; i < 0x10000; i++)
 		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 11, 5, 0));
+}
+
+void palette_device::palette_init_BBBBBGGGGGGRRRRR(palette_device &palette)
+{
+	int i;
+
+	for (i = 0; i < 0x10000; i++)
+		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 0, 5, 11));
 }
 
 rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(u32 raw)

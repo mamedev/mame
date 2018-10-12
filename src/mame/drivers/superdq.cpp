@@ -24,6 +24,7 @@
 #include "machine/ldv1000.h"
 #include "sound/sn76496.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -35,12 +36,16 @@ class superdq_state : public driver_device
 public:
 	superdq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") ,
+		m_laserdisc(*this, "laserdisc"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	void superdq(machine_config &config);
+
+private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	uint8_t m_ld_in_latch;
 	uint8_t m_ld_out_latch;
@@ -62,7 +67,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void superdq(machine_config &config);
 	void superdq_io(address_map &map);
 	void superdq_map(address_map &map);
 };
@@ -208,22 +212,24 @@ WRITE8_MEMBER(superdq_state::superdq_ld_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(superdq_state::superdq_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE(superdq_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void superdq_state::superdq_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x5c00, 0x5fff).ram().w(FUNC(superdq_state::superdq_videoram_w)).share("videoram");
+}
 
-ADDRESS_MAP_START(superdq_state::superdq_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(superdq_ld_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x04, 0x04) AM_READ(superdq_ld_r) AM_DEVWRITE("snsnd", sn76496_device, write)
-	AM_RANGE(0x08, 0x08) AM_WRITE(superdq_io_w)
-	AM_RANGE(0x0c, 0x0d) AM_NOP /* HD46505S */
-ADDRESS_MAP_END
+void superdq_state::superdq_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w(FUNC(superdq_state::superdq_ld_w));
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("DSW1");
+	map(0x03, 0x03).portr("DSW2");
+	map(0x04, 0x04).r(FUNC(superdq_state::superdq_ld_r)).w("snsnd", FUNC(sn76496_device::command_w));
+	map(0x08, 0x08).w(FUNC(superdq_state::superdq_io_w));
+	map(0x0c, 0x0d).noprw(); /* HD46505S */
+}
 
 
 
@@ -312,7 +318,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( superdq )
+static GFXDECODE_START( gfx_superdq )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -331,10 +337,10 @@ void superdq_state::machine_start()
 MACHINE_CONFIG_START(superdq_state::superdq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(superdq_map)
-	MCFG_CPU_IO_MAP(superdq_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superdq_state,  superdq_vblank)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(superdq_map)
+	MCFG_DEVICE_IO_MAP(superdq_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superdq_state,  superdq_vblank)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
@@ -344,17 +350,18 @@ MACHINE_CONFIG_START(superdq_state::superdq)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superdq)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superdq)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(superdq_state, superdq)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("snsnd", SN76496, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -417,6 +424,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, superdq,  0,        superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Long Scenes)",       MACHINE_NOT_WORKING )
-GAME( 1984, superdqs, superdq,  superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes)",      MACHINE_NOT_WORKING )
-GAME( 1984, superdqa, superdq,  superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes, Alt)", MACHINE_NOT_WORKING )
+GAME( 1984, superdq,  0,        superdq, superdq, superdq_state, empty_init, ROT0, "Universal", "Super Don Quix-ote (Long Scenes)",       MACHINE_NOT_WORKING )
+GAME( 1984, superdqs, superdq,  superdq, superdq, superdq_state, empty_init, ROT0, "Universal", "Super Don Quix-ote (Short Scenes)",      MACHINE_NOT_WORKING )
+GAME( 1984, superdqa, superdq,  superdq, superdq, superdq_state, empty_init, ROT0, "Universal", "Super Don Quix-ote (Short Scenes, Alt)", MACHINE_NOT_WORKING )

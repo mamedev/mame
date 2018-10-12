@@ -141,22 +141,22 @@
 
 
 
-DEFINE_DEVICE_TYPE(I8021,  i8021_device,  "i8021",  "I8021")
-DEFINE_DEVICE_TYPE(I8022,  i8022_device,  "i8022",  "I8022")
-DEFINE_DEVICE_TYPE(I8035,  i8035_device,  "i8035",  "I8035")
-DEFINE_DEVICE_TYPE(I8048,  i8048_device,  "i8048",  "I8048")
-DEFINE_DEVICE_TYPE(I8648,  i8648_device,  "i8648",  "I8648")
-DEFINE_DEVICE_TYPE(I8748,  i8748_device,  "i8748",  "I8748")
-DEFINE_DEVICE_TYPE(I8039,  i8039_device,  "i8039",  "I8039")
-DEFINE_DEVICE_TYPE(I8049,  i8049_device,  "i8049",  "I8049")
-DEFINE_DEVICE_TYPE(I8749,  i8749_device,  "i8749",  "I8749")
-DEFINE_DEVICE_TYPE(I8040,  i8040_device,  "i8040",  "I8040")
-DEFINE_DEVICE_TYPE(I8050,  i8050_device,  "i8050",  "I8050")
-DEFINE_DEVICE_TYPE(I8041,  i8041_device,  "i8041",  "I8041")
-DEFINE_DEVICE_TYPE(I8741,  i8741_device,  "i8741",  "I8741")
-DEFINE_DEVICE_TYPE(I8042,  i8042_device,  "i8042",  "I8042")
-DEFINE_DEVICE_TYPE(I8242,  i8242_device,  "i8242",  "I8242")
-DEFINE_DEVICE_TYPE(I8742,  i8742_device,  "i8742",  "I8742")
+DEFINE_DEVICE_TYPE(I8021,  i8021_device,  "i8021",  "Intel I8021")
+DEFINE_DEVICE_TYPE(I8022,  i8022_device,  "i8022",  "Intel I8022")
+DEFINE_DEVICE_TYPE(I8035,  i8035_device,  "i8035",  "Intel I8035")
+DEFINE_DEVICE_TYPE(I8048,  i8048_device,  "i8048",  "Intel I8048")
+DEFINE_DEVICE_TYPE(I8648,  i8648_device,  "i8648",  "Intel I8648")
+DEFINE_DEVICE_TYPE(I8748,  i8748_device,  "i8748",  "Intel I8748")
+DEFINE_DEVICE_TYPE(I8039,  i8039_device,  "i8039",  "Intel I8039")
+DEFINE_DEVICE_TYPE(I8049,  i8049_device,  "i8049",  "Intel I8049")
+DEFINE_DEVICE_TYPE(I8749,  i8749_device,  "i8749",  "Intel I8749")
+DEFINE_DEVICE_TYPE(I8040,  i8040_device,  "i8040",  "Intel I8040")
+DEFINE_DEVICE_TYPE(I8050,  i8050_device,  "i8050",  "Intel I8050")
+DEFINE_DEVICE_TYPE(I8041,  i8041_device,  "i8041",  "Intel I8041")
+DEFINE_DEVICE_TYPE(I8741,  i8741_device,  "i8741",  "Intel I8741")
+DEFINE_DEVICE_TYPE(I8042,  i8042_device,  "i8042",  "Intel I8042")
+DEFINE_DEVICE_TYPE(I8242,  i8242_device,  "i8242",  "Intel I8242")
+DEFINE_DEVICE_TYPE(I8742,  i8742_device,  "i8742",  "Intel I8742")
 DEFINE_DEVICE_TYPE(MB8884, mb8884_device, "mb8884", "MB8884")
 DEFINE_DEVICE_TYPE(N7751,  n7751_device,  "n7751",  "N7751")
 DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
@@ -167,29 +167,35 @@ DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
 ***************************************************************************/
 
 /* FIXME: the memory maps should probably support rom banking for EA */
-ADDRESS_MAP_START(mcs48_cpu_device::program_10bit)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_10bit(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::program_11bit)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_11bit(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::program_12bit)
-	AM_RANGE(0x000, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_12bit(address_map &map)
+{
+	map(0x000, 0xfff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_6bit)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_6bit(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_7bit)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_7bit(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_8bit)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_8bit(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
 
 mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)
@@ -338,9 +344,9 @@ device_memory_interface::space_config_vector mcs48_cpu_device::memory_space_conf
 		};
 }
 
-util::disasm_interface *mcs48_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mcs48_cpu_device::create_disassembler()
 {
-	return new mcs48_disassembler((m_feature_mask & UPI41_FEATURE) != 0, (m_feature_mask & I802X_FEATURE) != 0);
+	return std::make_unique<mcs48_disassembler>((m_feature_mask & UPI41_FEATURE) != 0, (m_feature_mask & I802X_FEATURE) != 0);
 }
 
 /***************************************************************************
@@ -355,7 +361,7 @@ uint8_t mcs48_cpu_device::opcode_fetch()
 {
 	uint16_t address = m_pc;
 	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
-	return m_direct->read_byte(address);
+	return m_cache->read_byte(address);
 }
 
 
@@ -368,7 +374,7 @@ uint8_t mcs48_cpu_device::argument_fetch()
 {
 	uint16_t address = m_pc;
 	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
-	return m_direct->read_byte(address);
+	return m_cache->read_byte(address);
 }
 
 
@@ -525,19 +531,25 @@ uint8_t mcs48_cpu_device::p2_mask()
 
 void mcs48_cpu_device::expander_operation(expander_op operation, uint8_t port)
 {
-	/* put opcode/data on low 4 bits of P2 */
+	// put opcode on low 4 bits of P2 (overwriting latch)
 	port_w(2, m_p2 = (m_p2 & 0xf0) | (uint8_t(operation) << 2) | (port & 3));
 
-	/* generate high-to-low transition on PROG line */
+	// generate high-to-low transition on PROG line
 	prog_w(0);
 
-	/* put data on low 4 bits of P2 */
+	// transfer data on low 4 bits of P2
 	if (operation != EXPANDER_OP_READ)
 		port_w(2, m_p2 = (m_p2 & 0xf0) | (m_a & 0x0f));
 	else
-		m_a = port_r(2) | 0x0f;
+	{
+		// place P20-P23 in input mode
+		port_w(2, m_p2 |= 0x0f);
 
-	/* generate low-to-high transition on PROG line */
+		// input data to lower 4 bits of A (upper 4 bits are cleared)
+		m_a = port_r(2) & 0x0f;
+	}
+
+	// generate low-to-high transition on PROG line
 	prog_w(1);
 }
 
@@ -1072,7 +1084,7 @@ void mcs48_cpu_device::device_start()
 	m_ea = (m_int_rom_size ? 0 : 1);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = (m_feature_mask & EXT_BUS_FEATURE) != 0 ? &space(AS_IO) : nullptr;
 
@@ -1093,7 +1105,7 @@ void mcs48_cpu_device::device_start()
 		state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
 		state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
 		state_add(STATE_GENSP,     "GENSP",     m_psw).mask(0x7).noshow();
-		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%10s");
+		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%11s");
 		state_add(MCS48_A,         "A",         m_a);
 		state_add(MCS48_TC,        "TC",        m_timer);
 		state_add(MCS48_TPRE,      "TPRE",      m_prescaler).mask(0x1f);
@@ -1149,7 +1161,7 @@ void mcs48_cpu_device::device_start()
 
 	save_item(NAME(m_a11));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1293,7 +1305,7 @@ void mcs48_cpu_device::execute_run()
 
 		/* fetch next opcode */
 		m_prevpc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		opcode = opcode_fetch();
 
 		/* process opcode and count cycles */
@@ -1366,17 +1378,6 @@ TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 WRITE8_MEMBER( upi41_cpu_device::upi41_master_w )
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upi41_cpu_device::master_callback), this), (offset << 8) | data);
-}
-
-
-READ8_MEMBER(mcs48_cpu_device::p1_r)
-{
-	return m_p1;
-}
-
-READ8_MEMBER(mcs48_cpu_device::p2_r)
-{
-	return m_p2;
 }
 
 

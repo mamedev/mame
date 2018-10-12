@@ -40,11 +40,16 @@ class zac_1_state : public genpin_class
 {
 public:
 	zac_1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_p_ram(*this, "ram")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_ram(*this, "ram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void locomotp(machine_config &config);
+	void zac_1(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(ctrl_r);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_READ_LINE_MEMBER(serial_r);
@@ -53,45 +58,44 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_int_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
-	void locomotp(machine_config &config);
-	void zac_1(machine_config &config);
+
 	void locomotp_data(address_map &map);
 	void locomotp_io(address_map &map);
 	void locomotp_map(address_map &map);
 	void zac_1_data(address_map &map);
 	void zac_1_io(address_map &map);
 	void zac_1_map(address_map &map);
-protected:
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_ram;
-
-	// driver_device overrides
-	virtual void machine_reset() override;
-private:
 	uint8_t m_t_c;
 	uint8_t m_out_offs;
 	uint8_t m_input_line;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_ram;
+	output_finder<78> m_digits;
 };
 
 
-ADDRESS_MAP_START(zac_1_state::zac_1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(reset_int_w)
-	AM_RANGE(0x1800, 0x18ff) AM_MIRROR(0x300) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void zac_1_state::zac_1_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x13ff).rom();
+	map(0x1400, 0x17ff).w(FUNC(zac_1_state::reset_int_w));
+	map(0x1800, 0x18ff).mirror(0x300).ram().share("ram");
+	map(0x1c00, 0x1fff).rom();
+}
 
-ADDRESS_MAP_START(zac_1_state::zac_1_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void zac_1_state::zac_1_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-ADDRESS_MAP_START(zac_1_state::zac_1_data)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
-ADDRESS_MAP_END
+void zac_1_state::zac_1_data(address_map &map)
+{
+	map.unmap_value_high();
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
+}
 
 static INPUT_PORTS_START( zac_1 )
 	PORT_START("TEST")
@@ -239,7 +243,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 	{
 		uint8_t display = (m_out_offs >> 3) & 7;
 		uint8_t digit = m_out_offs & 7;
-		output().set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
+		m_digits[display * 10 + digit] = patterns[m_p_ram[m_out_offs]&15];
 	}
 	else
 	if (m_out_offs == 0x4a) // outhole
@@ -257,19 +261,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 
 MACHINE_CONFIG_START(zac_1_state::zac_1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 6000000/2) // no xtal, just 2 chips forming a random oscillator
-	MCFG_CPU_PROGRAM_MAP(zac_1_map)
-	MCFG_CPU_IO_MAP(zac_1_io)
-	MCFG_CPU_DATA_MAP(zac_1_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(zac_1_state, serial_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(zac_1_state, serial_w))
-	MCFG_NVRAM_ADD_0FILL("ram")
+	MCFG_DEVICE_ADD("maincpu", S2650, 6000000/2) // no xtal, just 2 chips forming a random oscillator
+	MCFG_DEVICE_PROGRAM_MAP(zac_1_map)
+	MCFG_DEVICE_IO_MAP(zac_1_io)
+	MCFG_DEVICE_DATA_MAP(zac_1_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, zac_1_state, serial_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, zac_1_state, serial_w))
+	NVRAM(config, "ram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_inttimer", zac_1_state, zac_1_inttimer, attotime::from_hz(200))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_outtimer", zac_1_state, zac_1_outtimer, attotime::from_hz(187500))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_zac_1)
+	config.set_default_layout(layout_zac_1);
 
 	/* Sound */
 	genpin_audio(config);
@@ -277,21 +281,24 @@ MACHINE_CONFIG_END
 
 /*************************** LOCOMOTION ********************************/
 
-ADDRESS_MAP_START(zac_1_state::locomotp_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x18ff) AM_MIRROR(0x300) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void zac_1_state::locomotp_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x17ff).rom();
+	map(0x1800, 0x18ff).mirror(0x300).ram().share("ram");
+	map(0x1c00, 0x1fff).rom();
+}
 
-ADDRESS_MAP_START(zac_1_state::locomotp_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void zac_1_state::locomotp_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-ADDRESS_MAP_START(zac_1_state::locomotp_data)
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(reset_int_r)
-ADDRESS_MAP_END
+void zac_1_state::locomotp_data(address_map &map)
+{
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(zac_1_state::reset_int_r));
+}
 
 READ8_MEMBER( zac_1_state::reset_int_r )
 {
@@ -302,10 +309,10 @@ READ8_MEMBER( zac_1_state::reset_int_r )
 MACHINE_CONFIG_START(zac_1_state::locomotp)
 	zac_1(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(locomotp_map)
-	MCFG_CPU_IO_MAP(locomotp_io)
-	MCFG_CPU_DATA_MAP(locomotp_data)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(locomotp_map)
+	MCFG_DEVICE_IO_MAP(locomotp_io)
+	MCFG_DEVICE_DATA_MAP(locomotp_data)
 	// also has sound cpu
 MACHINE_CONFIG_END
 
@@ -466,15 +473,15 @@ ROM_START(wsports)
 	ROM_LOAD ( "ws5.bin", 0x1000, 0x0400, CRC(5ef51ced) SHA1(390579d0482ceabf87924f7718ef33e336726d92))
 ROM_END
 
-GAME(1981, ewf,       0,       zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Earth Wind Fire",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1980, firemntn,  0,       zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Fire Mountain",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1978, futurwld,  0,       zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Future World",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1979, hotwheel,  0,       zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Hot Wheels",                       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1978, hod,       0,       zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "House of Diamonds",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1981, locomotp,  0,       locomotp, zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Locomotion",                       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1979, strapids,  0,       zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Shooting the Rapids",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1980, sshtlzac,  0,       zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Space Shuttle (Zaccaria)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1980, stargod,   0,       zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Star God",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1980, stargoda,  stargod, zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Star God (alternate sound)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1980, stargodb,  stargod, zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Star God (variable replay score)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1978, wsports,   0,       zac_1,    zac_1, zac_1_state, 0,  ROT0,  "Zaccaria", "Winter Sports",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1981, ewf,       0,       zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Earth Wind Fire",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1980, firemntn,  0,       zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Fire Mountain",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1978, futurwld,  0,       zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Future World",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1979, hotwheel,  0,       zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Hot Wheels",                       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1978, hod,       0,       zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "House of Diamonds",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1981, locomotp,  0,       locomotp, zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Locomotion",                       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1979, strapids,  0,       zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Shooting the Rapids",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1980, sshtlzac,  0,       zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Space Shuttle (Zaccaria)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1980, stargod,   0,       zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1980, stargoda,  stargod, zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God (alternate sound)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1980, stargodb,  stargod, zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God (variable replay score)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1978, wsports,   0,       zac_1,    zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Winter Sports",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

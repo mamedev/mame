@@ -105,50 +105,54 @@ WRITE_LINE_MEMBER(pitnrun_state::vflip_w)
 	flip_screen_y_set(state);
 }
 
-ADDRESS_MAP_START(pitnrun_state::pitnrun_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa800, 0xa807) AM_DEVWRITE("noiselatch", ls259_device, write_d0) /* Analog Sound */
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc800, 0xc801) AM_WRITE(scroll_w)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE(scroll_y_w)
+void pitnrun_state::pitnrun_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8fff).ram().w(FUNC(pitnrun_state::videoram_w)).share("videoram");
+	map(0x9000, 0x9fff).ram().w(FUNC(pitnrun_state::videoram2_w)).share("videoram2");
+	map(0xa000, 0xa0ff).ram().share("spriteram");
+	map(0xa800, 0xa800).portr("SYSTEM");
+	map(0xa800, 0xa807).w("noiselatch", FUNC(ls259_device::write_d0)); /* Analog Sound */
+	map(0xb000, 0xb000).portr("DSW");
+	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb800, 0xb800).portr("INPUTS").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc800, 0xc801).w(FUNC(pitnrun_state::scroll_w));
+	map(0xc802, 0xc802).w(FUNC(pitnrun_state::scroll_y_w));
 	//AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
-	AM_RANGE(0xc805, 0xc805) AM_WRITE(h_heed_w)
-	AM_RANGE(0xc806, 0xc806) AM_WRITE(v_heed_w)
-	AM_RANGE(0xc807, 0xc807) AM_WRITE(ha_w)
+	map(0xc805, 0xc805).w(FUNC(pitnrun_state::h_heed_w));
+	map(0xc806, 0xc806).w(FUNC(pitnrun_state::v_heed_w));
+	map(0xc807, 0xc807).w(FUNC(pitnrun_state::ha_w));
 	//AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
 	//AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+	map(0xf000, 0xf000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
-ADDRESS_MAP_START(pitnrun_state::pitnrun_map_mcu)
-	AM_IMPORT_FROM(pitnrun_map)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
-	AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
-ADDRESS_MAP_END
+void pitnrun_state::pitnrun_map_mcu(address_map &map)
+{
+	pitnrun_map(map);
+	map(0xc804, 0xc804).w(FUNC(pitnrun_state::mcu_data_w));
+	map(0xd000, 0xd000).r(FUNC(pitnrun_state::mcu_data_r));
+	map(0xd800, 0xd800).r(FUNC(pitnrun_state::mcu_status_r));
+}
 
-ADDRESS_MAP_START(pitnrun_state::pitnrun_sound_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM
-ADDRESS_MAP_END
+void pitnrun_state::pitnrun_sound_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3800, 0x3bff).ram();
+}
 
-ADDRESS_MAP_START(pitnrun_state::pitnrun_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x8f, 0x8f) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x90, 0x96) AM_WRITENOP
-	AM_RANGE(0x97, 0x97) AM_WRITENOP
-	AM_RANGE(0x98, 0x98) AM_WRITENOP
-ADDRESS_MAP_END
+void pitnrun_state::pitnrun_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
+	map(0x8c, 0x8d).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8e, 0x8f).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8f, 0x8f).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x90, 0x96).nopw();
+	map(0x97, 0x97).nopw();
+	map(0x98, 0x98).nopw();
+}
 
 
 static INPUT_PORTS_START( pitnrun )
@@ -268,31 +272,31 @@ static const gfx_layout charlayout =
 	8*8*2
 };
 
-static GFXDECODE_START( pitnrun )
+static GFXDECODE_START( gfx_pitnrun )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   64, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   32, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 4 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(pitnrun_state::pitnrun)
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(18'432'000)/6)       /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(pitnrun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(18'432'000)/6)       /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(pitnrun_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 7B (mislabeled LS156 on schematic)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pitnrun_state, nmi_enable_w)) // NMION
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(pitnrun_state, color_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // COLOR SEL 2 - not used ?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pitnrun_state, char_bank_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pitnrun_state, hflip_w)) // HFLIP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pitnrun_state, vflip_w)) // VFLIP
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 7B (mislabeled LS156 on schematic)
+	mainlatch.q_out_cb<0>().set(FUNC(pitnrun_state::nmi_enable_w)); // NMION
+	mainlatch.q_out_cb<1>().set(FUNC(pitnrun_state::color_select_w));
+	mainlatch.q_out_cb<4>().set_nop(); // COLOR SEL 2 - not used ?
+	mainlatch.q_out_cb<5>().set(FUNC(pitnrun_state::char_bank_select_w));
+	mainlatch.q_out_cb<6>().set(FUNC(pitnrun_state::hflip_w)); // HFLIP
+	mainlatch.q_out_cb<7>().set(FUNC(pitnrun_state::vflip_w)); // VFLIP
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000)/2)          /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(pitnrun_sound_map)
-	MCFG_CPU_IO_MAP(pitnrun_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000)/2)          /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(pitnrun_sound_map)
+	MCFG_DEVICE_IO_MAP(pitnrun_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -305,23 +309,23 @@ MACHINE_CONFIG_START(pitnrun_state::pitnrun)
 	MCFG_SCREEN_UPDATE_DRIVER(pitnrun_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pitnrun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pitnrun)
 	MCFG_PALETTE_ADD("palette", 32*3)
 	MCFG_PALETTE_INIT_OWNER(pitnrun_state, pitnrun)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("noiselatch", LS259, 0) // 1J
@@ -329,15 +333,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pitnrun_state::pitnrun_mcu)
 	pitnrun(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pitnrun_map_mcu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pitnrun_map_mcu)
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL(18'432'000)/6)     /* verified on pcb */
-	MCFG_M68705_PORTA_R_CB(READ8(pitnrun_state, m68705_portA_r))
-	MCFG_M68705_PORTB_R_CB(READ8(pitnrun_state, m68705_portB_r))
-	MCFG_M68705_PORTC_R_CB(READ8(pitnrun_state, m68705_portC_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(pitnrun_state, m68705_portA_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(pitnrun_state, m68705_portB_w))
+	MCFG_DEVICE_ADD("mcu", M68705P5, XTAL(18'432'000)/6)     /* verified on pcb */
+	MCFG_M68705_PORTA_R_CB(READ8(*this, pitnrun_state, m68705_portA_r))
+	MCFG_M68705_PORTB_R_CB(READ8(*this, pitnrun_state, m68705_portB_r))
+	MCFG_M68705_PORTC_R_CB(READ8(*this, pitnrun_state, m68705_portC_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, pitnrun_state, m68705_portA_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, pitnrun_state, m68705_portB_w))
 MACHINE_CONFIG_END
 
 ROM_START( pitnrun )
@@ -412,40 +416,40 @@ ROM_END
 
 ROM_START( jumpkun )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "PR1.5D.2764", 0x00000, 0x02000, CRC(b0eabe9f) SHA1(e662f3946efe72b0bbf6c6934201163f765bb7aa) )
-	ROM_LOAD( "PR2.5C.2764", 0x02000, 0x02000, CRC(d9240413) SHA1(f4d0491e125f1fe435b200b38fa125889784af0a) )
-	ROM_LOAD( "PR3.5B.2764", 0x04000, 0x02000, CRC(105e3fec) SHA1(06ea902e6647fc37a603146324e3d0a067e1f649) )
-	ROM_LOAD( "PR4.5A.2764", 0x06000, 0x02000, CRC(3a17ca88) SHA1(00516798d546098831e75547664c8fdaa2bbf050) )
+	ROM_LOAD( "pr1.5d.2764", 0x00000, 0x02000, CRC(b0eabe9f) SHA1(e662f3946efe72b0bbf6c6934201163f765bb7aa) )
+	ROM_LOAD( "pr2.5c.2764", 0x02000, 0x02000, CRC(d9240413) SHA1(f4d0491e125f1fe435b200b38fa125889784af0a) )
+	ROM_LOAD( "pr3.5b.2764", 0x04000, 0x02000, CRC(105e3fec) SHA1(06ea902e6647fc37a603146324e3d0a067e1f649) )
+	ROM_LOAD( "pr4.5a.2764", 0x06000, 0x02000, CRC(3a17ca88) SHA1(00516798d546098831e75547664c8fdaa2bbf050) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "SND1.2732", 0x00000, 0x01000, CRC(1290f316) SHA1(13e393860c1f7d1f97343b9f936c60adb7641efc) )
-	ROM_LOAD( "SND2.2732", 0x01000, 0x01000, CRC(ec5e4489) SHA1(fc94fe798a1925e8e3dd15161648e9a960969fc4) )
+	ROM_LOAD( "snd1.2732", 0x00000, 0x01000, CRC(1290f316) SHA1(13e393860c1f7d1f97343b9f936c60adb7641efc) )
+	ROM_LOAD( "snd2.2732", 0x01000, 0x01000, CRC(ec5e4489) SHA1(fc94fe798a1925e8e3dd15161648e9a960969fc4) )
 
 	ROM_REGION( 0x0800, "mcu", ROMREGION_ERASE00 )
 	// not populated
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "OBJ1.1K.2764", 0x00000, 0x02000, CRC(8929abfd) SHA1(978994af5816c20a8cd520263d04d1cc1e4df576) )
-	ROM_LOAD( "OBJ2.1M.2764", 0x02000, 0x02000, CRC(c7bf5819) SHA1(15d8e1dd1c0911785237e9063a75a42a2dc1bd50) )
-	ROM_LOAD( "OBJ3.1N.2764", 0x04000, 0x02000, CRC(5eeec986) SHA1(e58a0b98b90a1dd3971ed305100337aa2e5ec450) )
+	ROM_LOAD( "obj1.1k.2764", 0x00000, 0x02000, CRC(8929abfd) SHA1(978994af5816c20a8cd520263d04d1cc1e4df576) )
+	ROM_LOAD( "obj2.1m.2764", 0x02000, 0x02000, CRC(c7bf5819) SHA1(15d8e1dd1c0911785237e9063a75a42a2dc1bd50) )
+	ROM_LOAD( "obj3.1n.2764", 0x04000, 0x02000, CRC(5eeec986) SHA1(e58a0b98b90a1dd3971ed305100337aa2e5ec450) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "CHR1.6D.2764", 0x00000, 0x02000, CRC(3c93d4ee) SHA1(003121c49bccbb95efb137e6d92d26eea1957fbd)  )
-	ROM_LOAD( "CHR2.6F.2764", 0x02000, 0x02000, CRC(154fad33) SHA1(7eddc794bd547053f185bb79a8220907bab13d85)  )
+	ROM_LOAD( "chr1.6d.2764", 0x00000, 0x02000, CRC(3c93d4ee) SHA1(003121c49bccbb95efb137e6d92d26eea1957fbd)  )
+	ROM_LOAD( "chr2.6f.2764", 0x02000, 0x02000, CRC(154fad33) SHA1(7eddc794bd547053f185bb79a8220907bab13d85)  )
 
 	ROM_REGION( 0x2000, "gfx3", 0 )
-	ROM_LOAD( "BSC2.3M.2764", 0x00000, 0x01000, CRC(25445f17) SHA1(b1ada95d8f02623bb4a4562d2d278a882414e57e) )
-	ROM_LOAD( "BSC1.3P.2764", 0x01000, 0x01000, CRC(39ca2c37) SHA1(b8c71f443a0faf54df03ac5aca46ddd34c42d3a0) )
+	ROM_LOAD( "bsc2.3m.2764", 0x00000, 0x01000, CRC(25445f17) SHA1(b1ada95d8f02623bb4a4562d2d278a882414e57e) )
+	ROM_LOAD( "bsc1.3p.2764", 0x01000, 0x01000, CRC(39ca2c37) SHA1(b8c71f443a0faf54df03ac5aca46ddd34c42d3a0) )
 
 	ROM_REGION( 0x2000, "spot", ROMREGION_ERASE00 )
 	// not populated
 
 	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "8H.82S123.bin", 0x0000, 0x0020, CRC(e54a6fe6) SHA1(c51da2cbf54b7abff7b0cdf0d6846c375b71edcd) )
-	ROM_LOAD( "8L.82S123.bin", 0x0020, 0x0020, CRC(624830d5) SHA1(793b2f770ccef6c03bf3ecbf4debcc0531f62da1) )
-	ROM_LOAD( "8J.82S123.bin", 0x0040, 0x0020, CRC(223a6990) SHA1(06e16de037c2c7ad5733390859fa7ec1ab1e2f69) )
+	ROM_LOAD( "8h.82s123.bin", 0x0000, 0x0020, CRC(e54a6fe6) SHA1(c51da2cbf54b7abff7b0cdf0d6846c375b71edcd) )
+	ROM_LOAD( "8l.82s123.bin", 0x0020, 0x0020, CRC(624830d5) SHA1(793b2f770ccef6c03bf3ecbf4debcc0531f62da1) )
+	ROM_LOAD( "8j.82s123.bin", 0x0040, 0x0020, CRC(223a6990) SHA1(06e16de037c2c7ad5733390859fa7ec1ab1e2f69) )
 ROM_END
 
-GAME( 1984, pitnrun,  0,       pitnrun_mcu, pitnrun, pitnrun_state, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pitnruna, pitnrun, pitnrun_mcu, pitnrun, pitnrun_state, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jumpkun,  0,       pitnrun,     jumpkun, pitnrun_state, 0, ROT90, "Kaneko",            "Jump Kun (prototype)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no copyright message
+GAME( 1984, pitnrun,  0,       pitnrun_mcu, pitnrun, pitnrun_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pitnruna, pitnrun, pitnrun_mcu, pitnrun, pitnrun_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jumpkun,  0,       pitnrun,     jumpkun, pitnrun_state, empty_init, ROT90, "Kaneko",            "Jump Kun (prototype)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no copyright message

@@ -21,6 +21,7 @@
 #include "cpu/tms34010/tms34010.h"
 
 #include "machine/74259.h"
+#include "machine/adc0808.h"
 #include "machine/asic65.h"
 #include "machine/eeprompar.h"
 #include "machine/mc68681.h"
@@ -29,6 +30,7 @@
 
 #include "sound/dac.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define HARDDRIV_MASTER_CLOCK   XTAL(32'000'000)
@@ -36,7 +38,7 @@
 
 DECLARE_DEVICE_TYPE(HARDDRIV_BOARD,               harddriv_board_device_state)
 DECLARE_DEVICE_TYPE(HARDDRIVC_BOARD,              harddrivc_board_device_state)
-DECLARE_DEVICE_TYPE(RACEDRIV_BOARD,               racedrivc_board_device_state)
+DECLARE_DEVICE_TYPE(RACEDRIV_BOARD,               racedriv_board_device_state)
 DECLARE_DEVICE_TYPE(RACEDRIVB1_BOARD,             racedrivb1_board_device_state)
 DECLARE_DEVICE_TYPE(RACEDRIVC_BOARD,              racedrivc_board_device_state)
 DECLARE_DEVICE_TYPE(RACEDRIVC1_BOARD,             racedrivc1_board_device_state)
@@ -54,6 +56,18 @@ DECLARE_DEVICE_TYPE(HARDDRIV_SOUND_BOARD,         harddriv_sound_board_device)
 class harddriv_state : public device_t
 {
 public:
+	harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	void driver_msp(machine_config &config);
+	void driver_nomsp(machine_config &config);
+	void multisync_msp(machine_config &config);
+	void multisync_nomsp(machine_config &config);
+	void dsk(machine_config &config);
+	void dsk2(machine_config &config);
+	void ds3(machine_config &config);
+	void multisync2(machine_config &config);
+	void adsp(machine_config &config);
+
 	void init_strtdriv(void);
 
 	void init_harddriv(void);
@@ -79,6 +93,11 @@ public:
 	mc68681_device* get_duart() { return m_duartn68681; }
 	screen_device* get_screen() { return m_screen; }
 
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
+
+protected:
+
 	void init_video();
 	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
 	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
@@ -99,7 +118,6 @@ public:
 
 	DECLARE_READ16_MEMBER( hd68k_a80000_r );
 	DECLARE_READ16_MEMBER( hd68k_port0_r );
-	DECLARE_READ16_MEMBER( hd68k_adc8_r );
 	DECLARE_READ16_MEMBER( hd68k_adc12_r );
 	DECLARE_READ16_MEMBER( hdc68k_port1_r );
 	DECLARE_READ16_MEMBER( hda68k_port1_r );
@@ -202,10 +220,6 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(hdgsp_write_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(hdgsp_read_from_shiftreg);
 
-	INTERRUPT_GEN_MEMBER(video_int_gen);
-	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
-
-
 	/* DSK board */
 	DECLARE_WRITE16_MEMBER( hd68k_dsk_control_w );
 	DECLARE_READ16_MEMBER( hd68k_dsk_ram_r );
@@ -255,15 +269,6 @@ public:
 	DECLARE_READ32_MEMBER(hdds3xdsp_serial_rx_callback);
 
 
-	void driver_msp(machine_config &config);
-	void driver_nomsp(machine_config &config);
-	void multisync_msp(machine_config &config);
-	void multisync_nomsp(machine_config &config);
-	void dsk(machine_config &config);
-	void dsk2(machine_config &config);
-	void ds3(machine_config &config);
-	void multisync2(machine_config &config);
-	void adsp(machine_config &config);
 	void adsp_data_map(address_map &map);
 	void adsp_program_map(address_map &map);
 	void driver_68k_map(address_map &map);
@@ -281,8 +286,6 @@ public:
 	void multisync2_gsp_map(address_map &map);
 	void multisync_68k_map(address_map &map);
 	void multisync_gsp_map(address_map &map);
-protected:
-	harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -300,6 +303,8 @@ protected:
 	optional_device<atari_jsa_base_device> m_jsa;
 	optional_device<screen_device> m_screen;
 	optional_device<mc68681_device> m_duartn68681;
+	required_device<adc0808_device> m_adc8;
+	output_finder<2> m_lamps;
 
 	uint8_t                   m_hd34010_host_access;
 
@@ -354,7 +359,6 @@ protected:
 	required_ioport m_in0;
 	optional_ioport m_sw1;
 	required_ioport m_a80000;
-	optional_ioport_array<8> m_8badc;
 	optional_ioport_array<4> m_12badc;
 
 	/* machine state */
@@ -416,8 +420,6 @@ protected:
 	optional_device<timer_device> m_ds3xdsp_internal_timer;
 
 	uint16_t                  m_adc_control;
-	uint8_t                   m_adc8_select;
-	uint8_t                   m_adc8_data;
 	uint8_t                   m_adc12_select;
 	uint8_t                   m_adc12_byte;
 	uint16_t                  m_adc12_data;
@@ -509,6 +511,8 @@ public:
 	DECLARE_WRITE16_MEMBER(hd68k_snd_data_w);
 	DECLARE_WRITE16_MEMBER(hd68k_snd_reset_w);
 
+private:
+
 	DECLARE_READ16_MEMBER(hdsnd68k_data_r);
 	DECLARE_WRITE16_MEMBER(hdsnd68k_data_w);
 	DECLARE_READ16_MEMBER(hdsnd68k_switches_r);
@@ -541,12 +545,11 @@ public:
 	void driversnd_68k_map(address_map &map);
 	void driversnd_dsp_io_map(address_map &map);
 	void driversnd_dsp_program_map(address_map &map);
-protected:
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<ls259_device> m_latch;
 	required_device<dac_word_interface> m_dac;

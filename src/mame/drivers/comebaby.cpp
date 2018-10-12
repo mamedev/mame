@@ -185,6 +185,7 @@ Nearly everything.
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -218,16 +219,18 @@ uint32_t comebaby_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(comebaby_state::comebaby_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
-	AM_RANGE(0x000c0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void comebaby_state::comebaby_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).ram();
+	map(0x000c0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(comebaby_state::comebaby_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-ADDRESS_MAP_END
+void comebaby_state::comebaby_io(address_map &map)
+{
+	pcat32_io_common(map);
+}
 
 static INPUT_PORTS_START( comebaby )
 INPUT_PORTS_END
@@ -235,9 +238,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(comebaby_state::comebaby)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, (66666666*19)/2) /* Actually a Celeron */
-	MCFG_CPU_PROGRAM_MAP(comebaby_map)
-	MCFG_CPU_IO_MAP(comebaby_io)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM2, (66666666*19)/2) /* Actually a Celeron */
+	MCFG_DEVICE_PROGRAM_MAP(comebaby_map)
+	MCFG_DEVICE_IO_MAP(comebaby_io)
 
 	pcat_common(config);
 
@@ -263,4 +266,4 @@ ROM_START(comebaby)
 ROM_END
 
 
-GAME( 2000, comebaby,  0,   comebaby,  comebaby, comebaby_state,  0,  ROT0,  "ExPotato",    "Come On Baby",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2000, comebaby, 0, comebaby, comebaby, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

@@ -35,14 +35,17 @@ public:
 	{ }
 
 	void vsmilpro(machine_config &config);
-	void vsmilpro_map(address_map &map);
+
 private:
+	void vsmilpro_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(vsmilpro_state::vsmilpro_map)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
-ADDRESS_MAP_END
+void vsmilpro_state::vsmilpro_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom();
+}
 
 
 /* Input ports */
@@ -51,8 +54,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vsmilpro_state::vsmilpro)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM9, 150000000)
-	MCFG_CPU_PROGRAM_MAP(vsmilpro_map)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 150000000)
+	MCFG_DEVICE_PROGRAM_MAP(vsmilpro_map)
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("vsmile_vdisk")
@@ -68,5 +71,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT COMPANY   FULLNAME       FLAGS
-COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, 0,    "VTech", "V.Smile Pro", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
+COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, empty_init, "VTech", "V.Smile Pro", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

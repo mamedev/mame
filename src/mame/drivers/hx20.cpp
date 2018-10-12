@@ -548,65 +548,70 @@ WRITE8_MEMBER( hx20_state::slave_p4_w )
 //  ADDRESS_MAP( hx20_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(hx20_state::hx20_mem)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_MAIN_TAG, hd63701_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0020, 0x0020) AM_WRITE(ksc_w)
-	AM_RANGE(0x0022, 0x0022) AM_READ(krtn07_r)
-	AM_RANGE(0x0026, 0x0026) AM_WRITE(lcd_cs_w)
-	AM_RANGE(0x0028, 0x0028) AM_READ(krtn89_r)
-	AM_RANGE(0x002a, 0x002a) AM_WRITE(lcd_data_w)
-	AM_RANGE(0x002c, 0x002c) // mask interruption by using IC 8E in sleep mode
-	AM_RANGE(0x0040, 0x007f) AM_DEVREADWRITE(MC146818_TAG, mc146818_device, read, write)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x3fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_READ(optrom_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(HD6301V1_MAIN_TAG, 0)
-ADDRESS_MAP_END
+void hx20_state::hx20_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(m_maincpu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0020, 0x0020).w(FUNC(hx20_state::ksc_w));
+	map(0x0022, 0x0022).r(FUNC(hx20_state::krtn07_r));
+	map(0x0026, 0x0026).w(FUNC(hx20_state::lcd_cs_w));
+	map(0x0028, 0x0028).r(FUNC(hx20_state::krtn89_r));
+	map(0x002a, 0x002a).w(FUNC(hx20_state::lcd_data_w));
+	map(0x002c, 0x002c); // mask interruption by using IC 8E in sleep mode
+	map(0x0040, 0x007f).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0080, 0x00ff).ram();
+	map(0x0100, 0x3fff).ram();
+	map(0x6000, 0x7fff).rom().r(FUNC(hx20_state::optrom_r));
+	map(0x8000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( hx20_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(hx20_state::hx20_io)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(main_p1_r, main_p1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(main_p2_r, main_p2_w)
-	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_NOP // A0-A7, D0-D7
-	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_NOP // A8-A15
-ADDRESS_MAP_END
+void hx20_state::hx20_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(hx20_state::main_p1_r), FUNC(hx20_state::main_p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(hx20_state::main_p2_r), FUNC(hx20_state::main_p2_w));
+	map(M6801_PORT3, M6801_PORT3).noprw(); // A0-A7, D0-D7
+	map(M6801_PORT4, M6801_PORT4).noprw(); // A8-A15
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( hx20_sub_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(hx20_state::hx20_sub_mem)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_SLAVE_TAG, hd63701_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6301V1_SLAVE_TAG, 0)
-ADDRESS_MAP_END
+void hx20_state::hx20_sub_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(m_subcpu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0080, 0x00ff).ram();
+	map(0xf000, 0xffff).rom().region(HD6301V1_SLAVE_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( hx20_sub_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(hx20_state::hx20_sub_io)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(slave_p1_r, slave_p1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(slave_p2_r, slave_p2_w)
-	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_READWRITE(slave_p3_r, slave_p3_w)
-	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_READWRITE(slave_p4_r, slave_p4_w)
-ADDRESS_MAP_END
+void hx20_state::hx20_sub_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(hx20_state::slave_p1_r), FUNC(hx20_state::slave_p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(hx20_state::slave_p2_r), FUNC(hx20_state::slave_p2_w));
+	map(M6801_PORT3, M6801_PORT3).rw(FUNC(hx20_state::slave_p3_r), FUNC(hx20_state::slave_p3_w));
+	map(M6801_PORT4, M6801_PORT4).rw(FUNC(hx20_state::slave_p4_r), FUNC(hx20_state::slave_p4_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( cm6000_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(hx20_state::cm6000_mem)
-	AM_IMPORT_FROM(hx20_mem)
-	AM_RANGE(0x4000, 0xffff) AM_ROM AM_REGION(HD6301V1_MAIN_TAG, 0)
-ADDRESS_MAP_END
+void hx20_state::cm6000_mem(address_map &map)
+{
+	hx20_mem(map);
+	map(0x4000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
+}
 
 
 //**************************************************************************
@@ -628,7 +633,7 @@ static INPUT_PORTS_START( hx20 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) // SW6:1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // SW6:1
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KSC1")
@@ -641,7 +646,7 @@ static INPUT_PORTS_START( hx20 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD )  PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD )  PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) // SW6:2
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // SW6:2
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KSC2")
@@ -654,7 +659,7 @@ static INPUT_PORTS_START( hx20 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) // SW6:3
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // SW6:3
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KSC3")
@@ -667,7 +672,7 @@ static INPUT_PORTS_START( hx20 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) // SW6:4
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // SW6:4
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KSC4")
@@ -891,16 +896,15 @@ void hx20_state::machine_start()
 
 MACHINE_CONFIG_START(hx20_state::hx20)
 	// basic machine hardware
-	MCFG_CPU_ADD(HD6301V1_MAIN_TAG, HD63701, XTAL(2'457'600))
-	MCFG_CPU_PROGRAM_MAP(hx20_mem)
-	MCFG_CPU_IO_MAP(hx20_io)
+	MCFG_DEVICE_ADD(HD6301V1_MAIN_TAG, HD63701, XTAL(2'457'600))
+	MCFG_DEVICE_PROGRAM_MAP(hx20_mem)
+	MCFG_DEVICE_IO_MAP(hx20_io)
 
-	MCFG_CPU_ADD(HD6301V1_SLAVE_TAG, HD63701, XTAL(2'457'600))
-	MCFG_CPU_PROGRAM_MAP(hx20_sub_mem)
-	MCFG_CPU_IO_MAP(hx20_sub_io)
+	MCFG_DEVICE_ADD(HD6301V1_SLAVE_TAG, HD63701, XTAL(2'457'600))
+	MCFG_DEVICE_PROGRAM_MAP(hx20_sub_mem)
+	MCFG_DEVICE_IO_MAP(hx20_sub_io)
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
@@ -920,23 +924,22 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_UPD7227_ADD(UPD7227_5_TAG, 80, 16)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_MC146818_ADD(MC146818_TAG, XTAL(4'194'304))
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(hx20_state, rtc_irq_w))
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
+	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
+	m_rtc->irq().set(FUNC(hx20_state::rtc_irq_w));
+
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_EPSON_SIO_ADD("sio", "tf20")
-	MCFG_EPSON_SIO_RX(WRITELINE(hx20_state, sio_rx_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(hx20_state, sio_pin_w))
+	MCFG_EPSON_SIO_RX(WRITELINE(*this, hx20_state, sio_rx_w))
+	MCFG_EPSON_SIO_PIN(WRITELINE(*this, hx20_state, sio_pin_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 
 	// optional rom
 	MCFG_GENERIC_SOCKET_ADD("optrom", generic_plain_slot, "opt_rom")
@@ -956,9 +959,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hx20_state::cm6000)
 	hx20(config);
 	// basic machine hardware
-	MCFG_CPU_MODIFY(HD6301V1_MAIN_TAG)
-	MCFG_CPU_PROGRAM_MAP(cm6000_mem)
-	MCFG_CPU_IO_MAP(hx20_io)
+	MCFG_DEVICE_MODIFY(HD6301V1_MAIN_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(cm6000_mem)
+	MCFG_DEVICE_IO_MAP(hx20_io)
 
 	// optional rom
 	MCFG_DEVICE_REMOVE("optrom")
@@ -981,15 +984,15 @@ ROM_START( ehx20 )
 	ROM_REGION( 0x8000, HD6301V1_MAIN_TAG, ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "v11" )
 	ROM_SYSTEM_BIOS( 0, "v10", "version 1.0" )
-	ROMX_LOAD( "hx20_v10.12e", 0x0000, 0x2000, CRC(ed7482c6) SHA1(8fba63037f2418aee9e933a353b052a5ed816ead), ROM_BIOS(1) )
-	ROMX_LOAD( "hx20_v10.13e", 0x2000, 0x2000, CRC(f5cc8868) SHA1(3248a1ddf0d8df7e9f2fe96955385218d760c4ad), ROM_BIOS(1) )
-	ROMX_LOAD( "hx20_v10.14e", 0x4000, 0x2000, CRC(27d743ed) SHA1(ebae367b0fa5f42ac78424df2534312296fd6fdc), ROM_BIOS(1) )
-	ROMX_LOAD( "hx20_v10.15e", 0x6000, 0x2000, CRC(33fbb1ab) SHA1(292ace94b4dad267aa7786dc64e68ac6f3c98aa7), ROM_BIOS(1) )
+	ROMX_LOAD( "hx20_v10.12e", 0x0000, 0x2000, CRC(ed7482c6) SHA1(8fba63037f2418aee9e933a353b052a5ed816ead), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.13e", 0x2000, 0x2000, CRC(f5cc8868) SHA1(3248a1ddf0d8df7e9f2fe96955385218d760c4ad), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.14e", 0x4000, 0x2000, CRC(27d743ed) SHA1(ebae367b0fa5f42ac78424df2534312296fd6fdc), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.15e", 0x6000, 0x2000, CRC(33fbb1ab) SHA1(292ace94b4dad267aa7786dc64e68ac6f3c98aa7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v11", "version 1.1" )
-	ROMX_LOAD( "hx20_v11.12e", 0x0000, 0x2000, CRC(4de0b4b6) SHA1(f15c537824b7effde9d9b9a21e92a081fb089371), ROM_BIOS(2) )
-	ROMX_LOAD( "hx20_v11.13e", 0x2000, 0x2000, CRC(10d6ae76) SHA1(3163954ed9981f70f590ee98bcc8e19e4be6527a), ROM_BIOS(2) )
-	ROMX_LOAD( "hx20_v11.14e", 0x4000, 0x2000, CRC(26c203a1) SHA1(b282d7233b2689820fcf718dbe1e93d623b67e4f), ROM_BIOS(2) )
-	ROMX_LOAD( "hx20_v11.15e", 0x6000, 0x2000, CRC(101cb3e8) SHA1(e0b5cf107a9387e34a0e46f54328b89696c0bdc5), ROM_BIOS(2) )
+	ROMX_LOAD( "hx20_v11.12e", 0x0000, 0x2000, CRC(4de0b4b6) SHA1(f15c537824b7effde9d9b9a21e92a081fb089371), ROM_BIOS(1) )
+	ROMX_LOAD( "hx20_v11.13e", 0x2000, 0x2000, CRC(10d6ae76) SHA1(3163954ed9981f70f590ee98bcc8e19e4be6527a), ROM_BIOS(1) )
+	ROMX_LOAD( "hx20_v11.14e", 0x4000, 0x2000, CRC(26c203a1) SHA1(b282d7233b2689820fcf718dbe1e93d623b67e4f), ROM_BIOS(1) )
+	ROMX_LOAD( "hx20_v11.15e", 0x6000, 0x2000, CRC(101cb3e8) SHA1(e0b5cf107a9387e34a0e46f54328b89696c0bdc5), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_SLAVE_TAG, 0 )
 	ROM_LOAD( "hd6301v1.6d", 0x0000, 0x1000, CRC(b36f5b99) SHA1(c6b54163bb268e4f4f5c79aa2e83ec51f775b16a) )
@@ -1032,7 +1035,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT   COMPANY   FULLNAME                 FLAGS
-COMP( 1983, ehx20,   0,      0,       hx20,      hx20,    hx20_state,    0,     "Epson",  "Epson HX-20",           MACHINE_NOT_WORKING )
-COMP( 1983, ehx20e,  ehx20,  0,       hx20,      hx20e,   hx20_state,    0,     "Epson",  "Epson HX-20 (Europe)",  MACHINE_NOT_WORKING )
-COMP( 1989, ecm6000, ehx20,  0,       cm6000,    cm6000,  hx20_state,    0,     "Epson",  "Epson CM6000",          MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY  FULLNAME                FLAGS
+COMP( 1983, ehx20,   0,      0,      hx20,    hx20,   hx20_state, empty_init, "Epson", "Epson HX-20",          MACHINE_NOT_WORKING )
+COMP( 1983, ehx20e,  ehx20,  0,      hx20,    hx20e,  hx20_state, empty_init, "Epson", "Epson HX-20 (Europe)", MACHINE_NOT_WORKING )
+COMP( 1989, ecm6000, ehx20,  0,      cm6000,  cm6000, hx20_state, empty_init, "Epson", "Epson CM6000",         MACHINE_NOT_WORKING )

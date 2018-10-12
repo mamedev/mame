@@ -168,33 +168,38 @@ Module timer tag static_vblank_timer name m_expire.seconds
 #include "emu.h"
 #include "includes/rm380z.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
-ADDRESS_MAP_START(rm380z_state::rm380z_mem)
-	AM_RANGE( 0xe000, 0xefff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0)
-	AM_RANGE( 0xf000, 0xf5ff ) AM_READWRITE(videoram_read,videoram_write)
-	AM_RANGE( 0xf600, 0xf9ff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0x1000)     /* Extra ROM space for COS4.0 */
-	AM_RANGE( 0xfa00, 0xfaff ) AM_RAM
-	AM_RANGE( 0xfb00, 0xfbff ) AM_READWRITE( port_read, port_write )
-	AM_RANGE( 0xfc00, 0xffff ) AM_READWRITE(hiram_read,hiram_write)
-ADDRESS_MAP_END
+void rm380z_state::rm380z_mem(address_map &map)
+{
+	map(0xe000, 0xefff).rom().region(RM380Z_MAINCPU_TAG, 0);
+	map(0xf000, 0xf5ff).rw(FUNC(rm380z_state::videoram_read), FUNC(rm380z_state::videoram_write));
+	map(0xf600, 0xf9ff).rom().region(RM380Z_MAINCPU_TAG, 0x1000);     /* Extra ROM space for COS4.0 */
+	map(0xfa00, 0xfaff).ram();
+	map(0xfb00, 0xfbff).rw(FUNC(rm380z_state::port_read), FUNC(rm380z_state::port_write));
+	map(0xfc00, 0xffff).rw(FUNC(rm380z_state::hiram_read), FUNC(rm380z_state::hiram_write));
+}
 
-ADDRESS_MAP_START(rm380z_state::rm380z_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READWRITE(rm380z_portlow_r, rm380z_portlow_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("wd1771", fd1771_device, read, write)
-	AM_RANGE(0xc4, 0xc4) AM_WRITE(disk_0_control)
-	AM_RANGE(0xc5, 0xff) AM_READWRITE(rm380z_porthi_r, rm380z_porthi_w)
-ADDRESS_MAP_END
+void rm380z_state::rm380z_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xbf).rw(FUNC(rm380z_state::rm380z_portlow_r), FUNC(rm380z_state::rm380z_portlow_w));
+	map(0xc0, 0xc3).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
+	map(0xc4, 0xc4).w(FUNC(rm380z_state::disk_0_control));
+	map(0xc5, 0xff).rw(FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
+}
 
-ADDRESS_MAP_START(rm380z_state::rm480z_mem)
-	AM_RANGE( 0x0000, 0xe7ff ) AM_RAM
-	AM_RANGE( 0xe800, 0xf7ff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0)
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void rm380z_state::rm480z_mem(address_map &map)
+{
+	map(0x0000, 0xe7ff).ram();
+	map(0xe800, 0xf7ff).rom().region(RM380Z_MAINCPU_TAG, 0);
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(rm380z_state::rm480z_io)
+void rm380z_state::rm480z_io(address_map &map)
+{
 	//AM_RANGE(0x00, 0x17) AM_RAM // videoram
 	//AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) // control port 0
 	//AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) // control port 1
@@ -207,7 +212,7 @@ ADDRESS_MAP_START(rm380z_state::rm480z_io)
 	//AM_RANGE(0x2c, 0x2f) AM_MIRROR(0xff00) // z80ctc IEEE int, Maths int, RTC, RTC // option
 	//AM_RANGE(0x30, 0x37) AM_MIRROR(0xff00) // IEEE chip // option
 	//AM_RANGE(0x38, 0x3b) AM_MIRROR(0xff00) // Hi-res graphics option
-ADDRESS_MAP_END
+}
 
 INPUT_PORTS_START( rm380z )
 //  PORT_START("additional_chars")
@@ -218,9 +223,10 @@ INPUT_PORTS_END
 //
 //
 
-static SLOT_INTERFACE_START( rm380z_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void rm380z_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_SSSD);
+}
 
 uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -230,9 +236,9 @@ uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(rm380z_state::rm380z)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(rm380z_mem)
-	MCFG_CPU_IO_MAP(rm380z_io)
+	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(rm380z_mem)
+	MCFG_DEVICE_IO_MAP(rm380z_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -254,11 +260,10 @@ MACHINE_CONFIG_START(rm380z_state::rm380z)
 	//m_cassette->change_state((BIT(data,x)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* RAM configurations */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("56K")
+	RAM(config, RAM_TAG).set_default_size("56K");
 
 	/* floppy disk */
-	MCFG_FD1771_ADD("wd1771", XTAL(1'000'000))
+	FD1771(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
@@ -270,9 +275,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rm380z_state::rm480z)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(rm480z_mem)
-	MCFG_CPU_IO_MAP(rm480z_io)
+	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(rm480z_mem)
+	MCFG_DEVICE_IO_MAP(rm480z_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(rm380z_state, rm480z)
 	/* video hardware */
@@ -345,10 +350,10 @@ ROM_END
 
 
 /* Driver */
-//   YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT     CLASS            INIT        COMPANY                 FULLNAME                FLAGS
-COMP(1978, rm380z,     0,         0,     rm380z,     rm380z,   rm380z_state,    rm380z,     "Research Machines",    "RM-380Z, COS 4.0B",    MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34d,  rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34d,  "Research Machines",    "RM-380Z, COS 3.4D",    MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34e,  rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "RM-380Z, COS 3.4E",    MACHINE_NO_SOUND_HW)
-COMP(1981, rm480z,     rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP(1981, rm480za,    rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT            COMPANY              FULLNAME                FLAGS
+COMP(1978, rm380z,    0,      0,      rm380z,  rm380z, rm380z_state, init_rm380z,    "Research Machines", "RM-380Z, COS 4.0B",    MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34d, rm380z, 0,      rm380z,  rm380z, rm380z_state, init_rm380z34d, "Research Machines", "RM-380Z, COS 3.4D",    MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34e, rm380z, 0,      rm380z,  rm380z, rm380z_state, init_rm380z34e, "Research Machines", "RM-380Z, COS 3.4E",    MACHINE_NO_SOUND_HW)
+COMP(1981, rm480z,    rm380z, 0,      rm480z,  rm380z, rm380z_state, init_rm380z34e, "Research Machines", "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1981, rm480za,   rm380z, 0,      rm480z,  rm380z, rm380z_state, init_rm380z34e, "Research Machines", "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 

@@ -70,7 +70,7 @@ TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
 	m_watchdog->watchdog_enable(ioport("IN0")->read() & 0x40);
 
 	if (ioport("IN0")->read() & 0x40)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_nmi_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
@@ -135,16 +135,6 @@ WRITE8_MEMBER(ultratnk_state::da_latch_w)
 }
 
 
-WRITE_LINE_MEMBER(ultratnk_state::led_1_w)
-{
-	output().set_led_value(0, state); /* left player start */
-}
-WRITE_LINE_MEMBER(ultratnk_state::led_2_w)
-{
-	output().set_led_value(1, state); /* right player start */
-}
-
-
 WRITE_LINE_MEMBER(ultratnk_state::lockout_w)
 {
 	machine().bookkeeping().coin_lockout_global_w(!state);
@@ -161,33 +151,34 @@ WRITE8_MEMBER(ultratnk_state::explosion_w)
 }
 
 
-ADDRESS_MAP_START(ultratnk_state::ultratnk_cpu_map)
+void ultratnk_state::ultratnk_cpu_map(address_map &map)
+{
 
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	map.global_mask(0x3fff);
 
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x700) AM_RAM
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(wram_r, wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(video_ram_w) AM_SHARE("videoram")
+	map(0x0000, 0x007f).mirror(0x700).ram();
+	map(0x0080, 0x00ff).mirror(0x700).rw(FUNC(ultratnk_state::wram_r), FUNC(ultratnk_state::wram_w));
+	map(0x0800, 0x0bff).mirror(0x400).ram().w(FUNC(ultratnk_state::video_ram_w)).share("videoram");
 
-	AM_RANGE(0x1000, 0x17ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x1800, 0x1fff) AM_READ_PORT("IN1")
+	map(0x1000, 0x17ff).portr("IN0");
+	map(0x1800, 0x1fff).portr("IN1");
 
-	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x718) AM_READ(analog_r)
-	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_READ(coin_r)
-	AM_RANGE(0x2040, 0x2047) AM_MIRROR(0x718) AM_READ(collision_r)
-	AM_RANGE(0x2060, 0x2063) AM_MIRROR(0x71c) AM_READ(options_r)
+	map(0x2000, 0x2007).mirror(0x718).r(FUNC(ultratnk_state::analog_r));
+	map(0x2020, 0x2027).mirror(0x718).r(FUNC(ultratnk_state::coin_r));
+	map(0x2040, 0x2047).mirror(0x718).r(FUNC(ultratnk_state::collision_r));
+	map(0x2060, 0x2063).mirror(0x71c).r(FUNC(ultratnk_state::options_r));
 
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x71f) AM_WRITE(attract_w)
-	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_WRITE(collision_reset_w)
-	AM_RANGE(0x2040, 0x2041) AM_MIRROR(0x718) AM_WRITE(da_latch_w)
-	AM_RANGE(0x2042, 0x2043) AM_MIRROR(0x718) AM_WRITE(explosion_w)
-	AM_RANGE(0x2044, 0x2045) AM_MIRROR(0x718) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x2060, 0x206f) AM_MIRROR(0x710) AM_DEVWRITE("latch", f9334_device, write_a0)
+	map(0x2000, 0x2000).mirror(0x71f).w(FUNC(ultratnk_state::attract_w));
+	map(0x2020, 0x2027).mirror(0x718).w(FUNC(ultratnk_state::collision_reset_w));
+	map(0x2040, 0x2041).mirror(0x718).w(FUNC(ultratnk_state::da_latch_w));
+	map(0x2042, 0x2043).mirror(0x718).w(FUNC(ultratnk_state::explosion_w));
+	map(0x2044, 0x2045).mirror(0x718).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x2060, 0x206f).mirror(0x710).w("latch", FUNC(f9334_device::write_a0));
 
-	AM_RANGE(0x2800, 0x2fff) AM_NOP /* diagnostic ROM */
-	AM_RANGE(0x3000, 0x3fff) AM_ROM
+	map(0x2800, 0x2fff).noprw(); /* diagnostic ROM */
+	map(0x3000, 0x3fff).rom();
 
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( ultratnk )
@@ -200,13 +191,13 @@ static INPUT_PORTS_START( ultratnk )
 
 	PORT_START("COLLISION")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)0 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)0 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* VCC */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )   /* SLAM */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)3 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)3 )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -239,13 +230,13 @@ static INPUT_PORTS_START( ultratnk )
 
 	PORT_START("ANALOG")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-W" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-W" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-Y" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-Y" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-X" )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-X" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-Z" )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-Z" )
 
 	PORT_START("JOY-W")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_PLAYER(1)
@@ -292,7 +283,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( ultratnk )
+static GFXDECODE_START( gfx_ultratnk )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 5 )
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout, 0, 5 )
 GFXDECODE_END
@@ -301,36 +292,34 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(ultratnk_cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(ultratnk_cpu_map)
 
-	MCFG_DEVICE_ADD("latch", F9334, 0) // E11
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ultratnk_state, lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ultratnk_state, led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ultratnk_state, led_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_2>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_1>))
+	f9334_device &latch(F9334(config, "latch")); // E11
+	latch.q_out_cb<3>().set(FUNC(ultratnk_state::lockout_w));
+	latch.q_out_cb<4>().set_output("led0"); // LED1 (left player start)
+	latch.q_out_cb<5>().set_output("led1"); // LED2 (right player start)
+	latch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<ULTRATNK_FIRE_EN_2>));
+	latch.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<ULTRATNK_FIRE_EN_1>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(ultratnk_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ultratnk_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ultratnk_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ultratnk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ultratnk)
 	MCFG_PALETTE_ADD("palette", 10)
 	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(ultratnk_state, ultratnk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(ultratnk)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, ultratnk_discrete)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -361,4 +350,4 @@ ROM_START( ultratnk )
 ROM_END
 
 
-GAME( 1978, ultratnk, 0, ultratnk, ultratnk, ultratnk_state, 0, 0, "Atari (Kee Games)", "Ultra Tank", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, ultratnk, 0, ultratnk, ultratnk, ultratnk_state, empty_init, ROT0, "Atari (Kee Games)", "Ultra Tank", MACHINE_SUPPORTS_SAVE )

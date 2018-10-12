@@ -316,19 +316,19 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ctstein_state::ctstein)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K, C=100pF
+	MCFG_DEVICE_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_G_CB(WRITE8(ctstein_state, write_g))
-	MCFG_COP400_WRITE_L_CB(WRITE8(ctstein_state, write_l))
-	MCFG_COP400_WRITE_SK_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_COP400_READ_L_CB(READ8(ctstein_state, read_l))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, ctstein_state, write_g))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, ctstein_state, write_l))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, ctstein_state, read_l))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ctstein)
+	config.set_default_layout(layout_ctstein);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -417,7 +417,7 @@ static INPUT_PORTS_START( h2hbaskbc )
 	PORT_START("IN.1") // G1 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Shoot")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start/Display")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // factory set
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // factory set
 
 	PORT_START("IN.2") // G2 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Defense Right")
@@ -434,7 +434,7 @@ static INPUT_PORTS_START( h2hbaskbc )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN.4") // IN3 (factory set)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( h2hhockeyc )
@@ -445,33 +445,33 @@ static INPUT_PORTS_START( h2hhockeyc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left")
 
 	PORT_MODIFY("IN.4")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( h2hsoccerc )
 	PORT_INCLUDE( h2hhockeyc )
 
 	PORT_MODIFY("IN.1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(h2hbaskbc_state::h2hbaskbc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 850000) // approximation - RC osc. R=43K, C=101pF
+	MCFG_DEVICE_ADD("maincpu", COP420, 850000) // approximation - RC osc. R=43K, C=101pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(h2hbaskbc_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(h2hbaskbc_state, write_g))
-	MCFG_COP400_WRITE_L_CB(WRITE8(h2hbaskbc_state, write_l))
-	MCFG_COP400_READ_IN_CB(READ8(h2hbaskbc_state, read_in))
-	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, h2hbaskbc_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, h2hbaskbc_state, write_g))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, h2hbaskbc_state, write_l))
+	MCFG_COP400_READ_IN_CB(READ8(*this, h2hbaskbc_state, read_in))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_h2hbaskbc)
+	config.set_default_layout(layout_h2hbaskbc);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -479,14 +479,14 @@ MACHINE_CONFIG_START(h2hbaskbc_state::h2hhockeyc)
 	h2hbaskbc(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_h2hhockeyc)
+	config.set_default_layout(layout_h2hhockeyc);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(h2hbaskbc_state::h2hsoccerc)
 	h2hbaskbc(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_h2hsoccerc)
+	config.set_default_layout(layout_h2hsoccerc);
 MACHINE_CONFIG_END
 
 
@@ -584,14 +584,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(einvaderc_state::einvaderc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP444L, 850000) // approximation - RC osc. R=47K, C=100pF
+	MCFG_DEVICE_ADD("maincpu", COP444L, 850000) // approximation - RC osc. R=47K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
-	MCFG_COP400_WRITE_D_CB(WRITE8(einvaderc_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(einvaderc_state, write_g))
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(einvaderc_state, write_sk))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(einvaderc_state, write_so))
-	MCFG_COP400_WRITE_L_CB(WRITE8(einvaderc_state, write_l))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, einvaderc_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, einvaderc_state, write_g))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, einvaderc_state, write_sk))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, einvaderc_state, write_so))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, einvaderc_state, write_l))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -599,11 +599,11 @@ MACHINE_CONFIG_START(einvaderc_state::einvaderc)
 	MCFG_SCREEN_SIZE(913, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 913-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_einvaderc)
+	config.set_default_layout(layout_einvaderc);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -713,21 +713,21 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(unkeinv_state::unkeinv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 850000) // frequency guessed
+	MCFG_DEVICE_ADD("maincpu", COP421, 850000) // frequency guessed
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_G_CB(WRITE8(unkeinv_state, write_g))
-	MCFG_COP400_WRITE_D_CB(WRITE8(unkeinv_state, write_d))
-	MCFG_COP400_WRITE_L_CB(WRITE8(unkeinv_state, write_l))
-	MCFG_COP400_READ_L_CB(READ8(unkeinv_state, read_l))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, unkeinv_state, write_g))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, unkeinv_state, write_d))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, unkeinv_state, write_l))
+	MCFG_COP400_READ_L_CB(READ8(*this, unkeinv_state, read_l))
 	MCFG_COP400_READ_L_TRISTATE_CB(CONSTANT(0xff))
-	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_unkeinv)
+	config.set_default_layout(layout_unkeinv);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -849,7 +849,7 @@ static INPUT_PORTS_START( lchicken )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lchicken_state, motor_switch, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lchicken_state, motor_switch, nullptr)
 INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER(lchicken_state::motor_switch)
@@ -869,22 +869,22 @@ void lchicken_state::machine_start()
 MACHINE_CONFIG_START(lchicken_state::lchicken)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K, C=100pF
+	MCFG_DEVICE_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_L_CB(WRITE8(lchicken_state, write_l))
-	MCFG_COP400_WRITE_D_CB(WRITE8(lchicken_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(lchicken_state, write_g))
-	MCFG_COP400_READ_G_CB(READ8(lchicken_state, read_g))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(lchicken_state, write_so))
-	MCFG_COP400_READ_SI_CB(READLINE(lchicken_state, read_si))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, lchicken_state, write_l))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, lchicken_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, lchicken_state, write_g))
+	MCFG_COP400_READ_G_CB(READ8(*this, lchicken_state, read_g))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, lchicken_state, write_so))
+	MCFG_COP400_READ_SI_CB(READLINE(*this, lchicken_state, read_si))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("chicken_motor", lchicken_state, motor_sim_tick, attotime::from_msec(6000/0x100)) // ~6sec for a full rotation
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_lchicken)
+	config.set_default_layout(layout_lchicken);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -969,7 +969,7 @@ static INPUT_PORTS_START( funjacks )
 
 	PORT_START("IN.3") // port G
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) // speaker
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speaker
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
 	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
@@ -979,20 +979,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(funjacks_state::funjacks)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pF
+	MCFG_DEVICE_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(funjacks_state, write_d))
-	MCFG_COP400_WRITE_L_CB(WRITE8(funjacks_state, write_l))
-	MCFG_COP400_WRITE_G_CB(WRITE8(funjacks_state, write_g))
-	MCFG_COP400_READ_L_CB(READ8(funjacks_state, read_l))
-	MCFG_COP400_READ_G_CB(READ8(funjacks_state, read_g))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, funjacks_state, write_d))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, funjacks_state, write_l))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, funjacks_state, write_g))
+	MCFG_COP400_READ_L_CB(READ8(*this, funjacks_state, read_l))
+	MCFG_COP400_READ_G_CB(READ8(*this, funjacks_state, read_g))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_funjacks)
+	config.set_default_layout(layout_funjacks);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1074,20 +1074,20 @@ INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
 MACHINE_CONFIG_START(funrlgl_state::funrlgl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pF
+	MCFG_DEVICE_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(funrlgl_state, write_d))
-	MCFG_COP400_WRITE_L_CB(WRITE8(funrlgl_state, write_l))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, funrlgl_state, write_d))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, funrlgl_state, write_l))
 	MCFG_COP400_READ_L_TRISTATE_CB(CONSTANT(0xff))
-	MCFG_COP400_WRITE_G_CB(WRITE8(funrlgl_state, write_g))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, funrlgl_state, write_g))
 	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_funrlgl)
+	config.set_default_layout(layout_funrlgl);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1210,20 +1210,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mdallas_state::mdallas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=57K, C=101pF
+	MCFG_DEVICE_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=57K, C=101pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_L_CB(WRITE8(mdallas_state, write_l))
-	MCFG_COP400_WRITE_D_CB(WRITE8(mdallas_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(mdallas_state, write_g))
-	MCFG_COP400_READ_IN_CB(READ8(mdallas_state, read_in))
-	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, mdallas_state, write_l))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, mdallas_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, mdallas_state, write_g))
+	MCFG_COP400_READ_IN_CB(READ8(*this, mdallas_state, read_in))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_mdallas)
+	config.set_default_layout(layout_mdallas);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1294,18 +1294,18 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(plus1_state::plus1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pF
+	MCFG_DEVICE_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(plus1_state, write_d))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, plus1_state, write_d))
 	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
-	MCFG_COP400_WRITE_L_CB(WRITE8(plus1_state, write_l))
-	MCFG_COP400_READ_L_CB(READ8(plus1_state, read_l))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, plus1_state, write_l))
+	MCFG_COP400_READ_L_CB(READ8(*this, plus1_state, read_l))
 
 	/* no visual feedback! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1422,20 +1422,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(lightfgt_state::lightfgt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K, C=56pF
+	MCFG_DEVICE_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K, C=56pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(lightfgt_state, write_so))
-	MCFG_COP400_WRITE_D_CB(WRITE8(lightfgt_state, write_d))
-	MCFG_COP400_WRITE_L_CB(WRITE8(lightfgt_state, write_l))
-	MCFG_COP400_WRITE_SK_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_COP400_READ_G_CB(READ8(lightfgt_state, read_g))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, lightfgt_state, write_so))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, lightfgt_state, write_d))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, lightfgt_state, write_l))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_COP400_READ_G_CB(READ8(*this, lightfgt_state, read_g))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_lightfgt)
+	config.set_default_layout(layout_lightfgt);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1576,23 +1576,23 @@ base pulled high with 4.7K resistor, connects directly to G3, 1K resistor to G2,
 MACHINE_CONFIG_START(bship82_state::bship82)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 750000) // approximation - RC osc. R=14K, C=100pF
+	MCFG_DEVICE_ADD("maincpu", COP420, 750000) // approximation - RC osc. R=14K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(bship82_state, write_d))
-	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_COP400_READ_L_CB(READ8(bship82_state, read_l))
-	MCFG_COP400_READ_IN_CB(READ8(bship82_state, read_in))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(bship82_state, write_so))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, bship82_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8("dac", dac_byte_interface, data_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, bship82_state, read_l))
+	MCFG_COP400_READ_IN_CB(READ8(*this, bship82_state, read_in))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, bship82_state, write_so))
 	MCFG_COP400_READ_SI_CB(IOPORT("IN.4"))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_bship82)
+	config.set_default_layout(layout_bship82);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // see above
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // see above
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1708,16 +1708,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(qkracer_state::qkracer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pF
+	MCFG_DEVICE_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(qkracer_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(qkracer_state, write_g))
-	MCFG_COP400_WRITE_L_CB(WRITE8(qkracer_state, write_l))
-	MCFG_COP400_READ_IN_CB(READ8(qkracer_state, read_in))
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(qkracer_state, write_sk))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, qkracer_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, qkracer_state, write_g))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, qkracer_state, write_l))
+	MCFG_COP400_READ_IN_CB(READ8(*this, qkracer_state, read_in))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, qkracer_state, write_sk))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_qkracer)
+	config.set_default_layout(layout_qkracer);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -1793,28 +1793,28 @@ static INPUT_PORTS_START( vidchal )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // TODO: light sensor
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // TODO: light sensor
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vidchal_state::vidchal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 900000) // approximation
+	MCFG_DEVICE_ADD("maincpu", COP420, 900000) // approximation
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(vidchal_state, write_d))
-	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_COP400_WRITE_L_CB(WRITE8(vidchal_state, write_l))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, vidchal_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8("dac", dac_byte_interface, data_w))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, vidchal_state, write_l))
 	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(vidchal_state, write_sk))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, vidchal_state, write_sk))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_vidchal)
+	config.set_default_layout(layout_vidchal);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // unknown DAC
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1919,30 +1919,30 @@ ROM_END
 
 
 
-//    YEAR  NAME        PARENT   COMP MACHINE     INPUT       STATE          INIT COMPANY, FULLNAME, FLAGS
-CONS( 1979, ctstein,    0,         0, ctstein,    ctstein,    ctstein_state,   0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    CMP MACHINE     INPUT       CLASS            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, ctstein,    0,         0, ctstein,    ctstein,    ctstein_state,   empty_init, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, h2hbaskbc,  0,         0, h2hbaskbc,  h2hbaskbc,  h2hbaskbc_state, 0, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hhockeyc, h2hhockey, 0, h2hhockeyc, h2hhockeyc, h2hbaskbc_state, 0, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hsoccerc, 0,         0, h2hsoccerc, h2hsoccerc, h2hbaskbc_state, 0, "Coleco", "Head to Head: Electronic Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hbaskbc,  0,         0, h2hbaskbc,  h2hbaskbc,  h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hhockeyc, h2hhockey, 0, h2hhockeyc, h2hhockeyc, h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hsoccerc, 0,         0, h2hsoccerc, h2hsoccerc, h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, einvaderc,  einvader,  0, einvaderc,  einvaderc,  einvaderc_state, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, einvaderc,  einvader,  0, einvaderc,  einvaderc,  einvaderc_state, empty_init, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, unkeinv,    0,         0, unkeinv,    unkeinv,    unkeinv_state,   0, "Gordon Barlow Design", "unknown electronic Space Invaders game (patent)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, unkeinv,    0,         0, unkeinv,    unkeinv,    unkeinv_state,   empty_init, "Gordon Barlow Design", "unknown electronic Space Invaders game (patent)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, lchicken,   0,         0, lchicken,   lchicken,   lchicken_state,  0, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
+CONS( 1980, lchicken,   0,         0, lchicken,   lchicken,   lchicken_state,  empty_init, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
-CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  0, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   0, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   0, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
-CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
-CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  0, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
+CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   empty_init, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-CONS( 1978, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   0, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1978, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1987, vidchal,    0,         0, vidchal,    vidchal,    vidchal_state,   0, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1987, vidchal,    0,         0, vidchal,    vidchal,    vidchal_state,   empty_init, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

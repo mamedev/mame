@@ -26,32 +26,34 @@
 DEFINE_DEVICE_TYPE(MIE,     mie_device,     "mie",     "Sega 315-6146 MIE")
 DEFINE_DEVICE_TYPE(MIE_JVS, mie_jvs_device, "mie_jvs", "JVS (MIE)")
 
-ADDRESS_MAP_START(mie_device::mie_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x6fff) AM_READ(read_ff)
-	AM_RANGE(0x7000, 0x7002) AM_READWRITE(control_r, control_w) AM_MIRROR(0x07c0)
-	AM_RANGE(0x7003, 0x7003) AM_READWRITE(lreg_r, lreg_w) AM_MIRROR(0x07c0)
-	AM_RANGE(0x7004, 0x7023) AM_READWRITE(tbuf_r, tbuf_w) AM_MIRROR(0x07c0)
-	AM_RANGE(0x7024, 0x703f) AM_READ(read_00) AM_MIRROR(0x07c0)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(read_78xx)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mie_device::mie_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x6fff).r(FUNC(mie_device::read_ff));
+	map(0x7000, 0x7002).rw(FUNC(mie_device::control_r), FUNC(mie_device::control_w)).mirror(0x07c0);
+	map(0x7003, 0x7003).rw(FUNC(mie_device::lreg_r), FUNC(mie_device::lreg_w)).mirror(0x07c0);
+	map(0x7004, 0x7023).rw(FUNC(mie_device::tbuf_r), FUNC(mie_device::tbuf_w)).mirror(0x07c0);
+	map(0x7024, 0x703f).r(FUNC(mie_device::read_00)).mirror(0x07c0);
+	map(0x7800, 0x7fff).r(FUNC(mie_device::read_78xx));
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(mie_device::mie_port)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_READWRITE(gpio_r, gpio_w)
-	AM_RANGE(0x08, 0x08) AM_READWRITE(gpiodir_r, gpiodir_w)
-	AM_RANGE(0x0f, 0x0f) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(jvs_r, jvs_w)     // ports 1x and 2x is standard UARTs, TODO handle it properly
-	AM_RANGE(0x12, 0x12) AM_WRITE(jvs_dest_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(jvs_lcr_w)
-	AM_RANGE(0x15, 0x15) AM_READ(jvs_status_r)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(irq_enable_r, irq_enable_w)
-	AM_RANGE(0x50, 0x50) AM_READWRITE(maple_irqlevel_r, maple_irqlevel_w)
-	AM_RANGE(0x70, 0x70) AM_READWRITE(irq_pending_r, irq_pending_w)
-	AM_RANGE(0x90, 0x90) AM_WRITE(jvs_control_w)
-	AM_RANGE(0x91, 0x91) AM_READ(jvs_sense_r)
-ADDRESS_MAP_END
+void mie_device::mie_port(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).rw(FUNC(mie_device::gpio_r), FUNC(mie_device::gpio_w));
+	map(0x08, 0x08).rw(FUNC(mie_device::gpiodir_r), FUNC(mie_device::gpiodir_w));
+	map(0x0f, 0x0f).rw(FUNC(mie_device::adc_r), FUNC(mie_device::adc_w));
+	map(0x10, 0x10).rw(FUNC(mie_device::jvs_r), FUNC(mie_device::jvs_w));     // ports 1x and 2x is standard UARTs, TODO handle it properly
+	map(0x12, 0x12).w(FUNC(mie_device::jvs_dest_w));
+	map(0x13, 0x13).w(FUNC(mie_device::jvs_lcr_w));
+	map(0x15, 0x15).r(FUNC(mie_device::jvs_status_r));
+	map(0x30, 0x30).rw(FUNC(mie_device::irq_enable_r), FUNC(mie_device::irq_enable_w));
+	map(0x50, 0x50).rw(FUNC(mie_device::maple_irqlevel_r), FUNC(mie_device::maple_irqlevel_w));
+	map(0x70, 0x70).rw(FUNC(mie_device::irq_pending_r), FUNC(mie_device::irq_pending_w));
+	map(0x90, 0x90).w(FUNC(mie_device::jvs_control_w));
+	map(0x91, 0x91).r(FUNC(mie_device::jvs_sense_r));
+}
 
 ROM_START( mie )
 	ROM_REGION( 0x800, "mie", 0 )
@@ -64,10 +66,10 @@ const tiny_rom_entry *mie_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(mie_device::device_add_mconfig)
-	MCFG_CPU_ADD("mie", Z80, DERIVED_CLOCK(1,1))
-	MCFG_CPU_PROGRAM_MAP(mie_map)
-	MCFG_CPU_IO_MAP(mie_port)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device, irq_callback)
+	MCFG_DEVICE_ADD("mie", Z80, DERIVED_CLOCK(1,1))
+	MCFG_DEVICE_PROGRAM_MAP(mie_map)
+	MCFG_DEVICE_IO_MAP(mie_port)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device, irq_callback)
 MACHINE_CONFIG_END
 
 mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

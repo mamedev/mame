@@ -8,6 +8,7 @@
 
 #include "machine/timer.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 
 class gberet_state : public driver_device
 {
@@ -25,6 +26,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void gberetb(machine_config &config);
+	void mrgoemon(machine_config &config);
+	void gberet(machine_config &config);
+
+	void init_mrgoemon();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -55,7 +63,6 @@ public:
 	DECLARE_WRITE8_MEMBER(gberet_scroll_w);
 	DECLARE_WRITE8_MEMBER(gberet_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(gberetb_scroll_w);
-	DECLARE_DRIVER_INIT(mrgoemon);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_START(gberet);
 	DECLARE_MACHINE_RESET(gberet);
@@ -69,9 +76,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void gberetb(machine_config &config);
-	void mrgoemon(machine_config &config);
-	void gberet(machine_config &config);
 	void gberet_map(address_map &map);
 	void gberetb_map(address_map &map);
 	void mrgoemon_map(address_map &map);

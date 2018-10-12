@@ -28,6 +28,7 @@
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -42,7 +43,7 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 			break;
 		case 6: /* 6502 sound cpu */
 			m_soundlatch->write(space, 0, data & 0xff);
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 		default:
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+offset);
@@ -53,31 +54,33 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(stadhero_state::main_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(stadhero_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)                          /* text layer */
-	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
-	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_r, pf_data_w)
-	AM_RANGE(0x30c000, 0x30c001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x30c002, 0x30c003) AM_READ_PORT("COIN")
-	AM_RANGE(0x30c004, 0x30c005) AM_READ_PORT("DSW")
-	AM_RANGE(0x30c000, 0x30c00b) AM_WRITE(stadhero_control_w)
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM /* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x000800) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void stadhero_state::main_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x200000, 0x2007ff).ram().w(FUNC(stadhero_state::stadhero_pf1_data_w)).share("pf1_data");
+	map(0x240000, 0x240007).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
+	map(0x240010, 0x240017).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x260000, 0x261fff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x30c000, 0x30c001).portr("INPUTS");
+	map(0x30c002, 0x30c003).portr("COIN");
+	map(0x30c004, 0x30c005).portr("DSW");
+	map(0x30c000, 0x30c00b).w(FUNC(stadhero_state::stadhero_control_w));
+	map(0x310000, 0x3107ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xff8000, 0xffbfff).ram(); /* Main ram */
+	map(0xffc000, 0xffc7ff).mirror(0x000800).ram().share("spriteram");
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(stadhero_state::audio_map)
-	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void stadhero_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x05ff).ram();
+	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
+	map(0x1000, 0x1001).w("ym2", FUNC(ym3812_device::write));
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x3800, 0x3800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 /******************************************************************************/
 
@@ -138,8 +141,8 @@ static INPUT_PORTS_START( stadhero )
 	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
 
 	PORT_START("COIN")  /* 0x30c002 & 0x30c003 */
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
@@ -191,7 +194,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( stadhero )
+static GFXDECODE_START( gfx_stadhero )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_3bpp,    512, 16 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 256, 16 ) /* Sprites 16x16 */
@@ -202,12 +205,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(stadhero_state::stadhero)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20_MHz_XTAL/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stadhero_state,  irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stadhero_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 24_MHz_XTAL/16)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 24_MHz_XTAL/16)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -218,7 +221,7 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 	MCFG_SCREEN_UPDATE_DRIVER(stadhero_state, screen_update_stadhero)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stadhero)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stadhero)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -232,21 +235,21 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 24_MHz_XTAL/16)
+	MCFG_DEVICE_ADD("ym1", YM2203, 24_MHz_XTAL/16)
 	MCFG_SOUND_ROUTE(0, "mono", 0.95)
 	MCFG_SOUND_ROUTE(1, "mono", 0.95)
 	MCFG_SOUND_ROUTE(2, "mono", 0.95)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 24_MHz_XTAL/8)
+	MCFG_DEVICE_ADD("ym2", YM3812, 24_MHz_XTAL/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -288,4 +291,4 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, stadhero, 0, stadhero, stadhero, stadhero_state, 0, ROT0, "Data East Corporation", "Stadium Hero (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, stadhero, 0, stadhero, stadhero, stadhero_state, empty_init, ROT0, "Data East Corporation", "Stadium Hero (Japan)", MACHINE_SUPPORTS_SAVE )

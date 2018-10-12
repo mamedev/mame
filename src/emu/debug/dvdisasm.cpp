@@ -159,7 +159,7 @@ void debug_view_disasm::view_char(int chval)
 		case DCH_HOME:              // set the active column to the PC
 		{
 			const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-			offs_t pc = source.device()->safe_pcbase() & source.m_space.logaddrmask();
+			offs_t pc = source.device()->state().pcbase() & source.m_space.logaddrmask();
 
 			// figure out which row the pc is on
 			for(unsigned int curline = 0; curline < m_dasm.size(); curline++)
@@ -247,17 +247,17 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 	if(address > pc)
 		address = 0;
 
-	util::disasm_interface *intf = dynamic_cast<device_disasm_interface &>(*source.device()).get_disassembler();
-	if(intf->interface_flags() & util::disasm_interface::NONLINEAR_PC) {
-		offs_t lpc = intf->pc_real_to_linear(pc);
-		while(intf->pc_real_to_linear(address) < lpc) {
+	util::disasm_interface &intf(dynamic_cast<device_disasm_interface &>(*source.device()).get_disassembler());
+	if(intf.interface_flags() & util::disasm_interface::NONLINEAR_PC) {
+		offs_t lpc = intf.pc_real_to_linear(pc);
+		while(intf.pc_real_to_linear(address) < lpc) {
 			std::string dasm;
 			offs_t size;
 			offs_t next_address;
 			u32 info;
 			buffer.disassemble(address, dasm, next_address, size, info);
 			m_dasm.emplace_back(address, size, dasm);
-			if(intf->pc_real_to_linear(address) > intf->pc_real_to_linear(next_address))
+			if(intf.pc_real_to_linear(address) > intf.pc_real_to_linear(next_address))
 				return false;
 			address = next_address;
 		}
@@ -311,7 +311,8 @@ void debug_view_disasm::generate_dasm(debug_disasm_buffer &buffer, offs_t pc)
 			m_topleft.x = 0;
 			m_topleft.y = 0;
 		}
-		generate_from_address(buffer, m_expression.value());
+		const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
+		generate_from_address(buffer, m_expression.value() & source.m_space.logaddrmask());
 		return;
 	}
 
@@ -375,7 +376,7 @@ void debug_view_disasm::view_update()
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 	debug_disasm_buffer buffer(*source.device());
-	offs_t pc = source.device()->safe_pcbase() & source.m_space.logaddrmask();
+	offs_t pc = source.device()->state().pcbase() & source.m_space.logaddrmask();
 
 	generate_dasm(buffer, pc);
 

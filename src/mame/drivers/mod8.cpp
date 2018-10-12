@@ -67,15 +67,17 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void mod8(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(out_w);
 	DECLARE_WRITE8_MEMBER(tty_w);
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(tty_r);
 	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
-	void mod8(machine_config &config);
 	void mod8_io(address_map &map);
 	void mod8_mem(address_map &map);
-private:
+
 	uint16_t m_tty_data;
 	uint8_t m_tty_key_data;
 	int m_tty_cnt;
@@ -110,19 +112,21 @@ READ8_MEMBER( mod8_state::tty_r )
 	return d;
 }
 
-ADDRESS_MAP_START(mod8_state::mod8_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000,0x6ff) AM_ROM
-	AM_RANGE(0x700,0xfff) AM_RAM
-ADDRESS_MAP_END
+void mod8_state::mod8_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x6ff).rom();
+	map(0x700, 0xfff).ram();
+}
 
-ADDRESS_MAP_START(mod8_state::mod8_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READ(tty_r)
-	AM_RANGE(0x0a,0x0a) AM_WRITE(out_w)
-	AM_RANGE(0x0b,0x0b) AM_WRITE(tty_w)
-ADDRESS_MAP_END
+void mod8_state::mod8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(mod8_state::tty_r));
+	map(0x0a, 0x0a).w(FUNC(mod8_state::out_w));
+	map(0x0b, 0x0b).w(FUNC(mod8_state::tty_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mod8 )
@@ -145,10 +149,10 @@ void mod8_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(mod8_state::mod8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8008, 800000)
-	MCFG_CPU_PROGRAM_MAP(mod8_mem)
-	MCFG_CPU_IO_MAP(mod8_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
+	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(mod8_mem)
+	MCFG_DEVICE_IO_MAP(mod8_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TELEPRINTER_TAG, TELEPRINTER, 0)
@@ -170,5 +174,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT  COMPANY                           FULLNAME  FLAGS
-COMP( 1974, mod8,   0,       0,      mod8,      mod8,   mod8_state,   0,    "Microsystems International Ltd", "MOD-8",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                           FULLNAME  FLAGS
+COMP( 1974, mod8, 0,      0,      mod8,    mod8,  mod8_state, empty_init, "Microsystems International Ltd", "MOD-8",  MACHINE_NO_SOUND_HW )

@@ -4,7 +4,7 @@
 
     m6502d.cpp
 
-    Mostek 6502, original NMOS variant, disassembler
+    MOS Technology 6502, original NMOS variant, disassembler
 
 ***************************************************************************/
 

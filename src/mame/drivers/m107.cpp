@@ -31,11 +31,11 @@ confirmed for m107 games as well.
 
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
+#include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
 #include "sound/iremga20.h"
 #include "speaker.h"
-
 
 /*****************************************************************************/
 
@@ -73,7 +73,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 }
 
 
-
 /*****************************************************************************/
 
 WRITE8_MEMBER(m107_state::coincounter_w)
@@ -84,7 +83,7 @@ WRITE8_MEMBER(m107_state::coincounter_w)
 
 WRITE8_MEMBER(m107_state::bankswitch_w)
 {
-	membank("bank1")->set_entry((data & 0x06) >> 1);
+	m_mainbank->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)
 		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
@@ -96,37 +95,53 @@ WRITE16_MEMBER(m107_state::sound_reset_w)
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(m107_state::main_map)
-	AM_RANGE(0x00000, 0x9ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(vram_w) AM_SHARE("vram_data")
-	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
-	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
-ADDRESS_MAP_END
+void m107_state::main_map(address_map &map)
+{
+	map(0xd0000, 0xdffff).ram().w(FUNC(m107_state::vram_w)).share("vram_data");
+	map(0xe0000, 0xeffff).ram(); /* System ram */
+	map(0xf8000, 0xf8fff).ram().share("spriteram");
+	map(0xf9000, 0xf9fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xffff0, 0xfffff).rom().region("maincpu", 0x7fff0);
+}
 
-ADDRESS_MAP_START(m107_state::main_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)   // answer from sound CPU
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(coincounter_w, 0x00ff)
-	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x9f) AM_WRITE(control_w)
-	AM_RANGE(0xa0, 0xaf) AM_WRITENOP /* Written with 0's in interrupt */
-	AM_RANGE(0xb0, 0xb1) AM_WRITE(spritebuffer_w)
-	AM_RANGE(0xc0, 0xc3) AM_READNOP /* Only wpksoc: ticket related? */
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(sound_reset_w)
-ADDRESS_MAP_END
+// Not bankswitched
+void m107_state::firebarr_map(address_map &map)
+{
+	map(0x00000, 0xbffff).rom();
+	main_map(map);
+}
 
-ADDRESS_MAP_START(m107_state::dsoccr94_io_map)
-	AM_IMPORT_FROM(main_portmap)
-	AM_RANGE(0x06, 0x07) AM_WRITE8(bankswitch_w, 0x00ff)
-ADDRESS_MAP_END
+// Bankswitched
+void m107_state::dsoccr94_map(address_map &map)
+{
+	map(0x00000, 0x9ffff).rom();
+	map(0xa0000, 0xbffff).bankr("mainbank");
+	main_map(map);
+}
+
+void m107_state::main_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("P1_P2");
+	map(0x02, 0x03).portr("COINS_DSW3");
+	map(0x04, 0x05).portr("DSW");
+	map(0x06, 0x07).portr("P3_P4");
+	map(0x08, 0x08).r("soundlatch2", FUNC(generic_latch_8_device::read));   // answer from sound CPU
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(FUNC(m107_state::coincounter_w));
+	map(0x04, 0x05).nopw(); /* ??? 0008 */
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x9f).w(FUNC(m107_state::control_w));
+	map(0xa0, 0xaf).nopw(); /* Written with 0's in interrupt */
+	map(0xb0, 0xb1).w(FUNC(m107_state::spritebuffer_w));
+	map(0xc0, 0xc3).nopr(); /* Only wpksoc: ticket related? */
+	map(0xc0, 0xc1).w(FUNC(m107_state::sound_reset_w));
+}
+
+void m107_state::dsoccr94_io_map(address_map &map)
+{
+	main_portmap(map);
+	map(0x06, 0x06).w(FUNC(m107_state::bankswitch_w));
+}
 
 /* same as M107 but with an extra i/o board */
 WRITE16_MEMBER(m107_state::wpksoc_output_w)
@@ -139,31 +154,35 @@ WRITE16_MEMBER(m107_state::wpksoc_output_w)
 		popmessage("%04x",data);
 }
 
-ADDRESS_MAP_START(m107_state::wpksoc_map)
-	AM_IMPORT_FROM(main_map)
-	AM_RANGE(0xf0000, 0xf0001) AM_READ_PORT("WPK_DSW0")
-	AM_RANGE(0xf0002, 0xf0003) AM_READ_PORT("WPK_DSW1")
-	AM_RANGE(0xf0004, 0xf0005) AM_READ_PORT("WPK_DSW2")
-ADDRESS_MAP_END
+void m107_state::wpksoc_map(address_map &map)
+{
+	main_map(map);
+	map(0x00000, 0x7ffff).rom();
+	map(0xf0000, 0xf0001).portr("WPK_DSW0");
+	map(0xf0002, 0xf0003).portr("WPK_DSW1");
+	map(0xf0004, 0xf0005).portr("WPK_DSW2");
+}
 
-ADDRESS_MAP_START(m107_state::wpksoc_io_map)
-	AM_IMPORT_FROM(main_portmap)
-	AM_RANGE(0x22, 0x23) AM_WRITE(wpksoc_output_w)
-	AM_RANGE(0xc0, 0xc1) AM_READ_PORT("WPK_IN0")
-	AM_RANGE(0xc2, 0xc3) AM_READ_PORT("WPK_IN1")
-ADDRESS_MAP_END
+void m107_state::wpksoc_io_map(address_map &map)
+{
+	main_portmap(map);
+	map(0x22, 0x23).w(FUNC(m107_state::wpksoc_output_w));
+	map(0xc0, 0xc1).portr("WPK_IN0");
+	map(0xc2, 0xc3).portr("WPK_IN1");
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(m107_state::sound_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)
-	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xa8044, 0xa8045) AM_DEVREADWRITE8("soundlatch", generic_latch_8_device, read, acknowledge_w, 0x00ff)
-	AM_RANGE(0xa8046, 0xa8047) AM_DEVWRITE8("soundlatch2", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("soundcpu", 0x1fff0)
-ADDRESS_MAP_END
+void m107_state::sound_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0xa0000, 0xa3fff).ram();
+	map(0xa8000, 0xa803f).rw("irem", FUNC(iremga20_device::irem_ga20_r), FUNC(iremga20_device::irem_ga20_w)).umask16(0x00ff);
+	map(0xa8040, 0xa8043).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0xa8044, 0xa8044).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0xa8046, 0xa8046).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0xffff0, 0xfffff).rom().region("soundcpu", 0x1fff0);
+}
 
 /******************************************************************************/
 
@@ -699,12 +718,12 @@ static const gfx_layout spritelayout2 =
 	32*8
 };
 
-static GFXDECODE_START( m107 )
+static GFXDECODE_START( gfx_m107 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( firebarr )
+static GFXDECODE_START( gfx_firebarr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2,0, 128 )
 GFXDECODE_END
@@ -714,13 +733,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(m107_state::firebarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, XTAL(28'000'000)/2)    /* NEC V33, 28MHz clock */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", V33, XTAL(28'000'000)/2)    /* NEC V33, 28MHz clock */
+	MCFG_DEVICE_PROGRAM_MAP(firebarr_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
 
-	MCFG_CPU_ADD("soundcpu", V35, XTAL(14'318'181))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", V35, XTAL(14'318'181))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 
 	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
@@ -729,6 +748,8 @@ MACHINE_CONFIG_START(m107_state::firebarr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m107_state, scanline_interrupt, "screen", 0, 1)
 
 	/* video hardware */
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -737,62 +758,64 @@ MACHINE_CONFIG_START(m107_state::firebarr)
 	MCFG_SCREEN_UPDATE_DRIVER(m107_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firebarr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firebarr)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP1))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("upd71059c", pic8259_device, ir3_w))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("upd71059c", pic8259_device, ir3_w))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_IREMGA20_ADD("irem", XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	iremga20_device &ga20(IREMGA20(config, "irem", XTAL(14'318'181)/4));
+	ga20.add_route(0, "lspeaker", 1.0);
+	ga20.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m107_state::dsoccr94)
 	firebarr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(20000000/2)  /* NEC V33, Could be 28MHz clock? */
-	MCFG_CPU_IO_MAP(dsoccr94_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(20000000/2)  /* NEC V33, Could be 28MHz clock? */
+	MCFG_DEVICE_PROGRAM_MAP(dsoccr94_map)
+	MCFG_DEVICE_IO_MAP(dsoccr94_io_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_m107)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(m107_state::wpksoc)
 	firebarr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wpksoc_map)
-	MCFG_CPU_IO_MAP(wpksoc_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wpksoc_map)
+	MCFG_DEVICE_IO_MAP(wpksoc_io_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m107_state::airass)
 	firebarr(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_m107)
 
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
@@ -820,7 +843,7 @@ ROM_START( airass )
 	ROM_LOAD( "w49.020", 0x200000, 0x100000, CRC(17b5caf2) SHA1(df38f9a625226c96ac921182ef975e598d9bc245) ) /* IC13 */
 	ROM_LOAD( "w50.030", 0x300000, 0x100000, CRC(63e4bec3) SHA1(252b4493e1bc368021389e65295036523c401ad4) ) /* IC14 */
 
-	ROM_REGION( 0x40000, "user1", 0 )   /* sprite tables */
+	ROM_REGION( 0x40000, "sprtable", 0 )   /* sprite tables */
 	ROM_LOAD16_BYTE( "f4-b-drh-.drh", 0x000001, 0x20000, CRC(12001372) SHA1(a5346d8a741cd1a93aa289562bb56d2fc40c1bbb) ) /* IC10 */
 	ROM_LOAD16_BYTE( "f4-b-drl-.drl", 0x000000, 0x20000, CRC(08cb7533) SHA1(9e0d8f8498bddfa1c6135abbab4465e9eeb033fe) ) /* IC1  */
 
@@ -855,7 +878,7 @@ ROM_START( firebarr )
 	ROM_LOAD16_BYTE( "f4-030.030", 0x300000, 0x80000, CRC(7e7b30cd) SHA1(eca9d2a5d9f9deebb565456018126bc37a1de1d8) ) /* IC14 */
 	ROM_LOAD16_BYTE( "f4-031.031", 0x300001, 0x80000, CRC(83ac56c5) SHA1(47e1063c71d5570fecf8591c2cb7c74fd45199f5) ) /* IC5  */
 
-	ROM_REGION( 0x40000, "user1", 0 )   /* sprite tables */
+	ROM_REGION( 0x40000, "sprtable", 0 )   /* sprite tables */
 	ROM_LOAD16_BYTE( "f4-b-drh-.drh", 0x000001, 0x20000, CRC(12001372) SHA1(a5346d8a741cd1a93aa289562bb56d2fc40c1bbb) ) /* IC10 */
 	ROM_LOAD16_BYTE( "f4-b-drl-.drl", 0x000000, 0x20000, CRC(08cb7533) SHA1(9e0d8f8498bddfa1c6135abbab4465e9eeb033fe) ) /* IC1  */
 
@@ -981,36 +1004,32 @@ ROM_END
 
 /***************************************************************************/
 
-DRIVER_INIT_MEMBER(m107_state,firebarr)
+void m107_state::init_firebarr()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->set_base(&ROM[0xa0000]);
-
 	m_spritesystem = 1;
 }
 
-DRIVER_INIT_MEMBER(m107_state,dsoccr94)
+void m107_state::init_wpksoc()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
-
 	m_spritesystem = 0;
 }
 
-DRIVER_INIT_MEMBER(m107_state,wpksoc)
+void m107_state::init_dsoccr94()
 {
-	m_spritesystem = 0;
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	m_mainbank->configure_entries(0, 4, &ROM[0x80000], 0x20000);
+
+	init_wpksoc();
 }
 
 /***************************************************************************/
 
-GAME( 1993, airass,    0,        airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // possible location test, but sound code is newer than Japan version
-GAME( 1993, firebarr,  airass,   firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, airass,    0,        airass,   firebarr, m107_state, init_firebarr, ROT270, "Irem", "Air Assault (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // possible location test, but sound code is newer than Japan version
+GAME( 1993, firebarr,  airass,   firebarr, firebarr, m107_state, init_firebarr, ROT270, "Irem", "Fire Barrel (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, dsoccr94,  0,        dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dsoccr94k, dsoccr94, dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (Korea, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // default team selected is Korea, so likely a Korean set
+GAME( 1994, dsoccr94,  0,        dsoccr94, dsoccr94, m107_state, init_dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dsoccr94k, dsoccr94, dsoccr94, dsoccr94, m107_state, init_dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (Korea, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // default team selected is Korea, so likely a Korean set
 
-GAME( 1995, wpksoc,    0,        wpksoc,   wpksoc,   m107_state, wpksoc,   ROT0,   "Jaleco", "World PK Soccer",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, kftgoal,   wpksoc,   wpksoc,   wpksoc,   m107_state, wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wpksoc,    0,        wpksoc,   wpksoc,   m107_state, init_wpksoc,   ROT0,   "Jaleco", "World PK Soccer",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kftgoal,   wpksoc,   wpksoc,   wpksoc,   m107_state, init_wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

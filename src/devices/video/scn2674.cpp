@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 /*
-    SCN2674 - Advanced Video Display Controller (AVDC)  (Video Chip)
+    SCN2672 - Programmable Video Timing Controller (PVTC)
+    SCN2674 - Advanced Video Display Controller (AVDC)
 */
 
 #include "emu.h"
@@ -17,50 +18,83 @@
 #include "logmacro.h"
 
 
+DEFINE_DEVICE_TYPE(SCN2672, scn2672_device, "scn2672", "Signetics SCN2672 PVTC")
 DEFINE_DEVICE_TYPE(SCN2674, scn2674_device, "scn2674", "Signetics SCN2674 AVDC")
 
 
 // default address map
-ADDRESS_MAP_START(scn2674_device::scn2674_vram)
-	AM_RANGE(0x0000, 0xffff) AM_NOP
-ADDRESS_MAP_END
+void scn2674_device::scn2674_vram(address_map &map)
+{
+	map(0x0000, 0xffff).noprw();
+}
+
+scn2672_device::scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: scn2674_device(mconfig, SCN2672, tag, owner, clock)
+{
+}
 
 scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SCN2674, tag, owner, clock)
+	: scn2674_device(mconfig, SCN2674, tag, owner, clock)
+{
+}
+
+scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
 	, m_intr_cb(*this)
 	, m_IR_pointer(0)
-	, m_screen1_l(0), m_screen1_h(0), m_cursor_l(0), m_cursor_h(0), m_screen2_l(0), m_screen2_h(0)
+	, m_screen1_address(0), m_screen2_address(0)
+	, m_cursor_address(0)
 	, m_irq_register(0), m_status_register(0), m_irq_mask(0)
-	, m_gfx_enabled(0), m_display_enabled(0), m_display_enabled_field(0), m_display_enabled_scanline(0), m_cursor_enabled(0)
+	, m_gfx_enabled(false)
+	, m_display_enabled(false), m_display_enabled_field(false), m_display_enabled_scanline(false)
+	, m_cursor_enabled(false)
 	, m_hpixels_per_column(0)
-	, m_IR0_double_ht_wd(0), m_IR0_scanline_per_char_row(0), m_IR0_sync_select(0), m_IR0_buffer_mode_select(0)
-	, m_IR1_interlace_enable(0), m_IR1_equalizing_constant(0)
-	, m_IR2_row_table(0), m_IR2_horz_sync_width(0), m_IR2_horz_back_porch(0)
-	, m_IR3_vert_front_porch(0), m_IR3_vert_back_porch(0)
-	, m_IR4_rows_per_screen(0), m_IR4_character_blink_rate_divisor(0)
-	, m_IR5_character_per_row(0)
-	, m_IR6_cursor_first_scanline(0), m_IR6_cursor_last_scanline(0)
-	, m_IR7_cursor_underline_position(0), m_IR7_cursor_rate_divisor(0), m_IR7_cursor_blink(0), m_IR7_vsync_width(0)
-	, m_IR8_display_buffer_first_address_LSB(0)
-	, m_IR9_display_buffer_first_address_MSB(0), m_IR9_display_buffer_last_address(0)
-	, m_IR10_display_pointer_address_lower(0)
-	, m_IR11_display_pointer_address_upper(0), m_IR11_reset_scanline_counter_on_scrollup(0), m_IR11_reset_scanline_counter_on_scrolldown(0)
-	, m_IR12_scroll_start(0), m_IR12_split_register_1(0)
-	, m_IR13_scroll_end(0), m_IR13_split_register_2(0)
-	, m_IR14_scroll_lines(0), m_IR14_double_1(0), m_IR14_double_2(0)
-	, m_spl1(0), m_spl2(0), m_dbl1(0)
-	, m_buffer(0), m_linecounter(0), m_address(0), m_start1change(0), m_irq_state(0)
+	, m_double_ht_wd(false)
+	, m_scanline_per_char_row(0)
+	, m_csync_select(false)
+	, m_buffer_mode_select(0)
+	, m_interlace_enable(false)
+	, m_equalizing_constant(0)
+	, m_use_row_table(false)
+	, m_horz_sync_width(0), m_horz_back_porch(0)
+	, m_vert_front_porch(0), m_vert_back_porch(0)
+	, m_rows_per_screen(0)
+	, m_character_blink_rate_divisor(0)
+	, m_character_per_row(0)
+	, m_cursor_first_scanline(0), m_cursor_last_scanline(0)
+	, m_cursor_underline_position(0)
+	, m_cursor_rate_divisor(0)
+	, m_cursor_blink(false)
+	, m_vsync_width(0)
+	, m_display_buffer_first_address(0)
+	, m_display_buffer_last_address(0)
+	, m_display_pointer_address(0)
+	, m_reset_scanline_counter_on_scrollup(false)
+	, m_reset_scanline_counter_on_scrolldown(false)
+	, m_scroll_start(false), m_scroll_end(false)
+	, m_scroll_lines(0)
+	, m_split_register{0, 0}
+	, m_double{0, 0}
+	, m_spl{false, false}
+	, m_dbl1(0)
+	, m_char_buffer(0), m_attr_buffer(0)
+	, m_linecounter(0), m_address(0), m_start1change(0)
 	, m_scanline_timer(nullptr)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
+	, m_char_space(nullptr), m_attr_space(nullptr)
+	, m_char_space_config("charram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
+	, m_attr_space_config("attrram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
 {
 }
 
 device_memory_interface::space_config_vector scn2674_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
+	return has_configured_map(1) ? space_config_vector {
+		std::make_pair(0, &m_char_space_config),
+		std::make_pair(1, &m_attr_space_config)
+	} : space_config_vector {
+		std::make_pair(0, &m_char_space_config)
 	};
 }
 
@@ -72,467 +106,690 @@ void scn2674_device::device_start()
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 	screen().register_screen_bitmap(m_bitmap);
 
+	m_char_space = &space(0);
+	if (has_space(1))
+		m_attr_space = &space(1);
+
 	save_item(NAME(m_address));
 	save_item(NAME(m_linecounter));
-	save_item(NAME(m_screen2_l));
-	save_item(NAME(m_screen2_h));
-	save_item(NAME(m_cursor_l));
-	save_item(NAME(m_cursor_h));
+	save_item(NAME(m_screen1_address));
+	save_item(NAME(m_screen2_address));
+	save_item(NAME(m_cursor_address));
+	save_item(NAME(m_IR_pointer));
+	save_item(NAME(m_irq_register));
+	save_item(NAME(m_status_register));
+	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_gfx_enabled));
+	save_item(NAME(m_display_enabled));
+	save_item(NAME(m_display_enabled_field));
+	save_item(NAME(m_display_enabled_scanline));
+	save_item(NAME(m_cursor_enabled));
+	save_item(NAME(m_double_ht_wd));
+	save_item(NAME(m_scanline_per_char_row));
+	save_item(NAME(m_csync_select));
+	save_item(NAME(m_buffer_mode_select));
+	save_item(NAME(m_interlace_enable));
+	save_item(NAME(m_equalizing_constant));
+	save_item(NAME(m_use_row_table));
+	save_item(NAME(m_horz_sync_width));
+	save_item(NAME(m_horz_back_porch));
+	save_item(NAME(m_vert_front_porch));
+	save_item(NAME(m_vert_back_porch));
+	save_item(NAME(m_rows_per_screen));
+	save_item(NAME(m_character_blink_rate_divisor));
+	save_item(NAME(m_character_per_row));
+	save_item(NAME(m_cursor_first_scanline));
+	save_item(NAME(m_cursor_last_scanline));
+	save_item(NAME(m_cursor_underline_position));
+	save_item(NAME(m_cursor_rate_divisor));
+	save_item(NAME(m_cursor_blink));
+	save_item(NAME(m_vsync_width));
+	save_item(NAME(m_display_buffer_first_address));
+	save_item(NAME(m_display_buffer_last_address));
+	save_item(NAME(m_display_pointer_address));
+	save_item(NAME(m_reset_scanline_counter_on_scrollup));
+	save_item(NAME(m_reset_scanline_counter_on_scrolldown));
+	save_item(NAME(m_scroll_start));
+	save_item(NAME(m_scroll_end));
+	save_item(NAME(m_scroll_lines));
+	save_item(NAME(m_split_register));
+	save_item(NAME(m_double));
+	save_item(NAME(m_spl));
+	save_item(NAME(m_dbl1));
+	save_item(NAME(m_char_buffer));
+	if (m_attr_space != nullptr)
+		save_item(NAME(m_attr_buffer));
+	save_item(NAME(m_start1change));
 }
 
 void scn2674_device::device_reset()
 {
-	m_screen1_l = 0;
-	m_screen1_h = 0;
-	m_cursor_l = 0;
-	m_cursor_h = 0;
-	m_screen2_l = 0;
-	m_screen2_h = 0;
+	m_screen1_address = 0;
+	m_screen2_address = 0;
+	m_cursor_address = 0;
 	m_irq_register = 0;
 	m_status_register = 0;
 	m_irq_mask = 0;
-	m_gfx_enabled = 0;
-	m_display_enabled = 0;
-	m_display_enabled_field = 0;
-	m_display_enabled_scanline = 0;
-	m_cursor_enabled = 0;
-	m_IR0_double_ht_wd = 0;
-	m_IR0_scanline_per_char_row = 1;
-	m_IR0_sync_select = 0;
-	m_IR0_buffer_mode_select = 0;
-	m_IR1_interlace_enable = 0;
-	m_IR1_equalizing_constant = 0;
-	m_IR2_row_table = 0;
-	m_IR2_horz_sync_width = 0;
-	m_IR2_horz_back_porch = 0;
-	m_IR3_vert_front_porch = 0;
-	m_IR3_vert_back_porch = 0;
-	m_IR4_rows_per_screen = 0;
-	m_IR4_character_blink_rate_divisor = 0;
-	m_IR5_character_per_row = 0;
-	m_IR6_cursor_first_scanline = 0;
-	m_IR6_cursor_last_scanline = 0;
-	m_IR7_cursor_underline_position = 0;
-	m_IR7_cursor_rate_divisor = 0;
-	m_IR7_cursor_blink = 0;
-	m_IR7_vsync_width = 0;
-	m_IR8_display_buffer_first_address_LSB = 0;
-	m_IR9_display_buffer_first_address_MSB = 0;
-	m_IR9_display_buffer_last_address = 0;
-	m_IR10_display_pointer_address_lower = 0;
-	m_IR11_display_pointer_address_upper = 0;
-	m_IR11_reset_scanline_counter_on_scrollup = 0;
-	m_IR11_reset_scanline_counter_on_scrolldown = 0;
-	m_IR12_scroll_start = 0;
-	m_IR12_split_register_1 = 0;
-	m_IR13_scroll_end = 0;
-	m_IR13_split_register_2 = 0;
-	m_IR14_scroll_lines = 0;
-	m_IR14_double_1 = 0;
-	m_IR14_double_2 = 0;
-	m_spl1 = 0;
-	m_spl2 = 0;
+	m_gfx_enabled = false;
+	m_display_enabled = false;
+	m_display_enabled_field = false;
+	m_display_enabled_scanline = false;
+	m_cursor_enabled = false;
+	m_double_ht_wd = false;
+	m_scanline_per_char_row = 1;
+	m_csync_select = false;
+	m_buffer_mode_select = 0;
+	m_interlace_enable = false;
+	m_equalizing_constant = 0;
+	m_use_row_table = false;
+	m_horz_sync_width = 0;
+	m_horz_back_porch = 0;
+	m_vert_front_porch = 0;
+	m_vert_back_porch = 0;
+	m_rows_per_screen = 0;
+	m_character_blink_rate_divisor = 0;
+	m_character_per_row = 0;
+	m_cursor_first_scanline = 0;
+	m_cursor_last_scanline = 0;
+	m_cursor_underline_position = 0;
+	m_cursor_rate_divisor = 0;
+	m_cursor_blink = false;
+	m_vsync_width = 3; // fixed for SCN2672
+	m_display_buffer_first_address = 0;
+	m_display_buffer_last_address = 0;
+	m_display_pointer_address = 0;
+	m_reset_scanline_counter_on_scrollup = false;
+	m_reset_scanline_counter_on_scrolldown = false;
+	m_scroll_start = false;
+	m_scroll_end = false;
+	m_scroll_lines = 0;
+	m_split_register[0] = m_split_register[1] = 0;
+	m_double[0] = m_double[1] = 0;
+	m_spl[0] = m_spl[1] = false;
 	m_dbl1 = 0;
-	m_buffer = 0;
+	m_char_buffer = m_attr_buffer = 0;
 	m_linecounter = 0;
-	m_irq_state = 0;
 	m_IR_pointer = 0;
 	m_address = 0;
 	m_start1change = 0;
+
+	m_intr_cb(CLEAR_LINE);
 }
 
-// 15 Initialization Registers (8-bit each)
-void scn2674_device::write_init_regs(uint8_t data)
+// 11 Initialization Registers (8-bit each)
+void scn2672_device::write_init_regs(uint8_t data)
 {
-	LOGMASKED(LOG_COMMAND, "scn2674_write_init_regs %02x %02x\n",m_IR_pointer,data);
+	//LOGMASKED(LOG_COMMAND, "scn2674_write_init_regs %02x %02x\n",m_IR_pointer,data);
 
-	switch ( m_IR_pointer) /* display some debug info, set mame specific variables */
+	switch (m_IR_pointer)
 	{
-		case 0:
-			m_IR0_double_ht_wd = (data & 0x80)>>7;
-			m_IR0_scanline_per_char_row = ((data & 0x78)>>3) + 1;
-			m_IR0_sync_select = (data&0x04)>>2;
-			m_IR0_buffer_mode_select = (data&0x03);
+	case 0:
+		m_double_ht_wd = BIT(data, 7);
+		m_scanline_per_char_row = ((data & 0x78) >> 3) + 1;
+		m_csync_select = BIT(data, 2);
+		m_buffer_mode_select = data & 0x03;
 
-			LOGMASKED(LOG_IR, "IR0 - Double Ht Wd %02x\n",m_IR0_double_ht_wd);//affects IR14 as well
-			LOGMASKED(LOG_IR, "IR0 - Scanlines per Character Row %02x\n",m_IR0_scanline_per_char_row);//value+1 = scanlines
-			LOGMASKED(LOG_IR, "IR0 - Sync Select %02x\n",m_IR0_sync_select);//1 = csync
-			LOGMASKED(LOG_IR, "IR0 - Buffer Mode Select %02x\n",m_IR0_buffer_mode_select); //0 independent 1 transparent 2 shared 3 row
+		LOGMASKED(LOG_IR, "IR0 - Scanlines per Character Row %02i\n", m_scanline_per_char_row);//value+1 = scanlines
+		LOGMASKED(LOG_IR, "IR0 - %s Output Selected\n", m_csync_select ? "CSYNC" : "VSYNC");
+		switch (m_buffer_mode_select)
+		{
+		case 0:
+			LOGMASKED(LOG_IR, "IR0 - Independent Buffer Mode\n");
 			break;
 
 		case 1:
-			m_IR1_interlace_enable = (data&0x80)>>7;
-			m_IR1_equalizing_constant = (data&0x7f)+1;
-
-			LOGMASKED(LOG_IR, "IR1 - Interlace Enable %02x\n",m_IR1_interlace_enable);
-			LOGMASKED(LOG_IR, "IR1 - Equalizing Constant %02i CCLKs\n",m_IR1_equalizing_constant);
+			LOGMASKED(LOG_IR, "IR0 - Transparent Buffer Mode\n");
 			break;
 
 		case 2:
-			m_IR2_row_table = (data&0x80)>>7;
-			m_IR2_horz_sync_width = (((data&0x78)>>3)*2) + 2;
-			m_IR2_horz_back_porch = ((data&0x07)*4) - 1;
-
-			LOGMASKED(LOG_IR, "IR2 - Row Table %02x\n",m_IR2_row_table);
-			LOGMASKED(LOG_IR, "IR2 - Horizontal Sync Width %02i CCLKs\n",m_IR2_horz_sync_width);
-			LOGMASKED(LOG_IR, "IR2 - Horizontal Back Porch %02i CCLKs\n",m_IR2_horz_back_porch);
+			LOGMASKED(LOG_IR, "IR0 - Shared Buffer Mode\n");
 			break;
 
 		case 3:
-			m_IR3_vert_front_porch =  (((data&0xe0)>>5) * 4)+4 ;
-			m_IR3_vert_back_porch = ((data&0x1f) * 2) + 4;
-
-			LOGMASKED(LOG_IR, "IR3 - Vertical Front Porch %02i Lines\n",m_IR3_vert_front_porch);
-			LOGMASKED(LOG_IR, "IR3 - Vertical Back Porch %02i Lines\n",m_IR3_vert_back_porch);
-			break;
-
-		case 4:
-			m_IR4_rows_per_screen = (data&0x7f) + 1;
-			m_IR4_character_blink_rate_divisor = ((data & 0x80)>>7 ? 128:64);
-
-			LOGMASKED(LOG_IR, "IR4 - Rows Per Screen %02i\n",m_IR4_rows_per_screen);
-			LOGMASKED(LOG_IR, "IR4 - Character Blink Rate = 1/%02i\n",m_IR4_character_blink_rate_divisor);
-			break;
-
-		case 5:
-			/* IR5 - Active Characters Per Row
-			 cccc cccc
-			 c = Characters Per Row */
-			m_IR5_character_per_row = data + 1;
-			LOGMASKED(LOG_IR, "IR5 - Active Characters Per Row %02i\n",m_IR5_character_per_row);
-			break;
-
-		case 6:
-			m_IR6_cursor_last_scanline = (data & 0x0f);
-			m_IR6_cursor_first_scanline = (data & 0xf0)>>4;
-			LOGMASKED(LOG_IR, "IR6 - First Line of Cursor %02x\n",m_IR6_cursor_first_scanline);
-			LOGMASKED(LOG_IR, "IR6 - Last Line of Cursor %02x\n",m_IR6_cursor_last_scanline);
-			break;
-
-		case 7:
-		{
-			const uint8_t vsync_table[4] = {3,1,5,7};
-			m_IR7_cursor_underline_position = (data & 0x0f);
-			m_IR7_cursor_rate_divisor = ((data & 0x10)>>4 ? 64:32);
-			m_IR7_cursor_blink = (data & 0x20)>>5;
-
-			m_IR7_vsync_width = vsync_table[(data & 0xC0)>>6];
-
-			LOGMASKED(LOG_IR, "IR7 - Underline Position %02x\n",m_IR7_cursor_underline_position);
-			LOGMASKED(LOG_IR, "IR7 - Cursor rate 1/%02i\n",m_IR7_cursor_rate_divisor);
-			LOGMASKED(LOG_IR, "IR7 - Cursor blink %02x\n",m_IR7_cursor_blink);
-			LOGMASKED(LOG_IR, "IR7 - Vsync Width  %02i Lines\n",m_IR7_vsync_width);
+			LOGMASKED(LOG_IR, "IR0 - Row Buffer Mode\n");
 			break;
 		}
+		break;
 
-		case 8:
-			m_IR8_display_buffer_first_address_LSB = data;
-			LOGMASKED(LOG_IR, "IR8 - Display Buffer First Address LSB %02x\n",m_IR8_display_buffer_first_address_LSB);
-			break;
+	case 1:
+		m_interlace_enable = BIT(data, 7);
+		m_equalizing_constant = (data & 0x7f) + 1;
 
-		case 9:
-			m_IR9_display_buffer_first_address_MSB = data & 0x0f;
-			m_IR9_display_buffer_last_address = (data & 0xf0)>>4;
-			LOGMASKED(LOG_IR, "IR9 - Display Buffer First Address MSB %02x\n",m_IR9_display_buffer_first_address_MSB);
-			LOGMASKED(LOG_IR, "IR9 - Display Buffer Last Address %02x\n",m_IR9_display_buffer_last_address);
-			break;
+		LOGMASKED(LOG_IR, "IR1 - Interlace %s\n", m_interlace_enable ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR1 - Equalizing Constant %02i CCLKs\n", m_equalizing_constant);
+		break;
 
-		case 10:
-			m_IR10_display_pointer_address_lower = data;
-			LOGMASKED(LOG_IR, "IR10 - Display Pointer Address Lower %02x\n",m_IR10_display_pointer_address_lower);
-			break;
+	case 2:
+		m_horz_sync_width = (((data & 0x78) >> 3) * 2) + 2;
+		m_horz_back_porch = ((data & 0x07) * 4) + 1;
 
-		case 11:
-			m_IR11_display_pointer_address_upper= data&0x3f;
-			m_IR11_reset_scanline_counter_on_scrollup= (data&0x40 >> 6);
-			m_IR11_reset_scanline_counter_on_scrolldown= (data&0x80 >> 7);
+		LOGMASKED(LOG_IR, "IR2 - Horizontal Sync Width %02i CCLKs\n", m_horz_sync_width);
+		LOGMASKED(LOG_IR, "IR2 - Horizontal Back Porch %02i CCLKs\n", m_horz_back_porch);
+		break;
 
-			LOGMASKED(LOG_IR, "IR11 - Display Pointer Address Lower %02x\n",m_IR11_display_pointer_address_upper);
-			LOGMASKED(LOG_IR, "IR11 - Reset Scanline Counter on Scroll Up %02x\n",m_IR11_reset_scanline_counter_on_scrollup);
-			LOGMASKED(LOG_IR, "IR11 - Reset Scanline Counter on Scroll Down %02x\n",m_IR11_reset_scanline_counter_on_scrolldown);
-			break;
+	case 3:
+		m_vert_front_porch = (((data & 0xe0) >> 5) * 4) + 4;
+		m_vert_back_porch = ((data & 0x1f) * 2) + 4;
 
-		case 12:
-			m_IR12_scroll_start = (data & 0x80)>>7;
-			m_IR12_split_register_1 = (data & 0x7f);
-			LOGMASKED(LOG_IR, "IR12 - Scroll Start %02x\n",m_IR12_scroll_start);
-			LOGMASKED(LOG_IR, "IR12 - Split Register 1 %02x\n",m_IR12_split_register_1);
-			break;
+		LOGMASKED(LOG_IR, "IR3 - Vertical Front Porch %02i Lines\n", m_vert_front_porch);
+		LOGMASKED(LOG_IR, "IR3 - Vertical Back Porch %02i Lines\n", m_vert_back_porch);
+		break;
 
-		case 13:
-			m_IR13_scroll_end = (data & 0x80)>>7;
-			m_IR13_split_register_2 = (data & 0x7f);
-			LOGMASKED(LOG_IR, "IR13 - Scroll End %02x\n",m_IR13_scroll_end);
-			LOGMASKED(LOG_IR, "IR13 - Split Register 2 %02x\n",m_IR13_split_register_2);
-			break;
+	case 4:
+		m_rows_per_screen = (data & 0x7f) + 1;
+		m_character_blink_rate_divisor = BIT(data, 7) ? 32 : 16;
 
-		case 14:
-			m_IR14_scroll_lines = (data & 0x0f);
-			if (!m_IR0_double_ht_wd)
-			{
-				m_IR14_double_2 = (data & 0x30)>>4;
-				LOGMASKED(LOG_IR, "IR14 - Double 2 %02x\n",m_IR14_double_2);
-			}
-			//0 normal, 1, double width, 2, double width and double tops 3, double width and double bottoms
-			//1 affects SSR1, 2 affects SSR2
-			//If Double Height enabled in IR0, Screen start 1 upper (bits 7 and 6)replace Double 1, and Double 2 is unused
-			m_IR14_double_1 = (data & 0xc0)>>6;
-			LOGMASKED(LOG_IR, "IR14 - Double 1 %02x\n",m_IR14_double_1);
+		LOGMASKED(LOG_IR, "IR4 - Rows Per Screen %02i\n", m_rows_per_screen);
+		LOGMASKED(LOG_IR, "IR4 - Character Blink Rate = 1/%02i\n", m_character_blink_rate_divisor);
+		break;
 
-			LOGMASKED(LOG_IR, "IR14 - Scroll Lines %02i\n",m_IR14_scroll_lines);
-			break;
+	case 5:
+		m_character_per_row = data + 1;
+		LOGMASKED(LOG_IR, "IR5 - Active Characters Per Row %02i\n", m_character_per_row);
+		break;
 
-		case 15: /* not valid! */
-			break;
+	case 6:
+		m_cursor_last_scanline = data & 0x0f;
+		m_cursor_first_scanline = (data & 0xf0) >> 4;
+		LOGMASKED(LOG_IR, "IR6 - First Line of Cursor %02i\n", m_cursor_first_scanline);
+		LOGMASKED(LOG_IR, "IR6 - Last Line of Cursor %02i\n", m_cursor_last_scanline);
+		break;
 
+	case 7:
+		m_cursor_underline_position = data & 0x0f;
+		m_double_ht_wd = BIT(data, 4);
+		m_cursor_blink = BIT(data, 5);
+
+		LOGMASKED(LOG_IR, "IR7 - Underline Position %02i\n", m_cursor_underline_position);
+		LOGMASKED(LOG_IR, "IR7 - Double Height %s\n", m_double_ht_wd ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR7 - Cursor blink %s\n", m_cursor_blink ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR7 - Light pen line %02i\n", ((data & 0xc0) >> 6) * 2 + 3);
+		break;
+
+	case 8:
+		m_display_buffer_first_address = (m_display_buffer_first_address & 0xf00) | data;
+		LOGMASKED(LOG_IR, "IR8 - Display Buffer First Address LSB %02x\n", m_display_buffer_first_address & 0xff);
+		break;
+
+	case 9:
+		m_display_buffer_first_address = (m_display_buffer_first_address & 0x0ff) | (data & 0x0f) << 4;
+		m_display_buffer_last_address = (data & 0xf0) >> 4;
+		LOGMASKED(LOG_IR, "IR9 - Display Buffer First Address MSB %01x\n", m_display_buffer_first_address >> 8);
+		LOGMASKED(LOG_IR, "IR9 - Display Buffer Last Address %02x\n", m_display_buffer_last_address);
+		break;
+
+	case 10:
+		m_cursor_rate_divisor = BIT(data, 7) ? 32 : 16;
+		m_split_register[0] = data & 0x7f;
+		LOGMASKED(LOG_IR, "IR10 - Split Register %02x\n", m_split_register[0]);
+		LOGMASKED(LOG_IR, "IR10 - Cursor rate 1/%02i\n", m_cursor_rate_divisor);
+		break;
+
+	case 11: // not valid!
+	case 12:
+	case 13:
+	case 14:
+	case 15:
+		break;
 	}
 
 	// Don't reconfigure if the display isn't turned on (incomplete configurations may generate invalid screen parameters)
 	if (m_display_enabled)
 		recompute_parameters();
 
-	m_IR_pointer++;
-	if (m_IR_pointer>14)m_IR_pointer=14;
+	m_IR_pointer = std::min(m_IR_pointer + 1, 10);
+}
+
+// 15 Initialization Registers (8-bit each)
+void scn2674_device::write_init_regs(uint8_t data)
+{
+	//LOGMASKED(LOG_COMMAND, "scn2674_write_init_regs %02x %02x\n",m_IR_pointer,data);
+
+	switch (m_IR_pointer)
+	{
+	case 0:
+		m_double_ht_wd = BIT(data, 7);
+		m_scanline_per_char_row = ((data & 0x78) >> 3) + 1;
+		m_csync_select = BIT(data, 2);
+		m_buffer_mode_select = data & 0x03;
+
+		LOGMASKED(LOG_IR, "IR0 - Double Ht Wd %s\n", m_double_ht_wd ? "on" : "off");//affects IR14 as well
+		LOGMASKED(LOG_IR, "IR0 - Scanlines per Character Row %02i\n", m_scanline_per_char_row);//value+1 = scanlines
+		LOGMASKED(LOG_IR, "IR0 - %s Output Selected\n", m_csync_select ? "CSYNC" : "VSYNC");
+		switch (m_buffer_mode_select)
+		{
+		case 0:
+			LOGMASKED(LOG_IR, "IR0 - Independent Buffer Mode\n");
+			break;
+
+		case 1:
+			LOGMASKED(LOG_IR, "IR0 - Transparent Buffer Mode\n");
+			break;
+
+		case 2:
+			LOGMASKED(LOG_IR, "IR0 - Shared Buffer Mode\n");
+			break;
+
+		case 3:
+			LOGMASKED(LOG_IR, "IR0 - Row Buffer Mode\n");
+			break;
+		}
+		break;
+
+	case 1:
+		m_interlace_enable = BIT(data, 7);
+		m_equalizing_constant = (data & 0x7f) + 1;
+
+		LOGMASKED(LOG_IR, "IR1 - Interlace %s\n", m_interlace_enable ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR1 - Equalizing Constant %02i CCLKs\n", m_equalizing_constant);
+		break;
+
+	case 2:
+		m_use_row_table = BIT(data, 7);
+		m_horz_sync_width = (((data & 0x78) >> 3) * 2) + 2;
+		m_horz_back_porch = ((data & 0x07) * 4) - 1;
+
+		LOGMASKED(LOG_IR, "IR2 - Row Table %s\n", m_use_row_table ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR2 - Horizontal Sync Width %02i CCLKs\n", m_horz_sync_width);
+		LOGMASKED(LOG_IR, "IR2 - Horizontal Back Porch %02i CCLKs\n", m_horz_back_porch);
+		break;
+
+	case 3:
+		m_vert_front_porch = (((data & 0xe0) >> 5) * 4) + 4;
+		m_vert_back_porch = ((data & 0x1f) * 2) + 4;
+
+		LOGMASKED(LOG_IR, "IR3 - Vertical Front Porch %02i Lines\n", m_vert_front_porch);
+		LOGMASKED(LOG_IR, "IR3 - Vertical Back Porch %02i Lines\n", m_vert_back_porch);
+		break;
+
+	case 4:
+		m_rows_per_screen = (data & 0x7f) + 1;
+		m_character_blink_rate_divisor = BIT(data, 7) ? 128 : 64;
+
+		LOGMASKED(LOG_IR, "IR4 - Rows Per Screen %02i\n", m_rows_per_screen);
+		LOGMASKED(LOG_IR, "IR4 - Character Blink Rate = 1/%02i\n", m_character_blink_rate_divisor);
+		break;
+
+	case 5:
+		m_character_per_row = data + 1;
+		LOGMASKED(LOG_IR, "IR5 - Active Characters Per Row %02i\n", m_character_per_row);
+		break;
+
+	case 6:
+		m_cursor_last_scanline = data & 0x0f;
+		m_cursor_first_scanline = (data & 0xf0) >> 4;
+		LOGMASKED(LOG_IR, "IR6 - First Line of Cursor %02i\n", m_cursor_first_scanline);
+		LOGMASKED(LOG_IR, "IR6 - Last Line of Cursor %02i\n", m_cursor_last_scanline);
+		break;
+
+	case 7:
+		{
+			const uint8_t vsync_table[4] = {3,1,5,7};
+			m_cursor_underline_position = data & 0x0f;
+			m_cursor_rate_divisor = BIT(data, 4) ? 64 : 32;
+			m_cursor_blink = BIT(data, 5);
+
+			m_vsync_width = vsync_table[(data & 0xc0) >> 6];
+
+			LOGMASKED(LOG_IR, "IR7 - Underline Position %02i\n", m_cursor_underline_position);
+			LOGMASKED(LOG_IR, "IR7 - Cursor rate 1/%02i\n", m_cursor_rate_divisor);
+			LOGMASKED(LOG_IR, "IR7 - Cursor blink %s\n", m_cursor_blink ? "on" : "off");
+			LOGMASKED(LOG_IR, "IR7 - Vsync Width  %02i Lines\n", m_vsync_width);
+			break;
+		}
+
+	case 8:
+		m_display_buffer_first_address = (m_display_buffer_first_address & 0xf00) | data;
+		LOGMASKED(LOG_IR, "IR8 - Display Buffer First Address LSB %02x\n", m_display_buffer_first_address & 0xff);
+		break;
+
+	case 9:
+		m_display_buffer_first_address = (m_display_buffer_first_address & 0x0ff) | (data & 0x0f) << 4;
+		m_display_buffer_last_address = (data & 0xf0) >> 4;
+		LOGMASKED(LOG_IR, "IR9 - Display Buffer First Address MSB %01x\n", m_display_buffer_first_address >> 8);
+		LOGMASKED(LOG_IR, "IR9 - Display Buffer Last Address %02x\n", m_display_buffer_last_address);
+		break;
+
+	case 10:
+		m_display_pointer_address = (m_display_pointer_address & 0x3f00) | data;
+		LOGMASKED(LOG_IR, "IR10 - Display Pointer Address Lower %02x\n", m_display_pointer_address & 0x00ff);
+		break;
+
+	case 11:
+		m_display_pointer_address = (m_display_pointer_address & 0x00ff) | (data & 0x3f) << 8;
+		m_reset_scanline_counter_on_scrollup = BIT(data, 6);
+		m_reset_scanline_counter_on_scrolldown = BIT(data, 7);
+
+		LOGMASKED(LOG_IR, "IR11 - Display Pointer Address Upper %02x\n", m_display_pointer_address >> 8);
+		LOGMASKED(LOG_IR, "IR11 - Reset Scanline Counter on Scroll Up %s\n", m_reset_scanline_counter_on_scrollup ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR11 - Reset Scanline Counter on Scroll Down %s\n", m_display_pointer_address ? "on" : "off");
+		break;
+
+	case 12:
+		m_scroll_start = BIT(data, 7);
+		m_split_register[0] = data & 0x7f;
+		LOGMASKED(LOG_IR, "IR12 - Scroll Start %s\n", m_scroll_start ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR12 - Split Register 1 %02x\n", m_split_register[0]);
+		break;
+
+	case 13:
+		m_scroll_end = BIT(data, 7);
+		m_split_register[1] = data & 0x7f;
+		LOGMASKED(LOG_IR, "IR13 - Scroll End %s\n", m_scroll_end ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR13 - Split Register 2 %02x\n", m_split_register[1]);
+		break;
+
+	case 14:
+		m_scroll_lines = data & 0x0f;
+		if (!m_double_ht_wd)
+		{
+			m_double[1] = (data & 0x30) >> 4;
+			LOGMASKED(LOG_IR, "IR14 - Double 2 %02x\n", m_double[1]);
+		}
+		//0 normal, 1, double width, 2, double width and double tops 3, double width and double bottoms
+		//1 affects SSR1, 2 affects SSR2
+		//If Double Height enabled in IR0, Screen start 1 upper (bits 7 and 6)replace Double 1, and Double 2 is unused
+		m_double[0] = (data & 0xc0) >> 6;
+		LOGMASKED(LOG_IR, "IR14 - Double 1 %02x\n", m_double[0]);
+
+		LOGMASKED(LOG_IR, "IR14 - Scroll Lines %02i\n", m_scroll_lines);
+		break;
+
+	case 15: // not valid!
+		break;
+	}
+
+	// Don't reconfigure if the display isn't turned on (incomplete configurations may generate invalid screen parameters)
+	if (m_display_enabled)
+		recompute_parameters();
+
+	m_IR_pointer = std::min(m_IR_pointer + 1, 14);
+}
+
+void scn2674_device::set_gfx_enabled(bool enabled)
+{
+	LOGMASKED(LOG_COMMAND, "%s: GFX %s\n", machine().describe_context(), enabled ? "enabled" : "disabled");
+	m_gfx_enabled = enabled;
+
+	// FIXME: GFX enable takes effect at next character row
+	recompute_parameters();
+}
+
+void scn2674_device::set_display_enabled(bool enabled, int n)
+{
+	if (!enabled)
+	{
+		m_display_enabled = false;
+
+		if (n == 1)
+			LOGMASKED(LOG_COMMAND, "%s: Display off - float DADD bus\n", machine().describe_context());
+		else
+			LOGMASKED(LOG_COMMAND, "%s: Display off - no float DADD bus\n", machine().describe_context());
+	}
+	else
+	{
+		if (n == 1)
+		{
+			m_display_enabled_field = true;
+			LOGMASKED(LOG_COMMAND, "%s: Display ON - next field\n", machine().describe_context());
+		}
+		else
+		{
+			m_display_enabled_scanline = true;
+			LOGMASKED(LOG_COMMAND, "%s: Display ON - next scanline\n", machine().describe_context());
+		}
+		recompute_parameters(); // start the scanline timer
+	}
+}
+
+void scn2674_device::set_cursor_enabled(bool enabled)
+{
+	LOGMASKED(LOG_COMMAND, "%s: Cursor %s\n", machine().describe_context(), enabled ? "on" : "off");
+	m_cursor_enabled = enabled;
+}
+
+void scn2674_device::reset_interrupt_status(uint8_t bits)
+{
+	LOGMASKED(LOG_COMMAND, "%s: Reset interrupts/status %02x\n", machine().describe_context(), bits);
+
+	uint8_t old_irq = m_irq_register;
+	uint8_t old_status = m_status_register;
+	m_irq_register &= ~bits;
+	m_status_register &= ~bits;
+
+	if (BIT(bits, 0) && BIT(old_status, 0))
+		LOGMASKED(LOG_INTR, "Split 2 %sstatus cleared\n", BIT(old_irq, 0) ? "interrupt/" : "");
+	if (BIT(bits, 1) && BIT(old_status, 1))
+		LOGMASKED(LOG_INTR, "Ready %sstatus cleared\n", BIT(old_irq, 1) ? "interrupt/" : "");
+	if (BIT(bits, 2) && BIT(old_status, 2))
+		LOGMASKED(LOG_INTR, "Split 1 %sstatus cleared\n", BIT(old_irq, 2) ? "interrupt/" : "");
+	if (BIT(bits, 3) && BIT(old_status, 3))
+		LOGMASKED(LOG_INTR, "Line Zero %sstatus cleared\n", BIT(old_irq, 3) ? "interrupt/" : "");
+	if (BIT(bits, 4) && BIT(old_status, 4))
+		LOGMASKED(LOG_INTR, "V-Blank %sstatus cleared\n", BIT(old_irq, 4) ? "interrupt/" : "");
+
+	if (m_irq_register == 0 && old_irq != 0)
+	{
+		LOGMASKED(LOG_INTR, "All interrupts cleared\n");
+		m_intr_cb(CLEAR_LINE);
+	}
+}
+
+void scn2674_device::write_interrupt_mask(bool enabled, uint8_t bits)
+{
+	uint8_t changed_bits = bits;
+
+	if (enabled)
+	{
+		changed_bits &= ~m_irq_mask;
+		m_irq_mask |= bits;
+	}
+	else
+	{
+		changed_bits &= m_irq_mask;
+		m_irq_mask &= ~bits;
+	}
+
+	LOGMASKED(LOG_INTR, "%s: %s interrupts %02x by mask\n", machine().describe_context(), enabled ? "Enable" : "Disable", bits);
+
+	if (BIT(changed_bits, 0))
+		LOGMASKED(LOG_INTR, "Split 2 IRQ %s\n", enabled ? "enabled" : "disabled");
+	if (BIT(changed_bits, 1))
+		LOGMASKED(LOG_INTR, "Ready IRQ %s\n", enabled ? "enabled" : "disabled");
+	if (BIT(changed_bits, 2))
+		LOGMASKED(LOG_INTR, "Split 1 IRQ %s\n", enabled ? "enabled" : "disabled");
+	if (BIT(changed_bits, 3))
+		LOGMASKED(LOG_INTR, "Line Zero IRQ %s\n", enabled ? "enabled" : "disabled");
+	if (BIT(changed_bits, 4))
+	{
+		LOGMASKED(LOG_INTR, "V-Blank IRQ %s\n", enabled ? "enabled" : "disabled");
+
+		// hack to allow PC-X to get its first interrupt
+		if (BIT(bits, 4) && !m_display_enabled)
+			recompute_parameters();
+	}
+}
+
+void scn2674_device::write_delayed_command(uint8_t data)
+{
+	int i;
+
+	// Delayed Commands
+	// These set 0x20 in status register when done
+	// These use the pointer address according to the datasheet but the pcx expects the screen start 2 address instead
+	switch (data)
+	{
+	case 0xa4:
+		// read at pointer address
+		m_char_buffer = m_char_space->read_byte(m_screen2_address);
+		if (m_attr_space != nullptr)
+			m_attr_buffer = m_attr_space->read_byte(m_screen2_address);
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED read at pointer address %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0xa2:
+		// write at pointer address
+		m_char_space->write_byte(m_screen2_address, m_char_buffer);
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(m_screen2_address, m_attr_buffer);
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED write at pointer address %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0xa6:  // used by the Octopus
+		// write at pointer address
+		m_char_space->write_byte(m_display_pointer_address, m_char_buffer);
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(m_display_pointer_address, m_attr_buffer);
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED write at display pointer address %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0xa9:
+		// increment cursor address
+		m_cursor_address++;
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED increase cursor address %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0xac:
+		// read at cursor address
+		m_char_buffer = m_char_space->read_byte(m_cursor_address);
+		if (m_attr_space != nullptr)
+			m_attr_buffer = m_attr_space->read_byte(m_cursor_address);
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED read at cursor address %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0xaa:
+		// write at cursor address
+		m_char_space->write_byte(m_cursor_address, m_char_buffer);
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(m_cursor_address, m_attr_buffer);
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED write at cursor address %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0xad:
+		// read at cursor address + increment
+		m_char_buffer = m_char_space->read_byte(m_cursor_address);
+		if (m_attr_space != nullptr)
+			m_attr_buffer = m_attr_space->read_byte(m_cursor_address);
+		m_cursor_address++;
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED read at cursor address+increment %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0xab:
+	case 0xaf:  // LSI Octopus sends command 0xAF
+		// write at cursor address + increment
+		m_char_space->write_byte(m_cursor_address, m_char_buffer);
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(m_cursor_address, m_attr_buffer);
+		m_cursor_address++;
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED write at cursor address+increment %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0xbb:
+		// write from cursor address to pointer address
+		// TODO: transfer only during blank
+		for (i = m_cursor_address; i != m_screen2_address; i = ((i + 1) & 0xffff))
+		{
+			m_char_space->write_byte(i, m_char_buffer);
+			if (m_attr_space != nullptr)
+				m_attr_space->write_byte(i, m_attr_buffer);
+		}
+		m_char_space->write_byte(i, m_char_buffer); // get the last
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(i, m_attr_buffer);
+		m_cursor_address = m_screen2_address;
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED write from cursor address to pointer address %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0xbd:
+		// read from cursor address to pointer address
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED read from cursor address to pointer address %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0xbf:
+		// write from cursor address to pointer address
+		// TODO: transfer only during blank
+		for (i = m_cursor_address; i != m_display_pointer_address; i = (i + 1) & 0xffff)
+		{
+			m_char_space->write_byte(i, m_char_buffer);
+			if (m_attr_space != nullptr)
+				m_attr_space->write_byte(i, m_attr_buffer);
+		}
+		m_char_space->write_byte(i, m_char_buffer); // get the last
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(i, m_attr_buffer);
+		m_cursor_address = m_display_pointer_address;
+		LOGMASKED(LOG_COMMAND, "%s: DELAYED write from cursor address to pointer address %02x\n", machine().describe_context(), data);
+		break;
+
+	default:
+		LOGMASKED(LOG_COMMAND, "%s: Unknown delayed command %02x\n", machine().describe_context(), data);
+		break;
+	}
 }
 
 void scn2674_device::write_command(uint8_t data)
 {
-	uint8_t operand;
-	int i;
-
-
-	if (data==0x00)
+	switch (data & 0xe0)
 	{
-		/* master reset, configures registers */
-		LOGMASKED(LOG_COMMAND, "master reset\n");
-		m_IR_pointer=0;
-		m_irq_register = 0x00;
-		m_status_register = 0x20;//RDFLG activated
-		m_linecounter =0;
-		m_irq_mask = 0x00;
-		m_gfx_enabled = 0;
-		m_display_enabled = 0;
-		m_cursor_enabled = 0;
-		m_IR2_row_table = 0;
-	}
-
-	if ((data&0xf0)==0x10)
-	{
-		/* set IR pointer */
-		operand = data & 0x0f;
-		LOGMASKED(LOG_COMMAND, "set IR pointer %02x\n",operand);
-
-		m_IR_pointer=operand;
-
-	}
-
-	/* ANY COMBINATION OF THESE ARE POSSIBLE */
-
-	if ((data&0xe3)==0x22)
-	{
-		/* Disable GFX */
-		LOGMASKED(LOG_COMMAND, "disable GFX %02x\n",data);
-		m_gfx_enabled = 0;
-		recompute_parameters();
-	}
-
-	if ((data&0xe3)==0x23)
-	{
-		/* Enable GFX */
-		LOGMASKED(LOG_COMMAND, "enable GFX %02x\n",data);
-		m_gfx_enabled = 1;
-
-		// FIXME: this takes effect at next character row
-		recompute_parameters();
-	}
-
-	if ((data&0xe9)==0x28)
-	{
-		/* Display off */
-		operand = data & 0x04;
-
-		m_display_enabled = 0;
-
-		if (operand)
-			LOGMASKED(LOG_COMMAND, "display OFF - float DADD bus %02x\n",data);
-		else
-			LOGMASKED(LOG_COMMAND, "display OFF - no float DADD bus %02x\n",data);
-	}
-
-	if ((data&0xe9)==0x29)
-	{
-		/* Display on */
-		operand = data & 0x04;
-
-		if (operand)
+	case 0x00:
+		if (!BIT(data, 4))
 		{
-			m_display_enabled_field = 1;
-			LOGMASKED(LOG_COMMAND, "display ON - next field %02x\n",data);
+			// master reset, configures registers
+			LOGMASKED(LOG_COMMAND, "%s: Master reset\n", machine().describe_context());
+			m_IR_pointer = 0;
+			m_irq_register = 0x00;
+			m_status_register = 0x20; // RDFLG activated
+			m_linecounter = 0;
+			m_irq_mask = 0x00;
+			m_gfx_enabled = false;
+			m_display_enabled = false;
+			m_cursor_enabled = false;
+			m_use_row_table = false;
+			m_intr_cb(CLEAR_LINE);
 		}
 		else
 		{
-			m_display_enabled_scanline = 1;
-			LOGMASKED(LOG_COMMAND, "display ON - next scanline %02x\n",data);
+			// set IR pointer
+			LOGMASKED(LOG_COMMAND, "%s: IR pointer set to %02i\n", machine().describe_context(), data & 0x0f);
+
+			m_IR_pointer = data & 0x0f;
 		}
-		recompute_parameters(); // start the scanline timer
-	}
+		break;
 
-	if ((data&0xf1)==0x30)
-	{
-		/* Cursor Off */
-		LOGMASKED(LOG_COMMAND, "cursor off %02x\n",data);
-		m_cursor_enabled = 0;
-	}
+	case 0x20:
+		// Any combination of these is valid
+		if (BIT(data, 1))
+			set_gfx_enabled(BIT(data, 0));
+		if (BIT(data, 3))
+			set_display_enabled(BIT(data, 0), BIT(data, 2));
+		if (BIT(data, 4))
+			set_cursor_enabled(BIT(data, 0));
 
-	if ((data&0xf1)==0x31)
-	{
-		/* Cursor On */
-		LOGMASKED(LOG_COMMAND, "cursor on %02x\n",data);
-		m_cursor_enabled = 1;
-	}
+		/* END */
+		break;
 
-	/* END */
+	case 0x40:
+		// Reset Interrupt / Status bits
+		reset_interrupt_status(data & 0x1f);
+		break;
 
-	if ((data&0xe0)==0x40)
-	{
-		/* Reset Interrupt / Status bit */
-		operand = data & 0x1f;
-		LOGMASKED(LOG_COMMAND, "reset interrupt / status bit %02x\n",operand);
+	case 0x80:
+		// Disable Interrupt mask
+		write_interrupt_mask(false, data & 0x1f);
+		break;
 
-		m_irq_register &= ~(data & 0x1f);
-		m_status_register &= ~(data & 0x1f);
+	case 0x60:
+		// Enable Interrupt mask
+		write_interrupt_mask(true, data & 0x1f);
+		break;
 
-		LOGMASKED(LOG_INTR, "IRQ Status after reset\n");
-		LOGMASKED(LOG_INTR, "Split 2   IRQ: %d Active\n",(m_irq_register>>0)&1);
-		LOGMASKED(LOG_INTR, "Ready     IRQ: %d Active\n",(m_irq_register>>1)&1);
-		LOGMASKED(LOG_INTR, "Split 1   IRQ: %d Active\n",(m_irq_register>>2)&1);
-		LOGMASKED(LOG_INTR, "Line Zero IRQ: %d Active\n",(m_irq_register>>3)&1);
-		LOGMASKED(LOG_INTR, "V-Blank   IRQ: %d Active\n",(m_irq_register>>4)&1);
+	case 0xa0:
+		write_delayed_command(data);
+		break;
 
-		m_irq_state = 0;
-
-		for (i = 0; i < 5; i++)
-		{
-			if ((m_irq_register>>i&1)&(m_irq_mask>>i&1))
-			{
-				m_irq_state = 1;
-			}
-		}
-		m_intr_cb(m_irq_register ? ASSERT_LINE : CLEAR_LINE);
-
-	}
-	if ((data&0xe0)==0x80)
-	{
-		/* Disable Interrupt mask*/
-		operand = data & 0x1f;
-		m_irq_mask &= ~(operand);
-		LOGMASKED(LOG_INTR, "IRQ Mask after disable %x\n",operand);
-		LOGMASKED(LOG_INTR, "Split 2   IRQ: %d Unmasked\n",(m_irq_mask>>0)&1);
-		LOGMASKED(LOG_INTR, "Ready     IRQ: %d Unmasked\n",(m_irq_mask>>1)&1);
-		LOGMASKED(LOG_INTR, "Split 1   IRQ: %d Unmasked\n",(m_irq_mask>>2)&1);
-		LOGMASKED(LOG_INTR, "Line Zero IRQ: %d Unmasked\n",(m_irq_mask>>3)&1);
-		LOGMASKED(LOG_INTR, "V-Blank   IRQ: %d Unmasked\n",(m_irq_mask>>4)&1);
-
-	}
-
-	if ((data&0xe0)==0x60)
-	{
-		/* Enable Interrupt mask*/
-		operand = data & 0x1f;
-		m_irq_mask |= (data & 0x1f);
-
-		LOGMASKED(LOG_INTR, "IRQ Mask after enable %x\n",operand);
-		LOGMASKED(LOG_INTR, "Split 2   IRQ: %d Unmasked\n",(m_irq_mask>>0)&1);
-		LOGMASKED(LOG_INTR, "Ready     IRQ: %d Unmasked\n",(m_irq_mask>>1)&1);
-		LOGMASKED(LOG_INTR, "Split 1   IRQ: %d Unmasked\n",(m_irq_mask>>2)&1);
-		LOGMASKED(LOG_INTR, "Line Zero IRQ: %d Unmasked\n",(m_irq_mask>>3)&1);
-		LOGMASKED(LOG_INTR, "V-Blank   IRQ: %d Unmasked\n",(m_irq_mask>>4)&1);
-
-	}
-
-	/* Delayed Commands */
-	/* These set 0x20 in status register when done */
-	// These use the pointer address according to the datasheet but the pcx expects the screen start 2 address instead
-	switch(data)
-	{
-		case 0xa4:
-			/* read at pointer address */
-			m_buffer = space().read_byte(m_screen2_l | (m_screen2_h << 8));
-			LOGMASKED(LOG_COMMAND, "DELAYED read at pointer address %02x\n",data);
-			break;
-
-		case 0xa2:
-			/* write at pointer address */
-			space().write_byte(m_screen2_l | (m_screen2_h << 8), m_buffer);
-			LOGMASKED(LOG_COMMAND, "DELAYED write at pointer address %02x\n",data);
-			break;
-
-		case 0xa6:  // used by the Octopus
-			/* write at pointer address */
-			space().write_byte((m_IR10_display_pointer_address_lower | (m_IR11_display_pointer_address_upper << 8)), m_buffer);
-			LOGMASKED(LOG_COMMAND, "DELAYED write at display pointer address %02x\n",data);
-			break;
-
-		case 0xa9:
-			/* increment cursor address */
-			if(!(++m_cursor_l))
-				m_cursor_h++;
-			LOGMASKED(LOG_COMMAND, "DELAYED increase cursor address %02x\n",data);
-			break;
-
-		case 0xac:
-			/* read at cursor address */
-			m_buffer = space().read_byte(m_cursor_l | (m_cursor_h << 8));
-			LOGMASKED(LOG_COMMAND, "DELAYED read at cursor address %02x\n",data);
-			break;
-
-		case 0xaa:
-			/* write at cursor address */
-			space().write_byte(m_cursor_l | (m_cursor_h << 8), m_buffer);
-			LOGMASKED(LOG_COMMAND, "DELAYED write at cursor address %02x\n",data);
-			break;
-
-		case 0xad:
-			/* read at cursor address + increment */
-			m_buffer = space().read_byte(m_cursor_l | (m_cursor_h << 8));
-			if(!(++m_cursor_l))
-				m_cursor_h++;
-			LOGMASKED(LOG_COMMAND, "DELAYED read at cursor address+increment %02x\n",data);
-			break;
-
-		case 0xab:
-		case 0xaf:  // LSI Octopus sends command 0xAF
-			/* write at cursor address + increment */
-			space().write_byte(m_cursor_l | (m_cursor_h << 8), m_buffer);
-			if(!(++m_cursor_l))
-				m_cursor_h++;
-			LOGMASKED(LOG_COMMAND, "DELAYED write at cursor address+increment %02x\n",data);
-			break;
-
-		case 0xbb:
-			/* write from cursor address to pointer address TODO: transfer only during blank*/
-			for(i = m_cursor_l | (m_cursor_h << 8); i != (m_screen2_l | (m_screen2_h << 8)); i = ((i + 1) & 0xffff))
-				space().write_byte(i, m_buffer);
-			space().write_byte(i, m_buffer); // get the last
-			m_cursor_l = m_screen2_l;
-			m_cursor_h = m_screen2_h;
-			LOGMASKED(LOG_COMMAND, "DELAYED write from cursor address to pointer address %02x\n",data);
-			break;
-
-		case 0xbd:
-			/* read from cursor address to pointer address */
-			LOGMASKED(LOG_COMMAND, "DELAYED read from cursor address to pointer address %02x\n",data);
-			break;
-
-		case 0xbf:
-			/* write from cursor address to pointer address TODO: transfer only during blank*/
-			for(i = m_cursor_l | (m_cursor_h << 8); i != (m_IR10_display_pointer_address_lower | (m_IR11_display_pointer_address_upper << 8)); i = ((i + 1) & 0xffff))
-				space().write_byte(i, m_buffer);
-			space().write_byte(i, m_buffer); // get the last
-			m_cursor_l = m_IR10_display_pointer_address_lower;
-			m_cursor_h = m_IR11_display_pointer_address_upper;
-			LOGMASKED(LOG_COMMAND, "DELAYED write from cursor address to pointer address %02x\n",data);
-			break;
+	default:
+		LOGMASKED(LOG_COMMAND, "%s: Unknown command %02x\n", machine().describe_context(), data);
+		break;
 	}
 }
 
@@ -553,33 +810,50 @@ READ8_MEMBER( scn2674_device::read )
 
 	switch (offset)
 	{
-		/*  Status / Irq Register
+	/*  Status / Irq Register
 
-		    --RV ZSRs
+	    --RV ZSRs
 
-		 6+7 -- = ALWAYS 0
-		  5  R  = RDFLG (Status Register Only)
-		  4  V  = Vblank
-		  3  Z  = Line Zero
-		  2  S  = Split 1
-		  1  R  = Ready
-		  0  s  = Split 2
-		*/
+	 6+7 -- = ALWAYS 0
+	  5  R  = RDFLG (Status Register Only)
+	  4  V  = Vblank
+	  3  Z  = Line Zero
+	  2  S  = Split 1
+	  1  R  = Ready
+	  0  s  = Split 2
+	*/
 
-		case 0:
-			LOGMASKED(LOG_READ, "Read Irq Register %02x %s\n",m_irq_register,machine().describe_context());
-			return m_irq_register;
+	case 0:
+		LOGMASKED(LOG_READ, "%s: Read Irq Register %02x\n", machine().describe_context(), m_irq_register);
+		return m_irq_register;
 
-		case 1:
-			LOGMASKED(LOG_READ, "Read Status Register %02X %s\n",m_status_register,machine().describe_context());
-			return m_status_register;
+	case 1:
+		LOGMASKED(LOG_READ, "%s: Read Status Register %02X\n", machine().describe_context(), m_status_register);
+		return m_status_register;
 
-		case 2: LOGMASKED(LOG_READ, "Read Screen1_l Register %s\n",machine().describe_context());return m_screen1_l;
-		case 3: LOGMASKED(LOG_READ, "Read Screen1_h Register %s\n",machine().describe_context());return m_screen1_h & 0x3f;
-		case 4: LOGMASKED(LOG_READ, "Read Cursor_l Register %s\n",machine().describe_context());return m_cursor_l;
-		case 5: LOGMASKED(LOG_READ, "Read Cursor_h Register %s\n",machine().describe_context());return m_cursor_h;
-		case 6: LOGMASKED(LOG_READ, "Read Screen2_l Register %s\n",machine().describe_context());return m_screen2_l;
-		case 7: LOGMASKED(LOG_READ, "Read Screen2_h Register %s\n",machine().describe_context());return m_screen2_h;
+	case 2:
+		LOGMASKED(LOG_READ, "%s: Read Screen1_l Register\n", machine().describe_context());
+		return m_screen1_address & 0x00ff;
+
+	case 3:
+		LOGMASKED(LOG_READ, "%s: Read Screen1_h Register\n", machine().describe_context());
+		return (m_screen1_address & 0x3f00) >> 8;
+
+	case 4:
+		LOGMASKED(LOG_READ, "%s: Read Cursor_l Register\n", machine().describe_context());
+		return m_cursor_address & 0x00ff;
+
+	case 5:
+		LOGMASKED(LOG_READ, "%s: Read Cursor_h Register\n", machine().describe_context());
+		return m_cursor_address >> 8;
+
+	case 6:
+		LOGMASKED(LOG_READ, "%s: Read Screen2_l Register\n", machine().describe_context());
+		return m_screen2_address & 0x00ff;
+
+	case 7:
+		LOGMASKED(LOG_READ, "%s: Read Screen2_h Register\n", machine().describe_context());
+		return m_screen2_address >> 8;
 	}
 
 	return 0xff;
@@ -602,61 +876,72 @@ WRITE8_MEMBER( scn2674_device::write )
 
 	switch (offset)
 	{
-		case 0:
-			write_init_regs(data);
-			break;
+	case 0:
+		write_init_regs(data);
+		break;
 
-		case 1:
-			write_command(data);
-			break;
+	case 1:
+		write_command(data);
+		break;
 
-		case 2:
-			m_screen1_l = data;
-			if(!screen().vblank())
-				m_start1change = (m_linecounter / m_IR0_scanline_per_char_row) + 1;
-			break;
-		case 3:
-			m_screen1_h = data;
-			m_dbl1=(data & 0xc0)>>6;
-			if (m_IR0_double_ht_wd)
-			{
-				m_IR14_double_1 = m_dbl1;
-				m_screen1_h &= 0x3f;
-				LOGMASKED(LOG_IR, "IR14 - Double 1 overridden %02x\n",m_IR14_double_1);
-			}
-			if(!screen().vblank())
-				m_start1change = (m_linecounter / m_IR0_scanline_per_char_row) + 1;
-			break;
+	case 2:
+		m_screen1_address = (m_screen1_address & 0x3f00) | data;
+		if (!screen().vblank())
+			m_start1change = (m_linecounter / m_scanline_per_char_row) + 1;
+		break;
 
-		case 4: m_cursor_l  = data; break;
-		case 5: m_cursor_h  = (data & 0x3f); break;
-		case 6: m_screen2_l = data; break;
-		case 7:
-			m_screen2_h = (data&0x3f);
-			m_spl1 = (data & 0x40);
-			m_spl2 = (data & 0x80);
-			break;
+	case 3:
+		m_screen1_address = (m_screen1_address & 0x00ff) | data << 8;
+		m_dbl1 = (data & 0xc0) >> 6;
+		if (m_double_ht_wd)
+		{
+			m_double[0] = m_dbl1;
+			m_screen1_address &= 0x3fff;
+			LOGMASKED(LOG_IR, "IR14 - Double 1 overridden %02x\n", m_double[0]);
+		}
+		if (!screen().vblank())
+			m_start1change = (m_linecounter / m_scanline_per_char_row) + 1;
+		break;
+
+	case 4:
+		m_cursor_address = (m_cursor_address & 0x3f00) | data;
+		break;
+
+	case 5:
+		m_cursor_address = (m_cursor_address & 0x00ff) | (data & 0x3f) << 8;
+		break;
+
+	case 6:
+		m_screen2_address = (m_screen2_address & 0x3f00) | data;
+		break;
+
+	case 7:
+		m_screen2_address = (m_screen2_address & 0x00ff) | (data & 0x3f) << 8;
+		m_spl[0] = BIT(data, 6);
+		m_spl[1] = BIT(data, 7);
+		break;
 	}
 }
 
 void scn2674_device::recompute_parameters()
 {
-	int horiz_pix_total = ((m_IR1_equalizing_constant + (m_IR2_horz_sync_width << 1)) << 1) * m_hpixels_per_column;
-	int vert_pix_total = m_IR4_rows_per_screen * m_IR0_scanline_per_char_row + m_IR3_vert_front_porch + m_IR3_vert_back_porch + m_IR7_vsync_width;
-	attoseconds_t refresh = screen().frame_period().attoseconds();
-	int max_visible_x = (m_IR5_character_per_row * m_hpixels_per_column) - 1;
-	int max_visible_y = (m_IR4_rows_per_screen * m_IR0_scanline_per_char_row) - 1;
+	int horiz_chars_total = (m_equalizing_constant + (m_horz_sync_width << 1)) << 1;
+	int horiz_pix_total = horiz_chars_total * m_hpixels_per_column;
+	int vert_pix_total = m_rows_per_screen * m_scanline_per_char_row + m_vert_front_porch + m_vert_back_porch + m_vsync_width;
+	attoseconds_t refresh = screen().frame_period().as_attoseconds();
+	int max_visible_x = (m_character_per_row * m_hpixels_per_column) - 1;
+	int max_visible_y = (m_rows_per_screen * m_scanline_per_char_row) - 1;
 
-	if(!horiz_pix_total || !vert_pix_total)
+	if (!horiz_pix_total || !vert_pix_total)
 	{
 		m_scanline_timer->adjust(attotime::never);
 		return;
 	}
 
-	LOGMASKED(LOG_IR, "width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+	//attoseconds_t refresh = clocks_to_attotime(horiz_chars_total * vert_pix_total).as_attoseconds();
+	LOGMASKED(LOG_IR, "width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, ATTOSECONDS_TO_HZ(refresh));
 
-	rectangle visarea;
-	visarea.set(0, max_visible_x, 0, max_visible_y);
+	rectangle visarea(0, max_visible_x, 0, max_visible_y);
 	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 	m_scanline_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
@@ -664,149 +949,134 @@ void scn2674_device::recompute_parameters()
 
 void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch(id)
+	switch (id)
 	{
-		case TIMER_SCANLINE:
+	case TIMER_SCANLINE:
 		{
-			int dw = m_IR0_double_ht_wd ? m_IR14_double_1 : 0;  // double width
-			if(((m_display_enabled_scanline) || (m_display_enabled_field && !m_IR1_interlace_enable)) && (!m_display_enabled))
+			int dw = m_double_ht_wd ? m_double[0] : 0;  // double width
+			if (((m_display_enabled_scanline) || (m_display_enabled_field && !m_interlace_enable)) && (!m_display_enabled))
 			{
-				m_display_enabled = 1;
-				m_display_enabled_scanline = 0;
-				m_display_enabled_field = 0;
+				m_display_enabled = true;
+				m_display_enabled_scanline = false;
+				m_display_enabled_field = false;
 			}
 
 			m_linecounter++;
 
-			if(m_linecounter >= screen().height())
+			if (m_linecounter >= screen().height())
 			{
 				m_linecounter = 0;
-				m_address = (m_screen1_h << 8) | m_screen1_l;
+				m_address = m_screen1_address;
 			}
 
-			if(m_linecounter == (m_IR4_rows_per_screen * m_IR0_scanline_per_char_row))
+			if (m_linecounter == (m_rows_per_screen * m_scanline_per_char_row))
 			{
 				m_status_register |= 0x10;
-				if(m_irq_mask & 0x10)
+				if (BIT(m_irq_mask, 4))
 				{
-					LOGMASKED(LOG_INTR, "vblank irq\n");
-					m_irq_state = 1;
+					LOGMASKED(LOG_INTR, "V-Blank interrupt at line %d\n", m_linecounter);
 					m_irq_register |= 0x10;
 					m_intr_cb(ASSERT_LINE);
 				}
 			}
 
-			if(m_linecounter >= (m_IR4_rows_per_screen * m_IR0_scanline_per_char_row))
+			if (m_linecounter >= (m_rows_per_screen * m_scanline_per_char_row))
 				break;
 
-			int charrow = m_linecounter % m_IR0_scanline_per_char_row;
+			int charrow = m_linecounter % m_scanline_per_char_row;
 			int tilerow = charrow;
 
 			// should be triggered at the start of each ROW (line zero for that row)
-			if(!charrow)
+			if (charrow == 0)
 			{
 				m_status_register |= 0x08;
-				if (m_irq_mask & 0x08)
+				if (BIT(m_irq_mask, 3))
 				{
-					LOGMASKED(LOG_INTR, "SCN2674 Line Zero\n");
-					m_irq_state = 1;
+					LOGMASKED(LOG_INTR, "Line Zero interrupt at line %d\n", m_linecounter);
 					m_irq_register |= 0x08;
 					m_intr_cb(ASSERT_LINE);
 				}
 			}
 
-			if((m_linecounter == ((m_IR12_split_register_1+1) * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 1 */
+			// Handle screen splits
+			for (int s = 0; s < 2; s++)
 			{
-				m_status_register |= 0x04;
-				if(m_irq_mask & 0x04)
+				if ((m_linecounter == ((m_split_register[s] + 1) * m_scanline_per_char_row)) && m_linecounter)
 				{
-					LOGMASKED(LOG_INTR, "SCN2674 Split Screen 1 irq\n");
-					m_irq_state = 1;
-					m_irq_register |= 0x04;
-					m_intr_cb(ASSERT_LINE);
+					uint8_t flag = (s == 0) ? 0x04 : 0x01;
+					m_status_register |= flag;
+					if ((m_irq_mask & flag) != 0)
+					{
+						LOGMASKED(LOG_INTR, "Split Screen %d interrupt at line %d\n", s + 1, m_linecounter);
+						m_irq_register |= flag;
+						m_intr_cb(ASSERT_LINE);
+					}
+					if (m_spl[s])
+						m_address = m_screen2_address;
+					if (!m_double_ht_wd)
+						dw = m_double[s];
 				}
-				if(m_spl1)
-					m_address = (m_screen2_h << 8) | m_screen2_l;
-				if(!m_IR0_double_ht_wd)
-					dw = m_IR14_double_1;
 			}
 
-			if((m_linecounter == ((m_IR13_split_register_2+1) * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 2 */
-			{
-				m_status_register |= 0x01;
-				if(m_irq_mask & 0x01)
-				{
-					LOGMASKED(LOG_INTR, "SCN2674 Split Screen 2 irq\n");
-					m_irq_state = 1;
-					m_irq_register |= 0x01;
-					m_intr_cb(ASSERT_LINE);
-				}
-				if(m_spl2)
-					m_address = (m_screen2_h << 8) | m_screen2_l;
-				if(!m_IR0_double_ht_wd)
-					dw = m_IR14_double_2;
-			}
-
-			if(!m_display_enabled)
+			if (!m_display_enabled)
 				break;
 
-			if(m_IR2_row_table)
+			if (m_use_row_table)
 			{
-				if(m_IR0_double_ht_wd)
-					dw = m_screen1_h >> 6;
-				if(!charrow)
+				if (m_double_ht_wd)
+					dw = m_screen1_address >> 14;
+				if (!charrow)
 				{
-					uint16_t addr = (m_screen2_h << 8) | m_screen2_l;
-					uint16_t line = space().read_word(addr);
-					m_screen1_h = (line >> 8);
-					m_screen1_l = line & 0xff;
-					if(m_IR0_double_ht_wd)
+					uint16_t addr = m_screen2_address;
+					uint16_t line = m_char_space->read_word(addr);
+					m_screen1_address = line;
+					if (m_double_ht_wd)
 					{
 						dw = line >> 14;
 						line &= ~0xc000;
 					}
 					m_address = line;
 					addr += 2;
-					m_screen2_h = (addr >> 8) & 0x3f;
-					m_screen2_l = addr & 0xff;
+					m_screen2_address = addr & 0x3fff;
 				}
 			}
-			else if(m_start1change && (m_start1change == (m_linecounter / m_IR0_scanline_per_char_row)))
+			else if (m_start1change && (m_start1change == (m_linecounter / m_scanline_per_char_row)))
 			{
-				m_address = (m_screen1_h << 8) | m_screen1_l;
+				m_address = m_screen1_address;
 				m_start1change = 0;
 			}
 
-			if(dw == 2)
+			if (dw == 2)
 				tilerow >>= 1;
-			else if(dw == 3)
-				tilerow = (charrow + m_IR0_scanline_per_char_row) >> 1;
+			else if (dw == 3)
+				tilerow = (charrow + m_scanline_per_char_row) >> 1;
 
 			uint16_t address = m_address;
 
-			for(int i = 0; i < m_IR5_character_per_row; i++)
+			for (int i = 0; i < m_character_per_row; i++)
 			{
-				bool cursor_on = ((address & 0x3fff) == ((m_cursor_h << 8) | m_cursor_l));
+				bool cursor_on = ((address & 0x3fff) == m_cursor_address);
 
 				if (!m_display_cb.isnull())
 					m_display_cb(m_bitmap,
 									i * m_hpixels_per_column,
 									m_linecounter,
 									tilerow,
-									space().read_byte(address),
+									m_char_space->read_byte(address),
+									m_attr_space != nullptr ? m_attr_space->read_byte(address) : 0,
 									address,
-									(charrow >= m_IR6_cursor_first_scanline) && (charrow <= m_IR6_cursor_last_scanline) && cursor_on,
+									(charrow >= m_cursor_first_scanline) && (charrow <= m_cursor_last_scanline) && cursor_on,
 									dw != 0,
-									m_gfx_enabled != 0,
-									charrow == m_IR7_cursor_underline_position,
-									m_IR7_cursor_blink && (screen().frame_number() & (m_IR7_cursor_rate_divisor ? 0x40 : 0x20)));
+									m_gfx_enabled,
+									charrow == m_cursor_underline_position,
+									m_cursor_blink && (screen().frame_number() & m_cursor_rate_divisor));
 				address = (address + 1) & 0xffff;
 
-				if(address > ((m_IR9_display_buffer_last_address << 10) | 0x3ff))
-					address = (m_IR9_display_buffer_first_address_MSB << 8) | m_IR8_display_buffer_first_address_LSB;
+				if (address > ((m_display_buffer_last_address << 10) | 0x3ff))
+					address = m_display_buffer_first_address;
 			}
 
-			if(m_gfx_enabled || (charrow == (m_IR0_scanline_per_char_row - 1)))
+			if (m_gfx_enabled || (charrow == (m_scanline_per_char_row - 1)))
 				m_address = address;
 		}
 	}

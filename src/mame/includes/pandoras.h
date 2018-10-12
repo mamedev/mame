@@ -5,12 +5,18 @@
     Pandora's Palace
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_PANDORAS_H
+#define MAME_INCLUDES_PANDORAS_H
+
+#pragma once
+
+#include "emupal.h"
 
 class pandoras_state : public driver_device
 {
 public:
-	pandoras_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pandoras_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -19,7 +25,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -65,8 +72,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pandoras);
 	uint32_t screen_update_pandoras(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pandoras_master_interrupt);
-	INTERRUPT_GEN_MEMBER(pandoras_slave_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* sr );
 	void pandoras(machine_config &config);
 	void pandoras_i8039_io_map(address_map &map);
@@ -75,3 +81,5 @@ public:
 	void pandoras_slave_map(address_map &map);
 	void pandoras_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PANDORAS_H

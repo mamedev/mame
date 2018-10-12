@@ -16,10 +16,22 @@
 #include "coretmpl.h"
 
 namespace util {
+
 // class implementing a disassembler
 class disasm_interface
 {
 public:
+	virtual ~disasm_interface() = default;
+
+	// independence from emu.h
+	using u8 = osd::u8;
+	using u16 = osd::u16;
+	using u32 = osd::u32;
+	using u64 = osd::u64;
+	using s8 = osd::s8;
+	using s16 = osd::s16;
+	using s32 = osd::s32;
+	using s64 = osd::s64;
 	using offs_t = u32;
 
 	// Disassembler constants for the return value

@@ -18,11 +18,12 @@ i8271_device::i8271_device(const machine_config &mconfig, const char *tag, devic
 	external_ready = false;
 }
 
-ADDRESS_MAP_START(i8271_device::map)
-	AM_RANGE(0x0, 0x0) AM_READWRITE(sr_r, cmd_w)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(rr_r, param_w)
-	AM_RANGE(0x2, 0x2) AM_WRITE(reset_w)
-ADDRESS_MAP_END
+void i8271_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(i8271_device::sr_r), FUNC(i8271_device::cmd_w));
+	map(0x1, 0x1).rw(FUNC(i8271_device::rr_r), FUNC(i8271_device::param_w));
+	map(0x2, 0x2).w(FUNC(i8271_device::reset_w));
+}
 
 void i8271_device::set_ready_line_connected(bool _ready)
 {
@@ -160,6 +161,24 @@ READ8_MEMBER(i8271_device::rr_r)
 void i8271_device::set_rate(int rate)
 {
 	cur_rate = rate;
+}
+
+READ8_MEMBER(i8271_device::read)
+{
+	switch(offset & 0x03) {
+	case 0x00: return sr_r(space, 0);
+	case 0x01: return rr_r(space, 0);
+	}
+	return 0xff;
+}
+
+WRITE8_MEMBER(i8271_device::write)
+{
+	switch(offset & 0x03) {
+	case 0x00: cmd_w(space, 0, data); break;
+	case 0x01: param_w(space, 0, data); break;
+	case 0x02: reset_w(space, 0, data); break;
+	}
 }
 
 READ8_MEMBER(i8271_device::data_r)

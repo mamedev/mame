@@ -24,7 +24,7 @@
  *
  *************************************/
 
-#define TIMER_PERIOD        attotime::from_hz(m_clock)
+#define TIMER_PERIOD        attotime::from_hz(clock())
 #define PCI_BUS_CLOCK       33000000
 // Number of dma words to transfer at a time, real hardware configurable between 8-32
 #define DMA_BURST_SIZE      32
@@ -147,24 +147,27 @@
 #define GINT_RETRYCTR_SHIFT (20)
 
 
-DEFINE_DEVICE_TYPE(GT64XXX, gt64xxx_device, "gt64xxx", "Galileo GT-64XXX System Controller")
+DEFINE_DEVICE_TYPE(GT64010, gt64010_device, "gt64010", "Galileo GT-64010 System Controller")
+DEFINE_DEVICE_TYPE(GT64111, gt64111_device, "gt64111", "Galileo GT-64111 System Controller")
 
-ADDRESS_MAP_START(gt64xxx_device::config_map)
-	AM_IMPORT_FROM(pci_device::config_map)
-ADDRESS_MAP_END
+void gt64xxx_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+}
 
 // cpu i/f map
-ADDRESS_MAP_START(gt64xxx_device::cpu_map)
-	AM_RANGE(0x00000000, 0x00000cff) AM_READWRITE(    cpu_if_r,          cpu_if_w)
-ADDRESS_MAP_END
+void gt64xxx_device::cpu_map(address_map &map)
+{
+	map(0x00000000, 0x00000cff).rw(FUNC(gt64xxx_device::cpu_if_r), FUNC(gt64xxx_device::cpu_if_w));
+}
 
-gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, GT64XXX, tag, owner, clock),
-		m_be(0), m_autoconfig(0), m_irq_num(-1),
-		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
-		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32),
-		m_romRegion(*this, "rom"),
-		m_updateRegion(*this, "update")
+gt64xxx_device::gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_host_device(mconfig, type, tag, owner, clock)
+	, m_cpu(*this, finder_base::DUMMY_TAG), m_be(0), m_autoconfig(0), m_irq_num(-1)
+	, m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32)
+	, m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32)
+	, m_romRegion(*this, "rom")
+	, m_updateRegion(*this, "update")
 {
 	for (int csIndex = 0; csIndex < 4; csIndex++) {
 		m_cs_devices[csIndex] = nullptr;
@@ -189,7 +192,6 @@ device_memory_interface::space_config_vector gt64xxx_device::memory_space_config
 void gt64xxx_device::device_start()
 {
 	pci_host_device::device_start();
-	m_cpu = machine().device<mips3_device>(cpu_tag);
 	m_cpu_space = &m_cpu->space(AS_PCI_CONFIG);
 	memory_space = &space(AS_PCI_MEM);
 	io_space = &space(AS_PCI_IO);
@@ -252,10 +254,9 @@ void gt64xxx_device::device_start()
 	save_pointer(NAME(m_ram[2].data()), m_simm_size[2] / 4);
 	save_pointer(NAME(m_ram[3].data()), m_simm_size[3] / 4);
 	save_item(NAME(m_last_dma));
-	machine().save().register_postload(save_prepost_delegate(FUNC(gt64xxx_device::map_cpu_space), this));
 }
 
-void gt64xxx_device::postload()
+void gt64xxx_device::device_post_load()
 {
 	map_cpu_space();
 	remap_cb();
@@ -636,7 +637,7 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 			result = timer->count;
 			if (timer->active)
 			{
-				uint32_t elapsed = (timer->timer->elapsed() * m_clock).as_double();
+				uint32_t elapsed = (timer->timer->elapsed() * clock()).as_double();
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
@@ -779,7 +780,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 				}
 				else if (timer->active && !(data & mask))
 				{
-					uint32_t elapsed = (timer->timer->elapsed() * m_clock).as_double();
+					uint32_t elapsed = (timer->timer->elapsed() * clock()).as_double();
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
 					timer->timer->adjust(attotime::never, which);

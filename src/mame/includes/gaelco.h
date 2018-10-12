@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/74259.h"
+#include "emupal.h"
 
 class gaelco_state : public driver_device
 {
@@ -25,6 +26,12 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_screenram(*this, "screenram") { }
 
+	void bigkarnk(machine_config &config);
+	void thoop(machine_config &config);
+	void maniacsq(machine_config &config);
+	void squash(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -63,10 +70,7 @@ public:
 	uint32_t screen_update_bigkarnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniacsq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void bigkarnk(machine_config &config);
-	void thoop(machine_config &config);
-	void maniacsq(machine_config &config);
-	void squash(machine_config &config);
+
 	void bigkarnk_map(address_map &map);
 	void bigkarnk_snd_map(address_map &map);
 	void maniacsq_map(address_map &map);

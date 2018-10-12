@@ -2,7 +2,7 @@
 // copyright-holders:Brad Oliver,Sal and John Bugliarisi,Paul Priest
 /***************************************************************************
 
-  video.c
+  naughtyb.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -154,11 +154,11 @@ WRITE8_MEMBER(naughtyb_state::popflame_videoreg_w)
   Each column in the virtual screen is 64 (40h) characters high.
   Thus, column 27 is stored in VRAm at address 0-3fh,
   column 26 is stored at 40-7f, and so on.
-  This illustration shows the horizonal scroll register set to zero,
+  This illustration shows the horizontal scroll register set to zero,
   so the topmost 32 rows of the virtual screen are shown.
 
   The following screen-to-memory mapping. This is shown from player's viewpoint,
-  which with the CRT rotated 90 degrees CCW. This example shows the horizonal
+  which with the CRT rotated 90 degrees CCW. This example shows the horizontal
   scroll register set to zero.
 
 

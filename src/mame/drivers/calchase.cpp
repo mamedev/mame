@@ -100,7 +100,7 @@ Grull Osgo - Improvements
 
 -Changes about BIOS memory management so ROM Shadow now works properly.
  The changes are:
-    Rom Memory Map remmapped to 128K size AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
+    Rom Memory Map remmapped to 128K size map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 
 -Changes in mtxc write handler and bios_ram write handler. Now The internal register access are
 compatible with chipset VIA.
@@ -168,8 +168,8 @@ public:
 	DECLARE_READ16_MEMBER(calchase_iocard5_r);
 	DECLARE_READ32_MEMBER(calchase_idle_skip_r);
 	DECLARE_WRITE32_MEMBER(calchase_idle_skip_w);
-	DECLARE_DRIVER_INIT(calchase);
-	DECLARE_DRIVER_INIT(hostinv);
+	void init_calchase();
+	void init_hostinv();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -200,7 +200,7 @@ uint8_t calchase_state::mtxc_config_r(int function, int reg)
 
 void calchase_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
 
 	/*
 	memory banking with North Bridge:
@@ -294,7 +294,7 @@ uint8_t calchase_state::piix4_config_r(int function, int reg)
 
 void calchase_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -387,75 +387,74 @@ READ16_MEMBER(calchase_state::calchase_iocard5_r)
 }
 
 
-ADDRESS_MAP_START(calchase_state::calchase_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000c8000, 0x000cffff) AM_NOP
-	//AM_RANGE(0x000d0000, 0x000d0003) AM_RAM  // XYLINX - Sincronus serial communication
-	AM_RANGE(0x000d0004, 0x000d0007) AM_READ16(calchase_iocard1_r, 0x0000ffff)
-	AM_RANGE(0x000d000c, 0x000d000f) AM_READ16(calchase_iocard2_r, 0x0000ffff)
-	AM_RANGE(0x000d0030, 0x000d0033) AM_READ16(calchase_iocard3_r, 0xffff0000)
-	AM_RANGE(0x000d0030, 0x000d0033) AM_READ16(calchase_iocard4_r, 0x0000ffff)
-	AM_RANGE(0x000d0034, 0x000d0037) AM_READ16(calchase_iocard5_r, 0x0000ffff)
-	AM_RANGE(0x000d0008, 0x000d000b) AM_WRITENOP // ???
-	AM_RANGE(0x000d0024, 0x000d0027) AM_DEVWRITE16("ldac", dac_word_interface, write, 0x0000ffff)
-	AM_RANGE(0x000d0028, 0x000d002b) AM_DEVWRITE16("rdac", dac_word_interface, write, 0x0000ffff)
-	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
-//  AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+void calchase_state::calchase_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
+	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
+	map(0x000c8000, 0x000cffff).noprw();
+	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
+	map(0x000d0004, 0x000d0005).r(FUNC(calchase_state::calchase_iocard1_r));
+	map(0x000d000c, 0x000d000d).r(FUNC(calchase_state::calchase_iocard2_r));
+	map(0x000d0032, 0x000d0033).r(FUNC(calchase_state::calchase_iocard3_r));
+	map(0x000d0030, 0x000d0031).r(FUNC(calchase_state::calchase_iocard4_r));
+	map(0x000d0034, 0x000d0035).r(FUNC(calchase_state::calchase_iocard5_r));
+	map(0x000d0008, 0x000d000b).nopw(); // ???
+	map(0x000d0024, 0x000d0025).w("ldac", FUNC(dac_word_interface::data_w));
+	map(0x000d0028, 0x000d0029).w("rdac", FUNC(dac_word_interface::data_w));
+	map(0x000d0800, 0x000d0fff).rom().region("nvram", 0); //
+//  map(0x000d0800, 0x000d0fff).ram();  // GAME_CMOS
 
-	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
-	//GRULL AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0x000e0000, 0x000effff) AM_ROMBANK("bios_ext") AM_WRITE(bios_ext_ram_w)
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_bank") AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM  // 64MB
-	AM_RANGE(0x04000000, 0x28ffffff) AM_NOP
-	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
-	//AM_RANGE(0x08000000, 0x080001ff) AM_RAM
-	//AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
-	//AM_RANGE(0x10000000, 0x100001ff) AM_RAM
-	//AM_RANGE(0x14000000, 0x140001ff) AM_RAM
-	//AM_RANGE(0x18000000, 0x180001ff) AM_RAM
-	//AM_RANGE(0x20000000, 0x200001ff) AM_RAM
-	//AM_RANGE(0x28000000, 0x280001ff) AM_RAM
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+	map(0x000e0000, 0x000effff).bankr("bios_ext").w(FUNC(calchase_state::bios_ext_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(calchase_state::bios_ram_w));
+	map(0x00100000, 0x03ffffff).ram();  // 64MB
+	map(0x04000000, 0x28ffffff).noprw();
+	//map(0x04000000, 0x040001ff).ram();
+	//map(0x08000000, 0x080001ff).ram();
+	//map(0x0c000000, 0x0c0001ff).ram();
+	//map(0x10000000, 0x100001ff).ram();
+	//map(0x14000000, 0x140001ff).ram();
+	//map(0x18000000, 0x180001ff).ram();
+	//map(0x20000000, 0x200001ff).ram();
+	//map(0x28000000, 0x280001ff).ram();
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-ADDRESS_MAP_START(calchase_state::calchase_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
-	AM_RANGE(0x0170, 0x0177) AM_NOP //To debug
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x0200, 0x021f) AM_NOP //To debug
-	AM_RANGE(0x0260, 0x026f) AM_NOP //To debug
-	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE(pnp_config_w)
-	AM_RANGE(0x0280, 0x0287) AM_NOP //To debug
-	AM_RANGE(0x02a0, 0x02a7) AM_NOP //To debug
-	AM_RANGE(0x02c0, 0x02c7) AM_NOP //To debug
-	AM_RANGE(0x02e0, 0x02ef) AM_NOP //To debug
-	AM_RANGE(0x02f8, 0x02ff) AM_NOP //To debug
-	AM_RANGE(0x0320, 0x038f) AM_NOP //To debug
-	AM_RANGE(0x03a0, 0x03a7) AM_NOP //To debug
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", trident_vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03e0, 0x03ef) AM_NOP //To debug
-	AM_RANGE(0x0378, 0x037f) AM_NOP //To debug
-	// AM_RANGE(0x0300, 0x03af) AM_NOP
-	// AM_RANGE(0x03b0, 0x03df) AM_NOP
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs1, write_cs1)
-	AM_RANGE(0x03f8, 0x03ff) AM_NOP // To debug Serial Port COM1:
-	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-	AM_RANGE(0x42e8, 0x43ef) AM_NOP //To debug
-	AM_RANGE(0x43c4, 0x43cb) AM_DEVREADWRITE8("vga", trident_vga_device, port_43c6_r, port_43c6_w, 0xffffffff)  // Trident Memory and Video Clock register
-	AM_RANGE(0x46e8, 0x46ef) AM_NOP //To debug
-	AM_RANGE(0x4ae8, 0x4aef) AM_NOP //To debug
-	AM_RANGE(0x83c4, 0x83cb) AM_DEVREADWRITE8("vga", trident_vga_device, port_83c6_r, port_83c6_w, 0xffffffff)  // Trident LUTDAC
-	AM_RANGE(0x92e8, 0x92ef) AM_NOP //To debug
-ADDRESS_MAP_END
+void calchase_state::calchase_io(address_map &map)
+{
+	pcat32_io_common(map);
+	//map(0x00e8, 0x00eb).noprw();
+	map(0x00e8, 0x00ef).noprw(); //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
+	map(0x0170, 0x0177).noprw(); //To debug
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x0200, 0x021f).noprw(); //To debug
+	map(0x0260, 0x026f).noprw(); //To debug
+	map(0x0278, 0x027b).nopw();//AM_WRITE(pnp_config_w)
+	map(0x0280, 0x0287).noprw(); //To debug
+	map(0x02a0, 0x02a7).noprw(); //To debug
+	map(0x02c0, 0x02c7).noprw(); //To debug
+	map(0x02e0, 0x02ef).noprw(); //To debug
+	map(0x02f8, 0x02ff).noprw(); //To debug
+	map(0x0320, 0x038f).noprw(); //To debug
+	map(0x03a0, 0x03a7).noprw(); //To debug
+	map(0x03b0, 0x03bf).rw("vga", FUNC(trident_vga_device::port_03b0_r), FUNC(trident_vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
+	map(0x03e0, 0x03ef).noprw(); //To debug
+	map(0x0378, 0x037f).noprw(); //To debug
+	// map(0x0300, 0x03af).noprw();
+	// map(0x03b0, 0x03df).noprw();
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
+	map(0x0a78, 0x0a7b).nopw();//AM_WRITE(pnp_data_w)
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+	map(0x42e8, 0x43ef).noprw(); //To debug
+	map(0x43c4, 0x43cb).rw("vga", FUNC(trident_vga_device::port_43c6_r), FUNC(trident_vga_device::port_43c6_w));  // Trident Memory and Video Clock register
+	map(0x46e8, 0x46ef).noprw(); //To debug
+	map(0x4ae8, 0x4aef).noprw(); //To debug
+	map(0x83c4, 0x83cb).rw("vga", FUNC(trident_vga_device::port_83c6_r), FUNC(trident_vga_device::port_83c6_w));  // Trident LUTDAC
+	map(0x92e8, 0x92ef).noprw(); //To debug
+}
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
@@ -679,15 +678,15 @@ void calchase_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(calchase_state::calchase)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
-	MCFG_CPU_PROGRAM_MAP(calchase_map)
-	MCFG_CPU_IO_MAP(calchase_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
+	MCFG_DEVICE_PROGRAM_MAP(calchase_map)
+	MCFG_DEVICE_IO_MAP(calchase_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, calchase_state, intel82439tx_pci_r, intel82439tx_pci_w)
@@ -696,30 +695,30 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 	/* video hardware */
 	pcvideo_trident_vga(config);
 
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config.replace(), "rtc"));
+	rtc.irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(calchase_state::hostinv)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
-	MCFG_CPU_PROGRAM_MAP(calchase_map)
-	MCFG_CPU_IO_MAP(calchase_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
+	MCFG_DEVICE_PROGRAM_MAP(calchase_map)
+	MCFG_DEVICE_IO_MAP(calchase_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "cdrom", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "cdrom", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, calchase_state, intel82439tx_pci_r, intel82439tx_pci_w)
@@ -729,12 +728,13 @@ MACHINE_CONFIG_START(calchase_state::hostinv)
 	pcvideo_trident_vga(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -751,7 +751,7 @@ WRITE32_MEMBER(calchase_state::calchase_idle_skip_w)
 	COMBINE_DATA(&m_idle_skip_ram);
 }
 
-DRIVER_INIT_MEMBER(calchase_state,calchase)
+void calchase_state::init_calchase()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 
@@ -760,7 +760,7 @@ DRIVER_INIT_MEMBER(calchase_state,calchase)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(FUNC(calchase_state::calchase_idle_skip_r),this), write32_delegate(FUNC(calchase_state::calchase_idle_skip_w),this));
 }
 
-DRIVER_INIT_MEMBER(calchase_state, hostinv)
+void calchase_state::init_hostinv()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 
@@ -812,6 +812,6 @@ ROM_START( eggsplc )
 	DISK_IMAGE_READONLY( "eggsplc", 0, SHA1(fa38dd6b0d25cde644f68cf639768f137c607eb5) )
 ROM_END
 
-GAME( 1998, hostinv,   0,    hostinv,  calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, calchase,  0,    calchase, calchase, calchase_state,  calchase, ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, eggsplc,   0,    calchase, calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", 0 )
+GAME( 1998, hostinv,  0, hostinv,  calchase, calchase_state, init_hostinv,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, calchase, 0, calchase, calchase, calchase_state, init_calchase, ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, eggsplc,  0, calchase, calchase, calchase_state, init_hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", 0 )

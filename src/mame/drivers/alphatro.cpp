@@ -41,6 +41,7 @@
 #include "sound/beep.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -51,11 +52,6 @@
 class alphatro_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_SYSTEM
-	};
-
 	alphatro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_ram(*this, RAM_TAG)
@@ -72,10 +68,21 @@ public:
 		, m_cartbank(*this, "cartbank")
 		, m_monbank(*this, "monbank")
 		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_dmac(*this, "dmac")
 		, m_config(*this, "CONFIG")
 		, m_cart(*this, "cartslot")
 	{ }
+
+	void alphatro(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
+
+private:
+	enum
+	{
+		TIMER_SYSTEM
+	};
 
 	DECLARE_READ8_MEMBER (ram0000_r);
 	DECLARE_WRITE8_MEMBER(ram0000_w);
@@ -92,7 +99,6 @@ public:
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_READ8_MEMBER(portf0_r);
 	DECLARE_WRITE8_MEMBER(portf0_w);
-	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
@@ -105,13 +111,12 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void alphatro(machine_config &config);
 	void alphatro_io(address_map &map);
 	void alphatro_map(address_map &map);
 	void cartbank_map(address_map &map);
 	void monbank_map(address_map &map);
 	void rombank_map(address_map &map);
-private:
+
 	uint8_t *m_ram_ptr;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<u8> m_p_videoram;
@@ -134,6 +139,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_lowbank, m_cartbank, m_monbank;
 	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<i8257_device> m_dmac;
 	required_ioport m_config;
 	required_device<generic_slot_device> m_cart;
@@ -299,18 +305,14 @@ WRITE8_MEMBER( alphatro_state::portf0_w)
 	{
 		m_fdc->reset();
 
-		floppy_connector *con = machine().device<floppy_connector>("fdc:0");
-		floppy_image_device *floppy = con ? con->get_device() : nullptr;
-		if (floppy)
+		for (auto &con : m_floppy)
 		{
-			floppy->mon_w(0);
-			m_fdc->set_rate(250000);
-		}
-		con = machine().device<floppy_connector>("fdc:1");
-		floppy = con ? con->get_device() : nullptr;
-		if (floppy)
-		{
-			floppy->mon_w(0);
+			floppy_image_device *floppy = con->get_device();
+			if (floppy)
+			{
+				floppy->mon_w(0);
+				m_fdc->set_rate(250000);
+			}
 		}
 	}
 
@@ -388,62 +390,66 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-ADDRESS_MAP_START(alphatro_state::alphatro_map)
-	AM_RANGE(0x0000, 0x5fff) AM_DEVICE("lowbank", address_map_bank_device, amap8)
-	AM_RANGE(0x6000, 0x9fff) AM_READWRITE(ram6000_r, ram6000_w)
-	AM_RANGE(0xa000, 0xdfff) AM_DEVICE("cartbank", address_map_bank_device, amap8)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(rame000_r, rame000_w)
-	AM_RANGE(0xf000, 0xffff) AM_DEVICE("monbank", address_map_bank_device, amap8)
+void alphatro_state::alphatro_map(address_map &map)
+{
+	map(0x0000, 0x5fff).m(m_lowbank, FUNC(address_map_bank_device::amap8));
+	map(0x6000, 0x9fff).rw(FUNC(alphatro_state::ram6000_r), FUNC(alphatro_state::ram6000_w));
+	map(0xa000, 0xdfff).m("cartbank", FUNC(address_map_bank_device::amap8));
+	map(0xe000, 0xefff).rw(FUNC(alphatro_state::rame000_r), FUNC(alphatro_state::rame000_w));
+	map(0xf000, 0xffff).m("monbank", FUNC(address_map_bank_device::amap8));
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(alphatro_state::rombank_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("roms", 0x0000) AM_WRITE(ram0000_w)
-	AM_RANGE(0x6000, 0xbfff) AM_READWRITE(ram0000_r, ram0000_w)
-ADDRESS_MAP_END
+void alphatro_state::rombank_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().region("roms", 0x0000).w(FUNC(alphatro_state::ram0000_w));
+	map(0x6000, 0xbfff).rw(FUNC(alphatro_state::ram0000_r), FUNC(alphatro_state::ram0000_w));
+}
 
-ADDRESS_MAP_START(alphatro_state::cartbank_map)
-	AM_RANGE(0x0000, 0x3fff) AM_DEVREAD("cartslot", generic_slot_device, read_rom) AM_WRITE(rama000_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(rama000_r, rama000_w)
-ADDRESS_MAP_END
+void alphatro_state::cartbank_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(m_cart, FUNC(generic_slot_device::read_rom)).w(FUNC(alphatro_state::rama000_w));
+	map(0x4000, 0x7fff).rw(FUNC(alphatro_state::rama000_r), FUNC(alphatro_state::rama000_w));
+}
 
-ADDRESS_MAP_START(alphatro_state::monbank_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0x8000)
-	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_REGION("roms", 0x9000)
-ADDRESS_MAP_END
+void alphatro_state::monbank_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("videoram");
+	map(0x1000, 0x1fff).rom().region("roms", 0x8000);
+	map(0x2000, 0x2fff).rom().region("roms", 0x9000);
+}
 
-ADDRESS_MAP_START(alphatro_state::alphatro_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r, port10_w)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("X0") AM_WRITE(port20_w)
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("X1")
-	AM_RANGE(0x22, 0x22) AM_READ_PORT("X2")
-	AM_RANGE(0x23, 0x23) AM_READ_PORT("X3")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("X4")
-	AM_RANGE(0x25, 0x25) AM_READ_PORT("X5")
-	AM_RANGE(0x26, 0x26) AM_READ_PORT("X6")
-	AM_RANGE(0x27, 0x27) AM_READ_PORT("X7")
-	AM_RANGE(0x28, 0x28) AM_READ_PORT("X8")
-	AM_RANGE(0x29, 0x29) AM_READ_PORT("X9")
-	AM_RANGE(0x2a, 0x2a) AM_READ_PORT("XA")
-	AM_RANGE(0x2b, 0x2b) AM_READ_PORT("XB")
-	AM_RANGE(0x30, 0x30) AM_READWRITE(port30_r, port30_w)
+void alphatro_state::alphatro_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x10, 0x10).rw(FUNC(alphatro_state::port10_r), FUNC(alphatro_state::port10_w));
+	map(0x20, 0x20).portr("X0").w(FUNC(alphatro_state::port20_w));
+	map(0x21, 0x21).portr("X1");
+	map(0x22, 0x22).portr("X2");
+	map(0x23, 0x23).portr("X3");
+	map(0x24, 0x24).portr("X4");
+	map(0x25, 0x25).portr("X5");
+	map(0x26, 0x26).portr("X6");
+	map(0x27, 0x27).portr("X7");
+	map(0x28, 0x28).portr("X8");
+	map(0x29, 0x29).portr("X9");
+	map(0x2a, 0x2a).portr("XA");
+	map(0x2b, 0x2b).portr("XB");
+	map(0x30, 0x30).rw(FUNC(alphatro_state::port30_r), FUNC(alphatro_state::port30_w));
 	// USART for cassette reading and writing
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
-	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
+	map(0x40, 0x41).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// CRTC - HD46505 / HD6845SP
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0x50, 0x50).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x51, 0x51).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	// 8257 DMAC
-	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE("dmac", i8257_device, read, write)
+	map(0x60, 0x68).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	// 8259 PIT
 	//AM_RANGE(0x70, 0x72) AM_DEVREADWRITE("
-	AM_RANGE(0xf0, 0xf0) AM_READ(portf0_r) AM_WRITE(portf0_w)
-	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE("fdc", upd765a_device, fifo_r, fifo_w)
-	AM_RANGE(0xf9, 0xf9) AM_DEVREAD("fdc", upd765a_device, msr_r)
-ADDRESS_MAP_END
+	map(0xf0, 0xf0).r(FUNC(alphatro_state::portf0_r)).w(FUNC(alphatro_state::portf0_w));
+	map(0xf8, 0xf8).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
+	map(0xf9, 0xf9).r(m_fdc, FUNC(upd765a_device::msr_r));
+}
 
 static INPUT_PORTS_START( alphatro )
 	PORT_START("X0")
@@ -575,7 +581,7 @@ static const gfx_layout charlayout =
 	8*16
 };
 
-static GFXDECODE_START( alphatro )
+static GFXDECODE_START( gfx_alphatro )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -688,15 +694,16 @@ FLOPPY_FORMATS_MEMBER( alphatro_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( alphatro_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void alphatro_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(alphatro_state::alphatro)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(alphatro_map)
-	MCFG_CPU_IO_MAP(alphatro_io)
+	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(alphatro_map)
+	MCFG_DEVICE_IO_MAP(alphatro_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -705,44 +712,42 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatro)
 	MCFG_PALETTE_ADD("palette", 9) // 8 colours + amber
 	MCFG_PALETTE_INIT_OWNER(alphatro_state, alphatro)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* piezo-device needs to be measured */
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(alphatro_state, fdc_irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", i8257_device, dreq2_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(alphatro_state::fdc_irq_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 
-	MCFG_DEVICE_ADD("dmac" , I8257, MAIN_CLOCK)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(alphatro_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(alphatro_state, ram0000_r))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(alphatro_state, ram0000_w))
-	MCFG_I8257_IN_IOR_2_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
-	MCFG_I8257_OUT_TC_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
+	I8257(config, m_dmac, MAIN_CLOCK);
+	m_dmac->out_hrq_cb().set(FUNC(alphatro_state::hrq_w));
+	m_dmac->in_memr_cb().set(FUNC(alphatro_state::ram0000_r));
+	m_dmac->out_memw_cb().set(FUNC(alphatro_state::ram0000_w));
+	m_dmac->in_ior_cb<2>().set("fdc", FUNC(upd765a_device::mdma_r));
+	m_dmac->out_iow_cb<2>().set("fdc", FUNC(upd765a_device::mdma_w));
+	m_dmac->out_tc_cb().set("fdc", FUNC(upd765a_device::tc_line_w));
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'288'000) / 8) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(alphatro_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD("usart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state, txdata_callback))
+	I8251(config, m_usart, 0);
+	m_usart->txd_handler().set(FUNC(alphatro_state::txdata_callback));
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19218) // 19218 to load a real tape, 19222 to load a tape made by this driver
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("usart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("usart", i8251_device, write_rxc))
+	clock_device &usart_clock(CLOCK(config, "usart_clock", 19218)); // 19218 to load a real tape, 19222 to load a tape made by this driver
+	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
+	usart_clock.signal_handler().append(m_usart, FUNC(i8251_device::write_rxc));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -752,8 +757,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", alphatro_state, timer_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", alphatro_state, timer_p, attotime::from_hz(40000))
 
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, "ram").set_default_size("64K");
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "alphatro_cart")
@@ -762,25 +766,13 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","alphatro_cart")
 
 	/* 0000 banking */
-	MCFG_DEVICE_ADD("lowbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rombank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x6000)
+	ADDRESS_MAP_BANK(config, "lowbank").set_map(&alphatro_state::rombank_map).set_options(ENDIANNESS_BIG, 8, 32, 0x6000);
 
 	/* A000 banking */
-	MCFG_DEVICE_ADD("cartbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(cartbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "cartbank").set_map(&alphatro_state::cartbank_map).set_options(ENDIANNESS_BIG, 8, 32, 0x4000);
 
 	/* F000 banking */
-	MCFG_DEVICE_ADD("monbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(monbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "monbank").set_map(&alphatro_state::monbank_map).set_options(ENDIANNESS_BIG, 8, 32, 0x1000);
 MACHINE_CONFIG_END
 
 
@@ -792,19 +784,24 @@ MACHINE_CONFIG_END
 
 ROM_START( alphatro )
 	ROM_REGION( 0xa000, "roms", ROMREGION_ERASE00)
-	ROM_SYSTEM_BIOS( 0, "default", "Alphatronic with Bicom graphics" )
-	ROMX_LOAD( "0_b4-6_ic1038.bin", 0x008000, 0x002000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49), ROM_BIOS(1) )
-	ROMX_LOAD( "1_b4-3_ic1058.bin", 0x000000, 0x002000, CRC(1509b15a) SHA1(225c36411de680eb8f4d6b58869460a58e60c0cf), ROM_BIOS(1) )
-	ROMX_LOAD( "2_b4-3_ic1046.bin", 0x002000, 0x002000, CRC(998a865d) SHA1(294fe64e839ae6c4032d5db1f431c35e0d80d367), ROM_BIOS(1) )
-	ROMX_LOAD( "3_b4-3_ic1037.bin", 0x004000, 0x002000, CRC(55cbafef) SHA1(e3376b92f80d5a698cdcb2afaa0f3ef4341dd624), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 0, "pcb-ig", "Alphatronic PC PCB-IG" ) // correctly displays German Umlauts
+	ROMX_LOAD( "0_b4-6_ic1038.bin", 0x008000, 0x002000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49), ROM_BIOS(0) )
+	ROMX_LOAD( "1_b4-3_ic1058.bin", 0x000000, 0x002000, CRC(1509b15a) SHA1(225c36411de680eb8f4d6b58869460a58e60c0cf), ROM_BIOS(0) )
+	ROMX_LOAD( "2_b4-3_ic1046.bin", 0x002000, 0x002000, CRC(998a865d) SHA1(294fe64e839ae6c4032d5db1f431c35e0d80d367), ROM_BIOS(0) )
+	ROMX_LOAD( "3_b4-3_ic1037.bin", 0x004000, 0x002000, CRC(55cbafef) SHA1(e3376b92f80d5a698cdcb2afaa0f3ef4341dd624), ROM_BIOS(0) )
 
-	ROM_SYSTEM_BIOS( 1, "orig", "Plain Alphatronic")
+	ROM_SYSTEM_BIOS( 1, "pcb-ii", "Alphatronic PC PCB-II")
+	ROMX_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467), ROM_BIOS(1) )
+	ROMX_LOAD( "2764.ic-1038",   0x8000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS( 2, "bicom", "Alphatronic PC PCB-II with BICOM Graphics extension") // correctly displays German Umlauts
 	ROMX_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467), ROM_BIOS(2) )
-	ROMX_LOAD( "2764.ic-1038",   0x8000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49), ROM_BIOS(2) )
+	ROMX_LOAD( "tapcgv2_ic1038.bin",   0x8000, 0x2000, CRC(446b4235) SHA1(ef835ae46b3fdfe6a6f394971396a577528e7b5a), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROMX_LOAD( "4_b4-0_ic1067.bin", 0x000000, 0x001000, CRC(00796934) SHA1(8e70f77cfe3eb2ec2051f660518da5c9d409119a), ROM_BIOS(1) )
-	ROMX_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8), ROM_BIOS(2) )
+	ROMX_LOAD( "4_b4-0_ic1067.bin", 0x000000, 0x001000, CRC(00796934) SHA1(8e70f77cfe3eb2ec2051f660518da5c9d409119a), ROM_BIOS(0) )
+	ROMX_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8), ROM_BIOS(1) )
+	ROMX_LOAD( "b40r_ic1067.bin",   0x0000, 0x1000, CRC(543e3ee8) SHA1(3e6c6f8c85d3a5d0735edfec52709c5670ff1646), ROM_BIOS(2) )
 ROM_END
 
-COMP( 1983, alphatro,   0,        0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alphatro, 0, 0, alphatro, alphatro, alphatro_state, empty_init, "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )

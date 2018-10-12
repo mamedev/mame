@@ -24,9 +24,10 @@ DEFINE_DEVICE_TYPE(A2BUS_SOFTCARD, a2bus_softcard_device, "a2softcard", "Microso
 
 #define Z80_TAG         "z80"
 
-ADDRESS_MAP_START(a2bus_softcard_device::z80_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
-ADDRESS_MAP_END
+void a2bus_softcard_device::z80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(a2bus_softcard_device::dma_r), FUNC(a2bus_softcard_device::dma_w));
+}
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -36,10 +37,11 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_softcard_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 1021800*2)   // Z80 runs on double the Apple II's clock
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-MACHINE_CONFIG_END
+void a2bus_softcard_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_z80, 1021800*2);   // Z80 runs on double the Apple II's clock
+	m_z80->set_addrmap(AS_PROGRAM, &a2bus_softcard_device::z80_mem);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

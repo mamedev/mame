@@ -78,6 +78,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -107,10 +108,10 @@
 #define CDP1869_PCB_READ_MEMBER(name) int name(uint16_t pma, uint8_t cma, uint8_t pmd)
 
 #define MCFG_CDP1869_PAL_NTSC_CALLBACK(_read) \
-	devcb = &downcast<cdp1869_device &>(*device).set_pal_ntsc_rd_callback(DEVCB_##_read);
+	downcast<cdp1869_device &>(*device).set_pal_ntsc_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1869_PRD_CALLBACK(_write) \
-	devcb = &downcast<cdp1869_device &>(*device).set_prd_wr_callback(DEVCB_##_write);
+	downcast<cdp1869_device &>(*device).set_prd_wr_callback(DEVCB_##_write);
 
 #define MCFG_CDP1869_COLOR_CLOCK(_clk) \
 	downcast<cdp1869_device &>(*device).set_color_clock(_clk);

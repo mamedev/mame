@@ -36,6 +36,9 @@ public:
 	{
 	}
 
+	void h89(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_WRITE8_MEMBER( port_f2_w );
@@ -43,28 +46,29 @@ public:
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
-	void h89(machine_config &config);
 	void h89_io(address_map &map);
 	void h89_mem(address_map &map);
 };
 
 
-ADDRESS_MAP_START(h89_state::h89_mem)
-	ADDRESS_MAP_UNMAP_HIGH
+void h89_state::h89_mem(address_map &map)
+{
+	map.unmap_value_high();
 	// Bank 0 - At startup has the format defined below, but software could swap it for RAM (Later H-89s and
 	//          Early ones with the Org-0 modification),
 	//          TODO - define the RAM so it can swap in/out under program control.
-	AM_RANGE(0x0000, 0x0fff) AM_ROM   // Page 0-4 - System ROM (at most 4k(MTR-90), early versions(MTR-88, MTR-89) only had 2k)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM   // Page 5 - Floppy Disk RAM (Write-protectable)
-	AM_RANGE(0x1400, 0x1fff) AM_ROM   // Page 6-7 - Floppy Disk ROM
+	map(0x0000, 0x0fff).rom();   // Page 0-4 - System ROM (at most 4k(MTR-90), early versions(MTR-88, MTR-89) only had 2k)
+	map(0x1000, 0x13ff).ram();   // Page 5 - Floppy Disk RAM (Write-protectable)
+	map(0x1400, 0x1fff).rom();   // Page 6-7 - Floppy Disk ROM
 
 	// Banks 1-7
-	AM_RANGE(0x2000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x2000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(h89_state::h89_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void h89_state::h89_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 //  AM_RANGE(0x78, 0x7b)    expansion 1    // Options - Cassette I/O (only uses 0x78 - 0x79) Requires MTR-88 ROM
 										   //         - H37 5-1/4" Soft-sectored Controller MTR-90 ROM
 										   //         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
@@ -76,15 +80,15 @@ ADDRESS_MAP_START(h89_state::h89_io)
 //  AM_RANGE(0xd0, 0xd7)    8250 UART DCE
 //  AM_RANGE(0xd8, 0xdf)    8250 UART DTE - MODEM
 //  AM_RANGE(0xe0, 0xe7)    8250 UART DCE - LP
-	AM_RANGE(0xe8, 0xef)    AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w) // 8250 UART console - this
+	map(0xe8, 0xef).rw("ins8250", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // 8250 UART console - this
 																								 // connects internally to a Terminal board
 																								 // that is also used in the H19. Ideally,
 																								 // the H19 code could be connected and ran
 																								 // as a separate thread.
 //  AM_RANGE(0xf0, 0xf1)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
-	AM_RANGE(0xf2, 0xf2)    AM_WRITE(port_f2_w) AM_READ_PORT("SW501")
+	map(0xf2, 0xf2).w(FUNC(h89_state::port_f2_w)).portr("SW501");
 //  AM_RANGE(0xf3, 0xf3)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( h89 )
@@ -183,16 +187,16 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(h89_state::h89)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(12'288'000) / 6)
-	MCFG_CPU_PROGRAM_MAP(h89_mem)
-	MCFG_CPU_IO_MAP(h89_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(12'288'000) / 6)
+	MCFG_DEVICE_PROGRAM_MAP(h89_mem)
+	MCFG_DEVICE_IO_MAP(h89_io)
 
-	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	ins8250_device &uart(INS8250(config, "ins8250", XTAL(1'843'200)));
+	uart.out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, rx_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", h89_state, h89_irq_timer, attotime::from_hz(100))
 MACHINE_CONFIG_END
@@ -210,5 +214,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT     COMPANY      FULLNAME        FLAGS */
-COMP( 1979, h89,    0,      0,       h89,       h89,   h89_state,  0,       "Heath Inc", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME        FLAGS */
+COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Inc", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

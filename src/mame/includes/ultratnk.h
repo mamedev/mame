@@ -12,16 +12,12 @@
 
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ultratnk_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_NMI
-	};
-
 	ultratnk_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -38,6 +34,11 @@ public:
 	void ultratnk(machine_config &config);
 
 protected:
+	enum
+	{
+		TIMER_NMI
+	};
+
 	DECLARE_READ8_MEMBER(wram_r);
 	DECLARE_READ8_MEMBER(analog_r);
 	DECLARE_READ8_MEMBER(coin_r);
@@ -46,8 +47,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(wram_w);
 	DECLARE_WRITE8_MEMBER(collision_reset_w);
 	DECLARE_WRITE8_MEMBER(da_latch_w);
-	DECLARE_WRITE_LINE_MEMBER(led_1_w);
-	DECLARE_WRITE_LINE_MEMBER(led_2_w);
 	DECLARE_WRITE_LINE_MEMBER(lockout_w);
 	DECLARE_WRITE8_MEMBER(video_ram_w);
 	DECLARE_WRITE8_MEMBER(attract_w);

@@ -45,28 +45,28 @@ enum
 
 
 #define MCFG_SC61860_READ_RESET_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_reset_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_reset_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_BRK_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_brk_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_brk_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_X_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_x_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_x_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_A_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_ina_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_ina_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_WRITE_A_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_outa_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_outa_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_B_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_inb_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_inb_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_WRITE_B_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_outb_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_outb_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_WRITE_C_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_outc_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_outc_cb(DEVCB_##_devcb);
 
 class sc61860_device : public cpu_device
 {
@@ -109,7 +109,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -135,7 +135,7 @@ private:
 	emu_timer *m_2ms_tick_timer;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	int m_icount;
 	uint8_t m_ram[0x100]; // internal special ram, should be 0x60, 0x100 to avoid memory corruption for now
 

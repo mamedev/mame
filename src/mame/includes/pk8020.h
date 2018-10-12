@@ -18,6 +18,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 
 
 class pk8020_state : public driver_device
@@ -29,8 +30,8 @@ public:
 		m_ppi8255_1(*this, "ppi8255_1"),
 		m_ppi8255_2(*this, "ppi8255_2"),
 		m_ppi8255_3(*this, "ppi8255_3"),
-		m_rs232(*this, "rs232"),
-		m_lan(*this, "lan"),
+		m_rs232(*this, "i8251line"),
+		m_lan(*this, "i8251lan"),
 		m_ram(*this, RAM_TAG),
 		m_wd1793(*this, "wd1793"),
 		m_floppy0(*this, "wd1793:0"),
@@ -44,6 +45,9 @@ public:
 		m_region_gfx1(*this, "gfx1"),
 		m_palette(*this, "palette")  { }
 
+	void pk8020(machine_config &config);
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	uint8_t m_color;
@@ -80,10 +84,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out1);
 
-	void pk8020(machine_config &config);
 	void pk8020_io(address_map &map);
 	void pk8020_mem(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255_1;
 	required_device<i8255_device> m_ppi8255_2;

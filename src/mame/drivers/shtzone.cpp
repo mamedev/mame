@@ -51,6 +51,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 class shtzone_state : public driver_device
@@ -58,18 +59,22 @@ class shtzone_state : public driver_device
 public:
 	shtzone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+
+	void shtzone(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void shtzone(machine_config &config);
 	void shtzone_map(address_map &map);
 };
 
-ADDRESS_MAP_START(shtzone_state::shtzone_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-ADDRESS_MAP_END
+void shtzone_state::shtzone_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram();
+}
 
 
 static INPUT_PORTS_START( shtzone )
@@ -98,8 +103,8 @@ uint32_t shtzone_state::screen_update_shtzone(screen_device &screen, bitmap_ind1
 MACHINE_CONFIG_START(shtzone_state::shtzone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("timercpu", Z80,10738000/4)
-	MCFG_CPU_PROGRAM_MAP(shtzone_map)
+	MCFG_DEVICE_ADD("timercpu", Z80,10738000/4)
+	MCFG_DEVICE_PROGRAM_MAP(shtzone_map)
 
 	/* + SMS CPU */
 
@@ -123,4 +128,4 @@ ROM_START( shtzone )
 	ROM_LOAD( "epr10894a.20", 0x00000, 0x04000, CRC(ea8901d9) SHA1(43fd8bfc395e3b2e3fbe9645d692a5eb04783d9c) )
 ROM_END
 
-GAME( 1987, shtzone,  0,    shtzone, shtzone, shtzone_state,  0, ROT0, "Sega", "Shooting Zone System BIOS", MACHINE_IS_SKELETON | MACHINE_IS_BIOS_ROOT )
+GAME( 1987, shtzone, 0, shtzone, shtzone, shtzone_state, empty_init, ROT0, "Sega", "Shooting Zone System BIOS", MACHINE_IS_SKELETON | MACHINE_IS_BIOS_ROOT )

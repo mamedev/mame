@@ -64,23 +64,26 @@ private:
 };
 
 
-ADDRESS_MAP_START(chaos_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void chaos_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(chaos_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x1e, 0x1e) AM_READ(port1e_r)
-	AM_RANGE(0x1f, 0x1f) AM_READWRITE(port90_r, port1f_w)
-	AM_RANGE(0x90, 0x90) AM_READ(port90_r)
-	AM_RANGE(0x91, 0x91) AM_READ(port91_r)
-	AM_RANGE(0x92, 0x92) AM_DEVWRITE("terminal", generic_terminal_device, write)
-ADDRESS_MAP_END
+void chaos_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x1e, 0x1e).r(FUNC(chaos_state::port1e_r));
+	map(0x1f, 0x1f).rw(FUNC(chaos_state::port90_r), FUNC(chaos_state::port1f_w));
+	map(0x90, 0x90).r(FUNC(chaos_state::port90_r));
+	map(0x91, 0x91).r(FUNC(chaos_state::port91_r));
+	map(0x92, 0x92).w(m_terminal, FUNC(generic_terminal_device::write));
+}
 
-ADDRESS_MAP_START(chaos_state::data_map)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // stops error log filling up while using debug
-ADDRESS_MAP_END
+void chaos_state::data_map(address_map &map)
+{
+	map(S2650_DATA_PORT, S2650_DATA_PORT).noprw(); // stops error log filling up while using debug
+}
 
 /* Input ports */
 static INPUT_PORTS_START( chaos )
@@ -147,13 +150,13 @@ void chaos_state::machine_reset()
 
 MACHINE_CONFIG_START(chaos_state::chaos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_DATA_MAP(data_map)
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_DATA_MAP(data_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(chaos_state, kbd_put))
 MACHINE_CONFIG_END
 
@@ -168,5 +171,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY          FULLNAME   FLAGS
-COMP( 1983, chaos,  0,      0,      chaos,   chaos, chaos_state, 0,    "David Greaves", "Chaos 2", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME   FLAGS
+COMP( 1983, chaos, 0,      0,      chaos,   chaos, chaos_state, empty_init, "David Greaves", "Chaos 2", MACHINE_NO_SOUND_HW )

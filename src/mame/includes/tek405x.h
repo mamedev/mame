@@ -21,6 +21,8 @@
 
 #include "video/vector.h"
 
+#include "emupal.h"
+
 
 #define MC6800_TAG          "u61"
 #define MC6820_Y_TAG        "u561"
@@ -51,27 +53,13 @@ public:
 		m_rom(*this, MC6800_TAG),
 		m_bsofl_rom(*this, "020_0147_00"),
 		m_bscom_rom(*this, "021_0188_00"),
-		m_special(*this, "SPECIAL")
-	{
-	}
+		m_special(*this, "SPECIAL"),
+		m_lamps(*this, "lamp%u", 1U)
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<pia6821_device> m_gpib_pia;
-	required_device<pia6821_device> m_com_pia;
-	required_device<acia6850_device> m_acia;
-	required_device<clock_device> m_acia_clock;
-	required_device<ieee488_device> m_gpib;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<ram_device> m_ram;
-	required_memory_region m_rom;
-	required_memory_region m_bsofl_rom;
-	required_memory_region m_bscom_rom;
-	required_ioport m_special;
+	void tek4051(machine_config &config);
 
-	virtual void machine_start() override;
-
-	virtual void video_start() override;
-
+private:
 	void bankswitch(uint8_t data);
 	void update_irq();
 	void update_nmi();
@@ -122,6 +110,26 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
+	void tek4051_mem(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<pia6821_device> m_gpib_pia;
+	required_device<pia6821_device> m_com_pia;
+	required_device<acia6850_device> m_acia;
+	required_device<clock_device> m_acia_clock;
+	required_device<ieee488_device> m_gpib;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_memory_region m_bsofl_rom;
+	required_memory_region m_bscom_rom;
+	required_ioport m_special;
+	output_finder<3> m_lamps;
+
 	// interrupts
 	int m_x_pia_irqa;
 	int m_x_pia_irqb;
@@ -138,33 +146,31 @@ public:
 	int m_acia_irq;
 
 	// keyboard
-	int m_kbhalt;
 	int m_kc;
 
 	// GPIB
 	int m_talk;
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
-	void tek4051(machine_config &config);
-	void tek4051_mem(address_map &map);
 };
 
 class tek4052_state : public driver_device
 {
 public:
-	tek4052_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, AM2901A_TAG),
-			m_ram(*this, RAM_TAG)
-		{ }
+	tek4052_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, AM2901A_TAG),
+		m_ram(*this, RAM_TAG)
+	{ }
+
+	void tek4052(machine_config &config);
+
+private:
+	void tek4052_mem(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-
-	virtual void machine_start() override;
-
-	virtual void video_start() override;
-	void tek4052(machine_config &config);
-	void tek4052_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_TEK405X_H

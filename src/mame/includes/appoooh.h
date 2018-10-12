@@ -6,6 +6,7 @@
 #pragma once
 
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class appoooh_state : public driver_device
 {
@@ -25,7 +26,7 @@ public:
 		m_msm(*this, "msm")
 	{ }
 
-	DECLARE_DRIVER_INIT(robowresb);
+	void init_robowresb();
 	void appoooh(machine_config &config);
 	void robowres(machine_config &config);
 	void robowrese(machine_config &config);

@@ -34,7 +34,7 @@ inline uint16_t galpani2_state::galpani2_bg8_regs_r(address_space &space, offs_t
 	{
 		case 0x16:  return machine().rand() & 1;
 		default:
-			logerror("CPU #0 PC %06X : Warning, bg8 #%d screen reg %04X read\n",space.cpu->safe_pc(),_n_,offset*2);
+			logerror("%s: Warning, bg8 #%d screen reg %04X read\n",machine().describe_context(),_n_,offset*2);
 	}
 	return m_bg8_regs[_n_][offset];
 }

@@ -225,13 +225,15 @@ DEFINE_DEVICE_TYPE(MOS8566, mos8566_device, "mos8566", "MOS 8566 VIC-II")
 
 
 // default address maps
-ADDRESS_MAP_START(mos6566_device::mos6566_videoram_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void mos6566_device::mos6566_videoram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+}
 
-ADDRESS_MAP_START(mos6566_device::mos6566_colorram_map)
-	AM_RANGE(0x000, 0x3ff) AM_RAM
-ADDRESS_MAP_END
+void mos6566_device::mos6566_colorram_map(address_map &map)
+{
+	map(0x000, 0x3ff).ram();
+}
 
 
 //-------------------------------------------------
@@ -646,7 +648,7 @@ mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, d
 void mos6566_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();

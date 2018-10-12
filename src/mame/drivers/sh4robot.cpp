@@ -42,31 +42,35 @@ public:
 	{ }
 
 	void sh4robot(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
 
-ADDRESS_MAP_START(sh4robot_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x00000fff) AM_ROM
-	AM_RANGE(0x08000000, 0x08ffffff) AM_RAM // SDRAM 1
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM // SDRAM 2
-	AM_RANGE(0xa0000000, 0xa0000fff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void sh4robot_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x00000fff).rom();
+	map(0x08000000, 0x08ffffff).ram(); // SDRAM 1
+	map(0x0c000000, 0x0cffffff).ram(); // SDRAM 2
+	map(0xa0000000, 0xa0000fff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(sh4robot_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void sh4robot_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 static INPUT_PORTS_START( sh4robot )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(sh4robot_state::sh4robot)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, 200000000) // SH7750
+	MCFG_DEVICE_ADD("maincpu", SH4LE, 200000000) // SH7750
 	MCFG_SH4_MD0(1)
 	MCFG_SH4_MD1(0)
 	MCFG_SH4_MD2(1)
@@ -77,8 +81,8 @@ MACHINE_CONFIG_START(sh4robot_state::sh4robot)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(200000000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_CPU_FORCE_NO_DRC()
 
 MACHINE_CONFIG_END
@@ -97,5 +101,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY      FULLNAME  FLAGS
-COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, 0,    "<unknown>", "Robot",  MACHINE_IS_SKELETON_MECHANICAL )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME  FLAGS
+COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, empty_init, "<unknown>", "Robot",  MACHINE_IS_SKELETON_MECHANICAL )

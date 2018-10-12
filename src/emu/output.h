@@ -28,6 +28,8 @@ typedef void (*output_notifier_func)(const char *outname, s32 value, void *param
 class output_manager
 {
 private:
+	template <typename Input, std::make_unsigned_t<Input> DefaultMask> friend class devcb_write;
+
 	class output_notify
 	{
 	public:
@@ -177,11 +179,6 @@ public:
 	// map a unique ID back to a name
 	const char *id_to_name(u32 id);
 
-	// helpers
-	void set_led_value(int index, int value) { set_indexed_value("led", index, value ? 1 : 0); }
-	void set_lamp_value(int index, int value) { set_indexed_value("lamp", index, value); }
-	[[deprecated("string format and hash in critical path")]] void set_digit_value(int index, int value) { set_indexed_value("digit", index, value); }
-
 	void pause();
 	void resume();
 
@@ -191,6 +188,7 @@ private:
 
 	output_item *find_item(const char *string);
 	output_item &create_new_item(const char *outname, s32 value);
+	output_item &find_or_create_item(const char *outname, s32 value);
 
 	// internal state
 	running_machine &m_machine;                  // reference to our machine

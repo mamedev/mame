@@ -97,35 +97,35 @@ void amiga_state::aga_fetch_sprite_data(int scanline, int sprite)
 	switch((CUSTOM_REG(REG_FMODE) >> 2) & 0x03)
 	{
 		case 0:
-			m_aga_sprdata[sprite][0] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			m_aga_sprdatb[sprite][0] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			m_aga_sprdata[sprite][0] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			m_aga_sprdatb[sprite][0] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			m_aga_sprite_fetched_words = 1;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, m_aga_sprdata[sprite][0], m_aga_sprdatb[sprite][0]);
 			break;
 		case 1:
 		case 2:
-			m_aga_sprdata[sprite][0] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			m_aga_sprdata[sprite][1] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			m_aga_sprdata[sprite][0] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			m_aga_sprdata[sprite][1] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			m_aga_sprdatb[sprite][0] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			m_aga_sprdatb[sprite][1] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			m_aga_sprdatb[sprite][0] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			m_aga_sprdatb[sprite][1] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			m_aga_sprite_fetched_words = 2;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X\n", scanline, sprite, m_aga_sprdata[sprite][0], m_aga_sprdatb[sprite][0], m_aga_sprdata[sprite][1], m_aga_sprdatb[sprite][1] );
 			break;
 		case 3:
-			m_aga_sprdata[sprite][0] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			m_aga_sprdata[sprite][1] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			m_aga_sprdata[sprite][0] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			m_aga_sprdata[sprite][1] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			m_aga_sprdata[sprite][2] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			m_aga_sprdata[sprite][3] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			m_aga_sprdata[sprite][2] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			m_aga_sprdata[sprite][3] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			m_aga_sprdatb[sprite][0] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			m_aga_sprdatb[sprite][1] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			m_aga_sprdatb[sprite][0] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			m_aga_sprdatb[sprite][1] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			m_aga_sprdatb[sprite][2] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			m_aga_sprdatb[sprite][3] = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			m_aga_sprdatb[sprite][2] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			m_aga_sprdatb[sprite][3] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			m_aga_sprite_fetched_words = 4;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X %04X-%04X %04X-%04X\n",
@@ -163,8 +163,8 @@ void amiga_state::aga_update_sprite_dma(int scanline)
 			m_sprite_dma_reload_mask &= ~bitmask;
 
 			/* fetch data into the control words */
-			CUSTOM_REG(REG_SPR0POS + 4 * num) = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			CUSTOM_REG(REG_SPR0CTL + 4 * num) = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
+			CUSTOM_REG(REG_SPR0POS + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
+			CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
 			/* fetch additional words */
 			switch((CUSTOM_REG(REG_FMODE) >> 2) & 0x03)
@@ -374,24 +374,24 @@ void amiga_state::aga_fetch_bitplane_data(int plane)
 	switch (CUSTOM_REG(REG_FMODE) & 0x03)
 	{
 		case 0:
-			aga_bpldat[plane] = (uint64_t)chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
+			aga_bpldat[plane] = (uint64_t)read_chip_ram(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 			break;
 		case 1:
 		case 2:
-			aga_bpldat[plane] = (uint64_t)chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 16;
+			aga_bpldat[plane] = (uint64_t)read_chip_ram(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 16;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= ((uint64_t)chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)));
+			aga_bpldat[plane] |= ((uint64_t)read_chip_ram(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)));
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 			break;
 		case 3:
-			aga_bpldat[plane] = (uint64_t)chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 48;
+			aga_bpldat[plane] = (uint64_t)read_chip_ram(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 48;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= ((uint64_t)chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 32;
+			aga_bpldat[plane] |= ((uint64_t)read_chip_ram(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 32;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= ((uint64_t)chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 16;
+			aga_bpldat[plane] |= ((uint64_t)read_chip_ram(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 16;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= (uint64_t)chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
+			aga_bpldat[plane] |= (uint64_t)read_chip_ram(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 			break;
 	}
@@ -596,7 +596,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
 		if ((CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN) &&
-			planes > 0 && scanline >= m_diw.min_y && scanline < m_diw.max_y)
+			planes > 0 && scanline >= m_diw.top() && scanline < m_diw.bottom())
 		{
 			int pfpix0 = 0, pfpix1 = 0, collide;
 
@@ -701,7 +701,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
 
 			/* if we are within the display region, render */
-			if (dst != nullptr && x >= m_diw.min_x && x < m_diw.max_x)
+			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right())
 			{
 				int pix, pri;
 
@@ -814,7 +814,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 #endif
 
 	/* end of the line: time to add the modulos */
-	if (scanline >= m_diw.min_y && scanline < m_diw.max_y)
+	if (scanline >= m_diw.top() && scanline < m_diw.bottom())
 	{
 		/* update odd planes */
 		for (pl = 0; pl < planes; pl += 2)
@@ -853,11 +853,11 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 uint32_t amiga_state::screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (cliprect.min_y != cliprect.max_y)
+	if (cliprect.top() != cliprect.bottom())
 		return 0;
 
 	// render each scanline in the visible region
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		aga_render_scanline(bitmap, y);
 
 	return 0;

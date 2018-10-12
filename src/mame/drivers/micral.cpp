@@ -53,6 +53,7 @@ Other things...
 #include "cpu/z80/z80.h"
 #include "video/tms9927.h"
 //#include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/ay31015.h"
@@ -72,7 +73,11 @@ public:
 		, m_crtc(*this, "crtc")
 	{ }
 
-	DECLARE_DRIVER_INIT(micral);
+	void micral(machine_config &config);
+
+	void init_micral();
+
+private:
 	DECLARE_MACHINE_RESET(micral);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
@@ -81,11 +86,10 @@ public:
 	DECLARE_WRITE8_MEMBER(video_w);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void micral(machine_config &config);
 	void io_kbd(address_map &map);
 	void mem_kbd(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u16 s_curpos;
 	u8 s_command;
 	u8 s_data;
@@ -147,43 +151,46 @@ WRITE8_MEMBER( micral_state::video_w )
 }
 
 
-ADDRESS_MAP_START(micral_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfeff) AM_ROM
-	AM_RANGE(0xff00, 0xffef) AM_RAM
-	AM_RANGE(0xfff6, 0xfff7) // AM_WRITENOP // unknown ports
-	AM_RANGE(0xfff8, 0xfff9) AM_READWRITE(video_r, video_w)
-	AM_RANGE(0xfffa, 0xfffa) AM_READ(keyin_r)
-	AM_RANGE(0xfffb, 0xfffb) AM_READ(unk_r)
-	AM_RANGE(0xfffc, 0xfffc) AM_READ(status_r)
-	AM_RANGE(0xfffd, 0xffff) // more unknown ports
-ADDRESS_MAP_END
+void micral_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xf7ff).ram();
+	map(0xf800, 0xfeff).rom();
+	map(0xff00, 0xffef).ram();
+	map(0xfff6, 0xfff7); // AM_WRITENOP // unknown ports
+	map(0xfff8, 0xfff9).rw(FUNC(micral_state::video_r), FUNC(micral_state::video_w));
+	map(0xfffa, 0xfffa).r(FUNC(micral_state::keyin_r));
+	map(0xfffb, 0xfffb).r(FUNC(micral_state::unk_r));
+	map(0xfffc, 0xfffc).r(FUNC(micral_state::status_r));
+	map(0xfffd, 0xffff); // more unknown ports
+}
 
-ADDRESS_MAP_START(micral_state::mem_kbd)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_RAM // byte returned to main cpu after receiving irq
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("X0")
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("X1")
-	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("X2")
-	AM_RANGE(0x8008, 0x8008) AM_READ_PORT("X3")
-	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("X4")
-	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("X5")
-	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("X6")
-	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("X7")
-	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("X8")
-	AM_RANGE(0x8200, 0x8200) AM_READ_PORT("X9")
-	AM_RANGE(0x8400, 0x8400) AM_READ_PORT("X10")
-	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("X11")
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("X12")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("X13")
-ADDRESS_MAP_END
+void micral_state::mem_kbd(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x8000, 0x8000).ram(); // byte returned to main cpu after receiving irq
+	map(0x8001, 0x8001).portr("X0");
+	map(0x8002, 0x8002).portr("X1");
+	map(0x8004, 0x8004).portr("X2");
+	map(0x8008, 0x8008).portr("X3");
+	map(0x8010, 0x8010).portr("X4");
+	map(0x8020, 0x8020).portr("X5");
+	map(0x8040, 0x8040).portr("X6");
+	map(0x8080, 0x8080).portr("X7");
+	map(0x8100, 0x8100).portr("X8");
+	map(0x8200, 0x8200).portr("X9");
+	map(0x8400, 0x8400).portr("X10");
+	map(0x8800, 0x8800).portr("X11");
+	map(0x9000, 0x9000).portr("X12");
+	map(0xa000, 0xa000).portr("X13");
+}
 
-ADDRESS_MAP_START(micral_state::io_kbd)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("X14")
-ADDRESS_MAP_END
+void micral_state::io_kbd(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("X14");
+}
 
 /* Input ports */
 static INPUT_PORTS_START( micral )
@@ -342,7 +349,7 @@ uint32_t micral_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-DRIVER_INIT_MEMBER( micral_state, micral )
+void micral_state::init_micral()
 {
 	//uint8_t *main = memregion("maincpu")->base();
 
@@ -372,12 +379,12 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 
 MACHINE_CONFIG_START(micral_state::micral)
 	// basic machine hardware
-	MCFG_CPU_ADD( "maincpu", Z80, XTAL(4'000'000) )
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD( "maincpu", Z80, XTAL(4'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	// no i/o ports on main cpu
-	MCFG_CPU_ADD( "keyboard", Z80, XTAL(1'000'000) ) // freq unknown
-	MCFG_CPU_PROGRAM_MAP(mem_kbd)
-	MCFG_CPU_IO_MAP(io_kbd)
+	MCFG_DEVICE_ADD( "keyboard", Z80, XTAL(1'000'000) ) // freq unknown
+	MCFG_DEVICE_PROGRAM_MAP(mem_kbd)
+	MCFG_DEVICE_IO_MAP(io_kbd)
 
 	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
@@ -390,24 +397,24 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", micral)
+	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_micral)
 
-	MCFG_DEVICE_ADD("crtc", CRT5037, 4000000 / 8)  // xtal freq unknown
-	MCFG_TMS9927_CHAR_WIDTH(8)  // unknown
-	//MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CRT5037(config, m_crtc, 4000000 / 8);  // xtal freq unknown
+	m_crtc->set_char_width(8);  // unknown
+	//m_crtc->vsyn_callback().set(TMS5501_TAG, FUNC(tms5501_device::sens_w));
+	m_crtc->set_screen("screen");
 
 	/* sound hardware */
 	//MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_SOUND_ADD("beeper", BEEP, 2000)
+	//MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // CDP6402
-	MCFG_AY51013_TX_CLOCK(153600)
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
+	AY31015(config, m_uart); // CDP6402
+	m_uart->set_tx_clock(153600);
+	m_uart->set_rx_clock(153600);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	RS232_PORT(config, "rs232", default_rs232_devices, "keyboard");
 MACHINE_CONFIG_END
 
 ROM_START( micral )
@@ -426,5 +433,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS          INIT     COMPANY     FULLNAME         FLAGS
-COMP( 1981, micral, 0,      0,      micral,    micral,  micral_state,  micral,  "Bull R2E", "Micral 80-22G", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY     FULLNAME         FLAGS
+COMP( 1981, micral, 0,      0,      micral,  micral, micral_state, init_micral, "Bull R2E", "Micral 80-22G", MACHINE_IS_SKELETON )

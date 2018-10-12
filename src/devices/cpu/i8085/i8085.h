@@ -18,19 +18,19 @@
 
 // STATUS changed callback
 #define MCFG_I8085A_STATUS(_devcb) \
-	devcb = &downcast<i8085a_cpu_device &>(*device).set_out_status_func(DEVCB_##_devcb);
+	downcast<i8085a_cpu_device &>(*device).set_out_status_func(DEVCB_##_devcb);
 
 // INTE changed callback
 #define MCFG_I8085A_INTE(_devcb) \
-	devcb = &downcast<i8085a_cpu_device &>(*device).set_out_inte_func(DEVCB_##_devcb);
+	downcast<i8085a_cpu_device &>(*device).set_out_inte_func(DEVCB_##_devcb);
 
 // SID changed callback (8085A only)
 #define MCFG_I8085A_SID(_devcb) \
-	devcb = &downcast<i8085a_cpu_device &>(*device).set_in_sid_func(DEVCB_##_devcb);
+	downcast<i8085a_cpu_device &>(*device).set_in_sid_func(DEVCB_##_devcb);
 
 // SOD changed callback (8085A only)
 #define MCFG_I8085A_SOD(_devcb) \
-	devcb = &downcast<i8085a_cpu_device &>(*device).set_out_sod_func(DEVCB_##_devcb);
+	downcast<i8085a_cpu_device &>(*device).set_out_sod_func(DEVCB_##_devcb);
 
 // CLK rate callback (8085A only)
 #define MCFG_I8085A_CLK_OUT_DEVICE(_tag) \
@@ -71,6 +71,10 @@ public:
 	template <class Object> devcb_base &set_in_sid_func(Object &&cb) { return m_in_sid_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_sod_func(Object &&cb) { return m_out_sod_func.set_callback(std::forward<Object>(cb)); }
 	template <typename Object> void set_clk_out(Object &&cb) { m_clk_out_func = std::forward<Object>(cb); }
+	auto out_status_func() { return m_out_status_func.bind(); }
+	auto out_inte_func() { return m_out_inte_func.bind(); }
+	auto in_sid_func() { return m_in_sid_func.bind(); }
+	auto out_sod_func() { return m_out_sod_func.bind(); }
 
 protected:
 	i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int cputype);
@@ -85,7 +89,8 @@ protected:
 	virtual u32 execute_min_cycles() const override { return 4; }
 	virtual u32 execute_max_cycles() const override { return 16; }
 	virtual u32 execute_input_lines() const override { return 4; }
-	virtual u32 execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == I8085_RST75_LINE; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 2 - 1) / 2; }
@@ -100,7 +105,7 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	enum
 	{
@@ -139,8 +144,8 @@ private:
 	bool m_ietemp;       /* import/export temp space */
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
-	direct_read_data<0> *m_opcode_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcode_cache;
 	address_space *m_io;
 	int m_icount;
 

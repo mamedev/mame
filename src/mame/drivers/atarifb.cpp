@@ -150,86 +150,90 @@ PALETTE_INIT_MEMBER(atarifb_state, atarifb)
  *
  *************************************/
 
-ADDRESS_MAP_START(atarifb_state::atarifb_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_SHARE("p1_videoram")
-	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_SHARE("p2_videoram")
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_SHARE("field_videoram")
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_SHARE("scroll_register") /* OUT 0 */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb_out1_w) /* OUT 1 */
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
-	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
-	AM_RANGE(0x3000, 0x3000) AM_NOP /* Interrupt Acknowledge */
-	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb_in0_r)
-	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb_in2_r)
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void atarifb_state::atarifb_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x01ff).ram();
+	map(0x0200, 0x025f).ram().w(FUNC(atarifb_state::atarifb_alpha1_videoram_w)).share("p1_videoram");
+	map(0x0260, 0x039f).ram();
+	map(0x03a0, 0x03ff).ram().w(FUNC(atarifb_state::atarifb_alpha2_videoram_w)).share("p2_videoram");
+	map(0x1000, 0x13bf).ram().w(FUNC(atarifb_state::atarifb_field_videoram_w)).share("field_videoram");
+	map(0x13c0, 0x13ff).ram().share("spriteram");
+	map(0x2000, 0x2000).writeonly().share("scroll_register"); /* OUT 0 */
+	map(0x2001, 0x2001).w(FUNC(atarifb_state::atarifb_out1_w)); /* OUT 1 */
+	map(0x2002, 0x2002).w(FUNC(atarifb_state::atarifb_out2_w)); /* OUT 2 */
+	map(0x2003, 0x2003).w(FUNC(atarifb_state::atarifb_out3_w)); /* OUT 3 */
+	map(0x3000, 0x3000).noprw(); /* Interrupt Acknowledge */
+	map(0x4000, 0x4000).r(FUNC(atarifb_state::atarifb_in0_r));
+	map(0x4002, 0x4002).r(FUNC(atarifb_state::atarifb_in2_r));
+	map(0x5000, 0x5000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x6000, 0x7fff).rom();
+}
 
 
-ADDRESS_MAP_START(atarifb_state::atarifb4_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_SHARE("p1_videoram")
-	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_SHARE("p2_videoram")
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_SHARE("field_videoram")
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_SHARE("scroll_register") /* OUT 0 */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb4_out1_w) /* OUT 1 */
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
-	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
-	AM_RANGE(0x3000, 0x3000) AM_NOP /* Interrupt Acknowledge */
-	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb4_in0_r)
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb4_in2_r)
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void atarifb_state::atarifb4_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x01ff).ram();
+	map(0x0200, 0x025f).ram().w(FUNC(atarifb_state::atarifb_alpha1_videoram_w)).share("p1_videoram");
+	map(0x0260, 0x039f).ram();
+	map(0x03a0, 0x03ff).ram().w(FUNC(atarifb_state::atarifb_alpha2_videoram_w)).share("p2_videoram");
+	map(0x1000, 0x13bf).ram().w(FUNC(atarifb_state::atarifb_field_videoram_w)).share("field_videoram");
+	map(0x13c0, 0x13ff).ram().share("spriteram");
+	map(0x2000, 0x2000).writeonly().share("scroll_register"); /* OUT 0 */
+	map(0x2001, 0x2001).w(FUNC(atarifb_state::atarifb4_out1_w)); /* OUT 1 */
+	map(0x2002, 0x2002).w(FUNC(atarifb_state::atarifb_out2_w)); /* OUT 2 */
+	map(0x2003, 0x2003).w(FUNC(atarifb_state::atarifb_out3_w)); /* OUT 3 */
+	map(0x3000, 0x3000).noprw(); /* Interrupt Acknowledge */
+	map(0x4000, 0x4000).r(FUNC(atarifb_state::atarifb4_in0_r));
+	map(0x4001, 0x4001).portr("EXTRA");
+	map(0x4002, 0x4002).r(FUNC(atarifb_state::atarifb4_in2_r));
+	map(0x5000, 0x5000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x6000, 0x7fff).rom();
+}
 
 
-ADDRESS_MAP_START(atarifb_state::abaseb_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_SHARE("p1_videoram")
-	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_SHARE("p2_videoram")
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_SHARE("field_videoram")
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_SHARE("scroll_register") /* OUT 0 */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(abaseb_out1_w) /* OUT 1 */
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
-	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
-	AM_RANGE(0x3000, 0x3000) AM_NOP /* Interrupt Acknowledge */
-	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb_in0_r)
-	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb_in2_r)
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void atarifb_state::abaseb_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x01ff).ram();
+	map(0x0200, 0x025f).ram().w(FUNC(atarifb_state::atarifb_alpha1_videoram_w)).share("p1_videoram");
+	map(0x0260, 0x039f).ram();
+	map(0x03a0, 0x03ff).ram().w(FUNC(atarifb_state::atarifb_alpha2_videoram_w)).share("p2_videoram");
+	map(0x1000, 0x13bf).ram().w(FUNC(atarifb_state::atarifb_field_videoram_w)).share("field_videoram");
+	map(0x13c0, 0x13ff).ram().share("spriteram");
+	map(0x2000, 0x2000).writeonly().share("scroll_register"); /* OUT 0 */
+	map(0x2001, 0x2001).w(FUNC(atarifb_state::abaseb_out1_w)); /* OUT 1 */
+	map(0x2002, 0x2002).w(FUNC(atarifb_state::atarifb_out2_w)); /* OUT 2 */
+	map(0x2003, 0x2003).w(FUNC(atarifb_state::atarifb_out3_w)); /* OUT 3 */
+	map(0x3000, 0x3000).noprw(); /* Interrupt Acknowledge */
+	map(0x4000, 0x4000).r(FUNC(atarifb_state::atarifb_in0_r));
+	map(0x4002, 0x4002).r(FUNC(atarifb_state::atarifb_in2_r));
+	map(0x5000, 0x5000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x6000, 0x7fff).rom();
+}
 
 
-ADDRESS_MAP_START(atarifb_state::soccer_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_SHARE("p1_videoram")
-	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_SHARE("p2_videoram")
-	AM_RANGE(0x0800, 0x0bbf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_SHARE("field_videoram")
-	AM_RANGE(0x0bc0, 0x0bff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_SHARE("scroll_register") /* OUT 0 */
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(soccer_out1_w) /* OUT 1 */
-	AM_RANGE(0x1002, 0x1002) AM_WRITE(soccer_out2_w) /* OUT 2 */
-	AM_RANGE(0x1004, 0x1004) AM_WRITENOP /* Interrupt Acknowledge */
-	AM_RANGE(0x1005, 0x1005) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_READ(atarifb4_in0_r)
-	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x1802, 0x1802) AM_READ(atarifb4_in2_r)
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void atarifb_state::soccer_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x01ff).ram();
+	map(0x0200, 0x025f).ram().w(FUNC(atarifb_state::atarifb_alpha1_videoram_w)).share("p1_videoram");
+	map(0x0260, 0x039f).ram();
+	map(0x03a0, 0x03ff).ram().w(FUNC(atarifb_state::atarifb_alpha2_videoram_w)).share("p2_videoram");
+	map(0x0800, 0x0bbf).ram().w(FUNC(atarifb_state::atarifb_field_videoram_w)).share("field_videoram");
+	map(0x0bc0, 0x0bff).ram().share("spriteram");
+	map(0x1000, 0x1000).writeonly().share("scroll_register"); /* OUT 0 */
+	map(0x1001, 0x1001).w(FUNC(atarifb_state::soccer_out1_w)); /* OUT 1 */
+	map(0x1002, 0x1002).w(FUNC(atarifb_state::soccer_out2_w)); /* OUT 2 */
+	map(0x1004, 0x1004).nopw(); /* Interrupt Acknowledge */
+	map(0x1005, 0x1005).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1800, 0x1800).r(FUNC(atarifb_state::atarifb4_in0_r));
+	map(0x1801, 0x1801).portr("EXTRA");
+	map(0x1802, 0x1802).r(FUNC(atarifb_state::atarifb4_in2_r));
+	map(0x1803, 0x1803).portr("DSW1");
+	map(0x2000, 0x3fff).rom();
+}
 
 
 
@@ -487,13 +491,13 @@ static const gfx_layout spritemasklayout =
 };
 
 
-static GFXDECODE_START( atarifb )
+static GFXDECODE_START( gfx_atarifb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x00, 0x01 ) /* offset into colors, # of colors */
 	GFXDECODE_ENTRY( "gfx2", 0, fieldlayout, 0x02, 0x01 ) /* offset into colors, # of colors */
 GFXDECODE_END
 
 
-static GFXDECODE_START( soccer )
+static GFXDECODE_START( gfx_soccer )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,         0x00, 0x01 ) /* offset into colors, # of colors */
 	GFXDECODE_ENTRY( "gfx3", 0x0400, soccer_fieldlayout, 0x06, 0x01 ) /* offset into colors, # of colors */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,       0x02, 0x02 ) /* offset into colors, # of colors */
@@ -510,6 +514,8 @@ GFXDECODE_END
 
 void atarifb_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_CTRLD));
 	save_item(NAME(m_sign_x_1));
 	save_item(NAME(m_sign_x_2));
@@ -553,11 +559,11 @@ void atarifb_state::machine_reset()
 MACHINE_CONFIG_START(atarifb_state::atarifb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 750000)
-	MCFG_CPU_PROGRAM_MAP(atarifb_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(atarifb_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_ADD("maincpu", M6502, 750000)
+	MCFG_DEVICE_PROGRAM_MAP(atarifb_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(atarifb_state, irq0_line_hold, 4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -568,15 +574,14 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_atarifb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarifb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarifb)
 	MCFG_PALETTE_ADD("palette", 12)
 	MCFG_PALETTE_INIT_OWNER(atarifb_state, atarifb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(atarifb)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, atarifb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.18)
 MACHINE_CONFIG_END
 
@@ -585,8 +590,8 @@ MACHINE_CONFIG_START(atarifb_state::atarifb4)
 	atarifb(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(atarifb4_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(atarifb4_map)
 MACHINE_CONFIG_END
 
 
@@ -594,16 +599,15 @@ MACHINE_CONFIG_START(atarifb_state::abaseb)
 	atarifb(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(abaseb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(abaseb_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_abaseb)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(abaseb)
+	MCFG_DEVICE_REPLACE("discrete", DISCRETE, abaseb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.24)
 MACHINE_CONFIG_END
 
@@ -612,14 +616,14 @@ MACHINE_CONFIG_START(atarifb_state::soccer)
 	atarifb(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(soccer_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(soccer_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_soccer)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", soccer)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_soccer)
 MACHINE_CONFIG_END
 
 
@@ -793,10 +797,10 @@ ROM_END
  *************************************/
 
 /*     YEAR  NAME      PARENT   MACHINE   INPUT */
-GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  atarifb_state, 0, ROT0, "Atari", "Atari Football (revision 2)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  atarifb_state, 0, ROT0, "Atari", "Atari Football (revision 1)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1978, atarifb2, atarifb, atarifb,  atarifb,  atarifb_state, 0, ROT0, "Atari", "Atari Football II", MACHINE_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, atarifb_state, 0, ROT0, "Atari", "Atari Football (4 players)", MACHINE_SUPPORTS_SAVE, layout_atarifb4 )
-GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   atarifb_state, 0, ROT0, "Atari", "Atari Baseball (set 1)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
-GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   atarifb_state, 0, ROT0, "Atari", "Atari Baseball (set 2)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
-GAME ( 1980, soccer,   0,       soccer,   soccer,   atarifb_state, 0, ROT0, "Atari", "Atari Soccer", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football (revision 2)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football (revision 1)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1978, atarifb2, atarifb, atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football II", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, atarifb_state, empty_init, ROT0, "Atari", "Atari Football (4 players)", MACHINE_SUPPORTS_SAVE, layout_atarifb4 )
+GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   atarifb_state, empty_init, ROT0, "Atari", "Atari Baseball (set 1)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
+GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   atarifb_state, empty_init, ROT0, "Atari", "Atari Baseball (set 2)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
+GAME(  1980, soccer,   0,       soccer,   soccer,   atarifb_state, empty_init, ROT0, "Atari", "Atari Soccer", MACHINE_SUPPORTS_SAVE )

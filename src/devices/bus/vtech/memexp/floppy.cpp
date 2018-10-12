@@ -19,12 +19,13 @@
 
 DEFINE_DEVICE_TYPE(VTECH_FLOPPY_CONTROLLER, vtech_floppy_controller_device, "vtech_fdc", "Laser/VZ Floppy Disk Controller")
 
-ADDRESS_MAP_START(vtech_floppy_controller_device::map)
-	AM_RANGE(0, 0) AM_WRITE(latch_w)
-	AM_RANGE(1, 1) AM_READ(shifter_r)
-	AM_RANGE(2, 2) AM_READ(rd_r)
-	AM_RANGE(3, 3) AM_READ(wpt_r)
-ADDRESS_MAP_END
+void vtech_floppy_controller_device::map(address_map &map)
+{
+	map(0, 0).w(FUNC(vtech_floppy_controller_device::latch_w));
+	map(1, 1).r(FUNC(vtech_floppy_controller_device::shifter_r));
+	map(2, 2).r(FUNC(vtech_floppy_controller_device::rd_r));
+	map(3, 3).r(FUNC(vtech_floppy_controller_device::wpt_r));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -44,9 +45,10 @@ const tiny_rom_entry *vtech_floppy_controller_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( laser_floppies )
-	SLOT_INTERFACE("525", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void laser_floppies(device_slot_interface &device)
+{
+	device.option_add("525", FLOPPY_525_SSSD);
+}
 
 MACHINE_CONFIG_START(vtech_floppy_controller_device::device_add_mconfig)
 	MCFG_MEMEXP_SLOT_ADD("mem")

@@ -106,7 +106,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		break;
 
 	case 0x04: // FLOP
-		data = m_fdc->read(space, offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 		break;
 
 	case 0x05: // VIPS
@@ -149,7 +149,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x04: // FLOP
-		m_fdc->write(space, offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 		break;
 
 	case 0x05: // VIPS
@@ -281,10 +281,10 @@ WRITE8_MEMBER( tiki100_state::system_w )
 	if (floppy) floppy->mon_w(!BIT(data, 6));
 
 	/* GRAFIKK key led */
-	output().set_led_value(1, BIT(data, 5));
+	m_leds[0] = BIT(data, 5);
 
 	/* LOCK key led */
-	output().set_led_value(2, BIT(data, 7));
+	m_leds[1] = BIT(data, 7);
 
 	/* bankswitch */
 	m_rome = BIT(data, 2);
@@ -293,15 +293,17 @@ WRITE8_MEMBER( tiki100_state::system_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(tiki100_state::tiki100_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mrq_r, mrq_w)
-ADDRESS_MAP_END
+void tiki100_state::tiki100_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(tiki100_state::mrq_r), FUNC(tiki100_state::mrq_w));
+}
 
-ADDRESS_MAP_START(tiki100_state::tiki100_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
-ADDRESS_MAP_END
+void tiki100_state::tiki100_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(tiki100_state::iorq_r), FUNC(tiki100_state::iorq_w));
+}
 
 /* Input Ports */
 
@@ -626,11 +628,12 @@ FLOPPY_FORMATS_MEMBER( tiki100_state::floppy_formats )
 	FLOPPY_TIKI100_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( tiki100_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD ) // Tead FD-55A
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Teac FD-55F
-SLOT_INTERFACE_END
+static void tiki100_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dd", FLOPPY_525_DD); // Tead FD-55A
+	device.option_add("525qd", FLOPPY_525_QD); // Teac FD-55F
+}
 
 /* AY-3-8912 Interface */
 
@@ -668,6 +671,8 @@ WRITE_LINE_MEMBER( tiki100_state::busrq_w )
 
 void tiki100_state::machine_start()
 {
+	m_leds.resolve();
+
 	/* allocate video RAM */
 	m_video_ram.allocate(TIKI100_VIDEORAM_SIZE);
 
@@ -697,69 +702,69 @@ void tiki100_state::machine_reset()
 
 MACHINE_CONFIG_START(tiki100_state::tiki100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(tiki100_mem)
-	MCFG_CPU_IO_MAP(tiki100_io)
-	MCFG_Z80_DAISY_CHAIN(tiki100_daisy_chain)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tiki100_state::tiki100_mem);
+	m_maincpu->set_addrmap(AS_IO, &tiki100_state::tiki100_io);
+	m_maincpu->set_daisy_config(tiki100_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000), 1280, 0, 1024, 312, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(20_MHz_XTAL, 1280, 0, 1024, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(tiki100_state, screen_update)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_TIKI100_BUS_ADD()
 	MCFG_TIKI100_BUS_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_TIKI100_BUS_NMI_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_NMI))
-	MCFG_TIKI100_BUS_BUSRQ_CALLBACK(WRITELINE(tiki100_state, busrq_w))
-	MCFG_TIKI100_BUS_IN_MREQ_CALLBACK(READ8(tiki100_state, mrq_r))
-	MCFG_TIKI100_BUS_OUT_MREQ_CALLBACK(WRITE8(tiki100_state, mrq_w))
+	MCFG_TIKI100_BUS_BUSRQ_CALLBACK(WRITELINE(*this, tiki100_state, busrq_w))
+	MCFG_TIKI100_BUS_IN_MREQ_CALLBACK(READ8(*this, tiki100_state, mrq_r))
+	MCFG_TIKI100_BUS_OUT_MREQ_CALLBACK(WRITE8(*this, tiki100_state, mrq_w))
 	MCFG_TIKI100_BUS_SLOT_ADD("slot1", "8088")
 	MCFG_TIKI100_BUS_SLOT_ADD("slot2", "hdc")
 	MCFG_TIKI100_BUS_SLOT_ADD("slot3", nullptr)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL(8'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80DART(config, m_dart, 8_MHz_XTAL / 4);
+	m_dart->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_dart->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_dart->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_dart->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(8'000'000)/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
-	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_Z80PIO_IN_PB_CB(READ8(tiki100_state, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(tiki100_state, pio_pb_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 4);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->in_pb_callback().set(FUNC(tiki100_state::pio_pb_r));
+	m_pio->out_pb_callback().set(FUNC(tiki100_state::pio_pb_w));
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000)/4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(tiki100_state, bar0_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(tiki100_state, bar2_w))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(tiki100_state::bar0_w));
+	m_ctc->zc_callback<1>().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	m_ctc->zc_callback<2>().set(FUNC(tiki100_state::bar2_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(XTAL(8'000'000)/4))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 4))
 
-	MCFG_FD1797_ADD(FD1797_TAG, XTAL(8'000'000)/8) // FD1767PL-02 or FD1797-PL
+	FD1797(config, m_fdc, 8_MHz_XTAL / 8); // FD1767PL-02 or FD1797-PL
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(tiki100_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(tiki100_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(tiki100_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer("cent_data_in");
+	m_centronics->ack_handler().set(FUNC(tiki100_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(tiki100_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(tiki100_state::write_centronics_perror));
 
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_data_in");
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
@@ -768,15 +773,14 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", tiki100_state, tape_tick, attotime::from_hz(44100))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(AY8912_TAG, AY8912, XTAL(8'000'000)/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(AY8912_TAG, AY8912, 8_MHz_XTAL / 4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tiki100_state, video_scroll_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tiki100_state, video_scroll_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tiki100")
@@ -797,9 +801,9 @@ ROM_START( tiki100 )
 	ROM_DEFAULT_BIOS( "v203w" )
 
 	ROM_SYSTEM_BIOS( 0, "v135", "TIKI ROM v1.35" )
-	ROMX_LOAD( "tikirom-1.35.u10",  0x0000, 0x2000, CRC(7dac5ee7) SHA1(14d622fd843833faec346bf5357d7576061f5a3d), ROM_BIOS(1) )
+	ROMX_LOAD( "tikirom-1.35.u10",  0x0000, 0x2000, CRC(7dac5ee7) SHA1(14d622fd843833faec346bf5357d7576061f5a3d), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v203w", "TIKI ROM v2.03 W" )
-	ROMX_LOAD( "tikirom-2.03w.u10", 0x0000, 0x2000, CRC(79662476) SHA1(96336633ecaf1b2190c36c43295ac9f785d1f83a), ROM_BIOS(2) )
+	ROMX_LOAD( "tikirom-2.03w.u10", 0x0000, 0x2000, CRC(79662476) SHA1(96336633ecaf1b2190c36c43295ac9f785d1f83a), ROM_BIOS(1) )
 
 	ROM_REGION( 0x100, "u4", 0 )
 	ROM_LOAD( "53ls140.u4", 0x000, 0x100, CRC(894b756f) SHA1(429e10de0e0e749246895801b18186ff514c12bc) )
@@ -807,6 +811,6 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE          INIT    COMPANY             FULLNAME        FLAGS
-COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, tiki100_state, 0,      "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, tiki100_state, 0,      "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME        FLAGS
+COMP( 1984, kontiki, 0,       0,      tiki100, tiki100, tiki100_state, empty_init, "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tiki100, kontiki, 0,      tiki100, tiki100, tiki100_state, empty_init, "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )

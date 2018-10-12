@@ -35,6 +35,14 @@ Hardware                Main    Sub             Sound   Sound Chips
 ----------------------------------------------------------------------
 [WEC Le Mans 24]        68000   68000   Z-80    YM2151 YM3012 1x007232
 
+[CPU PCB GX602 201020A]
+    007640  007641  007232  007452
+
+[VID PCB GX602 201023]
+    003634  003635  007557  007558  007559
+(note: 003634 and 003635 chips locations are marked 007634 and 007635 on PCB)
+
+
 [Hot Chase]             68000   68000   68B09E                3x007232
 
 [CPU PCB GX763 350861B]
@@ -509,30 +517,31 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
                     WEC Le Mans 24 Main CPU Handlers
 ***************************************************************************/
 
-ADDRESS_MAP_START(wecleman_state::wecleman_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM // ROM (03c000-03ffff used as RAM sometimes!)
-	AM_RANGE(0x040000, 0x043fff) AM_RAM // RAM
-	AM_RANGE(0x040494, 0x040495) AM_WRITE(wecleman_videostatus_w) AM_SHARE("videostatus")   // cloud blending control (HACK)
-	AM_RANGE(0x060000, 0x060005) AM_WRITE(wecleman_protection_w) AM_SHARE("protection_ram")
-	AM_RANGE(0x060006, 0x060007) AM_READ(wecleman_protection_r) // MCU read
-	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_SHARE("blitter_regs")   // Blitter
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wecleman_pageram_w) AM_SHARE("pageram")   // Background Layers
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(wecleman_txtram_w) AM_SHARE("txtram") // Text Layer
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("share1")  // Shared with main CPU
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)    // To sound CPU
-	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)    // Selects accelerator / wheel / ..
-	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)    // Main CPU controls the other CPUs
-	AM_RANGE(0x140006, 0x140007) AM_WRITENOP    // Watchdog reset
-	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")    // Coins + brake + gear
-	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")    // ??
-	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSWA")   // DSW 2
-	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSWB")   // DSW 1
-	AM_RANGE(0x140020, 0x140021) AM_WRITEONLY   // Paired with writes to $140003
-	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r) // Accelerator or Wheel or ..
-	AM_RANGE(0x140030, 0x140031) AM_WRITENOP    // toggles between 0 & 1 on hitting bumps and crashes (vibration?)
-ADDRESS_MAP_END
+void wecleman_state::wecleman_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom(); // ROM (03c000-03ffff used as RAM sometimes!)
+	map(0x040000, 0x043fff).ram(); // RAM
+	map(0x040494, 0x040495).w(FUNC(wecleman_state::wecleman_videostatus_w)).share("videostatus");   // cloud blending control (HACK)
+	map(0x060000, 0x060005).w(FUNC(wecleman_state::wecleman_protection_w)).share("protection_ram");
+	map(0x060006, 0x060007).r(FUNC(wecleman_state::wecleman_protection_r)); // MCU read
+	map(0x080000, 0x080011).ram().w(FUNC(wecleman_state::blitter_w)).share("blitter_regs");   // Blitter
+	map(0x100000, 0x103fff).ram().w(FUNC(wecleman_state::wecleman_pageram_w)).share("pageram");   // Background Layers
+	map(0x108000, 0x108fff).ram().w(FUNC(wecleman_state::wecleman_txtram_w)).share("txtram"); // Text Layer
+	map(0x110000, 0x110fff).ram().w(FUNC(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)).share("paletteram");
+	map(0x124000, 0x127fff).ram().share("share1");  // Shared with main CPU
+	map(0x130000, 0x130fff).ram().share("spriteram");   // Sprites
+	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));    // To sound CPU
+	map(0x140002, 0x140003).w(FUNC(wecleman_state::selected_ip_w));    // Selects accelerator / wheel / ..
+	map(0x140004, 0x140005).w(FUNC(wecleman_state::irqctrl_w));    // Main CPU controls the other CPUs
+	map(0x140006, 0x140007).nopw();    // Watchdog reset
+	map(0x140010, 0x140011).portr("IN0");    // Coins + brake + gear
+	map(0x140012, 0x140013).portr("IN1");    // ??
+	map(0x140014, 0x140015).portr("DSWA");   // DSW 2
+	map(0x140016, 0x140017).portr("DSWB");   // DSW 1
+	map(0x140020, 0x140021).writeonly();   // Paired with writes to $140003
+	map(0x140020, 0x140021).r(FUNC(wecleman_state::selected_ip_r)); // Accelerator or Wheel or ..
+	map(0x140030, 0x140031).nopw();    // toggles between 0 & 1 on hitting bumps and crashes (vibration?)
+}
 
 
 /***************************************************************************
@@ -541,54 +550,57 @@ ADDRESS_MAP_END
 
 
 
-ADDRESS_MAP_START(wecleman_state::hotchase_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM                                 // RAM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM                                 // RAM
-	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_SHARE("blitter_regs")   // Blitter
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("k051316_1", k051316_device, read, write, 0x00ff) // Background
-	AM_RANGE(0x101000, 0x10101f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0x00ff)   // Background Ctrl
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0x00ff) // Foreground
-	AM_RANGE(0x103000, 0x10301f) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0x00ff)   // Foreground Ctrl
-	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("share1")                  // Shared with sub CPU
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)    // To sound CPU
-	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)    // Selects accelerator / wheel /
-	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)    // Main CPU controls the other CPUs
-	AM_RANGE(0x140006, 0x140007) AM_READNOP // Watchdog reset
-	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")    // Coins + brake + gear
-	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")    // ?? bit 4 from sound cpu
-	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSW2")   // DSW 2
-	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSW1")   // DSW 1
-	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r) AM_WRITENOP // Paired with writes to $140003
-	AM_RANGE(0x140022, 0x140023) AM_READNOP // read and written at $601c0, unknown purpose
-	AM_RANGE(0x140030, 0x140031) AM_WRITENOP    // signal to cabinet vibration motors?
-ADDRESS_MAP_END
+void wecleman_state::hotchase_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x041fff).ram();                                 // RAM
+	map(0x060000, 0x063fff).ram();                                 // RAM
+	map(0x080000, 0x080011).ram().w(FUNC(wecleman_state::blitter_w)).share("blitter_regs");   // Blitter
+	map(0x100000, 0x100fff).rw("k051316_1", FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); // Background
+	map(0x101000, 0x10101f).w("k051316_1", FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   // Background Ctrl
+	map(0x102000, 0x102fff).rw("k051316_2", FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); // Foreground
+	map(0x103000, 0x10301f).w("k051316_2", FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   // Foreground Ctrl
+	map(0x110000, 0x111fff).ram().w(FUNC(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)).share("paletteram");
+	map(0x120000, 0x123fff).ram().share("share1");                  // Shared with sub CPU
+	map(0x130000, 0x130fff).ram().share("spriteram");   // Sprites
+	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));    // To sound CPU
+	map(0x140002, 0x140003).w(FUNC(wecleman_state::selected_ip_w));    // Selects accelerator / wheel /
+	map(0x140004, 0x140005).w(FUNC(wecleman_state::irqctrl_w));    // Main CPU controls the other CPUs
+	map(0x140006, 0x140007).nopr(); // Watchdog reset
+	map(0x140010, 0x140011).portr("IN0");    // Coins + brake + gear
+	map(0x140012, 0x140013).portr("IN1");    // ?? bit 4 from sound cpu
+	map(0x140014, 0x140015).portr("DSW2");   // DSW 2
+	map(0x140016, 0x140017).portr("DSW1");   // DSW 1
+	map(0x140020, 0x140021).r(FUNC(wecleman_state::selected_ip_r)).nopw(); // Paired with writes to $140003
+	map(0x140022, 0x140023).nopr(); // read and written at $601c0, unknown purpose
+	map(0x140030, 0x140031).nopw();    // signal to cabinet vibration motors?
+}
 
 
 /***************************************************************************
                     WEC Le Mans 24 Sub CPU Handlers
 ***************************************************************************/
 
-ADDRESS_MAP_START(wecleman_state::wecleman_sub_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM // ROM
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("roadram") // Road
-	AM_RANGE(0x070000, 0x073fff) AM_RAM AM_SHARE("share1")  // RAM (Shared with main CPU)
-ADDRESS_MAP_END
+void wecleman_state::wecleman_sub_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom(); // ROM
+	map(0x060000, 0x060fff).ram().share("roadram"); // Road
+	map(0x070000, 0x073fff).ram().share("share1");  // RAM (Shared with main CPU)
+}
 
 
 /***************************************************************************
                         Hot Chase Sub CPU Handlers
 ***************************************************************************/
 
-ADDRESS_MAP_START(wecleman_state::hotchase_sub_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM // ROM
-	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_SHARE("roadram") // Road
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("share1") // Shared with main CPU
-	AM_RANGE(0x060000, 0x060fff) AM_RAM // a table, presumably road related
-	AM_RANGE(0x061000, 0x06101f) AM_RAM // road vregs?
-ADDRESS_MAP_END
+void wecleman_state::hotchase_sub_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom(); // ROM
+	map(0x020000, 0x020fff).ram().share("roadram"); // Road
+	map(0x040000, 0x043fff).ram().share("share1"); // Shared with main CPU
+	map(0x060000, 0x060fff).ram(); // a table, presumably road related
+	map(0x061000, 0x06101f).ram(); // road vregs?
+}
 
 
 /***************************************************************************
@@ -633,18 +645,19 @@ WRITE8_MEMBER(wecleman_state::wecleman_K00723216_bank_w)
 	m_k007232[0]->set_bank(0, ~data&1 );  //* (wecleman062gre)
 }
 
-ADDRESS_MAP_START(wecleman_state::wecleman_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8500, 0x8500) AM_WRITENOP            // increased with speed (global volume)?
-	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // 007452: Protection
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // 007452: Protection
-	AM_RANGE(0x9006, 0x9006) AM_WRITENOP            // 007452: ?
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write) // K007232 (Reading offset 5/b triggers the sample)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(wecleman_K00723216_bank_w)    // Samples banking
-ADDRESS_MAP_END
+void wecleman_state::wecleman_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram();
+	map(0x8500, 0x8500).nopw();            // increased with speed (global volume)?
+	map(0x9000, 0x9000).r(FUNC(wecleman_state::multiply_r));    // 007452: Protection
+	map(0x9000, 0x9001).w(FUNC(wecleman_state::multiply_w));   // 007452: Protection
+	map(0x9006, 0x9006).nopw();            // 007452: ?
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read)); // From main CPU
+	map(0xb000, 0xb00d).rw("k007232_1", FUNC(k007232_device::read), FUNC(k007232_device::write)); // K007232 (Reading offset 5/b triggers the sample)
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xf000, 0xf000).w(FUNC(wecleman_state::wecleman_K00723216_bank_w));    // Samples banking
+}
 
 
 /***************************************************************************
@@ -717,17 +730,18 @@ WRITE8_MEMBER(wecleman_state::hotchase_k007232_w)
 	m_k007232[Chip]->write(space, offset ^ 1, data);
 }
 
-ADDRESS_MAP_START(wecleman_state::hotchase_sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x100d) AM_READWRITE(hotchase_k007232_r<0>, hotchase_k007232_w<0>)   // 3 x K007232
-	AM_RANGE(0x2000, 0x200d) AM_READWRITE(hotchase_k007232_r<1>, hotchase_k007232_w<1>)
-	AM_RANGE(0x3000, 0x300d) AM_READWRITE(hotchase_k007232_r<2>, hotchase_k007232_w<2>)
-	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w) // Sound volume, banking, etc.
-	AM_RANGE(0x5000, 0x5000) AM_WRITENOP   // 0 at start of IRQ service, 1 at end (irq mask?)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU (Read on IRQ)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(hotchase_sound_hs_w)    // ACK signal to main CPU
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void wecleman_state::hotchase_sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1000, 0x100d).rw(FUNC(wecleman_state::hotchase_k007232_r<0>), FUNC(wecleman_state::hotchase_k007232_w<0>));   // 3 x K007232
+	map(0x2000, 0x200d).rw(FUNC(wecleman_state::hotchase_k007232_r<1>), FUNC(wecleman_state::hotchase_k007232_w<1>));
+	map(0x3000, 0x300d).rw(FUNC(wecleman_state::hotchase_k007232_r<2>), FUNC(wecleman_state::hotchase_k007232_w<2>));
+	map(0x4000, 0x4007).w(FUNC(wecleman_state::hotchase_sound_control_w)); // Sound volume, banking, etc.
+	map(0x5000, 0x5000).nopw();   // 0 at start of IRQ service, 1 at end (irq mask?)
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read)); // From main CPU (Read on IRQ)
+	map(0x7000, 0x7000).w(FUNC(wecleman_state::hotchase_sound_hs_w));    // ACK signal to main CPU
+	map(0x8000, 0xffff).rom();
+}
 
 
 /***************************************************************************
@@ -749,7 +763,7 @@ static INPUT_PORTS_START( wecleman )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Right SW")  // right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   // from sound cpu ?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   // from sound cpu ?
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSWA")  /* $140015.b */
@@ -846,8 +860,8 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Right SW")   // right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // from sound cpu
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // from sound cpu
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, nullptr)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")  /* $140015.b */
@@ -961,7 +975,7 @@ static const gfx_layout wecleman_road_layout =
 	nullptr
 };
 
-static GFXDECODE_START( wecleman )
+static GFXDECODE_START( gfx_wecleman )
 	// "sprites" holds sprite, which are not decoded here
 	GFXDECODE_ENTRY( "layers", 0, wecleman_bg_layout,   0, 2048/8 )   // [0] bg + fg + txt
 	GFXDECODE_ENTRY( "road",   0, wecleman_road_layout, 0, 2048/8 )   // [1] road
@@ -995,7 +1009,7 @@ static const gfx_layout hotchase_road_layout =
 	nullptr
 };
 
-static GFXDECODE_START( hotchase )
+static GFXDECODE_START( gfx_hotchase )
 	// "sprites" holds sprite, which are not decoded here
 	GFXDECODE_ENTRY( "road", 0, hotchase_road_layout, 0x70*16, 16 ) // road
 GFXDECODE_END
@@ -1024,29 +1038,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-
-MACHINE_RESET_MEMBER(wecleman_state,wecleman)
+MACHINE_RESET_MEMBER(wecleman_state, wecleman)
 {
 	m_k007232[0]->set_bank( 0, 1 );
+}
+
+MACHINE_START_MEMBER(wecleman_state, wecleman)
+{
+	m_led.resolve();
 }
 
 MACHINE_CONFIG_START(wecleman_state::wecleman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* Schems show 10MHz */
-	MCFG_CPU_PROGRAM_MAP(wecleman_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* Schems show 10MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wecleman_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wecleman_state, wecleman_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000, 10000000)   /* Schems show 10MHz */
-	MCFG_CPU_PROGRAM_MAP(wecleman_sub_map)
+	MCFG_DEVICE_ADD("sub", M68000, 10000000)   /* Schems show 10MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wecleman_sub_map)
 
 	/* Schems: can be reset, no nmi, soundlatch, 3.58MHz */
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(wecleman_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(wecleman_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state,wecleman)
+	MCFG_MACHINE_START_OVERRIDE(wecleman_state, wecleman)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, wecleman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1056,23 +1075,24 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 	MCFG_SCREEN_VISIBLE_AREA(0 +8, 320-1 +8, 0 +8, 224-1 +8)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_wecleman)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wecleman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wecleman)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state,wecleman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.85)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.85)
 
-	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(wecleman_state, wecleman_volume_callback))
+	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, wecleman_state, wecleman_volume_callback))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
@@ -1087,7 +1107,12 @@ INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(wecleman_state,hotchase)
+MACHINE_START_MEMBER(wecleman_state, hotchase)
+{
+	m_led.resolve();
+}
+
+MACHINE_RESET_MEMBER(wecleman_state, hotchase)
 {
 	int i;
 
@@ -1104,20 +1129,21 @@ MACHINE_RESET_MEMBER(wecleman_state,hotchase)
 MACHINE_CONFIG_START(wecleman_state::hotchase)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
-	MCFG_CPU_PROGRAM_MAP(hotchase_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
+	MCFG_DEVICE_PROGRAM_MAP(hotchase_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wecleman_state, hotchase_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
-	MCFG_CPU_PROGRAM_MAP(hotchase_sub_map)
+	MCFG_DEVICE_ADD("sub", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
+	MCFG_DEVICE_PROGRAM_MAP(hotchase_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
-	MCFG_CPU_PROGRAM_MAP(hotchase_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wecleman_state, hotchase_sound_timer,  496)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
+	MCFG_DEVICE_PROGRAM_MAP(hotchase_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wecleman_state, hotchase_sound_timer,  496)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state,hotchase)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, hotchase)
+	MCFG_MACHINE_START_OVERRIDE(wecleman_state, hotchase)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1128,8 +1154,8 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_hotchase)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hotchase)
-	MCFG_PALETTE_ADD("palette", 2048*2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotchase)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
 
@@ -1145,21 +1171,22 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
+	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
+	MCFG_DEVICE_ADD("k007232_2", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_SOUND_ADD("k007232_3", K007232, 3579545)
+	MCFG_DEVICE_ADD("k007232_3", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
@@ -1171,6 +1198,55 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( wecleman )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU Code */
+	ROM_LOAD16_BYTE( "602g08.17h", 0x00000, 0x10000, CRC(2edf468c) SHA1(6143be7c45a6ab1597207f678602da9ca9d18c6d) )
+	ROM_LOAD16_BYTE( "602g11.23h", 0x00001, 0x10000, CRC(ca5ecb25) SHA1(0aeb3cbbf6f7d7293f25fc6d9f56ee934e0c11ff) )
+	ROM_LOAD16_BYTE( "602a09.18h", 0x20000, 0x10000, CRC(8a9d756f) SHA1(12605e86ce29e6300b5400720baac7b0293d9e66) )
+	ROM_LOAD16_BYTE( "602a10.22h", 0x20001, 0x10000, CRC(569f5001) SHA1(ec2dd331a279083cf847fbbe71c017038a1d562a) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* Sub CPU Code */
+	ROM_LOAD16_BYTE( "602a06.18a", 0x00000, 0x08000, CRC(e12c0d11) SHA1(991afd48bf1b2c303b975ce80c754e5972c39111) )
+	ROM_LOAD16_BYTE( "602a07.20a", 0x00001, 0x08000, CRC(47968e51) SHA1(9b01b2c6a14dd80327a8f66a7f1994471a4bc38e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU Code */
+	ROM_LOAD( "602a01.6d",  0x00000, 0x08000, CRC(deafe5f1) SHA1(4cfbe2841233b1222c22160af7287b7a7821c3a0) )
+
+	ROM_REGION( 0x200000 * 2, "sprites", 0 )   /* x2, do not dispose, zooming sprites */
+	ROM_LOAD( "602a25.12e", 0x000000, 0x20000, CRC(0eacf1f9) SHA1(b4dcd457e68175ffee3da4aff23a241fe33eb500) )
+	ROM_LOAD( "602a26.14e", 0x020000, 0x20000, CRC(2182edaf) SHA1(5ae4223a76b3c0be8f66458707f2e6f63fba0b13) )
+	ROM_LOAD( "602a27.15e", 0x040000, 0x20000, CRC(b22f08e9) SHA1(1ba99bc4e00e206507e9bfafc989208d6ae6f8a3) )
+	ROM_LOAD( "602a28.17e", 0x060000, 0x20000, CRC(5f6741fa) SHA1(9c81634f502da8682673b3b87efe0497af8abbd7) )
+	ROM_LOAD( "602a21.6e",  0x080000, 0x20000, CRC(8cab34f1) SHA1(264df01460f44cd5ccdf3c8bd2d3f327874b69ea) )
+	ROM_LOAD( "602a22.7e",  0x0a0000, 0x20000, CRC(e40303cb) SHA1(da943437ea2e208ea477f35bb05f77412ecdf9ac) )
+	ROM_LOAD( "602a23.9e",  0x0c0000, 0x20000, CRC(75077681) SHA1(32ad10e9e32779c36bb50b402f5c6d941e293942) )
+	ROM_LOAD( "602a24.10e", 0x0e0000, 0x20000, CRC(583dadad) SHA1(181ebe87095d739a5903c17ec851864e2275f571) )
+	ROM_LOAD( "602a17.12c", 0x100000, 0x20000, CRC(31612199) SHA1(dff58ec3f7d98bfa7e9405f0f23647ff4ecfee62) )
+	ROM_LOAD( "602a18.14c", 0x120000, 0x20000, CRC(3f061a67) SHA1(be57c38410c5635311d26afc44b3065e42fa12b7) )
+	ROM_LOAD( "602a19.15c", 0x140000, 0x20000, CRC(5915dbc5) SHA1(61ab123c8a4128a18d7eb2cae99ad58203f03ffc) )
+	ROM_LOAD( "602a20.17c", 0x160000, 0x20000, CRC(f87e4ef5) SHA1(4c2f0d036925a7ccd32aef3ca12b960a27247bc3) )
+	ROM_LOAD( "602a13.6c",  0x180000, 0x20000, CRC(5d3589b8) SHA1(d146cb8511cfe825bdfe8296c7758545542a0faa) )
+	ROM_LOAD( "602a14.7c",  0x1a0000, 0x20000, CRC(e3a75f6c) SHA1(80b20323e3560316ffbdafe4fd2f81326e103045) )
+	ROM_LOAD( "602a15.9c",  0x1c0000, 0x20000, CRC(0d493c9f) SHA1(02690a1963cadd469bd67cb362384923916900a1) )
+	ROM_LOAD( "602a16.10c", 0x1e0000, 0x20000, CRC(b08770b3) SHA1(41871e9261d08fd372b7deb72d939973fb694b54) )
+
+	ROM_REGION( 0x18000, "layers", 0 )
+	ROM_LOAD( "602a31.26g", 0x000000, 0x08000, CRC(01fa40dd) SHA1(2b8aa97f5116f39ae6a8e46f109853d70e370884) )   // layers
+	ROM_LOAD( "602a30.24g", 0x008000, 0x08000, CRC(be5c4138) SHA1(7aee2ee17ef3e37399a60d9b019cfa733acbf07b) )
+	ROM_LOAD( "602a29.23g", 0x010000, 0x08000, CRC(f1a8d33e) SHA1(ed6531f2fd4ad6835a879e9a5600387d8cad6d17) )
+
+	ROM_REGION( 0x0c000, "road", 0 )    /* road */
+	ROM_LOAD( "602a04.11e", 0x000000, 0x08000, CRC(ade9f359) SHA1(58db6be6217ed697827015e50e99e58602042a4c) )
+	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )   // may also exist as 32KB with one half empty
+
+	ROM_REGION( 0x40000, "k007232_1", 0 )  /* Samples (Channel A 0x20000=Channel B) */
+	ROM_LOAD( "602a03.10a", 0x00000, 0x20000, CRC(31392b01) SHA1(0424747bc2015c9c93afd20e6a23083c0dcc4fb7) )
+	ROM_LOAD( "602a02.8a",  0x20000, 0x20000, CRC(e2be10ae) SHA1(109c31bf7252c83a062d259143cd8299681db778) )
+
+	ROM_REGION( 0x04000, "user1", 0 )   /* extra data for road effects? */
+	ROM_LOAD( "602a12.1a",  0x000000, 0x04000, CRC(77b9383d) SHA1(7cb970889677704d6324bb64aafc05326c4503ad) )
+ROM_END
+
+ROM_START( weclemana )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU Code */
 	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(493b79d3) SHA1(9625e3b65c211d5081d8ed8977de287eff100842) )
 	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(6bb4f1fa) SHA1(2cfb7885b42b49dab9892e8dfd54914b64eeab06) )
@@ -1219,9 +1295,9 @@ ROM_START( wecleman )
 	ROM_LOAD( "602a12.1a",  0x000000, 0x04000, CRC(77b9383d) SHA1(7cb970889677704d6324bb64aafc05326c4503ad) )
 ROM_END
 
-ROM_START( weclemana )
+ROM_START( weclemanb )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU Code */
-	// I doubt these labels are correct, or one set of roms is bad (17h and 23h differ slightly from parent)
+	// This set has been hacked, set was provided using same labels as weclemana
 	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(43241265) SHA1(3da1ed0d15b03845c07f07ec6838ce160d81633d) ) // sldh
 	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(3ea7dae0) SHA1(d33d67f4cc65a7680e5f43407136b75512a10230) ) // sldh
 	ROM_LOAD16_BYTE( "602a09.18h", 0x20000, 0x10000, CRC(8a9d756f) SHA1(12605e86ce29e6300b5400720baac7b0293d9e66) )
@@ -1272,7 +1348,7 @@ ROM_END
 early set V.1.26
 rom labels faded out, all other roms match
 */
-ROM_START( weclemanb )
+ROM_START( weclemanc )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU Code */
 	ROM_LOAD16_BYTE( "17h", 0x00000, 0x10000, CRC(66901326) SHA1(672aab497e9b94843451e016de6ca6d3c358362e) )
 	ROM_LOAD16_BYTE( "23h", 0x00001, 0x10000, CRC(d9d492f4) SHA1(12c177fa5cc541be86431f314e96a4f3a74f95c6) )
@@ -1350,10 +1426,8 @@ void wecleman_state::bitswap(uint8_t *src,size_t len,int _14,int _13,int _12,int
 }
 
 /* Unpack sprites data and do some patching */
-DRIVER_INIT_MEMBER(wecleman_state,wecleman)
+void wecleman_state::init_wecleman()
 {
-	int i, len;
-	uint8_t *RAM;
 //  uint16_t *RAM1 = (uint16_t *) memregion("maincpu")->base();   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
 
@@ -1364,9 +1438,9 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 	    I hope you'll appreciate this effort!  */
 
 	/* let's swap even and odd *pixels* of the sprites */
-	RAM = m_sprite_region;
-	len = m_sprite_region.length();
-	for (i = 0; i < len; i ++)
+	uint8_t *RAM = m_sprite_region;
+	int len = m_sprite_region.length();
+	for (int i = 0; i < len; i ++)
 	{
 		/* TODO: could be wrong, colors have to be fixed.       */
 		/* The only certain thing is that 87 must convert to f0 */
@@ -1658,7 +1732,7 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 }
 
 /* Unpack sprites data and do some patching */
-DRIVER_INIT_MEMBER(wecleman_state,hotchase)
+void wecleman_state::init_hotchase()
 {
 //  uint16_t *RAM1 = (uint16_t) memregion("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
@@ -1675,10 +1749,11 @@ DRIVER_INIT_MEMBER(wecleman_state,hotchase)
                                 Game driver(s)
 ***************************************************************************/
 
-GAMEL( 1986, wecleman,  0,        wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 1)", 0, layout_wecleman )
-GAMEL( 1986, weclemana, wecleman, wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 2)", 0, layout_wecleman ) // 1988 release (maybe date hacked?)
-GAMEL( 1986, weclemanb, wecleman, wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v1.26)", 0, layout_wecleman )
+GAMEL( 1986, wecleman,  0,        wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.01)", 0, layout_wecleman )
+GAMEL( 1986, weclemana, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00)", 0, layout_wecleman )
+GAMEL( 1988, weclemanb, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "hack",   "WEC Le Mans 24 (v2.00, hack)", 0, layout_wecleman ) // small section of code inserted, year changed to 1988
+GAMEL( 1986, weclemanc, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v1.26)", 0, layout_wecleman )
 // a version 1.21 is known to exist too, see https://www.youtube.com/watch?v=4l8vYJi1OeU
 
-GAMEL( 1988, hotchase,  0,        hotchase, hotchase, wecleman_state, hotchase, ROT0, "Konami", "Hot Chase (set 1)", 0, layout_wecleman )
-GAMEL( 1988, hotchasea, hotchase, hotchase, hotchase, wecleman_state, hotchase, ROT0, "Konami", "Hot Chase (set 2)", 0, layout_wecleman )
+GAMEL( 1988, hotchase,  0,        hotchase, hotchase, wecleman_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 1)", 0, layout_wecleman )
+GAMEL( 1988, hotchasea, hotchase, hotchase, hotchase, wecleman_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 2)", 0, layout_wecleman )

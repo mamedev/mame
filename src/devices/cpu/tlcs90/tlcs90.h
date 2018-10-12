@@ -8,59 +8,59 @@
 
 // I/O callbacks
 #define MCFG_TLCS90_PORT_P0_READ_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(0, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_read_cb(0, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P1_READ_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(1, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_read_cb(1, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P2_READ_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(2, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_read_cb(2, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P3_READ_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(3, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_read_cb(3, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P4_READ_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(4, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_read_cb(4, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P5_READ_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(5, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_read_cb(5, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P6_READ_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(6, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_read_cb(6, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P7_READ_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(7, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_read_cb(7, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P8_READ_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(8, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_read_cb(8, DEVCB_##_devcb);
 
 
 #define MCFG_TLCS90_PORT_P0_WRITE_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(0, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_write_cb(0, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P1_WRITE_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(1, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_write_cb(1, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P2_WRITE_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(2, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_write_cb(2, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P3_WRITE_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(3, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_write_cb(3, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P4_WRITE_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(4, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_write_cb(4, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P5_WRITE_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(5, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_write_cb(5, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P6_WRITE_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(6, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_write_cb(6, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P7_WRITE_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(7, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_write_cb(7, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P8_WRITE_CB(_devcb) \
-	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(8, DEVCB_##_devcb);
+	downcast<tlcs90_device &>(*device).set_port_write_cb(8, DEVCB_##_devcb);
 
 
 enum tlcs90_e_irq {    INTSWI = 0, INTNMI, INTWD,  INT0,   INTT0,  INTT1,  INTT2,  INTT3,  INTT4,  INT1,   INTT5,  INT2,   INTRX,  INTTX,  INTMAX  };
@@ -112,7 +112,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 2; }
 	virtual uint32_t execute_max_cycles() const override { return 26; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void execute_burn(int32_t cycles) override;
@@ -124,7 +124,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	enum class e_mode : u8 {
@@ -143,7 +143,7 @@ private:
 	PAIR        m_prvpc,m_pc,m_sp,m_af,m_bc,m_de,m_hl,m_ix,m_iy;
 	PAIR        m_af2,m_bc2,m_de2,m_hl2;
 	uint8_t       m_halt, m_after_EI;
-	uint16_t      m_irq_state, m_irq_mask;
+	uint16_t      m_irq_state, m_irq_line_state, m_irq_mask;
 	address_space *m_program;
 	int     m_icount;
 	int         m_extra_cycles;       // extra cycles for interrupts
@@ -209,6 +209,8 @@ private:
 	inline void Push( uint16_t rr );
 	inline void Pop( uint16_t rr );
 	inline void leave_halt();
+	inline void raise_irq(int irq);
+	inline void clear_irq(int irq);
 	void take_interrupt(tlcs90_e_irq irq);
 	void check_interrupts();
 	inline void Cyc();

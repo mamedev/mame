@@ -1220,21 +1220,23 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 	}
 }
 
-ADDRESS_MAP_START(x07_state::x07_mem)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x1fff) AM_NOP     //RAM installed at runtime
-	AM_RANGE(0x2000, 0x7fff) AM_NOP     //Memory Card RAM/ROM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM     //TV VRAM
-	AM_RANGE(0x9800, 0x9fff) AM_UNMAP   //unused/unknown
-	AM_RANGE(0xa000, 0xafff) AM_ROM     AM_REGION("x720", 0)        //TV ROM
-	AM_RANGE(0xb000, 0xffff) AM_ROM     AM_REGION("basic", 0)       //BASIC ROM
-ADDRESS_MAP_END
+void x07_state::x07_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x1fff).noprw();     //RAM installed at runtime
+	map(0x2000, 0x7fff).noprw();     //Memory Card RAM/ROM
+	map(0x8000, 0x97ff).ram();     //TV VRAM
+	map(0x9800, 0x9fff).unmaprw();   //unused/unknown
+	map(0xa000, 0xafff).rom().region("x720", 0);        //TV ROM
+	map(0xb000, 0xffff).rom().region("basic", 0);       //BASIC ROM
+}
 
-ADDRESS_MAP_START(x07_state::x07_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK (0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(x07_io_r, x07_io_w)
-ADDRESS_MAP_END
+void x07_state::x07_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(FUNC(x07_state::x07_io_r), FUNC(x07_state::x07_io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( x07 )
@@ -1369,7 +1371,7 @@ static const gfx_layout x07_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( x07 )
+static GFXDECODE_START( gfx_x07 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, x07_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -1480,9 +1482,9 @@ void x07_state::machine_reset()
 MACHINE_CONFIG_START(x07_state::x07)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NSC800, 15.36_MHz_XTAL / 4)
-	MCFG_CPU_PROGRAM_MAP(x07_mem)
-	MCFG_CPU_IO_MAP(x07_io)
+	MCFG_DEVICE_ADD("maincpu", NSC800, 15.36_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(x07_mem)
+	MCFG_DEVICE_IO_MAP(x07_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("lcd", LCD)
@@ -1495,33 +1497,28 @@ MACHINE_CONFIG_START(x07_state::x07)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(x07_state, x07)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x07)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x07)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink_timer", x07_state, blink_timer, attotime::from_msec(300))
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", x07_state, nvram_init)   // t6834 RAM
-	MCFG_NVRAM_ADD_0FILL("nvram2") // RAM banks
+	NVRAM(config, "nvram1").set_custom_handler(FUNC(x07_state::nvram_init));   // t6834 RAM
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM banks
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
 	// 8KB  no expansion
 	// 12KB XM-100
 	// 16KB XR-100 or XM-101
 	// 20KB XR-100 and XM-100
 	// 24KB XR-100 and XM-101
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,12K,20K,24k")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K,20K,24K");
 
 	/* Memory Card */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "x07_card")
@@ -1553,7 +1550,7 @@ ROM_START( x07 )
 	ROM_REGION( 0x0800, "default", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(x07_state, x07)
+void x07_state::init_x07()
 {
 	uint8_t *RAM = memregion("default")->base();
 	uint8_t *GFX = memregion("gfx1")->base();
@@ -1569,5 +1566,5 @@ DRIVER_INIT_MEMBER(x07_state, x07)
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                COMPANY   FULLNAME    FLAGS */
-COMP( 1983, x07,    0,      0,       x07,       x07,     x07_state,   x07,   "Canon",  "X-07",     MACHINE_SUPPORTS_SAVE)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT      COMPANY  FULLNAME  FLAGS */
+COMP( 1983, x07,  0,      0,      x07,     x07,   x07_state, init_x07, "Canon", "X-07",   MACHINE_SUPPORTS_SAVE)

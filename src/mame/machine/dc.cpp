@@ -652,10 +652,13 @@ void dc_state::machine_start()
 	if(m_naomig1)
 		m_naomig1->set_dma_cb(naomi_g1_device::dma_cb(&dc_state::generic_dma, this));
 
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
+
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);
 	save_pointer(NAME(g2bus_regs), 0x100/4);
-	save_pointer(NAME(dc_sound_ram.target()),dc_sound_ram.bytes());
+	save_pointer(NAME(dc_sound_ram.target()),dc_sound_ram.bytes()/4);
 	SAVE_G2DMA(0)
 	SAVE_G2DMA(1)
 	SAVE_G2DMA(2)
@@ -747,18 +750,11 @@ WRITE_LINE_MEMBER(dc_state::sh4_aica_irq)
 MACHINE_RESET_MEMBER(dc_state,dc_console)
 {
 	dc_state::machine_reset();
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
 	m_aica->set_ram_base(dc_sound_ram, 2*1024*1024);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)
 {
 	m_powervr2->pvr_scanline_timer(param);
-}
-
-// crude cheat pending SH4 DRC, especially useful for inp playback
-INPUT_CHANGED_MEMBER(dc_state::mastercpu_cheat_r)
-{
-	const u32 CPU_CLOCK = (200000000);
-	const u32 timing_value[4] = { CPU_CLOCK, CPU_CLOCK/2, CPU_CLOCK/4, CPU_CLOCK/16 };
-	m_maincpu->set_unscaled_clock(timing_value[newval]);
 }

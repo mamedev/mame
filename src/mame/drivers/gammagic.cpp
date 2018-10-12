@@ -44,34 +44,38 @@ public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
-	virtual void machine_start() override;
 	void gammagic(machine_config &config);
+
+private:
+	virtual void machine_start() override;
 	void gammagic_io(address_map &map);
 	void gammagic_map(address_map &map);
 };
 
 // Memory is mostly handled by the chipset
-ADDRESS_MAP_START(gammagic_state::gammagic_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("user", 0x20000)/* System BIOS */
-	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM
-	AM_RANGE(0x08000000, 0xfffdffff) AM_NOP
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user", 0x20000)/* System BIOS */
-ADDRESS_MAP_END
+void gammagic_state::gammagic_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+	map(0x000e0000, 0x000fffff).rom().region("user", 0x20000);/* System BIOS */
+	map(0x00100000, 0x07ffffff).ram();
+	map(0x08000000, 0xfffdffff).noprw();
+	map(0xfffe0000, 0xffffffff).rom().region("user", 0x20000);/* System BIOS */
+}
 
-ADDRESS_MAP_START(gammagic_state::gammagic_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP
-	AM_RANGE(0x00f0, 0x01ef) AM_NOP
-	AM_RANGE(0x01f8, 0x03af) AM_NOP
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03e0, 0x03ef) AM_NOP
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-	AM_RANGE(0x0400, 0xffff) AM_NOP
-ADDRESS_MAP_END
+void gammagic_state::gammagic_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x00e8, 0x00ef).noprw();
+	map(0x00f0, 0x01ef).noprw();
+	map(0x01f8, 0x03af).noprw();
+	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x03e0, 0x03ef).noprw();
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+	map(0x0400, 0xffff).noprw();
+}
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
@@ -127,14 +131,14 @@ void gammagic_state::machine_start()
 }
 
 MACHINE_CONFIG_START(gammagic_state::gammagic)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Intel Pentium 133
-	MCFG_CPU_PROGRAM_MAP(gammagic_map)
-	MCFG_CPU_IO_MAP(gammagic_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 133000000) // Intel Pentium 133
+	MCFG_DEVICE_PROGRAM_MAP(gammagic_map)
+	MCFG_DEVICE_IO_MAP(gammagic_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
-//  MCFG_I82371SB_ADD("i82371sb")
+//  I82371SB(config, "i82371sb", 0);
 //  MCFG_I82439TX_ADD("i82439tx", "maincpu", "user")
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 //  MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
@@ -185,6 +189,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT       ROT   COMPANY             FULLNAME              FLAGS
-GAME( 1999, gammagic,  0,        gammagic, gammagic, gammagic_state, 0,         ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_IS_SKELETON )
-GAME( 1999, 99bottles, gammagic, gammagic, gammagic, gammagic_state, 0,         ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_IS_SKELETON )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        ROT   COMPANY             FULLNAME              FLAGS
+GAME( 1999, gammagic,  0,        gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_IS_SKELETON )
+GAME( 1999, 99bottles, gammagic, gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_IS_SKELETON )

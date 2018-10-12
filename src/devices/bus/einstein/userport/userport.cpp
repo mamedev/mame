@@ -118,7 +118,8 @@ device_einstein_userport_interface::~device_einstein_userport_interface()
 //  SLOT INTERFACE
 //**************************************************************************
 
-SLOT_INTERFACE_START( einstein_userport_cards )
-	SLOT_INTERFACE("mouse", EINSTEIN_MOUSE)
-	SLOT_INTERFACE("speech", EINSTEIN_SPEECH)
-SLOT_INTERFACE_END
+void einstein_userport_cards(device_slot_interface &device)
+{
+	device.option_add("mouse", EINSTEIN_MOUSE);
+	device.option_add("speech", EINSTEIN_SPEECH);
+}

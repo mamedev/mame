@@ -17,6 +17,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/intelfsh.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -38,6 +39,9 @@ public:
 			m_bios(*this, "bios")
 		{ }
 
+	void svmu(machine_config &config);
+
+private:
 	required_device<lc8670_cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
 	required_device<speaker_sound_device> m_speaker;
@@ -54,10 +58,9 @@ public:
 	DECLARE_READ8_MEMBER(p7_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
-	void svmu(machine_config &config);
 	void svmu_io_mem(address_map &map);
 	void svmu_mem(address_map &map);
-private:
+
 	uint8_t       m_page;
 };
 
@@ -70,9 +73,9 @@ WRITE8_MEMBER(svmu_state::page_w)
 READ8_MEMBER(svmu_state::prog_r)
 {
 	if (m_page == 1)
-		return m_flash->read(offset);
+		return m_flash->read(space, offset);
 	else if (m_page == 2)
-		return m_flash->read(0x10000 + offset);
+		return m_flash->read(space, 0x10000 + offset);
 	else
 		return m_bios[offset];
 }
@@ -80,9 +83,9 @@ READ8_MEMBER(svmu_state::prog_r)
 WRITE8_MEMBER(svmu_state::prog_w)
 {
 	if (m_page == 1)
-		m_flash->write(offset, data);
+		m_flash->write(space, offset, data);
 	else if (m_page == 2)
-		m_flash->write(0x10000 + offset, data);
+		m_flash->write(space, 0x10000 + offset, data);
 }
 
 /*
@@ -125,15 +128,17 @@ READ8_MEMBER(svmu_state::p7_r)
 }
 
 
-ADDRESS_MAP_START(svmu_state::svmu_mem)
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(prog_r, prog_w)
-ADDRESS_MAP_END
+void svmu_state::svmu_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(svmu_state::prog_r), FUNC(svmu_state::prog_w));
+}
 
-ADDRESS_MAP_START(svmu_state::svmu_io_mem)
-	AM_RANGE( LC8670_PORT1, LC8670_PORT1 ) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE( LC8670_PORT3, LC8670_PORT3 ) AM_READ_PORT("P3")
-	AM_RANGE( LC8670_PORT7, LC8670_PORT7 ) AM_READ(p7_r)
-ADDRESS_MAP_END
+void svmu_state::svmu_io_mem(address_map &map)
+{
+	map(LC8670_PORT1, LC8670_PORT1).rw(FUNC(svmu_state::p1_r), FUNC(svmu_state::p1_w));
+	map(LC8670_PORT3, LC8670_PORT3).portr("P3");
+	map(LC8670_PORT7, LC8670_PORT7).r(FUNC(svmu_state::p7_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( svmu )
@@ -305,13 +310,13 @@ QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 
 MACHINE_CONFIG_START(svmu_state::svmu)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LC8670, XTAL(32'768))
-	MCFG_CPU_PROGRAM_MAP(svmu_mem)
-	MCFG_CPU_IO_MAP(svmu_io_mem)
+	MCFG_DEVICE_ADD("maincpu", LC8670, XTAL(32'768))
+	MCFG_DEVICE_PROGRAM_MAP(svmu_mem)
+	MCFG_DEVICE_IO_MAP(svmu_io_mem)
 
 	/* specific LC8670 configurations */
 	MCFG_LC8670_SET_CLOCK_SOURCES(XTAL(32'768), 600000, XTAL(6'000'000))    // tolerance range of the RC oscillator is 600kHz to 1200kHz
-	MCFG_LC8670_BANKSWITCH_CB(WRITE8(svmu_state, page_w))
+	MCFG_LC8670_BANKSWITCH_CB(WRITE8(*this, svmu_state, page_w))
 	MCFG_LC8670_LCD_UPDATE_CB(svmu_lcd_update)
 
 	/* video hardware */
@@ -323,17 +328,17 @@ MACHINE_CONFIG_START(svmu_state::svmu)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", lc8670_cpu_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_svmu)
+	config.set_default_layout(layout_svmu);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(svmu_state, svmu)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_ATMEL_29C010_ADD("flash")
+	ATMEL_29C010(config, "flash");
 	MCFG_QUICKLOAD_ADD("quickload", svmu_state, svmu, "vms,bin", 0)
 	MCFG_QUICKLOAD_INTERFACE("svmu_quik")
 
@@ -351,39 +356,39 @@ ROM_START( svmu )
 
 	// Version 1.005,1999/04/28,315-6124-07,SEGA Visual Memory System BIOS Produced by Sue
 	ROM_SYSTEM_BIOS(0, "en1005a", "VMS English BIOS (1.005 1999/04/28)")
-	ROMX_LOAD("en1005-19990428-315-6124-07.bin", 0x0000, 0x10000, CRC(dfd77f4e) SHA1(4a7bfd1b8eb599d87883312df0bb48e0edd13034), ROM_BIOS(1)) // extracted with trojan
+	ROMX_LOAD("en1005-19990428-315-6124-07.bin", 0x0000, 0x10000, CRC(dfd77f4e) SHA1(4a7bfd1b8eb599d87883312df0bb48e0edd13034), ROM_BIOS(0)) // extracted with trojan
 
 	// Version 1.005,1999/10/26,315-6208-05,SEGA Visual Memory System BIOS Produced by Sue
 	ROM_SYSTEM_BIOS(1, "en1005b", "VMS English BIOS (1.005 1999/10/26)")
-	ROMX_LOAD("en1005-19991026-315-6208-05.bin", 0x0000, 0x10000, CRC(c825003a) SHA1(6242320d705c156f8369969d6caa8c737f01e4f3), ROM_BIOS(2)) // extracted with trojan
+	ROMX_LOAD("en1005-19991026-315-6208-05.bin", 0x0000, 0x10000, CRC(c825003a) SHA1(6242320d705c156f8369969d6caa8c737f01e4f3), ROM_BIOS(1)) // extracted with trojan
 
 	// Version 1.001,1998/05/28,315-6124-02,SEGA Visual Memory System BIOS Produced by Sue
 	ROM_SYSTEM_BIOS(2, "jp1001", "VMS Japanese BIOS (1.001 1998/05/28)")
-	ROMX_LOAD("jp1001-19980528-315-6124-02.bin", 0x0000, 0x10000, CRC(e6339f4a) SHA1(688b2e1ff8c60bde6e8b07a2d2695cdacc07bd0c), ROM_BIOS(3))
+	ROMX_LOAD("jp1001-19980528-315-6124-02.bin", 0x0000, 0x10000, CRC(e6339f4a) SHA1(688b2e1ff8c60bde6e8b07a2d2695cdacc07bd0c), ROM_BIOS(2))
 
 	// Version 1.002,1998/06/04,315-6124-03,SEGA Visual Memory System BIOS Produced by Sue
 	ROM_SYSTEM_BIOS(3, "jp1002", "VMS Japanese BIOS (1.002 1998/06/04)")
-	ROMX_LOAD("jp1002-19980604-315-6124-03.bin", 0x0000, 0x10000, CRC(6c020d48) SHA1(9ee7c87d7b033235e0b315a0b421e70deb547c7a), ROM_BIOS(4))
+	ROMX_LOAD("jp1002-19980604-315-6124-03.bin", 0x0000, 0x10000, CRC(6c020d48) SHA1(9ee7c87d7b033235e0b315a0b421e70deb547c7a), ROM_BIOS(3))
 
 	// Version 1.004,1998/09/30,315-6208-01,SEGA Visual Memory System BIOS Produced by Sue
 	ROM_SYSTEM_BIOS(4, "jp1004", "VMS Japanese BIOS (1.004, 1998/09/30)")
-	ROMX_LOAD("jp1004-19980930-315-6208-01.bin", 0x0000, 0x10000, CRC(8e0f867a) SHA1(dc2fa2963138a1049a43f7f36439ad0a416ee8b4), ROM_BIOS(5)) // from Sega Katana SDK (original file: fbios.sbf, CRC: c7c77b3c, xor key: 0x37)
+	ROMX_LOAD("jp1004-19980930-315-6208-01.bin", 0x0000, 0x10000, CRC(8e0f867a) SHA1(dc2fa2963138a1049a43f7f36439ad0a416ee8b4), ROM_BIOS(4)) // from Sega Katana SDK (original file: fbios.sbf, CRC: c7c77b3c, xor key: 0x37)
 
 	// Version 1.005,1998/12/09,315-6124-05,SEGA Visual Memory System BIOS Produced by Sue
 	ROM_SYSTEM_BIOS(5, "jp1005a", "VMS Japanese BIOS (1.005 1998/12/09)")
-	ROMX_LOAD("jp1005-19981209-315-6124-05.bin", 0x0000, 0x10000, CRC(47623324) SHA1(fca1aceff8a2f8c6826f3a865f4d5ef88dfd9ed1), ROM_BIOS(6))
+	ROMX_LOAD("jp1005-19981209-315-6124-05.bin", 0x0000, 0x10000, CRC(47623324) SHA1(fca1aceff8a2f8c6826f3a865f4d5ef88dfd9ed1), ROM_BIOS(5))
 
 	// Version 1.005,1999/10/26,315-6028-04,SEGA Visual Memory System BIOS Produced by Sue
 	ROM_SYSTEM_BIOS(6, "jp1005b", "VMS Japanese BIOS (1.005 1999/10/26)")
-	ROMX_LOAD("jp1005-19991026-315-6028-04.bin", 0x0000, 0x10000, CRC(6cab02c2) SHA1(6cc2fbf4a67770988922117c300d006aa20899ac), ROM_BIOS(7)) // extracted with trojan
+	ROMX_LOAD("jp1005-19991026-315-6028-04.bin", 0x0000, 0x10000, CRC(6cab02c2) SHA1(6cc2fbf4a67770988922117c300d006aa20899ac), ROM_BIOS(6)) // extracted with trojan
 
 	// Version 1.004,1998/09/30,315-6208-01,SEGA Visual Memory System BIOS Produced by Sue
 	ROM_SYSTEM_BIOS(7, "dev1004", "VMS Japanese Development BIOS (1.004 1998/09/30)") // automatically boot the first game found in the flash
-	ROMX_LOAD( "jp1004-19980930-315-6208-01-dev.bin", 0x0000, 0x10000, CRC(395e25f2) SHA1(37dea034322b5b80b35b2de784298d32c71ba7a3), ROM_BIOS(8)) // from Sega Katana SDK (original file: qbios.sbf, CRC: eed5524c, xor key: 0x43)
+	ROMX_LOAD( "jp1004-19980930-315-6208-01-dev.bin", 0x0000, 0x10000, CRC(395e25f2) SHA1(37dea034322b5b80b35b2de784298d32c71ba7a3), ROM_BIOS(7)) // from Sega Katana SDK (original file: qbios.sbf, CRC: eed5524c, xor key: 0x43)
 ROM_END
 
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY   FULLNAME               FLAGS */
-COMP( 1998, svmu, 0,      0,      svmu,    svmu,  svmu_state, 0,    "Sega",   "Visual Memory Unit",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY  FULLNAME              FLAGS */
+COMP( 1998, svmu, 0,      0,      svmu,    svmu,  svmu_state, empty_init, "Sega",  "Visual Memory Unit", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

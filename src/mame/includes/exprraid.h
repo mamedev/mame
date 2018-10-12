@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class exprraid_state : public driver_device
 {
@@ -23,6 +24,18 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram") { }
 
+	void exprraid(machine_config &config);
+	void exprboot(machine_config &config);
+
+	void init_exprraid();
+	void init_wexpressb();
+	void init_wexpressb2();
+	void init_wexpressb3();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_deco16);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
@@ -59,22 +72,14 @@ public:
 	DECLARE_WRITE8_MEMBER(exprraid_bgselect_w);
 	DECLARE_WRITE8_MEMBER(exprraid_scrollx_w);
 	DECLARE_WRITE8_MEMBER(exprraid_scrolly_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_deco16);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
 
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_DRIVER_INIT(exprraid);
-	DECLARE_DRIVER_INIT(wexpressb);
-	DECLARE_DRIVER_INIT(wexpressb2);
-	DECLARE_DRIVER_INIT(wexpressb3);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update_exprraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void exprraid_gfx_expand();
-	void exprraid(machine_config &config);
-	void exprboot(machine_config &config);
 	void master_io_map(address_map &map);
 	void master_map(address_map &map);
 	void slave_map(address_map &map);

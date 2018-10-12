@@ -53,6 +53,7 @@ ToDo:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -95,7 +96,7 @@ public:
 	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
-	DECLARE_DRIVER_INIT(chanbara);
+	void init_chanbara();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	virtual void machine_start() override;
@@ -228,21 +229,22 @@ uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_in
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(chanbara_state::chanbara_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(chanbara_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x1a00, 0x1bff) AM_RAM_WRITE(chanbara_colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P2")
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P1")
-	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void chanbara_state::chanbara_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0bff).ram().w(FUNC(chanbara_state::chanbara_videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(chanbara_state::chanbara_colorram_w)).share("colorram");
+	map(0x1000, 0x10ff).ram().share("spriteram");
+	map(0x1800, 0x19ff).ram().w(FUNC(chanbara_state::chanbara_videoram2_w)).share("videoram2");
+	map(0x1a00, 0x1bff).ram().w(FUNC(chanbara_state::chanbara_colorram2_w)).share("colorram2");
+	map(0x2000, 0x2000).portr("DSW1");
+	map(0x2001, 0x2001).portr("SYSTEM");
+	map(0x2002, 0x2002).portr("P2");
+	map(0x2003, 0x2003).portr("P1");
+	map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
 /***************************************************************************/
 
@@ -346,7 +348,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( chanbara )
+static GFXDECODE_START( gfx_chanbara )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   0x40, 32 )
 	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout, 0x80, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tile16layout, 0, 32 )
@@ -389,8 +391,8 @@ void chanbara_state::machine_reset()
 
 MACHINE_CONFIG_START(chanbara_state::chanbara)
 
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(chanbara_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(chanbara_map)
 
 
 	/* video hardware */
@@ -404,17 +406,17 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chanbara)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chanbara)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(chanbara_state, chanbara)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 12000000/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_1_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, chanbara_state, chanbara_ay_out_0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, chanbara_state, chanbara_ay_out_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -457,14 +459,13 @@ ROM_START( chanbara )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(chanbara_state,chanbara)
+void chanbara_state::init_chanbara()
 {
-	uint8_t   *src = memregion("gfx4")->base();
-	uint8_t   *dst = memregion("gfx3")->base() + 0x4000;
-	uint8_t   *bg = memregion("user1")->base();
+	uint8_t *src = memregion("gfx4")->base();
+	uint8_t *dst = memregion("gfx3")->base() + 0x4000;
+	uint8_t *bg = memregion("user1")->base();
 
-	int i;
-	for (i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 	{
 		dst[i + 0x1000] = src[i] & 0xf0;
 		dst[i + 0x0000] = (src[i] & 0x0f) << 4;
@@ -475,4 +476,4 @@ DRIVER_INIT_MEMBER(chanbara_state,chanbara)
 	membank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
 }
 
-GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara_state, chanbara, ROT270, "Data East", "Chanbara", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1985, chanbara, 0, chanbara, chanbara, chanbara_state, init_chanbara, ROT270, "Data East", "Chanbara", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

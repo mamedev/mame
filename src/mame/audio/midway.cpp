@@ -17,17 +17,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define SSIO_CLOCK          XTAL(16'000'000)
-#define SOUNDSGOOD_CLOCK    XTAL(16'000'000)
-#define TURBOCS_CLOCK       XTAL(8'000'000)
-#define SQUAWKTALK_CLOCK    XTAL(3'579'545)
-
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -67,6 +56,15 @@ midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char
 
 
 //-------------------------------------------------
+//  suspend_cpu
+//-------------------------------------------------
+
+void midway_ssio_device::suspend_cpu()
+{
+	m_cpu->suspend(SUSPEND_REASON_DISABLE, 1);
+}
+
+//-------------------------------------------------
 //  read - return the status value
 //-------------------------------------------------
 
@@ -93,16 +91,17 @@ WRITE8_MEMBER(midway_ssio_device::write)
 
 WRITE_LINE_MEMBER(midway_ssio_device::reset_write)
 {
-	// going high halts the CPU
 	if (state)
 	{
+		// going high halts the CPU
 		device_reset();
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
-
-	// going low resets and reactivates the CPU
 	else
+	{
+		// going low resets and reactivates the CPU
 		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
 }
 
 
@@ -354,22 +353,36 @@ void midway_ssio_device::update_volumes()
 //-------------------------------------------------
 
 // address map verified from schematics
-ADDRESS_MAP_START(midway_ssio_device::ssio_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x9000, 0x9003) AM_MIRROR(0x0ffc) AM_READ(data_r)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay0", ay8910_device, address_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x0ffc) AM_DEVREAD("ay0", ay8910_device, data_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay0", ay8910_device, data_w)
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0xc000, 0xcfff) AM_READNOP AM_WRITE(status_w)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITENOP    // low bit controls yellow LED
-	AM_RANGE(0xe000, 0xefff) AM_READ(irq_clear)
-	AM_RANGE(0xf000, 0xffff) AM_READ_PORT("DIP")    // 6 DIP switches
-ADDRESS_MAP_END
+void midway_ssio_device::ssio_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x83ff).mirror(0x0c00).ram();
+	map(0x9000, 0x9003).mirror(0x0ffc).r(FUNC(midway_ssio_device::data_r));
+	map(0xa000, 0xa000).mirror(0x0ffc).w("ay0", FUNC(ay8910_device::address_w));
+	map(0xa001, 0xa001).mirror(0x0ffc).r("ay0", FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa002).mirror(0x0ffc).w("ay0", FUNC(ay8910_device::data_w));
+	map(0xb000, 0xb000).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::address_w));
+	map(0xb001, 0xb001).mirror(0x0ffc).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xb002, 0xb002).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::data_w));
+	map(0xc000, 0xcfff).nopr().w(FUNC(midway_ssio_device::status_w));
+	map(0xd000, 0xdfff).nopw();    // low bit controls yellow LED
+	map(0xe000, 0xefff).r(FUNC(midway_ssio_device::irq_clear));
+	map(0xf000, 0xffff).portr("DIP");    // 6 DIP switches
+}
+
+
+//-------------------------------------------------
+//  default ports map
+//-------------------------------------------------
+
+void midway_ssio_device::ssio_input_ports(address_map &map, const char *ssio)
+{
+	map(0x00, 0x04).mirror(0x18).r(ssio, FUNC(midway_ssio_device::ioport_read));
+	map(0x07, 0x07).mirror(0x18).r(ssio, FUNC(midway_ssio_device::read));
+	map(0x00, 0x07).w(ssio, FUNC(midway_ssio_device::ioport_write));
+	map(0x1c, 0x1f).w(ssio, FUNC(midway_ssio_device::write));
+}
 
 
 //-------------------------------------------------
@@ -398,19 +411,20 @@ const tiny_rom_entry *midway_ssio_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(midway_ssio_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", Z80, SSIO_CLOCK/2/4)
-	MCFG_CPU_PROGRAM_MAP(ssio_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, SSIO_CLOCK/2/16/10)
+	MCFG_DEVICE_ADD("cpu", Z80, DERIVED_CLOCK(1, 2*4))
+	MCFG_DEVICE_PROGRAM_MAP(ssio_map)
+	if (clock())
+		MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, clock() / (2*16*10))
 
-	MCFG_SOUND_ADD("ay0", AY8910, SSIO_CLOCK/2/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(midway_ssio_device, porta0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(midway_ssio_device, portb0_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 0)
+	MCFG_DEVICE_ADD("ay0", AY8910, DERIVED_CLOCK(1, 2*4))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, midway_ssio_device, porta0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, midway_ssio_device, portb0_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.33, 0)
 
-	MCFG_SOUND_ADD("ay1", AY8910, SSIO_CLOCK/2/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(midway_ssio_device, porta1_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(midway_ssio_device, portb1_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 1)
+	MCFG_DEVICE_ADD("ay1", AY8910, DERIVED_CLOCK(1, 2*4))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, midway_ssio_device, porta1_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, midway_ssio_device, portb1_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.33, 1)
 MACHINE_CONFIG_END
 
 
@@ -561,13 +575,14 @@ WRITE_LINE_MEMBER(midway_sounds_good_device::irq_w)
 //-------------------------------------------------
 
 // address map determined by PAL; not verified
-ADDRESS_MAP_START(midway_sounds_good_device::soundsgood_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8("pia", pia6821_device, read_alt, write_alt, 0xff00)
-	AM_RANGE(0x070000, 0x070fff) AM_RAM
-ADDRESS_MAP_END
+void midway_sounds_good_device::soundsgood_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x7ffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x060000, 0x060007).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt)).umask16(0xff00);
+	map(0x070000, 0x070fff).ram();
+}
 
 
 //-------------------------------------------------
@@ -575,18 +590,18 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(midway_sounds_good_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", M68000, SOUNDSGOOD_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(soundsgood_map)
+	MCFG_DEVICE_ADD("cpu", M68000, DERIVED_CLOCK(1, 2))
+	MCFG_DEVICE_PROGRAM_MAP(soundsgood_map)
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_sounds_good_device, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_sounds_good_device, portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_sounds_good_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_sounds_good_device, irq_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(midway_sounds_good_device::porta_w));
+	m_pia->writepb_handler().set(FUNC(midway_sounds_good_device::portb_w));
+	m_pia->irqa_handler().set(FUNC(midway_sounds_good_device::irq_w));
+	m_pia->irqb_handler().set(FUNC(midway_sounds_good_device::irq_w));
 
-	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0) /// ad7533jn.u10
+	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0) /// ad7533jn.u10
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -616,7 +631,7 @@ void midway_sounds_good_device::device_reset()
 
 void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_pia->portb_w((param >> 1) & 0x0f);
+	m_pia->write_portb((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);
 
 	// oftentimes games will write one nibble at a time; the sync on this is very
@@ -716,12 +731,13 @@ WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::irq_w)
 //-------------------------------------------------
 
 // address map verified from schematics
-ADDRESS_MAP_START(midway_turbo_cheap_squeak_device::turbocs_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void midway_turbo_cheap_squeak_device::turbocs_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).mirror(0x3800).ram();
+	map(0x4000, 0x4003).mirror(0x3ffc).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0x8000, 0xffff).rom();
+}
 
 
 //-------------------------------------------------
@@ -729,18 +745,18 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(midway_turbo_cheap_squeak_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", MC6809E, TURBOCS_CLOCK / 4)
-	MCFG_CPU_PROGRAM_MAP(turbocs_map)
+	MCFG_DEVICE_ADD("cpu", MC6809E, DERIVED_CLOCK(1, 4))
+	MCFG_DEVICE_PROGRAM_MAP(turbocs_map)
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_turbo_cheap_squeak_device, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_turbo_cheap_squeak_device, portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_turbo_cheap_squeak_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_turbo_cheap_squeak_device, irq_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(midway_turbo_cheap_squeak_device::porta_w));
+	m_pia->writepb_handler().set(FUNC(midway_turbo_cheap_squeak_device::portb_w));
+	m_pia->irqa_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
+	m_pia->irqb_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 
-	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
+	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -770,7 +786,7 @@ void midway_turbo_cheap_squeak_device::device_reset()
 
 void midway_turbo_cheap_squeak_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_pia->portb_w((param >> 1) & 0x0f);
+	m_pia->write_portb((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);
 
 	// oftentimes games will write one nibble at a time; the sync on this is very
@@ -863,7 +879,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// write strobe -- pass the current command to the TMS5200
 	if (((data ^ m_tms_strobes) & 0x02) && !(data & 0x02))
 	{
-		m_tms5200->data_w(space, offset, m_tms_command);
+		m_tms5200->data_w(m_tms_command);
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);
@@ -873,7 +889,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// read strobe -- read the current status from the TMS5200
 	else if (((data ^ m_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		m_pia1->porta_w(m_tms5200->status_r(space, offset));
+		m_pia1->write_porta(m_tms5200->status_r());
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);
@@ -903,26 +919,28 @@ WRITE_LINE_MEMBER(midway_squawk_n_talk_device::irq_w)
 // address map verified from schematics
 // note that jumpers control the ROM sizes; if these are changed, use the alternate
 // address map below
-ADDRESS_MAP_START(midway_squawk_n_talk_device::squawkntalk_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0x4000) AM_WRITE(dac_w)
-	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM
-ADDRESS_MAP_END
+void midway_squawk_n_talk_device::squawkntalk_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram();     // internal RAM
+	map(0x0080, 0x0083).mirror(0x4f6c).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).mirror(0x4f6c).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x1fff).mirror(0x4000).w(FUNC(midway_squawk_n_talk_device::dac_w));
+	map(0x8000, 0xbfff).mirror(0x4000).rom();
+}
 
 // alternate address map if the ROM jumpers are changed to support a smaller
 // ROM size of 2k
 #ifdef UNUSED_FUNCTION
-ADDRESS_MAP_START(midway_squawk_n_talk_device::squawkntalk_alt_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0800, 0x0fff) AM_MIRROR(0x6000) AM_WRITE(dac_w)
-	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x6000) AM_ROM
-ADDRESS_MAP_END
+void midway_squawk_n_talk_device::squawkntalk_alt_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram();     // internal RAM
+	map(0x0080, 0x0083).mirror(0x676c).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).mirror(0x676c).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0800, 0x0fff).mirror(0x6000).w(FUNC(midway_squawk_n_talk_device::dac_w));
+	map(0x8000, 0x9fff).mirror(0x6000).rom();
+}
 #endif
 
 
@@ -931,23 +949,23 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(midway_squawk_n_talk_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", M6802, SQUAWKTALK_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(squawkntalk_map)
+	MCFG_DEVICE_ADD("cpu", M6802, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(squawkntalk_map)
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_squawk_n_talk_device, porta1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->writepa_handler().set(FUNC(midway_squawk_n_talk_device::porta1_w));
+	m_pia0->irqa_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
+	m_pia0->irqb_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_squawk_n_talk_device, porta2_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_squawk_n_talk_device, portb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->writepa_handler().set(FUNC(midway_squawk_n_talk_device::porta2_w));
+	m_pia1->writepb_handler().set(FUNC(midway_squawk_n_talk_device::portb2_w));
+	m_pia1->irqa_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
+	m_pia1->irqb_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
 
 	// only used on Discs of Tron, which is stereo
-	MCFG_SOUND_ADD("tms5200", TMS5200, 640000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60)
+	MCFG_DEVICE_ADD("tms5200", TMS5200, 640000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.60)
 
 	// the board also supports an AY-8912 and/or an 8-bit DAC, neither of
 	// which are populated on the Discs of Tron board
@@ -980,6 +998,6 @@ void midway_squawk_n_talk_device::device_reset()
 
 void midway_squawk_n_talk_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_pia0->porta_w(~param & 0x0f);
-	m_pia0->cb1_w(~param & 0x10);
+	m_pia0->write_porta(~param & 0x0f);
+	m_pia0->cb1_w(BIT(~param, 4));
 }

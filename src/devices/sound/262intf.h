@@ -7,7 +7,7 @@
 
 
 #define MCFG_YMF262_IRQ_HANDLER(cb) \
-		devcb = &downcast<ymf262_device &>(*device).set_irq_handler((DEVCB_##cb));
+		downcast<ymf262_device &>(*device).set_irq_handler((DEVCB_##cb));
 
 class ymf262_device : public device_t, public device_sound_interface
 {
@@ -26,6 +26,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "video/ladybug.h"
+#include "emupal.h"
 
 
 class ladybug_base_state : public driver_device
@@ -67,7 +68,7 @@ public:
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
-	DECLARE_DRIVER_INIT(dorodon);
+	void init_dorodon();
 	void dorodon(machine_config &config);
 
 protected:

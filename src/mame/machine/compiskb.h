@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	devcb = &downcast<compis_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
+	downcast<compis_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
 
 
 
@@ -51,16 +51,12 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	enum
-	{
-		LED_CAPS
-	};
-
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<9> m_y;
 	required_ioport m_special;
 	devcb_write_line m_out_tx_handler;
+	output_finder<> m_led_caps;
 
 	uint8_t m_bus;
 	uint8_t m_keylatch;

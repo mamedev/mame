@@ -95,6 +95,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -115,23 +116,30 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamps(*this, "lamp%u", 0U) { }
 
+	void sanremo(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	output_finder<7> m_lamps;
 
 	uint8_t m_attrram[0x800];
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(sanremo_videoram_w);
-	TILE_GET_INFO_MEMBER(get_sanremo_tile_info);
+	uint8_t m_banksel;
+
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_WRITE8_MEMBER(banksel_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
-	int banksel;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sanremo);
-	uint32_t screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	void sanremo(machine_config &config);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sanremo_map(address_map &map);
 	void sanremo_portmap(address_map &map);
 };
@@ -142,14 +150,14 @@ public:
 *********************************************/
 
 
-WRITE8_MEMBER(sanremo_state::sanremo_videoram_w)
+WRITE8_MEMBER(sanremo_state::videoram_w)
 {
 	m_videoram[offset] = data;
-	m_attrram[offset] = banksel;
+	m_attrram[offset] = m_banksel;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(sanremo_state::get_sanremo_tile_info)
+TILE_GET_INFO_MEMBER(sanremo_state::get_tile_info)
 {
 	int code = m_videoram[tile_index];
 	int bank = m_attrram[tile_index];
@@ -159,11 +167,15 @@ TILE_GET_INFO_MEMBER(sanremo_state::get_sanremo_tile_info)
 
 void sanremo_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanremo_state::get_sanremo_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanremo_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
 
+	m_lamps.resolve();
+
+	save_item(NAME(m_attrram));
+	save_item(NAME(m_banksel));
 }
 
-uint32_t sanremo_state::screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sanremo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -199,13 +211,8 @@ WRITE8_MEMBER(sanremo_state::lamps_w)
     -x-- ----  BET
     x--- ----  (always on)
 */
-	output().set_lamp_value(0, (data >> 0) & 1);  /* DISCARD 1 */
-	output().set_lamp_value(1, (data >> 1) & 1);  /* DISCARD 2 */
-	output().set_lamp_value(2, (data >> 2) & 1);  /* DISCARD 3 */
-	output().set_lamp_value(3, (data >> 3) & 1);  /* DISCARD 4 */
-	output().set_lamp_value(4, (data >> 4) & 1);  /* DISCARD 5 */
-	output().set_lamp_value(5, (data >> 5) & 1);  /* START */
-	output().set_lamp_value(6, (data >> 6) & 1);  /* BET */
+	for (int n = 0; n < 7; n++)
+		m_lamps[n] = BIT(data, n);
 }
 
 WRITE8_MEMBER(sanremo_state::banksel_w)
@@ -216,7 +223,7 @@ WRITE8_MEMBER(sanremo_state::banksel_w)
     ---x xxxx  GFX banks selector
     xxx- ----  unknown
 */
-	banksel = data & 0x1f;
+	m_banksel = data & 0x1f;
 }
 
 
@@ -224,24 +231,26 @@ WRITE8_MEMBER(sanremo_state::banksel_w)
 *           Memory map information           *
 *********************************************/
 
-ADDRESS_MAP_START(sanremo_state::sanremo_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(sanremo_videoram_w) AM_SHARE("videoram")  // 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")                               // battery backed UM6116
-ADDRESS_MAP_END
+void sanremo_state::sanremo_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(FUNC(sanremo_state::videoram_w)).share("videoram");  // 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
+	map(0xc000, 0xc7ff).ram().share("nvram");                               // battery backed UM6116
+}
 
-ADDRESS_MAP_START(sanremo_state::sanremo_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(lamps_w)
-	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x17, 0x17) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0x24, 0x24) AM_WRITE(banksel_w)
-	AM_RANGE(0x27, 0x27) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x37, 0x37) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-ADDRESS_MAP_END
+void sanremo_state::sanremo_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).portr("IN0");
+	map(0x02, 0x02).portr("IN1");
+	map(0x04, 0x04).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x05, 0x05).w(FUNC(sanremo_state::lamps_w));
+	map(0x14, 0x14).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x17, 0x17).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0x24, 0x24).w(FUNC(sanremo_state::banksel_w));
+	map(0x27, 0x27).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x37, 0x37).w("ay8910", FUNC(ay8910_device::address_w));
+}
 
 /*
 
@@ -336,7 +345,7 @@ static const gfx_layout tilelayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( sanremo )
+static GFXDECODE_START( gfx_sanremo )
 	GFXDECODE_ENTRY( "gfx",  0,   tilelayout, 0, 1 )
 GFXDECODE_END
 
@@ -348,12 +357,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sanremo_state::sanremo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sanremo_map)
-	MCFG_CPU_IO_MAP(sanremo_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sanremo_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sanremo_map)
+	MCFG_DEVICE_IO_MAP(sanremo_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sanremo_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -361,7 +370,7 @@ MACHINE_CONFIG_START(sanremo_state::sanremo)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(70*8, 41*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 38*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sanremo_state, screen_update_sanremo)
+	MCFG_SCREEN_UPDATE_DRIVER(sanremo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
@@ -372,13 +381,13 @@ MACHINE_CONFIG_START(sanremo_state::sanremo)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sanremo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sanremo)
 	MCFG_PALETTE_ADD("palette", 0x10)
 	MCFG_PALETTE_INIT_OWNER(sanremo_state, sanremo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, SND_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -412,5 +421,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT   ROT   COMPANY           FULLNAME       FLAGS  LAYOUT
-GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, 0,     ROT0, "San Remo Games", "Number One",  0,     layout_sanremo )
+//     YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY           FULLNAME       FLAGS                    LAYOUT
+GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, empty_init, ROT0, "San Remo Games", "Number One",  MACHINE_SUPPORTS_SAVE,   layout_sanremo )

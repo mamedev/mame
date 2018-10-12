@@ -109,6 +109,7 @@ Eproms are 27512,27010,274001
 #include "emu.h"
 #include "cpu/m6502/n2a03.h"
 #include "video/ppu2c0x.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -124,6 +125,18 @@ public:
 		m_p2(*this, "P2"),
 		m_dsw(*this, "DSW") { }
 
+	void multigam(machine_config &config);
+	void supergm3(machine_config &config);
+	void multigmt(machine_config &config);
+	void multigm3(machine_config &config);
+
+	void init_multigmt();
+	void init_multigam();
+	void init_multigm3();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_ioport m_p1;
@@ -164,7 +177,6 @@ public:
 	int m_vrom4k;
 	uint8_t m_supergm3_prg_bank;
 	uint8_t m_supergm3_chr_bank;
-	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
 	DECLARE_WRITE8_MEMBER(multigam_nt_w);
 	DECLARE_READ8_MEMBER(multigam_nt_r);
 	DECLARE_WRITE8_MEMBER(sprite_dma_w);
@@ -183,9 +195,6 @@ public:
 	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
 	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
 	void set_mirroring(int mirroring);
-	DECLARE_DRIVER_INIT(multigmt);
-	DECLARE_DRIVER_INIT(multigam);
-	DECLARE_DRIVER_INIT(multigm3);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -193,7 +202,6 @@ public:
 	DECLARE_MACHINE_START(multigm3);
 	DECLARE_MACHINE_RESET(multigm3);
 	DECLARE_MACHINE_START(supergm3);
-	uint32_t screen_update_multigam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mmc1_resync_callback);
 	void set_videorom_bank( int start, int count, int bank, int bank_size_in_kb);
 	void set_videoram_bank( int start, int count, int bank, int bank_size_in_kb);
@@ -203,11 +211,6 @@ public:
 	void supergm3_set_bank();
 	void multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
-	void ppu_irq(int *ppu_regs);
-	void multigam(machine_config &config);
-	void supergm3(machine_config &config);
-	void multigmt(machine_config &config);
-	void multigm3(machine_config &config);
 	void multigam_map(address_map &map);
 	void multigm3_map(address_map &map);
 	void multigmt_map(address_map &map);
@@ -402,37 +405,39 @@ WRITE8_MEMBER(multigam_state::multigam_mapper2_w)
 
 *******************************************************/
 
-ADDRESS_MAP_START(multigam_state::multigam_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5000, 0x5ffe) AM_ROM
-	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
-	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x6fff, 0x6fff) AM_WRITE(multigam_switch_prg_rom)
-	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(multigam_switch_gfx_rom)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigam_mapper2_w)
-ADDRESS_MAP_END
+void multigam_state::multigam_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x0800, 0x0fff).ram(); /* additional RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
+	map(0x5000, 0x5ffe).rom();
+	map(0x5002, 0x5002).nopw();
+	map(0x5fff, 0x5fff).portr("IN0");
+	map(0x6000, 0x7fff).rom();
+	map(0x6fff, 0x6fff).w(FUNC(multigam_state::multigam_switch_prg_rom));
+	map(0x7fff, 0x7fff).w(FUNC(multigam_state::multigam_switch_gfx_rom));
+	map(0x8000, 0xffff).rom().w(FUNC(multigam_state::multigam_mapper2_w));
+}
 
-ADDRESS_MAP_START(multigam_state::multigmt_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(multigam_switch_prg_rom)
-	AM_RANGE(0x3fff, 0x3fff) AM_WRITE(multigam_switch_gfx_rom)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)     /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5000, 0x5ffe) AM_ROM
-	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
-	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigam_mapper2_w)
-ADDRESS_MAP_END
+void multigam_state::multigmt_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x0800, 0x0fff).ram(); /* additional RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x3000, 0x3000).w(FUNC(multigam_state::multigam_switch_prg_rom));
+	map(0x3fff, 0x3fff).w(FUNC(multigam_state::multigam_switch_gfx_rom));
+	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));     /* IN1 - input port 2 / PSG second control register */
+	map(0x5000, 0x5ffe).rom();
+	map(0x5002, 0x5002).nopw();
+	map(0x5fff, 0x5fff).portr("IN0");
+	map(0x6000, 0x7fff).rom();
+	map(0x8000, 0xffff).rom().w(FUNC(multigam_state::multigam_mapper2_w));
+}
 
 /******************************************************
 
@@ -448,7 +453,7 @@ void multigam_state::multigam3_mmc3_scanline_cb( int scanline, int vblank, int b
 		if (--m_multigam3_mmc3_scanline_counter == -1)
 		{
 			m_multigam3_mmc3_scanline_counter = m_multigam3_mmc3_scanline_latch;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 }
@@ -590,7 +595,7 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 		break;
 
 		case 0x6000: /* disable irqs */
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 		break;
 
@@ -681,22 +686,23 @@ WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
 
 *******************************************************/
 
-ADDRESS_MAP_START(multigam_state::multigm3_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(multigm3_switch_prg_rom)
-	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
-	AM_RANGE(0x5003, 0x5003) AM_WRITE(multigm3_switch_gfx_rom)
-	AM_RANGE(0x5000, 0x5ffe) AM_ROM
-	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank10")
-	AM_RANGE(0x6fff, 0x6fff) AM_WRITENOP /* 0x00 in attract mode, 0xff during play */
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigm3_mapper2_w)
-ADDRESS_MAP_END
+void multigam_state::multigm3_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x0800, 0x0fff).ram(); /* additional RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
+	map(0x5001, 0x5001).w(FUNC(multigam_state::multigm3_switch_prg_rom));
+	map(0x5002, 0x5002).nopw();
+	map(0x5003, 0x5003).w(FUNC(multigam_state::multigm3_switch_gfx_rom));
+	map(0x5000, 0x5ffe).rom();
+	map(0x5fff, 0x5fff).portr("IN0");
+	map(0x6000, 0x7fff).bankrw("bank10");
+	map(0x6fff, 0x6fff).nopw(); /* 0x00 in attract mode, 0xff during play */
+	map(0x8000, 0xffff).rom().w(FUNC(multigam_state::multigm3_mapper2_w));
+}
 
 /******************************************************
 
@@ -981,22 +987,23 @@ WRITE8_MEMBER(multigam_state::supergm3_chr_bank_w)
 
 *******************************************************/
 
-ADDRESS_MAP_START(multigam_state::supergm3_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x4fff, 0x4fff) AM_READ_PORT("IN0")
-	AM_RANGE(0x5000, 0x5fff) AM_ROM
-	AM_RANGE(0x5000, 0x5000) AM_WRITENOP
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(supergm3_prg_bank_w)
-	AM_RANGE(0x5002, 0x5002) AM_WRITE(supergm3_chr_bank_w)
-	AM_RANGE(0x5fff, 0x5fff) AM_WRITENOP
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank10")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void multigam_state::supergm3_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x0800, 0x0fff).ram(); /* additional RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
+	map(0x4fff, 0x4fff).portr("IN0");
+	map(0x5000, 0x5fff).rom();
+	map(0x5000, 0x5000).nopw();
+	map(0x5001, 0x5001).w(FUNC(multigam_state::supergm3_prg_bank_w));
+	map(0x5002, 0x5002).w(FUNC(multigam_state::supergm3_chr_bank_w));
+	map(0x5fff, 0x5fff).nopw();
+	map(0x6000, 0x7fff).bankrw("bank10");
+	map(0x8000, 0xffff).rom();
+}
 
 /******************************************************
 
@@ -1026,7 +1033,7 @@ static INPUT_PORTS_START( multigam_common )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, multigam_state,multigam_inputs_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, multigam_state,multigam_inputs_r, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
@@ -1129,30 +1136,9 @@ INPUT_PORTS_END
 
 *******************************************************/
 
-PALETTE_INIT_MEMBER(multigam_state, multigam)
-{
-	m_ppu->init_palette(palette, 0);
-}
-
-void multigam_state::ppu_irq(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void multigam_state::video_start()
 {
 }
-
-uint32_t multigam_state::screen_update_multigam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	/* render the ppu */
-	m_ppu->render(bitmap, 0, 0, 0, 0);
-	return 0;
-}
-
-static GFXDECODE_START( multigam )
-	/* none, the ppu generates one */
-GFXDECODE_END
 
 /******************************************************
 
@@ -1222,34 +1208,28 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 
 MACHINE_CONFIG_START(multigam_state::multigam)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(multigam_map)
-
+	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(multigam_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(multigam_state, screen_update_multigam)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", multigam)
-	MCFG_PALETTE_ADD("palette", 8*4*16)
-	MCFG_PALETTE_INIT_OWNER(multigam_state, multigam)
-
-	MCFG_PPU2C04_ADD("ppu")
+	MCFG_PPU2C02_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(multigam_state, ppu_irq)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(multigam_state::multigm3)
 	multigam(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(multigm3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(multigm3_map)
 
 	MCFG_MACHINE_START_OVERRIDE(multigam_state, multigm3 )
 	MCFG_MACHINE_RESET_OVERRIDE(multigam_state, multigm3 )
@@ -1257,14 +1237,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(multigam_state::multigmt)
 	multigam(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(multigmt_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(multigmt_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(multigam_state::supergm3)
 	multigam(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(supergm3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(supergm3_map)
 
 	MCFG_MACHINE_START_OVERRIDE(multigam_state,supergm3)
 MACHINE_CONFIG_END
@@ -1400,7 +1380,7 @@ ROM_START( supergm3 )
 	ROM_LOAD( "sg3.rom17", 0x180000, 0x80000, CRC(7be7fbb8) SHA1(03cda9c098eaf21326b001d5c227ad85502b6378) )
 ROM_END
 
-DRIVER_INIT_MEMBER(multigam_state,multigam)
+void multigam_state::init_multigam()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	multigam_switch_prg_rom(space, 0x0, 0x01);
@@ -1415,7 +1395,7 @@ void multigam_state::multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* 
 	}
 }
 
-DRIVER_INIT_MEMBER(multigam_state,multigm3)
+void multigam_state::init_multigm3()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1429,49 +1409,46 @@ DRIVER_INIT_MEMBER(multigam_state,multigm3)
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
-DRIVER_INIT_MEMBER(multigam_state,multigmt)
+void multigam_state::init_multigmt()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	std::vector<uint8_t> buf(0x80000);
-	uint8_t *rom;
-	int size;
-	int i;
-	int addr;
 
-	rom = memregion("maincpu")->base();
-	size = 0x8000;
+	uint8_t *rom = memregion("maincpu")->base();
+	int size = 0x8000;
 	memcpy(&buf[0], rom, size);
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
-		addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
+		int addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
 
 	rom = memregion("user1")->base();
 	size = 0x80000;
 	memcpy(&buf[0], rom, size);
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
-		addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
+		int addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
+
 	rom = memregion("gfx1")->base();
 	size = 0x80000;
 	memcpy(&buf[0], rom, size);
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
-		addr = bitswap<24>(i,23,22,21,20,19,18,17,15,16,11,10,12,13,14,8,9,1,3,5,7,6,4,2,0);
+		int addr = bitswap<24>(i,23,22,21,20,19,18,17,15,16,11,10,12,13,14,8,9,1,3,5,7,6,4,2,0);
 		rom[i] = bitswap<8>(buf[addr], 4, 7, 3, 2, 5, 1, 6, 0);
 	}
 
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
-GAME( 1992, multigam, 0,        multigam, multigam, multigam_state, multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
-GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, multigam, ROT0, "<unknown>", "Multi Game (set 2)", 0 )
-GAME( 1992, multigm2, 0,        multigm3, multigm2, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
-GAME( 1992, multigm3, 0,        multigm3, multigm3, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )
-GAME( 1992, multigmt, 0,        multigmt, multigmt, multigam_state, multigmt, ROT0, "Tung Sheng Electronics", "Multi Game (Tung Sheng Electronics)", 0 )
-GAME( 1994, sgmt1,    0,        supergm3, sgmt1,    multigam_state, 0,        ROT0, "<unknown>", "Super Game Mega Type 1", 0 )
-GAME( 1996, supergm3, 0,        supergm3, supergm3, multigam_state, 0,        ROT0, "<unknown>", "Super Game III", 0 )
+GAME( 1992, multigam, 0,        multigam, multigam, multigam_state, init_multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
+GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, init_multigam, ROT0, "<unknown>", "Multi Game (set 2)", 0 )
+GAME( 1992, multigm2, 0,        multigm3, multigm2, multigam_state, init_multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
+GAME( 1992, multigm3, 0,        multigm3, multigm3, multigam_state, init_multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )
+GAME( 1992, multigmt, 0,        multigmt, multigmt, multigam_state, init_multigmt, ROT0, "Tung Sheng Electronics", "Multi Game (Tung Sheng Electronics)", 0 )
+GAME( 1994, sgmt1,    0,        supergm3, sgmt1,    multigam_state, empty_init,    ROT0, "<unknown>", "Super Game Mega Type 1", 0 )
+GAME( 1996, supergm3, 0,        supergm3, supergm3, multigam_state, empty_init,    ROT0, "<unknown>", "Super Game III", 0 )

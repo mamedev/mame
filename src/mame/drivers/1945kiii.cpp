@@ -47,6 +47,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -56,56 +57,59 @@ Notes:
 class k3_state : public driver_device
 {
 public:
-	k3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_oki2(*this, "oki2"),
-			m_oki1(*this, "oki1") ,
-		m_spriteram_1(*this, "spritera1"),
-		m_spriteram_2(*this, "spritera2"),
+	k3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_oki(*this, "oki%u", 1U) ,
+		m_spriteram(*this, "spritera%u", 1U),
 		m_bgram(*this, "bgram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
+	{ }
+
+	void flagrall(machine_config &config);
+	void k3(machine_config &config);
+
+private:
+	DECLARE_WRITE16_MEMBER(bgram_w);
+	DECLARE_WRITE16_MEMBER(scrollx_w);
+	DECLARE_WRITE16_MEMBER(scrolly_w);
+	DECLARE_WRITE16_MEMBER(k3_soundbanks_w);
+	DECLARE_WRITE16_MEMBER(flagrall_soundbanks_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	virtual void video_start() override;
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void k3_map(address_map &map);
+	void flagrall_map(address_map &map);
+	void k3_base_map(address_map &map);
 
 	/* devices */
-	optional_device<okim6295_device> m_oki2;
-	required_device<okim6295_device> m_oki1;
+	optional_device_array<okim6295_device, 2> m_oki;
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_spriteram_1;
-	required_shared_ptr<uint16_t> m_spriteram_2;
+	required_shared_ptr_array<uint16_t, 2> m_spriteram;
 	required_shared_ptr<uint16_t> m_bgram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
-
-	DECLARE_WRITE16_MEMBER(k3_bgram_w);
-	DECLARE_WRITE16_MEMBER(k3_scrollx_w);
-	DECLARE_WRITE16_MEMBER(k3_scrolly_w);
-	DECLARE_WRITE16_MEMBER(k3_soundbanks_w);
-	DECLARE_WRITE16_MEMBER(flagrall_soundbanks_w);
-	TILE_GET_INFO_MEMBER(get_k3_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void flagrall(machine_config &config);
-	void k3(machine_config &config);
-	void flagrall_map(address_map &map);
-	void k3_base_map(address_map &map);
-	void k3_map(address_map &map);
+	required_device<screen_device> m_screen;
 };
 
 
-WRITE16_MEMBER(k3_state::k3_bgram_w)
+WRITE16_MEMBER(k3_state::bgram_w)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(k3_state::get_k3_bg_tile_info)
+TILE_GET_INFO_MEMBER(k3_state::get_tile_info)
 {
 	int tileno = m_bgram[tile_index];
 	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
@@ -113,35 +117,34 @@ TILE_GET_INFO_MEMBER(k3_state::get_k3_bg_tile_info)
 
 void k3_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(k3_state::get_k3_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(k3_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint16_t *source = m_spriteram_1;
-	uint16_t *source2 = m_spriteram_2;
-	uint16_t *finish = source + 0x1000 / 2;
+	uint16_t *source = m_spriteram[0];
+	uint16_t *source2 = m_spriteram[1];
+	uint16_t *finish = source + 0x1000 / 2; // TODO : Not of all spriteram are used
 
 	while (source < finish)
 	{
-		int xpos, ypos;
-		int tileno;
-		xpos = (source[0] & 0xff00) >> 8;
-		ypos = (source[0] & 0x00ff) >> 0;
-		tileno = (source2[0] & 0x7ffe) >> 1;
-		xpos |=  (source2[0] & 0x0001) << 8;
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos, 0);
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos - 0x100, 0); // wrap
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos, 0); // wrap
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
+		int xpos = (source[0] & 0xff00) >> 8 | (source2[0] & 0x0001) << 8;
+		int ypos = (source[0] & 0x00ff) >> 0;
+		int tileno = (source2[0] & 0x7ffe) >> 1;
+		int color = BIT(source2[0], 15) ? 0 : 1;
+
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos, ypos, 0);
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos, ypos - 0x100, 0); // wrap
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos - 0x200, ypos, 0); // wrap
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
 
 		source++;
 		source2++;
 	}
 }
 
-uint32_t k3_state::screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -149,20 +152,20 @@ uint32_t k3_state::screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-WRITE16_MEMBER(k3_state::k3_scrollx_w)
+WRITE16_MEMBER(k3_state::scrollx_w)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE16_MEMBER(k3_state::k3_scrolly_w)
+WRITE16_MEMBER(k3_state::scrolly_w)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
 WRITE16_MEMBER(k3_state::k3_soundbanks_w)
 {
-	m_oki2->set_rom_bank((data & 4) >> 2);
-	m_oki1->set_rom_bank((data & 2) >> 1);
+	m_oki[1]->set_rom_bank(BIT(data, 2));
+	m_oki[0]->set_rom_bank(BIT(data, 1));
 }
 
 WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
@@ -183,46 +186,49 @@ WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
 	if (data & 0xfcc9)
 		popmessage("unk control %04x", data & 0xfcc9);
 
-	m_oki1->set_rom_bank((data & 0x6) >> 1);
-
+	m_oki[0]->set_rom_bank((data & 0x6) >> 1);
 }
 
 
-ADDRESS_MAP_START(k3_state::k3_base_map)
-	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITENOP    // k3 - bug in code? (clean up log)
-	AM_RANGE(0x0009d2, 0x0009d3) AM_WRITENOP    // l3 - bug in code? (clean up log)
+void k3_state::k3_base_map(address_map &map)
+{
+	map(0x0009ce, 0x0009cf).nopw();    // k3 - bug in code? (clean up log)
+	map(0x0009d0, 0x0009d1).nopw();
+	map(0x0009d2, 0x0009d3).nopw();    // l3 - bug in code? (clean up log)
 
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Main Ram
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("spritera1")
-	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("spritera2")
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM_WRITE(k3_bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0x2c0800, 0x2c0fff) AM_RAM // or does k3 have a bigger tilemap? (flagrall is definitely 32x32 tiles)
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(k3_scrollx_w)
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(k3_scrolly_w)
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x440000, 0x440001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+	map(0x000000, 0x0fffff).rom(); // ROM
+	map(0x100000, 0x10ffff).ram(); // Main Ram
+	map(0x200000, 0x2003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x240000, 0x240fff).ram().share(m_spriteram[0]);
+	map(0x280000, 0x280fff).ram().share(m_spriteram[1]);
+	map(0x2c0000, 0x2c07ff).ram().w(FUNC(k3_state::bgram_w)).share(m_bgram);
+	map(0x2c0800, 0x2c0fff).ram(); // or does k3 have a bigger tilemap? (flagrall is definitely 32x32 tiles)
+	map(0x340000, 0x340001).w(FUNC(k3_state::scrollx_w));
+	map(0x380000, 0x380001).w(FUNC(k3_state::scrolly_w));
+	map(0x400000, 0x400001).portr("INPUTS");
+	map(0x440000, 0x440001).portr("SYSTEM");
+	map(0x480000, 0x480001).portr("DSW");
+}
 
-ADDRESS_MAP_START(k3_state::k3_map)
-	AM_IMPORT_FROM( k3_base_map )
+void k3_state::k3_map(address_map &map)
+{
+	k3_base_map(map);
 
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(k3_soundbanks_w)
+	map(0x3c0000, 0x3c0001).w(FUNC(k3_state::k3_soundbanks_w));
 
-	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x8c0000, 0x8cffff) AM_RAM // not used? (bug in code?)
-ADDRESS_MAP_END
+	map(0x4c0001, 0x4c0001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).cswidth(16);
+	map(0x500001, 0x500001).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).cswidth(16);
+	map(0x8c0000, 0x8cffff).ram(); // not used? (bug in code?)
+}
 
 
-ADDRESS_MAP_START(k3_state::flagrall_map)
-	AM_IMPORT_FROM( k3_base_map )
+void k3_state::flagrall_map(address_map &map)
+{
+	k3_base_map(map);
 
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(flagrall_soundbanks_w)
-	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0x3c0000, 0x3c0001).w(FUNC(k3_state::flagrall_soundbanks_w));
+	map(0x4c0001, 0x4c0001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 static INPUT_PORTS_START( k3 )
@@ -355,61 +361,55 @@ static const gfx_layout k3_layout =
 	16,16,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	{ STEP16(0,8*16) },
 	16*128,
 };
 
 
-static GFXDECODE_START( 1945kiii )
-	GFXDECODE_ENTRY( "gfx1", 0, k3_layout,   0x0, 2  ) /* bg tiles */
-	GFXDECODE_ENTRY( "gfx2", 0, k3_layout,   0x0, 2  ) /* bg tiles */
+static GFXDECODE_START( gfx_1945kiii )
+	GFXDECODE_ENTRY( "gfx1", 0, k3_layout,   0x000, 2  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, k3_layout,   0x000, 2  ) /* bg tiles */
 GFXDECODE_END
 
 
-void k3_state::machine_start()
+void k3_state::flagrall(machine_config &config)
 {
+	M68000(config, m_maincpu, MASTER_CLOCK); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &k3_state::flagrall_map);
+	m_maincpu->set_vblank_int("screen", FUNC(k3_state::irq4_line_hold));
+
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_1945kiii);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(k3_state::screen_update));
+	m_screen->set_palette("palette");
+
+	PALETTE(config, m_palette, 0x200).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+
+	SPEAKER(config, "mono").front_center();
+
+	OKIM6295(config, m_oki[0], MASTER_CLOCK/16, okim6295_device::PIN7_HIGH);  /* dividers? */
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-MACHINE_CONFIG_START(k3_state::flagrall)
 
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
-	MCFG_CPU_PROGRAM_MAP(flagrall_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1945kiii)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(k3_state, screen_update_k3)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_OKIM6295_ADD("oki1", MASTER_CLOCK/16, PIN7_HIGH)  /* dividers? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(k3_state::k3)
+void k3_state::k3(machine_config &config)
+{
 	flagrall(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(k3_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &k3_state::k3_map);
 
-	MCFG_OKIM6295_ADD("oki2", MASTER_CLOCK/16, PIN7_HIGH) /* dividers? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, m_oki[1], MASTER_CLOCK/16, okim6295_device::PIN7_HIGH);  /* dividers? */
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+}
 
 
 
@@ -434,8 +434,8 @@ ROM_END
 
 ROM_START( 1945kiiin )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "U34", 0x00001, 0x80000, CRC(d0cf4f03) SHA1(3455927221afae5103c02b12c1b855f416c47e91) ) /* 27C040 ROM had no label */
-	ROM_LOAD16_BYTE( "U35", 0x00000, 0x80000, CRC(056c64ed) SHA1(b0eddad9c950676b94316d3aeb32f3ed4b9ade0f) ) /* 27C040 ROM had no label */
+	ROM_LOAD16_BYTE( "u34", 0x00001, 0x80000, CRC(d0cf4f03) SHA1(3455927221afae5103c02b12c1b855f416c47e91) ) /* 27C040 ROM had no label */
+	ROM_LOAD16_BYTE( "u35", 0x00000, 0x80000, CRC(056c64ed) SHA1(b0eddad9c950676b94316d3aeb32f3ed4b9ade0f) ) /* 27C040 ROM had no label */
 
 	ROM_REGION( 0x080000, "oki2", 0 ) /* Samples */
 	ROM_LOAD( "snd-2.su4", 0x00000, 0x80000, CRC(47e3952e) SHA1(d56524621a3f11981e4434e02f5fdb7e89fff0b4) ) /* ROM had no label, but same data as SND-2.SU4 */
@@ -444,50 +444,50 @@ ROM_START( 1945kiiin )
 	ROM_LOAD( "snd-1.su7", 0x00000, 0x80000, CRC(bbb7f0ff) SHA1(458cf3a0c2d42110bc2427db675226c6b8d30999) ) /* ROM had no label, but same data as SND-1.SU7 */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites
-	ROM_LOAD32_BYTE( "U5",  0x000000, 0x080000, CRC(f328f85e) SHA1(fe1e1b86a77a9b6da0f69b20da64e69b874d8ef9) ) /* These 4 27C040 ROMs had no label */
-	ROM_LOAD32_BYTE( "U6",  0x000001, 0x080000, CRC(cfdabf1b) SHA1(9822def10e5213d1b5c86034637481b5349bfb70) )
-	ROM_LOAD32_BYTE( "U7",  0x000002, 0x080000, CRC(59a6a944) SHA1(20a109edddd8ab9530b94b3b2d2f8a85af2c08f8) )
-	ROM_LOAD32_BYTE( "U8",  0x000003, 0x080000, CRC(59995aaf) SHA1(29c2c638b0dd2bf1e79707ea6f5b38b37f45b822) )
+	ROM_LOAD32_BYTE( "u5",  0x000000, 0x080000, CRC(f328f85e) SHA1(fe1e1b86a77a9b6da0f69b20da64e69b874d8ef9) ) /* These 4 27C040 ROMs had no label */
+	ROM_LOAD32_BYTE( "u6",  0x000001, 0x080000, CRC(cfdabf1b) SHA1(9822def10e5213d1b5c86034637481b5349bfb70) )
+	ROM_LOAD32_BYTE( "u7",  0x000002, 0x080000, CRC(59a6a944) SHA1(20a109edddd8ab9530b94b3b2d2f8a85af2c08f8) )
+	ROM_LOAD32_BYTE( "u8",  0x000003, 0x080000, CRC(59995aaf) SHA1(29c2c638b0dd2bf1e79707ea6f5b38b37f45b822) )
 
-	ROM_LOAD32_BYTE( "U58", 0x200000, 0x080000, CRC(6acf2ce4) SHA1(4b18678a9e03beb24494270d19c57bca32a72592) ) /* These 4 27C040  ROMs had no label */
-	ROM_LOAD32_BYTE( "U59", 0x200001, 0x080000, CRC(ca6ff210) SHA1(d7e476bb41c193654495f5ed6ba39980cb3660bc) )
-	ROM_LOAD32_BYTE( "U60", 0x200002, 0x080000, CRC(91eb038a) SHA1(b24082ba1675e87881a321ba87e079a1a027dfa4) )
-	ROM_LOAD32_BYTE( "U61", 0x200003, 0x080000, CRC(1b358c6d) SHA1(1abe6422b420fd064a32ed9ca9a28c85996d4e57) )
+	ROM_LOAD32_BYTE( "u58", 0x200000, 0x080000, CRC(6acf2ce4) SHA1(4b18678a9e03beb24494270d19c57bca32a72592) ) /* These 4 27C040  ROMs had no label */
+	ROM_LOAD32_BYTE( "u59", 0x200001, 0x080000, CRC(ca6ff210) SHA1(d7e476bb41c193654495f5ed6ba39980cb3660bc) )
+	ROM_LOAD32_BYTE( "u60", 0x200002, 0x080000, CRC(91eb038a) SHA1(b24082ba1675e87881a321ba87e079a1a027dfa4) )
+	ROM_LOAD32_BYTE( "u61", 0x200003, 0x080000, CRC(1b358c6d) SHA1(1abe6422b420fd064a32ed9ca9a28c85996d4e57) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "5.U102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) ) /* These 4 ROMs had no label */
-	ROM_LOAD32_BYTE( "6.U103", 0x000001, 0x80000, CRC(7b5bfb85) SHA1(ef59d64513c7f7e6ee3dcc9bb7bb0e14a71ca957) ) /* Same data as M16M-3.U61, just split up */
-	ROM_LOAD32_BYTE( "7.U104", 0x000002, 0x80000, CRC(cdafcedf) SHA1(82becd002a16185220131085db6576eb763429c8) )
-	ROM_LOAD32_BYTE( "8.U105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
+	ROM_LOAD32_BYTE( "5.u102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) ) /* These 4 ROMs had no label */
+	ROM_LOAD32_BYTE( "6.u103", 0x000001, 0x80000, CRC(7b5bfb85) SHA1(ef59d64513c7f7e6ee3dcc9bb7bb0e14a71ca957) ) /* Same data as M16M-3.U61, just split up */
+	ROM_LOAD32_BYTE( "7.u104", 0x000002, 0x80000, CRC(cdafcedf) SHA1(82becd002a16185220131085db6576eb763429c8) )
+	ROM_LOAD32_BYTE( "8.u105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
 ROM_END
 
 ROM_START( 1945kiiio )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "3.U34", 0x00001, 0x80000, CRC(5515baa0) SHA1(6fd4c9b7cc27035d6baaafa73f5f5930bfde62a4) )
-	ROM_LOAD16_BYTE( "4.U35", 0x00000, 0x80000, CRC(fd177664) SHA1(0ea1854be8d88577129546a56d13bcdc4739ae52) )
+	ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x80000, CRC(5515baa0) SHA1(6fd4c9b7cc27035d6baaafa73f5f5930bfde62a4) )
+	ROM_LOAD16_BYTE( "4.u35", 0x00000, 0x80000, CRC(fd177664) SHA1(0ea1854be8d88577129546a56d13bcdc4739ae52) )
 
 	ROM_REGION( 0x080000, "oki2", 0 ) /* Samples */
-	ROM_LOAD( "S21.SU5", 0x00000, 0x80000, CRC(9d96fd55) SHA1(80025cc2c44e8cd938620818e0b0974026377f5c) )
+	ROM_LOAD( "s21.su5", 0x00000, 0x80000, CRC(9d96fd55) SHA1(80025cc2c44e8cd938620818e0b0974026377f5c) )
 
 	ROM_REGION( 0x080000, "oki1", 0 ) /* Samples */
-	ROM_LOAD( "S13.SU4", 0x00000, 0x80000, CRC(d45aec3b) SHA1(fc182a10e19687eb2f2f4a1d2ad976814185f0fc))
+	ROM_LOAD( "s13.su4", 0x00000, 0x80000, CRC(d45aec3b) SHA1(fc182a10e19687eb2f2f4a1d2ad976814185f0fc))
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites
-	ROM_LOAD32_BYTE( "9.U5",   0x000000, 0x080000, CRC(be0f432e) SHA1(7d63f97a8cb38c5351f2cd2f720de16a0c4ab1d7) )
-	ROM_LOAD32_BYTE( "10.U6",  0x000001, 0x080000, CRC(cf9127b2) SHA1(e02f436662f47d8bb5a9d726889c6e86cf64bdcf) )
-	ROM_LOAD32_BYTE( "11.U7",  0x000002, 0x080000, CRC(644ee8cc) SHA1(1742e31ba48a93c005cce0dc575d9b5d739d1dce) )
-	ROM_LOAD32_BYTE( "12.U8",  0x000003, 0x080000, CRC(0900c208) SHA1(9446382d274dc7b6ccdf18738aa4db636fd9e3c9) )
+	ROM_LOAD32_BYTE( "9.u5",   0x000000, 0x080000, CRC(be0f432e) SHA1(7d63f97a8cb38c5351f2cd2f720de16a0c4ab1d7) )
+	ROM_LOAD32_BYTE( "10.u6",  0x000001, 0x080000, CRC(cf9127b2) SHA1(e02f436662f47d8bb5a9d726889c6e86cf64bdcf) )
+	ROM_LOAD32_BYTE( "11.u7",  0x000002, 0x080000, CRC(644ee8cc) SHA1(1742e31ba48a93c005cce0dc575d9b5d739d1dce) )
+	ROM_LOAD32_BYTE( "12.u8",  0x000003, 0x080000, CRC(0900c208) SHA1(9446382d274dc7b6ccdf18738aa4db636fd9e3c9) )
 
-	ROM_LOAD32_BYTE( "13.U58", 0x200000, 0x080000, CRC(8ea9c6be) SHA1(baf3af389417e1f14d0c38d8c872839a54008909) )
-	ROM_LOAD32_BYTE( "14.U59", 0x200001, 0x080000, CRC(10c18fb4) SHA1(68934e73cfb6a49a4c1639dcb4c49246f16179b2) )
-	ROM_LOAD32_BYTE( "15.U60", 0x200002, 0x080000, CRC(86ab6c7c) SHA1(59acaee6ba78a22f1423832a116ad41e19522aa1) )
-	ROM_LOAD32_BYTE( "16.U61", 0x200003, 0x080000, CRC(ff419080) SHA1(542819bdd60976bddfa96570321ba3f7fb6fbf23) )
+	ROM_LOAD32_BYTE( "13.u58", 0x200000, 0x080000, CRC(8ea9c6be) SHA1(baf3af389417e1f14d0c38d8c872839a54008909) )
+	ROM_LOAD32_BYTE( "14.u59", 0x200001, 0x080000, CRC(10c18fb4) SHA1(68934e73cfb6a49a4c1639dcb4c49246f16179b2) )
+	ROM_LOAD32_BYTE( "15.u60", 0x200002, 0x080000, CRC(86ab6c7c) SHA1(59acaee6ba78a22f1423832a116ad41e19522aa1) )
+	ROM_LOAD32_BYTE( "16.u61", 0x200003, 0x080000, CRC(ff419080) SHA1(542819bdd60976bddfa96570321ba3f7fb6fbf23) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) // bg tiles
-	ROM_LOAD32_BYTE( "5.U102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) ) /* Same data as M16M-3.U61, just split up */
-	ROM_LOAD32_BYTE( "6.U103", 0x000001, 0x80000, CRC(7b5bfb85) SHA1(ef59d64513c7f7e6ee3dcc9bb7bb0e14a71ca957) )
-	ROM_LOAD32_BYTE( "7.U104", 0x000002, 0x80000, CRC(cdafcedf) SHA1(82becd002a16185220131085db6576eb763429c8) )
-	ROM_LOAD32_BYTE( "8.U105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
+	ROM_LOAD32_BYTE( "5.u102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) ) /* Same data as M16M-3.U61, just split up */
+	ROM_LOAD32_BYTE( "6.u103", 0x000001, 0x80000, CRC(7b5bfb85) SHA1(ef59d64513c7f7e6ee3dcc9bb7bb0e14a71ca957) )
+	ROM_LOAD32_BYTE( "7.u104", 0x000002, 0x80000, CRC(cdafcedf) SHA1(82becd002a16185220131085db6576eb763429c8) )
+	ROM_LOAD32_BYTE( "8.u105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
 ROM_END
 
 
@@ -518,8 +518,8 @@ ROM_START( flagrall )
 ROM_END
 
 
-GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, 1945kiiin, 1945kiii, k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, 1945kiiio, 1945kiii, k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiiin, 1945kiii, k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, 1945kiiio, 1945kiii, k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, flagrall,  0,        flagrall, flagrall, k3_state, 0, ROT0,   "Promat?",       "'96 Flag Rally",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, flagrall,  0,        flagrall, flagrall, k3_state, empty_init, ROT0,   "Promat?",       "'96 Flag Rally",               MACHINE_SUPPORTS_SAVE )

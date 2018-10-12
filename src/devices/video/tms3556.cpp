@@ -57,9 +57,10 @@ DEFINE_DEVICE_TYPE(TMS3556, tms3556_device, "tms3556", "Texas Instruments TMS355
 
 
 // default address map
-ADDRESS_MAP_START(tms3556_device::tms3556)
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void tms3556_device::tms3556(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 //-------------------------------------------------
 //  memory_space_config - return a description of

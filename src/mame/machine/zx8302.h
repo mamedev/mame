@@ -34,6 +34,7 @@
 
 #pragma once
 
+#include "diserial.h"
 
 
 ///*************************************************************************
@@ -44,46 +45,46 @@
 	downcast<zx8302_device &>(*device).set_rtc_clock(_clk);
 
 #define MCFG_ZX8302_OUT_IPL1L_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_ipl1l_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_ipl1l_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_BAUDX4_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_baudx4_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_baudx4_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_COMDATA_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_comdata_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_comdata_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_TXD1_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_txd1_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_txd1_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_TXD2_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_txd2_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_txd2_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_NETOUT_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_netout_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_netout_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_MDSELCK_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_mdselck_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_mdselck_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_MDSELD_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_mdseld_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_mdseld_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_MDRDW_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_mdrdw_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_mdrdw_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_ERASE_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_erase_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_erase_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_RAW1_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_raw1_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_raw1_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_IN_RAW1_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_in_raw1_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_in_raw1_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_OUT_RAW2_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_out_raw2_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_out_raw2_callback(DEVCB_##_devcb);
 
 #define MCFG_ZX8302_IN_RAW2_CB(_devcb) \
-	devcb = &downcast<zx8302_device &>(*device).set_in_raw2_callback(DEVCB_##_devcb);
+	downcast<zx8302_device &>(*device).set_in_raw2_callback(DEVCB_##_devcb);
 
 
 ///*************************************************************************
@@ -256,7 +257,7 @@ private:
 
 
 // device type definition
-extern const device_type ZX8302;
+DECLARE_DEVICE_TYPE(ZX8302, zx8302_device)
 
 
 

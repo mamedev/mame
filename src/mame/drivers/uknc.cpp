@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -20,27 +21,32 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
+	void uknc(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void uknc(machine_config &config);
+
 	void uknc_mem(address_map &map);
 	void uknc_sub_mem(address_map &map);
 };
 
 
-ADDRESS_MAP_START(uknc_state::uknc_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAM  // RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM  // ROM
-ADDRESS_MAP_END
+void uknc_state::uknc_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram();  // RAM
+	map(0x8000, 0xffff).rom();  // ROM
+}
 
-ADDRESS_MAP_START(uknc_state::uknc_sub_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAM  // RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM  // ROM
-ADDRESS_MAP_END
+void uknc_state::uknc_sub_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram();  // RAM
+	map(0x8000, 0xffff).rom();  // ROM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( uknc )
@@ -62,13 +68,13 @@ uint32_t uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bit
 
 MACHINE_CONFIG_START(uknc_state::uknc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", K1801VM2, 8000000)
+	MCFG_DEVICE_ADD("maincpu", K1801VM2, 8000000)
 	MCFG_T11_INITIAL_MODE(0x8000)
-	MCFG_CPU_PROGRAM_MAP(uknc_mem)
+	MCFG_DEVICE_PROGRAM_MAP(uknc_mem)
 
-	MCFG_CPU_ADD("subcpu",  K1801VM2, 6000000)
+	MCFG_DEVICE_ADD("subcpu",  K1801VM2, 6000000)
 	MCFG_T11_INITIAL_MODE(0x8000)
-	MCFG_CPU_PROGRAM_MAP(uknc_sub_mem)
+	MCFG_DEVICE_PROGRAM_MAP(uknc_sub_mem)
 
 
 	/* video hardware */
@@ -93,5 +99,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY       FULLNAME  FLAGS */
-COMP( 1987, uknc,   0,      0,       uknc,      uknc,  uknc_state,   0,    "<unknown>",  "UKNC",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY      FULLNAME  FLAGS */
+COMP( 1987, uknc, 0,      0,      uknc,    uknc,  uknc_state, empty_init, "<unknown>", "UKNC",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

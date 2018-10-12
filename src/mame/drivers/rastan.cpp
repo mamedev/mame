@@ -184,7 +184,7 @@ WRITE_LINE_MEMBER(rastan_state::rastan_msm5205_vck)
 
 	if (m_adpcm_ff)
 	{
-		m_adpcm_sel->ba_w(m_adpcm_data[m_adpcm_pos]);
+		m_adpcm_sel->write_ba(m_adpcm_data[m_adpcm_pos]);
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
 	}
 }
@@ -208,40 +208,43 @@ WRITE8_MEMBER(rastan_state::rastan_msm5205_stop_w)
 
 
 
-ADDRESS_MAP_START(rastan_state::rastan_map)
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x350008, 0x350009) AM_WRITENOP    /* 0 only (often) ? */
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(rastan_spritectrl_w)  /* sprite palette bank, coin counters & lockout */
-	AM_RANGE(0x390000, 0x390001) AM_READ_PORT("P1")
-	AM_RANGE(0x390002, 0x390003) AM_READ_PORT("P2")
-	AM_RANGE(0x390004, 0x390005) AM_READ_PORT("SPECIAL")
-	AM_RANGE(0x390006, 0x390007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x390008, 0x390009) AM_READ_PORT("DSWA")
-	AM_RANGE(0x39000a, 0x39000b) AM_READ_PORT("DSWB")
-	AM_RANGE(0x3c0000, 0x3c0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
-	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
-	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
-	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE("pc080sn", pc080sn_device, ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
-ADDRESS_MAP_END
+void rastan_state::rastan_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0x10c000, 0x10ffff).ram();
+	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x350008, 0x350009).nopw();    /* 0 only (often) ? */
+	map(0x380000, 0x380001).w(FUNC(rastan_state::rastan_spritectrl_w));  /* sprite palette bank, coin counters & lockout */
+	map(0x390000, 0x390001).portr("P1");
+	map(0x390002, 0x390003).portr("P2");
+	map(0x390004, 0x390005).portr("SPECIAL");
+	map(0x390006, 0x390007).portr("SYSTEM");
+	map(0x390008, 0x390009).portr("DSWA");
+	map(0x39000a, 0x39000b).portr("DSWB");
+	map(0x3c0000, 0x3c0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x3e0000, 0x3e0001).nopr();
+	map(0x3e0001, 0x3e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0x3e0003, 0x3e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0xc00000, 0xc0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
+	map(0xc20000, 0xc20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
+	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
+	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
+	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
+}
 
 
-ADDRESS_MAP_START(rastan_state::rastan_s_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(rastan_msm5205_address_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(rastan_msm5205_start_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(rastan_msm5205_stop_w)
-ADDRESS_MAP_END
+void rastan_state::rastan_s_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+	map(0xb000, 0xb000).w(FUNC(rastan_state::rastan_msm5205_address_w));
+	map(0xc000, 0xc000).w(FUNC(rastan_state::rastan_msm5205_start_w));
+	map(0xd000, 0xd000).w(FUNC(rastan_state::rastan_msm5205_stop_w));
+}
 
 
 
@@ -267,9 +270,9 @@ static INPUT_PORTS_START( rastan )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (coin A gets locked if 0)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (coin B gets locked if 0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (above 2 bits not checked when 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )                // from PC050 (coin A gets locked if 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )                // from PC050 (coin B gets locked if 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )                // from PC050 (above 2 bits not checked when 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* 0x390008 -> 0x10c018 ($18,A5) */
@@ -336,7 +339,7 @@ static const gfx_layout spritelayout =
 	32*16
 };
 
-static GFXDECODE_START( rastan )
+static GFXDECODE_START( gfx_rastan )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 0x80 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 0x80 )
 GFXDECODE_END
@@ -365,16 +368,16 @@ void rastan_state::machine_reset()
 MACHINE_CONFIG_START(rastan_state::rastan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rastan_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rastan_state,  irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rastan_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rastan_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rastan_s_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rastan_s_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -385,7 +388,7 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	MCFG_SCREEN_UPDATE_DRIVER(rastan_state, screen_update_rastan)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rastan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rastan)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -398,21 +401,21 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rastan_state,rastan_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rastan_state,rastan_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(rastan_state, rastan_msm5205_vck)) /* VCK function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, rastan_state, rastan_msm5205_vck)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_DEVICE_ADD("adpcm_sel", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_sel, 0);
+	m_adpcm_sel->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
@@ -704,14 +707,14 @@ ROM_START( rastsagab )
 ROM_END
 
 /* Newer revised code base */
-GAME( 1987, rastan,    0,      rastan, rastan,   rastan_state, 0, ROT0, "Taito Corporation Japan",   "Rastan (World Rev 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastana,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation Japan",   "Rastan (World)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastanu,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US Rev 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastanua,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsaga,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastan,    0,      rastan, rastan,   rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World Rev 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastana,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanu,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US Rev 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanua,  rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsaga,  rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", MACHINE_SUPPORTS_SAVE )
 
 /* Based on earliest code base */
-GAME( 1987, rastanb,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation Japan",   "Rastan (World, Earlier code base)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastanub,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsagaa, rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1, Earlier code base)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsagab, rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan, Earlier code base)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanb,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World, Earlier code base)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanub,  rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsagaa, rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1, Earlier code base)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsagab, rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan, Earlier code base)",       MACHINE_SUPPORTS_SAVE )

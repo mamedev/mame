@@ -26,6 +26,7 @@
 
 #include "debug/debugcon.h"
 #include "debugger.h"
+#include "emupal.h"
 
 #include "formats/pc_dsk.h"
 
@@ -114,6 +115,14 @@ public:
 	{
 	}
 
+	void mbc55x(machine_config &config);
+
+	void init_mbc55x();
+
+	required_device<cpu_device> m_maincpu;
+	uint32_t      m_debug_machine;
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	//DECLARE_READ8_MEMBER(pic8259_r);
@@ -148,21 +157,15 @@ public:
 	DECLARE_WRITE8_MEMBER(mbc55x_disk_w);
 	DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
 	DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
-	DECLARE_DRIVER_INIT(mbc55x);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(mbc55x);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mbc55x);
 	TIMER_CALLBACK_MEMBER(keyscan_callback);
 
-	required_device<cpu_device> m_maincpu;
-
-	uint32_t      m_debug_machine;
-
-	void mbc55x(machine_config &config);
 	void mbc55x_io(address_map &map);
 	void mbc55x_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -192,7 +195,6 @@ protected:
 
 	keyboard_t  m_keyboard;
 
-private:
 	void debug_command(int ref, const std::vector<std::string> &params);
 	void video_debug(int ref, const std::vector<std::string> &params);
 };

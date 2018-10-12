@@ -133,7 +133,7 @@
   You must to RESET (F3) the machine to initialize the NVRAM properly.
 
   NOTE: These games are intended to be for amusement only.
-  There is not such a payout system, so... Dont ask about it!
+  There is not such a payout system, so... Don't ask about it!
 
 
   * Four In One Poker:
@@ -195,14 +195,14 @@
    3x Stars  75     3x Oranges     100     3x Bars     75
    3x Hearts  8     3x Watermelons  25     3x Cherries 10
    3x Cups    4     3x Horseshoes   10     3x Pears     6
-   3x Clubs   3     3x Licquors      5     3x Plums     4
+   3x Clubs   3     3x Liquors       5     3x Plums     4
    3x Crowns  1     3x Bells         2     3x Bananas   2
 
   ...but the game seems to have inverted objects importance:
 
   - Super Star -      - Lady Luck -         - Big Bar -
    3x Crowns 75     3x Bells       100     3x Bananas  75
-   3x Clubs   8     3x Licquors     25     3x Plums    10
+   3x Clubs   8     3x Liquors      25     3x Plums    10
    3x Cups    4     3x Horseshoes   10     3x Pears     6
    3x Hearts  3     3x Watermelons   5     3x Cherries  4
    3x Stars   1     3x Oranges       2     3x Bars      2
@@ -293,7 +293,7 @@
   - Switched the 8255 port C to be used as output port.
   - Adjusted the coin pulse timing.
   - Updated technical notes.
-  - Splitted the driver to driver + video.
+  - Split the driver to driver + video.
   - Final clean-up.
 
   [2008-05-31]
@@ -328,6 +328,7 @@
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -337,6 +338,8 @@
 
 
 #define MASTER_CLOCK    XTAL(16'000'000)
+#define CPU_CLOCK       MASTER_CLOCK / 24    // 666.66 kHz, guess...
+
 
 /****************************
 *    Read/Write Handlers    *
@@ -414,13 +417,8 @@ WRITE8_MEMBER(gatron_state::output_port_0_w)
   .x.. .... --> Change Card / Take / Low.
 
 */
-	output().set_lamp_value(0, (data) & 1);       /* hold3 lamp */
-	output().set_lamp_value(1, (data >> 1) & 1);  /* hold4 lamp */
-	output().set_lamp_value(2, (data >> 2) & 1);  /* hold5 lamp */
-	output().set_lamp_value(3, (data >> 3) & 1);  /* ante/bet lamp */
-	output().set_lamp_value(4, (data >> 4) & 1);  /* start lamp */
-	output().set_lamp_value(5, (data >> 5) & 1);  /* deal/hit lamp */
-	output().set_lamp_value(6, (data >> 6) & 1);  /* stand/fbdraw lamp */
+	for (uint8_t i = 0; i < 7; i++)
+		m_lamps[i] = BIT(data, i);
 }
 
 
@@ -439,26 +437,28 @@ WRITE8_MEMBER(gatron_state::output_port_1_w)
   x... .... --> Inverted pulse. Related to counters.
 
 */
-	output().set_lamp_value(7, (data) & 1);       /* hold2 lamp */
-	output().set_lamp_value(8, (data >> 1) & 1);  /* hold1 lamp */
+	for (uint8_t i = 0; i < 2; i++)
+		m_lamps[i + 7] = BIT(data, i);
 }
 
 /*************************
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(gatron_state::gat_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")                          /* battery backed RAM */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("snsnd", sn76489_device, write)       /* PSG */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(output_port_0_w)                         /* lamps */
-ADDRESS_MAP_END
+void gatron_state::gat_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).ram().w(FUNC(gatron_state::videoram_w)).share("videoram");
+	map(0x8000, 0x87ff).ram().share("nvram");                          /* battery backed RAM */
+	map(0xa000, 0xa000).w("snsnd", FUNC(sn76489_device::command_w));       /* PSG */
+	map(0xe000, 0xe000).w(FUNC(gatron_state::output_port_0_w));  /* lamps */
+}
 
-ADDRESS_MAP_START(gatron_state::gat_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void gatron_state::gat_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 /*************************
@@ -554,7 +554,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( gat )
+static GFXDECODE_START( gfx_gat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -566,17 +566,16 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gatron_state::gat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)   /* 666.66 kHz, guess */
-	MCFG_CPU_PROGRAM_MAP(gat_map)
-	MCFG_CPU_IO_MAP(gat_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gatron_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(gat_map)
+	MCFG_DEVICE_IO_MAP(gat_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gatron_state, output_port_1_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.out_pc_callback().set(FUNC(gatron_state::output_port_1_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -584,16 +583,16 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(48*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 16*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gatron_state, screen_update_gat)
+	MCFG_SCREEN_UPDATE_DRIVER(gatron_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gat)
 	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(gatron_state, gatron)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snsnd", SN76489, MASTER_CLOCK/8 )   // Present in Bingo PCB. Clock need to be verified.
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("snsnd", SN76489, MASTER_CLOCK/8 )   // Present in Bingo PCB. Clock need to be verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
@@ -638,7 +637,7 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE  INPUT      STATE          INIT  ROT   COMPANY         FULLNAME              FLAGS  LAYOUT   */
-GAMEL( 1983, poker41,  0,      gat,     poker41,   gatron_state,  0,    ROT0, "Game-A-Tron",  "Four In One Poker",  0,     layout_poker41  )
-GAMEL( 1983, pulltabs, 0,      gat,     pulltabs,  gatron_state,  0,    ROT0, "Game-A-Tron",  "Pull Tabs",          0,     layout_pulltabs )
-GAMEL( 1983, bingo,    0,      gat,     bingo,     gatron_state,  0,    ROT0, "Game-A-Tron",  "Bingo",              0,     layout_bingo  )
+/*     YEAR  NAME      PARENT  MACHINE  INPUT     CLASS         INIT        ROT   COMPANY         FULLNAME              FLAGS  LAYOUT   */
+GAMEL( 1983, poker41,  0,      gat,     poker41,  gatron_state, empty_init, ROT0, "Game-A-Tron",  "Four In One Poker",  MACHINE_SUPPORTS_SAVE,     layout_poker41  )
+GAMEL( 1983, pulltabs, 0,      gat,     pulltabs, gatron_state, empty_init, ROT0, "Game-A-Tron",  "Pull Tabs",          MACHINE_SUPPORTS_SAVE,     layout_pulltabs )
+GAMEL( 1983, bingo,    0,      gat,     bingo,    gatron_state, empty_init, ROT0, "Game-A-Tron",  "Bingo",              MACHINE_SUPPORTS_SAVE,     layout_bingo  )

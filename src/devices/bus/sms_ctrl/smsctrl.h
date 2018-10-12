@@ -27,11 +27,11 @@
 
 
 #define MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(_devcb) \
-	devcb = &downcast<sms_control_port_device &>(*device).set_th_input_handler(DEVCB_##_devcb);
+	downcast<sms_control_port_device &>(*device).set_th_input_handler(DEVCB_##_devcb);
 
 
 #define MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(_devcb) \
-	devcb = &downcast<sms_control_port_device &>(*device).set_pixel_handler(DEVCB_##_devcb);
+	downcast<sms_control_port_device &>(*device).set_pixel_handler(DEVCB_##_devcb);
 
 
 
@@ -110,7 +110,7 @@ protected:
 DECLARE_DEVICE_TYPE(SMS_CONTROL_PORT, sms_control_port_device)
 
 
-SLOT_INTERFACE_EXTERN( sms_control_port_devices );
+void sms_control_port_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SMS_CTRL_SMSCTRL_H

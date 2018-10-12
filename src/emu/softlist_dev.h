@@ -47,11 +47,11 @@ enum software_compatibility
 	downcast<software_list_device &>(*device).set_type(_list, _list_type);
 
 #define MCFG_SOFTWARE_LIST_ADD( _tag, _list ) \
-	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 ) \
+	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST ) \
 	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
 
 #define MCFG_SOFTWARE_LIST_COMPATIBLE_ADD( _tag, _list ) \
-	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 ) \
+	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST ) \
 	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
 
 #define MCFG_SOFTWARE_LIST_MODIFY( _tag, _list ) \
@@ -132,11 +132,13 @@ class software_list_device : public device_t
 
 public:
 	// construction/destruction
-	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// inline configuration helpers
-	void set_type(const char *list, softlist_type list_type) { m_list_name.assign(list); m_list_type = list_type; }
-	void set_filter(const char *filter) { m_filter = filter; }
+	software_list_device &set_type(const char *list, softlist_type list_type) { m_list_name.assign(list); m_list_type = list_type; return *this; }
+	software_list_device &set_original(const char *list) { return set_type(list, SOFTWARE_LIST_ORIGINAL_SYSTEM); }
+	software_list_device &set_compatible(const char *list) { return set_type(list, SOFTWARE_LIST_COMPATIBLE_SYSTEM); }
+	software_list_device &set_filter(const char *filter) { m_filter = filter; return *this; }
 
 	// getters
 	const std::string &list_name() const { return m_list_name; }

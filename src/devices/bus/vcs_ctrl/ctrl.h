@@ -27,7 +27,7 @@
 
 
 #define MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(_write) \
-	devcb = &downcast<vcs_control_port_device &>(*device).set_trigger_wr_callback(DEVCB_##_write);
+	downcast<vcs_control_port_device &>(*device).set_trigger_wr_callback(DEVCB_##_write);
 
 
 
@@ -71,6 +71,7 @@ public:
 
 	// static configuration helpers
 	template <class Object> devcb_base &set_trigger_wr_callback(Object &&cb) { return m_write_trigger.set_callback(std::forward<Object>(cb)); }
+	auto trigger_wr_callback() { return m_write_trigger.bind(); }
 
 	// computer interface
 
@@ -85,14 +86,14 @@ public:
 	//         pin 8 - GND
 	// bit 6 - pin 9 -
 	//
-	uint8_t joy_r() { uint8_t data = 0xff; if (exists()) data = m_device->vcs_joy_r(); return data; }
-	DECLARE_READ8_MEMBER( joy_r ) { return joy_r(); }
-	uint8_t pot_x_r() { uint8_t data = 0xff; if (exists()) data = m_device->vcs_pot_x_r(); return data; }
-	DECLARE_READ8_MEMBER( pot_x_r ) { return pot_x_r(); }
-	uint8_t pot_y_r() { uint8_t data = 0xff; if (exists()) data = m_device->vcs_pot_y_r(); return data; }
-	DECLARE_READ8_MEMBER( pot_y_r ) { return pot_y_r(); }
+	uint8_t read_joy() { return exists() ? m_device->vcs_joy_r() : 0xff; }
+	DECLARE_READ8_MEMBER( joy_r ) { return read_joy(); }
+	uint8_t read_pot_x() { return exists() ? m_device->vcs_pot_x_r() : 0xff; }
+	DECLARE_READ8_MEMBER( pot_x_r ) { return read_pot_x(); }
+	uint8_t read_pot_y() { return exists() ? m_device->vcs_pot_y_r() : 0xff; }
+	DECLARE_READ8_MEMBER( pot_y_r ) { return read_pot_y(); }
 
-	void joy_w( uint8_t data ) { if ( exists() ) m_device->vcs_joy_w( data ); }
+	void joy_w(uint8_t data) { if (exists()) m_device->vcs_joy_w(data); }
 
 	bool exists() { return m_device != nullptr; }
 	bool has_pot_x() { return exists() && m_device->has_pot_x(); }
@@ -114,6 +115,6 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(VCS_CONTROL_PORT, vcs_control_port_device)
 
-SLOT_INTERFACE_EXTERN( vcs_control_port_devices );
+void vcs_control_port_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_CVS_CTRL_CTRL_H

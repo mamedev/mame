@@ -403,6 +403,28 @@ protected:
 	uint8_t m_bank_mask, m_bank, m_reg, m_mode;
 };
 
+// ======================> gb_rom_camera_device
+class gb_rom_camera_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_camera_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	void update_camera();
+	uint8_t m_camera_regs[54];
+};
+
 
 
 // device type definition
@@ -423,5 +445,6 @@ DECLARE_DEVICE_TYPE(GB_ROM_LICHENG,  gb_rom_licheng_device)
 DECLARE_DEVICE_TYPE(GB_ROM_DIGIMON,  gb_rom_digimon_device)
 DECLARE_DEVICE_TYPE(GB_ROM_ROCKMAN8, gb_rom_rockman8_device)
 DECLARE_DEVICE_TYPE(GB_ROM_SM3SP,    gb_rom_sm3sp_device)
+DECLARE_DEVICE_TYPE(GB_ROM_CAMERA,   gb_rom_camera_device)
 
 #endif // MAME_BUS_GAMEBOY_MBC_H

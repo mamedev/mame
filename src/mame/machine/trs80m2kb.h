@@ -29,7 +29,7 @@
 //**************************************************************************
 
 #define MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(_write) \
-	devcb = &downcast<trs80m2_keyboard_device &>(*device).set_clock_wr_callback(DEVCB_##_write);
+	downcast<trs80m2_keyboard_device &>(*device).set_clock_wr_callback(DEVCB_##_write);
 
 
 
@@ -68,6 +68,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<12> m_y;
+	output_finder<2> m_leds;
 
 	devcb_write_line   m_write_clock;
 

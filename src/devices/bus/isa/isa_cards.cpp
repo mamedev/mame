@@ -33,7 +33,9 @@
 #include "side116.h"
 #include "aha1542.h"
 #include "wd1002a_wx1.h"
+#include "wd1007a.h"
 #include "mcd.h"
+#include "lbaenhancer.h"
 
 // sound
 #include "adlib.h"
@@ -52,6 +54,7 @@
 #include "ne1000.h"
 #include "ne2000.h"
 #include "3c505.h"
+#include "eis_sad8852.h"
 
 // communication ports
 #include "lpt.h"
@@ -62,101 +65,107 @@
 #include "finalchs.h"
 
 
-SLOT_INTERFACE_START( pc_isa8_cards )
-	SLOT_INTERFACE("mda", ISA8_MDA)
-	SLOT_INTERFACE("cga", ISA8_CGA)
-	SLOT_INTERFACE("cga_ec1841", ISA8_EC1841_0002)
-	SLOT_INTERFACE("cga_poisk2", ISA8_CGA_POISK2)
-	SLOT_INTERFACE("cga_mc1502", ISA8_CGA_MC1502)
-	SLOT_INTERFACE("cga_m24", ISA8_CGA_M24)
-	SLOT_INTERFACE("cga_cportiii", ISA8_CGA_CPORTIII)
-	SLOT_INTERFACE("aga", ISA8_AGA)
-	SLOT_INTERFACE("aga_pc200", ISA8_AGA_PC200)
-	SLOT_INTERFACE("ega", ISA8_EGA)
-	SLOT_INTERFACE("pgc", ISA8_PGC)
-	SLOT_INTERFACE("vga", ISA8_VGA)
-	SLOT_INTERFACE("svga_et4k", ISA8_SVGA_ET4K)
-	SLOT_INTERFACE("num9rev",ISA8_NUM_9_REV)
-	SLOT_INTERFACE("com", ISA8_COM)
-	SLOT_INTERFACE("fdc", ISA8_FDC_SUPERIO)
-	SLOT_INTERFACE("fdc_xt", ISA8_FDC_XT)
-	SLOT_INTERFACE("fdc_at", ISA8_FDC_AT)
-	SLOT_INTERFACE("fdc_smc", ISA8_FDC_SMC)
-	SLOT_INTERFACE("fdc_ps2", ISA8_FDC_PS2)
-	SLOT_INTERFACE("fdc344", ISA8_FDC344)
-	SLOT_INTERFACE("fdcmag", ISA8_FDCMAG)
-	SLOT_INTERFACE("wdxt_gen", ISA8_WDXT_GEN)
-	SLOT_INTERFACE("finalchs", ISA8_FINALCHS)
-	SLOT_INTERFACE("xtide", ISA8_XTIDE)
-	SLOT_INTERFACE("side116", ISA8_SIDE116)
-	SLOT_INTERFACE("hdc", ISA8_HDC)
-	SLOT_INTERFACE("adlib", ISA8_ADLIB)
-	SLOT_INTERFACE("hercules", ISA8_HERCULES)
-	SLOT_INTERFACE("gblaster", ISA8_GAME_BLASTER)
-	SLOT_INTERFACE("sblaster1_0", ISA8_SOUND_BLASTER_1_0)
-	SLOT_INTERFACE("sblaster1_5", ISA8_SOUND_BLASTER_1_5)
-	SLOT_INTERFACE("stereo_fx", ISA8_STEREO_FX)
-	SLOT_INTERFACE("ssi2001", ISA8_SSI2001)
-	SLOT_INTERFACE("mpu401", ISA8_MPU401)
-	SLOT_INTERFACE("ne1000", NE1000)
-	SLOT_INTERFACE("3c503", EL2_3C503)
-	SLOT_INTERFACE("lpt", ISA8_LPT)
-	SLOT_INTERFACE("ibm_mfc", ISA8_IBM_MFC)
-	SLOT_INTERFACE("wd1002a_wx1", ISA8_WD1002A_WX1)
-	SLOT_INTERFACE("dectalk", ISA8_DECTALK)
-	SLOT_INTERFACE("pds", ISA8_PDS)
-SLOT_INTERFACE_END
+void pc_isa8_cards(device_slot_interface &device)
+{
+	device.option_add("mda", ISA8_MDA);
+	device.option_add("cga", ISA8_CGA);
+	device.option_add("cga_ec1841", ISA8_EC1841_0002);
+	device.option_add("cga_poisk2", ISA8_CGA_POISK2);
+	device.option_add("cga_mc1502", ISA8_CGA_MC1502);
+	device.option_add("cga_m24", ISA8_CGA_M24);
+	device.option_add("cga_cportiii", ISA8_CGA_CPORTIII);
+	device.option_add("aga", ISA8_AGA);
+	device.option_add("aga_pc200", ISA8_AGA_PC200);
+	device.option_add("ega", ISA8_EGA);
+	device.option_add("pgc", ISA8_PGC);
+	device.option_add("vga", ISA8_VGA);
+	device.option_add("svga_et4k", ISA8_SVGA_ET4K);
+	device.option_add("num9rev",ISA8_NUM_9_REV);
+	device.option_add("com", ISA8_COM);
+	device.option_add("fdc", ISA8_FDC_SUPERIO);
+	device.option_add("fdc_xt", ISA8_FDC_XT);
+	device.option_add("fdc_at", ISA8_FDC_AT);
+	device.option_add("fdc_smc", ISA8_FDC_SMC);
+	device.option_add("fdc_ps2", ISA8_FDC_PS2);
+	device.option_add("fdc344", ISA8_FDC344);
+	device.option_add("fdcmag", ISA8_FDCMAG);
+	device.option_add("wdxt_gen", ISA8_WDXT_GEN);
+	device.option_add("finalchs", ISA8_FINALCHS);
+	device.option_add("xtide", ISA8_XTIDE);
+	device.option_add("side116", ISA8_SIDE116);
+	device.option_add("hdc", ISA8_HDC);
+	device.option_add("adlib", ISA8_ADLIB);
+	device.option_add("hercules", ISA8_HERCULES);
+	device.option_add("gblaster", ISA8_GAME_BLASTER);
+	device.option_add("sblaster1_0", ISA8_SOUND_BLASTER_1_0);
+	device.option_add("sblaster1_5", ISA8_SOUND_BLASTER_1_5);
+	device.option_add("stereo_fx", ISA8_STEREO_FX);
+	device.option_add("ssi2001", ISA8_SSI2001);
+	device.option_add("mpu401", ISA8_MPU401);
+	device.option_add("ne1000", NE1000);
+	device.option_add("3c503", EL2_3C503);
+	device.option_add("lpt", ISA8_LPT);
+	device.option_add("ibm_mfc", ISA8_IBM_MFC);
+	device.option_add("wd1002a_wx1", ISA8_WD1002A_WX1);
+	device.option_add("dectalk", ISA8_DECTALK);
+	device.option_add("pds", ISA8_PDS);
+	device.option_add("lba_enhancer", ISA8_LBA_ENHANCER);
+}
 
-SLOT_INTERFACE_START( pc_isa16_cards )
+void pc_isa16_cards(device_slot_interface &device)
+{
 	// 8-bit
-	SLOT_INTERFACE("mda", ISA8_MDA)
-	SLOT_INTERFACE("cga", ISA8_CGA)
-	SLOT_INTERFACE("cga_cportiii", ISA8_CGA_CPORTIII)
-	SLOT_INTERFACE("wyse700", ISA8_WYSE700)
-	SLOT_INTERFACE("ega", ISA8_EGA)
-	SLOT_INTERFACE("pgc", ISA8_PGC)
-	SLOT_INTERFACE("vga", ISA8_VGA)
-	SLOT_INTERFACE("svga_et4k", ISA8_SVGA_ET4K)
-	SLOT_INTERFACE("num9rev",ISA8_NUM_9_REV)
-	SLOT_INTERFACE("com", ISA8_COM)
-	SLOT_INTERFACE("comat", ISA8_COM_AT)
-	SLOT_INTERFACE("fdc", ISA8_FDC_AT)
-	SLOT_INTERFACE("fdc344", ISA8_FDC344)
-	SLOT_INTERFACE("fdcmag", ISA8_FDCMAG)
-	SLOT_INTERFACE("hdc", ISA8_HDC)
-	SLOT_INTERFACE("side116", ISA8_SIDE116)
-	SLOT_INTERFACE("adlib", ISA8_ADLIB)
-	SLOT_INTERFACE("hercules", ISA8_HERCULES)
-	SLOT_INTERFACE("gblaster", ISA8_GAME_BLASTER)
-	SLOT_INTERFACE("sblaster1_0", ISA8_SOUND_BLASTER_1_0)
-	SLOT_INTERFACE("sblaster1_5", ISA8_SOUND_BLASTER_1_5)
-	SLOT_INTERFACE("stereo_fx", ISA8_STEREO_FX)
-	SLOT_INTERFACE("ssi2001", ISA8_SSI2001)
-	SLOT_INTERFACE("ne1000", NE1000)
-	SLOT_INTERFACE("3c503", EL2_3C503)
-	SLOT_INTERFACE("mpu401", ISA8_MPU401)
-	SLOT_INTERFACE("lpt", ISA8_LPT)
-	SLOT_INTERFACE("ibm_mfc", ISA8_IBM_MFC)
-	SLOT_INTERFACE("fdcsmc", ISA8_FDC_SMC)
-	SLOT_INTERFACE("dectalk", ISA8_DECTALK)
-	SLOT_INTERFACE("pds", ISA8_PDS)
+	device.option_add("mda", ISA8_MDA);
+	device.option_add("cga", ISA8_CGA);
+	device.option_add("cga_cportiii", ISA8_CGA_CPORTIII);
+	device.option_add("wyse700", ISA8_WYSE700);
+	device.option_add("ega", ISA8_EGA);
+	device.option_add("pgc", ISA8_PGC);
+	device.option_add("vga", ISA8_VGA);
+	device.option_add("svga_et4k", ISA8_SVGA_ET4K);
+	device.option_add("num9rev",ISA8_NUM_9_REV);
+	device.option_add("com", ISA8_COM);
+	device.option_add("comat", ISA8_COM_AT);
+	device.option_add("fdc", ISA8_FDC_AT);
+	device.option_add("fdc344", ISA8_FDC344);
+	device.option_add("fdcmag", ISA8_FDCMAG);
+	device.option_add("hdc", ISA8_HDC);
+	device.option_add("side116", ISA8_SIDE116);
+	device.option_add("adlib", ISA8_ADLIB);
+	device.option_add("hercules", ISA8_HERCULES);
+	device.option_add("gblaster", ISA8_GAME_BLASTER);
+	device.option_add("sblaster1_0", ISA8_SOUND_BLASTER_1_0);
+	device.option_add("sblaster1_5", ISA8_SOUND_BLASTER_1_5);
+	device.option_add("stereo_fx", ISA8_STEREO_FX);
+	device.option_add("ssi2001", ISA8_SSI2001);
+	device.option_add("ne1000", NE1000);
+	device.option_add("3c503", EL2_3C503);
+	device.option_add("mpu401", ISA8_MPU401);
+	device.option_add("lpt", ISA8_LPT);
+	device.option_add("ibm_mfc", ISA8_IBM_MFC);
+	device.option_add("fdcsmc", ISA8_FDC_SMC);
+	device.option_add("dectalk", ISA8_DECTALK);
+	device.option_add("pds", ISA8_PDS);
+	device.option_add("lba_enhancer", ISA8_LBA_ENHANCER);
 	// 16-bit
-	SLOT_INTERFACE("ide", ISA16_IDE)
-	SLOT_INTERFACE("ne2000", NE2000)
-	SLOT_INTERFACE("aha1542", AHA1542)
-	SLOT_INTERFACE("gus",ISA16_GUS)
-	SLOT_INTERFACE("sblaster_16", ISA16_SOUND_BLASTER_16)
-	SLOT_INTERFACE("svga_s3", ISA16_SVGA_S3)
-	SLOT_INTERFACE("s3virge", ISA16_S3VIRGE)
-	SLOT_INTERFACE("s3virgedx", ISA16_S3VIRGEDX)
-	SLOT_INTERFACE("dms3d2kp", ISA16_DMS3D2KPRO)
-	SLOT_INTERFACE("svga_dm",ISA16_SVGA_CIRRUS)
-	SLOT_INTERFACE("clgd542x",ISA16_SVGA_CIRRUS_GD542X)
-	SLOT_INTERFACE("gfxultra", ISA16_VGA_GFXULTRA)
-	SLOT_INTERFACE("gfxultrap", ISA16_SVGA_GFXULTRAPRO)
-	SLOT_INTERFACE("tgui9680",ISA16_SVGA_TGUI9680)
-	SLOT_INTERFACE("3c505", ISA16_3C505)
-	SLOT_INTERFACE("mach64", ISA16_SVGA_MACH64)
-	SLOT_INTERFACE("sb16_lle", ISA16_SB16)
-	SLOT_INTERFACE("mcd", ISA16_MCD)
-SLOT_INTERFACE_END
+	device.option_add("ide", ISA16_IDE);
+	device.option_add("ne2000", NE2000);
+	device.option_add("aha1542", AHA1542);
+	device.option_add("gus",ISA16_GUS);
+	device.option_add("sblaster_16", ISA16_SOUND_BLASTER_16);
+	device.option_add("svga_s3", ISA16_SVGA_S3);
+	device.option_add("s3virge", ISA16_S3VIRGE);
+	device.option_add("s3virgedx", ISA16_S3VIRGEDX);
+	device.option_add("dms3d2kp", ISA16_DMS3D2KPRO);
+	device.option_add("svga_dm",ISA16_SVGA_CIRRUS);
+	device.option_add("clgd542x",ISA16_SVGA_CIRRUS_GD542X);
+	device.option_add("gfxultra", ISA16_VGA_GFXULTRA);
+	device.option_add("gfxultrap", ISA16_SVGA_GFXULTRAPRO);
+	device.option_add("tgui9680",ISA16_SVGA_TGUI9680);
+	device.option_add("3c505", ISA16_3C505);
+	device.option_add("mach64", ISA16_SVGA_MACH64);
+	device.option_add("sb16_lle", ISA16_SB16);
+	device.option_add("mcd", ISA16_MCD);
+	device.option_add("sad8852", ISA16_SAD8852);
+	device.option_add("wd1007a", WD1007A);
+}

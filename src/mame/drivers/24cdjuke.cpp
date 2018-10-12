@@ -61,21 +61,26 @@ class midcoin24cdjuke_state : public driver_device
 {
 public:
 	midcoin24cdjuke_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_io_row0(*this, "ROW0"),
-		m_io_row1(*this, "ROW1"),
-		m_io_row2(*this, "ROW2"),
-		m_io_row3(*this, "ROW3"),
-		m_charset(*this, "charset")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_io_row0(*this, "ROW0")
+		, m_io_row1(*this, "ROW1")
+		, m_io_row2(*this, "ROW2")
+		, m_io_row3(*this, "ROW3")
+		, m_charset(*this, "charset")
+		, m_digits(*this, "digit%u", 0U)
+	{ }
 
+	void midcoin24cdjuke(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;
 	required_ioport m_io_row3;
 	required_region_ptr<uint16_t> m_charset;
+	output_finder<16> m_digits;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -86,10 +91,9 @@ public:
 
 	DECLARE_READ8_MEMBER(unknown_r) { return machine().rand(); }
 
-	void midcoin24cdjuke(machine_config &config);
 	void midcoin24cdjuke_io(address_map &map);
 	void midcoin24cdjuke_map(address_map &map);
-private:
+
 	uint8_t m_kb_col;
 };
 
@@ -121,24 +125,26 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 
 	char_data = bitswap<16>(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
 
-	output().set_digit_value(offset, char_data ^ 0xffff);
+	m_digits[offset] = char_data ^ 0xffff;
 }
 
 
-ADDRESS_MAP_START(midcoin24cdjuke_state::midcoin24cdjuke_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x7800, 0x780f) AM_WRITE(digit_w)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void midcoin24cdjuke_state::midcoin24cdjuke_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x7800, 0x780f).w(FUNC(midcoin24cdjuke_state::digit_w));
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(midcoin24cdjuke_state::midcoin24cdjuke_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ic31", i8255_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ic11", i8255_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ic25", i8255_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_WRITENOP
-	AM_RANGE(0x10, 0x1f) AM_READ(unknown_r)
-ADDRESS_MAP_END
+void midcoin24cdjuke_state::midcoin24cdjuke_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ic31", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw("ic11", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ic25", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0c, 0x0c).nopw();
+	map(0x10, 0x1f).r(FUNC(midcoin24cdjuke_state::unknown_r));
+}
 
 static INPUT_PORTS_START( midcoin24cdjuke )
 	PORT_START("ROW0")
@@ -269,6 +275,7 @@ INPUT_PORTS_END
 
 void midcoin24cdjuke_state::machine_start()
 {
+	m_digits.resolve();
 }
 
 void midcoin24cdjuke_state::machine_reset()
@@ -278,26 +285,26 @@ void midcoin24cdjuke_state::machine_reset()
 
 MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(midcoin24cdjuke_map)
-	MCFG_CPU_IO_MAP(midcoin24cdjuke_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(midcoin24cdjuke_state, irq0_line_hold, 500)
+	MCFG_DEVICE_ADD("maincpu", Z80,6000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(midcoin24cdjuke_map)
+	MCFG_DEVICE_IO_MAP(midcoin24cdjuke_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(midcoin24cdjuke_state, irq0_line_hold, 500)
 
-	MCFG_DEFAULT_LAYOUT(layout_24cdjuke)
+	config.set_default_layout(layout_24cdjuke);
 
-	MCFG_DEVICE_ADD("ic11", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("MD1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("MD2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("MD3"))
+	i8255_device &ic11(I8255A(config, "ic11"));
+	ic11.in_pa_callback().set_ioport("MD1");
+	ic11.in_pb_callback().set_ioport("MD2");
+	ic11.in_pc_callback().set_ioport("MD3");
 
-	MCFG_DEVICE_ADD("ic25", I8255A, 0)
-	MCFG_I8255_IN_PORTB_CB(IOPORT("PB"))
-	MCFG_I8255_IN_PORTC_CB(READ8(midcoin24cdjuke_state, kb_row_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(midcoin24cdjuke_state, kb_col_w))
+	i8255_device &ic25(I8255A(config, "ic25"));
+	ic25.in_pb_callback().set_ioport("PB");
+	ic25.in_pc_callback().set(FUNC(midcoin24cdjuke_state::kb_row_r));
+	ic25.out_pc_callback().set(FUNC(midcoin24cdjuke_state::kb_col_w));
 
-	MCFG_DEVICE_ADD("ic31", I8255A, 0)
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("MD4"))
+	i8255_device &ic31(I8255A(config, "ic31", 0));
+	ic31.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ic31.in_pc_callback().set_ioport("MD4");
 MACHINE_CONFIG_END
 
 
@@ -316,4 +323,4 @@ ROM_START( 24cdjuke )
 ROM_END
 
 
-GAME( 1988, 24cdjuke,  0,    midcoin24cdjuke, midcoin24cdjuke, midcoin24cdjuke_state,  0, ROT0, "Midcoin", "Midcoin Juke Box 24CD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // what name was it sold under? name is from the PCB text
+GAME( 1988, 24cdjuke, 0, midcoin24cdjuke, midcoin24cdjuke, midcoin24cdjuke_state, empty_init, ROT0, "Midcoin", "Midcoin Juke Box 24CD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // what name was it sold under? name is from the PCB text

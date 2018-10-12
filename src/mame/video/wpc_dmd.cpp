@@ -2,21 +2,21 @@
 // copyright-holders:Olivier Galibert
 #include "emu.h"
 #include "wpc_dmd.h"
-#include "rendlay.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(WPC_DMD, wpc_dmd_device, "wpc_dmd", "Williams Pinball Controller Dot Matrix Display")
 
-ADDRESS_MAP_START(wpc_dmd_device::registers)
-	AM_RANGE(0, 0) AM_WRITE(bank2_w)
-	AM_RANGE(1, 1) AM_WRITE(bank0_w)
-	AM_RANGE(2, 2) AM_WRITE(bank6_w)
-	AM_RANGE(3, 3) AM_WRITE(bank4_w)
-	AM_RANGE(4, 4) AM_WRITE(banka_w)
-	AM_RANGE(5, 5) AM_WRITE(firq_scanline_w)
-	AM_RANGE(6, 6) AM_WRITE(bank8_w)
-	AM_RANGE(7, 7) AM_WRITE(visible_page_w)
-ADDRESS_MAP_END
+void wpc_dmd_device::registers(address_map &map)
+{
+	map(0, 0).w(FUNC(wpc_dmd_device::bank2_w));
+	map(1, 1).w(FUNC(wpc_dmd_device::bank0_w));
+	map(2, 2).w(FUNC(wpc_dmd_device::bank6_w));
+	map(3, 3).w(FUNC(wpc_dmd_device::bank4_w));
+	map(4, 4).w(FUNC(wpc_dmd_device::banka_w));
+	map(5, 5).w(FUNC(wpc_dmd_device::firq_scanline_w));
+	map(6, 6).w(FUNC(wpc_dmd_device::bank8_w));
+	map(7, 7).w(FUNC(wpc_dmd_device::visible_page_w));
+}
 
 
 wpc_dmd_device::wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -42,7 +42,6 @@ MACHINE_CONFIG_START(wpc_dmd_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wpc_dmd_device, screen_update)
 	MCFG_SCREEN_SIZE(128*4, 32*4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128*4-1, 0, 32*4-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scanline", wpc_dmd_device, scanline_timer, attotime::from_hz(60*4*32))
 MACHINE_CONFIG_END

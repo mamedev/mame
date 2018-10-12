@@ -113,8 +113,9 @@
 #include "emu.h"
 #include "includes/tsispch.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
-#include "cpu/upd7725/upd7725.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -184,44 +185,38 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 *****************************************************************************/
 READ16_MEMBER( tsispch_state::dsp_data_r )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	uint8_t temp;
-	temp = upd7725->snesdsp_read(true);
+	uint8_t temp = m_dsp->snesdsp_read(true);
 	fprintf(stderr, "dsp data read: %02x\n", temp);
 	return temp;
 #else
-	return upd7725->snesdsp_read(true);
+	return m_dsp->snesdsp_read(true);
 #endif
 }
 
 WRITE16_MEMBER( tsispch_state::dsp_data_w )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP_W
 	fprintf(stderr, "dsp data write: %02x\n", data);
 #endif
-	upd7725->snesdsp_write(true, data);
+	m_dsp->snesdsp_write(true, data);
 }
 
 READ16_MEMBER( tsispch_state::dsp_status_r )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	uint8_t temp;
-	temp = upd7725->snesdsp_read(false);
+	uint8_t temp = m_dsp->snesdsp_read(false);
 	fprintf(stderr, "dsp status read: %02x\n", temp);
 	return temp;
 #else
-	return upd7725->snesdsp_read(false);
+	return m_dsp->snesdsp_read(false);
 #endif
 }
 
 WRITE16_MEMBER( tsispch_state::dsp_status_w )
 {
 	fprintf(stderr, "warning: upd772x status register should never be written to!\n");
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
-	upd7725->snesdsp_write(false, data);
+	m_dsp->snesdsp_write(false, data);
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
@@ -245,7 +240,7 @@ void tsispch_state::machine_reset()
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
-DRIVER_INIT_MEMBER(tsispch_state,prose2k)
+void tsispch_state::init_prose2k()
 {
 	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
 	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());
@@ -266,28 +261,27 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 	// b1  15 16 17 18 19 20 21 22 ->      22 21 20 19 18 17 16 15
 	// b2  L  8  9  10 11 12 13 14 ->      14 13 12 11 10 9  8  7
 	// b3  0  1  2  3  4  5  6  7  ->      6  5  X  X  3  2  1  0
-	uint8_t byte1t;
-	uint16_t byte23t;
-		for (int i = 0; i < 0x600; i+= 3)
+	for (int i = 0; i < 0x600; i+= 3)
+	{
+		uint8_t byte1t = bitswap<8>(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
+		uint16_t byte23t;
+		// here's where things get disgusting: if the first byte was an OP or RT, do the following:
+		if ((byte1t&0x80) == 0x00) // op or rt instruction
 		{
-			byte1t = bitswap<8>(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
-			// here's where things get disgusting: if the first byte was an OP or RT, do the following:
-			if ((byte1t&0x80) == 0x00) // op or rt instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
-			}
-			else if ((byte1t&0xC0) == 0x80) // jp instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
-			}
-			else // ld instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
-			}
-
-			*dspprg = byte1t<<24 | byte23t<<8;
-			dspprg++;
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
 		}
+		else if ((byte1t&0xC0) == 0x80) // jp instruction
+		{
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
+		}
+		else // ld instruction
+		{
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
+		}
+
+		*dspprg = byte1t<<24 | byte23t<<8;
+		dspprg++;
+	}
 	m_paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
 }
 
@@ -311,31 +305,34 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
      1   1   0   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 2 and 3
      1   1   1   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 0 and 1
 */
-ADDRESS_MAP_START(tsispch_state::i8086_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x02FFF) AM_MIRROR(0x34000) AM_RAM // verified; 6264*2 sram, only first 3/4 used
-	AM_RANGE(0x03000, 0x03001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8("i8251a_u15", i8251_device, data_r, data_w, 0x00FF)
-	AM_RANGE(0x03002, 0x03003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8("i8251a_u15", i8251_device, status_r, control_w, 0x00FF)
-	AM_RANGE(0x03200, 0x03203) AM_MIRROR(0x341FC) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00FF) // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
-	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_READ8(dsw_r, 0x00FF) // verified, read from dipswitch s4
-	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_WRITE8(peripheral_w, 0xFF00) // verified, write to the 4 leds, plus 4 control bits
-	AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FC) AM_READWRITE(dsp_data_r, dsp_data_w) // verified; UPD77P20 data reg r/w
-	AM_RANGE(0x03602, 0x03603) AM_MIRROR(0x341FC) AM_READWRITE(dsp_status_r, dsp_status_w) // verified; UPD77P20 status reg r
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM // verified
-ADDRESS_MAP_END
+void tsispch_state::i8086_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x02FFF).mirror(0x34000).ram(); // verified; 6264*2 sram, only first 3/4 used
+	map(0x03000, 0x03003).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x03200, 0x03203).mirror(0x341FC).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
+	map(0x03400, 0x03400).mirror(0x341FE).r(FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
+	map(0x03401, 0x03401).mirror(0x341FE).w(FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
+	map(0x03600, 0x03601).mirror(0x341FC).rw(FUNC(tsispch_state::dsp_data_r), FUNC(tsispch_state::dsp_data_w)); // verified; UPD77P20 data reg r/w
+	map(0x03602, 0x03603).mirror(0x341FC).rw(FUNC(tsispch_state::dsp_status_r), FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
+	map(0xc0000, 0xfffff).rom(); // verified
+}
 
 // Technically the IO line of the i8086 is completely ignored (it is running in 8086 MIN mode,I believe, which may ignore IO)
-ADDRESS_MAP_START(tsispch_state::i8086_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void tsispch_state::i8086_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-ADDRESS_MAP_START(tsispch_state::dsp_prg_map)
-	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION("dspprg", 0)
-ADDRESS_MAP_END
+void tsispch_state::dsp_prg_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rom().region("dspprg", 0);
+}
 
-ADDRESS_MAP_START(tsispch_state::dsp_data_map)
-	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION("dspdata", 0)
-ADDRESS_MAP_END
+void tsispch_state::dsp_data_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rom().region("dspdata", 0);
+}
 
 
 /******************************************************************************
@@ -375,39 +372,47 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsispch_state::prose2k)
 	/* basic machine hardware */
 	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
-	MCFG_CPU_PROGRAM_MAP(i8086_mem)
-	MCFG_CPU_IO_MAP(i8086_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(i8086_mem)
+	MCFG_DEVICE_IO_MAP(i8086_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
 	/* TODO: hook up p0, p1, int */
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
-	MCFG_NECDSP_OUT_P0_CB(WRITELINE(tsispch_state, dsp_to_8086_p0_w))
-	MCFG_NECDSP_OUT_P1_CB(WRITELINE(tsispch_state, dsp_to_8086_p1_w))
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map)
+	MCFG_NECDSP_OUT_P0_CB(WRITELINE(*this, tsispch_state, dsp_to_8086_p0_w))
+	MCFG_NECDSP_OUT_P1_CB(WRITELINE(*this, tsispch_state, dsp_to_8086_p1_w))
 
 	/* PIC 8259 */
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* uarts */
-	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)
-	// (todo: proper hookup, currently using hack w/i8251_receive_character())
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(tsispch_state, i8251_rxrdy_int))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(tsispch_state, i8251_txrdy_int))
-	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(tsispch_state, i8251_txempty_int))
+	i8251_device &u15(I8251(config, "i8251a_u15", 0));
+	u15.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	u15.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	u15.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	u15.rxrdy_handler().set(FUNC(tsispch_state::i8251_rxrdy_int));
+	u15.txrdy_handler().set(FUNC(tsispch_state::i8251_txrdy_int));
+	u15.txempty_handler().set(FUNC(tsispch_state::i8251_txempty_int));
+
+	clock_device &clock(CLOCK(config, "baudclock", 153600));
+	clock.signal_handler().set("i8251a_u15", FUNC(i8251_device::write_txc));
+	clock.signal_handler().append("i8251a_u15", FUNC(i8251_device::write_rxc));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVPUT("i8251a_u15", i8251_device, receive_character))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("i8251a_u15", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("i8251a_u15", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("i8251a_u15", FUNC(i8251_device::write_cts));
 MACHINE_CONFIG_END
 
 /******************************************************************************
@@ -511,16 +516,16 @@ ROM_START( prose2ko )
 	// 'Older' prose2k set
 	ROM_REGION(0x100000,"maincpu", 0)
 	// prose 2000 firmware version 1.1
-	ROMX_LOAD( "v1.1__6__speech__plus__(c)1983.am2764.6.u24",   0xec000, 0x2000, CRC(c881f92d) SHA1(2d4eb96360adac54d4f0110595bfaf682280c1ca),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__7__speech__plus__(c)1983.am2764.7.u47",   0xec001, 0x2000, CRC(4d5771cb) SHA1(55ed59ad1cad154804dbeeebed98f062783c33c3),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__8__speech__plus__(c)1983.am2764.8.u25",   0xf0000, 0x2000, CRC(adf9bfb8) SHA1(0b73561b52b388b740fabf07ada2d70a52f22037),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__9__speech__plus__(c)1983.am2764.9.u48",   0xf0001, 0x2000, CRC(355f97d2) SHA1(7655fc55b577821e0bd8bf81fb74b8a20b1df098),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__10__speech__plus__(c)1983.am2764.10.u26", 0xf4000, 0x2000, CRC(949a0344) SHA1(8e33c69dfc413aea95f166b08902ad97b1e3e980),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__11__speech__plus__(c)1983.am2764.11.u49", 0xf4001, 0x2000, CRC(ad9a0670) SHA1(769f2f8696c7b6907706466aa9ab7a897ed9f889),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__12__speech__plus__(c)1983.am2764.12.u27", 0xf8000, 0x2000, CRC(9eaf9378) SHA1(d296b1d347c03e6123c38c208ead25b1f43b9859),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__13__speech__plus__(c)1983.am2764.13.u50", 0xf8001, 0x2000, CRC(5e173667) SHA1(93230c2fede5095f56e10d20ea36a5a45a1e7356),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__14__speech__plus__(c)1983.am2764.14.u28", 0xfc000, 0x2000, CRC(e616bd6e) SHA1(5dfae2c5079d89f791c9d7166f9504231a464203),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__15__speech__plus__(c)1983.am2764.15.u51", 0xfc001, 0x2000, CRC(beb1fa19) SHA1(72130fe45c3fd3de7cf794936dc68ed2d4193daf),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__6__speech__plus__=c=1983.am2764.6.u24",   0xec000, 0x2000, CRC(c881f92d) SHA1(2d4eb96360adac54d4f0110595bfaf682280c1ca),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__7__speech__plus__=c=1983.am2764.7.u47",   0xec001, 0x2000, CRC(4d5771cb) SHA1(55ed59ad1cad154804dbeeebed98f062783c33c3),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__8__speech__plus__=c=1983.am2764.8.u25",   0xf0000, 0x2000, CRC(adf9bfb8) SHA1(0b73561b52b388b740fabf07ada2d70a52f22037),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__9__speech__plus__=c=1983.am2764.9.u48",   0xf0001, 0x2000, CRC(355f97d2) SHA1(7655fc55b577821e0bd8bf81fb74b8a20b1df098),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__10__speech__plus__=c=1983.am2764.10.u26", 0xf4000, 0x2000, CRC(949a0344) SHA1(8e33c69dfc413aea95f166b08902ad97b1e3e980),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__11__speech__plus__=c=1983.am2764.11.u49", 0xf4001, 0x2000, CRC(ad9a0670) SHA1(769f2f8696c7b6907706466aa9ab7a897ed9f889),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__12__speech__plus__=c=1983.am2764.12.u27", 0xf8000, 0x2000, CRC(9eaf9378) SHA1(d296b1d347c03e6123c38c208ead25b1f43b9859),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__13__speech__plus__=c=1983.am2764.13.u50", 0xf8001, 0x2000, CRC(5e173667) SHA1(93230c2fede5095f56e10d20ea36a5a45a1e7356),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__14__speech__plus__=c=1983.am2764.14.u28", 0xfc000, 0x2000, CRC(e616bd6e) SHA1(5dfae2c5079d89f791c9d7166f9504231a464203),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__15__speech__plus__=c=1983.am2764.15.u51", 0xfc001, 0x2000, CRC(beb1fa19) SHA1(72130fe45c3fd3de7cf794936dc68ed2d4193daf),ROM_SKIP(1))
 
 	// TSI/Speech plus DSP firmware v?.? (no sticker, but S140025 printed on chip), unlabeled chip, but clearly a NEC UPD7720C ceramic
 	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder, since the dsp on the older board is MASK ROM and doesn't dump easily
@@ -542,6 +547,6 @@ ROM_START( prose2ko )
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    STATE          INIT     COMPANY                                FULLNAME                  FLAGS
-COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                                FULLNAME                  FLAGS
+COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

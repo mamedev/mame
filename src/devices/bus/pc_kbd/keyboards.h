@@ -19,7 +19,7 @@
 #define STR_KBD_EC_1841             "ec1841"
 #define STR_KBD_ISKR_1030           "iskr1030"
 
-SLOT_INTERFACE_EXTERN(pc_xt_keyboards);
+void pc_xt_keyboards(device_slot_interface &device);
 
 // PC AT protocol keyboards
 // Reuses STR_KBD_KEYTRONIC_PC3270 (same keyboard in AT protocol mode by default)
@@ -28,6 +28,6 @@ SLOT_INTERFACE_EXTERN(pc_xt_keyboards);
 #define STR_KBD_IBM_PC_AT_84        "pcat"
 #define STR_KBD_IBM_3270PC_122      "3270pc"
 
-SLOT_INTERFACE_EXTERN(pc_at_keyboards);
+void pc_at_keyboards(device_slot_interface &device);
 
 #endif // MAME_BUS_PC_KBD_KEYBOARDS_H

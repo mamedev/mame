@@ -9,6 +9,7 @@
 #include "machine/intelfsh.h"
 #include "cpu/sh/sh2.h"
 #include "audio/cps3.h"
+#include "emupal.h"
 
 
 class cps3_state : public driver_device
@@ -20,6 +21,13 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_cps3sound(*this, "cps3sound")
+		, m_simm{{*this, "simm1.%u", 0U},
+				 {*this, "simm2.%u", 0U},
+				 {*this, "simm3.%u", 0U},
+				 {*this, "simm4.%u", 0U},
+				 {*this, "simm5.%u", 0U},
+				 {*this, "simm6.%u", 0U},
+				 {*this, "simm7.%u", 0U}}
 		, m_mainram(*this, "mainram")
 		, m_spriteram(*this, "spriteram")
 		, m_colourram(*this, "colourram")
@@ -40,6 +48,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<cps3_sound_device> m_cps3sound;
+	optional_device_array<fujitsu_29f016a_device, 8> m_simm[7];
 
 	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_spriteram;
@@ -56,7 +65,6 @@ public:
 	optional_memory_region      m_user4_region;
 	optional_memory_region      m_user5_region;
 
-	fujitsu_29f016a_device *m_simm[7][8];
 	uint32_t m_cram_gfxflash_bank;
 	std::unique_ptr<uint32_t[]> m_char_ram;
 	std::unique_ptr<uint32_t[]> m_eeprom;
@@ -117,16 +125,17 @@ public:
 	DECLARE_WRITE32_MEMBER(cps3_unk_vidregs_w);
 	DECLARE_READ32_MEMBER(cps3_colourram_r);
 	DECLARE_WRITE32_MEMBER(cps3_colourram_w);
-	DECLARE_DRIVER_INIT(sfiii3);
-	DECLARE_DRIVER_INIT(sfiii);
-	DECLARE_DRIVER_INIT(redearth);
-	DECLARE_DRIVER_INIT(jojo);
-	DECLARE_DRIVER_INIT(jojoba);
-	DECLARE_DRIVER_INIT(sfiii2);
-	DECLARE_DRIVER_INIT(cps3boot);
+	void init_sfiii3();
+	void init_sfiii();
+	void init_redearth();
+	void init_jojo();
+	void init_jojoba();
+	void init_sfiii2();
+	void init_cps3boot();
 	SH2_DMA_KLUDGE_CB(dma_callback);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cps3_vbl_interrupt);
 	INTERRUPT_GEN_MEMBER(cps3_other_interrupt);
@@ -138,7 +147,7 @@ public:
 	void init_crypt(uint32_t key1, uint32_t key2, int altEncryption);
 	void cps3_set_mame_colours(int colournum, uint16_t data, uint32_t fadeval);
 	void cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	uint32_t cps3_flashmain_r(address_space &space, int which, uint32_t offset, uint32_t mem_mask);
+	uint32_t cps3_flashmain_r(int which, uint32_t offset, uint32_t mem_mask);
 	void cps3_flashmain_w(int which, uint32_t offset, uint32_t data, uint32_t mem_mask);
 	uint32_t process_byte( uint8_t real_byte, uint32_t destination, int max_length );
 	void cps3_do_char_dma( uint32_t real_source, uint32_t real_destination, uint32_t real_length );

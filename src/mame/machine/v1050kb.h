@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	devcb = &downcast<v1050_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
+	downcast<v1050_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
 
 
 
@@ -58,6 +58,7 @@ private:
 	required_device<discrete_sound_device> m_discrete;
 	required_ioport_array<12> m_y;
 	devcb_write_line   m_out_tx_handler;
+	output_finder<> m_led;
 
 	uint8_t m_keylatch;
 

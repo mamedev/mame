@@ -20,45 +20,45 @@ struct namco_06xx_config
 	MCFG_DEVICE_ADD(_tag, NAMCO_06XX, _clock)
 
 #define MCFG_NAMCO_06XX_MAINCPU(_tag) \
-	downcast<namco_06xx_device &>(*device).set_maincpu("^" _tag);
+	downcast<namco_06xx_device &>(*device).set_maincpu(_tag);
 
 #define MCFG_NAMCO_06XX_READ_0_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_read_callback<0>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_read_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_1_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_read_callback<1>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_read_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_2_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_read_callback<2>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_read_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_3_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_read_callback<3>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_read_callback<3>(DEVCB_##_devcb);
 
 
 #define MCFG_NAMCO_06XX_READ_REQUEST_0_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_read_request_callback<0>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_read_request_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_REQUEST_1_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_read_request_callback<1>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_read_request_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_REQUEST_2_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_read_request_callback<2>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_read_request_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_REQUEST_3_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_read_request_callback<3>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_read_request_callback<3>(DEVCB_##_devcb);
 
 
 #define MCFG_NAMCO_06XX_WRITE_0_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_write_callback<0>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_write_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_WRITE_1_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_write_callback<1>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_write_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_WRITE_2_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_write_callback<2>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_write_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_WRITE_3_CB(_devcb) \
-	devcb = &downcast<namco_06xx_device &>(*device).set_write_callback<3>(DEVCB_##_devcb);
+	downcast<namco_06xx_device &>(*device).set_write_callback<3>(DEVCB_##_devcb);
 
 
 /* device get info callback */

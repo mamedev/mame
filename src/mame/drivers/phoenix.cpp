@@ -29,7 +29,8 @@ Notes:
 To Do:
 
 Phoenix:
-- Emulate the different sound system used at least by phoenixc2 and griffono.
+- Emulate the different sound system used at least by phoenixc2, griffono,
+   and nextfase.
 - Better documentation of the bootlegs.
 
 Survival:
@@ -56,38 +57,41 @@ Pleiads:
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(phoenix_state::phoenix_memory_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
-	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("cust", phoenix_sound_device, control_a_w)
-	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE("cust", phoenix_sound_device, control_b_w)
-	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")                            /* IN0 or IN1 */
-	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")                           /* DSW */
-ADDRESS_MAP_END
+void phoenix_state::phoenix_memory_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(FUNC(phoenix_state::phoenix_videoreg_w));
+	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x6000, 0x63ff).w("cust", FUNC(phoenix_sound_device::control_a_w));
+	map(0x6800, 0x6bff).w("cust", FUNC(phoenix_sound_device::control_b_w));
+	map(0x7000, 0x73ff).portr("IN0");                            /* IN0 or IN1 */
+	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
+}
 
-ADDRESS_MAP_START(phoenix_state::pleiads_memory_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(pleiads_videoreg_w)
-	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("pleiads_custom", pleiads_sound_device, control_a_w)
-	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE("pleiads_custom", pleiads_sound_device, control_b_w)
-	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")                            /* IN0 or IN1 + protection */
-	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")                           /* DSW */
-ADDRESS_MAP_END
+void phoenix_state::pleiads_memory_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(FUNC(phoenix_state::pleiads_videoreg_w));
+	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x6000, 0x63ff).w(m_pleiads_custom, FUNC(pleiads_sound_device::control_a_w));
+	map(0x6800, 0x6bff).w(m_pleiads_custom, FUNC(pleiads_sound_device::control_b_w));
+	map(0x7000, 0x73ff).portr("IN0");                            /* IN0 or IN1 + protection */
+	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
+}
 
-ADDRESS_MAP_START(phoenix_state::survival_memory_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
-	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6800, 0x68ff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x6900, 0x69ff) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0x7000, 0x73ff) AM_READ(survival_input_port_0_r)               /* IN0 or IN1 */
-	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")                           /* DSW */
-ADDRESS_MAP_END
+void phoenix_state::survival_memory_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(FUNC(phoenix_state::phoenix_videoreg_w));
+	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x6800, 0x68ff).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x6900, 0x69ff).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x7000, 0x73ff).r(FUNC(phoenix_state::survival_input_port_0_r));               /* IN0 or IN1 */
+	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
+}
 
 
 
@@ -97,7 +101,7 @@ static INPUT_PORTS_START( phoenix )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION( "SW1:1,2" )
@@ -180,7 +184,7 @@ static INPUT_PORTS_START( condor )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION( "SW1:1,2" )
@@ -310,7 +314,7 @@ static INPUT_PORTS_START( pleiads )
 	PORT_INCLUDE( phoenix )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )
@@ -333,7 +337,7 @@ static INPUT_PORTS_START( pleiadbl )
 	PORT_INCLUDE( phoenix )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )
@@ -373,7 +377,7 @@ static INPUT_PORTS_START( survival )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 
 	PORT_START("IN1")       /* IN1 */
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL )    /* comes from IN0 0-2 */
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM )    /* comes from IN0 0-2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
@@ -420,12 +424,12 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( phoenix )
+static GFXDECODE_START( gfx_phoenix )
 	GFXDECODE_ENTRY( "bgtiles", 0, charlayout, 0, 32 )
 	GFXDECODE_ENTRY( "fgtiles", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( pleiads )
+static GFXDECODE_START( gfx_pleiads )
 	GFXDECODE_ENTRY( "bgtiles", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "fgtiles", 0, charlayout, 0, 64 )
 GFXDECODE_END
@@ -440,8 +444,8 @@ MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 MACHINE_CONFIG_START(phoenix_state::phoenix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)  /* 2.75 MHz */
-	MCFG_CPU_PROGRAM_MAP(phoenix_memory_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, CPU_CLOCK)  /* 2.75 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(phoenix_memory_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
@@ -451,14 +455,14 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phoenix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phoenix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,phoenix)
 	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_TMS36XX_ADD("tms", 372)
 	MCFG_TMS36XX_TYPE(MM6221AA)
@@ -466,11 +470,10 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_TMS36XX_TUNE_SPEED(0.21)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("cust", PHOENIX, 0)
+	MCFG_DEVICE_ADD("cust", PHOENIX_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 120000)
-	MCFG_DISCRETE_INTF(phoenix)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, 120000, phoenix_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 MACHINE_CONFIG_END
 
@@ -479,11 +482,11 @@ MACHINE_CONFIG_START(phoenix_state::pleiads)
 	phoenix(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pleiads_memory_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pleiads_memory_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pleiads)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pleiads)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,pleiads)
@@ -498,7 +501,7 @@ MACHINE_CONFIG_START(phoenix_state::pleiads)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_DEVICE_REMOVE("cust")
-	MCFG_SOUND_ADD("pleiads_custom", PLEIADS, 0)
+	MCFG_DEVICE_ADD("pleiads_custom", PLEIADS_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_REMOVE("discrete")
@@ -510,9 +513,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(phoenix_state::survival)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)  /* 5.50 MHz */
-	MCFG_I8085A_SID(READLINE(phoenix_state, survival_sid_callback))
-	MCFG_CPU_PROGRAM_MAP(survival_memory_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, CPU_CLOCK)  /* 5.50 MHz */
+	MCFG_I8085A_SID(READLINE(*this, phoenix_state, survival_sid_callback))
+	MCFG_DEVICE_PROGRAM_MAP(survival_memory_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
@@ -526,18 +529,18 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phoenix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phoenix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,survival)
 	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* FIXME: check clock */
-	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(phoenix_state, survival_protection_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 11000000/4)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, phoenix_state, survival_protection_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -548,8 +551,8 @@ MACHINE_CONFIG_START(phoenix_state::condor)
 
 	/* basic machine hardware */
 	/* FIXME: Verify clock. This is most likely 11MHz/2 */
-	MCFG_CPU_REPLACE("maincpu", Z80, 11000000/4)    /* 2.75 MHz??? */
-	MCFG_CPU_PROGRAM_MAP(phoenix_memory_map)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, 11000000/4)    /* 2.75 MHz??? */
+	MCFG_DEVICE_PROGRAM_MAP(phoenix_memory_map)
 MACHINE_CONFIG_END
 
 
@@ -867,26 +870,26 @@ ROM_END
 
 ROM_START( phoenixha ) // verified 2 PROMs, numer of boards unknown (probably 2)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "IC45",  0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
-	ROM_LOAD( "IC46",  0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
-	ROM_LOAD( "IC47",  0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
-	ROM_LOAD( "IC48",  0x1800, 0x0800, CRC(b2672265) SHA1(dfc635f2089b521c61b3b493e7c3aefcef65c8d0) )
-	ROM_LOAD( "IC49",  0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
-	ROM_LOAD( "IC50",  0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
-	ROM_LOAD( "IC51",  0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
-	ROM_LOAD( "IC52",  0x3800, 0x0800, CRC(f3f10ac5) SHA1(aebf35ea59197fff511096dbba7320a4e79216a7) )
+	ROM_LOAD( "ic45",  0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) ) // sldh
+	ROM_LOAD( "ic46",  0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) ) // sldh
+	ROM_LOAD( "ic47",  0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) ) // sldh
+	ROM_LOAD( "ic48",  0x1800, 0x0800, CRC(b2672265) SHA1(dfc635f2089b521c61b3b493e7c3aefcef65c8d0) ) // sldh
+	ROM_LOAD( "ic49",  0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "ic50",  0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "ic51",  0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "ic52",  0x3800, 0x0800, CRC(f3f10ac5) SHA1(aebf35ea59197fff511096dbba7320a4e79216a7) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "IC23",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "IC24",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "ic23",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "ic24",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "IC39",  0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
-	ROM_LOAD( "IC40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
+	ROM_LOAD( "ic39",  0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "ic40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "IC40_B",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "IC41_A",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "ic40_b",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "ic41_a",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
 
 ROM_START( phoenixi ) // verified single PCB, single PROM
@@ -912,6 +915,30 @@ ROM_START( phoenixi ) // verified single PCB, single PROM
 	ROM_LOAD( "sn74s471n.bin",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
+ROM_START( fenixn ) // Fenix, bootleg from the Spanish company Niemer
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2201.bin", 0x0000, 0x0800, CRC(2afa8e2c) SHA1(e9cd02b730912365aae4172da881bddb7c7b16aa) )
+	ROM_LOAD( "1202.bin", 0x0800, 0x0800, CRC(6527395e) SHA1(13799da4b5c4118b3fafe7b6145b0ebca89b9f00) )
+	ROM_LOAD( "1203.bin", 0x1000, 0x0800, CRC(868e69ba) SHA1(bef3173f1c978a9b9d1597439d272186b466e069) )
+	ROM_LOAD( "1204.bin", 0x1800, 0x0800, CRC(85d96d7c) SHA1(19bb1d0a6764b6982d3cb29e2681dee8648d5fda) )
+	ROM_LOAD( "1205.bin", 0x2000, 0x0800, CRC(a105e4e7) SHA1(b35142a91b6b7fdf7535202671793393c9f4685f) )
+	ROM_LOAD( "1206.bin", 0x2800, 0x0800, CRC(249a6f21) SHA1(1c83d9883120796cf3bf775ab6620c4850f52d3c) )
+	ROM_LOAD( "1207.bin", 0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "1208.bin", 0x3800, 0x0800, CRC(b90efc28) SHA1(61956880f64ae50c4796d4cf60a49c44a81aaa31) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "1211.bin", 0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "1212.bin", 0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "1209.bin", 0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "1210.bin", 0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom1.bin", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "prom2.bin", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+ROM_END
+
 ROM_START( condor )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cond01c.bin",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
@@ -932,8 +959,8 @@ ROM_START( condor )
 	ROM_LOAD( "cond12c.bin",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 // PCB is marked: "NOVARMATIC" and "13200"
@@ -981,8 +1008,8 @@ ROM_START( falcon )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( vautour )
@@ -1242,6 +1269,10 @@ ROM_START( griffono )  // verified single PCB with piggyback sound PCB instead o
 	ROM_LOAD( "sn74s471n.11k",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
+/*
+  There is no MN6221AA Melody-Alarm Generator.
+  There is a EPSON Electronics 7910CG Multi-Melody IC instead.
+*/
 ROM_START( nextfase )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nf01.bin",   0x0000, 0x0800, CRC(b31ce820) SHA1(dfdb17995a14b66d2571c2c8de481d2792f9ce6a) )
@@ -1536,13 +1567,13 @@ ROM_START( survival )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(phoenix_state, coindsw)
+void phoenix_state::init_coindsw()
 {
 	/* additional inputs for coinage */
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x5000, 0x5000, "DSW1");
 }
 
-DRIVER_INIT_MEMBER(phoenix_state, oneprom)
+void phoenix_state::init_oneprom()
 {
 	uint8_t *rgn = memregion("proms")->base();
 
@@ -1554,62 +1585,63 @@ DRIVER_INIT_MEMBER(phoenix_state, oneprom)
 	}
 }
 
-DRIVER_INIT_MEMBER(phoenix_state, oneprom_coindsw)
+void phoenix_state::init_oneprom_coindsw()
 {
-	DRIVER_INIT_CALL(coindsw);
+	init_coindsw();
 
-	DRIVER_INIT_CALL(oneprom);
+	init_oneprom();
 }
 
 
   /*** Phoenix (& clones) ***/
-GAME( 1980, phoenix,    0,       phoenix,  phoenix,  phoenix_state, 0,               ROT90, "Amstar",                            "Phoenix (Amstar, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phoenix2,   phoenix, phoenix,  phoenix,  phoenix_state, 0,               ROT90, "Amstar",                            "Phoenix (Amstar, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phoenixa,   phoenix, phoenix,  phoenixa, phoenix_state, 0,               ROT90, "Amstar (Centuri license)",          "Phoenix (Centuri, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phoenixb,   phoenix, phoenix,  phoenixa, phoenix_state, 0,               ROT90, "Amstar (Centuri license)",          "Phoenix (Centuri, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phoenixt,   phoenix, phoenix,  phoenixt, phoenix_state, 0,               ROT90, "Amstar (Taito license)",            "Phoenix (Taito)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phoenixj,   phoenix, phoenix,  phoenixt, phoenix_state, 0,               ROT90, "Amstar (Taito Japan license)",      "Phoenix (Taito Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phoenix3,   phoenix, phoenix,  phoenix3, phoenix_state, 0,               ROT90, "bootleg (T.P.N.)",                  "Phoenix (T.P.N. bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phoenixdal, phoenix, phoenix,  phoenixt, phoenix_state, 0,               ROT90, "bootleg (D&L)",                     "Phoenix (D&L bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, phoenixc,   phoenix, phoenix,  phoenixt, phoenix_state, 0,               ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, phoenixc2,  phoenix, phoenix,  phoenixt, phoenix_state, 0,               ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, phoenixc3,  phoenix, phoenix,  phoenixt, phoenix_state, 0,               ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, phoenixc4,  phoenix, phoenix,  phoenixt, phoenix_state, 0,               ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, phoenixi,   phoenix, condor,   condor,   phoenix_state, oneprom_coindsw, ROT90, "bootleg (IDI)",                     "Phoenix (IDI bootleg)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Needs correct color PROM decode
-GAME( 1981, condor,     phoenix, condor,   condor,   phoenix_state, coindsw,         ROT90, "bootleg (Sidam)",                   "Condor (Sidam bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, condorn,    phoenix, condor,   condor,   phoenix_state, oneprom_coindsw, ROT90, "bootleg (S C Novar)",               "Condor (S C Novar bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenix,    0,       phoenix,  phoenix,  phoenix_state, empty_init,      ROT90, "Amstar",                            "Phoenix (Amstar, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenix2,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,      ROT90, "Amstar",                            "Phoenix (Amstar, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenixa,   phoenix, phoenix,  phoenixa, phoenix_state, empty_init,      ROT90, "Amstar (Centuri license)",          "Phoenix (Centuri, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenixb,   phoenix, phoenix,  phoenixa, phoenix_state, empty_init,      ROT90, "Amstar (Centuri license)",          "Phoenix (Centuri, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenixt,   phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "Amstar (Taito license)",            "Phoenix (Taito)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenixj,   phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "Amstar (Taito Japan license)",      "Phoenix (Taito Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenix3,   phoenix, phoenix,  phoenix3, phoenix_state, empty_init,      ROT90, "bootleg (T.P.N.)",                  "Phoenix (T.P.N. bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenixdal, phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg (D&L)",                     "Phoenix (D&L bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixc,   phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixc2,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixc3,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixc4,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixi,   phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (IDI)",                     "Phoenix (IDI bootleg)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Needs correct color PROM decode
+GAME( 1980, fenixn,     phoenix, phoenix,  phoenix,  phoenix_state, empty_init,      ROT90, "bootleg (Niemer)",                  "Fenix (Niemer bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, condor,     phoenix, condor,   condor,   phoenix_state, init_coindsw,         ROT90, "bootleg (Sidam)",                   "Condor (Sidam bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, condorn,    phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (S C Novar)",               "Condor (S C Novar bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 // the following 2 were common bootlegs in England & France respectively
-GAME( 1980, falcon,     phoenix, phoenix,  phoenixt, phoenix_state, 0,               ROT90, "bootleg",                           "Falcon (bootleg of Phoenix) (8085A CPU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, vautour,    phoenix, phoenix,  phoenixt, phoenix_state, 0,               ROT90, "bootleg (Jeutel)",                  "Vautour (bootleg of Phoenix) (8085A CPU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, falconz,    phoenix, condor,   falconz,  phoenix_state, 0,               ROT90, "bootleg (Digimatic)",               "Falcon (bootleg of Phoenix) (Z80 CPU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, vautourz,   phoenix, condor,   condor,   phoenix_state, coindsw,         ROT90, "bootleg",                           "Vautour (bootleg of Phoenix) (Z80 CPU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, vautourza,  phoenix, condor ,  phoenixt, phoenix_state, oneprom,         ROT90, "bootleg (Jeutel)",                  "Vautour (bootleg of Phoenix) (Z80 CPU, single PROM)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, falcon,     phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg",                           "Falcon (bootleg of Phoenix) (8085A CPU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, vautour,    phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg (Jeutel)",                  "Vautour (bootleg of Phoenix) (8085A CPU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, falconz,    phoenix, condor,   falconz,  phoenix_state, empty_init,      ROT90, "bootleg (Digimatic)",               "Falcon (bootleg of Phoenix) (Z80 CPU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, vautourz,   phoenix, condor,   condor,   phoenix_state, init_coindsw,    ROT90, "bootleg",                           "Vautour (bootleg of Phoenix) (Z80 CPU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, vautourza,  phoenix, condor ,  phoenixt, phoenix_state, init_oneprom,    ROT90, "bootleg (Jeutel)",                  "Vautour (bootleg of Phoenix) (Z80 CPU, single PROM)", MACHINE_SUPPORTS_SAVE )
 
 // German bootlegs
-GAME( 1981, phoenixha,  phoenix, phoenix,  phoenixt, phoenix_state, 0,               ROT90, "bootleg (Hellomat Automaten)",      "Phoenix (Hellomat Automaten bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixha,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg (Hellomat Automaten)",      "Phoenix (Hellomat Automaten bootleg)", MACHINE_SUPPORTS_SAVE )
 
-// fenix is an Italian bootleg based on vautourz
-GAME( 1980, fenix,      phoenix, condor,   condor,   phoenix_state, oneprom_coindsw, ROT90, "bootleg (Orio)",                    "Fenix (bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, griffon,    phoenix, condor,   condor,   phoenix_state, oneprom_coindsw, ROT90, "bootleg (Videotron)",               "Griffon (Videotron bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, griffono,   phoenix, condor,   condor,   phoenix_state, oneprom_coindsw, ROT90, "bootleg (Olympia)",                 "Griffon (Olympia bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+// fenix is an Italian bootleg based on vautourz (also an unrelated Spanish bootleg from Niemer)
+GAME( 1980, fenix,      phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Orio)",                    "Fenix (Orio bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, griffon,    phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Videotron)",               "Griffon (Videotron bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, griffono,   phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Olympia)",                 "Griffon (Olympia bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // nextfase is a Spanish bootleg
-GAME( 1981, nextfase,   phoenix, phoenix,  nextfase, phoenix_state, 0,               ROT90, "bootleg (Petaco S.A.)",             "Next Fase (bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nextfase,   phoenix, phoenix,  nextfase, phoenix_state, empty_init,      ROT90, "bootleg (Petaco S.A.)",             "Next Fase (bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
   // as is this
-GAME( 1981, phoenixs,   phoenix, phoenix,  phoenix,  phoenix_state, 0,               ROT90, "bootleg (Sonic)",                   "Phoenix (Sonic, Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, phoenixass, phoenix, phoenix,  phoenix,  phoenix_state, 0,               ROT90, "bootleg (Assa)",                    "Phoenix (Assa, Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, avefenix,   phoenix, phoenix,  phoenix,  phoenix_state, 0,               ROT90, "bootleg (Video Game)",              "Ave Fenix (Electrogame, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE ) // Electrogame (Barcelona) made the dedicated cabinet and is likely the real manufacturer, ingame shows 'Video Game'
-GAME( 1980, avefenixrf, phoenix, phoenix,  phoenix,  phoenix_state, 0,               ROT90, "bootleg (Recreativos Franco S.A.)", "Ave Fenix (Recreativos Franco, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, avefenixl,  phoenix, phoenix,  phoenix,  phoenix_state, 0,               ROT90, "bootleg (Laguna)",                  "Ave Fenix (Laguna, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixs,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,      ROT90, "bootleg (Sonic)",                   "Phoenix (Sonic, Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixass, phoenix, phoenix,  phoenix,  phoenix_state, empty_init,      ROT90, "bootleg (Assa)",                    "Phoenix (Assa, Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, avefenix,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,      ROT90, "bootleg (Video Game)",              "Ave Fenix (Electrogame, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE ) // Electrogame (Barcelona) made the dedicated cabinet and is likely the real manufacturer, ingame shows 'Video Game'
+GAME( 1980, avefenixrf, phoenix, phoenix,  phoenix,  phoenix_state, empty_init,      ROT90, "bootleg (Recreativos Franco S.A.)", "Ave Fenix (Recreativos Franco, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, avefenixl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,      ROT90, "bootleg (Laguna)",                  "Ave Fenix (Laguna, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 
   /*** Pleiads (& clones) ***/
-GAME( 1981, pleiads,    0,       pleiads,  pleiads,  phoenix_state, 0,               ROT90, "Tehkan",                            "Pleiads (Tehkan)", MACHINE_IMPERFECT_COLORS )
-GAME( 1981, pleiadsb2,  pleiads, pleiads,  pleiads,  phoenix_state, 0,               ROT90, "bootleg (ESG)",                     "Pleiads (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, 0,               ROT90, "bootleg",                           "Pleiads (bootleg set 1)", MACHINE_IMPERFECT_COLORS )
-GAME( 1981, pleiadce,   pleiads, pleiads,  pleiadce, phoenix_state, 0,               ROT90, "Tehkan (Centuri license)",          "Pleiads (Centuri)", MACHINE_IMPERFECT_COLORS )
-GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, 0,               ROT90, "bootleg? (Irecsa)",                 "Pleiads (Irecsa)", MACHINE_IMPERFECT_COLORS ) // possibly licensed, but some of the roms match the bootlegs
-GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, phoenix_state, 0,               ROT90, "Niemer S.A.",                       "Pleiads (Niemer S.A.)", MACHINE_IMPERFECT_COLORS ) // possibly licensed, but some of the roms match the bootlegs
-GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, phoenix_state, 0,               ROT90, "bootleg",                           "Pleiads (Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
-GAME( 1981, capitol,    pleiads, phoenix,  capitol,  phoenix_state, 0,               ROT90, "bootleg? (Universal Video Spiel)",  "Capitol", MACHINE_IMPERFECT_COLORS )
+GAME( 1981, pleiads,    0,       pleiads,  pleiads,  phoenix_state, empty_init,      ROT90, "Tehkan",                            "Pleiads (Tehkan)", MACHINE_IMPERFECT_COLORS )
+GAME( 1981, pleiadsb2,  pleiads, pleiads,  pleiads,  phoenix_state, empty_init,      ROT90, "bootleg (ESG)",                     "Pleiads (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init,      ROT90, "bootleg",                           "Pleiads (bootleg set 1)", MACHINE_IMPERFECT_COLORS )
+GAME( 1981, pleiadce,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,      ROT90, "Tehkan (Centuri license)",          "Pleiads (Centuri)", MACHINE_IMPERFECT_COLORS )
+GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,      ROT90, "bootleg? (Irecsa)",                 "Pleiads (Irecsa)", MACHINE_IMPERFECT_COLORS ) // possibly licensed, but some of the roms match the bootlegs
+GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,      ROT90, "Niemer S.A.",                       "Pleiads (Niemer S.A.)", MACHINE_IMPERFECT_COLORS ) // possibly licensed, but some of the roms match the bootlegs
+GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,      ROT90, "bootleg",                           "Pleiads (Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
+GAME( 1981, capitol,    pleiads, phoenix,  capitol,  phoenix_state, empty_init,      ROT90, "bootleg? (Universal Video Spiel)",  "Capitol", MACHINE_IMPERFECT_COLORS )
 
   /*** Others ***/
-GAME( 1982, survival,   0,       survival, survival, phoenix_state, 0,               ROT90, "Rock-Ola",                          "Survival", MACHINE_IMPERFECT_COLORS )
+GAME( 1982, survival,   0,       survival, survival, phoenix_state, empty_init,      ROT90, "Rock-Ola",                          "Survival", MACHINE_IMPERFECT_COLORS )

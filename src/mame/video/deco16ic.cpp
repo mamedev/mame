@@ -268,9 +268,9 @@ void deco16ic_device::device_start()
 
 	save_item(NAME(m_pf1_8bpp_mode));
 
-	save_pointer(NAME(m_pf1_data.get()), 0x2000 / 2);
-	save_pointer(NAME(m_pf2_data.get()), 0x2000 / 2);
-	save_pointer(NAME(m_pf12_control.get()), 0x10 / 2);
+	save_pointer(NAME(m_pf1_data), 0x2000 / 2);
+	save_pointer(NAME(m_pf2_data), 0x2000 / 2);
+	save_pointer(NAME(m_pf12_control), 0x10 / 2);
 }
 
 //-------------------------------------------------
@@ -460,8 +460,8 @@ void deco16ic_device::custom_tilemap_draw(
 	if (!BIT(control0, 7))
 		return;
 
-	int starty = cliprect.min_y;
-	int endy = cliprect.max_y+1;
+	int starty = cliprect.top();
+	int endy = cliprect.bottom() + 1;
 
 	width_mask = src_bitmap0->width() - 1;
 	height_mask = src_bitmap0->height() - 1;

@@ -29,8 +29,13 @@ class marywu_state : public driver_device
 public:
 	marywu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void marywu(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(display_7seg_data_w);
 	DECLARE_WRITE8_MEMBER(multiplex_7seg_w);
 	DECLARE_WRITE8_MEMBER(ay1_port_a_w);
@@ -38,11 +43,13 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_port_a_w);
 	DECLARE_WRITE8_MEMBER(ay2_port_b_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	void marywu(machine_config &config);
 	void io_map(address_map &map);
 	void program_map(address_map &map);
-private:
+
 	uint8_t m_selected_7seg_module;
+	virtual void machine_start() override;
+	output_finder<32> m_digits;
+	output_finder<30> m_leds;
 };
 
 static INPUT_PORTS_START( marywu )
@@ -106,21 +113,21 @@ INPUT_PORTS_END
 WRITE8_MEMBER( marywu_state::ay1_port_a_w )
 {
 	for (uint8_t i=0; i<8; i++){
-		output().set_led_value(i, (data & (1 << i)) ? 1 : 0);
+		m_leds[i] = BIT(data, i);
 	}
 }
 
 WRITE8_MEMBER( marywu_state::ay1_port_b_w )
 {
 	for (uint8_t i=0; i<8; i++){
-		output().set_led_value(i+8, (data & (1 << i)) ? 1 : 0);
+		m_leds[i+8] = BIT(data, i);
 	}
 }
 
 WRITE8_MEMBER( marywu_state::ay2_port_a_w )
 {
 	for (uint8_t i=0; i<8; i++){
-		output().set_led_value(i+16, (data & (1 << i)) ? 1 : 0);
+		m_leds[i+16] = BIT(data, i);
 	}
 }
 
@@ -128,7 +135,7 @@ WRITE8_MEMBER( marywu_state::ay2_port_b_w )
 {
 	for (uint8_t i=0; i<6; i++){
 		/* we only have 30 LEDs. The last 2 bits in this port are unused.  */
-		output().set_led_value(i+24, (data & (1 << i)) ? 1 : 0);
+		m_leds[i+24] = BIT(data, i);
 	}
 }
 
@@ -153,51 +160,59 @@ WRITE8_MEMBER( marywu_state::display_7seg_data_w )
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
 
-	output().set_digit_value(2 * m_selected_7seg_module + 0, patterns[data & 0x0F]);
-	output().set_digit_value(2 * m_selected_7seg_module + 1, patterns[(data >> 4) & 0x0F]);
+	m_digits[2 * m_selected_7seg_module + 0] = patterns[data & 0x0F];
+	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
 }
 
-ADDRESS_MAP_START(marywu_state::program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void marywu_state::program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(marywu_state::io_map)
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_RAM /* HM6116: 2kbytes of Static RAM */
-	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x9003, 0x9003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb000, 0xb001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("i8279", i8279_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_NOP /* TODO: Investigate this. There's something going on at this address range. */
-ADDRESS_MAP_END
+void marywu_state::io_map(address_map &map)
+{
+	map(0x8000, 0x87ff).mirror(0x0800).ram(); /* HM6116: 2kbytes of Static RAM */
+	map(0x9000, 0x9000).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x9001, 0x9001).mirror(0x0ffc).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x9002, 0x9002).mirror(0x0ffc).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x9003, 0x9003).mirror(0x0ffc).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb000, 0xb001).mirror(0x0ffe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xf000, 0xf000).noprw(); /* TODO: Investigate this. There's something going on at this address range. */
+}
+
+void marywu_state::machine_start()
+{
+	m_digits.resolve();
+	m_leds.resolve();
+}
 
 MACHINE_CONFIG_START(marywu_state::marywu)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'738'635)) //actual CPU is a Winbond w78c31b-24
-	MCFG_CPU_PROGRAM_MAP(program_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(10'738'635)) //actual CPU is a Winbond w78c31b-24
+	MCFG_DEVICE_PROGRAM_MAP(program_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 
 	/* Keyboard & display interface */
-	MCFG_DEVICE_ADD("i8279", I8279, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
-	MCFG_I8279_OUT_SL_CB(WRITE8(marywu_state, multiplex_7seg_w))          // select  block of 7seg modules by multiplexing the SL scan lines
-	MCFG_I8279_IN_RL_CB(READ8(marywu_state, keyboard_r))                  // keyboard Return Lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(marywu_state, display_7seg_data_w))
+	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'635)));       // should it be perhaps a fraction of the XTAL clock ?
+	kbdc.out_sl_callback().set(FUNC(marywu_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
+	kbdc.in_rl_callback().set(FUNC(marywu_state::keyboard_r));          // keyboard Return Lines
+	kbdc.out_disp_callback().set(FUNC(marywu_state::display_7seg_data_w));
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_marywu)
+	config.set_default_layout(layout_marywu);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(marywu_state, ay1_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(marywu_state, ay1_port_b_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, marywu_state, ay1_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, marywu_state, ay1_port_b_w))
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(marywu_state, ay2_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(marywu_state, ay2_port_b_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, marywu_state, ay2_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, marywu_state, ay2_port_b_w))
 MACHINE_CONFIG_END
 
 ROM_START( marywu )
@@ -205,5 +220,5 @@ ROM_START( marywu )
 	ROM_LOAD( "marywu_sunkiss_chen.rom", 0x0000, 0x8000, CRC(11f67c7d) SHA1(9c1fd1a5cc6e2b0d675f0217aa8ff21c30609a0c) )
 ROM_END
 
-//    YEAR  NAME       PARENT   MACHINE   INPUT     STATE         INIT   ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( ????, marywu,    0,       marywu,   marywu,   marywu_state, 0,     ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
+GAME( ????, marywu, 0,       marywu,   marywu, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )

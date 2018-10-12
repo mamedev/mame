@@ -29,14 +29,16 @@ o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag,
 }
 
 
-ADDRESS_MAP_START(o2_chess_device::chess_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_READ(read_rom04)
-ADDRESS_MAP_END
+void o2_chess_device::chess_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).r(FUNC(o2_chess_device::read_rom04));
+}
 
-ADDRESS_MAP_START(o2_chess_device::chess_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void o2_chess_device::chess_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
 //-------------------------------------------------
@@ -44,7 +46,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(o2_chess_device::device_add_mconfig)
-	MCFG_CPU_ADD("subcpu", NSC800, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(chess_mem)
-	MCFG_CPU_IO_MAP(chess_io)
+	MCFG_DEVICE_ADD("subcpu", NSC800, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(chess_mem)
+	MCFG_DEVICE_IO_MAP(chess_io)
 MACHINE_CONFIG_END

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Charles MacDonald
 /*
-    HuC6280 sound chip emulator
+    Hudson PSG emulator
     by Charles MacDonald
     E-mail: cgfm2@hotmail.com
     WWW: http://cgfm2.emuviews.com
@@ -22,7 +22,7 @@
 
     Missing features / things to do:
 
-    - Add LFO support. But do any games actually use it?
+    - Verify LFO frequency from real hardware.
 
     - Add shared index for waveform playback and sample writes. Almost every
       game will reset the index prior to playback so this isn't an issue.
@@ -35,6 +35,10 @@
 
     - http://www.hudsonsoft.net/ww/about/about.html
     - http://www.hudson.co.jp/corp/eng/coinfo/history.html
+
+    Integrated on:
+    HuC6280 CPU (PC Engine/TurboGrafx 16)
+    HuC6230 Sound Chip (PC-FX, with OKI ADPCM)
 
 */
 
@@ -114,18 +118,48 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			}
 			else
 			{
-				/* Waveform mode */
-				uint32_t step = m_wave_freq_tab[m_channel[ch].m_frequency];
-				for (int i = 0; i < samples; i += 1)
+				if ((m_lfo_control & 0x80) && (ch < 2))
 				{
-					int offset;
-					int16_t data;
-					offset = (m_channel[ch].m_counter >> 12) & 0x1F;
-					m_channel[ch].m_counter += step;
-					m_channel[ch].m_counter &= 0x1FFFF;
-					data = m_channel[ch].m_waveform[offset];
-					outputs[0][i] += (int16_t)(vll * (data - 16));
-					outputs[1][i] += (int16_t)(vlr * (data - 16));
+					if (ch == 0) // CH 0 only, CH 1 is muted
+					{
+						/* Waveform mode with LFO */
+						uint32_t step = m_channel[0].m_frequency;
+						uint16_t lfo_step = m_channel[1].m_frequency;
+						for (int i = 0; i < samples; i += 1)
+						{
+							int offset, lfooffset;
+							int16_t data, lfo_data;
+							lfooffset = (m_channel[1].m_counter >> 12) & 0x1F;
+							m_channel[1].m_counter += m_wave_freq_tab[(lfo_step * m_lfo_frequency) & 0xfff]; // TODO : multiply? verify this from real hardware.
+							m_channel[1].m_counter &= 0x1FFFF;
+							lfo_data = m_channel[1].m_waveform[lfooffset];
+							if (m_lfo_control & 3)
+								step += ((lfo_data - 16) << ((m_lfo_control-1)<<1)); // verified from patent, TODO : same in real hardware?
+
+							offset = (m_channel[0].m_counter >> 12) & 0x1F;
+							m_channel[0].m_counter += m_wave_freq_tab[step & 0xfff];
+							m_channel[0].m_counter &= 0x1FFFF;
+							data = m_channel[0].m_waveform[offset];
+							outputs[0][i] += (int16_t)(vll * (data - 16));
+							outputs[1][i] += (int16_t)(vlr * (data - 16));
+						}
+					}
+				}
+				else
+				{
+					/* Waveform mode */
+					uint32_t step = m_wave_freq_tab[m_channel[ch].m_frequency];
+					for (int i = 0; i < samples; i += 1)
+					{
+						int offset;
+						int16_t data;
+						offset = (m_channel[ch].m_counter >> 12) & 0x1F;
+						m_channel[ch].m_counter += step;
+						m_channel[ch].m_counter &= 0x1FFFF;
+						data = m_channel[ch].m_waveform[offset];
+						outputs[0][i] += (int16_t)(vll * (data - 16));
+						outputs[1][i] += (int16_t)(vlr * (data - 16));
+					}
 				}
 			}
 		}
@@ -137,15 +171,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 /* MAME specific code                                                       */
 /*--------------------------------------------------------------------------*/
 
-READ8_MEMBER( c6280_device::c6280_r )
-{
-	return m_cpudevice->io_get_buffer();
-}
-
 WRITE8_MEMBER( c6280_device::c6280_w )
 {
-	m_cpudevice->io_set_buffer(data);
-
 	channel *chan = &m_channel[m_select];
 
 	/* Update stream */
@@ -226,12 +253,11 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 	}
 }
 
-DEFINE_DEVICE_TYPE(C6280, c6280_device, "c6280", "Hudson HuC6280")
+DEFINE_DEVICE_TYPE(C6280, c6280_device, "c6280", "Hudson Soft HuC6280 PSG")
 
 c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C6280, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_cpudevice(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -247,14 +273,14 @@ void c6280_device::calculate_clocks()
 	/* Make waveform frequency table */
 	for (int i = 0; i < 4096; i += 1)
 	{
-		double step = ((clock() / rate) * 4096) / (i + 1);
+		double step = (16 * 4096) / (i + 1);
 		m_wave_freq_tab[(1 + i) & 0xFFF] = (uint32_t)step;
 	}
 
 	/* Make noise frequency table */
 	for (int i = 0; i < 32; i += 1)
 	{
-		double step = ((clock() / rate) * 32) / (i+1);
+		double step = (16 * 32) / (i+1);
 		m_noise_freq_tab[i] = (uint32_t)step;
 	}
 

@@ -19,9 +19,9 @@ i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-util::disasm_interface *i8x9x_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8x9x_device::create_disassembler()
 {
-	return new i8x9x_disassembler;
+	return std::make_unique<i8x9x_disassembler>();
 }
 
 device_memory_interface::space_config_vector i8x9x_device::memory_space_config() const
@@ -372,7 +372,7 @@ p8098_device::p8098_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-DEFINE_DEVICE_TYPE(C8095, c8095_device, "c8095", "C8095")
-DEFINE_DEVICE_TYPE(P8098, p8098_device, "p8098", "P8098")
+DEFINE_DEVICE_TYPE(C8095, c8095_device, "c8095", "Intel C8095")
+DEFINE_DEVICE_TYPE(P8098, p8098_device, "p8098", "Intel P8098")
 
 #include "cpu/mcs96/i8x9x.hxx"

@@ -523,6 +523,22 @@ public:
 		m_beeper(*this, "beeper")
 	{ }
 
+	void cc10(machine_config &config);
+	void vcc(machine_config &config);
+
+	void bcc(machine_config &config);
+
+	void scc(machine_config &config);
+
+	void vsc(machine_config &config);
+
+	void vbrc(machine_config &config);
+
+	void dsc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
 	// devices/pointers
 	optional_device<i8041_device> m_mcu;
 	optional_device<z80pio_device> m_z80pio;
@@ -533,8 +549,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// CC10 and VCC/UVC
 	void vcc_prepare_display();
@@ -550,22 +564,18 @@ public:
 	void cc10_map(address_map &map);
 	void vcc_io(address_map &map);
 	void vcc_map(address_map &map);
-	void cc10(machine_config &config);
-	void vcc(machine_config &config);
 
 	// BCC
 	DECLARE_READ8_MEMBER(bcc_input_r);
 	DECLARE_WRITE8_MEMBER(bcc_control_w);
 	void bcc_io(address_map &map);
 	void bcc_map(address_map &map);
-	void bcc(machine_config &config);
 
 	// SCC
 	DECLARE_READ8_MEMBER(scc_input_r);
 	DECLARE_WRITE8_MEMBER(scc_control_w);
 	void scc_io(address_map &map);
 	void scc_map(address_map &map);
-	void scc(machine_config &config);
 
 	// VSC
 	void vsc_prepare_display();
@@ -579,7 +589,6 @@ public:
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 	void vsc_io(address_map &map);
 	void vsc_map(address_map &map);
-	void vsc(machine_config &config);
 
 	// VBRC
 	void vbrc_prepare_display();
@@ -588,17 +597,15 @@ public:
 	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t0_r);
 	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t1_r);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
-	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
+	template<int P> void vbrc_ioexp_port_w(uint8_t data);
 	void vbrc_main_io(address_map &map);
 	void vbrc_main_map(address_map &map);
-	void vbrc(machine_config &config);
 
 	// DSC
 	void dsc_prepare_display();
 	DECLARE_WRITE8_MEMBER(dsc_control_w);
 	DECLARE_WRITE8_MEMBER(dsc_select_w);
 	DECLARE_READ8_MEMBER(dsc_input_r);
-	void dsc(machine_config &config);
 	void dsc_map(address_map &map);
 };
 
@@ -1043,10 +1050,11 @@ WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 
 // I8243 I/O expander
 
-WRITE8_MEMBER(fidelz80_state::vbrc_ioexp_port_w)
+template<int P>
+void fidelz80_state::vbrc_ioexp_port_w(uint8_t data)
 {
 	// P4-P7: digit segment data
-	m_7seg_data = (m_7seg_data & ~(0xf << (4*offset))) | ((data & 0xf) << (4*offset));
+	m_7seg_data = (m_7seg_data & ~(0xf << (4*P))) | ((data & 0xf) << (4*P));
 	vbrc_prepare_display();
 }
 
@@ -1064,7 +1072,7 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
 {
 	// P20-P23: I8243 P2
 	// P24-P27: multiplexed inputs (active low)
-	return (m_i8243->p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
+	return (m_i8243->p2_r() & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
 READ_LINE_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
@@ -1126,69 +1134,77 @@ READ8_MEMBER(fidelz80_state::dsc_input_r)
 
 // CC10 and VCC/UVC
 
-ADDRESS_MAP_START(fidelz80_state::cc10_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0f00) AM_RAM
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0f00) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::cc10_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x10ff).mirror(0x0f00).ram();
+	map(0x3000, 0x30ff).mirror(0x0f00).ram();
+}
 
-ADDRESS_MAP_START(fidelz80_state::vcc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::vcc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x2fff).rom();
+	map(0x4000, 0x43ff).mirror(0x1c00).ram();
+}
 
-ADDRESS_MAP_START(fidelz80_state::vcc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x03)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void fidelz80_state::vcc_io(address_map &map)
+{
+	map.global_mask(0x03);
+	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 // BCC
 
-ADDRESS_MAP_START(fidelz80_state::bcc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0f00) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::bcc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).rom();
+	map(0x3000, 0x30ff).mirror(0x0f00).ram();
+}
 
-ADDRESS_MAP_START(fidelz80_state::bcc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x07) AM_READWRITE(bcc_input_r, bcc_control_w)
-ADDRESS_MAP_END
+void fidelz80_state::bcc_io(address_map &map)
+{
+	map.global_mask(0x07);
+	map(0x00, 0x07).rw(FUNC(fidelz80_state::bcc_input_r), FUNC(fidelz80_state::bcc_control_w));
+}
 
 
 // SCC
 
-ADDRESS_MAP_START(fidelz80_state::scc_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x5000, 0x50ff) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::scc_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x5000, 0x50ff).ram();
+}
 
-ADDRESS_MAP_START(fidelz80_state::scc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x07) AM_READWRITE(scc_input_r, scc_control_w)
-ADDRESS_MAP_END
+void fidelz80_state::scc_io(address_map &map)
+{
+	map.global_mask(0x07);
+	map(0x00, 0x07).rw(FUNC(fidelz80_state::scc_input_r), FUNC(fidelz80_state::scc_control_w));
+}
 
 
 // VSC
 
-ADDRESS_MAP_START(fidelz80_state::vsc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::vsc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).mirror(0x1000).rom();
+	map(0x6000, 0x63ff).mirror(0x1c00).ram();
+}
 
 // VSC io: A2 is 8255 _CE, A3 is Z80 PIO _CE - in theory, both chips can be accessed simultaneously
 READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 {
 	u8 data = 0xff; // open bus
 	if (~offset & 4)
-		data &= m_ppi8255->read(space, offset & 3);
+		data &= m_ppi8255->read(offset & 3);
 	if (~offset & 8)
 		data &= m_z80pio->read(space, offset & 3);
 
@@ -1198,42 +1214,46 @@ READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
 {
 	if (~offset & 4)
-		m_ppi8255->write(space, offset & 3, data);
+		m_ppi8255->write(offset & 3, data);
 	if (~offset & 8)
 		m_z80pio->write(space, offset & 3, data);
 }
 
-ADDRESS_MAP_START(fidelz80_state::vsc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(vsc_io_trampoline_r, vsc_io_trampoline_w)
-ADDRESS_MAP_END
+void fidelz80_state::vsc_io(address_map &map)
+{
+	map.global_mask(0x0f);
+	map(0x00, 0x0f).rw(FUNC(fidelz80_state::vsc_io_trampoline_r), FUNC(fidelz80_state::vsc_io_trampoline_w));
+}
 
 
 // VBRC
 
-ADDRESS_MAP_START(fidelz80_state::vbrc_main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_WRITE(vbrc_speech_w)
-ADDRESS_MAP_END
+void fidelz80_state::vbrc_main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).mirror(0x1c00).ram();
+	map(0xe000, 0xe000).mirror(0x1fff).w(FUNC(fidelz80_state::vbrc_speech_w));
+}
 
-ADDRESS_MAP_START(fidelz80_state::vbrc_main_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x01)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("mcu", i8041_device, upi41_master_r, upi41_master_w)
-ADDRESS_MAP_END
+void fidelz80_state::vbrc_main_io(address_map &map)
+{
+	map.global_mask(0x01);
+	map(0x00, 0x01).rw(m_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+}
 
 
 // DSC
 
-ADDRESS_MAP_START(fidelz80_state::dsc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x1fff) AM_WRITE(dsc_control_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_WRITE(dsc_select_w)
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(dsc_input_r)
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1c00) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::dsc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x4000).mirror(0x1fff).w(FUNC(fidelz80_state::dsc_control_w));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(fidelz80_state::dsc_select_w));
+	map(0x8000, 0x8000).mirror(0x1fff).r(FUNC(fidelz80_state::dsc_input_r));
+	map(0xa000, 0xa3ff).mirror(0x1c00).ram();
+}
 
 
 
@@ -1288,28 +1308,28 @@ static INPUT_PORTS_START( vcc )
 	PORT_INCLUDE( vcc_base )
 
 	PORT_START("IN.4") // language setting, hardwired with 4 jumpers (0: English, 1: German, 2: French, 4: Spanish, 8:Special(unused))
-	PORT_BIT(0x0f, 0x00, IPT_SPECIAL)
+	PORT_BIT(0x0f, 0x00, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccsp )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4") // set to Spanish
-	PORT_BIT(0x0f, 0x04, IPT_SPECIAL)
+	PORT_BIT(0x0f, 0x04, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccg )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4") // set to German
-	PORT_BIT(0x0f, 0x01, IPT_SPECIAL)
+	PORT_BIT(0x0f, 0x01, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccfr )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4") // set to French
-	PORT_BIT(0x0f, 0x02, IPT_SPECIAL)
+	PORT_BIT(0x0f, 0x02, IPT_CUSTOM)
 INPUT_PORTS_END
 
 
@@ -1589,28 +1609,28 @@ static INPUT_PORTS_START( vsc )
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.10") // language setting, hardwired with 2 diodes (0: English, 1: German, 2: French, 3: Spanish)
-	PORT_BIT(0x03, 0x00, IPT_SPECIAL)
+	PORT_BIT(0x03, 0x00, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vscsp )
 	PORT_INCLUDE( vsc )
 
 	PORT_MODIFY("IN.10") // set to Spanish
-	PORT_BIT(0x03, 0x03, IPT_SPECIAL)
+	PORT_BIT(0x03, 0x03, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vscg )
 	PORT_INCLUDE( vsc )
 
 	PORT_MODIFY("IN.10") // set to German
-	PORT_BIT(0x03, 0x01, IPT_SPECIAL)
+	PORT_BIT(0x03, 0x01, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vscfr )
 	PORT_INCLUDE( vsc )
 
 	PORT_MODIFY("IN.10") // set to French
-	PORT_BIT(0x03, 0x02, IPT_SPECIAL)
+	PORT_BIT(0x03, 0x02, IPT_CUSTOM)
 INPUT_PORTS_END
 
 
@@ -1643,59 +1663,59 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(fidelz80_state::bcc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3.579545_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(bcc_map)
-	MCFG_CPU_IO_MAP(bcc_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3.579545_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(bcc_map)
+	MCFG_DEVICE_IO_MAP(bcc_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_bcc)
+	config.set_default_layout(layout_fidel_bcc);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidelz80_state::scc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3.9_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(scc_map)
-	MCFG_CPU_IO_MAP(scc_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3.9_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(scc_map)
+	MCFG_DEVICE_IO_MAP(scc_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_sc8)
+	config.set_default_layout(layout_fidel_sc8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidelz80_state::cc10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(cc10_map)
-	MCFG_CPU_IO_MAP(vcc_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(cc10_map)
+	MCFG_DEVICE_IO_MAP(vcc_io)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidelz80_state, cc10_ppi_porta_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("LEVEL"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(fidelz80_state, vcc_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(fidelz80_state, vcc_ppi_portc_r))
-	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
+	I8255(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::cc10_ppi_porta_w));
+	m_ppi8255->tri_pa_callback().set_constant(0);
+	m_ppi8255->in_pb_callback().set_ioport("LEVEL");
+	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::vcc_ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_r));
+	m_ppi8255->tri_pb_callback().set_constant(0);
+	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
+	config.set_default_layout(layout_fidel_cc);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("beeper", BEEP, 1360) // approximation, from 556 timer ic
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 1360) // approximation, from 556 timer ic
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_TIMER_DRIVER_ADD("beeper_off", fidelz80_state, beeper_off_callback)
 MACHINE_CONFIG_END
@@ -1703,83 +1723,87 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::vcc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(vcc_map)
-	MCFG_CPU_IO_MAP(vcc_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(vcc_map)
+	MCFG_DEVICE_IO_MAP(vcc_io)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidelz80_state, vcc_ppi_porta_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
-	MCFG_I8255_IN_PORTB_CB(READ8(fidelz80_state, vcc_ppi_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(fidelz80_state, vcc_ppi_portb_w))
-	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
-	MCFG_I8255_IN_PORTC_CB(READ8(fidelz80_state, vcc_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
+	I8255(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::vcc_ppi_porta_w));
+	m_ppi8255->tri_pa_callback().set_constant(0);
+	m_ppi8255->in_pb_callback().set(FUNC(fidelz80_state::vcc_ppi_portb_r));
+	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::vcc_ppi_portb_w));
+	m_ppi8255->tri_pb_callback().set_constant(0);
+	m_ppi8255->in_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_r));
+	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vcc)
+	config.set_default_layout(layout_fidel_vcc);
 
 	MCFG_MACHINE_START_OVERRIDE(fidelz80_state,vcc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidelz80_state, vcc_speech_r))
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidelz80_state, vcc_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidelz80_state::vsc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3.9_MHz_XTAL) // 3.9MHz resonator
-	MCFG_CPU_PROGRAM_MAP(vsc_map)
-	MCFG_CPU_IO_MAP(vsc_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80_state, nmi_line_pulse, 587) // 555 timer, measured
+	MCFG_DEVICE_ADD("maincpu", Z80, 3.9_MHz_XTAL) // 3.9MHz resonator
+	MCFG_DEVICE_PROGRAM_MAP(vsc_map)
+	MCFG_DEVICE_IO_MAP(vsc_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidelz80_state, nmi_line_pulse, 587) // 555 timer, measured
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidelz80_state, vsc_ppi_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(fidelz80_state, vsc_ppi_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vsc_ppi_portc_w))
+	I8255(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::vsc_ppi_porta_w));
+	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::vsc_ppi_portb_w));
+	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vsc_ppi_portc_w));
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3.9_MHz_XTAL)
-	MCFG_Z80PIO_IN_PA_CB(READ8(fidelz80_state, vsc_pio_porta_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(fidelz80_state, vsc_pio_portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(fidelz80_state, vsc_pio_portb_w))
+	Z80PIO(config, m_z80pio, 3.9_MHz_XTAL);
+	m_z80pio->in_pa_callback().set(FUNC(fidelz80_state::vsc_pio_porta_r));
+	m_z80pio->in_pb_callback().set(FUNC(fidelz80_state::vsc_pio_portb_r));
+	m_z80pio->out_pb_callback().set(FUNC(fidelz80_state::vsc_pio_portb_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
+	config.set_default_layout(layout_fidel_vsc);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidelz80_state, vcc_speech_r))
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidelz80_state, vcc_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidelz80_state::vbrc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5_MHz_XTAL/2)
-	MCFG_CPU_PROGRAM_MAP(vbrc_main_map)
-	MCFG_CPU_IO_MAP(vbrc_main_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(vbrc_main_map)
+	MCFG_DEVICE_IO_MAP(vbrc_main_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("mcu", I8041, 5_MHz_XTAL)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(fidelz80_state, vbrc_mcu_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(fidelz80_state, vbrc_mcu_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(DEVWRITE8("i8243", i8243_device, p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(fidelz80_state, vbrc_mcu_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(fidelz80_state, vbrc_mcu_t1_r))
+	MCFG_DEVICE_ADD("mcu", I8041, 5_MHz_XTAL)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, fidelz80_state, vbrc_mcu_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, fidelz80_state, vbrc_mcu_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(m_i8243, i8243_device, p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t1_r))
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, vbrc_ioexp_port_w))
+	I8243(config, m_i8243);
+	m_i8243->p4_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<1>));
+	m_i8243->p6_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<2>));
+	m_i8243->p7_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<3>));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vbrc)
+	config.set_default_layout(layout_fidel_vbrc);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_S14001A_BSY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
@@ -1787,20 +1811,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::dsc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3.9_MHz_XTAL) // 3.9MHz resonator
-	MCFG_CPU_PROGRAM_MAP(dsc_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3.9_MHz_XTAL) // 3.9MHz resonator
+	MCFG_DEVICE_PROGRAM_MAP(dsc_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidelz80_state, irq_on, attotime::from_hz(523)) // from 555 timer (22nF, 120K, 2.7K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(523) - attotime::from_usec(41)) // active for 41us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidelz80_state, irq_off, attotime::from_hz(523))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_dsc)
+	config.set_default_layout(layout_fidel_dsc);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1989,28 +2013,28 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE INPUT  STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1978, cc10,     0,      0, cc10,   cc10,  fidelz80_state, 0, "Fidelity Electronics", "Chess Challenger 10 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, cc7,      0,      0, bcc,    bcc,   fidelz80_state, 0, "Fidelity Electronics", "Chess Challenger 7 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  CMP MACHINE INPUT  CLASS           INIT        COMPANY                 FULLNAME, FLAGS
+CONS( 1978, cc10,     0,       0, cc10,   cc10,  fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, cc7,      0,       0, bcc,    bcc,   fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, fscc8,    0,      0, scc,    scc,   fidelz80_state, 0, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, fscc8,    0,       0, scc,    scc,   fidelz80_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1979, vcc,      0,      0, vcc,    vcc,   fidelz80_state, 0, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, vccsp,    vcc,    0, vcc,    vccsp, fidelz80_state, 0, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, vccg,     vcc,    0, vcc,    vccg,  fidelz80_state, 0, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, vccfr,    vcc,    0, vcc,    vccfr, fidelz80_state, 0, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vcc,      0,       0, vcc,    vcc,   fidelz80_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccsp,    vcc,     0, vcc,    vccsp, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccg,     vcc,     0, vcc,    vccg,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccfr,    vcc,     0, vcc,    vccfr, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, uvc,      vcc,    0, vcc,    vcc,   fidelz80_state, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, uvcsp,    vcc,    0, vcc,    vccsp, fidelz80_state, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, uvcg,     vcc,    0, vcc,    vccg,  fidelz80_state, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, uvcfr,    vcc,    0, vcc,    vccfr, fidelz80_state, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvc,      vcc,     0, vcc,    vcc,   fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcsp,    vcc,     0, vcc,    vccsp, fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcg,     vcc,     0, vcc,    vccg,  fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcfr,    vcc,     0, vcc,    vccfr, fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, vsc,      0,      0, vsc,    vsc,   fidelz80_state, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscsp,    vsc,    0, vsc,    vscsp, fidelz80_state, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscg,     vsc,    0, vsc,    vscg,  fidelz80_state, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscfr,    vsc,    0, vsc,    vscfr, fidelz80_state, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vsc,      0,       0, vsc,    vsc,   fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscsp,    vsc,     0, vsc,    vscsp, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscg,     vsc,     0, vsc,    vscg,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscfr,    vsc,     0, vsc,    vscfr, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1979, vbrc,     0,      0, vbrc,   vbrc,  fidelz80_state, 0, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1980, bridgec3, vbrc,   0, vbrc,   vbrc,  fidelz80_state, 0, "Fidelity Electronics", "Bridge Challenger III",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, vbrc,     0,       0, vbrc,   vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1980, bridgec3, vbrc,    0, vbrc,   vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Bridge Challenger III",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1981, damesc,   0,      0, dsc,    dsc,   fidelz80_state, 0, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, damesc,   0,       0, dsc,    dsc,   fidelz80_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

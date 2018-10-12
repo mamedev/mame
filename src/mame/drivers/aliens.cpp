@@ -17,6 +17,7 @@ Preliminary driver by:
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -85,33 +86,36 @@ WRITE8_MEMBER(aliens_state::k052109_051960_w)
 		m_k051960->k051960_w(space, offset - 0x3c00, data);
 }
 
-ADDRESS_MAP_START(aliens_state::aliens_map)
-	AM_RANGE(0x0000, 0x03ff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
-	AM_RANGE(0x0400, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")                                /* banked ROM */
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-	AM_RANGE(0x5f80, 0x5f80) AM_READ_PORT("DSW3")
-	AM_RANGE(0x5f81, 0x5f81) AM_READ_PORT("P1")
-	AM_RANGE(0x5f82, 0x5f82) AM_READ_PORT("P2")
-	AM_RANGE(0x5f83, 0x5f83) AM_READ_PORT("DSW2")
-	AM_RANGE(0x5f84, 0x5f84) AM_READ_PORT("DSW1")
-	AM_RANGE(0x5f88, 0x5f88) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(aliens_coin_counter_w)      /* coin counters */
-	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(aliens_sh_irqtrigger_w)                       /* cause interrupt on audio CPU */
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x28000)                   /* ROM e24_j02.bin */
-ADDRESS_MAP_END
+void aliens_state::aliens_map(address_map &map)
+{
+	map(0x0000, 0x03ff).m(m_bank0000, FUNC(address_map_bank_device::amap8));
+	map(0x0400, 0x1fff).ram();
+	map(0x2000, 0x3fff).bankr("rombank");                                /* banked ROM */
+	map(0x4000, 0x7fff).rw(FUNC(aliens_state::k052109_051960_r), FUNC(aliens_state::k052109_051960_w));
+	map(0x5f80, 0x5f80).portr("DSW3");
+	map(0x5f81, 0x5f81).portr("P1");
+	map(0x5f82, 0x5f82).portr("P2");
+	map(0x5f83, 0x5f83).portr("DSW2");
+	map(0x5f84, 0x5f84).portr("DSW1");
+	map(0x5f88, 0x5f88).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(aliens_state::aliens_coin_counter_w));      /* coin counters */
+	map(0x5f8c, 0x5f8c).w(FUNC(aliens_state::aliens_sh_irqtrigger_w));                       /* cause interrupt on audio CPU */
+	map(0x8000, 0xffff).rom().region("maincpu", 0x28000);                   /* ROM e24_j02.bin */
+}
 
-ADDRESS_MAP_START(aliens_state::bank0000_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void aliens_state::bank0000_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(aliens_state::aliens_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                     /* ROM g04_b03.bin */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                                     /* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
-ADDRESS_MAP_END
+void aliens_state::aliens_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                                     /* ROM g04_b03.bin */
+	map(0x8000, 0x87ff).ram();                                     /* RAM */
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+}
 
 
 /***************************************************************************
@@ -194,21 +198,16 @@ WRITE8_MEMBER( aliens_state::banking_callback )
 MACHINE_CONFIG_START(aliens_state::aliens)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)       /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(aliens_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(aliens_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)       /* 052001 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(aliens_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, aliens_state, banking_callback))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(aliens_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(aliens_sound_map)
 
-	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(11)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+	ADDRESS_MAP_BANK(config, "bank0000").set_map(&aliens_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 11, 0x400);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -233,17 +232,17 @@ MACHINE_CONFIG_START(aliens_state::aliens)
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(aliens_state,aliens_snd_bankswitch_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, aliens_state,aliens_snd_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(aliens_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, aliens_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -479,10 +478,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, aliens,   0,      aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliens2,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliens3,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensu,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (US)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensj,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensj2, aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensa,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Asia)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens,   0,      aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (World set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens2,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (World set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens3,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (World set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensu,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (US)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensj,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensj2, aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensa,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (Asia)",        MACHINE_SUPPORTS_SAVE )

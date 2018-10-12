@@ -24,6 +24,11 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
+	void scorpion(machine_config &config);
+	void profi(machine_config &config);
+	void quorum(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(beta_neutral_r);
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
@@ -33,19 +38,17 @@ public:
 	DECLARE_MACHINE_START(scorpion);
 	DECLARE_MACHINE_RESET(scorpion);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
-	void scorpion(machine_config &config);
-	void profi(machine_config &config);
-	void quorum(machine_config &config);
+
 	void scorpion_io(address_map &map);
 	void scorpion_mem(address_map &map);
 	void scorpion_switch(address_map &map);
-protected:
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
-private:
+
 	address_space *m_program;
 	uint8_t *m_p_ram;
 	void scorpion_update_memory();
@@ -123,7 +126,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
 	{
 		m_port_1ffd_data |= 0x02;
 		scorpion_update_memory();
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -176,32 +179,35 @@ READ8_MEMBER(scorpion_state::beta_disable_r)
 	return m_program->read_byte(offset + 0x4000);
 }
 
-ADDRESS_MAP_START(scorpion_state::scorpion_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1") AM_WRITE(scorpion_0000_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void scorpion_state::scorpion_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1").w(FUNC(scorpion_state::scorpion_0000_w));
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-ADDRESS_MAP_START(scorpion_state::scorpion_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xff00)
-	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x4021, 0x4021) AM_WRITE(scorpion_port_7ffd_w)  AM_MIRROR(0x3fdc)
-	AM_RANGE(0x8021, 0x8021) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3fdc)
-	AM_RANGE(0xc021, 0xc021) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3fdc)
-	AM_RANGE(0x0021, 0x0021) AM_WRITE(scorpion_port_1ffd_w) AM_MIRROR(0x3fdc)
-ADDRESS_MAP_END
+void scorpion_state::scorpion_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x001f, 0x001f).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w)).mirror(0xff00);
+	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
+	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
+	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
+	map(0x00fe, 0x00fe).rw(FUNC(scorpion_state::spectrum_port_fe_r), FUNC(scorpion_state::spectrum_port_fe_w)).select(0xff00);
+	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
+	map(0x4021, 0x4021).w(FUNC(scorpion_state::scorpion_port_7ffd_w)).mirror(0x3fdc);
+	map(0x8021, 0x8021).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3fdc);
+	map(0xc021, 0xc021).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3fdc);
+	map(0x0021, 0x0021).w(FUNC(scorpion_state::scorpion_port_1ffd_w)).mirror(0x3fdc);
+}
 
-ADDRESS_MAP_START(scorpion_state::scorpion_switch)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with previous because we want real addresses on the 3e00-3fff range
-	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
-ADDRESS_MAP_END
+void scorpion_state::scorpion_switch(address_map &map)
+{
+	map(0x0000, 0x3fff).r(FUNC(scorpion_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
+	map(0x3d00, 0x3dff).r(FUNC(scorpion_state::beta_enable_r));
+	map(0x4000, 0xffff).r(FUNC(scorpion_state::beta_disable_r));
+}
 
 MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 {
@@ -272,36 +278,35 @@ static const gfx_layout profi_8_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( scorpion )
+static GFXDECODE_START( gfx_scorpion )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( profi )
+static GFXDECODE_START( gfx_profi )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 	GFXDECODE_ENTRY( "maincpu", 0x1abfc, profi_8_charlayout, 0, 8 )
 	/* There are more characters after this, that haven't been decoded */
 GFXDECODE_END
 
-static GFXDECODE_START( quorum )
+static GFXDECODE_START( gfx_quorum )
 	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(scorpion_state::scorpion)
 	spectrum_128(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scorpion_mem)
-	MCFG_CPU_IO_MAP(scorpion_io)
-	MCFG_CPU_OPCODES_MAP(scorpion_switch)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scorpion_mem)
+	MCFG_DEVICE_IO_MAP(scorpion_io)
+	MCFG_DEVICE_OPCODES_MAP(scorpion_switch)
 
 	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
 	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", scorpion)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_scorpion)
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	m_ram->set_default_size("256K");
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", scorpion_state, nmi_check_callback, attotime::from_hz(50))
 
@@ -310,12 +315,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scorpion_state::profi)
 	scorpion(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", profi)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_profi)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scorpion_state::quorum)
 	scorpion(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", quorum)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_quorum)
 MACHINE_CONFIG_END
 
 
@@ -329,25 +334,25 @@ MACHINE_CONFIG_END
 ROM_START(scorpio)
 	ROM_REGION(0x90000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "v1", "V.2.92")
-	ROMX_LOAD("scorp0.rom", 0x010000, 0x4000, CRC(0eb40a09) SHA1(477114ff0fe1388e0979df1423602b21248164e5), ROM_BIOS(1))
-	ROMX_LOAD("scorp1.rom", 0x014000, 0x4000, CRC(9d513013) SHA1(367b5a102fb663beee8e7930b8c4acc219c1f7b3), ROM_BIOS(1))
-	ROMX_LOAD("scorp2.rom", 0x018000, 0x4000, CRC(fd0d3ce1) SHA1(07783ee295274d8ff15d935bfd787c8ac1d54900), ROM_BIOS(1))
-	ROMX_LOAD("scorp3.rom", 0x01c000, 0x4000, CRC(1fe1d003) SHA1(33703e97cc93b7edfcc0334b64233cf81b7930db), ROM_BIOS(1))
+	ROMX_LOAD("scorp0.rom", 0x010000, 0x4000, CRC(0eb40a09) SHA1(477114ff0fe1388e0979df1423602b21248164e5), ROM_BIOS(0))
+	ROMX_LOAD("scorp1.rom", 0x014000, 0x4000, CRC(9d513013) SHA1(367b5a102fb663beee8e7930b8c4acc219c1f7b3), ROM_BIOS(0))
+	ROMX_LOAD("scorp2.rom", 0x018000, 0x4000, CRC(fd0d3ce1) SHA1(07783ee295274d8ff15d935bfd787c8ac1d54900), ROM_BIOS(0))
+	ROMX_LOAD("scorp3.rom", 0x01c000, 0x4000, CRC(1fe1d003) SHA1(33703e97cc93b7edfcc0334b64233cf81b7930db), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v2", "V.2.92 joined")
-	ROMX_LOAD( "scorpion.rom", 0x010000, 0x10000, CRC(fef73c28) SHA1(66cecdadf992d8adb9c66deee929eb56600dc9bc), ROM_BIOS(2))
+	ROMX_LOAD( "scorpion.rom", 0x010000, 0x10000, CRC(fef73c28) SHA1(66cecdadf992d8adb9c66deee929eb56600dc9bc), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v3", "V.2.94")
-	ROMX_LOAD( "scorp294.rom", 0x010000, 0x10000, CRC(99f57ce1) SHA1(083bb57ad52cc871b92d3e1794fd9790872c3584), ROM_BIOS(3))
+	ROMX_LOAD( "scorp294.rom", 0x010000, 0x10000, CRC(99f57ce1) SHA1(083bb57ad52cc871b92d3e1794fd9790872c3584), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v4", "SMUC V.4.02")
-	ROMX_LOAD( "scorp402.rom", 0x010000, 0x20000, CRC(9fcf893d) SHA1(0cc7ba60f5cfc36e75bd3a5c90e26b2a1905a970), ROM_BIOS(4))
+	ROMX_LOAD( "scorp402.rom", 0x010000, 0x20000, CRC(9fcf893d) SHA1(0cc7ba60f5cfc36e75bd3a5c90e26b2a1905a970), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "v5", "ProfROM V.3.9f")
-	ROMX_LOAD( "prof_39f.rom", 0x010000, 0x20000, CRC(c55e64da) SHA1(cec7770fe26350f57f6c325a29db78787dc4521e), ROM_BIOS(5))
+	ROMX_LOAD( "prof_39f.rom", 0x010000, 0x20000, CRC(c55e64da) SHA1(cec7770fe26350f57f6c325a29db78787dc4521e), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "v6", "ProfROM V.4.01")
-	ROMX_LOAD( "profrom.rom", 0x010000, 0x80000, CRC(b02d89de) SHA1(4cb85341e2a400e0e88869304d80af430266cdd1), ROM_BIOS(6))
+	ROMX_LOAD( "profrom.rom", 0x010000, 0x80000, CRC(b02d89de) SHA1(4cb85341e2a400e0e88869304d80af430266cdd1), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS(6, "v7", "NeOS 256")
-	ROMX_LOAD("neos_256.rom", 0x010000, 0x4000, CRC(364ae09a) SHA1(bb6db1947415503a6bc48f33c603fb3a0dbb3690), ROM_BIOS(7))
-	ROMX_LOAD("scorp1.rom",   0x014000, 0x4000, CRC(9d513013) SHA1(367b5a102fb663beee8e7930b8c4acc219c1f7b3), ROM_BIOS(7))
-	ROMX_LOAD("scorp2.rom",   0x018000, 0x4000, CRC(fd0d3ce1) SHA1(07783ee295274d8ff15d935bfd787c8ac1d54900), ROM_BIOS(7))
-	ROMX_LOAD("scorp3.rom",   0x01c000, 0x4000, CRC(1fe1d003) SHA1(33703e97cc93b7edfcc0334b64233cf81b7930db), ROM_BIOS(7))
+	ROMX_LOAD("neos_256.rom", 0x010000, 0x4000, CRC(364ae09a) SHA1(bb6db1947415503a6bc48f33c603fb3a0dbb3690), ROM_BIOS(6))
+	ROMX_LOAD("scorp1.rom",   0x014000, 0x4000, CRC(9d513013) SHA1(367b5a102fb663beee8e7930b8c4acc219c1f7b3), ROM_BIOS(6))
+	ROMX_LOAD("scorp2.rom",   0x018000, 0x4000, CRC(fd0d3ce1) SHA1(07783ee295274d8ff15d935bfd787c8ac1d54900), ROM_BIOS(6))
+	ROMX_LOAD("scorp3.rom",   0x01c000, 0x4000, CRC(1fe1d003) SHA1(33703e97cc93b7edfcc0334b64233cf81b7930db), ROM_BIOS(6))
 
 	ROM_REGION(0x01000, "keyboard", 0)
 	ROM_LOAD( "scrpkey.rom", 0x0000, 0x1000, CRC(e938a510) SHA1(2753993c97ff0fc6cff26ed792929abc1288dc6f))
@@ -360,19 +365,19 @@ ROM_END
 ROM_START(profi)
 	ROM_REGION(0x020000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "v1", "ver 1")
-	ROMX_LOAD( "profi.rom", 0x010000, 0x10000, CRC(285a0985) SHA1(2b33ab3561e7bc5997da7f0d3a2a906fe7ea960f), ROM_BIOS(1))
+	ROMX_LOAD( "profi.rom", 0x010000, 0x10000, CRC(285a0985) SHA1(2b33ab3561e7bc5997da7f0d3a2a906fe7ea960f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v2", "ver 2")
-	ROMX_LOAD( "profi_my.rom", 0x010000, 0x10000, CRC(2ffd6cd9) SHA1(1b74a3251358c5f102bb87654f47b02281e15e9c), ROM_BIOS(2))
+	ROMX_LOAD( "profi_my.rom", 0x010000, 0x10000, CRC(2ffd6cd9) SHA1(1b74a3251358c5f102bb87654f47b02281e15e9c), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v3", "ver 3")
-	ROMX_LOAD( "profi-p1.rom", 0x010000, 0x10000, CRC(537ddb81) SHA1(00a23e8dc722b248d4f98cb14a600ce7487f2b9c), ROM_BIOS(3))
+	ROMX_LOAD( "profi-p1.rom", 0x010000, 0x10000, CRC(537ddb81) SHA1(00a23e8dc722b248d4f98cb14a600ce7487f2b9c), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v4", "ver 4")
-	ROMX_LOAD( "profi_1.rom", 0x010000, 0x10000, CRC(f07fbee8) SHA1(b29c81a94658a4d50274ba953775a49e855534de), ROM_BIOS(4))
+	ROMX_LOAD( "profi_1.rom", 0x010000, 0x10000, CRC(f07fbee8) SHA1(b29c81a94658a4d50274ba953775a49e855534de), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "v5", "T-Rex")
-	ROMX_LOAD( "profi-p.rom", 0x010000, 0x10000, CRC(314f6b57) SHA1(1507f53ec64dcf5154b5cfce6922f69f70296a53), ROM_BIOS(5))
+	ROMX_LOAD( "profi-p.rom", 0x010000, 0x10000, CRC(314f6b57) SHA1(1507f53ec64dcf5154b5cfce6922f69f70296a53), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "v6", "JV Kramis V0.2")
-	ROMX_LOAD( "profi32.rom", 0x010000, 0x10000, CRC(77327f52) SHA1(019bd00cc7939741d99b99beac6ae1298652e652), ROM_BIOS(6))
+	ROMX_LOAD( "profi32.rom", 0x010000, 0x10000, CRC(77327f52) SHA1(019bd00cc7939741d99b99beac6ae1298652e652), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS(6, "v7", "Power Of Sound Group")
-	ROMX_LOAD( "profi1k.rom", 0x010000, 0x10000, CRC(a932676f) SHA1(907ac56219f325949a7c2fe8168799d9cdd5ba6c), ROM_BIOS(7))
+	ROMX_LOAD( "profi1k.rom", 0x010000, 0x10000, CRC(a932676f) SHA1(907ac56219f325949a7c2fe8168799d9cdd5ba6c), ROM_BIOS(6))
 ROM_END
 
 ROM_START(quorum)
@@ -388,17 +393,17 @@ ROM_END
 ROM_START( kay1024 )
 	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "ver 1")
-	ROMX_LOAD( "kay98.rom",    0x010000, 0x08000, CRC(7fbf2d43) SHA1(e555f2ed01ecf2231d493bd70a4d79b436e9f10e), ROM_BIOS(1))
-	ROMX_LOAD( "trd503.rom",   0x01c000, 0x04000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c), ROM_BIOS(1))
+	ROMX_LOAD( "kay98.rom",    0x010000, 0x08000, CRC(7fbf2d43) SHA1(e555f2ed01ecf2231d493bd70a4d79b436e9f10e), ROM_BIOS(0))
+	ROMX_LOAD( "trd503.rom",   0x01c000, 0x04000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v2", "Kramis V0.2")
-	ROMX_LOAD( "kay1024b.rom", 0x010000, 0x10000, CRC(ab99c31e) SHA1(cfa9e6553aea72956fce4f0130c007981d684734), ROM_BIOS(2))
+	ROMX_LOAD( "kay1024b.rom", 0x010000, 0x10000, CRC(ab99c31e) SHA1(cfa9e6553aea72956fce4f0130c007981d684734), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v3", "Kramis V0.3")
-	ROMX_LOAD( "kay1024s.rom", 0x010000, 0x10000, CRC(67351caa) SHA1(1d9c0606b380c000ca1dfa33f90a122ecf9df1f1), ROM_BIOS(3))
+	ROMX_LOAD( "kay1024s.rom", 0x010000, 0x10000, CRC(67351caa) SHA1(1d9c0606b380c000ca1dfa33f90a122ecf9df1f1), ROM_BIOS(2))
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT      CLASS           INIT    COMPANY              FULLNAME           FLAGS
-COMP( 1994, scorpio,  spec128,  0,      scorpion,   spec_plus, scorpion_state, 0,      "Zonov and Co.",     "Scorpion ZS-256", 0 )
-COMP( 1991, profi,    spec128,  0,      profi,      spec_plus, scorpion_state, 0,      "Kondor and Kramis", "Profi",           MACHINE_NOT_WORKING )
-COMP( 1998, kay1024,  spec128,  0,      scorpion,   spec_plus, scorpion_state, 0,      "NEMO",              "Kay 1024",        MACHINE_NOT_WORKING )
-COMP( 19??, quorum,   spec128,  0,      quorum,     spec_plus, scorpion_state, 0,      "<unknown>",         "Quorum",          MACHINE_NOT_WORKING )
-COMP( 19??, bestzx,   spec128,  0,      scorpion,   spec_plus, scorpion_state, 0,      "<unknown>",         "BestZX",          MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY              FULLNAME           FLAGS
+COMP( 1994, scorpio, spec128, 0,      scorpion, spec_plus, scorpion_state, empty_init, "Zonov and Co.",     "Scorpion ZS-256", 0 )
+COMP( 1991, profi,   spec128, 0,      profi,    spec_plus, scorpion_state, empty_init, "Kondor and Kramis", "Profi",           MACHINE_NOT_WORKING )
+COMP( 1998, kay1024, spec128, 0,      scorpion, spec_plus, scorpion_state, empty_init, "NEMO",              "Kay 1024",        MACHINE_NOT_WORKING )
+COMP( 19??, quorum,  spec128, 0,      quorum,   spec_plus, scorpion_state, empty_init, "<unknown>",         "Quorum",          MACHINE_NOT_WORKING )
+COMP( 19??, bestzx,  spec128, 0,      scorpion, spec_plus, scorpion_state, empty_init, "<unknown>",         "BestZX",          MACHINE_NOT_WORKING )

@@ -35,7 +35,7 @@ TODO:
 #include "speaker.h"
 
 
-DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
+void nbmj8900_state::init_ohpaipee()
 {
 #if 0
 	uint8_t *prot = memregion("protdata")->base();
@@ -64,7 +64,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
+void nbmj8900_state::init_togenkyo()
 {
 #if 0
 	uint8_t *prot = memregion("protdata")->base();
@@ -75,7 +75,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
@@ -93,42 +93,45 @@ DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
 }
 
 
-ADDRESS_MAP_START(nbmj8900_state::ohpaipee_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(clut_r, clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type1_r, palette_type1_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void nbmj8900_state::ohpaipee_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf00f).rw(FUNC(nbmj8900_state::clut_r), FUNC(nbmj8900_state::clut_w));
+	map(0xf400, 0xf5ff).rw(FUNC(nbmj8900_state::palette_type1_r), FUNC(nbmj8900_state::palette_type1_w));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(nbmj8900_state::togenkyo_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(clut_r, clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type1_r, palette_type1_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void nbmj8900_state::togenkyo_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf00f).rw(FUNC(nbmj8900_state::clut_r), FUNC(nbmj8900_state::clut_w));
+	map(0xf400, 0xf5ff).rw(FUNC(nbmj8900_state::palette_type1_r), FUNC(nbmj8900_state::palette_type1_w));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(nbmj8900_state::ohpaipee_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
-	AM_RANGE(0x20, 0x27) AM_WRITE(blitter_w)
+void nbmj8900_state::ohpaipee_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
+	map(0x00, 0x00).w(m_nb1413m3, FUNC(nb1413m3_device::nmi_clock_w));
+	map(0x20, 0x27).w(FUNC(nbmj8900_state::blitter_w));
 
-	AM_RANGE(0x40, 0x40) AM_WRITE(clutsel_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(romsel_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE(scrolly_w)
+	map(0x40, 0x40).w(FUNC(nbmj8900_state::clutsel_w));
+	map(0x60, 0x60).w(FUNC(nbmj8900_state::romsel_w));
+	map(0x70, 0x70).w(FUNC(nbmj8900_state::scrolly_w));
 
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
+	map(0x80, 0x81).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 
-	AM_RANGE(0x90, 0x90) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport0_r)
+	map(0x90, 0x90).r(m_nb1413m3, FUNC(nb1413m3_device::inputport0_r));
 
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport2_r, sndrombank1_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport3_r)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(vramsel_w)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, dipsw2_r, outcoin_w)
-ADDRESS_MAP_END
+	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
+	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
+	map(0xc0, 0xc0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport3_r));
+	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0xe0, 0xe0).w(FUNC(nbmj8900_state::vramsel_w));
+	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+	map(0xf1, 0xf1).rw(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r), FUNC(nb1413m3_device::outcoin_w));
+}
 
 
 static INPUT_PORTS_START( ohpaipee )
@@ -304,10 +307,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(nbmj8900_state::ohpaipee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ohpaipee_map)
-	MCFG_CPU_IO_MAP(ohpaipee_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj8900_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ohpaipee_map)
+	MCFG_DEVICE_IO_MAP(ohpaipee_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8900_state, irq0_line_hold)
 
 	MCFG_NB1413M3_ADD("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OHPAIPEE )
@@ -325,22 +328,22 @@ MACHINE_CONFIG_START(nbmj8900_state::ohpaipee)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 2500000)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.42) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.42) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8900_state::togenkyo)
 	ohpaipee(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(togenkyo_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(togenkyo_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_TOGENKYO )
@@ -395,5 +398,5 @@ ROM_START( togenkyo )
 ROM_END
 
 //    YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT, MONITOR,COMPANY,FULLNAME,FLAGS)
-GAME( 1989, ohpaipee,        0, ohpaipee, ohpaipee, nbmj8900_state, ohpaipee,  ROT270, "Nichibutsu", "Oh! Paipee (Japan 890227)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, togenkyo,        0, togenkyo, togenkyo, nbmj8900_state, togenkyo,    ROT0, "Nichibutsu", "Tougenkyou (Japan 890418)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ohpaipee,        0, ohpaipee, ohpaipee, nbmj8900_state, init_ohpaipee,  ROT270, "Nichibutsu", "Oh! Paipee (Japan 890227)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, togenkyo,        0, togenkyo, togenkyo, nbmj8900_state, init_togenkyo,    ROT0, "Nichibutsu", "Tougenkyou (Japan 890418)", MACHINE_SUPPORTS_SAVE )

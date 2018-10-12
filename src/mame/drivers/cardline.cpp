@@ -25,6 +25,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -36,21 +37,16 @@
 class cardline_state : public driver_device
 {
 public:
-	cardline_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cardline_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
-
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-
-	uint8_t m_video;
-	uint8_t m_hsync_q;
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(attr_w);
@@ -64,24 +60,34 @@ public:
 
 	DECLARE_PALETTE_INIT(cardline);
 
-	virtual void machine_start() override;
-
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void cardline(machine_config &config);
+	void mem_io(address_map &map);
+	void mem_prg(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+
+	uint8_t m_video;
+	uint8_t m_hsync_q;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	void cardline(machine_config &config);
-	void mem_io(address_map &map);
-	void mem_prg(address_map &map);
+	output_finder<8> m_lamps;
 };
 
 void cardline_state::machine_start()
 {
+	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
 	for (int i=0; i < 0x2000; i++)
@@ -202,38 +208,40 @@ READ8_MEMBER(cardline_state::hsync_r)
 WRITE8_MEMBER(cardline_state::lamps_w)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
-	output().set_lamp_value(5,(data >> 0) & 1);
-	output().set_lamp_value(0,(data >> 1) & 1);
-	output().set_lamp_value(1,(data >> 2) & 1);
-	output().set_lamp_value(2,(data >> 3) & 1);
-	output().set_lamp_value(3,(data >> 4) & 1);
-	output().set_lamp_value(4,(data >> 5) & 1);
-	output().set_lamp_value(6,(data >> 6) & 1);
-	output().set_lamp_value(7,(data >> 7) & 1);
+	m_lamps[5] = BIT(data, 0);
+	m_lamps[0] = BIT(data, 1);
+	m_lamps[1] = BIT(data, 2);
+	m_lamps[2] = BIT(data, 3);
+	m_lamps[3] = BIT(data, 4);
+	m_lamps[4] = BIT(data, 5);
+	m_lamps[6] = BIT(data, 6);
+	m_lamps[7] = BIT(data, 7);
 }
 
-ADDRESS_MAP_START(cardline_state::mem_prg)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cardline_state::mem_prg(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(cardline_state::mem_io)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("IN0")
-	AM_RANGE(0x2005, 0x2005) AM_READ_PORT("IN1")
-	AM_RANGE(0x2006, 0x2006) AM_READ_PORT("DSW")
-	AM_RANGE(0x2007, 0x2007) AM_WRITE(lamps_w)
-	AM_RANGE(0x2008, 0x2008) AM_NOP // set to 1 during coin input
+void cardline_state::mem_io(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2003, 0x2003).portr("IN0");
+	map(0x2005, 0x2005).portr("IN1");
+	map(0x2006, 0x2006).portr("DSW");
+	map(0x2007, 0x2007).w(FUNC(cardline_state::lamps_w));
+	map(0x2008, 0x2008).noprw(); // set to 1 during coin input
 	//AM_RANGE(0x2080, 0x213f) AM_NOP // ????
-	AM_RANGE(0x2100, 0x213f) AM_READWRITE(asic_r, asic_w)
-	AM_RANGE(0x2400, 0x2400) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2801, 0x2801) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	map(0x2100, 0x213f).rw(FUNC(cardline_state::asic_r), FUNC(cardline_state::asic_w));
+	map(0x2400, 0x2400).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2801, 0x2801).w("crtc", FUNC(mc6845_device::register_w));
 	//AM_RANGE(0x2840, 0x2840) AM_NOP // ???
 	//AM_RANGE(0x2880, 0x2880) AM_NOP // ???
-	AM_RANGE(0x3003, 0x3003) AM_WRITE(a3003_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_SHARE("colorram")
-ADDRESS_MAP_END
+	map(0x3003, 0x3003).w(FUNC(cardline_state::a3003_w));
+	map(0xc000, 0xdfff).w(FUNC(cardline_state::vram_w)).share("videoram");
+	map(0xe000, 0xffff).w(FUNC(cardline_state::attr_w)).share("colorram");
+}
 
 
 static INPUT_PORTS_START( cardline )
@@ -264,7 +272,7 @@ static INPUT_PORTS_START( cardline )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_SPECIAL ) // h/w status bits
+	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_CUSTOM ) // h/w status bits
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // VBLANK_Q
@@ -283,7 +291,7 @@ static const gfx_layout charlayout =
 	8*8*8
 };
 
-static GFXDECODE_START( cardline )
+static GFXDECODE_START( gfx_cardline )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
 GFXDECODE_END
 
@@ -317,13 +325,13 @@ PALETTE_INIT_MEMBER(cardline_state, cardline)
 MACHINE_CONFIG_START(cardline_state::cardline)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", I80C32, MASTER_CLOCK)
 	MCFG_MCS51_PORT1_CONFIG(0x10)
-	MCFG_CPU_PROGRAM_MAP(mem_prg)
-	MCFG_CPU_IO_MAP(mem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(cardline_state, hsync_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(cardline_state, video_w))
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
+	MCFG_DEVICE_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cardline_state, hsync_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, cardline_state, video_w))
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -335,7 +343,7 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	//MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cardline)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cardline)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(cardline_state, cardline)
 
@@ -344,15 +352,16 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(cardline_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(cardline_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(cardline_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(cardline_state, vsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, cardline_state, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, cardline_state, vsync_changed))
 
-	MCFG_DEFAULT_LAYOUT(layout_cardline)
+	config.set_default_layout(layout_cardline);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -380,4 +389,4 @@ ROM_START( cardline )
 
 ROM_END
 
-GAME( 199?, cardline,  0,       cardline,  cardline, cardline_state,  0, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)
+GAME( 199?, cardline, 0, cardline, cardline, cardline_state, empty_init, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)

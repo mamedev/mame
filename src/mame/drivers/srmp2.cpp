@@ -116,7 +116,7 @@ MACHINE_START_MEMBER(srmp2_state,srmp3)
 	m_iox.protcheck[2] = 0x1c; m_iox.protlatch[2] = 0x04;
 	m_iox.protcheck[3] = 0x45; m_iox.protlatch[3] = 0x00;
 
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base(), 0x2000);
+	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_gfx_bank));
 }
@@ -133,7 +133,7 @@ MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
 	m_iox.protcheck[2] = -1;   m_iox.protlatch[2] = -1;
 	m_iox.protcheck[3] = -1;   m_iox.protlatch[3] = -1;
 
-	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base(), 0x2000);
+	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_gfx_bank));
 }
@@ -170,8 +170,8 @@ WRITE16_MEMBER(srmp2_state::srmp2_flags_w)
 */
 
 
-	machine().bookkeeping().coin_counter_w(0, ((data & 0x01) >> 0) );
-	machine().bookkeeping().coin_lockout_w(0, (((~data) & 0x10) >> 4) );
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0) );
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4) );
 	m_adpcm_bank = ( (data & 0x20) >> 5 );
 	m_color_bank = ( (data & 0x80) >> 7 );
 }
@@ -184,8 +184,8 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_flags_w)
     ---x ---- : Coin Lock Out
 */
 
-	machine().bookkeeping().coin_counter_w(0, ((data & 0x01) >> 0) );
-	machine().bookkeeping().coin_lockout_w(0, (((~data) & 0x10) >> 4) );
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0) );
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4) );
 }
 
 
@@ -195,7 +195,6 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
     ---- xxxx : ADPCM Bank
     --xx ---- : GFX Bank
 */
-
 
 	m_adpcm_bank = (data & 0x0f);
 	m_gfx_bank = ((data >> 4) & 0x03);
@@ -211,10 +210,8 @@ WRITE8_MEMBER(srmp2_state::adpcm_code_w)
       table and plays the ADPCM for itself.
 */
 
-	uint8_t *ROM = memregion("adpcm")->base();
-
-	m_adpcm_sptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
-	m_adpcm_eptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
+	m_adpcm_sptr = (m_adpcm_rom[((m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
+	m_adpcm_eptr = (m_adpcm_rom[((m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
 	m_adpcm_eptr  = (m_adpcm_eptr - 1) & 0x0ffff;
 
 	m_adpcm_sptr += (m_adpcm_bank * 0x10000);
@@ -229,13 +226,11 @@ WRITE8_MEMBER(srmp2_state::adpcm_code_w)
 
 WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
 {
-	uint8_t *ROM = memregion("adpcm")->base();
-
 	if (m_adpcm_sptr)
 	{
 		if (m_adpcm_data == -1)
 		{
-			m_adpcm_data = ROM[m_adpcm_sptr];
+			m_adpcm_data = m_adpcm_rom[m_adpcm_sptr];
 
 			if (m_adpcm_sptr >= m_adpcm_eptr)
 			{
@@ -245,12 +240,12 @@ WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
 			}
 			else
 			{
-				m_msm->data_w(((m_adpcm_data >> 4) & 0x0f));
+				m_msm->write_data(((m_adpcm_data >> 4) & 0x0f));
 			}
 		}
 		else
 		{
-			m_msm->data_w(((m_adpcm_data >> 0) & 0x0f));
+			m_msm->write_data(((m_adpcm_data >> 0) & 0x0f));
 			m_adpcm_sptr++;
 			m_adpcm_data = -1;
 		}
@@ -372,7 +367,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
 */
 	m_adpcm_bank = ((data & 0xe0) >> 5);
 
-	membank("bank1")->set_entry(data & 0x0f);
+	m_mainbank->set_entry(data & 0x0f);
 }
 
 /**************************************************************************
@@ -392,26 +387,27 @@ WRITE8_MEMBER(srmp2_state::srmp2_irq4_ack_w)
 }
 
 
-ADDRESS_MAP_START(srmp2_state::srmp2_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     /* Sprites Code + X + Attr */
-	AM_RANGE(0x180000, 0x1805ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     /* Sprites Y */
-	AM_RANGE(0x180600, 0x180607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP                        /* ??? */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(srmp2_flags_w)            /* ADPCM bank, Color bank, etc. */
-	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("SYSTEM")             /* Coinage */
-	AM_RANGE(0x900000, 0x900001) AM_WRITENOP                        /* ??? */
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff) /* key matrix | I/O */
-	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE8(adpcm_code_w,0x00ff)   /* ADPCM number */
-	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)      /* ADPCM voice status */
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE8(srmp2_irq2_ack_w,0x00ff)         /* irq ack lv 2 */
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE8(srmp2_irq4_ack_w,0x00ff)         /* irq ack lv 4 */
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP                        /* watchdog */
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
-ADDRESS_MAP_END
+void srmp2_state::srmp2_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x0c0000, 0x0c3fff).ram().share("nvram");
+	map(0x140000, 0x143fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     /* Sprites Code + X + Attr */
+	map(0x180000, 0x1805ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     /* Sprites Y */
+	map(0x180600, 0x180607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0x1c0000, 0x1c0001).nopw();                        /* ??? */
+	map(0x800000, 0x800001).w(FUNC(srmp2_state::srmp2_flags_w));            /* ADPCM bank, Color bank, etc. */
+	map(0x900000, 0x900001).portr("SYSTEM");             /* Coinage */
+	map(0x900000, 0x900001).nopw();                        /* ??? */
+	map(0xa00001, 0xa00001).rw(FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w)); /* key matrix | I/O */
+	map(0xa00003, 0xa00003).rw(FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
+	map(0xb00001, 0xb00001).w(FUNC(srmp2_state::adpcm_code_w));   /* ADPCM number */
+	map(0xb00003, 0xb00003).r(FUNC(srmp2_state::vox_status_r));      /* ADPCM voice status */
+	map(0xc00001, 0xc00001).w(FUNC(srmp2_state::srmp2_irq2_ack_w));         /* irq ack lv 2 */
+	map(0xd00001, 0xd00001).w(FUNC(srmp2_state::srmp2_irq4_ack_w));         /* irq ack lv 4 */
+	map(0xe00000, 0xe00001).nopw();                        /* watchdog */
+	map(0xf00001, 0xf00001).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xf00000, 0xf00003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+}
 
 READ8_MEMBER(srmp2_state::mjyuugi_irq2_ack_r)
 {
@@ -425,32 +421,33 @@ READ8_MEMBER(srmp2_state::mjyuugi_irq4_ack_r)
 	return 0xff; // value returned doesn't matter
 }
 
-ADDRESS_MAP_START(srmp2_state::mjyuugi_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")             /* Coinage */
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(mjyuugi_flags_w)          /* Coin Counter */
-	AM_RANGE(0x100010, 0x100011) AM_READNOP                         /* ??? */
-	AM_RANGE(0x100010, 0x100011) AM_WRITE(mjyuugi_adpcm_bank_w)     /* ADPCM bank, GFX bank */
-	AM_RANGE(0x200000, 0x200001) AM_READ8(mjyuugi_irq2_ack_r,0x00ff) /* irq ack lv 2? */
-	AM_RANGE(0x300000, 0x300001) AM_READ8(mjyuugi_irq4_ack_r,0x00ff) /* irq ack lv 4? */
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3-1")             /* DSW 3-1 */
-	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")             /* DSW 3-2 */
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x800000, 0x800001) AM_READNOP             /* ??? */
-	AM_RANGE(0x900000, 0x900001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff) /* key matrix | I/O */
-	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(adpcm_code_w,0x00ff)           /* ADPCM number */
-	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)      /* ADPCM voice status */
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP                    /* ??? */
-	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) /* Sprites Y */
-	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
+void srmp2_state::mjyuugi_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100001).portr("SYSTEM");             /* Coinage */
+	map(0x100000, 0x100001).w(FUNC(srmp2_state::mjyuugi_flags_w));          /* Coin Counter */
+	map(0x100010, 0x100011).nopr();                         /* ??? */
+	map(0x100010, 0x100011).w(FUNC(srmp2_state::mjyuugi_adpcm_bank_w));     /* ADPCM bank, GFX bank */
+	map(0x200001, 0x200001).r(FUNC(srmp2_state::mjyuugi_irq2_ack_r)); /* irq ack lv 2? */
+	map(0x300001, 0x300001).r(FUNC(srmp2_state::mjyuugi_irq4_ack_r)); /* irq ack lv 4? */
+	map(0x500000, 0x500001).portr("DSW3-1");             /* DSW 3-1 */
+	map(0x500010, 0x500011).portr("DSW3-2");             /* DSW 3-2 */
+	map(0x700000, 0x7003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x800000, 0x800001).nopr();             /* ??? */
+	map(0x900001, 0x900001).rw(FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w)); /* key matrix | I/O */
+	map(0x900003, 0x900003).rw(FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
+	map(0xa00001, 0xa00001).w(FUNC(srmp2_state::adpcm_code_w));           /* ADPCM number */
+	map(0xb00003, 0xb00003).r(FUNC(srmp2_state::vox_status_r));      /* ADPCM voice status */
+	map(0xb00001, 0xb00001).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xb00000, 0xb00003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0xc00000, 0xc00001).nopw();                    /* ??? */
+	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); /* Sprites Y */
+	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 
-	AM_RANGE(0xd02000, 0xd023ff) AM_RAM                         /* ??? only writes $00fa */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) /* Sprites Code + X + Attr */
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0xd02000, 0xd023ff).ram();                         /* ??? only writes $00fa */
+	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16)); /* Sprites Code + X + Attr */
+	map(0xffc000, 0xffffff).ram().share("nvram");
+}
 
 WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
 {
@@ -460,9 +457,8 @@ WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
     xx-- ---- : GFX Bank
 */
 
-
-	machine().bookkeeping().coin_counter_w(0, ((data & 0x01) >> 0) );
-	machine().bookkeeping().coin_lockout_w(0, (((~data) & 0x10) >> 4) );
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0) );
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4) );
 	m_gfx_bank = (data >> 6) & 0x03;
 }
 
@@ -471,41 +467,44 @@ WRITE8_MEMBER(srmp2_state::srmp3_irq_ack_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(srmp2_state::srmp3_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")                            /* rom bank */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")   /* work ram */
-	AM_RANGE(0xa800, 0xa800) AM_WRITENOP                            /* flag ? */
-	AM_RANGE(0xb000, 0xb2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xb300, 0xb303) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r8, spritectrl_w8)
-	AM_RANGE(0xb800, 0xb800) AM_WRITENOP                            /* flag ? */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8) /* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
-ADDRESS_MAP_END
+void srmp2_state::srmp3_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("mainbank");                            /* rom bank */
+	map(0xa000, 0xa7ff).ram().share("nvram");   /* work ram */
+	map(0xa800, 0xa800).nopw();                            /* flag ? */
+	map(0xb000, 0xb2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
+	map(0xb300, 0xb303).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r8), FUNC(seta001_device::spritectrl_w8));
+	map(0xb800, 0xb800).nopw();                            /* flag ? */
+	map(0xc000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8)); /* Sprites Code + X + Attr */
+	map(0xe000, 0xffff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+}
 
-ADDRESS_MAP_START(srmp2_state::srmp3_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_WRITE(srmp3_irq_ack_w)                              /* interrupt acknowledge */
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM") AM_WRITE(srmp3_flags_w)         /* coin, service | GFX bank, counter, lockout */
-	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)                              /* ROM bank select */
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(adpcm_code_w)                   /* ADPCM number */
-	AM_RANGE(0xa1, 0xa1) AM_READ(vox_status_r)                                  /* ADPCM voice status */
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(iox_mux_r, iox_command_w)                 /* key matrix | I/O */
-	AM_RANGE(0xc1, 0xc1) AM_READWRITE(iox_status_r,iox_data_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void srmp2_state::srmp3_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x20, 0x20).w(FUNC(srmp2_state::srmp3_irq_ack_w));                              /* interrupt acknowledge */
+	map(0x40, 0x40).portr("SYSTEM").w(FUNC(srmp2_state::srmp3_flags_w));         /* coin, service | GFX bank, counter, lockout */
+	map(0x60, 0x60).w(FUNC(srmp2_state::srmp3_rombank_w));                              /* ROM bank select */
+	map(0xa0, 0xa0).w(FUNC(srmp2_state::adpcm_code_w));                   /* ADPCM number */
+	map(0xa1, 0xa1).r(FUNC(srmp2_state::vox_status_r));                                  /* ADPCM voice status */
+	map(0xc0, 0xc0).rw(FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w));                 /* key matrix | I/O */
+	map(0xc1, 0xc1).rw(FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
+	map(0xe0, 0xe1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xe2, 0xe2).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
-ADDRESS_MAP_START(srmp2_state::rmgoldyh_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")                            /* rom bank */
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("nvram")   /* work ram */
-	AM_RANGE(0xb000, 0xb2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xb300, 0xb303) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r8, spritectrl_w8)
-	AM_RANGE(0xb800, 0xb800) AM_WRITENOP                            /* flag ? */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8) /* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
-ADDRESS_MAP_END
+void srmp2_state::rmgoldyh_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("mainbank");                            /* rom bank */
+	map(0xa000, 0xafff).ram().share("nvram");   /* work ram */
+	map(0xb000, 0xb2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
+	map(0xb300, 0xb303).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r8), FUNC(seta001_device::spritectrl_w8));
+	map(0xb800, 0xb800).nopw();                            /* flag ? */
+	map(0xc000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8)); /* Sprites Code + X + Attr */
+	map(0xe000, 0xffff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+}
 
 WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
 {
@@ -515,17 +514,18 @@ WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
 */
 	m_adpcm_bank = ((data & 0xe0) >> 5);
 
-	membank("bank1")->set_entry(data & 0x1f);
+	m_mainbank->set_entry(data & 0x1f);
 }
 
-ADDRESS_MAP_START(srmp2_state::rmgoldyh_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_IMPORT_FROM(srmp3_io_map)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x60, 0x60) AM_WRITE(rmgoldyh_rombank_w)                       /* ROM bank select */
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW4")
-	AM_RANGE(0x81, 0x81) AM_READ_PORT("DSW3")
-ADDRESS_MAP_END
+void srmp2_state::rmgoldyh_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	srmp3_io_map(map);
+	map(0x00, 0x00).nopw(); /* watchdog */
+	map(0x60, 0x60).w(FUNC(srmp2_state::rmgoldyh_rombank_w));                       /* ROM bank select */
+	map(0x80, 0x80).portr("DSW4");
+	map(0x81, 0x81).portr("DSW3");
+}
 
 /***************************************************************************
 
@@ -1126,11 +1126,11 @@ static const gfx_layout charlayout =
 	16*16*2
 };
 
-static GFXDECODE_START( srmp2 )
+static GFXDECODE_START( gfx_srmp2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( srmp3 )
+static GFXDECODE_START( gfx_srmp3 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
@@ -1138,13 +1138,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(srmp2_state::srmp2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(srmp2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
-	MCFG_CPU_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
+	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(srmp2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -1158,22 +1158,22 @@ MACHINE_CONFIG_START(srmp2_state::srmp2)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp2)
 	MCFG_PALETTE_ADD("palette", 1024)   /* sprites only */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_PALETTE_INIT_OWNER(srmp2_state,srmp2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 20000000/16)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 20000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, srmp2_state, adpcm_int))            /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -1183,14 +1183,14 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("maincpu", Z80, 3500000)       /* 3.50 MHz ? */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)       /* 3.50 MHz ? */
 	//      4000000,                /* 4.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(srmp3_map)
-	MCFG_CPU_IO_MAP(srmp3_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp2_state,  irq0_line_assert)
+	MCFG_DEVICE_PROGRAM_MAP(srmp3_map)
+	MCFG_DEVICE_IO_MAP(srmp3_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state,  irq0_line_assert)
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -1205,22 +1205,22 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp3)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_PALETTE_INIT_OWNER(srmp2_state,srmp3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 16000000/16)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 16000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, srmp2_state, adpcm_int))            /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -1228,9 +1228,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(srmp2_state::rmgoldyh)
 	srmp3(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rmgoldyh_map)
-	MCFG_CPU_IO_MAP(rmgoldyh_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rmgoldyh_map)
+	MCFG_DEVICE_IO_MAP(rmgoldyh_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
 MACHINE_CONFIG_END
@@ -1238,14 +1238,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(mjyuugi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
-	MCFG_CPU_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
+	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mjyuugi_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,mjyuugi)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -1260,20 +1260,20 @@ MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_mjyuugi)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp3)
 	MCFG_PALETTE_ADD("palette", 512)            /* sprites only */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 16000000/16)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 16000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, srmp2_state, adpcm_int))            /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -1548,11 +1548,11 @@ ROM_END
 
 
 
-GAME( 1987, srmp1,     0,        srmp2,    srmp2,    srmp2_state,  0,       ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2_state,  0,       ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp2_state,  0,       ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, srmp2_state,  0,       ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srmp1,     0,        srmp2,    srmp2,    srmp2_state, empty_init, ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2_state, empty_init, ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp2_state, empty_init, ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, srmp2_state, empty_init, ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  srmp2_state, empty_init, ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  srmp2_state, empty_init, ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  srmp2_state, empty_init, ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  srmp2_state, empty_init, ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", MACHINE_SUPPORTS_SAVE )

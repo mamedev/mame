@@ -133,7 +133,7 @@ Example:
 
 .. _mame-commandline-listroms:
 
-**-listroms** [<*pattern*>]
+**-listroms** / **-lr** [<*pattern*>]
 
 	Displays a list of ROM images referenced by the specified pattern of system or device names. If no pattern is specified, the results will be *all* systems and devices.
 
@@ -174,13 +174,13 @@ Example:
 
 .. _mame-commandline-listslots:
 
-**-listslots** [<*pattern*>]
+**-listslots** / **-lslot** [<*pattern*>]
 
         Show available slots and options for each slot (if available). Primarily used for MAME to allow control over internal plug-in cards, much like PCs needing video, sound and other expansion cards.
 		
 		If slots are populated with devices, any additional slots those devices provide will be visible with **-listslots** as well. For instance, installing a floppy controller into a PC will expose the disk drive slots.
 		
-        The slot name (e.g. **ctrl1**) can be used from the command line (**-ctrl1** in this case) 
+        The slot name (e.g. **ctrl1**) can be used from the command line (**-ctrl1** in this case)
 
 .. _mame-commandline-listmedia:
 
@@ -190,25 +190,25 @@ Example:
 
 .. _mame-commandline-listsoftware:
 
-**-listsoftware** [<*pattern*>]
+**-listsoftware** / **-lsoft** [<*pattern*>]
 
         Posts to screen all software lists which can be used by the entered *pattern* or system. Note that this is simply a copy/paste of the .XML file which reside in the HASH folder which are allowed to be used.
 
 .. _mame-commandline-verifysoftware:
 
-**-verifysoftware** [<*pattern*>]
+**-verifysoftware** / **-vsoft** [<*pattern*>]
 
 	Checks for invalid or missing ROM images in your software lists. By default all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a specific driver name or *pattern* after the -verifysoftware command.
 
 .. _mame-commandline-getsoftlist:
 
-**-getsoftlist** [<*pattern*>]
+**-getsoftlist** / **-glist** [<*pattern*>]
 
         Posts to screen a specific software list which matches with the system name provided.
 
 .. _mame-commandline-verifysoftlist:
 
-**-verifysoftlist** [softwarelistname]
+**-verifysoftlist** / **-vlist** [softwarelistname]
 
 	Checks a specified software list for missing ROM images if files exist for issued softwarelistname. By default, all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a specific softwarelistname (without .XML) after the -verifysoftlist command.
 
@@ -349,6 +349,12 @@ Configuration Options
 Core Search Path Options
 ------------------------
 
+.. _mame-commandline-homepath:
+
+**-homepath** *<path>*
+
+	Specifies a path where the base 'plugins' folder is to be found. The default is '.' (that is, in the current working directory).
+
 .. _mame-commandline-rompath:
 
 **-rompath** / **-rp** *<path>*
@@ -389,7 +395,7 @@ Core Search Path Options
 
 **-fontpath** *<path>*
 
-	Specifies a list of paths within which to find .BDF font files. Multiple paths can be specified by separating them with semicolons. The default is '.' (that is, search in the same directory as the MAME executable).
+	Specifies a list of paths within which to find .BDF font files. Multiple paths can be specified by separating them with semicolons. The default is '.' (that is, search in the current working directory).
 
 .. _mame-commandline-cheatpath:
 
@@ -415,7 +421,12 @@ Core Search Path Options
 
 	Specifies a list of paths within which to find language files for localized UI text.
 
+.. _mame-commandline-swpath:
 
+**-swpath** *<path>*
+
+	Specifies a path within which to find loose software to be used by emulation.
+	
 
 Core Output Directory Options
 -----------------------------
@@ -539,13 +550,13 @@ Core State/Playback Options
 
 **-snapname** *<name>*
 
-	Describes how MAME should name files for snapshots. <name> is a string that provides a template that is used to generate a filename. 
+	Describes how MAME should name files for snapshots. <name> is a string that provides a template that is used to generate a filename.
 	
 	Three simple substitutions are provided: the / character represents the path separator on any target platform (even Windows); the string %g represents the driver name of the current system; and the string %i represents an incrementing index. If %i is omitted, then each snapshot taken will overwrite the previous one; otherwise, MAME will find the next empty value for %i and use that for a filename.
 	
 	The default is %g/%i, which creates a separate folder for each system, and names the snapshots under it starting with 0000 and increasing from there.
 	
-	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator. Replace [media] with the media switch you want to use. 
+	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator. Replace [media] with the media switch you want to use.
 	
 	A few examples: if you use 'mame robby -snapname foo/%g%i' snapshots will be saved as 'snaps\\foo\\robby0000.png' , 'snaps\\foo\\robby0001.png' and so on; if you use 'mame nes -cart robby -snapname %g/%d_cart' snapshots will be saved as 'snaps\\nes\\robby.png' ; if you use 'mame c64 -flop1 robby -snapname %g/%d_flop1/%i' snapshots will be saved as 'snaps\\c64\\robby\\0000.png'.
 
@@ -579,7 +590,7 @@ Core State/Playback Options
 	
 	The default is %g, which creates a separate folder for each system.
 	
-	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator. Replace [media] with the media switch you want to use. 
+	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator. Replace [media] with the media switch you want to use.
 	
 	A few examples: if you use 'mame robby -statename foo/%g' save states will be stored inside 'sta\\foo\\robby\\' ; if you use 'mame nes -cart robby -statename %g/%d_cart' save states will be stored inside 'sta\\nes\\robby\\' ; if you use 'mame c64 -flop1 robby -statename %g/%d_flop1' save states will be stored inside 'sta\\c64\\robby\\'.
 
@@ -671,7 +682,7 @@ Core Rotation Options
 
 | **-[no]ror**
 | **-[no]rol**
-| 
+|
 |
 |	Rotate the system screen to the right (clockwise) or left (counter-clockwise) relative to either its normal state (if **-rotate** is specified) or its native state (if **-norotate** is specified). The default for both of these options is OFF (*-noror -norol*).
 |
@@ -684,7 +695,7 @@ Core Rotation Options
 
 | **-[no]autoror**
 | **-[no]autorol**
-| 
+|
 |
 |	These options are designed for use with pivoting screens that only pivot in a single direction. If your screen only pivots clockwise, use -autorol to ensure that the system will fill the screen either horizontally or vertically in one of the directions you can handle. If your screen only pivots counter-clockwise, use **-autoror**.
 |
@@ -697,7 +708,7 @@ Core Rotation Options
 
 | **-[no]flipx**
 | **-[no]flipy**
-| 
+|
 |
 |	Flip (mirror) the system screen either horizontally (-flipx) or vertically (-flipy). The flips are applied after the -rotate and -ror/-rol options are applied. The default for both of these options is OFF (*-noflipx -noflipy*).
 |
@@ -712,30 +723,30 @@ Core Video Options
 **-video** *<bgfx|gdi|d3d|opengl|soft|accel|none>*
 
 |
-|	Specifies which video subsystem to use for drawing. Options here depend on the operating system and whether this is an SDL-compiled version of MAME.
+|   Specifies which video subsystem to use for drawing. Options here depend on the operating system and whether this is an SDL-compiled version of MAME.
 |
 |   Generally Available:
 |
 |	Using '**bgfx**' specifies the new hardware accelerated renderer.
-|   Using '**opengl**' tells MAME to render video using OpenGL acceleration.
-|   Using '**none**' displays no windows and does no drawing. This is primarily present for doing CPU benchmarks without the overhead of the video system.
+|	Using '**opengl**' tells MAME to render video using OpenGL acceleration.
+|	Using '**none**' displays no windows and does no drawing. This is primarily present for doing CPU benchmarks without the overhead of the video system.
 |
-|	On Windows:
+|   On Windows:
 |
-|   Using '**gdi**' here, tells MAME to render video using older standard Windows graphics drawing calls. This is the slowest but most compatible option on older versions of Windows.
-|   Using '**d3d**' tells MAME to use Direct3D for rendering. This produces the better quality output than gdi and enables additional rendering options. It is recommended if you have a semi-recent (2002+) video card or onboard Intel video of the HD3000 line or better.
+|	Using '**gdi**' here, tells MAME to render video using older standard Windows graphics drawing calls. This is the slowest but most compatible option on older versions of Windows.
+|	Using '**d3d**' tells MAME to use Direct3D for rendering. This produces the better quality output than gdi and enables additional rendering options. It is recommended if you have a semi-recent (2002+) video card or onboard Intel video of the HD3000 line or better.
 |
 |   On other platforms (including SDL on Windows):
 |
 |	Using '**accel**' tells MAME to render video using SDL's 2D acceleration if possible.
-|   Using '**soft**' uses software rendering for video output. This isn't as fast or as nice as OpenGL but will work on any platform.
+|	Using '**soft**' uses software rendering for video output. This isn't as fast or as nice as OpenGL but will work on any platform.
 |
 |   Defaults:
 |
-|   The default on Windows is **d3d**.
-|   The default for Mac OS X is '*opengl*' because OS X is guaranteed to have a compliant OpenGL stack.
-|   The default on all other systems is '*soft*'.
-
+|	The default on Windows is **d3d**.
+|	The default for Mac OS X is '*opengl*' because OS X is guaranteed to have a compliant OpenGL stack.
+|	The default on all other systems is '*soft*'.
+|
 
 .. _mame-commandline-numscreens:
 
@@ -825,7 +836,7 @@ NOTE:  **Multiple Screens may fail to work correctly on some Mac machines as of 
 |
 |	Specifies which physical monitor on your system you wish to have each window use by default. In order to use multiple windows, you must have increased the value of the **-numscreens** option. The name of each display in your system can be determined by running MAME with the -verbose option. The display names are typically in the format of: *\\\\.\\DISPLAYn*, where 'n' is a number from 1 to the number of connected monitors. The default value for these options is '*auto*', which means that the first window is placed on the first display, the second window on the second display, etc.
 |
-|	The **-screen0**, **-screen1**, **-screen2**, **-screen3** parameters apply to the specific window. The **-screen** parameter applies to all windows. The window-specific options override values from the all window option. 
+|	The **-screen0**, **-screen1**, **-screen2**, **-screen3** parameters apply to the specific window. The **-screen** parameter applies to all windows. The window-specific options override values from the all window option.
 |
 |
 
@@ -915,6 +926,18 @@ Core Artwork Options
 
 	Enables/disables the display of marquees. The default is ON (*-use_marquees*).
 
+.. _mame-commandline-fallbackartwork:
+
+**-fallback_artwork**
+
+	Specifies fallback artwork if no external artwork or internal driver layout is defined.
+
+.. _mame-commandline-overrideartwork:
+
+**-override_artwork**
+
+	Specifies override artwork for external artwork and internal driver layout.
+
 
 
 Core Screen Options
@@ -955,17 +978,23 @@ Core Screen Options
 Core Vector Options
 -------------------
 
-.. _mame-commandline-noantialias:
+.. _mame-commandline-beamwidthmin:
 
-**-[no]antialias** / **-[no]aa**
+**-beam_width_min** *<width>*
 
-	Enables antialiased line rendering for vector systems. The default is ON (*-antialias*).
+	Sets the vector beam minimum width.
 
-.. _mame-commandline-beam:
+.. _mame-commandline-beamwidthmax:
 
-**-beam** *<width>*
+**-beam_width_max** *<width>*
 
-	Sets the width of the vectors. This is a scaling factor against the standard vector width. A value of 1.0 will keep the default vector line width. Smaller values will reduce the width, and larger values will increase the width. The default is *1.0*.
+	Sets the vector beam maximum width.
+
+.. _mame-commandline-beamintensityweight:
+
+**-beam_intensity_weight** *<weight>*
+
+	Sets the vector beam intensity weight.
 
 .. _mame-commandline-flicker:
 
@@ -1184,7 +1213,7 @@ Core Input Options
  +-------------------------------------------------------------------------------------------+
  | 777888999.777888999.777888999.444555666.444555666.444555666.111222333.111222333.111222333 |
  +-------------------------------------------------------------------------------------------+
- 
+
 	However, this can be reduced using several shorthands supported by the <map> parameter. If information about a row is missing, then it is assumed that any missing data in columns 5-9 are left/right symmetric with data in columns 0-4; and any missing data in columns 0-4 is assumed to be copies of the previous data. The same logic applies to missing rows, except that up/down symmetry is assumed.
 
 	By using these shorthands, the 81 character map can be simply specified by this 11 character string: 7778...4445
@@ -1372,6 +1401,12 @@ Core Communication Options
 
 	Remote port to connect to. This can be any traditional communications port as an unsigned 16-bit integer (0-65535). The default value is "*15122*".
 
+.. _mame-commandline-commframesync:
+
+**-[no]comm_framesync**
+
+	Synchronize frames between the communications network. The default is OFF (*-nocomm_framesync*).
+
 
 
 Core Misc Options
@@ -1424,6 +1459,12 @@ Core Misc Options
 
 	Specifies the name of a font file to use for the UI font. If this font cannot be found or cannot be loaded, the system will fall back to its built-in UI font. On some platforms *fontname* can be a system font name instead of a BDF font file. The default is *default* (use the OSD-determined default font).
 
+.. _mame-commandline-ui:
+
+**-ui** *<type>*
+
+	Specifies the type of UI to use, either 'simple' or 'cabinet'.  The default is Cabinet (*-ui cabinet*).
+
 .. _mame-commandline-ramsize:
 
 **-ramsize** *[n]*
@@ -1442,11 +1483,28 @@ Core Misc Options
 
 	Displays a mouse cursor when using the built-in UI for MAME. The default is (*-noui_mouse*).
 
+.. _mame-commandline-language:
+
+**-language** *<language>*
+
+	Specify a localization language found in the *languagepath* tree.
+
+.. _mame-commandline-nvramsave:
+
+**-[no]nvram_save**
+
+	Save the NVRAM contents when exiting machine emulation. By turning this off, you can retain your previous NVRAM contents as any current changes made will not be saved. The default of ON (*-nvram_save*).
+
+
+
+Scripting Options
+-----------------
+
 .. _mame-commandline-autobootcommand:
 
 **-autoboot_command** *"<command>"*
 
-	Command string to execute after machine boot (in quotes " "). To issue a quote to the emulation, use """ in the string. Using **\\n** will issue a create a new line, issuing what was typed prior as a command. 
+	Command string to execute after machine boot (in quotes " "). To issue a quote to the emulation, use """ in the string. Using **\\n** will issue a create a new line, issuing what was typed prior as a command.
 
 	Example:  -autoboot_command "load """$""",8,1\\n"
 
@@ -1454,16 +1512,56 @@ Core Misc Options
 
 **-autoboot_delay** *[n]*
 
-    Timer delay (in seconds) to trigger command execution on autoboot.
+	Timer delay (in seconds) to trigger command execution on autoboot.
 
 .. _mame-commandline-autobootscript:
 
 **-autoboot_script** / **-script** *[filename.lua]*
 
-    File containing scripting to execute after machine boot.
+	File containing scripting to execute after machine boot.
 
-.. _mame-commandline-language:
+.. _mame-commandline-console:
 
-**-language** *<language>*
+**-[no]console**
 
-	Specify a localization language found in the *languagepath* tree.
+	Enables emulator Lua Console window. The default of OFF (*-noconsole*).
+
+.. _mame-commandline-plugins:
+
+**-plugins**
+
+	Enable the use of Lua Plugins.  The default is ON (*-plugins*).
+
+.. _mame-commandline-plugin:
+
+**-plugin** *[plugin shortname]*
+
+	A list of Lua Plugins to enable, comma separated.
+
+.. _mame-commandline-noplugin:
+
+**-noplugin** *[plugin shortname]*
+
+	A list of Lua Plugins to disable, comma separated.
+
+
+
+HTTP Server Options
+-------------------
+.. _mame-commandline-http:
+
+**-[no]http**
+
+	Enable HTTP server. The default is OFF (*-nohttp*).
+
+.. _mame-commandline-httpport:
+
+**-http_port** *[port]*
+
+	Choose HTTP server port. The default is *8080*.
+
+.. _mame-commandline-httproot:
+
+**-http_root** *[rootfolder]*
+
+	Choose HTTP server document root. The default os *web*.

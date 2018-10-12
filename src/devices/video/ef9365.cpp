@@ -166,9 +166,10 @@ const tiny_rom_entry *ef9365_device::device_rom_region() const
 // default address map
 // Up to 512*512 per bitplane, 8 bitplanes max.
 //-------------------------------------------------
-ADDRESS_MAP_START(ef9365_device::ef9365)
-	AM_RANGE(0x00000, ( ( ef9365_device::BITPLANE_MAX_SIZE * ef9365_device::MAX_BITPLANES ) - 1 ) ) AM_RAM
-ADDRESS_MAP_END
+void ef9365_device::ef9365(address_map &map)
+{
+	map(0x00000, ef9365_device::BITPLANE_MAX_SIZE * ef9365_device::MAX_BITPLANES - 1).ram();
+}
 
 //-------------------------------------------------
 //  memory_space_config - return a description of
@@ -363,6 +364,7 @@ void ef9365_device::device_reset()
 	m_screen_out.fill(0);
 
 	set_video_mode();
+	screen_scanning(1);
 
 	m_irq_handler(false);
 }

@@ -208,9 +208,10 @@ const fd1089_base_device::decrypt_parameters fd1089_base_device::s_data_params_a
 	{ 0xac, 1,6,3,5,0,7,4,2 },
 };
 
-ADDRESS_MAP_START(fd1089_base_device::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROM AM_SHARE(":fd1089_decrypted_opcodes")
-ADDRESS_MAP_END
+void fd1089_base_device::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).rom().share(":fd1089_decrypted_opcodes");
+}
 
 
 //**************************************************************************

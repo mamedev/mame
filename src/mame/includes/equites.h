@@ -17,6 +17,7 @@
 #include "sound/samples.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -105,7 +106,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(equites_8910porta_w);
 	DECLARE_WRITE8_MEMBER(equites_8910portb_w);
-	DECLARE_DRIVER_INIT(equites);
+	void init_equites();
 	TILE_GET_INFO_MEMBER(equites_fg_info);
 	TILE_GET_INFO_MEMBER(equites_bg_info);
 	DECLARE_VIDEO_START(equites);
@@ -153,7 +154,7 @@ class splndrbt_state : public equites_state
 {
 public:
 	using equites_state::equites_state;
-	DECLARE_DRIVER_INIT(splndrbt);
+	void init_splndrbt();
 	void splndrbt(machine_config &config);
 	void hvoltage(machine_config &config);
 

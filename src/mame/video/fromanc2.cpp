@@ -277,14 +277,14 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc2)
 		}
 	}
 
-	save_pointer(NAME(m_videoram[0][0].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[0][1].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[0][2].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[0][3].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[1][0].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[1][1].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[1][2].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[1][3].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[0][0]), (64 * 64));
+	save_pointer(NAME(m_videoram[0][1]), (64 * 64));
+	save_pointer(NAME(m_videoram[0][2]), (64 * 64));
+	save_pointer(NAME(m_videoram[0][3]), (64 * 64));
+	save_pointer(NAME(m_videoram[1][0]), (64 * 64));
+	save_pointer(NAME(m_videoram[1][1]), (64 * 64));
+	save_pointer(NAME(m_videoram[1][2]), (64 * 64));
+	save_pointer(NAME(m_videoram[1][3]), (64 * 64));
 	save_item(NAME(m_scrollx[0]));
 	save_item(NAME(m_scrollx[1]));
 	save_item(NAME(m_scrolly[0]));
@@ -315,12 +315,12 @@ VIDEO_START_MEMBER(fromanc2_state,fromancr)
 		}
 	}
 
-	save_pointer(NAME(m_videoram[0][0].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[0][1].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[0][2].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[1][0].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[1][1].get()), (64 * 64));
-	save_pointer(NAME(m_videoram[1][2].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[0][0]), (64 * 64));
+	save_pointer(NAME(m_videoram[0][1]), (64 * 64));
+	save_pointer(NAME(m_videoram[0][2]), (64 * 64));
+	save_pointer(NAME(m_videoram[1][0]), (64 * 64));
+	save_pointer(NAME(m_videoram[1][1]), (64 * 64));
+	save_pointer(NAME(m_videoram[1][2]), (64 * 64));
 	save_item(NAME(m_scrollx[0]));
 	save_item(NAME(m_scrollx[1]));
 	save_item(NAME(m_scrolly[0]));
@@ -351,12 +351,12 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc4)
 		}
 	}
 
-	save_pointer(NAME(m_videoram[0][0].get()), (256 * 64));
-	save_pointer(NAME(m_videoram[0][1].get()), (256 * 64));
-	save_pointer(NAME(m_videoram[0][2].get()), (256 * 64));
-	save_pointer(NAME(m_videoram[1][0].get()), (256 * 64));
-	save_pointer(NAME(m_videoram[1][1].get()), (256 * 64));
-	save_pointer(NAME(m_videoram[1][2].get()), (256 * 64));
+	save_pointer(NAME(m_videoram[0][0]), (256 * 64));
+	save_pointer(NAME(m_videoram[0][1]), (256 * 64));
+	save_pointer(NAME(m_videoram[0][2]), (256 * 64));
+	save_pointer(NAME(m_videoram[1][0]), (256 * 64));
+	save_pointer(NAME(m_videoram[1][1]), (256 * 64));
+	save_pointer(NAME(m_videoram[1][2]), (256 * 64));
 	save_item(NAME(m_scrollx[0]));
 	save_item(NAME(m_scrollx[1]));
 	save_item(NAME(m_scrolly[0]));

@@ -28,47 +28,52 @@ DEFINE_DEVICE_TYPE(MOS6530_NEW, mos6530_new_device, "mos6530_new", "MOS 6530 (ne
 DEFINE_DEVICE_TYPE(MOS6532_NEW, mos6532_new_device, "mos6532_new", "MOS 6532 (new)")
 
 
-ADDRESS_MAP_START(mos6530_new_device::rom_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x000, 0x3ff) AM_READ(rom_r)
-ADDRESS_MAP_END
+void mos6530_new_device::rom_map(address_map &map)
+{
+	map.global_mask(0x3ff);
+	map(0x000, 0x3ff).r(FUNC(mos6530_new_device::rom_r));
+}
 
-ADDRESS_MAP_START(mos6530_new_device::ram_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3f)
-	AM_RANGE(0x00, 0x3f) AM_READWRITE(ram_r, ram_w)
-ADDRESS_MAP_END
+void mos6530_new_device::ram_map(address_map &map)
+{
+	map.global_mask(0x3f);
+	map(0x00, 0x3f).rw(FUNC(mos6530_new_device::ram_r), FUNC(mos6530_new_device::ram_w));
+}
 
-ADDRESS_MAP_START(mos6530_new_device::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x8) AM_READWRITE(pa_data_r, pa_data_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x8) AM_READWRITE(pa_ddr_r, pa_ddr_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x8) AM_READWRITE(pb_data_r, pb_data_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x8) AM_READWRITE(pb_ddr_r, pb_ddr_w)
-	AM_RANGE(0x04, 0x07) AM_WRITE(timer_off_w)
-	AM_RANGE(0x0c, 0x0f) AM_WRITE(timer_on_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x2) AM_READ(timer_off_r)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x2) AM_READ(timer_on_r)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0xa) AM_READ(irq_r)
-ADDRESS_MAP_END
+void mos6530_new_device::io_map(address_map &map)
+{
+	map.global_mask(0xf);
+	map(0x00, 0x00).mirror(0x8).rw(FUNC(mos6530_new_device::pa_data_r), FUNC(mos6530_new_device::pa_data_w));
+	map(0x01, 0x01).mirror(0x8).rw(FUNC(mos6530_new_device::pa_ddr_r), FUNC(mos6530_new_device::pa_ddr_w));
+	map(0x02, 0x02).mirror(0x8).rw(FUNC(mos6530_new_device::pb_data_r), FUNC(mos6530_new_device::pb_data_w));
+	map(0x03, 0x03).mirror(0x8).rw(FUNC(mos6530_new_device::pb_ddr_r), FUNC(mos6530_new_device::pb_ddr_w));
+	map(0x04, 0x07).w(FUNC(mos6530_new_device::timer_off_w));
+	map(0x0c, 0x0f).w(FUNC(mos6530_new_device::timer_on_w));
+	map(0x04, 0x04).mirror(0x2).r(FUNC(mos6530_new_device::timer_off_r));
+	map(0x0c, 0x0c).mirror(0x2).r(FUNC(mos6530_new_device::timer_on_r));
+	map(0x05, 0x05).mirror(0xa).r(FUNC(mos6530_new_device::irq_r));
+}
 
-ADDRESS_MAP_START(mos6532_new_device::ram_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-	AM_RANGE(0x00, 0x7f) AM_READWRITE(ram_r, ram_w)
-ADDRESS_MAP_END
+void mos6532_new_device::ram_map(address_map &map)
+{
+	map.global_mask(0x7f);
+	map(0x00, 0x7f).rw(FUNC(mos6532_new_device::ram_r), FUNC(mos6532_new_device::ram_w));
+}
 
-ADDRESS_MAP_START(mos6532_new_device::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(pa_data_r, pa_data_w)  // SWCHA
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(pa_ddr_r, pa_ddr_w)    // SWACNT
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_READWRITE(pb_data_r, pb_data_w)  // SWCHB
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_READWRITE(pb_ddr_r, pb_ddr_w)    // SWBCNT
-	AM_RANGE(0x14, 0x17) AM_WRITE(timer_off_w)
-	AM_RANGE(0x1c, 0x1f) AM_WRITE(timer_on_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x12) AM_READ(timer_off_r)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x12) AM_READ(timer_on_r)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x1a) AM_READ(irq_r)
-	AM_RANGE(0x04, 0x07) AM_MIRROR(0x8) AM_WRITE(edge_w)
-ADDRESS_MAP_END
+void mos6532_new_device::io_map(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x00, 0x00).mirror(0x18).rw(FUNC(mos6532_new_device::pa_data_r), FUNC(mos6532_new_device::pa_data_w));  // SWCHA
+	map(0x01, 0x01).mirror(0x18).rw(FUNC(mos6532_new_device::pa_ddr_r), FUNC(mos6532_new_device::pa_ddr_w));    // SWACNT
+	map(0x02, 0x02).mirror(0x18).rw(FUNC(mos6532_new_device::pb_data_r), FUNC(mos6532_new_device::pb_data_w));  // SWCHB
+	map(0x03, 0x03).mirror(0x18).rw(FUNC(mos6532_new_device::pb_ddr_r), FUNC(mos6532_new_device::pb_ddr_w));    // SWBCNT
+	map(0x14, 0x17).w(FUNC(mos6532_new_device::timer_off_w));
+	map(0x1c, 0x1f).w(FUNC(mos6532_new_device::timer_on_w));
+	map(0x04, 0x04).mirror(0x12).r(FUNC(mos6532_new_device::timer_off_r));
+	map(0x0c, 0x0c).mirror(0x12).r(FUNC(mos6532_new_device::timer_on_r));
+	map(0x05, 0x05).mirror(0x1a).r(FUNC(mos6532_new_device::irq_r));
+	map(0x04, 0x07).mirror(0x8).w(FUNC(mos6532_new_device::edge_w));
+}
 
 READ8_MEMBER(mos6532_new_device::io_r)
 {

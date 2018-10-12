@@ -106,6 +106,27 @@
 #include "emu.h"
 #include "998board.h"
 
+#define LOG_DETAIL      (1U<<1)     // More detail
+#define LOG_CRU         (1U<<2)     // CRU logging
+#define LOG_ADDRESS     (1U<<3)     // Address bus
+#define LOG_MEM         (1U<<4)     // Memory access
+#define LOG_MAP         (1U<<5)     // Mapper
+#define LOG_READY       (1U<<6)     // READY line
+#define LOG_CLOCK       (1U<<7)     // CLKOUT
+#define LOG_MOFETTA     (1U<<8)     // Mofetta operation
+#define LOG_AMIGO       (1U<<9)     // Amigo operation
+#define LOG_OSO         (1U<<10)    // Oso operation
+#define LOG_HEXBUS      (1U<<11)    // Hexbus operation
+#define LOG_WS          (1U<<12)    // Wait states
+#define LOG_CPURY       (1U<<13)    // Combined ready line
+#define LOG_GROM        (1U<<14)    // GROM operation
+#define LOG_PUNMAP      (1U<<15)    // Unmapped physical addresss
+#define LOG_WARN        (1U<<31)    // Warnings
+
+#define VERBOSE ( LOG_WARN )
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
 DEFINE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
 DEFINE_DEVICE_TYPE_NS(TI99_MOFETTA, bus::ti99::internal, mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
@@ -113,22 +134,6 @@ DEFINE_DEVICE_TYPE_NS(TI99_OSO, bus::ti99::internal, oso_device, "ti998_oso", "T
 DEFINE_DEVICE_TYPE_NS(TI99_AMIGO, bus::ti99::internal, amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
 
 namespace bus { namespace ti99 { namespace internal {
-
-#define TRACE_CRU 0
-#define TRACE_ADDRESS 0
-#define TRACE_MAP 0
-#define TRACE_OSO 0
-#define TRACE_DECODE 0
-#define TRACE_READY 0
-#define TRACE_MEM 0
-#define TRACE_CLOCK 0
-#define TRACE_DETAIL 0
-#define TRACE_MOFETTA 0
-#define TRACE_AMIGO 0
-#define TRACE_WS 0
-#define TRACE_CPURY 0
-#define TRACE_GROM 0
-#define TRACE_PUNMAP 0
 
 enum
 {
@@ -153,6 +158,7 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_mofetta(*this, TI998_MOFETTA_TAG),
 	m_amigo(*this, TI998_AMIGO_TAG),
 	m_oso(*this, TI998_OSO_TAG),
+	m_maincpu(*owner, "maincpu"),
 	m_video(*owner, TI_VDP_TAG),               // subdevice of main class
 	m_sound(*owner, TI_SOUNDCHIP_TAG),
 	m_speech(*owner, TI998_SPEECHSYN_TAG),
@@ -160,6 +166,28 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_ioport(*owner, TI99_IOPORT_TAG),
 	m_sram(*owner, TI998_SRAM_TAG),
 	m_dram(*owner, TI998_DRAM_TAG),
+	m_sgrom0(*owner, TI998_SYSGROM0_TAG),
+	m_sgrom1(*owner, TI998_SYSGROM1_TAG),
+	m_sgrom2(*owner, TI998_SYSGROM2_TAG),
+	m_tsgrom0(*owner, TI998_GLIB10_TAG),
+	m_tsgrom1(*owner, TI998_GLIB11_TAG),
+	m_tsgrom2(*owner, TI998_GLIB12_TAG),
+	m_tsgrom3(*owner, TI998_GLIB13_TAG),
+	m_tsgrom4(*owner, TI998_GLIB14_TAG),
+	m_tsgrom5(*owner, TI998_GLIB15_TAG),
+	m_tsgrom6(*owner, TI998_GLIB16_TAG),
+	m_tsgrom7(*owner, TI998_GLIB17_TAG),
+	m_p8grom0(*owner, TI998_GLIB20_TAG),
+	m_p8grom1(*owner, TI998_GLIB21_TAG),
+	m_p8grom2(*owner, TI998_GLIB22_TAG),
+	m_p8grom3(*owner, TI998_GLIB23_TAG),
+	m_p8grom4(*owner, TI998_GLIB24_TAG),
+	m_p8grom5(*owner, TI998_GLIB25_TAG),
+	m_p8grom6(*owner, TI998_GLIB26_TAG),
+	m_p8grom7(*owner, TI998_GLIB27_TAG),
+	m_p3grom0(*owner, TI998_GLIB30_TAG),
+	m_p3grom1(*owner, TI998_GLIB31_TAG),
+	m_p3grom2(*owner, TI998_GLIB32_TAG),
 	m_sgrom_idle(true),
 	m_tsgrom_idle(true),
 	m_p8grom_idle(true),
@@ -343,9 +371,9 @@ WRITE_LINE_MEMBER( mainboard8_device::dbin_in )
 	m_dbin_level = (line_state)state;
 }
 
-SETOFFSET_MEMBER( mainboard8_device::setoffset )
+READ8_MEMBER( mainboard8_device::setoffset )
 {
-	if (TRACE_ADDRESS) logerror("set %s %04x\n", (m_dbin_level==ASSERT_LINE)? "R" : "W", offset);
+	LOGMASKED(LOG_ADDRESS, "set %s %04x\n", (m_dbin_level==ASSERT_LINE)? "R" : "W", offset);
 
 	// No data is waiting on the data bus
 	m_pending_write = false;
@@ -382,6 +410,8 @@ SETOFFSET_MEMBER( mainboard8_device::setoffset )
 	// AMIGO is the one to control the READY line to the CPU
 	// MOFETTA does not contribute to READY
 	m_ready(m_amigo->cpury_out());
+
+	return 0;
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::reset_console )
@@ -407,7 +437,7 @@ WRITE_LINE_MEMBER( mainboard8_device::holda_line )
 */
 WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 {
-	if (TRACE_CLOCK) logerror("CLKOUT = %d\n", state);
+	LOGMASKED(LOG_CLOCK, "CLKOUT = %d\n", state);
 
 	// Propagate to Vaquerro; may change GGRDY (trailing edge) and the GROM select lines
 	m_vaquerro->clock_in((line_state)state);
@@ -440,36 +470,54 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 		// Yields about 25% in bench (hoped for more, but well)
 		if (!m_sgrom_idle)
 		{
-			for (int i=0; i < 3; i++) m_sgrom[i]->gclock_in(gromclk);
+			m_sgrom0->gclock_in(gromclk);
+			m_sgrom1->gclock_in(gromclk);
+			m_sgrom2->gclock_in(gromclk);
 			m_gromport->gclock_in(gromclk);
-			m_sgrom_idle = m_sgrom[0]->idle();
+			m_sgrom_idle = m_sgrom0->idle();
 		}
 
 		if (!m_tsgrom_idle)
 		{
-			for (int i=0; i < 8; i++) m_tsgrom[i]->gclock_in(gromclk);
-			m_tsgrom_idle = m_tsgrom[0]->idle();
+			m_tsgrom0->gclock_in(gromclk);
+			m_tsgrom1->gclock_in(gromclk);
+			m_tsgrom2->gclock_in(gromclk);
+			m_tsgrom3->gclock_in(gromclk);
+			m_tsgrom4->gclock_in(gromclk);
+			m_tsgrom5->gclock_in(gromclk);
+			m_tsgrom6->gclock_in(gromclk);
+			m_tsgrom7->gclock_in(gromclk);
+			m_tsgrom_idle = m_tsgrom0->idle();
 		}
 		if (!m_p8grom_idle)
 		{
-			for (int i=0; i < 8; i++) m_p8grom[i]->gclock_in(gromclk);
-			m_p8grom_idle = m_p8grom[0]->idle();
+			m_p8grom0->gclock_in(gromclk);
+			m_p8grom1->gclock_in(gromclk);
+			m_p8grom2->gclock_in(gromclk);
+			m_p8grom3->gclock_in(gromclk);
+			m_p8grom4->gclock_in(gromclk);
+			m_p8grom5->gclock_in(gromclk);
+			m_p8grom6->gclock_in(gromclk);
+			m_p8grom7->gclock_in(gromclk);
+			m_p8grom_idle = m_p8grom0->idle();
 		}
 
 		if (!m_p3grom_idle)
 		{
-			for (int i=0; i < 3; i++) m_p3grom[i]->gclock_in(gromclk);
-			m_p3grom_idle = m_p3grom[0]->idle();
+			m_p3grom0->gclock_in(gromclk);
+			m_p3grom1->gclock_in(gromclk);
+			m_p3grom2->gclock_in(gromclk);
+			m_p3grom_idle = m_p3grom0->idle();
 		}
 	}
 
 	// Check video for writing
 	if (m_pending_write && m_vaquerro->vdpwt_out()==ASSERT_LINE)
 	{
-		if (m_A14_set) m_video->register_write(*m_space, 0, m_latched_data);
-		else m_video->vram_write(*m_space, 0, m_latched_data);
+		if (m_A14_set) m_video->register_write(m_latched_data);
+		else m_video->vram_write(m_latched_data);
 		m_pending_write = false;
-		if (TRACE_MEM) logerror("Write %04x (video) <- %02x\n", m_logical_address, m_latched_data);
+		LOGMASKED(LOG_MEM, "Write %04x (video) <- %02x\n", m_logical_address, m_latched_data);
 		cycle_end();
 		return;
 	}
@@ -486,14 +534,14 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 		{
 			m_dram->pointer()[m_physical_address & 0xffff] = m_latched_data;
 			m_pending_write = false;
-			if (TRACE_MEM) logerror("Write %04x (phys %06x, DRAM) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
+			LOGMASKED(LOG_MEM, "Write %04x (phys %06x, DRAM) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
 
 		if (m_mofetta->alccs_out()==ASSERT_LINE)
 		{
 			m_oso->write(*m_space, m_physical_address>>1, m_latched_data);
 			m_pending_write = false;
-			if (TRACE_MEM) logerror("Write %04x (phys %06x, OSO) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
+			LOGMASKED(LOG_MEM, "Write %04x (phys %06x, OSO) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
 
 		if (m_mofetta->cmas_out()==ASSERT_LINE)
@@ -501,7 +549,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 			m_gromport->romgq_line(ASSERT_LINE);
 			m_gromport->write(*m_space, m_physical_address & 0x3fff, m_latched_data);
 			m_pending_write = false;
-			if (TRACE_MEM) logerror("Write %04x (phys %06x, cartridge) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
+			LOGMASKED(LOG_MEM, "Write %04x (phys %06x, cartridge) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
 		else
 		{
@@ -512,7 +560,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 		{
 			m_ioport->write(*m_space, m_physical_address, m_latched_data);
 			m_pending_write = false;
-			if (TRACE_MEM) logerror("Write %04x (phys %06x, PEB) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
+			LOGMASKED(LOG_MEM, "Write %04x (phys %06x, PEB) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
 	}
 
@@ -533,29 +581,47 @@ void mainboard8_device::select_groms()
 	if (select != m_prev_grom)
 	{
 		m_prev_grom = select;
-		int lines = (m_dbin_level==ASSERT_LINE)? GROM_M_LINE : 0;
-		if (m_A14_set) lines |= GROM_MO_LINE;
+		line_state a14 = m_A14_set? ASSERT_LINE : CLEAR_LINE;
 
 		if (select & SGMSEL) m_sgrom_idle = false;
 		if (select & TSGSEL) m_tsgrom_idle = false;
 		if (select & P8GSEL) m_p8grom_idle = false;
 		if (select & P3GSEL) m_p3grom_idle = false;
 
-		for (int i=0; i < 3; i++)
-			m_sgrom[i]->set_lines(*m_space, lines, select & SGMSEL);
+		line_state ssel = (select & SGMSEL)? ASSERT_LINE : CLEAR_LINE;
+		line_state tsel = (select & TSGSEL)? ASSERT_LINE : CLEAR_LINE;
+		line_state p8sel = (select & P8GSEL)? ASSERT_LINE : CLEAR_LINE;
+		line_state p3sel = (select & P3GSEL)? ASSERT_LINE : CLEAR_LINE;
 
-		for (int i=0; i < 8; i++)
-			m_tsgrom[i]->set_lines(*m_space, lines, select & TSGSEL);
+		m_sgrom0->set_lines((line_state)m_dbin_level, a14, ssel);
+		m_sgrom1->set_lines((line_state)m_dbin_level, a14, ssel);
+		m_sgrom2->set_lines((line_state)m_dbin_level, a14, ssel);
 
-		for (int i=0; i < 8; i++)
-			m_p8grom[i]->set_lines(*m_space, lines, select & P8GSEL);
+		m_tsgrom0->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom1->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom2->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom3->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom4->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom5->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom6->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom7->set_lines((line_state)m_dbin_level, a14, tsel);
 
-		for (int i=0; i < 3; i++)
-			m_p3grom[i]->set_lines(*m_space, lines, select & P3GSEL);
+		m_p8grom0->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom1->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom2->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom3->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom4->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom5->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom6->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom7->set_lines((line_state)m_dbin_level, a14, p8sel);
 
-		// Write to the cartridge port. The GROMs on cartridges are accesses as system GROMs
+		m_p3grom0->set_lines((line_state)m_dbin_level, a14, p3sel);
+		m_p3grom1->set_lines((line_state)m_dbin_level, a14, p3sel);
+		m_p3grom2->set_lines((line_state)m_dbin_level, a14, p3sel);
+
+		// Write to the cartridge port. The GROMs on cartridges are accessed as system GROMs
 		if (select & SGMSEL) m_gromport->romgq_line(CLEAR_LINE);
-		m_gromport->set_gromlines(*m_space, lines, select & SGMSEL);
+		m_gromport->set_gromlines((line_state)m_dbin_level, a14, ssel);
 	}
 
 	// If we're planning to write to the GROMs, let's do it right now
@@ -565,40 +631,46 @@ void mainboard8_device::select_groms()
 		switch (select)
 		{
 		case SGMSEL:
-			for (int i=0; i < 3; i++)
-			{
-				m_sgrom[i]->write(*m_space, 0, m_latched_data);
-			}
-			if (TRACE_MEM) logerror("Write GS <- %02x\n", m_latched_data);
+			m_sgrom0->write(m_latched_data);
+			m_sgrom1->write(m_latched_data);
+			m_sgrom2->write(m_latched_data);
+			LOGMASKED(LOG_MEM, "Write GS <- %02x\n", m_latched_data);
 			m_gromport->write(*m_space, 0, m_latched_data);
 			break;
 
 		case TSGSEL:
-			for (int i=0; i < 8; i++)
-			{
-				m_tsgrom[i]->write(*m_space, 0, m_latched_data);
-			}
-			if (TRACE_MEM) logerror("Write GT <- %02x\n", m_latched_data);
+			m_tsgrom0->write(m_latched_data);
+			m_tsgrom1->write(m_latched_data);
+			m_tsgrom2->write(m_latched_data);
+			m_tsgrom3->write(m_latched_data);
+			m_tsgrom4->write(m_latched_data);
+			m_tsgrom5->write(m_latched_data);
+			m_tsgrom6->write(m_latched_data);
+			m_tsgrom7->write(m_latched_data);
+			LOGMASKED(LOG_MEM, "Write GT <- %02x\n", m_latched_data);
 			break;
 
 		case P8GSEL:
-			for (int i=0; i < 8; i++)
-			{
-				m_p8grom[i]->write(*m_space, 0, m_latched_data);
-			}
-			if (TRACE_MEM) logerror("Write G8 <- %02x\n", m_latched_data);
+			m_p8grom0->write(m_latched_data);
+			m_p8grom1->write(m_latched_data);
+			m_p8grom2->write(m_latched_data);
+			m_p8grom3->write(m_latched_data);
+			m_p8grom4->write(m_latched_data);
+			m_p8grom5->write(m_latched_data);
+			m_p8grom6->write(m_latched_data);
+			m_p8grom7->write(m_latched_data);
+			LOGMASKED(LOG_MEM, "Write G8 <- %02x\n", m_latched_data);
 			break;
 
 		case P3GSEL:
-			for (int i=0; i < 3; i++)
-			{
-				m_p3grom[i]->write(*m_space, 0, m_latched_data);
-			}
-			if (TRACE_MEM) logerror("Write G3 <- %02x\n", m_latched_data);
+			m_p3grom0->write(m_latched_data);
+			m_p3grom1->write(m_latched_data);
+			m_p3grom2->write(m_latched_data);
+			LOGMASKED(LOG_MEM, "Write G3 <- %02x\n", m_latched_data);
 			break;
 
 		default:
-			logerror("Error: Multiple GROM libs selected: SGM=%d TSG=%d P8G=%d P3G=%d\n", (select & SGMSEL)!=0, (select & TSGSEL)!=0, (select & P8GSEL)!=0, (select & P3GSEL)!=0);
+			LOGMASKED(LOG_WARN, "Error: Multiple GROM libs selected: SGM=%d TSG=%d P8G=%d P3G=%d\n", (select & SGMSEL)!=0, (select & TSGSEL)!=0, (select & P8GSEL)!=0, (select & P3GSEL)!=0);
 			break;
 		}
 	}
@@ -608,7 +680,7 @@ void mainboard8_device::set_paddress(int address)
 {
 	// Keep this value as the current address
 	m_physical_address = (m_physical_address << 16) | address;
-	if (TRACE_DETAIL) logerror("Setting physical address %06x\n", m_physical_address);
+	LOGMASKED(LOG_DETAIL, "Setting physical address %06x\n", m_physical_address);
 
 	m_mofetta->set_address(*m_space, address, m_dbin_level);
 	m_ioport->setaddress_dbin(*m_space, address, m_dbin_level);
@@ -616,7 +688,7 @@ void mainboard8_device::set_paddress(int address)
 
 WRITE_LINE_MEMBER( mainboard8_device::msast_in )
 {
-	if (TRACE_DETAIL) logerror("msast = %d\n", state);
+	LOGMASKED(LOG_DETAIL, "msast = %d\n", state);
 
 	// Start physical space cycle on the trailing edge
 	if (state==CLEAR_LINE)
@@ -661,7 +733,7 @@ READ8_MEMBER( mainboard8_device::read )
 		// VDP access
 		if (m_vaquerro->vdprd_out()==ASSERT_LINE)
 		{
-			value = m_A14_set? m_video->register_read(space, 0) : m_video->vram_read(space, 0);
+			value = m_A14_set? m_video->register_read() : m_video->vram_read();
 			what = "video";
 			goto readdone;
 		}
@@ -677,7 +749,7 @@ READ8_MEMBER( mainboard8_device::read )
 		// Speech
 		if (m_vaquerro->sprd_out()==ASSERT_LINE)
 		{
-			value = m_speech->status_r(space, 0) & 0xff;
+			value = m_speech->status_r() & 0xff;
 			what = "speech";
 			goto readdone;
 		}
@@ -687,42 +759,48 @@ READ8_MEMBER( mainboard8_device::read )
 		{
 		case SGMSEL:
 			m_sgrom_idle = false;
-			for (int i=0; i < 3; i++)
-			{
-				m_sgrom[i]->readz(space, 0, &value);
-			}
+			m_sgrom0->readz(&value);
+			m_sgrom1->readz(&value);
+			m_sgrom2->readz(&value);
 			m_gromport->readz(space, 0, &value);
-			if (TRACE_GROM && !m_A14_set) logerror("GS>%04x\n", m_sgrom[0]->debug_get_address()-1);
+			if (!m_A14_set) LOGMASKED(LOG_GROM, "GS>%04x\n", m_sgrom0->debug_get_address()-1);
 			what = "system GROM";
 			goto readdone;
 
 		case TSGSEL:
 			m_tsgrom_idle = false;
-			for (int i=0; i < 8; i++)
-			{
-				m_tsgrom[i]->readz(space, 0, &value);
-			}
-			if (TRACE_GROM && !m_A14_set) logerror("GT>%04x\n", m_tsgrom[0]->debug_get_address()-1);
+			m_tsgrom0->readz(&value);
+			m_tsgrom1->readz(&value);
+			m_tsgrom2->readz(&value);
+			m_tsgrom3->readz(&value);
+			m_tsgrom4->readz(&value);
+			m_tsgrom5->readz(&value);
+			m_tsgrom6->readz(&value);
+			m_tsgrom7->readz(&value);
+			if (!m_A14_set) LOGMASKED(LOG_GROM, "GT>%04x\n", m_tsgrom0->debug_get_address()-1);
 			what = "TTS GROM";
 			goto readdone;
 
 		case P8GSEL:
 			m_p8grom_idle = false;
-			for (int i=0; i < 8; i++)
-			{
-				m_p8grom[i]->readz(space, 0, &value);
-			}
-			if (TRACE_GROM && !m_A14_set) logerror("G8>%04x\n", m_p8grom[0]->debug_get_address()-1);
+			m_p8grom0->readz(&value);
+			m_p8grom1->readz(&value);
+			m_p8grom2->readz(&value);
+			m_p8grom3->readz(&value);
+			m_p8grom4->readz(&value);
+			m_p8grom5->readz(&value);
+			m_p8grom6->readz(&value);
+			m_p8grom7->readz(&value);
+			if (!m_A14_set) LOGMASKED(LOG_GROM, "G8>%04x\n", m_p8grom0->debug_get_address()-1);
 			what = "P8 GROM";
 			goto readdone;
 
 		case P3GSEL:
 			m_p3grom_idle = false;
-			for (int i=0; i < 3; i++)
-			{
-				m_p3grom[i]->readz(space, 0, &value);
-			}
-			if (TRACE_GROM && !m_A14_set) logerror("G3>%04x\n", m_p3grom[0]->debug_get_address()-1);
+			m_p3grom0->readz(&value);
+			m_p3grom1->readz(&value);
+			m_p3grom2->readz(&value);
+			if (!m_A14_set) LOGMASKED(LOG_GROM, "G3>%04x\n", m_p3grom0->debug_get_address()-1);
 			what = "P3 GROM";
 			goto readdone;
 		default:
@@ -733,7 +811,7 @@ READ8_MEMBER( mainboard8_device::read )
 		// an immediate value to a write-only address (like 9400) because the
 		// GPL interpreter always tries to load the value from the provided memory address first
 
-		logerror("Read %04x (unmapped) ignored\n", m_logical_address);
+		LOGMASKED(LOG_WARN, "Read %04x (unmapped) ignored\n", m_logical_address);
 
 		// Memory cycle ends
 		cycle_end();
@@ -758,7 +836,7 @@ READ8_MEMBER( mainboard8_device::read )
 			if (m_mofetta->rom1al_out()==ASSERT_LINE) address |= 0x2000;
 			value = m_rom1[address];
 
-			if (TRACE_MEM) logerror("Read %04x (ROM1@%04x) -> %02x\n", m_logical_address, address, value);
+			LOGMASKED(LOG_MEM, "Read %04x (ROM1@%04x) -> %02x\n", m_logical_address, address, value);
 			cycle_end();
 			return value;
 		}
@@ -792,7 +870,7 @@ READ8_MEMBER( mainboard8_device::read )
 			goto readdonephys;
 		}
 
-		if (TRACE_PUNMAP) logerror("Read %04x (phys %06x, unmapped) ignored\n", m_logical_address, m_physical_address);
+		LOGMASKED(LOG_PUNMAP, "Read %04x (phys %06x, unmapped) ignored\n", m_logical_address, m_physical_address);
 
 		// Memory cycle ends
 		cycle_end();
@@ -801,12 +879,12 @@ READ8_MEMBER( mainboard8_device::read )
 
 
 readdone:
-	if (TRACE_MEM) logerror("Read %04x (%s) -> %02x\n", m_logical_address, what, value);
+	LOGMASKED(LOG_MEM, "Read %04x (%s) -> %02x\n", m_logical_address, what, value);
 	cycle_end();
 	return value;
 
 readdonephys:
-	if (TRACE_MEM) logerror("Read %04x (phys %06x, %s) -> %02x\n", m_logical_address, m_physical_address, what, value);
+	LOGMASKED(LOG_MEM, "Read %04x (phys %06x, %s) -> %02x\n", m_logical_address, m_physical_address, what, value);
 	cycle_end();
 	return value;
 }
@@ -841,7 +919,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 	// GROMs and video must wait to be selected
 	if (m_amigo->mapper_accessed())
 	{
-		if (TRACE_MEM) logerror("Write %04x (mapper) <- %02x\n", m_logical_address, data);
+		LOGMASKED(LOG_MEM, "Write %04x (mapper) <- %02x\n", m_logical_address, data);
 		m_amigo->write(space, 0, data);
 		m_pending_write = false;
 	}
@@ -850,8 +928,8 @@ WRITE8_MEMBER( mainboard8_device::write )
 	// sound address lies within the SRAM area
 	if (m_vaquerro->sccs_out()==ASSERT_LINE)
 	{
-		if (TRACE_MEM) logerror("Write %04x (sound) <- %02x\n", m_logical_address, data);
-		m_sound->write(space, 0, data);         // Sound chip will lower READY after this access
+		LOGMASKED(LOG_MEM, "Write %04x (sound) <- %02x\n", m_logical_address, data);
+		m_sound->write(data);         // Sound chip will lower READY after this access
 		m_pending_write = false;
 	}
 	else
@@ -859,7 +937,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 		// SRAM
 		if (m_amigo->sramcs_out()==ASSERT_LINE)
 		{
-			if (TRACE_MEM) logerror("Write %04x (SRAM) <- %02x\n", m_logical_address, data);
+			LOGMASKED(LOG_MEM, "Write %04x (SRAM) <- %02x\n", m_logical_address, data);
 			m_sram->pointer()[m_logical_address & 0x07ff] = data;
 			m_pending_write = false;
 		}
@@ -868,8 +946,8 @@ WRITE8_MEMBER( mainboard8_device::write )
 	// Speech
 	if (m_vaquerro->spwt_out()==ASSERT_LINE)
 	{
-		if (TRACE_MEM) logerror("Write %04x (speech) <- %02x\n", m_logical_address, data);
-		m_speech->data_w(space, 0, data);
+		LOGMASKED(LOG_MEM, "Write %04x (speech) <- %02x\n", m_logical_address, data);
+		m_speech->data_w(data);
 		m_pending_write = false;
 	}
 
@@ -884,7 +962,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 */
 WRITE_LINE_MEMBER( mainboard8_device::crus_in )
 {
-	if (TRACE_CRU) logerror("%s CRUS\n", (state==1)? "Assert" : "Clear");
+	LOGMASKED(LOG_CRU, "%s CRUS\n", (state==1)? "Assert" : "Clear");
 	m_vaquerro->crus_in(state);
 	m_amigo->crus_in(state);
 	m_crus_debug = (line_state)state;
@@ -896,7 +974,7 @@ WRITE_LINE_MEMBER( mainboard8_device::crus_in )
 */
 WRITE_LINE_MEMBER( mainboard8_device::ptgen_in )
 {
-	if (TRACE_CRU) logerror("%s PTGEN*\n", (state==0)? "Assert" : "Clear");
+	LOGMASKED(LOG_CRU, "%s PTGEN*\n", (state==0)? "Assert" : "Clear");
 	m_vaquerro->crusgl_in((state==0)? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -945,30 +1023,12 @@ WRITE_LINE_MEMBER( mainboard8_device::ggrdy_in )
 	m_amigo->srdy_in((state==ASSERT_LINE && m_speech_ready && m_sound_ready && m_pbox_ready)? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const char *const glib0[] = { TI998_SYSGROM0_TAG, TI998_SYSGROM1_TAG, TI998_SYSGROM2_TAG };
-static const char *const glib1[] = { TI998_GLIB10_TAG, TI998_GLIB11_TAG, TI998_GLIB12_TAG, TI998_GLIB13_TAG, TI998_GLIB14_TAG, TI998_GLIB15_TAG, TI998_GLIB16_TAG, TI998_GLIB17_TAG };
-static const char *const glib2[] = { TI998_GLIB20_TAG, TI998_GLIB21_TAG, TI998_GLIB22_TAG, TI998_GLIB23_TAG, TI998_GLIB24_TAG, TI998_GLIB25_TAG, TI998_GLIB26_TAG, TI998_GLIB27_TAG };
-static const char *const glib3[] = { TI998_GLIB30_TAG, TI998_GLIB31_TAG, TI998_GLIB32_TAG };
-
 void mainboard8_device::device_start()
 {
-	logerror("Starting main board\n");
 	// Lines going to the main driver class, then to the CPU
 	m_ready.resolve_safe();         // READY
 	m_console_reset.resolve_safe(); // RESET
 	m_hold_line.resolve_safe();     // HOLD
-
-	// Setting up the links to the GROMs
-	for (int i=0; i < 8; i++)
-	{
-		if (i < 3)
-		{
-			m_sgrom[i] = downcast<tmc0430_device*>(machine().device(glib0[i]));
-			m_p3grom[i] = downcast<tmc0430_device*>(machine().device(glib3[i]));
-		}
-		m_tsgrom[i] = downcast<tmc0430_device*>(machine().device(glib1[i]));
-		m_p8grom[i] = downcast<tmc0430_device*>(machine().device(glib2[i]));
-	}
 
 	m_rom0  = machine().root_device().memregion(TI998_ROM0_REG)->base();
 	m_rom1  = machine().root_device().memregion(TI998_ROM1_REG)->base();
@@ -995,7 +1055,6 @@ void mainboard8_device::device_start()
 
 void mainboard8_device::device_reset()
 {
-	logerror("Resetting main board\n");
 	m_last_ready = CLEAR_LINE;
 	m_speech_ready = true;
 	m_sound_ready = true;
@@ -1007,17 +1066,17 @@ void mainboard8_device::device_reset()
 	m_amigo->connect_sram(m_sram->pointer());
 
 	// Get the pointer to the address space; we need it outside of the
-	// usual memory functions.
-	cpu_device* cpu = downcast<cpu_device*>(machine().device("maincpu"));
-	m_space = &cpu->space(AS_PROGRAM);
+	// usual memory functions. TODO: Possibly not anymore.
+	m_space = &m_maincpu->space(AS_PROGRAM);
 }
 
-MACHINE_CONFIG_START(mainboard8_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(TI998_VAQUERRO_TAG, TI99_VAQUERRO, 0)
-	MCFG_DEVICE_ADD(TI998_MOFETTA_TAG, TI99_MOFETTA, 0)
-	MCFG_DEVICE_ADD(TI998_AMIGO_TAG, TI99_AMIGO, 0)
-	MCFG_DEVICE_ADD(TI998_OSO_TAG, TI99_OSO, 0)
-MACHINE_CONFIG_END
+void mainboard8_device::device_add_mconfig(machine_config &config)
+{
+	TI99_VAQUERRO(config, TI998_VAQUERRO_TAG, 0);
+	TI99_MOFETTA(config, TI998_MOFETTA_TAG, 0);
+	TI99_AMIGO(config, TI998_AMIGO_TAG, 0);
+	TI99_OSO(config, TI998_OSO_TAG, 0);
+}
 
 /***************************************************************************
   ===== VAQUERRO: Logical Address Space decoder =====
@@ -1124,7 +1183,7 @@ SETADDRESS_DBIN_MEMBER( vaquerro_device::set_address )
 	// ===================   TI (compatibility) mode   ======================
 	if (m_crus == ASSERT_LINE)
 	{
-		if (TRACE_DETAIL) logerror("Compatibility mode\n");
+		LOGMASKED(LOG_DETAIL, "Compatibility mode\n");
 
 		// SPRD (Speech read)
 		m_sprd = ((offbase==0x9000) && reading);
@@ -1147,7 +1206,7 @@ SETADDRESS_DBIN_MEMBER( vaquerro_device::set_address )
 	// ======================   Native mode    ======================
 	else
 	{
-		if (TRACE_DETAIL) logerror("Native mode\n");
+		LOGMASKED(LOG_DETAIL, "Native mode\n");
 
 		// SPRD (Speech read)
 		m_sprd = ((offbase==0xf820) && reading);
@@ -1176,7 +1235,7 @@ SETADDRESS_DBIN_MEMBER( vaquerro_device::set_address )
 
 	m_lasreq = (m_sprd || m_spwt || m_sccs || m_sromcs || m_grom_or_video);
 
-	if (TRACE_DETAIL) logerror("sgfap=%d tsgfap=%d p8gfap=%d p3gfap=%d vfap=%d\n", sgfap, tsgfap, p8gfap, p3gfap, vfap);
+	LOGMASKED(LOG_DETAIL, "sgfap=%d tsgfap=%d p8gfap=%d p3gfap=%d vfap=%d\n", sgfap, tsgfap, p8gfap, p3gfap, vfap);
 
 	// Pass the selection to the wait state generators
 	// and pick up the current select line states
@@ -1195,7 +1254,7 @@ SETADDRESS_DBIN_MEMBER( vaquerro_device::set_address )
 	{
 		// We don't see the current selection now; only with next clock pulse.
 		m_mainboard->ggrdy_in(m_sry);
-		if (TRACE_READY) logerror("GGRDY = %d\n", m_sry);
+		LOGMASKED(LOG_READY, "GGRDY = %d\n", m_sry);
 	}
 }
 
@@ -1227,25 +1286,25 @@ READ_LINE_MEMBER( vaquerro_device::lascsq_out )
 */
 WRITE_LINE_MEMBER( vaquerro_device::sgmry )
 {
-	if (TRACE_READY) logerror("Incoming SGMRY = %d\n", state);
+	LOGMASKED(LOG_READY, "Incoming SGMRY = %d\n", state);
 	m_sgmws.ready_in((line_state)state);
 }
 
 WRITE_LINE_MEMBER( vaquerro_device::tsgry )
 {
-	if (TRACE_READY) logerror("Incoming TSGRY = %d\n", state);
+	LOGMASKED(LOG_READY, "Incoming TSGRY = %d\n", state);
 	m_tsgws.ready_in((line_state)state);
 }
 
 WRITE_LINE_MEMBER( vaquerro_device::p8gry )
 {
-	if (TRACE_READY) logerror("Incoming 8GRY = %d\n", state);
+	LOGMASKED(LOG_READY, "Incoming 8GRY = %d\n", state);
 	m_p8gws.ready_in((line_state)state);
 }
 
 WRITE_LINE_MEMBER( vaquerro_device::p3gry )
 {
-	if (TRACE_READY) logerror("Incoming P3GRY = %d\n", state);
+	LOGMASKED(LOG_READY, "Incoming P3GRY = %d\n", state);
 	m_p3gws.ready_in((line_state)state);
 }
 
@@ -1254,7 +1313,7 @@ WRITE_LINE_MEMBER( vaquerro_device::p3gry )
 */
 READ_LINE_MEMBER( vaquerro_device::ggrdy_out )
 {
-	if (TRACE_READY) logerror("GGRDY out = %d\n", m_ggrdy);
+	LOGMASKED(LOG_READY, "GGRDY out = %d\n", m_ggrdy);
 	return m_ggrdy;
 }
 
@@ -1335,7 +1394,7 @@ WRITE_LINE_MEMBER( vaquerro_device::clock_in )
 	if (level==CLEAR_LINE)
 	{
 		m_sry = m_sgmws.ready_out() || m_tsgws.ready_out() || m_p8gws.ready_out() || m_p3gws.ready_out() || m_vidws.ready_out();
-		if (TRACE_WS) logerror("ready_out = (%d, %d, %d, %d, %d)\n", m_sgmws.ready_out(), m_tsgws.ready_out(), m_p8gws.ready_out(), m_p3gws.ready_out(),m_vidws.ready_out());
+		LOGMASKED(LOG_WS, "ready_out = (%d, %d, %d, %d, %d)\n", m_sgmws.ready_out(), m_tsgws.ready_out(), m_p8gws.ready_out(), m_p3gws.ready_out(),m_vidws.ready_out());
 	}
 
 	// If the output gate is closed, propagate ASSERT_LINE (pulled up)
@@ -1345,7 +1404,6 @@ WRITE_LINE_MEMBER( vaquerro_device::clock_in )
 
 void vaquerro_device::device_start()
 {
-	logerror("Starting\n");
 	m_mainboard = downcast<mainboard8_device*>(owner());
 	m_sgmws.init(SGMSEL);
 	m_tsgws.init(TSGSEL);
@@ -1558,13 +1616,13 @@ SETADDRESS_DBIN_MEMBER( mofetta_device::set_address )
 	if (!m_gotfirstword)
 	{
 		// Store the first word and wait for clearing of MSAST
-		if (TRACE_MOFETTA) logerror("Got the upper word of the address: %04x\n", offset);
+		LOGMASKED(LOG_MOFETTA, "Got the upper word of the address: %04x\n", offset);
 		m_address_latch = offset;
 	}
 	else
 	{
 		// Second part - now decode the address
-		if (TRACE_MOFETTA) logerror("Got the lower word of the address: %04x\n", offset);
+		LOGMASKED(LOG_MOFETTA, "Got the lower word of the address: %04x\n", offset);
 
 		bool acs, tcs, rcs, acsx;
 		bool reading = (state==ASSERT_LINE);
@@ -1685,14 +1743,14 @@ WRITE8_MEMBER(mofetta_device::cruwrite)
 		{
 			// SWRST (Software reset)
 			// Value seems to be irrelevant
-			if (TRACE_CRU) logerror("Doing a software reset by SBO 2702\n");
+			LOGMASKED(LOG_CRU, "Doing a software reset by SBO 2702\n");
 			m_mainboard->reset_console(ASSERT_LINE);
 			m_mainboard->reset_console(CLEAR_LINE);
 		}
 		else
 		{
 			m_txspg = (data!=0);        // CRU>2700
-			if (TRACE_CRU)  logerror("Turning %s CRU>2700\n", m_txspg? "on" : "off");
+			LOGMASKED(LOG_CRU, "Turning %s CRU>2700\n", m_txspg? "on" : "off");
 		}
 	}
 	else
@@ -1700,7 +1758,7 @@ WRITE8_MEMBER(mofetta_device::cruwrite)
 		if ((offset & 0xff00)==0x1700)
 		{
 			m_alcpg = (data!=0);        // CRU>1700
-			if (TRACE_CRU) logerror("Turning %s CRU>1700\n", m_alcpg? "on" : "off");
+			LOGMASKED(LOG_CRU, "Turning %s CRU>1700\n", m_alcpg? "on" : "off");
 		}
 	}
 }
@@ -1740,7 +1798,6 @@ WRITE_LINE_MEMBER( mofetta_device::skdrcs_in )
 
 void mofetta_device::device_start()
 {
-	logerror("Starting\n");
 	m_mainboard = downcast<mainboard8_device*>(owner());
 
 	save_item(NAME(m_pmemen));
@@ -1873,13 +1930,13 @@ int amigo_device::get_physical_address_debug(offs_t offset)
 */
 WRITE_LINE_MEMBER( amigo_device::srdy_in )
 {
-	if (TRACE_READY) logerror("Incoming SRDY = %d\n", state);
+	LOGMASKED(LOG_READY, "Incoming SRDY = %d\n", state);
 	m_srdy = (line_state)state;
 
 	// If the access is going to logical space, pass through the READY line
 	if (m_logical_space)
 	{
-		if (TRACE_CPURY) logerror("Setting CPURY = %d (SRDY)\n", m_ready_out);
+		LOGMASKED(LOG_CPURY, "Setting CPURY = %d (SRDY)\n", m_ready_out);
 		m_ready_out = m_srdy;
 	}
 }
@@ -1943,7 +2000,7 @@ WRITE_LINE_MEMBER( amigo_device::lascs_in )
     3. Set the physical address bus with the second 16 bits of the physical
        address. Clear the MSAST line. Forward any incoming READY=0 to the CPU.
 */
-SETOFFSET_MEMBER( amigo_device::set_address )
+READ8_MEMBER( amigo_device::set_address )
 {
 	// Check whether the mapper itself is accessed
 	int mapaddr = (m_crus==ASSERT_LINE)? 0x8810 : 0xf870;
@@ -1958,7 +2015,7 @@ SETOFFSET_MEMBER( amigo_device::set_address )
 	// Is the address not in the logical address space?
 	if (!m_logical_space)
 	{
-		if (TRACE_AMIGO) logerror("Amigo decoding; %04x is a physical address.\n", offset);
+		LOGMASKED(LOG_AMIGO, "Amigo decoding; %04x is a physical address.\n", offset);
 		// Build the physical address
 		// The first three bits are the protection bits (Write, Execute, Read)
 		// Theoretically, the addition of the logical address could mess up those
@@ -1979,7 +2036,7 @@ SETOFFSET_MEMBER( amigo_device::set_address )
 		// Pull down READY
 		m_ready_out = CLEAR_LINE;
 
-		if (TRACE_CPURY) logerror("Setting CPURY = %d (PAS)\n", m_ready_out);
+		LOGMASKED(LOG_CPURY, "Setting CPURY = %d (PAS)\n", m_ready_out);
 	}
 	else
 	{
@@ -1987,8 +2044,10 @@ SETOFFSET_MEMBER( amigo_device::set_address )
 		m_dram_accessed = false;
 		m_amstate = IDLE;
 		m_ready_out = m_srdy;
-		if (TRACE_CPURY) logerror("Setting CPURY = %d (LAS)\n", m_ready_out);
+		LOGMASKED(LOG_CPURY, "Setting CPURY = %d (LAS)\n", m_ready_out);
 	}
+
+	return 0;
 }
 
 /*
@@ -2018,7 +2077,7 @@ WRITE8_MEMBER( amigo_device::write )
 		m_mapvalue = 0;
 		m_mainboard->hold_cpu(ASSERT_LINE);
 	}
-	else logerror("Invalid value written to Amigo: %02x\n", data);
+	else LOGMASKED(LOG_WARN, "Invalid value written to Amigo: %02x\n", data);
 }
 
 WRITE_LINE_MEMBER( amigo_device::clock_in )
@@ -2055,7 +2114,7 @@ WRITE_LINE_MEMBER( amigo_device::clock_in )
 			break;
 
 		default:
-			logerror("Invalid state in mapper: %d\n", m_amstate);
+			LOGMASKED(LOG_WARN, "Invalid state in mapper: %d\n", m_amstate);
 		}
 	}
 }
@@ -2066,7 +2125,7 @@ void amigo_device::mapper_load()
 
 	if ((m_sram_address & 0x03)==0)
 	{
-		if (TRACE_MAP) logerror("Loaded basereg %02d = %08x\n", m_basereg, m_mapvalue);
+		LOGMASKED(LOG_MAP, "Loaded basereg %02d = %08x\n", m_basereg, m_mapvalue);
 		m_base_register[m_basereg++] = m_mapvalue;
 	}
 	if (m_basereg == 16)
@@ -2089,7 +2148,7 @@ void amigo_device::mapper_save()
 		else
 		{
 			m_mapvalue = m_base_register[m_basereg];
-			if (TRACE_MAP) logerror("Saving basereg %02d = %08x\n", m_basereg, m_mapvalue);
+			LOGMASKED(LOG_MAP, "Saving basereg %02d = %08x\n", m_basereg, m_mapvalue);
 			m_basereg++;
 		}
 	}
@@ -2131,13 +2190,12 @@ void amigo_device::mapper_access_debug(int data)
 
 WRITE_LINE_MEMBER( amigo_device::holda_in )
 {
-	if (TRACE_MAP) logerror("HOLD acknowledged = %d\n", state);
+	LOGMASKED(LOG_MAP, "HOLD acknowledged = %d\n", state);
 	m_hold_acknowledged = (state==ASSERT_LINE);
 }
 
 void amigo_device::device_start()
 {
-	logerror("Starting\n");
 	m_mainboard = downcast<mainboard8_device*>(owner());
 
 	save_item(NAME(m_memen));
@@ -2210,67 +2268,29 @@ void amigo_device::device_reset()
   | 8 | 7 | 6 | 5 |      8 = ADB3; 7 = ADB2; 6 = nc;   5 = HSK*
   +---+---+---+---+
 
-  TODO: This is just a preliminary implementation to satisfy the operating
-        system. When completed we can hopefully emulate a Hexbus floppy and
-        use it in Extended Basic II which refuses to work with the PEB cards.
-        The Hexbus should then be designed as a slot device.
-
 ****************************************************************************/
-
-/* Status register bits */
-enum
-{
-	HSKWT = 0x80,
-	HSKRD = 0x40,
-	BAVIAS = 0x20,
-	BAVAIS = 0x10,
-	SBAV = 0x08,
-	WBUSY = 0x04,
-	RBUSY = 0x02,
-	SHSK = 0x01
-};
-
-/* Control register bits */
-enum
-{
-	WIEN = 0x80,
-	RIEN = 0x40,
-	BAVIAEN = 0x20,
-	BAVAIEN = 0x10,
-	BAVC = 0x08,
-	WEN = 0x04,
-	REN = 0x02,
-	CR7 = 0x01
-};
-
-/* Line */
-enum
-{
-	LINE_HSK = 0x10,
-	LINE_BAV = 0x04,
-	LINE_BIT32 = 0xc0,
-	LINE_BIT10 = 0x03
-};
 
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bus::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
 	m_int(*this),
+	m_hexbusout(*this, ":" TI_HEXBUS_TAG),
 	m_data(0),
 	m_status(0xff),
 	m_control(0),
-	m_xmit(0), m_lasthxvalue(0x01),
-	m_bav(false), m_sbav(false), m_sbavold(false), m_bavhold(false),
-	m_hsk(false), m_shsk(false), m_shskold(false), m_hskhold(false),
+	m_xmit(0),
+	m_bav(false), m_sbav(false), m_sbavold(false), m_bavold(false),
+	m_hsk(false), m_hsklocal(false), m_shsk(false), m_hskold(false),
 	m_wq1(false), m_wq1old(false), m_wq2(false), m_wq2old(false),
-	m_wnp(false), m_wbusyold(false), m_sendbyte(false),
+	m_wnp(false), m_wbusy(false), m_wbusyold(false), m_sendbyte(false),
 	m_wrset(false), m_counting(false), m_clkcount(0),
 	m_rq1(false), m_rq2(false), m_rq2old(false),
 	m_rnib(false), m_rnibcold(false),
 	m_rdset(false), m_rdsetold(false),
 	m_msns(false), m_lsns(false),
-	m_rhsus(false)
+	m_rhsus(false), m_rbusy(false),
+	m_phi3(false),
+	m_oldvalue(0xff)
 {
-	(void)m_shskold;
 	m_hexbus_inbound = nullptr;
 	m_hexbus_outbound = nullptr;
 }
@@ -2283,8 +2303,8 @@ READ8_MEMBER( oso_device::read )
 	{
 	case 0:
 		// read 5FF8: read data register
-		if (TRACE_OSO) logerror("Read data register = %02x\n", value);
 		value = m_data;
+		LOGMASKED(LOG_OSO, "Read data register = %02x\n", value);
 		// Release the handshake
 		m_rhsus = false;
 		break;
@@ -2292,7 +2312,7 @@ READ8_MEMBER( oso_device::read )
 		// read 5FFA: read status register
 		value = m_status;
 		clear_int_status();
-		if (TRACE_OSO) logerror("Read status %02x (HSKWT=%d,HSKRD=%d,BAVIAS=%d,BAVAIS=%d,SBAV=%d,WBUSY=%d,RBUSY=%d,SHSK=%d)\n", value,
+		LOGMASKED(LOG_OSO, "Read status %02x (HSKWT=%d,HSKRD=%d,BAVIAS=%d,BAVAIS=%d,SBAV=%d,WBUSY=%d,RBUSY=%d,SHSK=%d)\n", value,
 			(value&HSKWT)? 1:0, (value&HSKRD)? 1:0, (value&BAVIAS)? 1:0,
 			(value&BAVAIS)? 1:0, (value&SBAV)? 1:0, (value&WBUSY)? 1:0,
 			(value&RBUSY)? 1:0,(value&SHSK)? 1:0);
@@ -2300,12 +2320,12 @@ READ8_MEMBER( oso_device::read )
 	case 2:
 		// read 5FFC: read control register
 		value = m_control;
-		if (TRACE_OSO) logerror("Read control register = %02x\n", value);
+		LOGMASKED(LOG_OSO, "Read control register = %02x\n", value);
 		break;
 	case 3:
 		// read 5FFE: read transmit register
 		value = m_xmit;
-		if (TRACE_OSO) logerror("Read transmit register = %02x\n", value);
+		LOGMASKED(LOG_OSO, "Read transmit register = %02x\n", value);
 		break;
 	}
 	return value;
@@ -2318,7 +2338,7 @@ WRITE8_MEMBER( oso_device::write )
 	{
 	case 0:
 		// write 5FF8: write transmit register
-		if (TRACE_OSO) logerror("Write transmit register %02x\n", data);
+		LOGMASKED(LOG_OSO, "Write transmit register %02x\n", data);
 
 		// trigger some actions in the write subsystem
 		m_sendbyte = true;
@@ -2332,10 +2352,11 @@ WRITE8_MEMBER( oso_device::write )
 		break;
 	case 1:
 		// write 5FFA: write control register
-		if (TRACE_OSO) logerror("Write control register %02x (WIEN=%d, RIEN=%d, BAVIAEN=%d, BAVAIEN=%d, BAVC=%d, WEN=%d, REN=%d)\n",
+		LOGMASKED(LOG_OSO, "Write control register %02x (WIEN=%d, RIEN=%d, BAVIAEN=%d, BAVAIEN=%d, BAVC=%d, WEN=%d, REN=%d)\n",
 			data, (data & WIEN)? 1:0, (data & RIEN)? 1:0, (data&BAVIAEN)? 1:0, (data&BAVAIEN)? 1:0,
 			(data & BAVC)? 1:0, (data & WEN)? 1:0, (data & REN)? 1:0);
 		m_control = data;
+		m_bav = control_bit(BAVC);
 
 		// Reset some flipflops in the write/read timing section
 		if (!control_bit(WEN))
@@ -2346,10 +2367,11 @@ WRITE8_MEMBER( oso_device::write )
 		{
 			m_rq1 = m_rq2 = m_rdset = false;
 		}
+		update_hexbus();
 		break;
 	default:
 		// write 5FFC, 5FFE: undefined
-		if (TRACE_OSO) logerror("Invalid write on %04x: %02x\n", (offset<<1) | 0x5ff0, data);
+		LOGMASKED(LOG_OSO, "Invalid write on %04x: %02x\n", (offset<<1) | 0x5ff0, data);
 		break;
 	}
 }
@@ -2360,35 +2382,28 @@ void oso_device::clear_int_status()
 	m_int(CLEAR_LINE);
 }
 
-void oso_device::hexbus_value_changed(uint8_t data)
-{
-	if (TRACE_OSO) logerror("Hexbus value changed to %02x\n", data);
-
-	m_bav = ((data & LINE_BAV)==0) | control_bit(BAVC);
-
-	m_hsk = (data & LINE_HSK)==0;
-	int nibble = ((data & LINE_BIT32)>>4) | (data & LINE_BIT10);
-	if (m_msns)
-		m_data = (m_data & 0x0f) | (nibble<<4);
-	if (m_lsns)
-		m_data = (m_data & 0xf0) | nibble;
-}
-
 /*
     Phi3 incoming clock pulse
 */
 WRITE_LINE_MEMBER( oso_device::clock_in )
 {
+	m_phi3 = state;
 	if (state==ASSERT_LINE)
 	{
 		// Control lines SHSK, SBAV
 		// When BAV/HSK is 0/1 for two rising edges of Phi3*, SBAV/SHSK goes to
 		// 0/1 at the following falling edge of Phi3*.
 		// Page 5
-		m_sbav = m_bavhold && m_bav;   // could mean "stable BAV"
-		m_bavhold = m_bav;
-		m_shsk = m_hskhold && m_hsk;
-		m_hskhold = m_hsk;
+
+		// In reality, the HSK and BAV signals are checked for their minimum
+		// width (by waiting for two cycles of constant level), but due to
+		// problems with synchronous execution between different parts in the
+		// emulation, we accept the level change immediately.
+
+		m_sbav = m_bav;   // could mean "stable BAV"
+		// if (control_bit(WEN)) logerror("hskhold=%d, hsk=%d\n", m_hskhold? 1:0, m_hsk? 1:0);
+
+		m_shsk = m_hsk;
 		set_status(SHSK, m_shsk);
 		set_status(SBAV, m_sbav);
 
@@ -2412,7 +2427,9 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 
 		if (control_bit(WEN))  // Nothing happens without WEN
 		{
-			if (TRACE_OSO) if (!m_wrset && m_sendbyte) logerror("Starting write process\n");
+			if (!m_wrset && m_sendbyte)
+				LOGMASKED(LOG_OSO, "Starting write process\n");
+
 			// Page 3: Write timing
 			// Note: First pass counts to 30, second to 31
 			bool cnt30 = ((m_clkcount & 0x1e) == 30);
@@ -2420,7 +2437,7 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 			|| (cnt30 && !m_wq2 && m_wq1) || (m_shsk && m_wq2 && m_wq1);
 
 			bool jwq1 = cont && m_wq2;
-			bool kwq1 = !((cont && !m_wq2) || (!cont && m_wq2 && m_wnp));
+			bool kwq1 = !(cont && !m_wq2) && !(!cont && m_wq2 && m_wnp);
 
 			bool jwq2 = cont;
 			bool kwq2 = !(m_wq1 && !cont);
@@ -2431,17 +2448,26 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 			if (m_wq1 == true)
 				m_sendbyte = false;
 
-			// logerror("sendbyte=%d, wq1=%d, wq2=%d, jwq1=%d, kwq1=%d, jwq2=%d, kwq2=%d, shsk=%d\n", m_sendbyte, m_wq1, m_wq2, jwq1, kwq1, jwq2, kwq2, m_shsk);
+			// logerror("sendbyte=%d, wq1=%d, wq2=%d, jwq1=%d, kwq1=%d, jwq2=%d, kwq2=%d\n", m_sendbyte, m_wq1, m_wq2, jwq1, kwq1, jwq2, kwq2);
+			// logerror("sendbyte=%d, wq1=%d, wq2=%d, m_shsk=%d\n", m_sendbyte, m_wq1, m_wq2, m_shsk);
 			// WBUSY is asserted on byte load, during phase 1, and phase 2.
-			bool wbusy = m_sendbyte || m_wq1 || m_wq2;
+			m_wbusy = m_sendbyte || m_wq1 || m_wq2;
 
 			// Set status bits and raise interrupt (p. 4)
-			set_status(WBUSY, wbusy);
+			set_status(WBUSY, m_wbusy);
 
 			// Raising edge of wbusy*
-			if (m_wbusyold == true && wbusy == false)
+			// This is true when the two nibbles of the byte have been written and acknowledged
+			// by the receiver which has released HSK*
+			if (m_wbusyold == true && m_wbusy == false)
+			{
+				LOGMASKED(LOG_HEXBUS, "Setting HSKWT to true\n");
 				set_status(HSKWT, true);
-			m_wbusyold = wbusy;
+				// Problem: By turning off the WBUSY signal, the transmit register goes inactive
+				// so the peripheral setting dominates again. However, the peripheral sender will not
+				// send its value again.
+			}
+			m_wbusyold = m_wbusy;
 
 			// Operate flipflops
 			// Write phases
@@ -2487,27 +2513,26 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 
 		if (control_bit(REN))
 		{
-			bool rbusy = m_rq1 || m_rq2;
-			set_status(RBUSY, rbusy);
-
-			// Flipflop resets
-			if (!rbusy) m_rnib = false;
-			if (m_rq2) m_rdset = false;
-
-			bool rdsetin = !control_bit(WBUSY) && m_sbav && m_shsk;
+			bool rdsetin = !status_bit(WBUSY) && m_sbav && m_shsk;
 			bool next = (m_rdset && !m_rq2) || (m_shsk && m_rq2);
 			bool drq1 = (next && m_rq2) || (m_rq2 && m_rq1 && !m_rnib);
 			bool jrq2 = next && !m_rq1;
-			bool krq2 = m_rq1 && !m_rnib;
-			m_msns = m_rnib && !m_rq1 && m_rq2;
-			m_lsns = !m_rnib && !m_rq1 && m_rq2;
+			bool krq2 = !m_rq1 || m_rnib;
 			bool rnibc = m_rq1;
 
+			//logerror("n=%d,d1=%d,j2=%d,k2=%d,rn=%d\n", next, drq1, jrq2, krq2, m_rnib);
 			// Next state
-			if (!m_rdsetold && rdsetin) m_rdset = true; // raising edge
+			if (!m_rdsetold && rdsetin)
+			{
+				m_rdset = true; // raising edge
+			}
 			m_rdsetold = rdsetin;
+			// logerror("rdset=%d, rdsetin=%d\n", m_rdset, rdsetin);
+
+			// Set the RQ1 flipflop
 			m_rq1 = drq1;
 
+			// Set the RQ2 flipflop
 			if (jrq2)
 			{
 				if (!krq2) m_rq2 = !m_rq2;
@@ -2516,12 +2541,47 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 			else
 				if (!krq2) m_rq2 = false;
 
-			if (m_rnibcold == false && rnibc == true) m_rnib = !m_rnib;  // raising edge
+			if (m_rq2) m_rdset = false;
+
+			// Set the rnib flipflop. This is in sequence to the RQ1 flipflop.
+			rnibc = m_rq1;
+			if (m_rnibcold == false && rnibc == true) // raising edge
+				m_rnib = !m_rnib;
+
 			m_rnibcold = rnibc;
+
+			// Debugging only
+			// next = (m_rdset && !m_rq2) || (m_shsk && m_rq2);
+			// drq1 = (next && m_rq2) || (m_rq2 && m_rq1 && !m_rnib);
+			// jrq2 = next && !m_rq1;
+			// krq2 = !m_rq1 || m_rnib;
+			// logerror("r=%d,n=%d,rn=%d,d1=%d,j2=%d,k2=%d,q1=%d,q2=%d\n", m_rdset, next, m_rnib, drq1, jrq2, krq2, m_rq1, m_rq2);
+
+			// Set RBUSY
+			bool rbusy = m_rq1 || m_rq2;
+
+			if (rbusy != m_rbusy)
+				LOGMASKED(LOG_HEXBUS, "RBUSY=%d\n",rbusy);
+
+			m_rbusy = rbusy;
+			set_status(RBUSY, rbusy);
+
+			// Flipflop resets
+			if (!rbusy) m_rnib = false;
+
+			bool msns = m_rnib && !m_rq1 && m_rq2;
+			bool lsns = !m_rnib && !m_rq1 && m_rq2;
+
+			// if (msns != m_msns) LOGMASKED(LOG_HEXBUS, "MSNS=%d\n", msns);
+			// if (lsns != m_lsns) LOGMASKED(LOG_HEXBUS, "LSNS=%d\n", lsns);
+
+			m_lsns = lsns;
+			m_msns = msns;
 
 			// Raising edge of RQ2*
 			if (m_rq2old == true && m_rq2 == false)
 			{
+				LOGMASKED(LOG_HEXBUS, "Byte available for reading\n");
 				set_status(HSKRD, true);
 				m_rhsus = true;  // byte is available for reading
 			}
@@ -2534,11 +2594,14 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 
 		// Handshake control
 		// Set HSK (Page 6, RHSUS*)
-		bool hskwrite = !m_wq1 && m_wq2;
+		// This is very likely an error in the schematics. It does not make
+		// sense, and simulations show that the behaviour would be wrong.
+		// bool hskwrite = !m_wq1 && m_wq2;
+		bool hskwrite = (m_wq1 != m_wq2);
 
 		// We can simplify this to a single flag because the CPU read operation
 		// is atomic here (starts and immediately terminates)
-		m_hsk = hskwrite || m_rhsus;
+		m_hsklocal = hskwrite || m_rhsus;
 		update_hexbus();
 	}
 	// Actions that occur for Phi3=0
@@ -2575,30 +2638,115 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 	}
 }
 
+/*
+    Change the Hexbus line levels and propagate them towards the peripherals.
+*/
 void oso_device::update_hexbus()
 {
-	uint8_t value = 0x00;
-	uint8_t nibble = m_xmit;
+	bool changed = false;
+	if (m_hsklocal != m_hskold)
+	{
+		LOGMASKED(LOG_HEXBUS, "%s HSK*\n", m_hsklocal? "Pulling down" : "Releasing");
+		m_hskold = m_hsklocal;
+		changed = true;
+	}
+
+	if (m_bav != m_bavold)
+	{
+		LOGMASKED(LOG_HEXBUS, "%s BAV*\n", m_bav? "Pulling down" : "Releasing");
+		m_bavold = m_bav;
+		changed = true;
+	}
+
+	if (!changed) return;
+
+	// If wbusy==false, set the data output to 1111; since the Hexbus is
+	// a pull-down line bus, this means to inactivate the output
+	uint8_t nibble = m_wbusy? m_xmit : 0xff;
 	if (m_wnp) nibble >>= 4;
 
-	value = ((m_xmit & 0x0c)<<4) | (m_xmit & 0x03);
-	if (!m_hsk) value |= 0x10;
-	if (!control_bit(BAVC)) value |= 0x04;
-	if (value != m_lasthxvalue)
+	uint8_t value = to_line_state(nibble, control_bit(BAVC), m_hsklocal);
+
+	// if (m_oldvalue != value)
+	//      LOGMASKED(LOG_OSO, "Set hexbus = %02x (BAV*=%d, HSK*=%d, data=%01x)\n", value, (value & 0x04)? 1:0, (value & 0x10)? 1:0, ((value>>4)&0x0c) | (value&0x03));
+
+	// As for Oso, we can be sure that hexbus_write does not trigger further
+	// activities from the peripherals that cause a call to hexbus_value_changed.
+	hexbus_write(value);
+
+	// Check how the bus has changed. This depends on the states of all
+	// connected peripherals
+	uint8_t value1 = hexbus_read();
+	// if (value1 != value) LOGMASKED(LOG_OSO, "actually: %02x (BAV*=%d, HSK*=%d, data=%01x)\n", value1, (value1 & 0x04)? 1:0, (value1 & 0x10)? 1:0, ((value1>>4)&0x0c) | (value1&0x03));
+
+	// Update the state of BAV and HSK
+	m_bav = ((value1 & bus::hexbus::HEXBUS_LINE_BAV)==0);
+	m_hsk = ((value1 & bus::hexbus::HEXBUS_LINE_HSK)==0);
+
+	// Sometimes, Oso does not have a chance to advance its state after the
+	// last byte was read. In that case, a change of rdsetin would not be
+	// sensed. We reset the flag right here and so pretend that the tick
+	// has happened.
+	if (m_hsk==false) m_rdsetold = false;
+
+	m_oldvalue = value1;
+}
+
+/*
+    Called when the value on the Hexbus has changed.
+*/
+void oso_device::hexbus_value_changed(uint8_t data)
+{
+//  LOGMASKED(LOG_OSO, "Hexbus value changed to %02x\n", data);
+	bool bav = (data & bus::hexbus::HEXBUS_LINE_BAV)==0;
+	bool hsk = (data & bus::hexbus::HEXBUS_LINE_HSK)==0;
+
+	if ((bav != m_bav) || (hsk != m_hsk))
 	{
-		if (TRACE_OSO) logerror("Set hexbus = %02x (BAV*=%d, HSK*=%d, data=%01x)\n", value, (value & 0x04)? 1:0, (value & 0x10)? 1:0, ((value>>4)&0x0c) | (value&0x03));
-		hexbus_write(value);
+		m_bav = bav | control_bit(BAVC);
+		m_hsk = hsk;
+
+		LOGMASKED(LOG_HEXBUS, "BAV*=%d, HSK*=%d\n", m_bav? 0:1, m_hsk? 0:1);
+		int nibble = ((data & bus::hexbus::HEXBUS_LINE_BIT32)>>4) | (data & bus::hexbus::HEXBUS_LINE_BIT10);
+
+		// The real devices are driven at a similar clock rate like the 99/8.
+		// The designers assumed that there is a clock tick of Oso between
+		// every clock tick of the peripheral device. This is not true for
+		// the emulation in MAME, however. For that reason, we trigger "fake"
+		// clock ticks on every change of the hexbus.
+		for (int fake=0; fake < 4; fake++)
+		{
+			if (m_msns)
+			{
+				m_data = (m_data & 0x0f) | (nibble<<4);
+				LOGMASKED(LOG_HEXBUS, "Data register = %02x\n", m_data);
+			}
+			if (m_lsns)
+			{
+				m_data = (m_data & 0xf0) | nibble;
+				LOGMASKED(LOG_HEXBUS, "Data register = %02x\n", m_data);
+			}
+
+			LOGMASKED(LOG_HEXBUS, "Fake tick %d\n", fake);
+			bool phi3 = m_phi3;  // mind that clock_in swaps the state of m_phi3
+			clock_in(!phi3);
+			clock_in(phi3);
+			LOGMASKED(LOG_HEXBUS, "Fake tick %d end\n", fake);
+		}
 	}
-	m_lasthxvalue = value;
+	else
+	{
+		LOGMASKED(LOG_HEXBUS, "No change for BAV* and HSK*\n");
+	}
 }
 
 void oso_device::device_start()
 {
-	logerror("Starting\n");
 	m_status = m_xmit = m_control = m_data = 0;
 	m_int.resolve_safe();
 
-	m_hexbus_outbound = dynamic_cast<bus::hexbus::hexbus_device*>(machine().device(TI_HEXBUS_TAG));
+	// Establish the downstream link in the parent class hexbus_chained_device
+	set_outbound_hexbus(m_hexbusout);
 
 	// Establish callback for inbound propagations
 	m_hexbus_outbound->set_chain_element(this);

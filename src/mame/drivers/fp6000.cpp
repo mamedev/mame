@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -37,6 +38,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void fp6000(machine_config &config);
+
+private:
 	uint8_t *m_char_rom;
 	required_shared_ptr<uint16_t> m_gvram;
 	required_shared_ptr<uint16_t> m_vram;
@@ -62,7 +66,6 @@ public:
 	required_device<mc6845_device>m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void fp6000(machine_config &config);
 	void fp6000_io(address_map &map);
 	void fp6000_map(address_map &map);
 };
@@ -176,14 +179,15 @@ WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
 	m_crtc->register_w(space, offset, data);
 }
 
-ADDRESS_MAP_START(fp6000_state::fp6000_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0xbffff) AM_RAM
-	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_SHARE("gvram")//gvram
-	AM_RANGE(0xe0000,0xe0fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xe7000,0xe7fff) AM_READWRITE8(fp6000_pcg_r,fp6000_pcg_w,0xffff)
-	AM_RANGE(0xf0000,0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+void fp6000_state::fp6000_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xbffff).ram();
+	map(0xc0000, 0xdffff).ram().share("gvram");//gvram
+	map(0xe0000, 0xe0fff).ram().share("vram");
+	map(0xe7000, 0xe7fff).rw(FUNC(fp6000_state::fp6000_pcg_r), FUNC(fp6000_state::fp6000_pcg_w));
+	map(0xf0000, 0xfffff).rom().region("ipl", 0);
+}
 
 /* Hack until I understand what UART is this one ... */
 READ8_MEMBER(fp6000_state::fp6000_key_r)
@@ -226,17 +230,18 @@ READ16_MEMBER(fp6000_state::pit_r)
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(fp6000_state::fp6000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x08, 0x09) AM_READ(ex_board_r) // BIOS of some sort ...
-	AM_RANGE(0x0a, 0x0b) AM_READ_PORT("DSW") // installed RAM id?
-	AM_RANGE(0x10, 0x11) AM_READNOP
-	AM_RANGE(0x20, 0x23) AM_READWRITE8(fp6000_key_r,fp6000_key_w,0x00ff)
-	AM_RANGE(0x38, 0x39) AM_READ(pit_r) // pit?
-	AM_RANGE(0x70, 0x71) AM_WRITE8(fp6000_6845_address_w,0x00ff)
-	AM_RANGE(0x72, 0x73) AM_WRITE8(fp6000_6845_data_w,0x00ff)
-	AM_RANGE(0x74, 0x75) AM_READ(unk_r) //bit 6 busy flag
-ADDRESS_MAP_END
+void fp6000_state::fp6000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x08, 0x09).r(FUNC(fp6000_state::ex_board_r)); // BIOS of some sort ...
+	map(0x0a, 0x0b).portr("DSW"); // installed RAM id?
+	map(0x10, 0x11).nopr();
+	map(0x20, 0x23).rw(FUNC(fp6000_state::fp6000_key_r), FUNC(fp6000_state::fp6000_key_w)).umask16(0x00ff);
+	map(0x38, 0x39).r(FUNC(fp6000_state::pit_r)); // pit?
+	map(0x70, 0x70).w(FUNC(fp6000_state::fp6000_6845_address_w));
+	map(0x72, 0x72).w(FUNC(fp6000_state::fp6000_6845_data_w));
+	map(0x74, 0x75).r(FUNC(fp6000_state::unk_r)); //bit 6 busy flag
+}
 
 /* Input ports */
 static INPUT_PORTS_START( fp6000 )
@@ -278,7 +283,7 @@ static const gfx_layout fp6000_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( fp6000 )
+static GFXDECODE_START( gfx_fp6000 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, fp6000_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -294,9 +299,9 @@ void fp6000_state::machine_reset()
 
 MACHINE_CONFIG_START(fp6000_state::fp6000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
-	MCFG_CPU_PROGRAM_MAP(fp6000_map)
-	MCFG_CPU_IO_MAP(fp6000_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, 16000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(fp6000_map)
+	MCFG_DEVICE_IO_MAP(fp6000_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -313,7 +318,7 @@ MACHINE_CONFIG_START(fp6000_state::fp6000)
 
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp6000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp6000)
 
 MACHINE_CONFIG_END
 
@@ -330,5 +335,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE            INIT   COMPANY    FULLNAME   FLAGS */
-COMP( 1985, fp6000, 0,      0,       fp6000,    fp6000,  fp6000_state,    0,     "Casio",   "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS */
+COMP( 1985, fp6000, 0,      0,      fp6000,  fp6000, fp6000_state, empty_init, "Casio", "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

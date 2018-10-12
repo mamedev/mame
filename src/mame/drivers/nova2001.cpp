@@ -180,116 +180,124 @@ MACHINE_START_MEMBER(nova2001_state,ninjakun)
  *
  *************************************/
 
-ADDRESS_MAP_START(nova2001_state::nova2001_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(nova2001_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb800, 0xbfff) AM_WRITE(nova2001_flipscreen_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0xc003, 0xc003) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xc004, 0xc004) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN0")
-	AM_RANGE(0xc007, 0xc007) AM_READ_PORT("IN1")
-	AM_RANGE(0xc00e, 0xc00e) AM_READ_PORT("IN2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void nova2001_state::nova2001_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa7ff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xa800, 0xafff).ram().w(FUNC(nova2001_state::nova2001_bg_videoram_w)).share("bg_videoram");
+	map(0xb000, 0xb7ff).ram().share("spriteram");
+	map(0xb800, 0xbfff).w(FUNC(nova2001_state::nova2001_flipscreen_w));
+	map(0xc000, 0xc000).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xc001, 0xc001).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xc002, 0xc002).w("ay1", FUNC(ay8910_device::address_w));
+	map(0xc003, 0xc003).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xc004, 0xc004).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xc006, 0xc006).portr("IN0");
+	map(0xc007, 0xc007).portr("IN1");
+	map(0xc00e, 0xc00e).portr("IN2");
+	map(0xe000, 0xe7ff).ram();
+}
 
 
-ADDRESS_MAP_START(nova2001_state::ninjakun_cpu1_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu1_io_A002_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(pkunwar_flipscreen_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share2")
-ADDRESS_MAP_END
+void nova2001_state::ninjakun_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).rom();
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x8002, 0x8003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8003, 0x8003).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa001, 0xa001).portr("IN1");
+	map(0xa002, 0xa002).portr("IN2").w(FUNC(nova2001_state::ninjakun_cpu1_io_A002_w));
+	map(0xa003, 0xa003).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xc800, 0xcfff).rw(FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xe000, 0xe3ff).ram().share("share1");
+	map(0xe400, 0xe7ff).ram().share("share2");
+}
 
-ADDRESS_MAP_START(nova2001_state::ninjakun_cpu2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x2000)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu2_io_A002_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(nova2001_flipscreen_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share2") /* swapped wrt CPU1 */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share1") /* swapped wrt CPU1 */
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(nova2001_state::pkunwar_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(nova2001_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xa003, 0xa003) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nova2001_state::pkunwar_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pkunwar_flipscreen_w)
-ADDRESS_MAP_END
+void nova2001_state::ninjakun_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).rom().region("maincpu", 0x2000);
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x8002, 0x8003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8003, 0x8003).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa001, 0xa001).portr("IN1");
+	map(0xa002, 0xa002).portr("IN2").w(FUNC(nova2001_state::ninjakun_cpu2_io_A002_w));
+	map(0xa003, 0xa003).w(FUNC(nova2001_state::nova2001_flipscreen_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xc800, 0xcfff).rw(FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xe000, 0xe3ff).ram().share("share2"); /* swapped wrt CPU1 */
+	map(0xe400, 0xe7ff).ram().share("share1"); /* swapped wrt CPU1 */
+}
 
 
-ADDRESS_MAP_START(nova2001_state::raiders5_cpu1_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(nova2001_scroll_x_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(nova2001_scroll_y_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(pkunwar_flipscreen_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xc003, 0xc003) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void nova2001_state::pkunwar_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("spriteram");
+	map(0x8800, 0x8fff).ram().w(FUNC(nova2001_state::nova2001_bg_videoram_w)).share("bg_videoram");
+	map(0xa000, 0xa001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0xa001, 0xa001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xa003, 0xa003).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(nova2001_state::raiders5_cpu2_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x9000, 0x9000) AM_READNOP /* unknown */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc000, 0xc000) AM_READNOP /* unknown */
-	AM_RANGE(0xc800, 0xc800) AM_READNOP /* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_READNOP /* unknown */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(nova2001_scroll_x_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(nova2001_scroll_y_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(pkunwar_flipscreen_w)
-ADDRESS_MAP_END
+void nova2001_state::pkunwar_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
+}
 
-ADDRESS_MAP_START(nova2001_state::raiders5_io)
-	AM_RANGE(0x00, 0x00) AM_READNOP /* unknown */
-ADDRESS_MAP_END
+
+void nova2001_state::raiders5_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("spriteram");
+	map(0x8800, 0x8fff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0x9000, 0x97ff).rw(FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
+	map(0xa000, 0xa000).w(FUNC(nova2001_state::nova2001_scroll_x_w));
+	map(0xa001, 0xa001).w(FUNC(nova2001_state::nova2001_scroll_y_w));
+	map(0xa002, 0xa002).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
+	map(0xc000, 0xc001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0xc001, 0xc001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xc002, 0xc003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xc003, 0xc003).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xd000, 0xd1ff).ram().w(FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xe000, 0xe7ff).ram().share("share1");
+}
+
+void nova2001_state::raiders5_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x8002, 0x8003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8003, 0x8003).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x9000, 0x9000).nopr(); /* unknown */
+	map(0xa000, 0xa7ff).ram().share("share1");
+	map(0xc000, 0xc000).nopr(); /* unknown */
+	map(0xc800, 0xc800).nopr(); /* unknown */
+	map(0xd000, 0xd000).nopr(); /* unknown */
+	map(0xe000, 0xe000).w(FUNC(nova2001_state::nova2001_scroll_x_w));
+	map(0xe001, 0xe001).w(FUNC(nova2001_state::nova2001_scroll_y_w));
+	map(0xe002, 0xe002).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
+}
+
+void nova2001_state::raiders5_io(address_map &map)
+{
+	map(0x00, 0x00).nopr(); /* unknown */
+}
 
 
 
@@ -390,7 +398,7 @@ static INPUT_PORTS_START( ninjakun )
 
 	PORT_START("IN2")   /* 0xa002 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nova2001_state,ninjakun_io_A002_ctrl_r, nullptr)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nova2001_state,ninjakun_io_A002_ctrl_r, nullptr)
 
 	PORT_START("DSW1") // printed "SW 2"
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW2:1")
@@ -608,24 +616,24 @@ static const gfx_layout layout16x16 =
 	128*8
 };
 
-static GFXDECODE_START( nova2001 )
+static GFXDECODE_START( gfx_nova2001 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16,    0x000, 16 )    // sprites
 	GFXDECODE_ENTRY( "gfx1", 0x0000, layout8x8_part, 0x000, 16 )    // fg tiles (using only 1/4th of the ROM space)
 	GFXDECODE_ENTRY( "gfx1", 0x4000, layout8x8_part, 0x100, 16 )    // bg tiles (using only 1/4th of the ROM space)
 GFXDECODE_END
 
-static GFXDECODE_START( ninjakun )
+static GFXDECODE_START( gfx_ninjakun )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x200, 16 )    // sprites
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x000, 16 )    // fg tiles
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
-static GFXDECODE_START( pkunwar )
+static GFXDECODE_START( gfx_pkunwar )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x000, 16 )    // sprites
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
-static GFXDECODE_START( raiders5 )
+static GFXDECODE_START( gfx_raiders5 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,    0x200, 16 ) // sprites
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8_part, 0x000, 16 ) // fg tiles (using only 1/4th of the ROM space)
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,      0x100, 16 ) // bg tiles
@@ -641,11 +649,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(nova2001_state::nova2001)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz verified on schematics
-	MCFG_CPU_PROGRAM_MAP(nova2001_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz verified on schematics
+	MCFG_DEVICE_PROGRAM_MAP(nova2001_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -655,7 +663,7 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_nova2001)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nova2001)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nova2001)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
@@ -663,14 +671,14 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,nova2001)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/6) // 2 MHz verified on schematics
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nova2001_state, nova2001_scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(nova2001_state, nova2001_scroll_y_w))
+	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/6) // 2 MHz verified on schematics
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_x_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_y_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/6)
+	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/6)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -679,13 +687,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nova2001_state::ninjakun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(ninjakun_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(ninjakun_cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(ninjakun_cpu2_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60) /* ? */
+	MCFG_DEVICE_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(ninjakun_cpu2_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60) /* ? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame */
 
@@ -700,33 +708,33 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_ninjakun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjakun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjakun)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,ninjakun)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/4) // 3 MHz
+	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/4) // 3 MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/4) // 3 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nova2001_state, nova2001_scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(nova2001_state, nova2001_scroll_y_w))
+	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/4) // 3 MHz
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_x_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_y_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nova2001_state::pkunwar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(pkunwar_map)
-	MCFG_CPU_IO_MAP(pkunwar_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(pkunwar_map)
+	MCFG_DEVICE_IO_MAP(pkunwar_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -736,7 +744,7 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_pkunwar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkunwar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkunwar)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
@@ -744,14 +752,14 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,pkunwar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz (correct?)
+	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz (correct?)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -760,14 +768,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nova2001_state::raiders5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(raiders5_cpu1_map)
-	MCFG_CPU_IO_MAP(raiders5_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(raiders5_cpu1_map)
+	MCFG_DEVICE_IO_MAP(raiders5_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(raiders5_cpu2_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60)  /* ? */
+	MCFG_DEVICE_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(raiders5_cpu2_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60)  /* ? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
 
@@ -779,21 +787,21 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_raiders5)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiders5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiders5)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,raiders5)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz
+	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -829,8 +837,8 @@ ROM_START( nova2001h )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	// roms 1 and 2 had green stickers, but looks like an unofficial mod, bytes have been added in empty space to fix game checksum after mods were made to code.
 	// one of the mods fixes the game resetting if the coin input is held down for too short / long of a period, the purpose of the other is unknown.
-	ROM_LOAD( "1(green).6c",         0x0000, 0x2000, CRC(1a8731b3) SHA1(a865d1cb070686dfa19e0da887c599455692a860) )
-	ROM_LOAD( "2(green).6d",         0x2000, 0x2000, CRC(bc4e442b) SHA1(6e1dca5dde442db95403377bf49aaad2a337813e) ) // not actually modified?
+	ROM_LOAD( "1,green.6c",         0x0000, 0x2000, CRC(1a8731b3) SHA1(a865d1cb070686dfa19e0da887c599455692a860) )
+	ROM_LOAD( "2,green.6d",         0x2000, 0x2000, CRC(bc4e442b) SHA1(6e1dca5dde442db95403377bf49aaad2a337813e) ) // not actually modified?
 	ROM_LOAD( "3.6f",         0x4000, 0x2000, CRC(b2849038) SHA1(b56c7c03ef7c677cc6df0280a485f9cda3435b23) )
 	ROM_LOAD( "4.6g",         0x6000, 0x1000, CRC(6b5bb12d) SHA1(74aee3d08a7ee1f98eaec4a4b3062aa9d17948ec) )
 	ROM_RELOAD(               0x7000, 0x1000 )  // half size ROM, mirrored
@@ -1005,12 +1013,12 @@ void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(nova2001_state,pkunwar)
+void nova2001_state::init_pkunwar()
 {
 	lineswap_gfx_roms("gfx1", 13);
 }
 
-DRIVER_INIT_MEMBER(nova2001_state,raiders5)
+void nova2001_state::init_raiders5()
 {
 	lineswap_gfx_roms("gfx1", 13);
 	lineswap_gfx_roms("gfx2", 13);
@@ -1027,11 +1035,11 @@ DRIVER_INIT_MEMBER(nova2001_state,raiders5)
 // many of these don't explicitly state Japan, eg. Nova 2001 could easily be used anywhere.
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001h, nova2001, nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, nova2001_state, 0,        ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,  nova2001_state, pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,  nova2001_state, pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001h, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, nova2001_state, empty_init,    ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,  nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,  nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, init_raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", MACHINE_SUPPORTS_SAVE )

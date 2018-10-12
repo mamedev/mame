@@ -18,6 +18,7 @@ months for an average citizen.
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -28,20 +29,23 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
+	void mk90(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mk90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void mk90(machine_config &config);
 	void mk90_mem(address_map &map);
 };
 
 
-ADDRESS_MAP_START(mk90_state::mk90_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM // RAM
-	AM_RANGE(0x4000, 0x7fff) AM_ROM // Extension ROM
-	AM_RANGE(0x8000, 0xffff) AM_ROM // Main ROM
+void mk90_state::mk90_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram(); // RAM
+	map(0x4000, 0x7fff).rom(); // Extension ROM
+	map(0x8000, 0xffff).rom(); // Main ROM
 //  AM_RANGE(0xe800, 0xe801) LCD address
 //  AM_RANGE(0xe802, 0xe803) LCD data
 //  AM_RANGE(0xe810, 0xe810) serial bus controller data
@@ -49,7 +53,7 @@ ADDRESS_MAP_START(mk90_state::mk90_mem)
 //  AM_RANGE(0xe814, 0xe814) serial bus controller control/status
 //  AM_RANGE(0xe816, 0xe816) serial bus controller command
 //  AM_RANGE(0xea00, 0xea7e) RTC
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mk90 )
@@ -71,9 +75,9 @@ uint32_t mk90_state::screen_update_mk90(screen_device &screen, bitmap_ind16 &bit
 
 MACHINE_CONFIG_START(mk90_state::mk90)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu", K1801VM2, XTAL(4'000'000))
 	MCFG_T11_INITIAL_MODE(0x8000)
-	MCFG_CPU_PROGRAM_MAP(mk90_mem)
+	MCFG_DEVICE_PROGRAM_MAP(mk90_mem)
 
 
 	/* video hardware */
@@ -92,14 +96,14 @@ MACHINE_CONFIG_END
 ROM_START( mk90 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "bas1", "Basic 1")
-	ROMX_LOAD( "mk90ro10.bin",  0x8000, 0x8000, CRC(fac18038) SHA1(639f09a1be5f781f897603d0f799f7c6efd1b67f), ROM_BIOS(1))
+	ROMX_LOAD( "mk90ro10.bin",  0x8000, 0x8000, CRC(fac18038) SHA1(639f09a1be5f781f897603d0f799f7c6efd1b67f), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "bas2", "Basic 2")
-	ROMX_LOAD( "mk90ro20.bin",  0x8000, 0x8000, CRC(d8b3a5f5) SHA1(8f7ab2d97c7466392b6354c0ea7017531c2133ae), ROM_BIOS(2))
-	ROMX_LOAD( "mk90ro20t.bin", 0x4000, 0x4000, CRC(0f4b9434) SHA1(c74bbde6d201913c9e67ef8e2abe14b784187f8d), ROM_BIOS(2))  // Expansion ROM
+	ROMX_LOAD( "mk90ro20.bin",  0x8000, 0x8000, CRC(d8b3a5f5) SHA1(8f7ab2d97c7466392b6354c0ea7017531c2133ae), ROM_BIOS(1))
+	ROMX_LOAD( "mk90ro20t.bin", 0x4000, 0x4000, CRC(0f4b9434) SHA1(c74bbde6d201913c9e67ef8e2abe14b784187f8d), ROM_BIOS(1))  // Expansion ROM
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY        FULLNAME  FLAGS */
-COMP( 1988, mk90,   0,      0,       mk90,      mk90,  mk90_state, 0,    "Elektronika", "MK-90",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME  FLAGS */
+COMP( 1988, mk90, 0,      0,      mk90,    mk90,  mk90_state, empty_init, "Elektronika", "MK-90",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

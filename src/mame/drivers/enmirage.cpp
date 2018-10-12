@@ -57,46 +57,56 @@
 class enmirage_state : public driver_device
 {
 public:
-	enmirage_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	enmirage_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "wd1772"),
-		m_via(*this, "via6522")
+		m_floppy_connector(*this, "wd1772:0"),
+		m_via(*this, "via6522"),
+		m_digits(*this, "digit%u", 0U)
 	{
 	}
 
+	void mirage(machine_config &config);
+
+	void init_mirage();
+
+private:
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_DRIVER_INIT(mirage);
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(mirage_doc_irq);
 	DECLARE_READ8_MEMBER(mirage_adc_read);
 
-	void mirage(machine_config &config);
 	void mirage_map(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void video_start() override;
 
 	required_device<mc6809e_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
+	required_device<floppy_connector> m_floppy_connector;
 	required_device<via6522_device> m_via;
 
 	int last_sndram_bank;
 
 	uint8_t m_l_segs, m_r_segs;
 	int   m_l_hi, m_r_hi;
+	output_finder<2> m_digits;
 };
 
 FLOPPY_FORMATS_MEMBER( enmirage_state::floppy_formats )
 	FLOPPY_ESQ8IMG_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ensoniq_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void ensoniq_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 WRITE_LINE_MEMBER(enmirage_state::mirage_doc_irq)
 {
@@ -123,17 +133,18 @@ void enmirage_state::machine_reset()
 	membank("sndbank")->set_base(memregion("es5503")->base() );
 }
 
-ADDRESS_MAP_START(enmirage_state::mirage_map)
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("sndbank")  // 32k window on 128k of wave RAM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM         // main RAM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM         // expansion RAM
-	AM_RANGE(0xe100, 0xe101) AM_DEVREADWRITE("acia6850", acia6850_device, read, write)
-	AM_RANGE(0xe200, 0xe2ff) AM_DEVREADWRITE("via6522", via6522_device, read, write)
-	AM_RANGE(0xe400, 0xe4ff) AM_NOP
-	AM_RANGE(0xe800, 0xe803) AM_DEVREADWRITE("wd1772", wd1772_device, read, write)
-	AM_RANGE(0xec00, 0xecef) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("osrom", 0)
-ADDRESS_MAP_END
+void enmirage_state::mirage_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankrw("sndbank");  // 32k window on 128k of wave RAM
+	map(0x8000, 0xbfff).ram();         // main RAM
+	map(0xc000, 0xdfff).ram();         // expansion RAM
+	map(0xe100, 0xe101).rw("acia6850", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xe200, 0xe2ff).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xe400, 0xe4ff).noprw();
+	map(0xe800, 0xe803).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write));
+	map(0xec00, 0xecef).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
+	map(0xf000, 0xffff).rom().region("osrom", 0);
+}
 
 // port A: front panel
 // bits 0-2: column select from 0-7
@@ -164,7 +175,7 @@ WRITE8_MEMBER(enmirage_state::mirage_via_write_porta)
 		}
 
 		m_l_hi = seg;
-		output().set_digit_value(0, m_l_segs);
+		m_digits[0] = m_l_segs;
 //      printf("L LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_l_hi, segconv[seg], m_l_segs);
 	}
 	// right LED selected?
@@ -182,7 +193,7 @@ WRITE8_MEMBER(enmirage_state::mirage_via_write_porta)
 		}
 
 		m_r_hi = seg;
-		output().set_digit_value(1, m_r_segs);
+		m_digits[1] = m_r_segs;
 //      printf("R LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_r_hi, segconv[seg], m_r_segs);
 	}
 }
@@ -209,35 +220,36 @@ WRITE8_MEMBER(enmirage_state::mirage_via_write_portb)
 	}
 }
 
-MACHINE_CONFIG_START(enmirage_state::mirage)
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(mirage_map)
+void enmirage_state::mirage(machine_config &config)
+{
+	MC6809E(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &enmirage_state::mirage_map);
 
-	MCFG_DEFAULT_LAYOUT( layout_mirage )
+	config.set_default_layout(layout_mirage);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ES5503_ADD("es5503", 7000000)
-	MCFG_ES5503_OUTPUT_CHANNELS(2)
-	MCFG_ES5503_IRQ_FUNC(WRITELINE(enmirage_state, mirage_doc_irq))
-	MCFG_ES5503_ADC_FUNC(READ8(enmirage_state, mirage_adc_read))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	es5503_device &es5503(ES5503(config, "es5503", 7000000));
+	es5503.set_channels(2);
+	es5503.irq_func().set(FUNC(enmirage_state::mirage_doc_irq));
+	es5503.adc_func().set(FUNC(enmirage_state::mirage_adc_read));
+	es5503.add_route(0, "lspeaker", 1.0);
+	es5503.add_route(1, "rspeaker", 1.0);
 
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	VIA6522(config, m_via, 1000000);
+	m_via->writepa_handler().set(FUNC(enmirage_state::mirage_via_write_porta));
+	m_via->writepb_handler().set(FUNC(enmirage_state::mirage_via_write_portb));
+	m_via->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("via6522", VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(enmirage_state, mirage_via_write_porta))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(enmirage_state, mirage_via_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	acia6850_device &acia6850(ACIA6850(config, "acia6850", 0));
+	acia6850.irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	WD1772(config, m_fdc, 8000000);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
-
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", enmirage_state::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "wd1772:0", ensoniq_floppies, "35dd", enmirage_state::floppy_formats);
+}
 
 static INPUT_PORTS_START( mirage )
 INPUT_PORTS_END
@@ -249,10 +261,9 @@ ROM_START( enmirage )
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
 
-DRIVER_INIT_MEMBER(enmirage_state,mirage)
+void enmirage_state::init_mirage()
 {
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);
@@ -286,4 +297,4 @@ DRIVER_INIT_MEMBER(enmirage_state,mirage)
 	m_via->write_pb7(0);
 }
 
-CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, mirage, "Ensoniq", "Ensoniq Mirage", MACHINE_NOT_WORKING )
+CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Ensoniq Mirage", MACHINE_NOT_WORKING )

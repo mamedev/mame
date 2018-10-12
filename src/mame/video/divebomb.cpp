@@ -40,14 +40,14 @@ TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
 K051316_CB_MEMBER(divebomb_state::zoom_callback_1)
 {
 	*code |= (*color & 0x03) << 8;
-	*color = 0 + ((roz_pal >> 4) & 3);
+	*color = 0 + ((m_roz_pal >> 4) & 3);
 }
 
 
 K051316_CB_MEMBER(divebomb_state::zoom_callback_2)
 {
 	*code |= (*color & 0x03) << 8;
-	*color = 4 + (roz_pal & 3);
+	*color = 4 + (m_roz_pal & 3);
 }
 
 
@@ -65,39 +65,19 @@ WRITE8_MEMBER(divebomb_state::fgram_w)
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_wrap1_enable_w)
-{
-	roz1_wrap = !(data & 1);
-}
-
-
-WRITE8_MEMBER(divebomb_state::rozcpu_enable1_w)
-{
-	roz1_enable = !(data & 1);
-}
-
-
-WRITE8_MEMBER(divebomb_state::rozcpu_enable2_w)
-{
-	roz2_enable = !(data & 1);
-}
-
-
-WRITE8_MEMBER(divebomb_state::rozcpu_wrap2_enable_w)
-{
-	roz2_wrap = !(data & 1);
-}
-
-
 WRITE8_MEMBER(divebomb_state::rozcpu_pal_w)
 {
 	//.... ..xx  K051316 1 palette select
 	//..xx ....  K051316 2 palette select
 
-	roz_pal = data;
+	uint8_t old_pal = m_roz_pal;
+	m_roz_pal = data;
 
-	m_k051316_2->mark_tmap_dirty();
-	m_k051316_1->mark_tmap_dirty();
+	if ((old_pal & 0x03) != (data & 0x03))
+		m_k051316[1]->mark_tmap_dirty();
+
+	if ((old_pal & 0x30) != (data & 0x30))
+		m_k051316[0]->mark_tmap_dirty();
 
 	if (data & 0xcc)
 		logerror("rozcpu_port50_w %02x\n", data);
@@ -190,16 +170,15 @@ void divebomb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t divebomb_state::screen_update_divebomb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k051316_1->wraparound_enable(roz1_wrap);
-	m_k051316_2->wraparound_enable(roz2_wrap);
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	if (roz2_enable)
-		m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 0);
-
-	if (roz1_enable)
-		m_k051316_1->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	for (int chip = 1; chip >= 0; chip--)
+	{
+		if (m_roz_enable[chip])
+		{
+			m_k051316[chip]->zoom_draw(screen, bitmap, cliprect, 0, 0);
+		}
+	}
 
 	draw_sprites(bitmap, cliprect);
 

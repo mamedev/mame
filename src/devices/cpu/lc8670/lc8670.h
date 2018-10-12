@@ -49,7 +49,7 @@ enum
 	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::RC, _rc_clock); \
 	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::CF, _cf_clock);
 #define MCFG_LC8670_BANKSWITCH_CB(_devcb) \
-	devcb = &downcast<lc8670_cpu_device &>(*device).set_bankswitch_cb(DEVCB_##_devcb);
+	downcast<lc8670_cpu_device &>(*device).set_bankswitch_cb(DEVCB_##_devcb);
 
 #define MCFG_LC8670_LCD_UPDATE_CB(_cb) \
 	downcast<lc8670_cpu_device &>(*device).set_lcd_update_cb(_cb);
@@ -117,7 +117,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	// helpers
@@ -199,7 +199,7 @@ private:
 	address_space *     m_program;              // program space (ROM or flash)
 	address_space *     m_data;                 // internal RAM/register
 	address_space *     m_io;                   // I/O ports
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 
 	// timers
 	static const device_timer_id BASE_TIMER = 1;

@@ -43,6 +43,8 @@ static const char opname[][5] =
 class tms99xx_device : public cpu_device
 {
 public:
+	static constexpr int AS_SETOFFSET = 4;
+
 	~tms99xx_device();
 
 	// READY input line. When asserted (high), the memory is ready for data exchange.
@@ -54,13 +56,13 @@ public:
 	void set_hold(int state);
 
 	// Callbacks
-	template<class Object> devcb_base &set_extop_callback(Object &&cb) { return m_external_operation.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_intlevel_callback(Object &&cb) { return m_get_intlevel.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_iaq_callback(Object &&cb) { return m_iaq_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_clkout_callback(Object &&cb) { return m_clock_out_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_wait_callback(Object &&cb) { return m_wait_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_holda_callback(Object &&cb) { return m_holda_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_dbin_callback(Object &&cb) { return m_dbin_line.set_callback(std::forward<Object>(cb)); }
+	auto extop_cb() { return m_external_operation.bind(); }
+	auto intlevel_cb() { return m_get_intlevel.bind(); }
+	auto iaq_cb() { return m_iaq_line.bind(); }
+	auto clkout_cb() { return m_clock_out_line.bind(); }
+	auto wait_cb() { return m_wait_line.bind(); }
+	auto holda_cb() { return m_holda_line.bind(); }
+	auto dbin_cb() { return m_dbin_line.bind(); }
 
 protected:
 	tms99xx_device(const machine_config &mconfig, device_type type,
@@ -82,7 +84,7 @@ protected:
 	virtual void        execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -93,8 +95,10 @@ protected:
 	void                decode(uint16_t inst);
 
 	const address_space_config  m_program_config;
+	const address_space_config  m_setoffset_config;
 	const address_space_config  m_io_config;
 	address_space*          m_prgspace;
+	address_space*          m_sospace;
 	address_space*          m_cru;
 
 	virtual uint16_t  read_workspace_register_debug(int reg);
@@ -219,7 +223,7 @@ private:
 
 	// State / debug management
 	uint16_t  m_state_any;
-	static const char* s_statename[];
+	static char const *const s_statename[];
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;

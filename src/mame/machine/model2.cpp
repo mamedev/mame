@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
 /*********************************************************************************************************************************
 
-	Model 2 Debugger functions
+    Model 2 Debugger functions
 
 *********************************************************************************************************************************/
 
@@ -15,7 +15,7 @@
 
 #include <fstream>
 
- 
+
 void model2_state::debug_init()
 {
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
@@ -29,7 +29,7 @@ void model2_state::debug_commands(int ref, const std::vector<std::string> &param
 {
 	if (params.size() < 1)
 		return;
-	
+
 	if (params[0] == "geodasm")
 		debug_geo_dasm_command(ref, params);
 	else if(params[0] == "trilist")
@@ -41,7 +41,7 @@ void model2_state::debug_commands(int ref, const std::vector<std::string> &param
 void model2_state::debug_help_command(int ref, const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
-	
+
 	con.printf("Available Sega Model 2 commands:\n");
 	con.printf("  m2 geodasm,<filename> -- dump current geometrizer DASM in <filename>\n");
 	con.printf("  m2 trilist,<filename> -- dump current parsed triangles in <filename>\n");
@@ -112,12 +112,12 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 		}
 		else
 		{
-			
+
 			// parse the opcode info
 			switch((opcode >> 23) & 0x1f)
 			{
 				// nop
-				case 0x00: 
+				case 0x00:
 					util::stream_format(f, "nop");
 					break;
 				// object data display
@@ -126,7 +126,7 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 					ptr+=4;
 					break;
 				// direct object data display
-				case 0x02: 
+				case 0x02:
 					util::stream_format(f, "direct data  (point:%08x header:%08x)",m_bufferram[ptr],m_bufferram[ptr+1]);
 					ptr+=2;
 					// skip first point
@@ -134,14 +134,14 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 					// parse and get next pointer address
 					do{
 						attr = m_bufferram[ptr];
-						
+
 						ptr++;
 						if((attr & 3) == 0)
 							continue;
 						// check and skip quad/tri data
-						ptr += (attr & 1) ? 8 : 5;				
-					}while((attr & 3) != 0);					
-					
+						ptr += (attr & 1) ? 8 : 5;
+					}while((attr & 3) != 0);
+
 					break;
 				// set display window
 				case 0x03:
@@ -162,34 +162,34 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 					ptr+=6;
 					break;
 				// set texture color data to RAM
-				case 0x04: 
+				case 0x04:
 					util::stream_format(f, "texture data  (start:%08x count:%08x)",m_bufferram[ptr],m_bufferram[ptr+1]);
 					ptr+=(2+m_bufferram[ptr+1]);
 					break;
 				// set polygon data to RAM
-				case 0x05: 
+				case 0x05:
 					attr = m_bufferram[ptr+1];
 					util::stream_format(f, "polygon data  (start:%08x count:%08x)",m_bufferram[ptr],attr);
 					ptr+=(2+attr);
 					break;
 				// set texture params
-				case 0x06: 
+				case 0x06:
 					attr = m_bufferram[ptr+1];
 					util::stream_format(f, "texture param  (start:%08x count:%08x)",m_bufferram[ptr],attr);
 					ptr+=(2+attr*2);
 					break;
 				// set mode
-				case 0x07: 
+				case 0x07:
 					util::stream_format(f, "mode  (%08x)",m_bufferram[ptr]);
 					ptr++;
 					break;
 				// set z-sort mode
-				case 0x08: 
+				case 0x08:
 					util::stream_format(f, "zsort  (%08x)",m_bufferram[ptr]);
 					ptr++;
 					break;
 				// set focus
-				case 0x09: 
+				case 0x09:
 					util::stream_format(f, "focus  [%f,%f]",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]));
 					ptr+=2;
 					break;
@@ -199,15 +199,15 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 					ptr+=3;
 					break;
 				// set transform matrix
-				case 0x0B: 
+				case 0x0B:
 					util::stream_format(f, "matrix ");
 					for(attr=0;attr<12;attr+=3)
-						util::stream_format(f,"[%f,%f,%f] ",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]),u2f(m_bufferram[ptr+2]));
-					
+						util::stream_format(f,"[%f,%f,%f] ",u2f(m_bufferram[ptr+attr]),u2f(m_bufferram[ptr+1+attr]),u2f(m_bufferram[ptr+2+attr]));
+
 					ptr+=12;
 					break;
 				// set translate matrix
-				case 0x0C: 
+				case 0x0C:
 					util::stream_format(f, "translate  [%f,%f,%f]",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]),u2f(m_bufferram[ptr+2]));
 					ptr+=3;
 					break;
@@ -217,29 +217,29 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 					ptr+=2;
 					break;
 				// test
-				case 0x0E: 
+				case 0x0E:
 					util::stream_format(f, "test  (blocks:%08x)",m_bufferram[ptr+32]);
 					ptr+=32;
 					ptr+=m_bufferram[ptr]*3;
 					break;
 				// end code
-				case 0x0F: 
+				case 0x0F:
 					util::stream_format(f, "end");
 					end_code = true;
 					break;
 				// dummy
-				case 0x10: 
+				case 0x10:
 					util::stream_format(f, "dummy");
 					ptr++;
 					break;
 				// log data
-				case 0x14: 
+				case 0x14:
 					attr = m_bufferram[ptr+1];
 					util::stream_format(f, "log  (start:%08x count:%08x)",m_bufferram[ptr],attr);
 					ptr+=2+attr;
 					break;
 				// set lod mode
-				case 0x16: 
+				case 0x16:
 					util::stream_format(f, "lod  (%f)",u2f(m_bufferram[ptr]));
 					ptr++;
 					break;
@@ -249,7 +249,7 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 					break;
 			}
 		}
-		
+
 		// append the raw opcode and new line here
 		util::stream_format(f,"\t%08x\n",opcode);
 	}
@@ -268,13 +268,13 @@ void model2_state::debug_tri_dump_command(int ref, const std::vector<std::string
 {
 	debugger_console &con = machine().debugger().console();
 	FILE *f;
-	
+
 	if (params.size() < 2)
 	{
 		con.printf("Error: not enough parameters for m2 trilist command\n");
 		return;
 	}
-	
+
 	if (params[1].empty() || params[1].length() > 127)
 	{
 		con.printf("Error: invalid filename parameter for m2 trilist command\n");
@@ -288,5 +288,5 @@ void model2_state::debug_tri_dump_command(int ref, const std::vector<std::string
 	}
 
 	tri_list_dump(f);
-	con.printf("Data dumped successfully\n");	
+	con.printf("Data dumped successfully\n");
 }

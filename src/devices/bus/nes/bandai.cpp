@@ -34,8 +34,6 @@
 #include "emu.h"
 #include "bandai.h"
 
-#include "cpu/m6502/m6502.h"
-
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
 #else
@@ -126,7 +124,7 @@ void nes_fcg_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -147,7 +145,7 @@ void nes_lz93d50_24c01_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -170,7 +168,7 @@ void nes_fjump2_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_reg));
 }
@@ -303,7 +301,7 @@ void nes_fcg_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 			if (!m_irq_count)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 				m_irq_enable = 0;
 			}
 		}
@@ -334,7 +332,7 @@ WRITE8_MEMBER(nes_fcg_device::fcg_write)
 			break;
 		case 0x0a:
 			m_irq_enable = data & 0x01;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x0b:
 			m_irq_count = (m_irq_count & 0xff00) | data;

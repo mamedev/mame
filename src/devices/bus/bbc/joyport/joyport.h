@@ -34,14 +34,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_COMPACT_JOYPORT_ADD( _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, BBC_JOYPORT_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -53,10 +45,27 @@ class bbc_joyport_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	bbc_joyport_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
+		: bbc_joyport_slot_device(mconfig, tag, owner)
+	{
+		option_reset();
+		slot_options(*this);
+		set_default_option(default_option);
+		set_fixed(false);
+	}
 
-	uint8_t cb_r();
-	uint8_t pb_r();
+	bbc_joyport_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+
+	// callbacks
+	auto cb1_handler() { return m_cb1_handler.bind(); }
+	auto cb2_handler() { return m_cb2_handler.bind(); }
+
+	DECLARE_WRITE_LINE_MEMBER(cb1_w) { m_cb1_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER(cb2_w) { m_cb2_handler(state); }
+
+	DECLARE_READ8_MEMBER(pb_r);
+	DECLARE_WRITE8_MEMBER(pb_w);
 
 protected:
 	// device-level overrides
@@ -65,6 +74,10 @@ protected:
 	virtual void device_reset() override;
 
 	device_bbc_joyport_interface *m_device;
+
+private:
+	devcb_write_line m_cb1_handler;
+	devcb_write_line m_cb2_handler;
 };
 
 
@@ -73,11 +86,8 @@ protected:
 class device_bbc_joyport_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	virtual ~device_bbc_joyport_interface();
-
-	virtual uint8_t cb_r() { return 0xff; }
-	virtual uint8_t pb_r() { return 0x1f; }
+	virtual DECLARE_READ8_MEMBER(pb_r) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(pb_w) { }
 
 protected:
 	device_bbc_joyport_interface(const machine_config &mconfig, device_t &device);
@@ -89,7 +99,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_JOYPORT_SLOT, bbc_joyport_slot_device)
 
-SLOT_INTERFACE_EXTERN( bbc_joyport_devices );
+void bbc_joyport_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_BBC_JOYPORT_JOYPORT_H

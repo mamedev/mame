@@ -10,9 +10,8 @@
 
 #include "machine/timer.h"
 
-#define MCFG_WPC_DMD_ADD( _tag, _scanline_cb ) \
-	MCFG_DEVICE_ADD( _tag, WPC_DMD, 0 ) \
-	devcb = &downcast<wpc_dmd_device &>(*device).set_scanline_cb(DEVCB_##_scanline_cb);
+#define MCFG_WPC_DMD_SCANLINE_CALLBACK(_scanline_cb) \
+	downcast<wpc_dmd_device &>(*device).set_scanline_cb(DEVCB_##_scanline_cb);
 
 class wpc_dmd_device : public device_t
 {

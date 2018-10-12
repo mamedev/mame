@@ -32,7 +32,7 @@ enum
 	downcast<t11_device &>(*device).set_initial_mode(_mode);
 
 #define MCFG_T11_RESET(_devcb) \
-	devcb = &downcast<t11_device &>(*device).set_out_reset_func(DEVCB_##_devcb);
+	downcast<t11_device &>(*device).set_out_reset_func(DEVCB_##_devcb);
 
 class t11_device :  public cpu_device
 {
@@ -57,7 +57,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override { return 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return -1; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -66,7 +66,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 
@@ -80,7 +80,7 @@ protected:
 	uint8_t               m_irq_state;
 	int                 m_icount;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
 	devcb_write_line   m_out_reset_func;
 
 	inline int ROPCODE();

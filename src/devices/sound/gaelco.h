@@ -11,7 +11,7 @@
 //**************************************************************************
 
 #define MCFG_GAELCO_SND_DATA(_tag) \
-	downcast<gaelco_gae1_device &>(*device).set_snd_data_tag("^" _tag);
+	downcast<gaelco_gae1_device &>(*device).set_snd_data_tag(_tag);
 
 #define MCFG_GAELCO_BANKS(_offs1, _offs2, _offs3, _offs4) \
 	downcast<gaelco_gae1_device &>(*device).set_bank_offsets(_offs1, _offs2, _offs3, _offs4);

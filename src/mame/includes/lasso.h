@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 
 class lasso_state : public driver_device
 {
@@ -30,6 +31,15 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void base(machine_config &config);
+	void wwjgtin(machine_config &config);
+	void lasso(machine_config &config);
+	void chameleo(machine_config &config);
+	void pinbo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -64,7 +74,6 @@ public:
 	DECLARE_WRITE8_MEMBER(lasso_video_control_w);
 	DECLARE_WRITE8_MEMBER(wwjgtin_video_control_w);
 	DECLARE_WRITE8_MEMBER(pinbo_video_control_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
 	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);
@@ -84,11 +93,6 @@ public:
 	void wwjgtin_set_last_four_colors();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse );
 	void draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void base(machine_config &config);
-	void wwjgtin(machine_config &config);
-	void lasso(machine_config &config);
-	void chameleo(machine_config &config);
-	void pinbo(machine_config &config);
 	void chameleo_audio_map(address_map &map);
 	void chameleo_main_map(address_map &map);
 	void lasso_audio_map(address_map &map);

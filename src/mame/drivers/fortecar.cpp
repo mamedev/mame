@@ -26,7 +26,7 @@
   with the Bulgarian players. Improved versions were developed and were sold in Russia, Austria,
   Brazil, Argentina and the Balkan peninsular.
 
-  In 1995, Fortex, first of all Bulgarian games manufacturers, exibited at the Plovdiv Fair a com-
+  In 1995, Fortex, first of all Bulgarian games manufacturers, exhibited at the Plovdiv Fair a com-
   puter based version of Forte Card. The following years were times of hard teamwork, which resul-
   ted in a variety of products: centralized cash desk, on-line jackpot and a network control and
   management system for game centers.
@@ -318,6 +318,7 @@
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -340,24 +341,34 @@ public:
 		m_vram(*this, "vram"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_lamps(*this, "lamp%u", 0U) { }
 
+	void fortecar(machine_config &config);
+
+	void init_fortecar();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_shared_ptr<uint8_t> m_vram;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<8> m_lamps;
+
 	DECLARE_WRITE8_MEMBER(ppi0_portc_w);
 	DECLARE_READ8_MEMBER(ppi0_portc_r);
 	DECLARE_WRITE8_MEMBER(ayporta_w);
 	DECLARE_WRITE8_MEMBER(ayportb_w);
-	DECLARE_DRIVER_INIT(fortecar);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+
 	DECLARE_PALETTE_INIT(fortecar);
-	uint32_t screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void fortecar(machine_config &config);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void fortecar_map(address_map &map);
 	void fortecar_ports(address_map &map);
 };
@@ -367,24 +378,22 @@ public:
 *         Video Hardware           *
 ***********************************/
 
-void fortecar_state::video_start()
+void fortecar_state::machine_start()
 {
+	m_lamps.resolve();
 }
 
-uint32_t fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fortecar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, count;
-	count = 0;
+	int count = 0;
 
-	for (y = 0; y < 0x1e; y++)
+	for (int y = 0; y < 0x1e; y++)
 	{
-		for(x = 0; x < 0x4b; x++)
+		for(int x = 0; x < 0x4b; x++)
 		{
-			int tile, color, bpp;
-
-			tile = (m_vram[(count*4)+1] | (m_vram[(count*4)+2]<<8)) & 0xfff;
-			color = m_vram[(count*4)+3] & 0x1f;
-			bpp = (m_vram[(count*4)+3] & 0x20) >> 5;
+			int tile = (m_vram[(count*4)+1] | (m_vram[(count*4)+2]<<8)) & 0xfff;
+			int color = m_vram[(count*4)+3] & 0x1f;
+			int bpp = (m_vram[(count*4)+3] & 0x20) >> 5;
 
 			if(bpp)
 				color &= 0x3;
@@ -414,7 +423,6 @@ O8 (LS374) R220 BLUE
 
 R = 82 Ohms Pull Down.
 */
-	int i;
 	static const int resistances_rg[3] = { 1000, 510, 220 };
 	static const int resistances_b [2] = { 510, 220 };
 	double weights_r[3], weights_g[3], weights_b[2];
@@ -424,7 +432,7 @@ R = 82 Ohms Pull Down.
 			3,  resistances_rg, weights_g,  82, 0,
 			2,  resistances_b,  weights_b,  82, 0);
 
-	for (i = 0; i < 512; i++)
+	for (int i = 0; i < 512; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -500,10 +508,8 @@ WRITE8_MEMBER(fortecar_state::ayporta_w)
     0x20 (hold1): IRQ test
     0x40 (black): Stack RAM check
 */
-	int i;
-
-	for(i = 0; i < 8; i++)
-		output().set_lamp_value(i, (data >> i) & 1);
+	for (int i = 0; i < 8; i++)
+		m_lamps[i] = BIT(data, i);
 }
 
 
@@ -516,7 +522,7 @@ Bit7 of port B is a watchdog.
 
 A square wave is fed to through resistor R to capacitor C, with a constant charge/discharge
 time relative to the value of resistor R and value of capacitor C. If the square wave halts,
-capacitor C will charge beyond the hysteresis threshhold of the TL7705 (leg 6), causing it to
+capacitor C will charge beyond the hysteresis threshold of the TL7705 (leg 6), causing it to
 trigger a reset.
 
 Seems to work properly, but must be checked closely...
@@ -535,24 +541,26 @@ Seems to work properly, but must be checked closely...
 *      Memory Map Information      *
 ***********************************/
 
-ADDRESS_MAP_START(fortecar_state::fortecar_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd800, 0xffff) AM_RAM AM_SHARE("vram")
-ADDRESS_MAP_END
+void fortecar_state::fortecar_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).rom();
+	map(0xd000, 0xd7ff).ram().share("nvram");
+	map(0xd800, 0xffff).ram().share("vram");
+}
 
-ADDRESS_MAP_START(fortecar_state::fortecar_ports)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)  // pc=444
-	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("fcppi0", i8255_device, read, write)//M5L8255AP
+void fortecar_state::fortecar_ports(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x20, 0x20).w("crtc", FUNC(mc6845_device::address_w));  // pc=444
+	map(0x21, 0x21).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x60, 0x63).rw("fcppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));//M5L8255AP
 //  AM_RANGE(0x80, 0x81) //8251A UART
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("rtc", v3021_device, read, write)
-	AM_RANGE(0xa1, 0xa1) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+	map(0xa0, 0xa0).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
+	map(0xa1, 0xa1).portr("DSW");
+}
 /*
 
 CRTC REGISTER: 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f
@@ -651,7 +659,7 @@ static const gfx_layout tiles8x8_layout_6bpp =
 *      Graphics Decode Information      *
 ****************************************/
 
-static GFXDECODE_START( fortecar )
+static GFXDECODE_START( gfx_fortecar )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout_3bpp, 0x000, 0x20 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout_6bpp, 0x100, 0x04 )
 GFXDECODE_END
@@ -663,10 +671,8 @@ GFXDECODE_END
 
 void fortecar_state::machine_reset()
 {
-	int i;
-
-	/* apparently there's a random fill in there (checked thru trojan TODO: extract proper algorythm) */
-	for(i = 0; i < m_vram.bytes(); i++)
+	/* apparently there's a random fill in there (checked thru trojan TODO: extract proper algorithm) */
+	for (int i = 0; i < m_vram.bytes(); i++)
 		m_vram[i] = machine().rand();
 }
 
@@ -677,15 +683,13 @@ void fortecar_state::machine_reset()
 
 MACHINE_CONFIG_START(fortecar_state::fortecar)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)      /* 3 MHz, measured */
-	MCFG_CPU_PROGRAM_MAP(fortecar_map)
-	MCFG_CPU_IO_MAP(fortecar_ports)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortecar_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)      /* 3 MHz, measured */
+	MCFG_DEVICE_PROGRAM_MAP(fortecar_map)
+	MCFG_DEVICE_IO_MAP(fortecar_ports)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* guess */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(200));   /* guess */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -693,35 +697,35 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 240-1)    /* driven by CRTC */
-	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update_fortecar)
+	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	EEPROM_93C56_16BIT(config, "eeprom").default_value(0);
 
-	MCFG_DEVICE_ADD("fcppi0", I8255A, 0)
+	i8255_device &fcppi0(I8255A(config, "fcppi0"));
 	/*  Init with 0x9a... A, B and high C as input
 	 Serial Eprom connected to Port C */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("INPUT"))
-	MCFG_I8255_IN_PORTC_CB(READ8(fortecar_state, ppi0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fortecar_state, ppi0_portc_w))
+	fcppi0.in_pa_callback().set_ioport("SYSTEM");
+	fcppi0.in_pb_callback().set_ioport("INPUT");
+	fcppi0.in_pc_callback().set(FUNC(fortecar_state::ppi0_portc_r));
+	fcppi0.out_pc_callback().set(FUNC(fortecar_state::ppi0_portc_w));
 
-	MCFG_V3021_ADD("rtc")
+	V3021(config, "rtc");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fortecar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fortecar)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(fortecar_state, fortecar)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* 1.5 MHz, measured */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)   /* 1.5 MHz, measured */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fortecar_state, ayporta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(fortecar_state, ayportb_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)   /* 1.5 MHz, measured */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortecar_state, ayporta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fortecar_state, ayportb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -758,7 +762,7 @@ ROM_START( fortecar )
 	ROM_LOAD( "fortecar.u39", 0x10000, 0x10000, CRC(fc3ddf4f) SHA1(4a95b24c4edb67f6d59f795f86dfbd12899e01b0) )
 	ROM_LOAD( "fortecar.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )
 
-	/* took from the Spanish version, these are likely to be identical anyway */
+	/* taken from the Spanish version, these are likely to be identical anyway */
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(7d3e7eb5) SHA1(788fe7adc381bcc6eaefed33f5aa1081340608a0) )
 
@@ -774,7 +778,7 @@ ROM_END
 *           Driver Init            *
 ***********************************/
 
-DRIVER_INIT_MEMBER(fortecar_state, fortecar)
+void fortecar_state::init_fortecar()
 {
 	// ...
 }
@@ -784,6 +788,6 @@ DRIVER_INIT_MEMBER(fortecar_state, fortecar)
 *          Game Drivers            *
 ***********************************/
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY        FULLNAME                        FLAGS                LAYOUT
-GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   layout_fortecrd )
-GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, layout_fortecrd )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY       FULLNAME                         FLAGS                LAYOUT
+GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, init_fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   layout_fortecrd )
+GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, init_fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, layout_fortecrd )

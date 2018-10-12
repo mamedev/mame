@@ -6,6 +6,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h"
 #include "machine/z80scc.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -18,12 +19,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, "rtc") { }
 
+	void hotstuff(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_bitmapram;
 	virtual void video_start() override;
 	uint32_t screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
-	void hotstuff(machine_config &config);
 	void hotstuff_map(address_map &map);
 };
 
@@ -75,26 +78,33 @@ uint32_t hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-ADDRESS_MAP_START(hotstuff_state::hotstuff_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_NOP //ROM AM_REGION("data", 0)
+void hotstuff_state::hotstuff_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x0fffff).noprw(); //ROM AM_REGION("data", 0)
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM
+	map(0x400000, 0x40ffff).ram();
 
-	AM_RANGE(0x600000, 0x600003) AM_DEVREADWRITE8("scc1", z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xffff)
-	AM_RANGE(0x620000, 0x620003) AM_DEVREADWRITE8("scc2", z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xffff)
-	;map(0x680000, 0x680001).lrw8("rtc_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_rtc->read(space, offset^1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_rtc->write(space, offset^1, data, mem_mask); });
+	map(0x600000, 0x600003).rw("scc1", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w));
+	map(0x620000, 0x620003).rw("scc2", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w));
+	map(0x680000, 0x680001).lrw8("rtc_rw",
+								 [this](address_space &space, offs_t offset, u8 mem_mask) {
+									 return m_rtc->read(space, offset^1, mem_mask);
+								 },
+								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+									 m_rtc->write(space, offset^1, data, mem_mask);
+								 });
 
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bitmapram")
-ADDRESS_MAP_END
+	map(0x980000, 0x9bffff).ram().share("bitmapram");
+}
 
 static INPUT_PORTS_START( hotstuff )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(hotstuff_state::hotstuff)
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(hotstuff_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(hotstuff_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -105,24 +115,24 @@ MACHINE_CONFIG_START(hotstuff_state::hotstuff)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_DEVICE_ADD("scc1", SCC8530N, 4915200)
-	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_4))
+	scc8530_device& scc1(SCC8530N(config, "scc1", 4915200));
+	scc1.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	MCFG_DEVICE_ADD("scc2", SCC8530N, 4915200)
-	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
+	scc8530_device& scc2(SCC8530N(config, "scc2", 4915200));
+	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 
-	MCFG_DEVICE_ADD("rtc", MC146818, XTAL(32'768))
-	MCFG_MC146818_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
+	MC146818(config, m_rtc, XTAL(32'768));
+	m_rtc->irq().set_inputline("maincpu", M68K_IRQ_1);
 MACHINE_CONFIG_END
 
 
 
 ROM_START( hotstuff )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_WORD_SWAP( "hot stuff game u6 (68000).bin", 0x00000, 0x80000, CRC(65f6a72f) SHA1(3a6d489ec3bf351018e279605d42f10b0a2c61b1) )
+	ROM_LOAD16_WORD_SWAP( "hot stuff game u6,68000.bin", 0x00000, 0x80000, CRC(65f6a72f) SHA1(3a6d489ec3bf351018e279605d42f10b0a2c61b1) )
 
 	ROM_REGION( 0x80000, "data", 0 ) /* 68000 Data? */
-	ROM_LOAD16_WORD_SWAP( "hot stuff symbol u8 (68000).bin", 0x00000, 0x80000, CRC(f154a157) SHA1(92ae0fb977e2dcc0377487d768f95c6e447e990b) )
+	ROM_LOAD16_WORD_SWAP( "hot stuff symbol u8,68000.bin", 0x00000, 0x80000, CRC(f154a157) SHA1(92ae0fb977e2dcc0377487d768f95c6e447e990b) )
 ROM_END
 
-GAME( ????, hotstuff,    0,        hotstuff,    hotstuff, hotstuff_state,    0, ROT0,  "Olympic Video Gaming", "Olympic Hot Stuff (TAS 5 Reel System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( ????, hotstuff, 0, hotstuff, hotstuff, hotstuff_state, empty_init, ROT0, "Olympic Video Gaming", "Olympic Hot Stuff (TAS 5 Reel System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

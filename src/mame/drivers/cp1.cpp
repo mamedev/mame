@@ -22,24 +22,24 @@
 class cp1_state : public driver_device
 {
 public:
-	cp1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	cp1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i8155(*this, "i8155"),
 		m_i8155_cp3(*this, "i8155_cp3"),
 		m_cassette(*this, "cassette"),
-		m_io_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4"}),
-		m_io_config(*this, "CONFIG")
+		m_io_lines(*this, "LINE%u", 0U),
+		m_io_config(*this, "CONFIG"),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<i8155_device> m_i8155;
-	required_device<i8155_device> m_i8155_cp3;
-	required_device<cassette_image_device> m_cassette;
-	required_ioport_array<5> m_io_lines;
-	required_ioport m_io_config;
+	void cp1(machine_config &config);
+private:
+	void cp1_io(address_map &map);
 
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
@@ -53,9 +53,14 @@ public:
 	DECLARE_WRITE8_MEMBER(i8155_portb_w);
 	DECLARE_WRITE8_MEMBER(i8155_portc_w);
 
-	void cp1(machine_config &config);
-	void cp1_io(address_map &map);
-private:
+	required_device<cpu_device> m_maincpu;
+	required_device<i8155_device> m_i8155;
+	required_device<i8155_device> m_i8155_cp3;
+	required_device<cassette_image_device> m_cassette;
+	required_ioport_array<5> m_io_lines;
+	required_ioport m_io_config;
+	output_finder<6> m_digits;
+
 	uint8_t   m_7seg;
 	uint8_t   m_port2;
 	uint8_t   m_matrix;
@@ -151,12 +156,12 @@ WRITE8_MEMBER(cp1_state::i8155_porta_w)
 
 	if (m_7seg)
 	{
-		if (!(m_matrix & 0x01))     output().set_digit_value(5, data);
-		if (!(m_matrix & 0x02))     output().set_digit_value(4, data);
-		if (!(m_matrix & 0x04))     output().set_digit_value(3, data);
-		if (!(m_matrix & 0x08))     output().set_digit_value(2, data | 0x80);     // this digit has always the dot active
-		if (!(m_matrix & 0x10))     output().set_digit_value(1, data);
-		if (!(m_matrix & 0x20))     output().set_digit_value(0, data);
+		if (!(m_matrix & 0x01))     m_digits[5] = data;
+		if (!(m_matrix & 0x02))     m_digits[4] = data;
+		if (!(m_matrix & 0x04))     m_digits[3] = data;
+		if (!(m_matrix & 0x08))     m_digits[2] = data | 0x80;     // this digit has always the dot active
+		if (!(m_matrix & 0x10))     m_digits[1] = data;
+		if (!(m_matrix & 0x20))     m_digits[0] = data;
 	}
 
 	m_7seg ^= 0x01;
@@ -181,10 +186,11 @@ WRITE8_MEMBER(cp1_state::i8155_portc_w)
 }
 
 
-ADDRESS_MAP_START(cp1_state::cp1_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00,             0xff )          AM_READWRITE( i8155_read, i8155_write)
-ADDRESS_MAP_END
+void cp1_state::cp1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0xff).rw(FUNC(cp1_state::i8155_read), FUNC(cp1_state::i8155_write));
+}
 
 /* Input ports */
 INPUT_PORTS_START( cp1 )
@@ -223,6 +229,11 @@ INPUT_PORTS_START( cp1 )
 	PORT_CONFSETTING( 0x02, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
+void cp1_state::machine_start()
+{
+	m_digits.resolve();
+}
+
 void cp1_state::machine_reset()
 {
 	m_port2 = 0;
@@ -233,7 +244,7 @@ void cp1_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 {
-	uint8_t *dest = (uint8_t*)m_i8155->space().get_read_ptr(0);
+	address_space &space = machine().dummy_space();
 	char line[0x10];
 	int addr = 0;
 	while (image.fgets(line, 10) && addr < 0x100)
@@ -241,8 +252,8 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 		int op = 0, arg = 0;
 		if (sscanf(line, "%d.%d", &op, &arg) == 2)
 		{
-			dest[addr++] = op;
-			dest[addr++] = arg;
+			m_i8155->memory_w(space, addr++, op);
+			m_i8155->memory_w(space, addr++, arg);
 		}
 		else
 		{
@@ -255,26 +266,26 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 
 MACHINE_CONFIG_START(cp1_state::cp1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8049, XTAL(6'000'000))
-	MCFG_CPU_IO_MAP(cp1_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(cp1_state, port1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(cp1_state, port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(cp1_state, port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(cp1_state, port2_w))
-	MCFG_MCS48_PORT_BUS_IN_CB(LOGGER("getbus"))
-	MCFG_MCS48_PORT_BUS_OUT_CB(LOGGER("putbus"))
-	MCFG_MCS48_PORT_T0_IN_CB(LOGGER("t0_r"))
-	MCFG_MCS48_PORT_T1_IN_CB(LOGGER("t1_r"))
+	i8049_device &maincpu(I8049(config, m_maincpu, 6_MHz_XTAL));
+	maincpu.set_addrmap(AS_IO, &cp1_state::cp1_io);
+	maincpu.p1_in_cb().set(FUNC(cp1_state::port1_r));
+	maincpu.p1_out_cb().set(FUNC(cp1_state::port1_w));
+	maincpu.p2_in_cb().set(FUNC(cp1_state::port2_r));
+	maincpu.p2_out_cb().set(FUNC(cp1_state::port2_w));
+	maincpu.bus_in_cb().set_log("getbus");
+	maincpu.bus_out_cb().set_log("putbus");
+	maincpu.t0_in_cb().set_log("t0_r");
+	maincpu.t1_in_cb().set_log("t1_r");
 
-	MCFG_DEVICE_ADD("i8155", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(cp1_state, i8155_porta_w))
-	MCFG_I8155_IN_PORTB_CB(READ8(cp1_state, i8155_portb_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(cp1_state, i8155_portb_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(cp1_state, i8155_portc_w))
+	i8155_device &i8155(I8155(config, "i8155", 0));
+	i8155.out_pa_callback().set(FUNC(cp1_state::i8155_porta_w));
+	i8155.in_pb_callback().set(FUNC(cp1_state::i8155_portb_r));
+	i8155.out_pb_callback().set(FUNC(cp1_state::i8155_portb_w));
+	i8155.out_pc_callback().set(FUNC(cp1_state::i8155_portc_w));
 
-	MCFG_DEVICE_ADD("i8155_cp3", I8155, 0)
+	I8155(config, "i8155_cp3", 0);
 
-	MCFG_DEFAULT_LAYOUT(layout_cp1)
+	config.set_default_layout(layout_cp1);
 
 	MCFG_CASSETTE_ADD("cassette")
 
@@ -291,13 +302,13 @@ MACHINE_CONFIG_END
 ROM_START( cp1 )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "b", "b" )
-	ROMX_LOAD( "cp1-kosmos-b.rom", 0x0000, 0x0800, CRC(fea8a2b2) SHA1(c987b79a7b90fcbd58b66a69e95913f2655a1f0d), ROM_BIOS(1))
+	ROMX_LOAD( "cp1-kosmos-b.rom", 0x0000, 0x0800, CRC(fea8a2b2) SHA1(c987b79a7b90fcbd58b66a69e95913f2655a1f0d), ROM_BIOS(0))
 	// This is from 2716 eprom that was on board with I8039 instead of I8049
 	ROM_SYSTEM_BIOS( 1, "2716", "2716" )
-	ROMX_LOAD( "cp1-2716.bin",     0x0000, 0x0800, CRC(3a2caf0e) SHA1(ff4befcf82a664950186d3af1843fdef70d2209f), ROM_BIOS(2))
+	ROMX_LOAD( "cp1-2716.bin",     0x0000, 0x0800, CRC(3a2caf0e) SHA1(ff4befcf82a664950186d3af1843fdef70d2209f), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY   FULLNAME                 FLAGS
-COMP( 1980, cp1,  0,      0,      cp1,     cp1,   cp1_state, 0,    "Kosmos", "CP1 / Computer Praxis", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY   FULLNAME                 FLAGS
+COMP( 1980, cp1,  0,      0,      cp1,     cp1,   cp1_state, empty_init, "Kosmos", "CP1 / Computer Praxis", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

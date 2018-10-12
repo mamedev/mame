@@ -18,7 +18,7 @@
 #include "machine/bfm_sc45_helper.h"
 #include "speaker.h"
 
-DRIVER_INIT_MEMBER(adder5_state,ad5)
+void adder5_state::init_ad5()
 {
 	// sc5 roms always start with SC5
 	uint8_t *src = memregion( "maincpu" )->base();
@@ -59,15 +59,16 @@ DRIVER_INIT_MEMBER(adder5_state,ad5)
 
 }
 
-ADDRESS_MAP_START(adder5_state::ad5_map)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_ROM
-	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM
-	AM_RANGE(0x40000000, 0x40000fff) AM_RAM
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM
-	AM_RANGE(0x80800000, 0x8080ffff) AM_RAM
+void adder5_state::ad5_map(address_map &map)
+{
+	map(0x00000000, 0x00ffffff).rom();
+	map(0x01000000, 0x0100ffff).ram();
+	map(0x40000000, 0x40000fff).ram();
+	map(0x80000000, 0x8000ffff).ram();
+	map(0x80800000, 0x8080ffff).ram();
 
-	AM_RANGE(0xffff0000, 0xffff03ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, dev_r, dev_w) // technically this can be moved with MBAR
-ADDRESS_MAP_END
+	map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+}
 
 INPUT_PORTS_START( bfm_ad5 )
 INPUT_PORTS_END
@@ -79,12 +80,13 @@ INTERRUPT_GEN_MEMBER(adder5_state::ad5_fake_timer_int)
 }
 
 MACHINE_CONFIG_START(adder5_state::bfm_ad5)
-	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
-	MCFG_CPU_PROGRAM_MAP(ad5_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(adder5_state, ad5_fake_timer_int, 1000)
+	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
+	MCFG_DEVICE_PROGRAM_MAP(ad5_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(adder5_state, ad5_fake_timer_int, 1000)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
 MACHINE_CONFIG_END
 

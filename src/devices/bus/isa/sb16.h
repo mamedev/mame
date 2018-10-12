@@ -117,6 +117,6 @@ private:
 
 // device type definition
 
-extern const device_type ISA16_SB16;
+DECLARE_DEVICE_TYPE(ISA16_SB16, sb16_lle_device)
 
 #endif // MAME_BUS_ISA_SB16_H

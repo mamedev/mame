@@ -180,36 +180,36 @@ bits(7:4) and bit(24)), X, and Y:
 struct voodoo_device::poly_extra_data
 {
 	voodoo_device * device;
-	raster_info *       info;                   /* pointer to rasterizer information */
+	raster_info *       info;                   // pointer to rasterizer information
 
-	int16_t               ax, ay;                 /* vertex A x,y (12.4) */
-	int32_t               startr, startg, startb, starta; /* starting R,G,B,A (12.12) */
-	int32_t               startz;                 /* starting Z (20.12) */
-	int64_t               startw;                 /* starting W (16.32) */
-	int32_t               drdx, dgdx, dbdx, dadx; /* delta R,G,B,A per X */
-	int32_t               dzdx;                   /* delta Z per X */
-	int64_t               dwdx;                   /* delta W per X */
-	int32_t               drdy, dgdy, dbdy, dady; /* delta R,G,B,A per Y */
-	int32_t               dzdy;                   /* delta Z per Y */
-	int64_t               dwdy;                   /* delta W per Y */
+	int16_t             ax, ay;                 // vertex A x,y (12.4)
+	int32_t             startr, startg, startb, starta; // starting R,G,B,A (12.12)
+	int32_t             startz;                 // starting Z (20.12)
+	int64_t             startw;                 // starting W (16.32)
+	int32_t             drdx, dgdx, dbdx, dadx; // delta R,G,B,A per X
+	int32_t             dzdx;                   // delta Z per X
+	int64_t             dwdx;                   // delta W per X
+	int32_t             drdy, dgdy, dbdy, dady; // delta R,G,B,A per Y
+	int32_t             dzdy;                   // delta Z per Y
+	int64_t             dwdy;                   // delta W per Y
 
-	int64_t               starts0, startt0;       /* starting S,T (14.18) */
-	int64_t               startw0;                /* starting W (2.30) */
-	int64_t               ds0dx, dt0dx;           /* delta S,T per X */
-	int64_t               dw0dx;                  /* delta W per X */
-	int64_t               ds0dy, dt0dy;           /* delta S,T per Y */
-	int64_t               dw0dy;                  /* delta W per Y */
-	int32_t               lodbase0;               /* used during rasterization */
+	int64_t             starts0, startt0;       // starting S,T (14.18)
+	int64_t             startw0;                // starting W (2.30)
+	int64_t             ds0dx, dt0dx;           // delta S,T per X
+	int64_t             dw0dx;                  // delta W per X
+	int64_t             ds0dy, dt0dy;           // delta S,T per Y
+	int64_t             dw0dy;                  // delta W per Y
+	int32_t             lodbase0;               // used during rasterization
 
-	int64_t               starts1, startt1;       /* starting S,T (14.18) */
-	int64_t               startw1;                /* starting W (2.30) */
-	int64_t               ds1dx, dt1dx;           /* delta S,T per X */
-	int64_t               dw1dx;                  /* delta W per X */
-	int64_t               ds1dy, dt1dy;           /* delta S,T per Y */
-	int64_t               dw1dy;                  /* delta W per Y */
-	int32_t               lodbase1;               /* used during rasterization */
+	int64_t             starts1, startt1;       // starting S,T (14.18)
+	int64_t             startw1;                // starting W (2.30)
+	int64_t             ds1dx, dt1dx;           // delta S,T per X
+	int64_t             dw1dx;                  // delta W per X
+	int64_t             ds1dy, dt1dy;           // delta S,T per Y
+	int64_t             dw1dy;                  // delta W per Y
+	int32_t             lodbase1;               // used during rasterization
 
-	uint16_t              dither[16];             /* dither matrix, for fastfill */
+	uint16_t            dither[16];             // dither matrix, for fastfill
 };
 
 
@@ -482,7 +482,8 @@ void voodoo_device::init_fbi(voodoo_device* vd,fbi_state *f, void *memory, int f
 	}
 
 	/* allocate a VBLANK timer */
-	f->vblank_timer = vd->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_callback),vd), vd);
+	f->vsync_stop_timer = vd->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_off_callback), vd), vd);
+	f->vsync_start_timer = vd->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_callback),vd), vd);
 	f->vblank = false;
 
 	/* initialize the memory FIFO */
@@ -643,7 +644,8 @@ void voodoo_device::init_save_state(voodoo_device *vd)
 	vd->save_item(NAME(vd->fbi.height));
 	vd->save_item(NAME(vd->fbi.xoffs));
 	vd->save_item(NAME(vd->fbi.yoffs));
-	vd->save_item(NAME(vd->fbi.vsyncscan));
+	vd->save_item(NAME(vd->fbi.vsyncstart));
+	vd->save_item(NAME(vd->fbi.vsyncstop));
 	vd->save_item(NAME(vd->fbi.rowpixels));
 	vd->save_item(NAME(vd->fbi.vblank));
 	vd->save_item(NAME(vd->fbi.vblank_count));
@@ -819,10 +821,10 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 {
 	int count;
 
-	if (LOG_VBLANK_SWAP) vd->logerror("--- swap_buffers @ %d\n", vd->screen->vpos());
+	if (LOG_VBLANK_SWAP) vd->logerror("--- swap_buffers @ %d\n", vd->m_screen->vpos());
 
 	/* force a partial update */
-	vd->screen->update_partial(vd->screen->vpos());
+	vd->m_screen->update_partial(vd->m_screen->vpos());
 	vd->fbi.video_changed = true;
 
 	/* keep a history of swap intervals */
@@ -878,7 +880,7 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 	/* update the statistics (debug) */
 	if (vd->stats.display)
 	{
-		const rectangle &visible_area = vd->screen->visible_area();
+		const rectangle &visible_area = vd->m_screen->visible_area();
 		int screen_area = visible_area.width() * visible_area.height();
 		char *statsptr = vd->stats.buffer;
 		int pixelcount;
@@ -930,14 +932,14 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 }
 
 
-static void adjust_vblank_timer(voodoo_device *vd)
+void voodoo_device::adjust_vblank_timer()
 {
-	attotime vblank_period = vd->screen->time_until_pos(vd->fbi.vsyncscan);
-	if (LOG_VBLANK_SWAP) vd->logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
+	attotime vblank_period = m_screen->time_until_pos(fbi.vsyncstart);
+	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (vblank_period == attotime::zero)
-		vblank_period = vd->screen->frame_period();
-	vd->fbi.vblank_timer->adjust(vblank_period);
+		vblank_period = m_screen->frame_period();
+	fbi.vsync_start_timer->adjust(vblank_period);
 }
 
 
@@ -965,7 +967,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_off_callback )
 		m_vblank(false);
 
 	/* go to the end of the next frame */
-	adjust_vblank_timer(this);
+	adjust_vblank_timer();
 }
 
 
@@ -995,7 +997,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 		swap_buffers(this);
 
 	/* set a timer for the next off state */
-	machine().scheduler().timer_set(screen->time_until_pos(0), timer_expired_delegate(FUNC(voodoo_device::vblank_off_callback),this), 0, this);
+	fbi.vsync_stop_timer->adjust(m_screen->time_until_pos(fbi.vsyncstop));
 
 
 
@@ -2149,7 +2151,7 @@ void voodoo_device::stall_cpu(int state, attotime current_time)
 	if (!m_stall.isnull())
 		m_stall(true);
 	else
-		cpu->execute().spin_until_trigger(trigger);
+		m_cpu->spin_until_trigger(trigger);
 
 	/* set a timer to clear the stall */
 	pci.continue_timer->adjust(pci.op_end_time - current_time);
@@ -2562,7 +2564,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 				if (vd->reg[hSync].u != 0 && vd->reg[vSync].u != 0 && vd->reg[videoDimensions].u != 0)
 				{
 					int hvis, vvis, htotal, vtotal, hbp, vbp;
-					attoseconds_t refresh = vd->screen->frame_period().attoseconds();
+					attoseconds_t refresh = vd->m_screen->frame_period().attoseconds();
 					attoseconds_t stdperiod, medperiod, vgaperiod;
 					attoseconds_t stddiff, meddiff, vgadiff;
 					rectangle visarea;
@@ -2613,17 +2615,17 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					/* configure the screen based on which one matches the closest */
 					if (stddiff < meddiff && stddiff < vgadiff)
 					{
-						vd->screen->configure(htotal, vtotal, visarea, stdperiod);
+						vd->m_screen->configure(htotal, vtotal, visarea, stdperiod);
 						osd_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
 					}
 					else if (meddiff < vgadiff)
 					{
-						vd->screen->configure(htotal, vtotal, visarea, medperiod);
+						vd->m_screen->configure(htotal, vtotal, visarea, medperiod);
 						osd_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
 					}
 					else
 					{
-						vd->screen->configure(htotal, vtotal, visarea, vgaperiod);
+						vd->m_screen->configure(htotal, vtotal, visarea, vgaperiod);
 						osd_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
 					}
 
@@ -2632,10 +2634,11 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					vd->fbi.height = vvis;
 					vd->fbi.xoffs = hbp;
 					vd->fbi.yoffs = vbp;
-					vd->fbi.vsyncscan = (vd->reg[vSync].u >> 16) & 0xfff;
-
+					vd->fbi.vsyncstart = (vd->reg[vSync].u >> 16) & 0xfff;
+					vd->fbi.vsyncstop = (vd->reg[vSync].u >> 0) & 0xfff;
+					osd_printf_debug("yoffs: %d vsyncstart: %d vsyncstop: %d\n", vbp, vd->fbi.vsyncstart, vd->fbi.vsyncstop);
 					/* recompute the time of VBLANK */
-					adjust_vblank_timer(vd);
+					vd->adjust_vblank_timer();
 
 					/* if changing dimensions, update video memory layout */
 					if (regnum == videoDimensions)
@@ -3936,7 +3939,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 			/* bit 31 is not used */
 
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->execute().eat_cycles(1000);
+			if (EAT_CYCLES) vd->m_cpu->eat_cycles(1000);
 			break;
 
 		/* bit 2 of the initEnable register maps this to dacRead */
@@ -3947,23 +3950,22 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 
 		/* return the current visible scanline */
 		case vRetrace:
-
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->execute().eat_cycles(10);
+			if (EAT_CYCLES) vd->m_cpu->eat_cycles(10);
 			// Return 0 if vblank is active
 			if (vd->fbi.vblank) {
 				result = 0;
 			}
 			else {
 				// Want screen position from vblank off
-				result = vd->screen->vpos();
+				result = vd->m_screen->vpos();
 			}
 			break;
 
 		/* return visible horizontal and vertical positions. Read by the Vegas startup sequence */
 		case hvRetrace:
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->execute().eat_cycles(10);
+			if (EAT_CYCLES) vd->m_cpu->eat_cycles(10);
 			//result = 0x200 << 16;   /* should be between 0x7b and 0x267 */
 			//result |= 0x80;         /* should be between 0x17 and 0x103 */
 			// Return 0 if vblank is active
@@ -3972,10 +3974,10 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 			}
 			else {
 				// Want screen position from vblank off
-				result = vd->screen->vpos();
+				result = vd->m_screen->vpos();
 			}
 			// Hpos
-			result |= vd->screen->hpos() << 16;
+			result |= vd->m_screen->hpos() << 16;
 			break;
 
 		/* cmdFifo -- Voodoo2 only */
@@ -3983,7 +3985,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 			result = vd->fbi.cmdfifo[0].rdptr;
 
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->execute().eat_cycles(1000);
+			if (EAT_CYCLES) vd->m_cpu->eat_cycles(1000);
 			break;
 
 		case cmdFifoAMin:
@@ -4021,7 +4023,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 		/* don't log multiple identical status reads from the same address */
 		if (regnum == vdstatus)
 		{
-			offs_t pc = vd->cpu->safe_pc();
+			offs_t pc = vd->m_cpu->pc();
 			if (pc == vd->last_status_pc && result == vd->last_status_value)
 				logit = false;
 			vd->last_status_pc = pc;
@@ -4950,9 +4952,18 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 			int vtotal = banshee.crtc[6];
 			vtotal |= ((banshee.crtc[7] >> 0) & 0x1) << 8;
 			vtotal |= ((banshee.crtc[7] >> 5) & 0x1) << 9;
+			vtotal += 2;
+
 			int vstart = banshee.crtc[0x10];
 			vstart |= ((banshee.crtc[7] >> 2) & 0x1) << 8;
 			vstart |= ((banshee.crtc[7] >> 7) & 0x1) << 9;
+
+			int vstop = banshee.crtc[0x11] & 0xf;
+			// Compare to see if vstop is before or after low 4 bits of vstart
+			if (vstop < (vstart & 0xf))
+				vstop |= (vstart + 0x10) & ~0xf;
+			else
+				vstop |= vstart & ~0xf;
 
 			// Get pll k, m and n from pllCtrl0
 			const uint32_t k = (banshee.io[io_pllCtrl0] >> 0) & 0x3;
@@ -4964,21 +4975,24 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 
 			int width = fbi.width;
 			int height = fbi.height;
+			//vd->fbi.xoffs = hbp;
+			//vd->fbi.yoffs = vbp;
 
 			if (banshee.io[io_vidOverlayDudx] != 0)
 				width = (fbi.width * banshee.io[io_vidOverlayDudx]) / 1048576;
 			if (banshee.io[io_vidOverlayDvdy] != 0)
 				height = (fbi.height * banshee.io[io_vidOverlayDvdy]) / 1048576;
 			if (LOG_REGISTERS)
-				logerror("configure screen: htotal: %d vtotal: %d vstart: %d width: %d height: %d refresh: %f\n",
-					htotal, vtotal, vstart, width, height, 1.0 / frame_period);
+				logerror("configure screen: htotal: %d vtotal: %d vstart: %d vstop: %d width: %d height: %d refresh: %f\n",
+					htotal, vtotal, vstart, vstop, width, height, 1.0 / frame_period);
 			if (htotal > 0 && vtotal > 0) {
 				rectangle visarea(0, width - 1, 0, height - 1);
-				screen->configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
+				m_screen->configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
 
-				// Set the vsync start
-				fbi.vsyncscan = vstart;
-				adjust_vblank_timer(this);
+				// Set the vsync start and stop
+				fbi.vsyncstart = vstart;
+				fbi.vsyncstop = vstop;
+				adjust_vblank_timer();
 			}
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
@@ -5025,16 +5039,34 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
     device start callback
 -------------------------------------------------*/
 
+void voodoo_device::device_resolve_objects()
+{
+	if (!m_screen)
+		m_screen = m_screen_finder;
+	else if (m_screen_finder)
+		throw emu_fatalerror("%s: screen set by both configuration and direct reference (%s and %s)\n", tag(), m_screen_finder->tag(), m_screen->tag());
+	else if (m_screen_finder.finder_tag() != finder_base::DUMMY_TAG)
+		throw emu_fatalerror("%s: configured screen %s not found\n", tag(), m_screen_finder.finder_tag());
+
+	if (!m_cpu)
+		m_cpu = m_cpu_finder;
+	else if (m_cpu_finder)
+		throw emu_fatalerror("%s: CPU set by both configuration and direct reference (%s and %s)\n", tag(), m_cpu_finder->tag(), m_cpu->tag());
+	else if (m_cpu_finder.finder_tag() != finder_base::DUMMY_TAG)
+		throw emu_fatalerror("%s: configured CPU %s not found\n", tag(), m_cpu_finder.finder_tag());
+}
+
 void voodoo_device::device_start()
 {
+	if (!m_screen || !m_cpu)
+		throw device_missing_dependencies();
+
 	const raster_info *info;
 	void *fbmem, *tmumem[2];
 	uint32_t tmumem0, tmumem1;
 	int val;
 
 	/* validate configuration */
-	assert(m_screen != nullptr);
-	assert(m_cputag != nullptr);
 	assert(m_fbmem > 0);
 
 	/* copy config data */
@@ -5123,10 +5155,6 @@ void voodoo_device::device_start()
 				break;
 			index++;
 		}
-	screen = downcast<screen_device *>(machine().device(m_screen));
-	assert_always(screen != nullptr, "Unable to find screen attached to voodoo");
-	cpu = machine().device(m_cputag);
-	assert_always(cpu != nullptr, "Unable to find CPU attached to voodoo");
 
 	if (m_tmumem1 != 0)
 		tmu_config |= 0xc0;  // two TMUs
@@ -5854,11 +5882,13 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	, m_fbmem(0)
 	, m_tmumem0(0)
 	, m_tmumem1(0)
-	, m_screen(nullptr)
-	, m_cputag(nullptr)
 	, m_vblank(*this)
 	, m_stall(*this)
 	, m_pciint(*this)
+	, m_screen_finder(*this, finder_base::DUMMY_TAG)
+	, m_cpu_finder(*this, finder_base::DUMMY_TAG)
+	, m_screen(nullptr)
+	, m_cpu(nullptr)
 	, vd_type(vdt)
 {
 }

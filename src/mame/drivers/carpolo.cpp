@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "includes/carpolo.h"
 
-#include "cpu/m6502/m6502.h"
 #include "machine/74153.h"
 #include "machine/6821pia.h"
 #include "screen.h"
@@ -34,29 +33,30 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(carpolo_state::main_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x3000, 0x30ff) AM_WRITEONLY AM_SHARE("alpharam")
-	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x5400, 0x5403) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x5800, 0x5803) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(carpolo_ball_screen_collision_cause_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(carpolo_car_ball_collision_x_r)
-	AM_RANGE(0xa002, 0xa002) AM_READ(carpolo_car_ball_collision_y_r)
-	AM_RANGE(0xa003, 0xa003) AM_READ(carpolo_car_car_collision_cause_r)
-	AM_RANGE(0xa004, 0xa004) AM_READ(carpolo_car_border_collision_cause_r)
-	AM_RANGE(0xa005, 0xa005) AM_READ(carpolo_car_ball_collision_cause_r)
-	AM_RANGE(0xa006, 0xa006) AM_READ(carpolo_car_goal_collision_cause_r)
-	AM_RANGE(0xa007, 0xa007) AM_READ_PORT("IN1")
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(carpolo_ball_screen_interrupt_clear_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(carpolo_timer_interrupt_clear_w)
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(carpolo_car_car_interrupt_clear_w)
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(carpolo_car_border_interrupt_clear_w)
-	AM_RANGE(0xb005, 0xb005) AM_WRITE(carpolo_car_ball_interrupt_clear_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(carpolo_car_goal_interrupt_clear_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(carpolo_interrupt_cause_r)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void carpolo_state::main_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x3000, 0x30ff).writeonly().share(m_alpharam);
+	map(0x4000, 0x400f).writeonly().share(m_spriteram);
+	map(0x5400, 0x5403).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x5800, 0x5803).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xa000).r(FUNC(carpolo_state::ball_screen_collision_cause_r));
+	map(0xa001, 0xa001).r(FUNC(carpolo_state::car_ball_collision_x_r));
+	map(0xa002, 0xa002).r(FUNC(carpolo_state::car_ball_collision_y_r));
+	map(0xa003, 0xa003).r(FUNC(carpolo_state::car_car_collision_cause_r));
+	map(0xa004, 0xa004).r(FUNC(carpolo_state::car_border_collision_cause_r));
+	map(0xa005, 0xa005).r(FUNC(carpolo_state::car_ball_collision_cause_r));
+	map(0xa006, 0xa006).r(FUNC(carpolo_state::car_goal_collision_cause_r));
+	map(0xa007, 0xa007).portr("IN1");
+	map(0xb000, 0xb000).w(FUNC(carpolo_state::ball_screen_interrupt_clear_w));
+	map(0xb001, 0xb001).w(FUNC(carpolo_state::timer_interrupt_clear_w));
+	map(0xb003, 0xb003).w(FUNC(carpolo_state::car_car_interrupt_clear_w));
+	map(0xb004, 0xb004).w(FUNC(carpolo_state::car_border_interrupt_clear_w));
+	map(0xb005, 0xb005).w(FUNC(carpolo_state::car_ball_interrupt_clear_w));
+	map(0xb006, 0xb006).w(FUNC(carpolo_state::car_goal_interrupt_clear_w));
+	map(0xc000, 0xc000).r(FUNC(carpolo_state::interrupt_cause_r));
+	map(0xf000, 0xffff).rom();
+}
 
 
 
@@ -219,7 +219,7 @@ static const gfx_layout alphalayout =
 	8*8
 };
 
-static GFXDECODE_START( carpolo )
+static GFXDECODE_START( gfx_carpolo )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,         12 )
 	GFXDECODE_ENTRY( "gfx2", 0, goallayout,   12*2,      2 )
 	GFXDECODE_ENTRY( "gfx3", 0, alphalayout,  12*2+2*16, 4 )
@@ -234,52 +234,49 @@ GFXDECODE_END
 MACHINE_CONFIG_START(carpolo_state::carpolo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(11'289'000)/12)       /* 940.75 kHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", carpolo_state,  carpolo_timer_interrupt)   /* this not strictly VBLANK,
-	                                                   but it's supposed to happen 60
-	                                                   times a sec, so it's a good place */
+	M6502(config, m_maincpu, XTAL(11'289'000)/12); /* 940.75 kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &carpolo_state::main_map);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(carpolo_state, pia_0_port_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(carpolo_state, pia_0_port_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(carpolo_state, pia_0_port_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(carpolo_state, coin1_interrupt_clear_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(carpolo_state,coin2_interrupt_clear_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpb_handler().set(FUNC(carpolo_state::pia_0_port_b_r));
+	pia0.writepa_handler().set(FUNC(carpolo_state::pia_0_port_a_w));
+	pia0.writepb_handler().set(FUNC(carpolo_state::pia_0_port_b_w));
+	pia0.ca2_handler().set(FUNC(carpolo_state::coin1_interrupt_clear_w));
+	pia0.cb2_handler().set(FUNC(carpolo_state::coin2_interrupt_clear_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(carpolo_state, pia_1_port_a_r))
-	MCFG_PIA_READPB_HANDLER(READ8(carpolo_state, pia_1_port_b_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(carpolo_state, coin3_interrupt_clear_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(carpolo_state, coin4_interrupt_clear_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia0.readpa_handler().set(FUNC(carpolo_state::pia_1_port_a_r));
+	pia0.readpb_handler().set(FUNC(carpolo_state::pia_1_port_b_r));
+	pia1.ca2_handler().set(FUNC(carpolo_state::coin3_interrupt_clear_w));
+	pia1.cb2_handler().set(FUNC(carpolo_state::coin4_interrupt_clear_w));
 
-	MCFG_DEVICE_ADD("7474_2s_1", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(carpolo_state, carpolo_7474_2s_1_q_cb))
+	TTL7474(config, m_ttl7474_2s_1, 0);
+	m_ttl7474_2s_1->comp_output_cb().set(FUNC(carpolo_state::ttl7474_2s_1_q_cb));
 
-	MCFG_DEVICE_ADD("7474_2s_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(carpolo_state, carpolo_7474_2s_2_q_cb))
+	TTL7474(config, m_ttl7474_2s_2, 0);
+	m_ttl7474_2s_2->comp_output_cb().set(FUNC(carpolo_state::ttl7474_2s_2_q_cb));
 
-	MCFG_DEVICE_ADD("7474_2u_1", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(carpolo_state, carpolo_7474_2u_1_q_cb))
+	TTL7474(config, m_ttl7474_2u_1, 0);
+	m_ttl7474_2u_1->comp_output_cb().set(FUNC(carpolo_state::ttl7474_2u_1_q_cb));
 
-	MCFG_DEVICE_ADD("7474_2u_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(carpolo_state, carpolo_7474_2u_2_q_cb))
+	TTL7474(config, m_ttl7474_2u_2, 0);
+	m_ttl7474_2u_2->comp_output_cb().set(FUNC(carpolo_state::ttl7474_2u_2_q_cb));
 
-	MCFG_DEVICE_ADD("7474_1f_1", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1f_2", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1d_1", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1d_2", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1c_1", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1c_2", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1a_1", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1a_2", TTL7474, 0)
+	TTL7474(config, m_ttl7474_1f_1, 0);
+	TTL7474(config, m_ttl7474_1f_2, 0);
+	TTL7474(config, m_ttl7474_1d_1, 0);
+	TTL7474(config, m_ttl7474_1d_2, 0);
+	TTL7474(config, m_ttl7474_1c_1, 0);
+	TTL7474(config, m_ttl7474_1c_2, 0);
+	TTL7474(config, m_ttl7474_1a_1, 0);
+	TTL7474(config, m_ttl7474_1a_2, 0);
 
-	MCFG_DEVICE_ADD("74148_3s", TTL74148, 0)
-	MCFG_74148_OUTPUT_CB(carpolo_state, ttl74148_3s_cb)
+	TTL74148(config, m_ttl74148_3s, 0);
+	m_ttl74148_3s->out_cb().set(FUNC(carpolo_state::ttl74148_3s_cb));
 
-	MCFG_TTL153_ADD("74153_1k")
-	MCFG_TTL153_ZA_CB(WRITELINE(carpolo_state, ls153_za_w)) // pia1 pb5
-	MCFG_TTL153_ZB_CB(WRITELINE(carpolo_state, ls153_zb_w)) // pia1 pb4
+	TTL153(config, m_ttl74153_1k);
+	m_ttl74153_1k->za_cb().set(FUNC(carpolo_state::ls153_za_w)); // pia1 pb5
+	m_ttl74153_1k->zb_cb().set(FUNC(carpolo_state::ls153_zb_w)); // pia1 pb4
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -287,11 +284,11 @@ MACHINE_CONFIG_START(carpolo_state::carpolo)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(carpolo_state, screen_update_carpolo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(carpolo_state, screen_vblank_carpolo))
+	MCFG_SCREEN_UPDATE_DRIVER(carpolo_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, carpolo_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carpolo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carpolo)
 	MCFG_PALETTE_ADD("palette", 12*2+2*16+4*2)
 	MCFG_PALETTE_INIT_OWNER(carpolo_state,carpolo)
 
@@ -345,17 +342,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(carpolo_state,carpolo)
+void carpolo_state::init_carpolo()
 {
-	size_t i, len;
-	uint8_t *ROM;
-
-
 	/* invert gfx PROM since the bits are active LO */
-	ROM = memregion("gfx2")->base();
-	len = memregion("gfx2")->bytes();
-	for (i = 0;i < len; i++)
+	uint8_t *ROM = memregion("gfx2")->base();
+	size_t len = memregion("gfx2")->bytes();
+	for (size_t i = 0; i < len; i++)
 		ROM[i] ^= 0x0f;
 }
 
-GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, carpolo, ROT0, "Exidy", "Car Polo", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, init_carpolo, ROT0, "Exidy", "Car Polo", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

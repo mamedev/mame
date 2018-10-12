@@ -15,13 +15,13 @@
 
 // FIXME: M68000 ought to be a parent class, not an external object
 #define MCFG_TMP68301_CPU(_tag) \
-	downcast<tmp68301_device &>(*device).set_cpu_tag("^" _tag);
+	downcast<tmp68301_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_TMP68301_IN_PARALLEL_CB(cb) \
-	devcb = &downcast<tmp68301_device &>(*device).set_in_parallel_callback((DEVCB_##cb));
+	downcast<tmp68301_device &>(*device).set_in_parallel_callback((DEVCB_##cb));
 
 #define MCFG_TMP68301_OUT_PARALLEL_CB(cb) \
-	devcb = &downcast<tmp68301_device &>(*device).set_out_parallel_callback((DEVCB_##cb));
+	downcast<tmp68301_device &>(*device).set_out_parallel_callback((DEVCB_##cb));
 
 
 //**************************************************************************

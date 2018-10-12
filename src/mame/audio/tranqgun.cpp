@@ -143,7 +143,7 @@ WRITE8_MEMBER( vicdual_state::tranqgun_audio_w )
 MACHINE_CONFIG_START(vicdual_state::tranqgun_audio)
 
 	/* samples */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(8)
 	MCFG_SAMPLES_NAMES(tranqgun_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

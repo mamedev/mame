@@ -66,9 +66,10 @@ DEFINE_DEVICE_TYPE(SED1330, sed1330_device, "sed1330", "Epson SED1330")
 
 
 // default address map
-ADDRESS_MAP_START(sed1330_device::sed1330)
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sed1330_device::sed1330(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
 // internal character generator ROM

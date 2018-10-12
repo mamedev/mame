@@ -88,7 +88,7 @@ WRITE8_MEMBER(mainsnk_state::c600_w)
 	int bank;
 	int total_elements = m_gfxdecode->gfx(0)->elements();
 
-	flip_screen_set(~data & 0x80);
+	flip_screen_set(BIT(data, 7));
 
 	m_bg_tilemap->set_palette_offset((data & 0x07) << 4);
 	m_tx_tilemap->set_palette_offset((data & 0x07) << 4);

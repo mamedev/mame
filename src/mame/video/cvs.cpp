@@ -90,8 +90,8 @@ WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 	if (data & 0x04)   logerror("           SCREEN ROTATE\n");
 	if (data & 0x08)   logerror("           SHADE BRIGHTER TO LEFT\n");
 
-	output().set_led_value(1, data & 0x10);  /* lamp 1 */
-	output().set_led_value(2, data & 0x20);  /* lamp 2 */
+	m_lamps[0] = BIT(data, 4);  /* lamp 1 */
+	m_lamps[1] = BIT(data, 5);  /* lamp 2 */
 
 	if (data & 0x40)   logerror("           SHADE BRIGHTER TO BOTTOM\n");
 	if (data & 0x80)   logerror("           SHADE BRIGHTER TO TOP\n");
@@ -224,11 +224,11 @@ uint32_t cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitma
 	{
 		int y;
 
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			int x;
 
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int pixel0 = s2636_0_bitmap.pix16(y, x);
 				int pixel1 = s2636_1_bitmap.pix16(y, x);
@@ -328,7 +328,7 @@ void cvs_state::cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect
 			if (flip_screen_y())
 				y = ~y;
 
-			if ((y >= cliprect.min_y) && (y <= cliprect.max_y) &&
+			if ((y >= cliprect.top()) && (y <= cliprect.bottom()) &&
 				(update_always || (m_palette->pen_indirect(bitmap.pix16(y, x)) == 0)))
 				bitmap.pix16(y, x) = star_pen;
 		}

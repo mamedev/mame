@@ -1,138 +1,112 @@
-// license:BSD-3-Clause
-// copyright-holders:Curt Coder
-/**********************************************************************
+// license: BSD-3-Clause
+// copyright-holders: Dirk Best
+/***************************************************************************
 
-    National Semiconductor ADC0808/ADC0809 8-Bit A/D Converter emulation
+    ADC0808/ADC0809
 
-**********************************************************************
-                            _____   _____
-                   IN3   1 |*    \_/     | 28  IN2
-                   IN4   2 |             | 27  IN1
-                   IN5   3 |             | 26  IN0
-                   IN6   4 |             | 25  ADD A
-                   IN7   5 |             | 24  ADD B
-                 START   6 |             | 23  ADD C
-                   EOC   7 |   ADC0808   | 22  ALE
-                   2-5   8 |   ADC0809   | 21  2-1 MSB
-         OUTPUT ENABLE   9 |             | 20  2-2
-                 CLOCK  10 |             | 19  2-3
-                   Vcc  11 |             | 18  2-4
-                 Vref+  12 |             | 17  2-8 LSB
-                   GND  13 |             | 16  Vref-
-                   2-7  14 |_____________| 15  2-6
+    A/D Converter with 8 Channel-Multiplexer
 
-**********************************************************************/
+                ___ ___
+       IN3   1 |*  u   | 28  IN2
+       IN4   2 |       | 27  IN1
+       IN5   3 |       | 26  IN0
+       IN6   4 |       | 25  ADD A
+       IN7   5 |       | 24  ADD B
+     START   6 |       | 23  ADD C
+       EOC   7 |       | 22  ALE
+        D4   8 |       | 21  D0
+        OE   9 |       | 20  D1
+     CLOCK  10 |       | 19  D2
+       VCC  11 |       | 18  D3
+     VREF+  12 |       | 17  D7
+       DND  13 |       | 16  VREF-
+        D6  14 |_______| 15  D5
 
-#ifndef MAME_MACHINE_ADC0808_H
-#define MAME_MACHINE_ADC0808_H
+    Notes:
+    * The difference between the two devices is the total adjusted
+      error: ADC0808 ±½ LSB, ADC0809 ±1 LSB
+    * MM74C949 and M58990P are equivalent to ADC0808
+    * MM74C949-1 and M58990P-1 are equivalent to ADC0809
+    * ADC0816 and ADC0817 are 16 channel equivalents
+
+***************************************************************************/
+
+#ifndef MAME_DEVICES_MACHINE_ADC0808_H
+#define MAME_DEVICES_MACHINE_ADC0808_H
 
 #pragma once
-
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> adc0808_analog_read
-
-#define ADC0808_ANALOG_READ_CB(name)  double name()
-
-
-#define MCFG_ADC0808_OUT_EOC_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_out_eoc_callback(DEVCB_##_devcb);
-
-#define MCFG_ADC0808_IN_VREF_POS_CB(_class, _method) \
-	downcast<adc0808_device &>(*device).set_in_vref_pos_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_ADC0808_IN_VREF_NEG_CB(_class, _method) \
-	downcast<adc0808_device &>(*device).set_in_vref_neg_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_ADC0808_IN_IN_0_CB(_class, _method) \
-	downcast<adc0808_device &>(*device).set_in_in_0_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_ADC0808_IN_IN_1_CB(_class, _method) \
-	downcast<adc0808_device &>(*device).set_in_in_1_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_ADC0808_IN_IN_2_CB(_class, _method) \
-	downcast<adc0808_device &>(*device).set_in_in_2_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_ADC0808_IN_IN_3_CB(_class, _method) \
-	downcast<adc0808_device &>(*device).set_in_in_3_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_ADC0808_IN_IN_4_CB(_class, _method) \
-	downcast<adc0808_device &>(*device).set_in_in_4_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_ADC0808_IN_IN_5_CB(_class, _method) \
-	downcast<adc0808_device &>(*device).set_in_in_5_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_ADC0808_IN_IN_6_CB(_class, _method) \
-	downcast<adc0808_device &>(*device).set_in_in_6_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_ADC0808_IN_IN_7_CB(_class, _method) \
-	downcast<adc0808_device &>(*device).set_in_in_7_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
-
-// ======================> adc0808_device
-
-class adc0808_device :  public device_t
+class adc0808_device : public device_t
 {
 public:
-	typedef device_delegate<double ()> analog_read_delegate;
-
 	// construction/destruction
 	adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_eoc_callback(Object &&cb) { return m_out_eoc_cb.set_callback(std::forward<Object>(cb)); }
-	template <typename Object> void set_in_vref_pos_callback(Object &&cb) { m_in_vref_pos_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_in_vref_neg_callback(Object &&cb) { m_in_vref_neg_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_in_in_0_callback(Object &&cb) { m_in_in_0_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_in_in_1_callback(Object &&cb) { m_in_in_1_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_in_in_2_callback(Object &&cb) { m_in_in_2_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_in_in_3_callback(Object &&cb) { m_in_in_3_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_in_in_4_callback(Object &&cb) { m_in_in_4_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_in_in_5_callback(Object &&cb) { m_in_in_5_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_in_in_6_callback(Object &&cb) { m_in_in_6_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_in_in_7_callback(Object &&cb) { m_in_in_7_cb = std::forward<Object>(cb); }
+	auto eoc_callback() { return m_eoc_cb.bind(); }
+	auto eoc_ff_callback() { return m_eoc_ff_cb.bind(); }
+	template <std::size_t Bit> auto in_callback() { return m_in_cb[Bit].bind(); }
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( ale_w );
+	DECLARE_READ8_MEMBER(data_r);
+	DECLARE_WRITE8_MEMBER(address_w);
+	DECLARE_WRITE_LINE_MEMBER(start_w);
+	DECLARE_READ_LINE_MEMBER(eoc_r);
 
-	DECLARE_WRITE_LINE_MEMBER( start_w );
+	// common hookups
+	DECLARE_WRITE8_MEMBER(address_offset_start_w); // start and ale connected, address to the address bus
+	DECLARE_WRITE8_MEMBER(address_data_start_w); // start and ale connected, address to the data bus
 
 protected:
+	adc0808_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	devcb_write_line        m_out_eoc_cb;
-	analog_read_delegate    m_in_vref_pos_cb;
-	analog_read_delegate    m_in_vref_neg_cb;
-	analog_read_delegate    m_in_in_0_cb;
-	analog_read_delegate    m_in_in_1_cb;
-	analog_read_delegate    m_in_in_2_cb;
-	analog_read_delegate    m_in_in_3_cb;
-	analog_read_delegate    m_in_in_4_cb;
-	analog_read_delegate    m_in_in_5_cb;
-	analog_read_delegate    m_in_in_6_cb;
-	analog_read_delegate    m_in_in_7_cb;
+	// callbacks
+	devcb_write_line m_eoc_cb;
+	devcb_write_line m_eoc_ff_cb;
+	devcb_read8 m_in_cb[8];
 
-	int m_address;                      // analog channel address
-	int m_start;                        // start conversion pin
-	int m_eoc;                          // end of conversion pin
-	int m_next_eoc;                     // next value end of conversion pin
+	enum state : int
+	{
+		STATE_IDLE,
+		STATE_CONVERSION_START,
+		STATE_CONVERSION_READY,
+		STATE_CONVERSION_RUNNING
+	};
+	state m_state;
 
-	uint8_t m_sar;                        // successive approximation register
-
-	int m_cycle;                        // clock cycle counter
-	int m_bit;                          // bit counter
-
-	// timers
 	emu_timer *m_cycle_timer;
+
+	// state
+	int m_start;
+	int m_address;
+	uint8_t m_sar;
+	bool m_eoc;
+};
+
+class adc0809_device : public adc0808_device
+{
+public:
+	adc0809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class m58990_device : public adc0808_device
+{
+public:
+	m58990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(ADC0808, adc0808_device)
+DECLARE_DEVICE_TYPE(ADC0809, adc0809_device)
+DECLARE_DEVICE_TYPE(M58990, m58990_device)
 
-#endif // MAME_MACHINE_ADC0808_H
+#endif // MAME_DEVICES_MACHINE_ADC0808_H

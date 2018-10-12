@@ -62,7 +62,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beeper")
 		, m_io_dsw(*this, "DSW")
-		{ }
+	{ }
 
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_ack_w);
@@ -70,7 +70,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
 	DECLARE_READ8_MEMBER(pio_r);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_DRIVER_INIT(init);
+	void init_init();
 
 	void cortex(machine_config &config);
 	void io_map(address_map &map);
@@ -85,20 +85,22 @@ private:
 	required_ioport m_io_dsw;
 };
 
-ADDRESS_MAP_START(cortex_state::mem_map)
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x8000, 0xefff) AM_RAM
-	AM_RANGE(0xf100, 0xf11f) AM_RAM // memory mapping unit
-	AM_RANGE(0xf120, 0xf120) AM_DEVREADWRITE("crtc", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xf121, 0xf121) AM_DEVREADWRITE("crtc", tms9928a_device, register_read, register_write)
+void cortex_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bankr0").bankw("bankw0");
+	map(0x8000, 0xefff).ram();
+	map(0xf100, 0xf11f).ram(); // memory mapping unit
+	map(0xf120, 0xf120).rw("crtc", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xf121, 0xf121).rw("crtc", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	//AM_RANGE(0xf140, 0xf147) // fdc tms9909
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(cortex_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x18) AM_DEVWRITE("control", ls259_device, write_d0)
-	AM_RANGE(0x0000, 0x0000) AM_READ(pio_r)
-	AM_RANGE(0x0001, 0x0001) AM_READ(keyboard_r)
+void cortex_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0007).mirror(0x18).w("control", FUNC(ls259_device::write_d0));
+	map(0x0000, 0x0000).r(FUNC(cortex_state::pio_r));
+	map(0x0001, 0x0001).r(FUNC(cortex_state::keyboard_r));
 	//AM_RANGE(0x0040, 0x005f) AM_DEVWRITE("uart1", tms9902_device, cruwrite) // RS232 (r12 = 80-bf)
 	//AM_RANGE(0x0008, 0x000b) AM_DEVREAD("uart1", tms9902_device, cruread) // RS232
 	//AM_RANGE(0x00c0, 0x00df) AM_DEVWRITE("uart2", tms9902_device, cruwrite) // Cassette (r12 = 180-1bf)
@@ -108,7 +110,7 @@ ADDRESS_MAP_START(cortex_state::io_map)
 	//AM_RANGE(0x0400, 0x0407) AM_WRITE(cent_data_w) // r12 = 800-80e
 	//AM_RANGE(0x0408, 0x0408) AM_WRITE(cent_strobe_w) // r12 = 810
 	//AM_RANGE(0x0081, 0x0081) AM_READ(cent_stat_r) // CRU 409 (r12 = 812)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( cortex )
@@ -168,7 +170,7 @@ void cortex_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER( cortex_state, init )
+void cortex_state::init_init()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -182,24 +184,26 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map)
+	TMS9995(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cortex_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cortex_state::io_map);
 
-	MCFG_DEVICE_ADD("control", LS259, 0) // IC64
-	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cortex_state, basic_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cortex_state, keyboard_ack_w))
-	//MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(cortex_state, ebus_int_ack_w))
-	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cortex_state, ebus_to_en_w))
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cortex_state, disk_size_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(cortex_state, romsw_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state))
+	ls259_device &control(LS259(config, "control")); // IC64
+	//control.q_out_cb<0>().set(FUNC(cortex_state::basic_led_w));
+	control.q_out_cb<1>().set(FUNC(cortex_state::keyboard_ack_w));
+	//control.q_out_cb<2>().set(FUNC(cortex_state::ebus_int_ack_w));
+	//control.q_out_cb<3>().set(FUNC(cortex_state::ebus_to_en_w));
+	//control.q_out_cb<4>().set(FUNC(cortex_state::disk_size_w));
+	control.q_out_cb<5>().set(FUNC(cortex_state::romsw_w));
+	control.q_out_cb<6>().set("beeper", FUNC(beep_device::set_state));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "crtc", TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INT_9995_INT1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(cortex_state, vdp_int_w))
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", tms9928a_device, screen_update )
+	tms9929a_device &crtc(TMS9929A(config, "crtc", XTAL(10'738'635)));
+	crtc.set_screen("screen");
+	crtc.int_callback().set_inputline(m_maincpu, INT_9995_INT1);
+	crtc.int_callback().append(FUNC(cortex_state::vdp_int_w));
+	crtc.set_vram_size(0x4000);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(cortex_state, kbd_put))
@@ -208,8 +212,8 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	//MCFG_DEVICE_ADD("uart2", TMS9902, XTAL(12'000'000) / 4)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
@@ -217,15 +221,15 @@ MACHINE_CONFIG_END
 ROM_START( cortex )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "basic", "Cortex Bios")
-	ROMX_LOAD( "cortex.ic47", 0x10000, 0x2000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f), ROM_BIOS(1))
-	ROMX_LOAD( "cortex.ic46", 0x12000, 0x2000, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9), ROM_BIOS(1))
-	ROMX_LOAD( "cortex.ic45", 0x14000, 0x2000, CRC(b0c9b6e8) SHA1(4e20c3f0b7546b803da4805cd3b8616f96c3d923), ROM_BIOS(1))
+	ROMX_LOAD( "cortex.ic47", 0x10000, 0x2000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f), ROM_BIOS(0))
+	ROMX_LOAD( "cortex.ic46", 0x12000, 0x2000, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9), ROM_BIOS(0))
+	ROMX_LOAD( "cortex.ic45", 0x14000, 0x2000, CRC(b0c9b6e8) SHA1(4e20c3f0b7546b803da4805cd3b8616f96c3d923), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "forth", "FIG-Forth")
-	ROMX_LOAD( "forth.ic47",  0x10000, 0x2000, CRC(999034be) SHA1(0dcc7404c38aa0ae913101eb0aa98da82104b5d4), ROM_BIOS(2))
-	ROMX_LOAD( "forth.ic46",  0x12000, 0x2000, CRC(8eca54cc) SHA1(0f1680e941ef60bb9bde9a4b843b78f30dff3202), ROM_BIOS(2))
+	ROMX_LOAD( "forth.ic47",  0x10000, 0x2000, CRC(999034be) SHA1(0dcc7404c38aa0ae913101eb0aa98da82104b5d4), ROM_BIOS(1))
+	ROMX_LOAD( "forth.ic46",  0x12000, 0x2000, CRC(8eca54cc) SHA1(0f1680e941ef60bb9bde9a4b843b78f30dff3202), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                  FULLNAME  FLAGS
-COMP( 1982, cortex, 0,      0,       cortex,    cortex, cortex_state, init, "Powertran Cybernetics", "Cortex", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT       COMPANY                  FULLNAME  FLAGS
+COMP( 1982, cortex, 0,      0,      cortex,  cortex, cortex_state, init_init, "Powertran Cybernetics", "Cortex", MACHINE_NOT_WORKING )

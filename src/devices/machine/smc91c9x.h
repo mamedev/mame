@@ -19,6 +19,7 @@ class smc91c9x_device : public device_t,public device_network_interface
 {
 public:
 	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
@@ -34,6 +35,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void device_pre_save(void) override;
+	virtual void device_post_load(void) override;
+
 private:
 	static constexpr unsigned ETHER_BUFFER_SIZE   = 2048;
 	// TODO: 96 device is larger
@@ -46,7 +50,12 @@ private:
 	// mmu
 	// The bits in these vectors indicate a packet has been allocated
 	u32 m_alloc_rx, m_alloc_tx;
-	std::vector<int> m_comp_tx, m_comp_rx;
+	std::vector<u32> m_comp_tx, m_comp_rx;
+	// Fifo for allocated (queued) transmit packets
+	std::vector<u32> m_trans_tx;
+	// Save vector data and sizes for proper save state restoration
+	u32 m_comp_tx_data[ETHER_BUFFERS], m_comp_rx_data[ETHER_BUFFERS], m_trans_tx_data[ETHER_BUFFERS];
+	u32 m_comp_tx_size, m_comp_rx_size, m_trans_tx_size;
 	// Requests a packet allocation and returns true
 	// and sets the packet number if successful
 	bool alloc_req(const int tx, int &packet_num);
@@ -115,12 +124,12 @@ DECLARE_DEVICE_TYPE(SMC91C96, smc91c96_device)
 	MCFG_DEVICE_ADD((tag), SMC91C94, 0)
 
 #define MCFG_SMC91C94_IRQ_CALLBACK(write) \
-	devcb = &downcast<smc91c94_device &>(*device).set_irq_callback(DEVCB_##write);
+	downcast<smc91c94_device &>(*device).set_irq_callback(DEVCB_##write);
 
 #define MCFG_SMC91C96_ADD(tag) \
 	MCFG_DEVICE_ADD((tag), SMC91C96, 0)
 
 #define MCFG_SMC91C96_IRQ_CALLBACK(write) \
-	devcb = &downcast<smc91c96_device &>(*device).set_irq_callback(DEVCB_##write);
+	downcast<smc91c96_device &>(*device).set_irq_callback(DEVCB_##write);
 
 #endif // MAME_MACHINE_SMC91C9X_H

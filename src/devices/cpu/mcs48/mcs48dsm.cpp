@@ -53,7 +53,7 @@ offs_t mcs48_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x08:  if (m_i802x)
 						util::stream_format(stream, "in   a,p0");
 					else if (!m_upi41)
-						util::stream_format(stream, "in   a,bus");
+						util::stream_format(stream, "ins  a,bus");
 					else
 						util::stream_format(stream, "illegal");
 			break;
@@ -266,7 +266,7 @@ offs_t mcs48_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			flags = STEP_OUT;
 			break;
 		case 0x94:      util::stream_format(stream, "call $4%02X", params.r8(cpc++)); flags = STEP_OVER;   break;
-		case 0x95:  if (m_i802x)
+		case 0x95:  if (!m_i802x)
 						util::stream_format(stream, "cpl  f0");
 					else
 						util::stream_format(stream, "sel  an1");

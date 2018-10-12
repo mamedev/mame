@@ -110,7 +110,7 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual bool get_nonstandard_mnemonics_mode() const override;
 
 private:
@@ -149,7 +149,7 @@ typedef uint8_t Saturn64[16];
 	int     m_monitor_id;
 	int     m_monitor_in;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	int m_icount;
 	int64_t m_debugger_temp;
 

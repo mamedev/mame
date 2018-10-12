@@ -263,10 +263,10 @@ m6805_base_device::m6805_base_device(
 void m6805_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w.l).noshow();
@@ -411,9 +411,9 @@ void m6805_base_device::interrupt()
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *m6805_base_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6805_base_device::create_disassembler()
 {
-	return new m6805_disassembler;
+	return std::make_unique<m6805_disassembler>();
 }
 
 
@@ -492,7 +492,7 @@ void m6805_base_device::execute_run()
 			interrupt();
 		}
 
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		u8 const ireg = rdop(PC++);
 
@@ -667,6 +667,6 @@ void hd63705_device::interrupt_vector()
 }
 
 
-DEFINE_DEVICE_TYPE(M6805,     m6805_device,     "m6805",     "M6805")
-DEFINE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device, "m68hc05eg", "MC68HC05EG")
-DEFINE_DEVICE_TYPE(HD63705,   hd63705_device,   "hd63705",   "HD63705")
+DEFINE_DEVICE_TYPE(M6805,     m6805_device,     "m6805",     "Motorola M6805")
+DEFINE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device, "m68hc05eg", "Motorola MC68HC05EG")
+DEFINE_DEVICE_TYPE(HD63705,   hd63705_device,   "hd63705",   "Hitachi HD63705")

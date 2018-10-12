@@ -204,6 +204,8 @@ WRITE_LINE_MEMBER( i8214_device::etlg_w )
 	LOG("I8214 ETLG: %u\n", state);
 
 	m_etlg = state;
+
+	check_interrupt();
 }
 
 
@@ -216,4 +218,6 @@ WRITE_LINE_MEMBER( i8214_device::inte_w )
 	LOG("I8214 INTE: %u\n", state);
 
 	m_inte = state;
+
+	check_interrupt();
 }

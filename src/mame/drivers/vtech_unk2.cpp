@@ -13,8 +13,10 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void glmmc(machine_config &config);
+
+private:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 uint32_t glmmc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -27,7 +29,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(glmmc_state::glmmc)
 	/* basic machine hardware */
-	// MCFG_CPU_ADD("maincpu", unknown, unknown) // CPU type is unknown, epoxy blob
+	// MCFG_DEVICE_ADD("maincpu", unknown, unknown) // CPU type is unknown, epoxy blob
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -43,4 +45,4 @@ ROM_START( glmmc )
 	ROM_LOAD( "27-5889-00.bin", 0x000000, 0x080000, CRC(5e2c6359) SHA1(cc01c7bd5c87224b63dd1044db5a36a5cb7824f1) )
 ROM_END
 
-COMP( 19??, glmmc,      0,      0,      glmmc,     glmmc, glmmc_state, 0,    "Video Technology", "Genius Leader Master Mega Color (Germany)", MACHINE_IS_SKELETON)
+COMP( 19??, glmmc, 0, 0, glmmc, glmmc, glmmc_state, empty_init, "Video Technology", "Genius Leader Master Mega Color (Germany)", MACHINE_IS_SKELETON)

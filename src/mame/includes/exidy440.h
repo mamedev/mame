@@ -11,6 +11,7 @@
 #pragma once
 
 #include "audio/exidy440.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define EXIDY440_MASTER_CLOCK       (XTAL(12'979'200))
@@ -25,7 +26,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scanline(*this, "scanline"),
 		m_maincpu(*this, "maincpu"),
-		m_custom(*this, "custom"),
+		m_custom(*this, "440audio"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
@@ -34,10 +35,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(firq_vblank_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hitnmiss_button1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(showdown);
-	DECLARE_DRIVER_INIT(yukon);
-	DECLARE_DRIVER_INIT(exidy440);
-	DECLARE_DRIVER_INIT(claypign);
+	void init_showdown();
+	void init_yukon();
+	void init_exidy440();
+	void init_claypign();
 	void exidy440(machine_config &config);
 
 protected:
@@ -61,7 +62,7 @@ protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int scroll_offset, int check_collision);
 	void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,  int scroll_offset, int check_collision);
 	uint32_t screen_update_exidy440(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(exidy440_vblank_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);
 	TIMER_CALLBACK_MEMBER(delayed_sound_command_w);
 	TIMER_CALLBACK_MEMBER(beam_firq_callback);
 	TIMER_CALLBACK_MEMBER(collide_firq_callback);
@@ -73,7 +74,6 @@ protected:
 	virtual void video_start() override;
 	void exidy440_video(machine_config &config);
 	void exidy440_map(address_map &map);
-	void exidy440_audio_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_imageram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -106,7 +106,7 @@ class topsecex_state : public exidy440_state
 {
 public:
 	using exidy440_state::exidy440_state;
-	DECLARE_DRIVER_INIT(topsecex);
+	void init_topsecex();
 	void topsecex(machine_config &config);
 
 protected:

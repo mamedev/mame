@@ -21,6 +21,7 @@
 #include "video/wswan.h"
 #include "bus/wswan/slot.h"
 #include "bus/wswan/rom.h"
+#include "emupal.h"
 
 
 class wswan_state : public driver_device
@@ -97,6 +98,7 @@ protected:
 
 	void wswan_io(address_map &map);
 	void wswan_mem(address_map &map);
+	void wswan_snd(address_map &map);
 
 	void register_save();
 	void handle_irqs();

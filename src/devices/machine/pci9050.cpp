@@ -26,22 +26,24 @@
 
 DEFINE_DEVICE_TYPE(PCI9050, pci9050_device, "pci9050", "PLX PCI9050 PCI to Local Bus Bridge")
 
-ADDRESS_MAP_START(pci9050_device::map)
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(lasrr_r,   lasrr_w  )
-	AM_RANGE(0x10, 0x13) AM_READWRITE(eromrr_r,  eromrr_w )
-	AM_RANGE(0x14, 0x23) AM_READWRITE(lasba_r,   lasba_w  )
-	AM_RANGE(0x24, 0x27) AM_READWRITE(eromba_r,  eromba_w )
-	AM_RANGE(0x28, 0x37) AM_READWRITE(lasbrd_r,  lasbrd_w )
-	AM_RANGE(0x38, 0x3b) AM_READWRITE(erombrd_r, erombrd_w)
-	AM_RANGE(0x3c, 0x4b) AM_READWRITE(csbase_r,  csbase_w )
-	AM_RANGE(0x4c, 0x4f) AM_READWRITE(intcsr_r,  intcsr_w )
-	AM_RANGE(0x50, 0x53) AM_READWRITE(cntrl_r,   cntrl_w  )
-ADDRESS_MAP_END
+void pci9050_device::map(address_map &map)
+{
+	map(0x00, 0x0f).rw(FUNC(pci9050_device::lasrr_r), FUNC(pci9050_device::lasrr_w));
+	map(0x10, 0x13).rw(FUNC(pci9050_device::eromrr_r), FUNC(pci9050_device::eromrr_w));
+	map(0x14, 0x23).rw(FUNC(pci9050_device::lasba_r), FUNC(pci9050_device::lasba_w));
+	map(0x24, 0x27).rw(FUNC(pci9050_device::eromba_r), FUNC(pci9050_device::eromba_w));
+	map(0x28, 0x37).rw(FUNC(pci9050_device::lasbrd_r), FUNC(pci9050_device::lasbrd_w));
+	map(0x38, 0x3b).rw(FUNC(pci9050_device::erombrd_r), FUNC(pci9050_device::erombrd_w));
+	map(0x3c, 0x4b).rw(FUNC(pci9050_device::csbase_r), FUNC(pci9050_device::csbase_w));
+	map(0x4c, 0x4f).rw(FUNC(pci9050_device::intcsr_r), FUNC(pci9050_device::intcsr_w));
+	map(0x50, 0x53).rw(FUNC(pci9050_device::cntrl_r), FUNC(pci9050_device::cntrl_w));
+}
 
 pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, PCI9050, tag, owner, clock),
-	m_user_input_handler(*this), m_user_output_handler(*this)
+	: pci_device(mconfig, PCI9050, tag, owner, clock)
+	, m_user_input_handler(*this), m_user_output_handler(*this)
 {
+	set_ids(0x10b59050, 0x01, 0x06800000, 0x10b59050);
 	for(int i=0; i<4; i++) {
 		m_devices[i] = nullptr;
 		m_names[i] = nullptr;
@@ -79,11 +81,9 @@ void pci9050_device::device_start()
 	save_item(NAME(m_erombrd));
 	save_item(NAME(m_intcsr));
 	save_item(NAME(m_cntrl));
-	machine().save().register_postload(save_prepost_delegate(FUNC(pci9050_device::postload), this));
-
 }
 
-void pci9050_device::postload(void)
+void pci9050_device::device_post_load()
 {
 	remap_rom();
 	for (int id = 0; id < 4; id++)
@@ -175,7 +175,7 @@ READ32_MEMBER (pci9050_device::lasrr_r)
 
 WRITE32_MEMBER(pci9050_device::lasrr_w)
 {
-	logerror("%06X:PCI9050 local bus %d range = %08x: %s flags %d pf %d addr bits 27-4 %08x\n", machine().device("maincpu")->safe_pc(), offset, data, (data & 1) ? "I/O" : "MEM", (data & 6)>>1, (data & 8)>>3, data & 0xfffffff);
+	logerror("%s:PCI9050 local bus %d range = %08x: %s flags %d pf %d addr bits 27-4 %08x\n", machine().describe_context(), offset, data, (data & 1) ? "I/O" : "MEM", (data & 6)>>1, (data & 8)>>3, data & 0xfffffff);
 	m_lasrr[offset] = data;
 	remap_local(offset);
 }
@@ -187,7 +187,7 @@ READ32_MEMBER (pci9050_device::eromrr_r)
 
 WRITE32_MEMBER(pci9050_device::eromrr_w)
 {
-	logerror("%06X:PCI9050 ROM range = %08x: addr bits 27-11 %08x\n", machine().device("maincpu")->safe_pc(), data, data & 0xfffff800);
+	logerror("%s:PCI9050 ROM range = %08x: addr bits 27-11 %08x\n", machine().describe_context(), data, data & 0xfffff800);
 	m_eromrr = data;
 	remap_rom();
 }
@@ -199,7 +199,7 @@ READ32_MEMBER (pci9050_device::lasba_r)
 
 WRITE32_MEMBER(pci9050_device::lasba_w)
 {
-	logerror("%06X:PCI9050 local bus %d base = %08x: enable %d remap %08x\n", machine().device("maincpu")->safe_pc(), offset, data, data&1, data & 0x0ffffffe);
+	logerror("%s:PCI9050 local bus %d base = %08x: enable %d remap %08x\n", machine().describe_context(), offset, data, data&1, data & 0x0ffffffe);
 	m_lasba[offset] = data;
 	remap_local(offset);
 }
@@ -211,7 +211,7 @@ READ32_MEMBER (pci9050_device::eromba_r)
 
 WRITE32_MEMBER(pci9050_device::eromba_w)
 {
-	logerror("%06X:PCI9050 ROM base = %08x: remap %08x\n", machine().device("maincpu")->safe_pc(), data, data & 0x0ffff800);
+	logerror("%s:PCI9050 ROM base = %08x: remap %08x\n", machine().describe_context(), data, data & 0x0ffff800);
 	m_eromba = data;
 	remap_rom();
 }
@@ -223,7 +223,7 @@ READ32_MEMBER (pci9050_device::lasbrd_r)
 
 WRITE32_MEMBER(pci9050_device::lasbrd_w)
 {
-	logerror("%06X:PCI9050 local bus %d descriptors = %08x: burst %d prefetch %d width %d, endian %s, endian mode %d\n", machine().device("maincpu")->safe_pc(), offset, data, data&1, (data >> 5) & 1, (data >> 22) & 3, ((data >> 24) & 1) ? "BE" : "LE", (data >> 25) & 1);
+	logerror("%s:PCI9050 local bus %d descriptors = %08x: burst %d prefetch %d width %d, endian %s, endian mode %d\n", machine().describe_context(), offset, data, data&1, (data >> 5) & 1, (data >> 22) & 3, ((data >> 24) & 1) ? "BE" : "LE", (data >> 25) & 1);
 	m_lasbrd[offset] = data;
 	remap_local(offset);
 }
@@ -235,7 +235,7 @@ READ32_MEMBER (pci9050_device::erombrd_r)
 
 WRITE32_MEMBER(pci9050_device::erombrd_w)
 {
-	logerror("%06X:PCI9050 ROM descriptors = %08x: burst %d prefetch %d bits %d, endian %s, endian mode %d\n", machine().device("maincpu")->safe_pc(), data, data&1, (data >> 5) & 1, (data >> 22) & 3, ((data >> 24) & 1) ? "BE" : "LE", (data >> 25) & 1);
+	logerror("%s:PCI9050 ROM descriptors = %08x: burst %d prefetch %d bits %d, endian %s, endian mode %d\n", machine().describe_context(), data, data&1, (data >> 5) & 1, (data >> 22) & 3, ((data >> 24) & 1) ? "BE" : "LE", (data >> 25) & 1);
 	m_erombrd = data;
 	remap_rom();
 }
@@ -247,20 +247,20 @@ READ32_MEMBER (pci9050_device::csbase_r)
 
 WRITE32_MEMBER(pci9050_device::csbase_w)
 {
-	logerror("%06X:PCI9050 chip select %d base = %08x: enable %d size %08x\n", machine().device("maincpu")->safe_pc(), offset, data, data&1, data&0xfffffffe);
+	logerror("%s:PCI9050 chip select %d base = %08x: enable %d size %08x\n", machine().describe_context(), offset, data, data&1, data&0xfffffffe);
 	m_csbase[offset] = data;
 	remap_local(offset);
 }
 
 READ32_MEMBER (pci9050_device::intcsr_r)
 {
-	logerror("%06X:PCI9050 IRQ CSR read %08x\n", machine().device("maincpu")->safe_pc(), m_intcsr);
+	logerror("%s:PCI9050 IRQ CSR read %08x\n", machine().describe_context(), m_intcsr);
 	return m_intcsr;
 }
 
 WRITE32_MEMBER(pci9050_device::intcsr_w)
 {
-	logerror("%06X:PCI9050 IRQ CSR write %08x\n", machine().device("maincpu")->safe_pc(), data);
+	logerror("%s:PCI9050 IRQ CSR write %08x\n", machine().describe_context(), data);
 	m_intcsr = data;
 	remap_rom();
 }
@@ -275,14 +275,14 @@ READ32_MEMBER (pci9050_device::cntrl_r)
 				m_cntrl = (m_cntrl & ~(1<<(2 + userIndex * 3))) | (((readData>>userIndex)&1) << (2 + userIndex * 3));
 	}
 	if (0)
-		logerror("%06X:PCI9050 CNTRL read = %08x\n", machine().device("maincpu")->safe_pc(), m_cntrl);
+		logerror("%s:PCI9050 CNTRL read = %08x\n", machine().describe_context(), m_cntrl);
 	return m_cntrl;
 }
 
 WRITE32_MEMBER(pci9050_device::cntrl_w)
 {
 	if (0)
-		logerror("%06X:PCI9050 CNTRL write %08x\n", machine().device("maincpu")->safe_pc(), data);
+		logerror("%s:PCI9050 CNTRL write %08x\n", machine().describe_context(), data);
 	uint32_t oldData = m_cntrl;
 	m_cntrl = data;
 	remap_rom();

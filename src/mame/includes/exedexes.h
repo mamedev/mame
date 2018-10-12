@@ -8,6 +8,7 @@
 
 #include "machine/timer.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class exedexes_state : public driver_device
 {
@@ -24,6 +25,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void exedexes(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -60,7 +64,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void exedexes(machine_config &config);
 	void exedexes_map(address_map &map);
 	void sound_map(address_map &map);
 };

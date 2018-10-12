@@ -30,10 +30,10 @@
 //**************************************************************************
 
 #define MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(_write) \
-	devcb = &downcast<pc1512_keyboard_device &>(*device).set_clock_wr_callback(DEVCB_##_write);
+	downcast<pc1512_keyboard_device &>(*device).set_clock_wr_callback(DEVCB_##_write);
 
 #define MCFG_PC1512_KEYBOARD_DATA_CALLBACK(_write) \
-	devcb = &downcast<pc1512_keyboard_device &>(*device).set_data_wr_callback(DEVCB_##_write);
+	downcast<pc1512_keyboard_device &>(*device).set_data_wr_callback(DEVCB_##_write);
 
 
 
@@ -79,6 +79,7 @@ private:
 	required_device<vcs_control_port_device> m_joy;
 
 	required_ioport_array<11> m_y;
+	output_finder<2> m_leds;
 
 	devcb_write_line   m_write_clock;
 	devcb_write_line   m_write_data;

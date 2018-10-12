@@ -40,7 +40,7 @@ public:
 	DECLARE_READ16_MEMBER( spritecode_r16 );
 	DECLARE_WRITE16_MEMBER( spritecode_w16 );
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
 
 	void setac_eof( void );
 	void tnzs_eof( void );
@@ -63,7 +63,7 @@ protected:
 
 private:
 
-	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac_type);
+	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
 	void draw_foreground( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -81,14 +81,14 @@ private:
 	// live state
 	uint8_t m_bgflag;
 	uint8_t m_spritectrl[4];
-	uint8_t m_spriteylow[0x300]; // 0x200 low y + 0x100 bg stuff
-	uint8_t m_spritecodelow[0x2000]; // tnzs.c stuff only uses half?
-	uint8_t m_spritecodehigh[0x2000]; // ^
+	std::unique_ptr<uint8_t[]> m_spriteylow;
+	std::unique_ptr<uint8_t[]> m_spritecodelow; // tnzs.cpp stuff only uses half?
+	std::unique_ptr<uint8_t[]> m_spritecodehigh; // ^
 };
 
 DECLARE_DEVICE_TYPE(SETA001_SPRITE, seta001_device)
 
 #define MCFG_SETA001_SPRITE_GFXDECODE(_gfxtag) \
-	downcast<seta001_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<seta001_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_SETA001_H

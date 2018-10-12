@@ -540,21 +540,36 @@ class taitotz_state : public driver_device
 public:
 	taitotz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_screen(*this, "screen"),
 		m_maincpu(*this, "maincpu"),
 		m_iocpu(*this, "iocpu"),
 		m_work_ram(*this, "work_ram"),
 		m_mbox_ram(*this, "mbox_ram"),
-		m_ata(*this, "ata"),
-		m_screen(*this, "screen")
+		m_ata(*this, "ata")
 	{
 	}
 
+	void taitotz(machine_config &config);
+	void landhigh(machine_config &config);
+
+	void init_batlgr2a();
+	void init_batlgr2();
+	void init_pwrshovl();
+	void init_batlgear();
+	void init_landhigh();
+	void init_landhigha();
+	void init_raizpin();
+	void init_raizpinj();
+	void init_styphp();
+
+	required_device<screen_device> m_screen;
+
+private:
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_iocpu;
 	required_shared_ptr<uint64_t> m_work_ram;
 	required_shared_ptr<uint16_t> m_mbox_ram;
 	required_device<ata_interface_device> m_ata;
-	required_device<screen_device> m_screen;
 
 	DECLARE_READ64_MEMBER(ppc_common_r);
 	DECLARE_WRITE64_MEMBER(ppc_common_w);
@@ -575,7 +590,7 @@ public:
 	uint32_t m_video_reg;
 	uint32_t m_scr_base;
 
-	uint64_t m_video_fifo_mem[4];
+	//uint64_t m_video_fifo_mem[4];
 
 	uint16_t m_io_share_ram[0x2000];
 
@@ -590,18 +605,9 @@ public:
 
 
 	uint32_t m_reg105;
-	int m_count;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
-	DECLARE_DRIVER_INIT(batlgr2a);
-	DECLARE_DRIVER_INIT(batlgr2);
-	DECLARE_DRIVER_INIT(pwrshovl);
-	DECLARE_DRIVER_INIT(batlgear);
-	DECLARE_DRIVER_INIT(landhigh);
-	DECLARE_DRIVER_INIT(landhigha);
-	DECLARE_DRIVER_INIT(raizpin);
-	DECLARE_DRIVER_INIT(raizpinj);
-	DECLARE_DRIVER_INIT(styphp);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -617,8 +623,7 @@ public:
 	void video_reg_w(uint32_t reg, uint32_t data);
 	void init_taitotz_152();
 	void init_taitotz_111a();
-	void taitotz(machine_config &config);
-	void landhigh(machine_config &config);
+
 	void landhigh_tlcs900h_mem(address_map &map);
 	void ppc603e_mem(address_map &map);
 	void tlcs900h_mem(address_map &map);
@@ -2062,15 +2067,16 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 // 0x40000000...0x400fffff: BIOS Work RAM
 // 0x40100000...0x40ffffff: User Work RAM
 
-ADDRESS_MAP_START(taitotz_state::ppc603e_mem)
-	AM_RANGE(0x00000000, 0x0000001f) AM_READWRITE(video_chip_r, video_chip_w)
-	AM_RANGE(0x10000000, 0x1000001f) AM_READWRITE(video_fifo_r, video_fifo_w)
-	AM_RANGE(0x40000000, 0x40ffffff) AM_RAM AM_SHARE("work_ram")                // Work RAM
-	AM_RANGE(0xa4000000, 0xa40000ff) AM_READWRITE(ieee1394_r, ieee1394_w)       // IEEE1394 network
-	AM_RANGE(0xa8000000, 0xa8003fff) AM_READWRITE(ppc_common_r, ppc_common_w)   // Common RAM (with TLCS-900)
-	AM_RANGE(0xac000000, 0xac0fffff) AM_ROM AM_REGION("user1", 0)               // Apparently this should be flash ROM read/write access
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void taitotz_state::ppc603e_mem(address_map &map)
+{
+	map(0x00000000, 0x0000001f).rw(FUNC(taitotz_state::video_chip_r), FUNC(taitotz_state::video_chip_w));
+	map(0x10000000, 0x1000001f).rw(FUNC(taitotz_state::video_fifo_r), FUNC(taitotz_state::video_fifo_w));
+	map(0x40000000, 0x40ffffff).ram().share("work_ram");                // Work RAM
+	map(0xa4000000, 0xa40000ff).rw(FUNC(taitotz_state::ieee1394_r), FUNC(taitotz_state::ieee1394_w));       // IEEE1394 network
+	map(0xa8000000, 0xa8003fff).rw(FUNC(taitotz_state::ppc_common_r), FUNC(taitotz_state::ppc_common_w));   // Common RAM (with TLCS-900)
+	map(0xac000000, 0xac0fffff).rom().region("user1", 0);               // Apparently this should be flash ROM read/write access
+	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 
@@ -2222,27 +2228,29 @@ READ16_MEMBER(taitotz_state::tlcs_ide1_r)
 // 0xfc0d55:    INTRX1          Serial 1 receive
 // 0xfc0ce1:    INTTX1          Serial 1 transmit
 
-ADDRESS_MAP_START(taitotz_state::tlcs900h_mem)
-	AM_RANGE(0x010000, 0x02ffff) AM_RAM                                                     // Work RAM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM AM_SHARE("nvram")                                   // Backup RAM
-	AM_RANGE(0x044000, 0x04400f) AM_READWRITE8(tlcs_rtc_r, tlcs_rtc_w, 0xffff)
-	AM_RANGE(0x060000, 0x061fff) AM_READWRITE8(tlcs_common_r, tlcs_common_w, 0xffff)
-	AM_RANGE(0x064000, 0x064fff) AM_RAM AM_SHARE("mbox_ram")                                // MBox
-	AM_RANGE(0x068000, 0x06800f) AM_DEVWRITE("ata", ata_interface_device, write_cs0) AM_READ(tlcs_ide0_r)
-	AM_RANGE(0x06c000, 0x06c00f) AM_DEVWRITE("ata", ata_interface_device, write_cs1) AM_READ(tlcs_ide1_r)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
-ADDRESS_MAP_END
+void taitotz_state::tlcs900h_mem(address_map &map)
+{
+	map(0x010000, 0x02ffff).ram();                                                     // Work RAM
+	map(0x040000, 0x041fff).ram().share("nvram");                                   // Backup RAM
+	map(0x044000, 0x04400f).rw(FUNC(taitotz_state::tlcs_rtc_r), FUNC(taitotz_state::tlcs_rtc_w));
+	map(0x060000, 0x061fff).rw(FUNC(taitotz_state::tlcs_common_r), FUNC(taitotz_state::tlcs_common_w));
+	map(0x064000, 0x064fff).ram().share("mbox_ram");                                // MBox
+	map(0x068000, 0x06800f).w(m_ata, FUNC(ata_interface_device::cs0_w)).r(FUNC(taitotz_state::tlcs_ide0_r));
+	map(0x06c000, 0x06c00f).w(m_ata, FUNC(ata_interface_device::cs1_w)).r(FUNC(taitotz_state::tlcs_ide1_r));
+	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
+}
 
-ADDRESS_MAP_START(taitotz_state::landhigh_tlcs900h_mem)
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM                                                     // Work RAM
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("nvram")                                   // Backup RAM
-	AM_RANGE(0x404000, 0x40400f) AM_READWRITE8(tlcs_rtc_r, tlcs_rtc_w, 0xffff)
-	AM_RANGE(0x900000, 0x901fff) AM_READWRITE8(tlcs_common_r, tlcs_common_w, 0xffff)
-	AM_RANGE(0x910000, 0x910fff) AM_RAM AM_SHARE("mbox_ram")                                // MBox
-	AM_RANGE(0x908000, 0x90800f) AM_DEVWRITE("ata", ata_interface_device, write_cs0) AM_READ(tlcs_ide0_r)
-	AM_RANGE(0x918000, 0x91800f) AM_DEVWRITE("ata", ata_interface_device, write_cs1) AM_READ(tlcs_ide1_r)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
-ADDRESS_MAP_END
+void taitotz_state::landhigh_tlcs900h_mem(address_map &map)
+{
+	map(0x200000, 0x21ffff).ram();                                                     // Work RAM
+	map(0x400000, 0x401fff).ram().share("nvram");                                   // Backup RAM
+	map(0x404000, 0x40400f).rw(FUNC(taitotz_state::tlcs_rtc_r), FUNC(taitotz_state::tlcs_rtc_w));
+	map(0x900000, 0x901fff).rw(FUNC(taitotz_state::tlcs_common_r), FUNC(taitotz_state::tlcs_common_w));
+	map(0x910000, 0x910fff).ram().share("mbox_ram");                                // MBox
+	map(0x908000, 0x90800f).w(m_ata, FUNC(ata_interface_device::cs0_w)).r(FUNC(taitotz_state::tlcs_ide0_r));
+	map(0x918000, 0x91800f).w(m_ata, FUNC(ata_interface_device::cs1_w)).r(FUNC(taitotz_state::tlcs_ide1_r));
+	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
+}
 
 
 
@@ -2564,12 +2572,12 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 
 MACHINE_CONFIG_START(taitotz_state::taitotz)
 	/* IBM EMPPC603eBG-100 */
-	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
+	MCFG_DEVICE_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
+	MCFG_DEVICE_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */
-	MCFG_CPU_ADD("iocpu", TMP95C063, 25000000)
+	MCFG_DEVICE_ADD("iocpu", TMP95C063, 25000000)
 	MCFG_TMP95C063_PORT9_READ(IOPORT("INPUTS1"))
 	MCFG_TMP95C063_PORTB_READ(IOPORT("INPUTS2"))
 	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS3"))
@@ -2583,17 +2591,17 @@ MACHINE_CONFIG_START(taitotz_state::taitotz)
 	MCFG_TMP95C063_AN6_READ(IOPORT("ANALOG7"))
 	MCFG_TMP95C063_AN7_READ(IOPORT("ANALOG8"))
 
-	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
+	MCFG_DEVICE_PROGRAM_MAP(tlcs900h_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
 
 	/* MN1020819DA sound CPU */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(taitotz_state, ide_interrupt))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
+	ata.irq_handler().set(FUNC(taitotz_state::ide_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -2606,8 +2614,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitotz_state::landhigh)
 	taitotz(config);
-	MCFG_CPU_MODIFY("iocpu")
-	MCFG_CPU_PROGRAM_MAP(landhigh_tlcs900h_mem)
+	MCFG_DEVICE_MODIFY("iocpu")
+	MCFG_DEVICE_PROGRAM_MAP(landhigh_tlcs900h_mem)
 MACHINE_CONFIG_END
 
 
@@ -2653,7 +2661,7 @@ static const char RAIZPINJ_HDD_SERIAL[] =           // "824915745143        "
 static const char STYPHP_HDD_SERIAL[] =             // "            05872160"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x38, 0x37, 0x32, 0x31, 0x36, 0x30 };
 
-DRIVER_INIT_MEMBER(taitotz_state,landhigh)
+void taitotz_state::init_landhigh()
 {
 	init_taitotz_152();
 
@@ -2662,7 +2670,7 @@ DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,landhigha)
+void taitotz_state::init_landhigha()
 {
 	init_taitotz_152();
 
@@ -2671,7 +2679,7 @@ DRIVER_INIT_MEMBER(taitotz_state,landhigha)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,batlgear)
+void taitotz_state::init_batlgear()
 {
 	init_taitotz_111a();
 
@@ -2681,7 +2689,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgear)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
+void taitotz_state::init_batlgr2()
 {
 	init_taitotz_152();
 
@@ -2690,7 +2698,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
 	m_scr_base = 0x1e0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
+void taitotz_state::init_batlgr2a()
 {
 	init_taitotz_152();
 
@@ -2699,7 +2707,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
 	m_scr_base = 0x1e0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
+void taitotz_state::init_pwrshovl()
 {
 	init_taitotz_111a();
 
@@ -2709,7 +2717,7 @@ DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,raizpin)
+void taitotz_state::init_raizpin()
 {
 	init_taitotz_152();
 
@@ -2718,7 +2726,7 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpin)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,raizpinj)
+void taitotz_state::init_raizpinj()
 {
 	init_taitotz_152();
 
@@ -2727,7 +2735,7 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpinj)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,styphp)
+void taitotz_state::init_styphp()
 {
 	init_taitotz_152();
 
@@ -2906,7 +2914,7 @@ ROM_START( pwrshovla )
 	ROM_LOAD( "e74-08.ic8", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "POWER SHOVEL VER.2.07J", 0, SHA1(05410d4b4972262ef93400b02f21dd17d10b1c5e) )
+	DISK_IMAGE( "power shovel ver.2.07j", 0, SHA1(05410d4b4972262ef93400b02f21dd17d10b1c5e) )
 ROM_END
 
 ROM_START( raizpin )
@@ -2936,7 +2944,7 @@ ROM_START( raizpinj )
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "RAIZIN PING PONG VER 2.01J", 0, SHA1(eddc803c2507d19f0a3e3cc217bb22a565c04f3e) )
+	DISK_IMAGE( "raizin ping pong ver 2.01j", 0, SHA1(eddc803c2507d19f0a3e3cc217bb22a565c04f3e) )
 ROM_END
 
 ROM_START( styphp )
@@ -2954,14 +2962,14 @@ ROM_START( styphp )
 	DISK_IMAGE( "styphp", 0, SHA1(c232d3460e37523346132544b8e23a5f9b447150) )
 ROM_END
 
-GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, 0,        ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT)
-GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, landhigha,ROT0, "Taito", "Landing High Japan (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
-GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
-GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2000, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, styphp,   ROT0, "Taito", "Stunt Typhoon Plus (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, raizpin,   taitotz,  taitotz,  taitotz,  taitotz_state, raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, raizpinj,  raizpin,  taitotz,  taitotz,  taitotz_state, raizpinj, ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, empty_init,    ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT)
+GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, init_landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, init_landhigha,ROT0, "Taito", "Landing High Japan (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
+GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
+GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, init_styphp,   ROT0, "Taito", "Stunt Typhoon Plus (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, raizpin,   taitotz,  taitotz,  taitotz,  taitotz_state, init_raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, raizpinj,  raizpin,  taitotz,  taitotz,  taitotz_state, init_raizpinj, ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

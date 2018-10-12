@@ -264,20 +264,21 @@ READ8_MEMBER(airbustr_state::devram_r)
 
 WRITE8_MEMBER(airbustr_state::master_nmi_trigger_w)
 {
-	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(airbustr_state::master_bankswitch_w)
 {
-	membank("masterbank")->set_entry(data & 0x07);
+	m_masterbank->set_entry(data & 0x07);
 }
 
 WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 {
-	membank("slavebank")->set_entry(data & 0x07);
+	m_slavebank->set_entry(data & 0x07);
 
-	m_bg_tilemap->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	m_fg_tilemap->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	for (int layer = 0; layer < 2; layer++)
+		m_tilemap[layer]->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+
 	m_pandora->flip_screen_set(BIT(data, 4));
 
 	// used at the end of levels, after defeating the boss, to leave trails
@@ -286,15 +287,29 @@ WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 
 WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
 {
-	membank("audiobank")->set_entry(data & 0x07);
+	m_audiobank->set_entry(data & 0x07);
 }
 
 READ8_MEMBER(airbustr_state::soundcommand_status_r)
 {
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
-	return 4 | (m_soundlatch->pending_r() << 1) | !m_soundlatch2->pending_r();
+	return 4 | (m_soundlatch[0]->pending_r() << 1) | !m_soundlatch[1]->pending_r();
 }
 
+
+template<int Layer>
+WRITE8_MEMBER(airbustr_state::videoram_w)
+{
+	m_videoram[Layer][offset] = data;
+	m_tilemap[Layer]->mark_tile_dirty(offset);
+}
+
+template<int Layer>
+WRITE8_MEMBER(airbustr_state::colorram_w)
+{
+	m_colorram[Layer][offset] = data;
+	m_tilemap[Layer]->mark_tile_dirty(offset);
+}
 
 WRITE8_MEMBER(airbustr_state::coin_counter_w)
 {
@@ -305,61 +320,67 @@ WRITE8_MEMBER(airbustr_state::coin_counter_w)
 }
 
 /* Memory Maps */
-ADDRESS_MAP_START(airbustr_state::master_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("masterbank")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("devram") // shared with protection device
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void airbustr_state::master_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("masterbank");
+	map(0xc000, 0xcfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().share("devram"); // shared with protection device
+	map(0xf000, 0xffff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(airbustr_state::master_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_WRITENOP // ???
-	AM_RANGE(0x02, 0x02) AM_WRITE(master_nmi_trigger_w)
-ADDRESS_MAP_END
+void airbustr_state::master_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(airbustr_state::master_bankswitch_w));
+	map(0x01, 0x01).nopw(); // ???
+	map(0x02, 0x02).w(FUNC(airbustr_state::master_nmi_trigger_w));
+}
 
-ADDRESS_MAP_START(airbustr_state::slave_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("slavebank")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xd5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xd600, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void airbustr_state::slave_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("slavebank");
+	map(0xc000, 0xc3ff).ram().w(FUNC(airbustr_state::videoram_w<1>)).share("videoram2");
+	map(0xc400, 0xc7ff).ram().w(FUNC(airbustr_state::colorram_w<1>)).share("colorram2");
+	map(0xc800, 0xcbff).ram().w(FUNC(airbustr_state::videoram_w<0>)).share("videoram1");
+	map(0xcc00, 0xcfff).ram().w(FUNC(airbustr_state::colorram_w<0>)).share("colorram1");
+	map(0xd000, 0xd5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd600, 0xdfff).ram();
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xffff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(airbustr_state::slave_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x04, 0x0c) AM_WRITE(scrollregs_w)
-	AM_RANGE(0x0e, 0x0e) AM_READ(soundcommand_status_r)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
-	AM_RANGE(0x22, 0x22) AM_READ_PORT("P2")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x28, 0x28) AM_WRITE(coin_counter_w)
-	AM_RANGE(0x38, 0x38) AM_WRITENOP // irq ack / irq mask
-ADDRESS_MAP_END
+void airbustr_state::slave_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(airbustr_state::slave_bankswitch_w));
+	map(0x02, 0x02).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0x04, 0x0c).w(FUNC(airbustr_state::scrollregs_w));
+	map(0x0e, 0x0e).r(FUNC(airbustr_state::soundcommand_status_r));
+	map(0x20, 0x20).portr("P1");
+	map(0x22, 0x22).portr("P2");
+	map(0x24, 0x24).portr("SYSTEM");
+	map(0x28, 0x28).w(FUNC(airbustr_state::coin_counter_w));
+	map(0x38, 0x38).nopw(); // irq ack / irq mask
+}
 
-ADDRESS_MAP_START(airbustr_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-ADDRESS_MAP_END
+void airbustr_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0xc000, 0xdfff).ram();
+}
 
-ADDRESS_MAP_START(airbustr_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void airbustr_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(airbustr_state::sound_bankswitch_w));
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x04, 0x04).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x06, 0x06).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
+}
 
 /* Input Ports */
 
@@ -490,7 +511,7 @@ static const gfx_layout sprite_gfxlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( airbustr )
+static GFXDECODE_START( gfx_airbustr )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_gfxlayout,   0, 32 ) // tiles
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_gfxlayout, 512, 16 ) // sprites
 GFXDECODE_END
@@ -521,23 +542,21 @@ INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
 
 void airbustr_state::machine_start()
 {
-	membank("masterbank")->configure_entries(0, 8, memregion("master")->base(), 0x4000);
-	membank("slavebank")->configure_entries(0, 8, memregion("slave")->base(), 0x4000);
-	membank("audiobank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	m_masterbank->configure_entries(0, 8, memregion("master")->base(), 0x4000);
+	m_slavebank->configure_entries(0, 8, memregion("slave")->base(), 0x4000);
+	m_audiobank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
-	save_item(NAME(m_bg_scrollx));
-	save_item(NAME(m_bg_scrolly));
-	save_item(NAME(m_fg_scrollx));
-	save_item(NAME(m_fg_scrolly));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
 	save_item(NAME(m_highbits));
 }
 
 void airbustr_state::machine_reset()
 {
-	m_bg_scrollx = 0;
-	m_bg_scrolly = 0;
-	m_fg_scrollx = 0;
-	m_fg_scrolly = 0;
+	m_scrollx[0] = 0;
+	m_scrolly[0] = 0;
+	m_scrollx[1] = 0;
+	m_scrolly[1] = 0;
 	m_highbits = 0;
 }
 
@@ -546,26 +565,25 @@ void airbustr_state::machine_reset()
 MACHINE_CONFIG_START(airbustr_state::airbustr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", Z80, XTAL(12'000'000)/2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_IO_MAP(master_io_map)
+	MCFG_DEVICE_ADD("master", Z80, XTAL(12'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_IO_MAP(master_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airbustr_state, airbustr_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", Z80, XTAL(12'000'000)/2)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_IO_MAP(slave_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  slave_interrupt) /* nmi signal from master cpu */
+	MCFG_DEVICE_ADD("slave", Z80, XTAL(12'000'000)/2)    /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_IO_MAP(slave_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", airbustr_state,  slave_interrupt) /* nmi signal from master cpu */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  irq0_line_hold)       // nmi are caused by sub cpu writing a sound command
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", airbustr_state,  irq0_line_hold)       // nmi are caused by sub cpu writing a sound command
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -574,10 +592,10 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(airbustr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(airbustr_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, airbustr_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", airbustr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_airbustr)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -586,14 +604,14 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)   /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)   /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))       // DSW-1 connected to port A
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))       // DSW-2 connected to port B
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -601,15 +619,15 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/4, PIN7_LOW)   /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/4, okim6295_device::PIN7_LOW)   /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(airbustr_state::airbustrb)
+void airbustr_state::airbustrb(machine_config &config)
+{
 	airbustr(config);
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0)) // no protection device or watchdog
-MACHINE_CONFIG_END
+	m_watchdog->set_time(attotime::from_seconds(0)); // no protection device or watchdog
+}
 
 
 /* ROMs */
@@ -709,7 +727,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(airbustr_state,airbustr)
+void airbustr_state::init_airbustr()
 {
 	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
 }
@@ -717,6 +735,6 @@ DRIVER_INIT_MEMBER(airbustr_state,airbustr)
 
 /* Game Drivers */
 
-GAME( 1990, airbustr,   0,        airbustr, airbustr,  airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)",   MACHINE_SUPPORTS_SAVE ) // 891220
-GAME( 1990, airbustrj,  airbustr, airbustr, airbustrj, airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)",   MACHINE_SUPPORTS_SAVE ) // 891229
-GAME( 1990, airbustrb,  airbustr, airbustrb,airbustrj, airbustr_state, 0,        ROT0, "bootleg",                "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE ) // based on Japan set (891229)
+GAME( 1990, airbustr,  0,        airbustr,  airbustr,  airbustr_state, init_airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)",   MACHINE_SUPPORTS_SAVE ) // 891220
+GAME( 1990, airbustrj, airbustr, airbustr,  airbustrj, airbustr_state, init_airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)",   MACHINE_SUPPORTS_SAVE ) // 891229
+GAME( 1990, airbustrb, airbustr, airbustrb, airbustrj, airbustr_state, empty_init,    ROT0, "bootleg",                "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE ) // based on Japan set (891229)

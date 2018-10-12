@@ -391,11 +391,11 @@ void namco_51xx_device::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(namco_51xx_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-//  MCFG_MB88XX_READ_K_CB(READ8(namco_51xx_device, namco_51xx_K_r))
-//  MCFG_MB88XX_WRITE_O_CB(WRITE8(namco_51xx_device, namco_51xx_O_w))
-//  MCFG_MB88XX_READ_R0_CB(READ8(namco_51xx_device, namco_51xx_R0_r))
-//  MCFG_MB88XX_READ_R2_CB(READ8(namco_51xx_device, namco_51xx_R2_r))
+	MCFG_DEVICE_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
+//  MCFG_MB88XX_READ_K_CB(READ8(*this, namco_51xx_device, namco_51xx_K_r))
+//  MCFG_MB88XX_WRITE_O_CB(WRITE8(*this, namco_51xx_device, namco_51xx_O_w))
+//  MCFG_MB88XX_READ_R0_CB(READ8(*this, namco_51xx_device, namco_51xx_R0_r))
+//  MCFG_MB88XX_READ_R2_CB(READ8(*this, namco_51xx_device, namco_51xx_R2_r))
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 

@@ -18,6 +18,7 @@ the Deal 'Em board design, rather than the one they ultimately used, suggesting 
 
 #include "video/resnet.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -32,13 +33,15 @@ public:
 	{
 	}
 
+	void dealem(machine_config &config);
+
+private:
 	optional_shared_ptr<uint8_t> m_dealem_videoram;
 	DECLARE_MACHINE_RESET(dealem_vid);
 	DECLARE_PALETTE_INIT(dealem);
 	uint32_t screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
 	required_device<gfxdecode_device> m_gfxdecode;
-	void dealem(machine_config &config);
 	void dealem_memmap(address_map &map);
 };
 
@@ -56,7 +59,7 @@ static const gfx_layout dealemcharlayout =
 };
 
 
-static GFXDECODE_START( dealem )
+static GFXDECODE_START( gfx_dealem )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dealemcharlayout, 0, 32 )
 GFXDECODE_END
 
@@ -153,26 +156,27 @@ WRITE_LINE_MEMBER(mpu4dealem_state::dealem_vsync_changed)
  *
  *************************************/
 
-ADDRESS_MAP_START(mpu4dealem_state::dealem_memmap)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+void mpu4dealem_state::dealem_memmap(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
 /*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
+	map(0x0900, 0x0907).rw(m_6840ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));/* PTM6840 IC2 */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)        /* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)        /* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)        /* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)        /* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)        /* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)        /* PIA6821 IC8 */
+	map(0x0a00, 0x0a03).rw(m_pia3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC3 */
+	map(0x0b00, 0x0b03).rw(m_pia4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC4 */
+	map(0x0c00, 0x0c03).rw(m_pia5, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC5 */
+	map(0x0d00, 0x0d03).rw(m_pia6, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC6 */
+	map(0x0e00, 0x0e03).rw(m_pia7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC7 */
+	map(0x0f00, 0x0f03).rw(m_pia8, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC8 */
 
-	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_SHARE("dealem_videoram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITENOP/* 64k  paged ROM (4 pages) */
-ADDRESS_MAP_END
+	map(0x1000, 0x2fff).ram().share("dealem_videoram");
+	map(0x8000, 0xffff).rom().nopw();/* 64k  paged ROM (4 pages) */
+}
 
 MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
 {
@@ -200,18 +204,18 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_MACHINE_START_OVERRIDE(mpu4dealem_state,mod2)                          /* main mpu4 board initialisation */
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4dealem_state,dealem_vid)
 
-	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(dealem_memmap)
+	MCFG_DEVICE_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(dealem_memmap)
 
 	mpu4_common(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(820, 0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -221,7 +225,7 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dealem)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dealem)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(mpu4dealem_state,dealem)
@@ -229,7 +233,7 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", MPU4_MASTER_CLOCK / 4 / 8) /* HD68B45 */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mpu4dealem_state, dealem_vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mpu4dealem_state, dealem_vsync_changed))
 MACHINE_CONFIG_END
 
 
@@ -349,10 +353,10 @@ static INPUT_PORTS_START( dealem )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,EQUALS,0x00)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,EQUALS,0x01)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,EQUALS,0x02)
@@ -382,4 +386,4 @@ and reel assembly with this kit and a supplied monitor. This explains why the ca
 The original Deal 'Em ran on Summit Coin hardware, and was made by someone else.
 Two further different releases were made, running on the Barcrest MPU4 Video, rather than this one. These are Deal 'Em Again and Deal 'Em 2000*/
 
-GAME(  1987,v4dealem,   0,          dealem,     dealem, mpu4dealem_state,      0,          ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)",MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, v4dealem, 0, dealem, dealem, mpu4dealem_state, empty_init, ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)",MACHINE_IMPERFECT_GRAPHICS )

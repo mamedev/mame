@@ -31,15 +31,22 @@ public:
 	z80dev_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void z80dev(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER( display_w );
 	DECLARE_READ8_MEMBER( test_r );
-	void z80dev(machine_config &config);
+
+	virtual void machine_start() override;
+
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
+	output_finder<6> m_digits;
 };
 
 WRITE8_MEMBER( z80dev_state::display_w )
@@ -48,7 +55,7 @@ WRITE8_MEMBER( z80dev_state::display_w )
 	// xxxx ---- ???
 	static const uint8_t hex_7seg[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71};
 
-	output().set_digit_value(offset, hex_7seg[data&0x0f]);
+	m_digits[offset] = hex_7seg[data & 0x0f];
 }
 
 READ8_MEMBER( z80dev_state::test_r )
@@ -56,23 +63,30 @@ READ8_MEMBER( z80dev_state::test_r )
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(z80dev_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1000, 0x10ff) AM_RAM
-ADDRESS_MAP_END
+void z80dev_state::machine_start()
+{
+	m_digits.resolve();
+}
 
-ADDRESS_MAP_START(z80dev_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK (0xff)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("LINE0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("LINE1")
-	AM_RANGE(0x22, 0x22) AM_READ_PORT("LINE2")
-	AM_RANGE(0x23, 0x23) AM_READ_PORT("LINE3")
-	AM_RANGE(0x20, 0x25) AM_WRITE(display_w)
+void z80dev_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x1000, 0x10ff).ram();
+}
 
-	AM_RANGE(0x13, 0x13) AM_READ(test_r)
-ADDRESS_MAP_END
+void z80dev_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x20, 0x20).portr("LINE0");
+	map(0x21, 0x21).portr("LINE1");
+	map(0x22, 0x22).portr("LINE2");
+	map(0x23, 0x23).portr("LINE3");
+	map(0x20, 0x25).w(FUNC(z80dev_state::display_w));
+
+	map(0x13, 0x13).r(FUNC(z80dev_state::test_r));
+}
 
 /* Input ports */
 INPUT_PORTS_START( z80dev )
@@ -111,12 +125,12 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(z80dev_state::z80dev)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_z80dev)
+	config.set_default_layout(layout_z80dev);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -127,5 +141,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY      FULLNAME         FLAGS */
-COMP( 198?, z80dev, 0,      0,       z80dev,    z80dev, z80dev_state,  0,    "<unknown>", "Z80 dev board", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME         FLAGS */
+COMP( 198?, z80dev, 0,      0,      z80dev,  z80dev, z80dev_state, empty_init, "<unknown>", "Z80 dev board", MACHINE_NO_SOUND_HW)

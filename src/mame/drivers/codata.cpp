@@ -34,18 +34,19 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(codata_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x200000, 0x203fff) AM_ROM AM_REGION("user1", 0);
-	AM_RANGE(0x400000, 0x403fff) AM_ROM AM_REGION("user1", 0x4000);
-	AM_RANGE(0x600000, 0x600007) AM_MIRROR(0x1ffff8) AM_DEVREADWRITE8("uart", upd7201_new_device, ba_cd_r, ba_cd_w, 0xff00)
-	AM_RANGE(0x800000, 0x800003) AM_MIRROR(0x1ffffc) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
-	AM_RANGE(0xe00000, 0xe00001) AM_MIRROR(0x1ffffe) AM_READ_PORT("INPUT")
+void codata_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).ram().share("rambase");
+	map(0x200000, 0x203fff).rom().region("user1", 0);
+	map(0x400000, 0x403fff).rom().region("user1", 0x4000);
+	map(0x600000, 0x600007).mirror(0x1ffff8).rw("uart", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0xff00);
+	map(0x800000, 0x800003).mirror(0x1ffffc).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+	map(0xe00000, 0xe00001).mirror(0x1ffffe).portr("INPUT");
 	//AM_RANGE(0xa00000, 0xbfffff) page map (rw)
 	//AM_RANGE(0xc00000, 0xdfffff) segment map (rw), context register (r)
 	//AM_RANGE(0xe00000, 0xffffff) context register (w), 16-bit parallel input port (r)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( codata )
@@ -63,32 +64,32 @@ void codata_state::machine_reset()
 
 MACHINE_CONFIG_START(codata_state::codata)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("uart", UPD7201_NEW, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs423a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs423a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs423a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs423b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
+	upd7201_new_device& uart(UPD7201_NEW(config, "uart", 16_MHz_XTAL / 4));
+	uart.out_txda_callback().set("rs423a", FUNC(rs232_port_device::write_txd));
+	uart.out_dtra_callback().set("rs423a", FUNC(rs232_port_device::write_dtr));
+	uart.out_rtsa_callback().set("rs423a", FUNC(rs232_port_device::write_rts));
+	uart.out_txdb_callback().set("rs423b", FUNC(rs232_port_device::write_txd));
+	uart.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 
-	MCFG_DEVICE_ADD("timer", AM9513A, XTAL(16'000'000) / 4)
-	MCFG_AM9513_OUT1_CALLBACK(NOOP) // Timer 1 = "Abort/Reset" (watchdog)
-	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6)) // Timer 2
-	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7)) // Refresh
-	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("uart", upd7201_new_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", upd7201_new_device, txca_w))
-	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("uart", upd7201_new_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", upd7201_new_device, txcb_w))
+	am9513_device &timer(AM9513A(config, "timer", 16_MHz_XTAL / 4));
+	timer.out1_cb().set_nop(); // Timer 1 = "Abort/Reset" (watchdog)
+	timer.out2_cb().set_inputline(m_maincpu, M68K_IRQ_6); // Timer 2
+	timer.out3_cb().set_inputline(m_maincpu, M68K_IRQ_7); // Refresh
+	timer.out4_cb().set("uart", FUNC(upd7201_new_device::rxca_w));
+	timer.out4_cb().append("uart", FUNC(upd7201_new_device::txca_w));
+	timer.out5_cb().set("uart", FUNC(upd7201_new_device::rxcb_w));
+	timer.out5_cb().append("uart", FUNC(upd7201_new_device::txcb_w));
 
-	MCFG_RS232_PORT_ADD("rs423a", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", upd7201_new_device, rxa_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", upd7201_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", upd7201_new_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs423a", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", upd7201_new_device, rxa_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", upd7201_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", upd7201_new_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD("rs423b", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", upd7201_new_device, rxb_w))
+	MCFG_DEVICE_ADD("rs423b", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", upd7201_new_device, rxb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -107,5 +108,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY                      FULLNAME  FLAGS
-COMP( 1982, codata, 0,      0,      codata,  codata, codata_state, 0,    "Contel Codata Corporation", "Codata", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                      FULLNAME  FLAGS
+COMP( 1982, codata, 0,      0,      codata,  codata, codata_state, empty_init, "Contel Codata Corporation", "Codata", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

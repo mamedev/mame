@@ -195,16 +195,16 @@ static const uint8_t fcmp_cr_table_source[32] =
 };
 
 
-DEFINE_DEVICE_TYPE(PPC601,    ppc601_device,    "ppc601",     "PowerPC 601")
-DEFINE_DEVICE_TYPE(PPC602,    ppc602_device,    "ppc602",     "PowerPC 602")
-DEFINE_DEVICE_TYPE(PPC603,    ppc603_device,    "ppc603",     "PowerPC 603")
-DEFINE_DEVICE_TYPE(PPC603E,   ppc603e_device,   "ppc603e",    "PowerPC 603E")
-DEFINE_DEVICE_TYPE(PPC603R,   ppc603r_device,   "ppc603r",    "PowerPC 603R")
-DEFINE_DEVICE_TYPE(PPC604,    ppc604_device,    "ppc604",     "PowerPC 604")
-DEFINE_DEVICE_TYPE(MPC8240,   mpc8240_device,   "mpc8240",    "PowerPC MPC8240")
-DEFINE_DEVICE_TYPE(PPC403GA,  ppc403ga_device,  "ppc403ga",   "PowerPC 403GA")
-DEFINE_DEVICE_TYPE(PPC403GCX, ppc403gcx_device, "ppc403gcx",  "PowerPC 403GCX")
-DEFINE_DEVICE_TYPE(PPC405GP,  ppc405gp_device,  "ppc405gp",   "PowerPC 405GP")
+DEFINE_DEVICE_TYPE(PPC601,    ppc601_device,    "ppc601",     "IBM PowerPC 601")
+DEFINE_DEVICE_TYPE(PPC602,    ppc602_device,    "ppc602",     "IBM PowerPC 602")
+DEFINE_DEVICE_TYPE(PPC603,    ppc603_device,    "ppc603",     "IBM PowerPC 603")
+DEFINE_DEVICE_TYPE(PPC603E,   ppc603e_device,   "ppc603e",    "IBM PowerPC 603E")
+DEFINE_DEVICE_TYPE(PPC603R,   ppc603r_device,   "ppc603r",    "IBM PowerPC 603R")
+DEFINE_DEVICE_TYPE(PPC604,    ppc604_device,    "ppc604",     "IBM PowerPC 604")
+DEFINE_DEVICE_TYPE(MPC8240,   mpc8240_device,   "mpc8240",    "IBM PowerPC MPC8240")
+DEFINE_DEVICE_TYPE(PPC403GA,  ppc403ga_device,  "ppc403ga",   "IBM PowerPC 403GA")
+DEFINE_DEVICE_TYPE(PPC403GCX, ppc403gcx_device, "ppc403gcx",  "IBM PowerPC 403GCX")
+DEFINE_DEVICE_TYPE(PPC405GP,  ppc405gp_device,  "ppc405gp",   "IBM PowerPC 405GP")
 
 
 ppc_device::ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map)
@@ -229,6 +229,10 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	set_vtlb_dynamic_entries(POWERPC_TLB_ENTRIES);
 	if (m_cap & PPCCAP_603_MMU)
 		set_vtlb_fixed_entries(PPC603_FIXED_TLB_ENTRIES);
+}
+
+ppc_device::~ppc_device()
+{
 }
 
 //ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -276,9 +280,10 @@ ppc604_device::ppc604_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-ADDRESS_MAP_START(ppc4xx_device::internal_ppc4xx)
-	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE8(ppc4xx_spu_r, ppc4xx_spu_w, 0xffffffff)
-ADDRESS_MAP_END
+void ppc4xx_device::internal_ppc4xx(address_map &map)
+{
+	map(0x40000000, 0x4000000f).rw(FUNC(ppc4xx_device::ppc4xx_spu_r), FUNC(ppc4xx_device::ppc4xx_spu_w));
+}
 
 ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor)
 	: ppc_device(mconfig, type, tag, owner, clock, 31, 32, flavor, cap, tb_divisor, address_map_constructor(FUNC(ppc4xx_device::internal_ppc4xx), this))
@@ -693,7 +698,6 @@ void ppc_device::device_start()
 	m_pit_reload = 0;
 	m_irqstate = 0;
 	memset(m_buffered_dma_rate, 0, sizeof(m_buffered_dma_rate));
-	m_codexor = 0;
 	m_system_clock = 0;
 	m_cpu_clock = 0;
 	m_tb_zero_cycles = 0;
@@ -710,15 +714,36 @@ void ppc_device::device_start()
 	m_cache_line_size = 32;
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if(m_cap & PPCCAP_4XX)
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
+	else
+	{
+		auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		if(space_config()->m_endianness != ENDIANNESS_NATIVE)
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u32 *ptr = static_cast<u32 *>(cache->read_ptr(address & ~7));
+				if(!(address & 4))
+					ptr++;
+				return ptr;
+			};
+		else
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u32 *ptr = static_cast<u32 *>(cache->read_ptr(address & ~7));
+				if(address & 4)
+					ptr++;
+				return ptr;
+			};
+	}
 	m_system_clock = c_bus_frequency != 0 ? c_bus_frequency : clock();
 	m_dcr_read_func = read32_delegate();
 	m_dcr_write_func = write32_delegate();
 
 	m_tb_divisor = (m_tb_divisor * clock() + m_system_clock / 2 - 1) / m_system_clock;
-	m_codexor = 0;
-	if (!(m_cap & PPCCAP_4XX) && space_config()->m_endianness != ENDIANNESS_NATIVE)
-		m_codexor = 4;
 
 	/* allocate a timer for the compare interrupt */
 	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor))
@@ -814,7 +839,7 @@ void ppc_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_core->r[31]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow().formatstr("%1s");
 
-	m_icountptr = &m_core->icount;
+	set_icountptr(m_core->icount);
 
 	uint32_t flags = 0;
 	/* initialize the UML generator */
@@ -864,7 +889,7 @@ void ppc_device::device_start()
 	m_drcuml->symbol_add(&m_fcmp_cr_table, sizeof(m_fcmp_cr_table), "fcmp_cr_table");
 
 	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<ppc_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+	m_drcfe = std::make_unique<frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* compute the register parameters */
 	for (int regnum = 0; regnum < 32; regnum++)
@@ -1165,9 +1190,9 @@ void ppc_device::device_reset()
     CPU
 -------------------------------------------------*/
 
-util::disasm_interface *ppc_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ppc_device::create_disassembler()
 {
-	return new powerpc_disassembler;
+	return std::make_unique<powerpc_disassembler>();
 }
 
 

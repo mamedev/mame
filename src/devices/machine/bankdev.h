@@ -6,31 +6,36 @@
 #pragma once
 
 
-#define MCFG_ADDRESS_MAP_BANK_ENDIANNESS(_endianness) \
-	downcast<address_map_bank_device &>(*device).set_endianness(_endianness);
-
-#define MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(_data_width) \
-	downcast<address_map_bank_device &>(*device).set_data_width(_data_width);
-
-#define MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(_addr_width) \
-	downcast<address_map_bank_device &>(*device).set_addr_width(_addr_width);
-
-#define MCFG_ADDRESS_MAP_BANK_STRIDE(_stride) \
-	downcast<address_map_bank_device &>(*device).set_stride(_stride);
-
 class address_map_bank_device :
 	public device_t,
 	public device_memory_interface
 {
 public:
 	// construction/destruction
-	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration helpers
-	void set_endianness(endianness_t endianness) { m_endianness = endianness; }
-	void set_data_width(uint8_t data_width) { m_data_width = data_width; }
-	void set_addr_width(uint8_t addr_width) { m_addr_width = addr_width; }
-	void set_stride(uint32_t stride) { m_stride = stride; }
+	template <typename... T> address_map_bank_device& set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
+	address_map_bank_device& set_endianness(endianness_t endianness) { m_endianness = endianness; return *this; }
+	address_map_bank_device& set_data_width(uint8_t data_width) { m_data_width = data_width; return *this; }
+	address_map_bank_device& set_addr_width(uint8_t addr_width) { m_addr_width = addr_width; return *this; }
+	address_map_bank_device& set_stride(uint32_t stride) { m_stride = stride; return *this; }
+	address_map_bank_device& set_shift(uint32_t shift) { m_shift = shift; return *this; }
+	address_map_bank_device& set_options(endianness_t endianness, uint8_t data_width, uint8_t addr_width, uint32_t stride = 1)
+	{
+		set_endianness(endianness);
+		set_data_width(data_width);
+		set_addr_width(addr_width);
+		set_stride(stride);
+		return *this;
+	}
+
+	template <typename... T> address_map_bank_device& map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
+	address_map_bank_device& endianness(endianness_t endianness) { m_endianness = endianness; return *this; }
+	address_map_bank_device& data_width(uint8_t data_width) { m_data_width = data_width; return *this; }
+	address_map_bank_device& addr_width(uint8_t addr_width) { m_addr_width = addr_width; return *this; }
+	address_map_bank_device& stride(uint32_t stride) { m_stride = stride; return *this; }
+	address_map_bank_device& shift(uint32_t shift) { m_shift = shift; return *this; }
 
 	void amap8(address_map &map);
 	void amap16(address_map &map);
@@ -65,6 +70,7 @@ private:
 	address_space_config m_program_config;
 	address_space *m_program;
 	offs_t m_offset;
+	int m_shift;
 };
 
 

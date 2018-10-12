@@ -116,6 +116,6 @@ DECLARE_DEVICE_TYPE(COMPUCOLOR_FLOPPY,      compucolor_floppy_device)
 
 
 // slot devices
-SLOT_INTERFACE_EXTERN( compucolor_floppy_port_devices );
+void compucolor_floppy_port_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_COMPUCOLOR_FLOPPY_H

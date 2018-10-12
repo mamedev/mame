@@ -41,7 +41,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_l
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
+		logerror( "%s %s", machine.describe_context(), buf );
 	}
 }
 #endif
@@ -97,7 +97,7 @@ void newport_video_device::device_start()
 {
 	m_base = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
 
-	save_pointer(NAME(m_base.get()), (1280+64) * (1024+64));
+	save_pointer(NAME(m_base), (1280+64) * (1024+64));
 	save_item(NAME(m_VC2.nRegister));
 	save_item(NAME(m_VC2.nRAM));
 	save_item(NAME(m_VC2.nRegIdx));
@@ -200,9 +200,42 @@ void newport_video_device::device_reset()
 	m_REX3.nKludge_SkipLine = 0;
 }
 
+uint32_t newport_video_device::get_cursor_pixel(int x, int y)
+{
+	if (x < 0 || y < 0)
+		return 0;
+
+	bool monochrome_cursor = BIT(VC2_DISPLAYCTRL, DCR_CURSOR_SIZE_BIT) == DCR_CURSOR_SIZE_64;
+
+	int size = monochrome_cursor ? 64 : 32;
+	if (x >= size || y >= size)
+		return 0;
+
+	const int shift = 15 - (x % 16);
+
+	if (monochrome_cursor)
+	{
+		const int address = y * 4 + (x / 16);
+		const uint16_t word = m_VC2.nRAM[VC2_CURENTRY + address];
+		const uint16_t entry = BIT(word, shift);
+		return m_CMAP0.nPalette[entry];
+	}
+	else
+	{
+		const int address = y * 2 + (x / 16);
+		const uint16_t word0 = m_VC2.nRAM[VC2_CURENTRY + address];
+		const uint16_t word1 = m_VC2.nRAM[VC2_CURENTRY + address + 64];
+		const uint16_t entry = BIT(word0, shift) | (BIT(word1, shift) << 1);
+		return m_CMAP0.nPalette[entry];
+	}
+}
 
 uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	bool enable_cursor = BIT(VC2_DISPLAYCTRL, DCR_CURSOR_FUNC_ENABLE_BIT) != 0
+					  && BIT(VC2_DISPLAYCTRL, DCR_CURSOR_ENABLE_BIT) != 0
+					  && BIT(VC2_DISPLAYCTRL, DCR_CURSOR_MODE_BIT) == DCR_CURSOR_MODE_GLYPH;
+
 	/* loop over rows and copy to the destination */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -212,7 +245,14 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 		/* loop over columns */
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
-			*dest++ = (*src++) & 0x00f8f8f8;
+			uint32_t ram_pixel = (*src) & 0x00f8f8f8;
+			uint32_t cursor_pixel = 0;
+			if (x >= (VC2_CURSORX - 31) && x <= VC2_CURSORX && y >= (VC2_CURSORY - 31) && y <= VC2_CURSORY && enable_cursor)
+			{
+				cursor_pixel = get_cursor_pixel(x - ((int)VC2_CURSORX - 31), y - ((int)VC2_CURSORY - 31));
+			}
+			*dest++ = cursor_pixel ? cursor_pixel : ram_pixel;
+			src++;
 		}
 	}
 	return 0;
@@ -505,67 +545,68 @@ WRITE32_MEMBER( newport_video_device::vc2_w )
 			//verboselog(machine(), 2, "VC2 Register Setup:\n" );
 			m_VC2.nRegIdx = ( data & 0xff000000 ) >> 24;
 			m_VC2.nRegData = ( data & 0x00ffff00 ) >> 8;
-		switch( m_VC2.nRegIdx )
-		{
-		case 0x00:
-			//verboselog(machine(), 2, "    Video Entry Pointer:  %04x\n", m_VC2.nRegData );
-			break;
-		case 0x01:
-			//verboselog(machine(), 2, "    Cursor Entry Pointer: %04x\n", m_VC2.nRegData );
-			break;
-		case 0x02:
-			//verboselog(machine(), 2, "    Cursor X Location:    %04x\n", m_VC2.nRegData );
-			break;
-		case 0x03:
-			//verboselog(machine(), 2, "    Cursor Y Location:    %04x\n", m_VC2.nRegData );
-			break;
-		case 0x04:
-			//verboselog(machine(), 2, "    Current Cursor X:     %04x\n", m_VC2.nRegData );
-			break;
-		case 0x05:
-			//verboselog(machine(), 2, "    DID Entry Pointer:    %04x\n", m_VC2.nRegData );
-			break;
-		case 0x06:
-			//verboselog(machine(), 2, "    Scanline Length:      %04x\n", m_VC2.nRegData );
-			break;
-		case 0x07:
-			//verboselog(machine(), 2, "    RAM Address:          %04x\n", m_VC2.nRegData );
-			break;
-		case 0x08:
-			//verboselog(machine(), 2, "    VT Frame Table Ptr:   %04x\n", m_VC2.nRegData );
-			break;
-		case 0x09:
-			//verboselog(machine(), 2, "    VT Line Sequence Ptr: %04x\n", m_VC2.nRegData );
-			break;
-		case 0x0a:
-			//verboselog(machine(), 2, "    VT Lines in Run:      %04x\n", m_VC2.nRegData );
-			break;
-		case 0x0b:
-			//verboselog(machine(), 2, "    Vertical Line Count:  %04x\n", m_VC2.nRegData );
-			break;
-		case 0x0c:
-			//verboselog(machine(), 2, "    Cursor Table Ptr:     %04x\n", m_VC2.nRegData );
-			break;
-		case 0x0d:
-			//verboselog(machine(), 2, "    Working Cursor Y:     %04x\n", m_VC2.nRegData );
-			break;
-		case 0x0e:
-			//verboselog(machine(), 2, "    DID Frame Table Ptr:  %04x\n", m_VC2.nRegData );
-			break;
-		case 0x0f:
-			//verboselog(machine(), 2, "    DID Line Table Ptr:   %04x\n", m_VC2.nRegData );
-			break;
-		case 0x10:
-			//verboselog(machine(), 2, "    Display Control:      %04x\n", m_VC2.nRegData );
-			break;
-		case 0x1f:
-			//verboselog(machine(), 2, "    Configuration:        %04x\n", m_VC2.nRegData );
-			m_VC2.nRegister[0x20] = m_VC2.nRegData;
-			break;
-		default:
-			//verboselog(machine(), 2, "    Unknown VC2 Register: %04x\n", m_VC2.nRegData );
-			break;
-		}
+			switch( m_VC2.nRegIdx )
+			{
+				case 0x00:
+					//verboselog(machine(), 2, "    Video Entry Pointer:  %04x\n", m_VC2.nRegData );
+					break;
+				case 0x01:
+					//verboselog(machine(), 2, "    Cursor Entry Pointer: %04x\n", m_VC2.nRegData );
+					break;
+				case 0x02:
+					//verboselog(machine(), 2, "    Cursor X Location:    %04x\n", m_VC2.nRegData );
+					break;
+				case 0x03:
+					//verboselog(machine(), 2, "    Cursor Y Location:    %04x\n", m_VC2.nRegData );
+					VC2_CURCURSORX = VC2_CURSORX;
+					break;
+				case 0x04:
+					//verboselog(machine(), 2, "    Current Cursor X:     %04x\n", m_VC2.nRegData );
+					break;
+				case 0x05:
+					//verboselog(machine(), 2, "    DID Entry Pointer:    %04x\n", m_VC2.nRegData );
+					break;
+				case 0x06:
+					//verboselog(machine(), 2, "    Scanline Length:      %04x\n", m_VC2.nRegData );
+					break;
+				case 0x07:
+					//verboselog(machine(), 2, "    RAM Address:          %04x\n", m_VC2.nRegData );
+					break;
+				case 0x08:
+					//verboselog(machine(), 2, "    VT Frame Table Ptr:   %04x\n", m_VC2.nRegData );
+					break;
+				case 0x09:
+					//verboselog(machine(), 2, "    VT Line Sequence Ptr: %04x\n", m_VC2.nRegData );
+					break;
+				case 0x0a:
+					//verboselog(machine(), 2, "    VT Lines in Run:      %04x\n", m_VC2.nRegData );
+					break;
+				case 0x0b:
+					//verboselog(machine(), 2, "    Vertical Line Count:  %04x\n", m_VC2.nRegData );
+					break;
+				case 0x0c:
+					//verboselog(machine(), 2, "    Cursor Table Ptr:     %04x\n", m_VC2.nRegData );
+					break;
+				case 0x0d:
+					//verboselog(machine(), 2, "    Working Cursor Y:     %04x\n", m_VC2.nRegData );
+					break;
+				case 0x0e:
+					//verboselog(machine(), 2, "    DID Frame Table Ptr:  %04x\n", m_VC2.nRegData );
+					break;
+				case 0x0f:
+					//verboselog(machine(), 2, "    DID Line Table Ptr:   %04x\n", m_VC2.nRegData );
+					break;
+				case 0x10:
+					//verboselog(machine(), 2, "    Display Control:      %04x\n", m_VC2.nRegData );
+					break;
+				case 0x1f:
+					//verboselog(machine(), 2, "    Configuration:        %04x\n", m_VC2.nRegData );
+					m_VC2.nRegister[0x20] = m_VC2.nRegData;
+					break;
+				default:
+					//verboselog(machine(), 2, "    Unknown VC2 Register: %04x\n", m_VC2.nRegData );
+					break;
+			}
 			m_VC2.nRegister[m_VC2.nRegIdx] = m_VC2.nRegData;
 			break;
 		default:

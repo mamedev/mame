@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:?
+// copyright-holders:Samuele Zannoli
 /***************************************************************************
 
     XBOX (c) 2001 Microsoft
@@ -10,8 +10,9 @@
 
 
 #include "emu.h"
-#include "includes/xbox.h"
+#include "machine/pci.h"
 #include "includes/xbox_pci.h"
+#include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
 #include "machine/atapicdr.h"
@@ -31,14 +32,18 @@
 class xbox_state : public xbox_base_state
 {
 public:
-	xbox_state(const machine_config &mconfig, device_type type, const char *tag) :
-		xbox_base_state(mconfig, type, tag)
+	xbox_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xbox_base_state(mconfig, type, tag)
+		, m_ide(*this, "ide")
+		, m_devh(*this, "pci:09.0:ide:0:hdd")
+		, m_devc(*this, "pci:09.0:ide:1:cdrom")
 	{ }
 
 	void xbox(machine_config &config);
+protected:
 	void xbox_map(address_map &map);
 	void xbox_map_io(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -46,23 +51,26 @@ protected:
 
 	virtual void hack_eeprom() override;
 
-	struct chihiro_devices {
-		bus_master_ide_controller_device    *ide;
-	} xbox_devs;
+	// devices
+	optional_device<bus_master_ide_controller_device> m_ide;
+	required_device<ata_mass_storage_device> m_devh;
+	required_device<atapi_cdrom_device> m_devc;
 };
 
 void xbox_state::video_start()
 {
 }
 
-ADDRESS_MAP_START(xbox_state::xbox_map)
-	AM_IMPORT_FROM(xbox_base_map)
-	AM_RANGE(0xff000000, 0xff0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f00000)
-ADDRESS_MAP_END
+void xbox_state::xbox_map(address_map &map)
+{
+	xbox_base_map(map);
+	map(0xff000000, 0xff0fffff).rom().region("bios", 0).mirror(0x00f00000);
+}
 
-ADDRESS_MAP_START(xbox_state::xbox_map_io)
-	AM_IMPORT_FROM(xbox_base_map_io)
-ADDRESS_MAP_END
+void xbox_state::xbox_map_io(address_map &map)
+{
+	xbox_base_map_io(map);
+}
 
 static INPUT_PORTS_START( xbox )
 	/* dummy active high structure */
@@ -134,42 +142,40 @@ void xbox_state::hack_eeprom()
 void xbox_state::machine_start()
 {
 	xbox_base_state::machine_start();
-	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
 	// savestates
 	//save_item(NAME(item));
 }
 
 void xbox_state::machine_reset()
 {
-	ata_mass_storage_device *devh;
-	atapi_cdrom_device *devc;
 	uint16_t *id;
 
 	// set some needed parameters
-	devh = machine().device<ata_mass_storage_device>(":pci:09.0:ide:0:hdd");
-	id = devh->identify_device_buffer();
+	id = m_devh->identify_device_buffer();
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 	id[128] |= 2; // bits 2-1=01 drive already unlocked
-	devc = machine().device<atapi_cdrom_device>(":pci:09.0:ide:1:cdrom");
-	id = devc->identify_device_buffer();
+
+	id = m_devc->identify_device_buffer();
 	id[64] |= (1 << 1);
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 }
 
-SLOT_INTERFACE_START(usb_xbox)
-	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
-SLOT_INTERFACE_END
+void usb_xbox(device_slot_interface &device)
+{
+	device.option_add("xbox_controller", OHCI_GAME_CONTROLLER);
+}
 
-SLOT_INTERFACE_START(xbox_ata_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK)
-	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
-SLOT_INTERFACE_END
+void xbox_ata_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", IDE_HARDDISK);
+	device.option_add("cdrom", ATAPI_CDROM);
+}
 
 MACHINE_CONFIG_START(xbox_state::xbox)
 	xbox_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xbox_map)
-	MCFG_CPU_IO_MAP(xbox_map_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(xbox_map)
+	MCFG_DEVICE_IO_MAP(xbox_map_io)
 
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "hdd", true)
@@ -182,8 +188,8 @@ MACHINE_CONFIG_START(xbox_state::xbox)
 	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_xbox, nullptr, false)
 
 /* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)
@@ -196,7 +202,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 ROM_START( xbox )
 	ROM_REGION( 0x400, "mcpx", 0 )
@@ -224,17 +230,6 @@ ROM_START( xbox )
 	ROM_LOAD( "xbox-5713.bin", 0x080000, 0x040000, CRC(58fd8173) SHA1(8b7ccc4648ccd78cdb7b65cfca09621eaf2d4238) )
 	ROM_LOAD( "5838_256k.bin", 0x0C0000, 0x040000, CRC(5be2413d) SHA1(b9489e883c650b5e5fe2f83a32237dbf74f0e9f1) )
 ROM_END
-// See src/emu/gamedrv.h for details
-// For a game:
-// GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)
 
-// For a console:
-// CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-// For a computer:
-// COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
-
-// For a generic system:
-// SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
-
-CONS( 2001, xbox,  0,  0,   xbox,  xbox, xbox_state,  0,       "Microsoft",      "XBOX", MACHINE_IS_SKELETON )
+CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_IS_SKELETON )

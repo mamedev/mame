@@ -37,12 +37,13 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -74,6 +75,9 @@ public:
 		, m_framecnt(0)
 	{ }
 
+	void uts20(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -86,16 +90,13 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void uts20(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
 
-private:
-	required_device<cpu_device>     m_maincpu;
+	required_device<z80_device>     m_maincpu;
 	required_device<nvram_device>   m_nvram;
 	required_device<z80ctc_device>  m_ctc;
 	required_device<z80sio_device>  m_uart;
@@ -119,7 +120,7 @@ READ8_MEMBER( univac_state::ram_r )
 	if (BIT(m_p_parity[offset >> 3], offset & 0x07) && !machine().side_effects_disabled())
 	{
 		LOGPARITY("parity check failed offset = %04X\n", offset);
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	return m_p_videoram[offset];
 }
@@ -188,23 +189,25 @@ WRITE8_MEMBER( univac_state::porte6_w )
 }
 
 
-ADDRESS_MAP_START(univac_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x4fff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(bank_r, bank_w)
-	AM_RANGE( 0xc000, 0xffff ) AM_RAM_WRITE(ram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void univac_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x4fff).rom().region("roms", 0);
+	map(0x8000, 0xbfff).rw(FUNC(univac_state::bank_r), FUNC(univac_state::bank_w));
+	map(0xc000, 0xffff).ram().w(FUNC(univac_state::ram_w)).share("videoram");
+}
 
-ADDRESS_MAP_START(univac_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x43, 0x43) AM_WRITE(port43_w)
-	AM_RANGE(0x80, 0xbf) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0xc4, 0xc4) AM_WRITE(portc4_w)
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(porte6_w)
-ADDRESS_MAP_END
+void univac_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x20, 0x23).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x43, 0x43).w(FUNC(univac_state::port43_w));
+	map(0x80, 0xbf).ram().w(FUNC(univac_state::nvram_w)).share("nvram");
+	map(0xc4, 0xc4).w(FUNC(univac_state::portc4_w));
+	map(0xe6, 0xe6).w(FUNC(univac_state::porte6_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( uts20 )
@@ -219,7 +222,7 @@ void univac_state::machine_start()
 	m_p_parity.reset(new u8[parity_bytes]);
 	std::fill_n(m_p_parity.get(), parity_bytes, 0);
 
-	save_pointer(NAME(m_p_parity.get()), parity_bytes);
+	save_pointer(NAME(m_p_parity), parity_bytes);
 	save_item(NAME(m_bank_mask));
 	save_item(NAME(m_parity_check));
 	save_item(NAME(m_parity_poison));
@@ -298,7 +301,7 @@ static const gfx_layout c10_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( c10 )
+static GFXDECODE_START( gfx_c10 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, c10_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -311,10 +314,10 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(univac_state::uts20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &univac_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &univac_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -325,32 +328,32 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c10)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 2000000)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 2000000));
+	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("uart", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", z80sio_device, rxca_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("uart", z80sio_device, rxtxcb_w))
+	Z80CTC(config, m_ctc, 4_MHz_XTAL);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<1>().set(m_uart, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<1>().append(m_uart, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<2>().set(m_uart, FUNC(z80sio_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("uart", z80sio_device, rxa_w)) // FIXME: hacked in permanent loopback to pass test
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("uart", z80sio_device, rxb_w)) // FIXME: hacked in permanent loopback to pass test
-	MCFG_Z80SIO_OUT_WRDYB_CB(DEVWRITELINE("uart", z80sio_device, dcdb_w)) // FIXME: hacked in permanent loopback to pass test
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", z80sio_device, ctsb_w)) // FIXME: hacked in permanent loopback to pass test
+	Z80SIO(config, m_uart, 4_MHz_XTAL);
+	m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_uart->out_txda_callback().set(m_uart, FUNC(z80sio_device::rxa_w)); // FIXME: hacked in permanent loopback to pass test
+	m_uart->out_txdb_callback().set(m_uart, FUNC(z80sio_device::rxb_w)); // FIXME: hacked in permanent loopback to pass test
+	m_uart->out_wrdyb_callback().set(m_uart, FUNC(z80sio_device::dcdb_w)); // FIXME: hacked in permanent loopback to pass test
+	m_uart->out_wrdyb_callback().append(m_uart, FUNC(z80sio_device::ctsb_w)); // FIXME: hacked in permanent loopback to pass test
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
@@ -405,5 +408,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY            FULLNAME  FLAGS
-COMP( 1980, uts20,  0,      0,       uts20,     uts20, univac_state,   0,      "Sperry Univac",   "UTS-20", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY          FULLNAME  FLAGS
+COMP( 1980, uts20, 0,      0,      uts20,   uts20, univac_state, empty_init, "Sperry Univac", "UTS-20", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

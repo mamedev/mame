@@ -44,9 +44,10 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(by6803);
+	void init_by6803();
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_READ8_MEMBER(port2_r);
@@ -78,6 +79,7 @@ private:
 	//uint8_t m_digit;
 	uint8_t m_segment;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<m6803_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
@@ -87,20 +89,23 @@ private:
 	required_ioport m_io_x2;
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
+	output_finder<40> m_digits;
 };
 
 
-ADDRESS_MAP_START(by6803_state::by6803_map)
-	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("nvram") // 6116 ram
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void by6803_state::by6803_map(address_map &map)
+{
+	map(0x0020, 0x0023).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0040, 0x0043).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x17ff).ram().share("nvram"); // 6116 ram
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(by6803_state::by6803_io)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(port1_r, port1_w) // P10-P17
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w) // P20-P24
-ADDRESS_MAP_END
+void by6803_state::by6803_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(by6803_state::port1_r), FUNC(by6803_state::port1_w)); // P10-P17
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(by6803_state::port2_r), FUNC(by6803_state::port2_w)); // P20-P24
+}
 
 static INPUT_PORTS_START( by6803 )
 	PORT_START("TEST")
@@ -159,7 +164,7 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER( by6803_state::activity_test )
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( by6803_state::self_test )
@@ -227,19 +232,19 @@ WRITE8_MEMBER( by6803_state::pia0_a_w )
 	switch (m_pia0_a)
 	{
 		case 0x10: // wrong
-			output().set_digit_value(m_digit, m_segment);
+			m_digits[m_digit] = m_segment;
 			break;
 		case 0x1d:
-			output().set_digit_value(8+m_digit, m_segment);
+			m_digits[8+m_digit] = m_segment;
 			break;
 		case 0x1b:
-			output().set_digit_value(16+m_digit, m_segment);
+			m_digits[16+m_digit] = m_segment;
 			break;
 		case 0x07:
-			output().set_digit_value(24+m_digit, m_segment);
+			m_digits[24+m_digit] = m_segment;
 			break;
 		case 0x0f:
-			output().set_digit_value(32+m_digit, m_segment);
+			m_digits[32+m_digit] m_segment;
 			break;
 		default:
 			break;
@@ -350,7 +355,7 @@ void by6803_state::machine_reset()
 	m_port2 = 2+8;
 }
 
-DRIVER_INIT_MEMBER(by6803_state,by6803)
+void by6803_state::init_by6803()
 {
 }
 
@@ -375,38 +380,38 @@ TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
 
 MACHINE_CONFIG_START(by6803_state::by6803)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(by6803_map)
-	MCFG_CPU_IO_MAP(by6803_io)
+	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(by6803_map)
+	MCFG_DEVICE_IO_MAP(by6803_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	//MCFG_DEFAULT_LAYOUT(layout_by6803)
+	//config.set_default_layout(layout_by6803);
 
 	/* Sound */
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by6803_state, pia0_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by6803_state, pia0_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(by6803_state, pia0_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by6803_state, pia0_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(by6803_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by6803_state, pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6803_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6803_IRQ_LINE))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpa_handler().set(FUNC(by6803_state::pia0_a_r));
+	m_pia0->writepa_handler().set(FUNC(by6803_state::pia0_a_w));
+	m_pia0->readpb_handler().set(FUNC(by6803_state::pia0_b_r));
+	m_pia0->writepb_handler().set(FUNC(by6803_state::pia0_b_w));
+	m_pia0->ca2_handler().set(FUNC(by6803_state::pia0_ca2_w));
+	m_pia0->cb2_handler().set(FUNC(by6803_state::pia0_cb2_w));
+	m_pia0->irqa_handler().set_inputline("maincpu", M6803_IRQ_LINE);
+	m_pia0->irqb_handler().set_inputline("maincpu", M6803_IRQ_LINE);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z", by6803_state, pia0_timer, attotime::from_hz(120)) // mains freq*2
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by6803_state, pia1_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by6803_state, pia1_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by6803_state, pia1_b_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by6803_state, pia1_cb2_w))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set(FUNC(by6803_state::pia1_a_r));
+	m_pia1->writepa_handler().set(FUNC(by6803_state::pia1_a_w));
+	m_pia1->writepb_handler().set(FUNC(by6803_state::pia1_b_w));
+	m_pia1->cb2_handler().set(FUNC(by6803_state::pia1_cb2_w));
 
 	//MCFG_SPEAKER_STANDARD_MONO("speaker")
-	//MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0) // Cheap Squeak Turbo
+	//MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK) // Cheap Squeak Turbo
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -443,7 +448,7 @@ ROM_END
 
 ROM_START(beatclck2)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "btc_lights_pro_111385_C70-803-05_u3.cpu", 0xc000, 0x4000, CRC(dff5bad6) SHA1(915495d60be7ca12f00364b6e4b99c822ecfc7aa))
+	ROM_LOAD( "btc_lights_pro_111385_c70-803-05_u3.cpu", 0xc000, 0x4000, CRC(dff5bad6) SHA1(915495d60be7ca12f00364b6e4b99c822ecfc7aa))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("btc_u2.snd", 0xc000, 0x1000, CRC(fd22fd2a) SHA1(efad3b94e91d07930ada5366d389f35377dfbd99))
 	ROM_LOAD("btc_u3.snd", 0xd000, 0x1000, CRC(22311a4a) SHA1(2c22ba9228e44e68b9308b3bf8803edcd70fa5b9))
@@ -680,7 +685,16 @@ ROM_END
 /*------------------------------------
 / Strange Science #OE35
 /------------------------------------*/
+
 ROM_START(strngsci)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "strange_scienc.u2", 0x8000, 0x4000, CRC(0a0ebf25) SHA1(6b120e5b3aa13d1650c4ee8c4c98996b13be167e)) // 12/12/86
+	ROM_LOAD( "strange_scienc.u3", 0xc000, 0x4000, CRC(c5b17b07) SHA1(823eb1e2ceb33f221b69c11eb71cb53c48d0f716)) // 12/12/86
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("sound_u7.256", 0x8000, 0x8000, CRC(bc33901e) SHA1(5231d8f01a107742acee2d13580a461063018a11))
+ROM_END
+
+ROM_START(strngscia)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2.128", 0x8000, 0x4000, CRC(2ffcf284) SHA1(27d66806708c983092bab4ed6965c2e91e69acdc))
 	ROM_LOAD( "cpu_u3.128", 0xc000, 0x4000, CRC(35257931) SHA1(d3d6b84e50677a4c5f9d5c13c9522ad6d3a1358d))
@@ -688,7 +702,7 @@ ROM_START(strngsci)
 	ROM_LOAD("sound_u7.256", 0x8000, 0x8000, CRC(bc33901e) SHA1(5231d8f01a107742acee2d13580a461063018a11))
 ROM_END
 
-ROM_START(strngscg)
+ROM_START(strngscig)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpub_u2.128", 0x8000, 0x4000, CRC(48ef1052) SHA1(afcb0520ab834c0d6ef4a73f615c48653ccedc24))
 	ROM_LOAD( "cpub_u3.128", 0xc000, 0x4000, CRC(da5b4b3b) SHA1(ff9babf2efc6622803db9ba8712dd8b76c8412b8))
@@ -728,28 +742,29 @@ ROM_START(trucksp2)
 ROM_END
 
 
-GAME( 1985, eballchp,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Eight Ball Champ",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, beatclck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Beat the Clock",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, beatclck2, beatclck, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Beat the Clock (with flasher support)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "MotorDome",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "MotorDome (German)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, ladyluck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Strange Science",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngscg,  strngsci, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Strange Science (German)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Special Force",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Black Belt",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Black Belt (Squawk and Talk)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, cityslck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "City Slicker",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Hardbody",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Hardbody (German)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Party Animal",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Party Animal (German)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Heavy Metal Meltdown",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Escape from the Lost World",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Escape from the Lost World (German)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Dungeons & Dragons",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, black100,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Blackwater 100",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, black100s, black100, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Blackwater 100 (Single Ball Play)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, trucksp3,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Truck Stop (P-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, trucksp2,  trucksp3, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Truck Stop (P-2)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, atlantip,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Atlantis",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, eballchp,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Eight Ball Champ",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, beatclck,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Beat the Clock",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, beatclck2, beatclck, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Beat the Clock (with flasher support)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "MotorDome",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "MotorDome (German)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, ladyluck,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Strange Science (Rev C)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngscia, strngsci, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Strange Science (Rev A)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngscig, strngsci, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Strange Science (German, Rev A)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Special Force",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Black Belt",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Black Belt (Squawk and Talk)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, cityslck,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "City Slicker",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Hardbody",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Hardbody (German)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Party Animal",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Party Animal (German)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Heavy Metal Meltdown",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Escape from the Lost World",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Escape from the Lost World (German)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Dungeons & Dragons",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, black100,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Blackwater 100",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, black100s, black100, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Blackwater 100 (Single Ball Play)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, trucksp3,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Truck Stop (P-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, trucksp2,  trucksp3, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Truck Stop (P-2)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, atlantip,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Atlantis",                              MACHINE_IS_SKELETON_MECHANICAL)

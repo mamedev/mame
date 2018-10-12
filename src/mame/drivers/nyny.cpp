@@ -79,6 +79,7 @@
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -113,6 +114,9 @@ public:
 		m_soundlatch2(*this, "soundlatch2"),
 		m_soundlatch3(*this, "soundlatch3") { }
 
+	void nyny(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram1;
 	required_shared_ptr<uint8_t> m_colorram1;
@@ -157,7 +161,6 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_END_UPDATE(crtc_end_update);
-	void nyny(machine_config &config);
 	void nyny_audio_1_map(address_map &map);
 	void nyny_audio_2_map(address_map &map);
 	void nyny_main_map(address_map &map);
@@ -383,7 +386,7 @@ WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
 {
 	/* not sure what this does */
 
-	/*logerror("%x PORT A write %x at  Y=%x X=%x\n", space.device().safe_pc(), data, m_screen->vpos(), m_screen->hpos());*/
+	/*logerror("%s PORT A write %x at  Y=%x X=%x\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());*/
 }
 
 /*************************************
@@ -426,51 +429,54 @@ WRITE8_MEMBER(nyny_state::nyny_pia_1_2_w)
 }
 
 
-ADDRESS_MAP_START(nyny_state::nyny_main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram1")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("colorram1")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("colorram2")
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("nvram") /* SRAM (coin counter, shown when holding F2) */
-	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xa101, 0xa101) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xa200, 0xa20f) AM_MIRROR(0x00f0) AM_READWRITE(nyny_pia_1_2_r, nyny_pia_1_2_w)
-	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_DEVREAD("soundlatch3", generic_latch_8_device, read) AM_WRITE(audio_1_command_w)
-	AM_RANGE(0xa400, 0xa7ff) AM_NOP
-	AM_RANGE(0xa800, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void nyny_state::nyny_main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("videoram1");
+	map(0x2000, 0x3fff).ram().share("colorram1");
+	map(0x4000, 0x5fff).ram().share("videoram2");
+	map(0x6000, 0x7fff).ram().share("colorram2");
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xa0ff).ram().share("nvram"); /* SRAM (coin counter, shown when holding F2) */
+	map(0xa100, 0xa100).mirror(0x00fe).w(m_mc6845, FUNC(mc6845_device::address_w));
+	map(0xa101, 0xa101).mirror(0x00fe).w(m_mc6845, FUNC(mc6845_device::register_w));
+	map(0xa200, 0xa20f).mirror(0x00f0).rw(FUNC(nyny_state::nyny_pia_1_2_r), FUNC(nyny_state::nyny_pia_1_2_w));
+	map(0xa300, 0xa300).mirror(0x00ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(FUNC(nyny_state::audio_1_command_w));
+	map(0xa400, 0xa7ff).noprw();
+	map(0xa800, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(nyny_state::nyny_audio_1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
-	AM_RANGE(0x0080, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(audio_1_answer_w)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_READ_PORT("SW3")
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x3002, 0x3002) AM_MIRROR(0x0ffc) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x3002, 0x3003) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x4000, 0x4fff) AM_NOP
-	AM_RANGE(0x5000, 0x57ff) AM_MIRROR(0x0800) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_MIRROR(0x0800) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
-ADDRESS_MAP_END
+void nyny_state::nyny_audio_1_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x007f).ram();     /* internal RAM */
+	map(0x0080, 0x0fff).noprw();
+	map(0x1000, 0x1000).mirror(0x0fff).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(nyny_state::audio_1_answer_w));
+	map(0x2000, 0x2000).mirror(0x0fff).portr("SW3");
+	map(0x3000, 0x3000).mirror(0x0ffc).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x3000, 0x3001).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x3002, 0x3002).mirror(0x0ffc).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x3002, 0x3003).mirror(0x0ffc).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x4000, 0x4fff).noprw();
+	map(0x5000, 0x57ff).mirror(0x0800).rom();
+	map(0x6000, 0x67ff).mirror(0x0800).rom();
+	map(0x7000, 0x77ff).mirror(0x0800).rom();
+}
 
 
-ADDRESS_MAP_START(nyny_state::nyny_audio_2_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
-	AM_RANGE(0x0080, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD("ay3", ay8910_device, data_r)
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0ffe) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
-	AM_RANGE(0x3000, 0x6fff) AM_NOP
-	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
-ADDRESS_MAP_END
+void nyny_state::nyny_audio_2_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x007f).ram();     /* internal RAM */
+	map(0x0080, 0x0fff).noprw();
+	map(0x1000, 0x1000).mirror(0x0fff).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0x2000, 0x2000).mirror(0x0ffe).r("ay3", FUNC(ay8910_device::data_r));
+	map(0x2000, 0x2001).mirror(0x0ffe).w("ay3", FUNC(ay8910_device::data_address_w));
+	map(0x3000, 0x6fff).noprw();
+	map(0x7000, 0x77ff).mirror(0x0800).rom();
+}
 
 
 
@@ -592,17 +598,17 @@ void nyny_state::machine_reset()
 MACHINE_CONFIG_START(nyny_state::nyny)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, 5600000) /* 1.40 MHz? The clock signal is generated by analog chips */
-	MCFG_CPU_PROGRAM_MAP(nyny_main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nyny_state, update_pia_1,  25)
+	MCFG_DEVICE_ADD("maincpu", MC6809, 5600000) /* 1.40 MHz? The clock signal is generated by analog chips */
+	MCFG_DEVICE_PROGRAM_MAP(nyny_main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(nyny_state, update_pia_1,  25)
 
-	MCFG_CPU_ADD("audiocpu", M6802, AUDIO_CPU_1_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(nyny_audio_1_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802, AUDIO_CPU_1_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(nyny_audio_1_map)
 
-	MCFG_CPU_ADD("audio2", M6802, AUDIO_CPU_2_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(nyny_audio_2_map)
+	MCFG_DEVICE_ADD("audio2", M6802, AUDIO_CPU_2_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(nyny_audio_2_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -616,54 +622,54 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(nyny_state, crtc_update_row)
 	MCFG_MC6845_END_UPDATE_CB(nyny_state, crtc_end_update)
-	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE("ic48_1", ttl74123_device, a_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE("ic48_1", ttl74123_device, a_w))
 
 	/* 74LS123 */
-	MCFG_DEVICE_ADD("ic48_1", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type */
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(0.01))               /* capacitor connected to Cext and RCext */
-	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
-	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(nyny_state, ic48_1_74123_output_changed))
+	TTL74123(config, m_ic48_1, 0);
+	m_ic48_1->set_connection_type(TTL74123_GROUNDED);   /* the hook up type */
+	m_ic48_1->set_resistor_value(RES_K(22));            /* resistor connected to RCext */
+	m_ic48_1->set_capacitor_value(CAP_U(0.01));         /* capacitor connected to Cext and RCext */
+	m_ic48_1->set_a_pin_value(1);                       /* A pin - driven by the CRTC */
+	m_ic48_1->set_b_pin_value(1);                       /* B pin - pulled high */
+	m_ic48_1->set_clear_pin_value(1);                   /* Clear pin - pulled high */
+	m_ic48_1->out_cb().set(FUNC(nyny_state::ic48_1_74123_output_changed));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(nyny_state, main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(nyny_state, main_cpu_irq))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set_ioport("IN0");
+	m_pia1->readpb_handler().set_ioport("IN1");
+	m_pia1->irqa_handler().set(FUNC(nyny_state::main_cpu_irq));
+	m_pia1->irqb_handler().set(FUNC(nyny_state::main_cpu_irq));
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(nyny_state,pia_2_port_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(nyny_state,pia_2_port_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(nyny_state,flipscreen_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(nyny_state,main_cpu_firq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(nyny_state,main_cpu_irq))
+	PIA6821(config, m_pia2, 0);
+	m_pia2->writepa_handler().set(FUNC(nyny_state::pia_2_port_a_w));
+	m_pia2->writepb_handler().set(FUNC(nyny_state::pia_2_port_b_w));
+	m_pia2->ca2_handler().set(FUNC(nyny_state::flipscreen_w));
+	m_pia2->irqa_handler().set(FUNC(nyny_state::main_cpu_firq));
+	m_pia2->irqb_handler().set(FUNC(nyny_state::main_cpu_irq));
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CPU_1_CLOCK)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nyny_state, nyny_ay8910_37_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_DEVICE_ADD("ay1", AY8910, AUDIO_CPU_1_CLOCK)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nyny_state, nyny_ay8910_37_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CPU_1_CLOCK)
+	MCFG_DEVICE_ADD("ay2", AY8910, AUDIO_CPU_1_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8910, AUDIO_CPU_2_CLOCK)
+	MCFG_DEVICE_ADD("ay3", AY8910, AUDIO_CPU_2_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -743,6 +749,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, nyny,    0,    nyny, nyny, nyny_state, 0, ROT270, "Sigma Enterprises Inc.", "New York! New York!", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, nynyg,   nyny, nyny, nyny, nyny_state, 0, ROT270, "Sigma Enterprises Inc. (Gottlieb license)", "New York! New York! (Gottlieb)", MACHINE_IMPERFECT_SOUND  | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, warcadia,nyny, nyny, nyny, nyny_state, 0, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nyny,    0,    nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "New York! New York!", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nynyg,   nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc. (Gottlieb license)", "New York! New York! (Gottlieb)", MACHINE_IMPERFECT_SOUND  | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, warcadia,nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

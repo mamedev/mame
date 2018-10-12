@@ -39,7 +39,7 @@ INTERRUPT_GEN_MEMBER(subs_state::interrupt)
 {
 	/* only do NMI interrupt if not in TEST mode */
 	if ((ioport("IN1")->read() & 0x40)==0x40)
-		device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /***************************************************************************
@@ -174,20 +174,4 @@ READ8_MEMBER(subs_state::options_r)
 	}
 
 	return 0;
-}
-
-/***************************************************************************
-lamp1_w
-***************************************************************************/
-WRITE_LINE_MEMBER(subs_state::lamp1_w)
-{
-	output().set_led_value(0, !state);
-}
-
-/***************************************************************************
-lamp2_w
-***************************************************************************/
-WRITE_LINE_MEMBER(subs_state::lamp2_w)
-{
-	output().set_led_value(1, !state);
 }

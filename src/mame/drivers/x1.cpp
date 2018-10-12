@@ -733,13 +733,13 @@ READ8_MEMBER( x1_state::x1_fdc_r )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			return m_fdc->status_r(space, offset);
+			return m_fdc->status_r();
 		case 0x0ff9:
-			return m_fdc->track_r(space, offset);
+			return m_fdc->track_r();
 		case 0x0ffa:
-			return m_fdc->sector_r(space, offset);
+			return m_fdc->sector_r();
 		case 0x0ffb:
-			return m_fdc->data_r(space, offset);
+			return m_fdc->data_r();
 		case 0x0ffc:
 			logerror("FDC: read FM type\n");
 			return 0xff;
@@ -764,16 +764,16 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			m_fdc->cmd_w(space, offset,data);
+			m_fdc->cmd_w(data);
 			break;
 		case 0x0ff9:
-			m_fdc->track_w(space, offset,data);
+			m_fdc->track_w(data);
 			break;
 		case 0x0ffa:
-			m_fdc->sector_w(space, offset,data);
+			m_fdc->sector_w(data);
 			break;
 		case 0x0ffb:
-			m_fdc->data_w(space, offset,data);
+			m_fdc->data_w(data);
 			break;
 
 		case 0x0ffc:
@@ -989,7 +989,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 	}
 	else //compatible mode
 	{
-		switch (data & 0x0300)
+		switch (offset & 0x0300)
 		{
 		case 0x0000:
 			x1_pal_b_w(space, offset & 0x00ff, data);
@@ -1069,12 +1069,12 @@ WRITE8_MEMBER( x1_state::x1_6845_w )
 	if(offset == 0)
 	{
 		m_crtc_index = data & 31;
-		machine().device<mc6845_device>("crtc")->address_w(space, offset, data);
+		m_crtc->address_w(space, offset, data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		machine().device<mc6845_device>("crtc")->register_w(space, offset, data);
+		m_crtc->register_w(space, offset, data);
 	}
 }
 
@@ -1319,106 +1319,112 @@ WRITE8_MEMBER( x1_state::x1turbo_mem_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(x1_state::x1_io_banks_common)
-	ADDRESS_MAP_UNMAP_HIGH
+void x1_state::x1_io_banks_common(address_map &map)
+{
+	map.unmap_value_high();
 
-	AM_RANGE(0x0e00, 0x0e02)                   AM_WRITE(x1_rom_w)
-	AM_RANGE(0x0e03, 0x0e03)                   AM_READ(x1_rom_r)
+	map(0x0e00, 0x0e02).w(FUNC(x1_state::x1_rom_w));
+	map(0x0e03, 0x0e03).r(FUNC(x1_state::x1_rom_r));
 
-	AM_RANGE(0x0ff8, 0x0fff)                   AM_READWRITE(x1_fdc_r, x1_fdc_w)
+	map(0x0ff8, 0x0fff).rw(FUNC(x1_state::x1_fdc_r), FUNC(x1_state::x1_fdc_w));
 
-	AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x00ff) AM_WRITE(x1_pri_w)
-	AM_RANGE(0x1400, 0x17ff)                   AM_READWRITE(x1_pcg_r, x1_pcg_w)
+	map(0x1300, 0x1300).mirror(0x00ff).w(FUNC(x1_state::x1_pri_w));
+	map(0x1400, 0x17ff).rw(FUNC(x1_state::x1_pcg_r), FUNC(x1_state::x1_pcg_w));
 
-	AM_RANGE(0x1800, 0x1801)                   AM_WRITE(x1_6845_w)
+	map(0x1800, 0x1801).w(FUNC(x1_state::x1_6845_w));
 
-	AM_RANGE(0x1900, 0x1900) AM_MIRROR(0x00ff) AM_READWRITE(x1_sub_io_r, x1_sub_io_w)
-	AM_RANGE(0x1a00, 0x1a03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x1b00, 0x1b00) AM_MIRROR(0x00ff) AM_DEVREADWRITE("ay", ay8910_device, data_r, data_w)
-	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x00ff) AM_DEVWRITE("ay", ay8910_device, address_w)
-	AM_RANGE(0x1d00, 0x1d00) AM_MIRROR(0x00ff) AM_WRITE(x1_rom_bank_1_w)
-	AM_RANGE(0x1e00, 0x1e00) AM_MIRROR(0x00ff) AM_WRITE(x1_rom_bank_0_w)
+	map(0x1900, 0x1900).mirror(0x00ff).rw(FUNC(x1_state::x1_sub_io_r), FUNC(x1_state::x1_sub_io_w));
+	map(0x1a00, 0x1a03).mirror(0x00fc).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x1b00, 0x1b00).mirror(0x00ff).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x1c00, 0x1c00).mirror(0x00ff).w("ay", FUNC(ay8910_device::address_w));
+	map(0x1d00, 0x1d00).mirror(0x00ff).w(FUNC(x1_state::x1_rom_bank_1_w));
+	map(0x1e00, 0x1e00).mirror(0x00ff).w(FUNC(x1_state::x1_rom_bank_0_w));
 
-	AM_RANGE(0x1fa0, 0x1fa3)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x1fa8, 0x1fab)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	map(0x1fa0, 0x1fa3).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x1fa8, 0x1fab).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
-	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("avram")
+	map(0x2000, 0x27ff).mirror(0x0800).ram().share("avram");
 
-	AM_RANGE(0x4000, 0xffff)                   AM_READWRITE_BANK("bitmapbank")
+	map(0x4000, 0xffff).bankrw("bitmapbank");
 
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(x1_ex_gfxram_r, x1_ex_gfxram_w)
-ADDRESS_MAP_END
+	map(0x10000, 0x1ffff).rw(FUNC(x1_state::x1_ex_gfxram_r), FUNC(x1_state::x1_ex_gfxram_w));
+}
 
 
-ADDRESS_MAP_START(x1_state::x1_io_banks)
-	AM_IMPORT_FROM(x1_io_banks_common)
+void x1_state::x1_io_banks(address_map &map)
+{
+	x1_io_banks_common(map);
 
 //  AM_RANGE(0x0700, 0x0701) TODO: user could install ym2151 on plain X1 too
 
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_b_w)
-	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_r_w)
-	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_g_w)
+	map(0x1000, 0x1000).mirror(0x00ff).w(FUNC(x1_state::x1_pal_b_w));
+	map(0x1100, 0x1100).mirror(0x00ff).w(FUNC(x1_state::x1_pal_r_w));
+	map(0x1200, 0x1200).mirror(0x00ff).w(FUNC(x1_state::x1_pal_g_w));
 
-	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("tvram") // Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
-ADDRESS_MAP_END
+	map(0x3000, 0x37ff).mirror(0x0800).ram().share("tvram"); // Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
+}
 
 
-ADDRESS_MAP_START(x1_state::x1turbo_io_banks)
-	AM_IMPORT_FROM(x1_io_banks_common)
+void x1_state::x1turbo_io_banks(address_map &map)
+{
+	x1_io_banks_common(map);
 
 	// a * at the end states devices used on plain X1 too
 
-	AM_RANGE(0x0700, 0x0701)                   AM_READ(ym_r) AM_DEVWRITE("ym", ym2151_device, write)
+	map(0x0700, 0x0701).r(FUNC(x1_state::ym_r)).w("ym", FUNC(ym2151_device::write));
 	// 0x704 is FM sound detection port on X1 turboZ
-	AM_RANGE(0x0704, 0x0707)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	map(0x0704, 0x0707).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
-	AM_RANGE(0x0800, 0x0800)                   AM_WRITE(color_board_w)                          // *
-	AM_RANGE(0x0801, 0x0801)                   AM_READ(color_board_r)                           // *
-	AM_RANGE(0x0802, 0x0802)                   AM_WRITE(color_board_2_w)                        // *
-	AM_RANGE(0x0803, 0x0803)                   AM_READ(color_board_2_r)                         // *
-	AM_RANGE(0x0a00, 0x0a07)                   AM_READWRITE(stereo_board_r, stereo_board_w)     // *
-	AM_RANGE(0x0b00, 0x0b00)                   AM_READWRITE(x1turbo_bank_r, x1turbo_bank_w)
-	AM_RANGE(0x0c00, 0x0cff)                   AM_READWRITE(rs232_r, rs232_w)                   // *
-	AM_RANGE(0x0d00, 0x0dff)                   AM_READWRITE(x1_emm_r, x1_emm_w)                 // *
-	AM_RANGE(0x0e80, 0x0e81)                   AM_READ(x1_kanji_r)
-	AM_RANGE(0x0e80, 0x0e83)                   AM_WRITE(x1_kanji_w)
-	AM_RANGE(0x0fd0, 0x0fd3)                   AM_READWRITE(sasi_r, sasi_w)                     // *
-	AM_RANGE(0x0fe8, 0x0fef)                   AM_READWRITE(fdd8_r, fdd8_w)                     // *
+	map(0x0800, 0x0800).w(FUNC(x1_state::color_board_w));                          // *
+	map(0x0801, 0x0801).r(FUNC(x1_state::color_board_r));                           // *
+	map(0x0802, 0x0802).w(FUNC(x1_state::color_board_2_w));                        // *
+	map(0x0803, 0x0803).r(FUNC(x1_state::color_board_2_r));                         // *
+	map(0x0a00, 0x0a07).rw(FUNC(x1_state::stereo_board_r), FUNC(x1_state::stereo_board_w));     // *
+	map(0x0b00, 0x0b00).rw(FUNC(x1_state::x1turbo_bank_r), FUNC(x1_state::x1turbo_bank_w));
+	map(0x0c00, 0x0cff).rw(FUNC(x1_state::rs232_r), FUNC(x1_state::rs232_w));                   // *
+	map(0x0d00, 0x0dff).rw(FUNC(x1_state::x1_emm_r), FUNC(x1_state::x1_emm_w));                 // *
+	map(0x0e80, 0x0e81).r(FUNC(x1_state::x1_kanji_r));
+	map(0x0e80, 0x0e83).w(FUNC(x1_state::x1_kanji_w));
+	map(0x0fd0, 0x0fd3).rw(FUNC(x1_state::sasi_r), FUNC(x1_state::sasi_w));                     // *
+	map(0x0fe8, 0x0fef).rw(FUNC(x1_state::fdd8_r), FUNC(x1_state::fdd8_w));                     // *
 
-	AM_RANGE(0x1000, 0x12ff)                   AM_WRITE(x1turboz_4096_palette_w)
+	map(0x1000, 0x12ff).w(FUNC(x1_state::x1turboz_4096_palette_w));
 
-	AM_RANGE(0x1f80, 0x1f80) AM_MIRROR(0x000f) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-	AM_RANGE(0x1f90, 0x1f93)                   AM_DEVREADWRITE("sio", z80sio0_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x1f98, 0x1f9f)                   AM_READWRITE(ext_sio_ctc_r, ext_sio_ctc_w)
-	AM_RANGE(0x1fb0, 0x1fb0)                   AM_READWRITE(x1turbo_pal_r, x1turbo_pal_w)       // Z only!
-	AM_RANGE(0x1fb8, 0x1fbf)                   AM_READWRITE(x1turbo_txpal_r, x1turbo_txpal_w)   // Z only!
-	AM_RANGE(0x1fc0, 0x1fc0)                   AM_READWRITE(x1turbo_txdisp_r, x1turbo_txdisp_w) // Z only!
-	AM_RANGE(0x1fc1, 0x1fc1)                   AM_WRITE(z_img_cap_w)                            // Z only!
-	AM_RANGE(0x1fc2, 0x1fc2)                   AM_WRITE(z_mosaic_w)                             // Z only!
-	AM_RANGE(0x1fc3, 0x1fc3)                   AM_WRITE(z_chroma_key_w)                         // Z only!
-	AM_RANGE(0x1fc4, 0x1fc4)                   AM_WRITE(z_extra_scroll_w)                       // Z only!
-	AM_RANGE(0x1fc5, 0x1fc5)                   AM_READWRITE(x1turbo_gfxpal_r, x1turbo_gfxpal_w) // Z only!
+	map(0x1f80, 0x1f80).mirror(0x000f).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x1f90, 0x1f93).rw("sio", FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+	map(0x1f98, 0x1f9f).rw(FUNC(x1_state::ext_sio_ctc_r), FUNC(x1_state::ext_sio_ctc_w));
+	map(0x1fb0, 0x1fb0).rw(FUNC(x1_state::x1turbo_pal_r), FUNC(x1_state::x1turbo_pal_w));       // Z only!
+	map(0x1fb8, 0x1fbf).rw(FUNC(x1_state::x1turbo_txpal_r), FUNC(x1_state::x1turbo_txpal_w));   // Z only!
+	map(0x1fc0, 0x1fc0).rw(FUNC(x1_state::x1turbo_txdisp_r), FUNC(x1_state::x1turbo_txdisp_w)); // Z only!
+	map(0x1fc1, 0x1fc1).w(FUNC(x1_state::z_img_cap_w));                            // Z only!
+	map(0x1fc2, 0x1fc2).w(FUNC(x1_state::z_mosaic_w));                             // Z only!
+	map(0x1fc3, 0x1fc3).w(FUNC(x1_state::z_chroma_key_w));                         // Z only!
+	map(0x1fc4, 0x1fc4).w(FUNC(x1_state::z_extra_scroll_w));                       // Z only!
+	map(0x1fc5, 0x1fc5).rw(FUNC(x1_state::x1turbo_gfxpal_r), FUNC(x1_state::x1turbo_gfxpal_w)); // Z only!
 //  AM_RANGE(0x1fd0, 0x1fdf)                   AM_READ(x1_scrn_r)                               // Z only!
-	AM_RANGE(0x1fd0, 0x1fd0) AM_MIRROR(0x000f) AM_WRITE(x1_scrn_w)
-	AM_RANGE(0x1fe0, 0x1fe0)                   AM_READWRITE(x1turboz_blackclip_r, x1turbo_blackclip_w)
-	AM_RANGE(0x1ff0, 0x1ff0)                   AM_READ_PORT("X1TURBO_DSW")
+	map(0x1fd0, 0x1fd0).mirror(0x000f).w(FUNC(x1_state::x1_scrn_w));
+	map(0x1fe0, 0x1fe0).rw(FUNC(x1_state::x1turboz_blackclip_r), FUNC(x1_state::x1turbo_blackclip_w));
+	map(0x1ff0, 0x1ff0).portr("X1TURBO_DSW");
 
-	AM_RANGE(0x3000, 0x37ff)                   AM_RAM AM_SHARE("tvram")
-	AM_RANGE(0x3800, 0x3fff)                   AM_RAM AM_SHARE("kvram")
-ADDRESS_MAP_END
+	map(0x3000, 0x37ff).ram().share("tvram");
+	map(0x3800, 0x3fff).ram().share("kvram");
+}
 
 
-ADDRESS_MAP_START(x1_state::x1_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_mem_r,x1_mem_w)
-ADDRESS_MAP_END
+void x1_state::x1_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(x1_state::x1_mem_r), FUNC(x1_state::x1_mem_w));
+}
 
-ADDRESS_MAP_START(x1_state::x1turbo_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1turbo_mem_r,x1turbo_mem_w)
-ADDRESS_MAP_END
+void x1_state::x1turbo_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(x1_state::x1turbo_mem_r), FUNC(x1_state::x1turbo_mem_w));
+}
 
-ADDRESS_MAP_START(x1_state::x1_io)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE("iobank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void x1_state::x1_io(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_iobank, FUNC(address_map_bank_device::amap8));
+}
 
 /*************************************
  *
@@ -1541,9 +1547,9 @@ WRITE8_MEMBER(x1_state::io_write_byte)
 
 READ8_MEMBER(x1_state::ym_r)
 {
-	uint8_t result = machine().device<ym2151_device>("ym")->read(space, offset);
+	uint8_t result = m_ym->read(space, offset);
 	if (!BIT(offset, 0))
-		result = (result & 0x7f) | (ioport("SOUND_SW")->read() & 0x80);
+		result = (result & 0x7f) | (m_sound_sw->read() & 0x80);
 	return result;
 }
 
@@ -1976,7 +1982,7 @@ static const gfx_layout x1_chars_16x16 =
 };
 
 /* decoded for debugging purpose, this will be nuked in the end... */
-static GFXDECODE_START( x1 )
+static GFXDECODE_START( gfx_x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0, 1 )
 	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 1 )
@@ -2169,9 +2175,9 @@ MACHINE_START_MEMBER(x1_state,x1)
 	m_emm_ram = make_unique_clear<uint8_t[]>(0x1000000);
 	m_pcg_ram = make_unique_clear<uint8_t[]>(0x1800);
 
-	save_pointer(NAME(m_work_ram.get()), 0x10000*0x10);
-	save_pointer(NAME(m_emm_ram.get()), 0x1000000);
-	save_pointer(NAME(m_pcg_ram.get()), 0x1800);
+	save_pointer(NAME(m_work_ram), 0x10000*0x10);
+	save_pointer(NAME(m_emm_ram), 0x1000000);
+	save_pointer(NAME(m_pcg_ram), 0x1800);
 
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }
@@ -2188,39 +2194,35 @@ FLOPPY_FORMATS_MEMBER( x1_state::floppy_formats )
 	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( x1_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void x1_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(x1_state::x1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(x1_mem)
-	MCFG_CPU_IO_MAP(x1_io)
-	MCFG_Z80_DAISY_CHAIN(x1_daisy)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1_mem);
+	m_maincpu->set_addrmap(AS_IO, &x1_state::x1_io);
+	m_maincpu->set_daisy_config(x1_daisy);
 
-	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(x1_io_banks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "iobank").set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", MAIN_CLOCK/4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("ctc", FUNC(z80ctc_device::trg3));
+	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg2));
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(x1_state, x1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(x1_state, x1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(x1_state, x1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(x1_state, x1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(x1_state, x1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(x1_state, x1_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255_0"));
+	ppi.in_pa_callback().set(FUNC(x1_state::x1_porta_r));
+	ppi.in_pb_callback().set(FUNC(x1_state::x1_portb_r));
+	ppi.in_pc_callback().set(FUNC(x1_state::x1_portc_r));
+	ppi.out_pa_callback().set(FUNC(x1_state::x1_porta_w));
+	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
+	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
 
 	MCFG_MACHINE_START_OVERRIDE(x1_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1)
@@ -2240,13 +2242,13 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
-	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
-	// TODO: guesswork, try to implicitily start the motor
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w))
+	MB8877(config, m_fdc, MAIN_CLOCK / 16);
+	// TODO: guesswork, try to implicitly start the motor
+	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
@@ -2258,19 +2260,18 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
-	MCFG_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(x1_cassette_formats)
@@ -2285,29 +2286,29 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(x1_state::x1turbo)
 	x1(config);
-	MCFG_CPU_MODIFY("x1_cpu")
-	MCFG_CPU_PROGRAM_MAP(x1turbo_mem)
-	MCFG_Z80_DAISY_CHAIN(x1turbo_daisy)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1turbo_mem);
+	m_maincpu->set_daisy_config(x1turbo_daisy);
+
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
 	MCFG_DEVICE_MODIFY("iobank")
 	MCFG_DEVICE_PROGRAM_MAP(x1turbo_io_banks)
 
-	MCFG_DEVICE_ADD("sio", Z80SIO0, MAIN_CLOCK/4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
+	z80sio0_device& sio(Z80SIO0(config, "sio", MAIN_CLOCK/4));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, MAIN_CLOCK/4)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("x1_cpu", INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(x1_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(x1_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(x1_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(x1_state, io_write_byte))
+	Z80DMA(config, m_dma, MAIN_CLOCK/4);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dma->in_mreq_callback().set(FUNC(x1_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(x1_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(x1_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(x1_state::io_write_byte));
 
-	MCFG_DEVICE_MODIFY("fdc")
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(x1_state, fdc_drq_w))
+	m_fdc->drq_wr_callback().set(FUNC(x1_state::fdc_drq_w));
 
-	MCFG_YM2151_ADD("ym", MAIN_CLOCK/8) //option board
+	MCFG_DEVICE_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker",  0.50)
 MACHINE_CONFIG_END
@@ -2385,21 +2386,20 @@ ROM_END
 
 
 /* Convert the ROM interleaving into something usable by the write handlers */
-DRIVER_INIT_MEMBER(x1_state,x1_kanji)
+void x1_state::init_x1_kanji()
 {
-	uint32_t i,j,k,l;
 	uint8_t *kanji = memregion("kanji")->base();
 	uint8_t *raw_kanji = memregion("raw_kanji")->base();
 
-	k = 0;
-	for(l=0;l<2;l++)
+	uint32_t k = 0;
+	for (uint32_t l=0; l < 2; l++)
 	{
-		for(j=l*16;j<(l*16)+0x10000;j+=32)
+		for (uint32_t j = l*16; j < (l*16) + 0x10000; j += 32)
 		{
-			for(i=0;i<16;i++)
+			for (uint32_t i = 0; i  < 16; i++)
 			{
-				kanji[j+i] = raw_kanji[k];
-				kanji[j+i+0x10000] = raw_kanji[0x10000+k];
+				kanji[j + i] = raw_kanji[k];
+				kanji[j + i + 0x10000] = raw_kanji[0x10000 + k];
 				k++;
 			}
 		}
@@ -2407,9 +2407,9 @@ DRIVER_INIT_MEMBER(x1_state,x1_kanji)
 }
 
 
-//    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT    STATE        INIT      COMPANY  FULLNAME              FLAGS
-COMP( 1982, x1,        0,      0,       x1,      x1,      x1_state,    0,        "Sharp", "X1 (CZ-800C)",       0 )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS     INIT           COMPANY  FULLNAME              FLAGS
+COMP( 1982, x1,        0,      0,      x1,      x1,      x1_state, empty_init,    "Sharp", "X1 (CZ-800C)",       0 )
 // x1twin in x1twin.c
-COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
-COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
-//COMP( 1986, x1turboz,  x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )
+COMP( 1984, x1turbo,   x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
+COMP( 1985, x1turbo40, x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
+//COMP( 1986, x1turboz,  x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )

@@ -40,14 +40,15 @@ public:
 	// make slide switches usable on a keyboard
 	template <ioport_value V> DECLARE_INPUT_CHANGED_MEMBER(sw_function);
 	template <ioport_value V> DECLARE_INPUT_CHANGED_MEMBER(sw_mode);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(function_in) { return m_sw_function; }
 	DECLARE_CUSTOM_INPUT_MEMBER(mode_in) { return m_sw_mode; }
 
+private:
 	void sk1_memory(address_map &map);
-protected:
+
 	virtual void driver_start() override;
 
-private:
 	ioport_value    m_sw_function = 0xfe;
 	ioport_value    m_sw_mode = 0xfe;
 };
@@ -80,18 +81,17 @@ void sk1_state::driver_start()
 }
 
 
-ADDRESS_MAP_START(sk1_state::sk1_memory)
+void sk1_state::sk1_memory(address_map &map)
+{
 	// chip selects are driven by decoding A13 and A15 with IC3 quad 2-input NOR gate
-	AM_RANGE(0x0000, 0x7fff)                   AM_ROM AM_REGION("lsi2", 0x0000)
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x4000) AM_RAM
-ADDRESS_MAP_END
+	map(0x0000, 0x7fff).rom().region("lsi2", 0x0000);
+	map(0x8000, 0x83ff).mirror(0x4000).ram();
+}
 
 
 MACHINE_CONFIG_START(sk1_state::sk1)
-	MCFG_DEVICE_ADD("dummy", ADDRESS_MAP_BANK, 0) // just to attach the memory map to something until I can work out what the CPU core is
-	MCFG_DEVICE_PROGRAM_MAP(sk1_memory)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
+	// just to attach the memory map to something until I can work out what the CPU core is
+	ADDRESS_MAP_BANK(config, "dummy").set_map(&sk1_state::sk1_memory).set_data_width(8).set_addr_width(16);
 MACHINE_CONFIG_END
 
 
@@ -172,14 +172,14 @@ INPUT_PORTS_START(sk1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("G5#")
 
 	PORT_START("KO8")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, sk1_state, mode_in, nullptr)
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, sk1_state, mode_in, nullptr)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("A5")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("A5#")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("B5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("C6")
 
 	PORT_START("KO9")
-	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, sk1_state, function_in, nullptr)
+	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, sk1_state, function_in, nullptr)
 	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("TOGGLES")
@@ -200,5 +200,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY  FULLNAME  FLAGS
-SYST( 1985, sk1,  0,      0,      sk1,     sk1,   sk1_state,  0,    "Casio", "SK-1",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS
+SYST( 1985, sk1,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-1",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

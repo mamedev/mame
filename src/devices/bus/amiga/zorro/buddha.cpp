@@ -42,27 +42,30 @@ DEFINE_DEVICE_TYPE(BUDDHA, buddha_device, "buddha", "Buddha IDE controller")
 //  mmio_map - device-specific memory mapped I/O
 //-------------------------------------------------
 
-ADDRESS_MAP_START(buddha_device::mmio_map)
-	AM_RANGE(0x7fe, 0x7ff) AM_READWRITE(speed_r, speed_w)
-	AM_RANGE(0x800, 0x8ff) AM_READWRITE(ide_0_cs0_r, ide_0_cs0_w)
-	AM_RANGE(0x900, 0x9ff) AM_READWRITE(ide_0_cs1_r, ide_0_cs1_w)
-	AM_RANGE(0xa00, 0xaff) AM_READWRITE(ide_1_cs0_r, ide_1_cs0_w)
-	AM_RANGE(0xb00, 0xbff) AM_READWRITE(ide_1_cs1_r, ide_1_cs1_w)
-	AM_RANGE(0xf00, 0xf3f) AM_READ(ide_0_interrupt_r)
-	AM_RANGE(0xf40, 0xf7f) AM_READ(ide_1_interrupt_r)
-	AM_RANGE(0xfc0, 0xfff) AM_WRITE(ide_interrupt_enable_w)
-ADDRESS_MAP_END
+void buddha_device::mmio_map(address_map &map)
+{
+	map(0x7fe, 0x7ff).rw(FUNC(buddha_device::speed_r), FUNC(buddha_device::speed_w));
+	map(0x800, 0x8ff).rw(FUNC(buddha_device::ide_0_cs0_r), FUNC(buddha_device::ide_0_cs0_w));
+	map(0x900, 0x9ff).rw(FUNC(buddha_device::ide_0_cs1_r), FUNC(buddha_device::ide_0_cs1_w));
+	map(0xa00, 0xaff).rw(FUNC(buddha_device::ide_1_cs0_r), FUNC(buddha_device::ide_1_cs0_w));
+	map(0xb00, 0xbff).rw(FUNC(buddha_device::ide_1_cs1_r), FUNC(buddha_device::ide_1_cs1_w));
+	map(0xf00, 0xf3f).r(FUNC(buddha_device::ide_0_interrupt_r));
+	map(0xf40, 0xf7f).r(FUNC(buddha_device::ide_1_interrupt_r));
+	map(0xfc0, 0xfff).w(FUNC(buddha_device::ide_interrupt_enable_w));
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(buddha_device::device_add_mconfig)
-	MCFG_ATA_INTERFACE_ADD("ata_0", ata_devices, nullptr, nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_0_interrupt_w))
-	MCFG_ATA_INTERFACE_ADD("ata_1", ata_devices, nullptr, nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_1_interrupt_w))
-MACHINE_CONFIG_END
+void buddha_device::device_add_mconfig(machine_config &config)
+{
+	ATA_INTERFACE(config, m_ata_0).options(ata_devices, nullptr, nullptr, false);
+	m_ata_0->irq_handler().set(FUNC(buddha_device::ide_0_interrupt_w));
+
+	ATA_INTERFACE(config, m_ata_1).options(ata_devices, nullptr, nullptr, false);
+	m_ata_1->irq_handler().set(FUNC(buddha_device::ide_1_interrupt_w));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -72,9 +75,9 @@ ROM_START( buddha )
 	ROM_REGION16_BE(0x10000, "bootrom", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("v103-17")
 	ROM_SYSTEM_BIOS(0, "v103-8", "Version 103.8")
-	ROMX_LOAD("buddha_103-8.rom",  0x0000, 0x8000, CRC(44f81426) SHA1(95555c6690b5c697e1cdca2726e47c1c6c194d7c), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("buddha_103-8.rom",  0x0000, 0x8000, CRC(44f81426) SHA1(95555c6690b5c697e1cdca2726e47c1c6c194d7c), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v103-17", "Version 103.17")
-	ROMX_LOAD("buddha_103-17.rom", 0x0000, 0x8000, CRC(2b7b24e0) SHA1(ec17a58962c373a2892090ec9b1722d2c326d631), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("buddha_103-17.rom", 0x0000, 0x8000, CRC(2b7b24e0) SHA1(ec17a58962c373a2892090ec9b1722d2c326d631), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 const tiny_rom_entry *buddha_device::device_rom_region() const

@@ -113,67 +113,74 @@
 
 /* LX.382 CPU Board RAM */
 /* LX.382 CPU Board EPROM */
-ADDRESS_MAP_START(z80ne_state::z80ne_mem)
-	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x0400, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0x83ff ) AM_ROMBANK("bank2")
-	AM_RANGE( 0x8400, 0xffff ) AM_READNOP AM_WRITENOP
-ADDRESS_MAP_END
+void z80ne_state::z80ne_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).bankrw("bank1");
+	map(0x0400, 0x7fff).ram();
+	map(0x8000, 0x83ff).bankr("bank2");
+	map(0x8400, 0xffff).nopr().nopw();
+}
 
-ADDRESS_MAP_START(z80ne_state::z80net_mem)
-	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x0400, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0x83ff ) AM_ROMBANK("bank2")
-	AM_RANGE( 0x8400, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_SHARE("videoram") /* (6847) */
-	AM_RANGE( 0xee00, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void z80ne_state::z80net_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).bankrw("bank1");
+	map(0x0400, 0x7fff).ram();
+	map(0x8000, 0x83ff).bankr("bank2");
+	map(0x8400, 0xebff).ram();
+	map(0xec00, 0xedff).ram().share("videoram"); /* (6847) */
+	map(0xee00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(z80ne_state::z80netb_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_SHARE("videoram") /* (6847) */
-	AM_RANGE( 0xee00, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void z80ne_state::z80netb_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0xebff).ram();
+	map(0xec00, 0xedff).ram().share("videoram"); /* (6847) */
+	map(0xee00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(z80ne_state::z80ne_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xee, 0xee) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
-ADDRESS_MAP_END
+void z80ne_state::z80ne_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xee, 0xee).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xef, 0xef).rw(FUNC(z80ne_state::lx385_ctrl_r), FUNC(z80ne_state::lx385_ctrl_w));
+	map(0xf0, 0xff).rw(FUNC(z80ne_state::lx383_r), FUNC(z80ne_state::lx383_w));
+}
 
-ADDRESS_MAP_START(z80ne_state::z80net_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xea, 0xea) AM_READ(lx387_data_r )
-	AM_RANGE(0xeb, 0xeb) AM_READ(lx388_read_field_sync )
-	AM_RANGE(0xee, 0xee) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
-ADDRESS_MAP_END
+void z80ne_state::z80net_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xea, 0xea).r(FUNC(z80ne_state::lx387_data_r));
+	map(0xeb, 0xeb).r(FUNC(z80ne_state::lx388_read_field_sync));
+	map(0xee, 0xee).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xef, 0xef).rw(FUNC(z80ne_state::lx385_ctrl_r), FUNC(z80ne_state::lx385_ctrl_w));
+	map(0xf0, 0xff).rw(FUNC(z80ne_state::lx383_r), FUNC(z80ne_state::lx383_w));
+}
 
-ADDRESS_MAP_START(z80ne_state::z80netf_mem)
-	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x0400, 0x3fff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0x83ff ) AM_RAMBANK("bank3")
-	AM_RANGE( 0x8400, 0xdfff ) AM_RAM
-	AM_RANGE( 0xe000, 0xebff ) AM_READNOP AM_WRITENOP
-	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_SHARE("videoram") /* (6847) */
-	AM_RANGE( 0xee00, 0xefff ) AM_READNOP AM_WRITENOP
-	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank4")
-	AM_RANGE( 0xf400, 0xffff ) AM_READNOP AM_WRITENOP
-ADDRESS_MAP_END
+void z80netf_state::z80netf_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).bankrw("bank1");
+	map(0x0400, 0x3fff).bankrw("bank2");
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0x83ff).bankrw("bank3");
+	map(0x8400, 0xdfff).ram();
+	map(0xe000, 0xebff).nopr().nopw();
+	map(0xec00, 0xedff).ram().share("videoram"); /* (6847) */
+	map(0xee00, 0xefff).nopr().nopw();
+	map(0xf000, 0xf3ff).bankrw("bank4");
+	map(0xf400, 0xffff).nopr().nopw();
+}
 
-ADDRESS_MAP_START(z80ne_state::z80netf_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xd0, 0xd7) AM_READWRITE(lx390_fdc_r, lx390_fdc_w)
-	AM_RANGE(0xea, 0xea) AM_READ(lx387_data_r )
-	AM_RANGE(0xeb, 0xeb) AM_READ(lx388_read_field_sync )
-	AM_RANGE(0xee, 0xee) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
-ADDRESS_MAP_END
+void z80netf_state::z80netf_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xd0, 0xd7).rw(FUNC(z80netf_state::lx390_fdc_r), FUNC(z80netf_state::lx390_fdc_w));
+	map(0xea, 0xea).r(FUNC(z80netf_state::lx387_data_r));
+	map(0xeb, 0xeb).r(FUNC(z80netf_state::lx388_read_field_sync));
+	map(0xee, 0xee).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xef, 0xef).rw(FUNC(z80netf_state::lx385_ctrl_r), FUNC(z80netf_state::lx385_ctrl_w));
+	map(0xf0, 0xff).rw(FUNC(z80netf_state::lx383_r), FUNC(z80netf_state::lx383_w));
+}
 
 
 
@@ -403,22 +410,23 @@ FLOPPY_FORMATS_MEMBER( z80ne_state::floppy_formats )
 	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( z80ne_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void z80ne_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_SSSD);
+}
 
 MACHINE_CONFIG_START(z80ne_state::z80ne)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_CPU_PROGRAM_MAP(z80ne_mem)
-	MCFG_CPU_IO_MAP(z80ne_io)
+	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
+	MCFG_DEVICE_PROGRAM_MAP(z80ne_mem)
+	MCFG_DEVICE_IO_MAP(z80ne_io)
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80ne)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80ne)
 
-	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(4800.0)
-	MCFG_AY31015_RX_CLOCK(4800.0)
+	AY31015(config, m_uart);
+	m_uart->set_tx_clock(4800.0);
+	m_uart->set_rx_clock(4800.0);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -428,11 +436,10 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("z80ne_cass")
 
-	MCFG_DEFAULT_LAYOUT(layout_z80ne)
+	config.set_default_layout(layout_z80ne);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
+	RAM(config, m_ram).set_default_size("32K");
 
 	// all known tapes require LX.388 expansion
 	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
@@ -441,55 +448,53 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(z80ne_state::z80net)
 	z80ne(config);
 
-	MCFG_CPU_MODIFY("z80ne")
-	MCFG_CPU_PROGRAM_MAP(z80net_mem)
-	MCFG_CPU_IO_MAP(z80net_io)
+	MCFG_DEVICE_MODIFY("z80ne")
+	MCFG_DEVICE_PROGRAM_MAP(z80net_mem)
+	MCFG_DEVICE_IO_MAP(z80net_io)
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state, z80net )
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state, z80net )
 
-	MCFG_DEVICE_ADD("lx387_kr2376", KR2376_ST, 50000)
-	MCFG_KR2376_MATRIX_X0(IOPORT("X0"))
-	MCFG_KR2376_MATRIX_X1(IOPORT("X1"))
-	MCFG_KR2376_MATRIX_X2(IOPORT("X2"))
-	MCFG_KR2376_MATRIX_X3(IOPORT("X3"))
-	MCFG_KR2376_MATRIX_X4(IOPORT("X4"))
-	MCFG_KR2376_MATRIX_X5(IOPORT("X5"))
-	MCFG_KR2376_MATRIX_X6(IOPORT("X6"))
-	MCFG_KR2376_MATRIX_X7(IOPORT("X7"))
-	MCFG_KR2376_SHIFT_CB(READLINE(z80ne_state, lx387_shift_r))
-	MCFG_KR2376_CONTROL_CB(READLINE(z80ne_state, lx387_control_r))
+	KR2376_ST(config, m_lx387_kr2376, 50000);
+	m_lx387_kr2376->x<0>().set_ioport("X0");
+	m_lx387_kr2376->x<1>().set_ioport("X1");
+	m_lx387_kr2376->x<2>().set_ioport("X2");
+	m_lx387_kr2376->x<3>().set_ioport("X3");
+	m_lx387_kr2376->x<4>().set_ioport("X4");
+	m_lx387_kr2376->x<5>().set_ioport("X5");
+	m_lx387_kr2376->x<6>().set_ioport("X6");
+	m_lx387_kr2376->x<7>().set_ioport("X7");
+	m_lx387_kr2376->shift().set(FUNC(z80ne_state::lx387_shift_r));
+	m_lx387_kr2376->control().set(FUNC(z80ne_state::lx387_control_r));
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_DEFAULT_LAYOUT(layout_z80net)
+	config.set_default_layout(layout_z80net);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("1K")
+	m_ram->set_default_size("32K").set_extra_options("1K");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z80ne_state::z80netb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_CPU_PROGRAM_MAP(z80netb_mem)
-	MCFG_CPU_IO_MAP(z80net_io)
+	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
+	MCFG_DEVICE_PROGRAM_MAP(z80netb_mem)
+	MCFG_DEVICE_IO_MAP(z80net_io)
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netb)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netb)
 
-	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(4800.0)
-	MCFG_AY31015_RX_CLOCK(4800.0)
+	AY31015(config, m_uart);
+	m_uart->set_tx_clock(4800.0);
+	m_uart->set_rx_clock(4800.0);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -499,48 +504,46 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("z80ne_cass")
 
-	MCFG_DEVICE_ADD("lx387_kr2376", KR2376_ST, 50000)
-	MCFG_KR2376_MATRIX_X0(IOPORT("X0"))
-	MCFG_KR2376_MATRIX_X1(IOPORT("X1"))
-	MCFG_KR2376_MATRIX_X2(IOPORT("X2"))
-	MCFG_KR2376_MATRIX_X3(IOPORT("X3"))
-	MCFG_KR2376_MATRIX_X4(IOPORT("X4"))
-	MCFG_KR2376_MATRIX_X5(IOPORT("X5"))
-	MCFG_KR2376_MATRIX_X6(IOPORT("X6"))
-	MCFG_KR2376_MATRIX_X7(IOPORT("X7"))
-	MCFG_KR2376_SHIFT_CB(READLINE(z80ne_state, lx387_shift_r))
-	MCFG_KR2376_CONTROL_CB(READLINE(z80ne_state, lx387_control_r))
+	KR2376_ST(config, m_lx387_kr2376, 50000);
+	m_lx387_kr2376->x<0>().set_ioport("X0");
+	m_lx387_kr2376->x<1>().set_ioport("X1");
+	m_lx387_kr2376->x<2>().set_ioport("X2");
+	m_lx387_kr2376->x<3>().set_ioport("X3");
+	m_lx387_kr2376->x<4>().set_ioport("X4");
+	m_lx387_kr2376->x<5>().set_ioport("X5");
+	m_lx387_kr2376->x<6>().set_ioport("X6");
+	m_lx387_kr2376->x<7>().set_ioport("X7");
+	m_lx387_kr2376->shift().set(FUNC(z80ne_state::lx387_shift_r));
+	m_lx387_kr2376->control().set(FUNC(z80ne_state::lx387_control_r));
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_DEFAULT_LAYOUT(layout_z80netb)
+	config.set_default_layout(layout_z80netb);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("1K")
+	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(z80ne_state::z80netf)
+MACHINE_CONFIG_START(z80netf_state::z80netf)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_CPU_PROGRAM_MAP(z80netf_mem)
-	MCFG_CPU_IO_MAP(z80netf_io)
+	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
+	MCFG_DEVICE_PROGRAM_MAP(z80netf_mem)
+	MCFG_DEVICE_IO_MAP(z80netf_io)
 
-	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netf)
-	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netf)
+	MCFG_MACHINE_START_OVERRIDE(z80netf_state,z80netf)
+	MCFG_MACHINE_RESET_OVERRIDE(z80netf_state,z80netf)
 
-	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(4800.0)
-	MCFG_AY31015_RX_CLOCK(4800.0)
+	AY31015(config, m_uart);
+	m_uart->set_tx_clock(4800.0);
+	m_uart->set_rx_clock(4800.0);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -550,27 +553,26 @@ MACHINE_CONFIG_START(z80ne_state::z80netf)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("z80ne_cass")
 
-	MCFG_DEVICE_ADD("lx387_kr2376", KR2376_ST, 50000)
+	KR2376_ST(config, m_lx387_kr2376, 50000);
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_FD1771_ADD("wd1771", XTAL(2'000'000) / 2)
+	FD1771(config, m_wd1771, 2_MHz_XTAL / 2);
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:3", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
 
-	MCFG_DEFAULT_LAYOUT(layout_z80netf)
+	config.set_default_layout(layout_z80netf);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("56K")
+	RAM(config, m_ram).set_default_size("56K");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list","z80ne_flop")
@@ -629,8 +631,8 @@ ROM_START( z80netf )
 	ROM_LOAD( "ep2390.ic6", 0x14C00, 0x0400, CRC(28d28eee) SHA1(b80f75c1ac4905ae369ecbc9b9ce120cc85502ed) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    STATE         INIT     COMPANY               FULLNAME                      FLAGS
-COMP( 1980, z80ne,    0,        0,      z80ne,    z80ne,   z80ne_state,  z80ne,   "Nuova Elettronica",  "Z80NE",                      MACHINE_NO_SOUND_HW)
-COMP( 1980, z80net,   z80ne,    0,      z80net,   z80net,  z80ne_state,  z80net,  "Nuova Elettronica",  "Z80NE + LX.388",             MACHINE_NO_SOUND_HW)
-COMP( 1980, z80netb,  z80ne,    0,      z80netb,  z80net,  z80ne_state,  z80netb, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", MACHINE_NO_SOUND_HW)
-COMP( 1980, z80netf,  z80ne,    0,      z80netf,  z80netf, z80ne_state,  z80netf, "Nuova Elettronica",  "Z80NE + LX.388 + LX.390",    MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY               FULLNAME                      FLAGS
+COMP( 1980, z80ne,   0,      0,      z80ne,   z80ne,   z80ne_state,   init_z80ne,   "Nuova Elettronica",  "Z80NE",                      MACHINE_NO_SOUND_HW)
+COMP( 1980, z80net,  z80ne,  0,      z80net,  z80net,  z80ne_state,   init_z80net,  "Nuova Elettronica",  "Z80NE + LX.388",             MACHINE_NO_SOUND_HW)
+COMP( 1980, z80netb, z80ne,  0,      z80netb, z80net,  z80ne_state,   init_z80netb, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", MACHINE_NO_SOUND_HW)
+COMP( 1980, z80netf, z80ne,  0,      z80netf, z80netf, z80netf_state, init_z80netf, "Nuova Elettronica",  "Z80NE + LX.388 + LX.390",    MACHINE_NO_SOUND_HW)

@@ -37,27 +37,27 @@ enum
 
 // port a, 4 or 8 bits, 2-way
 #define MCFG_PIC16C5x_READ_A_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_read_a_callback(DEVCB_##_devcb);
+	downcast<pic16c5x_device &>(*device).set_read_a_callback(DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_A_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_write_a_callback(DEVCB_##_devcb);
+	downcast<pic16c5x_device &>(*device).set_write_a_callback(DEVCB_##_devcb);
 
 // port b, 8 bits, 2-way
 #define MCFG_PIC16C5x_READ_B_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_read_b_callback(DEVCB_##_devcb);
+	downcast<pic16c5x_device &>(*device).set_read_b_callback(DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_B_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_write_b_callback(DEVCB_##_devcb);
+	downcast<pic16c5x_device &>(*device).set_write_b_callback(DEVCB_##_devcb);
 
 // port c, 8 bits, 2-way
 #define MCFG_PIC16C5x_READ_C_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_read_c_callback(DEVCB_##_devcb);
+	downcast<pic16c5x_device &>(*device).set_read_c_callback(DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_C_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_write_c_callback(DEVCB_##_devcb);
+	downcast<pic16c5x_device &>(*device).set_write_c_callback(DEVCB_##_devcb);
 
 // port d, 8 bits, 2-way
 #define MCFG_PIC16C5x_READ_D_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
+	downcast<pic16c5x_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_D_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
+	downcast<pic16c5x_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
 
 // CONFIG register
 #define MCFG_PIC16C5x_SET_CONFIG(_data) \
@@ -122,7 +122,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 2; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == PIC16C5x_RTCC; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int line, int state) override;
 
@@ -135,7 +135,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -169,7 +169,7 @@ private:
 	int     m_inst_cycles;
 
 	address_space *m_program;
-	direct_read_data<-1> *m_direct;
+	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 
 	// i/o handlers

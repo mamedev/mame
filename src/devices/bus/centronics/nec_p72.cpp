@@ -36,12 +36,13 @@ const tiny_rom_entry *nec_p72_device::device_rom_region() const
 //  ADDRESS_MAP( p72_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(nec_p72_device::p72_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* 1Mbyte firmware */
+void nec_p72_device::p72_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom(); /* 1Mbyte firmware */
 	//AM_RANGE(0x100000, 0x1fffff) AM_RAM /* 1Mbyte external RAM */ /* TODO might be 2x1Mbit */
 	// [RH] 29 August 2016: Commented out because the NEC V33 only has 20 address lines, and
 	// the V40 has more, but we don't have an NEC V40 implemented yet.
-ADDRESS_MAP_END
+}
 
 
 //-------------------------------------------------
@@ -50,8 +51,8 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(nec_p72_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, XTAL(16'000'000)/2) /* TODO it's actually a V40 */
-	MCFG_CPU_PROGRAM_MAP(p72_mem)
+	MCFG_DEVICE_ADD("maincpu", V33, XTAL(16'000'000)/2) /* TODO it's actually a V40 */
+	MCFG_DEVICE_PROGRAM_MAP(p72_mem)
 
 MACHINE_CONFIG_END
 

@@ -23,13 +23,25 @@ public:
 	icecold_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_ay8910_0(*this, "ay0"),
-			m_ay8910_1(*this, "ay1"),
-			m_pia1(*this, "pia1")
+			m_ay8910(*this, "ay%u", 0U),
+			m_pia1(*this, "pia1"),
+			m_digit_outputs(*this, "digit%u", 0U),
+			m_lamp_outputs(*this, "lamp%u", 1U),
+			m_lmotor_output(*this, "lmotor"),
+			m_rmotor_output(*this, "rmotor"),
+			m_in_play(*this, "in_play"),
+			m_good_game(*this, "good_game"),
+			m_game_over(*this, "game_over"),
+			m_tilt_output(*this, "tilt"),
+			m_start_output(*this, "start")
 	{ }
+
+	void icecold(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
 	DECLARE_CUSTOM_INPUT_MEMBER( motors_limit_r );
+
+private:
 	DECLARE_WRITE8_MEMBER( scanlines_w );
 	DECLARE_WRITE8_MEMBER( digit_w );
 	DECLARE_READ8_MEMBER( kbd_r );
@@ -42,13 +54,24 @@ public:
 	DECLARE_WRITE8_MEMBER( motors_w );
 
 	// driver_device overrides
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<ay8910_device> m_ay8910_0;
-	required_device<ay8910_device> m_ay8910_1;
+	required_device_array<ay8910_device, 2> m_ay8910;
 	required_device<pia6821_device> m_pia1;
+
+	// outputs
+	output_finder<8> m_digit_outputs;
+	output_finder<10> m_lamp_outputs;
+	output_finder<> m_lmotor_output;
+	output_finder<> m_rmotor_output;
+	output_finder<> m_in_play;
+	output_finder<> m_good_game;
+	output_finder<> m_game_over;
+	output_finder<> m_tilt_output;
+	output_finder<> m_start_output;
 
 	uint8_t   m_digit;            // scanlines from i8279
 	uint8_t   m_sound_latch;      // sound bus latch
@@ -63,19 +86,19 @@ public:
 	int     m_lmotor;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
-	void icecold(machine_config &config);
 	void icecold_map(address_map &map);
 };
 
-ADDRESS_MAP_START(icecold_state::icecold_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4010, 0x4013) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x4020, 0x4023) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x4040, 0x4043) AM_DEVREADWRITE("pia2", pia6821_device, read, write)   // not used
-	AM_RANGE(0x4080, 0x4081) AM_DEVREADWRITE("i8279", i8279_device, read, write)
-	AM_RANGE(0x4100, 0x4100) AM_WRITE(motors_w)
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void icecold_state::icecold_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x4010, 0x4013).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4020, 0x4023).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4040, 0x4043).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));   // not used
+	map(0x4080, 0x4081).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x4100, 0x4100).w(FUNC(icecold_state::motors_w));
+	map(0xa000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( icecold )
 	PORT_START("DSW3")
@@ -133,7 +156,7 @@ static INPUT_PORTS_START( icecold )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP)
-	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_SPECIAL)          PORT_CUSTOM_MEMBER(DEVICE_SELF, icecold_state, motors_limit_r, nullptr)
+	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_CUSTOM)          PORT_CUSTOM_MEMBER(DEVICE_SELF, icecold_state, motors_limit_r, nullptr)
 
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
@@ -166,10 +189,23 @@ static INPUT_PORTS_START( icecold )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
+void icecold_state::machine_start()
+{
+	m_digit_outputs.resolve();
+	m_lamp_outputs.resolve();
+	m_lmotor_output.resolve();
+	m_rmotor_output.resolve();
+	m_in_play.resolve();
+	m_good_game.resolve();
+	m_game_over.resolve();
+	m_tilt_output.resolve();
+	m_start_output.resolve();
+}
+
 void icecold_state::machine_reset()
 {
 	// CH-C is used for generate a 30hz clock
-	m_ay8910_0->set_volume(2, 0);
+	m_ay8910[0]->set_volume(2, 0);
 
 	m_rmotor = m_lmotor = 10;
 	m_sint = 0;
@@ -201,12 +237,12 @@ WRITE8_MEMBER( icecold_state::motors_w )
 
 WRITE8_MEMBER( icecold_state::scanlines_w )
 {
-	m_digit = data;
+	m_digit = data & 7;
 }
 
 WRITE8_MEMBER( icecold_state::digit_w )
 {
-	output().set_digit_value(m_digit, data & 0x7f);
+	m_digit_outputs[m_digit] = data & 0x7f;
 }
 
 READ8_MEMBER( icecold_state::kbd_r )
@@ -229,9 +265,9 @@ READ8_MEMBER( icecold_state::kbd_r )
 WRITE8_MEMBER( icecold_state::snd_ctrl_w )
 {
 	if (m_ay_ctrl & ~data & 0x04)
-		m_ay8910_0->data_address_w(space, m_ay_ctrl & 0x01, m_sound_latch);
+		m_ay8910[0]->data_address_w(space, m_ay_ctrl & 0x01, m_sound_latch);
 	if (m_ay_ctrl & ~data & 0x20)
-		m_ay8910_1->data_address_w(space, (m_ay_ctrl>>3) & 0x01, m_sound_latch);
+		m_ay8910[1]->data_address_w(space, (m_ay_ctrl>>3) & 0x01, m_sound_latch);
 
 	m_ay_ctrl = data;
 }
@@ -244,34 +280,28 @@ WRITE8_MEMBER( icecold_state::ay_w )
 READ8_MEMBER( icecold_state::ay_r )
 {
 	if (m_ay_ctrl & 0x02)
-		return m_ay8910_0->data_r(space, 0);
+		return m_ay8910[0]->data_r(space, 0);
 	if (m_ay_ctrl & 0x10)
-		return m_ay8910_1->data_r(space, 0);
+		return m_ay8910[1]->data_r(space, 0);
 
 	return 0;
 }
 
 WRITE8_MEMBER( icecold_state::ay8910_0_b_w )
 {
-	output().set_lamp_value(1, BIT(data, 0));
-	output().set_lamp_value(2, BIT(data, 1));
-	output().set_lamp_value(3, BIT(data, 2));
-	output().set_lamp_value(4, BIT(data, 3));
-	output().set_lamp_value(5, BIT(data, 4));
-	output().set_value("in_play", BIT(data, 5));
-	output().set_value("good_game", BIT(data, 6));
+	for (int n = 0; n < 5; n++)
+		m_lamp_outputs[n] = BIT(data, n);
+	m_in_play = BIT(data, 5);
+	m_good_game = BIT(data, 6);
 	m_motenbl = BIT(data, 7);
 }
 
 WRITE8_MEMBER( icecold_state::ay8910_1_a_w )
 {
-	output().set_lamp_value(6, BIT(data, 0));
-	output().set_lamp_value(7, BIT(data, 1));
-	output().set_lamp_value(8, BIT(data, 2));
-	output().set_lamp_value(9, BIT(data, 3));
-	output().set_lamp_value(10, BIT(data, 4));
-	output().set_value("game_over", BIT(data, 5));
-	output().set_value("tilt", BIT(data, 6));
+	for (int n = 0; n < 5; n++)
+		m_lamp_outputs[n + 5] = BIT(data, n);
+	m_game_over = BIT(data, 5);
+	m_tilt_output = BIT(data, 6);
 	// BIT 7 watchdog reset
 }
 
@@ -279,7 +309,7 @@ WRITE8_MEMBER( icecold_state::ay8910_1_b_w )
 {
 	if (m_motenbl == 0)
 	{
-		output().set_value("start", BIT(data, 0));
+		m_start_output = BIT(data, 0);
 		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));     // hopper counter
 		machine().bookkeeping().coin_counter_w(2, BIT(data, 2));     // good game counter
 		machine().bookkeeping().coin_lockout_w(0, BIT(data, 3));     // not used ??
@@ -322,8 +352,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 
 		if (lmotor_dir != 0 || rmotor_dir != 0)
 		{
-			output().set_value("lmotor", m_lmotor);
-			output().set_value("rmotor", m_rmotor);
+			m_lmotor_output = m_lmotor;
+			m_rmotor_output = m_rmotor;
 
 			popmessage("Left Motor   Right Motor\n%-4s         %-4s\n%02d\\100       %02d\\100",
 						(lmotor_dir > 0) ? " up" : ((lmotor_dir < 0) ? "down" : "off"),
@@ -335,31 +365,31 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 MACHINE_CONFIG_START(icecold_state::icecold)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(6'000'000)/4) // 68A09E
-	MCFG_CPU_PROGRAM_MAP(icecold_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(6'000'000)/4) // 68A09E
+	MCFG_DEVICE_PROGRAM_MAP(icecold_map)
 
-	MCFG_DEVICE_ADD( "pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("JOY"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("DSW3"))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set_ioport("JOY");
+	pia0.readpb_handler().set_ioport("DSW3");
+	pia0.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	pia0.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD( "pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(icecold_state, ay_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(icecold_state, ay_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(icecold_state, snd_ctrl_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set(FUNC(icecold_state::ay_r));
+	m_pia1->writepa_handler().set(FUNC(icecold_state::ay_w));
+	m_pia1->writepb_handler().set(FUNC(icecold_state::snd_ctrl_w));
+	m_pia1->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
+	m_pia1->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
-	MCFG_DEVICE_ADD( "pia2", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	pia6821_device &pia2(PIA6821(config, "pia2", 0));
+	pia2.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	pia2.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("i8279", I8279, XTAL(6'000'000)/4)
-	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("pia0", pia6821_device, cb1_w)) // irq
-	MCFG_I8279_OUT_SL_CB(WRITE8(icecold_state, scanlines_w))        // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(icecold_state, digit_w))         // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(icecold_state, kbd_r))                // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", XTAL(6'000'000)/4));
+	kbdc.out_irq_callback().set("pia0", FUNC(pia6821_device::cb1_w));   // irq
+	kbdc.out_sl_callback().set(FUNC(icecold_state::scanlines_w));       // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(icecold_state::digit_w));         // display A&B
+	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));              // kbd RL lines
 
 	// 30Hz signal from CH-C of ay0
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sint_timer", icecold_state, icecold_sint_timer, attotime::from_hz(30))
@@ -368,18 +398,18 @@ MACHINE_CONFIG_START(icecold_state::icecold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("motors_timer", icecold_state, icecold_motors_timer, attotime::from_msec(50))
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_icecold)
+	config.set_default_layout(layout_icecold);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay0", AY8910, XTAL(6'000'000)/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay0", AY8910, XTAL(6'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(icecold_state, ay8910_0_b_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, icecold_state, ay8910_0_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(icecold_state, ay8910_1_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(icecold_state, ay8910_1_b_w))
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, icecold_state, ay8910_1_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, icecold_state, ay8910_1_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -402,5 +432,5 @@ ROM_START(zekepeak)
 ROM_END
 
 
-GAME(1983,  icecold,   0,        icecold,  icecold, icecold_state,  0,  ROT0,  "Taito",    "Ice Cold Beer",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
-GAME(1983,  zekepeak,  icecold,  icecold,  icecold, icecold_state,  0,  ROT0,  "Taito",    "Zeke's Peak",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME( 1983, icecold,  0,       icecold, icecold, icecold_state, empty_init, ROT0, "Taito", "Ice Cold Beer", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME( 1983, zekepeak, icecold, icecold, icecold, icecold_state, empty_init, ROT0, "Taito", "Zeke's Peak",   MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

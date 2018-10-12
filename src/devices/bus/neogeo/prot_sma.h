@@ -30,11 +30,13 @@ public:
 	uint32_t garou_bank_base(uint16_t sel);
 	uint32_t garouh_bank_base(uint16_t sel);
 	uint32_t mslug3_bank_base(uint16_t sel);
+	uint32_t mslug3a_bank_base(uint16_t sel);
 	uint32_t kof2000_bank_base(uint16_t sel);
 	void kof99_decrypt_68k(uint8_t* base);
 	void garou_decrypt_68k(uint8_t* base);
 	void garouh_decrypt_68k(uint8_t* base);
 	void mslug3_decrypt_68k(uint8_t* base);
+	void mslug3a_decrypt_68k(uint8_t* base);
 	void kof2000_decrypt_68k(uint8_t* base);
 
 protected:

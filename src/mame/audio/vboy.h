@@ -13,16 +13,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VBOYSND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, VBOYSND, vboysnd_device::AUDIO_FREQ)
-
-#define MCFG_VBOYSND_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, VBOYSND, vboysnd_device::AUDIO_FREQ)
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -31,10 +21,8 @@
 class vboysnd_device : public device_t, public device_sound_interface
 {
 public:
-	static constexpr unsigned AUDIO_FREQ      = 44100;
-
 	// construction/destruction
-	vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 5'000'000);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -80,6 +68,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

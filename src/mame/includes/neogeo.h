@@ -6,11 +6,17 @@
     Neo-Geo hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_NEOGEO_H
+#define MAME_INCLUDES_NEOGEO_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/upd1990a.h"
 #include "machine/ng_memcard.h"
 #include "video/neogeo_spr.h"
@@ -19,6 +25,7 @@
 #include "bus/neogeo/carts.h"
 #include "bus/neogeo_ctrl/ctrl.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -27,50 +34,44 @@
 #define NEOGEO_VBLANK_IRQ_HTIM (attotime::from_ticks(56+2, NEOGEO_MASTER_CLOCK))
 
 
-class neogeo_state : public driver_device
+class neogeo_base_state : public driver_device
 {
 public:
-	neogeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_upd4990a(*this, "upd4990a"),
-		m_ym(*this, "ymsnd"),
-		m_sprgen(*this, "spritegen"),
-		m_save_ram(*this, "saveram"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_memcard(*this, "memcard"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
-		m_region_maincpu(*this, "maincpu"),
-		m_region_sprites(*this, "sprites"),
-		m_region_fixed(*this, "fixed"),
-		m_region_fixedbios(*this, "fixedbios"),
-		m_region_mainbios(*this, "mainbios"),
-		m_region_audiobios(*this, "audiobios"),
-		m_region_audiocpu(*this, "audiocpu"),
-		m_bank_audio_main(*this, "audio_main"),
-		m_dsw(*this, "DSW"),
-		m_trackx(*this, "TRACK_X"),
-		m_tracky(*this, "TRACK_Y"),
-		m_edge(*this, "edge"),
-		m_ctrl1(*this, "ctrl1"),
-		m_ctrl2(*this, "ctrl2"),
-		m_use_cart_vectors(0),
-		m_use_cart_audio(0),
-		m_slot1(*this, "cslot1"),
-		m_slot2(*this, "cslot2"),
-		m_slot3(*this, "cslot3"),
-		m_slot4(*this, "cslot4"),
-		m_slot5(*this, "cslot5"),
-		m_slot6(*this, "cslot6")
+	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
+
+protected:
+	neogeo_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_ym(*this, "ymsnd")
+		, m_sprgen(*this, "spritegen")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_memcard(*this, "memcard")
+		, m_systemlatch(*this, "systemlatch")
+		, m_soundlatch(*this, "soundlatch")
+		, m_soundlatch2(*this, "soundlatch2")
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_sprites(*this, "sprites")
+		, m_region_fixed(*this, "fixed")
+		, m_region_fixedbios(*this, "fixedbios")
+		, m_region_mainbios(*this, "mainbios")
+		, m_region_audiobios(*this, "audiobios")
+		, m_region_audiocpu(*this, "audiocpu")
+		, m_bank_audio_main(*this, "audio_main")
+		, m_edge(*this, "edge")
+		, m_ctrl1(*this, "ctrl1")
+		, m_ctrl2(*this, "ctrl2")
+		, m_use_cart_vectors(0)
+		, m_use_cart_audio(0)
+		, m_slots(*this, "cslot%u", 1U)
+		, m_audionmi(*this, "audionmi")
 	{ }
 
 	DECLARE_READ16_MEMBER(memcard_r);
 	DECLARE_WRITE16_MEMBER(memcard_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
 	DECLARE_WRITE8_MEMBER(audio_cpu_enable_nmi_w);
 	DECLARE_READ16_MEMBER(unmapped_r);
@@ -78,24 +79,15 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(video_register_r);
 	DECLARE_WRITE16_MEMBER(video_register_w);
-	DECLARE_READ16_MEMBER(in0_r);
-	DECLARE_READ16_MEMBER(in1_r);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
 
 	TIMER_CALLBACK_MEMBER(display_position_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 
-	// MVS-specific
-	DECLARE_WRITE_LINE_MEMBER(set_save_ram_unlock);
-	DECLARE_WRITE16_MEMBER(save_ram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_start_r);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint32_t screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	DECLARE_WRITE8_MEMBER(io_control_w);
+	virtual DECLARE_WRITE8_MEMBER(io_control_w);
+	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_WRITE_LINE_MEMBER(set_use_cart_vectors);
 	DECLARE_WRITE_LINE_MEMBER(set_use_cart_audio);
 	DECLARE_READ16_MEMBER(banked_vectors_r);
@@ -110,103 +102,30 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(set_screen_shadow);
 	DECLARE_WRITE_LINE_MEMBER(set_palette_bank);
 
-	DECLARE_DRIVER_INIT(neogeo);
-
 	void neogeo_base(machine_config &config);
-	void neogeo_arcade(machine_config &config);
-	void mslug3b6(machine_config &config);
-	void s1945p(machine_config &config);
-	void rotd(machine_config &config);
-	void mslug4(machine_config &config);
-	void kof2003(machine_config &config);
-	void lans2004(machine_config &config);
-	void ms5plus(machine_config &config);
-	void kof2k4se(machine_config &config);
-	void kof2002(machine_config &config);
-	void kof2001(machine_config &config);
-	void svcplus(machine_config &config);
-	void kf2k5uni(machine_config &config);
-	void garou(machine_config &config);
-	void sbp(machine_config &config);
-	void cthd2k3(machine_config &config);
-	void ct2k3sp(machine_config &config);
-	void kof2000n(machine_config &config);
-	void mslug3(machine_config &config);
-	void kog(machine_config &config);
-	void fatfur2(machine_config &config);
-	void garouh(machine_config &config);
-	void ganryu(machine_config &config);
-	void zupapa(machine_config &config);
-	void neobase(machine_config &config);
-	void kof10th(machine_config &config);
-	void mslug5(machine_config &config);
-	void garoubl(machine_config &config);
-	void ct2k3sa(machine_config &config);
-	void nitd(machine_config &config);
-	void samsh5sp(machine_config &config);
-	void kof98(machine_config &config);
-	void kf2k3pl(machine_config &config);
-	void mvs(machine_config &config);
-	void ms4plus(machine_config &config);
-	void samsho5b(machine_config &config);
-	void popbounc(machine_config &config);
-	void svcplusa(machine_config &config);
-	void kof2002b(machine_config &config);
-	void svcboot(machine_config &config);
-	void kof2000(machine_config &config);
-	void samsho5(machine_config &config);
-	void kf2k2mp2(machine_config &config);
-	void pnyaa(machine_config &config);
-	void mslug3h(machine_config &config);
-	void vliner(machine_config &config);
-	void jockeygp(machine_config &config);
-	void matrim(machine_config &config);
-	void matrimbl(machine_config &config);
-	void kof97oro(machine_config &config);
-	void kizuna4p(machine_config &config);
-	void mslugx(machine_config &config);
-	void kf2k2pls(machine_config &config);
-	void kf10thep(machine_config &config);
-	void sengoku3(machine_config &config);
-	void neogeo_mj(machine_config &config);
-	void kf2k3upl(machine_config &config);
-	void preisle2(machine_config &config);
-	void svcsplus(machine_config &config);
-	void kf2k3bl(machine_config &config);
-	void kof99(machine_config &config);
-	void svc(machine_config &config);
-	void kof2003h(machine_config &config);
-	void kof99k(machine_config &config);
-	void irrmaze(machine_config &config);
-	void kf2k2mp(machine_config &config);
-	void bangbead(machine_config &config);
+	void neogeo_stereo(machine_config &config);
+
+	void base_main_map(address_map &map);
 	void audio_io_map(address_map &map);
 	void audio_map(address_map &map);
-	void main_map_slot(address_map &map);
-	void neogeo_main_map(address_map &map);
-protected:
-	void common_machine_start();
-
-	void set_outputs();
 
 	// device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void neogeo_postload();
+	virtual void device_post_load() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	// MVS-specific devices
-	optional_device<upd4990a_device> m_upd4990a;
 	optional_device<ym2610_device> m_ym;
 	required_device<neosprite_optimized_device> m_sprgen;
-	optional_shared_ptr<uint16_t> m_save_ram;
 
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
+	required_device<hc259_device> m_systemlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 
@@ -222,12 +141,6 @@ protected:
 	memory_bank           *m_bank_audio_cart[4];
 	memory_bank           *m_bank_cartridge;
 
-	// configuration
-	enum {NEOGEO_MVS, NEOGEO_AES, NEOGEO_CD} m_type;
-
-	optional_ioport m_dsw;
-	optional_ioport m_trackx;
-	optional_ioport m_tracky;
 	optional_device<neogeo_ctrl_edge_port_device> m_edge;
 	optional_device<neogeo_control_port_device> m_ctrl1;
 	optional_device<neogeo_control_port_device> m_ctrl2;
@@ -254,15 +167,9 @@ protected:
 	// temporary helper to restore memory banking while bankswitch is handled in the driver...
 	uint32_t m_bank_base;
 
-	optional_device<neogeo_cart_slot_device> m_slot1;
-	optional_device<neogeo_cart_slot_device> m_slot2;
-	optional_device<neogeo_cart_slot_device> m_slot3;
-	optional_device<neogeo_cart_slot_device> m_slot4;
-	optional_device<neogeo_cart_slot_device> m_slot5;
-	optional_device<neogeo_cart_slot_device> m_slot6;
+	optional_device_array<neogeo_cart_slot_device, 6> m_slots;
 
 	int m_curr_slot;
-	neogeo_cart_slot_device* m_slots[6];
 
 private:
 	void update_interrupts();
@@ -279,22 +186,8 @@ private:
 	void create_rgb_lookups();
 	void set_pens();
 
-	void audio_cpu_check_nmi();
-	void set_output_latch(uint8_t data);
-	void set_output_data(uint8_t data);
-
 	// internal state
 	bool       m_recurse;
-	bool       m_audio_cpu_nmi_enabled;
-	bool       m_audio_cpu_nmi_pending;
-
-	// MVS-specific state
-	uint8_t      m_save_ram_unlocked;
-	uint8_t      m_output_data;
-	uint8_t      m_output_latch;
-	uint8_t      m_el_value;
-	uint8_t      m_led1_value;
-	uint8_t      m_led2_value;
 
 	emu_timer  *m_display_position_interrupt_timer;
 	emu_timer  *m_display_position_vblank_timer;
@@ -307,73 +200,75 @@ private:
 
 	uint16_t get_video_control();
 
+	required_device<input_merger_device> m_audionmi;
+
 	// color/palette related
 	std::vector<uint16_t> m_paletteram;
-	uint8_t        m_palette_lookup[32][4];
+	uint8_t      m_palette_lookup[32][4];
 	int          m_screen_shadow;
 	int          m_palette_bank;
 };
 
 
-class aes_state : public neogeo_state
+class ngarcade_base_state : public neogeo_base_state
 {
-	public:
-		aes_state(const machine_config &mconfig, device_type type, const char *tag)
-			: neogeo_state(mconfig, type, tag)
-			, m_io_in2(*this, "IN2")
-	{}
+public:
+	DECLARE_CUSTOM_INPUT_MEMBER(startsel_edge_joy_r);
 
-	DECLARE_READ16_MEMBER(aes_in2_r);
-	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
-	DECLARE_MACHINE_START(aes);
-
-	void aes(machine_config &config);
-	void aes_main_map(address_map &map);
 protected:
-	required_ioport m_io_in2;
+	ngarcade_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: neogeo_base_state(mconfig, type, tag)
+		, m_save_ram(*this, "saveram")
+		, m_upd4990a(*this, "upd4990a")
+		, m_dsw(*this, "DSW")
+	{
+	}
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual DECLARE_WRITE8_MEMBER(io_control_w) override;
+	DECLARE_WRITE_LINE_MEMBER(set_save_ram_unlock);
+	DECLARE_WRITE16_MEMBER(save_ram_w);
+	DECLARE_READ16_MEMBER(in0_edge_r);
+	DECLARE_READ16_MEMBER(in0_edge_joy_r);
+	DECLARE_READ16_MEMBER(in1_edge_r);
+	DECLARE_READ16_MEMBER(in1_edge_joy_r);
+
+	void neogeo_arcade(machine_config &config);
+	void neogeo_mono(machine_config &config);
+
+	void neogeo_main_map(address_map &map);
+
+private:
+	required_shared_ptr<uint16_t> m_save_ram;
+	required_device<upd4990a_device> m_upd4990a;
+	required_ioport m_dsw;
+
+	uint8_t m_save_ram_unlocked;
 };
 
 
-#include "bus/neogeo/prot_pcm2.h"
-#include "bus/neogeo/prot_cmc.h"
-#include "bus/neogeo/prot_pvc.h"
-
-class neopcb_state : public neogeo_state
+class aes_base_state : public neogeo_base_state
 {
-	public:
-		neopcb_state(const machine_config &mconfig, device_type type, const char *tag)
-			: neogeo_state(mconfig, type, tag)
-		, m_cmc_prot(*this, "cmc50")
-		, m_pcm2_prot(*this, "pcm2")
-		, m_pvc_prot(*this, "pvc")
-	{}
+public:
+	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
-	// device overrides
+protected:
+	aes_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: neogeo_base_state(mconfig, type, tag)
+		, m_io_in2(*this, "IN2")
+	{
+	}
+
+	DECLARE_READ16_MEMBER(aes_in2_r);
+
 	virtual void machine_start() override;
 
-	DECLARE_WRITE16_MEMBER(write_bankpvc);
+	void aes_base_main_map(address_map &map);
 
-	DECLARE_INPUT_CHANGED_MEMBER(select_bios);
-
-	DECLARE_DRIVER_INIT(ms5pcb);
-	DECLARE_DRIVER_INIT(svcpcb);
-	DECLARE_DRIVER_INIT(kf2k3pcb);
-	DECLARE_DRIVER_INIT(vliner);
-
-	void install_common();
-	void install_banked_bios();
-	void neopcb_postload();
-	// non-carts
-	void svcpcb_gfx_decrypt();
-	void svcpcb_s1data_decrypt();
-	void kf2k3pcb_gfx_decrypt();
-	void kf2k3pcb_decrypt_s1data();
-	void kf2k3pcb_sp1_decrypt();
-
-	required_device<cmc_prot_device> m_cmc_prot;
-	required_device<pcm2_prot_device> m_pcm2_prot;
-	required_device<pvc_prot_device> m_pvc_prot;
-	void neopcb(machine_config &config);
+private:
+	required_ioport m_io_in2;
 };
 
 
@@ -381,3 +276,5 @@ class neopcb_state : public neogeo_state
 
 INPUT_PORTS_EXTERN(neogeo);
 INPUT_PORTS_EXTERN(aes);
+
+#endif // MAME_INCLUDES_NEOGEO_H

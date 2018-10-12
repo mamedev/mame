@@ -12,6 +12,7 @@
 #pragma once
 
 #include "s3c24xx.h"
+#include "emupal.h"
 
 
 /*******************************************************************************
@@ -21,37 +22,37 @@
 #define S3C2400_TAG "s3c2400"
 
 #define MCFG_S3C2400_PALETTE(palette_tag) \
-	downcast<s3c2400_device &>(*device).set_palette_tag(("^" palette_tag));
+	downcast<s3c2400_device &>(*device).set_palette_tag(palette_tag);
 
 #define MCFG_S3C2400_SCREEN(screen_tag) \
-	downcast<s3c2400_device &>(*device).set_screen_tag(("^" screen_tag));
+	downcast<s3c2400_device &>(*device).set_screen_tag(screen_tag);
 
 #define MCFG_S3C2400_CORE_PIN_R_CB(cb) \
-	devcb = &downcast<s3c2400_device &>(*device).set_core_pin_r_callback(DEVCB_##cb);
+	downcast<s3c2400_device &>(*device).set_core_pin_r_callback(DEVCB_##cb);
 
 #define MCFG_S3C2400_CORE_PIN_W_CB(cb) \
-	devcb = &downcast<s3c2400_device &>(*device).set_core_pin_w_callback(DEVCB_##cb);
+	downcast<s3c2400_device &>(*device).set_core_pin_w_callback(DEVCB_##cb);
 
 #define MCFG_S3C2400_GPIO_PORT_R_CB(cb) \
-	devcb = &downcast<s3c2400_device &>(*device).set_gpio_port_r_callback(DEVCB_##cb);
+	downcast<s3c2400_device &>(*device).set_gpio_port_r_callback(DEVCB_##cb);
 
 #define MCFG_S3C2400_GPIO_PORT_W_CB(cb) \
-	devcb = &downcast<s3c2400_device &>(*device).set_gpio_port_w_callback(DEVCB_##cb);
+	downcast<s3c2400_device &>(*device).set_gpio_port_w_callback(DEVCB_##cb);
 
 #define MCFG_S3C2400_I2C_SCL_W_CB(cb) \
-	devcb = &downcast<s3c2400_device &>(*device).set_i2c_scl_w_callback(DEVCB_##cb);
+	downcast<s3c2400_device &>(*device).set_i2c_scl_w_callback(DEVCB_##cb);
 
 #define MCFG_S3C2400_I2C_SDA_R_CB(cb) \
-	devcb = &downcast<s3c2400_device &>(*device).set_i2c_sda_r_callback(DEVCB_##cb);
+	downcast<s3c2400_device &>(*device).set_i2c_sda_r_callback(DEVCB_##cb);
 
 #define MCFG_S3C2400_I2C_SDA_W_CB(cb) \
-	devcb = &downcast<s3c2400_device &>(*device).set_i2c_sda_w_callback(DEVCB_##cb);
+	downcast<s3c2400_device &>(*device).set_i2c_sda_w_callback(DEVCB_##cb);
 
 #define MCFG_S3C2400_ADC_DATA_R_CB(cb) \
-	devcb = &downcast<s3c2400_device &>(*device).set_adc_data_r_callback(DEVCB_##cb);
+	downcast<s3c2400_device &>(*device).set_adc_data_r_callback(DEVCB_##cb);
 
 #define MCFG_S3C2400_I2S_DATA_W_CB(cb) \
-	devcb = &downcast<s3c2400_device &>(*device).set_i2s_data_w_callback(DEVCB_##cb);
+	downcast<s3c2400_device &>(*device).set_i2s_data_w_callback(DEVCB_##cb);
 
 #define MCFG_S3C2400_LCD_FLAGS(flags) \
 	downcast<s3c2400_device &>(*device).set_lcd_flags((flags));

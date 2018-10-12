@@ -24,23 +24,26 @@ public:
 	{ }
 
 	void astropc(machine_config &config);
+
+	void init_astropc();
+
+private:
 	void astropc_io(address_map &map);
 	void astropc_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-public:
-	DECLARE_DRIVER_INIT(astropc);
 };
 
-ADDRESS_MAP_START(astropc_state::astropc_map)
-	AM_RANGE(0x000c0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
-ADDRESS_MAP_END
+void astropc_state::astropc_map(address_map &map)
+{
+	map(0x000c0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(astropc_state::astropc_io)
-ADDRESS_MAP_END
+void astropc_state::astropc_io(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( astropc )
@@ -50,9 +53,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(astropc_state::astropc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 40000000 ) // ??
-	MCFG_CPU_PROGRAM_MAP(astropc_map)
-	MCFG_CPU_IO_MAP(astropc_io)
+	MCFG_DEVICE_ADD("maincpu", I486, 40000000 ) // ??
+	MCFG_DEVICE_PROGRAM_MAP(astropc_map)
+	MCFG_DEVICE_IO_MAP(astropc_io)
 MACHINE_CONFIG_END
 
 
@@ -161,19 +164,19 @@ ROM_START( rasce )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(astropc_state,astropc)
+void astropc_state::init_astropc()
 {
 }
 
-GAME( 2002, blackbd,   0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Black Beard (Russia, set 1)", MACHINE_IS_SKELETON )
-GAME( 2002, blackbda,  blackbd,  astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Black Beard (Russia, set 2)", MACHINE_IS_SKELETON )
-GAME( 2002, blackbdb,  blackbd,  astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Black Beard (Russia, set 3)", MACHINE_IS_SKELETON )
+GAME( 2002, blackbd,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 1)", MACHINE_IS_SKELETON )
+GAME( 2002, blackbda, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 2)", MACHINE_IS_SKELETON )
+GAME( 2002, blackbdb, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 3)", MACHINE_IS_SKELETON )
 
-GAME( 2002, dslayrr,   0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Dragon Slayer (Russia, set 1)", MACHINE_IS_SKELETON )
-GAME( 2002, dslayrra,  dslayrr,  astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Dragon Slayer (Russia, set 2)", MACHINE_IS_SKELETON )
+GAME( 2002, dslayrr,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Dragon Slayer (Russia, set 1)", MACHINE_IS_SKELETON )
+GAME( 2002, dslayrra, dslayrr, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Dragon Slayer (Russia, set 2)", MACHINE_IS_SKELETON )
 
-GAME( 2002, hawaii,    0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Hawaii (Russia)", MACHINE_IS_SKELETON )
+GAME( 2002, hawaii,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Hawaii (Russia)", MACHINE_IS_SKELETON )
 
-GAME( 2002, oligam,    0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Olympian Games (Russia)", MACHINE_IS_SKELETON )
+GAME( 2002, oligam,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Olympian Games (Russia)", MACHINE_IS_SKELETON )
 
-GAME( 2002, rasce,     0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Ra Sceptor (Russia)", MACHINE_IS_SKELETON )
+GAME( 2002, rasce,    0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Ra Sceptor (Russia)", MACHINE_IS_SKELETON )

@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+
+#include "emupal.h"
+
 class rocnrope_state : public driver_device
 {
 public:
@@ -14,6 +17,11 @@ public:
 		m_videoram(*this, "videoram")
 	{ }
 
+	void rocnrope(machine_config &config);
+
+	void init_rocnrope();
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -35,14 +43,12 @@ public:
 	DECLARE_WRITE8_MEMBER(rocnrope_videoram_w);
 	DECLARE_WRITE8_MEMBER(rocnrope_colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_DRIVER_INIT(rocnrope);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(rocnrope);
 	uint32_t screen_update_rocnrope(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void rocnrope(machine_config &config);
 	void rocnrope_map(address_map &map);
 };

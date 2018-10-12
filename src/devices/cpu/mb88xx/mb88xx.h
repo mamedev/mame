@@ -54,47 +54,47 @@
 
 // K (K3-K0): input-only port
 #define MCFG_MB88XX_READ_K_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_k_callback(DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_read_k_callback(DEVCB_##_devcb);
 
 // O (O7-O4 = OH, O3-O0 = OL): output through PLA
 #define MCFG_MB88XX_WRITE_O_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_o_callback(DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_write_o_callback(DEVCB_##_devcb);
 
 // P (P3-P0): output-only port
 #define MCFG_MB88XX_WRITE_P_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_p_callback(DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_write_p_callback(DEVCB_##_devcb);
 
 // R0 (R3-R0): input/output port
 #define MCFG_MB88XX_READ_R0_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_r_callback(0, DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_read_r_callback(0, DEVCB_##_devcb);
 #define MCFG_MB88XX_WRITE_R0_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_r_callback(0, DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_write_r_callback(0, DEVCB_##_devcb);
 
 // R1 (R7-R4): input/output port
 #define MCFG_MB88XX_READ_R1_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_r_callback(1, DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_read_r_callback(1, DEVCB_##_devcb);
 #define MCFG_MB88XX_WRITE_R1_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_r_callback(1, DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_write_r_callback(1, DEVCB_##_devcb);
 
 // R2 (R11-R8): input/output port
 #define MCFG_MB88XX_READ_R2_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_r_callback(2, DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_read_r_callback(2, DEVCB_##_devcb);
 #define MCFG_MB88XX_WRITE_R2_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_r_callback(2, DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_write_r_callback(2, DEVCB_##_devcb);
 
 // R3 (R15-R12): input/output port
 #define MCFG_MB88XX_READ_R3_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_r_callback(3, DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_read_r_callback(3, DEVCB_##_devcb);
 #define MCFG_MB88XX_WRITE_R3_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_r_callback(3, DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_write_r_callback(3, DEVCB_##_devcb);
 
 // SI: serial input
 #define MCFG_MB88XX_READ_SI_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_si_callback(DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_read_si_callback(DEVCB_##_devcb);
 
 // SO: serial output
 #define MCFG_MB88XX_WRITE_SO_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_so_callback(DEVCB_##_devcb);
+	downcast<mb88_cpu_device &>(*device).set_write_so_callback(DEVCB_##_devcb);
 
 // Configure 32 byte PLA; if nullptr (default) assume direct output
 #define MCFG_MB88XX_OUTPUT_PLA(_pla) \
@@ -169,7 +169,7 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -217,7 +217,7 @@ private:
 	uint8_t m_pending_interrupt;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
 	int m_icount;
 

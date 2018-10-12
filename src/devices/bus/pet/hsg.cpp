@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(CBM8000_HSG_B, cbm8000_hsg_b_device, "cbm8000_hsg_b", "CBM 80
 
 ROM_START( cbm8000_hsg )
 	ROM_REGION( 0x1000, "9000", 0 )
-	ROM_LOAD( "pet_hsg-ud12 on 8032 9000 (2532).bin", 0x0000, 0x1000, CRC(d651bf72) SHA1(d3d68228a5a8ec73fb39be860c00edb0d21bd1a9) )
+	ROM_LOAD( "pet_hsg-ud12 on 8032 9000,2532.bin", 0x0000, 0x1000, CRC(d651bf72) SHA1(d3d68228a5a8ec73fb39be860c00edb0d21bd1a9) )
 
 	ROM_REGION( 0x1000, "a000", 0 )
 	ROM_LOAD( "324381-01 rev b sw graphi", 0x0000, 0x1000, CRC(c8e3bff9) SHA1(12ed3176ddd632f52e91082ab574adcba2149684) )
@@ -69,20 +69,22 @@ const tiny_rom_entry *cbm8000_hsg_device::device_rom_region() const
 //  ADDRESS_MAP( hsg_a_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(cbm8000_hsg_a_device::hsg_a_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+void cbm8000_hsg_a_device::hsg_a_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x7fff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( hsg_b_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(cbm8000_hsg_b_device::hsg_b_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void cbm8000_hsg_b_device::hsg_b_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).ram();
+}
 
 
 //-------------------------------------------------

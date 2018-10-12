@@ -109,7 +109,7 @@ static INPUT_PORTS_START( simpl156 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // all bits? check..
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -221,113 +221,118 @@ WRITE32_MEMBER(simpl156_state::simpl156_pf2_rowscroll_w)
 /* Memory Map controled by PALs */
 
 /* Joe and Mac Returns */
-ADDRESS_MAP_START(simpl156_state::joemacr_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram
-	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
-	AM_RANGE(0x120000, 0x120fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
-	AM_RANGE(0x130000, 0x130003) AM_READ_PORT("IN1") AM_WRITE(simpl156_eeprom_w)
-	AM_RANGE(0x140000, 0x14001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x150000, 0x151fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x152000, 0x153fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x154000, 0x155fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
-	AM_RANGE(0x164000, 0x165fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
-	AM_RANGE(0x170000, 0x170003) AM_READONLY AM_WRITENOP // ?
-	AM_RANGE(0x180000, 0x180003) AM_DEVREADWRITE8("okisfx", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x1c0000, 0x1c0003) AM_DEVREADWRITE8("okimusic", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("IN0")
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("systemram") // work ram (32-bit)
-ADDRESS_MAP_END
+void simpl156_state::joemacr_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x107fff).rw(FUNC(simpl156_state::simpl156_mainram_r), FUNC(simpl156_state::simpl156_mainram_w)).share("mainram"); // main ram
+	map(0x110000, 0x111fff).rw(FUNC(simpl156_state::simpl156_spriteram_r), FUNC(simpl156_state::simpl156_spriteram_w));
+	map(0x120000, 0x120fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0x130000, 0x130003).portr("IN1").w(FUNC(simpl156_state::simpl156_eeprom_w));
+	map(0x140000, 0x14001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x150000, 0x151fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x152000, 0x153fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x154000, 0x155fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x160000, 0x161fff).rw(FUNC(simpl156_state::simpl156_pf1_rowscroll_r), FUNC(simpl156_state::simpl156_pf1_rowscroll_w));
+	map(0x164000, 0x165fff).rw(FUNC(simpl156_state::simpl156_pf2_rowscroll_r), FUNC(simpl156_state::simpl156_pf2_rowscroll_w));
+	map(0x170000, 0x170003).readonly().nopw(); // ?
+	map(0x180000, 0x180000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1c0000, 0x1c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x200000, 0x200003).portr("IN0");
+	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
+}
 
 
 /* Chain Reaction */
-ADDRESS_MAP_START(simpl156_state::chainrec_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM // rom (32-bit)
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("IN0")
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("systemram") // work ram (32-bit)
-	AM_RANGE(0x3c0000, 0x3c0003) AM_DEVREADWRITE8("okimusic", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x400000, 0x407fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram?
-	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
-	AM_RANGE(0x420000, 0x420fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
-	AM_RANGE(0x430000, 0x430003) AM_READ_PORT("IN1") AM_WRITE(simpl156_eeprom_w)
-	AM_RANGE(0x440000, 0x44001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x450000, 0x451fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x452000, 0x453fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x454000, 0x455fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x460000, 0x461fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
-	AM_RANGE(0x464000, 0x465fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
-	AM_RANGE(0x470000, 0x470003) AM_READONLY AM_WRITENOP // ??
-	AM_RANGE(0x480000, 0x480003) AM_DEVREADWRITE8("okisfx", okim6295_device, read, write, 0x000000ff)
-ADDRESS_MAP_END
+void simpl156_state::chainrec_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).rom(); // rom (32-bit)
+	map(0x200000, 0x200003).portr("IN0");
+	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
+	map(0x3c0000, 0x3c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x400000, 0x407fff).rw(FUNC(simpl156_state::simpl156_mainram_r), FUNC(simpl156_state::simpl156_mainram_w)).share("mainram"); // main ram?
+	map(0x410000, 0x411fff).rw(FUNC(simpl156_state::simpl156_spriteram_r), FUNC(simpl156_state::simpl156_spriteram_w));
+	map(0x420000, 0x420fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0x430000, 0x430003).portr("IN1").w(FUNC(simpl156_state::simpl156_eeprom_w));
+	map(0x440000, 0x44001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x450000, 0x451fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x452000, 0x453fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x454000, 0x455fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x460000, 0x461fff).rw(FUNC(simpl156_state::simpl156_pf1_rowscroll_r), FUNC(simpl156_state::simpl156_pf1_rowscroll_w));
+	map(0x464000, 0x465fff).rw(FUNC(simpl156_state::simpl156_pf2_rowscroll_r), FUNC(simpl156_state::simpl156_pf2_rowscroll_w));
+	map(0x470000, 0x470003).readonly().nopw(); // ??
+	map(0x480000, 0x480000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /* Magical Drop */
-ADDRESS_MAP_START(simpl156_state::magdrop_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("IN0")
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("systemram") // work ram (32-bit)
-	AM_RANGE(0x340000, 0x340003) AM_DEVREADWRITE8("okimusic", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x380000, 0x387fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram?
-	AM_RANGE(0x390000, 0x391fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
-	AM_RANGE(0x3a0000, 0x3a0fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
-	AM_RANGE(0x3b0000, 0x3b0003) AM_READ_PORT("IN1") AM_WRITE(simpl156_eeprom_w)
-	AM_RANGE(0x3c0000, 0x3c001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x3d0000, 0x3d1fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x3d2000, 0x3d3fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x3d4000, 0x3d5fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x3e0000, 0x3e1fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
-	AM_RANGE(0x3e4000, 0x3e5fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
-	AM_RANGE(0x3f0000, 0x3f0003) AM_READONLY AM_WRITENOP //?
-	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("okisfx", okim6295_device, read, write, 0x000000ff)
-ADDRESS_MAP_END
+void simpl156_state::magdrop_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x200003).portr("IN0");
+	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
+	map(0x340000, 0x340000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x380000, 0x387fff).rw(FUNC(simpl156_state::simpl156_mainram_r), FUNC(simpl156_state::simpl156_mainram_w)).share("mainram"); // main ram?
+	map(0x390000, 0x391fff).rw(FUNC(simpl156_state::simpl156_spriteram_r), FUNC(simpl156_state::simpl156_spriteram_w));
+	map(0x3a0000, 0x3a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0x3b0000, 0x3b0003).portr("IN1").w(FUNC(simpl156_state::simpl156_eeprom_w));
+	map(0x3c0000, 0x3c001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x3d0000, 0x3d1fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x3d2000, 0x3d3fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x3d4000, 0x3d5fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x3e0000, 0x3e1fff).rw(FUNC(simpl156_state::simpl156_pf1_rowscroll_r), FUNC(simpl156_state::simpl156_pf1_rowscroll_w));
+	map(0x3e4000, 0x3e5fff).rw(FUNC(simpl156_state::simpl156_pf2_rowscroll_r), FUNC(simpl156_state::simpl156_pf2_rowscroll_w));
+	map(0x3f0000, 0x3f0003).readonly().nopw(); //?
+	map(0x400000, 0x400000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /* Magical Drop Plus 1 */
-ADDRESS_MAP_START(simpl156_state::magdropp_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("IN0")
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("systemram") // work ram (32-bit)
-	AM_RANGE(0x4c0000, 0x4c0003) AM_DEVREADWRITE8("okimusic", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x680000, 0x687fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram?
-	AM_RANGE(0x690000, 0x691fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
-	AM_RANGE(0x6a0000, 0x6a0fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
-	AM_RANGE(0x6b0000, 0x6b0003) AM_READ_PORT("IN1") AM_WRITE(simpl156_eeprom_w)
-	AM_RANGE(0x6c0000, 0x6c001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x6d0000, 0x6d1fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x6d2000, 0x6d3fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x6d4000, 0x6d5fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x6e0000, 0x6e1fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
-	AM_RANGE(0x6e4000, 0x6e5fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
-	AM_RANGE(0x6f0000, 0x6f0003) AM_READONLY AM_WRITENOP // ?
-	AM_RANGE(0x780000, 0x780003) AM_DEVREADWRITE8("okisfx", okim6295_device, read, write, 0x000000ff)
-ADDRESS_MAP_END
+void simpl156_state::magdropp_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x200003).portr("IN0");
+	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
+	map(0x4c0000, 0x4c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x680000, 0x687fff).rw(FUNC(simpl156_state::simpl156_mainram_r), FUNC(simpl156_state::simpl156_mainram_w)).share("mainram"); // main ram?
+	map(0x690000, 0x691fff).rw(FUNC(simpl156_state::simpl156_spriteram_r), FUNC(simpl156_state::simpl156_spriteram_w));
+	map(0x6a0000, 0x6a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0x6b0000, 0x6b0003).portr("IN1").w(FUNC(simpl156_state::simpl156_eeprom_w));
+	map(0x6c0000, 0x6c001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x6d0000, 0x6d1fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x6d2000, 0x6d3fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x6d4000, 0x6d5fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x6e0000, 0x6e1fff).rw(FUNC(simpl156_state::simpl156_pf1_rowscroll_r), FUNC(simpl156_state::simpl156_pf1_rowscroll_w));
+	map(0x6e4000, 0x6e5fff).rw(FUNC(simpl156_state::simpl156_pf2_rowscroll_r), FUNC(simpl156_state::simpl156_pf2_rowscroll_w));
+	map(0x6f0000, 0x6f0003).readonly().nopw(); // ?
+	map(0x780000, 0x780000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /* Mitchell MT5601-0 PCB (prtytime, charlien, osman) */
-ADDRESS_MAP_START(simpl156_state::mitchell156_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("okisfx", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8("okimusic", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x180000, 0x187fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram
-	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
-	AM_RANGE(0x1a0000, 0x1a0fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
-	AM_RANGE(0x1b0000, 0x1b0003) AM_READ_PORT("IN1") AM_WRITE(simpl156_eeprom_w)
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x1d2000, 0x1d3fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
-	AM_RANGE(0x1e4000, 0x1e5fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
-	AM_RANGE(0x1f0000, 0x1f0003) AM_READONLY AM_WRITENOP // ?
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("IN0")
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("systemram") // work ram (32-bit)
-ADDRESS_MAP_END
+void simpl156_state::mitchell156_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x180000, 0x187fff).rw(FUNC(simpl156_state::simpl156_mainram_r), FUNC(simpl156_state::simpl156_mainram_w)).share("mainram"); // main ram
+	map(0x190000, 0x191fff).rw(FUNC(simpl156_state::simpl156_spriteram_r), FUNC(simpl156_state::simpl156_spriteram_w));
+	map(0x1a0000, 0x1a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0x1b0000, 0x1b0003).portr("IN1").w(FUNC(simpl156_state::simpl156_eeprom_w));
+	map(0x1c0000, 0x1c001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x1d0000, 0x1d1fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x1d2000, 0x1d3fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x1d4000, 0x1d5fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x1e0000, 0x1e1fff).rw(FUNC(simpl156_state::simpl156_pf1_rowscroll_r), FUNC(simpl156_state::simpl156_pf1_rowscroll_w));
+	map(0x1e4000, 0x1e5fff).rw(FUNC(simpl156_state::simpl156_pf2_rowscroll_r), FUNC(simpl156_state::simpl156_pf2_rowscroll_w));
+	map(0x1f0000, 0x1f0003).readonly().nopw(); // ?
+	map(0x200000, 0x200003).portr("IN0");
+	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
+}
 
 
 static const gfx_layout tile_8x8_layout =
@@ -364,7 +369,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( simpl156 )
+static GFXDECODE_START( gfx_simpl156 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0,     32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0,     32 )    /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32)    /* Sprites (16x16) */
@@ -399,11 +404,11 @@ DECOSPR_PRIORITY_CB_MEMBER(simpl156_state::pri_callback)
 MACHINE_CONFIG_START(simpl156_state::chainrec)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
-	MCFG_CPU_PROGRAM_MAP(chainrec_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
+	MCFG_DEVICE_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
+	MCFG_DEVICE_PROGRAM_MAP(chainrec_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93C45
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -418,7 +423,7 @@ MACHINE_CONFIG_START(simpl156_state::chainrec)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", simpl156)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_simpl156)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -441,13 +446,14 @@ MACHINE_CONFIG_START(simpl156_state::chainrec)
 	MCFG_DECO_SPRITE_PRIORITY_CB(simpl156_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("okisfx", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("okisfx", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MCFG_OKIM6295_ADD("okimusic", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("okimusic", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
@@ -456,34 +462,34 @@ MACHINE_CONFIG_START(simpl156_state::magdrop)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(magdrop_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(magdrop_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(simpl156_state::magdropp)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(magdropp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(magdropp_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(simpl156_state::joemacr)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(joemacr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(joemacr_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(simpl156_state::mitchell156)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mitchell156_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mitchell156_map)
 
-	MCFG_OKIM6295_REPLACE("okimusic", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_REPLACE("okimusic", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
@@ -1040,25 +1046,22 @@ ROM_END
 */
 
 
-DRIVER_INIT_MEMBER(simpl156_state,simpl156)
+void simpl156_state::init_simpl156()
 {
 	uint8_t *rom = memregion("okimusic")->base();
 	int length = memregion("okimusic")->bytes();
 	std::vector<uint8_t> buf1(length);
 
-	uint32_t x;
-
 	/* hmm low address line goes to banking chip instead? */
-	for (x = 0; x < length; x++)
+	for (uint32_t x = 0; x < length; x++)
 	{
-		uint32_t addr;
-
-		addr = bitswap<24> (x,23,22,21,0, 20,
+		uint32_t addr = bitswap<24> (x,23,
+							22,21, 0,20,
 							19,18,17,16,
 							15,14,13,12,
-							11,10,9, 8,
-							7, 6, 5, 4,
-							3, 2, 1 );
+							11,10, 9, 8,
+							 7, 6, 5, 4,
+							 3, 2, 1 );
 
 		buf1[addr] = rom[x];
 	}
@@ -1078,10 +1081,10 @@ READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 }
 
 
-DRIVER_INIT_MEMBER(simpl156_state,joemacr)
+void simpl156_state::init_joemacr()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::joemacr_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 READ32_MEMBER(simpl156_state::chainrec_speedup_r)
@@ -1091,10 +1094,10 @@ READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 	return m_systemram[0x18/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,chainrec)
+void simpl156_state::init_chainrec()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::chainrec_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 READ32_MEMBER(simpl156_state::prtytime_speedup_r)
@@ -1104,10 +1107,10 @@ READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 	return m_systemram[0xae0/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,prtytime)
+void simpl156_state::init_prtytime()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(FUNC(simpl156_state::prtytime_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 
@@ -1118,10 +1121,10 @@ READ32_MEMBER(simpl156_state::charlien_speedup_r)
 	return m_systemram[0x10/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,charlien)
+void simpl156_state::init_charlien()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::charlien_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 READ32_MEMBER(simpl156_state::osman_speedup_r)
@@ -1131,24 +1134,24 @@ READ32_MEMBER(simpl156_state::osman_speedup_r)
 	return m_systemram[0x10/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,osman)
+void simpl156_state::init_osman()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::osman_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 
 }
 
 /* Data East games running on the DE-0409-1 or DE-0491-1 PCB */
-GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
-GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, joemacrj, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (Japan, Version 1.2, 1994.06.06)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, chainrec, 0,        chainrec,    magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magdrop,  chainrec, magdrop,     magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magdropp, chainrec, magdropp,    magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
+GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, joemacrj, joemacr,  joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (Japan, Version 1.2, 1994.06.06)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, chainrec, 0,        chainrec,    magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdrop,  chainrec, magdrop,     magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdropp, chainrec, magdropp,    magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
 
 /* Mitchell games running on the DEC-22VO / MT5601-0 PCB */
-GAME( 1995, charlien, 0,        mitchell156, simpl156, simpl156_state, charlien, ROT0,  "Mitchell", "Charlie Ninja" , MACHINE_SUPPORTS_SAVE ) /* language in service mode */
-GAME( 1995, prtytime, 0,        mitchell156, simpl156, simpl156_state, prtytime, ROT90, "Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", MACHINE_SUPPORTS_SAVE ) /* language in service mode */
-GAME( 1995, gangonta, prtytime, mitchell156, simpl156, simpl156_state, prtytime, ROT90, "Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", MACHINE_SUPPORTS_SAVE ) /* language in service mode */
-GAME( 1996, osman,    0,        mitchell156, simpl156, simpl156_state, osman,    ROT0,  "Mitchell", "Osman (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, candance, osman,    mitchell156, simpl156, simpl156_state, osman,    ROT0,  "Mitchell (Atlus license)", "Cannon Dancer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, charlien, 0,        mitchell156, simpl156, simpl156_state, init_charlien, ROT0,  "Mitchell", "Charlie Ninja" , MACHINE_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1995, prtytime, 0,        mitchell156, simpl156, simpl156_state, init_prtytime, ROT90, "Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", MACHINE_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1995, gangonta, prtytime, mitchell156, simpl156, simpl156_state, init_prtytime, ROT90, "Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", MACHINE_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1996, osman,    0,        mitchell156, simpl156, simpl156_state, init_osman,    ROT0,  "Mitchell", "Osman (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, candance, osman,    mitchell156, simpl156, simpl156_state, init_osman,    ROT0,  "Mitchell (Atlus license)", "Cannon Dancer (Japan)", MACHINE_SUPPORTS_SAVE )

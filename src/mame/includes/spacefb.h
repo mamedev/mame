@@ -38,6 +38,15 @@ public:
 		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram") { }
 
+	void spacefb(machine_config &config);
+	void spacefb_audio(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<samples_device> m_samples;
@@ -77,17 +86,9 @@ public:
 	void draw_sprite(offs_t offs, pen_t *pens, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip);
 	void draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void spacefb(machine_config &config);
-	void spacefb_audio(machine_config &config);
 	void spacefb_audio_map(address_map &map);
 	void spacefb_main_io_map(address_map &map);
 	void spacefb_main_map(address_map &map);
-protected:
-
-	enum
-	{
-		TIMER_INTERRUPT
-	};
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
