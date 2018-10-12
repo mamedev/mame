@@ -20,6 +20,23 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 
 #define ENABLE_VERBOSE_LOG (1)
 
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+static const uint32_t s_visual_debug_palette[8] = {
+	0xff000000,
+	0xff0000ff,
+	0xff00ff00,
+	0xff00ffff,
+	0xffff0000,
+	0xffff00ff,
+	0xffffff00,
+	0xffffffff
+};
+#define SPG_VDB_BLACK 0
+#define SPG_VDB_WAVE 1
+#define SPG_VDB_EDD 2
+#define SPG_VDB_VOL 4
+#endif
+
 inline void spg2xx_device::verboselog(int n_level, const char *s_fmt, ...)
 {
 #if ENABLE_VERBOSE_LOG
@@ -38,7 +55,7 @@ inline void spg2xx_device::verboselog(int n_level, const char *s_fmt, ...)
 #define SPG_DEBUG_VIDEO		(0)
 #define SPG_DEBUG_AUDIO		(0)
 #define SPG_DEBUG_ENVELOPES	(0)
-#define SPG_DEBUG_SAMPLES	(0)
+#define SPG_DEBUG_SAMPLES	(1)
 
 #define IO_IRQ_ENABLE		m_io_regs[0x21]
 #define IO_IRQ_STATUS		m_io_regs[0x22]
@@ -63,6 +80,9 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_scrollram(*this, "scrollram")
 	, m_paletteram(*this, "paletteram")
 	, m_spriteram(*this, "spriteram")
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	, m_audio_screen(*this, finder_base::DUMMY_TAG)
+#endif
 {
 }
 
@@ -89,6 +109,9 @@ void spg2xx_device::map(address_map &map)
 
 void spg2xx_device::device_start()
 {
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	m_audio_debug_buffer = std::make_unique<uint8_t[]>(640*480);
+#endif
 	m_porta_out.resolve_safe();
 	m_portb_out.resolve_safe();
 	m_portc_out.resolve_safe();
@@ -413,6 +436,30 @@ void spg2xx_device::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	}
 #endif
 }
+
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+uint32_t spg2xx_device::debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	for (int y = 0; y < 480; y++)
+	{
+		for (int x = 0; x < 640; x++)
+		{
+			bitmap.pix32(y, x) = s_visual_debug_palette[m_audio_debug_buffer[y*640+x]];
+		}
+	}
+	return 0;
+}
+
+void spg2xx_device::advance_debug_pos()
+{
+	m_audio_debug_x++;
+	if (m_audio_debug_x == 640)
+	{
+		m_audio_debug_x = 0;
+	}
+}
+#endif
 
 uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -1623,10 +1670,26 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		int32_t right_total = 0;
 		int32_t active_count = 0;
 
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+		for (int y = 0; y < 480; y++)
+		{
+			m_audio_debug_buffer[y*640 + m_audio_debug_x] = 0;
+		}
+#endif
 		for (uint32_t ch_index = 0; ch_index < 6; ch_index++)
 		{
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+			const uint32_t debug_y = ch_index * 80;
+#endif
 			if (!get_channel_status(ch_index))
 			{
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+				m_audio_debug_buffer[(debug_y + 79)*640 + m_audio_debug_x] |= SPG_VDB_WAVE;
+				int edd_y = (int)((float)get_edd(ch_index) * 0.625f);
+				m_audio_debug_buffer[(debug_y + edd_y)*640 + m_audio_debug_x] |= SPG_VDB_EDD;
+				int vol_y = (int)((float)get_volume(ch_index) * 0.625f);
+				m_audio_debug_buffer[(debug_y + vol_y)*640 + m_audio_debug_x] |= SPG_VDB_VOL;
+#endif
 				continue;
 			}
 
@@ -1636,6 +1699,14 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			if (playing)
 			{
 				int32_t sample = (int16_t)(m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] ^ 0x8000);
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+				int sample_y = (int)((float)m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] / 819.0f);
+				m_audio_debug_buffer[(debug_y + sample_y)*640 + m_audio_debug_x] |= SPG_VDB_WAVE;
+				int edd_y = (int)((float)get_edd(ch_index) * 0.625f);
+				m_audio_debug_buffer[(debug_y + edd_y)*640 + m_audio_debug_x] |= SPG_VDB_EDD;
+				int vol_y = (int)((float)get_volume(ch_index) * 0.625f);
+				m_audio_debug_buffer[(debug_y + vol_y)*640 + m_audio_debug_x] |= SPG_VDB_VOL;
+#endif
 				if (!(m_audio_regs[AUDIO_CONTROL] & AUDIO_CONTROL_NOINT_MASK))
 				{
 					int32_t prev_sample = (int16_t)(m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA_PREV] ^ 0x8000);
@@ -1669,6 +1740,10 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			}
 		}
 
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+		advance_debug_pos();
+#endif
+
 		if (active_count)
 		{
 			*out_l++ = left_total / active_count;
@@ -1679,6 +1754,13 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			*out_l++ = 0;
 			*out_r++ = 0;
 		}
+
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+		for (int y = 0; y < 480; y++)
+		{
+			m_audio_debug_buffer[y*640 + m_audio_debug_x] = 7;
+		}
+#endif
 	}
 }
 
@@ -1859,7 +1941,7 @@ void spg2xx_device::audio_frame_tick()
 		const uint16_t mask = (1 << channel);
 		if (!(m_audio_regs[AUDIO_CHANNEL_STATUS] & mask))
 		{
-			if (SPG_DEBUG_ENVELOPES) printf("Skipping channel 4 due to status\n");
+			//if (SPG_DEBUG_ENVELOPES) printf("Skipping channel due to status\n");
 			continue;
 		}
 
@@ -1868,7 +1950,7 @@ void spg2xx_device::audio_frame_tick()
 			m_rampdown_frame[channel]--;
 			if (m_rampdown_frame[channel] == 0)
 			{
-				//printf("Ticking rampdown for channel %d\n", channel);
+				logerror("Ticking rampdown for channel %d\n", channel);
 				audio_rampdown_tick(channel);
 				continue;
 			}
@@ -1886,7 +1968,7 @@ void spg2xx_device::audio_frame_tick()
 		}
 		else if (SPG_DEBUG_ENVELOPES)
 		{
-			logerror("Not ticking envelope for channel %d\n", channel);
+			//logerror("Not ticking envelope for channel %d\n", channel);
 		}
 	}
 }
@@ -2048,7 +2130,7 @@ void spg2xx_device::audio_envelope_tick(address_space &space, const uint32_t cha
 			}
 			// FIXME: This makes things sound markedly worse even though the docs indicate
 			// the envelope count should be reloaded by the envelope load register! Why?
-			//set_envelope_count(channel, get_envelope_load(channel));
+			set_envelope_count(channel, get_envelope_load(channel));
 		}
 		else
 		{
@@ -2056,7 +2138,7 @@ void spg2xx_device::audio_envelope_tick(address_space &space, const uint32_t cha
 			// FIXME: This makes things sound markedly worse even though the docs indicate
 			// the envelope count should be reloaded by the envelope load register! So instead,
 			// we just reload with zero, which at least keeps the channels going. Why?
-			//new_count = get_envelope_load(channel);
+			new_count = get_envelope_load(channel);
 			set_envelope_count(channel, new_count);
 		}
 		if (SPG_DEBUG_ENVELOPES) logerror("Envelope %d new count %04x\n", channel, new_count);

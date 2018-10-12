@@ -82,6 +82,9 @@ public:
 		, device_nvram_interface(mconfig, *this)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+		, m_debug_screen(*this, "debug_screen")
+#endif
 		, m_spg(*this, "spg")
 		, m_bank(*this, "cart")
 		, m_io_p1(*this, "P1")
@@ -121,6 +124,9 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	required_device<screen_device> m_debug_screen;
+#endif
 	required_device<spg2xx_device> m_spg;
 	required_memory_bank m_bank;
 
@@ -629,6 +635,14 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 	m_screen->screen_vblank().set(m_spg, FUNC(spg2xx_device::vblank));
 	m_screen->screen_vblank().append(FUNC(spg2xx_game_state::poll_controls));
 
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	SCREEN(config, m_debug_screen, SCREEN_TYPE_RASTER);
+	m_debug_screen->set_refresh_hz(60);
+	m_debug_screen->set_size(640, 480);
+	m_debug_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_debug_screen->set_screen_update("spg", FUNC(spg2xx_device::debug_screen_update));
+#endif
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
@@ -637,7 +651,11 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 
 void spg2xx_game_state::non_spg_base(machine_config &config)
 {
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen, m_debug_screen);
+#else
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+#endif
 
 	spg2xx_base(config);
 }
@@ -652,7 +670,12 @@ void spg2xx_game_state::spg2xx_basep(machine_config &config)
 
 void spg2xx_cart_state::vii(machine_config &config)
 {
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen, m_debug_screen);
+#else
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+#endif
+
 	spg2xx_base(config);
 
 	m_spg->uart_rx().set(FUNC(spg2xx_cart_state::uart_rx));
@@ -667,7 +690,11 @@ void spg2xx_cart_state::vii(machine_config &config)
 
 void spg2xx_cart_state::vsmile(machine_config &config)
 {
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen, m_debug_screen);
+#else
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+#endif
 	spg2xx_base(config);
 
 	m_spg->uart_rx().set(FUNC(spg2xx_cart_state::uart_rx));
@@ -681,7 +708,11 @@ void spg2xx_cart_state::vsmile(machine_config &config)
 
 void spg2xx_game_state::wireless60(machine_config &config)
 {
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen, m_debug_screen);
+#else
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+#endif
 	spg2xx_base(config);
 
 	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
@@ -693,7 +724,11 @@ void spg2xx_game_state::wireless60(machine_config &config)
 
 void spg2xx_game_state::jakks(machine_config &config)
 {
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen, m_debug_screen);
+#else
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+#endif
 	spg2xx_base(config);
 
 	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
@@ -704,7 +739,11 @@ void spg2xx_game_state::jakks(machine_config &config)
 
 void spg2xx_game_state::rad_skat(machine_config &config)
 {
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen, m_debug_screen);
+#else
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+#endif
 	spg2xx_base(config);
 
 	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
@@ -717,7 +756,11 @@ void spg2xx_game_state::rad_skat(machine_config &config)
 
 void spg2xx_game_state::rad_crik(machine_config &config)
 {
+#if SPG2XX_VISUAL_AUDIO_DEBUG
+	SPG28X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen, m_debug_screen);
+#else
 	SPG28X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+#endif
 	spg2xx_base(config);
 
 	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
