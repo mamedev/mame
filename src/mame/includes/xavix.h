@@ -200,8 +200,8 @@ private:
 	uint8_t m_tmap1_regs[8];
 	uint8_t m_tmap2_regs[8];
 
-	uint8_t m_arena_start;
-	uint8_t m_arena_end;
+	int m_arena_start;
+	int m_arena_end;
 	uint8_t m_arena_control;
 
 	uint8_t m_6ff0;

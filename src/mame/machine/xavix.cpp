@@ -223,14 +223,15 @@ READ8_MEMBER(xavix_state::io_1_r)
 	return m_in1->read();
 }
 
+// has_wamg crashes on boot if these return high, either it's a button causing the game to eventually crash, or an invalid input (inputs are ACTIVE HIGH so returning 0x00 is safer
 READ8_MEMBER(xavix_state::io_2_r)
 {
-	return 0xff;
+	return 0x00;
 }
 
 READ8_MEMBER(xavix_state::io_3_r)
 {
-	return 0xff;
+	return 0x00;
 }
 
 
@@ -262,7 +263,7 @@ READ8_MEMBER(xavix_state::arena_start_r)
 
 WRITE8_MEMBER(xavix_state::arena_start_w)
 {
-	//logerror("%s: arena_start_w %02x\n", machine().describe_context(), data);
+	logerror("%s: arena_start_w %02x\n", machine().describe_context(), data);
 	m_arena_start = data; // expected to return data written
 
 }
@@ -274,7 +275,7 @@ READ8_MEMBER(xavix_state::arena_end_r)
 
 WRITE8_MEMBER(xavix_state::arena_end_w)
 {
-	//logerror("%s: arena_end_w %02x\n", machine().describe_context(), data);
+	logerror("%s: arena_end_w %02x\n", machine().describe_context(), data);
 	m_arena_end = data; // expected to return data written
 }
 
@@ -285,7 +286,7 @@ READ8_MEMBER(xavix_state::arena_control_r)
 
 WRITE8_MEMBER(xavix_state::arena_control_w)
 {
-	//logerror("%s: arena_control_w %02x\n", machine().describe_context(), data);
+	logerror("%s: arena_control_w %02x\n", machine().describe_context(), data);
 	m_arena_control = data;
 }
 

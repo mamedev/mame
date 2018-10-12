@@ -662,13 +662,37 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	handle_palette(screen, bitmap, cliprect);
 
 	// not sure what you end up with if you fall through all layers as transparent, so far no issues noticed
-	//bitmap.fill(m_palette->black_pen(), cliprect);
-	bitmap.fill(0, cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_zbuffer.fill(0,cliprect);
 
-	draw_tilemap(screen,bitmap,cliprect,1);
-	draw_tilemap(screen,bitmap,cliprect,0);
-	draw_sprites(screen,bitmap,cliprect);
+	rectangle clip = cliprect;
+
+	clip.min_y = cliprect.min_y;
+	clip.max_y = cliprect.max_y;
+	clip.min_x = cliprect.min_x;
+	clip.max_x = cliprect.max_x;
+
+	if (m_arena_control & 0x01)
+	{
+		// controls the clipping area (for all layers?) used for effect at start of Slap Fight and to add black borders in other cases
+		// based on Slap Fight Tiger lives display (and reference videos) this is slightly offset as all gfx must display
+		// other games don't correct the offset so will display a tiny bit of extra space at times?
+		// (there is some tilemap draw-in on Monster Truck)
+
+		clip.max_x = m_arena_start+1;
+		clip.min_x = m_arena_end-2;
+
+		if (clip.min_x < cliprect.min_x)
+			clip.min_x = cliprect.min_x;
+
+		if (clip.max_x > cliprect.max_x)
+			clip.max_x = cliprect.max_x;
+	}
+	bitmap.fill(0, clip);
+
+	draw_tilemap(screen,bitmap,clip,1);
+	draw_tilemap(screen,bitmap,clip,0);
+	draw_sprites(screen,bitmap,clip);
 
 	//popmessage("%02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x", m_soundregs[0],m_soundregs[1],m_soundregs[2],m_soundregs[3],m_soundregs[4],m_soundregs[5],m_soundregs[6],m_soundregs[7],m_soundregs[8],m_soundregs[9],m_soundregs[10],m_soundregs[11],m_soundregs[12],m_soundregs[13],m_soundregs[14],m_soundregs[15]);
 
