@@ -50,12 +50,26 @@ also on this hardware
     Dream Life                  ?           x16         48          not dumped      no              Sunplus
 
 Detailed list of bugs:
-- When loading a cart from file manager, sometimes it will crash
-- On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys
-- In the default bios (no cart loaded):
--- The "MOTOR" option in the diagnostic menu does nothing when selected
-- Zone 60 / Wireless 60:
--- Basketball: emulator crashes when starting the game due to jumping to invalid code.
+
+- all systems:
+  Various inaccuracies in samples/envelopes.
+- vsmile:
+  Games loop the first legal screen rather than continuing.
+- walle:
+  Voice sample on the title screen is continually retriggered by the game code.
+  Title screen lacks New Game / Continue Game menu options.
+- rad_skat:
+  Palette issues on the High Score screen.
+- vii:
+  Music does not loop.
+  When loading a cart from file manager, sometimes MAME will crash.
+  The "MOTOR" option in the diagnostic menu does nothing when selected.
+  The "SPEECH IC" option in the diagnostic menu does nothing when selected.
+  On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys.
+    This is not a bug per se, as the games are played with the controller physically rotated 90 degrees.
+- zone60/wirels60:
+  All Games: Music does not loop.
+  Basketball: MAME fatalerrors when starting the game due to jumping to invalid code.
 
 
 *******************************************************************************/
@@ -638,8 +652,8 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 #if SPG2XX_VISUAL_AUDIO_DEBUG
 	SCREEN(config, m_debug_screen, SCREEN_TYPE_RASTER);
 	m_debug_screen->set_refresh_hz(60);
-	m_debug_screen->set_size(640, 480);
-	m_debug_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_debug_screen->set_size(1024, 768);
+	m_debug_screen->set_visarea(0, 1024-1, 0, 768-1);
 	m_debug_screen->set_screen_update("spg", FUNC(spg2xx_device::debug_screen_update));
 #endif
 

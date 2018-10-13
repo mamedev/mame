@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 
 #define VERBOSE_LEVEL   (4)
 
-#define ENABLE_VERBOSE_LOG (1)
+#define ENABLE_VERBOSE_LOG (0)
 
 #if SPG2XX_VISUAL_AUDIO_DEBUG
 static const uint32_t s_visual_debug_palette[8] = {
@@ -55,7 +55,7 @@ inline void spg2xx_device::verboselog(int n_level, const char *s_fmt, ...)
 #define SPG_DEBUG_VIDEO		(0)
 #define SPG_DEBUG_AUDIO		(0)
 #define SPG_DEBUG_ENVELOPES	(0)
-#define SPG_DEBUG_SAMPLES	(1)
+#define SPG_DEBUG_SAMPLES	(0)
 
 #define IO_IRQ_ENABLE		m_io_regs[0x21]
 #define IO_IRQ_STATUS		m_io_regs[0x22]
@@ -110,7 +110,7 @@ void spg2xx_device::map(address_map &map)
 void spg2xx_device::device_start()
 {
 #if SPG2XX_VISUAL_AUDIO_DEBUG
-	m_audio_debug_buffer = std::make_unique<uint8_t[]>(640*480);
+	m_audio_debug_buffer = std::make_unique<uint8_t[]>(1024*768);
 #endif
 	m_porta_out.resolve_safe();
 	m_portb_out.resolve_safe();
@@ -135,19 +135,21 @@ void spg2xx_device::device_start()
 	m_audio_beat->adjust(attotime::never);
 
 	m_stream = stream_alloc(0, 2, 44100);
+
+	m_channel_debug = -1;
 }
 
 void spg2xx_device::device_reset()
 {
 	memset(m_audio_regs, 0, 0x800 * sizeof(uint16_t));
-	memset(m_sample_shift, 0, 6);
-	memset(m_sample_count, 0, sizeof(uint32_t) * 6);
-	memset(m_sample_addr, 0, sizeof(uint32_t) * 6);
-	memset(m_channel_rate, 0, sizeof(double) * 6);
-	memset(m_channel_rate_accum, 0, sizeof(double) * 6);
-	memset(m_rampdown_frame, 0, sizeof(uint32_t) * 6);
-	memset(m_envclk_frame, 4, sizeof(uint32_t) * 6);
-	memset(m_envelope_addr, 0, sizeof(uint32_t) * 6);
+	memset(m_sample_shift, 0, 16);
+	memset(m_sample_count, 0, sizeof(uint32_t) * 16);
+	memset(m_sample_addr, 0, sizeof(uint32_t) * 16);
+	memset(m_channel_rate, 0, sizeof(double) * 16);
+	memset(m_channel_rate_accum, 0, sizeof(double) * 16);
+	memset(m_rampdown_frame, 0, sizeof(uint32_t) * 16);
+	memset(m_envclk_frame, 4, sizeof(uint32_t) * 16);
+	memset(m_envelope_addr, 0, sizeof(uint32_t) * 16);
 
 	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
 	memset(m_io_regs, 0, 0x200 * sizeof(uint16_t));
@@ -441,11 +443,11 @@ void spg2xx_device::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 uint32_t spg2xx_device::debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	for (int y = 0; y < 480; y++)
+	for (int y = 0; y < 768; y++)
 	{
-		for (int x = 0; x < 640; x++)
+		for (int x = 0; x < 1024; x++)
 		{
-			bitmap.pix32(y, x) = s_visual_debug_palette[m_audio_debug_buffer[y*640+x]];
+			bitmap.pix32(y, x) = s_visual_debug_palette[m_audio_debug_buffer[y*1024+x]];
 		}
 	}
 	return 0;
@@ -454,7 +456,7 @@ uint32_t spg2xx_device::debug_screen_update(screen_device &screen, bitmap_rgb32 
 void spg2xx_device::advance_debug_pos()
 {
 	m_audio_debug_x++;
-	if (m_audio_debug_x == 640)
+	if (m_audio_debug_x == 1024)
 	{
 		m_audio_debug_x = 0;
 	}
@@ -630,6 +632,18 @@ WRITE_LINE_MEMBER(spg2xx_device::vblank)
 		m_debug_samples = !m_debug_samples;
 	if (machine().input().code_pressed_once(KEYCODE_4))
 		m_debug_rates = !m_debug_rates;
+	if (machine().input().code_pressed_once(KEYCODE_1))
+	{
+		m_channel_debug--;
+		if (m_channel_debug < -1)
+			m_channel_debug = 15;
+	}
+	if (machine().input().code_pressed_once(KEYCODE_2))
+	{
+		m_channel_debug++;
+		if (m_channel_debug == 16)
+			m_channel_debug = -1;
+	}
 #endif
 
 	const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
@@ -706,7 +720,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 
 	case 0x31: // UART Status
 		verboselog(5, "io_r: UART Status = %04x (%04x)\n", 3, mem_mask);
-		val = 3; // HACK
+		val = 0; // HACK
 		break;
 
 	case 0x36: // UART RX Data
@@ -774,7 +788,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x21: // IRQ Enable
 	{
-		verboselog(5, "io_w: IRQ Control = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: IRQ Enable = %04x (%04x)\n", data, mem_mask);
 		const uint16_t old = IO_IRQ_ENABLE & IO_IRQ_STATUS;
 		COMBINE_DATA(&IO_IRQ_ENABLE);
 		const uint16_t changed = old ^ (IO_IRQ_ENABLE & IO_IRQ_STATUS);
@@ -938,6 +952,7 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 	//      verboselog(0, "audio 1 IRQ\n");
 	//      m_cpu->set_input_line(UNSP_IRQ1_LINE, ASSERT_LINE);
 	//  }
+
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
 		m_cpu->set_input_line(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 
@@ -1031,7 +1046,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 		switch (offset)
 		{
 		case AUDIO_CHANNEL_ENABLE:
-			verboselog(0, "audio_r: Channel Enable: %04x\n", data);
+			verboselog(5, "audio_r: Channel Enable: %04x\n", data);
 			break;
 
 		case AUDIO_MAIN_VOLUME:
@@ -1054,12 +1069,14 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			verboselog(0, "audio_r: Beat Count: %04x\n", data);
 			break;
 
-		case AUDIO_ENVCLK:
-			verboselog(0, "audio_r: Envelope Interval (lo): %04x\n", data);
+		case AUDIO_ENVCLK0:
+		case AUDIO_ENVCLK1:
+			verboselog(0, "audio_r: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
 			break;
 
-		case AUDIO_ENVCLK_HIGH:
-			verboselog(0, "audio_r: Envelope Interval (hi): %04x\n", data);
+		case AUDIO_ENVCLK0_HIGH:
+		case AUDIO_ENVCLK1_HIGH:
+			verboselog(0, "audio_r: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
 			break;
 
 		case AUDIO_ENV_RAMP_DOWN:
@@ -1067,7 +1084,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		case AUDIO_CHANNEL_STOP:
-			verboselog(0, "audio_r: Channel Stop Status: %04x\n", data);
+			verboselog(5, "audio_r: Channel Stop Status: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_ZERO_CROSS:
@@ -1151,7 +1168,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 		}
 	}
-	else if (channel < 6)
+	else if (channel < 16)
 	{
 		switch (offset & AUDIO_CHAN_OFFSET_MASK)
 		{
@@ -1253,6 +1270,10 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 		}
 	}
+	else if (channel >= 16)
+	{
+		logerror("audio_r: Trying to read from channel %d\n", channel);
+	}
 	return data;
 }
 
@@ -1268,19 +1289,21 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 		{
 			verboselog(0, "audio_w: Channel Enable: %04x\n", data);
 			const uint16_t changed = m_audio_regs[AUDIO_CHANNEL_STATUS] ^ data;
-			for (uint32_t channel_bit = 0; channel_bit < 6; channel_bit++)
+			for (uint32_t channel_bit = 0; channel_bit < 16; channel_bit++)
 			{
 				const uint16_t mask = 1 << channel_bit;
 				if (!(changed & mask))
 					continue;
 
+				//if (channel_bit == 10)
+					//continue;
 				if (data & mask)
 				{
-					//printf("Enabling channel %d\n", channel_bit);
+					verboselog(0, "Enabling channel %d\n", channel_bit);
 					m_audio_regs[offset] |= mask;
 					if (!(m_audio_regs[AUDIO_CHANNEL_STOP] & mask))
 					{
-						//printf("Stop not set, starting playback on channel %d, mask %04x\n", channel_bit, mask);
+						verboselog(0, "Stop not set, starting playback on channel %d, mask %04x\n", channel_bit, mask);
 						m_audio_regs[AUDIO_CHANNEL_STATUS] |= mask;
 						m_sample_addr[channel_bit] = get_wave_addr(channel_bit);
 						m_envelope_addr[channel_bit] = get_envelope_addr(channel_bit);
@@ -1338,52 +1361,48 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			break;
 		}
 
-		case AUDIO_ENVCLK:
+		case AUDIO_ENVCLK0:
+		case AUDIO_ENVCLK1:
 		{
-			verboselog(0, "audio_w: Envelope Interval (lo): %04x\n", data);
+			verboselog(0, "audio_w: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
 			const uint16_t old = m_audio_regs[offset];
 			m_audio_regs[offset] = data;
 			const uint16_t changed = old ^ m_audio_regs[offset];
 
 			if (!changed)
-			{
-				if (SPG_DEBUG_ENVELOPES) logerror("No change, %04x %04x %04x\n", old, data, m_audio_regs[offset]);
 				break;
-			}
 
+			const uint8_t channel_offset = offset == AUDIO_ENVCLK0 ? 0 : 8;
 			for (uint8_t channel_bit = 0; channel_bit < 4; channel_bit++)
 			{
 				const uint8_t shift = channel_bit << 2;
 				const uint16_t mask = 0x0f << shift;
 				if (changed & mask)
 				{
-					m_envclk_frame[channel_bit] = get_envclk_frame_count(channel_bit);
-					if (SPG_DEBUG_ENVELOPES) logerror("envclk_frame %d: %08x\n", channel_bit, m_envclk_frame[channel_bit]);
+					m_envclk_frame[channel_bit + channel_offset] = get_envclk_frame_count(channel_bit + channel_offset);
 				}
 			}
 			break;
 		}
 
-		case AUDIO_ENVCLK_HIGH:
+		case AUDIO_ENVCLK0_HIGH:
+		case AUDIO_ENVCLK1_HIGH:
 		{
-			verboselog(0, "audio_w: Envelope Interval (hi): %04x\n", data);
+			verboselog(0, "audio_w: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
 			const uint16_t old = m_audio_regs[offset];
-			m_audio_regs[offset] = data & AUDIO_ENVCLK_HIGH_MASK;
+			m_audio_regs[offset] = data;
 			const uint16_t changed = old ^ m_audio_regs[offset];
 			if (!changed)
-			{
-				if (SPG_DEBUG_ENVELOPES) logerror("No change, %04x %04x %04x\n", old, data, m_audio_regs[offset]);
 				break;
-			}
 
-			for (uint8_t channel_bit = 0; channel_bit < 2; channel_bit++)
+			const uint8_t channel_offset = offset == AUDIO_ENVCLK0_HIGH ? 0 : 8;
+			for (uint8_t channel_bit = 0; channel_bit < 4; channel_bit++)
 			{
 				const uint8_t shift = channel_bit << 2;
 				const uint16_t mask = 0x0f << shift;
 				if (changed & mask)
 				{
-					m_envclk_frame[channel_bit + 4] = get_envclk_frame_count(channel_bit);
-					if (SPG_DEBUG_ENVELOPES) logerror("envclk_frame %d: %08x\n", channel_bit + 4, m_envclk_frame[channel_bit + 4]);
+					m_envclk_frame[channel_bit + channel_offset + 4] = get_envclk_frame_count(channel_bit + channel_offset);
 				}
 			}
 			break;
@@ -1402,7 +1421,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 				break;
 			}
 
-			for (uint32_t channel_bit = 0; channel_bit < 6; channel_bit++)
+			for (uint32_t channel_bit = 0; channel_bit < 16; channel_bit++)
 			{
 				const uint16_t mask = 1 << channel_bit;
 				if ((changed & mask) && (data & mask))
@@ -1524,7 +1543,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			break;
 		}
 	}
-	else if (channel < 6)
+	else if (channel < 16)
 	{
 		switch (offset & AUDIO_CHAN_OFFSET_MASK)
 		{
@@ -1558,7 +1577,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 
 		case AUDIO_ENVELOPE_DATA:
 			m_audio_regs[offset] = data & AUDIO_ENVELOPE_DATA_MASK;
-			verboselog(0, "audio_w: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
+			verboselog(5, "audio_w: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
 				get_envelope_count(channel), get_edd(channel));
 			break;
 
@@ -1605,7 +1624,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			m_audio_regs[offset] = data & AUDIO_PHASE_HIGH_MASK;
 			m_channel_rate[channel] = ((double)get_phase(channel) * 140625.0 * 2.0) / (double)(1 << 19);
 			m_channel_rate_accum[channel] = 0.0;
-			verboselog(0, "audio_w: Channel %d: Phase High: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
+			verboselog(5, "audio_w: Channel %d: Phase High: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
 			break;
 
 		case AUDIO_PHASE_ACCUM_HIGH:
@@ -1627,7 +1646,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			m_audio_regs[offset] = data;
 			m_channel_rate[channel] = ((double)get_phase(channel) * 140625.0 * 2.0) / (double)(1 << 19);
 			m_channel_rate_accum[channel] = 0.0;
-			verboselog(0, "audio_w: Channel %d: Phase: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
+			verboselog(5, "audio_w: Channel %d: Phase: %04x (rate: %f)\n", channel, data, m_channel_rate[channel]);
 			break;
 
 		case AUDIO_PHASE_ACCUM:
@@ -1652,6 +1671,10 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			break;
 		}
 	}
+	else if (channel >= 16)
+	{
+		logerror("audio_r: Trying to write from channel %d: %04x = %04x & %04x\n", channel, 0x3000 + offset, data, mem_mask);
+	}
 	else
 	{
 		m_audio_regs[offset] = data;
@@ -1671,24 +1694,37 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		int32_t active_count = 0;
 
 #if SPG2XX_VISUAL_AUDIO_DEBUG
-		for (int y = 0; y < 480; y++)
+		for (int y = 0; y < 768; y++)
 		{
-			m_audio_debug_buffer[y*640 + m_audio_debug_x] = 0;
+			m_audio_debug_buffer[y*1024 + m_audio_debug_x] = 0;
 		}
 #endif
-		for (uint32_t ch_index = 0; ch_index < 6; ch_index++)
+		for (uint32_t ch_index = 0; ch_index < 16; ch_index++)
 		{
 #if SPG2XX_VISUAL_AUDIO_DEBUG
-			const uint32_t debug_y = ch_index * 80;
+			uint32_t debug_y = 0;
+			if (m_channel_debug < 0)
+				debug_y = ch_index * 48;
 #endif
 			if (!get_channel_status(ch_index))
 			{
 #if SPG2XX_VISUAL_AUDIO_DEBUG
-				m_audio_debug_buffer[(debug_y + 79)*640 + m_audio_debug_x] |= SPG_VDB_WAVE;
-				int edd_y = (int)((float)get_edd(ch_index) * 0.625f);
-				m_audio_debug_buffer[(debug_y + edd_y)*640 + m_audio_debug_x] |= SPG_VDB_EDD;
-				int vol_y = (int)((float)get_volume(ch_index) * 0.625f);
-				m_audio_debug_buffer[(debug_y + vol_y)*640 + m_audio_debug_x] |= SPG_VDB_VOL;
+				if (m_channel_debug == -1)
+				{
+					m_audio_debug_buffer[(debug_y + 47)*1024 + m_audio_debug_x] |= SPG_VDB_WAVE;
+					int edd_y = (int)((float)get_edd(ch_index) * 0.375f);
+					m_audio_debug_buffer[(debug_y + (47 - edd_y))*1024 + m_audio_debug_x] |= SPG_VDB_EDD;
+					int vol_y = (int)((float)get_volume(ch_index) * 0.375f);
+					m_audio_debug_buffer[(debug_y + (47 - vol_y))*1024 + m_audio_debug_x] |= SPG_VDB_VOL;
+				}
+				else if (ch_index == m_channel_debug)
+				{
+					m_audio_debug_buffer[(debug_y + 767)*1024 + m_audio_debug_x] |= SPG_VDB_WAVE;
+					int edd_y = (int)((float)get_edd(ch_index) * 3.74f);
+					m_audio_debug_buffer[(debug_y + (767 - edd_y))*1024 + m_audio_debug_x] |= SPG_VDB_EDD;
+					int vol_y = (int)((float)get_volume(ch_index) * 3.74f);
+					m_audio_debug_buffer[(debug_y + (767 - vol_y))*1024 + m_audio_debug_x] |= SPG_VDB_VOL;
+				}
 #endif
 				continue;
 			}
@@ -1700,12 +1736,24 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			{
 				int32_t sample = (int16_t)(m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] ^ 0x8000);
 #if SPG2XX_VISUAL_AUDIO_DEBUG
-				int sample_y = (int)((float)m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] / 819.0f);
-				m_audio_debug_buffer[(debug_y + sample_y)*640 + m_audio_debug_x] |= SPG_VDB_WAVE;
-				int edd_y = (int)((float)get_edd(ch_index) * 0.625f);
-				m_audio_debug_buffer[(debug_y + edd_y)*640 + m_audio_debug_x] |= SPG_VDB_EDD;
-				int vol_y = (int)((float)get_volume(ch_index) * 0.625f);
-				m_audio_debug_buffer[(debug_y + vol_y)*640 + m_audio_debug_x] |= SPG_VDB_VOL;
+				if (m_channel_debug == -1)
+				{
+					int sample_y = (int)((float)m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] / 1365.0f);
+					m_audio_debug_buffer[(debug_y + (47 - sample_y))*1024 + m_audio_debug_x] |= SPG_VDB_WAVE;
+					int edd_y = (int)((float)get_edd(ch_index) * 0.375f);
+					m_audio_debug_buffer[(debug_y + (47 - edd_y))*1024 + m_audio_debug_x] |= SPG_VDB_EDD;
+					int vol_y = (int)((float)get_volume(ch_index) * 0.375f);
+					m_audio_debug_buffer[(debug_y + (47 - vol_y))*1024 + m_audio_debug_x] |= SPG_VDB_VOL;
+				}
+				else if (ch_index == m_channel_debug)
+				{
+					int sample_y = (int)((float)m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] / 136.0f);
+					m_audio_debug_buffer[(debug_y + (767 - sample_y))*1024 + m_audio_debug_x] |= SPG_VDB_WAVE;
+					int edd_y = (int)((float)get_edd(ch_index) * 0.375f);
+					m_audio_debug_buffer[(debug_y + (767 - edd_y))*1024 + m_audio_debug_x] |= SPG_VDB_EDD;
+					int vol_y = (int)((float)get_volume(ch_index) * 0.375f);
+					m_audio_debug_buffer[(debug_y + (767 - vol_y))*1024 + m_audio_debug_x] |= SPG_VDB_VOL;
+				}
 #endif
 				if (!(m_audio_regs[AUDIO_CONTROL] & AUDIO_CONTROL_NOINT_MASK))
 				{
@@ -1756,12 +1804,13 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		}
 
 #if SPG2XX_VISUAL_AUDIO_DEBUG
-		for (int y = 0; y < 480; y++)
+		for (int y = 0; y < 768; y++)
 		{
-			m_audio_debug_buffer[y*640 + m_audio_debug_x] = 7;
+			m_audio_debug_buffer[y*1024 + m_audio_debug_x] = 7;
 		}
 #endif
 	}
+	//printf("\n");
 }
 
 inline void spg2xx_device::stop_channel(const uint32_t channel)
@@ -1769,7 +1818,7 @@ inline void spg2xx_device::stop_channel(const uint32_t channel)
 	// TODO: IRQs
 	m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~(1 << channel);
 	m_audio_regs[AUDIO_CHANNEL_STOP] |= (1 << channel);
-	m_audio_regs[(channel << 4) | AUDIO_MODE] &= ~AUDIO_ADPCM_MASK;
+	//m_audio_regs[(channel << 4) | AUDIO_MODE] &= ~AUDIO_ADPCM_MASK;
 	m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~(1 << channel);
 }
 
@@ -1851,7 +1900,7 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 	{
 		// ADPCM mode
 		m_audio_regs[wave_data_reg] >>= m_sample_shift[channel];
-		m_audio_regs[wave_data_reg] = (uint16_t)(m_adpcm[channel].clock((uint8_t)(m_audio_regs[wave_data_reg] & 0x000f)) * 8) ^ 0x8000;
+		m_audio_regs[wave_data_reg] = (uint16_t)(m_adpcm[channel].clock((uint8_t)(m_audio_regs[wave_data_reg] & 0x000f)) * 7) ^ 0x8000;
 		if (tone_mode != 0 && raw_sample == 0xffff)
 		{
 			if (tone_mode == AUDIO_TONE_MODE_HW_ONESHOT)
@@ -1936,12 +1985,12 @@ void spg2xx_device::audio_frame_tick()
 	audio_beat_tick();
 
 	address_space &space = m_cpu->space(AS_PROGRAM);
-	for (uint32_t channel = 0; channel < 6; channel++)
+	bool any_changed = false;
+	for (uint32_t channel = 0; channel < 16; channel++)
 	{
 		const uint16_t mask = (1 << channel);
 		if (!(m_audio_regs[AUDIO_CHANNEL_STATUS] & mask))
 		{
-			//if (SPG_DEBUG_ENVELOPES) printf("Skipping channel due to status\n");
 			continue;
 		}
 
@@ -1950,10 +1999,11 @@ void spg2xx_device::audio_frame_tick()
 			m_rampdown_frame[channel]--;
 			if (m_rampdown_frame[channel] == 0)
 			{
-				logerror("Ticking rampdown for channel %d\n", channel);
+				if (SPG_DEBUG_ENVELOPES) logerror("Ticking rampdown for channel %d\n", channel);
 				audio_rampdown_tick(channel);
-				continue;
+				any_changed = true;
 			}
+			continue;
 		}
 
 		if (!(m_audio_regs[AUDIO_CHANNEL_ENV_MODE] & mask))
@@ -1962,14 +2012,15 @@ void spg2xx_device::audio_frame_tick()
 			if (m_envclk_frame[channel] == 0)
 			{
 				if (SPG_DEBUG_ENVELOPES) logerror("Ticking envelope for channel %d\n", channel);
-				audio_envelope_tick(space, channel);
+				any_changed = audio_envelope_tick(space, channel) || any_changed;
 				m_envclk_frame[channel] = get_envclk_frame_count(channel);
 			}
 		}
-		else if (SPG_DEBUG_ENVELOPES)
-		{
-			//logerror("Not ticking envelope for channel %d\n", channel);
-		}
+	}
+
+	if (any_changed)
+	{
+		m_stream->update();
 	}
 }
 
@@ -1982,7 +2033,7 @@ void spg2xx_device::audio_beat_tick()
 	m_audio_curr_beat_base_count--;
 	if (m_audio_curr_beat_base_count == 0)
 	{
-		//printf("Beat base count elapsed, reloading with %d\n", m_audio_regs[AUDIO_BEAT_BASE_COUNT]);
+		logerror("Beat base count elapsed, reloading with %d\n", m_audio_regs[AUDIO_BEAT_BASE_COUNT]);
 		m_audio_curr_beat_base_count = m_audio_regs[AUDIO_BEAT_BASE_COUNT];
 
 		beat_count--;
@@ -1992,13 +2043,13 @@ void spg2xx_device::audio_beat_tick()
 		{
 			if (m_audio_regs[AUDIO_BEAT_COUNT] & AUDIO_BIE_MASK)
 			{
-				//printf("Beat count elapsed, triggering IRQ\n");
+				logerror("Beat count elapsed, setting Status bit and checking IRQs\n");
 				m_audio_regs[AUDIO_BEAT_COUNT] |= AUDIO_BIS_MASK;
 				check_irqs(AUDIO_BIS_MASK);
 			}
 			else
 			{
-				//printf("Beat count elapsed but IRQ not enabled\n");
+				logerror("Beat count elapsed but IRQ not enabled\n");
 			}
 		}
 	}
@@ -2054,17 +2105,22 @@ uint32_t spg2xx_device::get_envclk_frame_count(const uint32_t channel)
 uint32_t spg2xx_device::get_envelope_clock(const offs_t channel) const
 {
 	if (channel < 4)
-		return (m_audio_regs[AUDIO_ENVCLK] >> (channel << 2)) & 0x000f;
+		return (m_audio_regs[AUDIO_ENVCLK0] >> (channel << 2)) & 0x000f;
+	else if (channel < 8)
+		return (m_audio_regs[AUDIO_ENVCLK0_HIGH] >> ((channel - 4) << 2)) & 0x000f;
+	else if (channel < 12)
+		return (m_audio_regs[AUDIO_ENVCLK1] >> ((channel - 8) << 2)) & 0x000f;
 	else
-		return (m_audio_regs[AUDIO_ENVCLK_HIGH] >> ((channel - 4) << 2)) & 0x000f;
+		return (m_audio_regs[AUDIO_ENVCLK1_HIGH] >> ((channel - 12) << 2)) & 0x000f;
 }
 
-void spg2xx_device::audio_envelope_tick(address_space &space, const uint32_t channel)
+bool spg2xx_device::audio_envelope_tick(address_space &space, const uint32_t channel)
 {
 	const uint16_t channel_mask = channel << 4;
 	uint16_t new_count = get_envelope_count(channel);
 	const uint16_t curr_edd = get_edd(channel);
 	if (SPG_DEBUG_ENVELOPES) logerror("envelope %d tick, count is %04x, curr edd is %04x\n", channel, new_count, curr_edd);
+	bool edd_changed = false;
 	if (new_count == 0)
 	{
 		const uint16_t target = get_envelope_target(channel);
@@ -2086,7 +2142,7 @@ void spg2xx_device::audio_envelope_tick(address_space &space, const uint32_t cha
 				{
 					if (SPG_DEBUG_ENVELOPES) logerror("Envelope %d at 0, stopping channel\n", channel);
 					stop_channel(channel);
-					return;
+					return true;
 				}
 			}
 			else
@@ -2128,22 +2184,19 @@ void spg2xx_device::audio_envelope_tick(address_space &space, const uint32_t cha
 				if (SPG_DEBUG_ENVELOPES) logerror("Fetched envelopes %04x %04x\n", m_audio_regs[channel_mask | AUDIO_ENVELOPE0], m_audio_regs[channel_mask | AUDIO_ENVELOPE1]);
 				m_envelope_addr[channel] += 2;
 			}
-			// FIXME: This makes things sound markedly worse even though the docs indicate
-			// the envelope count should be reloaded by the envelope load register! Why?
-			set_envelope_count(channel, get_envelope_load(channel));
+			new_count = get_envelope_load(channel);
+			set_envelope_count(channel, new_count);
 		}
 		else
 		{
 			if (SPG_DEBUG_ENVELOPES) logerror("Envelope %d not yet at target %04x (%04x)\n", channel, target, new_edd);
-			// FIXME: This makes things sound markedly worse even though the docs indicate
-			// the envelope count should be reloaded by the envelope load register! So instead,
-			// we just reload with zero, which at least keeps the channels going. Why?
 			new_count = get_envelope_load(channel);
 			set_envelope_count(channel, new_count);
 		}
 		if (SPG_DEBUG_ENVELOPES) logerror("Envelope %d new count %04x\n", channel, new_count);
 
 		set_edd(channel, new_edd);
+		edd_changed = true;
 		if (SPG_DEBUG_ENVELOPES) logerror("Setting channel %d edd to %04x, register is %04x\n", channel, new_edd, m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA]);
 	}
 	else
@@ -2152,4 +2205,5 @@ void spg2xx_device::audio_envelope_tick(address_space &space, const uint32_t cha
 		set_envelope_count(channel, new_count);
 	}
 	if (SPG_DEBUG_ENVELOPES) logerror("envelope %d post-tick, count is now %04x, register is %04x\n", channel, new_count, m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA]);
+	return edd_changed;
 }
