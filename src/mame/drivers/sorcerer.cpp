@@ -551,6 +551,9 @@ ROM_START(sorcerer2)
 	ROM_SYSTEM_BIOS(3, "ddmon", "DDMON 1.3")
 	ROMX_LOAD("ddmon.1e",    0xe000, 0x0800, CRC(6ce481da) SHA1(c927762b29a281b7c13d59bb17ea56494c64569b), ROM_BIOS(3) )
 	ROMX_LOAD("ddmon.2e",    0xe800, 0x0800, CRC(50069b13) SHA1(0808018830fac15cceaed8ff2b19900f77447470), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(4, "adsmon", "ADSMON") // This requires an unemulated 80-column card. You can type 64 to get 64-columns, but it's mostly off the side.
+	ROMX_LOAD("adsmon.1e",   0xe000, 0x0800, CRC(460f981a) SHA1(bdae1d87b9e8ae2cae11663acd349b9ed2387094), ROM_BIOS(4) )
+	ROMX_LOAD("adsmon.2e",   0xe800, 0x0800, CRC(cb3f1dda) SHA1(3fc14306e83d73b9b9afd9b543566e52ba3e008f), ROM_BIOS(4) )
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE           INIT           COMPANY      FULLNAME */
