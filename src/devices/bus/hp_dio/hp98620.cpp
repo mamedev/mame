@@ -78,10 +78,6 @@ void dio16_98620_device::device_start()
 	save_item(NAME(dmar));
 }
 
-void dio16_98620_device::map(address_map &map)
-{
-
-}
 void dio16_98620_device::device_reset()
 {
 	if (!m_installed_io)

@@ -20,7 +20,6 @@ public:
 	// construction/destruction
 	dio16_98620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
 protected:
 	dio16_98620_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

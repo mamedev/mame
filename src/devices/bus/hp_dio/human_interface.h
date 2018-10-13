@@ -64,7 +64,6 @@ private:
 	required_device<tms9914_device> m_tms9914;
 	required_device<msm58321_device> m_rtc;
 
-	void map(address_map &map);
 	void iocpu_map(address_map &map);
 
 	static constexpr uint8_t HIL_CS = 0x01;
