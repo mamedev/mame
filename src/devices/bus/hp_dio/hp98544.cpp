@@ -33,21 +33,19 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(dio16_98544_device::device_add_mconfig)
-	MCFG_SCREEN_ADD(HP98544_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, dio16_98544_device, screen_update)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_REFRESH_RATE(70)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dio16_98544_device, vblank_w))
-	MCFG_SCREEN_RAW_PARAMS(64108800, 1408, 0, 1024, 795, 0, 768);
+void dio16_98544_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, HP98544_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(dio16_98544_device::screen_update));
+	screen.screen_vblank().set(FUNC(dio16_98544_device::vblank_w));
+	screen.set_raw(XTAL(64'108'800), 1408, 0, 1024, 795, 0, 768);
 
 	topcat_device &topcat0(TOPCAT(config, "topcat", XTAL(64108800)));
 	topcat0.set_fb_width(1024);
 	topcat0.set_fb_height(768);
 	topcat0.set_planemask(1);
 	topcat0.irq_out_cb().set(FUNC(dio16_98544_device::int_w));
-MACHINE_CONFIG_END
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
