@@ -154,6 +154,8 @@ void spg2xx_device::device_reset()
 	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
 	memset(m_io_regs, 0, 0x200 * sizeof(uint16_t));
 
+	m_io_regs[0x23] = 0x0028;
+
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
 
@@ -656,8 +658,8 @@ WRITE_LINE_MEMBER(spg2xx_device::vblank)
 	// For now, manually trigger controller IRQs
 	if (IO_IRQ_ENABLE & 0x2100)
 	{
-		IO_IRQ_STATUS |= 0x0100;
-		m_cpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
+		//IO_IRQ_STATUS |= 0x0100;
+		//m_cpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
 	}
 }
 
@@ -692,52 +694,73 @@ READ16_MEMBER(spg2xx_device::io_r)
 		verboselog(5, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
 		break;
 
+	case 0x10: // Timebase Control
+		verboselog(4, "io_r: Timebase Control = %04x (%04x)\n", val, mem_mask);
+		break;
+
 	case 0x1c: // Video line counter
 		val = m_screen->vpos();
-		verboselog(5, "io_r: Video Line = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: Video Line = %04x (%04x)\n", val, mem_mask);
+		break;
+
+	case 0x20: // System Control
+		verboselog(4, "io_r: System Control = %04x (%04x)\n", val, mem_mask);
 		break;
 
 	case 0x21: // IRQ Control
-		verboselog(5, "io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
 		break;
 
 	case 0x22: // IRQ Status
-		verboselog(5, "io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
 		break;
 
 	case 0x2b:
-		return 0x0000;
+		verboselog(4, "io_r: Unknown 0x3D2B = 0000 (%04x)\n", mem_mask);
+		return 0;
 
 	case 0x2c: case 0x2d: // PRNG 0/1
 		val = machine().rand() & 0x0000ffff;
-		verboselog(5, "io_r: PRNG %d = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
+		verboselog(4, "io_r: PRNG %d = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
+		break;
+
+	case 0x23: // External Memory Control
+		verboselog(4, "io_r: Ext. Memory Control = %04x (%04x)\n", val, mem_mask);
+		break;
+
+	case 0x29: // Wakeup Source
+		verboselog(4, "io_r: Wakeup Source = %04x (%04x)\n", val, mem_mask);
+		break;
+
+	case 0x2e: // FIQ Source Select
+		verboselog(4, "io_r: FIQ Source Select = %04x (%04x)\n", val, mem_mask);
 		break;
 
 	case 0x2f: // Data Segment
 		val = m_cpu->state_int(UNSP_SR) >> 10;
-		verboselog(5, "io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
 		break;
 
 	case 0x31: // UART Status
-		verboselog(5, "io_r: UART Status = %04x (%04x)\n", 3, mem_mask);
+		verboselog(4, "io_r: UART Status = %04x (%04x)\n", 3, mem_mask);
 		val = 0; // HACK
 		break;
 
 	case 0x36: // UART RX Data
 		val = m_uart_rx();
-		verboselog(5, "io_r: UART RX Data = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: UART RX Data = %04x (%04x)\n", val, mem_mask);
 		break;
 
 	case 0x59: // I2C Status
-		verboselog(5, "io_r: I2C Status = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: I2C Status = %04x (%04x)\n", val, mem_mask);
 		break;
 
 	case 0x5e: // I2C Data In
-		verboselog(5, "io_r: I2C Data In = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: I2C Data In = %04x (%04x)\n", val, mem_mask);
 		break;
 
 	default:
-		verboselog(5, "io_r: Unknown register %04x\n", 0x3d00 + offset);
+		verboselog(4, "io_r: Unknown register %04x\n", 0x3d00 + offset);
 		break;
 	}
 
@@ -770,21 +793,66 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		do_gpio(offset);
 		break;
 
-	case 0x10:      // timebase control
-		if ((m_io_regs[offset] & 0x0003) != (data & 0x0003))
+	case 0x10: // Timebase Control
+	{
+		static const char* const s_tmb1_sel[2][4] =
 		{
-			uint16_t hz = 8 << (data & 0x0003);
-			verboselog(5, "*** TMB1 FREQ set to %dHz\n", hz);
-			m_tmb1->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
-		}
-		if ((m_io_regs[offset] & 0x000c) != (data & 0x000c))
+			{ "8Hz", "16Hz", "32Hz", "64Hz" },
+			{ "12kHz", "24kHz", "40kHz", "40kHz" }
+		};
+		static const char* const s_tmb2_sel[2][4] =
 		{
-			uint16_t hz = 128 << ((data & 0x000c) >> 2);
-			verboselog(5, "*** TMB2 FREQ set to %dHz\n", hz);
-			m_tmb2->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
+			{ "128Hz", "256Hz", "512Hz", "1024Hz" },
+			{ "105kHz", "210kHz", "420kHz", "840kHz" }
+		};
+		static const uint32_t s_tmb1_freq[2][4] =
+		{
+			{ 8, 16, 32, 64 },
+			{ 12000, 24000, 40000, 40000 }
+		};
+		static const uint32_t s_tmb2_freq[2][4] =
+		{
+			{ 128, 256, 512, 1024 },
+			{ 105000, 210000, 420000, 840000 }
+		};
+		verboselog(4, "io_w: Timebase Control = %04x (%04x) (Source:%s, TMB2:%s, TMB1:%s)\n", data, mem_mask,
+			BIT(data, 4) ? "27MHz" : "32768Hz", s_tmb2_sel[BIT(data, 4)][(data >> 2) & 3], s_tmb1_sel[BIT(data, 4)][data & 3]);
+		const uint16_t old = m_io_regs[offset];
+		COMBINE_DATA(&m_io_regs[offset]);
+		const uint16_t changed = old ^ m_io_regs[offset];
+		if (changed & 0x001f)
+		{
+			const uint8_t hifreq = BIT(data, 4);
+			if (changed & 0x0013)
+			{
+				const uint32_t freq = s_tmb1_freq[hifreq][data & 3];
+				m_tmb1->adjust(attotime::from_hz(freq), 0, attotime::from_hz(freq));
+			}
+			if (changed & 0x001c)
+			{
+				const uint32_t freq = s_tmb2_freq[hifreq][(data >> 2) & 3];
+				m_tmb2->adjust(attotime::from_hz(freq), 0, attotime::from_hz(freq));
+			}
 		}
+		break;
+	}
+
+	case 0x11: // Timebase Clear
+		verboselog(4, "io_w: Timebase Clear = %04x (%04x)\n", data, mem_mask);
+		break;
+
+	case 0x20: // System Control
+	{
+		static const char* const s_sysclk[4] = { "13.5MHz", "27MHz", "27MHz NoICE", "54MHz" };
+		static const char* const s_lvd_voltage[4] = { "2.7V", "2.9V", "3.1V", "3.3V" };
+		static const char* const s_weak_strong[2] = { "Weak", "Strong" };
+		verboselog(4, "io_w: System Control = %04x (Watchdog:%d, Sleep:%d, SysClk:%s, SysClkInv:%d, LVROutEn:%d, LVREn:%d\n"
+			, data, BIT(data, 15), BIT(data, 14), s_sysclk[(data >> 12) & 3], BIT(data, 11), BIT(data, 9), BIT(data, 8));
+		verboselog(4, "      LVDEn:%d, LVDVoltSel:%s, 32kHzDisable:%d, StrWkMode:%s, VDACDisable:%d, ADACDisable:%d, ADACOutDisable:%d)\n"
+			, BIT(data, 7), s_lvd_voltage[(data >> 5) & 3], BIT(data, 4), s_weak_strong[BIT(data, 3)], BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
+	}
 
 	case 0x21: // IRQ Enable
 	{
@@ -799,7 +867,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x22: // IRQ Acknowledge
 	{
-		verboselog(5, "io_w: IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~data;
 		const uint16_t changed = old ^ (IO_IRQ_ENABLE & IO_IRQ_STATUS);
@@ -808,94 +876,174 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		break;
 	}
 
+	case 0x23: // External Memory Control
+	{
+		static const char* const s_bus_arb[8] =
+		{
+			"Forbidden", "Forbidden", "Forbidden", "Forbidden", "Forbidden", "1:SPU/2:PPU/3:CPU", "Forbidden", "1:PPU/2:SPU/3:CPU"
+		};
+		static const char* const s_addr_decode[4] =
+		{
+			"ROMCSB: 4000-3fffff, CSB1: ---,           CSB2: ---,           CSB3: ---",
+			"ROMCSB: 4000-1fffff, CSB1: 200000-3fffff, CSB2: ---,           CSB3: ---",
+			"ROMCSB: 4000-0fffff, CSB1: 100000-1fffff, CSB2: 200000-2fffff, CSB3: 300000-3fffff",
+			"ROMCSB: 4000-0fffff, CSB1: 100000-1fffff, CSB2: 200000-2fffff, CSB3: 300000-3fffff"
+		};
+		static const char* const s_ram_decode[16] =
+		{
+			"None", "None", "None", "None", "None", "None", "None", "None",
+			"4KW,   3ff000-3fffff\n",
+			"8KW,   3fe000-3fffff\n",
+			"16KW,  3fc000-3fffff\n",
+			"32KW,  3f8000-3fffff\n",
+			"64KW,  3f0000-3fffff\n",
+			"128KW, 3e0000-3fffff\n",
+			"256KW, 3c0000-3fffff\n",
+			"512KW, 380000-3fffff\n"
+		};
+		verboselog(4, "io_w: Ext. Memory Control (not yet implemented) = %04x (%04x):\n", data, mem_mask);
+		verboselog(4, "      WaitStates:%d, BusArbPrio:%s\n", (data >> 1) & 3, s_bus_arb[(data >> 3) & 7]);
+		verboselog(4, "      ROMAddrDecode:%s\n", s_addr_decode[(data >> 6) & 3]);
+		verboselog(4, "      RAMAddrDecode:%s\n", s_ram_decode[(data >> 8) & 15]);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
+	}
+
+	case 0x24: // Watchdog
+		verboselog(5, "io_w: Watchdog Pet = %04x (%04x)\n", data, mem_mask);
+		break;
+
+	case 0x28: // Sleep Mode
+		verboselog(4, "io_w: Sleep Mode (%s enter value) = %04x (%04x)\n", data == 0xaa55 ? "valid" : "invalid", data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
+
+	case 0x29: // Wakeup Source
+	{
+		COMBINE_DATA(&m_io_regs[offset]);
+#if ENABLE_VERBOSE_LOG
+		static const char* const s_sources[8] =
+		{
+			"TMB1", "TMB2", "2Hz", "4Hz", "1024Hz", "2048Hz", "4096Hz", "Key"
+		};
+
+		verboselog(4, "io_w: Wakeup Source = %04x (%04x):\n", data, mem_mask);
+		bool comma = false;
+		char buf[1024];
+		int char_idx = 0;
+		for (int i = 7; i >= 0; i--)
+		{
+			if (BIT(data, i))
+			{
+				char_idx += sprintf(&buf[char_idx], "%s%s", comma ? ", " : "", s_sources[i]);
+				comma = true;
+			}
+		}
+		buf[char_idx] = 0;
+		verboselog(4, "      %s\n", buf);
+#endif
+		break;
+	}
+
+	case 0x2e: // FIQ Source Select
+	{
+		static const char* const s_fiq_select[8] =
+		{
+			"PPU", "SPU Channel", "Timer A", "Timer B", "UART/SPI", "External", "Reserved", "None"
+		};
+		verboselog(4, "io_w: FIQ Source Select (not yet implemented) = %04x (%04x), %s\n", data, mem_mask, s_fiq_select[data & 7]);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
+	}
+
 	case 0x2f: // Data Segment
 		temp = m_cpu->state_int(UNSP_SR);
 		m_cpu->set_state_int(UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
-		verboselog(5, "io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
 		break;
 
 	case 0x31: // Unknown UART
-		verboselog(5, "io_w: Unknown UART = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: Unknown UART = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x32: // UART Reset
-		verboselog(5, "io_w: UART Reset\n");
+		verboselog(4, "io_w: UART Reset\n");
 		break;
 
 	case 0x33: // UART Baud Rate
-		verboselog(5, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (m_io_regs[0x34] << 8) - data));
+		verboselog(4, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (m_io_regs[0x34] << 8) - data));
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x35: // UART TX Data
-		verboselog(5, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - m_io_regs[0x33]));
+		verboselog(4, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - m_io_regs[0x33]));
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x58: // I2C Command
-		verboselog(5, "io_w: I2C Command = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: I2C Command = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		do_i2c();
 		break;
 
 	case 0x59: // I2C Status / Acknowledge
-		verboselog(5, "io_w: I2C Acknowledge = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: I2C Acknowledge = %04x (%04x)\n", data, mem_mask);
 		m_io_regs[offset] &= ~data;
 		break;
 
 	case 0x5a: // I2C Access Mode
-		verboselog(5, "io_w: I2C Access Mode = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: I2C Access Mode = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x5b: // I2C Device Address
-		verboselog(5, "io_w: I2C Device Address = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: I2C Device Address = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x5c: // I2C Sub-Address
-		verboselog(5, "io_w: I2C Sub-Address = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: I2C Sub-Address = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x5d: // I2C Data Out
-		verboselog(5, "io_w: I2C Data Out = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: I2C Data Out = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x5e: // I2C Data In
-		verboselog(5, "io_w: I2C Data In = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: I2C Data In = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x5f: // I2C Controller Mode
-		verboselog(5, "io_w: I2C Controller Mode = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: I2C Controller Mode = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x100: // DMA Source (L)
-		verboselog(5, "io_w: DMA Source (L) 3e00 = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: DMA Source (L) 3e00 = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x101: // DMA Source (H)
-		verboselog(5, "io_w: DMA Source (H) 3e01 = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: DMA Source (H) 3e01 = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x103: // DMA Destination
-		verboselog(5, "io_w: DMA Dest 3e03 = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: DMA Dest 3e03 = %04x (%04x)\n", data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 
 	case 0x102: // DMA Length
-		verboselog(5, "io_w: DMA Length 3e02 = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: DMA Length 3e02 = %04x (%04x)\n", data, mem_mask);
 		do_cpu_dma(data);
 		break;
 
 	default:
-		verboselog(5, "io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
+		verboselog(4, "io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
 		COMBINE_DATA(&m_io_regs[offset]);
 		break;
 	}
@@ -956,8 +1104,8 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
 		m_cpu->set_input_line(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 
-	if (changed & 0x2100) // UART, ADC IRQ
-		m_cpu->set_input_line(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
+	//if (changed & 0x2100) // UART, ADC IRQ
+		//m_cpu->set_input_line(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (changed & (AUDIO_BIS_MASK | AUDIO_BIE_MASK)) // Beat IRQ
 		m_cpu->set_input_line(UNSP_IRQ4_LINE, (m_audio_regs[AUDIO_BEAT_COUNT] & (AUDIO_BIS_MASK | AUDIO_BIE_MASK)) == (AUDIO_BIS_MASK | AUDIO_BIE_MASK) ? ASSERT_LINE : CLEAR_LINE);
