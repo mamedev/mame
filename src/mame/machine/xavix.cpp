@@ -409,7 +409,9 @@ WRITE8_MEMBER(xavix_state::irq_source_w)
 
 void xavix_state::machine_start()
 {
-
+	// card night expects RAM to be initialized to 0xff or it will show the pause menu over the startup graphics?!
+	// don't do this every reset or it breaks the baseball 2 secret mode toggle which flips a bit in RAM
+	std::fill_n(&m_mainram[0], 0x4000, 0xff);
 }
 
 void xavix_state::machine_reset()
@@ -448,40 +450,13 @@ void xavix_state::machine_reset()
 	m_soundregs[12] = 0;
 	m_soundregs[13] = 0;
 
-	for (int i = 0; i < 3; i++)
-		m_multparams[i] = 0;
-
-	for (int i = 0; i < 2; i++)
-		m_multresults[i] = 0;
-
-	for (int i = 0; i < 2; i++)
-	{
-		m_spritefragment_dmaparam1[i] = 0;
-		m_spritefragment_dmaparam2[i] = 0;
-	}
-
-	for (int i = 0; i < 8; i++)
-	{
-		m_tmap1_regs[i] = 0;
-		m_tmap2_regs[i] = 0;
-	}
-
-	for (int i = 0; i < 3; i++)
-	{
-		m_txarray[i] = 0x00;
-	}
-
-	for (int i = 0; i < 0x800; i++)
-	{
-		// taito nostalgia 1 never initializes the ram at 0x6400 but there's no condition on using it at present?
-		m_fragment_sprite[i] = 0x00;
-	}
-
-	for (int i = 0; i < 0x4000; i++)
-	{
-		// card night expects RAM to be initialized to 0xff or it will show the pause menu over the startup graphics?!
-		m_mainram[i] = 0xff;
-	}
+	std::fill(std::begin(m_multparams), std::end(m_multparams), 0x00);
+	std::fill(std::begin(m_multresults), std::end(m_multresults), 0x00);
+	std::fill(std::begin(m_spritefragment_dmaparam1), std::end(m_spritefragment_dmaparam1), 0x00);
+	std::fill(std::begin(m_tmap1_regs), std::end(m_tmap1_regs), 0x00);
+	std::fill(std::begin(m_tmap2_regs), std::end(m_tmap2_regs), 0x00);
+	std::fill(std::begin(m_txarray), std::end(m_txarray), 0x00);
+	std::fill_n(&m_fragment_sprite[0], 0x800, 0x00); // taito nostalgia 1 never initializes the ram at 0x6400 but there's no condition on using it at present?
 
 	m_lowbus->set_bank(0);
 }
