@@ -1069,7 +1069,7 @@ Compiled by Robbbert
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="7824984">
-				<rom name="debug.wav" size="7824984" crc="f6a54d3f" sha1="6fff752fa4f2f1056a05e1d7d3368ec31828e9d3" offset="0" />
+				<rom name="crash.wav" size="7824984" crc="f6a54d3f" sha1="6fff752fa4f2f1056a05e1d7d3368ec31828e9d3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
