@@ -161,11 +161,6 @@ void dio16_98265a_device::device_start()
 	m_installed_io = false;
 }
 
-void dio16_98265a_device::map(address_map &map)
-{
-
-}
-
 void dio16_98265a_device::device_reset()
 {
 	uint8_t code = m_sw1->read() >> REG_SW1_SELECT_CODE_SHIFT;

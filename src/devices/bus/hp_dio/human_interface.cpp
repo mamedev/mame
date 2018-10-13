@@ -100,12 +100,6 @@ void human_interface_device::iocpu_map(address_map& map)
 {
 	map(0x0000, 0x07ff).rom().region("iocpu", 0);
 }
-void human_interface_device::map(address_map& map)
-{
-	map(0x00420000, 0x00420003).mirror(0x0000fffc).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
-	map(0x00470000, 0x0047001f).mirror(0x0000ffe0).rw(FUNC(human_interface_device::gpib_r), FUNC(human_interface_device::gpib_w)).umask16(0x00ff);
-
-}
 
 human_interface_device::human_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	human_interface_device(mconfig, HPDIO_HUMAN_INTERFACE, tag, owner, clock)

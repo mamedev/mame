@@ -23,7 +23,7 @@ public:
 	dio16_98265a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void mb87030(device_t *device);
-	void map(address_map &map);
+
 protected:
 	dio16_98265a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
