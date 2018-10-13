@@ -546,15 +546,6 @@ void msx_state::msx_memory_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(msx_state::msx_ay8910_w)
-{
-	if ( offset & 1 )
-		m_ay8910->data_w( space, offset, data );
-	else
-		m_ay8910->address_w( space, offset, data );
-}
-
-
 void msx_state::msx_io_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -563,7 +554,7 @@ void msx_state::msx_io_map(address_map &map)
 	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
 	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
 	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
-	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(FUNC(msx_state::msx_ay8910_w));
+	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x98).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0x99, 0x99).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
@@ -581,7 +572,7 @@ void msx2_state::msx2_io_map(address_map &map)
 	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
 	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
 	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
-	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(FUNC(msx2_state::msx_ay8910_w));
+	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0xb4, 0xb4).w(FUNC(msx2_state::msx_rtc_latch_w));
@@ -600,7 +591,7 @@ void msx2_state::msx2p_io_map(address_map &map)
 	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
 	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
 	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
-	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(FUNC(msx2_state::msx_ay8910_w));
+	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
 	map(0xb4, 0xb4).w(FUNC(msx2_state::msx_rtc_latch_w));

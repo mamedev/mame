@@ -322,7 +322,6 @@ protected:
 	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
-	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
 
 private:
 	void msx_memory_map_all();
