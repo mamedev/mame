@@ -188,10 +188,10 @@ inline uint8_t spg2xx_device::expand_rgb5_to_rgb8(uint8_t val)
 }
 
 // Perform a lerp between a and b
-inline uint8_t spg2xx_device::mix_channel(uint8_t a, uint8_t b)
+inline uint8_t spg2xx_device::mix_channel(uint8_t bottom, uint8_t top)
 {
 	uint8_t alpha = (m_video_regs[0x2a] & 3) << 6;
-	return ((255 - alpha) * a + alpha * b) / 255;
+	return ((256 - alpha) * bottom + alpha * top) >> 8;
 }
 
 void spg2xx_device::mix_pixel(uint32_t offset, uint16_t rgb)
@@ -658,8 +658,8 @@ WRITE_LINE_MEMBER(spg2xx_device::vblank)
 	// For now, manually trigger controller IRQs
 	if (IO_IRQ_ENABLE & 0x2100)
 	{
-		//IO_IRQ_STATUS |= 0x0100;
-		//m_cpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
+		IO_IRQ_STATUS |= 0x0100;
+		m_cpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
 	}
 }
 
@@ -708,16 +708,16 @@ READ16_MEMBER(spg2xx_device::io_r)
 		break;
 
 	case 0x21: // IRQ Control
-		verboselog(4, "io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: I/O IRQ Control = %04x (%04x)\n", val, mem_mask);
 		break;
 
 	case 0x22: // IRQ Status
-		verboselog(4, "io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: I/O IRQ Status = %04x (%04x)\n", val, mem_mask);
 		break;
 
 	case 0x2b:
 		verboselog(4, "io_r: Unknown 0x3D2B = 0000 (%04x)\n", mem_mask);
-		return 0;
+		return 0x0003;
 
 	case 0x2c: case 0x2d: // PRNG 0/1
 		val = machine().rand() & 0x0000ffff;
@@ -743,7 +743,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 
 	case 0x31: // UART Status
 		verboselog(4, "io_r: UART Status = %04x (%04x)\n", 3, mem_mask);
-		val = 0; // HACK
+		val = 0x0003; // HACK
 		break;
 
 	case 0x36: // UART RX Data
@@ -959,7 +959,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	case 0x2f: // Data Segment
 		temp = m_cpu->state_int(UNSP_SR);
 		m_cpu->set_state_int(UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
-		verboselog(4, "io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
+		verboselog(5, "io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
 		break;
 
 	case 0x31: // Unknown UART
@@ -1104,8 +1104,8 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
 		m_cpu->set_input_line(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 
-	//if (changed & 0x2100) // UART, ADC IRQ
-		//m_cpu->set_input_line(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
+	if (changed & 0x2100) // UART, ADC IRQ
+		m_cpu->set_input_line(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (changed & (AUDIO_BIS_MASK | AUDIO_BIE_MASK)) // Beat IRQ
 		m_cpu->set_input_line(UNSP_IRQ4_LINE, (m_audio_regs[AUDIO_BEAT_COUNT] & (AUDIO_BIS_MASK | AUDIO_BIE_MASK)) == (AUDIO_BIS_MASK | AUDIO_BIE_MASK) ? ASSERT_LINE : CLEAR_LINE);
