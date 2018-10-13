@@ -674,15 +674,19 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	if (m_arena_control & 0x01)
 	{
-		// some games enable it with both regs as 00, which causes a problem
-		if (m_arena_start > m_arena_end)
+		/* Controls the clipping area (for all layers?) used for effect at start of Slap Fight and to add black borders in other cases
+		   based on Slap Fight Tiger lives display (and reference videos) this is slightly offset as all status bar gfx must display
+		   Monster Truck black bars are wider on the right hand side, but this matches with the area in which the tilemap is incorrectly rendered so seems to be intentional
+		   Snowboard hides garbage sprites on the right hand side with this, confirming the right hand side offset
+		   Taito Nostalgia 1 'Gladiator' portraits in demo mode are cut slightly due to the area specified, again the cut-off points for left and right are confirmed as correct on hardware
+
+		   some games enable it with both regs as 00, which causes a problem, likewise ping pong sets both to 0xff
+		   but Slap Fight Tiger has both set to 0x82 at a time when everything should be clipped
+		*/
+		if (((m_arena_start != 0x00) && (m_arena_end != 0x00)) && ((m_arena_start != 0xff) && (m_arena_end != 0xff)))
 		{
-			// controls the clipping area (for all layers?) used for effect at start of Slap Fight and to add black borders in other cases
-			// based on Slap Fight Tiger lives display (and reference videos) this is slightly offset as all gfx must display
-			// other games don't correct the offset so will display a tiny bit of extra space at times?
-			// (there is some tilemap draw-in on Monster Truck)
-			clip.max_x = m_arena_start + 1;
-			clip.min_x = m_arena_end - 2;
+			clip.max_x = m_arena_start - 3;
+			clip.min_x = m_arena_end - 1;
 
 			if (clip.min_x < cliprect.min_x)
 				clip.min_x = cliprect.min_x;
