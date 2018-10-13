@@ -35027,6 +35027,9 @@ smssgamea
 shuuz                           // 136083           (c) 1990
 shuuz2                          // 136083           (c) 1990
 
+@source:si5500.cpp
+si5500                          //
+
 @source:sidearms.cpp
 dyger                           // (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
 dygera                          // (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)

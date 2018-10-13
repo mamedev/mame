@@ -618,6 +618,7 @@ MACHINES["WD11C00_17"] = true
 MACHINES["WD2010"] = true
 MACHINES["WD33C93"] = true
 MACHINES["WD7600"] = true
+MACHINES["X2201"] = true
 MACHINES["X2212"] = true
 MACHINES["X76F041"] = true
 MACHINES["X76F100"] = true
@@ -3808,6 +3809,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sh4robot.cpp",
 	MAME_DIR .. "src/mame/drivers/sansa_fuze.cpp",
 	MAME_DIR .. "src/mame/drivers/scopus.cpp",
+	MAME_DIR .. "src/mame/drivers/si5500.cpp",
 	MAME_DIR .. "src/mame/drivers/softbox.cpp",
 	MAME_DIR .. "src/mame/includes/softbox.h",
 	MAME_DIR .. "src/mame/drivers/squale.cpp",

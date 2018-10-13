@@ -650,6 +650,7 @@ segapm.cpp
 selz80.cpp
 sg1000.cpp
 sh4robot.cpp
+si5500.cpp
 sitcom.cpp
 sk1.cpp
 slc1.cpp

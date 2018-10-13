@@ -2961,6 +2961,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/x2201.h,MACHINES["X2201"] = true
+---------------------------------------------------
+
+if (MACHINES["X2201"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/x2201.cpp",
+		MAME_DIR .. "src/devices/machine/x2201.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/x2212.h,MACHINES["X2212"] = true
 ---------------------------------------------------
 
