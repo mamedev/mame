@@ -272,6 +272,7 @@ void sm8500_cpu_device::process_interrupts()
 				m_IR0 = m_program->read_byte(0x12);
 				m_IR1 = m_program->read_byte(0x13);
 				m_PS0 = m_program->read_byte(0x1e);
+				m_PS1 = m_program->read_byte(0x1f);
 				switch( irqline )
 				{
 				case WDT_INT:
