@@ -39,6 +39,10 @@
     - Memory accesses are always 2 bytes (even address byte, odd address byte)
       even for byte operations. Thus the 9980A, like the TMS9900, needs to
       pre-fetch the word at the destination before overwriting it.
+    - Whereas the TMS9900 relies on the TMS9904 to generate its four phase
+      clocks, the TMS9980A takes a single 6 MHz to 10 MHz clock input and
+      divides it by four internally. Only the phase 3 clock is provided as an
+      output for peripherals.
     - On the cycle level both TMS9900 and TMS9980A are equal, except for the
       additional cycles needed for memory read and write access. Accordingly,
       the emulation shares the core and the microprograms and redefines the
