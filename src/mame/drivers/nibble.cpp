@@ -50,7 +50,7 @@
 #include "cpu/upd7810/upd7811.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-//#include "video/ramdac.h"
+#include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -85,6 +85,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void nibble_map(address_map &map);
+	void ramdac1_map(address_map &map);
+	void ramdac2_map(address_map &map);
 };
 
 
@@ -162,11 +164,28 @@ void nibble_state::nibble_map(address_map &map)
 	map(0xd000, 0xdbff).ram();
 	map(0xdc00, 0xdfff).ram().w(FUNC(nibble_state::nibble_videoram_w)).share("videoram");
 	map(0xe000, 0xebff).ram();
-	// RAMDACs at 0xec00 and 0xec40?
+	map(0xec00, 0xec00).rw("ramdac1", FUNC(ramdac_device::index_r), FUNC(ramdac_device::index_w));
+	map(0xec01, 0xec01).rw("ramdac1", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
+	map(0xec02, 0xec02).rw("ramdac1", FUNC(ramdac_device::mask_r), FUNC(ramdac_device::mask_w));
+	map(0xec40, 0xec40).rw("ramdac2", FUNC(ramdac_device::index_r), FUNC(ramdac_device::index_w));
+	map(0xec41, 0xec41).rw("ramdac2", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
+	map(0xec42, 0xec42).rw("ramdac2", FUNC(ramdac_device::mask_r), FUNC(ramdac_device::mask_w));
 	map(0xec88, 0xec89).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xecc8, 0xecc8).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xecc9, 0xecc9).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xf000, 0xfbff).ram();
+}
+
+
+void nibble_state::ramdac1_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac1", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
+
+
+void nibble_state::ramdac2_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac2", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
 
@@ -326,8 +345,13 @@ MACHINE_CONFIG_START(nibble_state::nibble)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nibble)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(nibble_state, nibble)
+	MCFG_RAMDAC_ADD("ramdac1", ramdac1_map, "palette")
+	MCFG_RAMDAC_COLOR_BASE(0)
+
+	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette")
+	MCFG_RAMDAC_COLOR_BASE(0x100)
+
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -345,8 +369,11 @@ MACHINE_CONFIG_END
 
 ROM_START( l9nibble )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u101",    0x00000, 0x01000, NO_DUMP ) // first 4K of code likely contained in undumped internal ROM (with U123 banked over it?)
-	ROM_LOAD( "09.u123", 0x00000, 0x10000, CRC(dfef685d) SHA1(0aeb4257e408e8549df629a0cdb5f2b6790e32de) )
+	ROM_LOAD( "u101",    0x00000, 0x01000, NO_DUMP ) // first 4K of code likely contained in undumped internal ROM
+	ROM_LOAD( "09.u123", 0x00000, 0x10000, CRC(dfef685d) SHA1(0aeb4257e408e8549df629a0cdb5f2b6790e32de) ) // 0000-0FFF matches 3090-408F
+	ROM_FILL( 0x00000, 1, 0x54 ) // JMP to likely entrypoint
+	ROM_FILL( 0x00001, 1, 0x3c )
+	ROM_FILL( 0x00002, 1, 0x10 )
 
 	ROM_REGION( 0x80000, "gfx", 0 )
 	ROM_LOAD( "01.u139", 0x00000, 0x10000, CRC(aba06e58) SHA1(5841beec122613eed2ba9f48cb1d51bfa0ff450c) )
