@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(sliver_state::sliver)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
-	ramdac.set_addrmap(0, &adp_state::ramdac_map);
+	ramdac.set_addrmap(0, &sliver_state::ramdac_map);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

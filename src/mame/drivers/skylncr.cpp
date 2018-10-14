@@ -1681,11 +1681,11 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
-	ramdac.set_addrmap(0, &nibble_state::ramdac_map);
+	ramdac.set_addrmap(0, &skylncr_state::ramdac_map);
 	ramdac.set_color_base(0);
 
 	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette));
-	ramdac2.set_addrmap(0, &nibble_state::ramdac2_map);
+	ramdac2.set_addrmap(0, &skylncr_state::ramdac2_map);
 	ramdac2.set_color_base(0x100);
 
 	/* sound hardware */
