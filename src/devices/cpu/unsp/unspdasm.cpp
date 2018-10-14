@@ -47,11 +47,8 @@ u32 unsp_disassembler::opcode_alignment() const
 	return 1;
 }
 
-offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, uint16_t op, uint16_t imm16)
 {
-	uint16_t op = opcodes.r16(pc);
-	uint16_t imm16 = opcodes.r16(pc+1);
-
 	if(OP0 < 0xf && OPA == 0x7 && OP1 < 2)
 	{
 		util::stream_format(stream, "%s %04x", jmp[OP0], OP1 ? (pc - OPIMM + 1) : (pc + OPIMM + 1));
@@ -256,4 +253,12 @@ offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	}
 	util::stream_format(stream, "<inv>");
 	return UNSP_DASM_OK;
+}
+
+offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint16_t op = opcodes.r16(pc);
+	uint16_t imm16 = opcodes.r16(pc+1);
+
+	return disassemble(stream, pc, op, imm16);
 }

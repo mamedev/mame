@@ -19,6 +19,7 @@ public:
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+	offs_t disassemble(std::ostream &stream, offs_t pc, uint16_t op, uint16_t imm16);
 
 private:
 	static char const *const reg[];

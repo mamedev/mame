@@ -114,6 +114,7 @@ public:
 	void jakks(machine_config &config);
 	void wireless60(machine_config &config);
 	void rad_skat(machine_config &config);
+	void rad_skatp(machine_config &config);
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
 
@@ -124,8 +125,6 @@ protected:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(uart_rx);
-
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
 
@@ -133,8 +132,6 @@ protected:
 	DECLARE_WRITE16_MEMBER(wireless60_porta_w);
 	DECLARE_WRITE16_MEMBER(wireless60_portb_w);
 	DECLARE_READ16_MEMBER(wireless60_porta_r);
-
-	DECLARE_WRITE_LINE_MEMBER(poll_controls);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -149,7 +146,9 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
-private:
+protected:
+	DECLARE_WRITE_LINE_MEMBER(poll_controls);
+
 	virtual void machine_reset() override;
 
 	void mem_map(address_map &map);
@@ -157,7 +156,6 @@ private:
 	uint32_t m_current_bank;
 
 	std::unique_ptr<uint8_t[]> m_serial_eeprom;
-	uint16_t m_uart_rx_count;
 	uint8_t m_controller_input[8];
 	uint8_t m_w60_controller_input;
 	uint16_t m_w60_porta_data;
@@ -180,12 +178,13 @@ class spg2xx_cart_state : public spg2xx_game_state
 {
 public:
 	spg2xx_cart_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spg2xx_game_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
+		: spg2xx_game_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
 	{ }
 
 	void vii(machine_config &config);
 	void vsmile(machine_config &config);
+	void vsmilep(machine_config &config);
 
 	void init_vii();
 
@@ -195,10 +194,22 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
 
+	DECLARE_READ16_MEMBER(vsmile_porta_r);
+	DECLARE_READ16_MEMBER(vsmile_portb_r);
+	DECLARE_READ16_MEMBER(vsmile_portc_r);
+	DECLARE_WRITE16_MEMBER(vsmile_porta_w);
+	DECLARE_WRITE16_MEMBER(vsmile_portb_w);
+	DECLARE_WRITE16_MEMBER(vsmile_portc_w);
+
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_rom;
+
+	uint16_t m_vsmile_porta_data;
+	uint16_t m_vsmile_portb_data;
+	uint16_t m_vsmile_portc_data;
 };
 
 #define VERBOSE_LEVEL   (4)
@@ -243,13 +254,6 @@ READ8_MEMBER(spg2xx_game_state::eeprom_r)
 	return m_serial_eeprom[offset & 0x3ff];
 }
 
-READ8_MEMBER(spg2xx_game_state::uart_rx)
-{
-	uint8_t val = m_controller_input[m_uart_rx_count];
-	m_uart_rx_count = (m_uart_rx_count + 1) % 8;
-	return val;
-}
-
 WRITE16_MEMBER(spg2xx_game_state::wireless60_porta_w)
 {
 	m_w60_porta_data = data & 0xf00;
@@ -287,6 +291,42 @@ WRITE16_MEMBER(spg2xx_cart_state::vii_portb_w)
 {
 	if (data == 0x7c) machine().debug_break();
 	switch_bank(((data & 0x80) >> 7) | ((data & 0x20) >> 4));
+}
+
+READ16_MEMBER(spg2xx_cart_state::vsmile_porta_r)
+{
+	logerror("V.Smile Port A read, pull mask %04x\n", mem_mask);
+	return m_vsmile_porta_data & mem_mask;
+}
+
+READ16_MEMBER(spg2xx_cart_state::vsmile_portb_r)
+{
+	logerror("V.Smile Port B read, pull mask %04x\n", mem_mask);
+	return m_vsmile_portb_data & mem_mask;
+}
+
+READ16_MEMBER(spg2xx_cart_state::vsmile_portc_r)
+{
+	logerror("V.Smile Port C read, pull mask %04x\n", mem_mask);
+	return m_vsmile_portc_data & mem_mask;
+}
+
+WRITE16_MEMBER(spg2xx_cart_state::vsmile_porta_w)
+{
+	logerror("V.Smile Port A write %04x, push mask %04x\n", data, mem_mask);
+	m_vsmile_porta_data = data & mem_mask;
+}
+
+WRITE16_MEMBER(spg2xx_cart_state::vsmile_portb_w)
+{
+	logerror("V.Smile Port B write %04x, push mask %04x\n", data, mem_mask);
+	m_vsmile_portb_data = data & mem_mask;
+}
+
+WRITE16_MEMBER(spg2xx_cart_state::vsmile_portc_w)
+{
+	logerror("V.Smile Port C write %04x, push mask %04x\n", data, mem_mask);
+	m_vsmile_portc_data = data & mem_mask;
 }
 
 READ16_MEMBER(spg2xx_game_state::jakks_porta_r)
@@ -421,16 +461,15 @@ static INPUT_PORTS_START( rad_skat )
 	PORT_START("P2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) // read but unused?
 
-
-	PORT_START("P3") // PAL/NTSC flag
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM )
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM ) // NTSC (1) / PAL (0) flag
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_skatp )
 	PORT_INCLUDE(rad_skat)
 
-	PORT_MODIFY("P3") // PAL/NTSC flag
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_CUSTOM )
+	PORT_MODIFY("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) // NTSC (1) / PAL (0) flag
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_sktv )
@@ -527,10 +566,6 @@ static INPUT_PORTS_START( rad_sktv )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("P3") // PAL/NTSC flag
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) // NTSC
-	//PORT_BIT( 0xffff, IP_ACTIVE_PAL, IPT_CUSTOM ) // PAL
 INPUT_PORTS_END
 
 /* hold 'Console Down' while powering up to get the test menu, including input tests
@@ -564,6 +599,18 @@ void spg2xx_cart_state::machine_start()
 		m_bank->configure_entries(0, ceilf((float)m_cart_rom->bytes() / 0x800000), m_cart_rom->base(), 0x800000);
 		m_bank->set_entry(0);
 	}
+
+	m_vsmile_porta_data = 0;
+	m_vsmile_portb_data = 0;
+	m_vsmile_portc_data = 0;
+}
+
+void spg2xx_cart_state::machine_reset()
+{
+	m_controller_input[0] = 0;
+	m_controller_input[4] = 0;
+	m_controller_input[6] = 0xff;
+	m_controller_input[7] = 0;
 }
 
 void spg2xx_game_state::machine_start()
@@ -578,10 +625,6 @@ void spg2xx_game_state::machine_reset()
 {
 	m_current_bank = 0;
 
-	m_controller_input[0] = 0;
-	m_controller_input[4] = 0;
-	m_controller_input[6] = 0xff;
-	m_controller_input[7] = 0;
 	m_w60_controller_input = -1;
 	m_w60_porta_data = 0;
 }
@@ -595,6 +638,9 @@ WRITE_LINE_MEMBER(spg2xx_game_state::poll_controls)
 	int32_t y = m_io_motiony ? ((int32_t)m_io_motiony->read() - 0x200) : 0;
 	int32_t z = m_io_motionz ? ((int32_t)m_io_motionz->read() - 0x200) : 0;
 
+	uint8_t old_input[8];
+	memcpy(old_input, m_controller_input, 8);
+
 	m_controller_input[0] = m_io_p1->read();
 	m_controller_input[1] = (uint8_t)x;
 	m_controller_input[2] = (uint8_t)y;
@@ -607,7 +653,11 @@ WRITE_LINE_MEMBER(spg2xx_game_state::poll_controls)
 	m_controller_input[6] = 0xff;
 	m_controller_input[7] = 0;
 
-	m_uart_rx_count = 0;
+	if (memcmp(old_input, m_controller_input, 8))
+	{
+		for(int i = 0; i < 8; i++)
+			m_spg->uart_rx(m_controller_input[i]);
+	}
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(spg2xx_cart_state, vii_cart)
@@ -647,7 +697,6 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update("spg", FUNC(spg2xx_device::screen_update));
 	m_screen->screen_vblank().set(m_spg, FUNC(spg2xx_device::vblank));
-	m_screen->screen_vblank().append(FUNC(spg2xx_game_state::poll_controls));
 
 #if SPG2XX_VISUAL_AUDIO_DEBUG
 	SCREEN(config, m_debug_screen, SCREEN_TYPE_RASTER);
@@ -691,8 +740,8 @@ void spg2xx_cart_state::vii(machine_config &config)
 #endif
 
 	spg2xx_base(config);
+	m_screen->screen_vblank().append(FUNC(spg2xx_cart_state::poll_controls));
 
-	m_spg->uart_rx().set(FUNC(spg2xx_cart_state::uart_rx));
 	m_spg->portb_out().set(FUNC(spg2xx_cart_state::vii_portb_w));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vii_cart");
@@ -711,13 +760,24 @@ void spg2xx_cart_state::vsmile(machine_config &config)
 #endif
 	spg2xx_base(config);
 
-	m_spg->uart_rx().set(FUNC(spg2xx_cart_state::uart_rx));
+	m_spg->porta_in().set(FUNC(spg2xx_cart_state::vsmile_porta_r));
+	m_spg->portb_in().set(FUNC(spg2xx_cart_state::vsmile_portb_r));
+	m_spg->portc_in().set(FUNC(spg2xx_cart_state::vsmile_portc_r));
+	m_spg->porta_out().set(FUNC(spg2xx_cart_state::vsmile_porta_w));
+	m_spg->portb_out().set(FUNC(spg2xx_cart_state::vsmile_portb_w));
+	m_spg->portc_out().set(FUNC(spg2xx_cart_state::vsmile_portc_w));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vsmile_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(device_image_load_delegate(&spg2xx_cart_state::device_image_load_vsmile_cart, this));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmile_cart");
+}
+
+void spg2xx_cart_state::vsmilep(machine_config &config)
+{
+	vsmile(config);
+	m_spg->set_pal(true);
 }
 
 void spg2xx_game_state::wireless60(machine_config &config)
@@ -728,8 +788,7 @@ void spg2xx_game_state::wireless60(machine_config &config)
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 #endif
 	spg2xx_base(config);
-
-	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
+	m_screen->screen_vblank().append(FUNC(spg2xx_game_state::poll_controls));
 
 	m_spg->porta_out().set(FUNC(spg2xx_game_state::wireless60_porta_w));
 	m_spg->portb_out().set(FUNC(spg2xx_game_state::wireless60_portb_w));
@@ -745,7 +804,6 @@ void spg2xx_game_state::jakks(machine_config &config)
 #endif
 	spg2xx_base(config);
 
-	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
 	m_spg->porta_in().set(FUNC(spg2xx_cart_state::jakks_porta_r));
 
 	I2CMEM(config, "i2cmem", 0).set_data_size(0x200);
@@ -760,12 +818,17 @@ void spg2xx_game_state::rad_skat(machine_config &config)
 #endif
 	spg2xx_base(config);
 
-	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
 	m_spg->porta_in().set_ioport("P1");
 	m_spg->portb_in().set_ioport("P2");
 	m_spg->portc_in().set_ioport("P3");
 	m_spg->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
 	m_spg->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
+}
+
+void spg2xx_game_state::rad_skatp(machine_config &config)
+{
+	rad_skat(config);
+	m_spg->set_pal(true);
 }
 
 void spg2xx_game_state::rad_crik(machine_config &config)
@@ -777,7 +840,6 @@ void spg2xx_game_state::rad_crik(machine_config &config)
 #endif
 	spg2xx_base(config);
 
-	m_spg->uart_rx().set(FUNC(spg2xx_game_state::uart_rx));
 	m_spg->porta_in().set_ioport("P1");
 	m_spg->portb_in().set_ioport("P2");
 	m_spg->portc_in().set_ioport("P3");
@@ -990,10 +1052,10 @@ ROM_END
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
 // VTech systems
-CONS( 2005, vsmile,  0,      0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (US)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileg, vsmile, 0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmilef, vsmile, 0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (France)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileb, 0,      0, vsmile, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,  0,      0, vsmile,  vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (US)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileg, vsmile, 0, vsmilep, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmilef, vsmile, 0, vsmilep, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (France)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileb, 0,      0, vsmile,  vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 // Jungle Soft TV games
 CONS( 2007, vii,      0, 0, vii,        vii,      spg2xx_cart_state, empty_init, "Jungle Soft / KenSingTon / Siatronics",    "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
@@ -1005,10 +1067,10 @@ CONS( 2004, batmantv, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS
 CONS( 2008, walle,    0, 0, jakks, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc",              "Wall-E",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Radica TV games
-CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,  spg2xx_game_state, empty_init, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_skatp, rad_skat, 0, rad_skat, rad_skatp, spg2xx_game_state, empty_init, "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_crik,  0,        0, rad_crik, rad_crik,  spg2xx_game_state, empty_init, "Radica", "Connectv Cricket (PAL)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
-CONS( 2007, rad_sktv,  0,        0, rad_skat, rad_sktv,  spg2xx_game_state, empty_init, "Radica", "Skannerz TV",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, empty_init, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp, rad_skat, 0, rad_skatp, rad_skatp, spg2xx_game_state, empty_init, "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_crik,  0,        0, rad_crik, rad_crik,   spg2xx_game_state, empty_init, "Radica", "Connectv Cricket (PAL)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+CONS( 2007, rad_sktv,  0,        0, rad_skat, rad_sktv,   spg2xx_game_state, empty_init, "Radica", "Skannerz TV",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
 CONS( 2009, zone40,    0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

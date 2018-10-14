@@ -13,6 +13,7 @@
 #include "unspdasm.h"
 #include "debugger.h"
 
+#define LOG_OPCODES		(0)
 
 DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "SunPlus u'nSP")
 
@@ -284,6 +285,10 @@ void unsp_device::check_irqs()
 
 void unsp_device::execute_run()
 {
+#if LOG_OPCODES
+	unsp_disassembler dasm;
+#endif
+
 	uint32_t lres = 0;
 	uint16_t r0 = 0;
 	uint16_t r1 = 0;
@@ -295,6 +300,12 @@ void unsp_device::execute_run()
 
 		debugger_instruction_hook(UNSP_LPC);
 		const uint32_t op = read16(UNSP_LPC);
+
+#if LOG_OPCODES
+		std::stringstream strbuffer;
+		dasm.disassemble(strbuffer, UNSP_LPC, op, read16(UNSP_LPC+1));
+		logerror("%06x: %s\n", UNSP_LPC, strbuffer.str().c_str());
+#endif
 
 		UNSP_REG(PC)++;
 
@@ -851,10 +862,10 @@ void unsp_device::execute_run()
 				continue;
 		}
 
-		if (OP0 != 0x0d && OPA != 0x07) // If not a store opcode and not updating the PC, update negative/zero flags.
+		if (OP0 != 0x0d && OPA != 7) // If not a store opcode and not updating the PC, update negative/zero flags.
 			update_nz(lres);
 
-		if (OP0 < 0x05 && OPA != 0x07) // If Add, Add w/ Carry, Subtract, Subtract w/ Carry, Compare, and not updating the PC, update sign/carry flags.
+		if (OP0 < 0x05 && OPA != 7) // If Add, Add w/ Carry, Subtract, Subtract w/ Carry, Compare, and not updating the PC, update sign/carry flags.
 			update_sc(lres, r0, r1);
 
 		if (OP0 == 0x04 || OP0 == 0x0c) // Compare and Test don't write back results.

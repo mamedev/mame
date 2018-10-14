@@ -28,6 +28,8 @@ class spg2xx_device : public device_t, public device_sound_interface
 public:
 	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_pal(bool pal) { m_pal_flag = pal ? 1 : 0; }
+
 	void map(address_map &map);
 
 	auto porta_out() { return m_porta_out.bind(); }
@@ -41,7 +43,8 @@ public:
 	auto eeprom_r() { return m_eeprom_r.bind(); }
 
 	auto uart_tx() { return m_uart_tx.bind(); }
-	auto uart_rx() { return m_uart_rx.bind(); }
+
+	void uart_rx(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 #if SPG2XX_VISUAL_AUDIO_DEBUG
@@ -378,10 +381,14 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	void update_porta_special_modes();
+	void update_portb_special_modes();
 	void do_gpio(uint32_t offset);
+
 	void do_i2c();
-	void do_video_dma(uint32_t len);
 	void do_cpu_dma(uint32_t len);
+
+	void do_sprite_dma(uint32_t len);
 
 	void blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
 	void blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs);
@@ -427,9 +434,13 @@ protected:
 	int m_channel_debug;
 	uint16_t m_audio_curr_beat_base_count;
 
-	uint16_t m_video_regs[0x100];
 	uint16_t m_io_regs[0x200];
+	uint8_t m_uart_rx_fifo[8];
+	uint8_t m_uart_rx_index;
+
+	uint16_t m_video_regs[0x100];
 	size_t m_sprite_limit;
+	uint16_t m_pal_flag;
 
 	devcb_write16 m_porta_out;
 	devcb_write16 m_portb_out;
@@ -442,7 +453,6 @@ protected:
 	devcb_read8 m_eeprom_r;
 
 	devcb_write8 m_uart_tx;
-	devcb_read8 m_uart_rx;
 
 	emu_timer *m_tmb1;
 	emu_timer *m_tmb2;

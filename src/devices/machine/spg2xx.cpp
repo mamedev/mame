@@ -74,7 +74,6 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_eeprom_w(*this)
 	, m_eeprom_r(*this)
 	, m_uart_tx(*this)
-	, m_uart_rx(*this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_scrollram(*this, "scrollram")
@@ -121,7 +120,6 @@ void spg2xx_device::device_start()
 	m_eeprom_w.resolve_safe();
 	m_eeprom_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
-	m_uart_rx.resolve_safe(0);
 
 	m_tmb1 = timer_alloc(TIMER_TMB1);
 	m_tmb2 = timer_alloc(TIMER_TMB2);
@@ -491,7 +489,7 @@ uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-void spg2xx_device::do_video_dma(uint32_t len)
+void spg2xx_device::do_sprite_dma(uint32_t len)
 {
 	address_space &mem = m_cpu->space(AS_PROGRAM);
 
@@ -512,19 +510,19 @@ READ16_MEMBER(spg2xx_device::video_r)
 	switch (offset)
 	{
 	case 0x38: // Current Line
-		verboselog(5, "video_r: Current Line: %04x\n", m_screen->vpos());
+		verboselog(4, "video_r: Current Line: %04x\n", m_screen->vpos());
 		return m_screen->vpos();
 
 	case 0x62: // Video IRQ Enable
-		verboselog(5, "video_r: Video IRQ Enable: %04x\n", VIDEO_IRQ_ENABLE);
+		verboselog(4, "video_r: Video IRQ Enable: %04x\n", VIDEO_IRQ_ENABLE);
 		return VIDEO_IRQ_ENABLE;
 
 	case 0x63: // Video IRQ Status
-		verboselog(5, "video_r: Video IRQ Status: %04x\n", VIDEO_IRQ_STATUS);
+		verboselog(4, "video_r: Video IRQ Status: %04x\n", VIDEO_IRQ_STATUS);
 		return VIDEO_IRQ_STATUS;
 
 	default:
-		verboselog(5, "video_r: Unknown register %04x = %04x\n", 0x2800 + offset, m_video_regs[offset]);
+		verboselog(4, "video_r: Unknown register %04x = %04x\n", 0x2800 + offset, m_video_regs[offset]);
 		break;
 	}
 	return m_video_regs[offset];
@@ -534,41 +532,142 @@ WRITE16_MEMBER(spg2xx_device::video_w)
 {
 	switch (offset)
 	{
-	case 0x10:	// Page 1 X scroll
-		verboselog(5, "video_w: Page 1 X Scroll: %04x = %04x\n", 0x2800 | offset, data & 0x01ff);
+	case 0x10: // Page 1 X scroll
+		verboselog(4, "video_w: Page 1 X Scroll = %04x\n", data & 0x01ff);
 		m_video_regs[offset] = data & 0x01ff;
 		break;
 
-	case 0x16:	// Page 2 X scroll
-		verboselog(5, "video_w: Page 2 X Scroll: %04x = %04x\n", 0x2800 | offset, data & 0x01ff);
-		m_video_regs[offset] = data & 0x01ff;
-		break;
-
-	case 0x11:	// Page 1 Y scroll
-		verboselog(5, "video_w: Page 1 Y Scroll: %04x = %04x\n", 0x2800 | offset, data & 0x00ff);
+	case 0x11: // Page 1 Y scroll
+		verboselog(4, "video_w: Page 1 Y Scroll = %04x\n", data & 0x00ff);
 		m_video_regs[offset] = data & 0x00ff;
 		break;
 
-	case 0x17:	// Page 2 Y scroll
-		verboselog(5, "video_w: Page 2 Y Scroll: %04x = %04x\n", 0x2800 | offset, data & 0x00ff);
+	case 0x12: // Page 1 Attributes
+		verboselog(4, "video_w: Page 1 Attributes = %04x (Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", data
+			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x13: // Page 1 Control
+		verboselog(4, "video_w: Page 1 Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n", data
+			, BIT(data, 8), BIT(data, 7), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x14: // Page 1 Tile Address
+		verboselog(4, "video_w: Page 1 Tile Address = %04x\n", data & 0x1fff);
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x15: // Page 1 Attribute Address
+		verboselog(4, "video_w: Page 1 Attribute Address = %04x\n", data & 0x1fff);
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x16: // Page 2 X scroll
+		verboselog(4, "video_w: Page 2 X Scroll = %04x\n", data & 0x01ff);
+		m_video_regs[offset] = data & 0x01ff;
+		break;
+
+	case 0x17: // Page 2 Y scroll
+		verboselog(4, "video_w: Page 2 Y Scroll: %04x = %04x\n", 0x2800 | offset, data & 0x00ff);
 		m_video_regs[offset] = data & 0x00ff;
 		break;
 
-	case 0x36:      // IRQ pos V
-	case 0x37:      // IRQ pos H
+	case 0x18: // Page 2 Attributes
+		verboselog(4, "video_w: Page 2 Attributes = %04x (Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", data
+			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x19: // Page 2 Control
+		verboselog(4, "video_w: Page 2 Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n", data
+			, BIT(data, 8), BIT(data, 7), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x1a: // Page 2 Tile Address
+		verboselog(4, "video_w: Page 2 Tile Address = %04x\n", data & 0x1fff);
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x1b: // Page 2 Attribute Address
+		verboselog(4, "video_w: Page 2 Attribute Address = %04x\n", data & 0x1fff);
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x20: // Page 1 Segment Address
+		verboselog(4, "video_w: Page 1 Segment Address = %04x\n", data);
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x21: // Page 2 Segment Address
+		verboselog(4, "video_w: Page 2 Segment Address = %04x\n", data);
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x22: // Sprite Segment Address
+		verboselog(4, "video_w: Sprite Segment Address = %04x\n", data);
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x2a: // Blend Level Control
+		verboselog(4, "video_w: Blend Level Control = %04x\n", data & 0x0003);
+		m_video_regs[offset] = data & 0x0003;
+		break;
+
+	case 0x30: // Fade Effect Control
+		verboselog(4, "video_w: Fade Effect Control = %04x\n", data & 0x00ff);
+		m_video_regs[offset] = data & 0x00ff;
+		break;
+
+	case 0x36: // IRQ pos V
+	case 0x37: // IRQ pos H
 		m_video_regs[offset] = data & 0x01ff;
-		verboselog(5, "video_w: Video IRQ Position: %04x,%04x (%04x)\n", m_video_regs[0x37], m_video_regs[0x36], 0x2800 | offset);
+		verboselog(4, "video_w: Video IRQ Position: %04x,%04x (%04x)\n", m_video_regs[0x37], m_video_regs[0x36], 0x2800 | offset);
 		if (m_video_regs[0x37] < 160 && m_video_regs[0x36] < 240)
 			m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
 		else
 			m_screenpos_timer->adjust(attotime::never);
 		break;
 
+	case 0x39: // Latch 1st Line Pen Pulse
+		verboselog(4, "video_w: Latch 1st Line Pen Pulse = %04x\n", data & 0x0001);
+		m_video_regs[offset] = data & 0x0001;
+		break;
+
+	case 0x3c: // TV Control 1
+		verboselog(4, "video_w: TV Control 1 = %04x (Hue:%02x, Saturation:%02x)\n", data, data >> 8, data & 0x00ff);
+		m_video_regs[offset] = data;
+		break;
+
+	case 0x3d: // TV Control 2
+	{
+		static const char* const s_lpf_mode[4] = { "LPF1", "LPF2", "All", "Edge" };
+		verboselog(4, "video_w: TV Control 2 = %04x (LPFMode:%s, Enable:%d, Interlace:%d)\n", data & 0x000f
+			, s_lpf_mode[(data >> 2) & 3], BIT(data, 1), BIT(data, 0));
+		m_video_regs[offset] = data & 0x000f;
+		break;
+	}
+
+	case 0x3e: // Light Pen Y Position
+		verboselog(4, "video_w: Light Pen Y (read only) = %04x\n", data & 0x01ff);
+		break;
+
+	case 0x3f: // Light Pen YXPosition
+		verboselog(4, "video_w: Light Pen X (read only) = %04x\n", data & 0x01ff);
+		break;
+
+	case 0x42: // Sprite Control
+		verboselog(4, "video_w: Sprite Control = %04x (TopLeft:%d, Enable:%d)\n", data & 0x0003, BIT(data, 1), BIT(data, 0));
+		m_video_regs[offset] = data & 0x0003;
+		break;
+
 	case 0x62: // Video IRQ Enable
 	{
-		verboselog(5, "video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "video_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data & 0x0007, BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
-		COMBINE_DATA(&VIDEO_IRQ_ENABLE);
+		VIDEO_IRQ_ENABLE = data & 0x0007;
 		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
 		if (changed)
 			check_video_irq();
@@ -577,7 +676,7 @@ WRITE16_MEMBER(spg2xx_device::video_w)
 
 	case 0x63: // Video IRQ Acknowledge
 	{
-		verboselog(5, "video_w: Video IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "video_w: Video IRQ Acknowledge = %04x\n", data);
 		const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 		VIDEO_IRQ_STATUS &= ~data;
 		//verboselog(4, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
@@ -587,24 +686,24 @@ WRITE16_MEMBER(spg2xx_device::video_w)
 		break;
 	}
 
-	case 0x70: // Video DMA Source
-		verboselog(5, "video_w: Video DMA Source = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_video_regs[offset]);
+	case 0x70: // Sprite DMA Source
+		verboselog(4, "video_w: Sprite DMA Source = %04x\n", data & 0x3fff);
+		m_video_regs[offset] = data & 0x3fff;
 		break;
 
-	case 0x71: // Video DMA Dest
-		verboselog(5, "video_w: Video DMA Dest = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_video_regs[offset]);
+	case 0x71: // Sprite DMA Dest
+		verboselog(4, "video_w: Sprite DMA Dest = %04x\n", data & 0x03ff);
+		m_video_regs[offset] = data & 0x03ff;
 		break;
 
-	case 0x72: // Video DMA Length
-		verboselog(5, "video_w: Video DMA Length = %04x (%04x)\n", data, mem_mask);
-		do_video_dma(data & 0x3ff);
+	case 0x72: // Sprite DMA Length
+		verboselog(4, "video_w: Sprite DMA Length = %04x\n", data & 0x03ff);
+		do_sprite_dma(data & 0x3ff);
 		break;
 
 	default:
-		verboselog(5, "video_w: Unknown register %04x = %04x (%04x)\n", 0x2800 + offset, data, mem_mask);
-		COMBINE_DATA(&m_video_regs[offset]);
+		verboselog(4, "video_w: Unknown register %04x = %04x\n", 0x2800 + offset, data);
+		m_video_regs[offset] = data;
 		break;
 	}
 }
@@ -650,17 +749,10 @@ WRITE_LINE_MEMBER(spg2xx_device::vblank)
 
 	const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 	VIDEO_IRQ_STATUS |= 1;
-	verboselog(5, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
+	verboselog(4, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
 	const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
 	if (changed)
 		check_video_irq();
-
-	// For now, manually trigger controller IRQs
-	if (IO_IRQ_ENABLE & 0x2100)
-	{
-		IO_IRQ_STATUS |= 0x0100;
-		m_cpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
-	}
 }
 
 void spg2xx_device::check_video_irq()
@@ -673,6 +765,27 @@ void spg2xx_device::check_video_irq()
 *    Machine Hardware    *
 *************************/
 
+void spg2xx_device::uart_rx(uint8_t data)
+{
+	if (m_uart_rx_index < 8)
+	{
+		m_uart_rx_fifo[m_uart_rx_index] = data;
+		m_uart_rx_index++;
+		if (m_uart_rx_index > (m_io_regs[0x37] & 7))
+		{
+			const uint16_t old = IO_IRQ_STATUS;
+			IO_IRQ_STATUS |= 0x0100;
+			const uint16_t changed = old ^ IO_IRQ_STATUS;
+			if (changed & IO_IRQ_ENABLE)
+				check_irqs(0x0100);
+		}
+	}
+	else
+	{
+		m_io_regs[0x37] |= 0x4000;
+	}
+}
+
 READ16_MEMBER(spg2xx_device::io_r)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
@@ -684,79 +797,120 @@ READ16_MEMBER(spg2xx_device::io_r)
 	{
 	case 0x01: case 0x06: case 0x0b: // GPIO Data Port A/B/C
 		do_gpio(offset);
-		verboselog(5, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
+		verboselog(4, "io_r: %s %c = %04x\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset]);
 		val = m_io_regs[offset];
 		break;
 
 	case 0x02: case 0x03: case 0x04: case 0x05:
 	case 0x07: case 0x08: case 0x09: case 0x0a:
 	case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Other GPIO regs
-		verboselog(5, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
+		verboselog(4, "io_r: %s %c = %04x\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset]);
 		break;
 
 	case 0x10: // Timebase Control
-		verboselog(4, "io_r: Timebase Control = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: Timebase Control = %04x\n", val);
 		break;
 
 	case 0x1c: // Video line counter
 		val = m_screen->vpos();
-		verboselog(4, "io_r: Video Line = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: Video Line = %04x\n", val);
 		break;
 
 	case 0x20: // System Control
-		verboselog(4, "io_r: System Control = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: System Control = %04x\n", val);
 		break;
 
 	case 0x21: // IRQ Control
-		verboselog(4, "io_r: I/O IRQ Control = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: I/O IRQ Control = %04x\n", val);
 		break;
 
 	case 0x22: // IRQ Status
-		verboselog(4, "io_r: I/O IRQ Status = %04x (%04x)\n", val, mem_mask);
-		break;
-
-	case 0x2b:
-		verboselog(4, "io_r: Unknown 0x3D2B = 0000 (%04x)\n", mem_mask);
-		return 0x0003;
-
-	case 0x2c: case 0x2d: // PRNG 0/1
-		val = machine().rand() & 0x0000ffff;
-		verboselog(4, "io_r: PRNG %d = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
+		verboselog(4, "io_r: I/O IRQ Status = %04x\n", val);
 		break;
 
 	case 0x23: // External Memory Control
-		verboselog(4, "io_r: Ext. Memory Control = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: Ext. Memory Control = %04x\n", val);
+		break;
+
+	case 0x25: // ADC Control
+		verboselog(4, "io_r: ADC Control = %04x\n", val);
 		break;
 
 	case 0x29: // Wakeup Source
-		verboselog(4, "io_r: Wakeup Source = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: Wakeup Source = %04x\n", val);
+		break;
+
+	case 0x2b:
+		verboselog(4, "io_r: NTSC/PAL = %04x\n", m_pal_flag);
+		return m_pal_flag;
+
+	case 0x2c: case 0x2d: // PRNG 0/1
+		val = machine().rand() & 0x0000ffff;
+		verboselog(4, "io_r: PRNG %d = %04x\n", offset - 0x2c, val);
 		break;
 
 	case 0x2e: // FIQ Source Select
-		verboselog(4, "io_r: FIQ Source Select = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: FIQ Source Select = %04x\n", val);
 		break;
 
 	case 0x2f: // Data Segment
 		val = m_cpu->state_int(UNSP_SR) >> 10;
-		verboselog(4, "io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: Data Segment = %04x\n", val);
 		break;
 
 	case 0x31: // UART Status
-		verboselog(4, "io_r: UART Status = %04x (%04x)\n", 3, mem_mask);
-		val = 0x0003; // HACK
+		val = 0x0002 | (m_uart_rx_index ? 1 : 0) | (m_uart_rx_index == 8 ? 0x80 : 0);
+		verboselog(4, "io_r: UART Status = %04x\n", val);
 		break;
 
 	case 0x36: // UART RX Data
-		val = m_uart_rx();
-		verboselog(4, "io_r: UART RX Data = %04x (%04x)\n", val, mem_mask);
+		if (m_uart_rx_index)
+		{
+			val = m_uart_rx_fifo[0];
+			m_uart_rx_fifo[0] = 0;
+			m_uart_rx_index--;
+			for (uint8_t i = 0; i < m_uart_rx_index; i++)
+			{
+				m_uart_rx_fifo[i] = m_uart_rx_fifo[i + 1];
+			}
+		}
+		else
+		{
+			m_io_regs[0x37] |= 0x2000;
+			val = 0;
+		}
+		verboselog(4, "io_r: UART Rx Data = %04x\n", val);
+		break;
+
+	case 0x37: // UART Rx FIFO Control
+		val &= ~0x0070;
+		val |= (m_uart_rx_index > 7 ? 7 : m_uart_rx_index) << 4;
+		verboselog(4, "io_r: UART Rx FIFO Control = %04x\n", val);
 		break;
 
 	case 0x59: // I2C Status
-		verboselog(4, "io_r: I2C Status = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: I2C Status = %04x\n", val);
 		break;
 
 	case 0x5e: // I2C Data In
-		verboselog(4, "io_r: I2C Data In = %04x (%04x)\n", val, mem_mask);
+		verboselog(4, "io_r: I2C Data In = %04x\n", val);
+		break;
+
+	case 0x100: // DMA Source (L)
+		verboselog(4, "io_r: DMA Source (lo) = %04x\n", val);
+		break;
+
+	case 0x101: // DMA Source (H)
+		verboselog(4, "io_r: DMA Source (hi) = %04x\n", val);
+		break;
+
+	case 0x102: // DMA Length
+		verboselog(4, "io_r: DMA Length = %04x\n", 0);
+		val = 0;
+		break;
+
+	case 0x103: // DMA Destination
+		verboselog(4, "io_r: DMA Dest = %04x\n", val);
 		break;
 
 	default:
@@ -767,30 +921,109 @@ READ16_MEMBER(spg2xx_device::io_r)
 	return val;
 }
 
+void spg2xx_device::update_porta_special_modes()
+{
+	static const char* const s_pa_special[4][16] =
+	{
+		// Input,  Special 0
+		// Input,  Special 1
+		// Output, Special 0
+		// Output, Special 1
+
+		{ "LP",   "ExtClk2", "ExtClk1", "-",   "SDA", "SlvRDY", "-",     "-",       "SPICLK", "-",   "RxD", "SPISSB", "-",     "-",     "-",     "-"     },
+		{ "-",    "-",       "-",       "SCK", "-",   "SWS",    "-",     "-",       "-",      "-",   "-",   "-",      "IRQ2B", "-",     "-",     "IRQ1B" },
+		{ "-",    "-",       "-",       "SCK", "SDA", "SWS",    "-",     "-",       "SPICLK", "TxD", "-",   "SPISSB", "TAPWM", "TM1",   "TBPWM", "TM2"   },
+		{ "CSB3", "CSB2",    "CSB1",    "SCK", "SDA", "VSYNC",  "HSYNC", "SYSCLK3", "SPICLK", "TxD", "SWS", "SPISSB", "-",     "VSYNC", "HSYNC", "CSYNC" },
+	};
+	for (int bit = 15; bit >= 0; bit--)
+	{
+		if (!BIT(m_io_regs[0x05], bit))
+			continue;
+		uint8_t type = (BIT(m_io_regs[0x03], bit) << 1) | BIT(m_io_regs[0x00], 0);
+		verboselog(4, "      Bit %2d: %s\n", bit, s_pa_special[type][bit]);
+	}
+}
+
+void spg2xx_device::update_portb_special_modes()
+{
+	static const char* const s_pb_special[4][8] =
+	{
+		// Input,  Special 0
+		// Input,  Special 1
+		// Output, Special 0
+		// Output, Special 1
+
+		{ "-",    "-",      "-",     "-",     "-",   "-",   "SDA", "SlvRDY"  },
+		{ "-",    "-",      "-",     "-",     "-",   "-",   "SDA", "SlvRDY"  },
+		{ "VSYNC", "HSYNC", "CSYNC", "-",     "-",   "SCK", "SDA", "SWS"     },
+		{ "CSB3",  "CSB2",  "CSB1",  "TBPWM", "TM2", "-",   "-",   "SYSCLK2" },
+	};
+	for (int bit = 7; bit >= 0; bit--)
+	{
+		if (!BIT(m_io_regs[0x0a], bit))
+			continue;
+		uint8_t type = (BIT(m_io_regs[0x08], bit) << 1) | BIT(m_io_regs[0x00], 1);
+		verboselog(4, "      Bit %2d: %s\n", bit, s_pb_special[type][bit]);
+	}
+}
+
 WRITE16_MEMBER(spg2xx_device::io_w)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[3] = { 'A', 'B', 'C' };
 
-	uint16_t temp = 0;
-
 	switch (offset)
 	{
 	case 0x00: // GPIO special function select
-		verboselog(5, "io_w: GPIO Function Select = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+	{
+		verboselog(4, "io_w: GPIO Configuration = %04x (IOBWake:%d, IOAWake:%d, IOBSpecSel:%d, IOASpecSel:%d)\n", data
+			, BIT(data, 4), BIT(data, 3), BIT(data, 1), BIT(data, 0));
+		const uint16_t old = m_io_regs[offset];
+		m_io_regs[offset] = data;
+		const uint16_t changed = old ^ data;
+		if (BIT(changed, 0))
+			update_porta_special_modes();
+		if (BIT(changed, 1))
+			update_portb_special_modes();
 		break;
+	}
 
 	case 0x01: case 0x06: case 0x0b: // GPIO data, port A/B/C
 		offset++;
 		// Intentional fallthrough - we redirect data register writes to the buffer register.
 
-	case 0x02: case 0x03: case 0x04: case 0x05: // Port A
-	case 0x07: case 0x08: case 0x09: case 0x0a: // Port B
+	case 0x02: case 0x04: // Port A
+	case 0x07: case 0x09: // Port B
 	case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Port C
-		verboselog(5, "io_w: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: %s %c = %04x\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data);
+		m_io_regs[offset] = data;
 		do_gpio(offset);
+		break;
+
+	case 0x03: // Port A Direction
+		verboselog(4, "io_w: GPIO Direction Port A = %04x\n", data);
+		m_io_regs[offset] = data;
+		update_porta_special_modes();
+		do_gpio(offset);
+		break;
+
+	case 0x08: // Port B Direction
+		verboselog(4, "io_w: GPIO Direction Port B = %04x\n", data);
+		m_io_regs[offset] = data;
+		update_portb_special_modes();
+		do_gpio(offset);
+		break;
+
+	case 0x05: // Port A Special
+		verboselog(4, "io_w: Port A Special Function Select: %04x\n", data);
+		m_io_regs[offset] = data;
+		update_porta_special_modes();
+		break;
+
+	case 0x0a: // Port B Special
+		verboselog(4, "io_w: Port B Special Function Select: %04x\n", data);
+		m_io_regs[offset] = data;
+		update_portb_special_modes();
 		break;
 
 	case 0x10: // Timebase Control
@@ -815,10 +1048,10 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 			{ 128, 256, 512, 1024 },
 			{ 105000, 210000, 420000, 840000 }
 		};
-		verboselog(4, "io_w: Timebase Control = %04x (%04x) (Source:%s, TMB2:%s, TMB1:%s)\n", data, mem_mask,
+		verboselog(4, "io_w: Timebase Control = %04x (Source:%s, TMB2:%s, TMB1:%s)\n", data,
 			BIT(data, 4) ? "27MHz" : "32768Hz", s_tmb2_sel[BIT(data, 4)][(data >> 2) & 3], s_tmb1_sel[BIT(data, 4)][data & 3]);
 		const uint16_t old = m_io_regs[offset];
-		COMBINE_DATA(&m_io_regs[offset]);
+		m_io_regs[offset] = data;
 		const uint16_t changed = old ^ m_io_regs[offset];
 		if (changed & 0x001f)
 		{
@@ -838,7 +1071,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	}
 
 	case 0x11: // Timebase Clear
-		verboselog(4, "io_w: Timebase Clear = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: Timebase Clear = %04x\n", data);
 		break;
 
 	case 0x20: // System Control
@@ -850,15 +1083,15 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 			, data, BIT(data, 15), BIT(data, 14), s_sysclk[(data >> 12) & 3], BIT(data, 11), BIT(data, 9), BIT(data, 8));
 		verboselog(4, "      LVDEn:%d, LVDVoltSel:%s, 32kHzDisable:%d, StrWkMode:%s, VDACDisable:%d, ADACDisable:%d, ADACOutDisable:%d)\n"
 			, BIT(data, 7), s_lvd_voltage[(data >> 5) & 3], BIT(data, 4), s_weak_strong[BIT(data, 3)], BIT(data, 2), BIT(data, 1), BIT(data, 0));
-		COMBINE_DATA(&m_io_regs[offset]);
+		m_io_regs[offset] = data;
 		break;
 	}
 
 	case 0x21: // IRQ Enable
 	{
-		verboselog(4, "io_w: IRQ Enable = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: IRQ Enable = %04x\n", data);
 		const uint16_t old = IO_IRQ_ENABLE & IO_IRQ_STATUS;
-		COMBINE_DATA(&IO_IRQ_ENABLE);
+		m_io_regs[offset] = data;
 		const uint16_t changed = old ^ (IO_IRQ_ENABLE & IO_IRQ_STATUS);
 		if (changed)
 			check_irqs(changed);
@@ -867,7 +1100,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x22: // IRQ Acknowledge
 	{
-		verboselog(4, "io_w: IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: IRQ Acknowledge = %04x\n", data);
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~data;
 		const uint16_t changed = old ^ (IO_IRQ_ENABLE & IO_IRQ_STATUS);
@@ -901,33 +1134,38 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 			"256KW, 3c0000-3fffff\n",
 			"512KW, 380000-3fffff\n"
 		};
-		verboselog(4, "io_w: Ext. Memory Control (not yet implemented) = %04x (%04x):\n", data, mem_mask);
+		verboselog(4, "io_w: Ext. Memory Control (not yet implemented) = %04x:\n", data);
 		verboselog(4, "      WaitStates:%d, BusArbPrio:%s\n", (data >> 1) & 3, s_bus_arb[(data >> 3) & 7]);
 		verboselog(4, "      ROMAddrDecode:%s\n", s_addr_decode[(data >> 6) & 3]);
 		verboselog(4, "      RAMAddrDecode:%s\n", s_ram_decode[(data >> 8) & 15]);
-		COMBINE_DATA(&m_io_regs[offset]);
+		m_io_regs[offset] = data;
 		break;
 	}
 
 	case 0x24: // Watchdog
-		verboselog(5, "io_w: Watchdog Pet = %04x (%04x)\n", data, mem_mask);
+		verboselog(5, "io_w: Watchdog Pet = %04x\n", data);
+		break;
+
+	case 0x25: // ADC Control
+		verboselog(4, "io_w: ADC Control = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x28: // Sleep Mode
-		verboselog(4, "io_w: Sleep Mode (%s enter value) = %04x (%04x)\n", data == 0xaa55 ? "valid" : "invalid", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: Sleep Mode (%s enter value) = %04x\n", data == 0xaa55 ? "valid" : "invalid", data);
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x29: // Wakeup Source
 	{
-		COMBINE_DATA(&m_io_regs[offset]);
+		m_io_regs[offset] = data;
 #if ENABLE_VERBOSE_LOG
 		static const char* const s_sources[8] =
 		{
 			"TMB1", "TMB2", "2Hz", "4Hz", "1024Hz", "2048Hz", "4096Hz", "Key"
 		};
 
-		verboselog(4, "io_w: Wakeup Source = %04x (%04x):\n", data, mem_mask);
+		verboselog(4, "io_w: Wakeup Source = %04x:\n", data);
 		bool comma = false;
 		char buf[1024];
 		int char_idx = 0;
@@ -951,100 +1189,129 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		{
 			"PPU", "SPU Channel", "Timer A", "Timer B", "UART/SPI", "External", "Reserved", "None"
 		};
-		verboselog(4, "io_w: FIQ Source Select (not yet implemented) = %04x (%04x), %s\n", data, mem_mask, s_fiq_select[data & 7]);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: FIQ Source Select (not yet implemented) = %04x, %s\n", data, s_fiq_select[data & 7]);
+		m_io_regs[offset] = data;
 		break;
 	}
 
 	case 0x2f: // Data Segment
-		temp = m_cpu->state_int(UNSP_SR);
-		m_cpu->set_state_int(UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
-		verboselog(5, "io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
+	{
+		uint16_t ds = m_cpu->state_int(UNSP_SR);
+		m_cpu->set_state_int(UNSP_SR, (ds & 0x03ff) | ((data & 0x3f) << 10));
+		verboselog(5, "io_w: Data Segment = %04x\n", data);
 		break;
+	}
 
-	case 0x31: // Unknown UART
-		verboselog(4, "io_w: Unknown UART = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+	case 0x30: // UART Control
+	{
+		static const char* const s_9th_bit[4] = { "0", "1", "Odd", "Even" };
+		verboselog(4, "io_w: UART Control = %04x (TxEn:%d, RxEn:%d, Bits:%d, MultiProc:%d, 9thBit:%s, TxIntEn:%d, RxIntEn:%d\n", data
+			, BIT(data, 7), BIT(data, 6), BIT(data, 5) ? 9 : 8, BIT(data, 4), s_9th_bit[(data >> 2) & 3], BIT(data, 1), BIT(data, 0));
+		m_io_regs[offset] = data;
+		if (!BIT(data, 6))
+		{
+			m_uart_rx_index = 0;
+			memset(m_uart_rx_fifo, 0, 8);
+		}
 		break;
+	}
 
-	case 0x32: // UART Reset
-		verboselog(4, "io_w: UART Reset\n");
+	case 0x31: // UART Status
+		verboselog(4, "io_w: UART Status (read only) = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x33: // UART Baud Rate
-		verboselog(4, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (m_io_regs[0x34] << 8) - data));
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: UART Baud Rate = %d\n", 27000000 / (0x10000 - data));
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x35: // UART TX Data
-		verboselog(4, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - m_io_regs[0x33]));
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: UART Tx Data = %02x\n", data & 0x00ff);
+		m_io_regs[offset] = data;
+		break;
+
+	case 0x36: // UART RX Data
+		verboselog(4, "io_w: UART Rx Data (read-only) = %04x\n", data);
+		break;
+
+	case 0x37: // UART Rx FIFO Control
+		verboselog(4, "io_w: UART Rx FIFO Control = %04x (Reset:%d, Overrun:%d, Underrun:%d, Count:%d, Threshold:%d)\n", data
+			, BIT(data, 15), BIT(data, 14), BIT(data, 13), (data >> 4) & 7, data & 7);
+		if (data & 0x8000)
+		{
+			m_uart_rx_index = 0;
+			memset(m_uart_rx_fifo, 0, 8);
+		}
+		m_io_regs[offset] &= ~data & 0x6000;
+		m_io_regs[offset] &= ~0x0007;
+		m_io_regs[offset] |= data & 0x0007;
 		break;
 
 	case 0x58: // I2C Command
-		verboselog(4, "io_w: I2C Command = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: I2C Command = %04x\n", data);
+		m_io_regs[offset] = data;
 		do_i2c();
 		break;
 
 	case 0x59: // I2C Status / Acknowledge
-		verboselog(4, "io_w: I2C Acknowledge = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: I2C Acknowledge = %04x\n", data);
 		m_io_regs[offset] &= ~data;
 		break;
 
 	case 0x5a: // I2C Access Mode
-		verboselog(4, "io_w: I2C Access Mode = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: I2C Access Mode = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x5b: // I2C Device Address
-		verboselog(4, "io_w: I2C Device Address = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: I2C Device Address = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x5c: // I2C Sub-Address
-		verboselog(4, "io_w: I2C Sub-Address = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: I2C Sub-Address = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x5d: // I2C Data Out
-		verboselog(4, "io_w: I2C Data Out = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: I2C Data Out = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x5e: // I2C Data In
-		verboselog(4, "io_w: I2C Data In = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: I2C Data In = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x5f: // I2C Controller Mode
-		verboselog(4, "io_w: I2C Controller Mode = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: I2C Controller Mode = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
-	case 0x100: // DMA Source (L)
-		verboselog(4, "io_w: DMA Source (L) 3e00 = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+	case 0x100: // DMA Source (lo)
+		verboselog(4, "io_w: DMA Source (lo) = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
-	case 0x101: // DMA Source (H)
-		verboselog(4, "io_w: DMA Source (H) 3e01 = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+	case 0x101: // DMA Source (hi)
+		verboselog(4, "io_w: DMA Source (hi) = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x103: // DMA Destination
-		verboselog(4, "io_w: DMA Dest 3e03 = %04x (%04x)\n", data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: DMA Dest = %04x\n", data);
+		m_io_regs[offset] = data;
 		break;
 
 	case 0x102: // DMA Length
-		verboselog(4, "io_w: DMA Length 3e02 = %04x (%04x)\n", data, mem_mask);
+		verboselog(4, "io_w: DMA Length = %04x\n", data);
 		do_cpu_dma(data);
 		break;
 
 	default:
-		verboselog(4, "io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
-		COMBINE_DATA(&m_io_regs[offset]);
+		verboselog(4, "io_w: Unknown register %04x = %04x\n", 0x3d00 + offset, data);
+		m_io_regs[offset] = data;
 		break;
 	}
 }
@@ -1137,16 +1404,16 @@ void spg2xx_device::do_gpio(uint32_t offset)
 	switch (index)
 	{
 		case 0:
-			m_porta_out(what);
-			what = (what & ~pull) | (m_porta_in() & pull);
+			m_porta_out(0, what, push &~ special);
+			what = (what & ~pull) | (m_porta_in(0, pull &~ special) & pull);
 			break;
 		case 1:
-			m_portb_out(what);
-			what = (what & ~pull) | (m_portb_in() & pull);
+			m_portb_out(0, what, push &~ special);
+			what = (what & ~pull) | (m_portb_in(0, pull &~ special) & pull);
 			break;
 		case 2:
-			m_portc_out(what);
-			what = (what & ~pull) | (m_portc_in() & pull);
+			m_portc_out(0, what, push &~ special);
+			what = (what & ~pull) | (m_portc_in(0, pull &~ special) & pull);
 			break;
 	}
 
@@ -1174,10 +1441,14 @@ void spg2xx_device::do_cpu_dma(uint32_t len)
 
 	for (uint32_t j = 0; j < len; j++)
 	{
-		mem.write_word(dst + j, mem.read_word(src + j));
+		mem.write_word((dst + j) & 0x3fff, mem.read_word(src + j));
 	}
 
+	src += len;
+	m_io_regs[0x100] = (uint16_t)src;
+	m_io_regs[0x101] = (src >> 16) & 0x3f;
 	m_io_regs[0x102] = 0;
+	m_io_regs[0x103] = (dst + len) & 0x3fff;
 }
 
 /***********************
@@ -1312,7 +1583,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		default:
-			verboselog(0, "audio_r: Unknown register %04x (%04x & %04x)\n", 0x3000 + offset, data, mem_mask);
+			verboselog(0, "audio_r: Unknown register %04x = %04x\n", 0x3000 + offset, data);
 			break;
 		}
 	}
@@ -1687,7 +1958,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 
 		default:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: Unknown register %04x = %04x (%04x)\n", 0x3000 + offset, data, mem_mask);
+			verboselog(0, "audio_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
 			break;
 		}
 	}
@@ -1815,13 +2086,13 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 
 		default:
 			m_audio_regs[offset] = data;
-			verboselog(0, "audio_w: Unknown register %04x = %04x (%04x)\n", 0x3000 + offset, data, mem_mask);
+			verboselog(0, "audio_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
 			break;
 		}
 	}
 	else if (channel >= 16)
 	{
-		logerror("audio_r: Trying to write from channel %d: %04x = %04x & %04x\n", channel, 0x3000 + offset, data, mem_mask);
+		logerror("audio_r: Trying to write from channel %d: %04x = %04x\n", channel, 0x3000 + offset, data);
 	}
 	else
 	{
@@ -1942,8 +2213,10 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		if (active_count)
 		{
-			*out_l++ = left_total / active_count;
-			*out_r++ = right_total / active_count;
+			left_total /= active_count;
+			right_total /= active_count;
+			*out_l++ = (left_total * (int16_t)m_audio_regs[AUDIO_MAIN_VOLUME]) >> 7;
+			*out_r++ = (right_total * (int16_t)m_audio_regs[AUDIO_MAIN_VOLUME]) >> 7;
 		}
 		else
 		{
