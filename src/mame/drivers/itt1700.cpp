@@ -18,7 +18,7 @@ This device may be related to the Intel 8251, but it is definitely not a SCN2651
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-//#include "machine/nvram.h"
+#include "machine/itt1700_kbd.h"
 #include "video/mc6845.h"
 #include "screen.h"
 
@@ -74,7 +74,13 @@ void itt1700_state::itt1700(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &itt1700_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &itt1700_state::io_map);
 
-	I8741(config, "upi", 16.6698_MHz_XTAL / 3); // clock guessed
+	upi41_cpu_device &upi(I8741(config, "upi", 16.6698_MHz_XTAL / 3)); // clock guessed
+	upi.p1_out_cb().set("keyboard", FUNC(itt1700_keyboard_device::clock_w)).bit(0);
+	upi.p1_out_cb().append("keyboard", FUNC(itt1700_keyboard_device::line1_w)).bit(1);
+	upi.p1_out_cb().append("keyboard", FUNC(itt1700_keyboard_device::line2_w)).bit(2);
+	upi.t0_in_cb().set("keyboard", FUNC(itt1700_keyboard_device::sense_r));
+
+	ITT1700_KEYBOARD(config, "keyboard");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16.6698_MHz_XTAL, 882, 0, 720, 315, 0, 300);
