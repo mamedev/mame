@@ -16,10 +16,11 @@
 
   --- Hardware Notes ---
 
-There are at least 3 viariants for this hardware.
+There are at least 4 variants for this hardware.
+The first 3 share the same layout, the latest is a complete redesign.
 
 ---------  
-The oldest revision (green) is marked H83048 with the following hardware:
+The oldest revision (green) is marked "H83048" with the following hardware:
 (note that @IC2 is unpopulated)
   CPU:
     1x H8/3048 (HD64F3048F16)            @IC1
@@ -53,33 +54,66 @@ Known games on this hardware revision are:
 2001.02     Capitani Coraggiosi (Ver 1.3)
 
 ---------
-A slightly newer revision (green) is marked H83048 and adds a very small piggyback @IC2 with:
-
+A slightly newer revision (green) is marked "H83048" and adds a very small piggyback @IC2 with:
   Timekeeping: 1x Dallas DS1302 Trickle Charge Timekeeping Chip
   Clock:       1x Xtal 32.768
   A jumper cable connects the piggyback with ICL7673 pin2 @IC31 Automatic battery back-up switch
 
 Known games on this hardware revision are:
+200x        Pin Ups (Ver 1.0 Rev.A)
+200x        Venezia (Ver 1.0 Rev.A)
+2001        Bowling Road (Ver 1.5) - note: SRAMs are 8k x 8 instead of 32k x 8
 2001        Europa 2002 (Ver 2.0, set 1)
 2001        Europa 2002 (Ver 2.0, set 2)
-2002.01     La Perla Nera (Ver 2.0)
-2001.11     La Perla Nera Gold (Ver 2.0)
+2001        World Cup (Ver 1.5) - note: SRAMs are 8k x 8 instead of 32k x 8
 2001.06     Labyrinth (Versione 1.5)
-200x        Pin Ups (Ver 1.0 Rev.A)
-2001.12     World Cup (Ver 1.4) - note ICs location are differently numbered
-2001        World Cup (Ver 1.5) - note RAMS are smaller SRAM 8k x 8
+2001.11     La Perla Nera Gold (Ver 2.0)
+2002.01     La Perla Nera (Ver 2.0)
 
 
 ---------
-A more recent revision (red) is marked H83048 Rev 1.1 and removes the piggyback putting Timekeeping and Clock (X2) directly on the board.
+A more recent revision (red) is marked "H83048 Rev 1.1" and removes the piggyback putting Timekeeping and Clock (X2) directly on the board.
   A jumper cable on the solder side connects Timekeeping pin5 to unpopulated IC2 pin11
-		 
 Known games on this hardware revision are:
+2001.08     Labyrinth (Versione 1.5)
 2001.08.24  Abacus (Ver 1.0)
+2001.11     Bowling Road (Ver 1.4) - note: SRAMs are 8k x 8 instead of 32k x 8
 2002        Europa 2002 Space (Ver 3.0)
-2002.12     UFO Robot (Ver. 1.0 Rev.A)
+2002.12     UFO Robot (Ver 1.0 Rev.A)
 
 
+---------
+A complete redesign (green) is marked "ND 2001 Rev 1.0" and uses smaller factor SMDs instead of traditional DIP components.
+  CPU:
+    1x H8/3048 (HD64F3048F16)            @IC17
+    (128KB ROM; 4KB RAM)
+  Sound:
+    1x OKI 6295 or clones                @IC15
+	1x LM358N dual operational amplifier @IC13
+    1x TDA2003 audio amplifier           @IC8
+  PLDs:
+    1x ispLSI2064-80LJ                   @IC24
+  Clock:
+    1x Xtal 30.000 MHz                   @OSC1
+    1x Resonator ZTB1000J (1000 kHz)     @X1
+	1x Xtal K0SoF                        @X2
+  ROMs:
+    1x 27C010 (sound)                    @IC1
+    2x 27C040 (graphics)                 @IC7,8
+  RAMs:
+    2x SRAM 32k x 8                      @IC25,26
+  Connectors:
+    1x 28x2 edge connector
+    1x 12 legs connector                 @CN2
+  Other:
+    1x battery                           @BAT1
+    2x trimmer (VOLUME, SPARK)           @P1,2
+
+Known games on this hardware revision are:
+2001.11     Bowling Road (Ver 1.4)
+2001.12     World Cup (Ver 1.4)
+  
+  
 *******************************************************************/
 
 #include "emu.h"
