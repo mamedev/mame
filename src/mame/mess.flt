@@ -336,6 +336,7 @@ isbc.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
+itt1700.cpp
 itt3030.cpp
 jade.cpp
 jazz.cpp

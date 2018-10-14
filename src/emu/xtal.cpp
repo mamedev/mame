@@ -221,6 +221,7 @@ const double XTAL::known_xtals[] = {
 	 16'777'216, /* 16.777216_MHz_XTAL     Nintendo Game Boy Advance */
 	 16'934'400, /* 16.9344_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips (44100 * 384) */
 	 17'064'000, /* 17.064_MHz_XTAL        Memorex 1377 */
+	 17'350'000, /* 17.35_MHz_XTAL         ITT Courier 1700 */
 	 17'360'000, /* 17.36_MHz_XTAL         OMTI Series 10 SCSI controller */
 	 17'550'000, /* 17.55_MHz_XTAL         HP 264x display clock (50 Hz configuration) */
 	 17'600'000, /* 17.6_MHz_XTAL          LSI Octopus */
