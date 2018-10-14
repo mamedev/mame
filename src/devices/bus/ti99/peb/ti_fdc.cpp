@@ -273,7 +273,14 @@ WRITE_LINE_MEMBER(ti_fdc_device::sidsel_w)
 
 void ti_fdc_device::set_drive()
 {
-	switch (m_DSEL)
+	int dsel = m_DSEL;
+
+	// If the selected floppy drive is not attached, remove that line
+	if (m_floppy[2] == nullptr) dsel &= 0x03;  // 011
+	if (m_floppy[1] == nullptr) dsel &= 0x05;  // 101
+	if (m_floppy[0] == nullptr) dsel &= 0x06;  // 110
+
+	switch (dsel)
 	{
 	case 0:
 		m_current = NONE;
@@ -398,6 +405,8 @@ void ti_fdc_device::device_reset()
 void ti_fdc_device::device_config_complete()
 {
 	// Seems to be null when doing a "-listslots"
+	for (auto &elem : m_floppy)
+		elem = nullptr;
 	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
 	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
 	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
