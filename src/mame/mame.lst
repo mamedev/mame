@@ -2583,6 +2583,7 @@ atetrisa                        // 136066           (c) 1988
 atetrisb                        // (bootleg)
 atetrisb2                       // (bootleg)
 atetrisb3                       // (bootleg)
+atetb3482                       // (bootleg, with UM3482)
 atetrisc                        // 136066           (c) 1989
 atetrisc2                       // 136066           (c) 1989
 
@@ -12647,6 +12648,9 @@ royalpk2                        //
 @source:facit4440.cpp
 facit4440                       // 1984
 
+@source:falco5220.cpp
+falco5220                       // 1987
+
 @source:famibox.cpp
 famibox                         // 1986
 
@@ -13464,8 +13468,9 @@ victorycb                       // (c) Comsoft (bootleg)
 warofbug                        // (c) 1981 Armenia
 warofbugg                       // German Version
 warofbugu                       // (c) 1981 Armenia
-zerotime                        // hack
-zerotimed                       // hack
+zerotime                        // hack (Petaco S.A.)
+zerotimed                       // hack (Datamat)
+zerotimemc                      // hack (Marti Colls)
 zigzagb                         // (c) 1982 LAX (bootleg)
 zigzagb2                        // (c) 1982 LAX (bootleg)
 
@@ -14934,6 +14939,7 @@ uspbball                        // US Games
 exospace                        // Elektronika
 gnw_boxing                      // Nintendo
 gnw_dkjr                        // Nintendo
+gnw_dkong                       // Nintendo
 gnw_dkong2                      // Nintendo
 gnw_egg                         // Nintendo
 gnw_mario                       // Nintendo
@@ -15176,9 +15182,10 @@ sams64_2                        // 005 1998/10/16 Samurai Shodown: Warrior's Rag
 xrally                          // 003 1998/05/13 Xtreme Rally / Off Beat Racer!
 
 @source:holeland.cpp
-crzrally                        // (c) 1985
-crzrallya                       // (c) 1985
-crzrallyg                       // (c) 1985
+crzrally                        // (c) 1985 Tecfri
+crzrallya                       // (c) 1985 Tecfri
+crzrallyg                       // (c) 1985 Gecas
+crzrallyrf                      // (c) 1985 Recreativos Franco
 holeland                        // (c) 1984
 holeland2                       // (c) 1984
 
@@ -15279,7 +15286,11 @@ hp49gp                          // HP 49G+
 hp64k                           //
 
 @source:hp700.cpp
+hp700_70                        //
 hp700_92                        //
+
+@source:hp9825.cpp
+hp9825b                         // HP 9825B
 
 @source:hp9845.cpp
 hp9835a                         //
@@ -15302,6 +15313,7 @@ hp9k320                         //
 hp9k330                         //
 hp9k332                         //
 hp9k340                         //
+hp9k360                         //
 hp9k370                         //
 hp9k380                         //
 hp9k382                         //
@@ -15636,6 +15648,9 @@ farwest                         // bootleg
 ironhors                        // GX560 (c) 1986
 ironhorsh                       // GX560 (c) 1986
 
+@source:is48x.cpp
+is482                           //
+
 @source:isbc.cpp
 isbc286                         //
 isbc2861                        //
@@ -15786,6 +15801,7 @@ pegglet                         // (c) 1991 Strata/Incredible Technologies
 pokrdice                        // (c) 1991 Strata/Incredible Technologies
 rimrockn                        // (c) 1991 Strata/Incredible Technologies
 rimrockn12                      // (c) 1991 Strata/Incredible Technologies
+rimrockn12b                     // bootleg
 rimrockn16                      // (c) 1991 Strata/Incredible Technologies
 rimrockn20                      // (c) 1991 Strata/Incredible Technologies
 slikshot                        // (c) 1990 Grand Products/Incredible Technologies
@@ -15841,6 +15857,9 @@ laperlag                        // (c) 2001 Nazionale Elettronica
 mnumber                         // (c) 200? M.M. - B.R.L.
 wcup                            // (c) 2001 Nazionale Elettronica
 wcup14                          // (c) 2001 Nazionale Elettronica
+
+@source:itt1700.cpp
+itt1700                         //
 
 @source:itt3030.cpp
 itt3030                         //
@@ -21404,6 +21423,10 @@ minitel2                        //
 @source:minivadr.cpp
 minivadr                        // D26 cabinet test board
 
+@source:mips.cpp
+rc2030                          // MIPS RC2030
+rs2030                          // MIPS RS2030
+
 @source:mirage.cpp
 mirage                          // (c) 1994 Mitchell
 
@@ -21459,6 +21482,7 @@ qtono1                          // 25/12/1990 (QUIZ 3) (c) 1991 Capcom (Japan)
 sbbros                          // 01/10/1990 (c) 1990 Mitchell + Capcom (US) not listed on Capcom's site
 spang                           // 14/09/1990 (c) 1990 Mitchell (World)
 spangbl                         // bootleg
+spangbl2                        // bootleg
 spangj                          // --/--/1990 (c) 1990 Mitchell (Japan)
 
 @source:mits680b.cpp
@@ -23320,6 +23344,7 @@ m4colossg                       //
 m4ctn                           // Tuppenny Nudger Classic (Mdm?)
 m4ewshft                        // Each Way Shifter
 m4excam                         // Excalibur (Mdm)
+m4excamd                        //
 m4firebl                        // Fireball (Mdm)
 m4firebla                       //
 m4fireblb                       //
@@ -27488,6 +27513,8 @@ v4picdil                        // Piccadilly Nights
 v4psi                           // Prize Space Invaders
 v4psia                          //
 v4psib                          //
+v4psi20d                        //
+v4psi214                        //
 v4pztet                         // Prize Tetris
 v4pzteta                        //
 v4quidgr                        // Ten Quid Grid
@@ -27509,6 +27536,7 @@ v4strike2d                      //
 v4striked                       //
 v4sunbst                        // Sunburst
 v4tetrs                         // BwB Tetris v 2.2
+v4tetrs1                        // BwB Tetris v 1.0
 v4time                          // Time Machine
 v4timebn                        // Time Bandit
 v4turnov                        // Turnover
@@ -29933,6 +29961,7 @@ minasan                         // 0027 (c) 1990 Monolith Corp.
 moshougi                        // 0203 (c) 1995 ADK / SNK
 ms4plus                         // bootleg
 ms5plus                         // bootleg
+mvstemp							// development board
 mslug                           // 0201 (c) 1996 Nazca
 mslug2                          // 0241 (c) 1998 SNK
 mslug2t                         // bootleg
@@ -30642,6 +30671,7 @@ clubpacm                        // Miky SRL
 clubpacma                       // Miky SRL
 clubpacmb                       // Miky SRL
 crockman                        // 1980 bootleg (RENE PIERRE)
+crockmnf                        // bootleg (Marti Colls / Falgas)
 crush                           // (c) 1981 Kural Samno Electric Ltd
 crush2                          // (c) 1981 Kural Esco Electric Ltd - bootleg?
 crush3                          // Kural Electric Ltd
@@ -30678,6 +30708,7 @@ mrtnt                           // (c) 1983 Telko
 mschamp                         // hack by RAYGLO MFG "Zola-Puc" (c) 1992/1993
 mschamps                        // hack (hack of the Rayglo hack?)
 msheartb                        // hack
+mspacmbmc                       // bootleg (Marti Colls / Falgas)
 mspacii                         // bootleg
 mspacii2                        // bootleg
 mspacmab                        // bootleg
@@ -30737,6 +30768,7 @@ superabc                        // hack
 superabco                       // hack
 theglobp                        // (c) 1983 Epos Corporation
 titanpac                        // hack
+pacmanfm                        // bootleg (FAMARE S.A.)
 vanvan                          // (c) 1983 Sanritsu
 vanvanb                         // (c) 1983 Karateco (bootleg?)
 vanvank                         // (c) 1983 Karateco (bootleg?)
@@ -31848,7 +31880,8 @@ condor                          // bootleg (Sidam)
 condorn                         // bootleg (S C Novar)
 falcon                          // bootleg
 falconz                         // bootleg
-fenix                           // bootleg
+fenix                           // bootleg (Orio)
+fenixn                          // bootleg (Niemer)
 griffon                         // bootleg (Videotron)
 griffono                        // bootleg (Olympia)
 nextfase                        // bootleg
@@ -33854,6 +33887,9 @@ spacewin                        //
 @source:sderby2.cpp
 sderby2                         // (c) 1985
 
+@source:sdk51.cpp
+sdk51                           //
+
 @source:sdk80.cpp
 sdk80                           //
 
@@ -34929,6 +34965,7 @@ sg1000m2                        // Sega SG-1000 Mark II (Japan)
 chboxing                        // (c) 1984
 chwrestl                        // (c) 1985
 dokidoki                        // (c) 1985
+sderbys                         // (c) 1984
 sderby2s                        // (c) 1985
 
 @source:sh4robot.cpp
@@ -34996,6 +35033,9 @@ smssgamea
 @source:shuuz.cpp
 shuuz                           // 136083           (c) 1990
 shuuz2                          // 136083           (c) 1990
+
+@source:si5500.cpp
+si5500                          //
 
 @source:sidearms.cpp
 dyger                           // (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
@@ -37907,8 +37947,9 @@ gq863                           //
 
 @source:twins.cpp
 spider                          //
-twins                           // (c) 1994
-twinsa                          // (c) 1994
+twins                           // (c) 1993 Ecogames
+twinsed1                        // (c) 1994 Electronic Devices
+twinsed2                        // (c) 1994 Electronic Devices
 
 @source:tx0.cpp
 tx0_64kw                        // April 1956 MIT TX-0 (64kw RAM)
@@ -38287,13 +38328,13 @@ vigilanto                       // (c) 1988 (US)
 
 @source:vii.cpp
 batmantv                        // The Batman, 2004
-vii                             // Chintendo / KenSingTon / Jungle Soft / Siatronics Vii
+vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 vsmile                          //
 vsmileb                         //
 vsmilef                         //
 vsmileg                         //
 walle                           //
-wireless                        // Wireless
+wrlshunt                        // Wireless: Hunting Video Game System
 wirels60                        // Wireless 60
 wlsair60                        // Wireless Air 60
 zone40                          // Zone 40

@@ -869,6 +869,10 @@ if (BUSES["HPHIL"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_hil/hp_hil.h",
 		MAME_DIR .. "src/devices/bus/hp_hil/hil_devices.cpp",
 		MAME_DIR .. "src/devices/bus/hp_hil/hil_devices.h",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlebase.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlebase.h",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlemouse.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlemouse.h",
 		MAME_DIR .. "src/devices/bus/hp_hil/hlekbd.cpp",
 		MAME_DIR .. "src/devices/bus/hp_hil/hlekbd.h",
 	}
@@ -883,6 +887,8 @@ if (BUSES["HPDIO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98265a.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98265a.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98543.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98543.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98544.cpp",
@@ -891,8 +897,12 @@ if (BUSES["HPDIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98603a.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98603b.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98603b.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98620.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98620.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98644.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98644.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/human_interface.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/human_interface.h",
 	}
 end
 
@@ -1373,6 +1383,8 @@ if (BUSES["PC_KBD"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc_kbd/pcat84.h",
 		MAME_DIR .. "src/devices/bus/pc_kbd/pcxt83.cpp",
 		MAME_DIR .. "src/devices/bus/pc_kbd/pcxt83.h",
+		MAME_DIR .. "src/devices/bus/pc_kbd/pcat101.cpp",
+		MAME_DIR .. "src/devices/bus/pc_kbd/pcat101.h",
 	}
 end
 

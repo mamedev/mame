@@ -115,6 +115,7 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
+DEFINE_DEVICE_TYPE(R2000,       r2000_device,     "r2000",   "MIPS R2000")
 DEFINE_DEVICE_TYPE(R3041,       r3041_device,     "r3041",   "MIPS R3041")
 DEFINE_DEVICE_TYPE(R3051,       r3051_device,     "r3051",   "MIPS R3051")
 DEFINE_DEVICE_TYPE(R3052,       r3052_device,     "r3052",   "MIPS R3052")
@@ -165,6 +166,13 @@ r3000_device::r3000_device(const machine_config &mconfig, device_type type, cons
 r3000_device::~r3000_device()
 {
 }
+
+//-------------------------------------------------
+//  r2000_device - constructor
+//-------------------------------------------------
+
+r2000_device::r2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: r3000_device(mconfig, R2000, tag, owner, clock, CHIP_TYPE_R2000) { }
 
 
 //-------------------------------------------------
@@ -242,6 +250,12 @@ void r3000_device::device_start()
 	// determine the cache sizes
 	switch (m_chip_type)
 	{
+		case CHIP_TYPE_R2000:
+		{
+			m_icache_size = 32768; // external
+			m_dcache_size = 32768; // external
+			break;
+		}
 		case CHIP_TYPE_R3041:
 		{
 			m_icache_size = 2048;

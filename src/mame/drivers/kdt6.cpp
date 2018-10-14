@@ -707,9 +707,9 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 
 	UPD1990A(config, m_rtc);
 
-	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("ctc1", z80ctc_device, trg0))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, kdt6_state, fdc_drq_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set("ctc1", FUNC(z80ctc_device::trg0));
+	m_fdc->drq_wr_callback().set(FUNC(kdt6_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)
 

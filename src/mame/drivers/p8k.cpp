@@ -472,8 +472,8 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio2->in_pa_callback().set_ioport("DSW");
 
-	MCFG_I8272A_ADD("i8272", true)
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
+	I8272A(config, m_i8272, true);
+	m_i8272->drq_wr_callback().set("dma", FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 

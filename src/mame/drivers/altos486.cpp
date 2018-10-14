@@ -148,7 +148,7 @@ MACHINE_CONFIG_START(altos486_state::altos486)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
-	MCFG_UPD765A_ADD("fdc", false, false)
+	UPD765A(config, "fdc", false, false);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos486_floppies, "525qd", altos486_state::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 

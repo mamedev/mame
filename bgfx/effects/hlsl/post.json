@@ -42,6 +42,8 @@
     	{ "name": "u_shadow_uv",              "type": "vec4", "values": [ 0.25, 0.25, 0.0, 0.0 ] },
     	{ "name": "u_shadow_uv_offset",       "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_power",                  "type": "vec4", "values": [ 1.0, 1.0, 1.0, 0.0 ] },
-    	{ "name": "u_floor",                  "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] }
+		{ "name": "u_floor",                  "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_chroma_mode",            "type": "vec4", "values": [ 3.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_conversion_gain",        "type": "vec4", "values": [ 0.299, 0.587, 0.114, 0.0 ] }
     ]
 }

@@ -50,6 +50,7 @@ private:
 	DECLARE_PALETTE_INIT(m52);
 	uint32_t screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int initoffs);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

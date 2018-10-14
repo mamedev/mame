@@ -218,9 +218,9 @@ MACHINE_CONFIG_START(dps1_state::dps1)
 	AM9519(config, "am9519b", 0);
 
 	// floppy
-	MCFG_UPD765A_ADD("fdc", false, true)
-	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, dps1_state, fdc_int_w)) // doesn't appear to be used
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, dps1_state, fdc_drq_w))
+	UPD765A(config, m_fdc, false, true);
+	//m_fdc->intrq_wr_callback().set(FUNC(dps1_state::fdc_int_w)); // doesn't appear to be used
+	m_fdc->drq_wr_callback().set(FUNC(dps1_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats)

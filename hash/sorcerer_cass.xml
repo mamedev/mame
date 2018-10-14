@@ -4,6 +4,10 @@
 <softwarelist name="sorcerer_cass" description="Exidy Sorcerer cassettes">
 
 <!--
+Compiled by Robbbert
+-->
+
+<!--
      These come from tapes.
      Load the Basic ROM PAC, then from within it type CLOAD. When it has finished loading, type RUN.
  -->
@@ -1053,6 +1057,19 @@
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="3032962">
 				<rom name="nike2.wav" size="3032962" crc="de304e7c" sha1="88f4ee50e1537ffb0d35c1edc7732681c792a6b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<!-- Added 2018-10-13 -->
+	<software name="crash">
+		<description>Head-on Collision</description>
+		<year>1980</year>
+		<publisher>Quality Software</publisher>
+		<info name="developer" value="Lee Anders" />
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="7824984">
+				<rom name="crash.wav" size="7824984" crc="f6a54d3f" sha1="6fff752fa4f2f1056a05e1d7d3368ec31828e9d3" offset="0" />
 			</dataarea>
 		</part>
 	</software>

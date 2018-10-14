@@ -114,7 +114,7 @@ public:
 
 	// cart base
 	uint8_t *get_cart_base();
-	uint32_t get_cart_size();
+	virtual uint32_t get_cart_size();
 	void set_cart_base_update(cococart_base_update_delegate update);
 
 private:
@@ -180,6 +180,8 @@ public:
 	virtual uint8_t* get_cart_base();
 	virtual uint32_t get_cart_size();
 	void set_cart_base_update(cococart_base_update_delegate update);
+	virtual memory_region* get_cart_memregion();
+
 
 	virtual void interface_config_complete() override;
 	virtual void interface_pre_start() override;

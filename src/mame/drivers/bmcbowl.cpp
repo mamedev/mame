@@ -477,8 +477,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, HOLD_LINE);
 
 	PALETTE(config, m_palette, 256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0));
-	ramdac.set_palette(m_palette);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &bmcbowl_state::ramdac_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);

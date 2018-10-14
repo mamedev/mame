@@ -1375,11 +1375,12 @@ static void hp64k_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(hp64k_state::hp64k)
-	MCFG_DEVICE_ADD("cpu" , HP_5061_3011 , 6250000)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
-	MCFG_DEVICE_IO_MAP(cpu_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp64k_state , hp64k_irq_callback)
-	MCFG_QUANTUM_TIME(attotime::from_hz(100))
+	HP_5061_3011(config , m_cpu , 6250000);
+	m_cpu->set_rw_cycles(6 , 6);
+	m_cpu->set_relative_mode(true);
+	m_cpu->set_addrmap(AS_PROGRAM , &hp64k_state::cpu_mem_map);
+	m_cpu->set_addrmap(AS_IO , &hp64k_state::cpu_io_map);
+	m_cpu->set_irq_acknowledge_callback(FUNC(hp64k_state::hp64k_irq_callback));
 
 	// Actual keyboard refresh rate should be between 1 and 2 kHz
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", hp64k_state, hp64k_kb_scan, attotime::from_hz(100))

@@ -343,8 +343,10 @@ void mb86901_device::device_start()
 	save_item(NAME(m_bp_irl));
 	save_item(NAME(m_bp_fpu_present));
 	save_item(NAME(m_bp_cp_present));
+	save_item(NAME(m_pb_error));
 	save_item(NAME(m_pb_block_ldst_byte));
 	save_item(NAME(m_pb_block_ldst_word));
+	save_item(NAME(m_irq_state));
 	save_item(NAME(m_trap));
 	save_item(NAME(m_tt));
 	save_item(NAME(m_ticc_trap_type));
@@ -384,9 +386,27 @@ void mb86901_device::device_start()
 	save_item(NAME(m_ps));
 	save_item(NAME(m_et));
 	save_item(NAME(m_cwp));
+	save_item(NAME(m_alu_op3_assigned));
+	save_item(NAME(m_ldst_op3_assigned));
+	save_item(NAME(m_alu_setcc));
+	save_item(NAME(m_privileged_asr));
+	save_item(NAME(m_illegal_instruction_asr));
 	save_item(NAME(m_mae));
 	save_item(NAME(m_no_annul));
 	save_item(NAME(m_hold_bus));
+	save_item(NAME(m_icount));
+	save_item(NAME(m_stashed_icount));
+	save_item(NAME(m_insn_space));
+	save_item(NAME(m_data_space));
+
+#if LOG_FCODES
+	save_item(NAME(m_ss1_next_pc));
+	save_item(NAME(m_ss1_next_opcode));
+	save_item(NAME(m_ss1_next_handler_base));
+	save_item(NAME(m_ss1_next_entry_point));
+	save_item(NAME(m_ss1_next_stack));
+	save_item(NAME(m_log_fcodes));
+#endif
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -459,6 +479,17 @@ void mb86901_device::device_reset()
 	m_ss1_next_entry_point = ~0;
 	m_ss1_next_stack = ~0;
 #endif
+}
+
+
+//-------------------------------------------------
+//  device_post_load - update register pointers
+//  after loading a savestate
+//-------------------------------------------------
+
+void mb86901_device::device_post_load()
+{
+	update_gpr_pointers();
 }
 
 

@@ -412,7 +412,7 @@ and       32  er    .     1100...010......  A+-DXWLdxI  U U U U U U U   6   6   
 and        8  re    .     1100...100......  A+-DXWL...  U U U U U U U   8   8   4   4   4   4   4
 and       16  re    .     1100...101......  A+-DXWL...  U U U U U U U   8   8   4   4   4   4   4
 and       32  re    .     1100...110......  A+-DXWL...  U U U U U U U  12  12   4   4   4   4   4
-andi      16  toc   .     0000001000111100  ..........  U U U U U U U  20  16  12  12  12  12  12
+andi      8   toc   .     0000001000111100  ..........  U U U U U U U  20  16  12  12  12  12  12
 andi      16  tos   .     0000001001111100  ..........  S S S S S S S  20  16  12  12  12  12  12
 andi       8  .     d     0000001000000...  ..........  U U U U U U U   8   8   2   2   2   2   2
 andi       8  .     .     0000001000......  A+-DXWL...  U U U U U U U  12  12   4   4   4   4   4
@@ -556,7 +556,7 @@ eor       16  .     d     1011...101000...  ..........  U U U U U U U   4   4   
 eor       16  .     .     1011...101......  A+-DXWL...  U U U U U U U   8   8   4   4   4   4   4
 eor       32  .     d     1011...110000...  ..........  U U U U U U U   8   6   2   2   2   2   2
 eor       32  .     .     1011...110......  A+-DXWL...  U U U U U U U  12  12   4   4   4   4   4
-eori      16  toc   .     0000101000111100  ..........  U U U U U U U  20  16  12  12  12  12  12
+eori      8   toc   .     0000101000111100  ..........  U U U U U U U  20  16  12  12  12  12  12
 eori      16  tos   .     0000101001111100  ..........  S S S S S S S  20  16  12  12  12  12  12
 eori       8  .     d     0000101000000...  ..........  U U U U U U U   8   8   2   2   2   2   2
 eori       8  .     .     0000101000......  A+-DXWL...  U U U U U U U  12  12   4   4   4   4   4
@@ -735,7 +735,7 @@ or        32  er    .     1000...010......  A+-DXWLdxI  U U U U U U U   6   6   
 or         8  re    .     1000...100......  A+-DXWL...  U U U U U U U   8   8   4   4   4   4   4
 or        16  re    .     1000...101......  A+-DXWL...  U U U U U U U   8   8   4   4   4   4   4
 or        32  re    .     1000...110......  A+-DXWL...  U U U U U U U  12  12   4   4   4   4   4
-ori       16  toc   .     0000000000111100  ..........  U U U U U U U  20  16  12  12  12  12  12
+ori       8   toc   .     0000000000111100  ..........  U U U U U U U  20  16  12  12  12  12  12
 ori       16  tos   .     0000000001111100  ..........  S S S S S S S  20  16  12  12  12  12  12
 ori        8  .     d     0000000000000...  ..........  U U U U U U U   8   8   2   2   2   2   2
 ori        8  .     .     0000000000......  A+-DXWL...  U U U U U U U  12  12   4   4   4   4   4
@@ -1827,9 +1827,9 @@ M68KMAKE_OP(andi, 32, ., .)
 }
 
 
-M68KMAKE_OP(andi, 16, toc, .)
+M68KMAKE_OP(andi, 8, toc, .)
 {
-	m68ki_set_ccr(m68ki_get_ccr() & OPER_I_16());
+	m68ki_set_ccr(m68ki_get_ccr() & OPER_I_8());
 }
 
 
@@ -4950,9 +4950,9 @@ M68KMAKE_OP(eori, 32, ., .)
 }
 
 
-M68KMAKE_OP(eori, 16, toc, .)
+M68KMAKE_OP(eori, 8, toc, .)
 {
-	m68ki_set_ccr(m68ki_get_ccr() ^ OPER_I_16());
+	m68ki_set_ccr(m68ki_get_ccr() ^ OPER_I_8());
 }
 
 
@@ -8126,9 +8126,9 @@ M68KMAKE_OP(ori, 32, ., .)
 }
 
 
-M68KMAKE_OP(ori, 16, toc, .)
+M68KMAKE_OP(ori, 8, toc, .)
 {
-	m68ki_set_ccr(m68ki_get_ccr() | OPER_I_16());
+	m68ki_set_ccr(m68ki_get_ccr() | OPER_I_8());
 }
 
 

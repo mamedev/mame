@@ -97,15 +97,15 @@ MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
 	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
-	m_keybc->system_reset_cb().set(FUNC(sis85c496_host_device::cpu_reset_w));
-	m_keybc->gate_a20_cb().set(FUNC(sis85c496_host_device::cpu_a20_w));
-	m_keybc->input_buffer_full_cb().set("pic8259_master", FUNC(pic8259_device::ir1_w));
-	m_keybc->keyboard_clock_cb().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_keybc->keyboard_data_cb().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+	m_keybc->hot_res().set(FUNC(sis85c496_host_device::cpu_reset_w));
+	m_keybc->gate_a20().set(FUNC(sis85c496_host_device::cpu_a20_w));
+	m_keybc->kbd_irq().set("pic8259_master", FUNC(pic8259_device::ir1_w));
+	m_keybc->kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_keybc->kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_clk_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	DS12885(config, m_ds12885);

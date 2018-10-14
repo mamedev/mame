@@ -629,7 +629,8 @@ MACHINE_CONFIG_START(adp_state::funland)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &adp_state::ramdac_map);
 
 	MCFG_DEVICE_MODIFY("acrtc")
 	MCFG_HD63484_ADDRESS_MAP(fstation_hd63484_map)

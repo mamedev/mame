@@ -1648,9 +1648,9 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	m_dmac->in_memr_callback().set(FUNC(pc88va_state::dma_memr_cb));
 	m_dmac->out_memw_callback().set(FUNC(pc88va_state::dma_memw_cb));
 
-	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc88va_state, fdc_irq))
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc88va_state, fdc_drq))
+	UPD765A(config, m_fdc, false, true);
+	m_fdc->intrq_wr_callback().set(FUNC(pc88va_state::fdc_irq));
+	m_fdc->drq_wr_callback().set(FUNC(pc88va_state::fdc_drq));
 	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")

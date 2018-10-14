@@ -5,24 +5,9 @@
 
 #pragma once
 
-#define MCFG_TOPCAT_FB_WIDTH(_pixels) \
-	downcast<topcat_device &>(*device).set_fb_width(_pixels);
-
-#define MCFG_TOPCAT_FB_HEIGHT(_pixels) \
-	downcast<topcat_device &>(*device).set_fb_height(_pixels);
-
-#define MCFG_TOPCAT_PLANEMASK(_mask) \
-	downcast<topcat_device &>(*device).set_planemask(_mask);
-
-#define MCFG_TOPCAT_INT_CB(_write)                               \
-	downcast<topcat_device &>(*device).set_int_write_cb(DEVCB_##_write);
-
 class topcat_device : public device_t
 {
 public:
-	template <class Object> devcb_base& set_int_write_cb(Object &&cb)
-	{ return m_int_write_func.set_callback(std::forward<Object>(cb)); }
-
 	topcat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	bool has_changed() { bool ret = m_changed; m_changed = false; return ret; };
 	void set_fb_width(int _pixels) { m_fb_width = _pixels; }
@@ -40,6 +25,7 @@ public:
 
 	bool plane_enabled();
 
+	auto irq_out_cb() { return m_int_write_func.bind(); }
 protected:
 	topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -98,6 +84,7 @@ private:
 	};
 
 	void window_move();
+
 	void execute_rule(bool src, replacement_rule_t rule, bool &dst);
 
 	void update_cursor(int x, int y, uint16_t ctrl, uint8_t width);
@@ -116,7 +103,7 @@ private:
 			m_vram[offset] &= ~m_plane_mask;
 	}
 
-	bool get_vram_pixel(int x, int y) {
+	bool get_vram_pixel(int x, int y) const {
 		return m_vram[y * m_fb_width + x] & m_plane_mask;
 	}
 

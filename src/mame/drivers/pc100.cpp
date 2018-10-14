@@ -667,9 +667,9 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	//i8251.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	i8251.rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc100_state, irqnmi_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, pc100_state, drqnmi_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(pc100_state::irqnmi_w));
+	m_fdc->drq_wr_callback().set(FUNC(pc100_state::drqnmi_w));
 
 	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL(32'768))
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_0_w))

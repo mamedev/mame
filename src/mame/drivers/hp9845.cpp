@@ -3737,15 +3737,19 @@ void hp9845_base_state::ppu_io_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
-	MCFG_DEVICE_ADD("lpu", HP_5061_3001, 5700000)
-	MCFG_DEVICE_PROGRAM_MAP(global_mem_map)
-	MCFG_HPHYBRID_SET_9845_BOOT(true)
-	MCFG_DEVICE_ADD("ppu", HP_5061_3001, 5700000)
-	MCFG_DEVICE_PROGRAM_MAP(global_mem_map)
-	MCFG_DEVICE_IO_MAP(ppu_io_map)
-	MCFG_HPHYBRID_SET_9845_BOOT(true)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp9845_base_state , irq_callback)
-	MCFG_HPHYBRID_PA_CHANGED(WRITE8(*this, hp9845_base_state , pa_w))
+	HP_5061_3001(config , m_lpu , 5700000);
+	m_lpu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
+	m_lpu->set_9845_boot_mode(true);
+	m_lpu->set_rw_cycles(6 , 6);
+	m_lpu->set_relative_mode(true);
+	HP_5061_3001(config , m_ppu , 5700000);
+	m_ppu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
+	m_ppu->set_addrmap(AS_IO , &hp9845_base_state::ppu_io_map);
+	m_ppu->set_9845_boot_mode(true);
+	m_ppu->set_rw_cycles(6 , 6);
+	m_ppu->set_relative_mode(true);
+	m_ppu->set_irq_acknowledge_callback(FUNC(hp9845_base_state::irq_callback));
+	m_ppu->pa_changed_cb().set(FUNC(hp9845_base_state::pa_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

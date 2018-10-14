@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
 	MCFG_MC6845_UPDATE_ROW_CB(pyl601_state, pyl601_update_row)
 
-	MCFG_UPD765A_ADD("upd765", true, true)
+	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")

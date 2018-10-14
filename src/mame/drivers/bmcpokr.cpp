@@ -810,9 +810,8 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 
 	PALETTE(config, m_palette, 256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &bmcpokr_state::ramdac_map);
-	ramdac.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bmcpokr);
 
