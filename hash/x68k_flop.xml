@@ -7108,9 +7108,9 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 
 	<software name="janshqstd" cloneof="janshqst">
 		<description>Janshin Quest (Demo)</description>
-		<info name="alt_title" value="雀神クエスト (デモディスク)" />
 		<year>1994</year>
 		<publisher>SPS</publisher>
+		<info name="alt_title" value="雀神クエスト (デモディスク)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="janshin quest (demo) (199x)(sps).dim" size="1261824" crc="7de92049" sha1="141029f593c78a7355882c5c6fde9740a72c8b79" offset="000000" />
