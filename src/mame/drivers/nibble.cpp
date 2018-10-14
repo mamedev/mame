@@ -53,6 +53,7 @@
 //#include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK    XTAL(12'000'000)
@@ -157,10 +158,15 @@ void nibble_state::machine_reset()
 void nibble_state::nibble_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcbff).ram();
+	map(0xd000, 0xdbff).ram();
 	map(0xdc00, 0xdfff).ram().w(FUNC(nibble_state::nibble_videoram_w)).share("videoram");
-	// RAMDAC at 0xec40?
+	map(0xe000, 0xebff).ram();
+	// RAMDACs at 0xec00 and 0xec40?
+	map(0xec88, 0xec89).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xecc8, 0xecc8).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xecc9, 0xecc9).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xf000, 0xfbff).ram();
 }
 
 
@@ -327,6 +333,9 @@ MACHINE_CONFIG_START(nibble_state::nibble)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
