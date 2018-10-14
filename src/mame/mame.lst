@@ -23344,6 +23344,7 @@ m4colossg                       //
 m4ctn                           // Tuppenny Nudger Classic (Mdm?)
 m4ewshft                        // Each Way Shifter
 m4excam                         // Excalibur (Mdm)
+m4excamd                        //
 m4firebl                        // Fireball (Mdm)
 m4firebla                       //
 m4fireblb                       //
@@ -27512,6 +27513,8 @@ v4picdil                        // Piccadilly Nights
 v4psi                           // Prize Space Invaders
 v4psia                          //
 v4psib                          //
+v4psi20d                        //
+v4psi214                        //
 v4pztet                         // Prize Tetris
 v4pzteta                        //
 v4quidgr                        // Ten Quid Grid
@@ -27533,6 +27536,7 @@ v4strike2d                      //
 v4striked                       //
 v4sunbst                        // Sunburst
 v4tetrs                         // BwB Tetris v 2.2
+v4tetrs1                        // BwB Tetris v 1.0
 v4time                          // Time Machine
 v4timebn                        // Time Bandit
 v4turnov                        // Turnover
