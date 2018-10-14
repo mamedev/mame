@@ -4,12 +4,20 @@
 
 Skeleton driver for ITT Courier 1700 compact IBM 3278-compatible display terminal.
 
+Next to the CPU is a 40-pin DIP marked:
+
+    AMI 8421MAF
+    2651-P2
+    C02805
+    PHILIPPINES
+
+This device may be related to the Intel 8251, but it is definitely not a SCN2651 equivalent.
+
 ************************************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-//#include "machine/mc2661.h"
 //#include "machine/nvram.h"
 #include "video/mc6845.h"
 #include "screen.h"
