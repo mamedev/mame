@@ -3697,7 +3697,8 @@ GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4o
 GAME(  199?, v4vgpok,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4psi,      0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4psia,     0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psib,     0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS ) GAME(  199?, v4psi14d,   0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.4D?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psib,     0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psi14d,   0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.4D?) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4psi20d,   0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0D?) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4psi214,   0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.14?) (MPU4 Video)",GAME_FLAGS )
 // bad dump
