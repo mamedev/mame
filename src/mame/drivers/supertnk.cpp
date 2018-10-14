@@ -94,6 +94,8 @@ CRU lines:
 >b12    Unknown, maybe some special-hardware sound effect or lights blinking (?)
 >b13    Unknown, maybe some special-hardware sound effect or lights blinking (?)
 
+XTAL (on CPU board) is marked 20.790 on one PCB, 22.118 on another.
+
 ***************************************************************************/
 
 
