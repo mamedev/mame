@@ -436,7 +436,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(supertnk_state::supertnk)
 
 	// CPU TMS9980A; no line connections
-	TMS9980A(config, m_maincpu, 2598750);
+	TMS9980A(config, m_maincpu, 20.79_MHz_XTAL / 2); // divider not verified (possibly should be /3)
 	m_maincpu->set_addrmap(AS_PROGRAM, &supertnk_state::supertnk_map);
 	m_maincpu->set_addrmap(AS_IO, &supertnk_state::supertnk_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(supertnk_state::supertnk_interrupt));
