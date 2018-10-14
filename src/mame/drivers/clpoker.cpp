@@ -283,7 +283,8 @@ MACHINE_CONFIG_START(clpoker_state::clpoker)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, clpoker_state, vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HM86171
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette")); // HM86171
+	ramdac.set_addrmap(0, &clpoker_state::ramdac_map);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clpoker)
 

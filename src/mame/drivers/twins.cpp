@@ -479,8 +479,9 @@ MACHINE_CONFIG_START(twins_state::twins)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-	MCFG_RAMDAC_SPLIT_READ(0)
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &twins_state::ramdac_map);
+	ramdac.set_split_read(0);
 
 	MCFG_24C02_ADD("i2cmem")
 

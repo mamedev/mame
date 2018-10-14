@@ -1010,7 +1010,8 @@ MACHINE_CONFIG_START(magicard_state::magicard)
 	MCFG_SCREEN_UPDATE_DRIVER(magicard_state, screen_update_magicard)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &magicard_state::ramdac_map);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("saa", SAA1099, CLOCK_B)
