@@ -826,7 +826,8 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dunhuang)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &dunhuang_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

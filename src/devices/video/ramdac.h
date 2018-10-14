@@ -15,22 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_RAMDAC_ADD(_tag, _map, _palette) \
-	MCFG_DEVICE_ADD(_tag, RAMDAC, 0) \
-	MCFG_DEVICE_ADDRESS_MAP(0, _map) \
-	downcast<ramdac_device &>(*device).set_palette(_palette);
-
-#define MCFG_RAMDAC_COLOR_BASE(_color_base) \
-	downcast<ramdac_device &>(*device).set_color_base(_color_base);
-
-#define MCFG_RAMDAC_SPLIT_READ(_split) \
-	downcast<ramdac_device &>(*device).set_split_read(_split);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -41,10 +25,15 @@ class ramdac_device :   public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&tag)
+		: ramdac_device(mconfig, tag, owner, clock)
+	{
+		m_palette.set_tag(std::forward<T>(tag));
+	}
 	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_color_base(uint32_t color_base) { m_color_base = color_base; }
 	void set_split_read(int split) { m_split_read_reg = split; }
 

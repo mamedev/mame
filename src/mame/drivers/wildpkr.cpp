@@ -482,7 +482,8 @@ MACHINE_CONFIG_START(wildpkr_state::wildpkr)
 
 	MCFG_HD63484_ADD("acrtc", 0, hd63484_map)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)

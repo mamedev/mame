@@ -1680,11 +1680,13 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skylncr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-	MCFG_RAMDAC_COLOR_BASE(0)
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &nibble_state::ramdac_map);
+	ramdac.set_color_base(0);
 
-	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette")
-	MCFG_RAMDAC_COLOR_BASE(0x100)
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette));
+	ramdac2.set_addrmap(0, &nibble_state::ramdac2_map);
+	ramdac2.set_color_base(0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

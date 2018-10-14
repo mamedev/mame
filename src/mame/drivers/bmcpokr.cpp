@@ -823,7 +823,8 @@ MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &bmcpokr_state::ramdac_map);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmcpokr)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

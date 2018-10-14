@@ -345,11 +345,13 @@ MACHINE_CONFIG_START(nibble_state::nibble)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nibble)
 
-	MCFG_RAMDAC_ADD("ramdac1", ramdac1_map, "palette")
-	MCFG_RAMDAC_COLOR_BASE(0)
+	ramdac_device &ramdac1(RAMDAC(config, "ramdac1", 0, "palette"));
+	ramdac1.set_addrmap(0, &nibble_state::ramdac1_map);
+	ramdac1.set_color_base(0);
 
-	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette")
-	MCFG_RAMDAC_COLOR_BASE(0x100)
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, "palette"));
+	ramdac2.set_addrmap(0, &nibble_state::ramdac2_map);
+	ramdac2.set_color_base(0x100);
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
