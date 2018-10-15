@@ -391,6 +391,7 @@ protected:
 	void do_sprite_dma(uint32_t len);
 
 	void apply_saturation(const rectangle &cliprect);
+	void apply_fade(const rectangle &cliprect);
 	void blit(const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
 	void blit_page(const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs);
 	void blit_sprite(const rectangle &cliprect, int depth, uint32_t base_addr);
