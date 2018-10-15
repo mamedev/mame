@@ -42,6 +42,7 @@ public:
 	O(unk83_imm);
 	O(unk87_imm);
 
+	O(unh_imp);
 
 #undef O
 

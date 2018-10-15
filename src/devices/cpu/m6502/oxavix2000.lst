@@ -57,3 +57,8 @@ unk87_imm
 unk83_imm
 	read_pc();
 	prefetch();
+
+unh_imp
+	fatalerror("unhandled opcode %02x\n", inst_state);
+	read_pc_noinc();
+	prefetch();
