@@ -4531,7 +4531,7 @@ ROM_END
         Allumer X1-007 505100    (SDIP42 @ U110 - Feeds RGB DACs)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
 Inputs: Allumer X1-004 546100    (SDIP52)
-   OSC: 50.0000 MHz (@ X1), 32.5304 MHz (@ X2) & 32.768kHz (@ X3)
+   OSC: 50.0000MHz (@ X1), 32.5304MHz (@ X2) & 32.768kHz (@ X3)
  Other: 8 Position Dipswitch x 2
         Ricoh RP5C62 RTC (@ U128)
         3.6v Battery (@ BT1)
@@ -4564,9 +4564,9 @@ PCB Number: P0-121A / Sunsoft 2MP1-E00 (serial 0503)
 |o                              | X1-020   |   +--------------+|
 |n          +-------+           |          |   +--------------+|
 |n          |Toshiba|           | 9426HK003|   | MP3 CG-0 U16 ||
-|e C        |  TMP  |           +----------+   +--------------+|
-|c N        | 68301 |                          +--------------+|
-|t 2        +-------+                          |      U23*    ||
+|e          |  TMP  |           +----------+   +--------------+|
+|c          | 68301 |                          +--------------+|
+|t          +-------+                          |      U23*    ||
 |e         93C46                               +--------------+|
 |r              D                              +--------------+|
 |               S                              |      U22*    ||
@@ -4578,17 +4578,17 @@ PCB Number: P0-121A / Sunsoft 2MP1-E00 (serial 0503)
 |      6    4   1                                 X1-007 R G B |
 +--------------------------------------------------------------+
 
-U2 ST M27C4001 EPROM MP3prgEVEN  U2 V1.0
-U3 ST M27C4001 EPROM MP3 prgODD  U3 V1.0
+U2 ST M27C4001 EPROM  MP3prgEVEN  U2 V1.0
+U3 ST M27C4001 EPROM  MP3 prgODD  U3 V1.0
 U4 unpopulated silkscreened 27C4001 TBL EVEN
 U5 unpopulated silkscreened 27C4001 TBL ODD
-U15 ST M27C160 EPROM  PM# CG-1 U15 V1.0
-U16 ST M27C160 EPROM  PM# CG-0 U16 V1.0
-U21 ST M27C160 EPROM  PM# CG-2 U21 V1.0
+U15 ST M27C160 EPROM  PM3 CG-1  U15 V1.0
+U16 ST M27C160 EPROM  PM3 CG-0  U16 V1.0
+U21 ST M27C160 EPROM  PM3 CG-2  U21 V1.0
 U51 GAL KC-001C
 U52 GAL KC-002C
-U111 ST M27C4001 EPROM  MP3 SOUND0 U111 V1.0
-U112 ST M27C4001 EPROM  MP3 SOUND1 U112 V1.0
+U111 ST M27C4001 EPROM  MP3 SOUND0  U111 V1.0
+U112 ST M27C4001 EPROM  MP3 SOUND1  U112 V1.0
 U17, U18, U19, U20, U22 & U23 silkscreened 23C16000
 * Denotes not populated.
 

@@ -487,7 +487,7 @@ ROM_START( ncv2 )
 	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_RELOAD(                      0x200000, 0x200000 )
-	ROM_LOAD( "ncs1cg1.10e",         0x400000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
+	ROM_LOAD( "ncs1cg1.10f",         0x400000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
 	ROM_RELOAD(                      0x600000, 0x200000 )
 
 	ROM_REGION( 0x200000, "c352", 0 ) // Samples
@@ -505,7 +505,7 @@ ROM_START( ncv2j )
 	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_RELOAD(                      0x200000, 0x200000 )
-	ROM_LOAD( "ncs1cg1.10e",         0x400000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
+	ROM_LOAD( "ncs1cg1.10f",         0x400000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
 	ROM_RELOAD(                      0x600000, 0x200000 )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -515,7 +515,7 @@ ROM_END
 ROM_START( gynotai )
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD( "gy1main0.14e", 0x000000, 0x080000, CRC(1421dbf5) SHA1(7e4322cddc3317c9ed82a97c0fe387ce1364cf9b) )
-	ROM_LOAD( "gymain1.13e",  0x080000, 0x080000, CRC(dc10a4a7) SHA1(01a6b5aae8599de9015d6e332f5bd286bc84c807) )
+	ROM_LOAD( "gy1main1.13e", 0x080000, 0x080000, CRC(dc10a4a7) SHA1(01a6b5aae8599de9015d6e332f5bd286bc84c807) )
 
 	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "gy1sub0.1d",   0x000000, 0x080000, CRC(fd31e963) SHA1(b658921dd29cfad0c366465ae37a356c3d2fb4d3) )
@@ -525,8 +525,7 @@ ROM_START( gynotai )
     ROM_LOAD( "gy1cg1.10f",   0x400000, 0x400000, CRC(5a518733) SHA1(b6ea91629bc6ddf67c47c4189084aa947f4e31ed) )
 
 	ROM_REGION( 0x200000, "c352", 0 ) // Samples
-	ROM_LOAD( "gy1voice.7c",  0x000000, 0x200000, BAD_DUMP CRC(6cf58466) SHA1(db5f5d40677ca908d402649bc7b6e9953e7223db) ) // 1st and 2nd half identical
-	ROM_IGNORE(                         0x200000 )
+	ROM_LOAD( "gy1voic.7c",     0x000000, 0x200000, CRC(f135e79b) SHA1(01ce3e3b366d0b9045ad8599b60ca33c6d21f150) )
 ROM_END
 
 ROM_START( abcheck )
