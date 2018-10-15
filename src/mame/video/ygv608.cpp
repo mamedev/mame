@@ -30,7 +30,7 @@
  *    Split-screen scrolling by row (by column supported) (see test mode)
  *    Everything else! :)
  *
- *    TODO (2017 edition):
+ *    TODO (2017-2018 edition):
  *    - move ports into device_address_map (done);
  *    - add registers into own space, improve naming and variable usage;
  *    - remove code repetition in tilemap drawing functions;
@@ -38,6 +38,7 @@
  *    - fix garbage tiles in Mappy Arrange (done)
  *    - fix tile encryption for Abnormal Check (sets extra bit in cuskey);
  *      nopping bit 0 writes to 0x40081e makes gfxs to draw better!?
+ *    - fix Gynotai row scroll glitches;
  *    - fix attract mode garbage for Namco Collection Vol. 2 (either transparent or page banking select registers) (done);
  *    - fix tilemap dirty flags, move tilemap data in own space prolly helps;
  *    - DMA from/to ROM;
