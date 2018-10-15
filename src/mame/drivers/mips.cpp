@@ -299,5 +299,5 @@ ROM_END
 #define rom_rs2030 rom_rx2030
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME  FLAGS */
-COMP(1989,  rc2030,    0,      0,      rc2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RC2030", MACHINE_IS_SKELETON | MACHINE_NO_SOUND)
-COMP(1989,  rs2030,    0,      0,      rs2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RS2030", MACHINE_IS_SKELETON | MACHINE_NO_SOUND)
+COMP(1989,  rc2030,    0,      0,      rc2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RC2030", MACHINE_IS_SKELETON )
+COMP(1989,  rs2030,    0,      0,      rs2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RS2030", MACHINE_IS_SKELETON )
