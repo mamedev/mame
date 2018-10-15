@@ -263,7 +263,7 @@ void rx2030_state::rs2030(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(pixclock, 1688, 248, 1528, 1066, 38, 1062);
 	m_screen->set_screen_update(FUNC(rx2030_state::screen_update));
-	m_screen->screen_vblank().set([this](int state) {});
+	m_screen->screen_vblank().set([](int state) {});
 
 	BT458(config, m_ramdac, pixclock);
 	RAM(config, m_vram, 0).set_default_size("2M");
