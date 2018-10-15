@@ -407,8 +407,6 @@ protected:
 	bool fetch_sample(address_space &space, const uint32_t channel);
 	inline void loop_channel(const uint32_t channel);
 
-	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3, 4);
-
 	struct rgbtriad_t
 	{
 		uint8_t r, g, b;
