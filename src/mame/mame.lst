@@ -28958,7 +28958,7 @@ vshoot                          // (c) 1994
 ncv1                            // (c) 1995
 ncv1j                           // (c) 1995 (Japan)
 ncv1j2                          // (c) 1995 (Japan)
-gynotai							// (c) 1996 (Japan)
+gynotai                         // (c) 1996 (Japan)
 ncv2                            // (c) 1996
 ncv2j                           // (c) 1996 (Japan)
 abcheck                         // (c) 1996 (Japan)
@@ -29962,7 +29962,7 @@ minasan                         // 0027 (c) 1990 Monolith Corp.
 moshougi                        // 0203 (c) 1995 ADK / SNK
 ms4plus                         // bootleg
 ms5plus                         // bootleg
-mvstemp							// development board
+mvstemp                         // development board
 mslug                           // 0201 (c) 1996 Nazca
 mslug2                          // 0241 (c) 1998 SNK
 mslug2t                         // bootleg
@@ -31897,6 +31897,7 @@ phoenixc2                       // bootleg
 phoenixc3                       // bootleg
 phoenixc4                       // bootleg
 phoenixdal                      // bootleg D&L (No copyright/title)
+phoenixgu                       // bootleg G. Universal Video
 phoenixha                       // bootleg Hellomat Automaten
 phoenixi                        // bootleg IDI
 phoenixj                        // (c) 1980 Taito
