@@ -390,10 +390,12 @@ protected:
 
 	void do_sprite_dma(uint32_t len);
 
-	void blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
-	void blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs);
-	void blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t base_addr);
-	void blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth);
+	void apply_saturation(const rectangle &cliprect);
+	void blit(const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
+	void blit_page(const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs);
+	void blit_sprite(const rectangle &cliprect, int depth, uint32_t base_addr);
+	void blit_sprites(const rectangle &cliprect, int depth);
+
 	inline uint8_t expand_rgb5_to_rgb8(uint8_t val);
 	inline uint8_t mix_channel(uint8_t a, uint8_t b);
 	void mix_pixel(uint32_t offset, uint16_t rgb);
@@ -406,11 +408,12 @@ protected:
 
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3, 4);
 
-	struct
+	struct rgbtriad_t
 	{
 		uint8_t r, g, b;
-	}
-	m_screenbuf[320 * 240];
+	};
+
+	rgbtriad_t m_screenbuf[320 * 240];
 
 	bool m_hide_page0;
 	bool m_hide_page1;
