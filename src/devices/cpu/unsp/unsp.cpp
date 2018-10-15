@@ -13,8 +13,6 @@
 #include "unspdasm.h"
 #include "debugger.h"
 
-#define LOG_OPCODES		(0)
-
 DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "SunPlus u'nSP")
 
 
@@ -31,6 +29,9 @@ unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_
 	, m_program(nullptr)
 	, m_icount(0)
 	, m_debugger_temp(0)
+#if UNSP_LOG_OPCODES
+	, m_log_ops(0)
+#endif
 {
 }
 
@@ -117,6 +118,9 @@ void unsp_device::device_start()
 	state_add(UNSP_IRQ,    "IRQ", m_irq).formatstr("%1u");
 	state_add(UNSP_FIQ,    "FIQ", m_fiq).formatstr("%1u");
 	state_add(UNSP_SB,     "SB", m_sb).formatstr("%1u");
+#if UNSP_LOG_OPCODES
+	state_add(UNSP_LOG_OPS,"LOG", m_log_ops).formatstr("%1u");
+#endif
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
@@ -285,7 +289,7 @@ void unsp_device::check_irqs()
 
 void unsp_device::execute_run()
 {
-#if LOG_OPCODES
+#if UNSP_LOG_OPCODES
 	unsp_disassembler dasm;
 #endif
 
@@ -301,10 +305,13 @@ void unsp_device::execute_run()
 		debugger_instruction_hook(UNSP_LPC);
 		const uint32_t op = read16(UNSP_LPC);
 
-#if LOG_OPCODES
-		std::stringstream strbuffer;
-		dasm.disassemble(strbuffer, UNSP_LPC, op, read16(UNSP_LPC+1));
-		logerror("%06x: %s\n", UNSP_LPC, strbuffer.str().c_str());
+#if UNSP_LOG_OPCODES
+		if (m_log_ops)
+		{
+			std::stringstream strbuffer;
+			dasm.disassemble(strbuffer, UNSP_LPC, op, read16(UNSP_LPC+1));
+			logerror("%06x: %s\n", UNSP_LPC, strbuffer.str().c_str());
+		}
 #endif
 
 		UNSP_REG(PC)++;

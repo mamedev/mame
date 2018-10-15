@@ -13,6 +13,8 @@
 
 #pragma once
 
+#define UNSP_LOG_OPCODES		(0)
+
 enum
 {
 	UNSP_SP = 1,
@@ -30,8 +32,12 @@ enum
 	UNSP_FIQ_EN,
 	UNSP_IRQ,
 	UNSP_FIQ,
+#if UNSP_LOG_OPCODES
+	UNSP_SB,
+	UNSP_LOG_OPS
+#else
 	UNSP_SB
-
+#endif
 };
 
 enum
@@ -97,6 +103,9 @@ private:
 	int m_icount;
 
 	uint32_t m_debugger_temp;
+#if UNSP_LOG_OPCODES
+	uint32_t m_log_ops;
+#endif
 
 	void unimplemented_opcode(uint16_t op);
 	inline uint16_t read16(uint32_t address);
