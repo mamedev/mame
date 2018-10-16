@@ -79,6 +79,7 @@ Detailed list of bugs:
 #include "cpu/unsp/unsp.h"
 #include "machine/spg2xx.h"
 #include "machine/i2cmem.h"
+#include "machine/nvram.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -88,12 +89,11 @@ Detailed list of bugs:
 #include "softlist.h"
 #include "speaker.h"
 
-class spg2xx_game_state : public driver_device, public device_nvram_interface
+class spg2xx_game_state : public driver_device
 {
 public:
 	spg2xx_game_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, device_nvram_interface(mconfig, *this)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 #if SPG2XX_VISUAL_AUDIO_DEBUG
@@ -107,11 +107,14 @@ public:
 		, m_io_motionx(*this, "MOTIONX")
 		, m_io_motiony(*this, "MOTIONY")
 		, m_io_motionz(*this, "MOTIONZ")
+		, m_i2cmem(*this, "i2cmem")
+		, m_nvram(*this, "nvram")
 	{ }
 
 	void spg2xx_base(machine_config &config);
 	void spg2xx_basep(machine_config &config);
 	void jakks(machine_config &config);
+	void walle(machine_config &config);
 	void wireless60(machine_config &config);
 	void rad_skat(machine_config &config);
 	void rad_skatp(machine_config &config);
@@ -141,13 +144,11 @@ protected:
 	required_device<spg2xx_device> m_spg;
 	required_memory_bank m_bank;
 
-	// device_nvram_interface overrides
-	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
-
 protected:
 	DECLARE_WRITE_LINE_MEMBER(poll_controls);
+
+	DECLARE_READ16_MEMBER(walle_portc_r);
+	DECLARE_WRITE16_MEMBER(walle_portc_w);
 
 	virtual void machine_reset() override;
 
@@ -160,6 +161,8 @@ protected:
 	uint8_t m_w60_controller_input;
 	uint16_t m_w60_porta_data;
 
+	uint16_t m_walle_portc_data;
+
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3, 4);
 
 	required_ioport m_io_p1;
@@ -168,6 +171,8 @@ protected:
 	optional_ioport m_io_motionx;
 	optional_ioport m_io_motiony;
 	optional_ioport m_io_motionz;
+	optional_device<i2cmem_device> m_i2cmem;
+	optional_device<nvram_device> m_nvram;
 
 	// temp hack
 	DECLARE_READ16_MEMBER(rad_crik_hack_r);
@@ -329,6 +334,37 @@ WRITE16_MEMBER(spg2xx_cart_state::vsmile_portc_w)
 	m_vsmile_portc_data = data & mem_mask;
 }
 
+READ16_MEMBER(spg2xx_game_state::walle_portc_r)
+{
+	char mask_buf[17];
+	mask_buf[16] = 0;
+	for (uint32_t i = 0; i < 16; i++)
+	{
+		mask_buf[i] = BIT(mem_mask, 15 - i) ? '1' : '0';
+	}
+	logerror("Wall-E Port C read 0000, pull mask %s\n", mask_buf);
+	return m_i2cmem->read_sda();
+}
+
+WRITE16_MEMBER(spg2xx_game_state::walle_portc_w)
+{
+	char data_buf[17];
+	char mask_buf[17];
+	data_buf[16] = 0;
+	mask_buf[16] = 0;
+	for (uint32_t i = 0; i < 16; i++)
+	{
+		data_buf[i] = BIT(data,     15 - i) ? '1' : '0';
+		mask_buf[i] = BIT(mem_mask, 15 - i) ? '1' : '0';
+	}
+	logerror("Wall-E Port C write %s, push mask %s\n", data_buf, mask_buf);
+	m_walle_portc_data = data & mem_mask;
+	if (BIT(mem_mask, 1))
+		m_i2cmem->write_scl(BIT(data, 1));
+	if (BIT(mem_mask, 0))
+		m_i2cmem->write_sda(BIT(data, 0));
+}
+
 READ16_MEMBER(spg2xx_game_state::jakks_porta_r)
 {
 	const uint16_t temp = m_io_p1->read();
@@ -342,21 +378,6 @@ READ16_MEMBER(spg2xx_game_state::jakks_porta_r)
 	value |= (temp & 0x0040) ? 0x0200 : 0;
 	value |= (temp & 0x0080) ? 0x0100 : 0;
 	return value;
-}
-
-void spg2xx_game_state::nvram_default()
-{
-	memset(&m_serial_eeprom[0], 0, 0x400);
-}
-
-void spg2xx_game_state::nvram_read(emu_file &file)
-{
-	file.read(&m_serial_eeprom[0], 0x400);
-}
-
-void spg2xx_game_state::nvram_write(emu_file &file)
-{
-	file.write(&m_serial_eeprom[0], 0x400);
 }
 
 void spg2xx_game_state::mem_map(address_map &map)
@@ -619,6 +640,8 @@ void spg2xx_game_state::machine_start()
 	m_bank->set_entry(0);
 
 	m_serial_eeprom = std::make_unique<uint8_t[]>(0x400);
+	if (m_nvram)
+		m_nvram->set_base(&m_serial_eeprom[0], 0x400);
 }
 
 void spg2xx_game_state::machine_reset()
@@ -743,6 +766,10 @@ void spg2xx_cart_state::vii(machine_config &config)
 	m_screen->screen_vblank().append(FUNC(spg2xx_cart_state::poll_controls));
 
 	m_spg->portb_out().set(FUNC(spg2xx_cart_state::vii_portb_w));
+	m_spg->eeprom_w().set(FUNC(spg2xx_cart_state::eeprom_w));
+	m_spg->eeprom_r().set(FUNC(spg2xx_cart_state::eeprom_r));
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vii_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -806,7 +833,15 @@ void spg2xx_game_state::jakks(machine_config &config)
 
 	m_spg->porta_in().set(FUNC(spg2xx_cart_state::jakks_porta_r));
 
-	I2CMEM(config, "i2cmem", 0).set_data_size(0x200);
+	I2CMEM(config, m_i2cmem, 0).set_data_size(0x200);
+}
+
+void spg2xx_game_state::walle(machine_config &config)
+{
+	jakks(config);
+
+	m_spg->portc_in().set(FUNC(spg2xx_game_state::walle_portc_r));
+	m_spg->portc_out().set(FUNC(spg2xx_game_state::walle_portc_w));
 }
 
 void spg2xx_game_state::rad_skat(machine_config &config)
@@ -823,6 +858,8 @@ void spg2xx_game_state::rad_skat(machine_config &config)
 	m_spg->portc_in().set_ioport("P3");
 	m_spg->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
 	m_spg->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
 void spg2xx_game_state::rad_skatp(machine_config &config)
@@ -845,6 +882,8 @@ void spg2xx_game_state::rad_crik(machine_config &config)
 	m_spg->portc_in().set_ioport("P3");
 	m_spg->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
 	m_spg->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
 READ16_MEMBER(spg2xx_game_state::rad_crik_hack_r)
@@ -1064,7 +1103,7 @@ CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init,
 
 // JAKKS Pacific Inc TV games
 CONS( 2004, batmantv, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2008, walle,    0, 0, jakks, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc",              "Wall-E",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, walle,    0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc",              "Wall-E",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Radica TV games
 CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, empty_init, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
