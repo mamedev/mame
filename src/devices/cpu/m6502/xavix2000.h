@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-    xavix2000.h
+    xavix2000.h (Super XaviX)
 
 ***************************************************************************/
 #ifndef MAME_CPU_M6502_XAVIX2000_H
@@ -27,6 +27,11 @@ public:
 
 	// xaviv opcodes
 	O(unh_imp);
+
+	O(phx_imp); // 12
+	O(phy_imp); // 52
+	O(plx_imp); // 32
+	O(ply_imp); // 72
 
 	O(clr_acc); // b2
 
