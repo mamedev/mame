@@ -26,23 +26,9 @@ public:
 #define O(o) void o ## _full(); void o ## _partial()
 
 	// xaviv opcodes
-	O(phx_imp);
-	O(phy_imp);
-	O(plx_imp);
-	O(ply_imp);
-	O(unk1b_imp);
-	O(unk5b_imp);
-	O(unk9b_imp);
-	O(unka3_imp);
-	O(unka7_imp);
-	O(unkb2_imp);
-	O(unk07_imp);
-	O(unk73_imp);
-
-	O(unk83_imm);
-	O(unk87_imm);
-
 	O(unh_imp);
+
+	O(clr_acc); // b2
 
 #undef O
 
