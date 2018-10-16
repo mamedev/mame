@@ -78,10 +78,10 @@ private:
 	static constexpr uint16_t REG_1TQ4_CONTROL_START = 1 << 15;
 
 	/* registers */
-	static constexpr int REG1_1TQ4_ADDRESS_HIGH = 0x200;
-	static constexpr int REG1_1TQ4_ADDRESS_LOW = 0x202;
-	static constexpr int REG1_1TQ4_TRANSFER_COUNT_HIGH = 0x204;
-	static constexpr int REG1_1TQ4_TRANSFER_COUNT_LOW = 0x206;
+	static constexpr int REG1_1TQ4_ADDRESS_LOW = 0x200;
+	static constexpr int REG1_1TQ4_ADDRESS_HIGH = 0x202;
+	static constexpr int REG1_1TQ4_TRANSFER_COUNT_LOW = 0x204;
+	static constexpr int REG1_1TQ4_TRANSFER_COUNT_HIGH = 0x206;
 	static constexpr int REG1_1TQ4_CONTROL = 0x208;
 	static constexpr int REG1_1TQ4_STATUS = 0x20a;
 
