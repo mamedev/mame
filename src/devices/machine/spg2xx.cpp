@@ -18,30 +18,34 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 
 #define LOG_IO_READS		(1U << 0)
 #define LOG_IO_WRITES		(1U << 1)
-#define LOG_GPIO			(1U << 2)
+#define LOG_IRQS			(1U << 2)
 #define LOG_VLINES			(1U << 3)
-#define LOG_IRQS			(1U << 4)
+#define LOG_GPIO			(1U << 4)
 #define LOG_UART			(1U << 5)
 #define LOG_I2C				(1U << 6)
 #define LOG_DMA				(1U << 7)
 #define LOG_WATCHDOG		(1U << 8)
 #define LOG_SPU_READS		(1U << 9)
 #define LOG_SPU_WRITES		(1U << 10)
-#define LOG_ENVELOPES		(1U << 11)
-#define LOG_RAMPDOWN		(1U << 12)
-#define LOG_SAMPLES			(1U << 13)
-#define LOG_BEAT			(1U << 14)
-#define LOG_CHANNEL_READS	(1U << 15)
-#define LOG_CHANNEL_WRITES	(1U << 16)
+#define LOG_CHANNEL_READS	(1U << 11)
+#define LOG_CHANNEL_WRITES	(1U << 12)
+#define LOG_ENVELOPES		(1U << 13)
+#define LOG_SAMPLES			(1U << 14)
+#define LOG_RAMPDOWN		(1U << 15)
+#define LOG_BEAT			(1U << 16)
 #define LOG_PPU_READS		(1U << 17)
 #define LOG_PPU_WRITES		(1U << 18)
-#define LOG_IO				(LOG_IO_READS | LOG_IO_WRITES | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA)
-#define LOG_SPU				(LOG_SPU_READS | LOG_SPU_WRITES | LOG_ENVELOPES | LOG_RAMPDOWN | LOG_SAMPLES | LOG_BEAT | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
+#define LOG_IO				(LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA)
+#define LOG_CHANNELS		(LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
+#define LOG_SPU				(LOG_SPU_READS | LOG_SPU_WRITES | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES | LOG_ENVELOPES | LOG_SAMPLES | LOG_RAMPDOWN | LOG_BEAT)
 #define LOG_PPU				(LOG_PPU_READS | LOG_PPU_WRITES)
+#define LOG_ALL				(LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES)
 
 #define VERBOSE				(0)
-
 #include "logmacro.h"
+
+#define SPG_DEBUG_VIDEO		(0)
+#define SPG_DEBUG_AUDIO		(0)
 
 #if SPG2XX_VISUAL_AUDIO_DEBUG
 static const uint32_t s_visual_debug_palette[8] = {
@@ -59,11 +63,6 @@ static const uint32_t s_visual_debug_palette[8] = {
 #define SPG_VDB_EDD 2
 #define SPG_VDB_VOL 4
 #endif
-
-#define SPG_DEBUG_VIDEO		(0)
-#define SPG_DEBUG_AUDIO		(1)
-#define SPG_DEBUG_ENVELOPES	(0)
-#define SPG_DEBUG_SAMPLES	(1)
 
 #define IO_IRQ_ENABLE		m_io_regs[0x21]
 #define IO_IRQ_STATUS		m_io_regs[0x22]
@@ -586,15 +585,15 @@ READ16_MEMBER(spg2xx_device::video_r)
 	switch (offset)
 	{
 	case 0x38: // Current Line
-		LOGMASKED(LOG_PPU_READS, "video_r: Current Line: %04x\n", m_screen->vpos());
+		LOGMASKED(LOG_VLINES, "video_r: Current Line: %04x\n", m_screen->vpos());
 		return m_screen->vpos();
 
 	case 0x62: // Video IRQ Enable
-		LOGMASKED(LOG_PPU_READS, "video_r: Video IRQ Enable: %04x\n", VIDEO_IRQ_ENABLE);
+		LOGMASKED(LOG_IRQS, "video_r: Video IRQ Enable: %04x\n", VIDEO_IRQ_ENABLE);
 		return VIDEO_IRQ_ENABLE;
 
 	case 0x63: // Video IRQ Status
-		LOGMASKED(LOG_PPU_READS, "video_r: Video IRQ Status: %04x\n", VIDEO_IRQ_STATUS);
+		LOGMASKED(LOG_IRQS, "video_r: Video IRQ Status: %04x\n", VIDEO_IRQ_STATUS);
 		return VIDEO_IRQ_STATUS;
 
 	default:
@@ -700,7 +699,7 @@ WRITE16_MEMBER(spg2xx_device::video_w)
 	case 0x36: // IRQ pos V
 	case 0x37: // IRQ pos H
 		m_video_regs[offset] = data & 0x01ff;
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Video IRQ Position: %04x,%04x (%04x)\n", m_video_regs[0x37], m_video_regs[0x36], 0x2800 | offset);
+		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Position: %04x,%04x (%04x)\n", m_video_regs[0x37], m_video_regs[0x36], 0x2800 | offset);
 		if (m_video_regs[0x37] < 160 && m_video_regs[0x36] < 240)
 			m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
 		else
@@ -755,7 +754,6 @@ WRITE16_MEMBER(spg2xx_device::video_w)
 		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Acknowledge = %04x\n", data);
 		const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 		VIDEO_IRQ_STATUS &= ~data;
-		LOGMASKED(LOG_IRQS, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
 		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
 		if (changed)
 			check_video_irq();
@@ -1438,7 +1436,6 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 void spg2xx_device::check_irqs(const uint16_t changed)
 {
 	//  {
-	//      verboselog(0, "audio 1 IRQ\n");
 	//      m_cpu->set_input_line(UNSP_IRQ1_LINE, ASSERT_LINE);
 	//  }
 
@@ -1558,33 +1555,33 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		case AUDIO_CHANNEL_FIQ_ENABLE:
-			LOGMASKED(LOG_SPU_READS, "audio_r: Channel FIQ Enable: %04x\n", data);
+			LOGMASKED(LOG_SPU_READS | LOG_IRQS, "audio_r: Channel FIQ Enable: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_FIQ_STATUS:
-			LOGMASKED(LOG_SPU_READS, "audio_r: Channel FIQ Acknowledge: %04x\n", data);
+			LOGMASKED(LOG_SPU_READS | LOG_IRQS, "audio_r: Channel FIQ Acknowledge: %04x\n", data);
 			break;
 
 		case AUDIO_BEAT_BASE_COUNT:
-			LOGMASKED(LOG_SPU_READS, "audio_r: Beat Base Count: %04x\n", data);
+			LOGMASKED(LOG_SPU_READS | LOG_BEAT, "audio_r: Beat Base Count: %04x\n", data);
 			break;
 
 		case AUDIO_BEAT_COUNT:
-			LOGMASKED(LOG_SPU_READS, "audio_r: Beat Count: %04x\n", data);
+			LOGMASKED(LOG_SPU_READS | LOG_BEAT, "audio_r: Beat Count: %04x\n", data);
 			break;
 
 		case AUDIO_ENVCLK0:
 		case AUDIO_ENVCLK1:
-			LOGMASKED(LOG_SPU_READS, "audio_r: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
+			LOGMASKED(LOG_SPU_READS | LOG_ENVELOPES, "audio_r: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
 			break;
 
 		case AUDIO_ENVCLK0_HIGH:
 		case AUDIO_ENVCLK1_HIGH:
-			LOGMASKED(LOG_SPU_READS, "audio_r: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
+			LOGMASKED(LOG_SPU_READS | LOG_ENVELOPES, "audio_r: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
 			break;
 
 		case AUDIO_ENV_RAMP_DOWN:
-			LOGMASKED(LOG_SPU_READS, "audio_r: Envelope Fast Ramp Down: %04x\n", data);
+			LOGMASKED(LOG_SPU_READS | LOG_RAMPDOWN, "audio_r: Envelope Fast Ramp Down: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_STOP:
@@ -1628,7 +1625,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		case AUDIO_CHANNEL_ENV_MODE:
-			LOGMASKED(LOG_SPU_READS, "audio_r: Channel Envelope Enable: %04x\n", data);
+			LOGMASKED(LOG_SPU_READS | LOG_ENVELOPES, "audio_r: Channel Envelope Enable: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_TONE_RELEASE:
@@ -1636,7 +1633,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		case AUDIO_CHANNEL_ENV_IRQ:
-			LOGMASKED(LOG_SPU_READS, "audio_r: Channel Envelope IRQ Status: %04x\n", data);
+			LOGMASKED(LOG_SPU_READS | LOG_IRQS, "audio_r: Channel Envelope IRQ Status: %04x\n", data);
 			break;
 
 		case AUDIO_CHANNEL_PITCH_BEND:
@@ -1695,27 +1692,27 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		case AUDIO_ENVELOPE0:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
+			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
 				get_repeat_period_bit(channel), get_envelope_target(channel), get_envelope_sign_bit(channel), get_envelope_inc(channel));
 			break;
 
 		case AUDIO_ENVELOPE_DATA:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
+			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
 				get_envelope_count(channel), get_edd(channel));
 			break;
 
 		case AUDIO_ENVELOPE1:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
+			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
 				get_envelope_repeat_count(channel), get_envelope_repeat_bit(channel), get_envelope_load(channel));
 			break;
 
 		case AUDIO_ENVELOPE_ADDR_HIGH:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
+			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
 				get_audio_irq_addr(channel), get_audio_irq_enable_bit(channel), get_envelope_addr_high(channel));
 			break;
 
 		case AUDIO_ENVELOPE_ADDR:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Envelope Addr (lo): %04x \n", channel, data);
+			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Addr (lo): %04x \n", channel, data);
 			break;
 
 		case AUDIO_WAVE_DATA_PREV:
@@ -1723,7 +1720,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		case AUDIO_ENVELOPE_LOOP_CTRL:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
+			LOGMASKED(LOG_CHANNEL_READS | LOG_ENVELOPES, "audio_r: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
 				get_rampdown_offset(channel), get_envelope_eaoffset(channel));
 			break;
 
@@ -1749,7 +1746,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		case AUDIO_RAMP_DOWN_CLOCK:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Channel %d: Rampdown Clock: %04x\n", channel, data);
+			LOGMASKED(LOG_CHANNEL_READS | LOG_RAMPDOWN, "audio_r: Channel %d: Rampdown Clock: %04x\n", channel, data);
 			break;
 
 		case AUDIO_PHASE:
@@ -1776,7 +1773,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 	}
 	else if (channel >= 16)
 	{
-		LOGMASKED(LOG_SPU_READS, "audio_r: Trying to read from channel %d\n", channel);
+		LOGMASKED(LOG_CHANNEL_READS, "audio_r: Trying to read from channel %d\n", channel);
 	}
 	return data;
 }
@@ -1834,24 +1831,24 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			break;
 
 		case AUDIO_CHANNEL_FIQ_ENABLE:
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel FIQ Enable: %04x\n", data);
+			LOGMASKED(LOG_SPU_WRITES | LOG_IRQS, "audio_w: Channel FIQ Enable: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_CHANNEL_FIQ_ENABLE_MASK;
 			break;
 
 		case AUDIO_CHANNEL_FIQ_STATUS:
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel FIQ Acknowledge: %04x\n", data);
+			LOGMASKED(LOG_SPU_WRITES | LOG_IRQS, "audio_w: Channel FIQ Acknowledge: %04x\n", data);
 			m_audio_regs[offset] &= ~(data & AUDIO_CHANNEL_FIQ_STATUS_MASK);
 			break;
 
 		case AUDIO_BEAT_BASE_COUNT:
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Beat Base Count: %04x\n", data);
+			LOGMASKED(LOG_SPU_WRITES | LOG_BEAT, "audio_w: Beat Base Count: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_BEAT_BASE_COUNT_MASK;
 			m_audio_curr_beat_base_count = m_audio_regs[offset];
 			break;
 
 		case AUDIO_BEAT_COUNT:
 		{
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Beat Count: %04x\n", data);
+			LOGMASKED(LOG_SPU_WRITES | LOG_BEAT, "audio_w: Beat Count: %04x\n", data);
 			const uint16_t old = m_audio_regs[offset];
 			m_audio_regs[offset] &= ~(data & AUDIO_BIS_MASK);
 			m_audio_regs[offset] &= AUDIO_BIS_MASK;
@@ -1862,7 +1859,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			}
 			if (changed & (AUDIO_BIS_MASK | AUDIO_BIE_MASK))
 			{
-				LOGMASKED(LOG_SPU_WRITES, "BIS mask changed, updating IRQ\n");
+				LOGMASKED(LOG_BEAT, "BIS mask changed, updating IRQ\n");
 				check_irqs(changed & (AUDIO_BIS_MASK | AUDIO_BIE_MASK));
 			}
 			break;
@@ -1871,7 +1868,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 		case AUDIO_ENVCLK0:
 		case AUDIO_ENVCLK1:
 		{
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
+			LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Envelope Interval %d (lo): %04x\n", offset == AUDIO_ENVCLK0 ? 0 : 1, data);
 			const uint16_t old = m_audio_regs[offset];
 			m_audio_regs[offset] = data;
 			const uint16_t changed = old ^ m_audio_regs[offset];
@@ -1895,7 +1892,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 		case AUDIO_ENVCLK0_HIGH:
 		case AUDIO_ENVCLK1_HIGH:
 		{
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
+			LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Envelope Interval %d (hi): %04x\n", offset == AUDIO_ENVCLK0_HIGH ? 0 : 1, data);
 			const uint16_t old = m_audio_regs[offset];
 			m_audio_regs[offset] = data;
 			const uint16_t changed = old ^ m_audio_regs[offset];
@@ -1917,7 +1914,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 
 		case AUDIO_ENV_RAMP_DOWN:
 		{
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Envelope Fast Ramp Down: %04x\n", data);
+			LOGMASKED(LOG_SPU_WRITES | LOG_RAMPDOWN, "audio_w: Envelope Fast Ramp Down: %04x\n", data);
 			const uint16_t old = m_audio_regs[offset];
 			m_audio_regs[offset] = data & AUDIO_ENV_RAMP_DOWN_MASK;
 			const uint16_t changed = old ^ m_audio_regs[offset];
@@ -1991,7 +1988,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			break;
 
 		case AUDIO_CHANNEL_ENV_MODE:
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Envelope Enable: %04x\n", data);
+			LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES, "audio_w: Channel Envelope Enable: %04x\n", data);
 			m_audio_regs[offset] = data & AUDIO_CHANNEL_ENV_MODE_MASK;
 			break;
 
@@ -2001,7 +1998,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 			break;
 
 		case AUDIO_CHANNEL_ENV_IRQ:
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Envelope IRQ Acknowledge: %04x\n", data);
+			LOGMASKED(LOG_SPU_WRITES | LOG_ENVELOPES | LOG_IRQS, "audio_w: Channel Envelope IRQ Acknowledge: %04x\n", data);
 			m_audio_regs[offset] &= ~data & AUDIO_CHANNEL_ENV_IRQ_MASK;
 			break;
 
@@ -2074,31 +2071,31 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 
 		case AUDIO_ENVELOPE0:
 			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
+			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope0: %04x (RPTPER:%d, TARGET:%02x, SIGN:%d, INC:%02x)\n", channel, data,
 				get_repeat_period_bit(channel), get_envelope_target(channel), get_envelope_sign_bit(channel), get_envelope_inc(channel));
 			break;
 
 		case AUDIO_ENVELOPE_DATA:
 			m_audio_regs[offset] = data & AUDIO_ENVELOPE_DATA_MASK;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
+			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Data: %04x (CNT:%d, EDD:%02x)\n", channel, data,
 				get_envelope_count(channel), get_edd(channel));
 			break;
 
 		case AUDIO_ENVELOPE1:
 			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
+			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope1 Data: %04x (RPTCNT:%02x, RPT:%d, LOAD:%02x)\n", channel, data,
 				get_envelope_repeat_count(channel), get_envelope_repeat_bit(channel), get_envelope_load(channel));
 			break;
 
 		case AUDIO_ENVELOPE_ADDR_HIGH:
 			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
+			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Addr (hi): %04x (IRQADDR:%03x, IRQEN:%d, EADDR_HI:%02x)\n", channel, data,
 				get_audio_irq_addr(channel), get_audio_irq_enable_bit(channel), get_envelope_addr_high(channel));
 			break;
 
 		case AUDIO_ENVELOPE_ADDR:
 			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Envelope Addr (lo): %04x\n", channel, data);
+			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Addr (lo): %04x\n", channel, data);
 			break;
 
 		case AUDIO_WAVE_DATA_PREV:
@@ -2108,7 +2105,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 
 		case AUDIO_ENVELOPE_LOOP_CTRL:
 			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
+			LOGMASKED(LOG_CHANNEL_WRITES | LOG_ENVELOPES, "audio_w: Channel %d: Envelope Loop Ctrl: %04x (RDOFFS:%02x, EAOFFS:%03x)\n", channel, data,
 				get_rampdown_offset(channel), get_envelope_eaoffset(channel));
 			break;
 
@@ -2142,7 +2139,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 
 		case AUDIO_RAMP_DOWN_CLOCK:
 			m_audio_regs[offset] = data & AUDIO_RAMP_DOWN_CLOCK_MASK;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Channel %d: Rampdown Clock: %04x\n", channel, data);
+			LOGMASKED(LOG_CHANNEL_WRITES | LOG_RAMPDOWN, "audio_w: Channel %d: Rampdown Clock: %04x\n", channel, data);
 			break;
 
 		case AUDIO_PHASE:
@@ -2176,7 +2173,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 	}
 	else if (channel >= 16)
 	{
-		LOGMASKED(LOG_SPU_WRITES, "audio_w: Trying to write to channel %d: %04x = %04x\n", channel, 0x3000 + offset, data);
+		LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Trying to write to channel %d: %04x = %04x\n", channel, 0x3000 + offset, data);
 	}
 	else
 	{
@@ -2412,7 +2409,6 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 			if (tone_mode == AUDIO_TONE_MODE_HW_ONESHOT)
 			{
 				LOGMASKED(LOG_SAMPLES, "ADPCM stopped after %d samples\n", m_sample_count[channel]);
-				if (m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] & (1 << channel)) LOGMASKED(LOG_SAMPLES, "Channel %d ADPCM stopped, but tone release is set! Oops!\n", channel);
 				m_sample_count[channel] = 0;
 				stop_channel(channel);
 				return false;
@@ -2434,7 +2430,6 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 			if (tone_mode == AUDIO_TONE_MODE_HW_ONESHOT)
 			{
 				LOGMASKED(LOG_SAMPLES, "16-bit PCM stopped after %d samples\n", m_sample_count[channel]);
-				if (m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] & (1 << channel)) LOGMASKED(LOG_SAMPLES, "Channel %d 16-bit stopped, but tone release is set! Oops!\n", channel);
 				m_sample_count[channel] = 0;
 				stop_channel(channel);
 				return false;
@@ -2463,7 +2458,6 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 				if (tone_mode == AUDIO_TONE_MODE_HW_ONESHOT)
 				{
 					LOGMASKED(LOG_SAMPLES, "8-bit PCM stopped after %d samples\n", m_sample_count[channel]);
-					if (m_audio_regs[AUDIO_CHANNEL_TONE_RELEASE] & (1 << channel)) LOGMASKED(LOG_SAMPLES, "Channel %d 8-bit stopped, but tone release is set! Oops!\n", channel);
 					m_sample_count[channel] = 0;
 					stop_channel(channel);
 					return false;
@@ -2575,7 +2569,7 @@ void spg2xx_device::audio_rampdown_tick(const uint32_t channel)
 
 	if (new_edd)
 	{
-		LOGMASKED(LOG_ENVELOPES, "Channel %d preparing for next rampdown step (%02x)\n", channel, new_edd);
+		LOGMASKED(LOG_RAMPDOWN, "Channel %d preparing for next rampdown step (%02x)\n", channel, new_edd);
 		const uint16_t channel_mask = channel << 4;
 		m_audio_regs[channel_mask | AUDIO_ENVELOPE_DATA] &= ~AUDIO_EDD_MASK;
 		m_audio_regs[channel_mask | AUDIO_ENVELOPE_DATA] |= new_edd & AUDIO_EDD_MASK;
@@ -2583,7 +2577,7 @@ void spg2xx_device::audio_rampdown_tick(const uint32_t channel)
 	}
 	else
 	{
-		LOGMASKED(LOG_ENVELOPES, "Stopping channel %d due to rampdown\n", channel);
+		LOGMASKED(LOG_RAMPDOWN, "Stopping channel %d due to rampdown\n", channel);
 		const uint16_t channel_mask = 1 << channel;
 		m_audio_regs[AUDIO_CHANNEL_ENABLE] &= ~channel_mask;
 		m_audio_regs[AUDIO_CHANNEL_STATUS] &= ~channel_mask;
