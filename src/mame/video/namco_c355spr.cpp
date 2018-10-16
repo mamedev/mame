@@ -22,8 +22,8 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const 
 	m_gfx_region(0),
 	m_palxor(0),
 	m_is_namcofl(false),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, finder_base::DUMMY_TAG)
+	m_buffer(0),
+	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -41,8 +41,9 @@ void namco_c355spr_device::zdrawgfxzoom(
 	{
 		if( gfx )
 		{
-			int shadow_offset = (m_palette->shadows_enabled())?m_palette->entries():0;
-			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			device_palette_interface &palette = m_gfxdecode->palette();
+			int shadow_offset = (palette.shadows_enabled())?palette.entries():0;
+			const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 			int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
@@ -184,11 +185,13 @@ void namco_c355spr_device::zdrawgfxzoom(
 
 void namco_c355spr_device::device_start()
 {
-	//m_spriteram.resize(m_ramsize);
-	std::fill(std::begin(m_spriteram), std::end(m_spriteram), 0x0000);  // needed for Nebulas Ray
 	std::fill(std::begin(m_position), std::end(m_position), 0x0000);
+	for (int i = 0; i < 3; i++)
+	{
+		m_spriteram[i].resize(0x20000/2, 0);
+		save_item(NAME(m_spriteram[i]), i);
+	}
 
-	save_item(NAME(m_spriteram));
 	save_item(NAME(m_position));
 }
 
@@ -219,7 +222,7 @@ READ16_MEMBER( namco_c355spr_device::position_r )
 template<class _BitmapClass>
 void namco_c355spr_device::draw_sprite(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, const uint16_t *pSource, int pri, int zpos )
 {
-	uint16_t *spriteram16 = m_spriteram;
+	uint16_t *spriteram16 = &m_spriteram[m_buffer][0];
 	unsigned screen_height_remaining, screen_width_remaining;
 	unsigned source_height_remaining, source_width_remaining;
 	int hpos,vpos;
@@ -421,9 +424,9 @@ void namco_c355spr_device::draw(screen_device &screen, bitmap_ind16 &bitmap, con
 
 //  if (offs == 0)  // boot
 	// TODO: solvalou service mode wants 0x14000/2 & 0x00000/2
-		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[0x02000/2], &m_spriteram[0x00000/2]);
+		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[m_buffer][0x02000/2], &m_spriteram[m_buffer][0x00000/2]);
 //  else
-		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[0x14000/2], &m_spriteram[0x10000/2]);
+		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[m_buffer][0x14000/2], &m_spriteram[m_buffer][0x10000/2]);
 }
 
 void namco_c355spr_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
@@ -433,18 +436,27 @@ void namco_c355spr_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, con
 		screen.priority().fill(0, cliprect);
 
 //  if (offs == 0)  // boot
-		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[0x02000/2], &m_spriteram[0x00000/2]);
+		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[m_buffer][0x02000/2], &m_spriteram[m_buffer][0x00000/2]);
 //  else
-		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[0x14000/2], &m_spriteram[0x10000/2]);
+		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[m_buffer][0x14000/2], &m_spriteram[m_buffer][0x10000/2]);
 }
 
 WRITE16_MEMBER( namco_c355spr_device::spriteram_w )
 {
-	COMBINE_DATA(&m_spriteram[offset]);
+	COMBINE_DATA(&m_spriteram[0][offset]);
 }
 
 READ16_MEMBER( namco_c355spr_device::spriteram_r )
 {
-	return m_spriteram[offset];
+	return m_spriteram[0][offset];
+}
+
+WRITE_LINE_MEMBER( namco_c355spr_device::vblank )
+{
+	if (state)
+	{
+		std::copy(m_spriteram[1].begin(), m_spriteram[1].end(), m_spriteram[2].begin());
+		std::copy(m_spriteram[0].begin(), m_spriteram[0].end(), m_spriteram[1].begin());
+	}
 }
 

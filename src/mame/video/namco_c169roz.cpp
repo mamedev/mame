@@ -19,32 +19,44 @@
 #include "emu.h"
 #include "namco_c169roz.h"
 
+static const gfx_layout layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	{ STEP16(0,8*16) },
+	16*128
+};
+
+GFXDECODE_START( namco_c169roz_device::gfxinfo )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout, 0, 32 )
+GFXDECODE_END
+
 DEFINE_DEVICE_TYPE(NAMCO_C169ROZ, namco_c169roz_device, "namco_c169roz", "Namco C169 (ROZ)")
 
 namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCO_C169ROZ, tag, owner, clock),
-	m_gfx_region(0),
-	m_mask(nullptr),
+	device_gfx_interface(mconfig, *this, gfxinfo),
+	m_color_base(0),
 	m_is_namcofl(false),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_maskregion(*this, finder_base::DUMMY_TAG)
+	m_mask(*this, "mask")
 {
 }
 
 void namco_c169roz_device::device_start()
 {
-	m_mask = m_maskregion->base();
-
 	m_videoram.resize(m_ramsize);
 	std::fill(std::begin(m_videoram), std::end(m_videoram), 0x0000);
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode,
+	m_tilemap[0] = &machine().tilemap().create(*this,
 		tilemap_get_info_delegate(FUNC(namco_c169roz_device::get_info<0>), this),
 		tilemap_mapper_delegate(FUNC(namco_c169roz_device::mapper), this),
 		16, 16,
 		256, 256);
 
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode,
+	m_tilemap[1] = &machine().tilemap().create(*this,
 		tilemap_get_info_delegate(FUNC(namco_c169roz_device::get_info<1>), this),
 		tilemap_mapper_delegate(FUNC(namco_c169roz_device::mapper), this),
 		16, 16,
@@ -73,7 +85,7 @@ TILE_GET_INFO_MEMBER(namco_c169roz_device::get_info)
 	m_c169_cb(m_videoram[tile_index&(m_ramsize-1)] & 0x3fff, &tile, &mask, Which); // need to mask with ramsize because the nb1/fl games have twice as much RAM, presumably the tilemaps mirror in ns2?
 
 	tileinfo.mask_data = m_mask + 32 * mask;
-	SET_TILE_INFO_MEMBER(m_gfx_region, tile, 0/*color*/, 0/*flag*/);
+	SET_TILE_INFO_MEMBER(0, tile, 0/*color*/, 0/*flag*/);
 }
 
 TILEMAP_MAPPER_MEMBER( namco_c169roz_device::mapper )
@@ -160,7 +172,7 @@ void namco_c169roz_device::draw_helper(screen_device &screen, bitmap_ind16 &bitm
 				uint32_t xpos = (((cx >> 16) & size_mask) + params.left) & 0xfff;
 				uint32_t ypos = (((cy >> 16) & size_mask) + params.top) & 0xfff;
 				if (flagsbitmap.pix(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
-					*dest = srcbitmap.pix(ypos, xpos) + params.color;
+					*dest = srcbitmap.pix(ypos, xpos) + params.color + m_color_base;
 				cx += params.incxx;
 				cy += params.incxy;
 				x++;
@@ -173,7 +185,7 @@ void namco_c169roz_device::draw_helper(screen_device &screen, bitmap_ind16 &bitm
 	}
 	else
 	{
-		tmap.set_palette_offset(params.color);
+		tmap.set_palette_offset(m_color_base + params.color);
 		tmap.draw_roz(
 			screen,
 			bitmap,
