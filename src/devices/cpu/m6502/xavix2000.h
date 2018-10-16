@@ -25,8 +25,7 @@ public:
 
 #define O(o) void o ## _full(); void o ## _partial()
 
-	// xaviv opcodes
-	O(unh_imp);
+	// Super XaviX opcodes
 
 	O(phx_imp); // 12
 	O(phy_imp); // 52
@@ -116,6 +115,28 @@ public:
 	O(ldapb_imp); // (lda ($PB), y) ?
 	O(cmppb_imp); // (cmp ($PB), y) ?
 	O(sbcpb_imp); // (sbc ($PB), y) ?
+
+	O(stx_aby);
+	O(sty_abx);
+
+	O(stz_aba);
+	O(stz_zpg);
+
+	O(bit_zpx);
+	O(bit_abx);
+	O(bit_imm);
+
+	O(asr_zpg);
+	O(asr_aba);
+	O(asr_zpx);
+	O(asr_acc);
+	O(asr_abx);
+
+	O(cmc_imp);
+	O(sev_imp);
+
+	O(callf_aba);
+	O(callf_ind);
 
 #undef O
 
