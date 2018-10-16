@@ -40,6 +40,22 @@ clrl_imp
 	m_l = 0;
 	prefetch();
 
+decl_imp
+	read_pc_noinc();
+	prefetch();
+
+notl_imp
+	read_pc_noinc();
+	prefetch();
+
+incl_imp
+	read_pc_noinc();
+	prefetch();
+
+negl_imp
+	read_pc_noinc();
+	prefetch();
+
 oral0_acc
 	read_pc_noinc();
 	prefetch();

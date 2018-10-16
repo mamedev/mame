@@ -34,7 +34,11 @@ public:
 	O(ply_imp); // 72
 
 	O(clrl_imp); // b2
-	
+	O(decl_imp); // c2
+	O(notl_imp); // d2
+	O(incl_imp); // e2
+	O(negl_imp); // f2
+
 	O(oral0_acc);
 	O(oral1_acc);
 	O(oral2_acc);

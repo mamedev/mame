@@ -6,15 +6,15 @@ bpl_rel     unh_imp     phx_imp     orapa_imp   unh_imp     unh_imp     unh_imp 
 jsr_adr     unh_imp     callf_xa3   andl0_acc   unh_imp     unh_imp     rol_zpg     andl1_acc   plp_imp     and_imm     rol_acc     andl2_acc   bit_aba     unh_imp     unh_imp     andl3_acc
 bmi_rel     unh_imp     plx_imp     andpa_imp   unh_imp     unh_imp     unh_imp     andpb_imp   sec_imp     unh_imp     unh_imp     lpa0_acc    unh_imp     unh_imp     rol_abx     lpb0_acc
 rti_xav_imp unh_imp     nop_imp     eorl0_acc   nop_imp     eor_zpg     lsr_zpg     eorl1_acc   pha_imp     eor_imm     lsr_acc     eorl2_acc   jmp_adr     unh_imp     lsr_aba     eorl3_acc
-unh_imp     eor_idy     phy_imp     eorpa_imp   nop_imp     unh_imp     unh_imp     eorpb_imp   cli_imp     eor_aby     unh_imp     spa1_acc    unh_imp     eor_abx     unh_imp     spb1_acc
-rts_imp     unh_imp     nop_imp     adcl0_acc   unh_imp     adc_zpg     ror_zpg     adcl1_acc   pla_imp     adc_imm     unh_imp     adcl2_acc   jmp_ind     unh_imp     unh_imp     adcl3_acc
-bvs_rel     adc_idy     ply_imp     adcpa_imp   unh_imp     unh_imp     unh_imp     adcpb_imp   sei_imp     unh_imp     unh_imp     lpa1_acc    unh_imp     unh_imp     unh_imp     lpb1_acc
+unh_imp     eor_idy     phy_imp     eorpa_imp   nop_imp     unh_imp     unh_imp     eorpb_imp   cli_imp     eor_aby     nop_imp     spa1_acc    unh_imp     eor_abx     unh_imp     spb1_acc
+rts_imp     unh_imp     nop_imp     adcl0_acc   nop_imp     adc_zpg     ror_zpg     adcl1_acc   pla_imp     adc_imm     unh_imp     adcl2_acc   jmp_ind     unh_imp     unh_imp     adcl3_acc
+bvs_rel     adc_idy     ply_imp     adcpa_imp   nop_imp     unh_imp     unh_imp     adcpb_imp   sei_imp     unh_imp     nop_imp     lpa1_acc    unh_imp     unh_imp     unh_imp     lpb1_acc
 retf_imp    unh_imp     unh_imp     stal0_acc   sty_zpg     sta_zpg     stx_zpg     stal1_acc   dey_imp     unh_imp     txa_imp     stal2_acc   unh_imp     sta_aba     stx_aba     stal3_acc
 bcc_rel     sta_idy     unh_imp     stapa_imp   unh_imp     unh_imp     stx_zpy     stapb_imp   tya_imp     sta_aby     txs_imp     spa2_acc    unh_imp     sta_abx     unh_imp     spb2_acc
 ldy_imm     unh_imp     ldx_imm     ldal0_acc   ldy_zpg     lda_zpg     ldx_zpg     ldal1_acc   tay_imp     lda_imm     tax_imp     ldal2_acc   unh_imp     lda_aba     ldx_aba     ldal3_acc
 bcs_rel     lda_idy     clrl_imp    ldapa_imp   unh_imp     unh_imp     ldx_zpy     ldapb_imp   clv_imp     lda_aby     tsx_imp     lpa2_acc    unh_imp     lda_abx     ldx_aby     lpb2_acc
-cpy_imm     unh_imp     unh_imp     cmpl0_acc   cpy_zpg     cmp_zpg     dec_zpg     cmpl1_acc   iny_imp     cmp_imm     dex_imp     cmpl2_acc   unh_imp     unh_imp     dec_aba     cmpl3_acc
-bne_rel     cmp_idy     unh_imp     cmppa_imp   nop_imp     unh_imp     unh_imp     cmppb_imp   unh_imp     cmp_aby     unh_imp     decpa_imp   unh_imp     unh_imp     dec_abx     decpb_imp
-cpx_imm     unh_imp     unh_imp     sbcl0_acc   cpx_zpg     sbc_zpg     inc_zpg     sbcl1_acc   inx_imp     sbc_imm     nop_imp     sbcl2_acc   unh_imp     unh_imp     unh_imp     sbcl3_acc
-beq_rel     unh_imp     unh_imp     sbcpa_imp   nop_imp     unh_imp     unh_imp     sbcpb_imp   unh_imp     unh_imp     unh_imp     incpa_imp   unh_imp     unh_imp     unh_imp     incpb_imp
+cpy_imm     unh_imp     decl_imp    cmpl0_acc   cpy_zpg     cmp_zpg     dec_zpg     cmpl1_acc   iny_imp     cmp_imm     dex_imp     cmpl2_acc   unh_imp     unh_imp     dec_aba     cmpl3_acc
+bne_rel     cmp_idy     notl_imp    cmppa_imp   nop_imp     unh_imp     unh_imp     cmppb_imp   unh_imp     cmp_aby     nop_imp     decpa_imp   unh_imp     unh_imp     dec_abx     decpb_imp
+cpx_imm     unh_imp     incl_imp    sbcl0_acc   cpx_zpg     sbc_zpg     inc_zpg     sbcl1_acc   inx_imp     sbc_imm     nop_imp     sbcl2_acc   unh_imp     unh_imp     unh_imp     sbcl3_acc
+beq_rel     unh_imp     negl_imp    sbcpa_imp   nop_imp     unh_imp     unh_imp     sbcpb_imp   unh_imp     unh_imp     nop_imp     incpa_imp   unh_imp     unh_imp     unh_imp     incpb_imp
 reset
