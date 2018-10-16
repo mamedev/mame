@@ -2,18 +2,18 @@
 # copyright-holders:David Haywood
 # XaviX (SSD 2000) - m6502 with custom opcodes
 brk_xav_imp unh_imp     unh_imp     unh_imp     unh_imp     ora_zpg     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     ora_aba     unh_imp     unh_imp
-bpl_rel     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
+bpl_rel     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     clc_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 jsr_adr     unh_imp     callf_xa3   unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     and_imm     unh_imp     unh_imp     bit_aba     unh_imp     unh_imp     unh_imp
 unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     sec_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 rti_xav_imp unh_imp     unh_imp     unh_imp     unh_imp     eor_zpg     unh_imp     unh_imp     pha_imp     eor_imm     lsr_acc     unh_imp     jmp_adr     unh_imp     unh_imp     unh_imp
 unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 rts_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     ror_zpg     unh_imp     pla_imp     adc_imm     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 unh_imp     adc_idy     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
-retf_imp    unh_imp     unh_imp     unh_imp     sty_zpg     sta_zpg     stx_zpg     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     sta_aba     stx_aba     unh_imp
-unh_imp     sta_idy     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     txs_imp     unh_imp     unh_imp     sta_abx     unh_imp     unh_imp
-ldy_imm     unh_imp     ldx_imm     unh_imp     unh_imp     lda_zpg     ldx_zpg     unh_imp     tay_imp     lda_imm     unh_imp     unh_imp     unh_imp     lda_aba     unh_imp     unh_imp
+retf_imp    unh_imp     unh_imp     unh_imp     sty_zpg     sta_zpg     stx_zpg     unh_imp     dey_imp     unh_imp     txa_imp     unh_imp     unh_imp     sta_aba     stx_aba     unh_imp
+bcc_rel     sta_idy     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     sta_aby     txs_imp     unh_imp     unh_imp     sta_abx     unh_imp     unh_imp
+ldy_imm     unh_imp     ldx_imm     unh_imp     unh_imp     lda_zpg     ldx_zpg     unh_imp     tay_imp     lda_imm     tax_imp     unh_imp     unh_imp     lda_aba     unh_imp     unh_imp
 unh_imp     unh_imp     clr_acc     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
-unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     dec_zpg     unh_imp     iny_imp     cmp_imm     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
+unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     dec_zpg     unh_imp     iny_imp     cmp_imm     dex_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 bne_rel     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 cpx_imm     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     inc_zpg     unh_imp     inx_imp     sbc_imm     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 beq_rel     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
