@@ -25,31 +25,39 @@
     some of the documented but 'undocumented' opcodes on the 6502 to have additonal
     meaning for one specific function on startup
 
-    01BC37: A0 3F       ldy #$3f
-    01BC39: B2          ??
-    01BC3A: 1B          ??
-            9B          ??
-    -- outer loop
-    01BC3C: 98          tya
-    01BC3D: 5B          (has to be 1 byte?)
-    -- inner loop
-    01BC3E: A3          (has to be 1 byte)
-            73          (could be 3 byte?)
-    01BC40: 83 FB       presumably fb is the address
-    01BC42: A7          (presumably 1 byte)
-            73          (could be 3 byte?)
-    01BC44: 87 FB       presumably fb is the address
-    01BC46: D0 F6       bne $1bc3e
-    01BC48: 88          dey
-    01BC49: 10 F1       bpl $1bc3c
-    01BC4B: 8D FB 00    sta $00fb
-    01BC4E: A3          ??
-    01BC4F: 8D FA 00    sta $00fa
-    01BC52: 07          ??
-    --
-    01BC53: D0 03       bne $1bc58
-    01BC55: CE fa 00    dec $00fa
-    01BC58: 80          retf
+	a is 80 when entering here?
+
+	01BC37: A0 3F       ldy #$3f
+	01BC39: B2          clrl      // clear 32-bit 'long' register (part of it might be the accumulator?) (or clear accumulator?)
+	01BC3A: 1B          spa0 a    // store 'accumulator' into byte 0 of PA 'address' register
+	01BC3B: 9B          spa2 a    // store 'accumulator' into byte 2 of PA 'address' register
+	
+	-- loop point 2
+	01BC3C: 98          tya       // y -> a  (3f on first run of loop)
+	01BC3D: 5B          spa1 a    // store 'accumulator' into byte 1 of PA 'address' register  (803f80 on first loop? 003f00 if we clear accumulator with clrl instead) maybe should be 3f0000 ? (would make more sense for a ram test)
+	
+	-- loop point 1
+	01BC3E: A3          ldal0 a   // read byte 0 of 32-bit 'long' register into accumulator
+	01BC3F: 73          adcpa     // adc ($Address PA), y
+	01BC40: 83          stal0 a   // store accumulator back in byte 0 of 32-bit 'long' register (even byte checksum?)
+	01BC41: FB          incpa     // increase 'address' register PA
+	01BC42: A7          ldal1 a   // read byte 1 of 32-bit 'long' register into accumulator
+	01BC43: 73          adcpa     // adc ($Address PA), y
+	01BC44: 87          stal1 a   // store accumulator back in byte 0 of 32-bit 'long' register (odd byte checksum?)
+	01BC45: FB          incpa     // increase 'address' register PA
+	01BC46: D0 F6       bne $1bc3e // (branch based on PA increase, so PA must set flags?, probably overflows at 0xffff if upper byte is 'bank'?)
+
+	01BC48: 88          dey          // decrease y, which contained 3f at the start
+	01BC49: 10 F1       bpl $1bc3c  // branch back to loop point 2 to reload counter
+
+	// contains the odd byte checksum once we drop out the loop
+	01BC4B: 8D FB 00    sta $00fb // store it in zero page memory
+	01BC4E: A3          ldal0 a  // get the even byte checksum from byte 0 of 32-bit 'long' register 
+	01BC4F: 8D FA 00    sta $00fa // store it in zero page memory
+	01BC52: 07          oral1 a   // why do we want to do this? (routine below does it too)
+	01BC53: D0 03       bne $1bc58
+	01BC55: CE FA 00    dec $00fa
+	01BC58: 80          retf
 
     this is presumably meant to be similar to the function found in Namco
     Nostalgia 2
