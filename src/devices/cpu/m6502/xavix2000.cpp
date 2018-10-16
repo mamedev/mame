@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-    xavix2000.cpp
+    xavix2000.cpp (Super XaviX)
 
     The dies for these are marked
 
