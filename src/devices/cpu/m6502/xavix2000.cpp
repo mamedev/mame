@@ -25,6 +25,8 @@
     some of the documented but 'undocumented' opcodes on the 6502 to have additonal
     meaning for one specific function on startup
 
+	this just seems to be some very buggy checksum code where the games don't even care about the result...
+
 	a is 80 when entering here?
 
 	01BC37: A0 3F       ldy #$3f
@@ -45,7 +47,7 @@
 	01BC43: 73          adcpa     // adc ($Address PA), y
 	01BC44: 87          stal1 a   // store accumulator back in byte 0 of 32-bit 'long' register (odd byte checksum?)
 	01BC45: FB          incpa     // increase 'address' register PA
-	01BC46: D0 F6       bne $1bc3e // (branch based on PA increase, so PA must set flags?, probably overflows at 0xffff if upper byte is 'bank'?)
+	01BC46: D0 F6       bne $1bc3e // (branch based on PA increase, so PA must set flags?, probably overflows after 0xffff if upper byte is 'bank'? or at 0xff if this really is a mirror of the function below
 
 	01BC48: 88          dey          // decrease y, which contained 3f at the start
 	01BC49: 10 F1       bpl $1bc3c  // branch back to loop point 2 to reload counter
@@ -62,21 +64,25 @@
     this is presumably meant to be similar to the function found in Namco
     Nostalgia 2
 
+	// A is 80 on entry
     09FFD8: A9 3F       lda #$3f
-    09FFDA: 85 01       sta $01
-    09FFDC: A0 00       ldy #$00
-    09FFDE: AD FA 00    lda $00fa
-    09FFE1: 71 00       adc ($00), y
-    09FFE3: 8D FA 00    sta $00fa
-    09FFE6: C8          iny
-    09FFE7: AD FB 00    lda $00fb
-    09FFEA: 71 00       adc ($00), y
-    09FFEC: 8D FB 00    sta $00fb
-    09FFEF: C8          iny
-    09FFF0: D0 EC       bne $c
-    09FFF2: C6 01       dec $01
-    09FFF4: 10 E8       bpl $9ffde
-    09FFF6: 0D FA 00    ora $00fa
+    09FFDA: 85 01       sta $01   // set upper bit of pointer at 0x0000 to 3f  (it completely fails to initialize the ram at 00, we currently init it to ff, but should probably be 0?)
+    09FFDC: A0 00       ldy #$00  // clear inner loop counter
+	-- loop point 1 and 2
+    09FFDE: AD FA 00    lda $00fa     // read current even byte checksum value from zero page ram fa (game also completely fails to initialize this)
+    09FFE1: 71 00       adc ($00), y  // so 3f00 + y first outer loop, 3e00 + y second outer loop with y increasing in inner loop (add byte read to even checksum byte?)
+    09FFE3: 8D FA 00    sta $00fa     // store even checksum at 0xfa in zero page ram
+    09FFE6: C8          iny           // increase counter y
+    09FFE7: AD FB 00    lda $00fb     // read current odd byte checksum value from zero page ram fb (likewise never initialized!)
+    09FFEA: 71 00       adc ($00), y  // 3f00 + y (add byte read to odd checksum byte)
+    09FFEC: 8D FB 00    sta $00fb     // store odd checksum byte at 0xfb in zero page ram
+    09FFEF: C8          iny           // increase y
+    09FFF0: D0 EC       bne $9ffde    // branch back if y hasn't overflowed (so work on 0x100 bytes, looping back 0x7f times)
+    09FFF2: C6 01       dec $01       // decrease accumulator (started at 3f) (inner loop counter already 0 because it overflowed)
+    09FFF4: 10 E8       bpl $9ffde    // branch back
+
+	// checksums are already in place after loop so no need to copy them like in above
+	09FFF6: 0D FA 00    ora $00fa  // same weird 'or' call
     --
     09FFF9: D0 03       bne $9fffe
     09FFFB: CE FA 00    dec $00fa
