@@ -2031,6 +2031,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_c355)
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
@@ -2086,6 +2087,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_c355)
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
@@ -2141,6 +2143,7 @@ MACHINE_CONFIG_START(namcos2_state::suzuka8h)
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_c355)
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());

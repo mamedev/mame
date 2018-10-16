@@ -1062,6 +1062,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_c116, gfx_namconb1)
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));

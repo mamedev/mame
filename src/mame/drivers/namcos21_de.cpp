@@ -223,6 +223,7 @@ MACHINE_CONFIG_START(namco_de_pcbstack_device::device_add_mconfig)
 	m_namcos21_3d->set_framebuffer_size(496,480);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
