@@ -26,6 +26,7 @@
     meaning for one specific function on startup
 
 	this just seems to be some very buggy checksum code where the games don't even care about the result...
+	(actually it looks like some games might be using it as a PRNG seed?)
 
 	a is 80 when entering here?
 
