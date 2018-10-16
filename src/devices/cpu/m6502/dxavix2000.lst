@@ -3,18 +3,18 @@
 # Super XaviX (SSD 2000) - m6502 with custom opcodes
 brk_xav_imp unh_imp     unh_imp     unh_imp     unh_imp     ora_zpg     unh_imp     unh_imp     php_imp     unh_imp     asl_acc     unh_imp     unh_imp     ora_aba     unh_imp     unh_imp
 bpl_rel     unh_imp     phx_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     clc_imp     ora_aby     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
-jsr_adr     unh_imp     callf_xa3   unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     plp_imp     and_imm     unh_imp     unh_imp     bit_aba     unh_imp     unh_imp     unh_imp
-unh_imp     unh_imp     plx_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     sec_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
+jsr_adr     unh_imp     callf_xa3   unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     plp_imp     and_imm     rol_acc     unh_imp     bit_aba     unh_imp     unh_imp     unh_imp
+bmi_rel     unh_imp     plx_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     sec_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     rol_abx     unh_imp
 rti_xav_imp unh_imp     unh_imp     unh_imp     unh_imp     eor_zpg     lsr_zpg     unh_imp     pha_imp     eor_imm     lsr_acc     unh_imp     jmp_adr     unh_imp     lsr_aba     unh_imp
-unh_imp     unh_imp     phy_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     cli_imp     eor_aby     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
-rts_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     ror_zpg     unh_imp     pla_imp     adc_imm     unh_imp     unh_imp     jmp_ind     unh_imp     unh_imp     unh_imp
+unh_imp     eor_idy     phy_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     cli_imp     eor_aby     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
+rts_imp     unh_imp     unh_imp     unh_imp     unh_imp     adc_zpg     ror_zpg     unh_imp     pla_imp     adc_imm     unh_imp     unh_imp     jmp_ind     unh_imp     unh_imp     unh_imp
 unh_imp     adc_idy     ply_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     sei_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 retf_imp    unh_imp     unh_imp     unh_imp     sty_zpg     sta_zpg     stx_zpg     unh_imp     dey_imp     unh_imp     txa_imp     unh_imp     unh_imp     sta_aba     stx_aba     unh_imp
-bcc_rel     sta_idy     unh_imp     unh_imp     unh_imp     unh_imp     stx_zpy     unh_imp     unh_imp     sta_aby     txs_imp     unh_imp     unh_imp     sta_abx     unh_imp     unh_imp
+bcc_rel     sta_idy     unh_imp     unh_imp     unh_imp     unh_imp     stx_zpy     unh_imp     tya_imp     sta_aby     txs_imp     unh_imp     unh_imp     sta_abx     unh_imp     unh_imp
 ldy_imm     unh_imp     ldx_imm     unh_imp     ldy_zpg     lda_zpg     ldx_zpg     unh_imp     tay_imp     lda_imm     tax_imp     unh_imp     unh_imp     lda_aba     unh_imp     unh_imp
-bcs_rel     lda_idy     clr_acc     unh_imp     unh_imp     unh_imp     ldx_zpy     unh_imp     unh_imp     lda_aby     tsx_imp     unh_imp     unh_imp     lda_abx     ldx_aby     unh_imp
+bcs_rel     lda_idy     clr_acc     unh_imp     unh_imp     unh_imp     ldx_zpy     unh_imp     clv_imp     lda_aby     tsx_imp     unh_imp     unh_imp     lda_abx     ldx_aby     unh_imp
 cpy_imm     unh_imp     unh_imp     unh_imp     cpy_zpg     cmp_zpg     dec_zpg     unh_imp     iny_imp     cmp_imm     dex_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
-bne_rel     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
+bne_rel     cmp_idy     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 cpx_imm     unh_imp     unh_imp     unh_imp     cpx_zpg     sbc_zpg     inc_zpg     unh_imp     inx_imp     sbc_imm     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 beq_rel     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp     unh_imp
 reset
