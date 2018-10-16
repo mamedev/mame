@@ -7,12 +7,6 @@ unh_imp
 	read_pc_noinc();
 	prefetch();
 
-clr_acc
-	read_pc_noinc();
-	A = 0;
-	set_nz(A);
-	prefetch();
-
 phy_imp
 	read_pc_noinc();
 	write(SP, Y);
@@ -40,3 +34,265 @@ ply_imp
 	Y = read(SP);
 	set_nz(Y);
 	prefetch();
+
+clrl_imp
+	read_pc_noinc();
+	m_l = 0;
+	prefetch();
+
+oral0_acc
+	read_pc_noinc();
+	prefetch();
+
+oral1_acc
+	read_pc_noinc();
+	prefetch();
+
+oral2_acc
+	read_pc_noinc();
+	prefetch();
+
+oral3_acc
+	read_pc_noinc();
+	prefetch();
+
+andl0_acc
+	read_pc_noinc();
+	prefetch();
+
+andl1_acc
+	read_pc_noinc();
+	prefetch();
+
+andl2_acc
+	read_pc_noinc();
+	prefetch();
+
+andl3_acc
+	read_pc_noinc();
+	prefetch();
+
+eorl0_acc
+	read_pc_noinc();
+	prefetch();
+
+eorl1_acc
+	read_pc_noinc();
+	prefetch();
+
+eorl2_acc
+	read_pc_noinc();
+	prefetch();
+
+eorl3_acc
+	read_pc_noinc();
+	prefetch();
+
+adcl0_acc
+	read_pc_noinc();
+	prefetch();
+
+adcl1_acc
+	read_pc_noinc();
+	prefetch();
+
+adcl2_acc
+	read_pc_noinc();
+	prefetch();
+
+adcl3_acc
+	read_pc_noinc();
+	prefetch();
+	
+stal0_acc
+	read_pc_noinc();
+	prefetch();
+
+stal1_acc
+	read_pc_noinc();
+	prefetch();
+
+stal2_acc
+	read_pc_noinc();
+	prefetch();
+
+stal3_acc
+	read_pc_noinc();
+	prefetch();
+
+ldal0_acc
+	read_pc_noinc();
+	prefetch();
+
+ldal1_acc
+	read_pc_noinc();
+	prefetch();
+
+ldal2_acc
+	read_pc_noinc();
+	prefetch();
+
+ldal3_acc
+	read_pc_noinc();
+	prefetch();
+
+cmpl0_acc
+	read_pc_noinc();
+	prefetch();
+
+cmpl1_acc
+	read_pc_noinc();
+	prefetch();
+
+cmpl2_acc
+	read_pc_noinc();
+	prefetch();
+
+cmpl3_acc
+	read_pc_noinc();
+	prefetch();
+
+sbcl0_acc
+	read_pc_noinc();
+	prefetch();
+
+sbcl1_acc
+	read_pc_noinc();
+	prefetch();
+
+sbcl2_acc
+	read_pc_noinc();
+	prefetch();
+
+sbcl3_acc
+	read_pc_noinc();
+	prefetch();
+
+spa0_acc
+	read_pc_noinc();
+	prefetch();
+
+lpa0_acc
+	read_pc_noinc();
+	prefetch();
+
+spa1_acc
+	read_pc_noinc();
+	prefetch();
+
+lpa1_acc
+	read_pc_noinc();
+	prefetch();
+	
+spa2_acc
+	read_pc_noinc();
+	prefetch();
+
+lpa2_acc
+	read_pc_noinc();
+	prefetch();
+
+spb0_acc
+	read_pc_noinc();
+	prefetch();
+
+lpb0_acc
+	read_pc_noinc();
+	prefetch();
+
+spb1_acc
+	read_pc_noinc();
+	prefetch();
+
+lpb1_acc
+	read_pc_noinc();
+	prefetch();
+
+spb2_acc
+	read_pc_noinc();
+	prefetch();
+
+lpb2_acc
+	read_pc_noinc();
+	prefetch();
+
+incpa_imp
+	read_pc_noinc();
+	prefetch();
+
+incpb_imp
+	read_pc_noinc();
+	prefetch();
+
+decpa_imp
+	read_pc_noinc();
+	prefetch();
+
+decpb_imp
+	read_pc_noinc();
+	prefetch();
+
+orapa_imp
+	read_pc_noinc();
+	prefetch();
+
+andpa_imp
+	read_pc_noinc();
+	prefetch();
+
+eorpa_imp
+	read_pc_noinc();
+	prefetch();
+
+adcpa_imp
+	read_pc_noinc();
+	prefetch();
+
+stapa_imp
+	read_pc_noinc();
+	prefetch();
+
+ldapa_imp
+	read_pc_noinc();
+	prefetch();
+
+cmppa_imp
+	read_pc_noinc();
+	prefetch();
+
+sbcpa_imp
+	read_pc_noinc();
+	prefetch();
+	
+orapb_imp
+	read_pc_noinc();
+	prefetch();
+
+andpb_imp
+	read_pc_noinc();
+	prefetch();
+
+eorpb_imp
+	read_pc_noinc();
+	prefetch();
+
+adcpb_imp
+	read_pc_noinc();
+	prefetch();
+
+stapb_imp
+	read_pc_noinc();
+	prefetch();
+
+ldapb_imp
+	read_pc_noinc();
+	prefetch();
+
+cmppb_imp
+	read_pc_noinc();
+	prefetch();
+
+sbcpb_imp
+	read_pc_noinc();
+	prefetch();
+
