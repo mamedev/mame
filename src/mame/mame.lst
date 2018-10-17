@@ -10180,6 +10180,7 @@ mswordj                         // 23/06/1990 (c) 1990 (Japan)
 mswordr1                        // 23/06/1990 (c) 1990 (World)
 mswordu                         // 25/07/1990 (c) 1990 (USA)
 mtwins                          // 19/06/1990 (c) 1990 (World)
+mtwinsb                         // bootleg
 nemo                            // 30/11/1990 (c) 1990 (World)
 nemoj                           // 20/11/1990 (c) 1990 (Japan)
 nemor1                          // 09/11/1990 (c) 1990 (World)
@@ -21644,6 +21645,7 @@ dirtdvlsa                       //
 dirtdvlsj                       //
 eca                             // 1999.10 Kyukyuusya Emergency Call Ambulance
 ecap                            // 1999.12 Emergency Call Ambulance - US proto or location test
+ecaj                            //
 ecau                            //
 fvipers2                        // 1998.04 Fighting Vipers 2
 getbass                         //
@@ -29267,6 +29269,7 @@ timecris                        // (c) 1995
 timecrisa                       // (c) 1995
 tokyowar                        // (c) 1996
 victlapw                        // (c) 1996
+victlapj                        // (c) 1996
 
 @source:namcos23.cpp
 500gp                           // March 1999
@@ -30339,8 +30342,9 @@ spec2k                          // (c) 2000 Yonatech
 spec2kh                         // (c) 2000 Yonatech
 ssmissin                        // (c) 1992 Comad
 stagger1                        // (c) 1998
-strahl                          // UPL-91074 (c) 1992 UPL (Japan)
-strahla                         // UPL-91074 (c) 1992 UPL (Japan)
+strahl                           // UPL-91074 (c) 1992 UPL (World)
+strahlj                          // UPL-91074 (c) 1992 UPL (Japan)
+strahlja                         // UPL-91074 (c) 1992 UPL (Japan)
 tdragon                         // (c) 1991 NMK / Tecmo
 tdragon1                        // (c) 1991 NMK / Tecmo
 tdragon2                        // UPL-93091 (c) 1993 NMK
@@ -33819,6 +33823,7 @@ stratgyx                        // GX306 (c) 1981 Konami
 strongx                         // bootleg
 tazmani2                        // (c) 1982 Stern
 tazmani3                        // bootleg (Rodmar)
+tazmaniet                       // bootleg (U.R.V. BBCPE)
 
 @source:scopus.cpp
 sagitta180                      // 1979?
@@ -36368,6 +36373,7 @@ wmatch                          // (c) 1984 (S1)
 
 @source:system16.cpp
 altbeastbl                      //
+altbeastbl2                     //
 astormb2                        // BOOTLEG
 astormbl                        // BOOTLEG
 bayrouteb1                      // (c) 1989 (protected) (bootleg)

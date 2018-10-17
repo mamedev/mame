@@ -1,59 +1,42 @@
 # license:BSD-3-Clause
 # copyright-holders:David Haywood
-# xavix2000 opcodes
+# xavix2000 opcodes (Super XaviX)
 
-plx_imp
+unh_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
 	prefetch();
 
-phx_imp
+clr_acc
 	read_pc_noinc();
-	prefetch();
-
-ply_imp
-	read_pc_noinc();
+	A = 0;
+	set_nz(A);
 	prefetch();
 
 phy_imp
 	read_pc_noinc();
+	write(SP, Y);
+	dec_SP();
 	prefetch();
 
-unk1b_imp
+phx_imp
 	read_pc_noinc();
+	write(SP, X);
+	dec_SP();
 	prefetch();
 
-unk5b_imp
+plx_imp
 	read_pc_noinc();
+	read(SP);
+	inc_SP();
+	X = read(SP);
+	set_nz(X);
 	prefetch();
 
-unk9b_imp
+ply_imp
 	read_pc_noinc();
-	prefetch();
-
-unka3_imp
-	read_pc_noinc();
-	prefetch();
-
-unka7_imp
-	read_pc_noinc();
-	prefetch();
-
-unk07_imp
-	read_pc_noinc();
-	prefetch();
-
-unkb2_imp
-	read_pc_noinc();
-	prefetch();
-
-unk73_imp
-	read_pc_noinc();
-	prefetch();
-
-unk87_imm
-	read_pc();
-	prefetch();
-
-unk83_imm
-	read_pc();
+	read(SP);
+	inc_SP();
+	Y = read(SP);
+	set_nz(Y);
 	prefetch();
