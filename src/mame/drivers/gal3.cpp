@@ -137,7 +137,7 @@ better notes (complete chip lists) for each board still needed
 #include "video/namco_c355spr.h"
 #include "machine/namcos21_dsp_c67.h"
 #include "video/namcos21_3d.h"
-
+#include "emupal.h"
 
 #define NAMCOS21_NUM_COLORS 0x8000
 
@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_PALETTE_FORMAT(XBRG)
 
 	NAMCO_C355SPR(config, m_c355spr[0], 0);
-	m_c355spr[0]->set_palette_tag("palette_1");
+	m_c355spr[0]->set_screen("lscreen");
 	m_c355spr[0]->set_gfxdecode_tag("gfxdecode_1");
 	m_c355spr[0]->set_is_namcofl(false);
 	m_c355spr[0]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
@@ -684,7 +684,7 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_PALETTE_FORMAT(XBRG)
 
 	NAMCO_C355SPR(config, m_c355spr[1], 0);
-	m_c355spr[1]->set_palette_tag("palette_2");
+	m_c355spr[1]->set_screen("rscreen");
 	m_c355spr[1]->set_gfxdecode_tag("gfxdecode_2");
 	m_c355spr[1]->set_is_namcofl(false);
 	m_c355spr[1]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
