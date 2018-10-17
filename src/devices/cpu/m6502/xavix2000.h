@@ -23,6 +23,10 @@ public:
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
+	virtual void device_start() override;
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 #define O(o) void o ## _full(); void o ## _partial()
 
 	// Super XaviX opcodes
@@ -32,11 +36,11 @@ public:
 	O(plx_imp); // 32
 	O(ply_imp); // 72
 
-	O(clrl_imp); // b2
-	O(decl_imp); // c2
-	O(notl_imp); // d2
-	O(incl_imp); // e2
-	O(negl_imp); // f2
+	O(clr_acc); // b2
+	O(dec_acc); // c2
+	O(not_acc); // d2
+	O(inc_acc); // e2
+	O(neg_acc); // f2
 
 	O(oral0_acc);
 	O(oral1_acc);
@@ -136,7 +140,7 @@ public:
 	O(sev_imp);
 
 	O(callf_aba);
-	O(callf_ind);
+	O(jmpf_ind);
 
 #undef O
 
@@ -144,6 +148,12 @@ public:
 	uint32_t m_pa; // 24-bit address register?
 	uint32_t m_pb; // ^
 
+};
+
+enum {
+	SXAVIX_L = M6502_IR+1,
+	SXAVIX_PA,
+	SXAVIX_PB
 };
 
 DECLARE_DEVICE_TYPE(XAVIX2000, xavix2000_device)

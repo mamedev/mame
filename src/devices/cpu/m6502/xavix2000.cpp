@@ -31,13 +31,13 @@
 	a is 80 when entering here?
 
 	01BC37: A0 3F       ldy #$3f
-	01BC39: B2          clrl      // clear 32-bit 'long' register (part of it might be the accumulator?) (or clear accumulator?)
+	01BC39: B2          clr a     // clear acculuator
 	01BC3A: 1B          spa0 a    // store 'accumulator' into byte 0 of PA 'address' register
 	01BC3B: 9B          spa2 a    // store 'accumulator' into byte 2 of PA 'address' register
 	
 	-- loop point 2
 	01BC3C: 98          tya       // y -> a  (3f on first run of loop)
-	01BC3D: 5B          spa1 a    // store 'accumulator' into byte 1 of PA 'address' register  (803f80 on first loop? 003f00 if we clear accumulator with clrl instead) maybe should be 3f0000 ? (would make more sense for a ram test)
+	01BC3D: 5B          spa1 a    // store 'accumulator' into byte 1 of PA 'address' register  (003f00 on first loop?)
 	
 	-- loop point 1
 	01BC3E: A3          ldal0 a   // read byte 0 of 32-bit 'long' register into accumulator
@@ -107,10 +107,52 @@ xavix2000_device::xavix2000_device(const machine_config &mconfig, const char *ta
 	sprogram_config.m_logaddr_width = 24;
 }
 
+void xavix2000_device::device_start()
+{
+	xavix_device::device_start();
+
+	state_add(SXAVIX_L, "L", m_l).callimport().formatstr("%8s");;
+	state_add(SXAVIX_PA, "PA", m_pa).callimport().formatstr("%8s");
+	state_add(SXAVIX_PB, "PB", m_pb).callimport().formatstr("%8s");
+}
 
 std::unique_ptr<util::disasm_interface> xavix2000_device::create_disassembler()
 {
 	return std::make_unique<xavix2000_disassembler>();
+}
+
+
+void xavix2000_device::state_import(const device_state_entry &entry)
+{
+	xavix_device::state_import(entry);
+
+	switch(entry.index())
+	{
+	case SXAVIX_L:
+		break;
+	case SXAVIX_PA:
+		break;
+	case SXAVIX_PB:
+		break;
+	}
+}
+
+void xavix2000_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	xavix_device::state_string_export(entry, str);
+
+	switch(entry.index())
+	{
+	case SXAVIX_L:
+		str = string_format("%08x", m_l);
+		break;
+	case SXAVIX_PA:
+		str = string_format("%08x", m_pa);
+		break;
+	case SXAVIX_PB:
+		str = string_format("%08x", m_pb);
+		break;
+	}
 }
 
 

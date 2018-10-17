@@ -159,7 +159,7 @@ uint8_t xavix_device::mi_xavix_nd::read_arg(uint16_t adr)
 	return program->read_byte(base->adr_with_codebank(adr));
 }
 
-inline void xavix_device::set_codebank(uint8_t bank)
+void xavix_device::set_codebank(uint8_t bank)
 {
 //  space().write_byte(0xfe, bank);
 	m_codebank = bank;

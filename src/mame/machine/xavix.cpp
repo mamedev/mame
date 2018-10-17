@@ -281,6 +281,7 @@ WRITE8_MEMBER(xavix_state::arena_end_w)
 
 READ8_MEMBER(xavix_state::arena_control_r)
 {
+	m_arena_control ^= 0x40; // unknown, xavtenni expects this to become high, also seems to be running in some kind of interlace mode, so could be a field flag?
 	return m_arena_control;
 }
 

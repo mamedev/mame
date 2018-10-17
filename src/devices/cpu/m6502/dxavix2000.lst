@@ -8,13 +8,13 @@ bmi_rel     and_idy     plx_imp     andpa_imp   bit_zpx     and_zpx     rol_zpx 
 rti_xav_imp eor_idx     nop_imp     eorl0_acc   nop_imp     eor_zpg     lsr_zpg     eorl1_acc   pha_imp     eor_imm     lsr_acc     eorl2_acc   jmp_adr     eor_aba     lsr_aba     eorl3_acc
 bvc_rel     eor_idy     phy_imp     eorpa_imp   nop_imp     eor_zpx     lsr_zpx     eorpb_imp   cli_imp     eor_aby     nop_imp     spa1_acc    callf_aba   eor_abx     lsr_abx     spb1_acc
 rts_imp     adc_idx     nop_imp     adcl0_acc   nop_imp     adc_zpg     ror_zpg     adcl1_acc   pla_imp     adc_imm     ror_acc     adcl2_acc   jmp_ind     adc_aba     ror_aba     adcl3_acc
-bvs_rel     adc_idy     ply_imp     adcpa_imp   nop_imp     adc_zpx     ror_zpx     adcpb_imp   sei_imp     adc_aby     nop_imp     lpa1_acc    callf_ind   adc_abx     ror_abx     lpb1_acc
+bvs_rel     adc_idy     ply_imp     adcpa_imp   nop_imp     adc_zpx     ror_zpx     adcpb_imp   sei_imp     adc_aby     nop_imp     lpa1_acc    jmpf_ind    adc_abx     ror_abx     lpb1_acc
 retf_imp    sta_idx     stz_zpg     stal0_acc   sty_zpg     sta_zpg     stx_zpg     stal1_acc   dey_imp     sev_imp     txa_imp     stal2_acc   sty_aba     sta_aba     stx_aba     stal3_acc
 bcc_rel     sta_idy     stz_aba     stapa_imp   sty_zpx     sta_zpx     stx_zpy     stapb_imp   tya_imp     sta_aby     txs_imp     spa2_acc    sty_abx     sta_abx     stx_aby     spb2_acc
 ldy_imm     lda_idx     ldx_imm     ldal0_acc   ldy_zpg     lda_zpg     ldx_zpg     ldal1_acc   tay_imp     lda_imm     tax_imp     ldal2_acc   ldy_aba     lda_aba     ldx_aba     ldal3_acc
-bcs_rel     lda_idy     clrl_imp    ldapa_imp   ldy_zpx     lda_zpx     ldx_zpy     ldapb_imp   clv_imp     lda_aby     tsx_imp     lpa2_acc    ldy_abx     lda_abx     ldx_aby     lpb2_acc
-cpy_imm     cmp_idx     decl_imp    cmpl0_acc   cpy_zpg     cmp_zpg     dec_zpg     cmpl1_acc   iny_imp     cmp_imm     dex_imp     cmpl2_acc   cpy_aba     cmp_aba     dec_aba     cmpl3_acc
-bne_rel     cmp_idy     notl_imp    cmppa_imp   nop_imp     cmp_zpx     dec_zpx     cmppb_imp   cld_imp     cmp_aby     nop_imp     decpa_imp   nop_imp     cmp_abx     dec_abx     decpb_imp
-cpx_imm     sbc_idx     incl_imp    sbcl0_acc   cpx_zpg     sbc_zpg     inc_zpg     sbcl1_acc   inx_imp     sbc_imm     nop_imp     sbcl2_acc   cpx_aba     sbc_aba     inc_aba     sbcl3_acc
-beq_rel     sbc_idy     negl_imp    sbcpa_imp   nop_imp     sbc_zpx     inc_zpx     sbcpb_imp   sed_imp     sbc_aby     nop_imp     incpa_imp   nop_imp     sbc_abx     inc_abx     incpb_imp
+bcs_rel     lda_idy     clr_acc     ldapa_imp   ldy_zpx     lda_zpx     ldx_zpy     ldapb_imp   clv_imp     lda_aby     tsx_imp     lpa2_acc    ldy_abx     lda_abx     ldx_aby     lpb2_acc
+cpy_imm     cmp_idx     dec_acc     cmpl0_acc   cpy_zpg     cmp_zpg     dec_zpg     cmpl1_acc   iny_imp     cmp_imm     dex_imp     cmpl2_acc   cpy_aba     cmp_aba     dec_aba     cmpl3_acc
+bne_rel     cmp_idy     not_acc     cmppa_imp   nop_imp     cmp_zpx     dec_zpx     cmppb_imp   cld_imp     cmp_aby     nop_imp     decpa_imp   nop_imp     cmp_abx     dec_abx     decpb_imp
+cpx_imm     sbc_idx     inc_acc     sbcl0_acc   cpx_zpg     sbc_zpg     inc_zpg     sbcl1_acc   inx_imp     sbc_imm     nop_imp     sbcl2_acc   cpx_aba     sbc_aba     inc_aba     sbcl3_acc
+beq_rel     sbc_idy     neg_acc     sbcpa_imp   nop_imp     sbc_zpx     inc_zpx     sbcpb_imp   sed_imp     sbc_aby     nop_imp     incpa_imp   nop_imp     sbc_abx     inc_abx     incpb_imp
 reset
