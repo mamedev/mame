@@ -101,8 +101,8 @@ andl3_acc
 	prefetch();
 
 eorl0_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	A ^= (m_l & 0x000000ff) >> 0;
+	set_nz(A);
 	prefetch();
 
 eorl1_acc
@@ -251,8 +251,8 @@ lpa2_acc
 	prefetch();
 
 spb0_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_pb = (m_pb & 0xffff00) | A; // TODO: Flags?
 	prefetch();
 
 lpb0_acc
@@ -261,8 +261,8 @@ lpb0_acc
 	prefetch();
 
 spb1_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_pb = (m_pb & 0xff00ff) | (A << 8); // TODO: Flags?
 	prefetch();
 
 lpb1_acc
@@ -271,8 +271,8 @@ lpb1_acc
 	prefetch();
 
 spb2_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_pb = (m_pb & 0x00ffff) | (A << 16); // TODO: Flags?
 	prefetch();
 
 lpb2_acc
@@ -394,13 +394,14 @@ sty_abx
 	prefetch();
 
 stz_zpg
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	TMP = read_pc();
+	write(TMP, 0x00);
 	prefetch();
 
 stz_aba
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	write(TMP, 0x00);
 	prefetch();
 
 bit_zpx
@@ -414,8 +415,11 @@ bit_abx
 	prefetch();
 
 bit_imm
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	TMP = read_pc();
+	if(A & TMP)
+		P &= ~F_Z;
+	else
+		P |= F_Z;
 	prefetch();
 
 asr_zpg
@@ -458,7 +462,11 @@ callf_aba
 	read_pc_noinc();
 	prefetch();
 
-callf_ind
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+jmpf_ind
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	PC = read(TMP);
+	PC = set_h(PC, read(set_l(TMP, TMP+1)));
+	TMP2 = read(TMP+2);
+	set_codebank(TMP2);
 	prefetch();

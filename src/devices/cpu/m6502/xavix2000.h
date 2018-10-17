@@ -140,7 +140,7 @@ public:
 	O(sev_imp);
 
 	O(callf_aba);
-	O(callf_ind);
+	O(jmpf_ind);
 
 #undef O
 
