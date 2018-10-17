@@ -532,17 +532,21 @@ void qsound_hle_device::state_normal_update()
 	{
 		// Echo is output on the unfiltered component of the left channel and
 		// the filtered component of the right channel.
-		int32_t wet = (ch == 1) ? echo_output << 16 : 0;
-		int32_t dry = (ch == 0) ? echo_output << 16 : 0;
+		int32_t wet = (ch == 1) ? echo_output << 14 : 0;
+		int32_t dry = (ch == 0) ? echo_output << 14 : 0;
 
 		for (int i = 0; i < 19; i++)
 		{
 			uint16_t pan_index = m_voice_pan[i] + (ch * PAN_TABLE_CH_OFFSET);
 
 			// Apply different volume tables on the dry and wet inputs.
-			dry -= (m_voice_output[i] * (int16_t)read_dsp_rom(pan_index + PAN_TABLE_DRY)) << 2;
-			wet -= (m_voice_output[i] * (int16_t)read_dsp_rom(pan_index + PAN_TABLE_WET)) << 2;
+			dry -= (m_voice_output[i] * (int16_t)read_dsp_rom(pan_index + PAN_TABLE_DRY));
+			wet -= (m_voice_output[i] * (int16_t)read_dsp_rom(pan_index + PAN_TABLE_WET));
 		}
+		// Saturate accumulated voices
+		dry = (std::min<int32_t>(std::max<int32_t>(dry, -0x1fffffff), 0x1fffffff)) << 2;
+		wet = (std::min<int32_t>(std::max<int32_t>(wet, -0x1fffffff), 0x1fffffff)) << 2;
+
 		// Apply FIR filter on 'wet' input
 		wet = m_filter[ch].apply(wet >> 16);
 
@@ -551,11 +555,11 @@ void qsound_hle_device::state_normal_update()
 			dry = m_alt_filter[ch].apply(dry >> 16);
 
 		// output goes through a delay line and attenuation
-		int32_t output = (m_wet[ch].apply(wet) + m_dry[ch].apply(dry)) << 2;
+		int32_t output = (m_wet[ch].apply(wet) + m_dry[ch].apply(dry));
 
 		// DSP round function
-		output = (output + 0x8000) & ~0xffff;
-		m_out[ch] = output >> 16;
+		output = (output + 0x2000) & ~0x3fff;
+		m_out[ch] = (std::min<int32_t>(std::max<int32_t>(output >> 14, -0x7fff), 0x7fff));
 
 		if (m_delay_update)
 		{
