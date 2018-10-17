@@ -1230,12 +1230,12 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_fault))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, ins8250_uart_device, cts_w))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
+	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
+	rs232.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
+	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// ISA8 bus
 	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
@@ -1361,12 +1361,12 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_fault))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, cts_w))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
+	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
+	rs232.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
+	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// ISA8 bus
 	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
