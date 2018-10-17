@@ -208,10 +208,10 @@ MACHINE_CONFIG_START(altos486_state::altos486)
 	rs232_lp.dcd_handler().set("sio2", FUNC(z80dart_device::dcda_w));
 	rs232_lp.cts_handler().set("sio2", FUNC(z80dart_device::ctsa_w));
 
-	rs232_port_device &rs232_wn(RS232_PORT(config, "rs232_wn", default_rs232_devices, nullptr));
-	rs232_wn.rxd_handler().set("i8274", FUNC(z80dart_device::rxa_w));
-	rs232_wn.dcd_handler().set("i8274", FUNC(z80dart_device::dcda_w));
-	rs232_wn.cts_handler().set("i8274", FUNC(z80dart_device::ctsa_w));
+	rs232_port_device &rs422_wn(RS232_PORT(config, "rs422_wn", default_rs232_devices, nullptr));
+	rs422_wn.rxd_handler().set("i8274", FUNC(z80dart_device::rxa_w));
+	rs422_wn.dcd_handler().set("i8274", FUNC(z80dart_device::dcda_w));
+	rs422_wn.cts_handler().set("i8274", FUNC(z80dart_device::ctsa_w));
 
 	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
