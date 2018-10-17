@@ -547,6 +547,10 @@ void pokey_device::step_keyboard()
 void pokey_device::step_pot()
 {
 	int pot;
+
+	if( (m_SKCTL & SK_RESET) == 0)
+		return;
+
 	uint8_t upd = 0;
 	m_pot_counter++;
 	for (pot = 0; pot < 8; pot++)
@@ -809,7 +813,7 @@ READ8_MEMBER( pokey_device::read )
 		 ****************************************************************/
 		if( (m_SKCTL & SK_RESET) == 0)
 		{
-			data = 0;
+			data = m_ALLPOT;
 			LOG(("POKEY '%s' ALLPOT internal $%02x (reset)\n", tag(), data));
 		}
 		else if( !m_allpot_r_cb.isnull() )
@@ -1071,6 +1075,9 @@ inline void pokey_device::process_channel(int ch)
 void pokey_device::pokey_potgo(void)
 {
 	int pot;
+
+	if( (m_SKCTL & SK_RESET) == 0)
+		return;
 
 	LOG(("POKEY #%p pokey_potgo\n", (void *) this));
 

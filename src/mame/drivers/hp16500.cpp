@@ -493,8 +493,10 @@ MACHINE_CONFIG_START(hp16500_state::hp16500)
 
 	// TODO: for now hook up the ipc hil keyboard - this might be replaced
 	// later with a 16500b specific keyboard implementation
-	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
-	MCFG_HP_HIL_SLOT_ADD("mlc", "hil2", hp_hil_devices, "hp_ipc_kbd")
+	hp_hil_slot_device &keyboard(HP_HIL_SLOT(config, "hil1", 0));
+	hp_hil_devices(keyboard);
+	keyboard.set_default_option("hp_ipc_kbd");
+	keyboard.set_hp_hil_slot(this, "mlc");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

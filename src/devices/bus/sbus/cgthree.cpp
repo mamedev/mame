@@ -55,6 +55,7 @@ sbus_cgthree_device::sbus_cgthree_device(const machine_config &mconfig, const ch
 void sbus_cgthree_device::device_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(0x100000/4);
+	save_pointer(NAME(m_vram), 0x100000/4);
 }
 
 void sbus_cgthree_device::device_reset()

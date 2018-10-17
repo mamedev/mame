@@ -45,7 +45,7 @@ private:
 	{
 		uint32_t rate;
 		uint32_t pos;
-		uint32_t frac;
+		uint32_t counter;
 		uint32_t end;
 		uint32_t volume;
 		uint32_t play;

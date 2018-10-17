@@ -240,16 +240,17 @@ FLOPPY_FORMATS_MEMBER(fdc37c93x_device::floppy_formats)
 	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
-MACHINE_CONFIG_START(fdc37c93x_device::device_add_mconfig)
+void fdc37c93x_device::device_add_mconfig(machine_config &config)
+{
 	// floppy disc controller
-	MCFG_SMC37C78_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, fdc37c93x_device, irq_floppy_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, fdc37c93x_device, drq_floppy_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats)
+	smc37c78_device &fdcdev(SMC37C78(config, floppy_controller_fdcdev));
+	fdcdev.intrq_wr_callback().set(FUNC(fdc37c93x_device::irq_floppy_w));
+	fdcdev.drq_wr_callback().set(FUNC(fdc37c93x_device::drq_floppy_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats);
 	// parallel port
-	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_parallel_w))
+	PC_LPT(config, pc_lpt_lptdev);
+	pc_lpt_lptdev->irq_handler().set(FUNC(fdc37c93x_device::irq_parallel_w));
 
 	// serial ports
 	NS16450(config, pc_serial1_comdev, XTAL(1'843'200)); // or NS16550 ?
@@ -275,7 +276,7 @@ MACHINE_CONFIG_START(fdc37c93x_device::device_add_mconfig)
 	m_kbdc->input_buffer_full_callback().set(FUNC(fdc37c93x_device::irq_keyboard_w));
 	m_kbdc->system_reset_callback().set(FUNC(fdc37c93x_device::kbdp20_gp20_reset_w));
 	m_kbdc->gate_a20_callback().set(FUNC(fdc37c93x_device::kbdp21_gp25_gatea20_w));
-MACHINE_CONFIG_END
+}
 
 WRITE_LINE_MEMBER(fdc37c93x_device::irq_floppy_w)
 {

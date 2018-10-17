@@ -1411,7 +1411,7 @@ MACHINE_CONFIG_START(m5_state::m5)
 	m_maincpu->set_addrmap(AS_IO, &m5_state::m5_io);
 	m_maincpu->set_daisy_config(m5_daisy_chain);
 
-	MCFG_DEVICE_ADD(Z80_FD5_TAG, Z80, 14.318181_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD(m_fd5cpu, Z80, 14.318181_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(fd5_mem)
 	MCFG_DEVICE_IO_MAP(fd5_io)
 
@@ -1443,8 +1443,8 @@ MACHINE_CONFIG_START(m5_state::m5)
 	m_ppi->in_pc_callback().set(FUNC(m5_state::ppi_pc_r));
 	m_ppi->out_pc_callback().set(FUNC(m5_state::ppi_pc_w));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_FD5_TAG, INPUT_LINE_IRQ0))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_fd5cpu, INPUT_LINE_IRQ0);
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats)
 
 	// cartridge
@@ -1507,9 +1507,9 @@ MACHINE_CONFIG_START(brno_state::brno)
 
 
 	//remove devices used for fd5 floppy
-	MCFG_DEVICE_REMOVE(Z80_FD5_TAG)
-	MCFG_DEVICE_REMOVE(I8255A_TAG)
-	MCFG_DEVICE_REMOVE(UPD765_TAG)
+	config.device_remove(Z80_FD5_TAG);
+	config.device_remove(I8255A_TAG);
+	config.device_remove(UPD765_TAG);
 
 	// video hardware
 	tms9929a_device &vdp(TMS9929A(config, "tms9928a", 10.738635_MHz_XTAL));

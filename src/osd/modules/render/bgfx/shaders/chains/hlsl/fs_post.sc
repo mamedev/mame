@@ -3,10 +3,14 @@ $input v_color0, v_texcoord0
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Scanline & Shadowmask Effect
+// Shadowmask Effect
 //-----------------------------------------------------------------------------
 
 #include "common.sh"
+
+#define MONOCHROME 1.0
+#define DICHROME 2.0
+#define TRICHROME 3.0
 
 // Autos
 uniform vec4 u_swap_xy;
@@ -27,6 +31,8 @@ uniform vec4 u_humbar_hertz_rate; // difference between the 59.94 Hz field rate 
 uniform vec4 u_humbar_alpha;
 uniform vec4 u_power;
 uniform vec4 u_floor;
+uniform vec4 u_chroma_mode;
+uniform vec4 u_conversion_gain;
 
 // Parametric
 uniform vec4 u_time; // milliseconds
@@ -112,6 +118,14 @@ void main()
 	}
 	else
 	{
+		// Hum Bar Simulation
+		if (u_humbar_alpha.x > 0.0f)
+		{
+			float HumTimeStep = fract(u_time.x * u_humbar_hertz_rate.x);
+			float HumBrightness = 1.0 - fract(BaseCoord.y + HumTimeStep) * u_humbar_alpha.x;
+			BaseColor.rgb *= HumBrightness;
+		}
+
 		// Mask Simulation
 		if (u_shadow_alpha.x > 0.0)
 		{
@@ -139,14 +153,15 @@ void main()
 		BaseColor.g = pow(BaseColor.g, u_power.g);
 		BaseColor.b = pow(BaseColor.b, u_power.b);
 
-		// Hum Bar Simulation
-		if (u_humbar_alpha.x > 0.0f)
-		{
-			float HumTimeStep = fract(u_time.x * u_humbar_hertz_rate.x);
-			float HumBrightness = 1.0 - fract(BaseCoord.y + HumTimeStep) * u_humbar_alpha.x;
-			BaseColor.rgb *= HumBrightness;
+		BaseColor.rgb *= v_color0.rgb;
+		if (u_chroma_mode.x == MONOCHROME) {
+			BaseColor.r = dot(u_conversion_gain.rgb, BaseColor.rgb);
+			BaseColor.gb = vec2(BaseColor.r, BaseColor.r);
+		} else if (u_chroma_mode.x == DICHROME) {
+			BaseColor.r = dot(u_conversion_gain.rg, BaseColor.rg);
+			BaseColor.g = BaseColor.r;
 		}
 
-		gl_FragColor = vec4(BaseColor.rgb * v_color0.rgb, BaseColor.a);
+		gl_FragColor = BaseColor;
 	}
 }

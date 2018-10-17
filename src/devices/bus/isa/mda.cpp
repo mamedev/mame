@@ -126,8 +126,8 @@ MACHINE_CONFIG_START(isa8_mda_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcmda)
 
-	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, isa8_mda_device, pc_cpu_line))
+	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
+	lpt.irq_handler().set(FUNC(isa8_mda_device::pc_cpu_line));
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -554,8 +554,8 @@ MACHINE_CONFIG_START(isa8_hercules_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcherc)
 
-	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, isa8_mda_device, pc_cpu_line))
+	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
+	lpt.irq_handler().set(FUNC(isa8_mda_device::pc_cpu_line));
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

@@ -79,10 +79,15 @@ public:
 	template <class Object> devcb_base &set_brcond1_input(Object &&cb) { return m_in_brcond1.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_brcond2_input(Object &&cb) { return m_in_brcond2.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_brcond3_input(Object &&cb) { return m_in_brcond3.set_callback(std::forward<Object>(cb)); }
+	auto in_brcond0() { return m_in_brcond0.bind(); }
+	auto in_brcond1() { return m_in_brcond1.bind(); }
+	auto in_brcond2() { return m_in_brcond2.bind(); }
+	auto in_brcond3() { return m_in_brcond3.bind(); }
 
 protected:
 	enum chip_type
 	{
+		CHIP_TYPE_R2000,
 		CHIP_TYPE_R3041,
 		CHIP_TYPE_R3051,
 		CHIP_TYPE_R3052,
@@ -246,6 +251,14 @@ protected:
 	devcb_read_line    m_in_brcond3;
 };
 
+// ======================> r3041_device
+
+class r2000_device : public r3000_device
+{
+public:
+	r2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 // ======================> r3041_device
 
@@ -306,6 +319,7 @@ protected:
 
 // device type definition
 
+DECLARE_DEVICE_TYPE(R2000,       r2000_device)
 DECLARE_DEVICE_TYPE(R3041,       r3041_device)
 DECLARE_DEVICE_TYPE(R3051,       r3051_device)
 DECLARE_DEVICE_TYPE(R3052,       r3052_device)

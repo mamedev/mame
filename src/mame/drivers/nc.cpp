@@ -1260,7 +1260,7 @@ void nc200_state::nc200_io(address_map &map)
 	map(0xb0, 0xb9).r(FUNC(nc200_state::nc_key_data_in_r));
 	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xd1).rw("mc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
-	map(0xe0, 0xe1).m("upd765", FUNC(upd765a_device::map));
+	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
 }
 
 static INPUT_PORTS_START(nc200)
@@ -1482,8 +1482,8 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	m_uart->rxrdy_handler().set(FUNC(nc200_state::nc200_rxrdy_callback));
 	m_uart->txrdy_handler().set(FUNC(nc200_state::nc200_txrdy_callback));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, nc200_state, nc200_fdc_interrupt))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 

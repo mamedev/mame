@@ -510,15 +510,15 @@ MACHINE_CONFIG_START(southbridge_extended_device::device_add_mconfig)
 	southbridge_device::device_add_mconfig(config);
 
 	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
-	keybc.system_reset_cb().set_inputline(":maincpu", INPUT_LINE_RESET);
-	keybc.gate_a20_cb().set_inputline(":maincpu", INPUT_LINE_A20);
-	keybc.input_buffer_full_cb().set("pic8259_master", FUNC(pic8259_device::ir1_w));
-	keybc.keyboard_clock_cb().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
-	keybc.keyboard_data_cb().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+	keybc.hot_res().set_inputline(":maincpu", INPUT_LINE_RESET);
+	keybc.gate_a20().set_inputline(":maincpu", INPUT_LINE_A20);
+	keybc.kbd_irq().set("pic8259_master", FUNC(pic8259_device::ir1_w));
+	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_clk_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	ds12885_device &rtc(DS12885(config, "rtc"));

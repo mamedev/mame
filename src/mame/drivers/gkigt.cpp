@@ -637,7 +637,8 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &igt_gameking_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -39,7 +39,7 @@ team concepts
 icq3250a-d
 1f71lctctab973
 
- */
+*/
 
 #include "emu.h"
 #include "includes/comquest.h"
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(comquest_state::comquest)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
+	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(64*4, 128) /* 160 x 102 */
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*4-1, 0, 128-1)

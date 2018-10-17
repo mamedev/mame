@@ -1661,8 +1661,9 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
-	MCFG_RAMDAC_SPLIT_READ(1)
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac.set_addrmap(0, &bfcobra_state::ramdac_map);
+	ramdac.set_split_read(1);
 
 	SPEAKER(config, "mono").front_center();
 

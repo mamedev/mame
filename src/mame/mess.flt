@@ -291,6 +291,7 @@ hp48.cpp
 hp49gp.cpp
 hp64k.cpp
 hp700.cpp
+hp9825.cpp
 hp9845.cpp
 hp9k.cpp
 hp9k_3xx.cpp
@@ -330,10 +331,12 @@ iq151.cpp
 iqunlim.cpp
 iris3130.cpp
 irisha.cpp
+is48x.cpp
 isbc.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
+itt1700.cpp
 itt3030.cpp
 jade.cpp
 jazz.cpp
@@ -423,6 +426,7 @@ minicom.cpp
 miniforce.cpp
 miniframe.cpp
 minitel_2_rpic.cpp
+mips.cpp
 mits680b.cpp
 mk1.cpp
 mk14.cpp
@@ -636,6 +640,7 @@ sc2.cpp
 scopus.cpp
 scorpion.cpp
 scv.cpp
+sdk51.cpp
 sdk80.cpp
 sdk85.cpp
 sdk86.cpp
@@ -646,6 +651,7 @@ segapm.cpp
 selz80.cpp
 sg1000.cpp
 sh4robot.cpp
+si5500.cpp
 sitcom.cpp
 sk1.cpp
 slc1.cpp

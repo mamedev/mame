@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-    xavix2000.h
+    xavix2000.h (Super XaviX)
 
 ***************************************************************************/
 #ifndef MAME_CPU_M6502_XAVIX2000_H
@@ -26,22 +26,14 @@ public:
 #define O(o) void o ## _full(); void o ## _partial()
 
 	// xaviv opcodes
-	O(phx_imp);
-	O(phy_imp);
-	O(plx_imp);
-	O(ply_imp);
-	O(unk1b_imp);
-	O(unk5b_imp);
-	O(unk9b_imp);
-	O(unka3_imp);
-	O(unka7_imp);
-	O(unkb2_imp);
-	O(unk07_imp);
-	O(unk73_imp);
+	O(unh_imp);
 
-	O(unk83_imm);
-	O(unk87_imm);
+	O(phx_imp); // 12
+	O(phy_imp); // 52
+	O(plx_imp); // 32
+	O(ply_imp); // 72
 
+	O(clr_acc); // b2
 
 #undef O
 

@@ -288,9 +288,9 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	m_dmac->in_ior_cb<0>().set("upd765", FUNC(upd765a_device::mdma_r));
 	m_dmac->out_iow_cb<0>().set("upd765", FUNC(upd765a_device::mdma_w));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic8259_0", pic8259_device, ir2_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_dmac, i8257_device, dreq0_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set("pic8259_0", FUNC(pic8259_device::ir2_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 

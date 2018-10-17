@@ -52,6 +52,9 @@ public:
 		m_pg{ {*this, "upd934g_c"}, {*this, "upd934g_b"} },
 		m_samples{ {*this, "samples_a"}, {*this, "samples_b"} },
 		m_keys(*this, "kc%u", 0),
+		m_led_song(*this, "led_song"),
+		m_led_pattern(*this, "led_pattern"),
+		m_led_startstop(*this, "led_startstop"),
 		m_port_a(0),
 		m_port_b(0xff)
 	{ }
@@ -71,6 +74,10 @@ private:
 	required_device<upd934g_device> m_pg[2];
 	required_memory_region m_samples[2];
 	required_ioport_array<8> m_keys;
+
+	output_finder<> m_led_song;
+	output_finder<> m_led_pattern;
+	output_finder<> m_led_startstop;
 
 	void map(address_map &map);
 
@@ -307,13 +314,18 @@ READ8_MEMBER( rz1_state::key_r )
 
 WRITE8_MEMBER( rz1_state::leds_w )
 {
-	output().set_value("led_song",      BIT(data, 0) == 0 ? 1 : BIT(data, 1) == 0 ? 2 : 0);
-	output().set_value("led_pattern",   BIT(data, 2) == 0 ? 1 : BIT(data, 3) == 0 ? 2 : 0);
-	output().set_value("led_startstop", BIT(data, 4) == 0 ? 1 : 0);
+	m_led_song =      BIT(data, 0) == 0 ? 1 : BIT(data, 1) == 0 ? 2 : 0;
+	m_led_pattern =   BIT(data, 2) == 0 ? 1 : BIT(data, 3) == 0 ? 2 : 0;
+	m_led_startstop = BIT(data, 4) == 0 ? 1 : 0;
 }
 
 void rz1_state::machine_start()
 {
+	// resolve output finders
+	m_led_song.resolve();
+	m_led_pattern.resolve();
+	m_led_startstop.resolve();
+
 	// register for save states
 	save_item(NAME(m_port_a));
 	save_item(NAME(m_port_b));

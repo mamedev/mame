@@ -58,7 +58,6 @@ public:
 	void init_mariner();
 	void init_scramble_ppi();
 	void init_mars();
-	void init_ckongs();
 	void init_mimonscr();
 	void init_hotshock();
 	void init_ad2083();
@@ -70,6 +69,7 @@ public:
 	void init_scobra();
 	void init_stratgyx();
 	void init_tazmani2();
+	void init_tazmaniet();
 	void init_darkplnt();
 	void init_mimonkey();
 	void init_mimonsco();

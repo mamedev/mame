@@ -823,7 +823,7 @@ void tm990189_state::tm990_189_cru_map(address_map &map)
 
 MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	/* basic machine hardware */
-	TMS9980A(config, m_tms9980a, 2000000);
+	TMS9980A(config, m_tms9980a, 8_MHz_XTAL); // clock divided by 4 internally
 	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_memmap);
 	m_tms9980a->set_addrmap(AS_IO, &tm990189_state::tm990_189_cru_map);
 	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
@@ -841,14 +841,14 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	/* Devices */
 	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	TMS9901(config, m_tms9901_usr, 2000000);
+	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
 	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
 	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
 	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
 	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
 	m_tms9901_usr->intlevel_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
-	TMS9901(config, m_tms9901_sys, 2000000);
+	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
 	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
 	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel0_w));
 	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel1_w));
@@ -868,7 +868,8 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
 	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
-	TMS9902(config, m_tms9902, 2000000).xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
+	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
+	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
 	TM990_189_RS232(config, "rs232", 0, m_tms9902);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
@@ -879,7 +880,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	/* basic machine hardware */
-	TMS9980A(config, m_tms9980a, 2000000);
+	TMS9980A(config, m_tms9980a, 8_MHz_XTAL);
 	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_v_memmap);
 	m_tms9980a->set_addrmap(AS_IO, &tm990189_state::tm990_189_cru_map);
 	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
@@ -902,14 +903,14 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	/* Devices */
 	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	TMS9901(config, m_tms9901_usr, 2000000);
+	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
 	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
 	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
 	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
 	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
 	m_tms9901_usr->intlevel_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
-	TMS9901(config, m_tms9901_sys, 2000000);
+	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
 	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
 	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel0_w));
 	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel1_w));
@@ -929,7 +930,8 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
 	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
-	TMS9902(config, m_tms9902, 2000000).xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted;
+	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
+	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted;
 	TM990_189_RS232(config, "rs232", 0, m_tms9902);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))

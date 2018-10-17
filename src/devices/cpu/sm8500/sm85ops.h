@@ -356,7 +356,7 @@
 #define OP_INC16(X) d1 = X; \
 			res = d1 + 1; \
 			m_PS1 = m_PS1 & ( FLAG_C | FLAG_D | FLAG_H | FLAG_B | FLAG_I ); \
-			m_PS1 = m_PS1 | ( ( ( res & 0xFF ) == 0 ) ? FLAG_Z : 0 ); \
+			m_PS1 = m_PS1 | ( ( ( res & 0xFFFF ) == 0 ) ? FLAG_Z : 0 ); \
 			m_PS1 = m_PS1 | ( ( res & 0x8000 ) ? FLAG_S : 0 ); \
 			m_PS1 = m_PS1 | ( ( ( ( d1 ^ res ) & 0x8000 ) && ! ( res & 0x8000 ) ) ? FLAG_V : 0 );
 
@@ -377,7 +377,7 @@
 #define OP_AND8(X,Y)    d1 = X; \
 			d2 = Y; \
 			res = d1 & d2; \
-			m_PS1 = m_PS1 & ( FLAG_B | FLAG_I | FLAG_H | FLAG_D ); \
+			m_PS1 = m_PS1 & ( FLAG_B | FLAG_C | FLAG_I | FLAG_H | FLAG_D ); \
 			m_PS1 = m_PS1 | ( ( ( res & 0xFF ) == 0 ) ? FLAG_Z : 0 ); \
 			m_PS1 = m_PS1 | ( ( res & 0x80 ) ? FLAG_S : 0 );
 
@@ -390,7 +390,7 @@
 #define OP_OR8(X,Y) d1 = X; \
 			d2 = Y; \
 			res = d1 | d2; \
-			m_PS1 = m_PS1 & ( FLAG_B | FLAG_I | FLAG_H | FLAG_D ); \
+			m_PS1 = m_PS1 & ( FLAG_B | FLAG_C | FLAG_I | FLAG_H | FLAG_D ); \
 			m_PS1 = m_PS1 | ( ( ( res & 0xFF ) == 0 ) ? FLAG_Z : 0 ); \
 			m_PS1 = m_PS1 | ( ( res & 0x80 ) ? FLAG_S : 0 );
 
@@ -403,7 +403,7 @@
 #define OP_XOR8(X,Y)    d1 = X; \
 			d2 = Y; \
 			res = d1 ^ d2; \
-			m_PS1 = m_PS1 & ( FLAG_B | FLAG_I | FLAG_H | FLAG_D ); \
+			m_PS1 = m_PS1 & ( FLAG_B | FLAG_C | FLAG_I | FLAG_H | FLAG_D ); \
 			m_PS1 = m_PS1 | ( ( ( res & 0xFF ) == 0 ) ? FLAG_Z : 0 ); \
 			m_PS1 = m_PS1 | ( ( res & 0x80 ) ? FLAG_S : 0 );
 
@@ -501,7 +501,7 @@
 case 0x00:  /* CLR R - 4 cycles - Flags affected: -------- */
 	ARG_R;
 	mem_writebyte( r1, 0 );
-		mycycles += 4;
+	mycycles += 4;
 	break;
 case 0x01:  /* NEG R - 5 cycles - Flags affected: CZSV---- */
 	ARG_R;
@@ -909,7 +909,7 @@ logerror( "%04X: unk%02x\n", m_PC-1,op );
 case 0x2E:  /* MOV PS0,#00 - 4 cycles - Flags affected: -------- */
 	ARG_R;
 	m_PS0 = r1;
-		mycycles += 4;
+	mycycles += 4;
 	break;
 case 0x2F:  /* BTST R,i - 6 cycles - Flags affected: -Z-0---- */
 	ARG_RR;
@@ -1144,7 +1144,7 @@ case 0x4A:  /* MOVW RRr,RRs - 8 cycles - Flags affected: -------- */
 case 0x4B:  /* MOVW RRr,ww - 9 cycles - Flags affected: -------- */
 	ARG_Sw;
 	mem_writeword( r1, s2 );
-		mycycles += 9;
+	mycycles += 9;
 	break;
 case 0x4C:  /* MULT Rrr,Rs - 24 cycles - Flags affected: -Z-0---- */
 	// operation is not known if r1 is odd, assuming same as even for now
@@ -1268,7 +1268,7 @@ case 0x57:  /* XOR Rr,i - 6 cycles - Flags affected: -ZS0---- */
 case 0x58:  /* MOV Rr,i - 6 cycles - Flags affected: -------- */
 	ARG_iR;
 	mem_writebyte( r1, r2 );
-		mycycles += 6;
+	mycycles += 6;
 	break;
 case 0x59:  /* Invalid - 2? cycles - Flags affected: --------? */
 	logerror( "%04X: 59h: Invalid instruction\n", m_PC-1 );
@@ -1302,7 +1302,7 @@ case 0x5B:  /* unk5B - 6,7,11,8,7 cycles */
 case 0x5C:  /* DIV RRr,RRs - 47 cycles - Flags affected: -Z-V---- */
 		/* lower 8 bits of RRs is used to divide */
 		/* remainder in stored upper 8 bits of RRs */
-logerror( "%04X: DIV RRr,Rs!\n", m_PC-1 );
+//  logerror( "%04X: DIV RRr,Rs!\n", m_PC-1 );
 	ARG_RR;
 	m_PS1 = m_PS1 & ~ ( FLAG_Z | FLAG_V );
 	s1 = mem_readbyte( r2 + 1 );
@@ -1318,7 +1318,7 @@ logerror( "%04X: DIV RRr,Rs!\n", m_PC-1 );
 	mycycles += 47;
 	break;
 case 0x5D:  /* DIV RRr,i - 44 cycles - Flags affected: -Z-V---- */
-logerror( "%04X: DIV RRr,i!\n", m_PC-1 );
+//  logerror( "%04X: DIV RRr,i!\n", m_PC-1 );
 	ARG_iR;
 	m_PS1 = m_PS1 & ~ ( FLAG_Z | FLAG_V );
 	if ( r2 ) {
@@ -1578,7 +1578,7 @@ case 0xC6:
 case 0xC7:
 	ARG_ri;
 	mem_writebyte( r1, r2 );
-		mycycles += 4;
+	mycycles += 4;
 	break;
 case 0xC8:  /* MOV IE0/IE1/IR0/IR1/P0/P1/P2/P3,i - 4 cycles - Flags affected: -------- */
 case 0xC9:
@@ -1687,11 +1687,11 @@ case 0xFC:  /* SETC - 2 cycles - Flags affected: C------- */
 	break;
 case 0xFD:  /* EI - 2 cycles - Flags affected: -------I */
 	m_PS1 = m_PS1 | FLAG_I;
-		mycycles += 2;
+	mycycles += 2;
 	break;
 case 0xFE:  /* DI - 2 cycles - Flags affected: -------I */
 	m_PS1 = m_PS1 & ~ ( FLAG_I );
-		mycycles += 2;
+	mycycles += 2;
 	break;
 case 0xFF:  /* NOP - 2 cycles - Flags affected: -------- */
 	mycycles += 2;

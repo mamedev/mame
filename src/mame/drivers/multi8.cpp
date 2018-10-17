@@ -612,7 +612,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 
-	//MCFG_UPD765A_ADD("fdc", false, true)
+	//UPD765A(config, "fdc", false, true);
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", multi8_floppies, "525hd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 

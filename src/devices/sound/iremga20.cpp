@@ -80,7 +80,7 @@ void iremga20_device::device_start()
 	{
 		save_item(NAME(m_channel[i].rate), i);
 		save_item(NAME(m_channel[i].pos), i);
-		save_item(NAME(m_channel[i].frac), i);
+		save_item(NAME(m_channel[i].counter), i);
 		save_item(NAME(m_channel[i].end), i);
 		save_item(NAME(m_channel[i].volume), i);
 		save_item(NAME(m_channel[i].play), i);
@@ -99,7 +99,7 @@ void iremga20_device::device_reset()
 	{
 		m_channel[i].rate = 0;
 		m_channel[i].pos = 0;
-		m_channel[i].frac = 0;
+		m_channel[i].counter = 0;
 		m_channel[i].end = 0;
 		m_channel[i].volume = 0;
 		m_channel[i].play = 0;
@@ -150,9 +150,12 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 				else
 				{
 					sampleout += (sample - 0x80) * (int32_t)ch.volume;
-					ch.frac += ch.rate;
-					ch.pos += (ch.frac >> 24);
-					ch.frac &= ((1 << 24) - 1);
+					ch.counter--;
+					if (ch.counter <= ch.rate)
+					{
+						ch.pos++;
+						ch.counter = 0x100;
+					}
 				}
 			}
 		}
@@ -182,7 +185,7 @@ WRITE8_MEMBER( iremga20_device::irem_ga20_w )
 	switch (offset & 0x7)
 	{
 		case 4:
-			m_channel[ch].rate = (1 << 24) / (256 - data);
+			m_channel[ch].rate = data;
 			break;
 
 		case 5:
@@ -196,7 +199,7 @@ WRITE8_MEMBER( iremga20_device::irem_ga20_w )
 				m_channel[ch].play = 1;
 				m_channel[ch].pos = (m_regs[ch << 3 | 0] | m_regs[ch << 3 | 1] << 8) << 4;
 				m_channel[ch].end = (m_regs[ch << 3 | 2] | m_regs[ch << 3 | 3] << 8) << 4;
-				m_channel[ch].frac = 0;
+				m_channel[ch].counter = 0x100;
 			}
 			else
 				m_channel[ch].play = 0;

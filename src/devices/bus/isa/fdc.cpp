@@ -108,37 +108,40 @@ isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const ch
 {
 }
 
-MACHINE_CONFIG_START(isa8_fdc_smc_device::device_add_mconfig)
-	MCFG_SMC37C78_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void isa8_fdc_smc_device::device_add_mconfig(machine_config &config)
+{
+	smc37c78_device &smc(SMC37C78(config, fdc));
+	smc.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
+	smc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+}
 
 isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_PS2, tag, owner, clock)
 {
 }
 
-MACHINE_CONFIG_START(isa8_fdc_ps2_device::device_add_mconfig)
-	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void isa8_fdc_ps2_device::device_add_mconfig(machine_config &config)
+{
+	n82077aa_device &n82077aa(N82077AA(config, fdc, n82077aa_device::MODE_PS2));
+	n82077aa.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
+	n82077aa.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+}
 
 isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_SUPERIO, tag, owner, clock)
 {
 }
 
-MACHINE_CONFIG_START(isa8_fdc_superio_device::device_add_mconfig)
-	MCFG_PC_FDC_SUPERIO_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void isa8_fdc_superio_device::device_add_mconfig(machine_config &config)
+{
+	pc_fdc_superio_device &superio(PC_FDC_SUPERIO(config, fdc));
+	superio.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
+	superio.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+}
 
 isa8_ec1841_0003_device::isa8_ec1841_0003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: isa8_fdc_device(mconfig, ISA8_EC1841_0003, tag, owner, clock)
