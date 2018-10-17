@@ -31,29 +31,33 @@ ply_imp
 	prefetch();
 
 clr_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
-	m_l = 0;
+	A = 0;
+	set_nz(A);
 	prefetch();
 
 dec_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A--;
+	set_nz(A);
 	prefetch();
 
 not_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = A ^ 0xff;
+	set_nz(A);
 	prefetch();
 
 inc_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A++;
+	set_nz(A);
 	prefetch();
 
 neg_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (0x00 - A) & 0xff;
+	set_nz(A);
 	prefetch();
 
 oral0_acc
@@ -62,8 +66,8 @@ oral0_acc
 	prefetch();
 
 oral1_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	A |= (m_l & 0x0000ff00) >> 8;
+	set_nz(A);
 	prefetch();
 
 oral2_acc
@@ -137,43 +141,43 @@ adcl3_acc
 	prefetch();
 	
 stal0_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_l = (m_l & 0xffffff00) | (A & 0xff); // TODO: flags
 	prefetch();
 
 stal1_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_l = (m_l & 0xffff00ff) | ((A & 0xff) << 8); // TODO: flags
 	prefetch();
 
 stal2_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_l = (m_l & 0xff00ffff) | ((A & 0xff) << 16); // TODO: flags
 	prefetch();
 
 stal3_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_l = (m_l & 0x00ffffff) | ((A & 0xff) << 24); // TODO: flags
 	prefetch();
 
 ldal0_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (m_l & 0x000000ff) >> 0; // TODO: flags
 	prefetch();
 
 ldal1_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (m_l & 0x0000ff00) >> 8; // TODO: flags
 	prefetch();
 
 ldal2_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (m_l & 0x00ff0000) >> 16; // TODO: flags
 	prefetch();
 
 ldal3_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (m_l & 0xff000000) >> 24; // TODO: flags
 	prefetch();
 
 cmpl0_acc
@@ -217,8 +221,8 @@ sbcl3_acc
 	prefetch();
 
 spa0_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_pa = (m_pa & 0xffff00) | A; // TODO: Flags?
 	prefetch();
 
 lpa0_acc
@@ -227,8 +231,8 @@ lpa0_acc
 	prefetch();
 
 spa1_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_pa = (m_pa & 0xff00ff) | (A << 8); // TODO: Flags?
 	prefetch();
 
 lpa1_acc
@@ -237,8 +241,8 @@ lpa1_acc
 	prefetch();
 	
 spa2_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_pa = (m_pa & 0x00ffff) | (A << 16); // TODO: Flags?
 	prefetch();
 
 lpa2_acc
@@ -277,8 +281,9 @@ lpb2_acc
 	prefetch();
 
 incpa_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	m_pa++;
+	set_nz(m_pa&0xff); // startup code seems to require flag to set if low byte is 0x00?
 	prefetch();
 
 incpb_imp
@@ -312,8 +317,10 @@ eorpa_imp
 	prefetch();
 
 adcpa_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
+	m_databank = (m_pa & 0xff0000)>>16;
+	do_adc(read((m_pa&0xffff)+Y));
+	m_databank = TMP;
 	prefetch();
 
 stapa_imp
