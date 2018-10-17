@@ -32,11 +32,11 @@ public:
 	O(plx_imp); // 32
 	O(ply_imp); // 72
 
-	O(clrl_imp); // b2
-	O(decl_imp); // c2
-	O(notl_imp); // d2
-	O(incl_imp); // e2
-	O(negl_imp); // f2
+	O(clr_acc); // b2
+	O(dec_acc); // c2
+	O(not_acc); // d2
+	O(inc_acc); // e2
+	O(neg_acc); // f2
 
 	O(oral0_acc);
 	O(oral1_acc);

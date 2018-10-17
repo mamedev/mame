@@ -30,28 +30,28 @@ ply_imp
 	set_nz(Y);
 	prefetch();
 
-clrl_imp
+clr_acc
 	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
 	m_l = 0;
 	prefetch();
 
-decl_imp
+dec_acc
 	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
 	prefetch();
 
-notl_imp
+not_acc
 	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
 	prefetch();
 
-incl_imp
+inc_acc
 	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
 	prefetch();
 
-negl_imp
+neg_acc
 	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
 	prefetch();
