@@ -17,32 +17,25 @@
  * - alpinesa doesn't work, protection related?
  * - C139 for linked cabinets, as well as in RR fullscale
  * - confirm DSP and MCU clocks and their IRQ timing
+ * - EEPROM write timing should be around 5ms, it doesn't do any data/rdy polling
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
  *       it used to be much worse with the legacy_poly_manager
  * - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
- * - improve ss22 fogging:
- *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
- *       + timecris submarine explosion
- *       + aquajet underwater should show blue haze
- *       + 100% fog if you start dirtdash at the hill level
- * - improve ss22 lighting, eg. mountains in alpinr2b selection screen
- * - improve ss22 spot: the bugs hint toward an extra bg layer bank?
- *       + dirtdash spotlight is opaque for a short time when exiting the jungle level
- *       + dirtdash speedometer has wrong colors when in the jungle level
+ * - improve ss22 lighting:
+ *       + mountains in alpinr2b selection screen
+ *       + ridgerac waving flag shadowing
+ *       + cybrcomm enemies should flash white when you shoot them, probably lighting related
+ * - improve ss22 spot:
  *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
- * - polygon layer stays visible sometimes when it shouldn't:
- *       + cybrcomm/victlapw namco logo screen after attract demo
- *       + airco22b title logo after attract demo
- *       + aquajet namco logo/game over after ending
+ *       + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
+ *       + what is the high bit in spot_factor for? darkness instead of brightness? not used anywhere
+ * - support for text layer video partial updates after posirq, alpinesa does raster effects on it
+ * - alpha blended sprite/poly with priority over alpha blended text doesn't work right (see dirtdash countdown when you start at jungle level)
  * - cybrcomm arrows(black part) should be below textlayer when a messagebox pops up
- * - cybrcomm enemies should flash white when you shoot them, it's not poly fog
  * - cybrcycc speed dial needle is missing
- * - s22 background color control? see victlapw attract mode
  * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors), and alpinr2b character selection screen
- * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
  * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?
- * - propcycl scoreboard sprite part should fade out in attract mode and just before game over, fader or fog related?
  * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
  *       czram contents is rather odd here and partly cleared (probably the cause?):
  *        $0000-$0d7f - gradual increase from $00-$7c
@@ -1270,19 +1263,96 @@ WRITE32_MEMBER(namcos22_state::namcos22_sci_w)
 }
 
 
-/* system controller (ss22)
+// System Controller
+
+void namcos22_state::syscon_irqlevel(offs_t offset, u8 data)
+{
+	int line = 1 << offset;
+	int oldlevel = m_syscontrol[offset] & 7;
+	int newlevel = data & 7;
+
+	m_irq_enabled &= ~line;
+	if (m_is_ss22)
+		m_irq_enabled |= (newlevel != 0) ? line : 0;
+	else
+		m_irq_enabled |= (data & 0x10) ? line : 0; // always sets 0x30 to enable
+
+	// change active state
+	if (m_irq_state & line)
+	{
+		if (!(m_irq_enabled & line))
+		{
+			syscon_irqack(offset, 0);
+		}
+		else if (oldlevel != newlevel)
+		{
+			m_maincpu->set_input_line(oldlevel, CLEAR_LINE);
+			m_maincpu->set_input_line(newlevel, ASSERT_LINE);
+		}
+	}
+}
+
+void namcos22_state::syscon_irqack(offs_t offset, u8 data)
+{
+	int line = 1 << offset;
+	int level = m_syscontrol[offset] & 7;
+
+	m_irq_state &= ~line;
+	m_maincpu->set_input_line(level, CLEAR_LINE);
+}
+
+void namcos22_state::syscon_dspcontrol(offs_t offset, u8 data)
+{
+	if (data == m_syscontrol[offset])
+		return;
+
+	if (data == 0)
+	{
+		// disable DSPs
+		master_enable(false);
+		slave_enable(false);
+		m_dsp_irq_enabled = false;
+	}
+	else if (data == 1)
+	{
+		// enable dsp and rendering subsystem
+		master_enable(true);
+		slave_enable(true);
+		m_dsp_irq_enabled = true;
+	}
+	else if (data == 0xff)
+	{
+		// used to upload game-specific code to master/slave dsps
+		master_enable(true);
+		m_dsp_irq_enabled = false;
+	}
+}
+
+void namcos22_state::syscon_mcucontrol(offs_t offset, u8 data)
+{
+	// enable/disable mcu
+	m_mcu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+}
+
+READ8_MEMBER(namcos22_state::syscon_r)
+{
+	return m_syscontrol[offset];
+}
+
+
+/* System Controller (System Super22)
 
 0x00: vblank irq level
 0x01: hblank irq level
 0x02: sci irq level
-0x03: unk irq level (unused?)
+0x03: unknown irq level (unused?)
 
 0x04: vblank irq ack
 0x05: hblank irq ack
 0x06: sci irq ack
-0x07: unk irq ack
+0x07: unknown irq ack
 
-0x08: unknown
+0x08: ?
 0x09: 0x62 or 0x61
 0x0a: 0x62
 0x0b: 0x57
@@ -1309,7 +1379,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_sci_w)
 
 0x1c: dsp control
 */
-WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
+WRITE8_MEMBER(namcos22_state::ss22_syscon_w)
 {
 	switch (offset)
 	{
@@ -1318,67 +1388,29 @@ WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
 		case 0x01: // hblank
 		case 0x02: // SCI
 		case 0x03: // unknown
-		{
-			int line = 1 << offset;
-			int oldlevel = m_syscontrol[offset] & 7;
-			int newlevel = data & 7;
-			if (m_irq_state & line && oldlevel != newlevel)
-			{
-				m_maincpu->set_input_line(oldlevel, CLEAR_LINE);
-				if (newlevel)
-					m_maincpu->set_input_line(newlevel, ASSERT_LINE);
-				else
-					m_irq_state &= ~line;
-			}
+			syscon_irqlevel(offset, data);
 			break;
-		}
 
 		// acknowledge irqs
 		case 0x04: // vblank
 		case 0x05: // hblank
 		case 0x06: // SCI
 		case 0x07: // unknown
-		{
-			int line = 1 << (offset-4);
-			m_irq_state &= ~line;
-			m_maincpu->set_input_line(m_syscontrol[offset-4] & 7, CLEAR_LINE);
+			syscon_irqack(offset-4, data);
 			break;
-		}
 
 		// watchdog
 		case 0x14:
 			break;
 
-		// reset mcu
+		// mcu reset
 		case 0x16:
-			m_mcu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+			syscon_mcucontrol(offset, data);
 			break;
 
 		// dsp control
 		case 0x1c:
-			if (data != m_syscontrol[0x1c])
-			{
-				if (data == 0)
-				{
-					/* disable DSPs */
-					master_enable(false);
-					slave_enable(false);
-					m_dsp_irq_enabled = false;
-				}
-				else if (data == 1)
-				{
-					/* enable dsp and rendering subsystem */
-					master_enable(true);
-					slave_enable(true);
-					m_dsp_irq_enabled = true;
-				}
-				else if (data == 0xff)
-				{
-					/* used to upload game-specific code to master/slave dsps */
-					master_enable(true);
-					m_dsp_irq_enabled = false;
-				}
-			}
+			syscon_dspcontrol(offset, data);
 			break;
 
 		// other regs: unknown
@@ -1387,8 +1419,19 @@ WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
 	}
 
 	m_syscontrol[offset] = data;
-}
 
+	return;
+
+	std::string msg;
+	for (int i=0;i<0x20;i++)
+	{
+		if (i==0x10) msg+="\n";
+		char h[4];
+		sprintf(h, "%02X ",m_syscontrol[i]);
+		msg += h;
+	}
+	popmessage("%s",msg);
+}
 
 /*
 000064: 0000 8C9A  (1)
@@ -1404,30 +1447,30 @@ WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
 */
 INTERRUPT_GEN_MEMBER(namcos22_state::namcos22s_interrupt)
 {
-	if (m_syscontrol[0x00] & 7)
+	// vblank irq
+	int line = 1 << 0;
+	if (m_irq_enabled & line)
 	{
-		// vblank irq
-		m_irq_state |= (1 << 0x00);
-		device.execute().set_input_line(m_syscontrol[0x00] & 7, ASSERT_LINE);
+		m_irq_state |= line;
+		device.execute().set_input_line(m_syscontrol[0] & 7, ASSERT_LINE);
 	}
 }
 
 
+/* System Controller (System22)
 
-/* system controller (system22)
-
-0x00: IRQ (unknown)
+0x00: hblank irq level
 0x01: ?
-0x02: SCI IRQ level
-0x03: IRQ (unknown)
+0x02: sci irq level
+0x03: unknown irq level
 
-0x04: VSYNC IRQ level
-0x05: IRQ (unknown) acknowledge
+0x04: vblank irq level
+0x05: hblank irq ack
 0x06: ?
-0x07: SCI IRQ acknowledge
+0x07: sci irq ack
 
-0x08: IRQ (unknown) acknowledge
-0x09: VSYNC IRQ acknowledge
+0x08: unknown irq ack
+0x09: vblank irq ack
 0x0a: ?
 0x0b: ?
 
@@ -1451,78 +1494,40 @@ INTERRUPT_GEN_MEMBER(namcos22_state::namcos22s_interrupt)
 0x1a: 0 or 1 or 0xff -> DSP control
 0x1b: ?
 */
-WRITE8_MEMBER(namcos22_state::namcos22_system_controller_w)
+WRITE8_MEMBER(namcos22_state::s22_syscon_w)
 {
 	switch (offset)
 	{
 		// irq level / enable irqs
-		case 0x00: // unknown
+		case 0x00: // hblank
 		case 0x01: // ?
 		case 0x02: // SCI
 		case 0x03: // unknown
 		case 0x04: // vblank
-		{
-			int line = 1 << offset;
-			int oldlevel = m_syscontrol[offset] & 7;
-			int newlevel = data & 7;
-			if (m_irq_state & line && oldlevel != newlevel)
-			{
-				m_maincpu->set_input_line(oldlevel, CLEAR_LINE);
-				if (newlevel)
-					m_maincpu->set_input_line(newlevel, ASSERT_LINE);
-				else
-					m_irq_state &= ~line;
-			}
+			syscon_irqlevel(offset, data);
 			break;
-		}
 
 		// acknowledge irqs
-		case 0x05: // unknown
+		case 0x05: // hblank
 		case 0x06: // ?
 		case 0x07: // SCI
 		case 0x08: // unknown
 		case 0x09: // vblank
-		{
-			int line = 1 << (offset-5);
-			m_irq_state &= ~line;
-			m_maincpu->set_input_line(m_syscontrol[offset-5] & 7, CLEAR_LINE);
+			syscon_irqack(offset-5, data);
 			break;
-		}
 
 		// watchdog
 		case 0x16:
 			break;
 
-		// reset mcu
+		// mcu reset
 		case 0x18:
-			m_mcu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+			syscon_mcucontrol(offset, data);
 			break;
 
 		// dsp control
 		case 0x1a:
-			if (data != m_syscontrol[0x1a])
-			{
-				if (data == 0)
-				{
-					/* disable DSPs */
-					master_enable(false);
-					slave_enable(false);
-					m_dsp_irq_enabled = false;
-				}
-				else if (data == 1)
-				{
-					/* enable dsp and rendering subsystem */
-					master_enable(true);
-					slave_enable(true);
-					m_dsp_irq_enabled = true;
-				}
-				else if (data == 0xff)
-				{
-					/* used to upload game-specific code to master/slave dsps */
-					master_enable(true);
-					m_dsp_irq_enabled = false;
-				}
-			}
+			syscon_dspcontrol(offset, data);
 			break;
 
 		// other regs: unknown
@@ -1597,17 +1602,13 @@ INTERRUPT_GEN_MEMBER(namcos22_state::namcos22_interrupt)
 			break;
 	}
 
-	if (m_syscontrol[0x04] & 7)
+	// vblank irq
+	int line = 1 << 4;
+	if (m_irq_enabled & line)
 	{
-		// vblank irq
-		m_irq_state |= (1 << 0x04);
-		device.execute().set_input_line(m_syscontrol[0x04] & 7, ASSERT_LINE);
+		m_irq_state |= line;
+		device.execute().set_input_line(m_syscontrol[4] & 7, ASSERT_LINE);
 	}
-}
-
-READ8_MEMBER(namcos22_state::namcos22_system_controller_r)
-{
-	return m_syscontrol[offset];
 }
 
 
@@ -1842,15 +1843,15 @@ void namcos22_state::namcos22_am(address_map &map)
 	 * System Controller: Interrupt Control, Peripheral Control
 	 *
 	 */
-	map(0x40000000, 0x4000001f).rw(FUNC(namcos22_state::namcos22_system_controller_r), FUNC(namcos22_state::namcos22_system_controller_w));
+	map(0x40000000, 0x4000001f).rw(FUNC(namcos22_state::syscon_r), FUNC(namcos22_state::s22_syscon_w));
 
 	/**
 	 * Unknown Device (optional for diagnostics?)
 	 *
 	 * zero means not-connected.
-	 * may be related to device at 0x94000000
+	 * may be related to device at 0x90040000
 	 */
-	map(0x48000000, 0x4800003f).nopr().nopw();
+	map(0x48000000, 0x4800003f).noprw();
 
 	/**
 	 * DIPSW
@@ -1922,7 +1923,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	/**
 	 * LED on PCB(?)
 	 */
-	map(0x90000000, 0x90000003).ram();
+	map(0x90000000, 0x90000003).nopw();
 
 	/**
 	 * Depth-cueing Look-up Table (fog density between near to far)
@@ -1946,9 +1947,9 @@ void namcos22_state::namcos22_am(address_map &map)
 
 	/**
 	 * unknown (option)
-	 * Note: This device may be optional. This may relate to device at 0x40000000
+	 * Note: This device may be optional. This may relate to device at 0x48000000
 	 */
-	map(0x90040000, 0x9007ffff).ram(); /* diagnostic ROM? */
+	map(0x90040000, 0x9007ffff).nopr(); /* diagnostic ROM? */
 
 	/**
 	 * Tilemap PCG Memory
@@ -1967,7 +1968,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 * Tilemap Register
 	 * Mounted position: unknown
 	 */
-	map(0x900a0000, 0x900a000f).rw(FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w)).share("tilemapattr");
+	map(0x900a0000, 0x900a000f).rw(FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w));
 }
 
 
@@ -1982,17 +1983,17 @@ void namcos22_state::namcos22s_am(address_map &map)
 	map(0x440000, 0x440003).r(FUNC(namcos22_state::namcos22_dipswitch_r));
 	map(0x450008, 0x45000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
-	map(0x700000, 0x70001f).rw(FUNC(namcos22_state::namcos22_system_controller_r), FUNC(namcos22_state::namcos22s_system_controller_w));
+	map(0x700000, 0x70001f).rw(FUNC(namcos22_state::syscon_r), FUNC(namcos22_state::ss22_syscon_w));
 	map(0x800000, 0x800003).w(FUNC(namcos22_state::namcos22s_chipselect_w));
-	map(0x810000, 0x81000f).ram().share("czattr");
+	map(0x810000, 0x81000f).rw(FUNC(namcos22_state::namcos22s_czattr_r), FUNC(namcos22_state::namcos22s_czattr_w));
 	map(0x810200, 0x8103ff).rw(FUNC(namcos22_state::namcos22s_czram_r), FUNC(namcos22_state::namcos22s_czram_w));
 	map(0x820000, 0x8202ff).nopw(); // leftover of old (non-super) video mixer device
 	map(0x824000, 0x8243ff).ram().share("video_mixer");
 	map(0x828000, 0x83ffff).ram().w(FUNC(namcos22_state::namcos22_paletteram_w)).share("paletteram");
-	map(0x860000, 0x860007).rw(FUNC(namcos22_state::namcos22s_spotram_r), FUNC(namcos22_state::namcos22s_spotram_w));
+	map(0x860000, 0x860007).rw(FUNC(namcos22_state::spotram_r), FUNC(namcos22_state::spotram_w));
 	map(0x880000, 0x89dfff).ram().w(FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
 	map(0x89e000, 0x89ffff).ram().w(FUNC(namcos22_state::namcos22_textram_w)).share("textram");
-	map(0x8a0000, 0x8a000f).rw(FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w)).share("tilemapattr");
+	map(0x8a0000, 0x8a000f).rw(FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w));
 	map(0x900000, 0x90ffff).ram().share("vics_data");
 	map(0x940000, 0x94007f).rw(FUNC(namcos22_state::namcos22s_vics_control_r), FUNC(namcos22_state::namcos22s_vics_control_w)).share("vics_control");
 	map(0x980000, 0x9affff).ram().share("spriteram"); // C374
@@ -2160,19 +2161,17 @@ void namcos22_state::point_write(offs_t offs, u32 data)
 
 s32 namcos22_state::pointram_read(offs_t offs) // called from point_read
 {
-	// point ram, only used in ram test?
-	s32 result = 0;
+	// point ram, only used in ram test and ridgerac flag?
+	s32 result = -1;
 	if (m_is_ss22)
 	{
 		if (offs >= 0xf80000 && offs < 0xfa0000)
 			result = m_pointram[offs - 0xf80000];
-		else return -1;
 	}
 	else
 	{
 		if (offs >= 0xf00000 && offs < 0xf20000)
 			result = m_pointram[offs - 0xf00000];
-		else return -1;
 	}
 
 	// sign extend or crop
@@ -2204,7 +2203,8 @@ READ16_MEMBER(namcos22_state::point_loword_r)
 
 READ16_MEMBER(namcos22_state::point_hiword_ir)
 {
-	return point_read(m_point_address++) >> 16 & 0xffff;
+	// high bit is unknown busy signal (ridgerac, ridgera2, raveracw, cybrcomm)
+	return 0x8000 | (point_read(m_point_address++) >> 16 & 0x00ff);
 }
 
 
@@ -2215,12 +2215,20 @@ READ16_MEMBER(namcos22_state::pdp_status_r)
 
 READ16_MEMBER(namcos22_state::pdp_begin_r)
 {
+	if (machine().side_effects_disabled())
+		return 0;
+
 	/**
 	* This presumably kickstarts the PDP(polygon display parser/processor?)
 	* It parses through the displaylist and sends commands to the 3D render device.
 	* In MAME, this main task is done in simulate_slavedsp instead. Ideally, we'd make the PDP a device with execute_run
 	* SS22 supports more than just "goto" and render commands, they are handled here.
 	*/
+	m_pdp_frame = m_screen->frame_number();
+	if (m_screen->vblank())
+		m_pdp_frame++;
+	m_pdp_render_done = true;
+
 	m_dsp_master_bioz = 1;
 	u16 offs = (m_is_ss22) ? pdp_polygonram_read(0x7fff) : m_pdp_base;
 
@@ -2526,6 +2534,7 @@ WRITE16_MEMBER(namcos22_state::dsp_led_w)
 WRITE16_MEMBER(namcos22_state::dsp_unk8_w)
 {
 	m_RenderBufSize = 0;
+	m_render_refresh = true; // this one is more likely controlled by slavedsp somewhere
 }
 
 WRITE16_MEMBER(namcos22_state::master_render_device_w)
@@ -2543,14 +2552,14 @@ WRITE16_MEMBER(namcos22_state::master_render_device_w)
 void namcos22_state::master_dsp_program(address_map &map)
 {
 	map(0x0000, 0x0fff).rom(); /* internal ROM (4k words) */
-	map(0x4000, 0x7fff).rom().share("masterextram");
+	map(0x4000, 0x7fff).ram().share("masterextram").nopw();
 }
 
 void namcos22_state::master_dsp_data(address_map &map)
 {
 	map(0x1000, 0x3fff).ram();
 	map(0x4000, 0x7fff).ram().share("masterextram");
-	map(0x8000, 0xffff).r(FUNC(namcos22_state::namcos22_dspram16_r)).w(FUNC(namcos22_state::namcos22_dspram16_w));
+	map(0x8000, 0xffff).rw(FUNC(namcos22_state::namcos22_dspram16_r), FUNC(namcos22_state::namcos22_dspram16_w));
 }
 
 void namcos22_state::master_dsp_io(address_map &map)
@@ -2632,7 +2641,7 @@ WRITE16_MEMBER(namcos22_state::dsp_slave_portb_w)
 void namcos22_state::slave_dsp_program(address_map &map)
 {
 	map(0x0000, 0x0fff).rom(); /* internal ROM */
-	map(0x8000, 0x9fff).rom().share("slaveextram");
+	map(0x8000, 0x9fff).ram().share("slaveextram").nopw();
 }
 
 void namcos22_state::slave_dsp_data(address_map &map)
@@ -2704,11 +2713,7 @@ void namcos22_state::mcu_s22_program(address_map &map)
 {
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
 	map(0x004000, 0x00bfff).ram().share("shareram");
-	map(0x080000, 0x0fffff).rom().region("mcu", 0);
 	map(0x200000, 0x27ffff).rom().region("mcu", 0);
-	map(0x280000, 0x2fffff).rom().region("mcu", 0);
-	map(0x301000, 0x301001).noprw(); // watchdog? LEDs?
-	map(0x308000, 0x308003).noprw(); // volume control IC?
 }
 
 void namcos22_state::iomcu_s22_program(address_map &map)
@@ -2735,12 +2740,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
 	int scanline = param;
 
 	/* TODO: real sources of these */
-	if (scanline == 0)
+	if (scanline == 480)
+		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+	else if (scanline == 0)
 		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 	else if (scanline == 240)
 		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
-	else if (scanline == 480)
-		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
 
@@ -2798,11 +2803,10 @@ void namcos22_state::mcu_program(address_map &map)
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
 	map(0x004000, 0x00bfff).ram().share("shareram");
 	map(0x00c000, 0x00ffff).rom().region("mcu", 0xc000);
-	map(0x080000, 0x0fffff).rom().region("mcu", 0);
 	map(0x200000, 0x27ffff).rom().region("mcu", 0);
-	map(0x280000, 0x2fffff).rom().region("mcu", 0);
-	map(0x301000, 0x301001).noprw(); // watchdog? LEDs?
-	map(0x308000, 0x308003).noprw(); // volume control IC?
+	map(0x300000, 0x300001).nopr(); // ? (cybrcycc, alpinesa)
+	map(0x301000, 0x301001).nopw(); // watchdog? LEDs?
+	map(0x308000, 0x308003).nopw(); // volume control IC?
 }
 
 void namcos22_state::mcu_io(address_map &map)
@@ -2824,14 +2828,10 @@ void namcos22_state::handle_coinage(u16 flags)
 	int coin_state = (flags & 0x1000) >> 12 | (flags & 0x0200) >> 8;
 
 	if (!(coin_state & 1) && (m_old_coin_state & 1))
-	{
 		m_credits1++;
-	}
 
 	if (!(coin_state & 2) && (m_old_coin_state & 2))
-	{
 		m_credits2++;
-	}
 
 	m_old_coin_state = coin_state;
 	m_shareram[0x3a/2] = m_credits1 << 8 | m_credits2;
@@ -2980,15 +2980,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 
 	if (i != 0)
 	{
-		// the pedal has a simple 1-bit "light interrupted" sensor.  the faster you pedal,
+		// the pedal has a simple 1-bit "light interrupted" sensor. the faster you pedal,
 		// the faster it pulses.  this is connected to the clock input for timer A3,
 		// and timer A3 is configured by the MCU program to cause an interrupt each time
-		// it's clocked.  by counting the number of interrupts in a frame, we can determine
+		// it's clocked. by counting the number of interrupts in a frame, we can determine
 		// how fast the user is pedaling.
 
 		// these values(in usec) may need tweaking:
-		const int base = 1000;
-		const int range = 10000;
+		const int base = 750;
+		const int range = 100000;
 
 		attotime freq = attotime::from_usec(base + range * (1.0 / (double)i));
 		m_pc_pedal_interrupt->adjust(std::min(freq, m_pc_pedal_interrupt->time_left()), 0, freq);
@@ -3035,9 +3035,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 			a = M_PI / 2.0;
 
 		// tied to mcu A2/A3 timer (speed determines frequency)
-		// these values(in usec) may need tweaking:
-		const int base = 1000;
-		const int range = 5000;
+		// these values(in hz) may need tweaking:
+		const double base = 20;
+		const double range = 1250;
 
 		double t[2];
 		t[0] = v*sin(a); // y -> A2
@@ -3045,9 +3045,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 
 		for (int axis = 0; axis < 2; axis++)
 		{
-			if (t[axis] >  (1.0 / (double)(range)))
+			if (t[axis] > (1.0 / range))
 			{
-				attotime freq = attotime::from_usec((base + range) - ((double)(range) * t[axis]));
+				attotime freq = attotime::from_hz(base + range * t[axis]);
 				m_ar_tb_interrupt[axis]->adjust(std::min(freq, m_ar_tb_interrupt[axis]->remaining()), axis, freq);
 			}
 			else
@@ -3713,9 +3713,15 @@ void namcos22_state::machine_reset()
 	m_dsp_irq_enabled = false;
 	if (!m_is_ss22) m_iomcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-	m_poly->reset();
 }
+
+void namcos22_state::device_post_load()
+{
+	m_gfxdecode->gfx(0)->mark_all_dirty();
+}
+
+// allow save_item on a non-fundamental type
+ALLOW_SAVE_TYPE(namcos22_dsp_upload_state);
 
 void namcos22_state::machine_start()
 {
@@ -3723,6 +3729,89 @@ void namcos22_state::machine_start()
 	m_cpuled.resolve();
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
+
+	m_keycus_rng = 0;
+	m_su_82 = 0;
+	m_irq_state = 0;
+	m_p4 = 0;
+	m_old_coin_state = 0;
+	m_credits1 = m_credits2 = 0;
+
+	// register for savestates, stuff that isn't done in video_start()
+	// note: namcos22_renderer class doesn't need saving, it is refreshed every frame
+	save_item(NAME(m_poly_translucency));
+	save_item(NAME(m_mixer_flags));
+	save_item(NAME(m_fog_r));
+	save_item(NAME(m_fog_g));
+	save_item(NAME(m_fog_b));
+	save_item(NAME(m_fog_colormask));
+	save_item(NAME(m_screen_fade_r));
+	save_item(NAME(m_screen_fade_g));
+	save_item(NAME(m_screen_fade_b));
+	save_item(NAME(m_screen_fade_factor));
+	save_item(NAME(m_poly_fade_r));
+	save_item(NAME(m_poly_fade_g));
+	save_item(NAME(m_poly_fade_b));
+	save_item(NAME(m_poly_fade_enabled));
+
+	save_item(NAME(m_syscontrol));
+	save_item(NAME(m_dsp_irq_enabled));
+	save_item(NAME(m_dsp_master_bioz));
+	save_item(NAME(m_old_coin_state));
+	save_item(NAME(m_credits1));
+	save_item(NAME(m_credits2));
+	save_item(NAME(m_point_address));
+	save_item(NAME(m_point_data));
+	save_item(NAME(m_SerialDataSlaveToMasterNext));
+	save_item(NAME(m_SerialDataSlaveToMasterCurrent));
+	save_item(NAME(m_RenderBufSize));
+	save_item(NAME(m_RenderBufData));
+	save_item(NAME(m_portbits));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_enabled));
+	save_item(NAME(m_dsp_upload_state));
+	save_item(NAME(m_UploadDestIdx));
+	save_item(NAME(m_alpinesa_protection));
+	save_item(NAME(m_motor_status));
+	save_item(NAME(m_p4));
+	save_item(NAME(m_su_82));
+	save_item(NAME(m_keycus_id));
+	save_item(NAME(m_keycus_rng));
+	save_item(NAME(m_chipselect));
+	save_item(NAME(m_spotram_enable));
+	save_item(NAME(m_spotram_address));
+	save_item(NAME(m_cz_adjust));
+	save_item(NAME(m_dspram_bank));
+	save_item(NAME(m_dspram16_latch));
+	save_item(NAME(m_slave_simulation_active));
+	save_item(NAME(m_absolute_priority));
+	save_item(NAME(m_objectshift));
+	save_item(NAME(m_viewmatrix));
+	save_item(NAME(m_LitSurfaceInfo));
+	save_item(NAME(m_SurfaceNormalFormat));
+	save_item(NAME(m_LitSurfaceCount));
+	save_item(NAME(m_LitSurfaceIndex));
+	save_item(NAME(m_tilemapattr));
+	save_item(NAME(m_spot_factor));
+	save_item(NAME(m_text_palbase));
+	save_item(NAME(m_bg_palbase));
+	save_item(NAME(m_camera_zoom));
+	save_item(NAME(m_camera_vx));
+	save_item(NAME(m_camera_vy));
+	save_item(NAME(m_camera_vw));
+	save_item(NAME(m_camera_vh));
+	save_item(NAME(m_camera_lx));
+	save_item(NAME(m_camera_ly));
+	save_item(NAME(m_camera_lz));
+	save_item(NAME(m_camera_ambient));
+	save_item(NAME(m_camera_power));
+	save_item(NAME(m_reflection));
+	save_item(NAME(m_cullflip));
+	save_item(NAME(m_skipped_this_frame));
+	save_item(NAME(m_pdp_render_done));
+	save_item(NAME(m_render_refresh));
+	save_item(NAME(m_pdp_frame));
+	save_item(NAME(m_pdp_base));
 }
 
 // System22
@@ -3756,20 +3845,21 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
 
 	MCFG_DEVICE_ADD("mcu", NAMCO_C74, 49.152_MHz_XTAL/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
-	MCFG_DEVICE_PROGRAM_MAP( mcu_s22_program)
-	MCFG_DEVICE_IO_MAP( mcu_s22_io)
+	MCFG_DEVICE_PROGRAM_MAP(mcu_s22_program)
+	MCFG_DEVICE_IO_MAP(mcu_s22_io)
 
 	MCFG_DEVICE_ADD("iomcu", NAMCO_C74, 6.144_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP( iomcu_s22_program)
-	MCFG_DEVICE_IO_MAP( iomcu_s22_io)
+	MCFG_DEVICE_PROGRAM_MAP(iomcu_s22_program)
+	MCFG_DEVICE_IO_MAP(iomcu_s22_io)
 
-	EEPROM_2864(config, "eeprom");
+	EEPROM_2864(config, "eeprom").write_time(attotime::from_nsec(10));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos22_state, screen_vblank))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos22)
@@ -3796,58 +3886,26 @@ MACHINE_CONFIG_END
 
 // System Super22
 MACHINE_CONFIG_START(namcos22_state::namcos22s)
+	namcos22(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, 49.152_MHz_XTAL/2) // MC68EC020FG25
+	MCFG_DEVICE_REPLACE("maincpu", M68EC020, 49.152_MHz_XTAL/2) // MC68EC020FG25
 	MCFG_DEVICE_PROGRAM_MAP(namcos22s_am)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22s_interrupt)
 
-	tms32025_device& master(TMS32025(config, m_master, 40_MHz_XTAL));
-	master.set_addrmap(AS_PROGRAM, &namcos22_state::master_dsp_program);
-	master.set_addrmap(AS_DATA, &namcos22_state::master_dsp_data);
-	master.set_addrmap(AS_IO, &namcos22_state::master_dsp_io);
-	master.bio_in_cb().set(FUNC(namcos22_state::pdp_status_r));
-	master.hold_in_cb().set(FUNC(namcos22_state::dsp_hold_signal_r));
-	master.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
-	master.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
-	master.dr_in_cb().set(FUNC(namcos22_state::master_serial_io_r));
-	master.set_vblank_int("screen", FUNC(namcos22_state::dsp_vblank_irq));
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dsp_serial", namcos22_state, dsp_serial_pulse, attotime::from_hz(SERIAL_IO_PERIOD))
-
-	tms32025_device& slave(TMS32025(config, m_slave, 40_MHz_XTAL));
-	slave.set_addrmap(AS_PROGRAM, &namcos22_state::slave_dsp_program);
-	slave.set_addrmap(AS_DATA, &namcos22_state::slave_dsp_data);
-	slave.set_addrmap(AS_IO, &namcos22_state::slave_dsp_io);
-	slave.bio_in_cb().set(FUNC(namcos22_state::dsp_slave_bioz_r));
-	slave.hold_in_cb().set(FUNC(namcos22_state::dsp_hold_signal_r));
-	slave.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
-	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
-	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
-
-	MCFG_DEVICE_ADD("mcu", M37710S4, 49.152_MHz_XTAL/3)
+	MCFG_DEVICE_REPLACE("mcu", M37710S4, 49.152_MHz_XTAL/3)
 	MCFG_DEVICE_PROGRAM_MAP(mcu_program)
 	MCFG_DEVICE_IO_MAP(mcu_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_irq", namcos22_state, mcu_irq, "screen", 0, 240)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // erratic inputs otherwise, probably mcu vs maincpu shareram
 
-	EEPROM_2864(config, "eeprom");
+	MCFG_DEVICE_REMOVE("iomcu")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22s)
 
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super)
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	MCFG_DEVICE_ADD("c352", C352, 49.152_MHz_XTAL/2, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_DEVICE_REPLACE("gfxdecode", GFXDECODE, "palette", gfx_super)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos22_state::airco22b)
@@ -3862,7 +3920,6 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::alpine)
 	namcos22s(config);
 
-	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("mcu")
 	MCFG_DEVICE_IO_MAP(alpine_io_map)
 
@@ -3872,7 +3929,6 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::alpinesa)
 	alpine(config);
 
-	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(alpinesa_am)
 MACHINE_CONFIG_END
@@ -3898,7 +3954,6 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::timecris)
 	namcos22s(config);
 
-	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(timecris_am)
 MACHINE_CONFIG_END
@@ -3917,7 +3972,6 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::propcycl)
 	namcos22s(config);
 
-	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("mcu")
 	MCFG_DEVICE_IO_MAP(propcycl_io_map)
 
@@ -3936,9 +3990,7 @@ MACHINE_START_MEMBER(namcos22_state,adillor)
 MACHINE_CONFIG_START(namcos22_state::adillor)
 	namcos22s(config);
 
-	/* basic machine hardware */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ar_tb_upd", namcos22_state, adillor_trackball_update, attotime::from_msec(20))
-
 	MCFG_MACHINE_START_OVERRIDE(namcos22_state,adillor)
 MACHINE_CONFIG_END
 
@@ -5563,13 +5615,6 @@ void namcos22_state::install_141_speedup()
 void namcos22_state::namcos22_init(int game_type)
 {
 	m_gametype = game_type;
-
-	m_keycus_rng = 0;
-	m_su_82 = 0;
-	m_irq_state = 0;
-	m_p4 = 0;
-	m_old_coin_state = 0;
-	m_credits1 = m_credits2 = 0;
 }
 
 void namcos22_state::init_ridgeraj()
@@ -5656,8 +5701,8 @@ void namcos22_state::init_propcycl()
 	 *
 	 * DIP5: real time display of "INST_CUNT, MODE_NUM, MODE_CUNT"
 	 */
-//   ROM[0x22296/4] &= 0xffff0000;
-//   ROM[0x22296/4] |= 0x00004e75;
+	//ROM[0x22296/4] &= 0xffff0000;
+	//ROM[0x22296/4] |= 0x00004e75;
 
 	namcos22_init(NAMCOS22_PROP_CYCLE);
 	install_141_speedup();
@@ -5705,34 +5750,34 @@ void namcos22_state::init_dirtdash()
 
 /*     YEAR, NAME,    PARENT,    MACHINE,   INPUT,     CLASS,          INIT,          MNTR, COMPANY, FULLNAME, FLAGS */
 // System22 games
-GAME( 1993, ridgerac,  0,        namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR3, World)", MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
-GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World, 3-screen?)", MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, no indication that this really is a 3-screen version.
-GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2, World)", MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)", MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracf, ridgerac, namcos22,  ridgeracf, namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer Full Scale (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
-GAME( 1994, ridgera2,  0,        namcos22,  ridgera2,  namcos22_state, init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
-GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera2,  namcos22_state, init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
-GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera2,  namcos22_state, init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
-GAME( 1994, cybrcomm,  0,        cybrcomm,  cybrcomm,  namcos22_state, init_cybrcomm, ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)", MACHINE_IMPERFECT_GRAPHICS ) // 10/14/94
-GAME( 1995, raveracw,  0,        namcos22,  raveracw,  namcos22_state, init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV2, World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
-GAME( 1995, raveracj,  raveracw, namcos22,  raveracw,  namcos22_state, init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1 Ver.B, Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
-GAME( 1995, raveracja, raveracw, namcos22,  raveracw,  namcos22_state, init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
-GAME( 1994, acedrvrw,  0,        namcos22,  acedrvr,   namcos22_state, init_acedrvr,  ROT0, "Namco", "Ace Driver: Racing Evolution (Rev. AD2, World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
-GAME( 1996, victlapw,  0,        namcos22,  victlap,   namcos22_state, init_victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:50:06
-GAME( 1996, victlapj,  victlapw, namcos22,  victlap,   namcos22_state, init_victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV1, Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
+GAME( 1993, ridgerac,  0,        namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR3, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
+GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World, 3-screen?)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, no indication that this really is a 3-screen version.
+GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
+GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
+GAME( 1993, ridgeracf, ridgerac, namcos22,  ridgeracf, namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer Full Scale (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
+GAME( 1994, ridgera2,  0,        namcos22,  ridgera2,  namcos22_state, init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
+GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera2,  namcos22_state, init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
+GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera2,  namcos22_state, init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
+GAME( 1994, cybrcomm,  0,        cybrcomm,  cybrcomm,  namcos22_state, init_cybrcomm, ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94
+GAME( 1995, raveracw,  0,        namcos22,  raveracw,  namcos22_state, init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
+GAME( 1995, raveracj,  raveracw, namcos22,  raveracw,  namcos22_state, init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
+GAME( 1995, raveracja, raveracw, namcos22,  raveracw,  namcos22_state, init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
+GAME( 1994, acedrvrw,  0,        namcos22,  acedrvr,   namcos22_state, init_acedrvr,  ROT0, "Namco", "Ace Driver: Racing Evolution (Rev. AD2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
+GAME( 1996, victlapw,  0,        namcos22,  victlap,   namcos22_state, init_victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:50:06
+GAME( 1996, victlapj,  victlapw, namcos22,  victlap,   namcos22_state, init_victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
 
 // System Super22 games
-GAME( 1994, alpinerd, 0,         alpine,    alpiner,   namcos22_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, alpinerc, alpinerd,  alpine,    alpiner,   namcos22_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, airco22b, 0,         airco22b,  airco22,   namcos22_state, init_airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, cybrcycc, 0,         cybrcycc,  cybrcycc,  namcos22_state, init_cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
-GAME( 1995, dirtdash, 0,         dirtdash,  dirtdash,  namcos22_state, init_dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
-GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B, World)", MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
-GAME( 1995, timecrisa,timecris,  timecris,  timecris,  namcos22_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
-GAME( 1996, propcycl, 0,         propcycl,  propcycl,  namcos22_state, init_propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
-GAME( 1996, alpinesa, 0,         alpinesa,  alpiner,   namcos22_state, init_alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major gfx problems, slave dsp?
-GAME( 1996, tokyowar, 0,         tokyowar,  tokyowar,  namcos22_state, init_tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING ) // 96/09/03 14:08:47. near-invincible tanks, maybe related to timecris helicopter bug?
-GAME( 1996, aquajet,  0,         cybrcycc,  aquajet,   namcos22_state, init_aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
-GAME( 1996, alpinr2b, 0,         alpine,    alpiner,   namcos22_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_IMPERFECT_GRAPHICS ) // 97/01/10 17:10:59
-GAME( 1996, alpinr2a, alpinr2b,  alpine,    alpiner,   namcos22_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_IMPERFECT_GRAPHICS ) // 96/12/06 13:45:05
-GAME( 1997, adillor,  0,         adillor,   adillor,   namcos22_state, init_adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A, Japan)", MACHINE_IMPERFECT_GRAPHICS ) // 97/04/07 19:19:41
+GAME( 1994, alpinerd, 0,         alpine,    alpiner,   namcos22_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, alpinerc, alpinerd,  alpine,    alpiner,   namcos22_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, airco22b, 0,         airco22b,  airco22,   namcos22_state, init_airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, cybrcycc, 0,         cybrcycc,  cybrcycc,  namcos22_state, init_cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
+GAME( 1995, dirtdash, 0,         dirtdash,  dirtdash,  namcos22_state, init_dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
+GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
+GAME( 1995, timecrisa,timecris,  timecris,  timecris,  namcos22_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
+GAME( 1996, propcycl, 0,         propcycl,  propcycl,  namcos22_state, init_propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
+GAME( 1996, alpinesa, 0,         alpinesa,  alpiner,   namcos22_state, init_alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
+GAME( 1996, tokyowar, 0,         tokyowar,  tokyowar,  namcos22_state, init_tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING ) // 96/09/03 14:08:47. near-invincible tanks, maybe related to timecris helicopter bug?
+GAME( 1996, aquajet,  0,         cybrcycc,  aquajet,   namcos22_state, init_aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
+GAME( 1996, alpinr2b, 0,         alpine,    alpiner,   namcos22_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
+GAME( 1996, alpinr2a, alpinr2b,  alpine,    alpiner,   namcos22_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05
+GAME( 1997, adillor,  0,         adillor,   adillor,   namcos22_state, init_adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:19:41

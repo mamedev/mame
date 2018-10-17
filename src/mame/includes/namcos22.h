@@ -2,7 +2,7 @@
 // copyright-holders:Phil Stroffolino, hap, R. Belmont
 /***************************************************************************
 
-    Namco System 22 / Super System 22 hardware
+    Namco System22 / System Super22 hardware
 
 ***************************************************************************/
 
@@ -83,7 +83,9 @@ struct namcos22_scenenode
 
 		struct
 		{
-			int tile, color, pri;
+			int tile, color;
+			int prioverchar;
+			int fade_enabled;
 			int flipx, flipy;
 			int linktype;
 			int cols, rows;
@@ -138,7 +140,7 @@ public:
 	void render_scene(screen_device &screen, bitmap_rgb32 &bitmap);
 	struct namcos22_scenenode *new_scenenode(running_machine &machine, u32 zsort, namcos22_scenenode_type type);
 
-	void reset();
+	void init();
 
 private:
 	namcos22_state &m_state;
@@ -156,7 +158,7 @@ private:
 	void render_scene_nodes(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
 	void render_sprite(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
 	void poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
-	void poly3d_drawsprite(screen_device &screen, bitmap_rgb32 &dest_bmp, u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int cz_factor, int prioverchar, int alpha);
+	void poly3d_drawsprite(screen_device &screen, bitmap_rgb32 &dest_bmp, u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int cz_factor, int prioverchar, int fade_enabled, int alpha);
 
 	void free_scenenode(struct namcos22_scenenode *node);
 	struct namcos22_scenenode *alloc_scenenode(running_machine &machine, struct namcos22_scenenode *node);
@@ -183,7 +185,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_czram(*this, "czram"),
-		m_czattr(*this, "czattr"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_maincpu(*this, "maincpu"),
@@ -203,7 +204,6 @@ public:
 		m_gamma_proms(*this, "gamma_proms"),
 		m_vics_data(*this, "vics_data"),
 		m_vics_control(*this, "vics_control"),
-		m_tilemapattr(*this, "tilemapattr"),
 		m_motor_timer(*this, "motor_timer"),
 		m_pc_pedal_interrupt(*this, "pc_p_int"),
 		m_screen(*this, "screen"),
@@ -273,23 +273,31 @@ public:
 	int m_fog_r_per_cztype[4];
 	int m_fog_g_per_cztype[4];
 	int m_fog_b_per_cztype[4];
+	u16 m_czattr[8];
 
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<u32> m_czram;
-	optional_shared_ptr<u32> m_czattr;
 	optional_shared_ptr<u32> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void device_post_load() override;
+
 private:
+	DECLARE_WRITE16_MEMBER(namcos22s_czattr_w);
+	DECLARE_READ16_MEMBER(namcos22s_czattr_r);
 	DECLARE_WRITE32_MEMBER(namcos22s_czram_w);
 	DECLARE_READ32_MEMBER(namcos22s_czram_r);
 	DECLARE_READ32_MEMBER(namcos22s_vics_control_r);
 	DECLARE_WRITE32_MEMBER(namcos22s_vics_control_w);
 	DECLARE_WRITE32_MEMBER(namcos22_textram_w);
-	DECLARE_READ32_MEMBER(namcos22_tilemapattr_r);
-	DECLARE_WRITE32_MEMBER(namcos22_tilemapattr_w);
-	DECLARE_READ32_MEMBER(namcos22s_spotram_r);
-	DECLARE_WRITE32_MEMBER(namcos22s_spotram_w);
+	DECLARE_READ16_MEMBER(namcos22_tilemapattr_r);
+	DECLARE_WRITE16_MEMBER(namcos22_tilemapattr_w);
+	DECLARE_READ16_MEMBER(spotram_r);
+	DECLARE_WRITE16_MEMBER(spotram_w);
 	DECLARE_READ32_MEMBER(namcos22_dspram_r);
 	DECLARE_WRITE32_MEMBER(namcos22_dspram_w);
 	DECLARE_WRITE32_MEMBER(namcos22_cgram_w);
@@ -330,9 +338,6 @@ private:
 	DECLARE_WRITE16_MEMBER(dsp_slave_portb_w);
 	DECLARE_READ32_MEMBER(namcos22_sci_r);
 	DECLARE_WRITE32_MEMBER(namcos22_sci_w);
-	DECLARE_READ8_MEMBER(namcos22_system_controller_r);
-	DECLARE_WRITE8_MEMBER(namcos22s_system_controller_w);
-	DECLARE_WRITE8_MEMBER(namcos22_system_controller_w);
 	DECLARE_READ16_MEMBER(namcos22_shared_r);
 	DECLARE_WRITE16_MEMBER(namcos22_shared_w);
 	DECLARE_READ16_MEMBER(namcos22_keycus_r);
@@ -383,6 +388,18 @@ private:
 	void master_enable(bool enable);
 	void slave_enable(bool enable);
 
+	void syscon_irqlevel(offs_t offset, u8 data);
+	void syscon_irqack(offs_t offset, u8 data);
+	void syscon_dspcontrol(offs_t offset, u8 data);
+	void syscon_mcucontrol(offs_t offset, u8 data);
+	DECLARE_READ8_MEMBER(syscon_r);
+	DECLARE_WRITE8_MEMBER(ss22_syscon_w);
+	DECLARE_WRITE8_MEMBER(s22_syscon_w);
+
+	void posirq_update();
+	emu_timer *m_posirq_timer;
+	TIMER_CALLBACK_MEMBER(posirq_callback);
+
 	void matrix3d_multiply(float a[4][4], float b[4][4]);
 	void matrix3d_identity(float m[4][4]);
 	void matrix3d_apply_reflection(float m[4][4]);
@@ -391,11 +408,11 @@ private:
 	void register_normals(int addr, float m[4][4]);
 
 	void blit_single_quad(u32 color, u32 addr, float m[4][4], int polyshift, int flags, int packetformat);
-	void blit_quads(int addr, float m[4][4], int base);
+	void blit_quads(int addr, int len, float m[4][4]);
 	void blit_polyobject(int code, float m[4][4]);
 
 	void slavesim_handle_bb0003(const s32 *src);
-	void slavesim_handle_200002(const s32 *src);
+	void slavesim_handle_200002(const s32 *src, int code);
 	void slavesim_handle_300000(const s32 *src);
 	void slavesim_handle_233002(const s32 *src);
 	void simulate_slavedsp();
@@ -450,10 +467,6 @@ private:
 	void slave_dsp_program(address_map &map);
 	void timecris_am(address_map &map);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
@@ -471,7 +484,6 @@ private:
 	optional_region_ptr<u8> m_gamma_proms;
 	optional_shared_ptr<u32> m_vics_data;
 	optional_shared_ptr<u32> m_vics_control;
-	required_shared_ptr<u32> m_tilemapattr;
 	optional_device<timer_device> m_motor_timer;
 	optional_device<timer_device> m_pc_pedal_interrupt;
 	required_device<screen_device> m_screen;
@@ -491,7 +503,6 @@ private:
 	int m_old_coin_state;
 	u32 m_credits1;
 	u32 m_credits2;
-	u16 m_pdp_base;
 	u32 m_point_address;
 	u32 m_point_data;
 	u16 m_SerialDataSlaveToMasterNext;
@@ -500,6 +511,7 @@ private:
 	u16 m_RenderBufData[NAMCOS22_MAX_RENDER_CMD_SEQ];
 	u16 m_portbits[2];
 	int m_irq_state;
+	int m_irq_enabled;
 	namcos22_dsp_upload_state m_dsp_upload_state;
 	int m_UploadDestIdx;
 	u32 m_alpinesa_protection;
@@ -510,9 +522,8 @@ private:
 	u16 m_keycus_rng;
 	int m_gametype;
 	int m_chipselect;
-	int m_spot_enable;
-	int m_spot_read_address;
-	int m_spot_write_address;
+	int m_spotram_enable;
+	int m_spotram_address;
 	std::unique_ptr<u16[]> m_spotram;
 	std::unique_ptr<u16[]> m_banked_czram[4];
 	u32 m_cz_was_written[4];
@@ -523,7 +534,6 @@ private:
 	bool m_slave_simulation_active;
 	int m_absolute_priority;
 	int m_objectshift;
-	u16 m_PrimitiveID;
 	float m_viewmatrix[4][4];
 	u8 m_reflection;
 	bool m_cullflip;
@@ -536,9 +546,11 @@ private:
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
+	u16 m_tilemapattr[8];
 
-	int m_spot_limit;
+	int m_spot_factor;
 	int m_text_palbase;
+	int m_bg_palbase;
 
 	float m_camera_zoom;
 	float m_camera_vx;
@@ -550,6 +562,14 @@ private:
 	float m_camera_lz; // "
 	int m_camera_ambient; // 0.0..1.0
 	int m_camera_power;   // 0.0..1.0
+
+	bool m_skipped_this_frame;
+	void render_frame_active();
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	bool m_pdp_render_done;
+	bool m_render_refresh;
+	uint64_t m_pdp_frame;
+	u16 m_pdp_base;
 };
 
 #endif // MAME_INCLUDES_NAMCOS22_H
