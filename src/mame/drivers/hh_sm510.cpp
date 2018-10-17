@@ -1149,72 +1149,72 @@ MACHINE_CONFIG_END
 class gnw_dkong_state : public hh_sm510_state
 {
 public:
-        gnw_dkong_state(const machine_config &mconfig, device_type type, const char *tag)
-                : hh_sm510_state(mconfig, type, tag)
-        {
-                m_inp_lines = 3;
-        }
+	gnw_dkong_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 3;
+	}
 
-        void gnw_dkong(machine_config &config);
+	void gnw_dkong(machine_config &config);
 };
 
 // config
 
 static INPUT_PORTS_START( gnw_dkong )
-        PORT_START("IN.0") // S1
-        PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-        PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Jump
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Jump
 
-        PORT_START("IN.1") // S2
-        PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-        PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-        PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-        PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
 
-        PORT_START("IN.2") // S3
-        PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
-        PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
-        PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
-        PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
 
-        PORT_START("ACL")
-        PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 
-        PORT_START("B") // MCU B(beta) pin pulled to GND
-        PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
-        PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-        PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gnw_dkong_state::gnw_dkong)
 
-        /* basic machine hardware */
-        MCFG_DEVICE_ADD("maincpu", SM510)
-        MCFG_SM510_R_MASK_OPTION(2) // confirmed
-        MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-        MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-        MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-        MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-        MCFG_SM510_READ_B_CB(IOPORT("B"))
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", SM510)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
-        /* video hardware */
-        MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
-        MCFG_SCREEN_REFRESH_RATE(50)
-        MCFG_SCREEN_SIZE(1920/2, 1266/2)
-        MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1266/2-1)
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920/2, 1266/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1266/2-1)
 
-        MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
-        MCFG_SCREEN_REFRESH_RATE(50)
-        MCFG_SCREEN_SIZE(1920/2, 1266/2)
-        MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1266/2-1)
+	MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920/2, 1266/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1266/2-1)
 
-        MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-        config.set_default_layout(layout_gnw_dualv);
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	config.set_default_layout(layout_gnw_dualv);
 
-        /* sound hardware */
-        SPEAKER(config, "mono").front_center();
-        MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-        MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -6642,14 +6642,14 @@ ROM_START( exospace )
 ROM_END
 
 ROM_START( gnw_dkong )
-        ROM_REGION( 0x1000, "maincpu", 0 )
-        ROM_LOAD( "dk-52", 0x0000, 0x1000, CRC(5180cbf8) SHA1(5174570a8d6a601226f51e972bac6735535fe11d) )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dk-52", 0x0000, 0x1000, CRC(5180cbf8) SHA1(5174570a8d6a601226f51e972bac6735535fe11d) )
 
-        ROM_REGION( 176706, "svg_top", 0)
-        ROM_LOAD( "gnw_dkong_top.svg", 0, 176706, CRC(db041556) SHA1(fb0f979dea3ecd25288d341fa80e35b5fd0a8349) )
+	ROM_REGION( 176706, "svg_top", 0)
+	ROM_LOAD( "gnw_dkong_top.svg", 0, 176706, CRC(db041556) SHA1(fb0f979dea3ecd25288d341fa80e35b5fd0a8349) )
 
-        ROM_REGION( 145397, "svg_bottom", 0)
-        ROM_LOAD( "gnw_dkong_bottom.svg", 0, 145397, CRC(2c8c9d08) SHA1(658fd0bbccaabb0645b02e5cb81709c4b2a4250e) )
+	ROM_REGION( 145397, "svg_bottom", 0)
+	ROM_LOAD( "gnw_dkong_bottom.svg", 0, 145397, CRC(2c8c9d08) SHA1(658fd0bbccaabb0645b02e5cb81709c4b2a4250e) )
 ROM_END
 
 ROM_START( gnw_mickdon )
