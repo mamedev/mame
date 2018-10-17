@@ -764,6 +764,8 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -834,7 +836,7 @@ MACHINE_CONFIG_START(gaiden_state::raiga)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_raiga)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gaiden_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 MACHINE_CONFIG_END
 
@@ -850,6 +852,8 @@ MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 	MCFG_DEVICE_IO_MAP(drgnbowl_sound_port_map)
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -1008,6 +1012,8 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))

@@ -19,11 +19,6 @@
 
 void tecmo16_state::save_state()
 {
-	m_spritebuffer[0] = make_unique_clear<uint16_t[]>(0x1000/2);
-	m_spritebuffer[1] = make_unique_clear<uint16_t[]>(0x1000/2);
-
-	save_pointer(NAME(m_spritebuffer[0]), 0x1000/2);
-	save_pointer(NAME(m_spritebuffer[1]), 0x1000/2);
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_scroll_x_w));
 	save_item(NAME(m_scroll_y_w));
@@ -228,11 +223,7 @@ uint32_t tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	m_tile_bitmap_bg.fill(0, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);
 	m_tile_bitmap_tx.fill(0, cliprect);
-	m_sprite_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
-
-	if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spritebuffer[1].get(), 0, 0, flip_screen(),  m_sprite_bitmap);
-	else m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spritebuffer[1].get(), 2, 0, flip_screen(),  m_sprite_bitmap);
 
 	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
@@ -240,14 +231,10 @@ uint32_t tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	m_mixer->mix_bitmaps(screen, bitmap, cliprect, *m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, &m_tile_bitmap_tx, &m_sprite_bitmap);
 
-	return 0;
-}
+	// 2 frame sprite lags
+	m_sprite_bitmap.fill(0, cliprect);
+	if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram->buffer(), 0, 0, flip_screen(),  m_sprite_bitmap);
+	else m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram->buffer(), 2, 0, flip_screen(),  m_sprite_bitmap);
 
-WRITE_LINE_MEMBER(tecmo16_state::screen_vblank)
-{
-	if (state)
-	{
-		std::copy_n(&m_spritebuffer[0][0], 0x1000/2, &m_spritebuffer[1][0]);
-		std::copy_n(&m_spriteram[0],       0x1000/2, &m_spritebuffer[0][0]);
-	}
+	return 0;
 }

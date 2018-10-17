@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau, Nicola Salmoria
 
+#include "video/bufsprite.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
 #include "emupal.h"
@@ -9,8 +10,8 @@
 class tecmo16_state : public driver_device
 {
 public:
-	tecmo16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tecmo16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -44,7 +45,7 @@ private:
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_shared_ptr<uint16_t> m_colorram2;
 	required_shared_ptr<uint16_t> m_charram;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<buffered_spriteram16_device> m_spriteram;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -61,7 +62,6 @@ private:
 	uint16_t m_scroll2_y_w;
 	uint16_t m_scroll_char_x_w;
 	uint16_t m_scroll_char_y_w;
-	std::unique_ptr<uint16_t[]> m_spritebuffer[2];
 
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_WRITE16_MEMBER(colorram_w);
@@ -85,7 +85,6 @@ private:
 	DECLARE_VIDEO_START(riot);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void save_state();
 

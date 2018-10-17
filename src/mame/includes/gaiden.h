@@ -14,6 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/74157.h"
 #include "sound/msm5205.h"
+#include "video/bufsprite.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
 #include "emupal.h"
@@ -54,7 +55,7 @@ public:
 private:
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 3> m_videoram;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_memory_bank m_adpcm_bank;
 
 	/* video-related */
@@ -75,7 +76,6 @@ private:
 	int8_t        m_bg_offset_y;
 	int8_t        m_fg_offset_y;
 	int8_t        m_spr_offset_y;
-	std::unique_ptr<uint16_t[]> m_spritebuffer[2];
 
 	/* misc */
 	int         m_sprite_sizey;

@@ -367,13 +367,15 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo16_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tecmo16_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmo16)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 4096)
