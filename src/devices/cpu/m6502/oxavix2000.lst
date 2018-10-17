@@ -226,8 +226,8 @@ spa0_acc
 	prefetch();
 
 lpa0_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (m_pa & 0x0000ff) >> 0; // TODO: Flags?
 	prefetch();
 
 spa1_acc
@@ -236,8 +236,8 @@ spa1_acc
 	prefetch();
 
 lpa1_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (m_pa & 0x00ff00) >> 8; // TODO: Flags?
 	prefetch();
 	
 spa2_acc
@@ -246,8 +246,8 @@ spa2_acc
 	prefetch();
 
 lpa2_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (m_pa & 0xff0000) >> 16; // TODO: Flags?
 	prefetch();
 
 spb0_acc
@@ -256,8 +256,8 @@ spb0_acc
 	prefetch();
 
 lpb0_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (m_pb & 0x0000ff) >> 0; // TODO: Flags?
 	prefetch();
 
 spb1_acc
@@ -266,8 +266,8 @@ spb1_acc
 	prefetch();
 
 lpb1_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (m_pb & 0x00ff00) >> 8; // TODO: Flags?
 	prefetch();
 
 spb2_acc
@@ -276,8 +276,8 @@ spb2_acc
 	prefetch();
 
 lpb2_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	A = (m_pb & 0xff0000) >> 16; // TODO: Flags?
 	prefetch();
 
 incpa_imp
@@ -324,8 +324,10 @@ adcpa_imp
 	prefetch();
 
 stapa_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
+	m_databank = (m_pa & 0xff0000)>>16;
+	write((m_pa&0xffff)+Y, A);
+	m_databank = TMP;
 	prefetch();
 
 ldapa_imp
@@ -339,8 +341,10 @@ cmppa_imp
 	prefetch();
 
 sbcpa_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
+	m_databank = (m_pa & 0xff0000)>>16;
+	do_sbc(read((m_pa&0xffff)+Y));
+	m_databank = TMP;
 	prefetch();
 	
 orapb_imp
