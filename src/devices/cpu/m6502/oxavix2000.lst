@@ -2,17 +2,6 @@
 # copyright-holders:David Haywood
 # xavix2000 opcodes (Super XaviX)
 
-unh_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
-	prefetch();
-
-clr_acc
-	read_pc_noinc();
-	A = 0;
-	set_nz(A);
-	prefetch();
-
 phy_imp
 	read_pc_noinc();
 	write(SP, Y);
@@ -39,4 +28,430 @@ ply_imp
 	inc_SP();
 	Y = read(SP);
 	set_nz(Y);
+	prefetch();
+
+clrl_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	m_l = 0;
+	prefetch();
+
+decl_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+notl_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+incl_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+negl_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+oral0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+oral1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+oral2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+oral3_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+andl0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+andl1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+andl2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+andl3_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+eorl0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+eorl1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+eorl2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+eorl3_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+adcl0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+adcl1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+adcl2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+adcl3_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+	
+stal0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+stal1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+stal2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+stal3_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+ldal0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+ldal1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+ldal2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+ldal3_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+cmpl0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+cmpl1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+cmpl2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+cmpl3_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sbcl0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sbcl1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sbcl2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sbcl3_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+spa0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+lpa0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+spa1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+lpa1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+	
+spa2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+lpa2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+spb0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+lpb0_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+spb1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+lpb1_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+spb2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+lpb2_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+incpa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+incpb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+decpa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+decpb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+orapa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+andpa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+eorpa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+adcpa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+stapa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+ldapa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+cmppa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sbcpa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+	
+orapb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+andpb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+eorpb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+adcpb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+stapb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+ldapb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+cmppb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sbcpb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+stx_aby
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sty_abx
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+stz_zpg
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+stz_aba
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+bit_zpx
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+bit_abx
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+bit_imm
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+asr_zpg
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+asr_aba
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+asr_zpx
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+asr_acc
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+asr_abx
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+cmc_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sev_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+callf_aba
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+callf_ind
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
 	prefetch();
