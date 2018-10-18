@@ -135,7 +135,7 @@ WRITE8_MEMBER(xavix_state::adc_7b00_w)
 READ8_MEMBER(xavix_state::adc_7b80_r)
 {
 	logerror("%s: adc_7b80_r\n", machine().describe_context());
-	return 0xff;
+	return 0x00;//0xff;
 }
 
 WRITE8_MEMBER(xavix_state::adc_7b80_w)
@@ -150,7 +150,8 @@ WRITE8_MEMBER(xavix_state::adc_7b81_w)
 
 READ8_MEMBER(xavix_state::adc_7b81_r)
 {
-	return machine().rand();
+	return 0x00;
+//	return machine().rand();
 }
 
 
@@ -213,7 +214,19 @@ READ8_MEMBER(xavix_state::io0_data_r)
 
 READ8_MEMBER(xavix_state::io1_data_r)
 {
-	uint8_t ret = m_in1->read() & ~m_io1_direction;
+	uint8_t ret = m_in1->read();
+
+	if (m_i2cmem)
+	{
+		if (!(m_io1_direction & 0x08))
+		{
+			ret &= ~0x08;
+			ret |= (m_i2cmem->read_sda() & 1) << 3;
+		}
+	}
+
+	ret &= ~m_io1_direction;
+
 	ret |= m_io1_data & m_io1_direction;
 	return ret;
 }
@@ -239,18 +252,33 @@ WRITE8_MEMBER(xavix_state::io1_data_w)
 {
 	m_io1_data = data;
 	logerror("%s: io1_data_w %02x\n", machine().describe_context(), data);
+
+	if (m_i2cmem)
+	{
+		if (m_io1_direction & 0x08)
+		{
+			m_i2cmem->write_sda((data & 0x08) >> 3);
+		}
+
+		if (m_io1_direction & 0x10)
+		{
+			m_i2cmem->write_scl((data & 0x10) >> 4);
+		}
+	}
 }
 
 WRITE8_MEMBER(xavix_state::io0_direction_w)
 {
 	m_io0_direction = data;
 	logerror("%s: io0_direction_w %02x\n", machine().describe_context(), data);
+	io0_data_w(space,0,m_io0_data); 
 }
 
 WRITE8_MEMBER(xavix_state::io1_direction_w)
 {
 	m_io1_direction = data;
 	logerror("%s: io1_direction_w %02x\n", machine().describe_context(), data);
+	io1_data_w(space,0,m_io1_data); // requires this for i2cmem to work, is it correct tho?
 }
 
 READ8_MEMBER(xavix_state::arena_start_r)

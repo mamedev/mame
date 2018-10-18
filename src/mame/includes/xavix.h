@@ -10,6 +10,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
+#include "machine/i2cmem.h"
 
 
 class xavix_state : public driver_device
@@ -34,12 +35,16 @@ public:
 		m_in1(*this, "IN1"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lowbus(*this, "lowbus")
+		m_lowbus(*this, "lowbus"),
+		m_i2cmem(*this, "i2cmem")
 	{ }
 
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
+
+	void xavix_i2c(machine_config &config);
+	void xavix2000_i2c(machine_config &config);
 
 	void init_xavix();
 
@@ -262,6 +267,7 @@ private:
 	int get_current_address_byte();
 
 	required_device<address_map_bank_device> m_lowbus;
+	optional_device<i2cmem_device> m_i2cmem;
 };
 
 #endif // MAME_INCLUDES_XAVIX_H
