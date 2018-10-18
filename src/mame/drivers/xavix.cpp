@@ -384,10 +384,10 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7986, 0x7987).ram().w(FUNC(xavix_state::rom_dmalen_w)).share("rom_dma_len");
 
 	// IO Ports
-	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::io_0_r),FUNC(xavix_state::io_0_w));
-	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io_1_r),FUNC(xavix_state::io_1_w));
-	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io_2_r),FUNC(xavix_state::io_2_w));
-	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io_3_r),FUNC(xavix_state::io_3_w));
+	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::io0_data_r),FUNC(xavix_state::io0_data_w));
+	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io1_data_r),FUNC(xavix_state::io1_data_w));
+	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io0_direction_r),FUNC(xavix_state::io0_direction_w));
+	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io1_direction_r),FUNC(xavix_state::io1_direction_w));
 
 	// Interrupt control registers
 	map(0x7a80, 0x7a80).w(FUNC(xavix_state::xavix_7a80_w)); // still IO? ADC related?

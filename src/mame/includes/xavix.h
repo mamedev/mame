@@ -90,15 +90,15 @@ private:
 	DECLARE_WRITE8_MEMBER(spritefragment_dma_trg_w);
 	DECLARE_READ8_MEMBER(spritefragment_dma_status_r);
 
-	DECLARE_READ8_MEMBER(io_0_r);
-	DECLARE_READ8_MEMBER(io_1_r);
-	DECLARE_READ8_MEMBER(io_2_r);
-	DECLARE_READ8_MEMBER(io_3_r);
+	DECLARE_READ8_MEMBER(io0_data_r);
+	DECLARE_READ8_MEMBER(io1_data_r);
+	DECLARE_READ8_MEMBER(io0_direction_r);
+	DECLARE_READ8_MEMBER(io1_direction_r);
 
-	DECLARE_WRITE8_MEMBER(io_0_w);
-	DECLARE_WRITE8_MEMBER(io_1_w);
-	DECLARE_WRITE8_MEMBER(io_2_w);
-	DECLARE_WRITE8_MEMBER(io_3_w);
+	DECLARE_WRITE8_MEMBER(io0_data_w);
+	DECLARE_WRITE8_MEMBER(io1_data_w);
+	DECLARE_WRITE8_MEMBER(io0_direction_w);
+	DECLARE_WRITE8_MEMBER(io1_direction_w);
 
 	DECLARE_WRITE8_MEMBER(vector_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_vector_lo_w);
@@ -206,6 +206,9 @@ private:
 
 	uint8_t m_6ff0;
 	uint8_t m_6ff8;
+
+	uint8_t m_io0_direction;
+	uint8_t m_io1_direction;
 
 	uint8_t m_soundregs[0x10];
 

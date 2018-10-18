@@ -204,12 +204,12 @@ WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 	logerror("%s: dispctrl_posirq_y_w %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(xavix_state::io_0_r)
+READ8_MEMBER(xavix_state::io0_data_r)
 {
 	return m_in0->read();
 }
 
-READ8_MEMBER(xavix_state::io_1_r)
+READ8_MEMBER(xavix_state::io1_data_r)
 {
 	/*
 	int pc = m_maincpu->state_int(M6502_PC);
@@ -224,35 +224,37 @@ READ8_MEMBER(xavix_state::io_1_r)
 }
 
 // has_wamg crashes on boot if these return high, either it's a button causing the game to eventually crash, or an invalid input (inputs are ACTIVE HIGH so returning 0x00 is safer
-READ8_MEMBER(xavix_state::io_2_r)
+READ8_MEMBER(xavix_state::io0_direction_r)
 {
-	return 0x00;
+	return m_io0_direction;
 }
 
-READ8_MEMBER(xavix_state::io_3_r)
+READ8_MEMBER(xavix_state::io1_direction_r)
 {
-	return 0x00;
+	return m_io1_direction;
 }
 
 
-WRITE8_MEMBER(xavix_state::io_0_w)
+WRITE8_MEMBER(xavix_state::io0_data_w)
 {
-	logerror("%s: io_0_w %02x\n", machine().describe_context(), data);
+	logerror("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::io_1_w)
+WRITE8_MEMBER(xavix_state::io1_data_w)
 {
-	logerror("%s: io_1_w %02x\n", machine().describe_context(), data);
+	logerror("%s: io1_data_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::io_2_w)
+WRITE8_MEMBER(xavix_state::io0_direction_w)
 {
-	logerror("%s: io_2_w %02x\n", machine().describe_context(), data);
+	m_io0_direction = data;
+	logerror("%s: io0_direction_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::io_3_w)
+WRITE8_MEMBER(xavix_state::io1_direction_w)
 {
-	logerror("%s: io_3_w %02x\n", machine().describe_context(), data);
+	m_io1_direction = data;
+	logerror("%s: io1_direction_w %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(xavix_state::arena_start_r)
@@ -460,6 +462,10 @@ void xavix_state::machine_reset()
 	std::fill_n(&m_fragment_sprite[0], 0x800, 0x00); // taito nostalgia 1 never initializes the ram at 0x6400 but there's no condition on using it at present?
 
 	m_lowbus->set_bank(0);
+
+	m_io0_direction = 0xff;
+	m_io1_direction = 0xff;
+
 }
 
 typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
