@@ -459,11 +459,11 @@ void xavix_state::machine_reset()
 
 	m_lowbus->set_bank(0);
 
-	m_io0_data = 0xff;
-	m_io1_data = 0xff;
+	m_io0_data = 0x00;
+	m_io1_data = 0x00;
 
-	m_io0_direction = 0xff;
-	m_io1_direction = 0xff;
+	m_io0_direction = 0x00;
+	m_io1_direction = 0x00;
 
 }
 
