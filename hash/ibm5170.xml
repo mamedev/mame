@@ -10894,50 +10894,7 @@
 		</part>
 	</software>
 
-	<software name="nova9">
-		<description>Nova 9 (International Version, 3.5")</description>
-		<year>1991</year>
-		<publisher>Dynamix</publisher>
-		<info name="version" value="1.0" />
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size = "737280">
-				<rom name="nova 9 (international version, 3.5) disk 1.img" size="737280" crc="a14599bc" sha1="f94be59a1426c00b2b0421c8b47433b1fda48b19" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-	 		<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size = "737280">
-				<rom name="nova 9 (international version, 3.5) disk 2.img" size="737280" crc="7a3eaeac" sha1="5bc1879831c26dd7c1fb76df2af2ac938385d14c" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size = "737280">
-				<rom name="nova 9 (international version, 3.5) disk 3.img" size="737280" crc="ebce8727" sha1="e308e3b461ef6e23c53308fefe670f51e83ea940" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size = "737280">
-				<rom name="nova 9 (international version, 3.5) disk 4.img" size="737280" crc="1d884a9f" sha1="927fe65a2c607a21ca2f24d41d019b65abc47dda" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5" />
-			<dataarea name="flop" size = "737280">
-				<rom name="nova 9 (international version, 3.5) disk 5.img" size="737280" crc="3e9db843" sha1="7ca2acf1e7c270636d182c1484503246d310529d" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 6" />
-			<dataarea name="flop" size = "737280">
-				<rom name="nova 9 (international version, 3.5) disk 6.img" size="737280" crc="cc16d0de" sha1="3ba05e1d37397ff92f833ddc0111baeb342c1704" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nova9_525" cloneof="nova9">
+	<software name="nova9_525">
 		<description>Nova 9 (International Version, 5.25")</description>
 		<year>1991</year>
 		<publisher>Dynamix</publisher>
